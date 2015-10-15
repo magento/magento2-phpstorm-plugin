@@ -1,17 +1,17 @@
 <idea-plugin version="2">
-  <id>com.yourcompany.unique.plugin.id</id>
-  <name>Plugin display name here</name>
-  <version>1.0</version>
-  <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+  <id>com.magento.idea.magento2plugin</id>
+  <name>Magento2</name>
+  <version>0.0.6</version>
+  <vendor email="dkvashnin@ebay.com" url="http://www.magento.com">Magento</vendor>
 
   <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em>
+      Plugin, created to improve life-work balance while working with Magento 2
     ]]></description>
 
   <change-notes><![CDATA[
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>
+      v0.0.5 Implemented reference support for classes/interfaces in DI configuration
+      <br/>
+      v0.0.6 Implemented reference and completion support for virtual types/classes in DI configuration
     ]]>
   </change-notes>
 
@@ -27,7 +27,10 @@
   <depends>com.intellij.modules.platform</depends>
 
   <extensions defaultExtensionNs="com.intellij">
-    <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.reference.XmlReferenceContributor"/>
+      <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.di.reference.XmlReferenceContributor"/>
+      <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.xml.di.completion.VirtualTypeCompletionContributor" />
+      <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.xml.di.completion.ClassCompletionContributor" />
+      <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.di.index.VirtualTypesNamesFileBasedIndex" />
     <!-- Add your extensions here -->
   </extensions>
 

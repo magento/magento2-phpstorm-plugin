@@ -1,8 +1,9 @@
-package com.magento.idea.magento2plugin.xml;
+package com.magento.idea.magento2plugin.xml.di;
 
 import com.intellij.patterns.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.psi.xml.XmlTokenType;
 
@@ -15,24 +16,24 @@ public class XmlHelper {
      */
     public static XmlAttributeValuePattern getDiTypePattern() {
         return XmlPatterns
-                .xmlAttributeValue()
-                .withParent(
-                    XmlPatterns
-                        .xmlAttribute("name")
-                        .withParent(
-                            XmlPatterns
-                                .xmlTag()
-                                .withName("type")
-                        )
-                ).inside(
-                    XmlHelper.getInsideTagPattern("type")
-                ).inFile(XmlHelper.getXmlFilePattern());
+            .xmlAttributeValue()
+            .withParent(
+                XmlPatterns
+                    .xmlAttribute("name")
+                    .withParent(
+                        XmlPatterns
+                            .xmlTag()
+                            .withName("type")
+                    )
+            ).inside(
+                XmlHelper.getInsideTagPattern("type")
+            ).inFile(XmlHelper.getXmlFilePattern());
     }
 
     /**
      * <preference type="\Namespace\Class">
      */
-    public static XmlAttributeValuePattern getDiPreferencePattern() {
+    public static XmlAttributeValuePattern getDiPreferenceTypePattern() {
         return XmlPatterns
             .xmlAttributeValue()
             .withParent(
@@ -45,6 +46,44 @@ public class XmlHelper {
                     )
             ).inside(
                 XmlHelper.getInsideTagPattern("preference")
+            ).inFile(XmlHelper.getXmlFilePattern());
+    }
+
+    /**
+     * <preference for="\Namespace\Type">
+     */
+    public static XmlAttributeValuePattern getDiPreferenceForPattern() {
+        return XmlPatterns
+            .xmlAttributeValue()
+            .withParent(
+                XmlPatterns
+                    .xmlAttribute("for")
+                    .withParent(
+                        XmlPatterns
+                            .xmlTag()
+                            .withName("preference")
+                    )
+            ).inside(
+                XmlHelper.getInsideTagPattern("preference")
+            ).inFile(XmlHelper.getXmlFilePattern());
+    }
+
+    /**
+     * <virtualType type="\Namespace\Class">
+     */
+    public static XmlAttributeValuePattern getDiVirtualTypePattern() {
+        return XmlPatterns
+            .xmlAttributeValue()
+            .withParent(
+                XmlPatterns
+                    .xmlAttribute("type")
+                    .withParent(
+                        XmlPatterns
+                            .xmlTag()
+                            .withName("virtualType")
+                    )
+            ).inside(
+                XmlHelper.getInsideTagPattern("virtualType")
             ).inFile(XmlHelper.getXmlFilePattern());
     }
 
@@ -82,46 +121,34 @@ public class XmlHelper {
             ).inFile(XmlHelper.getXmlFilePattern());
     }
 
-    /**
-     * <virtualType type="\Namespace\Class">
-     */
-    public static XmlAttributeValuePattern getDiVirtualTypePattern() {
-        return XmlPatterns
-                .xmlAttributeValue()
-                .withParent(
-                        XmlPatterns
-                                .xmlAttribute("type")
-                                .withParent(
-                                        XmlPatterns
-                                                .xmlTag()
-                                                .withName("virtualType")
-                                )
-                ).inside(
-                        XmlHelper.getInsideTagPattern("virtualType")
-                ).inFile(XmlHelper.getXmlFilePattern());
-    }
-
     public static PsiFilePattern.Capture<PsiFile> getXmlFilePattern() {
         return XmlPatterns.psiFile()
-                .withName(XmlPatterns
-                        .string().endsWith(".xml")
-                );
+            .withName(XmlPatterns.string().equalTo("di.xml"));
     }
 
     public static PsiElementPattern.Capture<XmlTag> getInsideTagPattern(String insideTagName) {
         return XmlPatterns.psiElement(XmlTag.class).withName(insideTagName);
     }
 
-    public static PsiElementPattern.Capture<PsiElement> getTagPattern(String... tags) {
+    /**
+     * <tag attributeNames="|"/>
+     *
+     * @param tag tagname
+     * @param attributeNames attribute values listen for
+     */
+    public static PsiElementPattern.Capture<PsiElement> getTagAttributePattern(String tag, String... attributeNames) {
         return XmlPatterns
             .psiElement()
             .inside(XmlPatterns
                     .xmlAttributeValue()
                     .inside(XmlPatterns
                             .xmlAttribute()
-                            .withName(StandardPatterns.string().oneOfIgnoreCase(tags)
+                            .withName(StandardPatterns.string().oneOfIgnoreCase(attributeNames))
+                            .withParent(XmlPatterns
+                                    .xmlTag()
+                                    .withName(tag)
                             )
                     )
-            );
+            ).inFile(getXmlFilePattern());
     }
 }
