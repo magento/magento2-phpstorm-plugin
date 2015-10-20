@@ -14,6 +14,7 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.ArrayUtil;
 import com.intellij.util.indexing.*;
+import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import org.jetbrains.annotations.NotNull;
@@ -23,8 +24,8 @@ import java.util.*;
 /**
  * Created by dkvashnin on 10/13/15.
  */
-public class VirtualTypesNamesFileBasedIndex extends ScalarIndexExtension<String> {
-    public static final ID<String, Void> NAME = ID.create("com.magento.idea.magento2plugin.xml.di.index.virtual_types_names");
+public class VirtualTypesNamesFileBasedIndex extends FileBasedIndexExtension<String,String> {
+    public static final ID<String, String> NAME = ID.create("com.magento.idea.magento2plugin.xml.di.index.virtual_types_names");
     private final EnumeratorStringDescriptor myKeyDescriptor = new EnumeratorStringDescriptor();
     private final MyDataIndexer myDataIndexer = new MyDataIndexer();
 
@@ -53,7 +54,9 @@ public class VirtualTypesNamesFileBasedIndex extends ScalarIndexExtension<String
             for (XmlTag typeTag: rootTag.getSubTags()) {
                 if (typeTag.getName().equals("virtualType")) {
                     XmlAttribute nameAttribute = typeTag.getAttribute("name");
-                    if (nameAttribute != null && nameAttribute.getValue().equals(name)) {
+                    if (nameAttribute != null) {
+                        if (nameAttribute.getValue() != null && nameAttribute.getValue().equals(name))
+
                         xmlAttributeList.add(nameAttribute.getValueElement());
                     }
                 }
@@ -65,13 +68,13 @@ public class VirtualTypesNamesFileBasedIndex extends ScalarIndexExtension<String
 
     @NotNull
     @Override
-    public ID<String, Void> getName() {
+    public ID<String, String> getName() {
         return NAME;
     }
 
     @NotNull
     @Override
-    public DataIndexer<String, Void, FileContent> getIndexer() {
+    public DataIndexer<String, String, FileContent> getIndexer() {
         return myDataIndexer;
     }
 
@@ -79,6 +82,12 @@ public class VirtualTypesNamesFileBasedIndex extends ScalarIndexExtension<String
     @Override
     public KeyDescriptor<String> getKeyDescriptor() {
         return myKeyDescriptor;
+    }
+
+    @NotNull
+    @Override
+    public DataExternalizer<String> getValueExternalizer() {
+        return EnumeratorStringDescriptor.INSTANCE;
     }
 
     @NotNull
@@ -102,12 +111,12 @@ public class VirtualTypesNamesFileBasedIndex extends ScalarIndexExtension<String
         return 1;
     }
 
-    private class MyDataIndexer implements DataIndexer<String, Void, FileContent> {
+    private class MyDataIndexer implements DataIndexer<String, String, FileContent> {
 
         @NotNull
         @Override
-        public Map<String, Void> map(@NotNull FileContent fileContent) {
-            Map<String, Void> map = new HashMap<>();
+        public Map<String, String> map(@NotNull FileContent fileContent) {
+            Map<String, String> map = new HashMap<>();
 
             PsiFile psiFile = fileContent.getPsiFile();
             XmlDocumentImpl document = PsiTreeUtil.getChildOfType(psiFile, XmlDocumentImpl.class);
@@ -124,12 +133,12 @@ public class VirtualTypesNamesFileBasedIndex extends ScalarIndexExtension<String
                 if(xmlTag.getName().equals("config")) {
                     for(XmlTag typeNode: xmlTag.getSubTags()) {
                         if(typeNode.getName().equals("virtualType")) {
-                            XmlAttribute nameAttribute = typeNode.getAttribute("name");
-                            if (nameAttribute == null) {
-                                continue;
+                            if (typeNode.getAttributeValue("name") != null && typeNode.getAttributeValue("type") != null) {
+                                map.put(
+                                    typeNode.getAttributeValue("name"),
+                                    typeNode.getAttributeValue("type")
+                                );
                             }
-
-                            map.put(nameAttribute.getValue(), null);
                         }
                     }
                 }

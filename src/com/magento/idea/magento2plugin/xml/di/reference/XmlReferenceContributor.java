@@ -75,6 +75,7 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
             )
         );
 
+        // <argument name="typeName"></argument>
         psiReferenceRegistrar.registerReferenceProvider(
             XmlHelper.getArgumentNamePattern(),
             new ArgumentNameReferenceProvider()
