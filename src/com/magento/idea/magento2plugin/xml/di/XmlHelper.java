@@ -4,6 +4,7 @@ import com.intellij.patterns.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.xml.XmlAttribute;
+import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.psi.xml.XmlTokenType;
 
@@ -150,5 +151,24 @@ public class XmlHelper {
                             )
                     )
             ).inFile(getXmlFilePattern());
+    }
+
+    /**
+     * <argument name="argumentName" >
+     */
+    public static XmlAttributeValuePattern getArgumentNamePattern() {
+        return XmlPatterns
+            .xmlAttributeValue()
+            .withParent(
+                XmlPatterns
+                    .xmlAttribute("name")
+                    .withParent(
+                        XmlPatterns
+                            .xmlTag()
+                            .withName("argument")
+                    )
+            ).inside(
+                XmlHelper.getInsideTagPattern("argument")
+            ).inFile(XmlHelper.getXmlFilePattern());
     }
 }

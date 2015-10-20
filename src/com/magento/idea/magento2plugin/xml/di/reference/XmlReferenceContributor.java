@@ -1,9 +1,15 @@
 package com.magento.idea.magento2plugin.xml.di.reference;
 
 import com.intellij.patterns.XmlPatterns;
-import com.intellij.psi.PsiReferenceContributor;
-import com.intellij.psi.PsiReferenceRegistrar;
+import com.intellij.psi.*;
+import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.xml.XmlAttribute;
+import com.intellij.psi.xml.XmlAttributeValue;
+import com.intellij.psi.xml.XmlTag;
+import com.intellij.util.ProcessingContext;
 import com.magento.idea.magento2plugin.xml.di.XmlHelper;
+import com.magento.idea.magento2plugin.xml.di.reference.provider.ArgumentNameReferenceProvider;
+import com.magento.idea.magento2plugin.xml.di.reference.provider.DiInstanceReferenceProvider;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -67,6 +73,11 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
                     TypeReference.ReferenceType.VIRTUAL_TYPE
                 }
             )
+        );
+
+        psiReferenceRegistrar.registerReferenceProvider(
+            XmlHelper.getArgumentNamePattern(),
+            new ArgumentNameReferenceProvider()
         );
     }
 }

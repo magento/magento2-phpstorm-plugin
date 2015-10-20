@@ -1,9 +1,10 @@
-package com.magento.idea.magento2plugin.xml.di.reference;
+package com.magento.idea.magento2plugin.xml.di.reference.provider;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceProvider;
 import com.intellij.util.ProcessingContext;
+import com.magento.idea.magento2plugin.xml.di.reference.TypeReference;
 import org.jetbrains.annotations.NotNull;
 
 /**
