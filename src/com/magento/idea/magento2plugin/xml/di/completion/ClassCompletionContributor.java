@@ -22,11 +22,12 @@ public class ClassCompletionContributor extends CompletionContributor {
     public ClassCompletionContributor() {
         extend(CompletionType.BASIC,
             XmlPatterns.or(
-                XmlHelper.getArgumentObjectPattern(),
-                XmlHelper.getItemObjectPattern(),
-                XmlHelper.getTagAttributePattern("type", "name"),
-                XmlHelper.getTagAttributePattern("preference", "type"),
-                XmlHelper.getTagAttributePattern("virtualType", "type")
+                XmlHelper.getArgumentValuePatternForType("object"),
+                XmlHelper.getItemValuePatternForType("object"),
+                XmlHelper.getTagAttributePattern(XmlHelper.TYPE_TAG, XmlHelper.NAME_ATTRIBUTE),
+                XmlHelper.getTagAttributePattern(XmlHelper.PREFERENCE_TAG, XmlHelper.TYPE_ATTRIBUTE),
+                XmlHelper.getTagAttributePattern(XmlHelper.VIRTUAL_TYPE_TAG, XmlHelper.TYPE_ATTRIBUTE),
+                XmlHelper.getPluginTypePattern()
             ),
             new CompletionProvider<CompletionParameters>() {
                 public void addCompletions(@NotNull CompletionParameters parameters,

@@ -131,14 +131,12 @@ public class VirtualTypesNamesFileBasedIndex extends FileBasedIndexExtension<Str
 
             for(XmlTag xmlTag: xmlTags) {
                 if(xmlTag.getName().equals("config")) {
-                    for(XmlTag typeNode: xmlTag.getSubTags()) {
-                        if(typeNode.getName().equals("virtualType")) {
-                            if (typeNode.getAttributeValue("name") != null && typeNode.getAttributeValue("type") != null) {
-                                map.put(
-                                    typeNode.getAttributeValue("name"),
-                                    typeNode.getAttributeValue("type")
-                                );
-                            }
+                    for(XmlTag typeNode: xmlTag.findSubTags("virtualType")) {
+                        if (typeNode.getAttributeValue("name") != null && typeNode.getAttributeValue("type") != null) {
+                            map.put(
+                                typeNode.getAttributeValue("name"),
+                                typeNode.getAttributeValue("type")
+                            );
                         }
                     }
                 }

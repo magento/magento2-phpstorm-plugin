@@ -15,8 +15,8 @@ public class VirtualTypeCompletionContributor extends CompletionContributor {
     public VirtualTypeCompletionContributor() {
         extend(CompletionType.BASIC,
             XmlPatterns.or(
-                XmlHelper.getArgumentObjectPattern(),
-                XmlHelper.getItemObjectPattern()
+                XmlHelper.getArgumentValuePatternForType("object"),
+                XmlHelper.getItemValuePatternForType("object")
             ),
             new CompletionProvider<CompletionParameters>() {
                 public void addCompletions(@NotNull CompletionParameters parameters,

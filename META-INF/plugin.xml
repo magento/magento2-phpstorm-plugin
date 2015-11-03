@@ -12,6 +12,8 @@
       v0.0.5 Implemented reference support for classes/interfaces in DI configuration
       <br/>
       v0.0.6 Implemented reference and completion support for virtual types/classes in DI configuration
+      <br/>
+      v0.0.7 Events reference to configuration and observers (classes or virtualType), reference for observers configuration
     ]]>
   </change-notes>
 
@@ -27,10 +29,13 @@
   <depends>com.intellij.modules.platform</depends>
 
   <extensions defaultExtensionNs="com.intellij">
-      <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.di.reference.XmlReferenceContributor"/>
+      <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.di.reference.DiReferenceContributor"/>
+      <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.observer.reference.ObserverReferenceContributor"/>
+      <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.observer.reference.EventReferenceContributor"/>
       <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.xml.di.completion.VirtualTypeCompletionContributor" />
       <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.xml.di.completion.ClassCompletionContributor" />
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.di.index.VirtualTypesNamesFileBasedIndex" />
+      <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.observer.index.EventObserverFileBasedIndex" />
     <!-- Add your extensions here -->
   </extensions>
 
