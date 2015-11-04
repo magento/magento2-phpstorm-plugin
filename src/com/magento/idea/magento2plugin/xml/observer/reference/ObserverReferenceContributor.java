@@ -3,6 +3,7 @@ package com.magento.idea.magento2plugin.xml.observer.reference;
 import com.intellij.patterns.XmlPatterns;
 import com.intellij.psi.*;
 import com.magento.idea.magento2plugin.xml.di.reference.provider.DiInstanceReferenceProvider;
+import com.magento.idea.magento2plugin.xml.observer.reference.util.EventsDeclarationsFilesResultsFiller;
 import com.magento.idea.magento2plugin.xml.reference.XmlHelperUtility;
 import com.magento.idea.magento2plugin.xml.reference.util.ClassesResultsFiller;
 import com.magento.idea.magento2plugin.xml.reference.util.ResolveResultsFiller;
@@ -17,13 +18,20 @@ public class ObserverReferenceContributor extends PsiReferenceContributor {
     public void registerReferenceProviders(@NotNull PsiReferenceRegistrar psiReferenceRegistrar) {
         // <observer instance="\Namespace\Class" />
         psiReferenceRegistrar.registerReferenceProvider(
-            XmlPatterns.or(
-                XmlHelperUtility.getTagAttributeValuePattern("observer", "instance", "events")
-            ),
+            XmlHelperUtility.getTagAttributeValuePattern("observer", "instance", "events"),
             new DiInstanceReferenceProvider(
                 new ResolveResultsFiller[]{
                     ClassesResultsFiller.INSTANCE,
                     VirtualTypesResultsFiller.INSTANCE
+                }
+            )
+        );
+
+        psiReferenceRegistrar.registerReferenceProvider(
+            XmlHelperUtility.getTagAttributeValuePattern("event", "name", "events"),
+            new DiInstanceReferenceProvider(
+                new ResolveResultsFiller[]{
+                    EventsDeclarationsFilesResultsFiller.INSTANCE
                 }
             )
         );

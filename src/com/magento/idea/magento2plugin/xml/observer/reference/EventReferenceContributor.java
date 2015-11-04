@@ -1,15 +1,10 @@
 package com.magento.idea.magento2plugin.xml.observer.reference;
 
-import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
-import com.jetbrains.php.lang.PhpLanguage;
-import com.jetbrains.php.lang.patterns.PhpPatterns;
-import com.jetbrains.php.lang.psi.elements.ParameterList;
+import com.magento.idea.magento2plugin.xml.observer.PhpPatternsHelper;
 import com.magento.idea.magento2plugin.xml.observer.reference.util.ClassResultsFillerWrapper;
-import com.magento.idea.magento2plugin.xml.observer.reference.util.FilesResultsFiller;
-import com.magento.idea.magento2plugin.xml.reference.util.ClassesResultsFiller;
+import com.magento.idea.magento2plugin.xml.observer.reference.util.EventsConfigurationFilesResultsFiller;
 import com.magento.idea.magento2plugin.xml.reference.util.ResolveResultsFiller;
-import com.magento.idea.magento2plugin.xml.reference.util.VirtualTypesResultsFiller;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -19,19 +14,10 @@ public class EventReferenceContributor extends PsiReferenceContributor {
     @Override
     public void registerReferenceProviders(@NotNull PsiReferenceRegistrar psiReferenceRegistrar) {
         psiReferenceRegistrar.registerReferenceProvider(
-            PhpPatterns
-                .phpLiteralExpression()
-                .withParent(
-                    PlatformPatterns
-                        .psiElement(ParameterList.class)
-                        .withParent(
-                            PhpPatterns
-                                .phpFunctionReference()
-                        )
-                ).withLanguage(PhpLanguage.INSTANCE),
+            PhpPatternsHelper.STRING_METHOD_ARGUMENT,
             new EventReferenceProvider(
                 new ResolveResultsFiller[] {
-                    FilesResultsFiller.INSTANCE,
+                    EventsConfigurationFilesResultsFiller.INSTANCE,
                     ClassResultsFillerWrapper.INSTANCE
                 }
             )

@@ -17,8 +17,8 @@ import java.util.List;
 /**
  * Created by dkvashnin on 11/3/15.
  */
-public class FilesResultsFiller implements ResolveResultsFiller {
-    public static final ResolveResultsFiller INSTANCE = new FilesResultsFiller();
+public class EventsConfigurationFilesResultsFiller implements ResolveResultsFiller {
+    public static final ResolveResultsFiller INSTANCE = new EventsConfigurationFilesResultsFiller();
 
     @Override
     public void fillResults(PsiElement psiElement, List<ResolveResult> results, String typeName) {

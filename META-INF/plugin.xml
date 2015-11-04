@@ -11,9 +11,9 @@
   <change-notes><![CDATA[
       v0.0.5 Implemented reference support for classes/interfaces in DI configuration
       <br/>
-      v0.0.6 Implemented reference and completion support for virtual types/classes in DI configuration
+      v0.0.6 Implemented reference and completion support for virtual types/classes/arguments in DI configuration
       <br/>
-      v0.0.7 Events reference to configuration and observers (classes or virtualType), reference for observers configuration
+      v0.0.7 References: to configuration and observers (classes or virtualType), to observers from configuration, to event dispatch from configuration
     ]]>
   </change-notes>
 
@@ -36,6 +36,7 @@
       <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.xml.di.completion.ClassCompletionContributor" />
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.di.index.VirtualTypesNamesFileBasedIndex" />
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.observer.index.EventObserverFileBasedIndex" />
+      <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.observer.index.EventsDeclarationsFileBasedIndex" />
     <!-- Add your extensions here -->
   </extensions>
 
