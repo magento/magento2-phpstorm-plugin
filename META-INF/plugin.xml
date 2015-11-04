@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>com.magento.idea.magento2plugin</id>
   <name>Magento2</name>
-  <version>0.0.6</version>
+  <version>0.0.7</version>
   <vendor email="dkvashnin@ebay.com" url="http://www.magento.com">Magento</vendor>
 
   <description><![CDATA[
