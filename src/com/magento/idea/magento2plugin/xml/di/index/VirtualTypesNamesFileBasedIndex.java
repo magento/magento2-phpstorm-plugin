@@ -39,9 +39,9 @@ public class VirtualTypesNamesFileBasedIndex extends FileBasedIndexExtension<Str
         List<XmlAttributeValue> xmlAttributeList = new ArrayList<XmlAttributeValue>();
 
         Collection<VirtualFile> virtualFileCollection = FileBasedIndex.getInstance().getContainingFiles(NAME, name, scope);
+        PsiManager psiManager = PsiManager.getInstance(project);
 
         for (VirtualFile virtualFile: virtualFileCollection) {
-            PsiManager psiManager = PsiManager.getInstance(project);
             XmlFile xmlFile = (XmlFile)psiManager.findFile(virtualFile);
             if (xmlFile == null) {
                 continue;

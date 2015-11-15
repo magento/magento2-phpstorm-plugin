@@ -14,35 +14,29 @@ import com.jetbrains.php.lang.PhpLangUtil;
 import com.magento.idea.magento2plugin.xml.index.StringSetDataExternalizer;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by dkvashnin on 11/2/15.
  */
-public class EventObserverFileBasedIndex extends FileBasedIndexExtension<String,String[]> {
-    public static final ID<String, String[]> NAME = ID.create("com.magento.idea.magento2plugin.xml.observer.index.event_observer");
+public class EventObserverFileBasedIndex extends FileBasedIndexExtension<String,Set<String>> {
+    public static final ID<String, Set<String>> NAME = ID.create("com.magento.idea.magento2plugin.xml.observer.index.event_observer");
     private final KeyDescriptor<String> myKeyDescriptor = new EnumeratorStringDescriptor();
 
     @NotNull
     @Override
-    public ID<String, String[]> getName() {
+    public ID<String, Set<String>> getName() {
         return NAME;
     }
 
     @NotNull
     @Override
-    public DataIndexer<String, String[], FileContent> getIndexer() {
-        return new DataIndexer<String, String[], FileContent>() {
+    public DataIndexer<String, Set<String>, FileContent> getIndexer() {
+        return new DataIndexer<String, Set<String>, FileContent>() {
             @NotNull
             @Override
-            public Map<String, String[]> map(@NotNull FileContent fileContent) {
-                Map<String, String[]> map = new HashMap<>();
+            public Map<String, Set<String>> map(@NotNull FileContent fileContent) {
+                Map<String, Set<String>> map = new HashMap<>();
 
                 PsiFile psiFile = fileContent.getPsiFile();
                 XmlDocumentImpl document = PsiTreeUtil.getChildOfType(psiFile, XmlDocumentImpl.class);
@@ -71,8 +65,8 @@ public class EventObserverFileBasedIndex extends FileBasedIndexExtension<String,
                 return map;
             }
 
-            private String[] getObserversForEvent(XmlTag eventNode) {
-                List<String> observerNames = new ArrayList<String>();
+            private Set<String> getObserversForEvent(XmlTag eventNode) {
+                Set<String> observerNames = new HashSet<String>();
 
                 for (XmlTag observerTag: eventNode.findSubTags("observer")) {
                     String name = observerTag.getAttributeValue("instance");
@@ -81,7 +75,7 @@ public class EventObserverFileBasedIndex extends FileBasedIndexExtension<String,
                     }
                 }
 
-                return observerNames.toArray(new String[observerNames.size()]);
+                return observerNames;
             }
         };
     }
@@ -94,7 +88,7 @@ public class EventObserverFileBasedIndex extends FileBasedIndexExtension<String,
 
     @NotNull
     @Override
-    public DataExternalizer<String[]> getValueExternalizer() {
+    public DataExternalizer<Set<String>> getValueExternalizer() {
         return new StringSetDataExternalizer();
     }
 

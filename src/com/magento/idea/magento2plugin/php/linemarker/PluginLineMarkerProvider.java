@@ -47,7 +47,7 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
                     NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.
                         create(Magento2Icons.PLUGIN).
                         setTargets(results).
-                        setTooltipText("Navigate Plugin");
+                        setTooltipText("Navigate to plugins");
 
                     collection.add(builder.createLineMarkerInfo(psiElement));
                 }
@@ -66,7 +66,7 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
             }
 
 
-            List<String[]> plugins = FileBasedIndex.getInstance()
+            List<Set<String>> plugins = FileBasedIndex.getInstance()
                 .getValues(
                     PluginToTypeFileBasedIndex.NAME,
                     classFQN,
@@ -81,7 +81,7 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
             PhpIndex phpIndex = PhpIndex.getInstance(phpClass.getProject());
 
 
-            for (String[] pluginClassNames: plugins) {
+            for (Set<String> pluginClassNames: plugins) {
                 for (String pluginClassName: pluginClassNames) {
                     results.addAll(phpIndex.getClassesByFQN(pluginClassName));
                 }

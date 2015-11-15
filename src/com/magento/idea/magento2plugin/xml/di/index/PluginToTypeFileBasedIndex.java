@@ -19,24 +19,24 @@ import java.util.*;
 /**
  * Created by dkvashnin on 11/10/15.
  */
-public class PluginToTypeFileBasedIndex extends FileBasedIndexExtension<String, String[]> {
-    public static final ID<String, String[]> NAME = ID.create("com.magento.idea.magento2plugin.xml.di.index.plugin_to_type");
+public class PluginToTypeFileBasedIndex extends FileBasedIndexExtension<String, Set<String>> {
+    public static final ID<String, Set<String>> NAME = ID.create("com.magento.idea.magento2plugin.xml.di.index.plugin_to_type");
     private final KeyDescriptor<String> myKeyDescriptor = new EnumeratorStringDescriptor();
 
     @NotNull
     @Override
-    public ID<String, String[]> getName() {
+    public ID<String, Set<String>> getName() {
         return NAME;
     }
 
     @NotNull
     @Override
-    public DataIndexer<String, String[], FileContent> getIndexer() {
-        return new DataIndexer<String, String[], FileContent>() {
+    public DataIndexer<String, Set<String>, FileContent> getIndexer() {
+        return new DataIndexer<String, Set<String>, FileContent>() {
             @NotNull
             @Override
-            public Map<String, String[]> map(@NotNull FileContent fileContent) {
-                Map<String, String[]> map = new HashMap<>();
+            public Map<String, Set<String>> map(@NotNull FileContent fileContent) {
+                Map<String, Set<String>> map = new HashMap<>();
 
                 PsiFile psiFile = fileContent.getPsiFile();
                 XmlDocumentImpl document = PsiTreeUtil.getChildOfType(psiFile, XmlDocumentImpl.class);
@@ -54,8 +54,8 @@ public class PluginToTypeFileBasedIndex extends FileBasedIndexExtension<String, 
                         for(XmlTag typeNode: xmlTag.findSubTags("type")) {
                             String typeName = typeNode.getAttributeValue("name");
                             if (typeName != null) {
-                                String[] plugins = getPluginsForType(typeNode);
-                                if (plugins.length != 0) {
+                                Set<String> plugins = getPluginsForType(typeNode);
+                                if (plugins.size() != 0) {
                                     map.put(
                                         PhpLangUtil.toPresentableFQN(typeName),
                                         getPluginsForType(typeNode)
@@ -69,8 +69,8 @@ public class PluginToTypeFileBasedIndex extends FileBasedIndexExtension<String, 
                 return map;
             }
 
-            private String[] getPluginsForType(XmlTag typeNode) {
-                List<String> results = new ArrayList<String>();
+            private Set<String> getPluginsForType(XmlTag typeNode) {
+                Set<String> results = new HashSet<String>();
 
                 for (XmlTag pluginTag: typeNode.findSubTags("plugin")) {
                     String pluginType = pluginTag.getAttributeValue("type");
@@ -78,7 +78,7 @@ public class PluginToTypeFileBasedIndex extends FileBasedIndexExtension<String, 
                         results.add(PhpLangUtil.toPresentableFQN(pluginType));
                     }
                 }
-                return results.toArray(new String[results.size()]);
+                return results;
             }
         };
     }
@@ -91,7 +91,7 @@ public class PluginToTypeFileBasedIndex extends FileBasedIndexExtension<String, 
 
     @NotNull
     @Override
-    public DataExternalizer<String[]> getValueExternalizer() {
+    public DataExternalizer<Set<String>> getValueExternalizer() {
         return new StringSetDataExternalizer();
     }
 
