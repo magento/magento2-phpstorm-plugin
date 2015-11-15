@@ -37,6 +37,8 @@
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.di.index.VirtualTypesNamesFileBasedIndex" />
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.observer.index.EventObserverFileBasedIndex" />
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.observer.index.EventsDeclarationsFileBasedIndex" />
+      <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.di.index.PluginToTypeFileBasedIndex" />
+      <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.PluginLineMarkerProvider"/>
     <!-- Add your extensions here -->
   </extensions>
 

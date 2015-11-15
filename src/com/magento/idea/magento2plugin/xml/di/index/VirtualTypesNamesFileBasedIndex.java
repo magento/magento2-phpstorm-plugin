@@ -17,6 +17,7 @@ import com.intellij.util.indexing.*;
 import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
+import com.jetbrains.php.lang.PhpLangUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -108,7 +109,7 @@ public class VirtualTypesNamesFileBasedIndex extends FileBasedIndexExtension<Str
 
     @Override
     public int getVersion() {
-        return 1;
+        return 2;
     }
 
     private class MyDataIndexer implements DataIndexer<String, String, FileContent> {
@@ -135,8 +136,8 @@ public class VirtualTypesNamesFileBasedIndex extends FileBasedIndexExtension<Str
                         if (typeNode.getAttributeValue("name") != null && typeNode.getAttributeValue("type") != null) {
                             map.put(
                                 typeNode.getAttributeValue("name"),
-                                typeNode.getAttributeValue("type")
-                            );
+                                PhpLangUtil.toPresentableFQN(typeNode.getAttributeValue("type"))
+                                );
                         }
                     }
                 }

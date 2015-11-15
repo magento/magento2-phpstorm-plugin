@@ -50,7 +50,9 @@ public class DiReferenceContributor extends PsiReferenceContributor {
             XmlHelper.getDiTypePattern(),
             new DiInstanceReferenceProvider(
                 new ResolveResultsFiller[]{
-                    ClassesResultsFiller.INSTANCE
+                    ClassesResultsFiller.INSTANCE,
+                    InterfacesResultsFiller.INSTANCE,
+                    VirtualTypesResultsFiller.INSTANCE
                 }
             )
         );

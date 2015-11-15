@@ -1,4 +1,4 @@
-package com.magento.idea.magento2plugin.xml.observer.index;
+package com.magento.idea.magento2plugin.xml.di.index;
 
 import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -14,19 +14,13 @@ import com.jetbrains.php.lang.PhpLangUtil;
 import com.magento.idea.magento2plugin.xml.index.StringSetDataExternalizer;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
- * Created by dkvashnin on 11/2/15.
+ * Created by dkvashnin on 11/10/15.
  */
-public class EventObserverFileBasedIndex extends FileBasedIndexExtension<String,String[]> {
-    public static final ID<String, String[]> NAME = ID.create("com.magento.idea.magento2plugin.xml.observer.index.event_observer");
+public class PluginToTypeFileBasedIndex extends FileBasedIndexExtension<String, String[]> {
+    public static final ID<String, String[]> NAME = ID.create("com.magento.idea.magento2plugin.xml.di.index.plugin_to_type");
     private final KeyDescriptor<String> myKeyDescriptor = new EnumeratorStringDescriptor();
 
     @NotNull
@@ -57,12 +51,16 @@ public class EventObserverFileBasedIndex extends FileBasedIndexExtension<String,
 
                 for(XmlTag xmlTag: xmlTags) {
                     if(xmlTag.getName().equals("config")) {
-                        for(XmlTag eventNode: xmlTag.findSubTags("event")) {
-                            if (eventNode.getAttributeValue("name") != null) {
-                                map.put(
-                                    eventNode.getAttributeValue("name"),
-                                    getObserversForEvent(eventNode)
-                                );
+                        for(XmlTag typeNode: xmlTag.findSubTags("type")) {
+                            String typeName = typeNode.getAttributeValue("name");
+                            if (typeName != null) {
+                                String[] plugins = getPluginsForType(typeNode);
+                                if (plugins.length != 0) {
+                                    map.put(
+                                        PhpLangUtil.toPresentableFQN(typeName),
+                                        getPluginsForType(typeNode)
+                                    );
+                                }
                             }
                         }
                     }
@@ -71,17 +69,16 @@ public class EventObserverFileBasedIndex extends FileBasedIndexExtension<String,
                 return map;
             }
 
-            private String[] getObserversForEvent(XmlTag eventNode) {
-                List<String> observerNames = new ArrayList<String>();
+            private String[] getPluginsForType(XmlTag typeNode) {
+                List<String> results = new ArrayList<String>();
 
-                for (XmlTag observerTag: eventNode.findSubTags("observer")) {
-                    String name = observerTag.getAttributeValue("instance");
-                    if (name != null) {
-                        observerNames.add(PhpLangUtil.toPresentableFQN(name));
+                for (XmlTag pluginTag: typeNode.findSubTags("plugin")) {
+                    String pluginType = pluginTag.getAttributeValue("type");
+                    if (pluginType != null) {
+                        results.add(PhpLangUtil.toPresentableFQN(pluginType));
                     }
                 }
-
-                return observerNames.toArray(new String[observerNames.size()]);
+                return results.toArray(new String[results.size()]);
             }
         };
     }
@@ -104,7 +101,7 @@ public class EventObserverFileBasedIndex extends FileBasedIndexExtension<String,
         return new FileBasedIndex.InputFilter() {
             @Override
             public boolean acceptInput(@NotNull VirtualFile file) {
-                return file.getFileType() == XmlFileType.INSTANCE && file.getNameWithoutExtension().equals("events");
+                return file.getFileType() == XmlFileType.INSTANCE && file.getNameWithoutExtension().equals("di");
             }
         };
     }
@@ -116,6 +113,6 @@ public class EventObserverFileBasedIndex extends FileBasedIndexExtension<String,
 
     @Override
     public int getVersion() {
-        return 2;
+        return 1;
     }
 }
