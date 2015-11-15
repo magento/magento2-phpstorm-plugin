@@ -10,6 +10,7 @@ import com.magento.idea.magento2plugin.xml.reference.util.ResolveResultsFiller;
 import com.magento.idea.magento2plugin.xml.reference.util.VirtualTypesResultsFiller;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by dkvashnin on 11/3/15.
@@ -19,13 +20,13 @@ public class ClassResultsFillerWrapper implements ResolveResultsFiller {
 
     @Override
     public void fillResults(PsiElement psiElement, List<ResolveResult> results, String typeName) {
-        List<String[]> observersTypesList = FileBasedIndex.getInstance().getValues(
+        List<Set<String>> observersTypesList = FileBasedIndex.getInstance().getValues(
             EventObserverFileBasedIndex.NAME,
             typeName,
             GlobalSearchScope.allScope(psiElement.getProject())
         );
 
-        for (String[] observerTypes: observersTypesList) {
+        for (Set<String> observerTypes: observersTypesList) {
             for (String type: observerTypes) {
                 ClassesResultsFiller.INSTANCE.fillResults(psiElement, results, type);
                 VirtualTypesResultsFiller.INSTANCE.fillResults(psiElement, results, type);
