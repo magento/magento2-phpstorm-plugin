@@ -35,8 +35,8 @@
       <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.observer.reference.ObserverReferenceContributor"/>
       <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.observer.reference.EventReferenceContributor"/>
 
-      <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.xml.di.completion.VirtualTypeCompletionContributor" />
-      <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.xml.di.completion.ClassCompletionContributor" />
+      <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.xml.di.completion.DiCompletionContributor" />
+      <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.xml.observer.completion.EventCompletionContributor" />
 
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.di.index.VirtualTypesNamesFileBasedIndex" />
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.observer.index.EventObserverFileBasedIndex" />

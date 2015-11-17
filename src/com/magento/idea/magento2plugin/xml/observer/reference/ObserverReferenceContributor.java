@@ -1,10 +1,9 @@
 package com.magento.idea.magento2plugin.xml.observer.reference;
 
-import com.intellij.patterns.XmlPatterns;
 import com.intellij.psi.*;
 import com.magento.idea.magento2plugin.xml.di.reference.provider.DiInstanceReferenceProvider;
+import com.magento.idea.magento2plugin.xml.observer.XmlHelper;
 import com.magento.idea.magento2plugin.xml.observer.reference.util.EventsDeclarationsFilesResultsFiller;
-import com.magento.idea.magento2plugin.xml.reference.XmlHelperUtility;
 import com.magento.idea.magento2plugin.xml.reference.util.ClassesResultsFiller;
 import com.magento.idea.magento2plugin.xml.reference.util.ResolveResultsFiller;
 import com.magento.idea.magento2plugin.xml.reference.util.VirtualTypesResultsFiller;
@@ -18,7 +17,7 @@ public class ObserverReferenceContributor extends PsiReferenceContributor {
     public void registerReferenceProviders(@NotNull PsiReferenceRegistrar psiReferenceRegistrar) {
         // <observer instance="\Namespace\Class" />
         psiReferenceRegistrar.registerReferenceProvider(
-            XmlHelperUtility.getTagAttributeValuePattern("observer", "instance", "events"),
+            XmlHelper.getTagAttributeValuePattern(XmlHelper.OBSERVER_TAG, XmlHelper.INSTANCE_ATTRIBUTE),
             new DiInstanceReferenceProvider(
                 new ResolveResultsFiller[]{
                     ClassesResultsFiller.INSTANCE,
@@ -28,7 +27,7 @@ public class ObserverReferenceContributor extends PsiReferenceContributor {
         );
 
         psiReferenceRegistrar.registerReferenceProvider(
-            XmlHelperUtility.getTagAttributeValuePattern("event", "name", "events"),
+            XmlHelper.getTagAttributeValuePattern(XmlHelper.EVENT_TAG, XmlHelper.NAME_ATTRIBUTE),
             new DiInstanceReferenceProvider(
                 new ResolveResultsFiller[]{
                     EventsDeclarationsFilesResultsFiller.INSTANCE
