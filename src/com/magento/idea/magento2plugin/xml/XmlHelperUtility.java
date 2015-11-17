@@ -1,9 +1,7 @@
-package com.magento.idea.magento2plugin.xml.reference;
+package com.magento.idea.magento2plugin.xml;
 
-import com.intellij.patterns.PsiElementPattern;
-import com.intellij.patterns.PsiFilePattern;
-import com.intellij.patterns.XmlAttributeValuePattern;
-import com.intellij.patterns.XmlPatterns;
+import com.intellij.patterns.*;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.xml.XmlTag;
 
@@ -37,5 +35,24 @@ public class XmlHelperUtility {
             ).inside(
                 getInsideTagPattern(tagName)
             ).inFile(getXmlFilePattern(fileType));
+    }
+
+    /**
+     * <tag attributeNames="|"/>
+     */
+    public static PsiElementPattern.Capture<PsiElement> getTagAttributePattern(String tag, String attributeName, String fileName) {
+        return XmlPatterns
+            .psiElement()
+            .inside(XmlPatterns
+                    .xmlAttributeValue()
+                    .inside(XmlPatterns
+                            .xmlAttribute()
+                            .withName(attributeName)
+                            .withParent(XmlPatterns
+                                    .xmlTag()
+                                    .withName(tag)
+                            )
+                    )
+            ).inFile(getXmlFilePattern(fileName));
     }
 }

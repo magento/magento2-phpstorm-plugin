@@ -3,7 +3,7 @@ package com.magento.idea.magento2plugin.xml.di;
 import com.intellij.patterns.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.xml.XmlTokenType;
-import com.magento.idea.magento2plugin.xml.reference.XmlHelperUtility;
+import com.magento.idea.magento2plugin.xml.XmlHelperUtility;
 
 /**
  * Created by Warider on 17.08.2015.
@@ -103,23 +103,8 @@ public class XmlHelper extends XmlHelperUtility {
 
     /**
      * <tag attributeNames="|"/>
-     *
-     * @param tag tagname
-     * @param attributeNames attribute values listen for
      */
-    public static PsiElementPattern.Capture<PsiElement> getTagAttributePattern(String tag, String... attributeNames) {
-        return XmlPatterns
-            .psiElement()
-            .inside(XmlPatterns
-                    .xmlAttributeValue()
-                    .inside(XmlPatterns
-                            .xmlAttribute()
-                            .withName(StandardPatterns.string().oneOfIgnoreCase(attributeNames))
-                            .withParent(XmlPatterns
-                                    .xmlTag()
-                                    .withName(tag)
-                            )
-                    )
-            ).inFile(getXmlFilePattern(FILE_TYPE));
+    public static PsiElementPattern.Capture<PsiElement> getTagAttributePattern(String tag, String attributeName) {
+        return getTagAttributePattern(tag, attributeName, FILE_TYPE);
     }
 }
