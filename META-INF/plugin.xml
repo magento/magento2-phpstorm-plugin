@@ -34,6 +34,7 @@
       <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.di.reference.DiReferenceContributor"/>
       <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.observer.reference.ObserverReferenceContributor"/>
       <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.observer.reference.EventReferenceContributor"/>
+      <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.layout.reference.LayoutReferenceContributor"/>
 
       <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.xml.di.completion.DiCompletionContributor" />
       <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.xml.observer.completion.EventCompletionContributor" />
@@ -43,6 +44,8 @@
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.observer.index.EventsDeclarationsFileBasedIndex" />
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.di.index.PluginToTypeFileBasedIndex" />
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.di.index.TypeConfigurationFileBasedIndex" />
+      <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.layout.index.BlockFileBasedIndex" />
+      <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.layout.index.ContainerFileBasedIndex" />
 
       <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.PluginLineMarkerProvider"/>
       <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.ClassConfigurationLineMarkerProvider"/>
