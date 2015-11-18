@@ -4,14 +4,24 @@ import com.intellij.patterns.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.xml.XmlTag;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by dkvashnin on 11/2/15.
  */
 public class XmlHelperUtility {
-    public static PsiFilePattern.Capture<PsiFile> getXmlFilePattern(String fileName) {
+    public static PsiFilePattern.Capture<PsiFile> getXmlFilePattern(@Nullable String fileName) {
+        if (fileName == null) {
+            return getXmlFilePattern();
+        }
+
         return XmlPatterns.psiFile()
             .withName(XmlPatterns.string().equalTo(fileName + ".xml"));
+    }
+
+    public static PsiFilePattern.Capture<PsiFile> getXmlFilePattern() {
+        return XmlPatterns.psiFile()
+            .withName(XmlPatterns.string().endsWith(".xml"));
     }
 
     public static PsiElementPattern.Capture<XmlTag> getInsideTagPattern(String insideTagName) {
@@ -35,6 +45,25 @@ public class XmlHelperUtility {
             ).inside(
                 getInsideTagPattern(tagName)
             ).inFile(getXmlFilePattern(fileType));
+    }
+
+    /**
+     * <tagName attributeName="XmlAttributeValue">
+     */
+    public static XmlAttributeValuePattern getTagAttributeValuePattern(String tagName, String attributeName) {
+        return XmlPatterns
+            .xmlAttributeValue()
+            .withParent(
+                XmlPatterns
+                    .xmlAttribute(attributeName)
+                    .withParent(
+                        XmlPatterns
+                            .xmlTag()
+                            .withName(tagName)
+                    )
+            ).inside(
+                getInsideTagPattern(tagName)
+            ).inFile(getXmlFilePattern());
     }
 
     /**
