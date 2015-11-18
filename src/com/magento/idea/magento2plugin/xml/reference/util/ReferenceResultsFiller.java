@@ -8,6 +8,6 @@ import java.util.List;
 /**
  * Created by dkvashnin on 11/3/15.
  */
-public interface ResolveResultsFiller {
-    public void fillResults(PsiElement psiElement, List<ResolveResult> results, String typeName);
+public interface ReferenceResultsFiller {
+    public void fillResolveResults(PsiElement psiElement, List<ResolveResult> results, String typeName);
 }

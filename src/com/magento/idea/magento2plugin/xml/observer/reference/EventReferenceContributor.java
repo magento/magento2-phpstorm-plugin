@@ -4,7 +4,7 @@ import com.intellij.psi.*;
 import com.magento.idea.magento2plugin.xml.observer.PhpPatternsHelper;
 import com.magento.idea.magento2plugin.xml.observer.reference.util.ClassResultsFillerWrapper;
 import com.magento.idea.magento2plugin.xml.observer.reference.util.EventsConfigurationFilesResultsFiller;
-import com.magento.idea.magento2plugin.xml.reference.util.ResolveResultsFiller;
+import com.magento.idea.magento2plugin.xml.reference.util.ReferenceResultsFiller;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -16,7 +16,7 @@ public class EventReferenceContributor extends PsiReferenceContributor {
         psiReferenceRegistrar.registerReferenceProvider(
             PhpPatternsHelper.STRING_METHOD_ARGUMENT,
             new EventReferenceProvider(
-                new ResolveResultsFiller[] {
+                new ReferenceResultsFiller[] {
                     EventsConfigurationFilesResultsFiller.INSTANCE,
                     ClassResultsFillerWrapper.INSTANCE
                 }

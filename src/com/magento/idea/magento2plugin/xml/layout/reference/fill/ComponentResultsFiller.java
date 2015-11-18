@@ -6,7 +6,7 @@ import com.intellij.psi.ResolveResult;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.indexing.ID;
 import com.magento.idea.magento2plugin.xml.layout.index.AbstractComponentNameFileBasedIndex;
-import com.magento.idea.magento2plugin.xml.reference.util.ResolveResultsFiller;
+import com.magento.idea.magento2plugin.xml.reference.util.ReferenceResultsFiller;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Created by dkvashnin on 11/18/15.
  */
-public class ComponentResultsFiller implements ResolveResultsFiller {
+public class ComponentResultsFiller implements ReferenceResultsFiller {
     private ID<String, Void> indexId;
     private String componentType;
 
@@ -24,7 +24,7 @@ public class ComponentResultsFiller implements ResolveResultsFiller {
     }
 
     @Override
-    public void fillResults(PsiElement psiElement, List<ResolveResult> results, String typeName) {
+    public void fillResolveResults(PsiElement psiElement, List<ResolveResult> results, String typeName) {
         List<XmlTag> componentDeclarations = AbstractComponentNameFileBasedIndex
             .getComponentDeclarations(
                 typeName,
@@ -35,5 +35,9 @@ public class ComponentResultsFiller implements ResolveResultsFiller {
 
         ResolveResult[] resolveResults = PsiElementResolveResult.createResults(componentDeclarations);
         results.addAll(Arrays.asList(resolveResults));
+    }
+
+    public void getVariants(PsiElement psiElement, List<Object> results) {
+        results.addAll(AbstractComponentNameFileBasedIndex.getAllKeys(indexId, psiElement.getProject()));
     }
 }

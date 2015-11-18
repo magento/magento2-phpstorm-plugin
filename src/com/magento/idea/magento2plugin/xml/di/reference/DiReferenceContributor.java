@@ -5,11 +5,10 @@ import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
 import com.magento.idea.magento2plugin.xml.di.XmlHelper;
 import com.magento.idea.magento2plugin.xml.di.reference.provider.ArgumentNameReferenceProvider;
-import com.magento.idea.magento2plugin.xml.di.reference.provider.DiInstanceReferenceProvider;
-import com.magento.idea.magento2plugin.xml.reference.TypeReference;
+import com.magento.idea.magento2plugin.xml.di.reference.provider.XmlReferenceProvider;
 import com.magento.idea.magento2plugin.xml.reference.util.ClassesResultsFiller;
 import com.magento.idea.magento2plugin.xml.reference.util.InterfacesResultsFiller;
-import com.magento.idea.magento2plugin.xml.reference.util.ResolveResultsFiller;
+import com.magento.idea.magento2plugin.xml.reference.util.ReferenceResultsFiller;
 import com.magento.idea.magento2plugin.xml.reference.util.VirtualTypesResultsFiller;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,8 +25,8 @@ public class DiReferenceContributor extends PsiReferenceContributor {
         // <preference for="\SomeInterface" />
         psiReferenceRegistrar.registerReferenceProvider(
             XmlHelper.getDiPreferenceForPattern(),
-            new DiInstanceReferenceProvider(
-                new ResolveResultsFiller[]{
+            new XmlReferenceProvider(
+                new ReferenceResultsFiller[]{
                     ClassesResultsFiller.INSTANCE,
                     InterfacesResultsFiller.INSTANCE
                 }
@@ -37,8 +36,8 @@ public class DiReferenceContributor extends PsiReferenceContributor {
         // <preference type="SomeClassOrVirtualType" />
         psiReferenceRegistrar.registerReferenceProvider(
             XmlHelper.getDiPreferenceTypePattern(),
-            new DiInstanceReferenceProvider(
-                new ResolveResultsFiller[]{
+            new XmlReferenceProvider(
+                new ReferenceResultsFiller[]{
                     ClassesResultsFiller.INSTANCE,
                     VirtualTypesResultsFiller.INSTANCE
                 }
@@ -48,8 +47,8 @@ public class DiReferenceContributor extends PsiReferenceContributor {
         // <type name="\SomeClass"></type>
         psiReferenceRegistrar.registerReferenceProvider(
             XmlHelper.getDiTypePattern(),
-            new DiInstanceReferenceProvider(
-                new ResolveResultsFiller[]{
+            new XmlReferenceProvider(
+                new ReferenceResultsFiller[]{
                     ClassesResultsFiller.INSTANCE,
                     InterfacesResultsFiller.INSTANCE,
                     VirtualTypesResultsFiller.INSTANCE
@@ -60,8 +59,8 @@ public class DiReferenceContributor extends PsiReferenceContributor {
         // <virtualType type="SomeClassOrVirtualType"></virtualType>
         psiReferenceRegistrar.registerReferenceProvider(
             XmlHelper.getDiVirtualTypePattern(),
-            new DiInstanceReferenceProvider(
-                new ResolveResultsFiller[]{
+            new XmlReferenceProvider(
+                new ReferenceResultsFiller[]{
                     ClassesResultsFiller.INSTANCE,
                     VirtualTypesResultsFiller.INSTANCE
                 }
@@ -74,8 +73,8 @@ public class DiReferenceContributor extends PsiReferenceContributor {
                 XmlHelper.getArgumentValuePatternForType(OBJECT_TYPE_NAME),
                 XmlHelper.getItemValuePatternForType(OBJECT_TYPE_NAME)
             ),
-            new DiInstanceReferenceProvider(
-                new ResolveResultsFiller[]{
+            new XmlReferenceProvider(
+                new ReferenceResultsFiller[]{
                     ClassesResultsFiller.INSTANCE,
                     VirtualTypesResultsFiller.INSTANCE
                 }
@@ -108,8 +107,8 @@ public class DiReferenceContributor extends PsiReferenceContributor {
         // <plugin type="SomePlugin" />
         psiReferenceRegistrar.registerReferenceProvider(
             XmlHelper.getPluginTypePattern(),
-            new DiInstanceReferenceProvider(
-                new ResolveResultsFiller[]{
+            new XmlReferenceProvider(
+                new ReferenceResultsFiller[]{
                     ClassesResultsFiller.INSTANCE,
                     VirtualTypesResultsFiller.INSTANCE
                 }

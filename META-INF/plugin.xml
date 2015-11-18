@@ -38,6 +38,9 @@
 
       <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.xml.di.completion.DiCompletionContributor" />
       <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.xml.observer.completion.EventCompletionContributor" />
+      <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.xml.layout.completion.LayoutCompletionContributor" />
+
+
 
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.di.index.VirtualTypesNamesFileBasedIndex" />
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.observer.index.EventObserverFileBasedIndex" />

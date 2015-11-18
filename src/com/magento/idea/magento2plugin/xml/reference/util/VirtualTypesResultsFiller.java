@@ -11,13 +11,13 @@ import java.util.List;
 /**
  * Created by dkvashnin on 11/3/15.
  */
-public class VirtualTypesResultsFiller implements ResolveResultsFiller {
-    public static final ResolveResultsFiller INSTANCE = new VirtualTypesResultsFiller();
+public class VirtualTypesResultsFiller implements ReferenceResultsFiller {
+    public static final ReferenceResultsFiller INSTANCE = new VirtualTypesResultsFiller();
 
     private VirtualTypesResultsFiller() {}
 
     @Override
-    public void fillResults(PsiElement psiElement, List<ResolveResult> results, String typeName) {
+    public void fillResolveResults(PsiElement psiElement, List<ResolveResult> results, String typeName) {
         XmlAttributeValue[] virtualTypesByName = VirtualTypesNamesFileBasedIndex.getVirtualTypesByName(
             psiElement.getProject(),
             typeName,
