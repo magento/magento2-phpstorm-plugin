@@ -8,16 +8,16 @@ import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.magento.idea.magento2plugin.xml.reference.TypeReference;
-import com.magento.idea.magento2plugin.xml.reference.util.ResolveResultsFiller;
+import com.magento.idea.magento2plugin.xml.reference.util.ReferenceResultsFiller;
 import org.jetbrains.annotations.NotNull;
 
 /**
 * Created by dkvashnin on 11/3/15.
 */
 class EventReferenceProvider extends PsiReferenceProvider {
-    private final ResolveResultsFiller[] resultsFillers;
+    private final ReferenceResultsFiller[] resultsFillers;
 
-    public EventReferenceProvider(ResolveResultsFiller[] resultsFillers) {
+    public EventReferenceProvider(ReferenceResultsFiller[] resultsFillers) {
         this.resultsFillers = resultsFillers;
     }
 

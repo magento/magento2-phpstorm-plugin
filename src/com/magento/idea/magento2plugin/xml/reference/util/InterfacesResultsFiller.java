@@ -12,13 +12,13 @@ import java.util.List;
 /**
  * Created by dkvashnin on 11/3/15.
  */
-public class InterfacesResultsFiller implements ResolveResultsFiller {
-    public static final ResolveResultsFiller INSTANCE = new InterfacesResultsFiller();
+public class InterfacesResultsFiller implements ReferenceResultsFiller {
+    public static final ReferenceResultsFiller INSTANCE = new InterfacesResultsFiller();
 
     private InterfacesResultsFiller() {}
 
     @Override
-    public void fillResults(PsiElement psiElement, List<ResolveResult> results, String typeName) {
+    public void fillResolveResults(PsiElement psiElement, List<ResolveResult> results, String typeName) {
         PhpIndex phpIndex = PhpIndex.getInstance(psiElement.getProject());
 
         for (PhpClass phpClass : phpIndex.getInterfacesByFQN(PhpLangUtil.toFQN(typeName))) {

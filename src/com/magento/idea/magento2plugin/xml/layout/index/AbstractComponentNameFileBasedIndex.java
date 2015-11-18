@@ -57,6 +57,10 @@ public abstract class AbstractComponentNameFileBasedIndex extends ScalarIndexExt
         return results;
     }
 
+    public static Collection<String> getAllKeys(ID<String, Void> id, Project project) {
+        return FileBasedIndex.getInstance().getAllKeys(id, project);
+    }
+
     public static void collectComponentDeclarations(XmlTag parentTag, List<XmlTag> results, String componentName, String componentType) {
         for (XmlTag childTag: parentTag.getSubTags()) {
             if (componentType.equals(childTag.getName()) && componentName.equals(childTag.getAttributeValue("name"))) {

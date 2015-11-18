@@ -5,16 +5,16 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceProvider;
 import com.intellij.util.ProcessingContext;
 import com.magento.idea.magento2plugin.xml.reference.TypeReference;
-import com.magento.idea.magento2plugin.xml.reference.util.ResolveResultsFiller;
+import com.magento.idea.magento2plugin.xml.reference.util.ReferenceResultsFiller;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by Warider on 17.08.2015.
  */
-public class DiInstanceReferenceProvider extends PsiReferenceProvider {
-    private final ResolveResultsFiller[] resultsFillers;
+public class XmlReferenceProvider extends PsiReferenceProvider {
+    private final ReferenceResultsFiller[] resultsFillers;
 
-    public DiInstanceReferenceProvider(ResolveResultsFiller[] resultsFillers) {
+    public XmlReferenceProvider(ReferenceResultsFiller[] resultsFillers) {
         super();
         this.resultsFillers = resultsFillers;
     }

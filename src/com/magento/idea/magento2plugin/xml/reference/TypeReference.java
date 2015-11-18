@@ -4,7 +4,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiPolyVariantReferenceBase;
 import com.intellij.psi.ResolveResult;
-import com.magento.idea.magento2plugin.xml.reference.util.ResolveResultsFiller;
+import com.magento.idea.magento2plugin.xml.reference.util.ReferenceResultsFiller;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -16,15 +16,13 @@ import java.util.List;
 public class TypeReference extends PsiPolyVariantReferenceBase<PsiElement> {
     private final boolean greedy;
 
-    private ResolveResultsFiller[] resultsFillers;
+    private ReferenceResultsFiller[] resultsFillers;
 
-    public TypeReference(@NotNull PsiElement element, ResolveResultsFiller[] resultsFillers) {
+    public TypeReference(@NotNull PsiElement element, ReferenceResultsFiller[] resultsFillers) {
         this(element, resultsFillers, false);
-
-        this.resultsFillers = resultsFillers;
     }
 
-    public TypeReference(@NotNull PsiElement element, ResolveResultsFiller[] resultsFillers, boolean greedy) {
+    public TypeReference(@NotNull PsiElement element, ReferenceResultsFiller[] resultsFillers, boolean greedy) {
         super(element);
 
         this.resultsFillers = resultsFillers;
@@ -37,8 +35,8 @@ public class TypeReference extends PsiPolyVariantReferenceBase<PsiElement> {
         List<ResolveResult> resolveResults = new ArrayList<>();
         String typeName = StringUtil.unquoteString(getElement().getText());
 
-        for (ResolveResultsFiller resolveResultsFiller: resultsFillers) {
-            resolveResultsFiller.fillResults(getElement(), resolveResults, typeName);
+        for (ReferenceResultsFiller referenceResultsFiller : resultsFillers) {
+            referenceResultsFiller.fillResolveResults(getElement(), resolveResults, typeName);
             if (!greedy && resolveResults.size() > 0) {
                 break;
             }

@@ -84,4 +84,23 @@ public class XmlHelperUtility {
                     )
             ).inFile(getXmlFilePattern(fileName));
     }
+
+    /**
+     * <tag attributeNames="|"/>
+     */
+    public static PsiElementPattern.Capture<PsiElement> getTagAttributePattern(String tag, String attributeName) {
+        return XmlPatterns
+            .psiElement()
+            .inside(XmlPatterns
+                    .xmlAttributeValue()
+                    .inside(XmlPatterns
+                            .xmlAttribute()
+                            .withName(attributeName)
+                            .withParent(XmlPatterns
+                                    .xmlTag()
+                                    .withName(tag)
+                            )
+                    )
+            ).inFile(getXmlFilePattern());
+    }
 }

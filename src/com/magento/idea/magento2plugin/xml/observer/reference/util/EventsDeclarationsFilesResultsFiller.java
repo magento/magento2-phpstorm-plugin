@@ -11,7 +11,7 @@ import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.resolve.PhpResolveResult;
 import com.magento.idea.magento2plugin.xml.observer.PhpPatternsHelper;
 import com.magento.idea.magento2plugin.xml.observer.index.EventsDeclarationsFileBasedIndex;
-import com.magento.idea.magento2plugin.xml.reference.util.ResolveResultsFiller;
+import com.magento.idea.magento2plugin.xml.reference.util.ReferenceResultsFiller;
 
 import java.util.Collection;
 import java.util.List;
@@ -19,11 +19,11 @@ import java.util.List;
 /**
  * Created by dkvashnin on 11/5/15.
  */
-public class EventsDeclarationsFilesResultsFiller implements ResolveResultsFiller {
-    public static final ResolveResultsFiller INSTANCE = new EventsDeclarationsFilesResultsFiller();
+public class EventsDeclarationsFilesResultsFiller implements ReferenceResultsFiller {
+    public static final ReferenceResultsFiller INSTANCE = new EventsDeclarationsFilesResultsFiller();
 
     @Override
-    public void fillResults(PsiElement psiElement, List<ResolveResult> results, String typeName) {
+    public void fillResolveResults(PsiElement psiElement, List<ResolveResult> results, String typeName) {
         Collection<VirtualFile> containingFiles = FileBasedIndex
             .getInstance()
             .getContainingFiles(
