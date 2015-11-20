@@ -58,7 +58,7 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
     class PluginClassCache {
         private HashMap<String, List<PhpClass>> classPluginsMap = new HashMap<String, List<PhpClass>>();
 
-        public List<PhpClass> getPluginsForClass(PhpClass phpClass, String classFQN) {
+        public List<PhpClass> getPluginsForClass(@NotNull PhpClass phpClass, @NotNull String classFQN) {
             List<PhpClass> results = new ArrayList<>();
 
             if (classPluginsMap.containsKey(classFQN)) {
@@ -90,7 +90,7 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
             return results;
         }
 
-        public List<PhpClass> getPluginsForClass(PhpClass phpClass)
+        public List<PhpClass> getPluginsForClass(@NotNull PhpClass phpClass)
         {
             List<PhpClass> pluginsForClass = getPluginsForClass(phpClass, phpClass.getPresentableFQN());
             for (PhpClass parent: phpClass.getSupers()) {
@@ -100,7 +100,7 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
             return pluginsForClass;
         }
 
-        public List<Method> getPluginMethods(PhpClass plugin) {
+        public List<Method> getPluginMethods(@NotNull PhpClass plugin) {
             List<Method> methodList = new ArrayList<Method>();
             for (Method method : plugin.getMethods()) {
                 if (method.getAccess().isPublic()) {
@@ -124,7 +124,7 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
 }
 
 interface PluginCollectorI<T extends PsiElement> {
-    public List<T> collect(T psiElement);
+    public List<T> collect(@NotNull T psiElement);
 }
 
 class ClassPluginCollector implements PluginCollectorI<PhpClass> {
@@ -135,7 +135,7 @@ class ClassPluginCollector implements PluginCollectorI<PhpClass> {
     }
 
     @Override
-    public List<PhpClass> collect(PhpClass psiElement) {
+    public List<PhpClass> collect(@NotNull PhpClass psiElement) {
         return pluginClassCache.getPluginsForClass(psiElement);
     }
 }
@@ -148,10 +148,15 @@ class MethodPluginCollector implements PluginCollectorI<Method> {
     }
 
     @Override
-    public List<Method> collect(Method psiElement) {
+    public List<Method> collect(@NotNull Method psiElement) {
         List<Method> results = new ArrayList<>();
 
-        List<PhpClass> pluginsList = pluginClassCache.getPluginsForClass(psiElement.getContainingClass());
+        PhpClass methodClass = psiElement.getContainingClass();
+        if (methodClass == null) {
+            return results;
+        }
+
+        List<PhpClass> pluginsList = pluginClassCache.getPluginsForClass(methodClass);
         List<Method> pluginMethods = pluginClassCache.getPluginMethods(pluginsList);
 
         String classMethodName = WordUtils.capitalize(psiElement.getName());
