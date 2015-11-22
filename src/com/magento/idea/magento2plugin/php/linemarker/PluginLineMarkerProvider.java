@@ -123,11 +123,7 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
     }
 }
 
-interface PluginCollectorI<T extends PsiElement> {
-    public List<T> collect(@NotNull T psiElement);
-}
-
-class ClassPluginCollector implements PluginCollectorI<PhpClass> {
+class ClassPluginCollector implements Collector<PhpClass, PhpClass> {
     private PluginLineMarkerProvider.PluginClassCache pluginClassCache;
 
     public ClassPluginCollector(PluginLineMarkerProvider.PluginClassCache pluginClassCache) {
@@ -140,7 +136,7 @@ class ClassPluginCollector implements PluginCollectorI<PhpClass> {
     }
 }
 
-class MethodPluginCollector implements PluginCollectorI<Method> {
+class MethodPluginCollector implements Collector<Method, Method> {
     private PluginLineMarkerProvider.PluginClassCache pluginClassCache;
 
     public MethodPluginCollector(PluginLineMarkerProvider.PluginClassCache pluginClassCache) {

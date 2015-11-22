@@ -6,6 +6,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.indexing.DataIndexer;
 import com.intellij.util.indexing.FileContent;
+import com.jetbrains.php.lang.PhpLangUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -16,9 +17,11 @@ import java.util.Map;
  */
 public class LayoutDataIndexer implements DataIndexer<String, Void, FileContent> {
     private String indexTag;
+    private String indexAttribute;
 
-    public LayoutDataIndexer(String indexTag) {
+    public LayoutDataIndexer(String indexTag, String indexAttribute) {
         this.indexTag = indexTag;
+        this.indexAttribute = indexAttribute;
     }
 
     @NotNull
@@ -47,9 +50,9 @@ public class LayoutDataIndexer implements DataIndexer<String, Void, FileContent>
     private void fillResultMap(XmlTag parentTag, Map<String, Void> resultMap) {
         for (XmlTag childTag: parentTag.getSubTags()) {
             if (indexTag.equals(childTag.getName())) {
-                String blockName = childTag.getAttributeValue("name");
-                if (blockName != null) {
-                    resultMap.put(blockName, null);
+                String attributeValue = childTag.getAttributeValue(this.indexAttribute);
+                if (attributeValue != null) {
+                    resultMap.put(PhpLangUtil.toPresentableFQN(attributeValue), null);
                 }
             }
             fillResultMap(childTag, resultMap);

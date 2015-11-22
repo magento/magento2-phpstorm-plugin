@@ -15,8 +15,9 @@ public class BlockFileBasedIndex extends AbstractComponentNameFileBasedIndex {
         return NAME;
     }
 
+    @NotNull
     @Override
-    protected String getComponentName() {
-        return "block";
+    public DataIndexer<String, Void, FileContent> getIndexer() {
+        return new LayoutDataIndexer("block", "name");
     }
 }

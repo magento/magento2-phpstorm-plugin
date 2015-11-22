@@ -1,10 +1,6 @@
 package com.magento.idea.magento2plugin.xml.layout.index;
 
-import com.intellij.ide.highlighter.XmlFileType;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.indexing.*;
-import com.intellij.util.io.EnumeratorStringDescriptor;
-import com.intellij.util.io.KeyDescriptor;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -19,8 +15,9 @@ public class ContainerFileBasedIndex extends AbstractComponentNameFileBasedIndex
         return NAME;
     }
 
+    @NotNull
     @Override
-    protected String getComponentName() {
-        return "container";
+    public DataIndexer<String, Void, FileContent> getIndexer() {
+        return new LayoutDataIndexer("block", "name");
     }
 }
