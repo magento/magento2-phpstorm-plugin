@@ -10,6 +10,7 @@ import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.indexing.*;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
+import com.magento.idea.magento2plugin.xml.layout.LayoutUtility;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -34,8 +35,7 @@ public abstract class AbstractComponentNameFileBasedIndex extends ScalarIndexExt
         return new FileBasedIndex.InputFilter() {
             @Override
             public boolean acceptInput(@NotNull VirtualFile virtualFile) {
-                VirtualFile parent = virtualFile.getParent();
-                return virtualFile.getFileType() == XmlFileType.INSTANCE && parent.isDirectory() && parent.getName().endsWith("layout");
+                return LayoutUtility.isLayoutFile(virtualFile);
             }
         };
     }
