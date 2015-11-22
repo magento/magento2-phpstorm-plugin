@@ -1,21 +1,48 @@
 <idea-plugin version="2">
   <id>com.magento.idea.magento2plugin</id>
   <name>Magento2</name>
-  <version>0.0.8</version>
-  <vendor email="dkvashnin@ebay.com" url="http://www.magento.com">Magento</vendor>
+  <version>0.0.9</version>
+  <vendor email="dkvashnin@ebay.com" url="https://github.com/dkvashninbay/magento2plugin">Dmytro Kvashnin</vendor>
 
   <description><![CDATA[
       Plugin, created to improve life-work balance while working with Magento 2
     ]]></description>
 
   <change-notes><![CDATA[
-      v0.0.5 Implemented reference support for classes/interfaces in DI configuration
-      <br/>
-      v0.0.6 Implemented reference and completion support for virtual types/classes/arguments in DI configuration
-      <br/>
-      v0.0.7 References: to configuration and observers (classes or virtualType), to observers from configuration, to event dispatch from configuration
-      <br/>
-      v0.0.8 Line marker reference for php class/interface to: XML(di.xml) configuration, Plugins
+<h3>0.0.9</h3>
+<ul>
+    <li>Added Reference and completion support for layouts<br/>
+      - block: class, before, after<br/>
+      - referenceBlock: name<br/>
+      - move: element, destination, before, after<br/>
+      - remove: name<br/>
+      - update: handle<br/>
+      - referenceContainer: name</li>
+    <li>Line marker reference for php class to Layout configuration</li>
+</ul>
+
+<h3>0.0.8</h3>
+<ul>
+    <li>Added Line marker reference for php class/interface to DI configuration</li>
+    <li>Added Line marker reference to plugins</li>
+</ul>
+
+<h3>0.0.7</h3>
+<ul>
+    <li>Added reference to configuration and observers (classes or virtualType)</li>
+    <li>Added reference to observers from configuration
+    <li>Added reference to event dispatch from configuration</li>
+</ul>
+
+<h3>0.0.6</h3>
+<ul>
+    <li>Added reference and completion support for virtual types/classes/arguments in DI configuration</li>
+</ul>
+
+<h3>0.0.5</h3>
+<ul>
+    <li>Added reference support for classes/interfaces in DI configuration</li>
+</ul>
     ]]>
   </change-notes>
 
