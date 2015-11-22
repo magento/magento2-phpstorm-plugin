@@ -49,6 +49,7 @@
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.di.index.TypeConfigurationFileBasedIndex" />
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.layout.index.BlockFileBasedIndex" />
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.layout.index.ContainerFileBasedIndex" />
+      <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.layout.index.BlockClassFileBasedIndex" />
 
       <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.PluginLineMarkerProvider"/>
       <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.ClassConfigurationLineMarkerProvider"/>

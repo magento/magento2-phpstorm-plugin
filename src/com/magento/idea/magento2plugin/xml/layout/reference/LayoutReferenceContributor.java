@@ -5,7 +5,8 @@ import com.magento.idea.magento2plugin.xml.XmlHelperUtility;
 import com.magento.idea.magento2plugin.xml.di.reference.provider.XmlReferenceProvider;
 import com.magento.idea.magento2plugin.xml.layout.index.BlockFileBasedIndex;
 import com.magento.idea.magento2plugin.xml.layout.index.ContainerFileBasedIndex;
-import com.magento.idea.magento2plugin.xml.layout.reference.fill.ComponentResultsFiller;
+import com.magento.idea.magento2plugin.xml.layout.reference.fill.BlockResultsFiller;
+import com.magento.idea.magento2plugin.xml.layout.reference.fill.ContainerResultsFiller;
 import com.magento.idea.magento2plugin.xml.reference.util.ClassesResultsFiller;
 import com.magento.idea.magento2plugin.xml.reference.util.ReferenceResultsFiller;
 import com.magento.idea.magento2plugin.xml.reference.util.VirtualTypesResultsFiller;
@@ -32,7 +33,7 @@ public class LayoutReferenceContributor extends PsiReferenceContributor {
             XmlHelperUtility.getTagAttributeValuePattern("referenceBlock", "name"),
             new XmlReferenceProvider(
                 new ReferenceResultsFiller[]{
-                    new ComponentResultsFiller(BlockFileBasedIndex.NAME, "block")
+                    new BlockResultsFiller()
                 }
             )
         );
@@ -41,7 +42,7 @@ public class LayoutReferenceContributor extends PsiReferenceContributor {
             XmlHelperUtility.getTagAttributeValuePattern("referenceContainer", "name"),
             new XmlReferenceProvider(
                 new ReferenceResultsFiller[]{
-                    new ComponentResultsFiller(ContainerFileBasedIndex.NAME, "container")
+                    new ContainerResultsFiller()
                 }
             )
         );

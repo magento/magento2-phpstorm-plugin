@@ -24,55 +24,6 @@ public abstract class AbstractComponentNameFileBasedIndex extends ScalarIndexExt
 
     @NotNull
     @Override
-    public DataIndexer<String, Void, FileContent> getIndexer() {
-        return new LayoutDataIndexer(getComponentName());
-    }
-
-    protected abstract String getComponentName();
-
-    public static List<XmlTag> getComponentDeclarations(String componentName, String componentType, ID<String, Void> id, Project project) {
-        List<XmlTag> results = new ArrayList<XmlTag>();
-        Collection<VirtualFile> containingFiles = FileBasedIndex.getInstance()
-            .getContainingFiles(
-                id,
-                componentName,
-                GlobalSearchScope.allScope(project)
-            );
-        PsiManager psiManager = PsiManager.getInstance(project);
-
-        for (VirtualFile virtualFile: containingFiles) {
-            XmlFile xmlFile = (XmlFile)psiManager.findFile(virtualFile);
-            if (xmlFile == null) {
-                continue;
-            }
-
-            XmlTag rootTag = xmlFile.getRootTag();
-            if (rootTag == null) {
-                continue;
-            }
-            collectComponentDeclarations(rootTag, results, componentName, componentType);
-        }
-
-
-        return results;
-    }
-
-    public static Collection<String> getAllKeys(ID<String, Void> id, Project project) {
-        return FileBasedIndex.getInstance().getAllKeys(id, project);
-    }
-
-    public static void collectComponentDeclarations(XmlTag parentTag, List<XmlTag> results, String componentName, String componentType) {
-        for (XmlTag childTag: parentTag.getSubTags()) {
-            if (componentType.equals(childTag.getName()) && componentName.equals(childTag.getAttributeValue("name"))) {
-                results.add(childTag);
-            } else if(childTag.getSubTags().length > 0 ) {
-                collectComponentDeclarations(childTag, results, componentName, componentType);
-            }
-        }
-    }
-
-    @NotNull
-    @Override
     public KeyDescriptor<String> getKeyDescriptor() {
         return myKeyDescriptor;
     }

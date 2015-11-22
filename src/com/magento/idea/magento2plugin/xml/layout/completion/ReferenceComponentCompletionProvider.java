@@ -6,7 +6,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.util.indexing.ID;
 import com.jetbrains.php.PhpIcons;
 import com.magento.idea.magento2plugin.xml.completion.CompletionProviderI;
-import com.magento.idea.magento2plugin.xml.layout.index.AbstractComponentNameFileBasedIndex;
+import com.magento.idea.magento2plugin.xml.layout.index.util.LayoutIndexUtility;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,7 +24,7 @@ public class ReferenceComponentCompletionProvider implements CompletionProviderI
 
     @Override
     public List<LookupElement> collectCompletionResult(PsiElement psiElement) {
-        Collection<String> keys = AbstractComponentNameFileBasedIndex.getAllKeys(indexId, psiElement.getProject());
+        Collection<String> keys = LayoutIndexUtility.getAllKeys(indexId, psiElement.getProject());
 
         List<LookupElement> results = new ArrayList<>();
         for (String key: keys) {
