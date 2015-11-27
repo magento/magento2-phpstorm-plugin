@@ -18,6 +18,7 @@ import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.jetbrains.php.lang.PhpLangUtil;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -30,15 +31,17 @@ public class VirtualTypesNamesFileBasedIndex extends FileBasedIndexExtension<Str
     private final EnumeratorStringDescriptor myKeyDescriptor = new EnumeratorStringDescriptor();
     private final MyDataIndexer myDataIndexer = new MyDataIndexer();
 
+    private static final int SUPER_MAX_NESTING_LEVEL = 3;
+
     public static String[] getAllVirtualTypesNames(final Project project) {
         final Collection<String> allKeys = FileBasedIndex.getInstance().getAllKeys(NAME, project);
         return ArrayUtil.toStringArray(allKeys);
     }
 
-    public static XmlAttributeValue[] getVirtualTypesByName(final Project project, final String name, final GlobalSearchScope scope) {
+    public static XmlAttributeValue[] getVirtualTypesByName(final Project project, final String virtualTypeName, final GlobalSearchScope scope) {
         List<XmlAttributeValue> xmlAttributeList = new ArrayList<XmlAttributeValue>();
 
-        Collection<VirtualFile> virtualFileCollection = FileBasedIndex.getInstance().getContainingFiles(NAME, name, scope);
+        Collection<VirtualFile> virtualFileCollection = FileBasedIndex.getInstance().getContainingFiles(NAME, virtualTypeName, scope);
         PsiManager psiManager = PsiManager.getInstance(project);
 
         for (VirtualFile virtualFile: virtualFileCollection) {
@@ -56,7 +59,7 @@ public class VirtualTypesNamesFileBasedIndex extends FileBasedIndexExtension<Str
                 if (typeTag.getName().equals("virtualType")) {
                     XmlAttribute nameAttribute = typeTag.getAttribute("name");
                     if (nameAttribute != null) {
-                        if (nameAttribute.getValue() != null && nameAttribute.getValue().equals(name))
+                        if (nameAttribute.getValue() != null && nameAttribute.getValue().equals(virtualTypeName))
 
                         xmlAttributeList.add(nameAttribute.getValueElement());
                     }
@@ -65,6 +68,36 @@ public class VirtualTypesNamesFileBasedIndex extends FileBasedIndexExtension<Str
         }
 
         return xmlAttributeList.toArray(new XmlAttributeValue[xmlAttributeList.size()]);
+    }
+
+    public static String getParentTypeName(final Project project, String virtualTypeName) {
+        List<String> originNames = FileBasedIndex.getInstance().getValues(NAME, virtualTypeName, GlobalSearchScope.allScope(project));
+
+        if (originNames.size() > 0) {
+            return originNames.get(0);
+        }
+
+        return null;
+    }
+
+    public static String getSuperParentTypeName(final Project project, String inputChildTypeName) {
+        String superName = null;
+        String childTypeName = inputChildTypeName;
+
+        for (int index = 0; index < SUPER_MAX_NESTING_LEVEL; index++) {
+            superName = getParentTypeName(project, childTypeName);
+
+            if (superName == null) {
+                superName = childTypeName;
+                break;
+            }
+
+            childTypeName = superName;
+        }
+
+        return superName == null
+            ? (!inputChildTypeName.equals(childTypeName) ? childTypeName : null)
+            : superName;
     }
 
     @NotNull
