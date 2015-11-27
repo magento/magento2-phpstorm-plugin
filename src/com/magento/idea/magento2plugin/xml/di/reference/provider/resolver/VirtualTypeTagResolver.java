@@ -1,6 +1,9 @@
 package com.magento.idea.magento2plugin.xml.di.reference.provider.resolver;
 
 import com.intellij.psi.xml.XmlTag;
+import com.intellij.util.indexing.FileBasedIndex;
+import com.magento.idea.magento2plugin.xml.di.XmlHelper;
+import com.magento.idea.magento2plugin.xml.di.index.VirtualTypesNamesFileBasedIndex;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -9,18 +12,25 @@ import org.jetbrains.annotations.Nullable;
 public class VirtualTypeTagResolver extends ClassNameResolver {
     public static final VirtualTypeTagResolver INSTANCE = new VirtualTypeTagResolver();
 
-    private static final String TAG_NAME = "virtualType";
-
     private VirtualTypeTagResolver() {}
 
     @Nullable
     @Override
     public String resolveTypeName(XmlTag xmlTag) {
-        return xmlTag.getAttributeValue("type");
+        String parentTypeName = xmlTag.getAttributeValue(XmlHelper.TYPE_ATTRIBUTE);
+
+        if (parentTypeName == null) {
+            return parentTypeName;
+        }
+
+        String superParentName = VirtualTypesNamesFileBasedIndex.getSuperParentTypeName(xmlTag.getProject(), parentTypeName);
+
+        return superParentName == null ? parentTypeName : superParentName;
+
     }
 
     @Override
     protected String getTagName() {
-        return TAG_NAME;
+        return XmlHelper.VIRTUAL_TYPE_TAG;
     }
 }
