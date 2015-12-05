@@ -67,8 +67,6 @@
       <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.xml.observer.completion.EventCompletionContributor" />
       <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.xml.layout.completion.LayoutCompletionContributor" />
 
-
-
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.di.index.VirtualTypesNamesFileBasedIndex" />
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.observer.index.EventObserverFileBasedIndex" />
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.observer.index.EventsDeclarationsFileBasedIndex" />
@@ -77,9 +75,16 @@
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.layout.index.BlockFileBasedIndex" />
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.layout.index.ContainerFileBasedIndex" />
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.layout.index.BlockClassFileBasedIndex" />
+      <fileBasedIndex implementation="com.magento.idea.magento2plugin.php.index.ModulePackageFileBasedIndex" />
 
       <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.PluginLineMarkerProvider"/>
       <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.ClassConfigurationLineMarkerProvider"/>
+
+      <localInspection language="PHP" shortName="MagentoApiInspection" displayName="Module API"
+                       groupPath="Magento2"
+                       groupName="Module"
+                       enabledByDefault="true"
+                       level="WARNING" implementationClass="com.magento.idea.magento2plugin.php.inspections.MagentoApiInspection"/>
       <!-- Add your extensions here -->
   </extensions>
 
