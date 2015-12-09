@@ -58,6 +58,13 @@
   <depends>com.intellij.modules.platform</depends>
 
   <extensions defaultExtensionNs="com.intellij">
+      <toolWindow id="Magento2 Modules"
+                  icon="/resources/magento2-module.png"
+                  anchor="left"
+                  secondary="false"
+                  factoryClass="com.magento.idea.magento2plugin.php.tool.ModuleToolWindowFactory" />
+
+
       <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.di.reference.DiReferenceContributor"/>
       <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.observer.reference.ObserverReferenceContributor"/>
       <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.observer.reference.EventReferenceContributor"/>

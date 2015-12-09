@@ -25,55 +25,63 @@ public class MagentoApiInspection extends PhpInspection {
         return new PhpElementVisitor() {
             @Override
             public void visitPhpMethodReference(MethodReference reference) {
-                MagentoApiInspection.check(reference, "Method #ref is not in module API", problemsHolder);
+                PsiElement referencedElement = reference.resolve();
+
+                if(referencedElement instanceof Method) {
+                    PhpClass phpClass = ((Method) referencedElement).getContainingClass();
+
+                    if (phpClass == null) {
+                        return;
+                    }
+
+                    if (!MagentoApiInspection.isValidReference(phpClass, reference.getElement())
+                        || !MagentoApiInspection.isValidReference((Method) referencedElement, reference.getElement())) {
+                        problemsHolder.registerProblem(reference, "Method #ref is not in module API", ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
+                    }
+                }
             }
 
             @Override
-            public void visitPhpClassReference(ClassReference classReference) {
-                MagentoApiInspection.check(classReference, "Class #ref is not in module API", problemsHolder);
+            public void visitPhpClassReference(ClassReference reference) {
+                PsiElement referencedElement = reference.resolve();
+
+                if(referencedElement instanceof PhpClass) {
+                    if (!MagentoApiInspection.isValidReference((PhpClass) referencedElement, reference.getElement())) {
+                        problemsHolder.registerProblem(reference, "Class #ref is not in module API", ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
+                    }
+                }
             }
         };
     }
 
-    private static void check(PhpReference reference, String desc, ProblemsHolder holder) {
-        PsiElement element = reference.resolve();
-
-        if(element instanceof PhpNamedElement) {
-            MagentoModule referenceSourceModule = getMagentoModule((PhpPsiElement) element);
-            MagentoModule currentModule = getMagentoModule((PhpPsiElement) (reference.getElement()));
+    private static boolean isValidReference(PhpNamedElement referencedElement, PsiElement contextElement) {
+        MagentoModule referenceSourceModule = getMagentoModule(referencedElement);
+        MagentoModule currentModule = getMagentoModule(contextElement);
 
 
-            if (!areDifferentModules(referenceSourceModule, currentModule)) {
-                return;
-            }
-
-            PhpDocComment docComment = ((PhpNamedElement)element).getDocComment();
-            if(docComment == null) {
-                holder.registerProblem(reference, desc, ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
-                return;
-            }
-
-            PhpDocTag[] elements = docComment.getTagElementsByName(API_TAG);
-            if(elements.length == 0) {
-                holder.registerProblem(reference, desc, ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
-            }
+        if (!areDifferentModules(referenceSourceModule, currentModule)) {
+            return true;
         }
+
+        PhpDocComment docComment = referencedElement.getDocComment();
+        if(docComment == null) {
+            return false;
+        }
+
+        PhpDocTag[] elements = docComment.getTagElementsByName(API_TAG);
+        return elements.length > 0;
     }
 
-    private static MagentoModule getMagentoModule(PhpPsiElement element) {
+    private static MagentoModule getMagentoModule(PsiElement element) {
         ModuleManager moduleManager = ModuleManager.getInstance(element.getProject());
         return moduleManager.getModuleForFile(element.getContainingFile());
     }
 
-    private static boolean areDifferentModules(MagentoModule magentoModule1, MagentoModule magentoModule2) {
-        if (magentoModule1 == null) {
+    private static boolean areDifferentModules(MagentoModule magentoModule, MagentoModule currentPackage) {
+        if (magentoModule == null) {
             return false;
         }
 
-        if (magentoModule2 == null) {
-            return false;
-        }
-
-        return magentoModule1 != magentoModule2;
+        return magentoModule != currentPackage;
     }
 }
