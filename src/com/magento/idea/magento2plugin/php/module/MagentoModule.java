@@ -1,5 +1,6 @@
 package com.magento.idea.magento2plugin.php.module;
 
+import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.Nullable;
@@ -22,4 +23,6 @@ public interface MagentoModule {
     boolean isFileInContext(PsiFile psiFile);
 
     boolean isClassInContext(PhpClass phpClass);
+
+    PsiDirectory getSourceDirectory();
 }

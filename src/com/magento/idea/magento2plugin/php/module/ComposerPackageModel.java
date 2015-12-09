@@ -15,6 +15,9 @@ public interface ComposerPackageModel {
     String getType();
 
     @Nullable
+    String getVendor();
+
+    @Nullable
     String getVersion();
 
     @Nullable

@@ -9,6 +9,8 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.xml.XmlFile;
+import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.php.index.ModulePackageFileBasedIndex;
@@ -96,6 +98,8 @@ public class ModuleManager {
 class MagentoModuleImpl implements MagentoModule {
     private ComposerPackageModel composerPackageModel;
     private PsiDirectory directory;
+    private static final String DEFAULT_MODULE_NAME = "Undefined module";
+    private static final String CONFIGURATION_PATH = "etc";
 
     public MagentoModuleImpl(ComposerPackageModel composerPackageModel, PsiDirectory directory) {
 
@@ -106,7 +110,22 @@ class MagentoModuleImpl implements MagentoModule {
     @Nullable
     @Override
     public String getMagentoName() {
-        return null;
+        PsiDirectory configurationDir = directory.findSubdirectory(CONFIGURATION_PATH);
+        if (configurationDir != null) {
+            PsiFile configurationFile = configurationDir.findFile("module.xml");
+
+            if (configurationFile != null && configurationFile instanceof XmlFile) {
+                XmlTag rootTag = ((XmlFile) configurationFile).getRootTag();
+                if (rootTag != null) {
+                    XmlTag module = rootTag.findFirstSubTag("module");
+                    if (module != null && module.getAttributeValue("name") != null) {
+                        return module.getAttributeValue("name");
+                    }
+                }
+            }
+        }
+
+        return DEFAULT_MODULE_NAME;
     }
 
     @Nullable
@@ -138,5 +157,10 @@ class MagentoModuleImpl implements MagentoModule {
     @Override
     public boolean isClassInContext(PhpClass phpClass) {
         return false;
+    }
+
+    @Override
+    public PsiDirectory getSourceDirectory() {
+        return directory;
     }
 }

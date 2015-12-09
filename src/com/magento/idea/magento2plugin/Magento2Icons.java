@@ -10,4 +10,5 @@ import javax.swing.*;
 public class Magento2Icons {
     public static final Icon PLUGIN = IconLoader.getIcon("icons/interception_reference.png");
     public static final Icon CONFIGURATION = IconLoader.getIcon("icons/xml_reference.png");
+
 }

@@ -22,7 +22,6 @@ public class ComposerPackageModelImpl implements ComposerPackageModel {
     public static final String PSR4 = "psr4";
     public static final String FILES = "file";
 
-
     public ComposerPackageModelImpl(JsonObject sourceComposerJson) {
         this.sourceComposerJson = sourceComposerJson;
     }
@@ -37,6 +36,20 @@ public class ComposerPackageModelImpl implements ComposerPackageModel {
     @Override
     public String getType() {
         return getStringPropertyValue(TYPE);
+    }
+
+    @Nullable
+    @Override
+    public String getVendor() {
+        String nameProperty = getStringPropertyValue(NAME);
+        if (nameProperty != null) {
+            String[] vendorAndPackage = nameProperty.split("/");
+            if (vendorAndPackage.length == 2) {
+                return vendorAndPackage[0];
+            }
+        }
+
+        return null;
     }
 
     @Nullable
