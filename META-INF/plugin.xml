@@ -58,12 +58,13 @@
   <depends>com.intellij.modules.platform</depends>
 
   <extensions defaultExtensionNs="com.intellij">
+      <!--
       <toolWindow id="Magento2 Modules"
                   icon="/resources/magento2-module.png"
                   anchor="left"
                   secondary="false"
                   factoryClass="com.magento.idea.magento2plugin.php.tool.ModuleToolWindowFactory" />
-
+      -->
 
       <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.di.reference.DiReferenceContributor"/>
       <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.observer.reference.ObserverReferenceContributor"/>
@@ -89,9 +90,14 @@
 
       <localInspection language="PHP" shortName="MagentoApiInspection" displayName="Module API"
                        groupPath="Magento2"
-                       groupName="Module"
+                       groupName="Module Integrity"
                        enabledByDefault="true"
                        level="WARNING" implementationClass="com.magento.idea.magento2plugin.php.inspections.MagentoApiInspection"/>
+      <localInspection language="PHP" shortName="ObjectManagerInspection" displayName="ObjectManager usage"
+                       groupPath="Magento2"
+                       groupName="Module Integrity"
+                       enabledByDefault="true"
+                       level="WARNING" implementationClass="com.magento.idea.magento2plugin.php.inspections.ObjectManagerInspection"/>
       <!-- Add your extensions here -->
   </extensions>
 
