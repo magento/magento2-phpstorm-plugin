@@ -1,13 +1,16 @@
 package com.magento.idea.magento2plugin.xml.observer.reference;
 
 import com.intellij.psi.*;
+import com.magento.idea.magento2plugin.php.util.MagentoTypes;
 import com.magento.idea.magento2plugin.xml.di.reference.provider.XmlReferenceProvider;
 import com.magento.idea.magento2plugin.xml.observer.XmlHelper;
 import com.magento.idea.magento2plugin.xml.observer.reference.util.EventsDeclarationsFilesResultsFiller;
 import com.magento.idea.magento2plugin.xml.reference.util.ClassesResultsFiller;
+import com.magento.idea.magento2plugin.xml.reference.util.ImplementationContextDecorator;
 import com.magento.idea.magento2plugin.xml.reference.util.ReferenceResultsFiller;
 import com.magento.idea.magento2plugin.xml.reference.util.VirtualTypesResultsFiller;
 import org.jetbrains.annotations.NotNull;
+
 
 /**
  * Created by dkvashnin on 11/2/15.
@@ -20,7 +23,7 @@ public class ObserverReferenceContributor extends PsiReferenceContributor {
             XmlHelper.getTagAttributeValuePattern(XmlHelper.OBSERVER_TAG, XmlHelper.INSTANCE_ATTRIBUTE),
             new XmlReferenceProvider(
                 new ReferenceResultsFiller[]{
-                    ClassesResultsFiller.INSTANCE,
+                    new ImplementationContextDecorator(ClassesResultsFiller.INSTANCE, MagentoTypes.OBSERVER_TYPE),
                     VirtualTypesResultsFiller.INSTANCE
                 }
             )

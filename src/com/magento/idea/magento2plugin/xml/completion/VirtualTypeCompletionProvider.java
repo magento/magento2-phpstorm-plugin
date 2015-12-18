@@ -3,7 +3,9 @@ package com.magento.idea.magento2plugin.xml.completion;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.psi.PsiElement;
+import com.magento.idea.magento2plugin.util.PsiContextMatcherI;
 import com.magento.idea.magento2plugin.xml.di.index.VirtualTypesNamesFileBasedIndex;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +17,7 @@ public class VirtualTypeCompletionProvider implements CompletionProviderI {
     public final static CompletionProviderI INSTANCE = new VirtualTypeCompletionProvider();
 
     @Override
-    public List<LookupElement> collectCompletionResult(PsiElement psiElement) {
+    public List<LookupElement> collectCompletionResult(PsiElement psiElement, @Nullable PsiContextMatcherI context) {
         List<LookupElement> result = new ArrayList<>();
         String[] allVirtualTypesNames = VirtualTypesNamesFileBasedIndex.getAllVirtualTypesNames(
             psiElement.getProject()
@@ -26,5 +28,10 @@ public class VirtualTypeCompletionProvider implements CompletionProviderI {
         }
 
         return result;
+    }
+
+    @Override
+    public List<LookupElement> collectCompletionResult(PsiElement psiElement) {
+        return collectCompletionResult(psiElement, null);
     }
 }

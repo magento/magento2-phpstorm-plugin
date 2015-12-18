@@ -35,7 +35,7 @@ public class MagentoApiInspection extends PhpInspection {
                     }
 
                     if (!MagentoApiInspection.isValidReference(phpClass, reference.getElement())
-                        || !MagentoApiInspection.isValidReference((Method) referencedElement, reference.getElement())) {
+                        && !MagentoApiInspection.isValidReference((Method) referencedElement, reference.getElement())) {
                         problemsHolder.registerProblem(reference, "Method #ref is not in module API", ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
                     }
                 }
