@@ -5,8 +5,10 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.indexing.ID;
 import com.jetbrains.php.PhpIcons;
+import com.magento.idea.magento2plugin.util.PsiContextMatcherI;
 import com.magento.idea.magento2plugin.xml.completion.CompletionProviderI;
 import com.magento.idea.magento2plugin.xml.layout.index.util.LayoutIndexUtility;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,7 +25,7 @@ public class ReferenceComponentCompletionProvider implements CompletionProviderI
     }
 
     @Override
-    public List<LookupElement> collectCompletionResult(PsiElement psiElement) {
+    public List<LookupElement> collectCompletionResult(PsiElement psiElement, @Nullable PsiContextMatcherI context) {
         Collection<String> keys = LayoutIndexUtility.getAllKeys(indexId, psiElement.getProject());
 
         List<LookupElement> results = new ArrayList<>();
@@ -34,5 +36,10 @@ public class ReferenceComponentCompletionProvider implements CompletionProviderI
         }
 
         return results;
+    }
+
+    @Override
+    public List<LookupElement> collectCompletionResult(PsiElement psiElement) {
+        return collectCompletionResult(psiElement, null);
     }
 }

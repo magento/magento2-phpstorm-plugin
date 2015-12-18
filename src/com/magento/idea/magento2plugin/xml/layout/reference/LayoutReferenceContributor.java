@@ -1,24 +1,20 @@
 package com.magento.idea.magento2plugin.xml.layout.reference;
 
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.patterns.XmlPatterns;
 import com.intellij.psi.*;
-import com.intellij.psi.search.FilenameIndex;
-import com.intellij.util.indexing.FileBasedIndex;
+import com.magento.idea.magento2plugin.php.util.MagentoTypes;
 import com.magento.idea.magento2plugin.xml.XmlHelperUtility;
 import com.magento.idea.magento2plugin.xml.di.reference.provider.XmlReferenceProvider;
 import com.magento.idea.magento2plugin.xml.layout.LayoutUtility;
-import com.magento.idea.magento2plugin.xml.layout.index.BlockFileBasedIndex;
-import com.magento.idea.magento2plugin.xml.layout.index.ContainerFileBasedIndex;
 import com.magento.idea.magento2plugin.xml.layout.reference.fill.BlockResultsFiller;
 import com.magento.idea.magento2plugin.xml.layout.reference.fill.ContainerResultsFiller;
 import com.magento.idea.magento2plugin.xml.reference.util.ClassesResultsFiller;
+import com.magento.idea.magento2plugin.xml.reference.util.ImplementationContextDecorator;
 import com.magento.idea.magento2plugin.xml.reference.util.ReferenceResultsFiller;
 import com.magento.idea.magento2plugin.xml.reference.util.VirtualTypesResultsFiller;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -32,7 +28,7 @@ public class LayoutReferenceContributor extends PsiReferenceContributor {
             XmlHelperUtility.getTagAttributeValuePattern("block", "class"),
             new XmlReferenceProvider(
                 new ReferenceResultsFiller[]{
-                    ClassesResultsFiller.INSTANCE,
+                    new ImplementationContextDecorator(ClassesResultsFiller.INSTANCE, MagentoTypes.BLOCK_TYPE),
                     VirtualTypesResultsFiller.INSTANCE
                 }
             )

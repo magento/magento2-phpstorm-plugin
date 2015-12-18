@@ -5,10 +5,13 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
+import com.magento.idea.magento2plugin.php.util.MagentoTypes;
+import com.magento.idea.magento2plugin.php.util.PsiContextMatcherManager;
 import com.magento.idea.magento2plugin.xml.XmlHelperUtility;
 import com.magento.idea.magento2plugin.xml.completion.ClassCompletionProvider;
 import com.magento.idea.magento2plugin.xml.completion.CompletionProviderI;
 import com.magento.idea.magento2plugin.xml.completion.VirtualTypeCompletionProvider;
+import com.magento.idea.magento2plugin.php.util.ImplementationMatcher;
 import com.magento.idea.magento2plugin.xml.observer.XmlHelper;
 import com.magento.idea.magento2plugin.xml.observer.index.EventsDeclarationsFileBasedIndex;
 import org.jetbrains.annotations.NotNull;
@@ -31,9 +34,11 @@ public class EventCompletionContributor extends CompletionContributor {
             new CompletionProvider<CompletionParameters>() {
                 @Override
                 protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
+                    ImplementationMatcher completionContext = PsiContextMatcherManager.getInstance()
+                        .getImplementationMatcherForType(MagentoTypes.OBSERVER_TYPE);
                     PsiElement psiElement = completionParameters.getOriginalPosition();
                     for (CompletionProviderI completionProvider: typeCompletionProviders) {
-                        completionResultSet.addAllElements(completionProvider.collectCompletionResult(psiElement));
+                        completionResultSet.addAllElements(completionProvider.collectCompletionResult(psiElement, completionContext));
                     }
                 }
             }
@@ -56,5 +61,6 @@ public class EventCompletionContributor extends CompletionContributor {
             }
         );
     }
+
 }
 

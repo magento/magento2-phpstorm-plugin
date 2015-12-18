@@ -22,7 +22,11 @@ public class ClassesResultsFiller implements ReferenceResultsFiller {
         PhpIndex phpIndex = PhpIndex.getInstance(psiElement.getProject());
 
         for (PhpClass phpClass : phpIndex.getClassesByFQN(PhpLangUtil.toFQN(typeName))) {
-            results.add(new PsiElementResolveResult(phpClass));
+            addResult(results, phpClass);
         }
+    }
+
+    protected void addResult(List<ResolveResult> results, PhpClass phpClass) {
+        results.add(new PsiElementResolveResult(phpClass));
     }
 }

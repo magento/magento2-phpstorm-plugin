@@ -5,22 +5,19 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.XmlPatterns;
 import com.intellij.psi.PsiElement;
-import com.intellij.util.PlatformIcons;
 import com.intellij.util.ProcessingContext;
-import com.intellij.util.indexing.FileBasedIndex;
-import com.intellij.xml.util.XmlIconProvider;
-import com.jetbrains.php.PhpIcons;
+import com.magento.idea.magento2plugin.php.util.MagentoTypes;
+import com.magento.idea.magento2plugin.php.util.PsiContextMatcherManager;
+import com.magento.idea.magento2plugin.util.PsiContextMatcherI;
 import com.magento.idea.magento2plugin.xml.XmlHelperUtility;
 import com.magento.idea.magento2plugin.xml.completion.ClassCompletionProvider;
 import com.magento.idea.magento2plugin.xml.completion.CompletionProviderI;
 import com.magento.idea.magento2plugin.xml.completion.VirtualTypeCompletionProvider;
 import com.magento.idea.magento2plugin.xml.layout.LayoutUtility;
-import com.magento.idea.magento2plugin.xml.layout.index.AbstractComponentNameFileBasedIndex;
 import com.magento.idea.magento2plugin.xml.layout.index.BlockFileBasedIndex;
 import com.magento.idea.magento2plugin.xml.layout.index.ContainerFileBasedIndex;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.stream.Collectors;
 
 /**
@@ -44,8 +41,10 @@ public class LayoutCompletionContributor extends CompletionContributor {
                 @Override
                 protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
                     PsiElement psiElement = completionParameters.getOriginalPosition();
+                    PsiContextMatcherI completionContext = PsiContextMatcherManager.getInstance()
+                        .getImplementationMatcherForType(MagentoTypes.BLOCK_TYPE);
                     for (CompletionProviderI completionProvider: typeCompletionProviders) {
-                        completionResultSet.addAllElements(completionProvider.collectCompletionResult(psiElement));
+                        completionResultSet.addAllElements(completionProvider.collectCompletionResult(psiElement, completionContext));
                     }
                 }
             }
@@ -103,4 +102,5 @@ public class LayoutCompletionContributor extends CompletionContributor {
             }
         );
     }
+
 }

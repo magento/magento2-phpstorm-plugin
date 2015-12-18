@@ -8,6 +8,8 @@ import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.magento.idea.magento2plugin.util.PsiContextMatcherI;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,7 +22,7 @@ public class ClassCompletionProvider implements CompletionProviderI {
     public final static CompletionProviderI INSTANCE = new ClassCompletionProvider();
 
     @Override
-    public List<LookupElement> collectCompletionResult(PsiElement psiElement) {
+    public List<LookupElement> collectCompletionResult(PsiElement psiElement, @Nullable PsiContextMatcherI context) {
         List<LookupElement> result = new ArrayList<>();
         PhpIndex phpIndex = PhpIndex.getInstance(psiElement.getProject());
         String prefix = StringUtil.unquoteString(psiElement.getText());
@@ -30,10 +32,11 @@ public class ClassCompletionProvider implements CompletionProviderI {
         for (String className: classNames) {
             Collection<PhpClass> classesByName = phpIndex.getClassesByName(className);
             for (PhpClass phpClass: classesByName) {
-                String classFqn = phpClass.getPresentableFQN();
-                if (classFqn == null) {
+                if (context != null && !context.match(phpClass)) {
                     continue;
                 }
+
+                String classFqn = phpClass.getPresentableFQN();
 
                 result.add(
                     LookupElementBuilder
@@ -44,5 +47,10 @@ public class ClassCompletionProvider implements CompletionProviderI {
         }
 
         return result;
+    }
+
+    @Override
+    public List<LookupElement> collectCompletionResult(PsiElement psiElement) {
+        return collectCompletionResult(psiElement, null);
     }
 }
