@@ -14,7 +14,7 @@ import com.jetbrains.php.lang.psi.resolve.PhpResolveResult;
 import com.magento.idea.magento2plugin.xml.reference.util.ReferenceResultsFiller;
 import com.magento.idea.magento2plugin.xml.webapi.XmlHelper;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 /**
