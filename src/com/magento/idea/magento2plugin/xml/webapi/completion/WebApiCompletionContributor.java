@@ -5,18 +5,17 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.patterns.XmlPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.xml.XmlAttribute;
-import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.PhpLangUtil;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.magento.idea.magento2plugin.xml.completion.InterfaceCompletionProvider;
 import com.magento.idea.magento2plugin.xml.completion.CompletionProviderI;
+import com.magento.idea.magento2plugin.xml.completion.InterfaceCompletionProvider;
 import com.magento.idea.magento2plugin.xml.webapi.XmlHelper;
+import com.magento.idea.magento2plugin.xml.webapi.reference.resolver.InterfaceNameResolver;
 import org.jetbrains.annotations.NotNull;
-import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
@@ -77,19 +76,12 @@ public class WebApiCompletionContributor extends CompletionContributor {
 
     @Nullable
     private PhpClass getServiceInterface(PsiElement psiElement) {
-        XmlAttribute methodAttribute = PsiTreeUtil.getParentOfType(psiElement, XmlAttribute.class);
-        if (methodAttribute == null) {
+        InterfaceNameResolver resolver = new InterfaceNameResolver();
+        XmlAttribute classAttribute = resolver.getInterfaceAttributeByMethod(psiElement);
+        if (classAttribute == null) {
             return null;
         }
-        XmlTag serviceTag = PsiTreeUtil.getParentOfType(methodAttribute, XmlTag.class);
-        if (serviceTag == null) {
-            return null;
-        }
-        XmlAttribute serviceAttribute = serviceTag.getAttribute(XmlHelper.CLASS_ATTRIBUTE);
-        if (serviceAttribute == null) {
-            return null;
-        }
-        String className = serviceAttribute.getValue();
+        String className = classAttribute.getValue();
         if (className == null) {
             return null;
         }
