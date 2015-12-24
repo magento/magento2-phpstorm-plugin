@@ -12,6 +12,7 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -41,7 +42,11 @@ public class ConstantReference extends PsiPolyVariantReferenceBase<PsiElement> {
         String constantName = parts.get(1);
 
         List<ResolveResult> fields = new ArrayList<ResolveResult>();
-        for (PhpClass phpClass: phpIndex.getClassesByFQN(className)) {
+        Collection<PhpClass> classesAndInterfaces = new ArrayList<>();
+        classesAndInterfaces.addAll(phpIndex.getClassesByFQN(className));
+        classesAndInterfaces.addAll(phpIndex.getInterfacesByFQN(className));
+
+        for (PhpClass phpClass: classesAndInterfaces) {
             for(Field field: phpClass.getFields()) {
                 if (field.isConstant() && field.getName().equals(constantName)) {
                     fields.add(new PsiElementResolveResult(field));

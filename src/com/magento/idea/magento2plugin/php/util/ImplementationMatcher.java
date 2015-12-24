@@ -7,7 +7,7 @@ import com.magento.idea.magento2plugin.util.PsiContextMatcherI;
 /**
 * Created by dkvashnin on 12/18/15.
 */
-public class ImplementationMatcher implements PsiContextMatcherI {
+public class ImplementationMatcher implements PsiContextMatcherI<PsiElement> {
     private String type;
 
     public ImplementationMatcher(String type) {
