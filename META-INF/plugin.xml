@@ -1,14 +1,50 @@
 <idea-plugin version="2">
   <id>com.magento.idea.magento2plugin</id>
   <name>Magento2</name>
-  <version>0.0.9</version>
-  <vendor email="dkvashnin@ebay.com" url="https://github.com/dkvashninbay/magento2plugin">Dmytro Kvashnin</vendor>
+  <version>0.1</version>
+  <vendor email="dkvashnin@magento.com" url="https://github.com/dkvashninbay/magento2plugin">Dmytro Kvashnin</vendor>
 
   <description><![CDATA[
       Plugin, created to improve life-work balance while working with Magento 2
+      <h2>Features</h2>
+
+      <h3>Configuration smart completion and references</h3>
+      <ul>
+      <li>di.xml</li>
+      <li>layouts</li>
+      <li>events.xml</li>
+      <li>webapi.xml</li>
+      </ul>
+
+      <h3>Inspections</h3>
+      <ul>
+      <li>@api usage</li>
+      <li>ObjectManager usage</li>
+      </ul>
+
+      <h3>Code helpers</h3>
+      <ul>
+      <li>"Navigate to configuration" reference in scope of class/interface</li>
+      <li>"Go to plugin" reference in scope of class/interface</li>
+      </ul>
     ]]></description>
 
   <change-notes><![CDATA[
+<h3>0.1</h3>
+<ul>
+    <li>Context type completion for:<br/>
+      - Observers completion only for ObserverInterface impl in events.xml<br/>
+      - Blocks completion only for BlockInterface name in layouts.xml<br/>
+      - Preference configuration in di.xml<br/>
+      - Type hinting for object arguments in di.xml<br/>
+      </li>
+    <li>@api usage inspection in Module context</li>
+    <li>ObjectManager usage inspection in Module context</li>
+    <li>virtualType arguments resolution</li>
+    <li>webapi.xml interface/method completion/references</li>
+    <li>Support for old people using PhpStorm 8 or JDK1.7</li>
+</ul>
+
 <h3>0.0.9</h3>
 <ul>
     <li>Added Reference and completion support for layouts<br/>
