@@ -22,7 +22,7 @@ public class ClassCompletionProvider implements CompletionProviderI<PsiElement> 
     public final static ClassCompletionProvider INSTANCE = new ClassCompletionProvider();
 
     @Override
-    public List<LookupElement> collectCompletionResult(PsiElement psiElement, @Nullable PsiContextMatcherI context) {
+    public List<LookupElement> collectCompletionResult(PsiElement psiElement, @Nullable PsiContextMatcherI<PsiElement> context) {
         List<LookupElement> result = new ArrayList<>();
         PhpIndex phpIndex = PhpIndex.getInstance(psiElement.getProject());
         String prefix = StringUtil.unquoteString(psiElement.getText());
