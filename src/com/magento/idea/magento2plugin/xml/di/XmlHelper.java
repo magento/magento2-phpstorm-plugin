@@ -21,6 +21,10 @@ public class XmlHelper extends XmlHelperUtility {
     public static final String TYPE_ATTRIBUTE = "type";
     public static final String FOR_ATTRIBUTE = "for";
 
+    public static final String OBJECT_TYPE = "object";
+    public static final String CONST_TYPE = "const";
+    public static final String INIT_TYPE = "init_parameter";
+
 
     /**
      * <type name="\Namespace\Class">

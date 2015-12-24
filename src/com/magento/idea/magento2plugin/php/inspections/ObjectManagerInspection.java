@@ -21,59 +21,69 @@ import org.jetbrains.annotations.NotNull;
 public class ObjectManagerInspection extends PhpInspection {
     @NotNull
     @Override
-    public PsiElementVisitor buildVisitor(ProblemsHolder problemsHolder, boolean b) {
-        return new PhpElementVisitor() {
-            @Override
-            public void visitPhpMethodReference(MethodReference reference) {
-                PsiElement referencedElement = reference.resolve();
+    public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder problemsHolder, boolean b) {
+        return new OMInspectionVisitor(problemsHolder);
+    }
 
-                if(referencedElement instanceof Method) {
-                    ModuleManager moduleManager = ModuleManager.getInstance(referencedElement.getProject());
-                    if (moduleManager.getModuleForFile(reference.getContainingFile()) == null) {
-                        return;
-                    }
+    private class OMInspectionVisitor extends PhpElementVisitor {
 
-                    PhpClass phpClass = ((Method) referencedElement).getContainingClass();
+        private ProblemsHolder problemsHolder;
 
-                    verifyPhpClass(phpClass, reference);
-                }
-            }
+        public OMInspectionVisitor(@NotNull ProblemsHolder problemsHolder) {
+            super();
+            this.problemsHolder = problemsHolder;
+        }
 
-            @Override
-            public void visitPhpClassReference(ClassReference reference) {
-                PsiElement referencedElement = reference.resolve();
+        @Override
+        public void visitPhpMethodReference(MethodReference reference) {
+            PsiElement referencedElement = reference.resolve();
 
-                if(referencedElement instanceof PhpClass) {
-                    ModuleManager moduleManager = ModuleManager.getInstance(referencedElement.getProject());
-                    if (moduleManager.getModuleForFile(reference.getContainingFile()) == null) {
-                        return;
-                    }
-
-                    verifyPhpClass((PhpClass)referencedElement, reference);
-                }
-            }
-
-            private void verifyPhpClass(PhpClass phpClass, PsiReference reference) {
-                if (phpClass == null) {
+            if(referencedElement instanceof Method) {
+                ModuleManager moduleManager = ModuleManager.getInstance(referencedElement.getProject());
+                if (moduleManager.getModuleForFile(reference.getContainingFile()) == null) {
                     return;
                 }
 
-                if (phpClass.getPresentableFQN().equals(MagentoTypes.OBJECT_MANAGER_TYPE)) {
+                PhpClass phpClass = ((Method) referencedElement).getContainingClass();
+
+                verifyPhpClass(phpClass, reference);
+            }
+        }
+
+        @Override
+        public void visitPhpClassReference(ClassReference reference) {
+            PsiElement referencedElement = reference.resolve();
+
+            if(referencedElement instanceof PhpClass) {
+                ModuleManager moduleManager = ModuleManager.getInstance(referencedElement.getProject());
+                if (moduleManager.getModuleForFile(reference.getContainingFile()) == null) {
+                    return;
+                }
+
+                verifyPhpClass((PhpClass)referencedElement, reference);
+            }
+        }
+
+        private void verifyPhpClass(PhpClass phpClass, PsiReference reference) {
+            if (phpClass == null) {
+                return;
+            }
+
+            if (phpClass.getPresentableFQN().equals(MagentoTypes.OBJECT_MANAGER_TYPE)) {
+                registerProblem(reference);
+                return;
+            }
+
+            for (PhpClass implementedInterface : phpClass.getImplementedInterfaces()) {
+                if (implementedInterface.getPresentableFQN().equals(MagentoTypes.OBJECT_MANAGER_TYPE)) {
                     registerProblem(reference);
                     return;
                 }
-
-                for (PhpClass implementedInterface : phpClass.getImplementedInterfaces()) {
-                    if (implementedInterface.getPresentableFQN().equals(MagentoTypes.OBJECT_MANAGER_TYPE)) {
-                        registerProblem(reference);
-                        return;
-                    }
-                }
             }
+        }
 
-            private void registerProblem(PsiReference reference) {
-                problemsHolder.registerProblem(reference, "ObjectManager is not recommended to use in module", ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
-            }
-        };
+        private void registerProblem(PsiReference reference) {
+            problemsHolder.registerProblem(reference, "ObjectManager is not recommended to use in module", ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
+        }
     }
 }

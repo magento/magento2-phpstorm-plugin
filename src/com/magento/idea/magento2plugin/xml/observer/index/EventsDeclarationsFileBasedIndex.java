@@ -50,7 +50,7 @@ public class EventsDeclarationsFileBasedIndex extends ScalarIndexExtension<Strin
                 List<String> results = new ArrayList<String>();
                 recursiveFill(results, phpFile);
                 for (String result: results) {
-                    map.putIfAbsent(result, null);
+                    map.put(result, null);
                 }
 
                 return map;

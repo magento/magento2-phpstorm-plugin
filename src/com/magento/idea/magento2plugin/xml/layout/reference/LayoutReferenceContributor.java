@@ -65,13 +65,18 @@ public class LayoutReferenceContributor extends PsiReferenceContributor {
             XmlHelperUtility.getTagAttributeValuePattern("update", "handle"),
             new XmlReferenceProvider(
                 new ReferenceResultsFiller[]{
-                    (psiElement, results, typeName) -> results.addAll(
-                        Arrays.asList(
-                            PsiElementResolveResult.createResults(
-                                LayoutUtility.getLayoutFiles(psiElement.getProject(), typeName)
-                            )
-                        )
-                    )
+                    new ReferenceResultsFiller() {
+                        @Override
+                        public void fillResolveResults(PsiElement psiElement, List<ResolveResult> results, String typeName) {
+                            results.addAll(
+                                Arrays.asList(
+                                    PsiElementResolveResult.createResults(
+                                        LayoutUtility.getLayoutFiles(psiElement.getProject(), typeName)
+                                    )
+                                )
+                            );
+                        }
+                    }
                 }
             )
         );
