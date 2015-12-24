@@ -16,6 +16,7 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.util.PsiContextMatcherI;
 import com.magento.idea.magento2plugin.xml.completion.ClassCompletionProvider;
 import com.magento.idea.magento2plugin.xml.completion.CompletionProviderI;
+import com.magento.idea.magento2plugin.xml.completion.InterfaceCompletionProvider;
 import com.magento.idea.magento2plugin.xml.completion.VirtualTypeCompletionProvider;
 import com.magento.idea.magento2plugin.xml.di.XmlHelper;
 import com.magento.idea.magento2plugin.xml.di.index.VirtualTypesNamesFileBasedIndex;
@@ -50,6 +51,21 @@ public class DiCompletionContributor extends CompletionContributor {
                     for (CompletionProviderI completionProvider: completionProviders) {
                         resultSet.addAllElements(completionProvider.collectCompletionResult(psiElement));
                     }
+                }
+            }
+        );
+
+        extend(
+            CompletionType.BASIC,
+            XmlHelper.getTagAttributePattern(XmlHelper.PREFERENCE_TAG, XmlHelper.FOR_ATTRIBUTE),
+            new CompletionProvider<CompletionParameters>() {
+                public void addCompletions(@NotNull CompletionParameters parameters,
+                                           ProcessingContext context,
+                                           @NotNull CompletionResultSet resultSet) {
+                    PsiElement psiElement = parameters.getOriginalPosition();
+                    resultSet.addAllElements(InterfaceCompletionProvider.INSTANCE
+                            .collectCompletionResult(psiElement)
+                    );
                 }
             }
         );
