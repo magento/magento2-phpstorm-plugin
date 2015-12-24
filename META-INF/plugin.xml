@@ -70,8 +70,10 @@
       <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.observer.reference.ObserverReferenceContributor"/>
       <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.observer.reference.EventReferenceContributor"/>
       <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.layout.reference.LayoutReferenceContributor"/>
+      <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.webapi.reference.ServiceReferenceContributor"/>
 
       <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.xml.di.completion.DiCompletionContributor" />
+      <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.xml.webapi.completion.WebApiCompletionContributor" />
       <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.xml.observer.completion.EventCompletionContributor" />
       <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.xml.layout.completion.LayoutCompletionContributor" />
 
