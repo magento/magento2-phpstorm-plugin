@@ -1,17 +1,18 @@
 package com.magento.idea.magento2plugin.xml.webapi.reference.fill;
 
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveResult;
 import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlAttributeValue;
+import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.resolve.PhpResolveResult;
 import com.magento.idea.magento2plugin.xml.reference.util.ReferenceResultsFiller;
-import com.magento.idea.magento2plugin.xml.webapi.reference.resolver.InterfaceNameResolver;
+import com.magento.idea.magento2plugin.xml.webapi.XmlHelper;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -20,8 +21,7 @@ import java.util.List;
 public class ServiceMethodResultsFiller implements ReferenceResultsFiller {
     @Override
     public void fillResolveResults(PsiElement psiElement, List<ResolveResult> results, String typeName) {
-        InterfaceNameResolver resolver = new InterfaceNameResolver();
-        XmlAttribute classAttribute = resolver.getInterfaceAttributeByMethod(psiElement);
+        XmlAttribute classAttribute = XmlHelper.getInterfaceAttributeByMethod(psiElement);
         if (classAttribute == null) {
             return;
         }
@@ -43,12 +43,14 @@ public class ServiceMethodResultsFiller implements ReferenceResultsFiller {
             return null;
         }
 
-        PsiReference reference = value.getReference();
-        if (reference == null) {
-            return null;
+        PhpIndex phpIndex = PhpIndex.getInstance(xmlAttribute.getProject());
+
+        Iterator<PhpClass> iterator = phpIndex.getInterfacesByFQN(value.getValue()).iterator();
+        if (iterator.hasNext()) {
+            return iterator.next();
         }
 
-        return (PhpClass)reference.resolve();
+        return null;
     }
 
     protected void fillResults(PhpClass serviceInterface, List<ResolveResult> results, String typeName) {

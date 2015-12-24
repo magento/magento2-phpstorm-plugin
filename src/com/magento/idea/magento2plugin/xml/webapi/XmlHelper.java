@@ -4,8 +4,12 @@ import com.intellij.patterns.PsiElementPattern;
 import com.intellij.patterns.XmlAttributeValuePattern;
 import com.intellij.patterns.XmlPatterns;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.xml.XmlAttribute;
+import com.intellij.psi.xml.XmlTag;
 import com.intellij.psi.xml.XmlTokenType;
 import com.magento.idea.magento2plugin.xml.XmlHelperUtility;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by isentiabov on 20.12.2015.
@@ -24,45 +28,28 @@ public class XmlHelper extends XmlHelperUtility {
     }
 
     /**
-     * <argument name="argumentName" xsi:type="typeName">\Namespace\Class</argument>
-     * @param typeName Type name
-     */
-    public static PsiElementPattern.Capture<PsiElement> getArgumentValuePatternForType(String typeName) {
-        return XmlPatterns
-                .psiElement(XmlTokenType.XML_DATA_CHARACTERS)
-                .withParent(
-                        XmlPatterns
-                                .xmlText()
-                                .withParent(XmlPatterns
-                                        .xmlTag()
-                                        .withName("argument")
-                                        .withAttributeValue("xsi:type", typeName)
-                                )
-                ).inFile(XmlHelper.getXmlFilePattern(FILE_TYPE));
-    }
-
-    /**
-     * <item name="argumentName" xsi:type="typeName">\Namespace\Class</argument>
-     * @param typeName Type name
-     */
-    public static PsiElementPattern.Capture<PsiElement> getItemValuePatternForType(String typeName) {
-        return XmlPatterns
-                .psiElement(XmlTokenType.XML_DATA_CHARACTERS)
-                .withParent(
-                        XmlPatterns
-                                .xmlText()
-                                .withParent(XmlPatterns
-                                        .xmlTag()
-                                        .withName("item")
-                                        .withAttributeValue("xsi:type", typeName)
-                                )
-                ).inFile(XmlHelper.getXmlFilePattern(FILE_TYPE));
-    }
-
-    /**
      * <tag attributeNames="|"/>
      */
     public static PsiElementPattern.Capture<PsiElement> getTagAttributePattern(String tag, String attributeName) {
         return getTagAttributePattern(tag, attributeName, FILE_TYPE);
+    }
+
+    @Nullable
+    public static XmlAttribute getInterfaceAttributeByMethod(PsiElement psiElement)
+    {
+        // get service xml tag `method` attribute
+        XmlAttribute methodAttribute = PsiTreeUtil.getParentOfType(psiElement, XmlAttribute.class);
+        if (methodAttribute == null) {
+            return null;
+        }
+
+        // get service xml tag
+        XmlTag serviceTag = PsiTreeUtil.getParentOfType(methodAttribute, XmlTag.class);
+        if (serviceTag == null) {
+            return null;
+        }
+
+        // get service xml tag `class` attribute
+        return serviceTag.getAttribute(CLASS_ATTRIBUTE);
     }
 }
