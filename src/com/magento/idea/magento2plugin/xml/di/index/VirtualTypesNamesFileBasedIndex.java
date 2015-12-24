@@ -17,6 +17,7 @@ import com.intellij.util.indexing.*;
 import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
+import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.PhpLangUtil;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
@@ -98,6 +99,22 @@ public class VirtualTypesNamesFileBasedIndex extends FileBasedIndexExtension<Str
         return superName == null
             ? (!inputChildTypeName.equals(childTypeName) ? childTypeName : null)
             : superName;
+    }
+
+    public static List<PhpClass> getSuperParentTypes(final Project project, String inputChildTypeName) {
+        List<PhpClass> result = new ArrayList<>();
+
+        String superName = getSuperParentTypeName(project, inputChildTypeName);
+        if (superName == null) {
+            return result;
+        }
+
+        PhpIndex phpIndex = PhpIndex.getInstance(project);
+
+        result.addAll(phpIndex.getClassesByFQN(superName));
+        result.addAll(phpIndex.getInterfacesByFQN(superName));
+
+        return result;
     }
 
     @NotNull

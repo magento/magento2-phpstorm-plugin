@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Created by dkvashnin on 11/18/15.
  */
-public class ReferenceComponentCompletionProvider implements CompletionProviderI {
+public class ReferenceComponentCompletionProvider implements CompletionProviderI<PsiElement> {
     private ID<String, Void> indexId;
 
     public ReferenceComponentCompletionProvider(ID<String, Void> indexId) {
@@ -25,7 +25,7 @@ public class ReferenceComponentCompletionProvider implements CompletionProviderI
     }
 
     @Override
-    public List<LookupElement> collectCompletionResult(PsiElement psiElement, @Nullable PsiContextMatcherI context) {
+    public List<LookupElement> collectCompletionResult(PsiElement psiElement, @Nullable PsiContextMatcherI<PsiElement> context) {
         Collection<String> keys = LayoutIndexUtility.getAllKeys(indexId, psiElement.getProject());
 
         List<LookupElement> results = new ArrayList<>();

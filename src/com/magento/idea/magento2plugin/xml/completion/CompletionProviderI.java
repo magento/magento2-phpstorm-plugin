@@ -10,8 +10,8 @@ import java.util.List;
 /**
  * Created by dkvashnin on 11/17/15.
  */
-public interface CompletionProviderI {
-    public List<LookupElement> collectCompletionResult(PsiElement psiElement, @Nullable PsiContextMatcherI context);
+public interface CompletionProviderI<T> {
+    public List<LookupElement> collectCompletionResult(PsiElement psiElement, @Nullable PsiContextMatcherI<T> context);
 
     public List<LookupElement> collectCompletionResult(PsiElement psiElement);
 }

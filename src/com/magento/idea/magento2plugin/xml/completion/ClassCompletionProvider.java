@@ -18,8 +18,8 @@ import java.util.List;
 /**
  * Created by dkvashnin on 11/17/15.
  */
-public class ClassCompletionProvider implements CompletionProviderI {
-    public final static CompletionProviderI INSTANCE = new ClassCompletionProvider();
+public class ClassCompletionProvider implements CompletionProviderI<PsiElement> {
+    public final static ClassCompletionProvider INSTANCE = new ClassCompletionProvider();
 
     @Override
     public List<LookupElement> collectCompletionResult(PsiElement psiElement, @Nullable PsiContextMatcherI context) {
