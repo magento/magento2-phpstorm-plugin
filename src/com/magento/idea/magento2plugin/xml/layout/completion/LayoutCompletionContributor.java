@@ -5,6 +5,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.XmlPatterns;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.xml.XmlFile;
 import com.intellij.util.ProcessingContext;
 import com.magento.idea.magento2plugin.php.util.MagentoTypes;
 import com.magento.idea.magento2plugin.php.util.PsiContextMatcherManager;
@@ -17,8 +18,6 @@ import com.magento.idea.magento2plugin.xml.layout.LayoutUtility;
 import com.magento.idea.magento2plugin.xml.layout.index.BlockFileBasedIndex;
 import com.magento.idea.magento2plugin.xml.layout.index.ContainerFileBasedIndex;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.stream.Collectors;
 
 /**
  * Created by dkvashnin on 11/18/15.
@@ -91,13 +90,11 @@ public class LayoutCompletionContributor extends CompletionContributor {
                 protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
                     PsiElement psiElement = completionParameters.getOriginalPosition();
                     Project project = psiElement.getProject();
-
-                    completionResultSet.addAllElements(
-                        LayoutUtility.getLayoutFiles(project)
-                            .stream()
-                            .map(e -> LookupElementBuilder.create(e.getVirtualFile().getNameWithoutExtension()))
-                            .collect(Collectors.toList())
-                    );
+                    for (XmlFile xmlFile: LayoutUtility.getLayoutFiles(project)) {
+                        completionResultSet.addElement(
+                            LookupElementBuilder.create(xmlFile.getVirtualFile().getNameWithoutExtension())
+                        );
+                    }
                 }
             }
         );

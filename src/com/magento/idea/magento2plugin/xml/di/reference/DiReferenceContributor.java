@@ -16,10 +16,6 @@ import org.jetbrains.annotations.NotNull;
  * Created by Warider on 17.08.2015.
  */
 public class DiReferenceContributor extends PsiReferenceContributor {
-    private static final String OBJECT_TYPE_NAME = "object";
-    private static final String CONST_TYPE_NAME = "const";
-    private static final String INIT_TYPE_NAME = "init_parameter";
-
     @Override
     public void registerReferenceProviders(@NotNull PsiReferenceRegistrar psiReferenceRegistrar) {
         // <preference for="\SomeInterface" />
@@ -70,8 +66,8 @@ public class DiReferenceContributor extends PsiReferenceContributor {
         // <argument|item xsi:type="object">SomeClassOrVirtualType</argument|item>
         psiReferenceRegistrar.registerReferenceProvider(
             XmlPatterns.or(
-                XmlHelper.getArgumentValuePatternForType(OBJECT_TYPE_NAME),
-                XmlHelper.getItemValuePatternForType(OBJECT_TYPE_NAME)
+                XmlHelper.getArgumentValuePatternForType(XmlHelper.OBJECT_TYPE),
+                XmlHelper.getItemValuePatternForType(XmlHelper.OBJECT_TYPE)
             ),
             new XmlReferenceProvider(
                 new ReferenceResultsFiller[]{
@@ -90,10 +86,10 @@ public class DiReferenceContributor extends PsiReferenceContributor {
         // <argument|item xsi:type="init_parameter|const">SomeClass::SOME_CONSTANT</argument|item>
         psiReferenceRegistrar.registerReferenceProvider(
             XmlPatterns.or(
-                XmlHelper.getArgumentValuePatternForType(CONST_TYPE_NAME),
-                XmlHelper.getArgumentValuePatternForType(INIT_TYPE_NAME),
-                XmlHelper.getItemValuePatternForType(CONST_TYPE_NAME),
-                XmlHelper.getItemValuePatternForType(INIT_TYPE_NAME)
+                XmlHelper.getArgumentValuePatternForType(XmlHelper.CONST_TYPE),
+                XmlHelper.getArgumentValuePatternForType(XmlHelper.INIT_TYPE),
+                XmlHelper.getItemValuePatternForType(XmlHelper.CONST_TYPE),
+                XmlHelper.getItemValuePatternForType(XmlHelper.INIT_TYPE)
             ),
             new PsiReferenceProvider() {
                 @NotNull

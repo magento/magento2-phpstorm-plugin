@@ -22,36 +22,48 @@ public class MagentoApiInspection extends PhpInspection {
     @NotNull
     @Override
     public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder problemsHolder, boolean isOnTheFly) {
-        return new PhpElementVisitor() {
-            @Override
-            public void visitPhpMethodReference(MethodReference reference) {
-                PsiElement referencedElement = reference.resolve();
 
-                if(referencedElement instanceof Method) {
-                    PhpClass phpClass = ((Method) referencedElement).getContainingClass();
+        return new ApiInspectionVisitor(problemsHolder);
+    }
 
-                    if (phpClass == null) {
-                        return;
-                    }
+    private class ApiInspectionVisitor extends PhpElementVisitor {
 
-                    if (!MagentoApiInspection.isValidReference(phpClass, reference.getElement())
-                        && !MagentoApiInspection.isValidReference((Method) referencedElement, reference.getElement())) {
-                        problemsHolder.registerProblem(reference, "Method #ref is not in module API", ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
-                    }
+        private ProblemsHolder problemsHolder;
+
+        public ApiInspectionVisitor(@NotNull ProblemsHolder problemsHolder) {
+            super();
+
+            this.problemsHolder = problemsHolder;
+        }
+
+        @Override
+        public void visitPhpMethodReference(MethodReference reference) {
+            PsiElement referencedElement = reference.resolve();
+
+            if(referencedElement instanceof Method) {
+                PhpClass phpClass = ((Method) referencedElement).getContainingClass();
+
+                if (phpClass == null) {
+                    return;
+                }
+
+                if (!MagentoApiInspection.isValidReference(phpClass, reference.getElement())
+                    && !MagentoApiInspection.isValidReference((Method) referencedElement, reference.getElement())) {
+                    problemsHolder.registerProblem(reference, "Method #ref is not in module API", ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
                 }
             }
+        }
 
-            @Override
-            public void visitPhpClassReference(ClassReference reference) {
-                PsiElement referencedElement = reference.resolve();
+        @Override
+        public void visitPhpClassReference(ClassReference reference) {
+            PsiElement referencedElement = reference.resolve();
 
-                if(referencedElement instanceof PhpClass) {
-                    if (!MagentoApiInspection.isValidReference((PhpClass) referencedElement, reference.getElement())) {
-                        problemsHolder.registerProblem(reference, "Class #ref is not in module API", ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
-                    }
+            if(referencedElement instanceof PhpClass) {
+                if (!MagentoApiInspection.isValidReference((PhpClass) referencedElement, reference.getElement())) {
+                    problemsHolder.registerProblem(reference, "Class #ref is not in module API", ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
                 }
             }
-        };
+        }
     }
 
     private static boolean isValidReference(PhpNamedElement referencedElement, PsiElement contextElement) {

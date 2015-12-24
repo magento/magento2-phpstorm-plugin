@@ -20,7 +20,7 @@ public class VirtualTypeTagResolver extends ClassNameResolver {
         String parentTypeName = xmlTag.getAttributeValue(XmlHelper.TYPE_ATTRIBUTE);
 
         if (parentTypeName == null) {
-            return parentTypeName;
+            return null;
         }
 
         String superParentName = VirtualTypesNamesFileBasedIndex.getSuperParentTypeName(xmlTag.getProject(), parentTypeName);

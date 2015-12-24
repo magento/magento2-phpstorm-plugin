@@ -1,13 +1,14 @@
 package com.magento.idea.magento2plugin.php.module;
 
 import com.intellij.json.psi.*;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Created by dkvashnin on 12/5/15.
@@ -65,12 +66,12 @@ public class ComposerPackageModelImpl implements ComposerPackageModel {
         if (autoloadObject != null) {
             JsonArray jsonArray = getPropertyValueOfType(FILES, JsonArray.class);
             if (jsonArray != null) {
-                List<String> files = jsonArray.getValueList()
-                    .stream()
-                    .filter(value -> value instanceof JsonStringLiteral)
-                    .map(v -> ((JsonStringLiteral) v).getValue())
-                    .collect(Collectors.toList());
-
+                List<String> files = new ArrayList<>();
+                for(JsonValue value: jsonArray.getValueList()) {
+                    if (value instanceof JsonStringLiteral) {
+                        files.add(StringUtils.strip(value.getText(), "\""));
+                    }
+                }
                 return files.size() > 0 ? files.toArray(new String[files.size()]) : null;
             }
         }
@@ -90,7 +91,7 @@ public class ComposerPackageModelImpl implements ComposerPackageModel {
                     JsonValue value = property.getValue();
 
                     if (value != null && value instanceof JsonStringLiteral) {
-                        map.put(property.getName(), ((JsonStringLiteral) value).getValue());
+                        map.put(property.getName(), StringUtils.strip(value.getText(), "\""));
                     }
                 }
 
@@ -120,7 +121,7 @@ public class ComposerPackageModelImpl implements ComposerPackageModel {
         JsonStringLiteral stringLiteral = getPropertyValueOfType(propertyName, JsonStringLiteral.class);
 
         if (stringLiteral != null) {
-            return stringLiteral.getValue();
+            return StringUtils.strip(stringLiteral.getText(), "\"");
         }
 
         return null;

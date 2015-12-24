@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by dkvashnin on 10/18/15.
@@ -38,13 +37,11 @@ public class ArgumentNameReference extends PsiPolyVariantReferenceBase<PsiElemen
         List<ResolveResult> list = new ArrayList<ResolveResult>();
 
         String argumentName = StringUtil.unquoteString(getElement().getText());
-        list.addAll(
-            getParameters()
-                .stream()
-                .filter(parameter -> parameter.getName().equals(argumentName))
-                .map(PsiElementResolveResult::new)
-                .collect(Collectors.toList())
-        );
+        for (Parameter parameter: getParameters()) {
+            if (argumentName.equals(parameter.getName())) {
+                list.add(new PsiElementResolveResult(parameter));
+            }
+        }
 
         return list.toArray(new ResolveResult[list.size()]);
     }
