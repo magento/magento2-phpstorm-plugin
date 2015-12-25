@@ -23,6 +23,11 @@ public class LayoutUtility {
         return virtualFile.getFileType() == XmlFileType.INSTANCE && parent.isDirectory() && parent.getName().endsWith("layout");
     }
 
+    public static boolean isLayoutFile(PsiFile psiFile) {
+        VirtualFile virtualFile = psiFile.getVirtualFile();
+        return isLayoutFile(virtualFile);
+    }
+
     public static List<XmlFile> getLayoutFiles(Project project, @Nullable String fileName) {
         List<XmlFile> results = new ArrayList<XmlFile>();
         Collection<VirtualFile> xmlFiles = FilenameIndex.getAllFilesByExt(project, "xml");

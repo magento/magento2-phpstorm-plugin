@@ -18,6 +18,11 @@ public class ContainerFileBasedIndex extends AbstractComponentNameFileBasedIndex
     @NotNull
     @Override
     public DataIndexer<String, Void, FileContent> getIndexer() {
-        return new LayoutDataIndexer("block", "name");
+        return new LayoutDataIndexer("container", "name");
+    }
+
+    @Override
+    public int getVersion() {
+        return 1;
     }
 }

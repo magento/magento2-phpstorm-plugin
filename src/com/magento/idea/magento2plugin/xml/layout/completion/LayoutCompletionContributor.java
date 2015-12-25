@@ -9,11 +9,8 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.util.ProcessingContext;
 import com.magento.idea.magento2plugin.php.util.ImplementationMatcher;
 import com.magento.idea.magento2plugin.php.util.MagentoTypes;
-import com.magento.idea.magento2plugin.php.util.PsiContextMatcherManager;
-import com.magento.idea.magento2plugin.util.PsiContextMatcherI;
 import com.magento.idea.magento2plugin.xml.XmlHelperUtility;
 import com.magento.idea.magento2plugin.xml.completion.ClassCompletionProvider;
-import com.magento.idea.magento2plugin.xml.completion.CompletionProviderI;
 import com.magento.idea.magento2plugin.xml.completion.VirtualTypeCompletionProvider;
 import com.magento.idea.magento2plugin.xml.layout.LayoutUtility;
 import com.magento.idea.magento2plugin.xml.layout.index.BlockFileBasedIndex;
@@ -36,8 +33,7 @@ public class LayoutCompletionContributor extends CompletionContributor {
                 @Override
                 protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
                     PsiElement psiElement = completionParameters.getOriginalPosition();
-                    ImplementationMatcher completionContext = PsiContextMatcherManager.getInstance()
-                        .getImplementationMatcherForType(MagentoTypes.BLOCK_TYPE);
+                    ImplementationMatcher completionContext = new ImplementationMatcher(MagentoTypes.BLOCK_TYPE);
                     completionResultSet.addAllElements(
                         ClassCompletionProvider.INSTANCE.collectCompletionResult(psiElement, completionContext)
                     );
