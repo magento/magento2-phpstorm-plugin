@@ -11,22 +11,10 @@ import java.util.Map;
 public class PsiContextMatcherManager {
     private static PsiContextMatcherManager INSTANCE;
 
-    private Map<String, PsiContextMatcherI> map = new HashMap<>();
-
     private PsiContextMatcherManager() {}
 
     public ImplementationMatcher getImplementationMatcherForType(String type) {
-        if (map.containsKey(type)) {
-
-            PsiContextMatcherI psiContextMatcherI = map.get(type);
-            if (psiContextMatcherI instanceof ImplementationMatcher) {
-                return (ImplementationMatcher)psiContextMatcherI;
-            }
-        }
-        ImplementationMatcher implementationMatcher = new ImplementationMatcher(type);
-        map.put(type, implementationMatcher);
-
-        return implementationMatcher;
+        return new ImplementationMatcher(type);
     }
 
     public static PsiContextMatcherManager getInstance() {

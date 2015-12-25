@@ -2,6 +2,7 @@ package com.magento.idea.magento2plugin.xml.layout.reference;
 
 import com.intellij.patterns.XmlPatterns;
 import com.intellij.psi.*;
+import com.magento.idea.magento2plugin.php.util.ImplementationMatcher;
 import com.magento.idea.magento2plugin.php.util.MagentoTypes;
 import com.magento.idea.magento2plugin.xml.XmlHelperUtility;
 import com.magento.idea.magento2plugin.xml.di.reference.provider.XmlReferenceProvider;
@@ -28,7 +29,10 @@ public class LayoutReferenceContributor extends PsiReferenceContributor {
             XmlHelperUtility.getTagAttributeValuePattern("block", "class"),
             new XmlReferenceProvider(
                 new ReferenceResultsFiller[]{
-                    new ImplementationContextDecorator(ClassesResultsFiller.INSTANCE, MagentoTypes.BLOCK_TYPE),
+                    new ImplementationContextDecorator(
+                        ClassesResultsFiller.INSTANCE,
+                        new ImplementationMatcher(MagentoTypes.BLOCK_TYPE)
+                    ),
                     VirtualTypesResultsFiller.INSTANCE
                 }
             )
