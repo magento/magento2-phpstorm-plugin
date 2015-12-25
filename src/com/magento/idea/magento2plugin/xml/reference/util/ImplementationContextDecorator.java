@@ -4,7 +4,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveResult;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.php.util.ImplementationMatcher;
-import com.magento.idea.magento2plugin.php.util.PsiContextMatcherManager;
 
 import java.util.List;
 

@@ -142,7 +142,7 @@ class MagentoModuleImpl implements MagentoModule {
 
     @Override
     public boolean isFileInContext(PsiFile psiFile) {
-        PsiDirectory containingDirectory = psiFile.getContainingDirectory();
+        PsiDirectory containingDirectory = psiFile.getOriginalFile().getContainingDirectory();
         while (containingDirectory != null) {
             if (containingDirectory.getManager().areElementsEquivalent(containingDirectory, directory)) {
                 return true;
