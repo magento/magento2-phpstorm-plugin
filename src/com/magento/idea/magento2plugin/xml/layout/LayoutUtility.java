@@ -3,7 +3,6 @@ package com.magento.idea.magento2plugin.xml.layout;
 import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiElementResolveResult;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FilenameIndex;
@@ -24,7 +23,7 @@ public class LayoutUtility {
     }
 
     public static boolean isLayoutFile(PsiFile psiFile) {
-        VirtualFile virtualFile = psiFile.getVirtualFile();
+        VirtualFile virtualFile = psiFile.getOriginalFile().getVirtualFile();
         return isLayoutFile(virtualFile);
     }
 
