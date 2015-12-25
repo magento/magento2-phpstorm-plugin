@@ -1,6 +1,7 @@
 package com.magento.idea.magento2plugin.xml.observer.reference;
 
 import com.intellij.psi.*;
+import com.magento.idea.magento2plugin.php.util.ImplementationMatcher;
 import com.magento.idea.magento2plugin.php.util.MagentoTypes;
 import com.magento.idea.magento2plugin.xml.di.reference.provider.XmlReferenceProvider;
 import com.magento.idea.magento2plugin.xml.observer.XmlHelper;
@@ -23,7 +24,10 @@ public class ObserverReferenceContributor extends PsiReferenceContributor {
             XmlHelper.getTagAttributeValuePattern(XmlHelper.OBSERVER_TAG, XmlHelper.INSTANCE_ATTRIBUTE),
             new XmlReferenceProvider(
                 new ReferenceResultsFiller[]{
-                    new ImplementationContextDecorator(ClassesResultsFiller.INSTANCE, MagentoTypes.OBSERVER_TYPE),
+                    new ImplementationContextDecorator(
+                        ClassesResultsFiller.INSTANCE,
+                        new ImplementationMatcher(MagentoTypes.OBSERVER_TYPE)
+                    ),
                     VirtualTypesResultsFiller.INSTANCE
                 }
             )

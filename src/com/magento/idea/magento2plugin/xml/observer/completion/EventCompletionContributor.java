@@ -22,11 +22,6 @@ import java.util.Collection;
  * Created by dkvashnin on 11/17/15.
  */
 public class EventCompletionContributor extends CompletionContributor {
-    private CompletionProviderI[] typeCompletionProviders = new CompletionProviderI[] {
-        ClassCompletionProvider.INSTANCE,
-        VirtualTypeCompletionProvider.INSTANCE
-    };
-
     public EventCompletionContributor() {
         extend(
             CompletionType.BASIC,
@@ -37,9 +32,9 @@ public class EventCompletionContributor extends CompletionContributor {
                     ImplementationMatcher completionContext = PsiContextMatcherManager.getInstance()
                         .getImplementationMatcherForType(MagentoTypes.OBSERVER_TYPE);
                     PsiElement psiElement = completionParameters.getOriginalPosition();
-                    for (CompletionProviderI completionProvider: typeCompletionProviders) {
-                        completionResultSet.addAllElements(completionProvider.collectCompletionResult(psiElement, completionContext));
-                    }
+
+                    completionResultSet.addAllElements(ClassCompletionProvider.INSTANCE.collectCompletionResult(psiElement, completionContext));
+                    completionResultSet.addAllElements(VirtualTypeCompletionProvider.INSTANCE.collectCompletionResult(psiElement));
                 }
             }
         );
@@ -56,7 +51,6 @@ public class EventCompletionContributor extends CompletionContributor {
                     for (String eventName: eventNames) {
                         completionResultSet.addElement(LookupElementBuilder.create(eventName));
                     }
-
                 }
             }
         );

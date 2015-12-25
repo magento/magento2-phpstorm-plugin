@@ -13,19 +13,17 @@ import java.util.List;
  */
 public class ImplementationContextDecorator implements ReferenceResultsFiller {
     private ReferenceResultsFiller subject;
-    private String type;
+    private ImplementationMatcher implementationMatcher;
 
-    public ImplementationContextDecorator(ReferenceResultsFiller subject, String type) {
+    public ImplementationContextDecorator(ReferenceResultsFiller subject, ImplementationMatcher implementationMatcher) {
         this.subject = subject;
-        this.type = type;
+        this.implementationMatcher = implementationMatcher;
     }
 
     @Override
     public void fillResolveResults(PsiElement psiElement, List<ResolveResult> results, String typeName) {
         subject.fillResolveResults(psiElement, results, typeName);
 
-        ImplementationMatcher implementationMatcher = PsiContextMatcherManager.getInstance()
-            .getImplementationMatcherForType(type);
         for (ResolveResult resolveResult : results) {
             PsiElement element = resolveResult.getElement();
 

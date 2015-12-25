@@ -7,6 +7,7 @@ import com.intellij.patterns.XmlPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.util.ProcessingContext;
+import com.magento.idea.magento2plugin.php.util.ImplementationMatcher;
 import com.magento.idea.magento2plugin.php.util.MagentoTypes;
 import com.magento.idea.magento2plugin.php.util.PsiContextMatcherManager;
 import com.magento.idea.magento2plugin.util.PsiContextMatcherI;
@@ -23,11 +24,6 @@ import org.jetbrains.annotations.NotNull;
  * Created by dkvashnin on 11/18/15.
  */
 public class LayoutCompletionContributor extends CompletionContributor {
-    private CompletionProviderI[] typeCompletionProviders = new CompletionProviderI[] {
-        ClassCompletionProvider.INSTANCE,
-        VirtualTypeCompletionProvider.INSTANCE
-    };
-
     private ReferenceComponentCompletionProvider containerCompletionProvider = new ReferenceComponentCompletionProvider(ContainerFileBasedIndex.NAME);
     private ReferenceComponentCompletionProvider blockCompletionProvider = new ReferenceComponentCompletionProvider(BlockFileBasedIndex.NAME);
 
@@ -40,11 +36,15 @@ public class LayoutCompletionContributor extends CompletionContributor {
                 @Override
                 protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
                     PsiElement psiElement = completionParameters.getOriginalPosition();
-                    PsiContextMatcherI completionContext = PsiContextMatcherManager.getInstance()
+                    ImplementationMatcher completionContext = PsiContextMatcherManager.getInstance()
                         .getImplementationMatcherForType(MagentoTypes.BLOCK_TYPE);
-                    for (CompletionProviderI completionProvider: typeCompletionProviders) {
-                        completionResultSet.addAllElements(completionProvider.collectCompletionResult(psiElement, completionContext));
-                    }
+                    completionResultSet.addAllElements(
+                        ClassCompletionProvider.INSTANCE.collectCompletionResult(psiElement, completionContext)
+                    );
+
+                    completionResultSet.addAllElements(
+                        VirtualTypeCompletionProvider.INSTANCE.collectCompletionResult(psiElement)
+                    );
                 }
             }
         );
