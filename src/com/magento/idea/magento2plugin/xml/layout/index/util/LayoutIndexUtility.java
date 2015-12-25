@@ -11,6 +11,7 @@ import com.intellij.util.indexing.ID;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.xml.layout.index.BlockClassFileBasedIndex;
 import com.magento.idea.magento2plugin.xml.layout.index.BlockFileBasedIndex;
+import com.magento.idea.magento2plugin.xml.layout.index.ContainerFileBasedIndex;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -65,7 +66,7 @@ public class LayoutIndexUtility {
     }
 
     public static List<XmlTag> getContainerDeclarations(String componentName, Project project) {
-        return getComponentDeclarations(componentName, "container", BlockFileBasedIndex.NAME, project, new NameComponentMatcher());
+        return getComponentDeclarations(componentName, "container", ContainerFileBasedIndex.NAME, project, new NameComponentMatcher());
     }
 
     public static List<XmlTag> getBlockClassDeclarations(PhpClass phpClass, Project project) {
