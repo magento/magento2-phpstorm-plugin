@@ -121,10 +121,12 @@
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.layout.index.BlockFileBasedIndex" />
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.layout.index.ContainerFileBasedIndex" />
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.layout.index.BlockClassFileBasedIndex" />
+      <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.webapi.index.WebApiTypesFileBasedIndex" />
       <fileBasedIndex implementation="com.magento.idea.magento2plugin.php.index.ModulePackageFileBasedIndex" />
 
       <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.PluginLineMarkerProvider"/>
       <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.ClassConfigurationLineMarkerProvider"/>
+      <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.WebApiLineMarkerProvider"/>
 
       <localInspection language="PHP" shortName="MagentoApiInspection" displayName="Module API"
                        groupPath="Magento2"
