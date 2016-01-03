@@ -34,7 +34,8 @@ This is a plugin for Magento 2 development in the PhpStorm IDE. It is available 
 <h4>Code helpers</h4>
 <ul>
 <li>"Navigate to configuration" reference in scope of class/interface</li>
-<li>"Go to plugin" reference in scope of class/interface</li>
+<li>"Go to plugin" reference in scope of class/interface and method</li>
+<li>"Navigate to Web API configuration" reference in scope of class/interface and method</li>
 </ul>
 
 ## License

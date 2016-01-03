@@ -65,7 +65,6 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
                 return classPluginsMap.get(classFQN);
             }
 
-
             List<Set<String>> plugins = FileBasedIndex.getInstance()
                 .getValues(
                     PluginToTypeFileBasedIndex.NAME,
