@@ -6,8 +6,9 @@
 
   <description><![CDATA[
       Plugin, created to improve life-work balance while working with Magento 2
-      <h2>Features</h2>
-
+      <br/>
+      <h3>Features</h3>
+      <br/>
       <h3>Configuration smart completion and references</h3>
       <ul>
       <li>di.xml</li>
