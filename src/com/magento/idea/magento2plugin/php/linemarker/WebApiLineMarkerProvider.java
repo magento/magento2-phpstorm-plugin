@@ -78,19 +78,7 @@ class WebApiRoutesCollector {
         for (Method method : phpClass.getMethods()) {
             routesForClass.addAll(getRoutes(method));
         }
-        /** Make sure that routes are sorted as follows: GET, PUT, POST, DELETE */
-        Collections.sort(
-            routesForClass,
-            new Comparator<XmlTag>() {
-                @Override
-                public int compare(XmlTag firstTag, XmlTag secondTag) {
-                    String substring = firstTag.getName().substring(2, 5);
-                    Integer firstSortOrder = HTTP_METHODS_SORT_ORDER.get(substring);
-                    Integer secondSortOrder = HTTP_METHODS_SORT_ORDER.get(secondTag.getName().substring(2, 5));
-                    return firstSortOrder.compareTo(secondSortOrder);
-                }
-            }
-        );
+        sortRoutes(routesForClass);
         return routesForClass;
     }
 
@@ -102,7 +90,9 @@ class WebApiRoutesCollector {
     public List<XmlTag> getRoutes(@NotNull Method method) {
         String methodFqn = method.getFQN();
         if (!routesCache.containsKey(methodFqn)) {
-            routesCache.put(methodFqn, extractRoutesForMethod(method));
+            List<XmlTag> routesForMethod = extractRoutesForMethod(method);
+            sortRoutes(routesForMethod);
+            routesCache.put(methodFqn, routesForMethod);
         }
         return routesCache.get(methodFqn);
     }
@@ -127,5 +117,27 @@ class WebApiRoutesCollector {
             }
         }
         return routesForMethod;
+    }
+
+    /**
+     * Make sure that routes are sorted as follows: GET, PUT, POST, DELETE. Then by path.
+     */
+    private void sortRoutes(List<XmlTag> routes) {
+        Collections.sort(
+            routes,
+            new Comparator<XmlTag>() {
+                @Override
+                public int compare(XmlTag firstTag, XmlTag secondTag) {
+                    String substring = firstTag.getName().substring(2, 5);
+                    Integer firstSortOrder = HTTP_METHODS_SORT_ORDER.get(substring);
+                    Integer secondSortOrder = HTTP_METHODS_SORT_ORDER.get(secondTag.getName().substring(2, 5));
+                    if (firstSortOrder.compareTo(secondSortOrder) == 0) {
+                        /** Sort by route if HTTP methods are equal */
+                        return firstTag.getName().compareTo(secondTag.getName());
+                    }
+                    return firstSortOrder.compareTo(secondSortOrder);
+                }
+            }
+        );
     }
 }

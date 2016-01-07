@@ -98,7 +98,8 @@ public class WebApiTypesFileBasedIndex extends ScalarIndexExtension<String> {
         return new FileBasedIndex.InputFilter() {
             @Override
             public boolean acceptInput(@NotNull VirtualFile file) {
-                return file.getFileType() == XmlFileType.INSTANCE && file.getNameWithoutExtension().equals("webapi");
+                return file.getFileType() == XmlFileType.INSTANCE && file.getNameWithoutExtension().equals("webapi")
+                    && !file.getPath().contains("testsuite") && !file.getPath().contains("_files");
             }
         };
     }
