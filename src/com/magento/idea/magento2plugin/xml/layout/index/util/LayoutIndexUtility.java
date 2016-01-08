@@ -9,9 +9,12 @@ import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.intellij.util.indexing.ID;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.magento.idea.magento2plugin.xml.index.LineMarkerXmlTagDecorator;
 import com.magento.idea.magento2plugin.xml.layout.index.BlockClassFileBasedIndex;
 import com.magento.idea.magento2plugin.xml.layout.index.BlockFileBasedIndex;
 import com.magento.idea.magento2plugin.xml.layout.index.ContainerFileBasedIndex;
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -72,7 +75,12 @@ public class LayoutIndexUtility {
     public static List<XmlTag> getBlockClassDeclarations(PhpClass phpClass, Project project) {
         String className = phpClass.getPresentableFQN();
 
-        return getComponentDeclarations(className, "block", BlockClassFileBasedIndex.NAME, project, new ClassComponentMatcher());
+        List<XmlTag> blockTags = getComponentDeclarations(className, "block", BlockClassFileBasedIndex.NAME, project, new ClassComponentMatcher());
+        List<XmlTag> decoratedBlockTags = new ArrayList<>();
+        for (XmlTag blockTag: blockTags) {
+            decoratedBlockTags.add(new LayoutBlockLineMarkerXmlTagDecorator(blockTag));
+        }
+        return decoratedBlockTags;
     }
 }
 
@@ -91,5 +99,32 @@ class ClassComponentMatcher implements ComponentMatcher {
     @Override
     public boolean matches(String value, XmlTag tag) {
         return value.equals(tag.getAttributeValue("class"));
+    }
+}
+
+/**
+ * Decorator for XmlTag, which improves readability of "block" node in configuration line marker.
+ */
+class LayoutBlockLineMarkerXmlTagDecorator extends LineMarkerXmlTagDecorator {
+
+    public LayoutBlockLineMarkerXmlTagDecorator(XmlTag xmlTag) {
+        super(xmlTag);
+    }
+
+    @Override
+    @NotNull
+    @NonNls
+    public String getName() {
+        String name = xmlTag.getAttributeValue("name");
+        if (name != null) {
+            return String.format("[%s] block %s", getAreaName(), name);
+        }
+        return xmlTag.getName();
+    }
+
+    @NotNull
+    @Override
+    protected String getAreaName() {
+        return xmlTag.getContainingFile().getVirtualFile().getParent().getParent().getName();
     }
 }
