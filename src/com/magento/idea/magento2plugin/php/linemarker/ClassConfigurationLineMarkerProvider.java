@@ -12,9 +12,7 @@ import com.magento.idea.magento2plugin.xml.layout.index.util.LayoutIndexUtility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by dkvashnin on 11/15/15.
@@ -43,11 +41,23 @@ public class ClassConfigurationLineMarkerProvider implements LineMarkerProvider 
                 if (results.size() == 0) {
                     continue;
                 }
-
+                Collections.sort(
+                    results,
+                    new Comparator<XmlTag>() {
+                        @Override
+                        public int compare(XmlTag firstTag, XmlTag secondTag) {
+                            return firstTag.getName().compareTo(secondTag.getName());
+                        }
+                    }
+                );
+                String tooltipText = "Navigate to configuration:";
+                for (XmlTag resultItem: results) {
+                    tooltipText += "\n  " + resultItem.getName();
+                }
                 NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder.
                     create(Magento2Icons.CONFIGURATION).
                     setTargets(results).
-                    setTooltipText("Navigate to configuration");
+                    setTooltipText(tooltipText);
 
                 collection.add(builder.createLineMarkerInfo(psiElement));
             }

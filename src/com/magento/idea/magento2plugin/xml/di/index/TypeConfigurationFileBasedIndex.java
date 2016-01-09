@@ -16,7 +16,9 @@ import com.intellij.util.io.KeyDescriptor;
 import com.jetbrains.php.lang.PhpLangUtil;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.xml.di.XmlHelper;
+import com.magento.idea.magento2plugin.xml.index.LineMarkerXmlTagDecorator;
 import com.magento.idea.magento2plugin.xml.index.StringSetDataExternalizer;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -79,13 +81,32 @@ public class TypeConfigurationFileBasedIndex extends ScalarIndexExtension<String
 
             String className = childTag.getAttributeValue(attribute);
             if (className != null && PhpLangUtil.toPresentableFQN(className).equals(classFqn)) {
-                tagsReferences.add(childTag);
+                tagsReferences.add(getLineMarkerDecorator(childTag));
             }
 
             // type tag has plugin tags
             if (tagName.equals(XmlHelper.TYPE_TAG)) {
                 fillRelatedTags(classFqn, childTag, tagsReferences);
             }
+        }
+    }
+
+    /**
+     * Decorate tag with appropriate line marker decorator.
+     */
+    @NotNull
+    private static XmlTag getLineMarkerDecorator(XmlTag tag) {
+        switch (tag.getName()) {
+            case XmlHelper.PREFERENCE_TAG:
+                return new DiPreferenceLineMarkerXmlTagDecorator(tag);
+            case XmlHelper.TYPE_TAG:
+                return new DiTypeLineMarkerXmlTagDecorator(tag);
+            case XmlHelper.PLUGIN_TAG:
+                return new DiPluginLineMarkerXmlTagDecorator(tag);
+            case XmlHelper.VIRTUAL_TYPE_TAG:
+                return new DiVirtualTypeLineMarkerXmlTagDecorator(tag);
+            default:
+                return tag;
         }
     }
 
@@ -172,5 +193,89 @@ public class TypeConfigurationFileBasedIndex extends ScalarIndexExtension<String
     @Override
     public int getVersion() {
         return 0;
+    }
+}
+
+/**
+ * Decorator for XmlTag, which improves readability of "preference" node in configuration line marker.
+ */
+class DiPreferenceLineMarkerXmlTagDecorator extends LineMarkerXmlTagDecorator {
+
+    public DiPreferenceLineMarkerXmlTagDecorator(XmlTag xmlTag) {
+        super(xmlTag);
+    }
+
+    @Override
+    @NotNull
+    @NonNls
+    public String getName() {
+        String preference = xmlTag.getAttributeValue(XmlHelper.TYPE_ATTRIBUTE);
+        if (preference != null) {
+            return String.format("[%s] preference %s", getAreaName(), preference);
+        }
+        return xmlTag.getName();
+    }
+}
+
+/**
+ * Decorator for XmlTag, which improves readability of "type" node in configuration line marker.
+ */
+class DiTypeLineMarkerXmlTagDecorator extends LineMarkerXmlTagDecorator {
+
+    public DiTypeLineMarkerXmlTagDecorator(XmlTag xmlTag) {
+        super(xmlTag);
+    }
+
+    @Override
+    @NotNull
+    @NonNls
+    public String getName() {
+        return String.format("[%s] type declaration", getAreaName());
+    }
+}
+
+/**
+ * Decorator for XmlTag, which improves readability of "plugin" node in configuration line marker.
+ */
+class DiPluginLineMarkerXmlTagDecorator extends LineMarkerXmlTagDecorator {
+
+    public DiPluginLineMarkerXmlTagDecorator(XmlTag xmlTag) {
+        super(xmlTag);
+    }
+
+    @Override
+    @NotNull
+    @NonNls
+    public String getName() {
+        XmlTag typeTag = xmlTag.getParentTag();
+        if (typeTag == null) {
+            return xmlTag.getName();
+        }
+        String type = typeTag.getAttributeValue(XmlHelper.NAME_ATTRIBUTE);
+        if (type == null) {
+            return xmlTag.getName();
+        }
+        return String.format("[%s] plugin for %s", getAreaName(), type);
+    }
+}
+
+/**
+ * Decorator for XmlTag, which improves readability of "virtualType" node in configuration line marker.
+ */
+class DiVirtualTypeLineMarkerXmlTagDecorator extends LineMarkerXmlTagDecorator {
+
+    public DiVirtualTypeLineMarkerXmlTagDecorator(XmlTag xmlTag) {
+        super(xmlTag);
+    }
+
+    @Override
+    @NotNull
+    @NonNls
+    public String getName() {
+        String type = xmlTag.getAttributeValue(XmlHelper.NAME_ATTRIBUTE);
+        if (type != null) {
+            return String.format("[%s] virtual type %s", getAreaName(), type);
+        }
+        return xmlTag.getName();
     }
 }
