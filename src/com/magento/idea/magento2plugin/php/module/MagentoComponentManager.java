@@ -39,12 +39,12 @@ public class MagentoComponentManager {
         return magentoComponentManager;
     }
 
-    public Collection<MagentoComponent> getAllModules() {
+    public Collection<MagentoComponent> getAllComponents() {
         return getComponents().values();
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends MagentoComponent> Collection<T> getAllModulesOfType(@NotNull Class<T> type) {
+    public <T extends MagentoComponent> Collection<T> getAllComponentsOfType(@NotNull Class<T> type) {
         Collection<T> result = new ArrayList<>();
         Map<String, MagentoComponent> components = getComponents();
         for (String key: components.keySet()) {
@@ -68,7 +68,7 @@ public class MagentoComponentManager {
 
     @Nullable
     public MagentoComponent getComponentForFile(@NotNull PsiFile psiFile) {
-        for (MagentoComponent magentoComponent: this.getAllModules()) {
+        for (MagentoComponent magentoComponent: this.getAllComponents()) {
             if (magentoComponent.isFileInContext(psiFile)) {
                 return magentoComponent;
             }
@@ -80,7 +80,7 @@ public class MagentoComponentManager {
     @Nullable
     @SuppressWarnings("unchecked")
     public <T extends MagentoComponent> T getComponentOfTypeForFile(@NotNull PsiFile psiFile, @NotNull Class<T> type) {
-        for (MagentoComponent magentoComponent: this.getAllModules()) {
+        for (MagentoComponent magentoComponent: this.getAllComponents()) {
             if (type.isInstance(magentoComponent) && magentoComponent.isFileInContext(psiFile)) {
                 return (T)magentoComponent;
             }
@@ -89,7 +89,7 @@ public class MagentoComponentManager {
         return null;
     }
 
-    public void flushModules() {
+    synchronized public void flushModules() {
         components = new HashMap<>();
     }
 
@@ -130,8 +130,6 @@ public class MagentoComponentManager {
             }
         }
     }
-
-
 }
 
 /**
@@ -141,7 +139,7 @@ class MagentoModuleImpl extends MagentoComponentImp implements MagentoModule {
     private static final String DEFAULT_MODULE_NAME = "Undefined module";
     private static final String CONFIGURATION_PATH = "etc";
 
-    public MagentoModuleImpl(ComposerPackageModel composerPackageModel, PsiDirectory directory) {
+    public MagentoModuleImpl(@NotNull ComposerPackageModel composerPackageModel, @NotNull PsiDirectory directory) {
         super(composerPackageModel, directory);
     }
 

@@ -44,7 +44,7 @@ public class ModuleToolWindowFactory implements ToolWindowFactory {
 
         modulesTree.setModel(new  DefaultTreeModel(rootNode));
 
-        for (MagentoModule magentoModule: magentoComponentManager.getAllModulesOfType(MagentoModule.class)) {
+        for (MagentoModule magentoModule: magentoComponentManager.getAllComponentsOfType(MagentoModule.class)) {
             ComposerPackageModel packageModel = magentoModule.getComposerModel();
             if (packageModel == null) {
                 continue;

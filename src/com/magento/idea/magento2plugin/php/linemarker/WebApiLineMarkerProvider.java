@@ -8,6 +8,7 @@ import com.intellij.psi.xml.XmlTag;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.Magento2Icons;
+import com.magento.idea.magento2plugin.Settings;
 import com.magento.idea.magento2plugin.xml.webapi.index.WebApiTypesFileBasedIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,6 +31,11 @@ public class WebApiLineMarkerProvider implements LineMarkerProvider {
 
     @Override
     public void collectSlowLineMarkers(@NotNull List<PsiElement> list, @NotNull Collection<LineMarkerInfo> collection) {
+        if (list.size() > 0) {
+            if (!Settings.isEnabled(list.get(0).getProject())) {
+                return;
+            }
+        }
         for (PsiElement psiElement : list) {
             WebApiRoutesCollector collector = new WebApiRoutesCollector();
             List<XmlTag> results = new ArrayList<>();

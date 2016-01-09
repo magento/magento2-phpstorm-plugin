@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.xml.XmlTag;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.Magento2Icons;
+import com.magento.idea.magento2plugin.Settings;
 import com.magento.idea.magento2plugin.xml.di.index.TypeConfigurationFileBasedIndex;
 import com.magento.idea.magento2plugin.xml.layout.index.util.LayoutIndexUtility;
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +32,11 @@ public class ClassConfigurationLineMarkerProvider implements LineMarkerProvider 
 
     @Override
     public void collectSlowLineMarkers(@NotNull List<PsiElement> list, @NotNull Collection<LineMarkerInfo> collection) {
+        if (list.size() > 0) {
+            if (!Settings.isEnabled(list.get(0).getProject())) {
+                return;
+            }
+        }
         for (PsiElement psiElement: list) {
             if (psiElement instanceof PhpClass) {
                 List<XmlTag> results = new ArrayList<XmlTag>();

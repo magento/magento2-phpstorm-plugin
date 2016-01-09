@@ -11,6 +11,7 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
+import com.magento.idea.magento2plugin.Settings;
 import com.magento.idea.magento2plugin.php.module.MagentoComponentManager;
 import com.magento.idea.magento2plugin.php.module.MagentoModule;
 import com.magento.idea.magento2plugin.php.util.MagentoTypes;
@@ -37,6 +38,9 @@ public class ObjectManagerInspection extends PhpInspection {
 
         @Override
         public void visitPhpMethodReference(MethodReference reference) {
+            if (!Settings.isEnabled(reference.getProject())) {
+                return;
+            }
             PsiElement referencedElement = reference.resolve();
 
             if(referencedElement instanceof Method) {
@@ -53,6 +57,9 @@ public class ObjectManagerInspection extends PhpInspection {
 
         @Override
         public void visitPhpClassReference(ClassReference reference) {
+            if (!Settings.isEnabled(reference.getProject())) {
+                return;
+            }
             PsiElement referencedElement = reference.resolve();
 
             if(referencedElement instanceof PhpClass) {
