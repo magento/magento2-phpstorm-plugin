@@ -10,7 +10,7 @@ import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import com.magento.idea.magento2plugin.php.module.MagentoModule;
-import com.magento.idea.magento2plugin.php.module.ModuleManager;
+import com.magento.idea.magento2plugin.php.module.MagentoComponentManager;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -85,8 +85,8 @@ public class MagentoApiInspection extends PhpInspection {
     }
 
     private static MagentoModule getMagentoModule(PsiElement element) {
-        ModuleManager moduleManager = ModuleManager.getInstance(element.getProject());
-        return moduleManager.getModuleForFile(element.getContainingFile());
+        MagentoComponentManager magentoComponentManager = MagentoComponentManager.getInstance(element.getProject());
+        return magentoComponentManager.getComponentOfTypeForFile(element.getContainingFile(), MagentoModule.class);
     }
 
     private static boolean areDifferentModules(MagentoModule magentoModule, MagentoModule currentPackage) {

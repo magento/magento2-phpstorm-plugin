@@ -23,7 +23,7 @@ public class ComposerPackageModelImpl implements ComposerPackageModel {
     public static final String PSR4 = "psr4";
     public static final String FILES = "file";
 
-    public ComposerPackageModelImpl(JsonObject sourceComposerJson) {
+    public ComposerPackageModelImpl(@NotNull JsonObject sourceComposerJson) {
         this.sourceComposerJson = sourceComposerJson;
     }
 

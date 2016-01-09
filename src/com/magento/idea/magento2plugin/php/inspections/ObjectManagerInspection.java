@@ -11,7 +11,8 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
-import com.magento.idea.magento2plugin.php.module.ModuleManager;
+import com.magento.idea.magento2plugin.php.module.MagentoComponentManager;
+import com.magento.idea.magento2plugin.php.module.MagentoModule;
 import com.magento.idea.magento2plugin.php.util.MagentoTypes;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,8 +40,8 @@ public class ObjectManagerInspection extends PhpInspection {
             PsiElement referencedElement = reference.resolve();
 
             if(referencedElement instanceof Method) {
-                ModuleManager moduleManager = ModuleManager.getInstance(referencedElement.getProject());
-                if (moduleManager.getModuleForFile(reference.getContainingFile()) == null) {
+                MagentoComponentManager magentoComponentManager = MagentoComponentManager.getInstance(referencedElement.getProject());
+                if (magentoComponentManager.getComponentOfTypeForFile(reference.getContainingFile(), MagentoModule.class) == null) {
                     return;
                 }
 
@@ -55,8 +56,8 @@ public class ObjectManagerInspection extends PhpInspection {
             PsiElement referencedElement = reference.resolve();
 
             if(referencedElement instanceof PhpClass) {
-                ModuleManager moduleManager = ModuleManager.getInstance(referencedElement.getProject());
-                if (moduleManager.getModuleForFile(reference.getContainingFile()) == null) {
+                MagentoComponentManager magentoComponentManager = MagentoComponentManager.getInstance(referencedElement.getProject());
+                if (magentoComponentManager.getComponentOfTypeForFile(reference.getContainingFile(), MagentoModule.class) == null) {
                     return;
                 }
 

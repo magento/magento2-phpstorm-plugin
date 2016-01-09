@@ -5,17 +5,14 @@ import com.intellij.json.psi.*;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.indexing.*;
-import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.magento.idea.magento2plugin.php.module.ComposerPackageModel;
 import com.magento.idea.magento2plugin.php.module.ComposerPackageModelImpl;
-import com.magento.idea.magento2plugin.xml.index.StringSetDataExternalizer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by dkvashnin on 12/3/15.
@@ -40,9 +37,12 @@ public class ModulePackageFileBasedIndex extends ScalarIndexExtension<String> {
                 JsonFile jsonFile = (JsonFile)fileContent.getPsiFile();
 
                 JsonObject jsonObject = PsiTreeUtil.getChildOfType(jsonFile, JsonObject.class);
+                if (jsonObject == null) {
+                    return map;
+                }
                 ComposerPackageModel composerObject = new ComposerPackageModelImpl(jsonObject);
 
-                if (!"magento2-module".equals(composerObject.getType())) {
+                if (!"magento".equals(composerObject.getVendor())) {
                     return map;
                 }
 
@@ -82,6 +82,6 @@ public class ModulePackageFileBasedIndex extends ScalarIndexExtension<String> {
 
     @Override
     public int getVersion() {
-        return 0;
+        return 1;
     }
 }
