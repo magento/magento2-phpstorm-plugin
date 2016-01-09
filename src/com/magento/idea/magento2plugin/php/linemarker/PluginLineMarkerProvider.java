@@ -10,6 +10,7 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.Magento2Icons;
+import com.magento.idea.magento2plugin.Settings;
 import com.magento.idea.magento2plugin.xml.di.index.PluginToTypeFileBasedIndex;
 import org.apache.commons.lang.WordUtils;
 import org.jetbrains.annotations.NotNull;
@@ -29,6 +30,11 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
 
     @Override
     public void collectSlowLineMarkers(@NotNull List<PsiElement> list, @NotNull Collection<LineMarkerInfo> collection) {
+        if (list.size() > 0) {
+            if (!Settings.isEnabled(list.get(0).getProject())) {
+                return;
+            }
+        }
         PluginClassCache pluginClassCache = new PluginClassCache();
         ClassPluginCollector classPluginCollector = new ClassPluginCollector(pluginClassCache);
         MethodPluginCollector methodPluginCollector = new MethodPluginCollector(pluginClassCache);

@@ -7,6 +7,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.indexing.*;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
+import com.magento.idea.magento2plugin.Settings;
 import com.magento.idea.magento2plugin.php.module.ComposerPackageModel;
 import com.magento.idea.magento2plugin.php.module.ComposerPackageModelImpl;
 import org.jetbrains.annotations.NotNull;
@@ -35,6 +36,9 @@ public class ModulePackageFileBasedIndex extends ScalarIndexExtension<String> {
             public Map<String, Void> map(@NotNull FileContent fileContent) {
                 Map<String, Void> map = new HashMap<>();
                 JsonFile jsonFile = (JsonFile)fileContent.getPsiFile();
+                if (!Settings.isEnabled(jsonFile.getProject())) {
+                    return map;
+                }
 
                 JsonObject jsonObject = PsiTreeUtil.getChildOfType(jsonFile, JsonObject.class);
                 if (jsonObject == null) {
@@ -42,7 +46,12 @@ public class ModulePackageFileBasedIndex extends ScalarIndexExtension<String> {
                 }
                 ComposerPackageModel composerObject = new ComposerPackageModelImpl(jsonObject);
 
-                if (!"magento".equals(composerObject.getVendor())) {
+                String type = composerObject.getType();
+                if (type == null) {
+                    return map;
+                }
+
+                if (!type.startsWith("magento2-")) {
                     return map;
                 }
 

@@ -9,6 +9,7 @@ import com.jetbrains.php.lang.documentation.phpdoc.psi.tags.PhpDocTag;
 import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
+import com.magento.idea.magento2plugin.Settings;
 import com.magento.idea.magento2plugin.php.module.MagentoModule;
 import com.magento.idea.magento2plugin.php.module.MagentoComponentManager;
 import org.jetbrains.annotations.NotNull;
@@ -38,6 +39,9 @@ public class MagentoApiInspection extends PhpInspection {
 
         @Override
         public void visitPhpMethodReference(MethodReference reference) {
+            if (!Settings.isEnabled(reference.getProject())) {
+                return;
+            }
             PsiElement referencedElement = reference.resolve();
 
             if(referencedElement instanceof Method) {
@@ -56,6 +60,9 @@ public class MagentoApiInspection extends PhpInspection {
 
         @Override
         public void visitPhpClassReference(ClassReference reference) {
+            if (!Settings.isEnabled(reference.getProject())) {
+                return;
+            }
             PsiElement referencedElement = reference.resolve();
 
             if(referencedElement instanceof PhpClass) {

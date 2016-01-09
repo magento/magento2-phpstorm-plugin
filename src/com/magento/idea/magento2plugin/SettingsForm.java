@@ -1,16 +1,30 @@
 package com.magento.idea.magento2plugin;
 
+import com.intellij.javaee.ExternalResourceManager;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.search.FilenameIndex;
+import com.magento.idea.magento2plugin.php.module.ComposerPackageModel;
+import com.magento.idea.magento2plugin.php.module.MagentoComponent;
+import com.magento.idea.magento2plugin.php.module.MagentoComponentManager;
+import com.magento.idea.magento2plugin.php.module.MagentoModule;
 import com.magento.idea.magento2plugin.util.IndexUtil;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.*;
 
 /**
  * Created by dkvashnin on 1/9/16.
@@ -41,16 +55,34 @@ public class SettingsForm implements Configurable {
     @Nullable
     @Override
     public JComponent createComponent() {
+        onOff();
         buttonReindex.addMouseListener(
             new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     IndexUtil.manualReindex();
+                    MagentoComponentManager.getInstance(project).flushModules();
                     super.mouseClicked(e);
                 }
             }
         );
+
+        pluginEnabled.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                onOff();
+            }
+        });
+
+        regenerateUrnMapButton.addMouseListener(
+            new RegenerateUrnMapListener(project)
+        );
         return (JComponent) panel1;
+    }
+
+    private void onOff() {
+        buttonReindex.setEnabled(pluginEnabled.isSelected());
+        regenerateUrnMapButton.setEnabled(pluginEnabled.isSelected());
     }
 
     @Override
@@ -75,5 +107,101 @@ public class SettingsForm implements Configurable {
 
     private Settings getSettings() {
         return Settings.getInstance(project);
+    }
+}
+
+class RegenerateUrnMapListener extends MouseAdapter {
+    private final static String MODULE = "urn:magento:module:";
+    private final static String FRAMEWORK = "urn:magento:framework:";
+
+    private Project project;
+
+    public RegenerateUrnMapListener(@NotNull Project project) {
+        this.project = project;
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        ApplicationManager.getApplication().runWriteAction(
+            new Runnable() {
+                @Override
+                public void run() {
+                    ExternalResourceManager externalResourceManager = ExternalResourceManager.getInstance();
+                    PsiManager psiManager = PsiManager.getInstance(project);
+                    MagentoComponentManager componentManager = MagentoComponentManager.getInstance(project);
+
+                    Collection<VirtualFile> xsdFiles = FilenameIndex.getAllFilesByExt(project, "xsd");
+                    Collection<MagentoComponent> components = componentManager.getAllComponents();
+
+                    for (VirtualFile virtualFile: xsdFiles) {
+                        PsiFile psiFile = psiManager.findFile(virtualFile);
+                        if (psiFile == null) {
+                            continue;
+                        }
+
+                        MagentoComponent xsdOwner = findComponentForXsd(psiFile, components);
+                        if (xsdOwner == null) {
+                            continue;
+                        }
+
+                        String urnKey = buildUrnKeyForFile(psiFile, xsdOwner);
+                        if (urnKey == null) {
+                            continue;
+                        }
+
+                        externalResourceManager.addResource(urnKey, virtualFile.getCanonicalPath());
+                    }
+                }
+            }
+        );
+
+        super.mouseClicked(e);
+    }
+
+    @Nullable
+    private MagentoComponent findComponentForXsd(@NotNull PsiFile psiFile, Collection<MagentoComponent> components) {
+        for (MagentoComponent component: components) {
+            if (component.isFileInContext(psiFile)) {
+                return component;
+            }
+        }
+
+        return null;
+    }
+
+    @Nullable
+    private String buildUrnKeyForFile(@NotNull PsiFile psiFile, @NotNull MagentoComponent magentoComponent) {
+        String prefix = null;
+
+        if (magentoComponent instanceof MagentoModule) {
+            prefix = MODULE + ((MagentoModule)magentoComponent).getMagentoName() + ":";
+        } else {
+            ComposerPackageModel composerPackageModel = magentoComponent.getComposerModel();
+            if ("magento2-library".equals(composerPackageModel.getType())) {
+                prefix = FRAMEWORK;
+            }
+        }
+
+        if (prefix == null) {
+            return null;
+        }
+
+        Stack<String> relativePath = new Stack<>();
+        relativePath.push(psiFile.getName());
+
+        PsiManager psiManager = magentoComponent.getDirectory().getManager();
+        PsiDirectory parentDir = psiFile.getParent();
+        while (parentDir != null && !psiManager.areElementsEquivalent(parentDir, magentoComponent.getDirectory())) {
+            relativePath.push("/");
+            relativePath.push(parentDir.getName());
+            parentDir = parentDir.getParentDirectory();
+        }
+
+        StringBuilder stringBuilder = new StringBuilder(prefix);
+        while (!relativePath.empty()) {
+            stringBuilder.append(relativePath.pop());
+        }
+
+        return stringBuilder.toString();
     }
 }
