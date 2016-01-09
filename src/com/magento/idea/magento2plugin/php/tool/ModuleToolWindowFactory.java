@@ -7,15 +7,12 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.magento.idea.magento2plugin.php.module.ComposerPackageModel;
 import com.magento.idea.magento2plugin.php.module.MagentoModule;
-import com.magento.idea.magento2plugin.php.module.ModuleManager;
+import com.magento.idea.magento2plugin.php.module.MagentoComponentManager;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,7 +36,7 @@ public class ModuleToolWindowFactory implements ToolWindowFactory {
     }
 
     private void initializeModulesTree(Project project) {
-        ModuleManager moduleManager = ModuleManager.getInstance(project);
+        MagentoComponentManager magentoComponentManager = MagentoComponentManager.getInstance(project);
 
         Map<String, DefaultMutableTreeNode> vendorNodes = new HashMap<>();
 
@@ -47,7 +44,7 @@ public class ModuleToolWindowFactory implements ToolWindowFactory {
 
         modulesTree.setModel(new  DefaultTreeModel(rootNode));
 
-        for (MagentoModule magentoModule: moduleManager.getModules()) {
+        for (MagentoModule magentoModule: magentoComponentManager.getAllModulesOfType(MagentoModule.class)) {
             ComposerPackageModel packageModel = magentoModule.getComposerModel();
             if (packageModel == null) {
                 continue;

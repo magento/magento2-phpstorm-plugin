@@ -103,6 +103,8 @@
                   secondary="false"
                   factoryClass="com.magento.idea.magento2plugin.php.tool.ModuleToolWindowFactory" />
       -->
+      <projectConfigurable instance="com.magento.idea.magento2plugin.SettingsForm" id="Magento2.SettingsForm" displayName="Magento2 Plugin"/>
+      <projectService serviceImplementation="com.magento.idea.magento2plugin.Settings"/>
 
       <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.di.reference.DiReferenceContributor"/>
       <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.observer.reference.ObserverReferenceContributor"/>

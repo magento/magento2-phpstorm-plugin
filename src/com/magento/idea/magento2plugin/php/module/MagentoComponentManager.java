@@ -12,8 +12,8 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.indexing.FileBasedIndex;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.php.index.ModulePackageFileBasedIndex;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -21,39 +21,68 @@ import java.util.*;
 /**
  * Created by dkvashnin on 12/5/15.
  */
-public class ModuleManager {
-    private Map<String, MagentoModule> modules = new HashMap<>();
+public class MagentoComponentManager {
+    private Map<String, MagentoComponent> components = new HashMap<>();
     private long cacheStartTime;
     private static final int CACHE_LIFE_TIME = 20000;
-    private static ModuleManager moduleManager;
+    private static MagentoComponentManager magentoComponentManager;
     private Project project;
 
-    private ModuleManager(Project project){
+    private MagentoComponentManager(Project project){
         this.project = project;
     }
 
-    public static ModuleManager getInstance(Project project) {
-        if (moduleManager == null) {
-            moduleManager = new ModuleManager(project);
+    public static MagentoComponentManager getInstance(@NotNull Project project) {
+        if (magentoComponentManager == null) {
+            magentoComponentManager = new MagentoComponentManager(project);
         }
-        return moduleManager;
+        return magentoComponentManager;
     }
 
-    synchronized public Collection<MagentoModule> getModules() {
+    public Collection<MagentoComponent> getAllModules() {
+        return getComponents().values();
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends MagentoComponent> Collection<T> getAllModulesOfType(@NotNull Class<T> type) {
+        Collection<T> result = new ArrayList<>();
+        Map<String, MagentoComponent> components = getComponents();
+        for (String key: components.keySet()) {
+            if (type.isInstance(components.get(key))) {
+                result.add((T)components.get(key));
+            }
+        }
+
+        return result;
+    }
+
+    synchronized private Map<String, MagentoComponent> getComponents() {
         if (cacheStartTime + CACHE_LIFE_TIME < System.currentTimeMillis()) {
             flushModules();
             loadModules();
             cacheStartTime = System.currentTimeMillis();
         }
 
-        return modules.values();
+        return components;
     }
 
     @Nullable
-    public MagentoModule getModuleForFile(PsiFile psiFile) {
-        for (MagentoModule magentoModule: this.getModules()) {
-            if (magentoModule.isFileInContext(psiFile)) {
-                return magentoModule;
+    public MagentoComponent getComponentForFile(@NotNull PsiFile psiFile) {
+        for (MagentoComponent magentoComponent: this.getAllModules()) {
+            if (magentoComponent.isFileInContext(psiFile)) {
+                return magentoComponent;
+            }
+        }
+
+        return null;
+    }
+
+    @Nullable
+    @SuppressWarnings("unchecked")
+    public <T extends MagentoComponent> T getComponentOfTypeForFile(@NotNull PsiFile psiFile, @NotNull Class<T> type) {
+        for (MagentoComponent magentoComponent: this.getAllModules()) {
+            if (type.isInstance(magentoComponent) && magentoComponent.isFileInContext(psiFile)) {
+                return (T)magentoComponent;
             }
         }
 
@@ -61,17 +90,16 @@ public class ModuleManager {
     }
 
     public void flushModules() {
-        modules = new HashMap<>();
+        components = new HashMap<>();
     }
 
     private void loadModules() {
         Collection<String> packages = FileBasedIndex.getInstance().getAllKeys(ModulePackageFileBasedIndex.NAME, this.project);
         PsiManager psiManager = PsiManager.getInstance(this.project);
         for (String packageName: packages) {
-            if (modules.containsKey(packageName)) {
+            if (components.containsKey(packageName)) {
                 continue;
             }
-
 
             Collection<VirtualFile> containingFiles = FileBasedIndex.getInstance()
                 .getContainingFiles(ModulePackageFileBasedIndex.NAME, packageName, GlobalSearchScope.allScope(this.project));
@@ -82,29 +110,39 @@ public class ModuleManager {
                 PsiFile psiFile = psiManager.findFile(configurationFile);
                 if (psiFile != null && psiFile instanceof JsonFile) {
                     JsonObject jsonObject = PsiTreeUtil.getChildOfType((JsonFile) psiFile, JsonObject.class);
-                    modules.put(
+                    if (jsonObject == null) {
+                        continue;
+                    }
+
+                    MagentoComponent magentoComponent;
+                    ComposerPackageModel composerPackageModel = new ComposerPackageModelImpl(jsonObject);
+                    if ("magento2-module".equals(composerPackageModel.getType())) {
+                        magentoComponent = new MagentoModuleImpl(new ComposerPackageModelImpl(jsonObject), psiFile.getContainingDirectory());
+                    } else {
+                        magentoComponent = new MagentoComponentImp(new ComposerPackageModelImpl(jsonObject), psiFile.getContainingDirectory());
+                    }
+
+                    components.put(
                         packageName,
-                        new MagentoModuleImpl(new ComposerPackageModelImpl(jsonObject), psiFile.getContainingDirectory())
+                        magentoComponent
                     );
                 }
             }
         }
     }
+
+
 }
 
 /**
  * Created by dkvashnin on 12/5/15.
  */
-class MagentoModuleImpl implements MagentoModule {
-    private ComposerPackageModel composerPackageModel;
-    private PsiDirectory directory;
+class MagentoModuleImpl extends MagentoComponentImp implements MagentoModule {
     private static final String DEFAULT_MODULE_NAME = "Undefined module";
     private static final String CONFIGURATION_PATH = "etc";
 
     public MagentoModuleImpl(ComposerPackageModel composerPackageModel, PsiDirectory directory) {
-
-        this.composerPackageModel = composerPackageModel;
-        this.directory = directory;
+        super(composerPackageModel, directory);
     }
 
     @Nullable
@@ -126,41 +164,5 @@ class MagentoModuleImpl implements MagentoModule {
         }
 
         return DEFAULT_MODULE_NAME;
-    }
-
-    @Nullable
-    @Override
-    public List<MagentoModule> getMagentoDependencies() {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public ComposerPackageModel getComposerModel() {
-        return composerPackageModel;
-    }
-
-    @Override
-    public boolean isFileInContext(PsiFile psiFile) {
-        PsiDirectory containingDirectory = psiFile.getOriginalFile().getContainingDirectory();
-        while (containingDirectory != null) {
-            if (containingDirectory.getManager().areElementsEquivalent(containingDirectory, directory)) {
-                return true;
-            }
-
-            containingDirectory = containingDirectory.getParentDirectory();
-        }
-
-        return false;
-    }
-
-    @Override
-    public boolean isClassInContext(PhpClass phpClass) {
-        return false;
-    }
-
-    @Override
-    public PsiDirectory getSourceDirectory() {
-        return directory;
     }
 }
