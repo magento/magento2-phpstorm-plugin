@@ -83,6 +83,8 @@ public class SettingsForm implements Configurable {
     @Override
     public void apply() throws ConfigurationException {
         getSettings().pluginEnabled = pluginEnabled.isSelected();
+        buttonReindex.setEnabled(getSettings().pluginEnabled);
+        regenerateUrnMapButton.setEnabled(getSettings().pluginEnabled);
     }
 
     @Override
