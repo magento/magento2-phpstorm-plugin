@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>com.magento.idea.magento2plugin</id>
   <name>Magento2</name>
-  <version>0.1</version>
+  <version>0.2.0</version>
   <vendor email="dkvashnin@magento.com" url="https://github.com/dkvashninbay/magento2plugin">Dmytro Kvashnin</vendor>
 
   <description><![CDATA[
@@ -32,6 +32,13 @@
     ]]></description>
 
   <change-notes><![CDATA[
+<h3>0.2.0</h3>
+<ul>
+    <li>WebApi routes</li>
+    <li>nicer "Goto configuration" labels</li>
+    <li>plugin settings (manual reindex, URN generation, plugin on/off)</li>
+</ul>
+
 <h3>0.1</h3>
 <ul>
     <li>Context type completion for:<br/>
