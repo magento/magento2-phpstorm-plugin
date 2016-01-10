@@ -7,6 +7,7 @@ import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.indexing.DataIndexer;
 import com.intellij.util.indexing.FileContent;
 import com.jetbrains.php.lang.PhpLangUtil;
+import com.magento.idea.magento2plugin.Settings;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -30,6 +31,10 @@ public class LayoutDataIndexer implements DataIndexer<String, Void, FileContent>
         Map<String, Void> map = new HashMap<>();
 
         PsiFile psiFile = fileContent.getPsiFile();
+        if (!Settings.isEnabled(psiFile.getProject())) {
+            return map;
+        }
+
         XmlDocumentImpl document = PsiTreeUtil.getChildOfType(psiFile, XmlDocumentImpl.class);
         if(document == null) {
             return map;

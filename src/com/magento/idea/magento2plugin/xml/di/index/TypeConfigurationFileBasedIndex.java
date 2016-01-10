@@ -15,6 +15,7 @@ import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.jetbrains.php.lang.PhpLangUtil;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.magento.idea.magento2plugin.Settings;
 import com.magento.idea.magento2plugin.xml.di.XmlHelper;
 import com.magento.idea.magento2plugin.xml.index.LineMarkerXmlTagDecorator;
 import com.magento.idea.magento2plugin.xml.index.StringSetDataExternalizer;
@@ -41,9 +42,6 @@ public class TypeConfigurationFileBasedIndex extends ScalarIndexExtension<String
     @Nullable
     public static List<XmlTag> getClassConfigurations(PhpClass phpClass) {
         String classFqn = phpClass.getPresentableFQN();
-        if (classFqn == null) {
-            return null;
-        }
 
         Collection<VirtualFile> containingFiles = FileBasedIndex
             .getInstance()
@@ -126,6 +124,10 @@ public class TypeConfigurationFileBasedIndex extends ScalarIndexExtension<String
                 Map<String, Void> map = new HashMap<>();
 
                 PsiFile psiFile = fileContent.getPsiFile();
+                if (!Settings.isEnabled(psiFile.getProject())) {
+                    return map;
+                }
+
                 XmlDocumentImpl document = PsiTreeUtil.getChildOfType(psiFile, XmlDocumentImpl.class);
                 if(document == null) {
                     return map;

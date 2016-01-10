@@ -15,6 +15,7 @@ import com.intellij.util.io.KeyDescriptor;
 import com.jetbrains.php.lang.PhpLangUtil;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.magento.idea.magento2plugin.Settings;
 import com.magento.idea.magento2plugin.xml.index.LineMarkerXmlTagDecorator;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -47,6 +48,10 @@ public class WebApiTypesFileBasedIndex extends ScalarIndexExtension<String> {
                 Map<String, Void> map = new HashMap<>();
 
                 PsiFile psiFile = fileContent.getPsiFile();
+                if (!Settings.isEnabled(psiFile.getProject())) {
+                    return map;
+                }
+
                 XmlDocumentImpl document = PsiTreeUtil.getChildOfType(psiFile, XmlDocumentImpl.class);
                 if (document == null) {
                     return map;

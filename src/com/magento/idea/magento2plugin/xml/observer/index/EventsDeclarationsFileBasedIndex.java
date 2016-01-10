@@ -16,6 +16,7 @@ import com.jetbrains.php.lang.patterns.PhpPatterns;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
+import com.magento.idea.magento2plugin.Settings;
 import com.magento.idea.magento2plugin.xml.observer.PhpPatternsHelper;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,6 +47,10 @@ public class EventsDeclarationsFileBasedIndex extends ScalarIndexExtension<Strin
             public Map<String, Void> map(@NotNull FileContent fileContent) {
                 Map<String, Void> map = new HashMap<>();
                 PhpFile phpFile = (PhpFile)fileContent.getPsiFile();
+
+                if (!Settings.isEnabled(phpFile.getProject())) {
+                    return map;
+                }
 
                 List<String> results = new ArrayList<String>();
                 recursiveFill(results, phpFile);
