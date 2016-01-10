@@ -55,7 +55,6 @@ public class SettingsForm implements Configurable {
     @Nullable
     @Override
     public JComponent createComponent() {
-        onOff();
         buttonReindex.addMouseListener(
             new MouseAdapter() {
                 @Override
@@ -67,22 +66,13 @@ public class SettingsForm implements Configurable {
             }
         );
 
-        pluginEnabled.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                onOff();
-            }
-        });
+        buttonReindex.setEnabled(getSettings().pluginEnabled);
+        regenerateUrnMapButton.setEnabled(getSettings().pluginEnabled);
 
         regenerateUrnMapButton.addMouseListener(
             new RegenerateUrnMapListener(project)
         );
         return (JComponent) panel1;
-    }
-
-    private void onOff() {
-        buttonReindex.setEnabled(pluginEnabled.isSelected());
-        regenerateUrnMapButton.setEnabled(pluginEnabled.isSelected());
     }
 
     @Override

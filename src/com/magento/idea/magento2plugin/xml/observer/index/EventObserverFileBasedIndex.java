@@ -11,6 +11,7 @@ import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.jetbrains.php.lang.PhpLangUtil;
+import com.magento.idea.magento2plugin.Settings;
 import com.magento.idea.magento2plugin.xml.index.StringSetDataExternalizer;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,6 +40,10 @@ public class EventObserverFileBasedIndex extends FileBasedIndexExtension<String,
                 Map<String, Set<String>> map = new HashMap<>();
 
                 PsiFile psiFile = fileContent.getPsiFile();
+                if (!Settings.isEnabled(psiFile.getProject())) {
+                    return map;
+                }
+
                 XmlDocumentImpl document = PsiTreeUtil.getChildOfType(psiFile, XmlDocumentImpl.class);
                 if(document == null) {
                     return map;
