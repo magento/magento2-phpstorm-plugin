@@ -11,6 +11,10 @@ This is a plugin for Magento 2 development in the PhpStorm IDE. It is available 
 
 4. Install the plugin and restart PhpStorm
 
+5. Go to Settings / Preferences / Other Settings / Magento2 plugin in the PhpStorm IDE
+
+6. Check "Enable" and "OK" button. 
+
 ## Works with
 * PhpStorm >= 8.0.3
 * JRE >= 1.7
