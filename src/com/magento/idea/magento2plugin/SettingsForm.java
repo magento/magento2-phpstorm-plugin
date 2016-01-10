@@ -1,6 +1,7 @@
 package com.magento.idea.magento2plugin;
 
 import com.intellij.javaee.ExternalResourceManager;
+import com.intellij.javaee.ExternalResourceManagerEx;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
@@ -59,8 +60,7 @@ public class SettingsForm implements Configurable {
             new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    IndexUtil.manualReindex();
-                    MagentoComponentManager.getInstance(project).flushModules();
+                    reindex();
                     super.mouseClicked(e);
                 }
             }
@@ -75,6 +75,11 @@ public class SettingsForm implements Configurable {
         return (JComponent) panel1;
     }
 
+    private void reindex() {
+        IndexUtil.manualReindex();
+        MagentoComponentManager.getInstance(project).flushModules();
+    }
+
     @Override
     public boolean isModified() {
         return !pluginEnabled.isSelected() == getSettings().pluginEnabled;
@@ -85,6 +90,11 @@ public class SettingsForm implements Configurable {
         getSettings().pluginEnabled = pluginEnabled.isSelected();
         buttonReindex.setEnabled(getSettings().pluginEnabled);
         regenerateUrnMapButton.setEnabled(getSettings().pluginEnabled);
+
+        if (buttonReindex.isEnabled()) {
+            reindex();
+        }
+
     }
 
     @Override
@@ -141,7 +151,15 @@ class RegenerateUrnMapListener extends MouseAdapter {
                             continue;
                         }
 
-                        externalResourceManager.addResource(urnKey, virtualFile.getCanonicalPath());
+                        // we need to attach resource to a project scope
+                        // but with ExternalResourceManager itself it's not possible unfortunately
+                        if (externalResourceManager instanceof ExternalResourceManagerEx) {
+                            ((ExternalResourceManagerEx)externalResourceManager).addResource(
+                                urnKey, virtualFile.getCanonicalPath(), project
+                            );
+                        } else {
+                            externalResourceManager.addResource(urnKey, virtualFile.getCanonicalPath());
+                        }
                     }
                 }
             }
