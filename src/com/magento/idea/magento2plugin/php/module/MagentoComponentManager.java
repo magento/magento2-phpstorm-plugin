@@ -138,14 +138,18 @@ public class MagentoComponentManager {
 class MagentoModuleImpl extends MagentoComponentImp implements MagentoModule {
     private static final String DEFAULT_MODULE_NAME = "Undefined module";
     private static final String CONFIGURATION_PATH = "etc";
+    private String moduleName;
 
     public MagentoModuleImpl(@NotNull ComposerPackageModel composerPackageModel, @NotNull PsiDirectory directory) {
         super(composerPackageModel, directory);
     }
 
-    @Nullable
     @Override
     public String getMagentoName() {
+        if (moduleName != null) {
+            return moduleName;
+        }
+
         PsiDirectory configurationDir = directory.findSubdirectory(CONFIGURATION_PATH);
         if (configurationDir != null) {
             PsiFile configurationFile = configurationDir.findFile("module.xml");
@@ -155,7 +159,8 @@ class MagentoModuleImpl extends MagentoComponentImp implements MagentoModule {
                 if (rootTag != null) {
                     XmlTag module = rootTag.findFirstSubTag("module");
                     if (module != null && module.getAttributeValue("name") != null) {
-                        return module.getAttributeValue("name");
+                        moduleName = module.getAttributeValue("name");
+                        return moduleName;
                     }
                 }
             }

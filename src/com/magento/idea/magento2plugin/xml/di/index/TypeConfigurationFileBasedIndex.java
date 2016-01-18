@@ -207,6 +207,16 @@ class DiPreferenceLineMarkerXmlTagDecorator extends LineMarkerXmlTagDecorator {
         super(xmlTag);
     }
 
+    @NotNull
+    @Override
+    public String getDescription() {
+        String preference = xmlTag.getAttributeValue(XmlHelper.TYPE_ATTRIBUTE);
+        if (preference != null) {
+            return String.format("preference %s", preference);
+        }
+        return xmlTag.getName();
+    }
+
     @Override
     @NotNull
     @NonNls
@@ -228,11 +238,10 @@ class DiTypeLineMarkerXmlTagDecorator extends LineMarkerXmlTagDecorator {
         super(xmlTag);
     }
 
-    @Override
     @NotNull
-    @NonNls
-    public String getName() {
-        return String.format("[%s] type declaration", getAreaName());
+    @Override
+    public String getDescription() {
+        return "type declaration";
     }
 }
 
@@ -245,10 +254,9 @@ class DiPluginLineMarkerXmlTagDecorator extends LineMarkerXmlTagDecorator {
         super(xmlTag);
     }
 
-    @Override
     @NotNull
-    @NonNls
-    public String getName() {
+    @Override
+    public String getDescription() {
         XmlTag typeTag = xmlTag.getParentTag();
         if (typeTag == null) {
             return xmlTag.getName();
@@ -257,7 +265,8 @@ class DiPluginLineMarkerXmlTagDecorator extends LineMarkerXmlTagDecorator {
         if (type == null) {
             return xmlTag.getName();
         }
-        return String.format("[%s] plugin for %s", getAreaName(), type);
+
+        return String.format("plugin for %s", type);
     }
 }
 
@@ -270,13 +279,12 @@ class DiVirtualTypeLineMarkerXmlTagDecorator extends LineMarkerXmlTagDecorator {
         super(xmlTag);
     }
 
-    @Override
     @NotNull
-    @NonNls
-    public String getName() {
+    @Override
+    public String getDescription() {
         String type = xmlTag.getAttributeValue(XmlHelper.NAME_ATTRIBUTE);
         if (type != null) {
-            return String.format("[%s] virtual type %s", getAreaName(), type);
+            return String.format("virtual type %s", type);
         }
         return xmlTag.getName();
     }

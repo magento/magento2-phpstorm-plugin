@@ -111,20 +111,19 @@ class LayoutBlockLineMarkerXmlTagDecorator extends LineMarkerXmlTagDecorator {
         super(xmlTag);
     }
 
-    @Override
-    @NotNull
-    @NonNls
-    public String getName() {
-        String name = xmlTag.getAttributeValue("name");
-        if (name != null) {
-            return String.format("[%s] block %s", getAreaName(), name);
-        }
-        return xmlTag.getName();
-    }
-
     @NotNull
     @Override
     protected String getAreaName() {
         return xmlTag.getContainingFile().getVirtualFile().getParent().getParent().getName();
+    }
+
+    @NotNull
+    @Override
+    public String getDescription() {
+        String name = xmlTag.getAttributeValue("name");
+        if (name != null) {
+            return String.format("block %s", name);
+        }
+        return xmlTag.getName();
     }
 }

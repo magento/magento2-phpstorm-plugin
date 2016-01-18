@@ -6,6 +6,5 @@ import org.jetbrains.annotations.Nullable;
  * Created by dkvashnin on 12/5/15.
  */
 public interface MagentoModule extends MagentoComponent {
-    @Nullable
     String getMagentoName();
 }

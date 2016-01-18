@@ -2,6 +2,7 @@ package com.magento.idea.magento2plugin.xml.index;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
@@ -19,6 +20,9 @@ import com.intellij.psi.xml.XmlTagValue;
 import com.intellij.util.IncorrectOperationException;
 import com.intellij.xml.XmlElementDescriptor;
 import com.intellij.xml.XmlNSDescriptor;
+import com.magento.idea.magento2plugin.php.module.MagentoComponent;
+import com.magento.idea.magento2plugin.php.module.MagentoComponentManager;
+import com.magento.idea.magento2plugin.php.module.MagentoModule;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -56,13 +60,30 @@ abstract public class LineMarkerXmlTagDecorator implements XmlTag {
         return configDirectory;
     }
 
+    @NotNull
+    protected String getComponentName() {
+        MagentoComponentManager moduleManager = MagentoComponentManager.getInstance(project);
+        MagentoModule module = moduleManager.getComponentOfTypeForFile(xmlTag.getContainingFile(), MagentoModule.class);
+
+        if (module == null) {
+            return "";
+        }
+
+        return module.getMagentoName();
+    }
+
+    @NotNull
+    abstract public String getDescription();
+
     /**
      * Get line marker text. This method should be overridden to generate user-friendly XmlTag presentation.
      */
     @Override
     @NotNull
     @NonNls
-    abstract public String getName();
+    public String getName() {
+        return String.format("%s [%s] - %s", getComponentName(), getAreaName(), getDescription());
+    }
 
     @Override
     @NotNull
