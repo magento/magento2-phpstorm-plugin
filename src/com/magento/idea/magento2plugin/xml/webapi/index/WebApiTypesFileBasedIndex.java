@@ -173,6 +173,12 @@ class WebApiLineMarkerXmlTagDecorator extends LineMarkerXmlTagDecorator {
         super(xmlTag);
     }
 
+    @NotNull
+    @Override
+    public String getDescription() {
+        return "";
+    }
+
     @Override
     @NotNull
     @NonNls
