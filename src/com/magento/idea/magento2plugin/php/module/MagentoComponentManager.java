@@ -2,6 +2,7 @@ package com.magento.idea.magento2plugin.php.module;
 
 import com.intellij.json.psi.JsonFile;
 import com.intellij.json.psi.JsonObject;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
@@ -57,6 +58,10 @@ public class MagentoComponentManager {
     }
 
     synchronized private Map<String, MagentoComponent> getComponents() {
+        if (DumbService.getInstance(project).isDumb()) {
+            return new HashMap<>();
+        }
+
         if (cacheStartTime + CACHE_LIFE_TIME < System.currentTimeMillis()) {
             flushModules();
             loadModules();

@@ -2,6 +2,7 @@ package com.magento.idea.magento2plugin.php.inspections;
 
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocComment;
@@ -42,6 +43,7 @@ public class MagentoApiInspection extends PhpInspection {
             if (!Settings.isEnabled(reference.getProject())) {
                 return;
             }
+
             PsiElement referencedElement = reference.resolve();
 
             if(referencedElement instanceof Method) {
