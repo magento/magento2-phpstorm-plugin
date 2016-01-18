@@ -5,6 +5,7 @@ import com.intellij.lang.Language;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.meta.PsiMetaData;
 import com.intellij.psi.scope.PsiScopeProcessor;
@@ -33,14 +34,26 @@ abstract public class LineMarkerXmlTagDecorator implements XmlTag {
 
     protected XmlTag xmlTag;
 
+    protected Project project;
+
     public LineMarkerXmlTagDecorator(XmlTag xmlTag) {
         this.xmlTag = xmlTag;
+        this.project = xmlTag.getProject();
     }
 
     @NotNull
     protected String getAreaName() {
-        String configDirectory = xmlTag.getContainingFile().getVirtualFile().getParent().getName();
-        return configDirectory.equals("etc") ? "global" : configDirectory;
+        VirtualFile containingDirectory = xmlTag.getContainingFile().getVirtualFile().getParent();
+        String configDirectory = containingDirectory.getName();
+
+        if (configDirectory.equals("etc")) {
+            VirtualFile moduleDirectory = containingDirectory.getParent();
+            if (moduleDirectory.getName().equals("app")) {
+                return "primary";
+            }
+            return "global";
+        }
+        return configDirectory;
     }
 
     /**
