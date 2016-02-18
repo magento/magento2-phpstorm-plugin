@@ -16,12 +16,14 @@ public class XmlHelper extends XmlHelperUtility {
     public static final String VIRTUAL_TYPE_TAG = "virtualType";
     public static final String PREFERENCE_TAG = "preference";
     public static final String ARGUMENT_TAG = "argument";
+    public static final String ARGUMENTS_TAG = "arguments";
 
     public static final String NAME_ATTRIBUTE = "name";
     public static final String TYPE_ATTRIBUTE = "type";
     public static final String FOR_ATTRIBUTE = "for";
 
     public static final String OBJECT_TYPE = "object";
+    public static final String STRING_TYPE = "string";
     public static final String CONST_TYPE = "const";
     public static final String INIT_TYPE = "init_parameter";
 

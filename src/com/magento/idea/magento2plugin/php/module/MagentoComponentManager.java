@@ -58,7 +58,7 @@ public class MagentoComponentManager {
     }
 
     synchronized private Map<String, MagentoComponent> getComponents() {
-        if (DumbService.getInstance(project).isDumb()) {
+        if (DumbService.getInstance(project).isDumb() || project.isDisposed()) {
             return new HashMap<>();
         }
 

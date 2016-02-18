@@ -64,10 +64,12 @@ public class DiReferenceContributor extends PsiReferenceContributor {
         );
 
         // <argument|item xsi:type="object">SomeClassOrVirtualType</argument|item>
+        // <item xsi:type="string">SomeClassOrVirtualType</item> - lazy initialization
         psiReferenceRegistrar.registerReferenceProvider(
             XmlPatterns.or(
                 XmlHelper.getArgumentValuePatternForType(XmlHelper.OBJECT_TYPE),
-                XmlHelper.getItemValuePatternForType(XmlHelper.OBJECT_TYPE)
+                XmlHelper.getItemValuePatternForType(XmlHelper.OBJECT_TYPE),
+                XmlHelper.getItemValuePatternForType(XmlHelper.STRING_TYPE)
             ),
             new XmlReferenceProvider(
                 new ReferenceResultsFiller[]{

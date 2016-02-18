@@ -7,11 +7,13 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementResolveResult;
 import com.intellij.psi.PsiPolyVariantReferenceBase;
 import com.intellij.psi.ResolveResult;
+import com.intellij.psi.xml.XmlTag;
 import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.magento.idea.magento2plugin.xml.di.XmlHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -23,11 +25,13 @@ import java.util.List;
  * Created by dkvashnin on 10/18/15.
  */
 public class ArgumentNameReference extends PsiPolyVariantReferenceBase<PsiElement> {
+    private XmlTag typeTag;
     private String typeName;
 
-    public ArgumentNameReference(@NotNull PsiElement psiElement, @NotNull String typeName) {
+    public ArgumentNameReference(@NotNull PsiElement psiElement, @NotNull XmlTag typeTag, @NotNull String typeName) {
         super(psiElement);
 
+        this.typeTag = typeTag;
         this.typeName = typeName;
     }
 
@@ -50,10 +54,17 @@ public class ArgumentNameReference extends PsiPolyVariantReferenceBase<PsiElemen
     @Override
     public Object[] getVariants() {
         List<LookupElement> variants = new ArrayList<LookupElement>();
+        List<String> definedArguments = getAlreadyConfiguredArguments();
+
         for (Parameter parameter: getParameters()) {
+            String argumentName = parameter.getName();
+            if (definedArguments.contains(argumentName)) {
+                continue;
+            }
+
             variants.add(
                 LookupElementBuilder
-                    .create(parameter.getName())
+                    .create(argumentName)
                     .withIcon(PhpIcons.PARAMETER)
                     .withTypeText(parameter.getDeclaredType().toStringResolved())
             );
@@ -79,5 +90,23 @@ public class ArgumentNameReference extends PsiPolyVariantReferenceBase<PsiElemen
         }
 
         return parameterList;
+    }
+
+    private List<String> getAlreadyConfiguredArguments()
+    {
+        List<String> result = new ArrayList<>();
+
+        XmlTag argumentsTag = typeTag.findFirstSubTag(XmlHelper.ARGUMENTS_TAG);
+        if (argumentsTag == null) {
+            return result;
+        }
+
+        for (XmlTag argumentTag: argumentsTag.findSubTags(XmlHelper.ARGUMENT_TAG)) {
+            result.add(
+                argumentTag.getAttributeValue(XmlHelper.NAME_ATTRIBUTE)
+            );
+        }
+
+        return result;
     }
 }
