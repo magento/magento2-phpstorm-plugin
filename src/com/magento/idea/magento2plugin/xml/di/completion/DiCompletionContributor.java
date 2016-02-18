@@ -37,6 +37,7 @@ public class DiCompletionContributor extends CompletionContributor {
         extend(CompletionType.BASIC,
             XmlPatterns.or(
                 XmlHelper.getItemValuePatternForType(XmlHelper.OBJECT_TYPE),
+                XmlHelper.getItemValuePatternForType(XmlHelper.STRING_TYPE),
                 XmlHelper.getTagAttributePattern(XmlHelper.TYPE_TAG, XmlHelper.NAME_ATTRIBUTE),
                 XmlHelper.getTagAttributePattern(XmlHelper.VIRTUAL_TYPE_TAG, XmlHelper.TYPE_ATTRIBUTE),
                 XmlHelper.getTagAttributePattern(XmlHelper.PLUGIN_TAG, XmlHelper.TYPE_ATTRIBUTE)

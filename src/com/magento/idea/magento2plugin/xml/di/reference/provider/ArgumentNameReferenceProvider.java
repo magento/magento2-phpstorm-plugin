@@ -40,7 +40,7 @@ public class ArgumentNameReferenceProvider extends PsiReferenceProvider {
                 continue;
             }
 
-            return new PsiReference[]{new ArgumentNameReference(psiElement, typeName)};
+            return new PsiReference[]{new ArgumentNameReference(psiElement, typeTag, typeName)};
         }
 
         return new PsiReference[0];
