@@ -1,5 +1,9 @@
 # PhpStorm Magento 2 Plugin
 
+[![Version](http://phpstorm.espend.de/badge/8024/version)](https://plugins.jetbrains.com/plugin/8024)
+[![Downloads](http://phpstorm.espend.de/badge/8024/downloads)](https://plugins.jetbrains.com/plugin/8024)
+[![Downloads last month](http://phpstorm.espend.de/badge/8024/last-month)](https://plugins.jetbrains.com/plugin/8024)
+
 This is a plugin for Magento 2 development in the PhpStorm IDE. It is available via the [JetBrains Plugin Repository](https://plugins.jetbrains.com/plugin/8024)
 ## Installation
 
