@@ -2,7 +2,6 @@ package com.magento.idea.magento2plugin.php.inspections;
 
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
-import com.intellij.openapi.project.DumbService;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocComment;
@@ -10,9 +9,9 @@ import com.jetbrains.php.lang.documentation.phpdoc.psi.tags.PhpDocTag;
 import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
-import com.magento.idea.magento2plugin.Settings;
-import com.magento.idea.magento2plugin.php.module.MagentoModule;
+import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.php.module.MagentoComponentManager;
+import com.magento.idea.magento2plugin.php.module.MagentoModule;
 import org.jetbrains.annotations.NotNull;
 
 /**

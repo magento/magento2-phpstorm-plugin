@@ -13,11 +13,14 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.indexing.FileBasedIndex;
-import com.magento.idea.magento2plugin.php.index.ModulePackageFileBasedIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.ModulePackageIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by dkvashnin on 12/5/15.
@@ -99,7 +102,7 @@ public class MagentoComponentManager {
     }
 
     private void loadModules() {
-        Collection<String> packages = FileBasedIndex.getInstance().getAllKeys(ModulePackageFileBasedIndex.NAME, this.project);
+        Collection<String> packages = FileBasedIndex.getInstance().getAllKeys(ModulePackageIndex.KEY, this.project);
         PsiManager psiManager = PsiManager.getInstance(this.project);
         for (String packageName: packages) {
             if (components.containsKey(packageName)) {
@@ -107,7 +110,7 @@ public class MagentoComponentManager {
             }
 
             Collection<VirtualFile> containingFiles = FileBasedIndex.getInstance()
-                .getContainingFiles(ModulePackageFileBasedIndex.NAME, packageName, GlobalSearchScope.allScope(this.project));
+                .getContainingFiles(ModulePackageIndex.KEY, packageName, GlobalSearchScope.allScope(this.project));
 
             if (containingFiles.size() > 0) {
                 VirtualFile configurationFile = containingFiles.iterator().next();

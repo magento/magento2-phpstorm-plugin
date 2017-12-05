@@ -11,7 +11,7 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
-import com.magento.idea.magento2plugin.Settings;
+import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.php.module.MagentoComponentManager;
 import com.magento.idea.magento2plugin.php.module.MagentoModule;
 import com.magento.idea.magento2plugin.php.util.MagentoTypes;

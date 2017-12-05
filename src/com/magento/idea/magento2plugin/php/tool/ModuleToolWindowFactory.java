@@ -6,8 +6,8 @@ import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.magento.idea.magento2plugin.php.module.ComposerPackageModel;
-import com.magento.idea.magento2plugin.php.module.MagentoModule;
 import com.magento.idea.magento2plugin.php.module.MagentoComponentManager;
+import com.magento.idea.magento2plugin.php.module.MagentoModule;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;

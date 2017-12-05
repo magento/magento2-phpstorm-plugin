@@ -1,6 +1,6 @@
-<idea-plugin version="2">
+<idea-plugin>
   <id>com.magento.idea.magento2plugin</id>
-  <name>Magento2</name>
+  <name>Magento PhpStorm</name>
   <version>0.2.2</version>
   <vendor email="dkvashnin@magento.com" url="https://github.com/dkvashninbay/magento2plugin">Dmytro Kvashnin</vendor>
 
@@ -96,7 +96,7 @@
   </change-notes>
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-  <idea-version since-build="139"/>
+  <idea-version since-build="172"/>
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
        on how to target different products -->
@@ -104,6 +104,7 @@
   <depends>com.intellij.modules.lang</depends>
   -->
   <depends>com.jetbrains.php</depends>
+  <depends>JavaScript</depends>
   <depends>com.intellij.modules.platform</depends>
 
   <extensions defaultExtensionNs="com.intellij">
@@ -114,46 +115,50 @@
                   secondary="false"
                   factoryClass="com.magento.idea.magento2plugin.php.tool.ModuleToolWindowFactory" />
       -->
-      <projectConfigurable instance="com.magento.idea.magento2plugin.SettingsForm" id="Magento2.SettingsForm" displayName="Magento2 Plugin"/>
-      <projectService serviceImplementation="com.magento.idea.magento2plugin.Settings"/>
+      <projectConfigurable instance="com.magento.idea.magento2plugin.project.SettingsForm"
+                           id="Magento2.SettingsForm"
+                           displayName="Magento"
+                           nonDefaultProject="true"
+                           groupId="language"
+                           parentId="reference.webide.settings.project.settings.php"
+      />
+      <projectService serviceImplementation="com.magento.idea.magento2plugin.project.Settings"/>
 
-      <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.di.reference.DiReferenceContributor"/>
-      <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.observer.reference.ObserverReferenceContributor"/>
-      <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.observer.reference.EventReferenceContributor"/>
-      <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.layout.reference.LayoutReferenceContributor"/>
-      <psi.referenceContributor implementation="com.magento.idea.magento2plugin.xml.webapi.reference.ServiceReferenceContributor"/>
+      <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.completion.xml.XmlCompletionContributor" />
 
-      <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.xml.di.completion.DiCompletionContributor" />
-      <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.xml.webapi.completion.WebApiCompletionContributor" />
-      <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.xml.observer.completion.EventCompletionContributor" />
-      <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.xml.layout.completion.LayoutCompletionContributor" />
+      <psi.referenceContributor language="XML" implementation="com.magento.idea.magento2plugin.reference.xml.XmlReferenceContributor"/>
+      <psi.referenceContributor language="PHP" implementation="com.magento.idea.magento2plugin.reference.php.PhpReferenceContributor"/>
+      <psi.referenceContributor language="JavaScript" implementation="com.magento.idea.magento2plugin.reference.js.JsReferenceContributor"/>
 
-      <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.di.index.VirtualTypesNamesFileBasedIndex" />
-      <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.observer.index.EventObserverFileBasedIndex" />
-      <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.observer.index.EventsDeclarationsFileBasedIndex" />
-      <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.di.index.PluginToTypeFileBasedIndex" />
-      <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.di.index.TypeConfigurationFileBasedIndex" />
-      <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.layout.index.BlockFileBasedIndex" />
-      <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.layout.index.ContainerFileBasedIndex" />
-      <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.layout.index.BlockClassFileBasedIndex" />
-      <fileBasedIndex implementation="com.magento.idea.magento2plugin.xml.webapi.index.WebApiTypesFileBasedIndex" />
-      <fileBasedIndex implementation="com.magento.idea.magento2plugin.php.index.ModulePackageFileBasedIndex" />
+
+      <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.EventObserverIndex" />
+      <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.EventNameIndex" />
+      <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.TypeConfigurationIndex" />
+      <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.VirtualTypeIndex" />
+      <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.PluginIndex" />
+      <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.BlockNameIndex" />
+      <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ContainerNameIndex" />
+      <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.BlockClassNameIndex" />
+      <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.WebApiTypeIndex" />
+      <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ModulePackageIndex" />
+      <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex" />
 
       <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.PluginLineMarkerProvider"/>
       <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.ClassConfigurationLineMarkerProvider"/>
       <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.WebApiLineMarkerProvider"/>
 
-      <localInspection language="PHP" shortName="MagentoApiInspection" displayName="Module API"
-                       groupPath="Magento2"
-                       groupName="Module Integrity"
-                       enabledByDefault="true"
-                       level="WARNING" implementationClass="com.magento.idea.magento2plugin.php.inspections.MagentoApiInspection"/>
-      <localInspection language="PHP" shortName="ObjectManagerInspection" displayName="ObjectManager usage"
-                       groupPath="Magento2"
-                       groupName="Module Integrity"
-                       enabledByDefault="true"
-                       level="WARNING" implementationClass="com.magento.idea.magento2plugin.php.inspections.ObjectManagerInspection"/>
+      <!--<localInspection language="PHP" shortName="MagentoApiInspection" displayName="Module API"-->
+                       <!--groupPath="Magento2"-->
+                       <!--groupName="Module Integrity"-->
+                       <!--enabledByDefault="true"-->
+                       <!--level="WARNING" implementationClass="com.magento.idea.magento2plugin.php.inspections.MagentoApiInspection"/>-->
+      <!--<localInspection language="PHP" shortName="ObjectManagerInspection" displayName="ObjectManager usage"-->
+                       <!--groupPath="Magento2"-->
+                       <!--groupName="Module Integrity"-->
+                       <!--enabledByDefault="true"-->
+                       <!--level="WARNING" implementationClass="com.magento.idea.magento2plugin.php.inspections.ObjectManagerInspection"/>-->
       <!-- Add your extensions here -->
+      <directoryProjectConfigurator implementation="com.magento.idea.magento2plugin.project.ProjectDetector"/>
   </extensions>
 
   <application-components>
