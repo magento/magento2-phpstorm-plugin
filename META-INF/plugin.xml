@@ -45,7 +45,6 @@
         <psi.referenceContributor language="PHP" implementation="com.magento.idea.magento2plugin.reference.php.PhpReferenceContributor"/>
         <psi.referenceContributor language="JavaScript" implementation="com.magento.idea.magento2plugin.reference.js.JsReferenceContributor"/>
 
-
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.EventObserverIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.EventNameIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.TypeConfigurationIndex" />
