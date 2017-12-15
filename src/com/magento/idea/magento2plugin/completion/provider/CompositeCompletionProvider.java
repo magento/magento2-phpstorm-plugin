@@ -1,4 +1,4 @@
-package com.magento.idea.magento2plugin.completion.xml.provider;
+package com.magento.idea.magento2plugin.completion.provider;
 
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
