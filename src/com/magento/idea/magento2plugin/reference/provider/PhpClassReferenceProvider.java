@@ -27,7 +27,7 @@ public class PhpClassReferenceProvider extends PsiReferenceProvider {
 
         String origValue = element.getText();
 
-        Pattern pattern = Pattern.compile(PhpRegex.Xml.CLASS_NAME);
+        Pattern pattern = Pattern.compile(PhpRegex.CLASS_NAME);
         Matcher matcher = pattern.matcher(origValue);
         if (!matcher.find()) {
             return PsiReference.EMPTY_ARRAY;

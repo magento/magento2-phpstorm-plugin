@@ -1,19 +1,19 @@
-package com.magento.idea.magento2plugin.completion.xml.provider;
+package com.magento.idea.magento2plugin.completion.provider;
 
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.icons.AllIcons;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
-import com.jetbrains.php.PhpIcons;
-import com.magento.idea.magento2plugin.indexes.LayoutIndex;
-import com.magento.idea.magento2plugin.stubs.indexes.BlockNameIndex;
+import com.intellij.util.indexing.FileBasedIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
-public class LayoutBlockCompletionContributor extends CompletionProvider<CompletionParameters> {
+public class ModuleNameCompletionProvider extends CompletionProvider<CompletionParameters> {
 
     @Override
     protected void addCompletions(@NotNull CompletionParameters parameters,
@@ -23,11 +23,18 @@ public class LayoutBlockCompletionContributor extends CompletionProvider<Complet
         if (position == null) {
             return;
         }
+        String prefix = result.getPrefixMatcher().getPrefix();
 
-        Collection<String> keys = LayoutIndex.getAllKeys(BlockNameIndex.KEY, position.getProject());
-        for (String key: keys) {
+        Collection<String> moduleNames
+                = FileBasedIndex.getInstance().getAllKeys(ModuleNameIndex.KEY, position.getProject());
+
+
+        moduleNames.removeIf(m -> !m.startsWith(prefix));
+        for (String moduleName : moduleNames) {
             result.addElement(
-                LookupElementBuilder.create(key).withIcon(PhpIcons.XML_TAG_ICON)
+                    LookupElementBuilder
+                            .create(moduleName)
+                            .withIcon(AllIcons.Modules.ModulesNode)
             );
         }
     }
