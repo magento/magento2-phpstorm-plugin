@@ -1,6 +1,5 @@
 package com.magento.idea.magento2plugin.reference.provider;
 
-import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.*;
 import com.intellij.psi.*;
@@ -8,6 +7,7 @@ import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
+import com.jetbrains.php.lang.PhpFileType;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 import com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex;
 import gnu.trove.THashMap;
@@ -33,6 +33,7 @@ public class FilePathReferenceProvider extends PsiReferenceProvider {
             return PsiReference.EMPTY_ARRAY;
         }
 
+        // Find all files based on provided path
         Collection<VirtualFile> files = getFiles(element);
         if (!(files.size() > 0)) {
             return PsiReference.EMPTY_ARRAY;
@@ -92,12 +93,9 @@ public class FilePathReferenceProvider extends PsiReferenceProvider {
             }
 
             if (psiPathElements.size() > 0) {
-                psiPathElements.forEach(new BiConsumer<TextRange, List<PsiElement>>() {
-                    @Override
-                    public void accept(TextRange textRange, List<PsiElement> psiElements) {
-                        psiReferences.add(new PolyVariantReferenceBase(element, textRange, psiElements));
-                    }
-                });
+                psiPathElements.forEach(((textRange, psiElements) ->
+                        psiReferences.add(new PolyVariantReferenceBase(element, textRange, psiElements))
+                ));
             }
         }
 
@@ -141,7 +139,7 @@ public class FilePathReferenceProvider extends PsiReferenceProvider {
             Collection<VirtualFile> vfs = getModuleSourceFiles(element);
             if (null != vfs) {
                 for (VirtualFile vf : vfs) {
-                    Collection<VirtualFile> vfChildren = getAllSubFiles(vf.findChild("view"));
+                    Collection<VirtualFile> vfChildren = getAllSubFiles(vf);
                     if (null != vfChildren) {
                         vfChildren.removeIf(f -> {
                             if (!f.isDirectory()) {
@@ -171,7 +169,7 @@ public class FilePathReferenceProvider extends PsiReferenceProvider {
                 .getContainingFiles(ModuleNameIndex.KEY, moduleName,
                         GlobalSearchScope.getScopeRestrictedByFileTypes(
                                 GlobalSearchScope.allScope(element.getProject()),
-                                XmlFileType.INSTANCE
+                                PhpFileType.INSTANCE
                         )
                 );
     }
@@ -182,10 +180,10 @@ public class FilePathReferenceProvider extends PsiReferenceProvider {
         if (null == virtualFiles) {
             return null;
         }
-        virtualFiles.removeIf(vf -> !(vf != null && vf.getParent() != null && vf.getParent().getParent() != null));
+        virtualFiles.removeIf(vf -> !(vf != null && vf.getParent() != null));
         Collection<VirtualFile> sourceVfs = new ArrayList<>();
         for (VirtualFile vf : virtualFiles) {
-            sourceVfs.add(vf.getParent().getParent());
+            sourceVfs.add(vf.getParent());
         }
         return sourceVfs;
     }
@@ -222,10 +220,6 @@ public class FilePathReferenceProvider extends PsiReferenceProvider {
     private Collection<VirtualFile> getAllSubFiles(VirtualFile virtualFile)
     {
         Collection<VirtualFile> list = new ArrayList<>();
-
-        if (null == virtualFile) {
-            return list;
-        }
 
         VfsUtilCore.visitChildrenRecursively(virtualFile, new VirtualFileVisitor() {
             @Override
