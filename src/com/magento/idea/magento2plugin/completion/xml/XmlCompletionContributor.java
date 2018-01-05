@@ -4,8 +4,7 @@ import com.intellij.codeInsight.completion.CompletionContributor;
 import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.patterns.XmlPatterns;
 import com.intellij.psi.xml.XmlTokenType;
-import com.magento.idea.magento2plugin.completion.xml.provider.*;
-import com.magento.idea.magento2plugin.php.util.PhpRegex;
+import com.magento.idea.magento2plugin.completion.provider.*;
 
 import static com.intellij.patterns.PlatformPatterns.psiElement;
 import static com.intellij.patterns.StandardPatterns.string;
@@ -14,19 +13,21 @@ import static com.intellij.patterns.XmlPatterns.xmlFile;
 public class XmlCompletionContributor extends CompletionContributor {
 
     public XmlCompletionContributor() {
-        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
-                .withText(string().matches(PhpRegex.Xml.CLASS_ELEMENT)),
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN),
             new CompositeCompletionProvider(
                 new PhpClassCompletionProvider(),
-                new PhpClassMemberCompletionProvider()
+                new PhpClassMemberCompletionProvider(),
+                new ModuleNameCompletionProvider(),
+                new FilePathCompletionProvider()
             )
         );
 
-        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_DATA_CHARACTERS)
-                .withText(string().matches(PhpRegex.Xml.CLASS_ELEMENT)),
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_DATA_CHARACTERS),
             new CompositeCompletionProvider(
                 new PhpClassCompletionProvider(),
-                new PhpClassMemberCompletionProvider()
+                new PhpClassMemberCompletionProvider(),
+                new ModuleNameCompletionProvider(),
+                new FilePathCompletionProvider()
             )
         );
 

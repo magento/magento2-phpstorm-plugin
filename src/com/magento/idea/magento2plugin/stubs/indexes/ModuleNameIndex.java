@@ -5,6 +5,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.indexing.*;
+import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.jetbrains.php.lang.PhpFileType;
@@ -16,22 +17,24 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class ModuleNameIndex extends ScalarIndexExtension<String> {
-    public static final ID<String, Void> KEY =
+public class ModuleNameIndex extends FileBasedIndexExtension<String, String> {
+    public static final ID<String, String> KEY =
             ID.create("com.magento.idea.magento2plugin.stubs.indexes.module_name");
 
     @NotNull
     @Override
-    public ID<String, Void> getName() {
+    public ID<String, String> getName() {
         return KEY;
     }
 
     @NotNull
     @Override
-    public DataIndexer<String, Void, FileContent> getIndexer() {
+    public DataIndexer<String, String, FileContent> getIndexer() {
         return inputData -> {
-            Map<String, Void> map = new HashMap<>();
+            Map<String, String> map = new HashMap<>();
             PsiFile psiFile = inputData.getPsiFile();
 
             if (!Settings.isEnabled(psiFile.getProject())) {
@@ -46,10 +49,26 @@ public class ModuleNameIndex extends ScalarIndexExtension<String> {
                         PsiElement firstParameter = parameterList.getFirstPsiChild();
                         if (firstParameter != null && firstParameter instanceof ClassConstantReference) {
                             String constantName = ((ClassConstantReference) firstParameter).getName();
-                            if (constantName != null && constantName.equalsIgnoreCase("module")) {
-                                PsiElement moduleName = ((ClassConstantReference) firstParameter).getNextPsiSibling();
-                                if (moduleName != null && moduleName instanceof StringLiteralExpression) {
-                                    map.put(StringUtil.unquoteString(moduleName.getText()), null);
+                            if (constantName != null) {
+                                PsiElement moduleNameEl = ((ClassConstantReference) firstParameter).getNextPsiSibling();
+                                if (moduleNameEl != null && moduleNameEl instanceof StringLiteralExpression) {
+                                    String moduleName = StringUtil.unquoteString(moduleNameEl.getText());
+
+                                    PsiElement modulePathEl =
+                                            ((StringLiteralExpression) moduleNameEl).getNextPsiSibling();
+                                    if (modulePathEl != null) {
+                                        Pattern pattern = Pattern.compile(
+                                                "__DIR__(\\s*[.,]\\s*[\\'\\\"]((/[\\w-]+)+)/?[\\'\\\"])?"
+                                        );
+                                        Matcher matcher = pattern.matcher(modulePathEl.getText());
+                                        if (matcher.find()) {
+                                            String modulePath = matcher.group(2);
+                                            map.put(
+                                                    moduleName,
+                                                    modulePath == null ? "" : modulePath
+                                            );
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -65,6 +84,11 @@ public class ModuleNameIndex extends ScalarIndexExtension<String> {
     @Override
     public KeyDescriptor<String> getKeyDescriptor() {
         return new EnumeratorStringDescriptor();
+    }
+
+    @NotNull
+    public DataExternalizer<String> getValueExternalizer() {
+        return EnumeratorStringDescriptor.INSTANCE;
     }
 
     @NotNull
