@@ -7,9 +7,8 @@ import com.intellij.icons.AllIcons;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.xml.XmlTag;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.magento.idea.magento2plugin.indexes.XmlIndex;
 import com.magento.idea.magento2plugin.project.Settings;
-import com.magento.idea.magento2plugin.indexes.LayoutIndex;
-import com.magento.idea.magento2plugin.stubs.indexes.TypeConfigurationIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,8 +37,8 @@ public class ClassConfigurationLineMarkerProvider implements LineMarkerProvider 
         for (PsiElement psiElement: list) {
             if (psiElement instanceof PhpClass) {
                 List<XmlTag> results = new ArrayList<XmlTag>();
-                results.addAll(TypeConfigurationIndex.getClassConfigurations((PhpClass) psiElement));
-                results.addAll(LayoutIndex.getBlockClassDeclarations((PhpClass) psiElement, psiElement.getProject()));
+
+                results.addAll(XmlIndex.getPhpClassDeclarations((PhpClass) psiElement));
 
                 if (!(results.size() > 0)) {
                     continue;
