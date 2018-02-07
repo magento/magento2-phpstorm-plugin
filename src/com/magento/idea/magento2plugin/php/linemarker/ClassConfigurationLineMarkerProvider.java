@@ -45,14 +45,11 @@ public class ClassConfigurationLineMarkerProvider implements LineMarkerProvider 
                 }
                 results.sort(Comparator.comparing(XmlTag::getName));
 
-                StringBuilder tooltipText = new StringBuilder("Navigate to configuration:");
-                for (XmlTag resultItem: results) {
-                    tooltipText.append("\n  ").append(resultItem.getName());
-                }
+                String tooltipText = "Navigate to configuration";
                 NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder
                         .create(AllIcons.FileTypes.Xml)
                         .setTargets(results)
-                        .setTooltipText(tooltipText.toString());
+                        .setTooltipText(tooltipText);
 
                 collection.add(builder.createLineMarkerInfo(psiElement));
             }
