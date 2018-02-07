@@ -20,6 +20,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 public class PhpClassNameIndex extends ScalarIndexExtension<String> {
+    private static final String CLASS_NAME_PATTERN =
+            PhpRegex.CLASS_NAME + "(\\\\" + PhpRegex.CLASS_NAME + ")+";
+
     public static final ID<String, Void> KEY = ID.create(
             "com.magento.idea.magento2plugin.stubs.indexes.xml.php_class_name");
 
@@ -56,14 +59,14 @@ public class PhpClassNameIndex extends ScalarIndexExtension<String> {
                 String xmlAttributeValue = xmlAttribute.getValue();
                 if (xmlAttributeValue != null
                         && !xmlAttributeValue.isEmpty()
-                        && xmlAttributeValue.matches(PhpRegex.FQN)
+                        && xmlAttributeValue.matches(CLASS_NAME_PATTERN)
                 ) {
                     resultMap.put(PhpLangUtil.toPresentableFQN(xmlAttributeValue), null);
                 }
             }
             XmlTagValue childTagValue = childTag.getValue();
             String tagValue = childTagValue.getTrimmedText();
-            if (!tagValue.isEmpty() && tagValue.matches(PhpRegex.FQN)) {
+            if (!tagValue.isEmpty() && tagValue.matches(CLASS_NAME_PATTERN)) {
                 resultMap.put(PhpLangUtil.toPresentableFQN(tagValue), null);
             }
 
