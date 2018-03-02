@@ -100,6 +100,6 @@ public class PhpClassNameIndex extends ScalarIndexExtension<String> {
 
     @Override
     public int getVersion() {
-        return DomApplicationComponent.getInstance().getCumulativeVersion(false);
+        return 1;
     }
 }

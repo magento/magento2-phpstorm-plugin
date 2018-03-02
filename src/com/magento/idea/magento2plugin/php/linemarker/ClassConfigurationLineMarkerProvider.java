@@ -51,7 +51,10 @@ public class ClassConfigurationLineMarkerProvider implements LineMarkerProvider 
                         .setTargets(results)
                         .setTooltipText(tooltipText);
 
-                collection.add(builder.createLineMarkerInfo(psiElement));
+                PsiElement className = ((PhpClass) psiElement).getNameIdentifier();
+                if (className != null) {
+                    collection.add(builder.createLineMarkerInfo(className));
+                }
             }
         }
     }
