@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class PhpClassNameIndex extends ScalarIndexExtension<String> {
     private static final String CLASS_NAME_PATTERN =
-            PhpRegex.CLASS_NAME + "(\\\\" + PhpRegex.CLASS_NAME + ")+";
+            "\\\\?" + PhpRegex.CLASS_NAME + "(\\\\" + PhpRegex.CLASS_NAME + ")+";
 
     public static final ID<String, Void> KEY = ID.create(
             "com.magento.idea.magento2plugin.stubs.indexes.xml.php_class_name");

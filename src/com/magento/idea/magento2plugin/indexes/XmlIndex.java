@@ -66,13 +66,18 @@ public class XmlIndex {
         for (XmlTag childTag: parentTag.getSubTags()) {
             for (XmlAttribute xmlAttribute: childTag.getAttributes()) {
                 String xmlAttributeValue = xmlAttribute.getValue();
-                if (xmlAttributeValue != null && xmlAttributeValue.equalsIgnoreCase(fqn)) {
-                    list.add(childTag);
+                if (xmlAttributeValue != null) {
+                    xmlAttributeValue = xmlAttributeValue.startsWith("\\")
+                            ? xmlAttributeValue.substring(1) : xmlAttributeValue;
+                    if (xmlAttributeValue.startsWith(fqn)) {
+                        list.add(childTag);
+                    }
                 }
             }
             XmlTagValue childTagValue = childTag.getValue();
             String tagValue = childTagValue.getTrimmedText();
-            if (!tagValue.isEmpty() && tagValue.equalsIgnoreCase(fqn)) {
+            tagValue = tagValue.startsWith("\\") ? tagValue.substring(1) : tagValue;
+            if (!tagValue.isEmpty() && tagValue.startsWith(fqn)) {
                 list.add(childTag);
             }
 

@@ -2,8 +2,8 @@ package com.magento.idea.magento2plugin.indexes;
 
 import com.intellij.util.indexing.FileBasedIndexImpl;
 import com.intellij.util.indexing.ID;
-import com.jetbrains.php.lang.psi.stubs.indexes.PhpClassNameIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.*;
+import com.magento.idea.magento2plugin.stubs.indexes.xml.PhpClassNameIndex;
 
 /**
  * Created by dkvashnin on 1/9/16.
