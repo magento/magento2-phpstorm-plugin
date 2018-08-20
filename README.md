@@ -9,7 +9,7 @@ This is a plugin for Magento 2 development in the PhpStorm IDE. It is available 
 
 1. Go to Settings / Preferences in the PhpStorm IDE
 2. Navigate to "Plugins"
-3. Click the "Browse repositories..." button and search for "Magento2"
+3. Click the "Browse repositories..." button and search for "Magento PhpStorm"
 4. Install the plugin and restart PhpStorm
 5. Go to Settings / Preferences / Languages & Frameworks / PHP / Magento in the PhpStorm IDE
 6. Check "Enable" and "OK" button. 
