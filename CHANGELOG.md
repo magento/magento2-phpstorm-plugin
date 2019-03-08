@@ -1,5 +1,13 @@
-0.2.3
+0.3.0
 ============= 
+* Features:
+    * Extended navigation from PHP class to its XML declaration to support any configs
+    * Documented local environment set up for plugin development
+* Fixed bugs:
+    * Fixed NullPointerException
+
+0.2.3
+=============
 * Features:
     * Added JavaScript reference contributor
     * Support references for each part of FQN of PHP class, methods, constants
