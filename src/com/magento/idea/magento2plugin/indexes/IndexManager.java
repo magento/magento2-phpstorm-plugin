@@ -3,6 +3,7 @@ package com.magento.idea.magento2plugin.indexes;
 import com.intellij.util.indexing.FileBasedIndexImpl;
 import com.intellij.util.indexing.ID;
 import com.magento.idea.magento2plugin.stubs.indexes.*;
+import com.magento.idea.magento2plugin.stubs.indexes.xml.PhpClassNameIndex;
 
 /**
  * Created by dkvashnin on 1/9/16.
@@ -14,10 +15,8 @@ public class IndexManager {
             ModulePackageIndex.KEY,
             // xml|di configuration
             PluginIndex.KEY,
-            TypeConfigurationIndex.KEY,
             VirtualTypeIndex.KEY,
             // layouts
-            BlockClassNameIndex.KEY,
             BlockNameIndex.KEY,
             ContainerNameIndex.KEY,
             // events
@@ -25,7 +24,8 @@ public class IndexManager {
             EventObserverIndex.KEY,
             // webapi
             WebApiTypeIndex.KEY,
-            ModuleNameIndex.KEY
+            ModuleNameIndex.KEY,
+            PhpClassNameIndex.KEY
         };
 
         for (ID<?, ?> id: indexIds) {

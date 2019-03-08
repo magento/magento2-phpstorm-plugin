@@ -11,12 +11,8 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.intellij.util.indexing.ID;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.magento.idea.magento2plugin.stubs.indexes.BlockClassNameIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.BlockNameIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.ContainerNameIndex;
-import com.magento.idea.magento2plugin.xml.LineMarkerXmlTagDecorator;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -111,17 +107,6 @@ public class LayoutIndex {
         return getComponentDeclarations(componentName, "container", ContainerNameIndex.KEY, project, new NameComponentMatcher());
     }
 
-    public static List<XmlTag> getBlockClassDeclarations(PhpClass phpClass, Project project) {
-        String className = phpClass.getPresentableFQN();
-
-        List<XmlTag> blockTags = getComponentDeclarations(className, "block", BlockClassNameIndex.KEY, project, new ClassComponentMatcher());
-        List<XmlTag> decoratedBlockTags = new ArrayList<>();
-        for (XmlTag blockTag: blockTags) {
-            decoratedBlockTags.add(new LayoutBlockLineMarkerXmlTagDecorator(blockTag));
-        }
-        return decoratedBlockTags;
-    }
-
     private interface ComponentMatcher {
         boolean matches(String value, XmlTag tag);
     }
@@ -130,39 +115,6 @@ public class LayoutIndex {
         @Override
         public boolean matches(String value, XmlTag tag) {
             return value.equals(tag.getAttributeValue("name"));
-        }
-    }
-
-    private static class ClassComponentMatcher implements ComponentMatcher {
-        @Override
-        public boolean matches(String value, XmlTag tag) {
-            return value.equals(tag.getAttributeValue("class"));
-        }
-    }
-
-    /**
-     * Decorator for XmlTag, which improves readability of "block" node in configuration line marker.
-     */
-    private static class LayoutBlockLineMarkerXmlTagDecorator extends LineMarkerXmlTagDecorator {
-
-        LayoutBlockLineMarkerXmlTagDecorator(XmlTag xmlTag) {
-            super(xmlTag);
-        }
-
-        @NotNull
-        @Override
-        protected String getAreaName() {
-            return xmlTag.getContainingFile().getVirtualFile().getParent().getParent().getName();
-        }
-
-        @NotNull
-        @Override
-        public String getDescription() {
-            String name = xmlTag.getAttributeValue("name");
-            if (name != null) {
-                return String.format("block %s", name);
-            }
-            return xmlTag.getName();
         }
     }
 }

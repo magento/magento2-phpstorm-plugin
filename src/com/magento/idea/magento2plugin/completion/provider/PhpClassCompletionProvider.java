@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class PhpClassCompletionProvider extends CompletionProvider<CompletionParameters> {
 
     final private static String PHP_CLASS_COMPLETION_REGEX
-            = "\\\\?" + PhpRegex.CLASS_NAME + "\\\\?";
+            = "\\\\?" + PhpRegex.FQN + "\\\\?";
 
     @Override
     protected void addCompletions(@NotNull CompletionParameters parameters,
