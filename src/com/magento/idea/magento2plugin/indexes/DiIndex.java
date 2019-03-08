@@ -1,6 +1,5 @@
 package com.magento.idea.magento2plugin.indexes;
 
-import com.android.annotations.NonNull;
 import com.intellij.codeInsight.completion.PrefixMatcher;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -118,7 +117,7 @@ public class DiIndex {
     }
 
     @NotNull
-    private String getTopTypeOfVirtualType(@NonNull String name) {
+    private String getTopTypeOfVirtualType(@NotNull String name) {
         List<String> values;
         int parentNestingLevel = 0;
         int maxNestingLevel = 5;
