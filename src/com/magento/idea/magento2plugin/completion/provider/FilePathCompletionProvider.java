@@ -101,12 +101,17 @@ public class FilePathCompletionProvider extends CompletionProvider<CompletionPar
                 FileBasedIndexUtil.findViewVfsByModuleName(matcher.group(0), parameters.getPosition().getProject())
             );
         } else {
-            VirtualFile moduleVf =
-                VfsUtil.findVfUp(parameters.getOriginalFile().getVirtualFile(), "registration.php");
+            VirtualFile tf = parameters.getOriginalFile().getVirtualFile();
+            if (tf != null) {
+                VirtualFile moduleVf =
+                        VfsUtil.findVfUp(tf, "registration.php");
 
-            viewVfs.addAll(
-                FileBasedIndexUtil.findViewVfsByModuleVf(moduleVf, parameters.getPosition().getProject())
-            );
+                if (moduleVf != null) {
+                    viewVfs.addAll(
+                            FileBasedIndexUtil.findViewVfsByModuleVf(moduleVf, parameters.getPosition().getProject())
+                    );
+                }
+            }
         }
 
         return viewVfs;

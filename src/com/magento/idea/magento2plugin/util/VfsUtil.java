@@ -4,12 +4,14 @@ import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileVisitor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class VfsUtil {
 
+    @Nullable
     public static VirtualFile findVfUp(VirtualFile item, String searchItemName)
     {
         if (item.getParent() != null) {
@@ -17,8 +19,9 @@ public class VfsUtil {
             if (vf != null && !vf.isDirectory()) {
                 return vf;
             }
+            return findVfUp(item.getParent(), searchItemName);
         }
-        return findVfUp(item.getParent(), searchItemName);
+        return null;
     }
 
     public static Collection<VirtualFile> getAllSubFiles(VirtualFile virtualFile)
