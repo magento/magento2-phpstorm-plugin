@@ -62,6 +62,8 @@
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.WebApiLineMarkerProvider"/>
 
         <directoryProjectConfigurator implementation="com.magento.idea.magento2plugin.project.ProjectDetector"/>
+
+        <libraryRoot id=".phpstorm.meta.php" path="/.phpstorm.meta.php/" runtime="false"/>
     </extensions>
 
     <application-components>
