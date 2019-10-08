@@ -6,6 +6,7 @@ import com.intellij.psi.PsiReferenceRegistrar;
 import com.intellij.psi.xml.XmlTokenType;
 import com.magento.idea.magento2plugin.php.util.PhpRegex;
 import com.magento.idea.magento2plugin.reference.provider.*;
+import com.magento.idea.magento2plugin.reference.provider.mftf.*;
 import org.jetbrains.annotations.NotNull;
 
 import static com.intellij.patterns.XmlPatterns.string;
@@ -151,6 +152,66 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
                 new CompositeReferenceProvider(
                         new FilePathReferenceProvider()
                 )
+        );
+
+        // <someXmlTag someAttribute="{{someValue}}" />
+        registrar.registerReferenceProvider(
+            XmlPatterns.xmlAttributeValue().withValue(string().matches(".*\\{\\{[^\\}]+\\}\\}.*")),
+            new CompositeReferenceProvider(
+                new DataReferenceProvider(),
+                new PageReferenceProvider(),
+                new SectionReferenceProvider()
+            )
+        );
+
+        // <createData entity="SimpleProduct" />
+        registrar.registerReferenceProvider(
+            XmlPatterns.xmlAttributeValue().withParent(XmlPatterns.xmlAttribute().withName(string().oneOf("entity", "value", "userInput", "url"))),
+            new CompositeReferenceProvider(
+                new DataReferenceProvider(),
+                new SectionReferenceProvider()
+            )
+        );
+
+        // <actionGroup ref="someActionGroup" />
+        registrar.registerReferenceProvider(
+            XmlPatterns.xmlAttributeValue().withParent(XmlPatterns.xmlAttribute().withName("ref")
+                .withParent(XmlPatterns.xmlTag().withName("actionGroup"))),
+            new CompositeReferenceProvider(
+                new ActionGroupReferenceProvider()
+            )
+        );
+
+        // <assert*><*Result type="variable">$someVariableReferenceToStepKey</*Result></assert*>
+        registrar.registerReferenceProvider(
+            XmlPatterns.psiElement(XmlTokenType.XML_DATA_CHARACTERS).withParent(
+                XmlPatterns.xmlText().withParent(
+                    XmlPatterns.xmlTag().withChild(
+                        XmlPatterns.xmlAttribute().withName("type")
+                    )
+                )
+            ),
+            new CompositeReferenceProvider(
+                new VariableToStepKeyProvider()
+            )
+        );
+
+        // <actionGroup extends="parentActionGroup" />
+        registrar.registerReferenceProvider(
+            XmlPatterns.xmlAttributeValue().withParent(XmlPatterns.xmlAttribute().withName("extends")
+                .withParent(XmlPatterns.xmlTag().withName("actionGroup"))),
+            new CompositeReferenceProvider(
+                new ActionGroupReferenceProvider()
+            )
+        );
+
+        // <entity name="B" extends="A" />
+        registrar.registerReferenceProvider(
+            XmlPatterns.xmlAttributeValue().withParent(XmlPatterns.xmlAttribute().withName("extends")
+                .withParent(XmlPatterns.xmlTag().withName("entity"))),
+            new CompositeReferenceProvider(
+                new DataReferenceProvider()
+            )
         );
     }
 }
