@@ -1,6 +1,6 @@
 0.3.0
 ============= 
-* # Features:
+* ## Features:
     * Extended navigation from PHP class to its XML declaration to support any configs
     * Documented local environment set up for plugin development
 * **Fixed bugs:
