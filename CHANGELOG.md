@@ -3,12 +3,12 @@
 * ### Features:
     * Extended navigation from PHP class to its XML declaration to support any configs
     * Documented local environment set up for plugin development
-* **Fixed bugs:
+* ### Fixed bugs:
     * Fixed NullPointerException
 
 0.2.3
 =============
-* **Features:
+* ### Features:
     * Added JavaScript reference contributor
     * Support references for each part of FQN of PHP class, methods, constants
     * Support reference from XML/JavaScript for module name
@@ -19,26 +19,26 @@
     
 0.2.2
 ============= 
-* **Features:
+* ### Features:
     * Added Module name to configuration tooltip
-* **Fixed bugs:
+* ### Fixed bugs:
     * Fixed "Project disposed" exception
    
 0.2.1
 =============    
-* **Features:
+* ### Features:
     * added module name for "Goto configuration" labels
     
 0.2.0
 =============
-* **Features:
+* ### Features:
     * WebApi routes
     * nicer "Goto configuration" labels
     * plugin settings (manual reindex, URN generation, plugin on/off)
  
 0.1
 =============  
-* **Features:
+* ### Features:
     * Context type completion for:
         * Observers completion only for ObserverInterface impl in events.xml
         * Blocks completion only for BlockInterface name in layouts.xml
@@ -52,7 +52,7 @@
     
 0.0.9
 =============    
-* **Features:
+* ### Features:
     * Added Reference and completion support for layouts
         * block: class, before, after
         * referenceBlock: name
@@ -64,23 +64,23 @@
 
 0.0.8
 =============
-* **Features:
+* ### Features:
     * Added Line marker reference for php class/interface to DI configuration
     * Added Line marker reference to plugins
 
 0.0.7
 =============
-* **Features:
+* ### Features:
     * Added reference to configuration and observers (classes or virtualType)
     * Added reference to observers from configuration
     * Added reference to event dispatch from configuration
     
 0.0.6
 =============
-* **Features:
+* ### Features:
     * Added reference and completion support for virtual types/classes/arguments in DI configuration
     
 0.0.5
 =============
-* **Features:
+* ### Features:
     * Added reference support for classes/interfaces in DI configuration
