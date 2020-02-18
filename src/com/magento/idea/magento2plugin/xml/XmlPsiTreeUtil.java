@@ -1,3 +1,7 @@
+/**
+ * Copyright © Dmytro Kvashnin. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 package com.magento.idea.magento2plugin.xml;
 
 import com.intellij.psi.util.PsiTreeUtil;

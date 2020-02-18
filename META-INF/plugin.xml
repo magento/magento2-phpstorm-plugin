@@ -1,3 +1,9 @@
+<!--
+/**
+ * Copyright © Dmytro Kvashnin. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
 <idea-plugin>
     <id>com.magento.idea.magento2plugin</id>
     <name>Magento PhpStorm</name>
