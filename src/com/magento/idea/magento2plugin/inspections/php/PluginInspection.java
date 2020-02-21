@@ -32,8 +32,8 @@ public class PluginInspection extends PhpInspection {
             private static final String pluginOnFinalMethodProblemDescription = "You can't declare a plugin for the final method!";
             private static final String pluginOnStaticMethodProblemDescription = "You can't declare a plugin for the static method!";
             private static final String pluginOnConstructorMethodProblemDescription = "You can't declare a plugin for the __construct method!";
-            private static final String toFewArgumentsProblemDescription = "To few arguments in the plugin!";
-            private static final String toManyArgumentsProblemDescription = "To many arguments in the plugin";
+            private static final String toFewArgumentsProblemDescription = "Too few arguments in the plugin!";
+            private static final String toManyArgumentsProblemDescription = "Too many arguments in the plugin";
 
             public void visitPhpMethod(Method pluginMethod) {
                 PluginInspector pluginInspector = PluginInspectorFactory.create(pluginMethod);
