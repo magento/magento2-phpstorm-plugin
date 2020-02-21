@@ -62,6 +62,11 @@
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.WebApiLineMarkerProvider"/>
 
         <directoryProjectConfigurator implementation="com.magento.idea.magento2plugin.project.ProjectDetector"/>
+
+        <localInspection language="PHP" groupPath="PHP"
+                         shortName="PluginInspection" displayName="Plugin for not public method"
+                         groupName="Magento"                                 enabledByDefault="true" level="ERROR"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.php.PluginInspection"/>
     </extensions>
 
     <application-components>
