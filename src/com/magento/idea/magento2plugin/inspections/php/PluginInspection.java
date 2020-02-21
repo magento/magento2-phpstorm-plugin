@@ -27,11 +27,11 @@ public class PluginInspection extends PhpInspection {
     @Override
     public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder problemsHolder, boolean b) {
         return new PhpElementVisitor() {
-            private static final String pluginOnNotPublicMethodProblemDescription = "You can't declare a plugin for the not public method";
-            private static final String pluginOnFinalClassProblemDescription = "You can't declare a plugin for the final class!";
-            private static final String pluginOnFinalMethodProblemDescription = "You can't declare a plugin for the final method!";
-            private static final String pluginOnStaticMethodProblemDescription = "You can't declare a plugin for the static method!";
-            private static final String pluginOnConstructorMethodProblemDescription = "You can't declare a plugin for the __construct method!";
+            private static final String pluginOnNotPublicMethodProblemDescription = "You can't declare a plugin for a not public method";
+            private static final String pluginOnFinalClassProblemDescription = "You can't declare a plugin for a final class!";
+            private static final String pluginOnFinalMethodProblemDescription = "You can't declare a plugin for a final method!";
+            private static final String pluginOnStaticMethodProblemDescription = "You can't declare a plugin for a static method!";
+            private static final String pluginOnConstructorMethodProblemDescription = "You can't declare a plugin for a __construct method!";
             private static final String toFewArgumentsProblemDescription = "Too few arguments in the plugin!";
             private static final String toManyArgumentsProblemDescription = "Too many arguments in the plugin";
 
