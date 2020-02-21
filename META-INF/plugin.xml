@@ -64,7 +64,7 @@
         <directoryProjectConfigurator implementation="com.magento.idea.magento2plugin.project.ProjectDetector"/>
 
         <localInspection language="PHP" groupPath="PHP"
-                         shortName="PluginInspection" displayName="Plugin for not public method"
+                         shortName="PluginInspection" displayName="Inspection for the Plugin declaration"
                          groupName="Magento"                                 enabledByDefault="true" level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.php.PluginInspection"/>
     </extensions>
