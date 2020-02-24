@@ -13,8 +13,6 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
-import com.magento.idea.magento2plugin.inspections.php.plugin.inspection.PluginInspector;
-import com.magento.idea.magento2plugin.inspections.php.plugin.inspection.PluginInspectorFactory;
 import com.magento.idea.magento2plugin.stubs.indexes.PluginIndex;
 import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
@@ -32,12 +30,29 @@ public class PluginInspection extends PhpInspection {
             private static final String pluginOnFinalMethodProblemDescription = "You can't declare a plugin for a final method!";
             private static final String pluginOnStaticMethodProblemDescription = "You can't declare a plugin for a static method!";
             private static final String pluginOnConstructorMethodProblemDescription = "You can't declare a plugin for a __construct method!";
-            private static final String toFewArgumentsProblemDescription = "Too few arguments in the plugin!";
             private static final String toManyArgumentsProblemDescription = "Too many arguments in the plugin";
+            private static final String aroundPluginPrefix = "around";
+            private static final String beforePluginPrefix = "before";
+            private static final String afterPluginPrefix = "after";
+
+            public String getPluginPrefix(Method pluginMethod) {
+                String pluginMethodName = pluginMethod.getName();
+                if (pluginMethodName.startsWith(aroundPluginPrefix)) {
+                    return aroundPluginPrefix;
+                }
+                if (pluginMethodName.startsWith(beforePluginPrefix)) {
+                    return beforePluginPrefix;
+                }
+                if (pluginMethodName.startsWith(afterPluginPrefix)) {
+                    return afterPluginPrefix;
+                }
+
+                return null;
+            }
 
             public void visitPhpMethod(Method pluginMethod) {
-                PluginInspector pluginInspector = PluginInspectorFactory.create(pluginMethod);
-                if (pluginInspector == null) {
+                String pluginPrefix = getPluginPrefix(pluginMethod);
+                if (pluginPrefix == null) {
                     return;
                 }
 
@@ -77,7 +92,7 @@ public class PluginInspection extends PhpInspection {
                                     }
                                 }
 
-                                String targetClassMethodName = pluginInspector.getTargetMethodName();
+                                String targetClassMethodName = getTargetMethodName(pluginMethod, pluginPrefix);
 
                                 if (targetClassMethodName.equals("__construct")) {
                                     problemsHolder.registerProblem(pluginMethod.getNameIdentifier(), pluginOnConstructorMethodProblemDescription, ProblemHighlightType.ERROR);
@@ -97,19 +112,33 @@ public class PluginInspection extends PhpInspection {
                                     problemsHolder.registerProblem(pluginMethod.getNameIdentifier(), pluginOnNotPublicMethodProblemDescription, ProblemHighlightType.ERROR);
                                 }
 
-                                Parameter[] targetMethodParameters = targetMethod.getParameters();
-                                int targetMethodArgumentsCount = targetMethodParameters.length;
+                                Parameter[] targetMethodArguments = targetMethod.getParameters();
+                                int targetMethodArgumentsCount = targetMethodArguments.length;
+                                Parameter[] pluginMethodArguments = pluginMethod.getParameters();
+                                int pluginMethodArgumentsCount = pluginMethodArguments.length;
 
-                                if (!pluginInspector.inspectMaximumArguments(targetMethodArgumentsCount)) {
+                                if (!inspectMaximumArguments(targetMethodArgumentsCount, pluginMethodArgumentsCount, pluginPrefix)) {
                                     problemsHolder.registerProblem(pluginMethod.getNameIdentifier(), toManyArgumentsProblemDescription, ProblemHighlightType.ERROR);
-                                }
-                                if (!pluginInspector.inspectMinimumArguments(targetMethodArgumentsCount)) {
-                                    problemsHolder.registerProblem(pluginMethod.getNameIdentifier(), toFewArgumentsProblemDescription, ProblemHighlightType.ERROR);
                                 }
                             }
                         }
                     }
                 }
+            }
+
+            private boolean inspectMaximumArguments(int targetMethodArgumentsCount, int pluginMethodArgumentsCount, String pluginPrefix) {
+                int additionalParams = 2;
+                if (pluginPrefix.equals(beforePluginPrefix)) {
+                    additionalParams = 1;
+                }
+                return !(pluginMethodArgumentsCount > targetMethodArgumentsCount + additionalParams);
+            }
+
+            private String getTargetMethodName(Method pluginMethod, String pluginPrefix) {
+                String pluginMethodName = pluginMethod.getName();
+                String targetClassMethodName = pluginMethodName.
+                        replace(pluginPrefix, "");
+                return Character.toLowerCase(targetClassMethodName.charAt(0)) + targetClassMethodName.substring(1);
             }
 
             private int getFinalClassProblems(ProblemDescriptor[] currentResults) {
