@@ -35,7 +35,7 @@ public class PluginInspection extends PhpInspection {
             private static final String beforePluginPrefix = "before";
             private static final String afterPluginPrefix = "after";
 
-            public String getPluginPrefix(Method pluginMethod) {
+            private String getPluginPrefix(Method pluginMethod) {
                 String pluginMethodName = pluginMethod.getName();
                 if (pluginMethodName.startsWith(aroundPluginPrefix)) {
                     return aroundPluginPrefix;
@@ -70,7 +70,7 @@ public class PluginInspection extends PhpInspection {
                     List<Set<String>> pluginsList = FileBasedIndex.getInstance()
                             .getValues(com.magento.idea.magento2plugin.stubs.indexes.PluginIndex.KEY, targetClassName, GlobalSearchScope.allScope(problemsHolder.getProject()));
                     if (pluginsList.isEmpty()) {
-                        return;
+                        continue;
                     }
                     for (Set<String> plugins : pluginsList) {
                         for (String plugin : plugins) {
