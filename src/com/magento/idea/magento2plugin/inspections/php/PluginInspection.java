@@ -7,17 +7,19 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
+import com.jetbrains.php.PhpBundle;
+import com.jetbrains.php.PhpClassHierarchyUtils;
 import com.jetbrains.php.PhpIndex;
+import com.jetbrains.php.lang.PhpLangUtil;
 import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
+import com.magento.idea.magento2plugin.inspections.php.util.PhpClassImplementsInterfaceUtil;
 import com.magento.idea.magento2plugin.stubs.indexes.PluginIndex;
 import org.jetbrains.annotations.NotNull;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class PluginInspection extends PhpInspection {
 
@@ -30,10 +32,13 @@ public class PluginInspection extends PhpInspection {
             private static final String pluginOnFinalMethodProblemDescription = "You can't declare a plugin for a final method!";
             private static final String pluginOnStaticMethodProblemDescription = "You can't declare a plugin for a static method!";
             private static final String pluginOnConstructorMethodProblemDescription = "You can't declare a plugin for a __construct method!";
-            private static final String toManyArgumentsProblemDescription = "Too many arguments in the plugin";
+            private static final String redundantParameterProblemDescription = "Redundant parameter";
+            private static final String possibleTypeIncompatibilityProblemDescription = "Possible type incompatibility. Consider changing the parameter according to the target method.";
             private static final String aroundPluginPrefix = "around";
             private static final String beforePluginPrefix = "before";
             private static final String afterPluginPrefix = "after";
+            private final Integer beforePluginExtraParamsStart = 2;
+            private final Integer afterAndAroundPluginExtraParamsStart = 3;
 
             private String getPluginPrefix(Method pluginMethod) {
                 String pluginMethodName = pluginMethod.getName();
@@ -60,13 +65,130 @@ public class PluginInspection extends PhpInspection {
                 if (!(parentClass instanceof PhpClass)) {
                     return;
                 }
-                String currentClass = ((PhpClass) parentClass).getFQN().substring(1);
                 PsiElement currentClassNameIdentifier = ((PhpClass) parentClass).getNameIdentifier();
+                String currentClass = ((PhpClass) parentClass).getFQN().substring(1);
+                ArrayList<String> targetClassNames = getTargetClassNamesByPluginClassName(currentClass);
+                PhpIndex phpIndex = PhpIndex.getInstance(problemsHolder.getProject());
 
+                for (String targetClassName : targetClassNames) {
+
+                    PhpClass target = getPhpClassByFQN(targetClassName, phpIndex);
+                    if (target == null) {
+                        return;
+                    }
+                    checkTargetClass(currentClassNameIdentifier, target);
+
+                    String targetClassMethodName = getTargetMethodName(pluginMethod, pluginPrefix);
+                    if (targetClassMethodName == null) {
+                        return;
+                    }
+                    Method targetMethod = target.findMethodByName(targetClassMethodName);
+                    if (targetMethod == null) {
+                        return;
+                    }
+                    checkTargetMethod(pluginMethod, targetClassMethodName, targetMethod);
+                    checkParametersCompatibility(pluginMethod, pluginPrefix, phpIndex, targetClassName, targetMethod);
+                }
+            }
+
+            private void checkTargetClass(PsiElement currentClassNameIdentifier, PhpClass target) {
+                if (target.isFinal()) {
+                    ProblemDescriptor[] currentResults = problemsHolder.getResultsArray();
+                    int finalClassProblems = getFinalClassProblems(currentResults);
+                    if (finalClassProblems == 0) {
+                        problemsHolder.registerProblem(currentClassNameIdentifier, pluginOnFinalClassProblemDescription, ProblemHighlightType.ERROR);
+                    }
+                }
+            }
+
+            private void checkTargetMethod(Method pluginMethod, String targetClassMethodName, Method targetMethod) {
+                if (targetClassMethodName.equals("__construct")) {
+                    problemsHolder.registerProblem(pluginMethod.getNameIdentifier(), pluginOnConstructorMethodProblemDescription, ProblemHighlightType.ERROR);
+                }
+                if (targetMethod.isFinal()) {
+                    problemsHolder.registerProblem(pluginMethod.getNameIdentifier(), pluginOnFinalMethodProblemDescription, ProblemHighlightType.ERROR);
+                }
+                if (targetMethod.isStatic()) {
+                    problemsHolder.registerProblem(pluginMethod.getNameIdentifier(), pluginOnStaticMethodProblemDescription, ProblemHighlightType.ERROR);
+                }
+                if (!targetMethod.getAccess().toString().equals("public")) {
+                    problemsHolder.registerProblem(pluginMethod.getNameIdentifier(), pluginOnNotPublicMethodProblemDescription, ProblemHighlightType.ERROR);
+                }
+            }
+
+            private void checkParametersCompatibility(Method pluginMethod, String pluginPrefix, PhpIndex phpIndex, String targetClassName, Method targetMethod) {
+                Parameter[] targetMethodParameters = targetMethod.getParameters();
+                Parameter[] pluginMethodParameters = pluginMethod.getParameters();
+
+                int index = 0;
+                for (Parameter pluginMethodParameter : pluginMethodParameters) {
+                    index++;
+                    String declaredType = pluginMethodParameter.getDeclaredType().toString();
+
+                    if (index == 1) {
+                        String targetClassFqn = "\\".concat(targetClassName);
+                        if (!checkTypeIncompatibility(targetClassFqn, declaredType, phpIndex)) {
+                            problemsHolder.registerProblem(pluginMethodParameter, PhpBundle.message("inspection.wrong_param_type", new Object[]{declaredType, targetClassFqn}), ProblemHighlightType.ERROR);
+                        }
+                        if (!checkPossibleTypeIncompatibility(targetClassFqn, declaredType, phpIndex)) {
+                            problemsHolder.registerProblem(pluginMethodParameter, possibleTypeIncompatibilityProblemDescription, ProblemHighlightType.WEAK_WARNING);
+                        }
+                        continue;
+                    }
+                    if (index == 2 && pluginPrefix.equals(aroundPluginPrefix)) {
+                        if (!checkTypeIncompatibility("callable", declaredType, phpIndex)) {
+                            problemsHolder.registerProblem(pluginMethodParameter, PhpBundle.message("inspection.wrong_param_type", new Object[]{declaredType, "callable"}), ProblemHighlightType.ERROR);
+                        }
+                        continue;
+                    }
+                    if (index == 2 && pluginPrefix.equals(afterPluginPrefix) &&
+                            !targetMethod.getDeclaredType().toString().equals("void")) {
+                        if (declaredType.isEmpty() || targetMethod.getDeclaredType().toString().isEmpty()) {
+                            continue;
+                        }
+                        if (!checkTypeIncompatibility(targetMethod.getDeclaredType().toString(), declaredType, phpIndex)) {
+                            problemsHolder.registerProblem(pluginMethodParameter, PhpBundle.message("inspection.wrong_param_type", new Object[]{declaredType, targetMethod.getDeclaredType().toString()}), ProblemHighlightType.ERROR);
+                        }
+                        if (!checkPossibleTypeIncompatibility(targetMethod.getDeclaredType().toString(), declaredType, phpIndex)) {
+                            problemsHolder.registerProblem(pluginMethodParameter, possibleTypeIncompatibilityProblemDescription, ProblemHighlightType.WEAK_WARNING);
+                        }
+                        continue;
+                    }
+                    if (index == 2 && pluginPrefix.equals(afterPluginPrefix) &&
+                            targetMethod.getDeclaredType().toString().equals("void")) {
+                        if (declaredType.isEmpty()) {
+                            continue;
+                        }
+                        if (!declaredType.equals("null")) {
+                            problemsHolder.registerProblem(pluginMethodParameter, PhpBundle.message("inspection.wrong_param_type", new Object[]{declaredType, "null"}), ProblemHighlightType.ERROR);
+                        }
+                        continue;
+                    }
+                    int targetParameterKey = index - (pluginPrefix.equals(beforePluginPrefix) ?
+                            beforePluginExtraParamsStart :
+                            afterAndAroundPluginExtraParamsStart);
+                    if (targetMethodParameters.length <= targetParameterKey) {
+                        problemsHolder.registerProblem(pluginMethodParameter, redundantParameterProblemDescription, ProblemHighlightType.ERROR);
+                        continue;
+                    }
+                    Parameter targetMethodParameter = targetMethodParameters[targetParameterKey];
+                    String targetMethodParameterDeclaredType = targetMethodParameter.getDeclaredType().toString();
+
+                    if (!checkTypeIncompatibility(targetMethodParameterDeclaredType, declaredType, phpIndex)) {
+                        problemsHolder.registerProblem(pluginMethodParameter, PhpBundle.message("inspection.wrong_param_type", new Object[]{declaredType, targetMethodParameterDeclaredType}), ProblemHighlightType.ERROR);
+                    }
+                    if (!checkPossibleTypeIncompatibility(targetMethodParameterDeclaredType, declaredType, phpIndex)) {
+                        problemsHolder.registerProblem(pluginMethodParameter, possibleTypeIncompatibilityProblemDescription, ProblemHighlightType.WEAK_WARNING);
+                    }
+                }
+            }
+
+            private ArrayList<String> getTargetClassNamesByPluginClassName(String currentClassName) {
+                ArrayList<String> targetClassNames = new ArrayList<String>();
                 Collection<String> allKeys = FileBasedIndex.getInstance()
                         .getAllKeys(PluginIndex.KEY, problemsHolder.getProject());
 
-                for (String targetClassName: allKeys) {
+                for (String targetClassName : allKeys) {
                     List<Set<String>> pluginsList = FileBasedIndex.getInstance()
                             .getValues(com.magento.idea.magento2plugin.stubs.indexes.PluginIndex.KEY, targetClassName, GlobalSearchScope.allScope(problemsHolder.getProject()));
                     if (pluginsList.isEmpty()) {
@@ -74,81 +196,114 @@ public class PluginInspection extends PhpInspection {
                     }
                     for (Set<String> plugins : pluginsList) {
                         for (String plugin : plugins) {
-                            if (!plugin.equals(currentClass)){
+                            if (!plugin.equals(currentClassName)) {
                                 continue;
                             }
-
-                            PhpIndex phpIndex = PhpIndex.getInstance(problemsHolder.getProject());
-                            Collection<PhpClass> targets = phpIndex.getClassesByFQN(targetClassName);
-                            if (targets.isEmpty()) {
-                                return;
-                            }
-                            for (PhpClass target : targets) {
-                                if (target.isFinal()) {
-                                    ProblemDescriptor[] currentResults = problemsHolder.getResultsArray();
-                                    int finalClassProblems = getFinalClassProblems(currentResults);
-                                    if (finalClassProblems == 0) {
-                                        problemsHolder.registerProblem(currentClassNameIdentifier, pluginOnFinalClassProblemDescription, ProblemHighlightType.ERROR);
-                                    }
-                                }
-
-                                String targetClassMethodName = getTargetMethodName(pluginMethod, pluginPrefix);
-
-                                if (targetClassMethodName.equals("__construct")) {
-                                    problemsHolder.registerProblem(pluginMethod.getNameIdentifier(), pluginOnConstructorMethodProblemDescription, ProblemHighlightType.ERROR);
-                                }
-
-                                Method targetMethod = target.findMethodByName(targetClassMethodName);
-                                if (targetMethod == null) {
-                                    return;
-                                }
-                                if (targetMethod.isFinal()) {
-                                    problemsHolder.registerProblem(pluginMethod.getNameIdentifier(), pluginOnFinalMethodProblemDescription, ProblemHighlightType.ERROR);
-                                }
-                                if (targetMethod.isStatic()) {
-                                    problemsHolder.registerProblem(pluginMethod.getNameIdentifier(), pluginOnStaticMethodProblemDescription, ProblemHighlightType.ERROR);
-                                }
-                                if (!targetMethod.getAccess().toString().equals("public")) {
-                                    problemsHolder.registerProblem(pluginMethod.getNameIdentifier(), pluginOnNotPublicMethodProblemDescription, ProblemHighlightType.ERROR);
-                                }
-
-                                Parameter[] targetMethodArguments = targetMethod.getParameters();
-                                int targetMethodArgumentsCount = targetMethodArguments.length;
-                                Parameter[] pluginMethodArguments = pluginMethod.getParameters();
-                                int pluginMethodArgumentsCount = pluginMethodArguments.length;
-
-                                if (!inspectMaximumArguments(targetMethodArgumentsCount, pluginMethodArgumentsCount, pluginPrefix)) {
-                                    problemsHolder.registerProblem(pluginMethod.getNameIdentifier(), toManyArgumentsProblemDescription, ProblemHighlightType.ERROR);
-                                }
-                            }
+                            targetClassNames.add(targetClassName);
                         }
                     }
                 }
-            }
 
-            private boolean inspectMaximumArguments(int targetMethodArgumentsCount, int pluginMethodArgumentsCount, String pluginPrefix) {
-                int additionalParams = 2;
-                if (pluginPrefix.equals(beforePluginPrefix)) {
-                    additionalParams = 1;
-                }
-                return !(pluginMethodArgumentsCount > targetMethodArgumentsCount + additionalParams);
+                return targetClassNames;
             }
 
             private String getTargetMethodName(Method pluginMethod, String pluginPrefix) {
                 String pluginMethodName = pluginMethod.getName();
                 String targetClassMethodName = pluginMethodName.
                         replace(pluginPrefix, "");
-                return Character.toLowerCase(targetClassMethodName.charAt(0)) + targetClassMethodName.substring(1);
+                char firstCharOfTargetName = targetClassMethodName.charAt(0);
+                int charType = Character.getType(firstCharOfTargetName);
+                if (charType == Character.LOWERCASE_LETTER) {
+                    return null;
+                }
+                return Character.toLowerCase(firstCharOfTargetName) + targetClassMethodName.substring(1);
             }
 
             private int getFinalClassProblems(ProblemDescriptor[] currentResults) {
                 int finalClassProblems = 0;
-                for (ProblemDescriptor currentProblem: currentResults) {
+                for (ProblemDescriptor currentProblem : currentResults) {
                     if (currentProblem.getDescriptionTemplate().equals(pluginOnFinalClassProblemDescription)) {
                         finalClassProblems++;
                     }
                 }
                 return finalClassProblems;
+            }
+
+            private PhpClass getPhpClassByFQN(String targetClassName, PhpIndex phpIndex) {
+                Collection<PhpClass> interfaces = phpIndex.getInterfacesByFQN(targetClassName);
+                if (!interfaces.isEmpty()) {
+                    return interfaces.iterator().next();
+                }
+                Collection<PhpClass> classes = phpIndex.getClassesByFQN(targetClassName);
+                if (classes.isEmpty()) {
+                    return null;
+                }
+                return classes.iterator().next();
+            }
+
+
+            private boolean checkTypeIncompatibility(String targetType, String declaredType, PhpIndex phpIndex) {
+                if (targetType.isEmpty() || declaredType.isEmpty()) {
+                    return true;
+                }
+
+                if (declaredType.equals(targetType)) {
+                    return true;
+                }
+
+                boolean isDeclaredTypeClass = PhpLangUtil.isFqn(declaredType);
+                boolean isTargetTypeClass = PhpLangUtil.isFqn(targetType);
+                if (!isTargetTypeClass && isDeclaredTypeClass) {
+                    return false;
+                }
+
+                PhpClass targetClass = getPhpClassByFQN(targetType, phpIndex);
+                PhpClass declaredClass = getPhpClassByFQN(declaredType, phpIndex);
+                if (targetClass == null || declaredClass == null) {
+                    return false;
+                }
+
+                if (declaredClass.isInterface() && PhpClassImplementsInterfaceUtil.execute(declaredClass, targetClass)) {
+                    return true;
+                }
+
+                if (PhpClassHierarchyUtils.classesEqual(targetClass, declaredClass)) {
+                    return true;
+                }
+
+                if (PhpClassHierarchyUtils.isSuperClass(targetClass, declaredClass, false)) {
+                    return true;
+                }
+
+                if (targetClass.isInterface() && PhpClassImplementsInterfaceUtil.execute(targetClass, declaredClass)) {
+                    return true;
+                }
+
+                if (PhpClassHierarchyUtils.isSuperClass(declaredClass, targetClass, false)) {
+                    return true;
+                }
+
+                return false;
+            }
+
+            private boolean checkPossibleTypeIncompatibility(String targetType, String declaredType, PhpIndex phpIndex) {
+                if (targetType.isEmpty() || declaredType.isEmpty()) {
+                    return true;
+                }
+
+                PhpClass targetClass = getPhpClassByFQN(targetType, phpIndex);
+                PhpClass declaredClass = getPhpClassByFQN(declaredType, phpIndex);
+                if (targetClass == null || declaredClass == null) {
+                    return true;
+                }
+                if (PhpClassHierarchyUtils.isSuperClass(declaredClass, targetClass, false)) {
+                    return false;
+                }
+                if (targetClass.isInterface() && PhpClassImplementsInterfaceUtil.execute(targetClass, declaredClass)) {
+                    return false;
+                }
+
+                return true;
             }
         };
     }
