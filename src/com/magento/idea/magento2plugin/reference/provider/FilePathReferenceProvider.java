@@ -1,7 +1,3 @@
-/**
- * Copyright © Dmytro Kvashnin. All rights reserved.
- * See COPYING.txt for license details.
- */
 package com.magento.idea.magento2plugin.reference.provider;
 
 import com.intellij.openapi.util.TextRange;
@@ -10,8 +6,11 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.ProcessingContext;
+import com.magento.idea.magento2plugin.reference.provider.util.GetAllSubFilesOfVirtualFileUtil;
+import com.magento.idea.magento2plugin.reference.provider.util.GetFilePathUtil;
+import com.magento.idea.magento2plugin.reference.provider.util.GetModuleNameUtil;
+import com.magento.idea.magento2plugin.reference.provider.util.GetModuleSourceFilesUtil;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
-import com.magento.idea.magento2plugin.util.magento.*;
 import gnu.trove.THashMap;
 import org.jetbrains.annotations.NotNull;
 import java.util.*;
@@ -138,7 +137,7 @@ public class FilePathReferenceProvider extends PsiReferenceProvider {
             if (null != vfs) {
                 for (VirtualFile vf : vfs) {
                     Collection<VirtualFile> vfChildren = GetAllSubFilesOfVirtualFileUtil.
-                            getInstance().execute(vf);;
+                            getInstance().execute(vf);
                     if (null != vfChildren) {
                         vfChildren.removeIf(f -> {
                             if (!f.isDirectory()) {

@@ -1,4 +1,4 @@
-package com.magento.idea.magento2plugin.util.magento;
+package com.magento.idea.magento2plugin.reference.provider.util;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;

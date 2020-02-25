@@ -1,4 +1,4 @@
-package com.magento.idea.magento2plugin.util.magento;
+package com.magento.idea.magento2plugin.reference.provider.util;
 
 import org.jetbrains.annotations.NotNull;
 import java.util.regex.Matcher;

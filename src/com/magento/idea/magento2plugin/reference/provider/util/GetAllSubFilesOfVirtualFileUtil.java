@@ -1,4 +1,9 @@
-package com.magento.idea.magento2plugin.util.magento;
+/*
+ * @author Atwix Team
+ * @copyright Copyright (c) 2020 Atwix (https://www.atwix.com/)
+ */
+
+package com.magento.idea.magento2plugin.reference.provider.util;
 
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
