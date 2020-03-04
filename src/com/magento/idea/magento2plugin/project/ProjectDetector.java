@@ -25,23 +25,23 @@ import javax.swing.event.HyperlinkEvent;
 
 public class ProjectDetector implements DirectoryProjectConfigurator {
     @Override
-    public void configureProject(Project project, @NotNull VirtualFile virtualFile, Ref<Module> ref) {
+    public void configureProject(@NotNull Project project, @NotNull VirtualFile baseDir, @NotNull Ref<Module> moduleRef, boolean newProject) {
         StartupManager.getInstance(project).runWhenProjectIsInitialized(() -> {
             DumbService.getInstance(project).smartInvokeLater(() -> {
                 if (null == VfsUtil.findRelativeFile(project.getBaseDir(), "app", "etc", "di.xml")) {
                     return;
                 }
                 Notification notification = new Notification("Magento", "Magento",
-                    "<a href='enable'>Enable</a> Magento support for this project?",
-                    NotificationType.INFORMATION, new NotificationListener.Adapter() {
-                        @Override
-                        public void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent event) {
-                            Settings.getInstance(project).pluginEnabled = true;
-                            IndexManager.manualReindex();
-                            MagentoComponentManager.getInstance(project).flushModules();
-                            notification.expire();
-                        }
+                        "<a href='enable'>Enable</a> Magento support for this project?",
+                        NotificationType.INFORMATION, new NotificationListener.Adapter() {
+                    @Override
+                    public void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent event) {
+                        Settings.getInstance(project).pluginEnabled = true;
+                        IndexManager.manualReindex();
+                        MagentoComponentManager.getInstance(project).flushModules();
+                        notification.expire();
                     }
+                }
                 );
                 Notifications.Bus.notify(notification, project);
             });
