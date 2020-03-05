@@ -3,6 +3,7 @@ package com.magento.idea.magento2plugin.indexes;
 import com.intellij.util.indexing.FileBasedIndexImpl;
 import com.intellij.util.indexing.ID;
 import com.magento.idea.magento2plugin.stubs.indexes.*;
+import com.magento.idea.magento2plugin.stubs.indexes.graphql.GraphQlResolverIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.PhpClassNameIndex;
 
 /**
@@ -25,7 +26,9 @@ public class IndexManager {
             // webapi
             WebApiTypeIndex.KEY,
             ModuleNameIndex.KEY,
-            PhpClassNameIndex.KEY
+            PhpClassNameIndex.KEY,
+             //graphql
+            GraphQlResolverIndex.KEY
         };
 
         for (ID<?, ?> id: indexIds) {
