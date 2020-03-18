@@ -99,11 +99,12 @@
 
         <directoryProjectConfigurator implementation="com.magento.idea.magento2plugin.project.ProjectDetector"/>
 
+        <libraryRoot id=".phpstorm.meta.php" path="/.phpstorm.meta.php/" runtime="false"/>
+
         <localInspection language="PHP" groupPath="PHP"
                          shortName="PluginInspection" displayName="Inspection for the Plugin declaration"
                          groupName="Magento"                                 enabledByDefault="true" level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.php.PluginInspection"/>
-
     </extensions>
 
     <application-components>
