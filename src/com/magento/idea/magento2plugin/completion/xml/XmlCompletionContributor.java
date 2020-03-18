@@ -9,6 +9,7 @@ import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.patterns.XmlPatterns;
 import com.intellij.psi.xml.XmlTokenType;
 import com.magento.idea.magento2plugin.completion.provider.*;
+import com.magento.idea.magento2plugin.completion.provider.mftf.*;
 
 import static com.intellij.patterns.PlatformPatterns.psiElement;
 import static com.intellij.patterns.StandardPatterns.string;
@@ -123,6 +124,47 @@ public class XmlCompletionContributor extends CompletionContributor {
                 )
             ),
             new RequireJsMappingCompletionProvider()
+        );
+
+        // mftf selector completion contributor
+        extend(CompletionType.BASIC,
+            psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+            .inside(XmlPatterns.xmlAttribute())
+            .inFile(xmlFile().withName(string().endsWith("Test.xml"))),
+            new SelectorCompletionProvider()
+        );
+
+        // mftf action group completion contributor
+        extend(
+            CompletionType.BASIC,
+            psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(
+                    XmlPatterns.xmlAttribute().withName(string().oneOf("ref", "extends"))
+                        .withParent(XmlPatterns.xmlTag().withName("actionGroup")
+                )
+            ),
+            new ActionGroupCompletionProvider()
+        );
+
+        // mftf data entity completion contributor
+        extend(
+            CompletionType.BASIC,
+            psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(XmlPatterns.xmlAttribute().withName(string().oneOf("entity", "value", "userInput", "url"))
+            ),
+            new DataCompletionProvider()
+        );
+
+        // Data entity/extends completion contributor
+        extend(
+            CompletionType.BASIC,
+            psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(
+                    XmlPatterns.xmlAttribute().withName("extends")
+                        .withParent(XmlPatterns.xmlTag().withName("entity")
+                )
+            ),
+            new DataCompletionProvider()
         );
     }
 }

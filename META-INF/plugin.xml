@@ -7,7 +7,7 @@
 <idea-plugin>
     <id>com.magento.idea.magento2plugin</id>
     <name>Magento PhpStorm</name>
-    <version>0.3.0</version>
+    <version>1.0.0</version>
     <vendor url="https://github.com/magento/magento2-phpstorm-plugin">Magento Inc.</vendor>
 
     <description><![CDATA[
@@ -25,7 +25,7 @@
     </change-notes>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="172"/>
+    <idea-version since-build="193.4386.10"/>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
@@ -35,6 +35,26 @@
     <depends>com.jetbrains.php</depends>
     <depends>JavaScript</depends>
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.lang.jsgraphql</depends>
+
+    <actions>
+        <group id="MagentoGenerateGroup">
+            <action id="MagentoGenerateBeforeMethodAction"
+                    class="com.magento.idea.magento2plugin.actions.generation.MagentoGenerateBeforeMethodAction"
+                    text="Magento Before Plugin..."
+                    description="Create Magento before plugin method."/>
+            <action id="MagentoGenerateAfterMethodAction"
+                    class="com.magento.idea.magento2plugin.actions.generation.MagentoGenerateAfterMethodAction"
+                    text="Magento After Plugin..."
+                    description="Create Magento after plugin method."/>
+            <action id="MagentoGenerateAroundMethodAction"
+                    class="com.magento.idea.magento2plugin.actions.generation.MagentoGenerateAroundMethodAction"
+                    text="Magento Around Plugin..."
+                    description="Create Magento around plugin method."/>
+            <add-to-group group-id="PhpGenerateGroup" anchor="last"/>
+        </group>
+
+    </actions>
 
     <extensions defaultExtensionNs="com.intellij">
         <projectConfigurable instance="com.magento.idea.magento2plugin.project.SettingsForm"
@@ -62,14 +82,28 @@
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ModulePackageIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.PhpClassNameIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.SectionIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.ActionGroupIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.DataIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.PageIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.StepKeyIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.graphql.GraphQlResolverIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex" />
 
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.PluginLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.ClassConfigurationLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.WebApiLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="GraphQL" implementationClass="com.magento.idea.magento2plugin.graphql.linemarker.GraphQlResolverClassLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.GraphQlResolverUsageLineMarkerProvider"/>
 
         <directoryProjectConfigurator implementation="com.magento.idea.magento2plugin.project.ProjectDetector"/>
+
+        <localInspection language="PHP" groupPath="PHP"
+                         shortName="PluginInspection" displayName="Inspection for the Plugin declaration"
+                         groupName="Magento"                                 enabledByDefault="true" level="ERROR"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.php.PluginInspection"/>
+
     </extensions>
 
     <application-components>

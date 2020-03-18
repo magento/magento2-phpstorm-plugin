@@ -9,6 +9,8 @@ import com.intellij.util.indexing.ID;
 import com.magento.idea.magento2plugin.stubs.indexes.*;
 import com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.graphql.GraphQlResolverIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.mftf.*;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.PhpClassNameIndex;
 
 /**
@@ -34,7 +36,15 @@ public class IndexManager {
             PhpClassNameIndex.KEY,
             //require_js
             RequireJsIndex.KEY,
-            MagentoLibJsIndex.KEY
+            MagentoLibJsIndex.KEY,
+            // mftf
+            ActionGroupIndex.KEY,
+            DataIndex.KEY,
+            PageIndex.KEY,
+            SectionIndex.KEY,
+            StepKeyIndex.KEY,
+             //graphql
+            GraphQlResolverIndex.KEY
         };
 
         for (ID<?, ?> id: indexIds) {
