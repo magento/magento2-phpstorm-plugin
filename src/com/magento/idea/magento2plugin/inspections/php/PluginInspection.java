@@ -5,8 +5,6 @@ import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.PhpBundle;
 import com.jetbrains.php.PhpClassHierarchyUtils;
 import com.jetbrains.php.PhpIndex;
@@ -17,7 +15,8 @@ import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import com.magento.idea.magento2plugin.inspections.php.util.PhpClassImplementsInterfaceUtil;
-import com.magento.idea.magento2plugin.stubs.indexes.PluginIndex;
+import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
+import com.magento.idea.magento2plugin.util.magento.plugin.GetTargetClassNamesByPluginClassName;
 import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
@@ -67,12 +66,13 @@ public class PluginInspection extends PhpInspection {
                 }
                 PsiElement currentClassNameIdentifier = ((PhpClass) parentClass).getNameIdentifier();
                 String currentClass = ((PhpClass) parentClass).getFQN().substring(1);
-                ArrayList<String> targetClassNames = getTargetClassNamesByPluginClassName(currentClass);
+                GetTargetClassNamesByPluginClassName targetClassesService = GetTargetClassNamesByPluginClassName.getInstance(problemsHolder.getProject());
+                ArrayList<String> targetClassNames = targetClassesService.execute(currentClass);
                 PhpIndex phpIndex = PhpIndex.getInstance(problemsHolder.getProject());
 
                 for (String targetClassName : targetClassNames) {
 
-                    PhpClass target = getPhpClassByFQN(targetClassName, phpIndex);
+                    PhpClass target = GetPhpClassByFQN.getInstance(problemsHolder.getProject()).execute(targetClassName);
                     if (target == null) {
                         return;
                     }
@@ -183,29 +183,7 @@ public class PluginInspection extends PhpInspection {
                 }
             }
 
-            private ArrayList<String> getTargetClassNamesByPluginClassName(String currentClassName) {
-                ArrayList<String> targetClassNames = new ArrayList<String>();
-                Collection<String> allKeys = FileBasedIndex.getInstance()
-                        .getAllKeys(PluginIndex.KEY, problemsHolder.getProject());
 
-                for (String targetClassName : allKeys) {
-                    List<Set<String>> pluginsList = FileBasedIndex.getInstance()
-                            .getValues(com.magento.idea.magento2plugin.stubs.indexes.PluginIndex.KEY, targetClassName, GlobalSearchScope.allScope(problemsHolder.getProject()));
-                    if (pluginsList.isEmpty()) {
-                        continue;
-                    }
-                    for (Set<String> plugins : pluginsList) {
-                        for (String plugin : plugins) {
-                            if (!plugin.equals(currentClassName)) {
-                                continue;
-                            }
-                            targetClassNames.add(targetClassName);
-                        }
-                    }
-                }
-
-                return targetClassNames;
-            }
 
             private String getTargetMethodName(Method pluginMethod, String pluginPrefix) {
                 String pluginMethodName = pluginMethod.getName();
@@ -229,18 +207,6 @@ public class PluginInspection extends PhpInspection {
                 return finalClassProblems;
             }
 
-            private PhpClass getPhpClassByFQN(String targetClassName, PhpIndex phpIndex) {
-                Collection<PhpClass> interfaces = phpIndex.getInterfacesByFQN(targetClassName);
-                if (!interfaces.isEmpty()) {
-                    return interfaces.iterator().next();
-                }
-                Collection<PhpClass> classes = phpIndex.getClassesByFQN(targetClassName);
-                if (classes.isEmpty()) {
-                    return null;
-                }
-                return classes.iterator().next();
-            }
-
 
             private boolean checkTypeIncompatibility(String targetType, String declaredType, PhpIndex phpIndex) {
                 if (targetType.isEmpty() || declaredType.isEmpty()) {
@@ -257,8 +223,9 @@ public class PluginInspection extends PhpInspection {
                     return false;
                 }
 
-                PhpClass targetClass = getPhpClassByFQN(targetType, phpIndex);
-                PhpClass declaredClass = getPhpClassByFQN(declaredType, phpIndex);
+                GetPhpClassByFQN getPhpClassByFQN = GetPhpClassByFQN.getInstance(problemsHolder.getProject());
+                PhpClass targetClass = getPhpClassByFQN.execute(targetType);
+                PhpClass declaredClass = getPhpClassByFQN.execute(declaredType);
                 if (targetClass == null || declaredClass == null) {
                     return false;
                 }
@@ -291,8 +258,9 @@ public class PluginInspection extends PhpInspection {
                     return true;
                 }
 
-                PhpClass targetClass = getPhpClassByFQN(targetType, phpIndex);
-                PhpClass declaredClass = getPhpClassByFQN(declaredType, phpIndex);
+                GetPhpClassByFQN getPhpClassByFQN = GetPhpClassByFQN.getInstance(problemsHolder.getProject());
+                PhpClass targetClass = getPhpClassByFQN.execute(targetType);
+                PhpClass declaredClass = getPhpClassByFQN.execute(declaredType);
                 if (targetClass == null || declaredClass == null) {
                     return true;
                 }
