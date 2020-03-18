@@ -36,6 +36,25 @@
     <depends>JavaScript</depends>
     <depends>com.intellij.modules.platform</depends>
 
+    <actions>
+        <group id="MagentoGenerateGroup">
+            <action id="MagentoGenerateBeforeMethodAction"
+                    class="com.magento.idea.magento2plugin.actions.generation.MagentoGenerateBeforeMethodAction"
+                    text="Magento Before Plugin..."
+                    description="Create Magento before plugin method."/>
+            <action id="MagentoGenerateAfterMethodAction"
+                    class="com.magento.idea.magento2plugin.actions.generation.MagentoGenerateAfterMethodAction"
+                    text="Magento After Plugin..."
+                    description="Create Magento after plugin method."/>
+            <action id="MagentoGenerateAroundMethodAction"
+                    class="com.magento.idea.magento2plugin.actions.generation.MagentoGenerateAroundMethodAction"
+                    text="Magento Around Plugin..."
+                    description="Create Magento around plugin method."/>
+            <add-to-group group-id="PhpGenerateGroup" anchor="last"/>
+        </group>
+
+    </actions>
+
     <extensions defaultExtensionNs="com.intellij">
         <projectConfigurable instance="com.magento.idea.magento2plugin.project.SettingsForm"
                              id="Magento2.SettingsForm"
@@ -73,6 +92,12 @@
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.WebApiLineMarkerProvider"/>
 
         <directoryProjectConfigurator implementation="com.magento.idea.magento2plugin.project.ProjectDetector"/>
+
+        <localInspection language="PHP" groupPath="PHP"
+                         shortName="PluginInspection" displayName="Inspection for the Plugin declaration"
+                         groupName="Magento"                                 enabledByDefault="true" level="ERROR"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.php.PluginInspection"/>
+
     </extensions>
 
     <application-components>
