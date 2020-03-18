@@ -25,7 +25,7 @@
     </change-notes>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="193.4386.10"/>
+    <idea-version since-build="193.6494.35"/>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
@@ -99,12 +99,11 @@
 
         <directoryProjectConfigurator implementation="com.magento.idea.magento2plugin.project.ProjectDetector"/>
 
-        <libraryRoot id=".phpstorm.meta.php" path="/.phpstorm.meta.php/" runtime="false"/>
-
         <localInspection language="PHP" groupPath="PHP"
                          shortName="PluginInspection" displayName="Inspection for the Plugin declaration"
                          groupName="Magento"                                 enabledByDefault="true" level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.php.PluginInspection"/>
+        <libraryRoot id=".phpstorm.meta.php" path=".phpstorm.meta.php/" runtime="false"/>
     </extensions>
 
     <application-components>
