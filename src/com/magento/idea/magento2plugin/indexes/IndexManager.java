@@ -1,9 +1,14 @@
+/**
+ * Copyright © Dmytro Kvashnin. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 package com.magento.idea.magento2plugin.indexes;
 
 import com.intellij.util.indexing.FileBasedIndexImpl;
 import com.intellij.util.indexing.ID;
 import com.magento.idea.magento2plugin.stubs.indexes.*;
 import com.magento.idea.magento2plugin.stubs.indexes.graphql.GraphQlResolverIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.mftf.*;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.PhpClassNameIndex;
 
 /**
@@ -27,6 +32,12 @@ public class IndexManager {
             WebApiTypeIndex.KEY,
             ModuleNameIndex.KEY,
             PhpClassNameIndex.KEY,
+            // mftf
+            ActionGroupIndex.KEY,
+            DataIndex.KEY,
+            PageIndex.KEY,
+            SectionIndex.KEY,
+            StepKeyIndex.KEY,
              //graphql
             GraphQlResolverIndex.KEY
         };
