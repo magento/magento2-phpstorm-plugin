@@ -1,3 +1,7 @@
+/**
+ * Copyright © Dmytro Kvashnin. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 package com.magento.idea.magento2plugin.reference.provider;
 
 import com.intellij.openapi.util.TextRange;
@@ -6,17 +10,14 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.ProcessingContext;
-import com.intellij.util.indexing.FileBasedIndex;
-import com.jetbrains.php.lang.PhpFileType;
+import com.magento.idea.magento2plugin.reference.provider.util.GetAllSubFilesOfVirtualFileUtil;
+import com.magento.idea.magento2plugin.reference.provider.util.GetFilePathUtil;
+import com.magento.idea.magento2plugin.reference.provider.util.GetModuleNameUtil;
+import com.magento.idea.magento2plugin.reference.provider.util.GetModuleSourceFilesUtil;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
-import com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex;
 import gnu.trove.THashMap;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class FilePathReferenceProvider extends PsiReferenceProvider {
 
@@ -28,7 +29,7 @@ public class FilePathReferenceProvider extends PsiReferenceProvider {
 
         String origValue = element.getText();
 
-        String filePath = getFilePath(element);
+        String filePath = GetFilePathUtil.getInstance().execute(origValue);
         if (null == filePath) {
             return PsiReference.EMPTY_ARRAY;
         }
@@ -106,7 +107,7 @@ public class FilePathReferenceProvider extends PsiReferenceProvider {
     {
         Collection<VirtualFile> files = new ArrayList<>();
 
-        String filePath = getFilePath(element);
+        String filePath = GetFilePathUtil.getInstance().execute(element.getText());
         if (null == filePath) {
             return files;
         }
@@ -123,7 +124,7 @@ public class FilePathReferenceProvider extends PsiReferenceProvider {
             files.removeIf(f -> !f.getPath().endsWith(filePath));
 
             // filter by module
-            Collection<VirtualFile> vfs = getModuleSourceFiles(element);
+            Collection<VirtualFile> vfs = GetModuleSourceFilesUtil.getInstance().execute(element.getText(), element.getProject());
             if (null != vfs) {
                 files.removeIf(f -> {
                     for (VirtualFile vf : vfs) {
@@ -136,10 +137,11 @@ public class FilePathReferenceProvider extends PsiReferenceProvider {
             }
         } else if (isModuleNamePresent(element)) {
             // extension absent
-            Collection<VirtualFile> vfs = getModuleSourceFiles(element);
+            Collection<VirtualFile> vfs = GetModuleSourceFilesUtil.getInstance().execute(element.getText(), element.getProject());
             if (null != vfs) {
                 for (VirtualFile vf : vfs) {
-                    Collection<VirtualFile> vfChildren = getAllSubFiles(vf);
+                    Collection<VirtualFile> vfChildren = GetAllSubFilesOfVirtualFileUtil.
+                            getInstance().execute(vf);
                     if (null != vfChildren) {
                         vfChildren.removeIf(f -> {
                             if (!f.isDirectory()) {
@@ -159,77 +161,8 @@ public class FilePathReferenceProvider extends PsiReferenceProvider {
         return files;
     }
 
-    private Collection<VirtualFile> getModuleFile(@NotNull PsiElement element)
-    {
-        String moduleName = getModuleName(element);
-        if (null == moduleName || moduleName.isEmpty()) {
-            return null;
-        }
-        return FileBasedIndex.getInstance()
-                .getContainingFiles(ModuleNameIndex.KEY, moduleName,
-                        GlobalSearchScope.getScopeRestrictedByFileTypes(
-                                GlobalSearchScope.allScope(element.getProject()),
-                                PhpFileType.INSTANCE
-                        )
-                );
-    }
-
-    private Collection<VirtualFile> getModuleSourceFiles(@NotNull PsiElement element)
-    {
-        Collection<VirtualFile> virtualFiles = getModuleFile(element);
-        if (null == virtualFiles) {
-            return null;
-        }
-        virtualFiles.removeIf(vf -> !(vf != null && vf.getParent() != null));
-        Collection<VirtualFile> sourceVfs = new ArrayList<>();
-        for (VirtualFile vf : virtualFiles) {
-            sourceVfs.add(vf.getParent());
-        }
-        return sourceVfs;
-    }
-
-    private String getFilePath(@NotNull PsiElement element)
-    {
-        String value = element.getText();
-        String moduleName = getModuleName(element);
-        if (null != moduleName && value.contains(moduleName))  {
-            value = value.replace(moduleName, "");
-        }
-
-        Pattern pattern = Pattern.compile("\\W?(([\\w-]+/)*[\\w\\.-]+)");
-        Matcher matcher = pattern.matcher(value);
-        if (!matcher.find()) {
-            return null;
-        }
-
-        return matcher.group(1);
-    }
-
-    private String getModuleName(@NotNull PsiElement element)
-    {
-        Pattern pattern = Pattern.compile("(([A-Z][a-zA-Z0-9]+)_([A-Z][a-zA-Z0-9]+))");
-        Matcher matcher = pattern.matcher(element.getText());
-        return matcher.find() ? matcher.group(1) : null;
-    }
-
     private boolean isModuleNamePresent(@NotNull PsiElement element)
     {
-        return getModuleName(element) != null;
-    }
-
-    private Collection<VirtualFile> getAllSubFiles(VirtualFile virtualFile)
-    {
-        Collection<VirtualFile> list = new ArrayList<>();
-
-        VfsUtilCore.visitChildrenRecursively(virtualFile, new VirtualFileVisitor() {
-            @Override
-            public boolean visitFile(@NotNull VirtualFile file) {
-                if (!file.isDirectory()) {
-                    list.add(file);
-                }
-                return super.visitFile(file);
-            }
-        });
-        return list;
+        return GetModuleNameUtil.getInstance().execute(element.getText()) != null;
     }
 }
