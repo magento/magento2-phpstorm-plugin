@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.indexes;
 import com.intellij.util.indexing.FileBasedIndexImpl;
 import com.intellij.util.indexing.ID;
 import com.magento.idea.magento2plugin.stubs.indexes.*;
+import com.magento.idea.magento2plugin.stubs.indexes.graphql.GraphQlResolverIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.mftf.*;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.PhpClassNameIndex;
 
@@ -36,7 +37,9 @@ public class IndexManager {
             DataIndex.KEY,
             PageIndex.KEY,
             SectionIndex.KEY,
-            StepKeyIndex.KEY
+            StepKeyIndex.KEY,
+             //graphql
+            GraphQlResolverIndex.KEY
         };
 
         for (ID<?, ?> id: indexIds) {
