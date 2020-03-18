@@ -13,8 +13,7 @@ import com.magento.idea.magento2plugin.reference.provider.*;
 import com.magento.idea.magento2plugin.reference.provider.mftf.*;
 import org.jetbrains.annotations.NotNull;
 
-import static com.intellij.patterns.XmlPatterns.string;
-import static com.intellij.patterns.XmlPatterns.xmlFile;
+import static com.intellij.patterns.XmlPatterns.*;
 
 public class XmlReferenceContributor extends PsiReferenceContributor {
 
@@ -216,6 +215,28 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
             new CompositeReferenceProvider(
                 new DataReferenceProvider()
             )
+        );
+
+        // <someXmlTag component="requireJsMappingKey" />
+        registrar.registerReferenceProvider(
+                XmlPatterns.xmlAttributeValue().withParent(
+                        XmlPatterns.xmlAttribute().withName("component")
+                ),
+                new RequireJsPreferenceReferenceProvider()
+        );
+
+        // <item name="component">requireJsMappingKey</item>
+        registrar.registerReferenceProvider(
+                XmlPatterns.psiElement(XmlTokenType.XML_DATA_CHARACTERS).withParent(
+                        XmlPatterns.xmlText().withParent(
+                                XmlPatterns.xmlTag().withName("item").withChild(
+                                        XmlPatterns.xmlAttribute().withValue(string().matches("component"))
+                                ).withChild(
+                                        XmlPatterns.xmlAttribute().withName("name")
+                                )
+                        )
+                ),
+                new RequireJsPreferenceReferenceProvider()
         );
     }
 }
