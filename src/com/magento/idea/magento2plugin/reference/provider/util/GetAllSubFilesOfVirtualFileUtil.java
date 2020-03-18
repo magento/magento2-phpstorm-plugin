@@ -1,8 +1,7 @@
 /*
- * @author Atwix Team
- * @copyright Copyright (c) 2020 Atwix (https://www.atwix.com/)
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
  */
-
 package com.magento.idea.magento2plugin.reference.provider.util;
 
 import com.intellij.openapi.vfs.VfsUtilCore;
