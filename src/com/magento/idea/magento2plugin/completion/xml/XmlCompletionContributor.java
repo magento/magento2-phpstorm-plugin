@@ -107,6 +107,25 @@ public class XmlCompletionContributor extends CompletionContributor {
             new EventNameCompletionContributor()
         );
 
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+            .inside(XmlPatterns.xmlAttributeValue().withParent(
+                XmlPatterns.xmlAttribute().withName("component")
+            )),
+            new RequireJsMappingCompletionProvider()
+        );
+
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_DATA_CHARACTERS)
+             .withParent(XmlPatterns.xmlText().withParent(
+                XmlPatterns.xmlTag().withName("item").withChild(
+                        XmlPatterns.xmlAttribute().withValue(string().matches("component"))
+                    ).withChild(
+                        XmlPatterns.xmlAttribute().withName("name")
+                    )
+                )
+            ),
+            new RequireJsMappingCompletionProvider()
+        );
+
         // mftf selector completion contributor
         extend(CompletionType.BASIC,
             psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
