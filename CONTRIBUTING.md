@@ -1,7 +1,7 @@
 # Setting up development environment
 
 1. Check out this repository
-1. Download PhpStorm build specified in the [META-INF/plugin.xml](./META-INF/plugin.xml). Older builds can be found [here](https://confluence.jetbrains.com/display/PhpStorm/Previous+PhpStorm+Releases)
+1. Download PhpStorm build specified in the [META-INF/plugin.xml](resources/META-INF/plugin.xml). Older builds can be found [here](https://confluence.jetbrains.com/display/PhpStorm/Previous+PhpStorm+Releases)
 1. Create a new project in the InteliJ. The type of the project must be "InteliJ Platform Plugin". Specify a path to the PhpStorm from the previous step as SDK for this project
 1. Instead of creating a project in a new directory, point it to an existing one checked out in the first step. When prompted, replace all configs
 1. Revert any local modifications (which were done by the IDE during project creation)

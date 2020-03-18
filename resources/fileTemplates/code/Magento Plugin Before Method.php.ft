@@ -1,0 +1,10 @@
+/**
+${PARAM_DOC}
+#if (${RETURN_VARIABLES})* @return array
+#end
+ */
+public function ${NAME}(${PARAM_LIST})
+{
+    // TODO: Implement plugin method.
+    #if (${RETURN_VARIABLES})return [${RETURN_VARIABLES}]; #end
+}

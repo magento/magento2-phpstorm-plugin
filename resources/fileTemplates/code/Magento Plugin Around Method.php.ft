@@ -1,0 +1,8 @@
+/**
+${PARAM_DOC}
+ */
+public function ${NAME}(${PARAM_LIST})
+{
+    // TODO: Implement plugin method.
+    return $proceed(#if(${RETURN_VARIABLES})${RETURN_VARIABLES}#end);
+}
