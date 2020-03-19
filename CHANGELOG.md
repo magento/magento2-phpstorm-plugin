@@ -5,7 +5,7 @@
     * "Go to GraphQL resolver class" line marke in scope of GraphQL schema type arguments
     * RequireJS mapping support (reference navigation, completion)
     * Plugin class methods generation
-    * Plugin declaration inspection
+    * Plugin declaration inspection in scope of Plugin Class
     * MFTF support (reference navigation, completion)
     * Fixed support of 2020.* versions of IDE's
 
