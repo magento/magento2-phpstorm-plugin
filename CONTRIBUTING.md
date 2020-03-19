@@ -2,6 +2,7 @@
 
 1. Check out this repository
 1. Open a folder with the project in the IntelliJ Ultimate using the `open` action button.
+1. Make sure that you on the latest develop branch (e.g 1.0.0-develop)
 1. Right-click on the `build.gradle` file, choose "Import Gradle project"
 1. When the Gradle sections appeared in the right bar, navigate there and right-click `magento-2-php-storm-plguin > Tasks -> Intellij -> runIde`
 1. Click on "Run "magento-2-php-storm-plugin" to run the plugin. You should see a new instance of IntelliJ launched with the plugin installed. Make sure that the plugin is enabled in IntelliJ settings and indexing is finished. Plugin features should be accessible at this point.
