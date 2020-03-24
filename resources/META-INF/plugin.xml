@@ -108,7 +108,6 @@
                          groupName="Magento"                                 enabledByDefault="true" level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.php.PluginInspection"/>
         <libraryRoot id=".phpstorm.meta.php" path=".phpstorm.meta.php/" runtime="false"/>
-
     </extensions>
 
     <application-components>
@@ -122,6 +121,5 @@
     <actions>
         <!-- Add your actions here -->
     </actions>
-
 
 </idea-plugin>
