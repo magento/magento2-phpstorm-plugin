@@ -9,7 +9,7 @@ import com.intellij.lang.xml.XMLLanguage;
 
 public class ModuleXml implements ModuleFileInterface {
     public static String FILE_NAME = "module.xml";
-    public static String TEMPLATE = "Magento Module XML";
+    public static String TEMPLATE = "Magento Module Xml";
     private static ModuleXml INSTANCE = null;
 
     public static ModuleXml getInstance() {

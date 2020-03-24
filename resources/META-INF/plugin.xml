@@ -108,6 +108,10 @@
                          groupName="Magento"                                 enabledByDefault="true" level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.php.PluginInspection"/>
         <libraryRoot id=".phpstorm.meta.php" path=".phpstorm.meta.php/" runtime="false"/>
+
+        <internalFileTemplate name="Magento Module Composer"/>
+        <internalFileTemplate name="Magento Module Registration Php"/>
+        <internalFileTemplate name="Magento Module Xml"/>
     </extensions>
 
     <application-components>
