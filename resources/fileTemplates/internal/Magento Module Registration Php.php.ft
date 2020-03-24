@@ -1,0 +1,6 @@
+<?php
+#parse("PHP File Header.php")
+
+use Magento\Framework\Component\ComponentRegistrar;
+
+ComponentRegistrar::register(ComponentRegistrar::MODULE, '${PACKAGE}_${MODULE_NAME}', __DIR__);

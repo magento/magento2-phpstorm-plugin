@@ -53,6 +53,10 @@
                     description="Create Magento around plugin method."/>
             <add-to-group group-id="PhpGenerateGroup" anchor="last"/>
         </group>
+        <group id="MagentoNewGroup">
+            <action id="Magento2NewModule" class="com.magento.idea.magento2plugin.actions.generation.NewModuleAction"/>
+            <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewDir"/>
+        </group>
 
     </actions>
 
@@ -104,6 +108,7 @@
                          groupName="Magento"                                 enabledByDefault="true" level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.php.PluginInspection"/>
         <libraryRoot id=".phpstorm.meta.php" path=".phpstorm.meta.php/" runtime="false"/>
+
     </extensions>
 
     <application-components>
@@ -117,5 +122,6 @@
     <actions>
         <!-- Add your actions here -->
     </actions>
+
 
 </idea-plugin>

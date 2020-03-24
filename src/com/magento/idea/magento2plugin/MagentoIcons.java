@@ -13,4 +13,5 @@ import javax.swing.*;
  */
 public class MagentoIcons {
     public static final Icon WEB_API = IconLoader.getIcon("icons/webapi.png");
+    public static final Icon MODULE = IconLoader.getIcon("/icons/module.png");
 }
