@@ -8,6 +8,7 @@
     * Plugin declaration inspection in scope of Plugin Class
     * MFTF support (reference navigation, completion)
     * Fixed support of 2020.* versions of IDE's
+    * Create a New Magento 2 Module action
 
 0.3.0
 ============= 
