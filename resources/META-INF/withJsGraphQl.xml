@@ -1,0 +1,7 @@
+<idea-plugin>
+    <extensions defaultExtensionNs="com.intellij">
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.graphql.GraphQlResolverIndex" />
+        <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.GraphQlResolverUsageLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="GraphQL" implementationClass="com.magento.idea.magento2plugin.graphql.linemarker.GraphQlResolverClassLineMarkerProvider"/>
+    </extensions>
+</idea-plugin>
