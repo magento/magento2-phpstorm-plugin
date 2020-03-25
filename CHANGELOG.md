@@ -1,3 +1,15 @@
+1.0.0
+============= 
+* Features:
+    * "Go to GraphQL schema" line marker in scope of class/interface and method
+    * "Go to GraphQL resolver class" line marke in scope of GraphQL schema type arguments
+    * RequireJS mapping support (reference navigation, completion)
+    * Plugin class methods generation
+    * Plugin declaration inspection in scope of Plugin Class
+    * MFTF support (reference navigation, completion)
+    * Fixed support of 2020.* versions of IDE's
+    * Create a New Magento 2 Module action
+
 0.3.0
 ============= 
 * Features:

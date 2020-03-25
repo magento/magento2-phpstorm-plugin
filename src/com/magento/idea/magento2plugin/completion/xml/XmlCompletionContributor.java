@@ -1,3 +1,7 @@
+/**
+ * Copyright © Dmytro Kvashnin. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 package com.magento.idea.magento2plugin.completion.xml;
 
 import com.intellij.codeInsight.completion.CompletionContributor;
@@ -5,6 +9,7 @@ import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.patterns.XmlPatterns;
 import com.intellij.psi.xml.XmlTokenType;
 import com.magento.idea.magento2plugin.completion.provider.*;
+import com.magento.idea.magento2plugin.completion.provider.mftf.*;
 
 import static com.intellij.patterns.PlatformPatterns.psiElement;
 import static com.intellij.patterns.StandardPatterns.string;
@@ -100,6 +105,66 @@ public class XmlCompletionContributor extends CompletionContributor {
                 .withParent(XmlPatterns.xmlTag().withName("event"))
             ).inFile(xmlFile().withName(string().endsWith("events.xml"))),
             new EventNameCompletionContributor()
+        );
+
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+            .inside(XmlPatterns.xmlAttributeValue().withParent(
+                XmlPatterns.xmlAttribute().withName("component")
+            )),
+            new RequireJsMappingCompletionProvider()
+        );
+
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_DATA_CHARACTERS)
+             .withParent(XmlPatterns.xmlText().withParent(
+                XmlPatterns.xmlTag().withName("item").withChild(
+                        XmlPatterns.xmlAttribute().withValue(string().matches("component"))
+                    ).withChild(
+                        XmlPatterns.xmlAttribute().withName("name")
+                    )
+                )
+            ),
+            new RequireJsMappingCompletionProvider()
+        );
+
+        // mftf selector completion contributor
+        extend(CompletionType.BASIC,
+            psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+            .inside(XmlPatterns.xmlAttribute())
+            .inFile(xmlFile().withName(string().endsWith("Test.xml"))),
+            new SelectorCompletionProvider()
+        );
+
+        // mftf action group completion contributor
+        extend(
+            CompletionType.BASIC,
+            psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(
+                    XmlPatterns.xmlAttribute().withName(string().oneOf("ref", "extends"))
+                        .withParent(XmlPatterns.xmlTag().withName("actionGroup")
+                )
+            ),
+            new ActionGroupCompletionProvider()
+        );
+
+        // mftf data entity completion contributor
+        extend(
+            CompletionType.BASIC,
+            psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(XmlPatterns.xmlAttribute().withName(string().oneOf("entity", "value", "userInput", "url"))
+            ),
+            new DataCompletionProvider()
+        );
+
+        // Data entity/extends completion contributor
+        extend(
+            CompletionType.BASIC,
+            psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(
+                    XmlPatterns.xmlAttribute().withName("extends")
+                        .withParent(XmlPatterns.xmlTag().withName("entity")
+                )
+            ),
+            new DataCompletionProvider()
         );
     }
 }

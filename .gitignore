@@ -45,3 +45,8 @@ Temporary Items
 .idea
 .git
 out
+# Gradle
+.gradle
+.idea-sandbox
+build
+gradle
