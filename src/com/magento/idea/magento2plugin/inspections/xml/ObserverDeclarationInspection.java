@@ -13,6 +13,8 @@ import com.intellij.psi.xml.XmlDocument;
 import com.intellij.psi.xml.XmlTag;
 import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.magento.idea.magento2plugin.indexes.EventIndex;
+import com.magento.idea.magento2plugin.magento.files.ModuleXml;
+import com.magento.idea.magento2plugin.magento.packages.MagentoPackages;
 import org.jetbrains.annotations.NotNull;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -29,12 +31,13 @@ public class ObserverDeclarationInspection extends PhpInspection {
     @Override
     public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder problemsHolder, boolean b) {
         return new XmlElementVisitor() {
-            private static final String duplicatedObserverNameProblemDescription = "Duplicated observer name!";
-            private static final String moduleXmlFileName = "module.xml";
-            private static final String eventsXmlFileName = "events.xml";
-            private static final String notSequencedModuleProblemDescription =
-                    "Observer name \"%s\" for event \"%s\" is already declared in the module \"%s\" for the current area. In case you want to override the implementation make sure the \"%s\" module is added to sequences in the current module \"module.xml\".";
+            private final String moduleXmlFileName = ModuleXml.getInstance().getFileName();
+            private static final String eventsXmlFileName = "events.xml";//todo: move to separate file as done to ModuleXml
+            private static final String duplicatedObserverNameSameFileProblemDescription = "Observer name already used in this file. For more details see Inspection Description.";
+            private static final String duplicatedObserverNameProblemDescription =
+                    "Observer name \"%s\" for event \"%s\" is already used in the module \"%s\" (%s scope). For more details see Inspection Description.";
             private HashMap<String, VirtualFile> loadedFileHash = new HashMap<>();
+            private final ProblemHighlightType errorSeverity = ProblemHighlightType.WARNING;
 
             @Override
             public void visitFile(PsiFile file) {
@@ -50,6 +53,7 @@ public class ObserverDeclarationInspection extends PhpInspection {
                 }
 
                 HashMap<String, XmlTag> targetObserversHash = new HashMap<>();
+
                 for (XmlTag eventXmlTag: xmlTags) {
                     HashMap<String, XmlTag> eventProblems = new HashMap<>();
                     if (!eventXmlTag.getName().equals("event")) {
@@ -67,37 +71,50 @@ public class ObserverDeclarationInspection extends PhpInspection {
 
                     for (XmlTag observerXmlTag: targetObservers) {
                         XmlAttribute observerNameAttribute = observerXmlTag.getAttribute("name");
-                        if (observerNameAttribute == null) {
+                        XmlAttribute observerDisabledAttribute = observerXmlTag.getAttribute("disabled");
+
+                        if (observerNameAttribute == null || (observerDisabledAttribute != null && observerDisabledAttribute.getValue().equals("true"))) {
                             continue;
                         }
 
                         String observerName = observerNameAttribute.getValue();
                         String observerKey = eventNameAttributeValue.concat("_").concat(observerName);
                         if (targetObserversHash.containsKey(observerKey)) {
-                            problemsHolder.registerProblem(observerNameAttribute.getValueElement(), duplicatedObserverNameProblemDescription, ProblemHighlightType.ERROR);
+                            problemsHolder.registerProblem(
+                                observerNameAttribute.getValueElement(),
+                                duplicatedObserverNameSameFileProblemDescription,
+                                errorSeverity
+                            );
                         }
                         targetObserversHash.put(observerKey, observerXmlTag);
 
-                        List<String> moduleNamesToBeSequencedOn = fetchModuleNamesToBeSequencedOn(eventNameAttributeValue, observerName, eventIndex, file);
-                        if (!moduleNamesToBeSequencedOn.isEmpty()) {
-                            List<String> sequencedModuleNames = getSequencedModulesByConfigFile(file);
-                            for (String moduleNameToBeSequencedOn: moduleNamesToBeSequencedOn) {
-                                String problemKey = observerKey.concat("_").concat(moduleNameToBeSequencedOn);
-                                if (!sequencedModuleNames.contains(moduleNameToBeSequencedOn) && !eventProblems.containsKey(problemKey)){
-                                    problemsHolder.registerProblem(observerNameAttribute.getValueElement(), String.format(notSequencedModuleProblemDescription, observerName, eventNameAttributeValue, moduleNameToBeSequencedOn, moduleNameToBeSequencedOn), ProblemHighlightType.ERROR);
-                                    eventProblems.put(problemKey, observerXmlTag);
-                                }
+                        HashMap<String, String> modulesWithSameObserverName = fetchModuleNamesWhereSameObserverNameUsed(eventNameAttributeValue, observerName, eventIndex, file);
+                        for (String moduleName: modulesWithSameObserverName.keySet()) {
+                            String problemKey = observerKey.concat("_").concat(moduleName);
+                            if (!eventProblems.containsKey(problemKey)){
+                                problemsHolder.registerProblem(
+                                    observerNameAttribute.getValueElement(),
+                                    String.format(
+                                        duplicatedObserverNameProblemDescription,
+                                        observerName,
+                                        eventNameAttributeValue,
+                                        moduleName,
+                                        modulesWithSameObserverName.get(moduleName)
+                                    ),
+                                    errorSeverity
+                                );
+                                eventProblems.put(problemKey, observerXmlTag);
                             }
                         }
                     }
                 }
             }
 
-            private List<String> fetchModuleNamesToBeSequencedOn(String eventNameAttributeValue, String observerName, EventIndex eventIndex, PsiFile file) {
-                List<String> moduleDeclarationToBeSequencedOn = new ArrayList<>();
+            private HashMap<String, String> fetchModuleNamesWhereSameObserverNameUsed(String eventNameAttributeValue, String observerName, EventIndex eventIndex, PsiFile file) {
+                HashMap<String, String> modulesName = new HashMap<String, String>();
                 String currentFileDirectory = file.getContainingDirectory().toString();
                 String currentFileFullPath = currentFileDirectory.concat("/").concat(file.getName());
-                String currentFileArea = file.getContainingDirectory().getName();
+                String scope = "global";
 
                 Collection<PsiElement> indexedEvents = eventIndex.getEventElements(eventNameAttributeValue, GlobalSearchScope.getScopeRestrictedByFileTypes(
                         GlobalSearchScope.allScope(file.getProject()),
@@ -117,12 +134,14 @@ public class ObserverDeclarationInspection extends PhpInspection {
 
                     String indexedFileDirectory = indexedAttributeParent.getContainingDirectory().toString();
                     String indexedFileFullPath = indexedFileDirectory.concat("/").concat(indexedAttributeParent.getName());
-                    String indexedFileArea = indexedAttributeParent.getContainingDirectory().getName();
                     if (indexedFileFullPath.equals(currentFileFullPath)) {
                         continue;
                     }
-                    if (!indexedFileArea.equals(currentFileArea)) {
-                        continue;
+
+                    if (indexedFileDirectory.contains(MagentoPackages.AREA_ADMINHTML)) {
+                        scope = MagentoPackages.AREA_ADMINHTML;
+                    } else if (indexedFileDirectory.contains(MagentoPackages.AREA_FRONTEND)) {
+                        scope = MagentoPackages.AREA_FRONTEND;
                     }
 
                     List<XmlTag> indexObserversTags = fetchObserverTagsFromEventTag((XmlTag) indexedEvent.getParent().getParent());
@@ -134,45 +153,11 @@ public class ObserverDeclarationInspection extends PhpInspection {
                         if (!observerName.equals(indexedObserverNameAttribute.getValue())){
                             continue;
                         }
-                        addModuleNameToBeSequencedOn(moduleDeclarationToBeSequencedOn, indexedAttributeParent);
+                        addModuleNameWhereSameObserverUsed(modulesName, indexedAttributeParent, scope);
                     }
                 }
 
-                return moduleDeclarationToBeSequencedOn;
-            }
-
-            private List<String> getSequencedModulesByConfigFile(PsiFile file) {
-                List<String> sequencedModules = new ArrayList<>();
-                XmlTag currentModuleDeclaration = getModuleDeclarationTagByConfigFile(file);
-                if (currentModuleDeclaration == null) {
-                    return sequencedModules;
-                }
-                XmlTag[] moduleDeclarationChildren = PsiTreeUtil.getChildrenOfType(currentModuleDeclaration, XmlTag.class);
-                if (moduleDeclarationChildren == null) {
-                    return sequencedModules;
-                }
-                for (XmlTag moduleDeclarationChild: moduleDeclarationChildren) {
-                    if (!moduleDeclarationChild.getName().equals("sequence")) {
-                        continue;
-                    }
-                    XmlTag[] sequenceDeclarationChildren = PsiTreeUtil.getChildrenOfType(moduleDeclarationChild, XmlTag.class);
-                    if (sequenceDeclarationChildren == null) {
-                        continue;
-                    }
-                    for (XmlTag sequenceDeclarationChild: sequenceDeclarationChildren) {
-                        if (!sequenceDeclarationChild.getName().equals("module")) {
-                            continue;
-                        }
-
-                        XmlAttribute sequencedModuleNameAttribute = sequenceDeclarationChild.getAttribute("name");
-                        if (sequencedModuleNameAttribute == null) {
-                            continue;
-                        }
-
-                        sequencedModules.add(sequencedModuleNameAttribute.getValue());
-                    }
-                }
-                return sequencedModules;
+                return modulesName;
             }
 
             private List<XmlTag> fetchObserverTagsFromEventTag(XmlTag eventXmlTag) {
@@ -193,7 +178,7 @@ public class ObserverDeclarationInspection extends PhpInspection {
                 return result;
             }
 
-            private void addModuleNameToBeSequencedOn(List<String> moduleDeclarationToBeSequencedOn, PsiFile indexedFile) {
+            private void addModuleNameWhereSameObserverUsed(HashMap<String, String> modulesName, PsiFile indexedFile, String scope) {
                 XmlTag moduleDeclarationTag = getModuleDeclarationTagByConfigFile(indexedFile);
                 if (moduleDeclarationTag == null) return;
 
@@ -204,7 +189,8 @@ public class ObserverDeclarationInspection extends PhpInspection {
                 if (moduleNameAttribute == null) {
                     return;
                 }
-                moduleDeclarationToBeSequencedOn.add(moduleNameAttribute.getValue());
+
+                modulesName.put(moduleNameAttribute.getValue(), scope);
             }
 
             @Nullable

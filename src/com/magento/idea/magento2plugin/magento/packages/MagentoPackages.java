@@ -6,4 +6,6 @@ package com.magento.idea.magento2plugin.magento.packages;
 
 public class MagentoPackages {
     public static String PACKAGES_ROOT = "app/code";
+    public static String AREA_ADMINHTML = "adminhtml";
+    public static String AREA_FRONTEND = "frontend";
 }
