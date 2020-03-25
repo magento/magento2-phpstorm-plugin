@@ -105,12 +105,17 @@
 
         <localInspection language="PHP" groupPath="PHP"
                          shortName="PluginInspection" displayName="Inspection for the Plugin declaration"
-                         groupName="Magento"                                 enabledByDefault="true" level="ERROR"
+                         groupName="Magento 2"
+                         enabledByDefault="true"
+                         level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.php.PluginInspection"/>
 
         <localInspection language="XML" groupPath="XML"
-                         shortName="ObserverDeclarationInspection" displayName="Inspection for the Observer XML declaration"
-                         groupName="Magento"                                 enabledByDefault="true" level="ERROR"
+                         shortName="ObserverDeclarationInspection"
+                         displayName="Duplicated Observer Usage in events XML"
+                         groupName="Magento 2"
+                         enabledByDefault="true"
+                         level="WARNING"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.ObserverDeclarationInspection"/>
 
         <libraryRoot id=".phpstorm.meta.php" path=".phpstorm.meta.php/" runtime="false"/>
