@@ -71,7 +71,7 @@ public class GraphQlResolverUsageLineMarkerProvider implements LineMarkerProvide
 
     private static class GraphQlUsagesCollector {
 
-        private HashMap<String, List<GraphQLQuotedString>> routesCache = new HashMap<>();
+        private HashMap<String, List<GraphQLQuotedString>> graphQlCache = new HashMap<>();
 
         List<GraphQLQuotedString> getGraphQLUsages(@NotNull PhpClass phpClass) {
             List<GraphQLQuotedString> graphQLQuotedStrings = new ArrayList<>();
@@ -83,11 +83,11 @@ public class GraphQlResolverUsageLineMarkerProvider implements LineMarkerProvide
 
         List<GraphQLQuotedString> getUsages(@NotNull PhpClass phpClass) {
             String phpClassFQN = phpClass.getFQN();
-            if (!routesCache.containsKey(phpClassFQN)) {
+            if (!graphQlCache.containsKey(phpClassFQN)) {
                 List<GraphQLQuotedString> graphQLStringValues = extractGraphQLQuotesStringsForClass(phpClass);
-                routesCache.put(phpClassFQN, graphQLStringValues);
+                graphQlCache.put(phpClassFQN, graphQLStringValues);
             }
-            return routesCache.get(phpClassFQN);
+            return graphQlCache.get(phpClassFQN);
         }
 
         List<GraphQLQuotedString> extractGraphQLQuotesStringsForClass(@NotNull PhpClass phpClass) {
