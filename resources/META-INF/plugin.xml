@@ -35,7 +35,7 @@
     <depends>com.jetbrains.php</depends>
     <depends>JavaScript</depends>
     <depends>com.intellij.modules.platform</depends>
-    <depends>com.intellij.lang.jsgraphql</depends>
+    <depends optional="true" config-file="withJsGraphQl.xml">com.intellij.lang.jsgraphql</depends>
 
     <actions>
         <group id="MagentoGenerateGroup">
@@ -91,15 +91,12 @@
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.DataIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.PageIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.StepKeyIndex" />
-        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.graphql.GraphQlResolverIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex" />
 
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.PluginLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.ClassConfigurationLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.WebApiLineMarkerProvider"/>
-        <codeInsight.lineMarkerProvider language="GraphQL" implementationClass="com.magento.idea.magento2plugin.graphql.linemarker.GraphQlResolverClassLineMarkerProvider"/>
-        <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.GraphQlResolverUsageLineMarkerProvider"/>
 
         <directoryProjectConfigurator implementation="com.magento.idea.magento2plugin.project.ProjectDetector"/>
 

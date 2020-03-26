@@ -34,10 +34,10 @@ public class GraphQlResolverIndex extends ScalarIndexExtension<String> {
         return inputData -> {
             Map<String, Void> map = new HashMap<>();
 
-            GraphQLFile qraphQLFile = (GraphQLFile) inputData.getPsiFile();
-            PsiElement[] children = qraphQLFile.getChildren();
+            GraphQLFile graphQLFile = (GraphQLFile) inputData.getPsiFile();
+            PsiElement[] children = graphQLFile.getChildren();
             for (PsiElement child : children) {
-                if (!(child instanceof GraphQLObjectTypeDefinition)) {
+                if (!(child instanceof GraphQLObjectTypeDefinition) && !(child instanceof GraphQLInterfaceTypeDefinition)) {
                     continue;
                 }
                 PsiElement[] objectChildren = child.getChildren();
