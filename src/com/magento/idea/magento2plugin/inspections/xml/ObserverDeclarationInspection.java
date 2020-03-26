@@ -23,10 +23,8 @@ import com.magento.idea.magento2plugin.magento.packages.MagentoPackages;
 import org.jetbrains.annotations.NotNull;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+
 import com.intellij.openapi.vfs.VfsUtil;
 import org.jetbrains.annotations.Nullable;
 
@@ -93,9 +91,12 @@ public class ObserverDeclarationInspection extends PhpInspection {
                         }
                         targetObserversHash.put(observerKey, observerXmlTag);
 
-                        HashMap<String, String> modulesWithSameObserverName = fetchModuleNamesWhereSameObserverNameUsed(eventNameAttributeValue, observerName, eventIndex, file);
-                        for (String moduleName: modulesWithSameObserverName.keySet()) {
-                            String problemKey = observerKey.concat("_").concat(moduleName);
+                        List<HashMap<String, String>> modulesWithSameObserverName = fetchModuleNamesWhereSameObserverNameUsed(eventNameAttributeValue, observerName, eventIndex, file);
+                        for (HashMap<String, String> moduleEntry: modulesWithSameObserverName) {
+                            Map.Entry<String, String> module = moduleEntry.entrySet().iterator().next();
+                            String moduleName = module.getKey();
+                            String scope = module.getValue();
+                            String problemKey = observerKey.concat("_").concat(moduleName).concat("_").concat(scope);
                             if (!eventProblems.containsKey(problemKey)){
                                 problemsHolder.registerProblem(
                                     observerNameAttribute.getValueElement(),
@@ -104,7 +105,7 @@ public class ObserverDeclarationInspection extends PhpInspection {
                                         observerName,
                                         eventNameAttributeValue,
                                         moduleName,
-                                        modulesWithSameObserverName.get(moduleName)
+                                        scope
                                     ),
                                     errorSeverity
                                 );
@@ -115,11 +116,10 @@ public class ObserverDeclarationInspection extends PhpInspection {
                 }
             }
 
-            private HashMap<String, String> fetchModuleNamesWhereSameObserverNameUsed(String eventNameAttributeValue, String observerName, EventIndex eventIndex, PsiFile file) {
-                HashMap<String, String> modulesName = new HashMap<String, String>();
+            private List<HashMap<String, String>> fetchModuleNamesWhereSameObserverNameUsed(String eventNameAttributeValue, String observerName, EventIndex eventIndex, PsiFile file) {
+                List<HashMap<String, String>> modulesName = new ArrayList<>();
                 String currentFileDirectory = file.getContainingDirectory().toString();
                 String currentFileFullPath = currentFileDirectory.concat("/").concat(file.getName());
-                String scope = MagentoPackages.AREA_BASE;
 
                 Collection<PsiElement> indexedEvents = eventIndex.getEventElements(eventNameAttributeValue, GlobalSearchScope.getScopeRestrictedByFileTypes(
                         GlobalSearchScope.allScope(file.getProject()),
@@ -143,11 +143,7 @@ public class ObserverDeclarationInspection extends PhpInspection {
                         continue;
                     }
 
-                    if (indexedFileDirectory.contains(MagentoPackages.AREA_ADMINHTML)) {
-                        scope = MagentoPackages.AREA_ADMINHTML;
-                    } else if (indexedFileDirectory.contains(MagentoPackages.AREA_FRONTEND)) {
-                        scope = MagentoPackages.AREA_FRONTEND;
-                    }
+                    String scope = getAreaFromFileDirectory(indexedAttributeParent);
 
                     List<XmlTag> indexObserversTags = fetchObserverTagsFromEventTag((XmlTag) indexedEvent.getParent().getParent());
                     for (XmlTag indexObserversTag: indexObserversTags) {
@@ -183,7 +179,7 @@ public class ObserverDeclarationInspection extends PhpInspection {
                 return result;
             }
 
-            private void addModuleNameWhereSameObserverUsed(HashMap<String, String> modulesName, PsiFile indexedFile, String scope) {
+            private void addModuleNameWhereSameObserverUsed(List<HashMap<String, String>> modulesName, PsiFile indexedFile, String scope) {
                 XmlTag moduleDeclarationTag = getModuleDeclarationTagByConfigFile(indexedFile);
                 if (moduleDeclarationTag == null) return;
 
@@ -195,7 +191,10 @@ public class ObserverDeclarationInspection extends PhpInspection {
                     return;
                 }
 
-                modulesName.put(moduleNameAttribute.getValue(), scope);
+                HashMap<String, String> moduleEntry = new HashMap<>();
+
+                moduleEntry.put(moduleNameAttribute.getValue(), scope);
+                modulesName.add(moduleEntry);
             }
 
             @Nullable
@@ -246,6 +245,35 @@ public class ObserverDeclarationInspection extends PhpInspection {
                 XmlDocument xmlDocument = PsiTreeUtil.getChildOfType(file, XmlDocument.class);
                 XmlTag xmlRootTag = PsiTreeUtil.getChildOfType(xmlDocument, XmlTag.class);
                 return PsiTreeUtil.getChildrenOfType(xmlRootTag, XmlTag.class);
+            }
+
+            private String getAreaFromFileDirectory(@NotNull PsiFile file) {
+                if (file.getParent() == null) {
+                    return "";
+                }
+
+                String areaFromFileDirectory = file.getParent().getName();
+
+                if (areaFromFileDirectory.equals("etc")) {
+                    return MagentoPackages.AREA_BASE;
+                }
+
+                List<String> possibleAreas = new ArrayList<>(Arrays.asList(
+                    MagentoPackages.AREA_ADMINHTML,
+                    MagentoPackages.AREA_FRONTEND,
+                    MagentoPackages.AREA_CRON,
+                    MagentoPackages.AREA_API_REST,
+                    MagentoPackages.AREA_API_SOAP,
+                    MagentoPackages.AREA_GRAPHQL
+                ));
+
+                for (String area: possibleAreas) {
+                    if (area.equals(areaFromFileDirectory)) {
+                        return area;
+                    }
+                }
+
+                return "";
             }
         };
     }
