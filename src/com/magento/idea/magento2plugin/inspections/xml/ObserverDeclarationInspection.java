@@ -1,3 +1,8 @@
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 package com.magento.idea.magento2plugin.inspections.xml;
 
 import com.intellij.codeInspection.ProblemHighlightType;
@@ -32,10 +37,10 @@ public class ObserverDeclarationInspection extends PhpInspection {
     public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder problemsHolder, boolean b) {
         return new XmlElementVisitor() {
             private final String moduleXmlFileName = ModuleXml.getInstance().getFileName();
-            private static final String eventsXmlFileName = "events.xml";//todo: move to separate file as done to ModuleXml
-            private static final String duplicatedObserverNameSameFileProblemDescription = "Observer name already used in this file. For more details see Inspection Description.";
+            private static final String eventsXmlFileName = "events.xml";
+            private static final String duplicatedObserverNameSameFileProblemDescription = "The observer name already used in this file. For more details see Inspection Description.";
             private static final String duplicatedObserverNameProblemDescription =
-                    "Observer name \"%s\" for event \"%s\" is already used in the module \"%s\" (%s scope). For more details see Inspection Description.";
+                    "The observer name \"%s\" for event \"%s\" is already used in the module \"%s\" (%s scope). For more details see Inspection Description.";
             private HashMap<String, VirtualFile> loadedFileHash = new HashMap<>();
             private final ProblemHighlightType errorSeverity = ProblemHighlightType.WARNING;
 
@@ -114,7 +119,7 @@ public class ObserverDeclarationInspection extends PhpInspection {
                 HashMap<String, String> modulesName = new HashMap<String, String>();
                 String currentFileDirectory = file.getContainingDirectory().toString();
                 String currentFileFullPath = currentFileDirectory.concat("/").concat(file.getName());
-                String scope = "global";
+                String scope = MagentoPackages.AREA_BASE;
 
                 Collection<PsiElement> indexedEvents = eventIndex.getEventElements(eventNameAttributeValue, GlobalSearchScope.getScopeRestrictedByFileTypes(
                         GlobalSearchScope.allScope(file.getProject()),

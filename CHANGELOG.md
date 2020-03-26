@@ -9,6 +9,7 @@
     * MFTF support (reference navigation, completion)
     * Fixed support of 2020.* versions of IDE's
     * Create a New Magento 2 Module action
+    * Code Inspection: Duplicated Observer Usage in events XML
 
 0.3.0
 ============= 
