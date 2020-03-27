@@ -36,6 +36,7 @@ import com.magento.idea.magento2plugin.actions.generation.ImportReferences.PhpCl
 import com.magento.idea.magento2plugin.actions.generation.data.MagentoPluginMethodData;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.magento.plugin.GetTargetClassNamesByPluginClassName;
+import com.magento.idea.magento2plugin.util.magento.plugin.IsPluginAllowedForMethod;
 import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -198,7 +199,7 @@ public abstract class MagentoGeneratePluginMethodHandlerBase implements Language
 
             while(methodIterator.hasNext()) {
                 Method method = (Method) methodIterator.next();
-                if (method.getAccess().isPublic() && !method.isStatic() && !method.isFinal() && !pluginAlreadyHasMethod(phpClass, method)) {
+                if (IsPluginAllowedForMethod.getInstance().check(method) && !pluginAlreadyHasMethod(phpClass, method)) {
                     method.putUserData(targetClassKey, targetClass);
                     nodes.put(method.getName(), new PhpNamedElementNode(method));
                 }
