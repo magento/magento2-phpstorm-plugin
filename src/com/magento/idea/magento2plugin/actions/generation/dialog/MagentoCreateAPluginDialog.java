@@ -7,9 +7,11 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.magento.idea.magento2plugin.actions.generation.data.MagentoPluginDiXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.MagentoPluginFileData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.MagentoCreateAPluginDialogValidator;
 import com.magento.idea.magento2plugin.actions.generation.generator.MagentoPluginClassGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.MagentoPluginDiXmlGenerator;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.magento.packages.Package;
@@ -18,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.util.List;
 
 public class MagentoCreateAPluginDialog extends JDialog {
@@ -34,12 +37,16 @@ public class MagentoCreateAPluginDialog extends JDialog {
     private JLabel pluginClassNameLabel;
     private JTextField pluginDirectory;
     private JLabel pluginDirectoryName;
-    private JLabel selectTargetModule;
+    private JLabel selectPluginModule;
     private JComboBox pluginType;
     private JLabel pluginTypeLabel;
     private FilteredComboBox pluginModule;
-    private JComboBox targetArea;
-    private JLabel targetAreaLabel;
+    private JComboBox pluginArea;
+    private JLabel pluginAreaLabel;
+    private JTextField pluginName;
+    private JLabel pluginNameLabel;
+    private JTextField pluginSortOrder;
+    private JLabel pluginSortOrderLabel;
 
     public MagentoCreateAPluginDialog(@NotNull Project project, Method targetMethod, PhpClass targetClass) {
         this.project = project;
@@ -88,7 +95,7 @@ public class MagentoCreateAPluginDialog extends JDialog {
 
     private void fillTargetAreaOptions() {
         for(Package.Areas area: Package.Areas.values()) {
-            targetArea.addItem(area.toString());
+            pluginArea.addItem(area.toString());
         }
     }
 
@@ -107,12 +114,33 @@ public class MagentoCreateAPluginDialog extends JDialog {
                 getPluginType(),
                 getPluginModule(),
                 targetClass,
-                targetMethod
+                targetMethod,
+                getPluginClassFqn(),
+                getNamespace()
         );
         MagentoPluginClassGenerator classGenerator = new MagentoPluginClassGenerator(magentoPluginFileData, project);
         classGenerator.generate();
 
+        MagentoPluginDiXmlData magentoPluginDiXmlData = new MagentoPluginDiXmlData(
+                getPluginArea(),
+                getPluginModule(),
+                targetClass,
+                getPluginSortOrder(),
+                getPluginName(),
+                getPluginClassFqn()
+        );
+        MagentoPluginDiXmlGenerator diXmlGenerator = new MagentoPluginDiXmlGenerator(magentoPluginDiXmlData, project);
+        diXmlGenerator.generate();
+
         this.setVisible(false);
+    }
+
+    private String getPluginName() {
+        return this.pluginName.getText().trim();
+    }
+
+    private String getPluginSortOrder() {
+        return this.pluginSortOrder.getText().trim();
     }
 
     public String getPluginClassName() {
@@ -121,6 +149,10 @@ public class MagentoCreateAPluginDialog extends JDialog {
 
     public String getPluginDirectory() {
         return this.pluginDirectory.getText().trim();
+    }
+
+    public String getPluginArea() {
+        return this.pluginArea.getSelectedItem().toString();
     }
 
     public String getPluginType() {
@@ -145,5 +177,16 @@ public class MagentoCreateAPluginDialog extends JDialog {
         List<String> allModulesList = ModuleIndex.getInstance(project).getEditableModuleNames();
 
         this.pluginModule = new FilteredComboBox(allModulesList);
+    }
+
+    private String getNamespace() {
+        String targetModule = getPluginModule();
+        String namespace = targetModule.replace(Package.VENDOR_MODULE_NAME_SEPARATOR, Package.FQN_SEPARATOR);
+        namespace = namespace.concat(Package.FQN_SEPARATOR);
+        return namespace.concat(getPluginDirectory().replace(File.separator, Package.FQN_SEPARATOR));
+    }
+
+    private String getPluginClassFqn() {
+        return getNamespace().concat(Package.FQN_SEPARATOR).concat(getPluginClassName());
     }
 }

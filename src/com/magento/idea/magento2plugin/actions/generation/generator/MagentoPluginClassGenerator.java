@@ -20,13 +20,14 @@ import com.magento.idea.magento2plugin.actions.generation.ImportReferences.PhpCl
 import com.magento.idea.magento2plugin.actions.generation.MagentoCreateAPluginAction;
 import com.magento.idea.magento2plugin.actions.generation.data.MagentoPluginFileData;
 import com.magento.idea.magento2plugin.actions.generation.data.MagentoPluginMethodData;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.util.CodeStyleSettings;
 import com.magento.idea.magento2plugin.actions.generation.util.CollectInsertedMethods;
 import com.magento.idea.magento2plugin.actions.generation.util.FillTextBufferWithPluginMethods;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
-import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import gnu.trove.THashSet;
@@ -58,7 +59,7 @@ public class MagentoPluginClassGenerator {
     public void generate()
     {
         WriteCommandAction.runWriteCommandAction(project, () -> {
-            PhpClass pluginClass = GetPhpClassByFQN.getInstance(project).execute(getPluginClassFqn());
+            PhpClass pluginClass = GetPhpClassByFQN.getInstance(project).execute(pluginFileData.getPluginFqn());
             if (pluginClass == null) {
                 pluginClass = createPluginClass();
             }
@@ -105,7 +106,7 @@ public class MagentoPluginClassGenerator {
 
 
     private PhpClass createPluginClass() {
-        PsiDirectory parentDirectory = ModuleIndex.getInstance(project).getModuleDirectoryByModuleName(getTargetModule());
+        PsiDirectory parentDirectory = ModuleIndex.getInstance(project).getModuleDirectoryByModuleName(getPluginModule());
         String[] pluginDirectories = pluginFileData.getPluginDirectory().split(File.separator);
         for (String pluginDirectory: pluginDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, pluginDirectory);
@@ -127,25 +128,14 @@ public class MagentoPluginClassGenerator {
 
     private void fillAttributes(Properties attributes) {
         attributes.setProperty("NAME", pluginFileData.getPluginClassName());
-        attributes.setProperty("NAMESPACE", getNamespace());
-    }
-
-    private String getNamespace() {
-        String targetModule = getTargetModule();
-        String namespace = targetModule.replace(Package.VENDOR_MODULE_NAME_SEPARATOR, Package.FQN_SEPARATOR);
-        namespace = namespace.concat(Package.FQN_SEPARATOR);
-        return namespace.concat(pluginFileData.getPluginDirectory().replace(File.separator, Package.FQN_SEPARATOR));
-    }
-
-    private String getPluginClassFqn() {
-        return getNamespace().concat(Package.FQN_SEPARATOR).concat(pluginFileData.getPluginClassName());
+        attributes.setProperty("NAMESPACE", pluginFileData.getNamespace());
     }
 
     public Plugin.PluginType getPluginType() {
         return Plugin.getPluginTypeByString(pluginFileData.getPluginType());
     }
 
-    public String getTargetModule() {
+    public String getPluginModule() {
         return pluginFileData.getPluginModule();
     }
 

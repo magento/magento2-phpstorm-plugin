@@ -14,6 +14,8 @@ public class MagentoPluginFileData {
     private String pluginModule;
     private PhpClass targetClass;
     private Method targetMethod;
+    private String pluginFqn;
+    private String namespace;
 
     public MagentoPluginFileData(
             String pluginDirectory,
@@ -21,7 +23,9 @@ public class MagentoPluginFileData {
             String pluginType,
             String pluginModule,
             PhpClass targetClass,
-            Method targetMethod
+            Method targetMethod,
+            String pluginFqn,
+            String namespace
     ) {
         this.pluginDirectory = pluginDirectory;
         this.pluginClassName = pluginClassName;
@@ -29,6 +33,8 @@ public class MagentoPluginFileData {
         this.pluginModule = pluginModule;
         this.targetClass = targetClass;
         this.targetMethod = targetMethod;
+        this.pluginFqn = pluginFqn;
+        this.namespace = namespace;
     }
 
     public String getPluginClassName() {
@@ -53,5 +59,13 @@ public class MagentoPluginFileData {
 
     public Method getTargetMethod() {
         return targetMethod;
+    }
+
+    public String getPluginFqn() {
+        return pluginFqn;
+    }
+
+    public String getNamespace() {
+        return namespace;
     }
 }

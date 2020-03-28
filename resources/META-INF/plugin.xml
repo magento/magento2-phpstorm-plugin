@@ -122,6 +122,7 @@
         <internalFileTemplate name="Magento Module Composer"/>
         <internalFileTemplate name="Magento Module Registration Php"/>
         <internalFileTemplate name="Magento Module Xml"/>
+        <internalFileTemplate name="Magento Module DI Xml"/>
     </extensions>
 
     <application-components>

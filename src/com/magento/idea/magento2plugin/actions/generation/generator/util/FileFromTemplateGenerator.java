@@ -2,7 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
-package com.magento.idea.magento2plugin.actions.generation.generator;
+package com.magento.idea.magento2plugin.actions.generation.generator.util;
 
 import com.intellij.ide.fileTemplates.DefaultTemplatePropertiesProvider;
 import com.intellij.ide.fileTemplates.FileTemplate;
@@ -71,7 +71,7 @@ public class FileFromTemplateGenerator {
     private PsiFile createFile(@NotNull ModuleFileInterface moduleFile, @NotNull String filePath, @NotNull PsiDirectory baseDir, @NotNull Properties attributes) throws IOException, IncorrectOperationException {
         List<String> path = StringUtil.split(filePath.replace(File.separator, "/"), "/");
         String fileName = path.get(path.size() - 1);
-        PsiFile fileTemplate = createFileFromTemplate(getTestTemplateManager(), baseDir, moduleFile.getTemplate(), attributes, fileName, moduleFile.getLanguage());
+        PsiFile fileTemplate = createFileFromTemplate(getTemplateManager(), baseDir, moduleFile.getTemplate(), attributes, fileName, moduleFile.getLanguage());
         if (fileTemplate == null) {
             throw new IncorrectOperationException("Template not found!");
         } else {
@@ -115,7 +115,7 @@ public class FileFromTemplateGenerator {
         }
     }
 
-    public FileTemplateManager getTestTemplateManager() {
+    public FileTemplateManager getTemplateManager() {
         return FileTemplateManager.getInstance(project);
     }
 }
