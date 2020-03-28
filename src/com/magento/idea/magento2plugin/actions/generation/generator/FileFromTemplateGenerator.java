@@ -56,7 +56,6 @@ public class FileFromTemplateGenerator {
                 } catch (IncorrectOperationException | IOException var9) {
                     exceptionRef.set(var9.getMessage());
                 }
-
             };
             ApplicationManager.getApplication().runWriteAction(run);
         }, actionName, null);

@@ -17,7 +17,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.data.ModuleD
 import com.magento.idea.magento2plugin.magento.files.ComposerJson;
 import com.magento.idea.magento2plugin.magento.files.ModuleXml;
 import com.magento.idea.magento2plugin.magento.files.RegistrationPhp;
-import com.magento.idea.magento2plugin.magento.packages.MagentoPackages;
+import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -98,7 +98,7 @@ public class NewMagentoModuleDialog extends JDialog {
 
     private void detectPackageName(@NotNull PsiDirectory initialBaseDir) {
         PsiDirectory parentDir = initialBaseDir.getParent();
-        if (parentDir != null && parentDir.toString().endsWith(MagentoPackages.PACKAGES_ROOT)) {
+        if (parentDir != null && parentDir.toString().endsWith(Package.PACKAGES_ROOT)) {
             packageName.setVisible(false);
             packageNameLabel.setVisible(false);
             this.detectedPackageName = initialBaseDir.getName();

@@ -6,7 +6,6 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
 import com.magento.idea.magento2plugin.actions.generation.dialog.MagentoCreateAPluginDialog;
 import com.magento.idea.magento2plugin.util.Regex;
-
 import javax.swing.*;
 
 public class MagentoCreateAPluginDialogValidator {
@@ -24,45 +23,25 @@ public class MagentoCreateAPluginDialogValidator {
     public boolean validate()
     {
         String errorTitle = "Error";
-        String packageName = dialog.getPluginClassName();
-        if (packageName.length() == 0) {
-            JOptionPane.showMessageDialog(null, "Package Name must not be empty.", errorTitle, JOptionPane.ERROR_MESSAGE);
+        String pluginClassName = dialog.getPluginClassName();
+        if (pluginClassName.length() == 0) {
+            JOptionPane.showMessageDialog(null, "Plugin Class Name must not be empty.", errorTitle, JOptionPane.ERROR_MESSAGE);
             return false;
         }
 
-        if (!packageName.matches(Regex.ALPHANUMERIC)) {
-            JOptionPane.showMessageDialog(null, "Package Name must contain letters and numbers only.", errorTitle, JOptionPane.ERROR_MESSAGE);
+        if (!pluginClassName.matches(Regex.ALPHANUMERIC)) {
+            JOptionPane.showMessageDialog(null, "Plugin Class Name must contain letters and numbers only.", errorTitle, JOptionPane.ERROR_MESSAGE);
             return false;
         }
 
-        if (!Character.isUpperCase(packageName.charAt(0)) && !Character.isDigit(packageName.charAt(0))) {
-            JOptionPane.showMessageDialog(null, "Package Name must start from a number or a capital letter", errorTitle, JOptionPane.ERROR_MESSAGE);
+        if (!Character.isUpperCase(pluginClassName.charAt(0)) && !Character.isDigit(pluginClassName.charAt(0))) {
+            JOptionPane.showMessageDialog(null, "Plugin Class Name must start from a number or a capital letter", errorTitle, JOptionPane.ERROR_MESSAGE);
             return false;
         }
 
-        String moduleName = dialog.getPluginDirectory();
-        if (moduleName.length() == 0) {
-            JOptionPane.showMessageDialog(null, "Module Name must not be empty.", errorTitle, JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
-        if (!moduleName.matches(Regex.ALPHANUMERIC)) {
-            JOptionPane.showMessageDialog(null, "Module Name must contain letters and numbers only.", errorTitle, JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
-        if (!Character.isUpperCase(moduleName.charAt(0)) && !Character.isDigit(moduleName.charAt(0))) {
-            JOptionPane.showMessageDialog(null, "Module Name must start from a number or a capital letter", errorTitle, JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
-        if (dialog.getModuleVersion().length() == 0) {
-            JOptionPane.showMessageDialog(null, "Module Version must not be empty.", errorTitle, JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
-        if (dialog.getModuleDescription().length() == 0) {
-            JOptionPane.showMessageDialog(null, "Module Version must not be empty.", errorTitle, JOptionPane.ERROR_MESSAGE);
+        String pluginDirectory = dialog.getPluginDirectory();
+        if (pluginDirectory.length() == 0) {
+            JOptionPane.showMessageDialog(null, "Plugin Directory must not be empty.", errorTitle, JOptionPane.ERROR_MESSAGE);
             return false;
         }
 

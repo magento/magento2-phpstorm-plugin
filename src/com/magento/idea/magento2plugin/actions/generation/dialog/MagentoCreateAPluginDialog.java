@@ -5,30 +5,28 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDirectory;
+import com.jetbrains.php.lang.psi.elements.Method;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.magento.idea.magento2plugin.actions.generation.data.MagentoPluginFileData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.MagentoCreateAPluginDialogValidator;
-import com.magento.idea.magento2plugin.actions.generation.generator.DirectoryGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.FileFromTemplateGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.MagentoPluginClassGenerator;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
-import com.magento.idea.magento2plugin.magento.packages.MagentoPackages;
+import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
-import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
 import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
-import java.util.Properties;
 
 public class MagentoCreateAPluginDialog extends JDialog {
     @NotNull
     private final Project project;
+    private Method targetMethod;
+    private PhpClass targetClass;
     @NotNull
-    private final DirectoryGenerator directoryGenerator;
-    private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final MagentoCreateAPluginDialogValidator validator;
-    private final CamelCaseToHyphen camelCaseToHyphen;
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -36,19 +34,17 @@ public class MagentoCreateAPluginDialog extends JDialog {
     private JLabel pluginClassNameLabel;
     private JTextField pluginDirectory;
     private JLabel pluginDirectoryName;
-    private JTextArea moduleDescription;
-    private JTextField moduleVersion;
     private JLabel selectTargetModule;
     private JComboBox pluginType;
     private JLabel pluginTypeLabel;
-    private FilteredComboBox targetModule;
-    private String detectedPackageName;
+    private FilteredComboBox pluginModule;
+    private JComboBox targetArea;
+    private JLabel targetAreaLabel;
 
-    public MagentoCreateAPluginDialog(@NotNull Project project) {
+    public MagentoCreateAPluginDialog(@NotNull Project project, Method targetMethod, PhpClass targetClass) {
         this.project = project;
-        this.directoryGenerator = DirectoryGenerator.getInstance();
-        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
-        this.camelCaseToHyphen = CamelCaseToHyphen.getInstance();
+        this.targetMethod = targetMethod;
+        this.targetClass = targetClass;
         this.validator = MagentoCreateAPluginDialogValidator.getInstance(this);
 
         setContentPane(contentPane);
@@ -56,6 +52,7 @@ public class MagentoCreateAPluginDialog extends JDialog {
         getRootPane().setDefaultButton(buttonOK);
         pushToMiddle();
         fillPluginTypeOptions();
+        fillTargetAreaOptions();
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -84,17 +81,14 @@ public class MagentoCreateAPluginDialog extends JDialog {
     }
 
     private void fillPluginTypeOptions() {
-        pluginType.addItem(Plugin.beforePluginPrefix);
-        pluginType.addItem(Plugin.afterPluginPrefix);
-        pluginType.addItem(Plugin.aroundPluginPrefix);
+        for (Plugin.PluginType pluginPrefixType: Plugin.PluginType.values()) {
+            pluginType.addItem(pluginPrefixType.toString());
+        }
     }
 
-    private void detectPackageName(@NotNull PsiDirectory initialBaseDir) {
-        PsiDirectory parentDir = initialBaseDir.getParent();
-        if (parentDir != null && parentDir.toString().endsWith(MagentoPackages.PACKAGES_ROOT)) {
-            pluginClassName.setVisible(false);
-            pluginClassNameLabel.setVisible(false);
-            this.detectedPackageName = initialBaseDir.getName();
+    private void fillTargetAreaOptions() {
+        for(Package.Areas area: Package.Areas.values()) {
+            targetArea.addItem(area.toString());
         }
     }
 
@@ -107,29 +101,21 @@ public class MagentoCreateAPluginDialog extends JDialog {
         if (!validator.validate()) {
             return;
         }
-        //generateFiles();
+        MagentoPluginFileData magentoPluginFileData = new MagentoPluginFileData(
+                getPluginDirectory(),
+                getPluginClassName(),
+                getPluginType(),
+                getPluginModule(),
+                targetClass,
+                targetMethod
+        );
+        MagentoPluginClassGenerator classGenerator = new MagentoPluginClassGenerator(magentoPluginFileData, project);
+        classGenerator.generate();
+
         this.setVisible(false);
     }
 
-//    private void generateFiles() {
-//        PsiDirectory baseDir = detectedPackageName != null;
-//        ModuleDirectoriesData moduleDirectoriesData = directoryGenerator.createModuleDirectories(getPluginClassName(), getPluginDirectory(), baseDir);
-//        Properties attributes = getAttributes();
-//        PsiFile composerJson = fileFromTemplateGenerator.generate(ComposerJson.getInstance(), attributes, moduleDirectoriesData.getModuleDirectory(), NewModuleAction.ACTION_NAME);
-//        if (composerJson == null) {
-//            return;
-//        }
-//        PsiFile registrationPhp = fileFromTemplateGenerator.generate(RegistrationPhp.getInstance(), attributes, moduleDirectoriesData.getModuleDirectory(), NewModuleAction.ACTION_NAME);
-//        if (registrationPhp == null) {
-//            return;
-//        }
-//        fileFromTemplateGenerator.generate(ModuleXml.getInstance(), attributes, moduleDirectoriesData.getModuleEtcDirectory(), NewModuleAction.ACTION_NAME);
-//    }
-
     public String getPluginClassName() {
-        if (detectedPackageName != null) {
-            return detectedPackageName;
-        }
         return this.pluginClassName.getText().trim();
     }
 
@@ -137,48 +123,27 @@ public class MagentoCreateAPluginDialog extends JDialog {
         return this.pluginDirectory.getText().trim();
     }
 
-    public String getModuleDescription() {
-        return this.moduleDescription.getText().trim();
+    public String getPluginType() {
+        return this.pluginType.getSelectedItem().toString();
     }
 
-    public String getModuleVersion() {
-        return this.moduleVersion.getText().trim();
+    public String getPluginModule() {
+        return this.pluginModule.getSelectedItem().toString();
     }
 
     private void onCancel() {
         this.setVisible(false);
     }
 
-    public static void open(@NotNull Project project) {
-        MagentoCreateAPluginDialog dialog = new MagentoCreateAPluginDialog(project);
+    public static void open(@NotNull Project project, Method targetMethod, PhpClass targetClass) {
+        MagentoCreateAPluginDialog dialog = new MagentoCreateAPluginDialog(project, targetMethod, targetClass);
         dialog.pack();
         dialog.setVisible(true);
-    }
-
-    private Properties getAttributes() {
-        Properties attributes = new Properties();
-        this.fillAttributes(attributes);
-        return attributes;
-    }
-
-    private void fillAttributes(Properties attributes) {
-        attributes.setProperty("PACKAGE", getPluginClassName());
-        attributes.setProperty("MODULE_NAME", getPluginDirectory());
-        attributes.setProperty("MODULE_DESCRIPTION", getModuleDescription());
-        attributes.setProperty("COMPOSER_PACKAGE_NAME", getComposerPackageName());
-        attributes.setProperty("MODULE_VERSION", getModuleVersion());
-    }
-
-    @NotNull
-    private String getComposerPackageName() {
-        return camelCaseToHyphen.convert(getPluginClassName())
-                .concat("/")
-                .concat(camelCaseToHyphen.convert(getPluginDirectory()));
     }
 
     private void createUIComponents() {
         List<String> allModulesList = ModuleIndex.getInstance(project).getEditableModuleNames();
 
-        this.targetModule = new FilteredComboBox(allModulesList);
+        this.pluginModule = new FilteredComboBox(allModulesList);
     }
 }

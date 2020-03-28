@@ -57,10 +57,7 @@
             <action id="Magento2NewModule" class="com.magento.idea.magento2plugin.actions.generation.NewModuleAction"/>
             <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewDir"/>
         </group>
-        <action id="MagentoCreateAPlugin" class="com.magento.idea.magento2plugin.actions.generation.MagentoCreateAPluginAction" text="Create A Magento 2 Plugin">
-            <add-to-group group-id="GenerateGroup" anchor="last"/>
-        </action>
-        <action id="MagentoCreateAPlugin.Menu" class="com.magento.idea.magento2plugin.actions.generation.MagentoCreateAPluginEditorAction">
+        <action id="MagentoCreateAPlugin.Menu" class="com.magento.idea.magento2plugin.actions.generation.MagentoCreateAPluginAction">
             <add-to-group group-id="EditorPopupMenu"/>
         </action>
     </actions>

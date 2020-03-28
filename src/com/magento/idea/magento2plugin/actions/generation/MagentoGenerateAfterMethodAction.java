@@ -14,15 +14,14 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.MagentoPluginMethodData;
 import com.magento.idea.magento2plugin.actions.generation.generator.MagentoPluginMethodsGenerator;
+import com.magento.idea.magento2plugin.magento.files.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 public class MagentoGenerateAfterMethodAction extends CodeInsightAction {
-    public static final String MAGENTO_PLUGIN_AFTER_METHOD_TEMPLATE_NAME = "Magento Plugin After Method";
-
-    private final MagentoGeneratePluginMethodHandlerBase myHandler = new MagentoGeneratePluginMethodHandlerBase(MagentoPluginMethodData.Type.AFTER) {
+    private final MagentoGeneratePluginMethodHandlerBase myHandler = new MagentoGeneratePluginMethodHandlerBase(Plugin.PluginType.after) {
         protected MagentoPluginMethodData[] createPluginMethods(PhpClass currentClass, Method method, Key<Object> targetClassKey) {
             return (new MagentoPluginMethodsGenerator(currentClass, method, targetClassKey)
-                    .createPluginMethods(MAGENTO_PLUGIN_AFTER_METHOD_TEMPLATE_NAME, MagentoPluginMethodData.Type.AFTER));
+                    .createPluginMethods(Plugin.PluginType.after));
         }
     };
 

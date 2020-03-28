@@ -8,17 +8,21 @@ import com.intellij.lang.Language;
 import com.jetbrains.php.lang.PhpLanguage;
 
 public class Plugin implements ModuleFileInterface {
-    public static String TEMPLATE = "Magento Plugin Class";
+    public static String TEMPLATE = "PHP Class";
+    public static final String BEFORE_METHOD_TEMPLATE_NAME = "Magento Plugin Before Method";
+    public static final String AROUND_METHOD_TEMPLATE_NAME = "Magento Plugin Around Method";
+    public static final String AFTER_METHOD_TEMPLATE_NAME = "Magento Plugin After Method";
 
-    //plugin prefixes
-    public static final String aroundPluginPrefix = "around";
-    public static final String beforePluginPrefix = "before";
-    public static final String afterPluginPrefix = "after";
+    public static enum PluginType {
+        before,
+        after,
+        around
+    }
 
-    //forbidden target methods
+    //forbidden target method
     public static final String constructMethodName = "__construct";
 
-    //allowed methods access types
+    //allowed methods access type
     public static final String publicAccess = "public";
 
     private static Plugin INSTANCE = null;
@@ -50,4 +54,30 @@ public class Plugin implements ModuleFileInterface {
     private void setFileName(String filename) {
         this.fileName = filename;
     };
+
+    public static String getMethodTemplateByPluginType(PluginType pluginType)
+    {
+        if (pluginType.equals(PluginType.after)) {
+            return AFTER_METHOD_TEMPLATE_NAME;
+        }
+        if (pluginType.equals(PluginType.before)) {
+            return BEFORE_METHOD_TEMPLATE_NAME;
+        }
+        if (pluginType.equals(PluginType.around)) {
+            return AROUND_METHOD_TEMPLATE_NAME;
+        }
+        return null;
+    }
+
+    public static Plugin.PluginType getPluginTypeByString(String string)
+    {
+        for (Plugin.PluginType pluginType: Plugin.PluginType.values()) {
+            if (!pluginType.toString().equals(string))
+            {
+                continue;
+            }
+            return pluginType;
+        }
+        return null;
+    }
 }

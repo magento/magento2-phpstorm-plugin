@@ -16,33 +16,36 @@ import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocComment;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.magento.idea.magento2plugin.actions.generation.data.MagentoPluginMethodData;
+import com.magento.idea.magento2plugin.magento.files.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.regex.Pattern;
 
 public class MagentoPluginMethodsGenerator {
+    public static String originalTargetKey = "original.target";
     @NotNull
-    private final PhpClass myCurrentClass;
+    private final PhpClass pluginClass;
     @NotNull
     private final Method myMethod;
     @NotNull
     private final PhpClass myTargetClass;
 
-    public MagentoPluginMethodsGenerator(@NotNull PhpClass myCurrentClass, @NotNull Method method, Key<Object> targetClassKey) {
+    public MagentoPluginMethodsGenerator(@NotNull PhpClass pluginClass, @NotNull Method method, Key<Object> targetClassKey) {
         super();
-        this.myCurrentClass = myCurrentClass;
+        this.pluginClass = pluginClass;
         this.myMethod = method;
         this.myTargetClass = (PhpClass)Objects.requireNonNull(method.getUserData(targetClassKey));
     }
 
     @NotNull
-    public MagentoPluginMethodData[] createPluginMethods(@NotNull String templateName, @NotNull MagentoPluginMethodData.Type type) {
+    public MagentoPluginMethodData[] createPluginMethods(@NotNull Plugin.PluginType type) {
         List<MagentoPluginMethodData> pluginMethods = new ArrayList();
-        PhpClass currentClass = this.myCurrentClass;
+        String templateName = Plugin.getMethodTemplateByPluginType(type);
+        PhpClass currentClass = this.pluginClass;
         if (currentClass != null) {
-            Properties attributes = this.getAccessMethodAttributes(PhpCodeInsightUtil.findScopeForUseOperator(this.myMethod), templateName, type);
-            String methodTemplate = PhpCodeUtil.getCodeTemplate(templateName, attributes, this.myCurrentClass.getProject());
+            Properties attributes = this.getAccessMethodAttributes(PhpCodeInsightUtil.findScopeForUseOperator(this.myMethod), type);
+            String methodTemplate = PhpCodeUtil.getCodeTemplate(templateName, attributes, this.pluginClass.getProject());
             PhpClass dummyClass = PhpCodeUtil.createClassFromMethodTemplate(currentClass, currentClass.getProject(), methodTemplate);
             if (dummyClass != null) {
                 PhpDocComment currDocComment = null;
@@ -51,31 +54,28 @@ public class MagentoPluginMethodsGenerator {
                     if (child instanceof PhpDocComment) {
                         currDocComment = (PhpDocComment)child;
                     } else if (child instanceof Method) {
-                        pluginMethods.add(new MagentoPluginMethodData(myMethod, currentClass, currDocComment, (Method)child, type));
+                        pluginMethods.add(new MagentoPluginMethodData(myMethod, currDocComment, (Method)child));
                         currDocComment = null;
                     }
                 }
             }
         }
 
-        MagentoPluginMethodData[] magentoPluginMethodData = pluginMethods.toArray(new MagentoPluginMethodData[0]);
-
-        return magentoPluginMethodData;
+        return pluginMethods.toArray(new MagentoPluginMethodData[0]);
     }
 
-    private Properties getAccessMethodAttributes(@Nullable PhpPsiElement scopeForUseOperator, String templateName, @NotNull MagentoPluginMethodData.Type type) {
+    private Properties getAccessMethodAttributes(@Nullable PhpPsiElement scopeForUseOperator, @NotNull Plugin.PluginType type) {
         Properties attributes = new Properties();
-        String typeHint = this.fillAttributes(scopeForUseOperator, attributes, templateName, type);
+        String typeHint = this.fillAttributes(scopeForUseOperator, attributes, type);
         this.addTypeHintsAndReturnType(attributes, typeHint);
         return attributes;
     }
 
     @NotNull
-    private String fillAttributes(@Nullable PhpPsiElement scopeForUseOperator, Properties attributes, String templateName, @NotNull MagentoPluginMethodData.Type type) {
+    private String fillAttributes(@Nullable PhpPsiElement scopeForUseOperator, Properties attributes, @NotNull Plugin.PluginType type) {
         String fieldName = this.myMethod.getName();
-        String methodPrefix = type.toString().toLowerCase();
         String methodSuffix = fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-        String pluginMethodName = methodPrefix.concat(methodSuffix);
+        String pluginMethodName = type.toString().concat(methodSuffix);
 
         attributes.setProperty("NAME", pluginMethodName);
         PhpReturnType targetMethodReturnType = myMethod.getReturnType();
@@ -97,7 +97,7 @@ public class MagentoPluginMethodsGenerator {
     }
 
     private void addTypeHintsAndReturnType(Properties attributes, String typeHint) {
-        Project project = this.myCurrentClass.getProject();
+        Project project = this.pluginClass.getProject();
         if (PhpLanguageFeature.SCALAR_TYPE_HINTS.isSupported(project) && isDocTypeConvertable(typeHint)) {
             attributes.setProperty("SCALAR_TYPE_HINT", convertDocTypeToHint(project, typeHint));
         }
@@ -138,7 +138,7 @@ public class MagentoPluginMethodsGenerator {
         return hint;
     }
 
-    private String getParameterDoc(Collection<PsiElement> parameters, @NotNull MagentoPluginMethodData.Type type, Project project) {
+    private String getParameterDoc(Collection<PsiElement> parameters, @NotNull Plugin.PluginType type, Project project) {
         StringBuilder sb = new StringBuilder();
         PhpReturnType returnType = myMethod.getReturnType();
 
@@ -163,10 +163,10 @@ public class MagentoPluginMethodsGenerator {
             }
             sb.append('$').append(paramName);
 
-            if (type.equals(MagentoPluginMethodData.Type.AROUND) && i == 0) {
+            if (type.equals(Plugin.PluginType.around) && i == 0) {
                 sb.append("\n* @param callable $proceed");
             }
-            if (type.equals(MagentoPluginMethodData.Type.AFTER) && i == 0) {
+            if (type.equals(Plugin.PluginType.after) && i == 0) {
                 if (returnType != null) {
                     if (returnType.getText().equals("void")) {
                         sb.append("\n* @param null $result");
@@ -179,7 +179,7 @@ public class MagentoPluginMethodsGenerator {
             }
         }
 
-        if (!type.equals(MagentoPluginMethodData.Type.BEFORE) && returnType != null) {
+        if (!type.equals(Plugin.PluginType.before) && returnType != null) {
             if (returnType.getText().equals("void")) {
                 sb.append("\n* @return void");
             } else {
@@ -189,7 +189,7 @@ public class MagentoPluginMethodsGenerator {
         return sb.toString();
     }
 
-    protected String getParameterList(Collection<PsiElement> parameters, @NotNull MagentoPluginMethodData.Type type) {
+    protected String getParameterList(Collection<PsiElement> parameters, @NotNull Plugin.PluginType type) {
         StringBuilder buf = new StringBuilder();
         PhpReturnType returnType = myMethod.getReturnType();
         Iterator iterator = parameters.iterator();
@@ -215,14 +215,14 @@ public class MagentoPluginMethodsGenerator {
                 }
                 buf.append("$").append(paramName);
             }
-            if (type.equals(MagentoPluginMethodData.Type.AFTER) && i == 0){
+            if (type.equals(Plugin.PluginType.after) && i == 0){
                 if (returnType != null && !returnType.getText().equals("void")) {
                     buf.append(", ").append(returnType.getText()).append(" $result");
                 } else {
                     buf.append(", $result");
                 }
             }
-            if (type.equals(MagentoPluginMethodData.Type.AROUND) && i == 0){
+            if (type.equals(Plugin.PluginType.around) && i == 0){
                 buf.append(", callable $proceed");
             }
             i++;
@@ -231,9 +231,9 @@ public class MagentoPluginMethodsGenerator {
         return buf.toString();
     }
 
-    protected String getReturnVariables(@NotNull MagentoPluginMethodData.Type type) {
+    protected String getReturnVariables(@NotNull Plugin.PluginType type) {
         StringBuilder buf = new StringBuilder();
-        if (type.equals(MagentoPluginMethodData.Type.AFTER)) {
+        if (type.equals(Plugin.PluginType.after)) {
             return buf.append("$result").toString();
         }
         Parameter[] parameters = myMethod.getParameters();
@@ -258,7 +258,7 @@ public class MagentoPluginMethodsGenerator {
 
     @Nullable
     private String getTypeHint(@NotNull PhpNamedElement element) {
-        PhpType filedType = element.getType().global(this.myCurrentClass.getProject());
+        PhpType filedType = element.getType().global(this.pluginClass.getProject());
         Set<String> typeStrings = filedType.getTypes();
         String typeString = null;
         if (typeStrings.size() == 1) {
@@ -294,7 +294,7 @@ public class MagentoPluginMethodsGenerator {
     }
 
     private String getFieldTypeString(PhpNamedElement element, @NotNull PhpType type) {
-        return PhpDocUtil.getTypePresentation(this.myCurrentClass.getProject(), type, PhpCodeInsightUtil.findScopeForUseOperator(element));
+        return PhpDocUtil.getTypePresentation(this.pluginClass.getProject(), type, PhpCodeInsightUtil.findScopeForUseOperator(element));
     }
 
     private static PhpType filterNullCaseInsensitive(PhpType filedType) {

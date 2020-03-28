@@ -43,14 +43,14 @@ public class PluginInspection extends PhpInspection {
 
             private String getPluginPrefix(Method pluginMethod) {
                 String pluginMethodName = pluginMethod.getName();
-                if (pluginMethodName.startsWith(Plugin.aroundPluginPrefix)) {
-                    return Plugin.aroundPluginPrefix;
+                if (pluginMethodName.startsWith(Plugin.PluginType.around.toString())) {
+                    return Plugin.PluginType.around.toString();
                 }
-                if (pluginMethodName.startsWith(Plugin.beforePluginPrefix)) {
-                    return Plugin.beforePluginPrefix;
+                if (pluginMethodName.startsWith(Plugin.PluginType.before.toString())) {
+                    return Plugin.PluginType.before.toString();
                 }
-                if (pluginMethodName.startsWith(Plugin.afterPluginPrefix)) {
-                    return Plugin.afterPluginPrefix;
+                if (pluginMethodName.startsWith(Plugin.PluginType.after.toString())) {
+                    return Plugin.PluginType.after.toString();
                 }
 
                 return null;
@@ -137,13 +137,13 @@ public class PluginInspection extends PhpInspection {
                         }
                         continue;
                     }
-                    if (index == 2 && pluginPrefix.equals(Plugin.aroundPluginPrefix)) {
+                    if (index == 2 && pluginPrefix.equals(Plugin.PluginType.around.toString())) {
                         if (!checkTypeIncompatibility("callable", declaredType, phpIndex)) {
                             problemsHolder.registerProblem(pluginMethodParameter, PhpBundle.message("inspection.wrong_param_type", new Object[]{declaredType, "callable"}), ProblemHighlightType.ERROR);
                         }
                         continue;
                     }
-                    if (index == 2 && pluginPrefix.equals(Plugin.afterPluginPrefix) &&
+                    if (index == 2 && pluginPrefix.equals(Plugin.PluginType.after.toString()) &&
                             !targetMethod.getDeclaredType().toString().equals("void")) {
                         if (declaredType.isEmpty() || targetMethod.getDeclaredType().toString().isEmpty()) {
                             continue;
@@ -156,7 +156,7 @@ public class PluginInspection extends PhpInspection {
                         }
                         continue;
                     }
-                    if (index == 2 && pluginPrefix.equals(Plugin.afterPluginPrefix) &&
+                    if (index == 2 && pluginPrefix.equals(Plugin.PluginType.after.toString()) &&
                             targetMethod.getDeclaredType().toString().equals("void")) {
                         if (declaredType.isEmpty()) {
                             continue;
@@ -166,7 +166,7 @@ public class PluginInspection extends PhpInspection {
                         }
                         continue;
                     }
-                    int targetParameterKey = index - (pluginPrefix.equals(Plugin.beforePluginPrefix) ?
+                    int targetParameterKey = index - (pluginPrefix.equals(Plugin.PluginType.before.toString()) ?
                             beforePluginExtraParamsStart :
                             afterAndAroundPluginExtraParamsStart);
                     if (targetMethodParameters.length <= targetParameterKey) {
