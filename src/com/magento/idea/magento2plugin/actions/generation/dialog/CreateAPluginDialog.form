@@ -6,8 +6,8 @@
       <xy x="48" y="54" width="600" height="500"/>
     </constraints>
     <properties>
-      <minimumSize width="400" height="400"/>
-      <preferredSize width="400" height="400"/>
+      <minimumSize width="400" height="350"/>
+      <preferredSize width="400" height="350"/>
       <requestFocusEnabled value="true"/>
     </properties>
     <border type="none"/>
