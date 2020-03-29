@@ -19,7 +19,7 @@ import com.intellij.psi.xml.XmlTag;
 import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.magento.idea.magento2plugin.indexes.EventIndex;
 import com.magento.idea.magento2plugin.magento.files.ModuleXml;
-import com.magento.idea.magento2plugin.magento.packages.MagentoPackages;
+import com.magento.idea.magento2plugin.magento.packages.Package;
 import org.jetbrains.annotations.NotNull;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -254,22 +254,13 @@ public class ObserverDeclarationInspection extends PhpInspection {
 
                 String areaFromFileDirectory = file.getParent().getName();
 
-                if (areaFromFileDirectory.equals("etc")) {
-                    return MagentoPackages.AREA_BASE;
+                if (areaFromFileDirectory.equals(Package.MODULE_BASE_AREA_DIR)) {
+                    return Package.Areas.base.toString();
                 }
 
-                List<String> possibleAreas = new ArrayList<>(Arrays.asList(
-                    MagentoPackages.AREA_ADMINHTML,
-                    MagentoPackages.AREA_FRONTEND,
-                    MagentoPackages.AREA_CRON,
-                    MagentoPackages.AREA_API_REST,
-                    MagentoPackages.AREA_API_SOAP,
-                    MagentoPackages.AREA_GRAPHQL
-                ));
-
-                for (String area: possibleAreas) {
-                    if (area.equals(areaFromFileDirectory)) {
-                        return area;
+                for (Package.Areas area: Package.Areas.values()) {
+                    if (area.toString().equals(areaFromFileDirectory)) {
+                        return area.toString();
                     }
                 }
 

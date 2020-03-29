@@ -1,0 +1,8 @@
+#if (${TYPE})
+<type name="${TYPE}">
+#end
+<plugin name="${NAME}"
+            type="${PLUGIN_TYPE}" sortOrder="${SORT_ORDER}" />
+#if (${TYPE})
+</type>
+#end
