@@ -29,6 +29,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFro
 import com.magento.idea.magento2plugin.actions.generation.util.CodeStyleSettings;
 import com.magento.idea.magento2plugin.actions.generation.util.CollectInsertedMethods;
 import com.magento.idea.magento2plugin.actions.generation.util.FillTextBufferWithPluginMethods;
+import com.magento.idea.magento2plugin.actions.generation.util.NavigateToCreatedFile;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
@@ -44,6 +45,7 @@ import java.util.Properties;
 import java.util.Set;
 
 public class MagentoPluginClassGenerator {
+    private final NavigateToCreatedFile navigateToCreatedFile;
     private MagentoPluginFileData pluginFileData;
     private Project project;
     private final FillTextBufferWithPluginMethods fillTextBuffer;
@@ -60,6 +62,7 @@ public class MagentoPluginClassGenerator {
         this.collectInsertedMethods = CollectInsertedMethods.getInstance();
         this.pluginFileData = pluginFileData;
         this.project = project;
+        this.navigateToCreatedFile = NavigateToCreatedFile.getInstance();
     }
 
     public void generate()
@@ -113,6 +116,7 @@ public class MagentoPluginClassGenerator {
                 }
             }
             codeStyleSettings.restore();
+            navigateToCreatedFile.navigate(project, pluginFile);
         });
     }
 
