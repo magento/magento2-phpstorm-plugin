@@ -19,6 +19,7 @@ import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import com.magento.idea.magento2plugin.inspections.php.util.PhpClassImplementsInterfaceUtil;
+import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.magento.plugin.GetTargetClassNamesByPluginClassName;
 import org.jetbrains.annotations.NotNull;
@@ -37,22 +38,19 @@ public class PluginInspection extends PhpInspection {
             private static final String pluginOnConstructorMethodProblemDescription = "You can't declare a plugin for a __construct method!";
             private static final String redundantParameterProblemDescription = "Redundant parameter";
             private static final String possibleTypeIncompatibilityProblemDescription = "Possible type incompatibility. Consider changing the parameter according to the target method.";
-            private static final String aroundPluginPrefix = "around";
-            private static final String beforePluginPrefix = "before";
-            private static final String afterPluginPrefix = "after";
             private final Integer beforePluginExtraParamsStart = 2;
             private final Integer afterAndAroundPluginExtraParamsStart = 3;
 
             private String getPluginPrefix(Method pluginMethod) {
                 String pluginMethodName = pluginMethod.getName();
-                if (pluginMethodName.startsWith(aroundPluginPrefix)) {
-                    return aroundPluginPrefix;
+                if (pluginMethodName.startsWith(Plugin.PluginType.around.toString())) {
+                    return Plugin.PluginType.around.toString();
                 }
-                if (pluginMethodName.startsWith(beforePluginPrefix)) {
-                    return beforePluginPrefix;
+                if (pluginMethodName.startsWith(Plugin.PluginType.before.toString())) {
+                    return Plugin.PluginType.before.toString();
                 }
-                if (pluginMethodName.startsWith(afterPluginPrefix)) {
-                    return afterPluginPrefix;
+                if (pluginMethodName.startsWith(Plugin.PluginType.after.toString())) {
+                    return Plugin.PluginType.after.toString();
                 }
 
                 return null;
@@ -106,7 +104,7 @@ public class PluginInspection extends PhpInspection {
             }
 
             private void checkTargetMethod(Method pluginMethod, String targetClassMethodName, Method targetMethod) {
-                if (targetClassMethodName.equals("__construct")) {
+                if (targetClassMethodName.equals(Plugin.constructMethodName)) {
                     problemsHolder.registerProblem(pluginMethod.getNameIdentifier(), pluginOnConstructorMethodProblemDescription, ProblemHighlightType.ERROR);
                 }
                 if (targetMethod.isFinal()) {
@@ -115,7 +113,7 @@ public class PluginInspection extends PhpInspection {
                 if (targetMethod.isStatic()) {
                     problemsHolder.registerProblem(pluginMethod.getNameIdentifier(), pluginOnStaticMethodProblemDescription, ProblemHighlightType.ERROR);
                 }
-                if (!targetMethod.getAccess().toString().equals("public")) {
+                if (!targetMethod.getAccess().toString().equals(Plugin.publicAccess)) {
                     problemsHolder.registerProblem(pluginMethod.getNameIdentifier(), pluginOnNotPublicMethodProblemDescription, ProblemHighlightType.ERROR);
                 }
             }
@@ -139,13 +137,13 @@ public class PluginInspection extends PhpInspection {
                         }
                         continue;
                     }
-                    if (index == 2 && pluginPrefix.equals(aroundPluginPrefix)) {
+                    if (index == 2 && pluginPrefix.equals(Plugin.PluginType.around.toString())) {
                         if (!checkTypeIncompatibility("callable", declaredType, phpIndex)) {
                             problemsHolder.registerProblem(pluginMethodParameter, PhpBundle.message("inspection.wrong_param_type", new Object[]{declaredType, "callable"}), ProblemHighlightType.ERROR);
                         }
                         continue;
                     }
-                    if (index == 2 && pluginPrefix.equals(afterPluginPrefix) &&
+                    if (index == 2 && pluginPrefix.equals(Plugin.PluginType.after.toString()) &&
                             !targetMethod.getDeclaredType().toString().equals("void")) {
                         if (declaredType.isEmpty() || targetMethod.getDeclaredType().toString().isEmpty()) {
                             continue;
@@ -158,7 +156,7 @@ public class PluginInspection extends PhpInspection {
                         }
                         continue;
                     }
-                    if (index == 2 && pluginPrefix.equals(afterPluginPrefix) &&
+                    if (index == 2 && pluginPrefix.equals(Plugin.PluginType.after.toString()) &&
                             targetMethod.getDeclaredType().toString().equals("void")) {
                         if (declaredType.isEmpty()) {
                             continue;
@@ -168,7 +166,7 @@ public class PluginInspection extends PhpInspection {
                         }
                         continue;
                     }
-                    int targetParameterKey = index - (pluginPrefix.equals(beforePluginPrefix) ?
+                    int targetParameterKey = index - (pluginPrefix.equals(Plugin.PluginType.before.toString()) ?
                             beforePluginExtraParamsStart :
                             afterAndAroundPluginExtraParamsStart);
                     if (targetMethodParameters.length <= targetParameterKey) {

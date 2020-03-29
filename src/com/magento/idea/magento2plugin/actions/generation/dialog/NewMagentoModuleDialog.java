@@ -11,13 +11,14 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.NewModuleAction;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewMagentoModuleDialogValidator;
-import com.magento.idea.magento2plugin.actions.generation.generator.DirectoryGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.FileFromTemplateGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.data.ModuleDirectoriesData;
+import com.magento.idea.magento2plugin.actions.generation.util.NavigateToCreatedFile;
 import com.magento.idea.magento2plugin.magento.files.ComposerJson;
 import com.magento.idea.magento2plugin.magento.files.ModuleXml;
 import com.magento.idea.magento2plugin.magento.files.RegistrationPhp;
-import com.magento.idea.magento2plugin.magento.packages.MagentoPackages;
+import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,6 +42,7 @@ public class NewMagentoModuleDialog extends JDialog {
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final NewMagentoModuleDialogValidator validator;
     private final CamelCaseToHyphen camelCaseToHyphen;
+    private final NavigateToCreatedFile navigateToCreatedFile;
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -64,6 +66,7 @@ public class NewMagentoModuleDialog extends JDialog {
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         this.camelCaseToHyphen = CamelCaseToHyphen.getInstance();
         this.validator = NewMagentoModuleDialogValidator.getInstance(this);
+        this.navigateToCreatedFile = NavigateToCreatedFile.getInstance();
         detectPackageName(initialBaseDir);
         setContentPane(contentPane);
         setModal(true);
@@ -98,7 +101,7 @@ public class NewMagentoModuleDialog extends JDialog {
 
     private void detectPackageName(@NotNull PsiDirectory initialBaseDir) {
         PsiDirectory parentDir = initialBaseDir.getParent();
-        if (parentDir != null && parentDir.toString().endsWith(MagentoPackages.PACKAGES_ROOT)) {
+        if (parentDir != null && parentDir.toString().endsWith(Package.PACKAGES_ROOT)) {
             packageName.setVisible(false);
             packageNameLabel.setVisible(false);
             this.detectedPackageName = initialBaseDir.getName();
@@ -130,7 +133,9 @@ public class NewMagentoModuleDialog extends JDialog {
         if (registrationPhp == null) {
             return;
         }
-        fileFromTemplateGenerator.generate(ModuleXml.getInstance(), attributes, moduleDirectoriesData.getModuleEtcDirectory(), NewModuleAction.ACTION_NAME);
+        PsiFile moduleXml = fileFromTemplateGenerator.generate(ModuleXml.getInstance(), attributes, moduleDirectoriesData.getModuleEtcDirectory(), NewModuleAction.ACTION_NAME);
+
+        navigateToCreatedFile.navigate(project, moduleXml);
     }
 
     public String getPackageName() {

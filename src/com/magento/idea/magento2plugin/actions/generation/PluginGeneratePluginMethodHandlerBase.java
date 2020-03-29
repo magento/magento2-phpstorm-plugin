@@ -4,7 +4,6 @@
  */
 package com.magento.idea.magento2plugin.actions.generation;
 
-import com.intellij.application.options.CodeStyle;
 import com.intellij.codeInsight.hint.HintManager;
 import com.intellij.ide.util.MemberChooser;
 import com.intellij.lang.LanguageCodeInsightActionHandler;
@@ -16,14 +15,10 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
-import com.intellij.psi.codeStyle.CommonCodeStyleSettings;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.containers.ContainerUtil;
 import com.jetbrains.php.codeInsight.PhpCodeInsightUtil;
-import com.jetbrains.php.lang.PhpLangUtil;
-import com.jetbrains.php.lang.PhpLanguage;
 import com.jetbrains.php.lang.actions.PhpNamedElementNode;
-import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocComment;
 import com.jetbrains.php.lang.lexer.PhpTokenTypes;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.parser.PhpStubElementTypes;
@@ -34,17 +29,27 @@ import com.jetbrains.php.lang.psi.elements.*;
 import java.util.*;
 import com.magento.idea.magento2plugin.actions.generation.ImportReferences.PhpClassReferenceResolver;
 import com.magento.idea.magento2plugin.actions.generation.data.MagentoPluginMethodData;
+import com.magento.idea.magento2plugin.actions.generation.generator.MagentoPluginMethodsGenerator;
+import com.magento.idea.magento2plugin.actions.generation.util.CodeStyleSettings;
+import com.magento.idea.magento2plugin.actions.generation.util.CollectInsertedMethods;
+import com.magento.idea.magento2plugin.actions.generation.util.FillTextBufferWithPluginMethods;
+import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.magento.plugin.GetTargetClassNamesByPluginClassName;
+import com.magento.idea.magento2plugin.util.magento.plugin.IsPluginAllowedForMethod;
 import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class MagentoGeneratePluginMethodHandlerBase implements LanguageCodeInsightActionHandler {
+public abstract class PluginGeneratePluginMethodHandlerBase implements LanguageCodeInsightActionHandler {
+    private CollectInsertedMethods collectInsertedMethods;
     public String type;
+    public FillTextBufferWithPluginMethods fillTextBuffer;
 
-    public MagentoGeneratePluginMethodHandlerBase(MagentoPluginMethodData.Type type) {
+    public PluginGeneratePluginMethodHandlerBase(Plugin.PluginType type) {
         this.type = type.toString();
+        this.fillTextBuffer = FillTextBufferWithPluginMethods.getInstance();
+        this.collectInsertedMethods = CollectInsertedMethods.getInstance();
     }
 
     public boolean isValidFor(Editor editor, PsiFile file) {
@@ -61,14 +66,14 @@ public abstract class MagentoGeneratePluginMethodHandlerBase implements Language
         return !targetClassNames.isEmpty();
     }
 
-    public void invoke(@NotNull Project project, @NotNull Editor editor, @NotNull PsiFile file) {
-        PhpFile phpFile = (PhpFile)file;
-        PhpClass currentClass = PhpCodeEditUtil.findClassAtCaret(editor, phpFile);
-        Key<Object> targetClassKey = Key.create("original.target");
-        if (currentClass == null) {
+    public void invoke(@NotNull Project project, @NotNull Editor editor, @NotNull PsiFile pluginFile) {
+        PhpFile pluginPhpFile = (PhpFile)pluginFile;
+        PhpClass pluginClass = PhpCodeEditUtil.findClassAtCaret(editor, pluginPhpFile);
+        Key<Object> targetClassKey = Key.create(MagentoPluginMethodsGenerator.originalTargetKey);
+        if (pluginClass == null) {
             return;
         }
-        PhpNamedElementNode[] fieldsToShow = this.targetMethods(currentClass, targetClassKey);
+        PhpNamedElementNode[] fieldsToShow = this.targetMethods(pluginClass, targetClassKey);
         if (fieldsToShow.length == 0) {
             if (ApplicationManager.getApplication().isHeadlessEnvironment()) {
                 return;
@@ -76,83 +81,43 @@ public abstract class MagentoGeneratePluginMethodHandlerBase implements Language
             HintManager.getInstance().showErrorHint(editor, this.getErrorMessage());
             return;
         }
-        PhpNamedElementNode[] members = this.chooseMembers(fieldsToShow, true, file.getProject());
+        PhpNamedElementNode[] members = this.chooseMembers(fieldsToShow, true, pluginFile.getProject());
         if (members == null || members.length == 0) {
             return;
         }
-        int insertPos = getSuitableEditorPosition(editor, phpFile);
-        CommonCodeStyleSettings settings = CodeStyle.getLanguageSettings(file, PhpLanguage.INSTANCE);
-        boolean currLineBreaks = settings.KEEP_LINE_BREAKS;
-        int currBlankLines = settings.KEEP_BLANK_LINES_IN_CODE;
-        settings.KEEP_LINE_BREAKS = false;
-        settings.KEEP_BLANK_LINES_IN_CODE = 0;
+        int insertPos = getSuitableEditorPosition(editor, pluginPhpFile);
+
+        CodeStyleSettings codeStyleSettings = new CodeStyleSettings(pluginPhpFile);
+        codeStyleSettings.adjustBeforeWrite();
         ApplicationManager.getApplication().runWriteAction(() -> {
             Set<CharSequence> insertedMethodsNames = new THashSet();
             PhpClassReferenceResolver resolver = new PhpClassReferenceResolver();
             StringBuffer textBuf = new StringBuffer();
-            PhpPsiElement scope = PhpCodeInsightUtil.findScopeForUseOperator(currentClass);
+            PhpPsiElement scope = PhpCodeInsightUtil.findScopeForUseOperator(pluginClass);
 
             for (PhpNamedElementNode member : members) {
                 PsiElement method = member.getPsiElement();
-                MagentoPluginMethodData[] pluginMethods = this.createPluginMethods(currentClass, (Method) method, targetClassKey);
-                for (MagentoPluginMethodData pluginMethod : pluginMethods) {
-                    insertedMethodsNames.add(pluginMethod.getMethod().getName());
-                    PhpDocComment comment = pluginMethod.getDocComment();
-                    if (comment != null) {
-                        textBuf.append(comment.getText());
-                    }
-                    Method targetMethod = pluginMethod.getTargetMethod();
-                    Parameter[] parameters = targetMethod.getParameters();
-                    Collection<PsiElement> processElements = new ArrayList<>(Arrays.asList(parameters));
-                    resolver.processElements(processElements);
-                    PsiElement targetClass = (PsiElement) pluginMethod.getTargetMethod().getUserData(targetClassKey);
-                    resolver.processElement(targetClass);
-                    PhpReturnType returnType = targetMethod.getReturnType();
-                    if (returnType != null) {
-                        resolver.processElement(returnType);
-                    }
-
-                    textBuf.append('\n');
-                    textBuf.append(pluginMethod.getMethod().getText());
-                }
+                MagentoPluginMethodData[] pluginMethods = this.createPluginMethods(pluginClass, (Method) method, targetClassKey);
+                fillTextBuffer.execute(targetClassKey, insertedMethodsNames, resolver, textBuf, pluginMethods);
             }
 
-            if (textBuf.length() > 0 && insertPos >= 0) {
-                editor.getDocument().insertString(insertPos, textBuf);
-                int endPos = insertPos + textBuf.length();
-                CodeStyleManager.getInstance(project).reformatText(phpFile, insertPos, endPos);
-                PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument());
-            }
-            if (!insertedMethodsNames.isEmpty()) {
-                List<PsiElement> insertedMethods = collectInsertedMethods(file, currentClass.getNameCS(), insertedMethodsNames);
-                if (scope != null && insertedMethods != null) {
-                    resolver.importReferences(scope, insertedMethods);
-                }
-            }
+            insertPluginMethodsToFile(project, editor, pluginFile, pluginClass, insertPos, insertedMethodsNames, resolver, textBuf, scope);
         });
-        settings.KEEP_LINE_BREAKS = currLineBreaks;
-        settings.KEEP_BLANK_LINES_IN_CODE = currBlankLines;
+        codeStyleSettings.restore();
     }
 
-    @Nullable
-    private static List<PsiElement> collectInsertedMethods(@NotNull PsiFile file, @NotNull CharSequence className, @NotNull Set<CharSequence> methodNames) {
-        if (!(file instanceof PhpFile)) {
-            return null;
+    private void insertPluginMethodsToFile(@NotNull Project project, @NotNull Editor editor, @NotNull PsiFile pluginFile, PhpClass pluginClass, int insertPos, Set<CharSequence> insertedMethodsNames, PhpClassReferenceResolver resolver, StringBuffer textBuf, PhpPsiElement scope) {
+        if (textBuf.length() > 0 && insertPos >= 0) {
+            editor.getDocument().insertString(insertPos, textBuf);
+            int endPos = insertPos + textBuf.length();
+            CodeStyleManager.getInstance(project).reformatText(pluginFile, insertPos, endPos);
+            PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument());
         }
-        PhpClass phpClass = PhpPsiUtil.findClass((PhpFile) file, (aClass) -> PhpLangUtil.equalsClassNames(aClass.getNameCS(), className));
-        if (phpClass == null) {
-            return null;
-        } else {
-            List<PsiElement> insertedMethods = new ArrayList();
-            Method[] ownMethods = phpClass.getOwnMethods();
-
-            for (Method method : ownMethods) {
-                if (methodNames.contains(method.getNameCS())) {
-                    insertedMethods.add(method);
-                }
+        if (!insertedMethodsNames.isEmpty()) {
+            List<PsiElement> insertedMethods = collectInsertedMethods.execute(pluginFile, pluginClass.getNameCS(), insertedMethodsNames);
+            if (scope != null && insertedMethods != null) {
+                resolver.importReferences(scope, insertedMethods);
             }
-
-            return insertedMethods;
         }
     }
 
@@ -170,7 +135,7 @@ public abstract class MagentoGeneratePluginMethodHandlerBase implements Language
     protected PhpNamedElementNode[] chooseMembers(PhpNamedElementNode[] members, boolean allowEmptySelection, Project project) {
         PhpNamedElementNode[] nodes = fixOrderToBeAsOriginalFiles(members).toArray(new PhpNamedElementNode[members.length]);
         if (!ApplicationManager.getApplication().isHeadlessEnvironment()) {
-            MagentoGeneratePluginMethodHandlerBase.MyMemberChooser chooser = new MagentoGeneratePluginMethodHandlerBase.MyMemberChooser(nodes, allowEmptySelection, project);
+            PluginGeneratePluginMethodHandlerBase.MyMemberChooser chooser = new PluginGeneratePluginMethodHandlerBase.MyMemberChooser(nodes, allowEmptySelection, project);
             chooser.setTitle("Choose Methods");
             chooser.setCopyJavadocVisible(false);
             chooser.show();
@@ -198,7 +163,7 @@ public abstract class MagentoGeneratePluginMethodHandlerBase implements Language
 
             while(methodIterator.hasNext()) {
                 Method method = (Method) methodIterator.next();
-                if (method.getAccess().isPublic() && !method.isStatic() && !method.isFinal() && !pluginAlreadyHasMethod(phpClass, method)) {
+                if (IsPluginAllowedForMethod.getInstance().check(method) && !pluginAlreadyHasMethod(phpClass, method)) {
                     method.putUserData(targetClassKey, targetClass);
                     nodes.put(method.getName(), new PhpNamedElementNode(method));
                 }
@@ -212,7 +177,7 @@ public abstract class MagentoGeneratePluginMethodHandlerBase implements Language
     protected boolean pluginAlreadyHasMethod(@NotNull PhpClass currentClass, @NotNull Method method) {
         Collection<Method> currentMethods = currentClass.getMethods();
         String methodName = method.getName();
-        String methodPrefix = type.toLowerCase();
+        String methodPrefix = type;
         String methodSuffix = methodName.substring(0, 1).toUpperCase() + methodName.substring(1);
         String pluginMethodName = methodPrefix.concat(methodSuffix);
         for (Method currentMethod: currentMethods) {
