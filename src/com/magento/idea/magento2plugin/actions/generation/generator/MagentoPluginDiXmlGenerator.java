@@ -16,7 +16,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.*;
 import com.intellij.xml.util.XmlUtil;
 import com.jetbrains.php.lang.PhpLangUtil;
-import com.magento.idea.magento2plugin.actions.generation.MagentoCreateAPluginAction;
+import com.magento.idea.magento2plugin.actions.generation.CreateAPluginAction;
 import com.magento.idea.magento2plugin.actions.generation.data.MagentoPluginDiXmlData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
@@ -154,7 +154,7 @@ public class MagentoPluginDiXmlGenerator {
                 project
         );
         if (diXml == null) {
-            diXml = fileFromTemplateGenerator.generate(moduleDiXml, new Properties(), parentDirectory, MagentoCreateAPluginAction.ACTION_NAME);
+            diXml = fileFromTemplateGenerator.generate(moduleDiXml, new Properties(), parentDirectory, CreateAPluginAction.ACTION_NAME);
         }
         return diXml;
     }

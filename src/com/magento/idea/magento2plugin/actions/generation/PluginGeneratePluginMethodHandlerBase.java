@@ -41,12 +41,12 @@ import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class MagentoGeneratePluginMethodHandlerBase implements LanguageCodeInsightActionHandler {
+public abstract class PluginGeneratePluginMethodHandlerBase implements LanguageCodeInsightActionHandler {
     private CollectInsertedMethods collectInsertedMethods;
     public String type;
     public FillTextBufferWithPluginMethods fillTextBuffer;
 
-    public MagentoGeneratePluginMethodHandlerBase(Plugin.PluginType type) {
+    public PluginGeneratePluginMethodHandlerBase(Plugin.PluginType type) {
         this.type = type.toString();
         this.fillTextBuffer = FillTextBufferWithPluginMethods.getInstance();
         this.collectInsertedMethods = CollectInsertedMethods.getInstance();
@@ -137,7 +137,7 @@ public abstract class MagentoGeneratePluginMethodHandlerBase implements Language
     protected PhpNamedElementNode[] chooseMembers(PhpNamedElementNode[] members, boolean allowEmptySelection, Project project) {
         PhpNamedElementNode[] nodes = fixOrderToBeAsOriginalFiles(members).toArray(new PhpNamedElementNode[members.length]);
         if (!ApplicationManager.getApplication().isHeadlessEnvironment()) {
-            MagentoGeneratePluginMethodHandlerBase.MyMemberChooser chooser = new MagentoGeneratePluginMethodHandlerBase.MyMemberChooser(nodes, allowEmptySelection, project);
+            PluginGeneratePluginMethodHandlerBase.MyMemberChooser chooser = new PluginGeneratePluginMethodHandlerBase.MyMemberChooser(nodes, allowEmptySelection, project);
             chooser.setTitle("Choose Methods");
             chooser.setCopyJavadocVisible(false);
             chooser.show();

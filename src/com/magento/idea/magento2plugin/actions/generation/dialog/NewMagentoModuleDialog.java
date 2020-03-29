@@ -14,6 +14,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewMa
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.data.ModuleDirectoriesData;
+import com.magento.idea.magento2plugin.actions.generation.util.NavigateToCreatedFile;
 import com.magento.idea.magento2plugin.magento.files.ComposerJson;
 import com.magento.idea.magento2plugin.magento.files.ModuleXml;
 import com.magento.idea.magento2plugin.magento.files.RegistrationPhp;
@@ -41,6 +42,7 @@ public class NewMagentoModuleDialog extends JDialog {
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final NewMagentoModuleDialogValidator validator;
     private final CamelCaseToHyphen camelCaseToHyphen;
+    private final NavigateToCreatedFile navigateToCreatedFile;
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -64,6 +66,7 @@ public class NewMagentoModuleDialog extends JDialog {
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         this.camelCaseToHyphen = CamelCaseToHyphen.getInstance();
         this.validator = NewMagentoModuleDialogValidator.getInstance(this);
+        this.navigateToCreatedFile = NavigateToCreatedFile.getInstance();
         detectPackageName(initialBaseDir);
         setContentPane(contentPane);
         setModal(true);
@@ -130,7 +133,9 @@ public class NewMagentoModuleDialog extends JDialog {
         if (registrationPhp == null) {
             return;
         }
-        fileFromTemplateGenerator.generate(ModuleXml.getInstance(), attributes, moduleDirectoriesData.getModuleEtcDirectory(), NewModuleAction.ACTION_NAME);
+        PsiFile moduleXml = fileFromTemplateGenerator.generate(ModuleXml.getInstance(), attributes, moduleDirectoriesData.getModuleEtcDirectory(), NewModuleAction.ACTION_NAME);
+
+        navigateToCreatedFile.navigate(project, moduleXml);
     }
 
     public String getPackageName() {

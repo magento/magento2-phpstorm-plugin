@@ -40,15 +40,15 @@
     <actions>
         <group id="MagentoGenerateGroup">
             <action id="MagentoGenerateBeforeMethodAction"
-                    class="com.magento.idea.magento2plugin.actions.generation.MagentoGenerateBeforeMethodAction"
+                    class="com.magento.idea.magento2plugin.actions.generation.PluginGenerateBeforeMethodAction"
                     text="Magento Before Plugin..."
                     description="Create Magento before plugin method."/>
             <action id="MagentoGenerateAfterMethodAction"
-                    class="com.magento.idea.magento2plugin.actions.generation.MagentoGenerateAfterMethodAction"
+                    class="com.magento.idea.magento2plugin.actions.generation.PluginGenerateAfterMethodAction"
                     text="Magento After Plugin..."
                     description="Create Magento after plugin method."/>
             <action id="MagentoGenerateAroundMethodAction"
-                    class="com.magento.idea.magento2plugin.actions.generation.MagentoGenerateAroundMethodAction"
+                    class="com.magento.idea.magento2plugin.actions.generation.PluginGenerateAroundMethodAction"
                     text="Magento Around Plugin..."
                     description="Create Magento around plugin method."/>
             <add-to-group group-id="PhpGenerateGroup" anchor="last"/>
@@ -57,7 +57,7 @@
             <action id="Magento2NewModule" class="com.magento.idea.magento2plugin.actions.generation.NewModuleAction"/>
             <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewDir"/>
         </group>
-        <action id="MagentoCreateAPlugin.Menu" class="com.magento.idea.magento2plugin.actions.generation.MagentoCreateAPluginAction">
+        <action id="MagentoCreateAPlugin.Menu" class="com.magento.idea.magento2plugin.actions.generation.CreateAPluginAction">
             <add-to-group group-id="EditorPopupMenu"/>
         </action>
     </actions>

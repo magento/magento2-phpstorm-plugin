@@ -22,7 +22,7 @@ import com.magento.idea.magento2plugin.util.magento.plugin.IsPluginAllowedForMet
 import org.jetbrains.annotations.NotNull;
 import com.magento.idea.magento2plugin.project.Settings;
 
-public class MagentoCreateAPluginAction extends DumbAwareAction {
+public class CreateAPluginAction extends DumbAwareAction {
     public static String ACTION_NAME = "Create A Plugin...";
     public static String ACTION_DESCRIPTION = "Create a new Magento 2 plugin for the class";
     private final IsPluginAllowedForMethod isPluginAllowed;
@@ -30,7 +30,7 @@ public class MagentoCreateAPluginAction extends DumbAwareAction {
     private Method targetMethod;
     private PhpClass targetClass;
 
-    public MagentoCreateAPluginAction() {
+    public CreateAPluginAction() {
         super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
         this.isPluginAllowed = IsPluginAllowedForMethod.getInstance();
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();

@@ -17,8 +17,8 @@ import com.magento.idea.magento2plugin.actions.generation.generator.MagentoPlugi
 import com.magento.idea.magento2plugin.magento.files.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-public class MagentoGenerateAfterMethodAction extends CodeInsightAction {
-    private final MagentoGeneratePluginMethodHandlerBase myHandler = new MagentoGeneratePluginMethodHandlerBase(Plugin.PluginType.after) {
+public class PluginGenerateAfterMethodAction extends CodeInsightAction {
+    private final PluginGeneratePluginMethodHandlerBase myHandler = new PluginGeneratePluginMethodHandlerBase(Plugin.PluginType.after) {
         protected MagentoPluginMethodData[] createPluginMethods(PhpClass currentClass, Method method, Key<Object> targetClassKey) {
             return (new MagentoPluginMethodsGenerator(currentClass, method, targetClassKey)
                     .createPluginMethods(Plugin.PluginType.after));

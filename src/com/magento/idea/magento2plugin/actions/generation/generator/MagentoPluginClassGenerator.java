@@ -20,8 +20,8 @@ import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpPsiElement;
+import com.magento.idea.magento2plugin.actions.generation.CreateAPluginAction;
 import com.magento.idea.magento2plugin.actions.generation.ImportReferences.PhpClassReferenceResolver;
-import com.magento.idea.magento2plugin.actions.generation.MagentoCreateAPluginAction;
 import com.magento.idea.magento2plugin.actions.generation.data.MagentoPluginFileData;
 import com.magento.idea.magento2plugin.actions.generation.data.MagentoPluginMethodData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
@@ -141,7 +141,7 @@ public class MagentoPluginClassGenerator {
         }
 
         Properties attributes = getAttributes();
-        PsiFile pluginFile = fileFromTemplateGenerator.generate(Plugin.getInstance(pluginFileData.getPluginClassName()), attributes, parentDirectory, MagentoCreateAPluginAction.ACTION_NAME);
+        PsiFile pluginFile = fileFromTemplateGenerator.generate(Plugin.getInstance(pluginFileData.getPluginClassName()), attributes, parentDirectory, CreateAPluginAction.ACTION_NAME);
         if (pluginFile == null) {
             return null;
         }
