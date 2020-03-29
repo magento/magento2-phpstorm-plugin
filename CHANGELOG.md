@@ -10,6 +10,7 @@
     * Fixed support of 2020.* versions of IDE's
     * Create a New Magento 2 Module action
     * Code Inspection: Duplicated Observer Usage in events XML
+    * Code Inspection: Warning regarding Cacheable false attribute in default XML 
 
 0.3.0
 ============= 
