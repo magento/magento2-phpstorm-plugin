@@ -4,7 +4,6 @@
  */
 package com.magento.idea.magento2plugin.actions.generation;
 
-import com.intellij.application.options.CodeStyle;
 import com.intellij.codeInsight.hint.HintManager;
 import com.intellij.ide.util.MemberChooser;
 import com.intellij.lang.LanguageCodeInsightActionHandler;
@@ -16,11 +15,9 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
-import com.intellij.psi.codeStyle.CommonCodeStyleSettings;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.containers.ContainerUtil;
 import com.jetbrains.php.codeInsight.PhpCodeInsightUtil;
-import com.jetbrains.php.lang.PhpLanguage;
 import com.jetbrains.php.lang.actions.PhpNamedElementNode;
 import com.jetbrains.php.lang.lexer.PhpTokenTypes;
 import com.jetbrains.php.lang.parser.PhpElementTypes;

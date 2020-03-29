@@ -87,7 +87,9 @@
               </grid>
             </constraints>
             <properties>
+              <enabled value="false"/>
               <text value="Plugin"/>
+              <toolTipText value="Plugin directory path separated by slashes"/>
             </properties>
             <clientProperties>
               <html.disable class="java.lang.Boolean" value="true"/>
