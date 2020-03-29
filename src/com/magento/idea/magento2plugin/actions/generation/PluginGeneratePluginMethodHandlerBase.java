@@ -121,8 +121,6 @@ public abstract class PluginGeneratePluginMethodHandlerBase implements LanguageC
         }
     }
 
-
-
     protected abstract MagentoPluginMethodData[] createPluginMethods(PhpClass currentClass, Method method, Key<Object> targetClassKey);
 
     protected String getErrorMessage() {
