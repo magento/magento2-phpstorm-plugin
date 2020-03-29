@@ -16,14 +16,14 @@ import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.MagentoIcons;
-import com.magento.idea.magento2plugin.actions.generation.dialog.MagentoCreateAPluginDialog;
+import com.magento.idea.magento2plugin.actions.generation.dialog.CreateAPluginDialog;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.magento.plugin.IsPluginAllowedForMethod;
 import org.jetbrains.annotations.NotNull;
 import com.magento.idea.magento2plugin.project.Settings;
 
 public class MagentoCreateAPluginAction extends DumbAwareAction {
-    public static String ACTION_NAME = "Create A Magento 2 Plugin";
+    public static String ACTION_NAME = "Create A Plugin...";
     public static String ACTION_DESCRIPTION = "Create a new Magento 2 plugin for the class";
     private final IsPluginAllowedForMethod isPluginAllowed;
     private final GetFirstClassOfFile getFirstClassOfFile;
@@ -63,7 +63,7 @@ public class MagentoCreateAPluginAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        MagentoCreateAPluginDialog.open(e.getProject(), this.targetMethod, this.targetClass);
+        CreateAPluginDialog.open(e.getProject(), this.targetMethod, this.targetClass);
     }
 
     @Override

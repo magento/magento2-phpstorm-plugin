@@ -16,6 +16,7 @@ import com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class ModuleIndex {
@@ -59,6 +60,7 @@ public class ModuleIndex {
 
             allModulesList.add(moduleName);
         }
+        Collections.sort(allModulesList);
         return allModulesList;
     }
 

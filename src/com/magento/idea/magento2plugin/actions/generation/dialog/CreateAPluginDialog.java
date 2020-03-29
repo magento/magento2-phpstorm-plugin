@@ -9,7 +9,7 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.MagentoPluginDiXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.MagentoPluginFileData;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.MagentoCreateAPluginDialogValidator;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.CreateAPluginDialogValidator;
 import com.magento.idea.magento2plugin.actions.generation.generator.MagentoPluginClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.MagentoPluginDiXmlGenerator;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
@@ -23,13 +23,13 @@ import java.awt.event.*;
 import java.io.File;
 import java.util.List;
 
-public class MagentoCreateAPluginDialog extends JDialog {
+public class CreateAPluginDialog extends JDialog {
     @NotNull
     private final Project project;
     private Method targetMethod;
     private PhpClass targetClass;
     @NotNull
-    private final MagentoCreateAPluginDialogValidator validator;
+    private final CreateAPluginDialogValidator validator;
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -48,11 +48,11 @@ public class MagentoCreateAPluginDialog extends JDialog {
     private JTextField pluginSortOrder;
     private JLabel pluginSortOrderLabel;
 
-    public MagentoCreateAPluginDialog(@NotNull Project project, Method targetMethod, PhpClass targetClass) {
+    public CreateAPluginDialog(@NotNull Project project, Method targetMethod, PhpClass targetClass) {
         this.project = project;
         this.targetMethod = targetMethod;
         this.targetClass = targetClass;
-        this.validator = MagentoCreateAPluginDialogValidator.getInstance(this);
+        this.validator = CreateAPluginDialogValidator.getInstance(this);
 
         setContentPane(contentPane);
         setModal(true);
@@ -105,10 +105,10 @@ public class MagentoCreateAPluginDialog extends JDialog {
     }
 
     private void onOK() {
-        if (!validator.validate()) {
+        if (!validator.validate(project)) {
             return;
         }
-        MagentoPluginFileData magentoPluginFileData = new MagentoPluginFileData(
+        new MagentoPluginClassGenerator(new MagentoPluginFileData(
                 getPluginDirectory(),
                 getPluginClassName(),
                 getPluginType(),
@@ -117,29 +117,25 @@ public class MagentoCreateAPluginDialog extends JDialog {
                 targetMethod,
                 getPluginClassFqn(),
                 getNamespace()
-        );
-        MagentoPluginClassGenerator classGenerator = new MagentoPluginClassGenerator(magentoPluginFileData, project);
-        classGenerator.generate();
+        ), project).generate();
 
-        MagentoPluginDiXmlData magentoPluginDiXmlData = new MagentoPluginDiXmlData(
+        new MagentoPluginDiXmlGenerator(new MagentoPluginDiXmlData(
                 getPluginArea(),
                 getPluginModule(),
                 targetClass,
                 getPluginSortOrder(),
                 getPluginName(),
                 getPluginClassFqn()
-        );
-        MagentoPluginDiXmlGenerator diXmlGenerator = new MagentoPluginDiXmlGenerator(magentoPluginDiXmlData, project);
-        diXmlGenerator.generate();
+        ), project).generate();
 
         this.setVisible(false);
     }
 
-    private String getPluginName() {
+    public String getPluginName() {
         return this.pluginName.getText().trim();
     }
 
-    private String getPluginSortOrder() {
+    public String getPluginSortOrder() {
         return this.pluginSortOrder.getText().trim();
     }
 
@@ -168,7 +164,7 @@ public class MagentoCreateAPluginDialog extends JDialog {
     }
 
     public static void open(@NotNull Project project, Method targetMethod, PhpClass targetClass) {
-        MagentoCreateAPluginDialog dialog = new MagentoCreateAPluginDialog(project, targetMethod, targetClass);
+        CreateAPluginDialog dialog = new CreateAPluginDialog(project, targetMethod, targetClass);
         dialog.pack();
         dialog.setVisible(true);
     }

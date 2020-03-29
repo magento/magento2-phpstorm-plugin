@@ -32,7 +32,9 @@ import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
+import javax.swing.*;
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -64,15 +66,21 @@ public class MagentoPluginClassGenerator {
                 pluginClass = createPluginClass();
             }
             if (pluginClass == null) {
-                //Todo: consider
+                JOptionPane.showMessageDialog(null, "Plugin Class cant be created!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+
             Key<Object> targetClassKey = Key.create(MagentoPluginMethodsGenerator.originalTargetKey);
             Method targetMethod = pluginFileData.getTargetMethod();
             targetMethod.putUserData(targetClassKey, pluginFileData.getTargetClass());
             MagentoPluginMethodsGenerator pluginGenerator = new MagentoPluginMethodsGenerator(pluginClass, targetMethod, targetClassKey);
 
             MagentoPluginMethodData[] pluginMethodData = pluginGenerator.createPluginMethods(getPluginType());
+            if (checkIfMethodExist(pluginClass, pluginMethodData)){
+                JOptionPane.showMessageDialog(null, "Plugin method already exist!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             Set<CharSequence> insertedMethodsNames = new THashSet();
             PhpClassReferenceResolver resolver = new PhpClassReferenceResolver();
             StringBuffer textBuf = new StringBuffer();
@@ -104,6 +112,18 @@ public class MagentoPluginClassGenerator {
         });
     }
 
+    private boolean checkIfMethodExist(PhpClass pluginClass, MagentoPluginMethodData[] pluginMethodData) {
+        Collection<Method> currentPluginMethods = pluginClass.getMethods();
+        for (Method currentPluginMethod: currentPluginMethods) {
+            for (MagentoPluginMethodData pluginMethod: pluginMethodData) {
+                if (pluginMethod.getMethod().getName().equals(currentPluginMethod.getName())){
+                    continue;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
 
     private PhpClass createPluginClass() {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project).getModuleDirectoryByModuleName(getPluginModule());
