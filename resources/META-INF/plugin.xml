@@ -117,6 +117,13 @@
                          level="WARNING"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.ObserverDeclarationInspection"/>
 
+        <localInspection language="XML" groupPath="XML"
+                         shortName="CacheableFalseInDefaultLayoutInspection"
+                         displayName="Inspection for disabled cache site-wide"
+                         groupName="Magento 2"
+                         enabledByDefault="true" level="WARNING"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.CacheableFalseInDefaultLayoutInspection"/>
+
         <libraryRoot id=".phpstorm.meta.php" path=".phpstorm.meta.php/" runtime="false"/>
 
         <internalFileTemplate name="Magento Module Composer"/>
