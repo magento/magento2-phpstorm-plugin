@@ -123,7 +123,7 @@ public class PluginClassGenerator extends FileGenerator {
         Collection<Method> currentPluginMethods = pluginClass.getMethods();
         for (Method currentPluginMethod: currentPluginMethods) {
             for (PluginMethodData pluginMethod: pluginMethodData) {
-                if (pluginMethod.getMethod().getName().equals(currentPluginMethod.getName())){
+                if (!pluginMethod.getMethod().getName().equals(currentPluginMethod.getName())){
                     continue;
                 }
                 return true;
