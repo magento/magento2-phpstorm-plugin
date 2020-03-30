@@ -10,14 +10,16 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.NewModuleAction;
+import com.magento.idea.magento2plugin.actions.generation.data.ModuleComposerJsonData;
+import com.magento.idea.magento2plugin.actions.generation.data.ModuleRegistrationPhpData;
+import com.magento.idea.magento2plugin.actions.generation.data.ModuleXmlData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewMagentoModuleDialogValidator;
+import com.magento.idea.magento2plugin.actions.generation.generator.ModuleComposerJsonGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.ModuleRegistrationPhpGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.ModuleXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.data.ModuleDirectoriesData;
 import com.magento.idea.magento2plugin.actions.generation.util.NavigateToCreatedFile;
-import com.magento.idea.magento2plugin.magento.files.ComposerJson;
-import com.magento.idea.magento2plugin.magento.files.ModuleXml;
-import com.magento.idea.magento2plugin.magento.files.RegistrationPhp;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +27,6 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Properties;
 
 public class NewMagentoModuleDialog extends JDialog {
     @NotNull
@@ -122,20 +123,47 @@ public class NewMagentoModuleDialog extends JDialog {
     }
 
     private void generateFiles() {
-        PsiDirectory baseDir = detectedPackageName != null ? this.initialBaseDir.getParent() : this.initialBaseDir;
-        ModuleDirectoriesData moduleDirectoriesData = directoryGenerator.createModuleDirectories(getPackageName(), getModuleName(), baseDir);
-        Properties attributes = getAttributes();
-        PsiFile composerJson = fileFromTemplateGenerator.generate(ComposerJson.getInstance(), attributes, moduleDirectoriesData.getModuleDirectory(), NewModuleAction.ACTION_NAME);
+        PsiFile composerJson = generateComposerJson();
         if (composerJson == null) {
             return;
         }
-        PsiFile registrationPhp = fileFromTemplateGenerator.generate(RegistrationPhp.getInstance(), attributes, moduleDirectoriesData.getModuleDirectory(), NewModuleAction.ACTION_NAME);
+
+        PsiFile registrationPhp = generateRegistrationPhp();
         if (registrationPhp == null) {
             return;
         }
-        PsiFile moduleXml = fileFromTemplateGenerator.generate(ModuleXml.getInstance(), attributes, moduleDirectoriesData.getModuleEtcDirectory(), NewModuleAction.ACTION_NAME);
+        generateModuleXml();
+    }
 
-        navigateToCreatedFile.navigate(project, moduleXml);
+    private PsiFile generateComposerJson() {
+        return new ModuleComposerJsonGenerator(new ModuleComposerJsonData(
+                getPackageName(),
+                getModuleName(),
+                getBaseDir(),
+                getModuleDescription(),
+                getComposerPackageName(),
+                getModuleVersion()
+        ), project).generate(NewModuleAction.ACTION_NAME);
+    }
+
+    private PsiFile generateRegistrationPhp() {
+        return new ModuleRegistrationPhpGenerator(new ModuleRegistrationPhpData(
+                    getPackageName(),
+                    getModuleName(),
+                    getBaseDir()
+            ), project).generate(NewModuleAction.ACTION_NAME);
+    }
+
+    private void generateModuleXml() {
+        new ModuleXmlGenerator(new ModuleXmlData(
+                getPackageName(),
+                getModuleName(),
+                getBaseDir()
+        ), project).generate(NewModuleAction.ACTION_NAME, true);
+    }
+
+    private PsiDirectory getBaseDir() {
+        return detectedPackageName != null ? this.initialBaseDir.getParent() : this.initialBaseDir;
     }
 
     public String getPackageName() {
@@ -165,20 +193,6 @@ public class NewMagentoModuleDialog extends JDialog {
         NewMagentoModuleDialog dialog = new NewMagentoModuleDialog(project, initialBaseDir, file, view, editor);
         dialog.pack();
         dialog.setVisible(true);
-    }
-
-    private Properties getAttributes() {
-        Properties attributes = new Properties();
-        this.fillAttributes(attributes);
-        return attributes;
-    }
-
-    private void fillAttributes(Properties attributes) {
-        attributes.setProperty("PACKAGE", getPackageName());
-        attributes.setProperty("MODULE_NAME", getModuleName());
-        attributes.setProperty("MODULE_DESCRIPTION", getModuleDescription());
-        attributes.setProperty("COMPOSER_PACKAGE_NAME", getComposerPackageName());
-        attributes.setProperty("MODULE_VERSION", getModuleVersion());
     }
 
     @NotNull

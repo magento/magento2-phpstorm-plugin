@@ -28,8 +28,8 @@ import com.jetbrains.php.lang.psi.PhpPsiUtil;
 import com.jetbrains.php.lang.psi.elements.*;
 import java.util.*;
 import com.magento.idea.magento2plugin.actions.generation.ImportReferences.PhpClassReferenceResolver;
-import com.magento.idea.magento2plugin.actions.generation.data.MagentoPluginMethodData;
-import com.magento.idea.magento2plugin.actions.generation.generator.MagentoPluginMethodsGenerator;
+import com.magento.idea.magento2plugin.actions.generation.data.code.PluginMethodData;
+import com.magento.idea.magento2plugin.actions.generation.generator.code.PluginMethodsGenerator;
 import com.magento.idea.magento2plugin.actions.generation.util.CodeStyleSettings;
 import com.magento.idea.magento2plugin.actions.generation.util.CollectInsertedMethods;
 import com.magento.idea.magento2plugin.actions.generation.util.FillTextBufferWithPluginMethods;
@@ -41,12 +41,12 @@ import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class PluginGeneratePluginMethodHandlerBase implements LanguageCodeInsightActionHandler {
+public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeInsightActionHandler {
     private CollectInsertedMethods collectInsertedMethods;
     public String type;
     public FillTextBufferWithPluginMethods fillTextBuffer;
 
-    public PluginGeneratePluginMethodHandlerBase(Plugin.PluginType type) {
+    public PluginGenerateMethodHandlerBase(Plugin.PluginType type) {
         this.type = type.toString();
         this.fillTextBuffer = FillTextBufferWithPluginMethods.getInstance();
         this.collectInsertedMethods = CollectInsertedMethods.getInstance();
@@ -69,7 +69,7 @@ public abstract class PluginGeneratePluginMethodHandlerBase implements LanguageC
     public void invoke(@NotNull Project project, @NotNull Editor editor, @NotNull PsiFile pluginFile) {
         PhpFile pluginPhpFile = (PhpFile)pluginFile;
         PhpClass pluginClass = PhpCodeEditUtil.findClassAtCaret(editor, pluginPhpFile);
-        Key<Object> targetClassKey = Key.create(MagentoPluginMethodsGenerator.originalTargetKey);
+        Key<Object> targetClassKey = Key.create(PluginMethodsGenerator.originalTargetKey);
         if (pluginClass == null) {
             return;
         }
@@ -97,7 +97,7 @@ public abstract class PluginGeneratePluginMethodHandlerBase implements LanguageC
 
             for (PhpNamedElementNode member : members) {
                 PsiElement method = member.getPsiElement();
-                MagentoPluginMethodData[] pluginMethods = this.createPluginMethods(pluginClass, (Method) method, targetClassKey);
+                PluginMethodData[] pluginMethods = this.createPluginMethods(pluginClass, (Method) method, targetClassKey);
                 fillTextBuffer.execute(targetClassKey, insertedMethodsNames, resolver, textBuf, pluginMethods);
             }
 
@@ -121,7 +121,7 @@ public abstract class PluginGeneratePluginMethodHandlerBase implements LanguageC
         }
     }
 
-    protected abstract MagentoPluginMethodData[] createPluginMethods(PhpClass currentClass, Method method, Key<Object> targetClassKey);
+    protected abstract PluginMethodData[] createPluginMethods(PhpClass currentClass, Method method, Key<Object> targetClassKey);
 
     protected String getErrorMessage() {
         return "No methods to generate";
@@ -135,7 +135,7 @@ public abstract class PluginGeneratePluginMethodHandlerBase implements LanguageC
     protected PhpNamedElementNode[] chooseMembers(PhpNamedElementNode[] members, boolean allowEmptySelection, Project project) {
         PhpNamedElementNode[] nodes = fixOrderToBeAsOriginalFiles(members).toArray(new PhpNamedElementNode[members.length]);
         if (!ApplicationManager.getApplication().isHeadlessEnvironment()) {
-            PluginGeneratePluginMethodHandlerBase.MyMemberChooser chooser = new PluginGeneratePluginMethodHandlerBase.MyMemberChooser(nodes, allowEmptySelection, project);
+            PluginGenerateMethodHandlerBase.MyMemberChooser chooser = new PluginGenerateMethodHandlerBase.MyMemberChooser(nodes, allowEmptySelection, project);
             chooser.setTitle("Choose Methods");
             chooser.setCopyJavadocVisible(false);
             chooser.show();

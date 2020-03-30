@@ -6,7 +6,7 @@ package com.magento.idea.magento2plugin.actions.generation.data;
 
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 
-public class MagentoPluginDiXmlData {
+public class PluginDiXmlData {
     private String area;
     private String pluginModule;
     private PhpClass targetClass;
@@ -14,7 +14,7 @@ public class MagentoPluginDiXmlData {
     private final String pluginName;
     private String pluginFqn;
 
-    public MagentoPluginDiXmlData(
+    public PluginDiXmlData(
             String area,
             String pluginModule,
             PhpClass targetClass,

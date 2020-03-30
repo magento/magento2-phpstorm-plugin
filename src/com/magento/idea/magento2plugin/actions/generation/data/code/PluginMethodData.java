@@ -2,17 +2,17 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
-package com.magento.idea.magento2plugin.actions.generation.data;
+package com.magento.idea.magento2plugin.actions.generation.data.code;
 
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocComment;
 import com.jetbrains.php.lang.psi.elements.Method;
 
-public class MagentoPluginMethodData {
+public class PluginMethodData {
     private final PhpDocComment docComment;
     private final Method method;
     private final Method targetMethod;
 
-    public MagentoPluginMethodData(Method targetMethod, PhpDocComment docComment, Method method) {
+    public PluginMethodData(Method targetMethod, PhpDocComment docComment, Method method) {
         super();
         this.docComment = docComment;
         this.method = method;

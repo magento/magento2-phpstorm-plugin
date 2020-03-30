@@ -2,7 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
-package com.magento.idea.magento2plugin.actions.generation.generator;
+package com.magento.idea.magento2plugin.actions.generation.generator.code;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
@@ -15,14 +15,14 @@ import com.jetbrains.php.lang.documentation.phpdoc.PhpDocUtil;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocComment;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
-import com.magento.idea.magento2plugin.actions.generation.data.MagentoPluginMethodData;
+import com.magento.idea.magento2plugin.actions.generation.data.code.PluginMethodData;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.regex.Pattern;
 
-public class MagentoPluginMethodsGenerator {
+public class PluginMethodsGenerator {
     public static String originalTargetKey = "original.target";
     @NotNull
     private final PhpClass pluginClass;
@@ -31,7 +31,7 @@ public class MagentoPluginMethodsGenerator {
     @NotNull
     private final PhpClass myTargetClass;
 
-    public MagentoPluginMethodsGenerator(@NotNull PhpClass pluginClass, @NotNull Method method, Key<Object> targetClassKey) {
+    public PluginMethodsGenerator(@NotNull PhpClass pluginClass, @NotNull Method method, Key<Object> targetClassKey) {
         super();
         this.pluginClass = pluginClass;
         this.myMethod = method;
@@ -39,8 +39,8 @@ public class MagentoPluginMethodsGenerator {
     }
 
     @NotNull
-    public MagentoPluginMethodData[] createPluginMethods(@NotNull Plugin.PluginType type) {
-        List<MagentoPluginMethodData> pluginMethods = new ArrayList();
+    public PluginMethodData[] createPluginMethods(@NotNull Plugin.PluginType type) {
+        List<PluginMethodData> pluginMethods = new ArrayList();
         String templateName = Plugin.getMethodTemplateByPluginType(type);
         PhpClass currentClass = this.pluginClass;
         if (currentClass != null) {
@@ -54,14 +54,14 @@ public class MagentoPluginMethodsGenerator {
                     if (child instanceof PhpDocComment) {
                         currDocComment = (PhpDocComment)child;
                     } else if (child instanceof Method) {
-                        pluginMethods.add(new MagentoPluginMethodData(myMethod, currDocComment, (Method)child));
+                        pluginMethods.add(new PluginMethodData(myMethod, currDocComment, (Method)child));
                         currDocComment = null;
                     }
                 }
             }
         }
 
-        return pluginMethods.toArray(new MagentoPluginMethodData[0]);
+        return pluginMethods.toArray(new PluginMethodData[0]);
     }
 
     private Properties getAccessMethodAttributes(@Nullable PhpPsiElement scopeForUseOperator, @NotNull Plugin.PluginType type) {

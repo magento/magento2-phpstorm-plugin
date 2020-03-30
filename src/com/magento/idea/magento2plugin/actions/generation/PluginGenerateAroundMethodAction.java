@@ -12,15 +12,15 @@ import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.magento.idea.magento2plugin.actions.generation.data.MagentoPluginMethodData;
-import com.magento.idea.magento2plugin.actions.generation.generator.MagentoPluginMethodsGenerator;
+import com.magento.idea.magento2plugin.actions.generation.data.code.PluginMethodData;
+import com.magento.idea.magento2plugin.actions.generation.generator.code.PluginMethodsGenerator;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 public class PluginGenerateAroundMethodAction extends CodeInsightAction {
-    private final PluginGeneratePluginMethodHandlerBase myHandler = new PluginGeneratePluginMethodHandlerBase(Plugin.PluginType.around) {
-        protected MagentoPluginMethodData[] createPluginMethods(PhpClass currentClass, Method method, Key<Object> targetClassKey) {
-            return (new MagentoPluginMethodsGenerator(currentClass, method, targetClassKey)
+    private final PluginGenerateMethodHandlerBase myHandler = new PluginGenerateMethodHandlerBase(Plugin.PluginType.around) {
+        protected PluginMethodData[] createPluginMethods(PhpClass currentClass, Method method, Key<Object> targetClassKey) {
+            return (new PluginMethodsGenerator(currentClass, method, targetClassKey)
                     .createPluginMethods(Plugin.PluginType.around));
         }
     };

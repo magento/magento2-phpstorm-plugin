@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.generator.util;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.actions.generation.generator.data.ModuleDirectoriesData;
+import com.magento.idea.magento2plugin.magento.packages.Package;
 import org.jetbrains.annotations.NotNull;
 
 public class DirectoryGenerator {
@@ -19,10 +20,10 @@ public class DirectoryGenerator {
         return INSTANCE;
     }
 
-    public ModuleDirectoriesData createModuleDirectories(@NotNull String packageName, @NotNull String moduleName, @NotNull PsiDirectory baseDirectory){
+    public ModuleDirectoriesData createOrFindModuleDirectories(@NotNull String packageName, @NotNull String moduleName, @NotNull PsiDirectory baseDirectory){
         PsiDirectory packageDirectory = findOrCreateSubdirectory(baseDirectory, packageName);
         PsiDirectory moduleDirectory = findOrCreateSubdirectory(packageDirectory, moduleName);
-        PsiDirectory moduleEtcDirectory = findOrCreateSubdirectory(moduleDirectory, "etc");
+        PsiDirectory moduleEtcDirectory = findOrCreateSubdirectory(moduleDirectory, Package.MODULE_BASE_AREA_DIR);
         return new ModuleDirectoriesData(moduleDirectory, moduleEtcDirectory);
     }
 
