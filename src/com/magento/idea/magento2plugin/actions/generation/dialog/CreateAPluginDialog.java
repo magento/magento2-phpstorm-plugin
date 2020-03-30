@@ -7,11 +7,12 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.magento.idea.magento2plugin.actions.generation.data.MagentoPluginDiXmlData;
-import com.magento.idea.magento2plugin.actions.generation.data.MagentoPluginFileData;
+import com.magento.idea.magento2plugin.actions.generation.CreateAPluginAction;
+import com.magento.idea.magento2plugin.actions.generation.data.PluginDiXmlData;
+import com.magento.idea.magento2plugin.actions.generation.data.PluginFileData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.CreateAPluginDialogValidator;
-import com.magento.idea.magento2plugin.actions.generation.generator.MagentoPluginClassGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.MagentoPluginDiXmlGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.PluginClassGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.PluginDiXmlGenerator;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.magento.packages.Package;
@@ -108,7 +109,7 @@ public class CreateAPluginDialog extends JDialog {
         if (!validator.validate(project)) {
             return;
         }
-        new MagentoPluginClassGenerator(new MagentoPluginFileData(
+        new PluginClassGenerator(new PluginFileData(
                 getPluginDirectory(),
                 getPluginClassName(),
                 getPluginType(),
@@ -117,16 +118,16 @@ public class CreateAPluginDialog extends JDialog {
                 targetMethod,
                 getPluginClassFqn(),
                 getNamespace()
-        ), project).generate();
+        ), project).generate(CreateAPluginAction.ACTION_NAME, true);
 
-        new MagentoPluginDiXmlGenerator(new MagentoPluginDiXmlData(
+        new PluginDiXmlGenerator(new PluginDiXmlData(
                 getPluginArea(),
                 getPluginModule(),
                 targetClass,
                 getPluginSortOrder(),
                 getPluginName(),
                 getPluginClassFqn()
-        ), project).generate();
+        ), project).generate(CreateAPluginAction.ACTION_NAME);
 
         this.setVisible(false);
     }

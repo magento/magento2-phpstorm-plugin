@@ -20,16 +20,15 @@ import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpPsiElement;
-import com.magento.idea.magento2plugin.actions.generation.CreateAPluginAction;
 import com.magento.idea.magento2plugin.actions.generation.ImportReferences.PhpClassReferenceResolver;
-import com.magento.idea.magento2plugin.actions.generation.data.MagentoPluginFileData;
-import com.magento.idea.magento2plugin.actions.generation.data.MagentoPluginMethodData;
+import com.magento.idea.magento2plugin.actions.generation.data.PluginFileData;
+import com.magento.idea.magento2plugin.actions.generation.data.code.PluginMethodData;
+import com.magento.idea.magento2plugin.actions.generation.generator.code.PluginMethodsGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.util.CodeStyleSettings;
 import com.magento.idea.magento2plugin.actions.generation.util.CollectInsertedMethods;
 import com.magento.idea.magento2plugin.actions.generation.util.FillTextBufferWithPluginMethods;
-import com.magento.idea.magento2plugin.actions.generation.util.NavigateToCreatedFile;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
@@ -44,9 +43,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-public class MagentoPluginClassGenerator {
-    private final NavigateToCreatedFile navigateToCreatedFile;
-    private MagentoPluginFileData pluginFileData;
+public class PluginClassGenerator extends FileGenerator {
+    private PluginFileData pluginFileData;
     private Project project;
     private final FillTextBufferWithPluginMethods fillTextBuffer;
     private final CollectInsertedMethods collectInsertedMethods;
@@ -54,7 +52,8 @@ public class MagentoPluginClassGenerator {
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final GetFirstClassOfFile getFirstClassOfFile;
 
-    public MagentoPluginClassGenerator(@NotNull MagentoPluginFileData pluginFileData, Project project) {
+    public PluginClassGenerator(@NotNull PluginFileData pluginFileData, Project project) {
+        super(project);
         this.directoryGenerator = DirectoryGenerator.getInstance();
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
@@ -62,27 +61,27 @@ public class MagentoPluginClassGenerator {
         this.collectInsertedMethods = CollectInsertedMethods.getInstance();
         this.pluginFileData = pluginFileData;
         this.project = project;
-        this.navigateToCreatedFile = NavigateToCreatedFile.getInstance();
     }
 
-    public void generate()
+    public PsiFile generate(String actionName)
     {
+        final PsiFile[] pluginFile = {null};
         WriteCommandAction.runWriteCommandAction(project, () -> {
             PhpClass pluginClass = GetPhpClassByFQN.getInstance(project).execute(pluginFileData.getPluginFqn());
             if (pluginClass == null) {
-                pluginClass = createPluginClass();
+                pluginClass = createPluginClass(actionName);
             }
             if (pluginClass == null) {
                 JOptionPane.showMessageDialog(null, "Plugin Class cant be created!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            Key<Object> targetClassKey = Key.create(MagentoPluginMethodsGenerator.originalTargetKey);
+            Key<Object> targetClassKey = Key.create(PluginMethodsGenerator.originalTargetKey);
             Method targetMethod = pluginFileData.getTargetMethod();
             targetMethod.putUserData(targetClassKey, pluginFileData.getTargetClass());
-            MagentoPluginMethodsGenerator pluginGenerator = new MagentoPluginMethodsGenerator(pluginClass, targetMethod, targetClassKey);
+            PluginMethodsGenerator pluginGenerator = new PluginMethodsGenerator(pluginClass, targetMethod, targetClassKey);
 
-            MagentoPluginMethodData[] pluginMethodData = pluginGenerator.createPluginMethods(getPluginType());
+            PluginMethodData[] pluginMethodData = pluginGenerator.createPluginMethods(getPluginType());
             if (checkIfMethodExist(pluginClass, pluginMethodData)){
                 JOptionPane.showMessageDialog(null, "Plugin method already exist!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -94,8 +93,8 @@ public class MagentoPluginClassGenerator {
 
             fillTextBuffer.execute(targetClassKey, insertedMethodsNames, resolver, textBuf, pluginMethodData);
 
-            PsiFile pluginFile = pluginClass.getContainingFile();
-            CodeStyleSettings codeStyleSettings = new CodeStyleSettings((PhpFile) pluginFile);
+            pluginFile[0] = pluginClass.getContainingFile();
+            CodeStyleSettings codeStyleSettings = new CodeStyleSettings((PhpFile) pluginFile[0]);
             codeStyleSettings.adjustBeforeWrite();
 
             int insertPos = getInsertPos(pluginClass);
@@ -103,28 +102,28 @@ public class MagentoPluginClassGenerator {
 
             if (textBuf.length() > 0 && insertPos >= 0) {
                 PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(project);
-                Document document = psiDocumentManager.getDocument(pluginFile);
+                Document document = psiDocumentManager.getDocument(pluginFile[0]);
                 document.insertString(insertPos, textBuf);
                 int endPos = insertPos + textBuf.length() + 1;
-                CodeStyleManager.getInstance(project).reformatText(pluginFile, insertPos, endPos);
+                CodeStyleManager.getInstance(project).reformatText(pluginFile[0], insertPos, endPos);
                 psiDocumentManager.commitDocument(document);
             }
             if (!insertedMethodsNames.isEmpty()) {
-                List<PsiElement> insertedMethods = collectInsertedMethods.execute(pluginFile, pluginClass.getNameCS(), insertedMethodsNames);
+                List<PsiElement> insertedMethods = collectInsertedMethods.execute(pluginFile[0], pluginClass.getNameCS(), insertedMethodsNames);
                 if (scope != null && insertedMethods != null) {
                     resolver.importReferences(scope, insertedMethods);
                 }
             }
             codeStyleSettings.restore();
-            navigateToCreatedFile.navigate(project, pluginFile);
         });
+        return pluginFile[0];
     }
 
-    private boolean checkIfMethodExist(PhpClass pluginClass, MagentoPluginMethodData[] pluginMethodData) {
+    private boolean checkIfMethodExist(PhpClass pluginClass, PluginMethodData[] pluginMethodData) {
         Collection<Method> currentPluginMethods = pluginClass.getMethods();
         for (Method currentPluginMethod: currentPluginMethods) {
-            for (MagentoPluginMethodData pluginMethod: pluginMethodData) {
-                if (pluginMethod.getMethod().getName().equals(currentPluginMethod.getName())){
+            for (PluginMethodData pluginMethod: pluginMethodData) {
+                if (!pluginMethod.getMethod().getName().equals(currentPluginMethod.getName())){
                     continue;
                 }
                 return true;
@@ -133,7 +132,7 @@ public class MagentoPluginClassGenerator {
         return false;
     }
 
-    private PhpClass createPluginClass() {
+    private PhpClass createPluginClass(String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project).getModuleDirectoryByModuleName(getPluginModule());
         String[] pluginDirectories = pluginFileData.getPluginDirectory().split(File.separator);
         for (String pluginDirectory: pluginDirectories) {
@@ -141,20 +140,14 @@ public class MagentoPluginClassGenerator {
         }
 
         Properties attributes = getAttributes();
-        PsiFile pluginFile = fileFromTemplateGenerator.generate(Plugin.getInstance(pluginFileData.getPluginClassName()), attributes, parentDirectory, CreateAPluginAction.ACTION_NAME);
+        PsiFile pluginFile = fileFromTemplateGenerator.generate(Plugin.getInstance(pluginFileData.getPluginClassName()), attributes, parentDirectory, actionName);
         if (pluginFile == null) {
             return null;
         }
         return getFirstClassOfFile.execute((PhpFile) pluginFile);
     }
 
-    private Properties getAttributes() {
-        Properties attributes = new Properties();
-        this.fillAttributes(attributes);
-        return attributes;
-    }
-
-    private void fillAttributes(Properties attributes) {
+    protected void fillAttributes(Properties attributes) {
         attributes.setProperty("NAME", pluginFileData.getPluginClassName());
         attributes.setProperty("NAMESPACE", pluginFileData.getNamespace());
     }

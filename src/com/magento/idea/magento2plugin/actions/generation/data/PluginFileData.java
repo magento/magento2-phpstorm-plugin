@@ -7,7 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.data;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 
-public class MagentoPluginFileData {
+public class PluginFileData {
     private String pluginDirectory;
     private String pluginClassName;
     private String pluginType;
@@ -17,7 +17,7 @@ public class MagentoPluginFileData {
     private String pluginFqn;
     private String namespace;
 
-    public MagentoPluginFileData(
+    public PluginFileData(
             String pluginDirectory,
             String pluginClassName,
             String pluginType,

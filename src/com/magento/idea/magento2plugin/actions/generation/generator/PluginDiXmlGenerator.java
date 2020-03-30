@@ -16,8 +16,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.*;
 import com.intellij.xml.util.XmlUtil;
 import com.jetbrains.php.lang.PhpLangUtil;
-import com.magento.idea.magento2plugin.actions.generation.CreateAPluginAction;
-import com.magento.idea.magento2plugin.actions.generation.data.MagentoPluginDiXmlData;
+import com.magento.idea.magento2plugin.actions.generation.data.PluginDiXmlData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplate;
@@ -30,14 +29,16 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.*;
 
-public class MagentoPluginDiXmlGenerator {
+public class PluginDiXmlGenerator extends FileGenerator {
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final DirectoryGenerator directoryGenerator;
     private final GetCodeTemplate getCodeTemplate;
-    private MagentoPluginDiXmlData pluginFileData;
+    private PluginDiXmlData pluginFileData;
     private Project project;
+    private boolean isTypeDeclared;
 
-    public MagentoPluginDiXmlGenerator(@NotNull MagentoPluginDiXmlData pluginFileData, Project project) {
+    public PluginDiXmlGenerator(@NotNull PluginDiXmlData pluginFileData, Project project) {
+        super(project);
         this.pluginFileData = pluginFileData;
         this.project = project;
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
@@ -45,30 +46,29 @@ public class MagentoPluginDiXmlGenerator {
         this.getCodeTemplate = GetCodeTemplate.getInstance(project);
     }
 
-    public void generate()
+    public PsiFile generate(String actionName)
     {
-        PsiFile diXmlFile = findOrCreateDiXml();
+        PsiFile diXmlFile = findOrCreateDiXml(actionName);
         XmlAttributeValue typeAttributeValue = getTypeAttributeValue((XmlFile) diXmlFile);
         boolean isPluginDeclared = false;
-        boolean isTypeDeclared = false;
+        this.isTypeDeclared = false;
         if (typeAttributeValue != null) {
-            isTypeDeclared = true;
+            this.isTypeDeclared = true;
             isPluginDeclared = isPluginDeclared(typeAttributeValue);
         }
         if (isPluginDeclared) {
-            return;
+            return null;
         }
-        boolean finalIsTypeDeclared = isTypeDeclared;
         WriteCommandAction.runWriteCommandAction(project, () -> {
             StringBuffer textBuf = new StringBuffer();
             try {
-                textBuf.append(getCodeTemplate.execute(ModuleDiXml.TEMPLATE_PLUGIN, getAttributes(finalIsTypeDeclared)));
+                textBuf.append(getCodeTemplate.execute(ModuleDiXml.TEMPLATE_PLUGIN, getAttributes()));
             } catch (IOException e) {
                 e.printStackTrace();
                 return;
             }
 
-            int insertPos = finalIsTypeDeclared
+            int insertPos = isTypeDeclared
                     ? getEndPositionOfTag(PsiTreeUtil.getParentOfType(typeAttributeValue, XmlTag.class))
                     : getRootInsertPosition((XmlFile) diXmlFile);
             if (textBuf.length() > 0 && insertPos >= 0) {
@@ -80,6 +80,8 @@ public class MagentoPluginDiXmlGenerator {
                 psiDocumentManager.commitDocument(document);
             }
         });
+
+        return diXmlFile;
     }
 
     private boolean isPluginDeclared(XmlAttributeValue typeAttributeValue) {
@@ -120,13 +122,7 @@ public class MagentoPluginDiXmlGenerator {
         return null;
     }
 
-    private Properties getAttributes(boolean isTypeDeclared) {
-        Properties attributes = new Properties();
-        this.fillAttributes(attributes, isTypeDeclared);
-        return attributes;
-    }
-
-    private void fillAttributes(Properties attributes, boolean isTypeDeclared) {
+    protected void fillAttributes(Properties attributes) {
         if (!isTypeDeclared) {
             attributes.setProperty("TYPE", pluginFileData.getTargetClass().getPresentableFQN());
         }
@@ -136,7 +132,7 @@ public class MagentoPluginDiXmlGenerator {
         attributes.setProperty("SORT_ORDER", pluginFileData.getSortOrder());
     }
 
-    private PsiFile findOrCreateDiXml() {
+    private PsiFile findOrCreateDiXml(String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project).getModuleDirectoryByModuleName(pluginFileData.getPluginModule());
         ArrayList<String> pluginDirectories = new ArrayList<>();
         pluginDirectories.add(Package.MODULE_BASE_AREA_DIR);
@@ -154,7 +150,7 @@ public class MagentoPluginDiXmlGenerator {
                 project
         );
         if (diXml == null) {
-            diXml = fileFromTemplateGenerator.generate(moduleDiXml, new Properties(), parentDirectory, CreateAPluginAction.ACTION_NAME);
+            diXml = fileFromTemplateGenerator.generate(moduleDiXml, new Properties(), parentDirectory, actionName);
         }
         return diXml;
     }

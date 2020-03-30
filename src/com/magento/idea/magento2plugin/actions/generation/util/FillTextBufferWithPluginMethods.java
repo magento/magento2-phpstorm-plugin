@@ -11,7 +11,7 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpReturnType;
 import com.magento.idea.magento2plugin.actions.generation.ImportReferences.PhpClassReferenceResolver;
-import com.magento.idea.magento2plugin.actions.generation.data.MagentoPluginMethodData;
+import com.magento.idea.magento2plugin.actions.generation.data.code.PluginMethodData;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,8 +28,8 @@ public class FillTextBufferWithPluginMethods {
         return INSTANCE;
     }
 
-    public void execute(@NotNull Key<Object> targetClassKey, Set<CharSequence> insertedMethodsNames, @NotNull PhpClassReferenceResolver resolver, @NotNull StringBuffer textBuf, @NotNull MagentoPluginMethodData[] pluginMethods) {
-        for (MagentoPluginMethodData pluginMethod : pluginMethods) {
+    public void execute(@NotNull Key<Object> targetClassKey, Set<CharSequence> insertedMethodsNames, @NotNull PhpClassReferenceResolver resolver, @NotNull StringBuffer textBuf, @NotNull PluginMethodData[] pluginMethods) {
+        for (PluginMethodData pluginMethod : pluginMethods) {
             insertedMethodsNames.add(pluginMethod.getMethod().getName());
             PhpDocComment comment = pluginMethod.getDocComment();
             if (comment != null) {
