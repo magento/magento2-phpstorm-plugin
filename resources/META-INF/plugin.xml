@@ -1,0 +1,151 @@
+<!--
+/**
+ * Copyright © Dmytro Kvashnin. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<idea-plugin>
+    <id>com.magento.idea.magento2plugin</id>
+    <name>Magento PhpStorm</name>
+    <version>1.0.0</version>
+    <vendor url="https://github.com/magento/magento2-phpstorm-plugin">Magento Inc.</vendor>
+
+    <description><![CDATA[
+        Magento PhpStorm plugin, created to improve life-work balance while working with Magento 2
+    ]]></description>
+
+    <change-notes><![CDATA[
+        Please, find change notes
+        <a
+            href="https://github.com/magento/magento2-phpstorm-plugin/blob/master/CHANGELOG.md"
+            title="CHANGELOG.md"
+        >here</a>
+    ]]>
+
+    </change-notes>
+
+    <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
+    <idea-version since-build="193.6494.35"/>
+
+    <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
+    <depends>com.jetbrains.php</depends>
+    <depends>JavaScript</depends>
+    <depends>com.intellij.modules.platform</depends>
+    <depends optional="true" config-file="withJsGraphQl.xml">com.intellij.lang.jsgraphql</depends>
+
+    <actions>
+        <group id="MagentoGenerateGroup">
+            <action id="MagentoGenerateBeforeMethodAction"
+                    class="com.magento.idea.magento2plugin.actions.generation.PluginGenerateBeforeMethodAction"
+                    text="Magento Before Plugin..."
+                    description="Create Magento before plugin method."/>
+            <action id="MagentoGenerateAfterMethodAction"
+                    class="com.magento.idea.magento2plugin.actions.generation.PluginGenerateAfterMethodAction"
+                    text="Magento After Plugin..."
+                    description="Create Magento after plugin method."/>
+            <action id="MagentoGenerateAroundMethodAction"
+                    class="com.magento.idea.magento2plugin.actions.generation.PluginGenerateAroundMethodAction"
+                    text="Magento Around Plugin..."
+                    description="Create Magento around plugin method."/>
+            <add-to-group group-id="PhpGenerateGroup" anchor="last"/>
+        </group>
+        <group id="MagentoNewGroup">
+            <action id="Magento2NewModule" class="com.magento.idea.magento2plugin.actions.generation.NewModuleAction"/>
+            <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewDir"/>
+        </group>
+        <action id="MagentoCreateAPlugin.Menu" class="com.magento.idea.magento2plugin.actions.generation.CreateAPluginAction">
+            <add-to-group group-id="EditorPopupMenu"/>
+        </action>
+        <action id="OverrideClassByAPreference.Menu" class="com.magento.idea.magento2plugin.actions.generation.OverrideClassByAPreferenceAction">
+            <add-to-group group-id="EditorPopupMenu"/>
+        </action>
+    </actions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <projectConfigurable instance="com.magento.idea.magento2plugin.project.SettingsForm"
+                             id="Magento2.SettingsForm"
+                             displayName="Magento"
+                             nonDefaultProject="true"
+                             groupId="language"
+                             parentId="reference.webide.settings.project.settings.php"
+        />
+        <projectService serviceImplementation="com.magento.idea.magento2plugin.project.Settings"/>
+
+        <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.completion.xml.XmlCompletionContributor" />
+
+        <psi.referenceContributor language="XML" implementation="com.magento.idea.magento2plugin.reference.xml.XmlReferenceContributor"/>
+        <psi.referenceContributor language="PHP" implementation="com.magento.idea.magento2plugin.reference.php.PhpReferenceContributor"/>
+        <psi.referenceContributor language="JavaScript" implementation="com.magento.idea.magento2plugin.reference.js.JsReferenceContributor"/>
+
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.EventObserverIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.EventNameIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.VirtualTypeIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.PluginIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.BlockNameIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ContainerNameIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.WebApiTypeIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ModulePackageIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.PhpClassNameIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.SectionIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.ActionGroupIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.DataIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.PageIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.StepKeyIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex" />
+
+        <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.PluginLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.ClassConfigurationLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.WebApiLineMarkerProvider"/>
+
+        <directoryProjectConfigurator implementation="com.magento.idea.magento2plugin.project.ProjectDetector"/>
+
+        <localInspection language="PHP" groupPath="PHP"
+                         shortName="PluginInspection" displayName="Inspection for the Plugin declaration"
+                         groupName="Magento 2"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.php.PluginInspection"/>
+
+        <localInspection language="XML" groupPath="XML"
+                         shortName="ObserverDeclarationInspection"
+                         displayName="Duplicated Observer Usage in events XML"
+                         groupName="Magento 2"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.ObserverDeclarationInspection"/>
+
+        <localInspection language="XML" groupPath="XML"
+                         shortName="CacheableFalseInDefaultLayoutInspection"
+                         displayName="Inspection for disabled cache site-wide"
+                         groupName="Magento 2"
+                         enabledByDefault="true" level="WARNING"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.CacheableFalseInDefaultLayoutInspection"/>
+
+        <libraryRoot id=".phpstorm.meta.php" path=".phpstorm.meta.php/" runtime="false"/>
+
+        <internalFileTemplate name="Magento Module Composer"/>
+        <internalFileTemplate name="Magento Module Registration Php"/>
+        <internalFileTemplate name="Magento Module Xml"/>
+        <internalFileTemplate name="Magento Module DI Xml"/>
+        <internalFileTemplate name="Magento Php Preference Class"/>
+    </extensions>
+
+    <application-components>
+        <!-- Add your application components here -->
+    </application-components>
+
+    <project-components>
+        <!-- Add your project components here -->
+    </project-components>
+
+    <actions>
+        <!-- Add your actions here -->
+    </actions>
+
+</idea-plugin>
