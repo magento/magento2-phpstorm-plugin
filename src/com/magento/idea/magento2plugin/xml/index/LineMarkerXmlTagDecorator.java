@@ -1,8 +1,11 @@
-package com.magento.idea.magento2plugin.xml.index;
+/**
+ * Copyright © Dmytro Kvashnin. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+package com.magento.idea.magento2plugin.xml;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
-import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
@@ -20,7 +23,6 @@ import com.intellij.psi.xml.XmlTagValue;
 import com.intellij.util.IncorrectOperationException;
 import com.intellij.xml.XmlElementDescriptor;
 import com.intellij.xml.XmlNSDescriptor;
-import com.magento.idea.magento2plugin.php.module.MagentoComponent;
 import com.magento.idea.magento2plugin.php.module.MagentoComponentManager;
 import com.magento.idea.magento2plugin.php.module.MagentoModule;
 import org.jetbrains.annotations.Contract;
@@ -61,7 +63,7 @@ abstract public class LineMarkerXmlTagDecorator implements XmlTag {
     }
 
     @NotNull
-    protected String getComponentName() {
+    private String getComponentName() {
         MagentoComponentManager moduleManager = MagentoComponentManager.getInstance(project);
         MagentoModule module = moduleManager.getComponentOfTypeForFile(xmlTag.getContainingFile(), MagentoModule.class);
 

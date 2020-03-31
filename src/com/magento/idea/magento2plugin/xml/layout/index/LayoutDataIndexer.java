@@ -1,28 +1,41 @@
-package com.magento.idea.magento2plugin.xml.layout.index;
+/**
+ * Copyright © Dmytro Kvashnin. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+package com.magento.idea.magento2plugin.stubs.indexes;
 
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.impl.source.xml.XmlDocumentImpl;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.xml.XmlDocument;
+import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.indexing.DataIndexer;
 import com.intellij.util.indexing.FileContent;
-import com.jetbrains.php.lang.PhpLangUtil;
-import com.magento.idea.magento2plugin.Settings;
+import com.magento.idea.magento2plugin.project.Settings;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Created by dkvashnin on 11/18/15.
  */
 public class LayoutDataIndexer implements DataIndexer<String, Void, FileContent> {
     private String indexTag;
+
     private String indexAttribute;
 
-    public LayoutDataIndexer(String indexTag, String indexAttribute) {
+    private Function<String, String> valueProcessor;
+
+    LayoutDataIndexer(String indexTag, String indexAttribute) {
         this.indexTag = indexTag;
         this.indexAttribute = indexAttribute;
+    }
+
+    LayoutDataIndexer(String indexTag, String indexAttribute, Function<String, String> valueProcessor) {
+        this(indexTag, indexAttribute);
+        this.valueProcessor = valueProcessor;
     }
 
     @NotNull
@@ -35,13 +48,17 @@ public class LayoutDataIndexer implements DataIndexer<String, Void, FileContent>
             return map;
         }
 
-        XmlDocumentImpl document = PsiTreeUtil.getChildOfType(psiFile, XmlDocumentImpl.class);
-        if(document == null) {
+        if (!(psiFile instanceof XmlFile)) {
+            return map;
+        }
+
+        XmlDocument document = ((XmlFile) psiFile).getDocument();
+        if (document == null) {
             return map;
         }
 
         XmlTag xmlTags[] = PsiTreeUtil.getChildrenOfType(psiFile.getFirstChild(), XmlTag.class);
-        if(xmlTags == null) {
+        if (xmlTags == null) {
             return map;
         }
 
@@ -54,10 +71,11 @@ public class LayoutDataIndexer implements DataIndexer<String, Void, FileContent>
 
     private void fillResultMap(XmlTag parentTag, Map<String, Void> resultMap) {
         for (XmlTag childTag: parentTag.getSubTags()) {
-            if (indexTag.equals(childTag.getName())) {
-                String attributeValue = childTag.getAttributeValue(this.indexAttribute);
+            if (childTag.getName().equals(indexTag)) {
+                String attributeValue = childTag.getAttributeValue(indexAttribute);
                 if (attributeValue != null) {
-                    resultMap.put(PhpLangUtil.toPresentableFQN(attributeValue), null);
+                    attributeValue = valueProcessor != null ? valueProcessor.apply(attributeValue) : attributeValue;
+                    resultMap.put(attributeValue, null);
                 }
             }
             fillResultMap(childTag, resultMap);
