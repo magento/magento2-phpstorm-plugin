@@ -3,9 +3,14 @@
   "version": "${MODULE_VERSION}",
   "description": "${MODULE_DESCRIPTION}",
   "type": "magento2-module",
-   #if (${DEPENDENCIES}) "require": {
-   ${DEPENDENCIES} }, #end
-#if (${LICENSE})   ${LICENSE}, #end
+  #if (${DEPENDENCIES})
+  "require": {
+    ${DEPENDENCIES}
+  },
+  #end
+  #if (${LICENSE})
+  ${LICENSE},
+  #end
   "autoload": {
     "files": [
       "registration.php"
