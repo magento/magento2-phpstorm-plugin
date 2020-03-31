@@ -11,7 +11,8 @@
     * Create a New Magento 2 Module action
     * Code Inspection: Duplicated Observer Usage in events XML
     * Create a Plugin class for a class public method action
-    * Code Inspection: Warning regarding Cacheable false attribute in default XML  
+    * Code Inspection: Warning regarding Cacheable false attribute in default XML
+    * Create a Preference for a class action
 
 0.3.0
 ============= 

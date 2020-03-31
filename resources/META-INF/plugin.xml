@@ -60,6 +60,9 @@
         <action id="MagentoCreateAPlugin.Menu" class="com.magento.idea.magento2plugin.actions.generation.CreateAPluginAction">
             <add-to-group group-id="EditorPopupMenu"/>
         </action>
+        <action id="OverrideClassByAPreference.Menu" class="com.magento.idea.magento2plugin.actions.generation.OverrideClassByAPreferenceAction">
+            <add-to-group group-id="EditorPopupMenu"/>
+        </action>
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -130,6 +133,7 @@
         <internalFileTemplate name="Magento Module Registration Php"/>
         <internalFileTemplate name="Magento Module Xml"/>
         <internalFileTemplate name="Magento Module DI Xml"/>
+        <internalFileTemplate name="Magento Php Preference Class"/>
     </extensions>
 
     <application-components>

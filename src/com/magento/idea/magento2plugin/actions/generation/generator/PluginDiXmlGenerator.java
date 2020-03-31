@@ -7,32 +7,26 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiDocumentManager;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.*;
-import com.intellij.xml.util.XmlUtil;
 import com.jetbrains.php.lang.PhpLangUtil;
 import com.magento.idea.magento2plugin.actions.generation.data.PluginDiXmlData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateDiXml;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplate;
-import com.magento.idea.magento2plugin.indexes.ModuleIndex;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.XmlFilePositionUtil;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
-import com.magento.idea.magento2plugin.magento.packages.Package;
-import com.magento.idea.magento2plugin.util.magento.FileBasedIndexUtil;
 import com.magento.idea.magento2plugin.xml.XmlPsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.*;
 
 public class PluginDiXmlGenerator extends FileGenerator {
-    private final FileFromTemplateGenerator fileFromTemplateGenerator;
-    private final DirectoryGenerator directoryGenerator;
     private final GetCodeTemplate getCodeTemplate;
+    private final FindOrCreateDiXml findOrCreateDiXml;
+    private final XmlFilePositionUtil positionUtil;
     private PluginDiXmlData pluginFileData;
     private Project project;
     private boolean isTypeDeclared;
@@ -41,14 +35,14 @@ public class PluginDiXmlGenerator extends FileGenerator {
         super(project);
         this.pluginFileData = pluginFileData;
         this.project = project;
-        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
-        this.directoryGenerator = DirectoryGenerator.getInstance();
         this.getCodeTemplate = GetCodeTemplate.getInstance(project);
+        this.findOrCreateDiXml = FindOrCreateDiXml.getInstance(project);
+        this.positionUtil = XmlFilePositionUtil.getInstance();
     }
 
     public PsiFile generate(String actionName)
     {
-        PsiFile diXmlFile = findOrCreateDiXml(actionName);
+        PsiFile diXmlFile = findOrCreateDiXml.execute(actionName, pluginFileData.getPluginModule(), pluginFileData.getArea());
         XmlAttributeValue typeAttributeValue = getTypeAttributeValue((XmlFile) diXmlFile);
         boolean isPluginDeclared = false;
         this.isTypeDeclared = false;
@@ -69,8 +63,8 @@ public class PluginDiXmlGenerator extends FileGenerator {
             }
 
             int insertPos = isTypeDeclared
-                    ? getEndPositionOfTag(PsiTreeUtil.getParentOfType(typeAttributeValue, XmlTag.class))
-                    : getRootInsertPosition((XmlFile) diXmlFile);
+                    ? positionUtil.getEndPositionOfTag(PsiTreeUtil.getParentOfType(typeAttributeValue, XmlTag.class))
+                    : positionUtil.getRootInsertPosition((XmlFile) diXmlFile);
             if (textBuf.length() > 0 && insertPos >= 0) {
                 PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(project);
                 Document document = psiDocumentManager.getDocument(diXmlFile);
@@ -130,50 +124,5 @@ public class PluginDiXmlGenerator extends FileGenerator {
         attributes.setProperty("PLUGIN_TYPE", pluginFileData.getPluginFqn());
         attributes.setProperty("PLUGIN_NAME", pluginFileData.getPluginName());
         attributes.setProperty("SORT_ORDER", pluginFileData.getSortOrder());
-    }
-
-    private PsiFile findOrCreateDiXml(String actionName) {
-        PsiDirectory parentDirectory = ModuleIndex.getInstance(project).getModuleDirectoryByModuleName(pluginFileData.getPluginModule());
-        ArrayList<String> pluginDirectories = new ArrayList<>();
-        pluginDirectories.add(Package.MODULE_BASE_AREA_DIR);
-        if (!getArea().equals(Package.Areas.base)) {
-            pluginDirectories.add(getArea().toString());
-        }
-        for (String pluginDirectory: pluginDirectories) {
-            parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, pluginDirectory);
-        }
-        ModuleDiXml moduleDiXml = new ModuleDiXml();
-        PsiFile diXml = FileBasedIndexUtil.findModuleConfigFile(
-                moduleDiXml.getFileName(),
-                getArea(),
-                pluginFileData.getPluginModule(),
-                project
-        );
-        if (diXml == null) {
-            diXml = fileFromTemplateGenerator.generate(moduleDiXml, new Properties(), parentDirectory, actionName);
-        }
-        return diXml;
-    }
-
-    public Package.Areas getArea() {
-        return Package.getAreaByString(pluginFileData.getArea());
-    }
-
-    private int getRootInsertPosition(XmlFile xmlFile) {
-        int insertPos = -1;
-        XmlTag rootTag = xmlFile.getRootTag();
-        if (rootTag == null) {
-            return insertPos;
-        }
-        return getEndPositionOfTag(rootTag);
-    }
-
-    private int getEndPositionOfTag(XmlTag tag) {
-        PsiElement tagEnd = XmlUtil.getTokenOfType(tag, XmlTokenType.XML_END_TAG_START);
-        if (tagEnd == null) {
-            return -1;
-        }
-
-        return tagEnd.getTextOffset();
     }
 }

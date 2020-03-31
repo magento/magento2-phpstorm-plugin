@@ -24,7 +24,7 @@ import java.awt.event.*;
 import java.io.File;
 import java.util.List;
 
-public class CreateAPluginDialog extends JDialog {
+public class CreateAPluginDialog extends AbstractDialog {
     @NotNull
     private final Project project;
     private Method targetMethod;
@@ -100,11 +100,6 @@ public class CreateAPluginDialog extends JDialog {
         }
     }
 
-    private void pushToMiddle() {
-        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        this.setLocation(dim.width / 2  -this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
-    }
-
     private void onOK() {
         if (!validator.validate(project)) {
             return;
@@ -158,10 +153,6 @@ public class CreateAPluginDialog extends JDialog {
 
     public String getPluginModule() {
         return this.pluginModule.getSelectedItem().toString();
-    }
-
-    private void onCancel() {
-        this.setVisible(false);
     }
 
     public static void open(@NotNull Project project, Method targetMethod, PhpClass targetClass) {

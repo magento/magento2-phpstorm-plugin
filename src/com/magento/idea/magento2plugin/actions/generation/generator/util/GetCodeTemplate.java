@@ -21,6 +21,7 @@ public class GetCodeTemplate {
 
         return INSTANCE;
     }
+
     GetCodeTemplate (Project project) {
         this.project = project;
     }

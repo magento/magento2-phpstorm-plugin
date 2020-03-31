@@ -28,7 +28,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class NewMagentoModuleDialog extends JDialog {
+public class NewMagentoModuleDialog extends AbstractDialog {
     @NotNull
     private final Project project;
     @NotNull
@@ -109,11 +109,6 @@ public class NewMagentoModuleDialog extends JDialog {
         }
     }
 
-    private void pushToMiddle() {
-        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        this.setLocation(dim.width / 2  -this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
-    }
-
     private void onOK() {
         if (!validator.validate()) {
             return;
@@ -183,10 +178,6 @@ public class NewMagentoModuleDialog extends JDialog {
 
     public String getModuleVersion() {
         return this.moduleVersion.getText().trim();
-    }
-
-    private void onCancel() {
-        this.setVisible(false);
     }
 
     public static void open(@NotNull Project project, @NotNull PsiDirectory initialBaseDir, @Nullable PsiFile file, @Nullable IdeView view, @Nullable Editor editor) {
