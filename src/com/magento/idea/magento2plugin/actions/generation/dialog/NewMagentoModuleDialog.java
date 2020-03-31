@@ -55,6 +55,8 @@ public class NewMagentoModuleDialog extends AbstractDialog {
     private JLabel moduleDescriptionLabel;
     private JTextField moduleVersion;
     private JLabel moduleVersionLabel;
+    private JList moduleLicense;
+    private JLabel moduleLicenseLabel;
     private String detectedPackageName;
 
     public NewMagentoModuleDialog(@NotNull Project project, @NotNull PsiDirectory initialBaseDir, @Nullable PsiFile file, @Nullable IdeView view, @Nullable Editor editor) {
@@ -73,6 +75,10 @@ public class NewMagentoModuleDialog extends AbstractDialog {
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
         pushToMiddle();
+
+        String licenses[] = {"license 1", "license 2"};
+
+        moduleLicense.setListData(licenses);
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -178,6 +184,10 @@ public class NewMagentoModuleDialog extends AbstractDialog {
 
     public String getModuleVersion() {
         return this.moduleVersion.getText().trim();
+    }
+
+    public List getModuleLicense() {
+        return (List) this.moduleLicense.getSelectedValuesList();
     }
 
     public static void open(@NotNull Project project, @NotNull PsiDirectory initialBaseDir, @Nullable PsiFile file, @Nullable IdeView view, @Nullable Editor editor) {

@@ -9,7 +9,9 @@
   },
   #end
   #if (${LICENSE})
-  ${LICENSE},
+  "license": [
+  ${LICENSE}
+  ],
   #end
   "autoload": {
     "files": [
