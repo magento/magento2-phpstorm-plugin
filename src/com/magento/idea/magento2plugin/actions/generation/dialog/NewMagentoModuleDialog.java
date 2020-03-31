@@ -27,6 +27,9 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
 
 public class NewMagentoModuleDialog extends AbstractDialog {
     @NotNull
@@ -57,7 +60,10 @@ public class NewMagentoModuleDialog extends AbstractDialog {
     private JLabel moduleVersionLabel;
     private JList moduleLicense;
     private JLabel moduleLicenseLabel;
+    private JTextField moduleLicenseCustom;
+    private JScrollPane moduleLicenseScrollPanel;
     private String detectedPackageName;
+    private String[] licensesNames;
 
     public NewMagentoModuleDialog(@NotNull Project project, @NotNull PsiDirectory initialBaseDir, @Nullable PsiFile file, @Nullable IdeView view, @Nullable Editor editor) {
         this.project = project;
@@ -70,15 +76,24 @@ public class NewMagentoModuleDialog extends AbstractDialog {
         this.camelCaseToHyphen = CamelCaseToHyphen.getInstance();
         this.validator = NewMagentoModuleDialogValidator.getInstance(this);
         this.navigateToCreatedFile = NavigateToCreatedFile.getInstance();
+
+        Package.License[] licenses = Package.License.values();
+        Vector licenseNames = new Vector<String>(licenses.length);
+
+        for (Package.License license: licenses) {
+//            licensesNames.push(license.getLicenseName());
+            licenseNames.add(license.getLicenseName());
+        }
+
+//        moduleLicense.setListData(licenses);
+        moduleLicense.setListData(licenseNames);
+        moduleLicense.setSelectedIndex(0);
+
         detectPackageName(initialBaseDir);
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
         pushToMiddle();
-
-        String licenses[] = {"license 1", "license 2"};
-
-        moduleLicense.setListData(licenses);
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -143,7 +158,8 @@ public class NewMagentoModuleDialog extends AbstractDialog {
                 getBaseDir(),
                 getModuleDescription(),
                 getComposerPackageName(),
-                getModuleVersion()
+                getModuleVersion(),
+                getModuleLicense()
         ), project).generate(NewModuleAction.ACTION_NAME);
     }
 
@@ -187,7 +203,7 @@ public class NewMagentoModuleDialog extends AbstractDialog {
     }
 
     public List getModuleLicense() {
-        return (List) this.moduleLicense.getSelectedValuesList();
+        return this.moduleLicense.getSelectedValuesList();
     }
 
     public static void open(@NotNull Project project, @NotNull PsiDirectory initialBaseDir, @Nullable PsiFile file, @Nullable IdeView view, @Nullable Editor editor) {
