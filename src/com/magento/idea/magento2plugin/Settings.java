@@ -1,4 +1,8 @@
-package com.magento.idea.magento2plugin;
+/**
+ * Copyright © Dmytro Kvashnin. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+package com.magento.idea.magento2plugin.project;
 
 import com.intellij.openapi.components.*;
 import com.intellij.openapi.project.Project;
@@ -26,14 +30,8 @@ public class Settings implements PersistentStateComponent<Settings> {
         XmlSerializerUtil.copyBean(settings, this);
     }
 
-    protected Project project;
-
     public static Settings getInstance(Project project) {
-        Settings settings = ServiceManager.getService(project, Settings.class);
-
-        settings.project = project;
-
-        return settings;
+        return ServiceManager.getService(project, Settings.class);
     }
 
     public static boolean isEnabled(@NotNull Project project) {

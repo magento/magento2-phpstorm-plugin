@@ -1,4 +1,8 @@
-package com.magento.idea.magento2plugin;
+/**
+ * Copyright © Dmytro Kvashnin. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+package com.magento.idea.magento2plugin.project;
 
 import com.intellij.javaee.ExternalResourceManager;
 import com.intellij.javaee.ExternalResourceManagerEx;
@@ -11,27 +15,29 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FilenameIndex;
+import com.magento.idea.magento2plugin.indexes.IndexManager;
 import com.magento.idea.magento2plugin.php.module.ComposerPackageModel;
 import com.magento.idea.magento2plugin.php.module.MagentoComponent;
 import com.magento.idea.magento2plugin.php.module.MagentoComponentManager;
 import com.magento.idea.magento2plugin.php.module.MagentoModule;
-import com.magento.idea.magento2plugin.util.IndexUtil;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.*;
+import java.util.Collection;
+import java.util.Stack;
 
 /**
  * Created by dkvashnin on 1/9/16.
  */
 public class SettingsForm implements Configurable {
-    private Project project;
+
+    private final static String DISPLAY_NAME = "Magento";
+
+    private final Project project;
     private JCheckBox pluginEnabled;
     private JButton buttonReindex;
     private JPanel panel1;
@@ -44,7 +50,7 @@ public class SettingsForm implements Configurable {
     @Nls
     @Override
     public String getDisplayName() {
-        return "Magento2 plugin";
+        return SettingsForm.DISPLAY_NAME;
     }
 
     @Nullable
@@ -76,7 +82,7 @@ public class SettingsForm implements Configurable {
     }
 
     private void reindex() {
-        IndexUtil.manualReindex();
+        IndexManager.manualReindex();
         MagentoComponentManager.getInstance(project).flushModules();
     }
 
