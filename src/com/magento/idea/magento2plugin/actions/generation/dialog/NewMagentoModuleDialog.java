@@ -25,13 +25,14 @@ import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-public class NewMagentoModuleDialog extends AbstractDialog {
+public class NewMagentoModuleDialog extends AbstractDialog implements ListSelectionListener {
     @NotNull
     private final Project project;
     @NotNull
@@ -63,7 +64,6 @@ public class NewMagentoModuleDialog extends AbstractDialog {
     private JTextField moduleLicenseCustom;
     private JScrollPane moduleLicenseScrollPanel;
     private String detectedPackageName;
-    private String[] licensesNames;
 
     public NewMagentoModuleDialog(@NotNull Project project, @NotNull PsiDirectory initialBaseDir, @Nullable PsiFile file, @Nullable IdeView view, @Nullable Editor editor) {
         this.project = project;
@@ -76,24 +76,15 @@ public class NewMagentoModuleDialog extends AbstractDialog {
         this.camelCaseToHyphen = CamelCaseToHyphen.getInstance();
         this.validator = NewMagentoModuleDialogValidator.getInstance(this);
         this.navigateToCreatedFile = NavigateToCreatedFile.getInstance();
-
-        Package.License[] licenses = Package.License.values();
-        Vector licenseNames = new Vector<String>(licenses.length);
-
-        for (Package.License license: licenses) {
-//            licensesNames.push(license.getLicenseName());
-            licenseNames.add(license.getLicenseName());
-        }
-
-//        moduleLicense.setListData(licenses);
-        moduleLicense.setListData(licenseNames);
-        moduleLicense.setSelectedIndex(0);
-
         detectPackageName(initialBaseDir);
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
         pushToMiddle();
+        setLicenses();
+
+        moduleLicenseCustom.setToolTipText("Custom License Name");
+        moduleLicenseCustom.setText("Custom License Name");
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -202,8 +193,25 @@ public class NewMagentoModuleDialog extends AbstractDialog {
         return this.moduleVersion.getText().trim();
     }
 
+    /**
+     * Retrieve selected licenses name for the module
+     *
+     * @return List
+     */
     public List getModuleLicense() {
-        return this.moduleLicense.getSelectedValuesList();
+        List selectedLicenses = this.moduleLicense.getSelectedValuesList();
+        Package.License customLicense = Package.License.CUSTOM;
+
+        /**
+         * When custom license is selected, the selected label "Custom License"
+         * must be replaced with the custom license name provided
+         */
+        if (selectedLicenses.contains(customLicense.getLicenseName())) {
+            selectedLicenses.remove(customLicense.getLicenseName());
+            selectedLicenses.add(moduleLicenseCustom.getText());
+        }
+
+        return selectedLicenses;
     }
 
     public static void open(@NotNull Project project, @NotNull PsiDirectory initialBaseDir, @Nullable PsiFile file, @Nullable IdeView view, @Nullable Editor editor) {
@@ -217,5 +225,44 @@ public class NewMagentoModuleDialog extends AbstractDialog {
         return camelCaseToHyphen.convert(getPackageName())
                 .concat("/")
                 .concat(camelCaseToHyphen.convert(getModuleName()));
+    }
+
+    /**
+     * Set licenses to select from
+     */
+    private void setLicenses() {
+        Package.License[] licenses = Package.License.values();
+        Vector<String> licenseNames = new Vector<>(licenses.length);
+
+        for (Package.License license: licenses) {
+            licenseNames.add(license.getLicenseName());
+        }
+
+        moduleLicense.setListData(licenseNames);
+        moduleLicense.setSelectedIndex(0);
+        moduleLicense.addListSelectionListener(this);
+    }
+
+    /**
+     * Make the Custom Module License input available when custom license is selected
+     */
+    private void handleModuleCustomLicenseInputVisibility () {
+        boolean isCustomLicenseSelected = false;
+
+        for (Object value: moduleLicense.getSelectedValuesList()) {
+            if (Package.License.CUSTOM.getLicenseName().equals(value.toString())) {
+                isCustomLicenseSelected = true;
+
+                break;
+            }
+        }
+
+        moduleLicenseCustom.setEnabled(isCustomLicenseSelected);
+        moduleLicenseCustom.setEditable(isCustomLicenseSelected);
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent listSelectionEvent) {
+        handleModuleCustomLicenseInputVisibility();
     }
 }

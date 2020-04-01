@@ -31,7 +31,8 @@ public class Package {
         GPL("GNU General Public License (GPL)"),
         BSDL("Berkeley Software Distribution License (BSDL)"),
         ASL("Apache Software License (ASL)"),
-        AFL("Academic Free License (AFL)");
+        AFL("Academic Free License (AFL)"),
+        CUSTOM("Custom License");
 
         private String licenseName;
 
