@@ -24,7 +24,5 @@ jobs:
       run: gradle wrapper
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: Build project
-      run: ./gradlew build
     - name: Run automated tests
-      run: ./gradlew test --stacktrace
+      run: ./gradlew build --stacktrace
