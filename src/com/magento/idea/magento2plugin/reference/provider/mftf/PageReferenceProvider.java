@@ -13,11 +13,9 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
-import com.magento.idea.magento2plugin.stubs.indexes.mftf.ActionGroupIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.mftf.PageIndex;
 import com.magento.idea.magento2plugin.xml.XmlPsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
-import sun.jvm.hotspot.debugger.Page;
 
 import java.util.ArrayList;
 import java.util.Collection;
