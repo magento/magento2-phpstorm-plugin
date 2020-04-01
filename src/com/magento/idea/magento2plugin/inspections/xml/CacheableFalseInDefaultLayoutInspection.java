@@ -15,11 +15,12 @@ import com.magento.idea.magento2plugin.magento.files.LayoutXml;
 import org.jetbrains.annotations.NotNull;
 
 public class CacheableFalseInDefaultLayoutInspection extends XmlSuppressableInspectionTool {
+    public static final String CacheDisableProblemDescription = "Cacheable false attribute on the default layout will disable cache site-wide";
+
     @NotNull
     @Override
     public PsiElementVisitor buildVisitor(final @NotNull ProblemsHolder holder, final boolean isOnTheFly) {
         return new XmlElementVisitor() {
-            private static final String CacheDisableProblemDescription = "Cacheable false attribute on the default layout will disable cache site-wide";
             @Override
             public void visitXmlAttribute(XmlAttribute attribute) {
                 String fileName = holder.getFile().getName();
@@ -27,7 +28,8 @@ public class CacheableFalseInDefaultLayoutInspection extends XmlSuppressableInsp
                 final String text = attribute.getValue();
                 final String attributeName = attribute.getName();
                 if (!attributeName.equals(LayoutXml.CacheableAttributeName)) return;
-                if (!attribute.getParent().getName().equals(LayoutXml.BlockAttributeTagName)) return;
+                if (!attribute.getParent().getName().equals(LayoutXml.BlockAttributeTagName)
+                && !attribute.getParent().getName().equals(LayoutXml.ReferenceBlockAttributeTagName)) return;
                 if (text == null) return;
                 if (text.equals(LayoutXml.CacheableAttributeFalseValue)) {
                     holder.registerProblem(attribute, CacheDisableProblemDescription,
