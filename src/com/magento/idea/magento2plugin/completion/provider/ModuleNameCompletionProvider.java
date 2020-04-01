@@ -38,7 +38,7 @@ public class ModuleNameCompletionProvider extends CompletionProvider<CompletionP
             result.addElement(
                     LookupElementBuilder
                             .create(moduleName)
-                            .withIcon(AllIcons.Modules.ModulesNode)
+                            .withIcon(AllIcons.Nodes.ModuleGroup)
             );
         }
     }

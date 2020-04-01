@@ -18,22 +18,45 @@ import static com.intellij.patterns.XmlPatterns.xmlFile;
 public class XmlCompletionContributor extends CompletionContributor {
 
     public XmlCompletionContributor() {
-        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN),
-            new CompositeCompletionProvider(
-                new PhpClassCompletionProvider(),
-                new PhpClassMemberCompletionProvider(),
-                new ModuleNameCompletionProvider(),
-                new FilePathCompletionProvider()
-            )
+
+        /* PHP class member completion provider */
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_DATA_CHARACTERS)
+                        .withParent(XmlPatterns.xmlText().withParent(XmlPatterns.xmlTag().withChild(
+                                XmlPatterns.xmlAttribute().withName("xsi:type").withValue(string().oneOf("init_parameter"))))
+                        ),
+                new PhpClassMemberCompletionProvider()
         );
 
-        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_DATA_CHARACTERS),
-            new CompositeCompletionProvider(
-                new PhpClassCompletionProvider(),
-                new PhpClassMemberCompletionProvider(),
-                new ModuleNameCompletionProvider(),
+        /* Module Completion provider */
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                        .inside(XmlPatterns.xmlAttribute().withName("id"))
+                        .inFile(xmlFile().withName(string().endsWith("acl.xml"))),
+                new ModuleNameCompletionProvider()
+        );
+
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                        .inside(XmlPatterns.xmlAttribute().withName("name"))
+                        .inFile(xmlFile().withName(string().endsWith("module.xml"))),
+                new ModuleNameCompletionProvider()
+        );
+
+        /* PHP Class completion provider */
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_DATA_CHARACTERS)
+                        .withParent(XmlPatterns.xmlText().withParent(XmlPatterns.xmlTag().withChild(
+                                XmlPatterns.xmlAttribute().withName("xsi:type").withValue(string().oneOf("object"))))
+                        ),
+                new PhpClassCompletionProvider()
+        );
+
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                        .inside(XmlPatterns.xmlAttribute().withName("class")),
+                new PhpClassCompletionProvider()
+        );
+
+        /* File Path Completion provider */
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                        .inside(XmlPatterns.xmlAttribute().withName("template")),
                 new FilePathCompletionProvider()
-            )
         );
 
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
