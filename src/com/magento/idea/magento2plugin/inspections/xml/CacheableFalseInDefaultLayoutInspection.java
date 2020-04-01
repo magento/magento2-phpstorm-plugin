@@ -24,7 +24,7 @@ public class CacheableFalseInDefaultLayoutInspection extends XmlSuppressableInsp
             @Override
             public void visitXmlAttribute(XmlAttribute attribute) {
                 String fileName = holder.getFile().getName();
-                //if (!fileName.equals(LayoutXml.DefaultFileName)) return;
+                if (!fileName.equals(LayoutXml.DefaultFileName)) return;
                 final String text = attribute.getValue();
                 final String attributeName = attribute.getName();
                 if (!attributeName.equals(LayoutXml.CacheableAttributeName)) return;

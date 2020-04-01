@@ -4,8 +4,6 @@
 name: Run automated tests
 
 on:
-  push:
-    branches: [ master, 1.0.0-develop ]
   pull_request:
     branches: [ master, 1.0.0-develop ]
 
