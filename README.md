@@ -26,5 +26,8 @@ This is a plugin for Magento 2 development in the PhpStorm IDE. It is available 
 * "Navigate to Web API configuration" reference in scope of class/interface and method
 
 ## License
+Each Magento source file included in this distribution is licensed under OSL-3.0 license.
 
-Copyright (c) 2015 Dmytro Kvashnin. See LICENSE.md for details.
+Please see [LICENSE.txt](https://github.com/magento/magento2-phpstorm-plugin/blob/master/LICENSE.txt) for the full text of the [Open Software License v. 3.0 (OSL-3.0)](http://opensource.org/licenses/osl-3.0.php).
+
+### <img src="https://upload.wikimedia.org/wikipedia/commons/7/76/Slack_Icon.png" width="20"> Join [#phpstorm-plugin](https://magentocommeng.slack.com/archives/C010C2LUCEA) channel for more details.
