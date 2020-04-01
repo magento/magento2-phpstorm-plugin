@@ -20,11 +20,11 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    - name: gradle wrapper
+    - name: Gradle wrapper
       run: gradle wrapper
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: Run automated tests
+    - name: Build project
       run: ./gradlew build
     - name: Run automated tests
-      run: ./gradlew test
+      run: ./gradlew test --stacktrace
