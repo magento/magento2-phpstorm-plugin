@@ -15,7 +15,7 @@ This is a plugin for Magento 2 development in the PhpStorm IDE. It is available 
 6. Check "Enable" and "OK" button. 
 
 ## Works with
-* PhpStorm >= 2017.2
+* PhpStorm >= 2019.3.3
 * JRE >= 1.8
 
 ## Features
@@ -24,6 +24,13 @@ This is a plugin for Magento 2 development in the PhpStorm IDE. It is available 
 * "Navigate to configuration" reference in scope of class/interface
 * "Go to plugin" reference in scope of class/interface and method
 * "Navigate to Web API configuration" reference in scope of class/interface and method
+* Plugin class methods generation
+* Plugin declaration inspection
+* RequireJs reference navigation and completion
+* MFTF reference navigation and completion
+* GraphQL navigation line markers
+* Code generation
+* Inspections for XML configuration
 
 ## License
 Each Magento source file included in this distribution is licensed under OSL-3.0 license.
