@@ -9,4 +9,5 @@ public class LayoutXml {
     public static String CacheableAttributeName = "cacheable";
     public static String CacheableAttributeFalseValue = "false";
     public static String BlockAttributeTagName = "block";
+    public static String ReferenceBlockAttributeTagName = "referenceBlock";
 }
