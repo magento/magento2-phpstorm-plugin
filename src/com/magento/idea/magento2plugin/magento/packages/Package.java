@@ -24,6 +24,7 @@ public class Package {
     }
 
     public static enum License {
+        CUSTOM("Custom License"),
         OSL("Open Software License (OSL)"),
         MPL("Mozilla Public License (MPL)"),
         MITL("Massachusetts Institute of Technology License (MITL)"),
@@ -31,8 +32,7 @@ public class Package {
         GPL("GNU General Public License (GPL)"),
         BSDL("Berkeley Software Distribution License (BSDL)"),
         ASL("Apache Software License (ASL)"),
-        AFL("Academic Free License (AFL)"),
-        CUSTOM("Custom License");
+        AFL("Academic Free License (AFL)");
 
         private String licenseName;
 

@@ -84,7 +84,7 @@ public class NewMagentoModuleDialog extends AbstractDialog implements ListSelect
         setLicenses();
 
         moduleLicenseCustom.setToolTipText("Custom License Name");
-        moduleLicenseCustom.setText("Custom License Name");
+        moduleLicenseCustom.setText("proprietary");
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -193,19 +193,10 @@ public class NewMagentoModuleDialog extends AbstractDialog implements ListSelect
         return this.moduleVersion.getText().trim();
     }
 
-    /**
-     * Retrieve selected licenses name for the module
-     *
-     * @return List
-     */
     public List getModuleLicense() {
         List selectedLicenses = this.moduleLicense.getSelectedValuesList();
         Package.License customLicense = Package.License.CUSTOM;
 
-        /**
-         * When custom license is selected, the selected label "Custom License"
-         * must be replaced with the custom license name provided
-         */
         if (selectedLicenses.contains(customLicense.getLicenseName())) {
             selectedLicenses.remove(customLicense.getLicenseName());
             selectedLicenses.add(moduleLicenseCustom.getText());
@@ -227,9 +218,6 @@ public class NewMagentoModuleDialog extends AbstractDialog implements ListSelect
                 .concat(camelCaseToHyphen.convert(getModuleName()));
     }
 
-    /**
-     * Set licenses to select from
-     */
     private void setLicenses() {
         Package.License[] licenses = Package.License.values();
         Vector<String> licenseNames = new Vector<>(licenses.length);
@@ -243,9 +231,6 @@ public class NewMagentoModuleDialog extends AbstractDialog implements ListSelect
         moduleLicense.addListSelectionListener(this);
     }
 
-    /**
-     * Make the Custom Module License input available when custom license is selected
-     */
     private void handleModuleCustomLicenseInputVisibility () {
         boolean isCustomLicenseSelected = false;
 
