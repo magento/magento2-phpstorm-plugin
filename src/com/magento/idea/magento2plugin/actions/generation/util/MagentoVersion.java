@@ -16,8 +16,11 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.magento.idea.magento2plugin.magento.files.ComposerJson;
 import com.magento.idea.magento2plugin.php.module.ComposerPackageModel;
 import com.magento.idea.magento2plugin.php.module.ComposerPackageModelImpl;
+
+import java.io.File;
 
 public class MagentoVersion {
     private static MagentoVersion INSTANCE = null;
@@ -63,7 +66,6 @@ public class MagentoVersion {
     }
 
     private String getFilePath() {
-        String fileName = "composer.json";
-        return this.project.getBasePath() + "/" + fileName;
+        return this.project.getBasePath() + File.separator + ComposerJson.FILE_NAME;
     }
 }
