@@ -12,6 +12,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
+import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,7 +39,7 @@ public class ModuleNameCompletionProvider extends CompletionProvider<CompletionP
             result.addElement(
                     LookupElementBuilder
                             .create(moduleName)
-                            .withIcon(AllIcons.Nodes.ModuleGroup)
+                            .withIcon(MagentoIcons.MODULE)
             );
         }
     }
