@@ -10,9 +10,7 @@ import com.intellij.patterns.XmlPatterns;
 import com.intellij.psi.xml.XmlTokenType;
 import com.magento.idea.magento2plugin.completion.provider.*;
 import com.magento.idea.magento2plugin.completion.provider.mftf.*;
-import com.magento.idea.magento2plugin.magento.files.CommonXml;
-import com.magento.idea.magento2plugin.magento.files.ModuleAclXml;
-import com.magento.idea.magento2plugin.magento.files.ModuleXml;
+import com.magento.idea.magento2plugin.magento.files.*;
 
 import static com.intellij.patterns.PlatformPatterns.psiElement;
 import static com.intellij.patterns.StandardPatterns.string;
@@ -45,6 +43,8 @@ public class XmlCompletionContributor extends CompletionContributor {
         );
 
         /* PHP Class completion provider */
+
+        // <randomTag xsi:type="completion">
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_DATA_CHARACTERS)
                         .withParent(XmlPatterns.xmlText().withParent(XmlPatterns.xmlTag().withChild(
                                 XmlPatterns.xmlAttribute().withName(CommonXml.SCHEMA_VALIDATE_ATTRIBUTE).withValue(string().oneOf(CommonXml.OBJECT))))
@@ -52,14 +52,28 @@ public class XmlCompletionContributor extends CompletionContributor {
                 new PhpClassCompletionProvider()
         );
 
+        // <randomTag class="completion">
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
                         .inside(XmlPatterns.xmlAttribute().withName(CommonXml.ATTR_CLASS)),
                 new PhpClassCompletionProvider()
         );
 
+        // <preference for="completion">
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                        .inside(XmlPatterns.xmlAttribute().withName(ModuleDiXml.PREFERENCE_ATTR_FOR)),
+                new PhpClassCompletionProvider()
+        );
+
+        // <type name="completion">
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                        .inside(XmlPatterns.xmlAttribute().withName(ModuleDiXml.PLUGIN_TYPE_ATTR_NAME)
+                                .withParent(XmlPatterns.xmlTag().withName(ModuleDiXml.PLUGIN_TYPE_TAG))),
+                new PhpClassCompletionProvider()
+        );
+
         /* File Path Completion provider */
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
-                        .inside(XmlPatterns.xmlAttribute().withName("template")),
+                        .inside(XmlPatterns.xmlAttribute().withName(LayoutXml.XML_ATTRIBUTE_TEMPLATE)),
                 new FilePathCompletionProvider()
         );
 
