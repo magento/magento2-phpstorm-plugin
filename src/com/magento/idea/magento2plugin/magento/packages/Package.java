@@ -4,8 +4,6 @@
  */
 package com.magento.idea.magento2plugin.magento.packages;
 
-import java.util.ArrayList;
-
 public class Package {
     public static String PACKAGES_ROOT = "app/code";
     public static String VENDOR = "vendor";
