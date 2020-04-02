@@ -1,0 +1,18 @@
+<?php
+#parse("PHP File Header.php")
+
+#if (${NAMESPACE})
+namespace ${NAMESPACE};
+#end
+
+use \Magento\Framework\View\Element\Block\ArgumentInterface;
+
+/**
+ * ${PARAM_DOC}
+ */
+class ${NAME} implements ArgumentInterface {
+    public function __construct()
+    {
+
+    }
+}
