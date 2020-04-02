@@ -79,7 +79,10 @@ public class SettingsForm implements Configurable {
             new RegenerateUrnMapListener(project)
         );
 
-        magentoVersion.setText("Magento version: ".concat(magentoVersionModel.get()));
+        String version = magentoVersionModel.get();
+        if (version != null) {
+            magentoVersion.setText("Magento version: " . concat(version));
+        }
 
         return (JComponent) panel1;
     }

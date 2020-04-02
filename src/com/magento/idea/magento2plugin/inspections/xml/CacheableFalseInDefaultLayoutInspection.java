@@ -24,14 +24,14 @@ public class CacheableFalseInDefaultLayoutInspection extends XmlSuppressableInsp
             @Override
             public void visitXmlAttribute(XmlAttribute attribute) {
                 String fileName = holder.getFile().getName();
-                if (!fileName.equals(LayoutXml.DefaultFileName)) return;
+                if (!fileName.equals(LayoutXml.DEFAULT_FILENAME)) return;
                 final String text = attribute.getValue();
                 final String attributeName = attribute.getName();
-                if (!attributeName.equals(LayoutXml.CacheableAttributeName)) return;
-                if (!attribute.getParent().getName().equals(LayoutXml.BlockAttributeTagName)
-                && !attribute.getParent().getName().equals(LayoutXml.ReferenceBlockAttributeTagName)) return;
+                if (!attributeName.equals(LayoutXml.CACHEABLE_ATTRIBUTE_NAME)) return;
+                if (!attribute.getParent().getName().equals(LayoutXml.BLOCK_ATTRIBUTE_TAG_NAME)
+                && !attribute.getParent().getName().equals(LayoutXml.REFERENCE_BLOCK_ATTRIBUTE_TAG_NAME)) return;
                 if (text == null) return;
-                if (text.equals(LayoutXml.CacheableAttributeFalseValue)) {
+                if (text.equals(LayoutXml.CACHEABLE_ATTRIBUTE_VALUE_FALSE)) {
                     holder.registerProblem(attribute, CacheDisableProblemDescription,
                             ProblemHighlightType.WARNING,
                             new XmlRemoveCacheableAttributeQuickFix());
