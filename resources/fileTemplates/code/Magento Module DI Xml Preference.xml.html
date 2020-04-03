@@ -6,5 +6,34 @@
 -->
 <html>
 <body>
+<table width="100%" border="0" cellpadding="5" cellspacing="0" style="border-collapse: collapse">
+    <tr>
+        <td><font face="verdana" size="-1">
+            The object manager uses mappings to determine what the default implementation is for a class in a constructor (scope dependent).
+            For this goal where designed preference node in the di.xml settings file.
+            For example:
+            In class A here are dependencies in the constructor - interface B and class C.
+            Our aim to get in the class A concrete realization of interface B - BConcrete and replace concrete implementation for class C on its child CSpecific.
+            We can easily determine for object manager to instantiate interface B as concrete class BConcrete by using this template.
+            In the same way, we can determine for object manager to instantiate class CSpecific instead of class C.
+        </font><br>
+        </td>
+    </tr>
+</table>
+<table width="100%" border="0" cellpadding="5" cellspacing="0" style="border-collapse: collapse">
+    <tr>
+        <td colspan="3"><font face="verdana" size="-1">Predefined variables will take the following values:</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${FOR}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">Target PHP Class to change its concrete implementation</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${TYPE}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">PHP Class that will be instantiated instead of specified in predefined ${FOR} variable</font></td>
+    </tr>
+</table>
 </body>
 </html>
