@@ -21,7 +21,6 @@
             title="CHANGELOG.md"
         >here</a>
     ]]>
-
     </change-notes>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
@@ -55,6 +54,7 @@
         </group>
         <group id="MagentoNewGroup">
             <action id="Magento2NewModule" class="com.magento.idea.magento2plugin.actions.generation.NewModuleAction"/>
+            <action id="MagentoCreateABlock" class="com.magento.idea.magento2plugin.actions.generation.NewBlockAction" />
             <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewDir"/>
         </group>
         <action id="MagentoCreateAPlugin.Menu" class="com.magento.idea.magento2plugin.actions.generation.CreateAPluginAction">

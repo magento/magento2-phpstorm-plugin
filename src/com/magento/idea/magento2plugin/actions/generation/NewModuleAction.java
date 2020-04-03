@@ -19,8 +19,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class NewModuleAction extends com.intellij.openapi.actionSystem.AnAction {
-    public static String ACTION_NAME = "New Magento 2 Module";
-    public static String ACTION_DESCRIPTION = "Create a new Magento 2 module";
+    public static String ACTION_NAME = "Magento2 Module";
+    public static String ACTION_DESCRIPTION = "Create a new Magento2 module";
 
     NewModuleAction() {
         super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
