@@ -15,11 +15,9 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FilenameIndex;
+import com.magento.idea.magento2plugin.actions.generation.util.MagentoVersion;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
-import com.magento.idea.magento2plugin.php.module.ComposerPackageModel;
-import com.magento.idea.magento2plugin.php.module.MagentoComponent;
-import com.magento.idea.magento2plugin.php.module.MagentoComponentManager;
-import com.magento.idea.magento2plugin.php.module.MagentoModule;
+import com.magento.idea.magento2plugin.php.module.*;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,6 +40,8 @@ public class SettingsForm implements Configurable {
     private JButton buttonReindex;
     private JPanel panel1;
     private JButton regenerateUrnMapButton;
+    private JLabel magentoVersion;
+    private MagentoVersion magentoVersionModel = MagentoVersion.getInstance();
 
     public SettingsForm(@NotNull final Project project) {
         this.project = project;
@@ -78,6 +78,12 @@ public class SettingsForm implements Configurable {
         regenerateUrnMapButton.addMouseListener(
             new RegenerateUrnMapListener(project)
         );
+
+        String version = magentoVersionModel.get();
+        if (version != null) {
+            magentoVersion.setText("Magento version: " . concat(version));
+        }
+
         return (JComponent) panel1;
     }
 

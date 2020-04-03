@@ -13,6 +13,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFro
 import com.magento.idea.magento2plugin.magento.files.ComposerJson;
 import org.jetbrains.annotations.NotNull;
 import java.util.Properties;
+import java.util.List;
 
 public class ModuleComposerJsonGenerator extends FileGenerator {
 
@@ -38,5 +39,25 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
         attributes.setProperty("MODULE_DESCRIPTION", moduleComposerJsonData.getModuleDescription());
         attributes.setProperty("COMPOSER_PACKAGE_NAME", moduleComposerJsonData.getComposerPackageName());
         attributes.setProperty("MODULE_VERSION", moduleComposerJsonData.getModuleVersion());
+        attributes.setProperty("LICENSE", this.getLicensesString(moduleComposerJsonData.getModuleLicense()));
+    }
+
+    protected String getLicensesString(List licensesList) {
+        String license = "[\n";
+        Object[] licenses = licensesList.toArray();
+
+        for (int i = 0; i < licenses.length; i++) {
+            license = license.concat("\"");
+            license = license.concat(licenses[i].toString());
+            license = license.concat("\"");
+
+            if (licenses.length != (i + 1)) license = license.concat(",");
+
+            license = license.concat("\n");
+        }
+
+        license = license.concat("\n]");
+
+        return license;
     }
 }

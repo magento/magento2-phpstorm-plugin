@@ -5,8 +5,10 @@
 package com.magento.idea.magento2plugin.magento.files;
 
 public class LayoutXml {
-    public static String DefaultFileName = "default.xml";
-    public static String CacheableAttributeName = "cacheable";
-    public static String CacheableAttributeFalseValue = "false";
-    public static String BlockAttributeTagName = "block";
+    public static String DEFAULT_FILENAME = "default.xml";
+    public static String CACHEABLE_ATTRIBUTE_NAME = "cacheable";
+    public static String CACHEABLE_ATTRIBUTE_VALUE_FALSE = "false";
+    public static String BLOCK_ATTRIBUTE_TAG_NAME = "block";
+    public static String REFERENCE_BLOCK_ATTRIBUTE_TAG_NAME = "referenceBlock";
+    public static String XML_ATTRIBUTE_TEMPLATE = "template";
 }
