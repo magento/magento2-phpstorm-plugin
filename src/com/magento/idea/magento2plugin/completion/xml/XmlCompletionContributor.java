@@ -71,6 +71,13 @@ public class XmlCompletionContributor extends CompletionContributor {
                 new PhpClassCompletionProvider()
         );
 
+        // <frontend_model>completion</frontend_model>
+        extend(CompletionType.BASIC,
+                psiElement(XmlTokenType.XML_DATA_CHARACTERS)
+                        .inside(XmlPatterns.xmlTag().withName(SystemXml.XML_TAG_FRONTEND_MODEL)),
+                new PhpClassCompletionProvider()
+        );
+
         /* File Path Completion provider */
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
                         .inside(XmlPatterns.xmlAttribute().withName(LayoutXml.XML_ATTRIBUTE_TEMPLATE)),
