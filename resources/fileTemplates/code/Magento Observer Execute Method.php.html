@@ -1,0 +1,43 @@
+<!--
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<html>
+<body>
+<table width="100%" border="0" cellpadding="5" cellspacing="0" style="border-collapse: collapse">
+    <tr>
+        <td><font face="verdana" size="-1">Magento runs all after methods following the completion of the observed method.
+            Magento requires these methods have a return value and they must have the same name as the observed method with ‘after’ as the prefix.
+        </font><br>
+        </td>
+    </tr>
+</table>
+<table width="100%" border="0" cellpadding="5" cellspacing="0" style="border-collapse: collapse">
+    <tr>
+        <td colspan="3"><font face="verdana" size="-1">Predefined variables will take the following values:</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${PARAM_DOC}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">PHP DocBlock for plugin function</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${NAME}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">Name of the plugin function</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${PARAM_LIST}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">List of plugin function parameters</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${RETURN_VARIABLES}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">Return value for plugin function</font></td>
+    </tr>
+</table>
+</body>
+</html>

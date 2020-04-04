@@ -39,6 +39,10 @@
 
     <actions>
         <group id="MagentoGenerateGroup">
+            <action id="MagentoGenerateObserverMethodAction"
+                    class="com.magento.idea.magento2plugin.actions.generation.PluginGenerateBeforeMethodAction"
+                    text="Magento Before Plugin..."
+                    description="Create Magento before plugin method."/>
             <action id="MagentoGenerateBeforeMethodAction"
                     class="com.magento.idea.magento2plugin.actions.generation.PluginGenerateBeforeMethodAction"
                     text="Magento Before Plugin..."
@@ -57,6 +61,9 @@
             <action id="Magento2NewModule" class="com.magento.idea.magento2plugin.actions.generation.NewModuleAction"/>
             <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewDir"/>
         </group>
+        <action id="MagentoCreateAnObserver.Menu" class="com.magento.idea.magento2plugin.actions.generation.CreateAnObserverAction">
+            <add-to-group group-id="EditorPopupMenu"/>
+        </action>
         <action id="MagentoCreateAPlugin.Menu" class="com.magento.idea.magento2plugin.actions.generation.CreateAPluginAction">
             <add-to-group group-id="EditorPopupMenu"/>
         </action>

@@ -1,0 +1,12 @@
+/**
+* Observer for ${EVENT_NAME}
+*
+* @param Observer $observer
+* @throws \Magento\Framework\Validator\Exception
+* @return void
+*/
+public function execute(Observer $observer)
+{
+    $event = $observer->getEvent();
+    // TODO: Implement observer method.
+}
