@@ -13,20 +13,22 @@ import com.magento.idea.magento2plugin.actions.generation.data.BlockFileData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
+import com.magento.idea.magento2plugin.magento.files.BlockPhp;
 import com.magento.idea.magento2plugin.magento.files.PhpPreference;
+import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.io.File;
 import java.util.Properties;
 
-public class BlockClassGenerator extends FileGenerator {
+public class ModuleBlockClassGenerator extends FileGenerator {
     private BlockFileData blockFileData;
     private Project project;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
 
-    public BlockClassGenerator(@NotNull BlockFileData blockFileData, Project project) {
+    public ModuleBlockClassGenerator(@NotNull BlockFileData blockFileData, Project project) {
         super(project);
         this.directoryGenerator = DirectoryGenerator.getInstance();
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
@@ -35,9 +37,10 @@ public class BlockClassGenerator extends FileGenerator {
     }
 
     public PsiFile generate(String actionName) {
-        PhpClass block = GetPhpClassByFQN.getInstance(project).execute(blockFileData.getBlockFqn());
+        PhpClass block = GetPhpClassByFQN.getInstance(project).execute(getBlockFqn());
         if (block != null) {
-           return null;
+            JOptionPane.showMessageDialog(null, "Block Class already exist!", "Error", JOptionPane.ERROR_MESSAGE);
+            return null;
         }
         PhpFile blockFile = createBlockClass(actionName);
         if (blockFile == null) {
@@ -46,6 +49,11 @@ public class BlockClassGenerator extends FileGenerator {
         }
 
         return blockFile;
+    }
+
+    @NotNull
+    private String getBlockFqn() {
+        return blockFileData.getNamespace() + Package.FQN_SEPARATOR + blockFileData.getBlockClassName();
     }
 
     private PhpFile createBlockClass(String actionName) {
@@ -68,13 +76,12 @@ public class BlockClassGenerator extends FileGenerator {
         String blockClassName = blockFileData.getBlockClassName();
         attributes.setProperty("NAME", blockClassName);
         attributes.setProperty("NAMESPACE", blockFileData.getNamespace());
-        String parentClassName = blockFileData.getTargetClass().getName();
-        if (!parentClassName.equals(blockClassName)) {
-            attributes.setProperty("USE", blockFileData.getTargetClass().getPresentableFQN());
-            attributes.setProperty("EXTENDS", parentClassName);
+        if (!BlockPhp.STOREFRONT_BLOCK_NAME.equals(blockClassName)) {
+            attributes.setProperty("USE", BlockPhp.STOREFRONT_BLOCK_FQN);
+            attributes.setProperty("EXTENDS", BlockPhp.STOREFRONT_BLOCK_NAME);
             return;
         }
-        attributes.setProperty("EXTENDS", blockFileData.getTargetClass().getFQN());
+        attributes.setProperty("EXTENDS", Package.FQN_SEPARATOR + BlockPhp.STOREFRONT_BLOCK_FQN);
     }
 
     public String getBlockModule() {

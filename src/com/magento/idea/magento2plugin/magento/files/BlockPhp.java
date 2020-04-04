@@ -9,6 +9,9 @@ import com.jetbrains.php.lang.PhpLanguage;
 
 public class BlockPhp implements ModuleFileInterface {
     public static String TEMPLATE = "Magento Module Common Php Class";
+    public static String DEFAULT_DIR = "Block";
+    public static String STOREFRONT_BLOCK_FQN = "Magento\\Framework\\View\\Element\\Template";
+    public static String STOREFRONT_BLOCK_NAME = "Template";
 
     private static BlockPhp INSTANCE = null;
     private String fileName;
