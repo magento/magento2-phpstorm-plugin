@@ -7,6 +7,9 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * All code generate dialog should extend this class
+ */
 public abstract class AbstractDialog extends JDialog {
     protected void pushToMiddle() {
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();

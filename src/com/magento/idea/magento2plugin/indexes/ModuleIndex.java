@@ -28,7 +28,7 @@ public class ModuleIndex {
     private ModuleIndex() {
     }
 
-    public static ModuleIndex getInstance(final Project project) {
+    public static ModuleIndex getInstance(Project project) {
         if (null == INSTANCE) {
             INSTANCE = new ModuleIndex();
         }
@@ -72,6 +72,7 @@ public class ModuleIndex {
                 PhpFileType.INSTANCE
         ));
         VirtualFile virtualFile = files.iterator().next();
+
         return PsiManager.getInstance(project).findDirectory(virtualFile.getParent());
     }
 }
