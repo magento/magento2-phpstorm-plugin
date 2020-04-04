@@ -71,13 +71,6 @@ public class XmlCompletionContributor extends CompletionContributor {
                 new PhpClassCompletionProvider()
         );
 
-        // <frontend_model>completion</frontend_model>
-        extend(CompletionType.BASIC,
-                psiElement(XmlTokenType.XML_DATA_CHARACTERS)
-                        .inside(XmlPatterns.xmlTag().withName(SystemXml.XML_TAG_FRONTEND_MODEL)),
-                new PhpClassCompletionProvider()
-        );
-
         /* File Path Completion provider */
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
                         .inside(XmlPatterns.xmlAttribute().withName(LayoutXml.XML_ATTRIBUTE_TEMPLATE)),
@@ -112,10 +105,17 @@ public class XmlCompletionContributor extends CompletionContributor {
 
         // <source_model>php class completion</source_model> in system.xml files.
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_DATA_CHARACTERS)
-            .inside(XmlPatterns.xmlTag().withName(ModuleSystemXml.SOURCE_MODEL_ELEMENT_NAME)
+            .inside(XmlPatterns.xmlTag().withName(ModuleSystemXml.XML_TAG_SOURCE_MODEL)
                 .withParent(XmlPatterns.xmlTag().withName(ModuleSystemXml.FIELD_ELEMENT_NAME))
             ).inFile(xmlFile().withName(string().endsWith(ModuleSystemXml.FILE_NAME))),
             new PhpClassCompletionProvider()
+        );
+
+        // <frontend_model>completion</frontend_model>
+        extend(CompletionType.BASIC,
+                psiElement(XmlTokenType.XML_DATA_CHARACTERS)
+                        .inside(XmlPatterns.xmlTag().withName(ModuleSystemXml.XML_TAG_FRONTEND_MODEL)),
+                new PhpClassCompletionProvider()
         );
 
         // <parameter source_model="completion">...</parameter> in widget.xml files.
