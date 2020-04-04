@@ -7,18 +7,21 @@ package com.magento.idea.magento2plugin.actions.generation;
 import com.intellij.ide.IdeView;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
+import com.jetbrains.php.lang.psi.PhpFile;
+import com.jetbrains.php.lang.psi.elements.Method;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewBlockDialog;
-import com.magento.idea.magento2plugin.actions.generation.provider.NewBlockDataProvider;
+import com.magento.idea.magento2plugin.actions.generation.generator.code.PluginMethodsGenerator;
+import com.magento.idea.magento2plugin.magento.files.RegistrationPhp;
+import com.magento.idea.magento2plugin.project.Settings;
 import org.jetbrains.annotations.NotNull;
 
-/**
- *
- */
 public class NewBlockAction extends AnAction {
-    public static String ACTION_NAME = "Magento2 Block";
-    public static String ACTION_DESCRIPTION = "Create a new Magento block";
+    public static String ACTION_NAME = "Magento 2 Block";
+    public static String ACTION_DESCRIPTION = "Create a new Magento 2 block";
 
     NewBlockAction() {
         super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
@@ -47,8 +50,6 @@ public class NewBlockAction extends AnAction {
         if (directory == null) {
             return;
         }
-
-        NewBlockDataProvider.get(directory);
 
         NewBlockDialog.open(project, directory);
     }

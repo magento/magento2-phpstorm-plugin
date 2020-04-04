@@ -67,7 +67,7 @@ public class PreferenceClassGenerator extends FileGenerator {
 
     protected void fillAttributes(Properties attributes) {
         String preferenceClassName = preferenceFileData.getPreferenceClassName();
-        attributes.setProperty("NAME", preferenceFileData.getPreferenceClassName());
+        attributes.setProperty("NAME", preferenceClassName);
         attributes.setProperty("NAMESPACE", preferenceFileData.getNamespace());
         if (!preferenceFileData.isInheritClass()) {
             return;

@@ -13,7 +13,7 @@ import com.magento.idea.magento2plugin.actions.generation.NewModuleAction;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleComposerJsonData;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleRegistrationPhpData;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleXmlData;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewMagentoModuleDialogValidator;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewModuleDialogValidator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleComposerJsonGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleRegistrationPhpGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleXmlGenerator;
@@ -27,12 +27,11 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
 import java.util.Vector;
 
-public class NewMagentoModuleDialog extends AbstractDialog implements ListSelectionListener {
+public class NewModuleDialog extends AbstractDialog implements ListSelectionListener {
     @NotNull
     private final Project project;
     @NotNull
@@ -45,7 +44,7 @@ public class NewMagentoModuleDialog extends AbstractDialog implements ListSelect
     private final Editor editor;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
-    private final NewMagentoModuleDialogValidator validator;
+    private final NewModuleDialogValidator validator;
     private final CamelCaseToHyphen camelCaseToHyphen;
     private final NavigateToCreatedFile navigateToCreatedFile;
     private JPanel contentPane;
@@ -65,7 +64,7 @@ public class NewMagentoModuleDialog extends AbstractDialog implements ListSelect
     private JScrollPane moduleLicenseScrollPanel;
     private String detectedPackageName;
 
-    public NewMagentoModuleDialog(@NotNull Project project, @NotNull PsiDirectory initialBaseDir, @Nullable PsiFile file, @Nullable IdeView view, @Nullable Editor editor) {
+    public NewModuleDialog(@NotNull Project project, @NotNull PsiDirectory initialBaseDir, @Nullable PsiFile file, @Nullable IdeView view, @Nullable Editor editor) {
         this.project = project;
         this.initialBaseDir = initialBaseDir;
         this.file = file;
@@ -74,7 +73,7 @@ public class NewMagentoModuleDialog extends AbstractDialog implements ListSelect
         this.directoryGenerator = DirectoryGenerator.getInstance();
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         this.camelCaseToHyphen = CamelCaseToHyphen.getInstance();
-        this.validator = NewMagentoModuleDialogValidator.getInstance(this);
+        this.validator = NewModuleDialogValidator.getInstance(this);
         this.navigateToCreatedFile = NavigateToCreatedFile.getInstance();
         detectPackageName(initialBaseDir);
         setContentPane(contentPane);
@@ -206,7 +205,7 @@ public class NewMagentoModuleDialog extends AbstractDialog implements ListSelect
     }
 
     public static void open(@NotNull Project project, @NotNull PsiDirectory initialBaseDir, @Nullable PsiFile file, @Nullable IdeView view, @Nullable Editor editor) {
-        NewMagentoModuleDialog dialog = new NewMagentoModuleDialog(project, initialBaseDir, file, view, editor);
+        NewModuleDialog dialog = new NewModuleDialog(project, initialBaseDir, file, view, editor);
         dialog.pack();
         dialog.setVisible(true);
     }

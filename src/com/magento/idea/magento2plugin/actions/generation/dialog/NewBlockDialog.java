@@ -1,7 +1,12 @@
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
+import com.jetbrains.php.lang.psi.PhpFile;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 
@@ -9,17 +14,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class NewBlockDialog extends JDialog {
+public class NewBlockDialog extends AbstractDialog {
     private JPanel contentPanel;
     private JButton buttonOK;
     private JButton buttonCancel;
-
     private JTextField blockName;
     private JRadioButton frontendRadioButton;
     private JRadioButton adminhtmlRadioButton;
     private JTextField blockParentDir;
-    private FilteredComboBox moduleName;
-
     private Project project;
 
     public NewBlockDialog(Project project) {
@@ -27,9 +29,9 @@ public class NewBlockDialog extends JDialog {
 
         setContentPane(contentPanel);
         setModal(true);
-        setTitle("Create a new Magento2 block..");
+        setTitle("Create a new Magento 2 block..");
         getRootPane().setDefaultButton(buttonOK);
-        moveDialogToScreenMiddle();
+        pushToMiddle();
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -59,8 +61,6 @@ public class NewBlockDialog extends JDialog {
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    /**
-     */
     public static void open(Project project, PsiDirectory directory) {
         NewBlockDialog dialog = new NewBlockDialog(project);
         dialog.pack();
@@ -68,23 +68,15 @@ public class NewBlockDialog extends JDialog {
     }
 
     private void onOK() {
-        // add your code here
-        dispose();
+        if (!validator.validate()) {
+            return;
+        }
+        generateFiles();
+        this.setVisible(false);
     }
 
-    private void onCancel() {
+    public void onCancel() {
         // add your code here if necessary
         dispose();
-    }
-
-    private void moveDialogToScreenMiddle() {
-        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        this.setLocation(dim.width / 2  -this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
-    }
-
-    private void createUIComponents() {
-        this.moduleName = new FilteredComboBox(
-                ModuleIndex.getInstance(this.project).getEditableModuleNames()
-        );
     }
 }

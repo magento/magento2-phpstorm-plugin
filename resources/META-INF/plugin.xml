@@ -37,6 +37,7 @@
     <depends optional="true" config-file="withJsGraphQl.xml">com.intellij.lang.jsgraphql</depends>
 
     <actions>
+        <!-- In editor generators -->
         <group id="MagentoGenerateGroup">
             <action id="MagentoGenerateBeforeMethodAction"
                     class="com.magento.idea.magento2plugin.actions.generation.PluginGenerateBeforeMethodAction"
@@ -52,9 +53,16 @@
                     description="Create Magento around plugin method."/>
             <add-to-group group-id="PhpGenerateGroup" anchor="last"/>
         </group>
+
+        <!-- Module file generators -->
+        <group id="MagentoNewModuleFileGroup" class="com.magento.idea.magento2plugin.actions.groups.NewModuleFileGroup" text="Module File" popup="true">
+            <action id="MagentoCreateABlock" class="com.magento.idea.magento2plugin.actions.generation.NewBlockAction" />
+            <add-to-group group-id="NewGroup" anchor="last"/>
+        </group>
+
+        <!-- Complex generators -->
         <group id="MagentoNewGroup">
             <action id="Magento2NewModule" class="com.magento.idea.magento2plugin.actions.generation.NewModuleAction"/>
-            <action id="MagentoCreateABlock" class="com.magento.idea.magento2plugin.actions.generation.NewBlockAction" />
             <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewDir"/>
         </group>
         <action id="MagentoCreateAPlugin.Menu" class="com.magento.idea.magento2plugin.actions.generation.CreateAPluginAction">
@@ -63,6 +71,7 @@
         <action id="OverrideClassByAPreference.Menu" class="com.magento.idea.magento2plugin.actions.generation.OverrideClassByAPreferenceAction">
             <add-to-group group-id="EditorPopupMenu"/>
         </action>
+
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -134,18 +143,7 @@
         <internalFileTemplate name="Magento Module Xml"/>
         <internalFileTemplate name="Magento Module DI Xml"/>
         <internalFileTemplate name="Magento Php Preference Class"/>
+        <internalFileTemplate name="Magento Module Common Php Class"/>
     </extensions>
-
-    <application-components>
-        <!-- Add your application components here -->
-    </application-components>
-
-    <project-components>
-        <!-- Add your project components here -->
-    </project-components>
-
-    <actions>
-        <!-- Add your actions here -->
-    </actions>
 
 </idea-plugin>

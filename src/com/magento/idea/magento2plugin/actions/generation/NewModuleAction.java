@@ -14,13 +14,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.MagentoIcons;
-import com.magento.idea.magento2plugin.actions.generation.dialog.NewMagentoModuleDialog;
+import com.magento.idea.magento2plugin.actions.generation.dialog.NewModuleDialog;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class NewModuleAction extends com.intellij.openapi.actionSystem.AnAction {
-    public static String ACTION_NAME = "Magento2 Module";
-    public static String ACTION_DESCRIPTION = "Create a new Magento2 module";
+    public static String ACTION_NAME = "Magento 2 Module";
+    public static String ACTION_DESCRIPTION = "Create a new Magento 2 module";
 
     NewModuleAction() {
         super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
@@ -41,7 +41,7 @@ public class NewModuleAction extends com.intellij.openapi.actionSystem.AnAction 
     }
 
     public void invoke(@NotNull Project project, @NotNull PsiDirectory initialBaseDir, @Nullable PsiFile file, @Nullable IdeView view, @Nullable Editor editor) {
-        NewMagentoModuleDialog.open(project, initialBaseDir, file, view, editor);
+        NewModuleDialog.open(project, initialBaseDir, file, view, editor);
     }
 
     @Override

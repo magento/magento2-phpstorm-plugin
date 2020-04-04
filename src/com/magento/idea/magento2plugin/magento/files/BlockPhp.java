@@ -7,22 +7,23 @@ package com.magento.idea.magento2plugin.magento.files;
 import com.intellij.lang.Language;
 import com.jetbrains.php.lang.PhpLanguage;
 
-public class RegistrationPhp implements ModuleFileInterface {
-    public static String FILE_NAME = "registration.php";
-    public static String TEMPLATE = "Magento Module Registration Php";
-    public static String REGISTER_METHOD_NAME = "register";
-    private static RegistrationPhp INSTANCE = null;
+public class BlockPhp implements ModuleFileInterface {
+    public static String TEMPLATE = "Magento Module Common Php Class";
 
-    public static RegistrationPhp getInstance() {
+    private static BlockPhp INSTANCE = null;
+    private String fileName;
+
+    public static BlockPhp getInstance(String className) {
         if (null == INSTANCE) {
-            INSTANCE = new RegistrationPhp();
+            INSTANCE = new BlockPhp();
         }
+        INSTANCE.setFileName(className.concat(".php"));
         return INSTANCE;
     }
 
     @Override
     public String getFileName() {
-        return FILE_NAME;
+        return this.fileName;
     }
 
     @Override
@@ -33,5 +34,9 @@ public class RegistrationPhp implements ModuleFileInterface {
     @Override
     public Language getLanguage() {
         return PhpLanguage.INSTANCE;
+    }
+
+    private void setFileName(String filename) {
+        this.fileName = filename;
     }
 }
