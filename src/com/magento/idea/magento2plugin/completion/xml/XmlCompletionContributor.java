@@ -103,6 +103,23 @@ public class XmlCompletionContributor extends CompletionContributor {
             new PhpConstructorArgumentCompletionProvider()
         );
 
+        // <source_model>php class completion</source_model> in system.xml files.
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_DATA_CHARACTERS)
+            .inside(XmlPatterns.xmlTag().withName(ModuleSystemXml.SOURCE_MODEL_ELEMENT_NAME)
+                .withParent(XmlPatterns.xmlTag().withName(ModuleSystemXml.FIELD_ELEMENT_NAME))
+            ).inFile(xmlFile().withName(string().endsWith(ModuleSystemXml.FILE_NAME))),
+            new PhpClassCompletionProvider()
+        );
+
+        // <parameter source_model="completion">...</parameter> in widget.xml files.
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+            .inside(XmlPatterns.xmlAttribute().withName(ModuleWidgetXml.ATTRIBUTE_SOURCE_MODEL_NAME)
+                .withParent(XmlPatterns.xmlTag().withName(ModuleWidgetXml.TAG_PARAMETER_NAME).
+                    withParent(XmlPatterns.xmlTag().withName(ModuleWidgetXml.TAG_PARAMETERS_NAME)))
+            ).inFile(xmlFile().withName(string().endsWith(ModuleWidgetXml.FILE_NAME))),
+                new PhpClassCompletionProvider()
+        );
+
         // <service method="methodName"/>
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
                 .inside(XmlPatterns.xmlAttribute().withName("method")
