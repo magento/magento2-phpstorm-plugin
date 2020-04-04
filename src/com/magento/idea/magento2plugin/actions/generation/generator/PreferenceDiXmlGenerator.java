@@ -71,9 +71,9 @@ public class PreferenceDiXmlGenerator extends FileGenerator {
 
     private boolean getTypeAttributeValue(XmlFile diXml) {
         Collection<XmlAttributeValue> preferences = XmlPsiTreeUtil.findAttributeValueElements(diXml, ModuleDiXml.PREFERENCE_TAG_NAME, ModuleDiXml.PREFERENCE_ATTR_FOR);
-        String pluginClassFqn = preferenceDiXmFileData.getTargetClass().getPresentableFQN();
+        String fqn = preferenceDiXmFileData.getTargetClass().getPresentableFQN();
         for (XmlAttributeValue preference: preferences) {
-            if (!PhpLangUtil.toPresentableFQN(preference.getValue()).equals(pluginClassFqn)) {
+            if (!PhpLangUtil.toPresentableFQN(preference.getValue()).equals(fqn)) {
                 continue;
             }
             return true;
