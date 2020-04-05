@@ -25,7 +25,8 @@ import org.jetbrains.annotations.NotNull;
 public class CreateAnObserverAction extends DumbAwareAction {
     public static final String ACTION_NAME = "Create a Magento Observer...";
     static final String ACTION_DESCRIPTION = "Create a new Magento 2 Observer for the event";
-    static final String SIGNATURE = "#M#C\\Magento\\Framework\\Event\\ManagerInterface.dispatch|#M#M#C\\Magento\\Framework\\App\\Action\\Context.getEventManager.dispatch";
+    static final String SIGNATURE_INTERFACE = "#M#C\\Magento\\Framework\\Event\\ManagerInterface.dispatch";
+    static final String SIGNATURE_CONTEXT = "#M#M#C\\Magento\\Framework\\App\\Action\\Context.getEventManager.dispatch";
     public String targetEvent;
 
     public CreateAnObserverAction() {
@@ -56,13 +57,6 @@ public class CreateAnObserverAction extends DumbAwareAction {
             return;
         }
 
-        if (isDispatchMethodClicked(element)) {
-            //@TODO implement fetching from the dispatch method
-            //this.setStatus(event, true);
-            //targetEvent = fetchTargetEventName(element);
-            //return;
-        }
-
         this.setStatus(event, false);
     }
 
@@ -82,12 +76,9 @@ public class CreateAnObserverAction extends DumbAwareAction {
 
     private boolean isObserverEventNameClicked(@NotNull PsiElement element) {
         if (checkIsElementStringLiteral(element)) {
-            //@TODO check if quotes are clicked
-
             if (checkIsParametersList(element.getParent().getParent()) &&
                     checkIsMethodReference(element.getParent().getParent().getParent()) &&
-                    checkIsEventDispatchMethod((MethodReference) element.getParent().getParent().getParent()))
-            {
+                    checkIsEventDispatchMethod((MethodReference) element.getParent().getParent().getParent())) {
                 return true;
             }
         }
@@ -109,7 +100,7 @@ public class CreateAnObserverAction extends DumbAwareAction {
     }
 
     private boolean checkIsEventDispatchMethod(MethodReference element) {
-        return element.getSignature().equals(SIGNATURE);
+        return element.getSignature().equals(SIGNATURE_INTERFACE) || element.getSignature().equals(SIGNATURE_CONTEXT);
     }
 
     private boolean checkIsElementStringLiteral(@NotNull PsiElement element) {
@@ -124,34 +115,6 @@ public class CreateAnObserverAction extends DumbAwareAction {
         }
 
         return true;
-    }
-
-    private boolean checkIsElementMethodReference(@NotNull PsiElement element) {
-        ASTNode astNode = element.getNode();
-        if (astNode == null) {
-            return false;
-        }
-        IElementType elementType = astNode.getElementType();
-        if (elementType != PhpTokenTypes.IDENTIFIER) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private boolean isDispatchMethodClicked(@NotNull PsiElement element) {
-        if (checkIsElementMethodReference(element) &&
-                checkIsMethodReference(element.getParent()) &&
-                checkIsEventDispatchMethod((MethodReference) element.getParent())) {
-            return true;
-        }
-
-        return false;
-    }
-
-    private String fetchTargetEventName(@NotNull PsiElement element) {
-        //@TODO implement fetching event name from the dispatch method
-        return null;
     }
 
     private void setStatus(AnActionEvent event, boolean status) {

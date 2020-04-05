@@ -16,8 +16,6 @@ import com.magento.idea.magento2plugin.actions.generation.data.ObserverFileData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.util.CodeStyleSettings;
-import com.magento.idea.magento2plugin.actions.generation.util.CollectInsertedMethods;
-import com.magento.idea.magento2plugin.actions.generation.util.FillTextBufferWithPluginMethods;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.Observer;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
@@ -31,8 +29,6 @@ public class ObserverClassGenerator extends FileGenerator {
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final GetFirstClassOfFile getFirstClassOfFile;
-    private final FillTextBufferWithPluginMethods fillTextBuffer;
-    private final CollectInsertedMethods collectInsertedMethods;
     private ObserverFileData observerFileData;
     private Project project;
 
@@ -44,14 +40,10 @@ public class ObserverClassGenerator extends FileGenerator {
         this.directoryGenerator = DirectoryGenerator.getInstance();
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
-        this.fillTextBuffer = FillTextBufferWithPluginMethods.getInstance();
-        this.collectInsertedMethods = CollectInsertedMethods.getInstance();
     }
 
     @Override
     public PsiFile generate(String actionName) {
-
-
         WriteCommandAction.runWriteCommandAction(project, () -> {
             PhpClass observerClass = GetPhpClassByFQN.getInstance(project).execute(
                     observerFileData.getObserverClassFqn()
