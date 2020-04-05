@@ -8,17 +8,16 @@ import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.lang.jsgraphql.GraphQLIcons;
-import com.intellij.lang.jsgraphql.psi.GraphQLQuotedString;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.project.Settings;
-import com.magento.idea.magento2plugin.stubs.indexes.graphql.GraphQlResolverIndex;
+import com.magento.idea.magento2plugin.util.magento.graphql.GraphQlUsagesCollector;
+import com.magento.idea.magento2plugin.util.magento.graphql.GraphQlUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import java.util.ArrayList;
+
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
 public class GraphQlResolverUsageLineMarkerProvider implements LineMarkerProvider {
@@ -40,7 +39,7 @@ public class GraphQlResolverUsageLineMarkerProvider implements LineMarkerProvide
             if (psiElement instanceof PhpClass) {
                 List<? extends PsiElement> results;
 
-                if (!isResolver((PhpClass) psiElement)) {
+                if (GraphQlUtil.isResolver((PhpClass) psiElement)) {
                     return;
                 }
                 GraphQlUsagesCollector collector = new GraphQlUsagesCollector();
@@ -55,43 +54,6 @@ public class GraphQlResolverUsageLineMarkerProvider implements LineMarkerProvide
                     );
                 }
             }
-        }
-    }
-
-    private boolean isResolver(PhpClass psiElement) {
-        PhpClass[] implementedInterfaces = psiElement.getImplementedInterfaces();
-        for (PhpClass implementedInterface: implementedInterfaces) {
-            if (!implementedInterface.getFQN().equals("\\Magento\\Framework\\GraphQl\\Query\\ResolverInterface")) {
-                continue;
-            }
-            return true;
-        }
-        return false;
-    }
-
-    private static class GraphQlUsagesCollector {
-
-        private HashMap<String, List<GraphQLQuotedString>> graphQlCache = new HashMap<>();
-
-        List<GraphQLQuotedString> getGraphQLUsages(@NotNull PhpClass phpClass) {
-            List<GraphQLQuotedString> graphQLQuotedStrings = new ArrayList<>();
-
-            graphQLQuotedStrings.addAll(getUsages(phpClass));
-
-            return graphQLQuotedStrings;
-        }
-
-        List<GraphQLQuotedString> getUsages(@NotNull PhpClass phpClass) {
-            String phpClassFQN = phpClass.getFQN();
-            if (!graphQlCache.containsKey(phpClassFQN)) {
-                List<GraphQLQuotedString> graphQLStringValues = extractGraphQLQuotesStringsForClass(phpClass);
-                graphQlCache.put(phpClassFQN, graphQLStringValues);
-            }
-            return graphQlCache.get(phpClassFQN);
-        }
-
-        List<GraphQLQuotedString> extractGraphQLQuotesStringsForClass(@NotNull PhpClass phpClass) {
-            return GraphQlResolverIndex.getGraphQLUsages(phpClass);
         }
     }
 }

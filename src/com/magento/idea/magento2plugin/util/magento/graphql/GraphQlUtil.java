@@ -6,6 +6,7 @@ package com.magento.idea.magento2plugin.util.magento.graphql;
 
 import com.intellij.lang.jsgraphql.psi.GraphQLStringValue;
 import com.intellij.psi.PsiElement;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,4 +41,17 @@ public class GraphQlUtil {
 
         return argumentStringValue;
     }
+
+    public static boolean isResolver(PhpClass psiElement) {
+        PhpClass[] implementedInterfaces = psiElement.getImplementedInterfaces();
+        for (PhpClass implementedInterface: implementedInterfaces) {
+            if (!implementedInterface.getFQN().equals("\\Magento\\Framework\\GraphQl\\Query\\ResolverInterface")) {
+                continue;
+            }
+            return false;
+        }
+        return true;
+    }
+
+
 }
