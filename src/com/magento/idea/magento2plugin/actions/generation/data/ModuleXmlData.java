@@ -6,8 +6,6 @@ package com.magento.idea.magento2plugin.actions.generation.data;
 
 import com.intellij.psi.PsiDirectory;
 
-import java.util.List;
-
 public class ModuleXmlData {
     private final String packageName;
     private final String moduleName;
