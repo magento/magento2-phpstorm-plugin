@@ -65,6 +65,9 @@
             <action id="Magento2NewModule" class="com.magento.idea.magento2plugin.actions.generation.NewModuleAction"/>
             <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewDir"/>
         </group>
+        <action id="MagentoCreateAnObserver.Menu" class="com.magento.idea.magento2plugin.actions.generation.CreateAnObserverAction">
+            <add-to-group group-id="EditorPopupMenu"/>
+        </action>
         <action id="MagentoCreateAPlugin.Menu" class="com.magento.idea.magento2plugin.actions.generation.CreateAPluginAction">
             <add-to-group group-id="EditorPopupMenu"/>
         </action>
@@ -109,6 +112,7 @@
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex" />
 
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.PluginLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.PluginTargetLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.ClassConfigurationLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.WebApiLineMarkerProvider"/>
 
@@ -144,6 +148,8 @@
         <internalFileTemplate name="Magento Module DI Xml"/>
         <internalFileTemplate name="Magento Php Preference Class"/>
         <internalFileTemplate name="Magento Module Common Php Class"/>
+        <internalFileTemplate name="Magento Observer Class"/>
+        <internalFileTemplate name="Magento Module Events Xml"/>
     </extensions>
 
 </idea-plugin>

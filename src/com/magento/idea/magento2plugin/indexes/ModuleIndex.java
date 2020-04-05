@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ModuleIndex {
 
@@ -38,10 +40,19 @@ public class ModuleIndex {
     }
 
     public List<String> getEditableModuleNames() {
+        return getModuleNames(Package.VENDOR);
+    }
+
+    public List<String> getModuleNames() {
+        return getModuleNames("/tests/|/test/");
+    }
+
+    public List<String> getModuleNames(String filterPattern) {
         FileBasedIndex index = FileBasedIndex
                 .getInstance();
         List<String> allModulesList = new ArrayList<>();
         Collection<String> allModules = index.getAllKeys(ModuleNameIndex.KEY, project);
+        Pattern p = Pattern.compile(filterPattern);
         for (String moduleName : allModules) {
             if (!moduleName.matches(RegExUtil.Magento.MODULE_NAME)) {
                 continue;
@@ -54,10 +65,10 @@ public class ModuleIndex {
                 continue;
             }
             VirtualFile virtualFile = files.iterator().next();
-            if (virtualFile.getPath().contains(Package.VENDOR)) {
+            Matcher m = p.matcher(virtualFile.getPath());
+            if (m.find()) {
                 continue;
             }
-
             allModulesList.add(moduleName);
         }
         Collections.sort(allModulesList);
