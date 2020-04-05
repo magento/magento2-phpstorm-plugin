@@ -13,7 +13,7 @@ import com.magento.idea.magento2plugin.actions.generation.NewModuleAction;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleComposerJsonData;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleRegistrationPhpData;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleXmlData;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewMagentoModuleDialogValidator;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewModuleDialogValidator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleComposerJsonGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleRegistrationPhpGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleXmlGenerator;
@@ -25,10 +25,13 @@ import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
-import java.awt.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.event.*;
+import java.util.List;
+import java.util.Vector;
 
-public class NewMagentoModuleDialog extends AbstractDialog {
+public class NewModuleDialog extends AbstractDialog implements ListSelectionListener {
     @NotNull
     private final Project project;
     @NotNull
@@ -41,7 +44,7 @@ public class NewMagentoModuleDialog extends AbstractDialog {
     private final Editor editor;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
-    private final NewMagentoModuleDialogValidator validator;
+    private final NewModuleDialogValidator validator;
     private final CamelCaseToHyphen camelCaseToHyphen;
     private final NavigateToCreatedFile navigateToCreatedFile;
     private JPanel contentPane;
@@ -55,9 +58,13 @@ public class NewMagentoModuleDialog extends AbstractDialog {
     private JLabel moduleDescriptionLabel;
     private JTextField moduleVersion;
     private JLabel moduleVersionLabel;
+    private JList moduleLicense;
+    private JLabel moduleLicenseLabel;
+    private JTextField moduleLicenseCustom;
+    private JScrollPane moduleLicenseScrollPanel;
     private String detectedPackageName;
 
-    public NewMagentoModuleDialog(@NotNull Project project, @NotNull PsiDirectory initialBaseDir, @Nullable PsiFile file, @Nullable IdeView view, @Nullable Editor editor) {
+    public NewModuleDialog(@NotNull Project project, @NotNull PsiDirectory initialBaseDir, @Nullable PsiFile file, @Nullable IdeView view, @Nullable Editor editor) {
         this.project = project;
         this.initialBaseDir = initialBaseDir;
         this.file = file;
@@ -66,13 +73,17 @@ public class NewMagentoModuleDialog extends AbstractDialog {
         this.directoryGenerator = DirectoryGenerator.getInstance();
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         this.camelCaseToHyphen = CamelCaseToHyphen.getInstance();
-        this.validator = NewMagentoModuleDialogValidator.getInstance(this);
+        this.validator = NewModuleDialogValidator.getInstance(this);
         this.navigateToCreatedFile = NavigateToCreatedFile.getInstance();
         detectPackageName(initialBaseDir);
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
         pushToMiddle();
+        setLicenses();
+
+        moduleLicenseCustom.setToolTipText("Custom License Name");
+        moduleLicenseCustom.setText("proprietary");
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -137,7 +148,8 @@ public class NewMagentoModuleDialog extends AbstractDialog {
                 getBaseDir(),
                 getModuleDescription(),
                 getComposerPackageName(),
-                getModuleVersion()
+                getModuleVersion(),
+                getModuleLicense()
         ), project).generate(NewModuleAction.ACTION_NAME);
     }
 
@@ -180,8 +192,20 @@ public class NewMagentoModuleDialog extends AbstractDialog {
         return this.moduleVersion.getText().trim();
     }
 
+    public List getModuleLicense() {
+        List selectedLicenses = this.moduleLicense.getSelectedValuesList();
+        Package.License customLicense = Package.License.CUSTOM;
+
+        if (selectedLicenses.contains(customLicense.getLicenseName())) {
+            selectedLicenses.remove(customLicense.getLicenseName());
+            selectedLicenses.add(moduleLicenseCustom.getText());
+        }
+
+        return selectedLicenses;
+    }
+
     public static void open(@NotNull Project project, @NotNull PsiDirectory initialBaseDir, @Nullable PsiFile file, @Nullable IdeView view, @Nullable Editor editor) {
-        NewMagentoModuleDialog dialog = new NewMagentoModuleDialog(project, initialBaseDir, file, view, editor);
+        NewModuleDialog dialog = new NewModuleDialog(project, initialBaseDir, file, view, editor);
         dialog.pack();
         dialog.setVisible(true);
     }
@@ -191,5 +215,38 @@ public class NewMagentoModuleDialog extends AbstractDialog {
         return camelCaseToHyphen.convert(getPackageName())
                 .concat("/")
                 .concat(camelCaseToHyphen.convert(getModuleName()));
+    }
+
+    private void setLicenses() {
+        Package.License[] licenses = Package.License.values();
+        Vector<String> licenseNames = new Vector<>(licenses.length);
+
+        for (Package.License license: licenses) {
+            licenseNames.add(license.getLicenseName());
+        }
+
+        moduleLicense.setListData(licenseNames);
+        moduleLicense.setSelectedIndex(0);
+        moduleLicense.addListSelectionListener(this);
+    }
+
+    private void handleModuleCustomLicenseInputVisibility () {
+        boolean isCustomLicenseSelected = false;
+
+        for (Object value: moduleLicense.getSelectedValuesList()) {
+            if (Package.License.CUSTOM.getLicenseName().equals(value.toString())) {
+                isCustomLicenseSelected = true;
+
+                break;
+            }
+        }
+
+        moduleLicenseCustom.setEnabled(isCustomLicenseSelected);
+        moduleLicenseCustom.setEditable(isCustomLicenseSelected);
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent listSelectionEvent) {
+        handleModuleCustomLicenseInputVisibility();
     }
 }

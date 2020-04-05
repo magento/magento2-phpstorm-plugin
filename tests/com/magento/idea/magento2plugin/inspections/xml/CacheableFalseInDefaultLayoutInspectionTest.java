@@ -29,12 +29,12 @@ public class CacheableFalseInDefaultLayoutInspectionTest extends BasePlatformTes
     }
 
     public void testWithCacheableFalseBlock() throws Exception {
-        myFixture.configureByFile(getTestName(true) + "/" + LayoutXml.DefaultFileName);
+        myFixture.configureByFile(getTestName(true) + "/" + LayoutXml.DEFAULT_FILENAME);
         myFixture.testHighlighting(true, false, false);
     }
 
     public void testWithoutCacheableFalseBlock() throws Exception {
-        myFixture.configureByFile(getTestName(true) + "/" + LayoutXml.DefaultFileName);
+        myFixture.configureByFile(getTestName(true) + "/" + LayoutXml.DEFAULT_FILENAME);
         myFixture.testHighlighting(true, true, true);
     }
 
