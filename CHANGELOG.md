@@ -13,6 +13,8 @@
     * Create a Plugin class for a class public method action
     * Code Inspection: Warning regarding Cacheable false attribute in default XML
     * Create a Preference for a class action
+    * Create a Block action
+    * Line markers for navigation from a plugin class to a target class
 
 0.3.0
 ============= 
