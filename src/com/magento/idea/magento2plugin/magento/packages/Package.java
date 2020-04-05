@@ -43,15 +43,15 @@ public class Package {
         }
     }
 
-    public static Package.Areas getAreaByString(String string)
-    {
+    public static Package.Areas getAreaByString(String string) {
         for (Package.Areas areas: Package.Areas.values()) {
-            if (!areas.toString().equals(string))
-            {
+            if (!areas.toString().equals(string)) {
                 continue;
             }
+
             return areas;
         }
+
         return null;
     }
 }

@@ -12,6 +12,8 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Directo
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.magento.files.ModuleXml;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 import java.util.Properties;
 
 public class ModuleXmlGenerator extends FileGenerator {
