@@ -8,12 +8,11 @@ import com.intellij.lang.Language;
 import com.jetbrains.php.lang.PhpLanguage;
 
 public class Plugin implements ModuleFileInterface {
-    public static String TEMPLATE = "PHP Class";
-    public static final String BEFORE_METHOD_TEMPLATE_NAME = "Magento Plugin Before Method";
-    public static final String AROUND_METHOD_TEMPLATE_NAME = "Magento Plugin Around Method";
-    public static final String AFTER_METHOD_TEMPLATE_NAME = "Magento Plugin After Method";
+    private static final String BEFORE_METHOD_TEMPLATE_NAME = "Magento Plugin Before Method";
+    private static final String AROUND_METHOD_TEMPLATE_NAME = "Magento Plugin Around Method";
+    private static final String AFTER_METHOD_TEMPLATE_NAME = "Magento Plugin After Method";
 
-    public static enum PluginType {
+    public enum PluginType {
         before,
         after,
         around
@@ -43,7 +42,7 @@ public class Plugin implements ModuleFileInterface {
 
     @Override
     public String getTemplate() {
-        return TEMPLATE;
+        return "PHP Class";
     }
 
     @Override
@@ -53,7 +52,7 @@ public class Plugin implements ModuleFileInterface {
 
     private void setFileName(String filename) {
         this.fileName = filename;
-    };
+    }
 
     public static String getMethodTemplateByPluginType(PluginType pluginType)
     {

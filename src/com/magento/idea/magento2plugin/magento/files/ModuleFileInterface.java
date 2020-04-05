@@ -7,7 +7,7 @@ package com.magento.idea.magento2plugin.magento.files;
 import com.intellij.lang.Language;
 
 public interface ModuleFileInterface {
-    public String getFileName();
-    public String getTemplate();
-    public Language getLanguage();
+    String getFileName();
+    String getTemplate();
+    Language getLanguage();
 }
