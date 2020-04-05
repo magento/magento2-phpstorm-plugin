@@ -42,6 +42,8 @@ public class CreateAnObserverDialog extends AbstractDialog {
     private FilteredComboBox observerModule;
     private JComboBox observerArea;
     private JLabel observerAreaLabel;
+    private JLabel observerNameLabel;
+    private JTextField observerName;
 
     public CreateAnObserverDialog(@NotNull Project project, String targetEvent) {
         this.project = project;
@@ -99,20 +101,23 @@ public class CreateAnObserverDialog extends AbstractDialog {
                 getNamespace()
         ), project).generate(CreateAnObserverAction.ACTION_NAME, true);
 
-//        new ObserverEventsXmlGenerator(new ObserverEventsXmlData(
-//                getObserverArea(),
-//                getObserverModule(),
-//                targetClass,
-//                getObserverSortOrder(),
-//                getObserverName(),
-//                getObserverClassFqn()
-//        ), project).generate(CreateAPluginAction.ACTION_NAME);
+        new ObserverEventsXmlGenerator(new ObserverEventsXmlData(
+                getObserverArea(),
+                getObserverModule(),
+                targetEvent,
+                getObserverName(),
+                getObserverClassFqn()
+        ), project).generate(CreateAPluginAction.ACTION_NAME);
 
         this.setVisible(false);
     }
 
     public String getObserverClassName() {
-        return this.observerClassName.getText().trim();
+        return observerClassName.getText().trim();
+    }
+
+    public String getObserverName() {
+        return observerName.getText().trim();
     }
 
     public String getObserverDirectory() {

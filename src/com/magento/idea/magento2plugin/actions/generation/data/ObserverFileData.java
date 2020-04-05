@@ -11,14 +11,14 @@ public class ObserverFileData {
     public ObserverFileData(
             String observerDirectory,
             String observerClassName,
-            String pluginModule,
+            String observerModule,
             String targetEvent,
             String pluginClassFqn,
             String namespace
     ) {
         this.observerDirectory = observerDirectory;
         this.observerClassName = observerClassName;
-        this.observerModule = pluginModule;
+        this.observerModule = observerModule;
         this.targetEvent = targetEvent;
         this.observerClassFqn = pluginClassFqn;
         this.namespace = namespace;

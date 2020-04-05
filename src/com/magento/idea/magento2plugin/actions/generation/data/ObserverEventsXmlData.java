@@ -1,9 +1,43 @@
 package com.magento.idea.magento2plugin.actions.generation.data;
 
-import com.jetbrains.php.lang.psi.elements.PhpClass;
-
 public class ObserverEventsXmlData {
-    public ObserverEventsXmlData(String observerArea, String pluginModule, PhpClass targetClass, String observerSortOrder, String observerName, String pluginClassFqn) {
-        //@TODO implement XML file generation
+    private String area;
+    private String observerModule;
+    private String targetEvent;
+    private String observerName;
+    private String observerClassFqn;
+
+    public ObserverEventsXmlData(
+            String area,
+            String observerModule,
+            String targetEvent,
+            String observerName,
+            String observerClassFqn
+    ) {
+        this.area = area;
+        this.observerModule = observerModule;
+        this.targetEvent = targetEvent;
+        this.observerName = observerName;
+        this.observerClassFqn = observerClassFqn;
+    }
+
+    public String getObserverModule() {
+        return observerModule;
+    }
+
+    public String getObserverClassFqn() {
+        return observerClassFqn;
+    }
+
+    public String getTargetEvent() {
+        return targetEvent;
+    }
+
+    public String getArea() {
+        return area;
+    }
+
+    public String getObserverName() {
+        return observerName;
     }
 }
