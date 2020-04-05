@@ -9,4 +9,5 @@ public class ModuleSystemXml {
     public static final String FIELD_ELEMENT_NAME = "field";
     public static final String XML_TAG_SOURCE_MODEL = "source_model";
     public static final String XML_TAG_FRONTEND_MODEL = "frontend_model";
+    public static final String XML_TAG_BACKEND_MODEL = "backend_model";
 }
