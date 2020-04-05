@@ -14,7 +14,8 @@ public class ModuleComposerJsonData {
     private final String moduleDescription;
     private final String composerPackageName;
     private final String moduleVersion;
-    private final List moduleLicense;
+    private final List<String> moduleLicense;
+    private final List<String> moduleDependencies;
 
     public ModuleComposerJsonData(
         String packageName,
@@ -23,7 +24,8 @@ public class ModuleComposerJsonData {
         String moduleDescription,
         String composerPackageName,
         String moduleVersion,
-        List moduleLicense
+        List<String> moduleLicense,
+        List<String> moduleDependencies
     ) {
         this.packageName = packageName;
         this.moduleName = moduleName;
@@ -32,6 +34,7 @@ public class ModuleComposerJsonData {
         this.composerPackageName = composerPackageName;
         this.moduleVersion = moduleVersion;
         this.moduleLicense = moduleLicense;
+        this.moduleDependencies = moduleDependencies;
     }
 
     public String getPackageName() {
@@ -58,7 +61,11 @@ public class ModuleComposerJsonData {
         return this.moduleVersion;
     }
 
-    public List getModuleLicense() {
+    public List<String> getModuleLicense() {
         return this.moduleLicense;
+    }
+
+    public List<String> getModuleDependencies() {
+        return moduleDependencies;
     }
 }

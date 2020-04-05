@@ -42,9 +42,14 @@ public class FileFromTemplateGenerator {
     }
 
     @Nullable
-    public PsiFile generate(@NotNull ModuleFileInterface moduleFile, @NotNull Properties attributes, @NotNull PsiDirectory baseDir, @NotNull String actionName) {
-        Ref<PsiFile> fileRef = new Ref(null);
-        Ref<String> exceptionRef = new Ref(null);
+    public PsiFile generate(
+            @NotNull ModuleFileInterface moduleFile,
+            @NotNull Properties attributes,
+            @NotNull PsiDirectory baseDir,
+            @NotNull String actionName)
+    {
+        Ref<PsiFile> fileRef = new Ref<>(null);
+        Ref<String> exceptionRef = new Ref<>(null);
         String filePath = baseDir.getText().concat("/").concat(moduleFile.getFileName());
         CommandProcessor.getInstance().executeCommand(project, () -> {
             Runnable run = () -> {
@@ -68,10 +73,17 @@ public class FileFromTemplateGenerator {
     }
 
     @Nullable
-    private PsiFile createFile(@NotNull ModuleFileInterface moduleFile, @NotNull String filePath, @NotNull PsiDirectory baseDir, @NotNull Properties attributes) throws IOException, IncorrectOperationException {
+    private PsiFile createFile(
+            @NotNull ModuleFileInterface moduleFile,
+            @NotNull String filePath,
+            @NotNull PsiDirectory baseDir,
+            @NotNull Properties attributes
+    ) throws IOException, IncorrectOperationException {
         List<String> path = StringUtil.split(filePath.replace(File.separator, "/"), "/");
         String fileName = path.get(path.size() - 1);
-        PsiFile fileTemplate = createFileFromTemplate(getTemplateManager(), baseDir, moduleFile.getTemplate(), attributes, fileName, moduleFile.getLanguage());
+        PsiFile fileTemplate = createFileFromTemplate(
+                getTemplateManager(),
+                baseDir, moduleFile.getTemplate(), attributes, fileName, moduleFile.getLanguage());
         if (fileTemplate == null) {
             throw new IncorrectOperationException("Template not found!");
         } else {
@@ -86,8 +98,21 @@ public class FileFromTemplateGenerator {
         }
     }
 
-    public PsiFile createFileFromTemplate(@NotNull FileTemplateManager templateManager, @NotNull PsiDirectory directory, @NotNull String templateName, @NotNull Properties properties, @NotNull String fileName, @NotNull Language language) throws IOException {
-        FileTemplate fileTemplate = templateManager.getInternalTemplate(templateName);
+    public PsiFile createFileFromTemplate(
+            @NotNull FileTemplateManager templateManager,
+            @NotNull PsiDirectory directory,
+            @NotNull String templateName,
+            @NotNull Properties properties,
+            @NotNull String fileName,
+            @NotNull Language language
+    ) throws IOException {
+        FileTemplate fileTemplate;
+        try {
+            fileTemplate = templateManager.getInternalTemplate(templateName);
+        } catch (IllegalStateException e) {
+            fileTemplate = templateManager.getInstance(project).getCodeTemplate(templateName);
+        }
+
         fillDefaultProperties(templateManager, properties, directory);
         String fileTemplateText = fileTemplate.getText(properties);
         PsiFile file = PsiFileFactory.getInstance(project).createFileFromText(fileName, language, fileTemplateText, true, false);
