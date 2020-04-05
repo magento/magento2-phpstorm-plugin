@@ -10,6 +10,7 @@ import com.jetbrains.php.lang.PhpLanguage;
 public class RegistrationPhp implements ModuleFileInterface {
     public static String FILE_NAME = "registration.php";
     public static String TEMPLATE = "Magento Module Registration Php";
+    public static String REGISTER_METHOD_NAME = "register";
     private static RegistrationPhp INSTANCE = null;
 
     public static RegistrationPhp getInstance() {
