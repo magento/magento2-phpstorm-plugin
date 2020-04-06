@@ -75,7 +75,7 @@ public class ModuleViewModelClassGenerator extends FileGenerator {
         String viewModelClassName = viewModelFileData.getViewModelClassName();
         attributes.setProperty("NAME", viewModelClassName);
         attributes.setProperty("NAMESPACE", viewModelFileData.getNamespace());
-        attributes.setProperty("USE", ViewModelPhp.INTERFACE_PATH);
+        attributes.setProperty("USE", ViewModelPhp.INTERFACE_FQN);
         attributes.setProperty("IMPLEMENTS", ViewModelPhp.INTERFACE_NAME);
     }
 

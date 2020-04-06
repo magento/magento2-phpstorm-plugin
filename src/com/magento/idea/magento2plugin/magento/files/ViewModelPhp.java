@@ -10,7 +10,7 @@ import com.jetbrains.php.lang.PhpLanguage;
 public class ViewModelPhp implements ModuleFileInterface {
     public static String TEMPLATE = "Magento Module Common Php Class";
     public static String DEFAULT_DIR = "ViewModel";
-    public static String INTERFACE_PATH = "Magento\\Framework\\View\\Element\\Block\\ArgumentInterface";
+    public static String INTERFACE_FQN = "Magento\\Framework\\View\\Element\\Block\\ArgumentInterface";
     public static String INTERFACE_NAME = "ArgumentInterface";
 
     private static ViewModelPhp INSTANCE = null;
