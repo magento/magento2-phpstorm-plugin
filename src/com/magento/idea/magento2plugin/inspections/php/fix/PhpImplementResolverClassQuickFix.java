@@ -11,8 +11,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.psi.PhpPsiElementFactory;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.magento.idea.magento2plugin.magento.files.GraphQlResolver;
 import org.jetbrains.annotations.NotNull;
-import com.magento.idea.magento2plugin.util.magento.graphql.GraphQlUtil;
 
 public class PhpImplementResolverClassQuickFix implements LocalQuickFix {
     @NotNull
@@ -23,7 +23,7 @@ public class PhpImplementResolverClassQuickFix implements LocalQuickFix {
 
     @Override
     public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
-        PsiElement correctInterface = PhpPsiElementFactory.createImplementsList(project, GraphQlUtil.RESOLVER_INTERFACE);
+        PsiElement correctInterface = PhpPsiElementFactory.createImplementsList(project, GraphQlResolver.RESOLVER_INTERFACE);
         PhpClass graphQlResolverClass = (PhpClass) descriptor.getPsiElement().getParent();
         graphQlResolverClass.getImplementsList().replace(correctInterface);
     }

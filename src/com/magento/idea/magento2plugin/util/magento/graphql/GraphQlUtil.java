@@ -7,18 +7,18 @@ package com.magento.idea.magento2plugin.util.magento.graphql;
 import com.intellij.lang.jsgraphql.psi.GraphQLStringValue;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.magento.idea.magento2plugin.magento.files.GraphQlResolver;
+import com.magento.idea.magento2plugin.magento.packages.Package;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class GraphQlUtil {
 
-    public static final String RESOLVER_INTERFACE = "\\Magento\\Framework\\GraphQl\\Query\\ResolverInterface";
-
     @NotNull
     public static String resolverStringToPhpFQN(String resolverFQN) {
-        resolverFQN = resolverFQN.replace("\\\\", "\\").replace("\"","");
-        if (!resolverFQN.startsWith("\\")) {
-            resolverFQN = "\\".concat(resolverFQN);
+        resolverFQN = resolverFQN.replace("\\\\", Package.FQN_SEPARATOR).replace("\"","");
+        if (!resolverFQN.startsWith(Package.FQN_SEPARATOR)) {
+            resolverFQN = Package.FQN_SEPARATOR.concat(resolverFQN);
         }
         return resolverFQN;
     }
@@ -37,7 +37,7 @@ public class GraphQlUtil {
 
         GraphQLStringValue argumentStringValue = (GraphQLStringValue) argumentChildren[1];
 
-        if (!argumentIdentifier.getText().equals("class")) {
+        if (!argumentIdentifier.getText().equals(GraphQlResolver.CLASS_ARGUMENT)) {
             return null;
         }
 
@@ -47,7 +47,7 @@ public class GraphQlUtil {
     public static boolean isResolver(PhpClass psiElement) {
         PhpClass[] implementedInterfaces = psiElement.getImplementedInterfaces();
         for (PhpClass implementedInterface: implementedInterfaces) {
-            if (!implementedInterface.getFQN().equals(RESOLVER_INTERFACE)) {
+            if (!implementedInterface.getFQN().equals(GraphQlResolver.RESOLVER_INTERFACE)) {
                 continue;
             }
             return false;
