@@ -143,7 +143,7 @@ public class NewBlockDialog extends AbstractDialog {
             return null;
         }
         String directoryPart = getBlockDirectory().replace(File.separator, Package.FQN_SEPARATOR);
-        return parts[0] + Package.FQN_SEPARATOR + parts[1] + directoryPart;
+        return parts[0] + Package.FQN_SEPARATOR + parts[1]+ Package.FQN_SEPARATOR + directoryPart;
     }
 
     public void onCancel() {
