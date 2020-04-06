@@ -12,6 +12,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class GraphQlUtil {
 
+    public static final String RESOLVER_INTERFACE = "\\Magento\\Framework\\GraphQl\\Query\\ResolverInterface";
+
     @NotNull
     public static String resolverStringToPhpFQN(String resolverFQN) {
         resolverFQN = resolverFQN.replace("\\\\", "\\").replace("\"","");
@@ -45,13 +47,11 @@ public class GraphQlUtil {
     public static boolean isResolver(PhpClass psiElement) {
         PhpClass[] implementedInterfaces = psiElement.getImplementedInterfaces();
         for (PhpClass implementedInterface: implementedInterfaces) {
-            if (!implementedInterface.getFQN().equals("\\Magento\\Framework\\GraphQl\\Query\\ResolverInterface")) {
+            if (!implementedInterface.getFQN().equals(RESOLVER_INTERFACE)) {
                 continue;
             }
             return false;
         }
         return true;
     }
-
-
 }
