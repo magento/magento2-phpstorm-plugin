@@ -14,7 +14,6 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Directo
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.ViewModelPhp;
-import com.magento.idea.magento2plugin.magento.files.PhpCommonClass;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import org.jetbrains.annotations.NotNull;
@@ -65,7 +64,7 @@ public class ModuleViewModelClassGenerator extends FileGenerator {
         }
 
         Properties attributes = getAttributes();
-        PsiFile viewModelFile = fileFromTemplateGenerator.generate(PhpCommonClass.getInstance(viewModelFileData.getViewModelClassName()), attributes, parentDirectory, actionName);
+        PsiFile viewModelFile = fileFromTemplateGenerator.generate(ViewModelPhp.getInstance(viewModelFileData.getViewModelClassName()), attributes, parentDirectory, actionName);
         if (viewModelFile == null) {
             return null;
         }
