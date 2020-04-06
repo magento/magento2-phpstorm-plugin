@@ -103,6 +103,43 @@ public class XmlCompletionContributor extends CompletionContributor {
             new PhpConstructorArgumentCompletionProvider()
         );
 
+        // <source_model>php class completion</source_model> in system.xml files.
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_DATA_CHARACTERS)
+            .inside(XmlPatterns.xmlTag().withName(ModuleSystemXml.XML_TAG_SOURCE_MODEL)
+                .withParent(XmlPatterns.xmlTag().withName(ModuleSystemXml.FIELD_ELEMENT_NAME))
+            ).inFile(xmlFile().withName(string().endsWith(ModuleSystemXml.FILE_NAME))),
+            new PhpClassCompletionProvider()
+        );
+
+        // <frontend_model>completion</frontend_model>
+        extend(CompletionType.BASIC,
+                psiElement(XmlTokenType.XML_DATA_CHARACTERS)
+                        .inside(XmlPatterns.xmlTag().withName(ModuleSystemXml.XML_TAG_FRONTEND_MODEL)),
+                new PhpClassCompletionProvider()
+        );
+
+        // <backend_model>completion</backend_model>
+        extend(CompletionType.BASIC,
+                psiElement(XmlTokenType.XML_DATA_CHARACTERS)
+                        .inside(XmlPatterns.xmlTag().withName(ModuleSystemXml.XML_TAG_BACKEND_MODEL)),
+                new PhpClassCompletionProvider()
+        );
+
+        // <randomTag backend_model="completion">
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                        .inside(XmlPatterns.xmlAttribute().withName(ModuleConfigXml.XML_ATTRIBUTE_BACKEND_MODEL)),
+                new PhpClassCompletionProvider()
+        );
+
+        // <parameter source_model="completion">...</parameter> in widget.xml files.
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+            .inside(XmlPatterns.xmlAttribute().withName(ModuleWidgetXml.ATTRIBUTE_SOURCE_MODEL_NAME)
+                .withParent(XmlPatterns.xmlTag().withName(ModuleWidgetXml.TAG_PARAMETER_NAME).
+                    withParent(XmlPatterns.xmlTag().withName(ModuleWidgetXml.TAG_PARAMETERS_NAME)))
+            ).inFile(xmlFile().withName(string().endsWith(ModuleWidgetXml.FILE_NAME))),
+                new PhpClassCompletionProvider()
+        );
+
         // <service method="methodName"/>
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
                 .inside(XmlPatterns.xmlAttribute().withName("method")
