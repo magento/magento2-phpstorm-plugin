@@ -1,0 +1,64 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<html lang="en">
+    <body>
+        <font face="verdana" size="-1">
+            <p>
+                events.xml file is the place where module's Observers are declared to adjust the system.
+            </p>
+            <p>
+                Read more about <a href="https://devdocs.magento.com/guides/v2.3/extension-dev-guide/events-and-observers.html#subscribing-to-events">Subscribing to events</a>.
+            </p>
+        </font>
+
+        <table width="100%" border="0" cellpadding="5" cellspacing="0" style="border-collapse: collapse">
+            <tr>
+                <td colspan="3"><font face="verdana" size="-1">Areas where events can be used:</font></td>
+            </tr>
+            <tr>
+                <td valign="top"><b>Area</b></td>
+                <td width="10"><b>Area Code</b></td>
+                <td width="100%" valign="top"><b>Description</b></td>
+            </tr>
+            <tr>
+                <td valign="top"><nobr><font face="verdana" size="-2"><b>Global</b></font></nobr></td>
+                <td width="10">global</td>
+                <td width="100%" valign="top"><font face="verdana" size="-1">Observer will be executed in all areas: adminhtml, crontab, frontend, graphql, webapi_rest, webapi_soap.</font></td>
+            </tr>
+            <tr>
+                <td valign="top"><nobr><font face="verdana" size="-2"><b>Admin area</b></font></nobr></td>
+                <td width="10">adminhtml</td>
+                <td width="100%" valign="top"><font face="verdana" size="-1">Observer will be executed in the adminhtml area only.</font></td>
+            </tr>
+            <tr>
+                <td valign="top"><nobr><font face="verdana" size="-2"><b>Storefront</b></font></nobr></td>
+                <td width="10">frontend</td>
+                <td width="100%" valign="top"><font face="verdana" size="-1">Observer will be executed in the frontend area only.</font></td>
+            </tr>
+            <tr>
+                <td valign="top"><nobr><font face="verdana" size="-2"><b>Cron</b></font></nobr></td>
+                <td width="10">crontab</td>
+                <td width="100%" valign="top"><font face="verdana" size="-1">Observer will be executed in the crontab area only.</font></td>
+            </tr>
+            <tr>
+                <td valign="top"><nobr><font face="verdana" size="-2"><b>GraphQl</b></font></nobr></td>
+                <td width="10">graphql</td>
+                <td width="100%" valign="top"><font face="verdana" size="-1">Observer will be executed in the graphql area only.</font></td>
+            </tr>
+            <tr>
+                <td valign="top"><nobr><font face="verdana" size="-2"><b>REST API</b></font></nobr></td>
+                <td width="10">webapi_rest</td>
+                <td width="100%" valign="top"><font face="verdana" size="-1">Observer will be executed in the webapi_rest area only.</font></td>
+            </tr>
+            <tr>
+                <td valign="top"><nobr><font face="verdana" size="-2"><b>SOAP API</b></font></nobr></td>
+                <td width="10">webapi_soap</td>
+                <td width="100%" valign="top"><font face="verdana" size="-1">Observer will be executed in the webapi_soap area only,</font></td>
+            </tr>
+        </table>
+    </body>
+</html>
