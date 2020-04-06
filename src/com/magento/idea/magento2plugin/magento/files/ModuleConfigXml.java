@@ -4,10 +4,6 @@
  */
 package com.magento.idea.magento2plugin.magento.files;
 
-import com.intellij.lang.Language;
-
-public interface ModuleFileInterface {
-    String getFileName();
-    String getTemplate();
-    Language getLanguage();
+public class ModuleConfigXml {
+    public static final String XML_ATTRIBUTE_BACKEND_MODEL = "backend_model";
 }

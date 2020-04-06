@@ -1,0 +1,11 @@
+/**
+* Observer for ${EVENT_NAME}
+*
+* @param Observer $observer
+* @return void
+*/
+public function execute(Observer $observer)
+{
+    $event = $observer->getEvent();
+    // TODO: Implement observer method.
+}

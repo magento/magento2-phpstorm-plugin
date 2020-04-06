@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
@@ -22,9 +22,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-/**
- * Created by dkvashnin on 11/12/15.
- */
 public class PluginLineMarkerProvider implements LineMarkerProvider {
     @Nullable
     @Override
