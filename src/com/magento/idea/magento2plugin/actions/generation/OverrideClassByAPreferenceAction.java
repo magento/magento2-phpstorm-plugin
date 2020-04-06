@@ -37,15 +37,14 @@ public class OverrideClassByAPreferenceAction extends DumbAwareAction {
             PsiFile psiFile = pair.getFirst();
             PhpClass phpClass = pair.getSecond();
             targetClass = phpClass;
-            if (!(psiFile instanceof PhpFile) && phpClass != null) {
+            if (psiFile instanceof PhpFile && phpClass != null) {
+                this.setStatus(event, true);
+            } else  {
                 this.setStatus(event, false);
-                return;
             }
         } else {
             this.setStatus(event, false);
-            return;
         }
-        this.setStatus(event, true);
     }
 
     private void setStatus(AnActionEvent event, boolean status) {
