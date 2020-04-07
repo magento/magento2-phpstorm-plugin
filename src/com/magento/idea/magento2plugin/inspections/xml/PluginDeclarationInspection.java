@@ -19,11 +19,13 @@ import com.intellij.psi.xml.XmlDocument;
 import com.intellij.psi.xml.XmlTag;
 import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.magento.idea.magento2plugin.indexes.PluginIndex;
+import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.magento.files.ModuleXml;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
@@ -35,16 +37,15 @@ public class PluginDeclarationInspection extends PhpInspection {
     public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder problemsHolder, boolean b) {
         return new XmlElementVisitor() {
             private final String moduleXmlFileName = ModuleXml.getInstance().getFileName();
-            private static final String pluginsXmlFileName = "di.xml";
-            private static final String duplicatedObserverNameSameFileProblemDescription = "The plugin name already used in this file. For more details see Inspection Description.";
-            private static final String duplicatedObserverNameProblemDescription =
+            private static final String duplicatedPluginNameSameFileProblemDescription = "The plugin name already used in this file. For more details see Inspection Description.";
+            private static final String duplicatedPluginNameProblemDescription =
                     "The plugin name \"%s\" for targeted \"%s\" class is already used in the module \"%s\" (%s scope). For more details see Inspection Description.";
             private HashMap<String, VirtualFile> loadedFileHash = new HashMap<>();
             private final ProblemHighlightType errorSeverity = ProblemHighlightType.WARNING;
 
             @Override
             public void visitFile(PsiFile file) {
-                if (!file.getName().equals(pluginsXmlFileName)) {
+                if (!file.getName().equals(ModuleDiXml.FILE_NAME)) {
                     return;
                 }
 
@@ -55,26 +56,26 @@ public class PluginDeclarationInspection extends PhpInspection {
                     return;
                 }
 
-                HashMap<String, XmlTag> targetObserversHash = new HashMap<>();
+                HashMap<String, XmlTag> targetPluginHash = new HashMap<>();
 
                 for (XmlTag pluginXmlTag: xmlTags) {
                     HashMap<String, XmlTag> pluginProblems = new HashMap<>();
-                    if (!pluginXmlTag.getName().equals("type")) {
+                    if (!pluginXmlTag.getName().equals(ModuleDiXml.PLUGIN_TYPE_TAG)) {
                         continue;
                     }
 
-                    XmlAttribute pluginNameAttribute = pluginXmlTag.getAttribute("name");
+                    XmlAttribute pluginNameAttribute = pluginXmlTag.getAttribute(ModuleDiXml.PLUGIN_TYPE_ATTR_NAME);
 
                     String pluginNameAttributeValue = pluginNameAttribute.getValue();
                     if (pluginNameAttributeValue == null) {
                         continue;
                     }
 
-                    List<XmlTag> targetObservers = fetchObserverTagsFromPluginTag(pluginXmlTag);
+                    List<XmlTag> targetPlugin = fetchPluginTagsFromPluginTag(pluginXmlTag);
 
-                    for (XmlTag pluginTypeXmlTag: targetObservers) {
-                        XmlAttribute pluginTypeNameAttribute = pluginTypeXmlTag.getAttribute("name");
-                        XmlAttribute pluginTypeDisabledAttribute = pluginTypeXmlTag.getAttribute("disabled");
+                    for (XmlTag pluginTypeXmlTag: targetPlugin) {
+                        XmlAttribute pluginTypeNameAttribute = pluginTypeXmlTag.getAttribute(ModuleDiXml.PLUGIN_TYPE_ATTR_NAME);
+                        XmlAttribute pluginTypeDisabledAttribute = pluginTypeXmlTag.getAttribute(ModuleDiXml.DISABLED_ATTR_NAME);
 
                         if (pluginTypeNameAttribute == null || (pluginTypeDisabledAttribute != null && pluginTypeDisabledAttribute.getValue().equals("true"))) {
                             continue;
@@ -82,17 +83,17 @@ public class PluginDeclarationInspection extends PhpInspection {
 
                         String pluginTypeName = pluginTypeNameAttribute.getValue();
                         String pluginTypeKey = pluginNameAttributeValue.concat("_").concat(pluginTypeName);
-                        if (targetObserversHash.containsKey(pluginTypeKey)) {
+                        if (targetPluginHash.containsKey(pluginTypeKey)) {
                             problemsHolder.registerProblem(
                                 pluginTypeNameAttribute.getValueElement(),
-                                duplicatedObserverNameSameFileProblemDescription,
+                                duplicatedPluginNameSameFileProblemDescription,
                                 errorSeverity
                             );
                         }
-                        targetObserversHash.put(pluginTypeKey, pluginTypeXmlTag);
+                        targetPluginHash.put(pluginTypeKey, pluginTypeXmlTag);
 
-                        List<HashMap<String, String>> modulesWithSameObserverName = fetchModuleNamesWhereSamePluginNameUsed(pluginNameAttributeValue, pluginTypeName, pluginIndex, file);
-                        for (HashMap<String, String> moduleEntry: modulesWithSameObserverName) {
+                        List<HashMap<String, String>> modulesWithSamePluginName = fetchModuleNamesWhereSamePluginNameUsed(pluginNameAttributeValue, pluginTypeName, pluginIndex, file);
+                        for (HashMap<String, String> moduleEntry: modulesWithSamePluginName) {
                             Map.Entry<String, String> module = moduleEntry.entrySet().iterator().next();
                             String moduleName = module.getKey();
                             String scope = module.getValue();
@@ -101,7 +102,7 @@ public class PluginDeclarationInspection extends PhpInspection {
                                 problemsHolder.registerProblem(
                                     pluginTypeNameAttribute.getValueElement(),
                                     String.format(
-                                        duplicatedObserverNameProblemDescription,
+                                        duplicatedPluginNameProblemDescription,
                                         pluginTypeName,
                                         pluginNameAttributeValue,
                                         moduleName,
@@ -119,7 +120,7 @@ public class PluginDeclarationInspection extends PhpInspection {
             private List<HashMap<String, String>> fetchModuleNamesWhereSamePluginNameUsed(String pluginNameAttributeValue, String pluginTypeName, PluginIndex pluginIndex, PsiFile file) {
                 List<HashMap<String, String>> modulesName = new ArrayList<>();
                 String currentFileDirectory = file.getContainingDirectory().toString();
-                String currentFileFullPath = currentFileDirectory.concat("/").concat(file.getName());
+                String currentFileFullPath = currentFileDirectory.concat(File.separator).concat(file.getName());
 
                 Collection<PsiElement> indexedPlugins = pluginIndex.getPluginElements(pluginNameAttributeValue, GlobalSearchScope.getScopeRestrictedByFileTypes(
                         GlobalSearchScope.allScope(file.getProject()),
@@ -138,20 +139,20 @@ public class PluginDeclarationInspection extends PhpInspection {
                     }
 
                     String indexedFileDirectory = indexedAttributeParent.getContainingDirectory().toString();
-                    String indexedFileFullPath = indexedFileDirectory.concat("/").concat(indexedAttributeParent.getName());
+                    String indexedFileFullPath = indexedFileDirectory.concat(File.separator).concat(indexedAttributeParent.getName());
                     if (indexedFileFullPath.equals(currentFileFullPath)) {
                         continue;
                     }
 
                     String scope = getAreaFromFileDirectory(indexedAttributeParent);
 
-                    List<XmlTag> indexObserversTags = fetchObserverTagsFromPluginTag((XmlTag) indexedPlugin.getParent().getParent());
-                    for (XmlTag indexObserversTag: indexObserversTags) {
-                        XmlAttribute indexedObserverNameAttribute = indexObserversTag.getAttribute("name");
-                        if (indexedObserverNameAttribute == null) {
+                    List<XmlTag> indexPluginTags = fetchPluginTagsFromPluginTag((XmlTag) indexedPlugin.getParent().getParent());
+                    for (XmlTag indexPluginTag: indexPluginTags) {
+                        XmlAttribute indexedPluginNameAttribute = indexPluginTag.getAttribute(ModuleDiXml.PLUGIN_TYPE_ATTR_NAME);
+                        if (indexedPluginNameAttribute == null) {
                             continue;
                         }
-                        if (!pluginTypeName.equals(indexedObserverNameAttribute.getValue())){
+                        if (!pluginTypeName.equals(indexedPluginNameAttribute.getValue())){
                             continue;
                         }
                         addModuleNameWhereSamePluginUsed(modulesName, indexedAttributeParent, scope);
@@ -161,7 +162,7 @@ public class PluginDeclarationInspection extends PhpInspection {
                 return modulesName;
             }
 
-            private List<XmlTag> fetchObserverTagsFromPluginTag(XmlTag pluginXmlTag) {
+            private List<XmlTag> fetchPluginTagsFromPluginTag(XmlTag pluginXmlTag) {
                 List<XmlTag> result = new ArrayList<>();
                 XmlTag[] pluginTypeXmlTags = PsiTreeUtil.getChildrenOfType(pluginXmlTag, XmlTag.class);
                 if (pluginTypeXmlTags == null) {
@@ -169,7 +170,7 @@ public class PluginDeclarationInspection extends PhpInspection {
                 }
 
                 for (XmlTag pluginTypeXmlTag: pluginTypeXmlTags) {
-                    if (!pluginTypeXmlTag.getName().equals("plugin")) {
+                    if (!pluginTypeXmlTag.getName().equals(ModuleDiXml.PLUGIN_TAG_NAME)) {
                         continue;
                     }
 
@@ -186,7 +187,7 @@ public class PluginDeclarationInspection extends PhpInspection {
                 if (!moduleDeclarationTag.getName().equals("module")) {
                     return;
                 }
-                XmlAttribute moduleNameAttribute = moduleDeclarationTag.getAttribute("name");
+                XmlAttribute moduleNameAttribute = moduleDeclarationTag.getAttribute(ModuleXml.MODULE_ATTR_NAME);
                 if (moduleNameAttribute == null) {
                     return;
                 }
@@ -234,8 +235,8 @@ public class PluginDeclarationInspection extends PhpInspection {
 
             private String getModuleXmlFilePathByConfigFileDirectory(String fileDirectory, String fileArea) {
                 String moduleXmlFile = fileDirectory.replace(fileArea, "").concat(moduleXmlFileName);
-                if (fileDirectory.endsWith("etc")) {
-                    moduleXmlFile = fileDirectory.concat("/").concat(moduleXmlFileName);
+                if (fileDirectory.endsWith(Package.MODULE_BASE_AREA_DIR)) {
+                    moduleXmlFile = fileDirectory.concat(File.separator).concat(moduleXmlFileName);
                 }
                 return moduleXmlFile.replace("PsiDirectory:", "file:");
             }

@@ -22,6 +22,7 @@ public class ModuleDiXml implements ModuleFileInterface {
     public static String PLUGIN_TYPE_ATTR_NAME = "name";
     public static String PREFERENCE_TAG_NAME = "preference";
     public static String PREFERENCE_ATTR_FOR = "for";
+    public static String DISABLED_ATTR_NAME = "disabled";
 
     private static ModuleDiXml INSTANCE = null;
 

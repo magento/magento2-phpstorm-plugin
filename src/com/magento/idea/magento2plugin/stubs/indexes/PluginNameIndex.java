@@ -19,6 +19,7 @@ import com.jetbrains.php.lang.PhpFileType;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
+import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.php.util.PhpPatternsHelper;
 import com.magento.idea.magento2plugin.project.Settings;
 import org.jetbrains.annotations.NotNull;
@@ -97,8 +98,8 @@ public class PluginNameIndex extends ScalarIndexExtension<String> {
         if (xmlDocument != null) {
             XmlTag xmlRootTag = xmlDocument.getRootTag();
             if (xmlRootTag != null) {
-                for (XmlTag pluginTag : xmlRootTag.findSubTags("plugin")) {
-                    String name = pluginTag.getAttributeValue("name");
+                for (XmlTag pluginTag : xmlRootTag.findSubTags(ModuleDiXml.PLUGIN_TYPE_ATTRIBUTE)) {
+                    String name = pluginTag.getAttributeValue(ModuleDiXml.PLUGIN_TYPE_ATTR_NAME);
                     if (name != null && !name.isEmpty()) {
                         map.put(name, null);
                     }
@@ -118,7 +119,7 @@ public class PluginNameIndex extends ScalarIndexExtension<String> {
     public FileBasedIndex.InputFilter getInputFilter() {
         return file -> (
                 file.getFileType() == PhpFileType.INSTANCE
-                    || (file.getFileType() == XmlFileType.INSTANCE && file.getName().equals("di.xml"))
+                    || (file.getFileType() == XmlFileType.INSTANCE && file.getName().equals(ModuleDiXml.FILE_NAME))
         );
     }
 
