@@ -41,6 +41,7 @@ public class SettingsForm implements Configurable {
     private JPanel panel1;
     private JButton regenerateUrnMapButton;
     private JLabel magentoVersion;
+    private JTextField moduleDefaultLicenseName;
     private MagentoVersion magentoVersionModel = MagentoVersion.getInstance();
 
     public SettingsForm(@NotNull final Project project) {
@@ -84,6 +85,8 @@ public class SettingsForm implements Configurable {
             magentoVersion.setText("Magento version: " . concat(version));
         }
 
+        moduleDefaultLicenseName.setText(getSettings().defaultLicenseName);
+
         return (JComponent) panel1;
     }
 
@@ -94,12 +97,16 @@ public class SettingsForm implements Configurable {
 
     @Override
     public boolean isModified() {
-        return !pluginEnabled.isSelected() == getSettings().pluginEnabled;
+        boolean licenseChanged = !moduleDefaultLicenseName.getText().equals(getSettings().defaultLicenseName);
+        boolean statusChanged = !pluginEnabled.isSelected() == getSettings().pluginEnabled;
+
+        return statusChanged || licenseChanged;
     }
 
     @Override
     public void apply() throws ConfigurationException {
         getSettings().pluginEnabled = pluginEnabled.isSelected();
+        getSettings().defaultLicenseName = moduleDefaultLicenseName.getText();
         buttonReindex.setEnabled(getSettings().pluginEnabled);
         regenerateUrnMapButton.setEnabled(getSettings().pluginEnabled);
 
