@@ -8,8 +8,6 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.magento.idea.magento2plugin.magento.files.ModuleSystemXml;
 import com.magento.idea.magento2plugin.magento.files.ModuleWidgetXml;
-
-import java.io.File;
 import java.io.IOException;
 
 public class SourceModelXmlCompletionRegistrarTest extends CompletionLightJavaCodeInsightFixtureTestCase {
@@ -18,21 +16,13 @@ public class SourceModelXmlCompletionRegistrarTest extends CompletionLightJavaCo
     private static VirtualFile widgetXmlVirtualFile;
     private static final String fixturesFolderPath;
     private static final String classesSourceFile;
-    private static final String multipleCompletionFolder;
-    private static final String[] singleLookupStringsCheck;
-    private static final String[] multipleLookupStringsCheck;
+    private static final String[] lookupStringsCheck;
 
     static {
-        multipleCompletionFolder = "multipleCompletion";
-        fixturesFolderPath = "tests/com/magento/idea/magento2plugin/completion/xml/fixtures";
+        fixturesFolderPath = "testData/completion/common/";
         classesSourceFile = "classes.php";
-        singleLookupStringsCheck = new String[]{
+        lookupStringsCheck = new String[]{
                 "Magento\\Config\\Model\\Config\\Source\\Yesno"
-        };
-        multipleLookupStringsCheck = new String[]{
-                "Magento\\Backend\\Model\\Source\\Roles",
-                "Magento\\Customer\\Model\\Source\\Roles",
-                "Magento\\B2b\\Model\\Source\\Roles"
         };
     }
 
@@ -49,56 +39,39 @@ public class SourceModelXmlCompletionRegistrarTest extends CompletionLightJavaCo
         return fixturesFolderPath;
     }
 
-    public void testThatSourceModelXmlElementMustProvideCompletion() {
-        assertCompletionContains(ModuleSystemXml.FILE_NAME, singleLookupStringsCheck);
+    public void testSourceModelXmlElementMustProvideCompletion() {
+        assertCompletionContains(ModuleSystemXml.FILE_NAME, lookupStringsCheck);
     }
 
-    public void testThatSourceModelXmlElementMustProvideMultipleCompletion() {
-        String multipleCompletionFile = String.join(
-                File.separator,
-                new String[]{multipleCompletionFolder, ModuleSystemXml.FILE_NAME}
-        );
-        assertCompletionContains(multipleCompletionFile, multipleLookupStringsCheck);
+    public void testSourceModelXmlElementMatchWithFilePositiveCase() {
+        assertCompletionMatchWithFilePositiveCase(ModuleSystemXml.FILE_NAME, lookupStringsCheck);
     }
 
-    public void testThatSourceModelXmlElementMuchWithFilePositiveCase() {
-        assertCompletionMuchWithFilePositiveCase(ModuleSystemXml.FILE_NAME, singleLookupStringsCheck);
-    }
-
-    public void testThatSourceModelXmlElementMuchWithFileNegativeCase() throws IOException {
+    public void testSourceModelXmlElementMatchWithFileNegativeCase() throws IOException {
         String negativeFilePath = "not" + ModuleSystemXml.FILE_NAME;
 
-        assertCompletionMuchWithFileNegativeCase(
+        assertCompletionMatchWithFileNegativeCase(
                 negativeFilePath,
                 VfsUtil.loadText(systemXmlVirtualFile),
-                singleLookupStringsCheck
+                lookupStringsCheck
         );
     }
 
-    public void testThatSourceModelXmlAttributeMustProvideCompletion() {
-        assertCompletionContains(ModuleWidgetXml.FILE_NAME, singleLookupStringsCheck);
+    public void testSourceModelXmlAttributeMustProvideCompletion() {
+        assertCompletionContains(ModuleWidgetXml.FILE_NAME, lookupStringsCheck);
     }
 
-    public void testThatSourceModelXmlAttributeMustProvideMultipleCompletion() {
-        String multipleCompletionFile = String.join(
-                File.separator,
-                new String[]{multipleCompletionFolder, ModuleWidgetXml.FILE_NAME}
-        );
-
-        assertCompletionContains(multipleCompletionFile, multipleLookupStringsCheck);
+    public void testSourceModelXmlAttributeMatchWithFilePositiveCase() {
+        assertCompletionMatchWithFilePositiveCase(ModuleWidgetXml.FILE_NAME, lookupStringsCheck);
     }
 
-    public void testThatSourceModelXmlAttributeMuchWithFilePositiveCase() {
-        assertCompletionMuchWithFilePositiveCase(ModuleWidgetXml.FILE_NAME, singleLookupStringsCheck);
-    }
-
-    public void testThatSourceModelXmlAttributeMuchWithFileNegativeCase() throws IOException {
+    public void testSourceModelXmlAttributeMatchWithFileNegativeCase() throws IOException {
         String negativeFilePath = "not" + ModuleWidgetXml.FILE_NAME;
 
-        assertCompletionMuchWithFileNegativeCase(
+        assertCompletionMatchWithFileNegativeCase(
                 negativeFilePath,
                 VfsUtil.loadText(widgetXmlVirtualFile),
-                singleLookupStringsCheck
+                lookupStringsCheck
         );
     }
 }

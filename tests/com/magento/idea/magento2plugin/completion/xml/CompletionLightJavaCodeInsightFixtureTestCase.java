@@ -18,7 +18,7 @@ abstract public class CompletionLightJavaCodeInsightFixtureTestCase extends Base
         checkContainsCompletion(lookupStrings);
     }
 
-    protected void assertCompletionMuchWithFilePositiveCase(
+    protected void assertCompletionMatchWithFilePositiveCase(
             String positiveFilePath,
             String... lookupStrings
     ) {
@@ -31,7 +31,7 @@ abstract public class CompletionLightJavaCodeInsightFixtureTestCase extends Base
         checkContainsCompletion(lookupStrings, messageEmptyLookup, messageCompletionContains);
     }
 
-    protected void assertCompletionMuchWithFileNegativeCase(
+    protected void assertCompletionMatchWithFileNegativeCase(
             String negativeFilePath,
             String negativeFileText,
             String... lookupStrings
