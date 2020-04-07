@@ -42,6 +42,7 @@ public class SettingsForm implements Configurable {
     private JButton regenerateUrnMapButton;
     private JLabel magentoVersion;
     private JTextField moduleDefaultLicenseName;
+    private JCheckBox mftfSupportEnabled;
     private MagentoVersion magentoVersionModel = MagentoVersion.getInstance();
 
     public SettingsForm(@NotNull final Project project) {
@@ -86,6 +87,7 @@ public class SettingsForm implements Configurable {
         }
 
         moduleDefaultLicenseName.setText(getSettings().defaultLicenseName);
+        mftfSupportEnabled.setSelected(getSettings().mftfSupportEnabled);
 
         return (JComponent) panel1;
     }
@@ -99,14 +101,16 @@ public class SettingsForm implements Configurable {
     public boolean isModified() {
         boolean licenseChanged = !moduleDefaultLicenseName.getText().equals(getSettings().defaultLicenseName);
         boolean statusChanged = !pluginEnabled.isSelected() == getSettings().pluginEnabled;
+        boolean mftfSupportChanged = mftfSupportEnabled.isSelected() != getSettings().mftfSupportEnabled;
 
-        return statusChanged || licenseChanged;
+        return statusChanged || licenseChanged || mftfSupportChanged;
     }
 
     @Override
     public void apply() throws ConfigurationException {
         getSettings().pluginEnabled = pluginEnabled.isSelected();
         getSettings().defaultLicenseName = moduleDefaultLicenseName.getText();
+        getSettings().mftfSupportEnabled = mftfSupportEnabled.isSelected();
         buttonReindex.setEnabled(getSettings().pluginEnabled);
         regenerateUrnMapButton.setEnabled(getSettings().pluginEnabled);
 
