@@ -23,6 +23,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFro
 import com.magento.idea.magento2plugin.actions.generation.util.NavigateToCreatedFile;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex;
 import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
 import org.jetbrains.annotations.NotNull;
@@ -100,7 +101,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         setModuleDependencies();
 
         moduleLicenseCustom.setToolTipText("Custom License Name");
-        moduleLicenseCustom.setText("proprietary");
+        moduleLicenseCustom.setText(Settings.getDefaultLicenseName(project));
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
