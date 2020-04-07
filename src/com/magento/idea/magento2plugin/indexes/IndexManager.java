@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.indexes;
 import com.intellij.util.indexing.FileBasedIndexImpl;
 import com.intellij.util.indexing.ID;
 import com.magento.idea.magento2plugin.stubs.indexes.*;
+import com.magento.idea.magento2plugin.stubs.indexes.PluginIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.graphql.GraphQlResolverIndex;
@@ -23,6 +24,7 @@ public class IndexManager {
             ModulePackageIndex.KEY,
             // xml|di configuration
             PluginIndex.KEY,
+            PluginNameIndex.KEY,
             VirtualTypeIndex.KEY,
             // layouts
             BlockNameIndex.KEY,

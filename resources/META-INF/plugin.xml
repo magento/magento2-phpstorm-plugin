@@ -96,6 +96,7 @@
 
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.EventObserverIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.EventNameIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.PluginNameIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.VirtualTypeIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.PluginIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.BlockNameIndex" />
@@ -133,6 +134,14 @@
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.ObserverDeclarationInspection"/>
+
+        <localInspection language="XML" groupPath="XML"
+                         shortName="PluginDeclarationInspection"
+                         displayName="Duplicated Plugin Usage in di XML"
+                         groupName="Magento 2"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.PluginDeclarationInspection"/>
 
         <localInspection language="XML" groupPath="XML"
                          shortName="CacheableFalseInDefaultLayoutInspection"
