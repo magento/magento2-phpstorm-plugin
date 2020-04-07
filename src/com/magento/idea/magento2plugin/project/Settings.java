@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 )
 public class Settings implements PersistentStateComponent<Settings> {
     public boolean pluginEnabled = false;
+    public String defaultLicenseName = "Proprietary";
 
     @Nullable
     @Override
@@ -36,5 +37,9 @@ public class Settings implements PersistentStateComponent<Settings> {
 
     public static boolean isEnabled(@NotNull Project project) {
         return getInstance(project).pluginEnabled;
+    }
+
+    public static String getDefaultLicenseName(@NotNull Project project) {
+        return getInstance(project).defaultLicenseName;
     }
 }
