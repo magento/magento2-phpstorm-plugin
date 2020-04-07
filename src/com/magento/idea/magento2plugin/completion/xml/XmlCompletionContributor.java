@@ -107,7 +107,7 @@ public class XmlCompletionContributor extends CompletionContributor {
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_DATA_CHARACTERS)
             .inside(XmlPatterns.xmlTag().withName(ModuleSystemXml.XML_TAG_SOURCE_MODEL)
                 .withParent(XmlPatterns.xmlTag().withName(ModuleSystemXml.FIELD_ELEMENT_NAME))
-            ).inFile(xmlFile().withName(string().endsWith(ModuleSystemXml.FILE_NAME))),
+            ).inFile(xmlFile().withName(string().matches(ModuleSystemXml.FILE_NAME))),
             new PhpClassCompletionProvider()
         );
 
@@ -136,7 +136,7 @@ public class XmlCompletionContributor extends CompletionContributor {
             .inside(XmlPatterns.xmlAttribute().withName(ModuleWidgetXml.ATTRIBUTE_SOURCE_MODEL_NAME)
                 .withParent(XmlPatterns.xmlTag().withName(ModuleWidgetXml.TAG_PARAMETER_NAME).
                     withParent(XmlPatterns.xmlTag().withName(ModuleWidgetXml.TAG_PARAMETERS_NAME)))
-            ).inFile(xmlFile().withName(string().endsWith(ModuleWidgetXml.FILE_NAME))),
+            ).inFile(xmlFile().withName(string().matches(ModuleWidgetXml.FILE_NAME))),
                 new PhpClassCompletionProvider()
         );
 
