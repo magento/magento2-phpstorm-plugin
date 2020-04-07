@@ -1,0 +1,3 @@
+<event name="${EVENT_NAME}">
+    <observer name="${OBSERVER_NAME}" instance="${OBSERVER_CLASS}" />
+</event>

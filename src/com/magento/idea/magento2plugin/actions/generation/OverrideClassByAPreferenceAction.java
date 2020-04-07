@@ -19,7 +19,7 @@ import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import org.jetbrains.annotations.NotNull;
 
 public class OverrideClassByAPreferenceAction extends DumbAwareAction {
-    public static String ACTION_NAME = "Override Class By A Preference...";
+    public static String ACTION_NAME = "Override Class By a Preference...";
     public static String ACTION_DESCRIPTION = "Create a new Magento 2 preference for the class";
     private final GetFirstClassOfFile getFirstClassOfFile;
     private PhpClass targetClass;
@@ -37,15 +37,14 @@ public class OverrideClassByAPreferenceAction extends DumbAwareAction {
             PsiFile psiFile = pair.getFirst();
             PhpClass phpClass = pair.getSecond();
             targetClass = phpClass;
-            if (!(psiFile instanceof PhpFile) && phpClass != null) {
+            if (psiFile instanceof PhpFile && phpClass != null) {
+                this.setStatus(event, true);
+            } else  {
                 this.setStatus(event, false);
-                return;
             }
         } else {
             this.setStatus(event, false);
-            return;
         }
-        this.setStatus(event, true);
     }
 
     private void setStatus(AnActionEvent event, boolean status) {

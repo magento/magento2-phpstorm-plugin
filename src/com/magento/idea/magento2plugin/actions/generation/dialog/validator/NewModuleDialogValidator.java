@@ -4,17 +4,17 @@
  */
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
-import com.magento.idea.magento2plugin.actions.generation.dialog.NewMagentoModuleDialog;
+import com.magento.idea.magento2plugin.actions.generation.dialog.NewModuleDialog;
 import com.magento.idea.magento2plugin.util.Regex;
 import javax.swing.*;
 
-public class NewMagentoModuleDialogValidator {
-    private static NewMagentoModuleDialogValidator INSTANCE = null;
-    private NewMagentoModuleDialog dialog;
+public class NewModuleDialogValidator {
+    private static NewModuleDialogValidator INSTANCE = null;
+    private NewModuleDialog dialog;
 
-    public static NewMagentoModuleDialogValidator getInstance(NewMagentoModuleDialog dialog) {
+    public static NewModuleDialogValidator getInstance(NewModuleDialog dialog) {
         if (null == INSTANCE) {
-            INSTANCE = new NewMagentoModuleDialogValidator();
+            INSTANCE = new NewModuleDialogValidator();
         }
         INSTANCE.dialog = dialog;
         return INSTANCE;

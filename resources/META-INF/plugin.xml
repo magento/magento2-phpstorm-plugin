@@ -21,7 +21,6 @@
             title="CHANGELOG.md"
         >here</a>
     ]]>
-
     </change-notes>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
@@ -38,6 +37,7 @@
     <depends optional="true" config-file="withJsGraphQl.xml">com.intellij.lang.jsgraphql</depends>
 
     <actions>
+        <!-- In editor generators -->
         <group id="MagentoGenerateGroup">
             <action id="MagentoGenerateBeforeMethodAction"
                     class="com.magento.idea.magento2plugin.actions.generation.PluginGenerateBeforeMethodAction"
@@ -53,16 +53,29 @@
                     description="Create Magento around plugin method."/>
             <add-to-group group-id="PhpGenerateGroup" anchor="last"/>
         </group>
+
+        <!-- Module file generators -->
+        <group id="MagentoNewModuleFileGroup" class="com.magento.idea.magento2plugin.actions.groups.NewModuleFileGroup" text="Module File" popup="true">
+            <action id="MagentoCreateABlock" class="com.magento.idea.magento2plugin.actions.generation.NewBlockAction" />
+            <action id="MagentoCreateAViewModel" class="com.magento.idea.magento2plugin.actions.generation.NewViewModelAction" />
+            <add-to-group group-id="NewGroup" anchor="last"/>
+        </group>
+
+        <!-- Complex generators -->
         <group id="MagentoNewGroup">
             <action id="Magento2NewModule" class="com.magento.idea.magento2plugin.actions.generation.NewModuleAction"/>
             <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewDir"/>
         </group>
+        <action id="MagentoCreateAnObserver.Menu" class="com.magento.idea.magento2plugin.actions.generation.CreateAnObserverAction">
+            <add-to-group group-id="EditorPopupMenu"/>
+        </action>
         <action id="MagentoCreateAPlugin.Menu" class="com.magento.idea.magento2plugin.actions.generation.CreateAPluginAction">
             <add-to-group group-id="EditorPopupMenu"/>
         </action>
         <action id="OverrideClassByAPreference.Menu" class="com.magento.idea.magento2plugin.actions.generation.OverrideClassByAPreferenceAction">
             <add-to-group group-id="EditorPopupMenu"/>
         </action>
+
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -100,6 +113,7 @@
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex" />
 
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.PluginLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.PluginTargetLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.ClassConfigurationLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.WebApiLineMarkerProvider"/>
 
@@ -134,18 +148,9 @@
         <internalFileTemplate name="Magento Module Xml"/>
         <internalFileTemplate name="Magento Module DI Xml"/>
         <internalFileTemplate name="Magento Php Preference Class"/>
+        <internalFileTemplate name="Magento Module Common Php Class"/>
+        <internalFileTemplate name="Magento Observer Class"/>
+        <internalFileTemplate name="Magento Module Events Xml"/>
     </extensions>
-
-    <application-components>
-        <!-- Add your application components here -->
-    </application-components>
-
-    <project-components>
-        <!-- Add your project components here -->
-    </project-components>
-
-    <actions>
-        <!-- Add your actions here -->
-    </actions>
 
 </idea-plugin>

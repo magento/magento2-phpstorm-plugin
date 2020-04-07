@@ -9,30 +9,35 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
+import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.actions.generation.NewModuleAction;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleComposerJsonData;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleRegistrationPhpData;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleXmlData;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewMagentoModuleDialogValidator;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewModuleDialogValidator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleComposerJsonGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleRegistrationPhpGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.util.NavigateToCreatedFile;
+import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.project.Settings;
+import com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex;
 import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
-public class NewMagentoModuleDialog extends AbstractDialog implements ListSelectionListener {
+public class NewModuleDialog extends AbstractDialog implements ListSelectionListener {
     @NotNull
     private final Project project;
     @NotNull
@@ -45,7 +50,7 @@ public class NewMagentoModuleDialog extends AbstractDialog implements ListSelect
     private final Editor editor;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
-    private final NewMagentoModuleDialogValidator validator;
+    private final NewModuleDialogValidator validator;
     private final CamelCaseToHyphen camelCaseToHyphen;
     private final NavigateToCreatedFile navigateToCreatedFile;
     private JPanel contentPane;
@@ -63,9 +68,19 @@ public class NewMagentoModuleDialog extends AbstractDialog implements ListSelect
     private JLabel moduleLicenseLabel;
     private JTextField moduleLicenseCustom;
     private JScrollPane moduleLicenseScrollPanel;
+    private JList moduleDependencies;
+    private JLabel moduleDependenciesLabel;
+    private JScrollPane moduleDependenciesScrollPanel;
     private String detectedPackageName;
+    private ModuleIndex moduleIndex;
 
-    public NewMagentoModuleDialog(@NotNull Project project, @NotNull PsiDirectory initialBaseDir, @Nullable PsiFile file, @Nullable IdeView view, @Nullable Editor editor) {
+    public NewModuleDialog(
+            @NotNull Project project,
+            @NotNull PsiDirectory initialBaseDir,
+            @Nullable PsiFile file,
+            @Nullable IdeView view,
+            @Nullable Editor editor
+    ) {
         this.project = project;
         this.initialBaseDir = initialBaseDir;
         this.file = file;
@@ -74,17 +89,19 @@ public class NewMagentoModuleDialog extends AbstractDialog implements ListSelect
         this.directoryGenerator = DirectoryGenerator.getInstance();
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         this.camelCaseToHyphen = CamelCaseToHyphen.getInstance();
-        this.validator = NewMagentoModuleDialogValidator.getInstance(this);
+        this.validator = NewModuleDialogValidator.getInstance(this);
         this.navigateToCreatedFile = NavigateToCreatedFile.getInstance();
+        this.moduleIndex = ModuleIndex.getInstance(project);
         detectPackageName(initialBaseDir);
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
         pushToMiddle();
         setLicenses();
+        setModuleDependencies();
 
         moduleLicenseCustom.setToolTipText("Custom License Name");
-        moduleLicenseCustom.setText("proprietary");
+        moduleLicenseCustom.setText(Settings.getDefaultLicenseName(project));
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -150,7 +167,8 @@ public class NewMagentoModuleDialog extends AbstractDialog implements ListSelect
                 getModuleDescription(),
                 getComposerPackageName(),
                 getModuleVersion(),
-                getModuleLicense()
+                getModuleLicense(),
+                getModuleDependencies()
         ), project).generate(NewModuleAction.ACTION_NAME);
     }
 
@@ -205,8 +223,12 @@ public class NewMagentoModuleDialog extends AbstractDialog implements ListSelect
         return selectedLicenses;
     }
 
+    public List<String> getModuleDependencies() {
+        return moduleDependencies.getSelectedValuesList();
+    }
+
     public static void open(@NotNull Project project, @NotNull PsiDirectory initialBaseDir, @Nullable PsiFile file, @Nullable IdeView view, @Nullable Editor editor) {
-        NewMagentoModuleDialog dialog = new NewMagentoModuleDialog(project, initialBaseDir, file, view, editor);
+        NewModuleDialog dialog = new NewModuleDialog(project, initialBaseDir, file, view, editor);
         dialog.pack();
         dialog.setVisible(true);
     }
@@ -229,6 +251,17 @@ public class NewMagentoModuleDialog extends AbstractDialog implements ListSelect
         moduleLicense.setListData(licenseNames);
         moduleLicense.setSelectedIndex(0);
         moduleLicense.addListSelectionListener(this);
+    }
+
+    private void setModuleDependencies() {
+        List<String> moduleNames = moduleIndex.getModuleNames();
+        Vector<String> licenseNames = new Vector<>(moduleNames.size());
+        for (String name : moduleNames) {
+            licenseNames.add(name);
+        }
+        moduleDependencies.setListData(licenseNames);
+        moduleDependencies.setSelectedIndex(0);
+        moduleDependencies.addListSelectionListener(this);
     }
 
     private void handleModuleCustomLicenseInputVisibility () {
