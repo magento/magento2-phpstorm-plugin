@@ -33,16 +33,26 @@ abstract public class CompletionLightJavaCodeInsightFixtureTestCase extends Base
 
     protected void assertCompletionMatchWithFileNegativeCase(
             String negativeFilePath,
-            String negativeFileText,
             String... lookupStrings
     ) {
-        myFixture.configureByText(negativeFilePath, negativeFileText);
+        myFixture.configureByFile(negativeFilePath);
         myFixture.completeBasic();
 
         String messageCompletionNotContains = "Failed that completion not contains `%s` in `%s` for file "
                 + negativeFilePath;
 
         checkNotContainsCompletion(lookupStrings, messageCompletionNotContains);
+    }
+
+    protected void assertCompletionNotShowing(String filePath) {
+        myFixture.configureByFile(filePath);
+        myFixture.completeBasic();
+
+        List<String> lookupElements = myFixture.getLookupElementStrings();
+
+        if (null != lookupElements && lookupElements.size() != 0) {
+            fail("Failed asserting the completion won't show up.");
+        }
     }
 
     protected void checkContainsCompletion(String[] lookupStrings) {
