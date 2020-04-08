@@ -1,0 +1,15 @@
+<?php
+#parse("PHP File Header.php")
+
+#if (${NAMESPACE})
+
+namespace ${NAMESPACE};
+
+#end
+use Magento\Framework\GraphQl\Config\Element\Field;
+use Magento\Framework\GraphQl\Query\Resolver\BatchResolverInterface;
+use Magento\Framework\GraphQl\Query\Resolver\BatchResponse;
+use Magento\Framework\GraphQl\Query\Resolver\ContextInterface;
+
+class ${NAME} implements BatchResolverInterface {
+}
