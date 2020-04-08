@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 public class Settings implements PersistentStateComponent<Settings> {
     public boolean pluginEnabled = false;
     public String defaultLicenseName = "Proprietary";
+    public boolean mftfSupportEnabled = false;
 
     @Nullable
     @Override
@@ -41,5 +42,9 @@ public class Settings implements PersistentStateComponent<Settings> {
 
     public static String getDefaultLicenseName(@NotNull Project project) {
         return getInstance(project).defaultLicenseName;
+    }
+
+    public static boolean isMftfSupportEnabled(@NotNull Project project) {
+        return getInstance(project).mftfSupportEnabled;
     }
 }
