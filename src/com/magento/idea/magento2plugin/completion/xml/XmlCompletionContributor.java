@@ -118,17 +118,19 @@ public class XmlCompletionContributor extends CompletionContributor {
                 new PhpClassCompletionProvider()
         );
 
-        // <backend_model>completion</backend_model>
-        extend(CompletionType.BASIC,
-                psiElement(XmlTokenType.XML_DATA_CHARACTERS)
-                        .inside(XmlPatterns.xmlTag().withName(ModuleSystemXml.XML_TAG_BACKEND_MODEL)),
-                new PhpClassCompletionProvider()
+        // <backend_model>completion</backend_model> in system.xml
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_DATA_CHARACTERS)
+            .inside(XmlPatterns.xmlTag().withName(ModuleSystemXml.XML_TAG_BACKEND_MODEL)
+                    .withParent(XmlPatterns.xmlTag().withName(ModuleSystemXml.FIELD_ELEMENT_NAME))
+            ).inFile(xmlFile().withName(string().matches(ModuleSystemXml.FILE_NAME))),
+            new PhpClassCompletionProvider()
         );
 
-        // <randomTag backend_model="completion">
+        // <randomTag backend_model="completion"> in config.xml
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
-                        .inside(XmlPatterns.xmlAttribute().withName(ModuleConfigXml.XML_ATTRIBUTE_BACKEND_MODEL)),
-                new PhpClassCompletionProvider()
+            .inside(XmlPatterns.xmlAttribute().withName(ModuleConfigXml.XML_ATTRIBUTE_BACKEND_MODEL))
+            .inFile(xmlFile().withName(string().matches(ModuleConfigXml.FILE_NAME))),
+            new PhpClassCompletionProvider()
         );
 
         // <parameter source_model="completion">...</parameter> in widget.xml files.
