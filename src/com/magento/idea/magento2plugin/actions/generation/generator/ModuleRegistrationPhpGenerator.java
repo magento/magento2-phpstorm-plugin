@@ -31,9 +31,8 @@ public class ModuleRegistrationPhpGenerator extends FileGenerator {
         if (moduleRegistrationPhpData.getCreateModuleDirs()) {
             ModuleDirectoriesData moduleDirectoriesData = directoryGenerator.createOrFindModuleDirectories(moduleRegistrationPhpData.getPackageName(), moduleRegistrationPhpData.getModuleName(), moduleRegistrationPhpData.getBaseDir());
             return fileFromTemplateGenerator.generate(RegistrationPhp.getInstance(), getAttributes(), moduleDirectoriesData.getModuleDirectory(), actionName);
-        } else {
-            return fileFromTemplateGenerator.generate(RegistrationPhp.getInstance(), getAttributes(), moduleRegistrationPhpData.getBaseDir(), actionName);
         }
+        return fileFromTemplateGenerator.generate(RegistrationPhp.getInstance(), getAttributes(), moduleRegistrationPhpData.getBaseDir(), actionName);
     }
 
     protected void fillAttributes(Properties attributes) {

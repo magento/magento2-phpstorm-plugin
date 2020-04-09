@@ -45,9 +45,8 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
         if (moduleComposerJsonData.getCreateModuleDirs()) {
             ModuleDirectoriesData moduleDirectoriesData = directoryGenerator.createOrFindModuleDirectories(moduleComposerJsonData.getPackageName(), moduleComposerJsonData.getModuleName(), moduleComposerJsonData.getBaseDir());
             return fileFromTemplateGenerator.generate(ComposerJson.getInstance(), getAttributes(), moduleDirectoriesData.getModuleDirectory(), actionName);
-        } else {
-            return fileFromTemplateGenerator.generate(ComposerJson.getInstance(), getAttributes(), moduleComposerJsonData.getBaseDir(), actionName);
         }
+        return fileFromTemplateGenerator.generate(ComposerJson.getInstance(), getAttributes(), moduleComposerJsonData.getBaseDir(), actionName);
     }
 
     protected void fillAttributes(Properties attributes) {

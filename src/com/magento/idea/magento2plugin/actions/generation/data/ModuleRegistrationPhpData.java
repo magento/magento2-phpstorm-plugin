@@ -36,5 +36,7 @@ public class ModuleRegistrationPhpData {
         return this.baseDir;
     }
 
-    public boolean getCreateModuleDirs() { return this.createModuleDirs; }
+    public boolean getCreateModuleDirs() {
+        return this.createModuleDirs;
+    }
 }

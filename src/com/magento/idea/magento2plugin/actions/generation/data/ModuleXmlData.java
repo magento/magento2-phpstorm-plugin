@@ -36,5 +36,7 @@ public class ModuleXmlData {
         return this.baseDir;
     }
 
-    public boolean getCreateModuleDirs() { return this.createModuleDirs; }
+    public boolean getCreateModuleDirs() {
+        return this.createModuleDirs;
+    }
 }

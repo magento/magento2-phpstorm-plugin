@@ -87,7 +87,7 @@ public class ConfigurationManager {
                         ContentEntry[] entries = contentEntries;
                         int length = contentEntries.length;
 
-                        for(int i = 0; i < length; ++i) {
+                        for (int i = 0; i < length; ++i) {
                             ContentEntry entry = entries[i];
                             VirtualFile entryFile = entry.getFile();
                             if (entryFile != null && VfsUtilCore.isAncestor(entryFile, project.getBaseDir(), false)) {
@@ -215,7 +215,7 @@ public class ConfigurationManager {
         VirtualFile[] roots = contentRoots;
         int length = contentRoots.length;
 
-        for(int i = 0; i < length; ++i) {
+        for (int i = 0; i < length; ++i) {
             VirtualFile root = roots[i];
             if (VfsUtilCore.isAncestor(root, magentoFile, false)) {
                 return true;
@@ -237,7 +237,7 @@ public class ConfigurationManager {
         Function[] functions = actions;
         int length = actions.length;
 
-        for(int i = 0; i < length; ++i) {
+        for (int i = 0; i < length; ++i) {
             Function<Notification, AnAction> generator = functions[i];
             notification.addAction(generator.apply(notification));
         }

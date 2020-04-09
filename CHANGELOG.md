@@ -6,7 +6,7 @@
     * RequireJS mapping support (reference navigation, completion)
     * Plugin class methods generation
     * Plugin declaration inspection in the scope of a Plugin Class
-    * MFTF support (reference navigation, completion)
+    * MFTF support MVP (reference navigation, completion)
     * Fixed support of 2020.* versions of IDE's
     * Create a New Magento 2 Module action
     * Code Inspection: Duplicated Observer Usage in events XML

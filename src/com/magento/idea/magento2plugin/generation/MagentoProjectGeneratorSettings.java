@@ -5,7 +5,6 @@
 package com.magento.idea.magento2plugin.generation;
 
 import com.magento.idea.magento2plugin.project.Settings;
-
 import java.util.List;
 
 public class MagentoProjectGeneratorSettings {

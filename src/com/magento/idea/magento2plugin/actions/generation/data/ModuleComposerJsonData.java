@@ -72,6 +72,7 @@ public class ModuleComposerJsonData {
         return moduleDependencies;
     }
 
-    public boolean getCreateModuleDirs() { return this.createModuleDirs; }
-
+    public boolean getCreateModuleDirs() {
+        return this.createModuleDirs;
+    }
 }

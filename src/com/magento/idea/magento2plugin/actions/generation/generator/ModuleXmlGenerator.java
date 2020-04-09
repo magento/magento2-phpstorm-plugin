@@ -34,10 +34,9 @@ public class ModuleXmlGenerator extends FileGenerator {
         if (moduleXmlData.getCreateModuleDirs()) {
             ModuleDirectoriesData moduleDirectoriesData = directoryGenerator.createOrFindModuleDirectories(moduleXmlData.getPackageName(), moduleXmlData.getModuleName(), moduleXmlData.getBaseDir());
             return fileFromTemplateGenerator.generate(ModuleXml.getInstance(), getAttributes(), moduleDirectoriesData.getModuleEtcDirectory(), actionName);
-        } else {
-            PsiDirectory etcDirectory = directoryGenerator.findOrCreateSubdirectory(moduleXmlData.getBaseDir(), Package.MODULE_BASE_AREA_DIR);
-            return fileFromTemplateGenerator.generate(ModuleXml.getInstance(), getAttributes(), etcDirectory, actionName);
         }
+        PsiDirectory etcDirectory = directoryGenerator.findOrCreateSubdirectory(moduleXmlData.getBaseDir(), Package.MODULE_BASE_AREA_DIR);
+        return fileFromTemplateGenerator.generate(ModuleXml.getInstance(), getAttributes(), etcDirectory, actionName);
     }
 
     protected void fillAttributes(Properties attributes) {
