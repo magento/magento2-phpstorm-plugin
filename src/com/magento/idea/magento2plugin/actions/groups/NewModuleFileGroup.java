@@ -13,6 +13,7 @@ import javax.swing.Icon;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.magento.idea.magento2plugin.MagentoIcons;
+import com.magento.idea.magento2plugin.actions.generation.util.IsClickedDirectoryInsideProject;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +32,11 @@ public class NewModuleFileGroup extends NonTrivialActionGroup {
         Project project = event.getData(PlatformDataKeys.PROJECT);
         PsiElement psiElement = event.getData(PlatformDataKeys.PSI_ELEMENT);
         if (!(psiElement instanceof PsiDirectory)) {
+            event.getPresentation().setVisible(false);
+            return;
+        }
+
+        if(!IsClickedDirectoryInsideProject.getInstance().execute(project, (PsiDirectory) psiElement)) {
             event.getPresentation().setVisible(false);
             return;
         }
