@@ -25,29 +25,29 @@ public class NewGraphQlResolverValidator {
     {
         String errorTitle = "Error";
 
-        String moduleName = dialog.getGraphQlResolverClassName();
-        if (moduleName.length() == 0) {
+        String resolverClassName = dialog.getGraphQlResolverClassName();
+        if (resolverClassName.length() == 0) {
             JOptionPane.showMessageDialog(null, "GraphQL Resolver Name must not be empty.", errorTitle, JOptionPane.ERROR_MESSAGE);
             return false;
         }
 
-        if (!moduleName.matches(Regex.ALPHANUMERIC)) {
+        if (!resolverClassName.matches(Regex.ALPHANUMERIC)) {
             JOptionPane.showMessageDialog(null, "GraphQL Resolver Name must contain letters and numbers only.", errorTitle, JOptionPane.ERROR_MESSAGE);
             return false;
         }
 
-        if (!Character.isUpperCase(moduleName.charAt(0)) && !Character.isDigit(moduleName.charAt(0))) {
+        if (!Character.isUpperCase(resolverClassName.charAt(0)) && !Character.isDigit(resolverClassName.charAt(0))) {
             JOptionPane.showMessageDialog(null, "GraphQL Resolver Name must start from a number or a capital letter", errorTitle, JOptionPane.ERROR_MESSAGE);
             return false;
         }
 
-        String pluginDirectory = dialog.getGraphQlResolverDirectory();
-        if (pluginDirectory.length() == 0) {
+        String graphQlResolverDirectory = dialog.getGraphQlResolverDirectory();
+        if (graphQlResolverDirectory.length() == 0) {
             JOptionPane.showMessageDialog(null, "GraphQL Resolver Directory must not be empty.", errorTitle, JOptionPane.ERROR_MESSAGE);
             return false;
         }
 
-        if (!pluginDirectory.matches(Regex.DIRECTORY)) {
+        if (!graphQlResolverDirectory.matches(Regex.DIRECTORY)) {
             JOptionPane.showMessageDialog(null, "GraphQL Resolver Directory is not valid.", errorTitle, JOptionPane.ERROR_MESSAGE);
             return false;
         }
