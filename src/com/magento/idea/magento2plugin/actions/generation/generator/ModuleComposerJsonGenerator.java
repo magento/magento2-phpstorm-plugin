@@ -5,7 +5,6 @@
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -18,10 +17,8 @@ import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.ComposerJson;
 import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
 import org.jetbrains.annotations.NotNull;
-
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.ArrayList;
 import java.util.Properties;
 import java.util.List;
 
@@ -45,8 +42,11 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
     }
 
     public PsiFile generate(String actionName) {
-        ModuleDirectoriesData moduleDirectoriesData = directoryGenerator.createOrFindModuleDirectories(moduleComposerJsonData.getPackageName(), moduleComposerJsonData.getModuleName(), moduleComposerJsonData.getBaseDir());
-        return fileFromTemplateGenerator.generate(ComposerJson.getInstance(), getAttributes(), moduleDirectoriesData.getModuleDirectory(), actionName);
+        if (moduleComposerJsonData.getCreateModuleDirs()) {
+            ModuleDirectoriesData moduleDirectoriesData = directoryGenerator.createOrFindModuleDirectories(moduleComposerJsonData.getPackageName(), moduleComposerJsonData.getModuleName(), moduleComposerJsonData.getBaseDir());
+            return fileFromTemplateGenerator.generate(ComposerJson.getInstance(), getAttributes(), moduleDirectoriesData.getModuleDirectory(), actionName);
+        }
+        return fileFromTemplateGenerator.generate(ComposerJson.getInstance(), getAttributes(), moduleComposerJsonData.getBaseDir(), actionName);
     }
 
     protected void fillAttributes(Properties attributes) {
@@ -81,6 +81,12 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
     private String getDependenciesString(List dependenciesList) {
         String result = "";
         Object[] dependencies = dependenciesList.toArray();
+        result = result.concat(ComposerJson.DEFAULT_DEPENDENCY);
+        if (dependencies.length == 0) {
+            result = result.concat("\n");
+        } else {
+            result = result.concat(",\n");
+        }
 
         for (int i = 0; i < dependencies.length; i++) {
             String dependency = dependencies[i].toString();
@@ -105,7 +111,7 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
         String version = "*";
         try {
             VirtualFile virtualFile = moduleIndex.getModuleDirectoryByModuleName(dependency)
-                    .findFile("composer.json")
+                    .findFile(ComposerJson.FILE_NAME)
                     .getVirtualFile();
             if (virtualFile.exists()) {
                 JsonElement jsonElement = new JsonParser().parse(new FileReader(virtualFile.getPath()));

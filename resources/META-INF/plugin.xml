@@ -80,13 +80,9 @@
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
-        <projectConfigurable instance="com.magento.idea.magento2plugin.project.SettingsForm"
-                             id="Magento2.SettingsForm"
-                             displayName="Magento"
-                             nonDefaultProject="true"
-                             groupId="language"
-                             parentId="reference.webide.settings.project.settings.php"
-        />
+        <directoryProjectGenerator implementation="com.magento.idea.magento2plugin.generation.MagentoModuleGenerator"/>
+        <projectTemplatesFactory implementation="com.magento.idea.magento2plugin.generation.MagentoTemplatesFactory"/>
+
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.Settings"/>
 
         <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.completion.xml.XmlCompletionContributor" />
@@ -152,6 +148,11 @@
         <internalFileTemplate name="Magento Module Common Php Class"/>
         <internalFileTemplate name="Magento Observer Class"/>
         <internalFileTemplate name="Magento Module Events Xml"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="com.jetbrains.php">
+        <frameworkProjectConfigurableProvider implementation="com.magento.idea.magento2plugin.project.ConfigurableProvider"/>
+        <frameworkUsageProvider implementation="com.magento.idea.magento2plugin.project.UsagesProvider"/>
     </extensions>
 
 </idea-plugin>
