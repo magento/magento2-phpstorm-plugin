@@ -9,7 +9,6 @@ import com.intellij.javaee.ExternalResourceManagerEx;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
-import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComponentWithBrowseButton;
@@ -20,6 +19,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FilenameIndex;
+import com.jetbrains.php.frameworks.PhpFrameworkConfigurable;
 import com.magento.idea.magento2plugin.actions.generation.util.MagentoVersion;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
 import com.magento.idea.magento2plugin.init.ConfigurationManager;
@@ -34,7 +34,7 @@ import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.Stack;
 
-public class SettingsForm implements Configurable {
+public class SettingsForm implements PhpFrameworkConfigurable {
 
     private final static String DISPLAY_NAME = "Magento";
     private final Project project;
@@ -166,6 +166,17 @@ public class SettingsForm implements Configurable {
             }
         };
         this.magentoPath.addActionListener(browseFolderListener);
+    }
+
+    @Override
+    public boolean isBeingUsed() {
+        return this.pluginEnabled.isSelected();
+    }
+
+    @NotNull
+    @Override
+    public String getId() {
+        return "Magento2.SettingsForm";
     }
 }
 
