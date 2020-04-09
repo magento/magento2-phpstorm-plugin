@@ -15,6 +15,10 @@
     * Create a Preference for a class action
     * Create a Block action
     * Line markers for navigation from a plugin class to a target class
+    * Magento 2 Module Project template on the start up
+    * Create an observer for an event action
+    * Plugin - Target line markers 
+    * GraphQL resolver inspection in the scope of a PHP Class
 
 0.3.0
 ============= 
