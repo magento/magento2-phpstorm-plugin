@@ -6,7 +6,7 @@
     * RequireJS mapping support (reference navigation, completion)
     * Plugin class methods generation
     * Plugin declaration inspection in the scope of a Plugin Class
-    * MFTF support (reference navigation, completion)
+    * MFTF support MVP (reference navigation, completion)
     * Fixed support of 2020.* versions of IDE's
     * Create a New Magento 2 Module action
     * Code Inspection: Duplicated Observer Usage in events XML
@@ -15,6 +15,10 @@
     * Create a Preference for a class action
     * Create a Block action
     * Line markers for navigation from a plugin class to a target class
+    * Magento 2 Module Project template on the start up
+    * Create an observer for an event action
+    * Plugin - Target line markers 
+    * GraphQL resolver inspection in the scope of a PHP Class
 
 0.3.0
 ============= 
