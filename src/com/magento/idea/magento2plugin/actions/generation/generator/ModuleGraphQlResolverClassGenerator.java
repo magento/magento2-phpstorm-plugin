@@ -124,7 +124,5 @@ public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
         String graphQlResolverClassName = graphQlResolverFileData.getGraphQlResolverClassName();
         attributes.setProperty("NAME", graphQlResolverClassName);
         attributes.setProperty("NAMESPACE", graphQlResolverFileData.getNamespace());
-        attributes.setProperty("USE", GraphQlResolverPhp.INTERFACE_FQN);
-        attributes.setProperty("IMPLEMENTS", GraphQlResolverPhp.INTERFACE_NAME);
     }
 }

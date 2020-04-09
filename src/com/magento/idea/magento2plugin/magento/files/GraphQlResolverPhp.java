@@ -10,8 +10,6 @@ import com.jetbrains.php.lang.PhpLanguage;
 public class GraphQlResolverPhp implements ModuleFileInterface {
     public static String TEMPLATE = "Magento GraphQL Resolver Class";
     public static String DEFAULT_DIR = "Model";
-    public static String INTERFACE_FQN = "Magento\\Framework\\GraphQl\\Query\\Resolver\\BatchResolverInterface";
-    public static String INTERFACE_NAME = "BatchResolverInterface";
     public static final String GRAPHQL_RESOLVER_TEMPLATE_NAME = "Magento GraphQL Resolver";
 
     private String fileName;
