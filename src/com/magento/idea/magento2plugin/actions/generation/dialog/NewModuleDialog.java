@@ -168,7 +168,8 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
                 getComposerPackageName(),
                 getModuleVersion(),
                 getModuleLicense(),
-                getModuleDependencies()
+                getModuleDependencies(),
+                true
         ), project).generate(NewModuleAction.ACTION_NAME);
     }
 
@@ -176,7 +177,8 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         return new ModuleRegistrationPhpGenerator(new ModuleRegistrationPhpData(
                     getPackageName(),
                     getModuleName(),
-                    getBaseDir()
+                    getBaseDir(),
+                    true
             ), project).generate(NewModuleAction.ACTION_NAME);
     }
 
@@ -184,7 +186,8 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         new ModuleXmlGenerator(new ModuleXmlData(
                 getPackageName(),
                 getModuleName(),
-                getBaseDir()
+                getBaseDir(),
+                true
         ), project).generate(NewModuleAction.ACTION_NAME, true);
     }
 

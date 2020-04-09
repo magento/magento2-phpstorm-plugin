@@ -15,24 +15,18 @@ import com.intellij.openapi.startup.StartupManager;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.vfs.*;
 import com.intellij.platform.DirectoryProjectConfigurator;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiFileSystemItem;
-import com.intellij.psi.search.FilenameIndex;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
 import com.magento.idea.magento2plugin.php.module.MagentoComponentManager;
+import com.magento.idea.magento2plugin.util.magento.MagentoBasePathUtil;
 import org.jetbrains.annotations.NotNull;
-
 import javax.swing.event.HyperlinkEvent;
-
 
 public class ProjectDetector implements DirectoryProjectConfigurator {
     @Override
     public void configureProject(@NotNull Project project, @NotNull VirtualFile baseDir, @NotNull Ref<Module> moduleRef, boolean newProject) {
         StartupManager.getInstance(project).runWhenProjectIsInitialized(() -> {
             DumbService.getInstance(project).smartInvokeLater(() -> {
-                if (null == VfsUtil.findRelativeFile(project.getBaseDir(), "app", "etc", "di.xml")) {
+                if (!MagentoBasePathUtil.isMagentoFolderValid(baseDir.getPath())) {
                     return;
                 }
                 Notification notification = new Notification("Magento", "Magento",
@@ -40,13 +34,15 @@ public class ProjectDetector implements DirectoryProjectConfigurator {
                         NotificationType.INFORMATION, new NotificationListener.Adapter() {
                     @Override
                     public void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent event) {
-                        Settings.getInstance(project).pluginEnabled = true;
+                        Settings settings = Settings.getInstance(project);
+                        settings.pluginEnabled = true;
+                        settings.mftfSupportEnabled = true;
+                        settings.magentoPath = project.getBasePath();
                         IndexManager.manualReindex();
                         MagentoComponentManager.getInstance(project).flushModules();
                         notification.expire();
                     }
-                }
-                );
+                });
                 Notifications.Bus.notify(notification, project);
             });
         });

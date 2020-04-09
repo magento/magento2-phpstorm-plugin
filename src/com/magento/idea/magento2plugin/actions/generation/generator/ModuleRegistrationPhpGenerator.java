@@ -28,8 +28,12 @@ public class ModuleRegistrationPhpGenerator extends FileGenerator {
     }
 
     public PsiFile generate(String actionName) {
-        ModuleDirectoriesData moduleDirectoriesData = directoryGenerator.createOrFindModuleDirectories(moduleRegistrationPhpData.getPackageName(), moduleRegistrationPhpData.getModuleName(), moduleRegistrationPhpData.getBaseDir());
-        return fileFromTemplateGenerator.generate(RegistrationPhp.getInstance(), getAttributes(), moduleDirectoriesData.getModuleDirectory(), actionName);
+        if (moduleRegistrationPhpData.getCreateModuleDirs()) {
+            ModuleDirectoriesData moduleDirectoriesData = directoryGenerator.createOrFindModuleDirectories(moduleRegistrationPhpData.getPackageName(), moduleRegistrationPhpData.getModuleName(), moduleRegistrationPhpData.getBaseDir());
+            return fileFromTemplateGenerator.generate(RegistrationPhp.getInstance(), getAttributes(), moduleDirectoriesData.getModuleDirectory(), actionName);
+        } else {
+            return fileFromTemplateGenerator.generate(RegistrationPhp.getInstance(), getAttributes(), moduleRegistrationPhpData.getBaseDir(), actionName);
+        }
     }
 
     protected void fillAttributes(Properties attributes) {

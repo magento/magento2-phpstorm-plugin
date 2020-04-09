@@ -79,6 +79,9 @@
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
+        <directoryProjectGenerator implementation="com.magento.idea.magento2plugin.generation.MagentoModuleGenerator"/>
+        <projectTemplatesFactory implementation="com.magento.idea.magento2plugin.generation.MagentoTemplatesFactory"/>
+
         <projectConfigurable instance="com.magento.idea.magento2plugin.project.SettingsForm"
                              id="Magento2.SettingsForm"
                              displayName="Magento"

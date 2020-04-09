@@ -7,9 +7,14 @@ package com.magento.idea.magento2plugin.project;
 import com.intellij.javaee.ExternalResourceManager;
 import com.intellij.javaee.ExternalResourceManagerEx;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.ComponentWithBrowseButton;
+import com.intellij.openapi.ui.TextComponentAccessor;
+import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
@@ -17,32 +22,31 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FilenameIndex;
 import com.magento.idea.magento2plugin.actions.generation.util.MagentoVersion;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
+import com.magento.idea.magento2plugin.init.ConfigurationManager;
 import com.magento.idea.magento2plugin.php.module.*;
+import com.magento.idea.magento2plugin.util.magento.MagentoBasePathUtil;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.Stack;
 
-/**
- * Created by dkvashnin on 1/9/16.
- */
 public class SettingsForm implements Configurable {
 
     private final static String DISPLAY_NAME = "Magento";
-
     private final Project project;
     private JCheckBox pluginEnabled;
     private JButton buttonReindex;
-    private JPanel panel1;
+    private JPanel jPanel;
     private JButton regenerateUrnMapButton;
     private JLabel magentoVersion;
     private JTextField moduleDefaultLicenseName;
     private JCheckBox mftfSupportEnabled;
+    private JLabel magentoPathLabel;
+    private TextFieldWithBrowseButton magentoPath;
     private MagentoVersion magentoVersionModel = MagentoVersion.getInstance();
 
     public SettingsForm(@NotNull final Project project) {
@@ -86,10 +90,12 @@ public class SettingsForm implements Configurable {
             magentoVersion.setText("Magento version: " . concat(version));
         }
 
-        moduleDefaultLicenseName.setText(getSettings().defaultLicenseName);
+        moduleDefaultLicenseName.setText(getSettings().DEFAULT_LICENSE);
         mftfSupportEnabled.setSelected(getSettings().mftfSupportEnabled);
+        magentoPath.getTextField().setText(getSettings().magentoPath);
+        addPathListener();
 
-        return (JComponent) panel1;
+        return (JComponent) jPanel;
     }
 
     private void reindex() {
@@ -99,25 +105,35 @@ public class SettingsForm implements Configurable {
 
     @Override
     public boolean isModified() {
-        boolean licenseChanged = !moduleDefaultLicenseName.getText().equals(getSettings().defaultLicenseName);
+        boolean licenseChanged = !moduleDefaultLicenseName.getText().equals(getSettings().DEFAULT_LICENSE);
         boolean statusChanged = !pluginEnabled.isSelected() == getSettings().pluginEnabled;
         boolean mftfSupportChanged = mftfSupportEnabled.isSelected() != getSettings().mftfSupportEnabled;
+        boolean magentoPathChanged = isMagentoPathChanged();
 
-        return statusChanged || licenseChanged || mftfSupportChanged;
+        return statusChanged || licenseChanged || mftfSupportChanged || magentoPathChanged;
+    }
+
+    private boolean isMagentoPathChanged() {
+        return !magentoPath.getTextField().getText().equals(getSettings().magentoPath);
     }
 
     @Override
     public void apply() throws ConfigurationException {
         getSettings().pluginEnabled = pluginEnabled.isSelected();
-        getSettings().defaultLicenseName = moduleDefaultLicenseName.getText();
+        getSettings().DEFAULT_LICENSE = moduleDefaultLicenseName.getText();
         getSettings().mftfSupportEnabled = mftfSupportEnabled.isSelected();
+        getSettings().magentoPath = magentoPath.getTextField().getText().trim();
         buttonReindex.setEnabled(getSettings().pluginEnabled);
         regenerateUrnMapButton.setEnabled(getSettings().pluginEnabled);
+
+        if (getSettings().pluginEnabled && !MagentoBasePathUtil.isMagentoFolderValid(getSettings().magentoPath)) {
+            throw new ConfigurationException("Please specify valid magento installation path!");
+        }
+        ConfigurationManager.getInstance().refreshIncludePaths(getSettings().getState(), project);
 
         if (buttonReindex.isEnabled()) {
             reindex();
         }
-
     }
 
     @Override
@@ -132,6 +148,24 @@ public class SettingsForm implements Configurable {
 
     private Settings getSettings() {
         return Settings.getInstance(project);
+    }
+
+    private void addPathListener() {
+        FileChooserDescriptor descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor();
+        ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseFolderListener = new ComponentWithBrowseButton.BrowseFolderActionListener<JTextField>(
+                "Magento Root Directory",
+                "Choose Magento root directory",
+                this.magentoPath,
+                null,
+                descriptor,
+                TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
+        ) {
+            @Nullable
+            protected VirtualFile getInitialFile() {
+                return super.getInitialFile();
+            }
+        };
+        this.magentoPath.addActionListener(browseFolderListener);
     }
 }
 

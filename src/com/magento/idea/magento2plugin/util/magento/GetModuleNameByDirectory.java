@@ -41,14 +41,14 @@ public class GetModuleNameByDirectory {
 
 
     private PhpFile getRegistrationPhpRecursively(PsiDirectory psiDirectory, Project project) {
-        String basePath = project.getBasePath();
-        if (psiDirectory.getVirtualFile().getPath().equals(basePath)) {
-            return null;
-        }
         PsiElement[] containingFiles = psiDirectory.getChildren();
         PhpFile containingFile = getModuleRegistrationPhpFile(containingFiles);
         if (containingFile != null) {
             return containingFile;
+        }
+        String basePath = project.getBasePath();
+        if (psiDirectory.getVirtualFile().getPath().equals(basePath)) {
+            return null;
         }
         PsiDirectory getParent = psiDirectory.getParent();
         if (getParent != null) {
