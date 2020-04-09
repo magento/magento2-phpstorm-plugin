@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.completion.xml;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.magento.idea.magento2plugin.magento.files.ModuleConfigXml;
 import com.magento.idea.magento2plugin.magento.files.ModuleSystemXml;
-
 import java.io.File;
 
 public class BackendModelXmlCompletionRegistrarTest extends CompletionLightJavaCodeInsightFixtureTestCase {
