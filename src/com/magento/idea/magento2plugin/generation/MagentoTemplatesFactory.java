@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.generation;
 import com.intellij.ide.util.projectWizard.WizardContext;
 import com.intellij.platform.ProjectTemplate;
 import com.intellij.platform.ProjectTemplatesFactory;
+import com.jetbrains.php.config.generation.PhpEmptyTemplatesFactory;
 import icons.PhpIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,7 +19,7 @@ public class MagentoTemplatesFactory extends ProjectTemplatesFactory {
 
     @NotNull
     public String[] getGroups() {
-        return new String[]{"PHP"};
+        return new String[]{PhpEmptyTemplatesFactory.PHP_PROJECT_TEMPLATE_GROUP};
     }
 
     public Icon getGroupIcon(String group) {
