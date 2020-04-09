@@ -8,18 +8,22 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.magento.idea.magento2plugin.magento.files.ModuleSystemXml;
 import com.magento.idea.magento2plugin.magento.files.ModuleWidgetXml;
+
+import java.io.File;
 import java.io.IOException;
 
 public class SourceModelXmlCompletionRegistrarTest extends CompletionLightJavaCodeInsightFixtureTestCase {
 
     private static VirtualFile systemXmlVirtualFile;
     private static VirtualFile widgetXmlVirtualFile;
+    private static final String testDataFolderPath;
     private static final String fixturesFolderPath;
     private static final String classesSourceFile;
     private static final String[] lookupStringsCheck;
 
     static {
-        fixturesFolderPath = "testData/completion/common/";
+        testDataFolderPath = "testData/completion/common/";
+        fixturesFolderPath = "xml/SourceModelXmlCompletionRegistrar";
         classesSourceFile = "classes.php";
         lookupStringsCheck = new String[]{
                 "Magento\\Config\\Model\\Config\\Source\\Yesno"
@@ -30,48 +34,80 @@ public class SourceModelXmlCompletionRegistrarTest extends CompletionLightJavaCo
     protected void setUp() throws Exception {
         super.setUp();
         myFixture.copyFileToProject(classesSourceFile);
-        systemXmlVirtualFile = myFixture.copyFileToProject(ModuleSystemXml.FILE_NAME);
-        widgetXmlVirtualFile = myFixture.copyFileToProject(ModuleWidgetXml.FILE_NAME);
     }
 
     @Override
     protected String getTestDataPath() {
-        return fixturesFolderPath;
+        return testDataFolderPath;
+    }
+
+    protected String getFixturePath(String folderName, String fileName) {
+        return fixturesFolderPath + File.separator + folderName + File.separator + fileName;
     }
 
     public void testSourceModelXmlElementMustProvideCompletion() {
-        assertCompletionContains(ModuleSystemXml.FILE_NAME, lookupStringsCheck);
+        String filePath = this.getFixturePath(
+            "sourceModelXmlElementMustProvideCompletion",
+            ModuleSystemXml.FILE_NAME
+        );
+        systemXmlVirtualFile = myFixture.copyFileToProject(filePath);
+
+        assertCompletionContains(filePath, lookupStringsCheck);
     }
 
     public void testSourceModelXmlElementMatchWithFilePositiveCase() {
-        assertCompletionMatchWithFilePositiveCase(ModuleSystemXml.FILE_NAME, lookupStringsCheck);
+        String filePath = this.getFixturePath(
+                "sourceModelXmlElementMatchWithFilePositiveCase",
+                ModuleSystemXml.FILE_NAME
+        );
+        systemXmlVirtualFile = myFixture.copyFileToProject(filePath);
+
+        assertCompletionMatchWithFilePositiveCase(filePath, lookupStringsCheck);
     }
 
-    public void testSourceModelXmlElementMatchWithFileNegativeCase() throws IOException {
-        String negativeFilePath = "not" + ModuleSystemXml.FILE_NAME;
+    public void testSourceModelXmlElementMatchWithFileNegativeCase() {
+        String filePath = this.getFixturePath(
+            "sourceModelXmlElementMatchWithFileNegativeCase",
+            "not-system.xml"
+        );
+        systemXmlVirtualFile = myFixture.copyFileToProject(filePath);
 
         assertCompletionMatchWithFileNegativeCase(
-                negativeFilePath,
-                VfsUtil.loadText(systemXmlVirtualFile),
-                lookupStringsCheck
+            filePath,
+            lookupStringsCheck
         );
     }
 
     public void testSourceModelXmlAttributeMustProvideCompletion() {
-        assertCompletionContains(ModuleWidgetXml.FILE_NAME, lookupStringsCheck);
+        String filePath = this.getFixturePath(
+                "sourceModelXmlAttributeMustProvideCompletion",
+                ModuleWidgetXml.FILE_NAME
+        );
+        widgetXmlVirtualFile = myFixture.copyFileToProject(filePath);
+
+        assertCompletionContains(filePath, lookupStringsCheck);
     }
 
     public void testSourceModelXmlAttributeMatchWithFilePositiveCase() {
-        assertCompletionMatchWithFilePositiveCase(ModuleWidgetXml.FILE_NAME, lookupStringsCheck);
+        String filePath = this.getFixturePath(
+                "sourceModelXmlAttributeMatchWithFilePositiveCase",
+                ModuleWidgetXml.FILE_NAME
+        );
+        widgetXmlVirtualFile = myFixture.copyFileToProject(filePath);
+
+        assertCompletionMatchWithFilePositiveCase(filePath, lookupStringsCheck);
     }
 
     public void testSourceModelXmlAttributeMatchWithFileNegativeCase() throws IOException {
-        String negativeFilePath = "not" + ModuleWidgetXml.FILE_NAME;
+        String filePath = this.getFixturePath(
+            "sourceModelXmlAttributeMatchWithFileNegativeCase",
+            "not-widget.xml"
+        );
+        widgetXmlVirtualFile = myFixture.copyFileToProject(filePath);
 
         assertCompletionMatchWithFileNegativeCase(
-                negativeFilePath,
-                VfsUtil.loadText(widgetXmlVirtualFile),
-                lookupStringsCheck
+            filePath,
+            lookupStringsCheck
         );
     }
 }
