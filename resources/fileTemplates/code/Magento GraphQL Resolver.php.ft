@@ -1,0 +1,15 @@
+/**
+ * Resolve multiple requests.
+ *
+ * @param ContextInterface $context
+ * @param Field $field
+ * @param array $requests
+ * @return BatchResponse
+ */
+public function resolve(
+    ContextInterface $context,
+    Field $field,
+    array $requests
+): BatchResponse {
+    // TODO: Implement resolve() method.
+}
