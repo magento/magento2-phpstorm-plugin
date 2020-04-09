@@ -18,7 +18,6 @@ public class UsagesProvider implements PhpFrameworkUsageProvider {
     }
 
     public boolean isEnabled(@NotNull Project project) {
-
         return Settings.getInstance(project).pluginEnabled;
     }
 }
