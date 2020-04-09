@@ -5,6 +5,7 @@
 package com.magento.idea.magento2plugin.indexes;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiManager;
@@ -12,6 +13,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.PhpFileType;
 import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.project.util.GetProjectBasePath;
 import com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import java.util.ArrayList;
@@ -40,14 +42,14 @@ public class ModuleIndex {
     }
 
     public List<String> getEditableModuleNames() {
-        return getModuleNames(Package.VENDOR);
+        return getModuleNames(Package.VENDOR, true);
     }
 
     public List<String> getModuleNames() {
-        return getModuleNames("/tests/|/test/");
+        return getModuleNames("/tests/|/test/", false);
     }
 
-    public List<String> getModuleNames(String filterPattern) {
+    public List<String> getModuleNames(String filterPattern, boolean withinProject) {
         FileBasedIndex index = FileBasedIndex
                 .getInstance();
         List<String> allModulesList = new ArrayList<>();
@@ -65,6 +67,11 @@ public class ModuleIndex {
                 continue;
             }
             VirtualFile virtualFile = files.iterator().next();
+            if (withinProject) {
+                if (!VfsUtilCore.isAncestor(GetProjectBasePath.execute(project), virtualFile, false)) {
+                    continue;
+                }
+            }
             Matcher m = p.matcher(virtualFile.getPath());
             if (m.find()) {
                 continue;
