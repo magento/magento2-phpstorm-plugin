@@ -6,6 +6,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewGraphQlResolverDialog;
 import com.magento.idea.magento2plugin.util.Regex;
+import com.magento.idea.magento2plugin.validators.ValidatorBundle;
 
 import javax.swing.*;
 
@@ -27,28 +28,38 @@ public class NewGraphQlResolverValidator {
 
         String resolverClassName = dialog.getGraphQlResolverClassName();
         if (resolverClassName.length() == 0) {
-            JOptionPane.showMessageDialog(null, "GraphQL Resolver Name must not be empty.", errorTitle, JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.notEmpty", "GraphQL Resolver Name");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return false;
         }
 
         if (!resolverClassName.matches(Regex.ALPHANUMERIC)) {
-            JOptionPane.showMessageDialog(null, "GraphQL Resolver Name must contain letters and numbers only.", errorTitle, JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.alphaNumericCharacters", "GraphQL Resolver Name");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return false;
         }
 
         if (!Character.isUpperCase(resolverClassName.charAt(0)) && !Character.isDigit(resolverClassName.charAt(0))) {
-            JOptionPane.showMessageDialog(null, "GraphQL Resolver Name must start from a number or a capital letter", errorTitle, JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.startWithNumberOrCapitalLetter", "GraphQL Resolver Name");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return false;
         }
 
         String graphQlResolverDirectory = dialog.getGraphQlResolverDirectory();
         if (graphQlResolverDirectory.length() == 0) {
-            JOptionPane.showMessageDialog(null, "GraphQL Resolver Directory must not be empty.", errorTitle, JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.notEmpty", "GraphQL Resolver Directory");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return false;
         }
 
         if (!graphQlResolverDirectory.matches(Regex.DIRECTORY)) {
-            JOptionPane.showMessageDialog(null, "GraphQL Resolver Directory is not valid.", errorTitle, JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.directory.isNotValid", "GraphQL Resolver Directory");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return false;
         }
 

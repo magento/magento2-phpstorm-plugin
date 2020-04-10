@@ -5,7 +5,7 @@
 package com.magento.idea.magento2plugin.generation.validator;
 
 import com.magento.idea.magento2plugin.generation.NewModuleForm;
-import com.magento.idea.magento2plugin.resources.ValidatorBundle;
+import com.magento.idea.magento2plugin.validators.ValidatorBundle;
 import com.magento.idea.magento2plugin.util.Regex;
 import com.magento.idea.magento2plugin.util.magento.MagentoBasePathUtil;
 
