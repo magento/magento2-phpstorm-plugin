@@ -60,10 +60,10 @@ public class ValidatorBundle {
     /**
      * Loads a {@link String} from the {@link #BUNDLE} {@link ResourceBundle}.
      *
-     * @param key    the key of the resource
-     * @param params the optional parameters for the specific resource
+     * @param key The key of the resource
+     * @param params The optional parameters for the specific resource
      *
-     * @return the {@link String} value or {@code null} if no resource found for the key
+     * @return {@link String} or {@code null}
      */
     public static String message(@PropertyKey(resourceBundle = BUNDLE_NAME) String key, Object... params) {
         return CommonBundle.message(BUNDLE, key, params);
@@ -72,11 +72,11 @@ public class ValidatorBundle {
     /**
      * Loads a {@link String} from the {@link #BUNDLE} {@link ResourceBundle}.
      *
-     * @param key the key of the resource
-     * @param defaultValue the default value that will be returned if there is nothing set
-     * @param params the optional parameters for the specific resource
+     * @param key The key of the resource
+     * @param defaultValue The default value that will be returned if there is nothing set
+     * @param params The optional parameters for the specific resource
      *
-     * @return the {@link String} value or {@code null} if no resource found for the key
+     * @return the {@link String} value or {@code null}
      */
     public static String messageOrDefault(
             @PropertyKey(resourceBundle = BUNDLE_NAME) String key,
