@@ -5,6 +5,7 @@
 package com.magento.idea.magento2plugin.generation.validator;
 
 import com.magento.idea.magento2plugin.generation.NewModuleForm;
+import com.magento.idea.magento2plugin.resources.ValidatorBundle;
 import com.magento.idea.magento2plugin.util.Regex;
 import com.magento.idea.magento2plugin.util.magento.MagentoBasePathUtil;
 
@@ -24,40 +25,40 @@ public class NewModuleFormValidator {
     {
         String packageName = form.getPackageName();
         if (packageName.length() == 0) {
-            return "Package Name must not be empty.";
+            return ValidatorBundle.message("validator.notEmpty", "Package Name");
         }
 
         if (!packageName.matches(Regex.ALPHANUMERIC)) {
-            return "Package Name must contain letters and numbers only.";
+            return ValidatorBundle.message("validator.alphaNumericCharacters", "Package Name");
         }
 
         if (!Character.isUpperCase(packageName.charAt(0)) && !Character.isDigit(packageName.charAt(0))) {
-            return "Package Name must start from a number or a capital letter";
+            return ValidatorBundle.message("validator.startWithNumberOrCapitalLetter", "Package Name");
         }
 
         String moduleName = form.getModuleName();
         if (moduleName.length() == 0) {
-            return "Module Name must not be empty.";
+            return ValidatorBundle.message("validator.notEmpty", "Module Name");
         }
 
         if (!moduleName.matches(Regex.ALPHANUMERIC)) {
-            return "Module Name must contain letters and numbers only.";
+            return ValidatorBundle.message("validator.alphaNumericCharacters", "Module Name");
         }
 
         if (!Character.isUpperCase(moduleName.charAt(0)) && !Character.isDigit(moduleName.charAt(0))) {
-            return "Module Name must start from a number or a capital letter";
+            return ValidatorBundle.message("validator.startWithNumberOrCapitalLetter", "Module Name");
         }
 
         if (form.getModuleVersion().length() == 0) {
-            return "Module Version must not be empty.";
+            return ValidatorBundle.message("validator.notEmpty", "Module Version");
         }
 
         if (form.getModuleDescription().length() == 0) {
-            return "Module Version must not be empty.";
+            return ValidatorBundle.message("validator.notEmpty", "Module Description");
         }
 
         if (!MagentoBasePathUtil.isMagentoFolderValid(form.getMagentoPath())) {
-            return "Please specify valid magento installation path!";
+            return ValidatorBundle.message("validator.package.validPath");
         }
 
         return null;
