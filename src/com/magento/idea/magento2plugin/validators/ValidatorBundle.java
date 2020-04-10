@@ -16,7 +16,7 @@ public class ValidatorBundle {
      * The {@link ResourceBundle} path.
      */
     @NonNls
-    public static final String BUNDLE_NAME = "messages.magento2";
+    public static final String BUNDLE_NAME = "magento2.validation";
 
     /**
      * The {@link ResourceBundle} instance.
