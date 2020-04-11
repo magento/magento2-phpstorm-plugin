@@ -4,68 +4,36 @@
  */
 package com.magento.idea.magento2plugin.completion.xml;
 
-import com.intellij.openapi.vfs.VirtualFile;
 import com.magento.idea.magento2plugin.magento.files.ModuleConfigXml;
 import com.magento.idea.magento2plugin.magento.files.ModuleSystemXml;
-import java.io.File;
 
-public class BackendModelXmlCompletionRegistrarTest extends CompletionLightJavaCodeInsightFixtureTestCase {
+public class BackendModelXmlCompletionRegistrarTest extends CompletionXmlFixtureTestCase {
 
-    private static VirtualFile systemXmlVirtualFile;
-    private static VirtualFile configXmlVirtualFile;
-    private static final String testDataFolderPath;
-    private static final String fixturesFolderPath;
-    private static final String classesSourceFile;
-    private static final String[] systemXmlBackendModelLookupStringCheck;
-    private static final String[] configXmlBackendModelLookupStringCheck;
-
-    static {
-        testDataFolderPath = "testData/completion/common/";
-        fixturesFolderPath = "xml/BackendModelXmlCompletionRegistrar";
-        classesSourceFile = "classes.php";
-        systemXmlBackendModelLookupStringCheck = new String[]{
+    private static final String[] systemXmlBackendModelLookupStringCheck = new String[]{
                 "Magento\\Backend\\Model\\Source\\Roles"
         };
-        configXmlBackendModelLookupStringCheck = new String[]{
-                "Magento\\Config\\Model\\Config\\Source\\Yesno"
-        };
-    }
+    private static final String[] configXmlBackendModelLookupStringCheck = new String[]{
+                "Magento\\Backend\\Model\\Source\\YesNo"
+    };
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        myFixture.copyFileToProject(classesSourceFile);
-    }
-
-    @Override
-    protected String getTestDataPath() {
-        return testDataFolderPath;
-    }
-
-    protected String getFixturePath(String folderName, String fileName) {
-        return fixturesFolderPath + File.separator + folderName + File.separator + fileName;
-    }
-
-    public void testSystemXmlBackendModelElementProvideCompletion() {
-        String filePath = this.getFixturePath("systemXmlElementProvideCompletion", ModuleSystemXml.FILE_NAME);
-        systemXmlVirtualFile = myFixture.copyFileToProject(filePath);
+    public void testSystemXmlElementProvideCompletion() {
+        String filePath = this.getFixturePath(ModuleSystemXml.FILE_NAME);
+        myFixture.configureByFile(filePath);
 
         assertCompletionContains(filePath, systemXmlBackendModelLookupStringCheck);
     }
 
-    public void testSystemXmlBackendModelElementCompletionWontShow() {
+    public void testSystemXmlElementCompletionWontShow() {
         String filePath = this.getFixturePath(
-            "systemXmlElementCompletionWontShow",
             ModuleSystemXml.FILE_NAME
         );
-        systemXmlVirtualFile = myFixture.copyFileToProject(filePath);
+        myFixture.copyFileToProject(filePath);
 
         assertCompletionNotShowing(filePath);
     }
 
     public void testSystemXmlBackendModelAttributeMatchWithFile() {
         String filePath = this.getFixturePath(
-            "systemXmlBackendModelAttributeMatchWithFile",
             ModuleSystemXml.FILE_NAME
         );
 
@@ -74,7 +42,6 @@ public class BackendModelXmlCompletionRegistrarTest extends CompletionLightJavaC
 
     public void testSystemXmlBackendModelAttributeDontMatchWithFile() {
         String filePath = this.getFixturePath(
-            "systemXmlBackendModelAttributeDontMatchWithFile",
             "other-file-than-system.xml"
         );
 
@@ -84,29 +51,26 @@ public class BackendModelXmlCompletionRegistrarTest extends CompletionLightJavaC
         );
     }
 
-    public void testConfigXmlBackendModelElementProvideCompletion() {
+    public void testConfigXmlElementProvideCompletion() {
         String filePath = this.getFixturePath(
-            "configXmlElementProvideCompletion",
             ModuleConfigXml.FILE_NAME
         );
-        configXmlVirtualFile = myFixture.copyFileToProject(filePath);
+        myFixture.copyFileToProject(filePath);
 
         assertCompletionContains(filePath, configXmlBackendModelLookupStringCheck);
     }
 
-    public void testConfigXmlBackendModelElementCompletionWontShow() {
+    public void testConfigXmlElementCompletionWontShow() {
         String filePath = this.getFixturePath(
-            "configXmlElementCompletionWontShow",
             ModuleConfigXml.FILE_NAME
         );
-        configXmlVirtualFile = myFixture.copyFileToProject(filePath);
+        myFixture.copyFileToProject(filePath);
 
         assertCompletionNotShowing(filePath);
     }
 
     public void testConfigXmlBackendModelAttributeMatchWithFile() {
         String filePath = this.getFixturePath(
-            "configXmlBackendModelAttributeMatchWithFile",
             ModuleConfigXml.FILE_NAME
         );
 
@@ -115,7 +79,6 @@ public class BackendModelXmlCompletionRegistrarTest extends CompletionLightJavaC
 
     public void testConfigXmlBackendModelAttributeDontMatchWithFile() {
         String filePath = this.getFixturePath(
-            "configXmlBackendModelAttributeDontMatchWithFile",
             "other-file-than-config.xml"
         );
 

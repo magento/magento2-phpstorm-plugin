@@ -4,12 +4,23 @@
  */
 package com.magento.idea.magento2plugin.completion.xml;
 
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
-
+import com.magento.idea.magento2plugin.BaseProjectTestCase;
 import java.util.Arrays;
 import java.util.List;
 
-abstract public class CompletionLightJavaCodeInsightFixtureTestCase extends BasePlatformTestCase {
+abstract public class CompletionXmlFixtureTestCase extends BaseProjectTestCase {
+    private static final String testDataFolderPath = "testData/completion/";
+    private static final String fixturesFolderPath = "xml/";
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        myFixture.setTestDataPath(testDataFolderPath);
+    }
+
+    protected String getFixturePath(String fileName) {
+        return prepareFixturePath(fileName, fixturesFolderPath);
+    }
 
     public void assertCompletionContains(String filePath, String... lookupStrings) {
         myFixture.configureByFile(filePath);
