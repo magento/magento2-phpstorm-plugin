@@ -37,7 +37,7 @@ public class BackendModelXmlCompletionRegistrarTest extends CompletionXmlFixture
             ModuleSystemXml.FILE_NAME
         );
 
-        assertFileConatainsCompletions(filePath, systemXmlBackendModelLookupStringCheck);
+        assertFileContainsCompletions(filePath, systemXmlBackendModelLookupStringCheck);
     }
 
     public void testSystemXmlBackendModelAttributeDontMatchWithFile() {
@@ -45,7 +45,7 @@ public class BackendModelXmlCompletionRegistrarTest extends CompletionXmlFixture
             "other-file-than-system.xml"
         );
 
-        assertFileNotConatainsCompletions(
+        assertFileNotContainsCompletions(
                 filePath,
                 systemXmlBackendModelLookupStringCheck
         );
@@ -74,7 +74,7 @@ public class BackendModelXmlCompletionRegistrarTest extends CompletionXmlFixture
             ModuleConfigXml.FILE_NAME
         );
 
-        assertFileConatainsCompletions(filePath, configXmlBackendModelLookupStringCheck);
+        assertFileContainsCompletions(filePath, configXmlBackendModelLookupStringCheck);
     }
 
     public void testConfigXmlBackendModelAttributeDontMatchWithFile() {
@@ -82,7 +82,7 @@ public class BackendModelXmlCompletionRegistrarTest extends CompletionXmlFixture
             "other-file-than-config.xml"
         );
 
-        assertFileNotConatainsCompletions(
+        assertFileNotContainsCompletions(
                 filePath,
                 configXmlBackendModelLookupStringCheck
         );

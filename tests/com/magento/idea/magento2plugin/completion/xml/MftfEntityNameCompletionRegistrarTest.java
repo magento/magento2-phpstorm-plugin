@@ -19,14 +19,14 @@ public class MftfEntityNameCompletionRegistrarTest extends CompletionXmlFixtureT
         );
         myFixture.copyFileToProject(filePath);
 
-        assertFileConatainsCompletions(filePath, lookupStringsEntities);
+        assertFileContainsCompletions(filePath, lookupStringsEntities);
     }
 
     public void testCreateDataInTestMustProvideCompletion () {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.copyFileToProject(filePath);
 
-        assertFileConatainsCompletions(filePath, lookupStringsEntities);
+        assertFileContainsCompletions(filePath, lookupStringsEntities);
     }
 
     public void testCreateDataInTestWithSectionMustBeEmpty () {
@@ -40,7 +40,7 @@ public class MftfEntityNameCompletionRegistrarTest extends CompletionXmlFixtureT
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.copyFileToProject(filePath);
 
-        assertFileConatainsCompletions(filePath, lookupStringsEntities);
+        assertFileContainsCompletions(filePath, lookupStringsEntities);
     }
 
     public void testUpdateDataActionGroupMustBeEmpty () {
@@ -54,7 +54,7 @@ public class MftfEntityNameCompletionRegistrarTest extends CompletionXmlFixtureT
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.copyFileToProject(filePath);
 
-        assertFileConatainsCompletions(filePath, lookupStringsEntities);
+        assertFileContainsCompletions(filePath, lookupStringsEntities);
     }
 
     public void testUpdateDataInTestMustBeEmpty () {
@@ -68,7 +68,7 @@ public class MftfEntityNameCompletionRegistrarTest extends CompletionXmlFixtureT
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.copyFileToProject(filePath);
 
-        assertFileConatainsCompletions(filePath, lookupStringsEntities);
+        assertFileContainsCompletions(filePath, lookupStringsEntities);
     }
 
     public void testUserInputInActionGroupMustBeEmpty () {
@@ -82,7 +82,7 @@ public class MftfEntityNameCompletionRegistrarTest extends CompletionXmlFixtureT
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.copyFileToProject(filePath);
 
-        assertFileConatainsCompletions(filePath, lookupStringsEntities);
+        assertFileContainsCompletions(filePath, lookupStringsEntities);
     }
 
     public void testUserInputInTestMustBeEmpty () {
@@ -96,7 +96,7 @@ public class MftfEntityNameCompletionRegistrarTest extends CompletionXmlFixtureT
         String filePath = this.getFixturePath("TestData.xml");
         myFixture.copyFileToProject(filePath);
 
-        assertFileConatainsCompletions(filePath, lookupStringsEntities);
+        assertFileContainsCompletions(filePath, lookupStringsEntities);
     }
 
     public void testEntityExtendsInDataMustBeEmpty () {

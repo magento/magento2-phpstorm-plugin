@@ -25,14 +25,14 @@ public class SourceModelXmlCompletionRegistrarTest extends CompletionXmlFixtureT
         String filePath = this.getFixturePath(ModuleSystemXml.FILE_NAME);
         myFixture.copyFileToProject(filePath);
 
-        assertFileConatainsCompletions(filePath, lookupStringsCheck);
+        assertFileContainsCompletions(filePath, lookupStringsCheck);
     }
 
     public void testSourceModelXmlElementMatchWithFileNegativeCase() {
         String filePath = this.getFixturePath("not-system.xml");
         myFixture.copyFileToProject(filePath);
 
-        assertFileNotConatainsCompletions(
+        assertFileNotContainsCompletions(
             filePath,
             lookupStringsCheck
         );
@@ -49,14 +49,14 @@ public class SourceModelXmlCompletionRegistrarTest extends CompletionXmlFixtureT
         String filePath = this.getFixturePath(ModuleWidgetXml.FILE_NAME);
         myFixture.copyFileToProject(filePath);
 
-        assertFileConatainsCompletions(filePath, lookupStringsCheck);
+        assertFileContainsCompletions(filePath, lookupStringsCheck);
     }
 
     public void testSourceModelXmlAttributeMatchWithFileNegativeCase() throws IOException {
         String filePath = this.getFixturePath("not-widget.xml");
         myFixture.copyFileToProject(filePath);
 
-        assertFileNotConatainsCompletions(
+        assertFileNotContainsCompletions(
             filePath,
             lookupStringsCheck
         );
