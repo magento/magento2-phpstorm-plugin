@@ -5,12 +5,14 @@
 package com.magento.idea.magento2plugin.completion.xml;
 
 import com.magento.idea.magento2plugin.BaseProjectTestCase;
+
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
 abstract public class CompletionXmlFixtureTestCase extends BaseProjectTestCase {
-    private static final String testDataFolderPath = "testData/completion/";
-    private static final String fixturesFolderPath = "xml/";
+    private static final String testDataFolderPath = "testData" + File.separator + "completion" + File.separator;
+    private static final String fixturesFolderPath = "xml" + File.separator;
 
     @Override
     protected void setUp() throws Exception {

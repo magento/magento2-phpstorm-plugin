@@ -10,7 +10,7 @@ import java.io.File;
  * Configure test environment with Magento 2 project
  */
 abstract public class BaseProjectTestCase extends BasePlatformTestCase {
-    private static final String testDataProjectPath = "testData/project";
+    private static final String testDataProjectPath = "testData" + File.separator + "project";
     private static final String testDataProjectDirectory = "magento2";
 
     @Override
