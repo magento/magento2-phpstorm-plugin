@@ -16,6 +16,7 @@ import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.PhpPreference;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
+import com.magento.idea.magento2plugin.validators.ValidatorBundle;
 import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.io.File;
@@ -39,11 +40,15 @@ public class PreferenceClassGenerator extends FileGenerator {
 
     public PsiFile generate(String actionName) {
         PhpClass pluginClass = GetPhpClassByFQN.getInstance(project).execute(preferenceFileData.getPreferenceFqn());
+
         if (pluginClass == null) {
             pluginClass = createPluginClass(actionName);
         }
+
         if (pluginClass == null) {
-            JOptionPane.showMessageDialog(null, "Preference Class cant be created!", "Error", JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.file.cantBeCreated", "Preference Class");
+            JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+
             return null;
         }
 

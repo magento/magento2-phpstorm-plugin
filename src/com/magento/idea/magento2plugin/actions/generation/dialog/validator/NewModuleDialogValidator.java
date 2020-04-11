@@ -5,6 +5,7 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewModuleDialog;
+import com.magento.idea.magento2plugin.validators.ValidatorBundle;
 import com.magento.idea.magento2plugin.util.Regex;
 import javax.swing.*;
 
@@ -25,43 +26,59 @@ public class NewModuleDialogValidator {
         String errorTitle = "Error";
         String packageName = dialog.getPackageName();
         if (packageName.length() == 0) {
-            JOptionPane.showMessageDialog(null, "Package Name must not be empty.", errorTitle, JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.notEmpty", "Package Name");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return false;
         }
 
         if (!packageName.matches(Regex.ALPHANUMERIC)) {
-            JOptionPane.showMessageDialog(null, "Package Name must contain letters and numbers only.", errorTitle, JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.alphaNumericCharacters", "Package Name");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return false;
         }
 
         if (!Character.isUpperCase(packageName.charAt(0)) && !Character.isDigit(packageName.charAt(0))) {
-            JOptionPane.showMessageDialog(null, "Package Name must start from a number or a capital letter", errorTitle, JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.startWithNumberOrCapitalLetter", "Package Name");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return false;
         }
 
         String moduleName = dialog.getModuleName();
         if (moduleName.length() == 0) {
-            JOptionPane.showMessageDialog(null, "Module Name must not be empty.", errorTitle, JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.notEmpty", "Module Name");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return false;
         }
 
         if (!moduleName.matches(Regex.ALPHANUMERIC)) {
-            JOptionPane.showMessageDialog(null, "Module Name must contain letters and numbers only.", errorTitle, JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.alphaNumericCharacters", "Module Name");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return false;
         }
 
         if (!Character.isUpperCase(moduleName.charAt(0)) && !Character.isDigit(moduleName.charAt(0))) {
-            JOptionPane.showMessageDialog(null, "Module Name must start from a number or a capital letter", errorTitle, JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.startWithNumberOrCapitalLetter", "Module Name");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return false;
         }
 
         if (dialog.getModuleVersion().length() == 0) {
-            JOptionPane.showMessageDialog(null, "Module Version must not be empty.", errorTitle, JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.notEmpty", "Module Version");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return false;
         }
 
         if (dialog.getModuleDescription().length() == 0) {
-            JOptionPane.showMessageDialog(null, "Module Version must not be empty.", errorTitle, JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.notEmpty", "Module Description");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return false;
         }
 

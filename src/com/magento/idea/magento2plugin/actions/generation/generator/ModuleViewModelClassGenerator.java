@@ -16,6 +16,7 @@ import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.ViewModelPhp;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
+import com.magento.idea.magento2plugin.validators.ValidatorBundle;
 import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.io.File;
@@ -38,12 +39,17 @@ public class ModuleViewModelClassGenerator extends FileGenerator {
     public PsiFile generate(String actionName) {
         PhpClass block = GetPhpClassByFQN.getInstance(project).execute(getViewModelFqn());
         if (block != null) {
-            JOptionPane.showMessageDialog(null, "View Model already exist!", "Error", JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.file.alreadyExists", "View Model");
+            JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+
             return null;
         }
+
         PhpFile viewModelFile = createViewModelClass(actionName);
         if (viewModelFile == null) {
-            JOptionPane.showMessageDialog(null, "View Model can't be created!", "Error", JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.file.cantBeCreated", "View Model");
+            JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+
             return null;
         }
 

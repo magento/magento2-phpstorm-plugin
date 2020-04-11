@@ -6,6 +6,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewBlockDialog;
 import com.magento.idea.magento2plugin.util.Regex;
+import com.magento.idea.magento2plugin.validators.ValidatorBundle;
 import javax.swing.*;
 
 public class NewBlockValidator {
@@ -26,28 +27,38 @@ public class NewBlockValidator {
 
         String moduleName = dialog.getBlockName();
         if (moduleName.length() == 0) {
-            JOptionPane.showMessageDialog(null, "Block Name must not be empty.", errorTitle, JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.notEmpty", "Block Name");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return false;
         }
 
         if (!moduleName.matches(Regex.ALPHANUMERIC)) {
-            JOptionPane.showMessageDialog(null, "Block Name must contain letters and numbers only.", errorTitle, JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.alphaNumericCharacters", "Block Name");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return false;
         }
 
         if (!Character.isUpperCase(moduleName.charAt(0)) && !Character.isDigit(moduleName.charAt(0))) {
-            JOptionPane.showMessageDialog(null, "Block Name must start from a number or a capital letter", errorTitle, JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.startWithNumberOrCapitalLetter", "Block Name");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return false;
         }
 
         String pluginDirectory = dialog.getBlockDirectory();
         if (pluginDirectory.length() == 0) {
-            JOptionPane.showMessageDialog(null, "Block Directory must not be empty.", errorTitle, JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.notEmpty", "Block Directory");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return false;
         }
 
         if (!pluginDirectory.matches(Regex.DIRECTORY)) {
-            JOptionPane.showMessageDialog(null, "Block Directory is not valid.", errorTitle, JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.directory.isNotValid", "Block Directory");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return false;
         }
 

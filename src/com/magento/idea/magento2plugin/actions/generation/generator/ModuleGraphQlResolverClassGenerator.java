@@ -25,6 +25,7 @@ import com.magento.idea.magento2plugin.magento.files.GraphQlResolverPhp;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
+import com.magento.idea.magento2plugin.validators.ValidatorBundle;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -58,12 +59,14 @@ public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
             }
 
             if (graphQlResolverClass == null) {
+                String errorMessage = ValidatorBundle.message("validator.file.cantBeCreated", "GraphQL Resolver Class");
                 JOptionPane.showMessageDialog(
                         null,
-                        "GraphQL Resolver Class can't be created!",
+                        errorMessage,
                         "Error",
                         JOptionPane.ERROR_MESSAGE
                 );
+
                 return;
             }
 
