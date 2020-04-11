@@ -75,7 +75,9 @@ public class CreateAPluginDialogValidator {
         }
 
         if (!pluginName.matches(Regex.IDENTIFIER)) {
-            JOptionPane.showMessageDialog(null, "Plugin Name must contain letters, numbers, dashes, and underscores only.", errorTitle, JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.identifier", "Plugin Name");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return false;
         }
 
@@ -88,7 +90,9 @@ public class CreateAPluginDialogValidator {
         }
 
         if (!sortOrder.matches(Regex.NUMERIC)) {
-            JOptionPane.showMessageDialog(null, "Sort Order must contain numbers only.", errorTitle, JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.onlyNumbers", "Sort Order");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return false;
         }
 
@@ -102,7 +106,9 @@ public class CreateAPluginDialogValidator {
 
         List<String> allModulesList = ModuleIndex.getInstance(project).getEditableModuleNames();
         if (!allModulesList.contains(pluginModule)) {
-            JOptionPane.showMessageDialog(null, "No such module '".concat(pluginModule).concat("'."), errorTitle, JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.module.noSuchModule", pluginModule);
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return false;
         }
 
