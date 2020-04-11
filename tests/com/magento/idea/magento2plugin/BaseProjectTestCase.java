@@ -25,7 +25,7 @@ abstract public class BaseProjectTestCase extends BasePlatformTestCase {
         myFixture.setTestDataPath(testDataProjectPath);
         myFixture.copyDirectoryToProject(
                 testDataProjectDirectory,
-                GetProjectBasePath.execute(myFixture.getProject()).getPath()
+                ""
         );
     }
 
