@@ -4,6 +4,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
 import com.magento.idea.magento2plugin.project.Settings;
+import com.magento.idea.magento2plugin.project.util.GetProjectBasePath;
 import java.io.File;
 
 /**
@@ -24,7 +25,7 @@ abstract public class BaseProjectTestCase extends BasePlatformTestCase {
         myFixture.setTestDataPath(testDataProjectPath);
         myFixture.copyDirectoryToProject(
                 testDataProjectDirectory,
-                myFixture.getProject().getBasePath()
+                GetProjectBasePath.execute(myFixture.getProject()).getPath()
         );
     }
 
