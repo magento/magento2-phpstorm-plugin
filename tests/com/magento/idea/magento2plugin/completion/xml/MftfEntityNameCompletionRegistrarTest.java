@@ -14,9 +14,7 @@ public class MftfEntityNameCompletionRegistrarTest extends CompletionXmlFixtureT
         };
 
     public void testCreateDataActionGroupMustProvideCompletion () {
-        String filePath = this.getFixturePath(
-                "TestActionGroup.xml"
-        );
+        String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.copyFileToProject(filePath);
 
         assertFileContainsCompletions(filePath, lookupStringsEntities);
