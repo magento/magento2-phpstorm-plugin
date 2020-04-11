@@ -36,12 +36,16 @@ public class OverrideClassByAPreferenceDialogValidator {
         }
 
         if (!preferenceClassName.matches(Regex.ALPHANUMERIC)) {
-            JOptionPane.showMessageDialog(null, "Preference Class Name must contain letters and numbers only.", errorTitle, JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.alphaNumericCharacters", "Preference Class");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return false;
         }
 
         if (!Character.isUpperCase(preferenceClassName.charAt(0)) && !Character.isDigit(preferenceClassName.charAt(0))) {
-            JOptionPane.showMessageDialog(null, "Preference Class Name must start from a number or a capital letter", errorTitle, JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.startWithNumberOrCapitalLetter", "Preference Class");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return false;
         }
 
