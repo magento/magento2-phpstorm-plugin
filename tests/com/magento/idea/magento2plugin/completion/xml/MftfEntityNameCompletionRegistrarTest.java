@@ -6,12 +6,12 @@ package com.magento.idea.magento2plugin.completion.xml;
 
 public class MftfEntityNameCompletionRegistrarTest extends CompletionXmlFixtureTestCase {
 
-    private static final String[] lookupStringsEntities = new String[]{
-                "TestAdminMenuCatalog",
-                "TestAdminMenuCatalog.pageTitle",
-                "TestDefaultAttributeSet",
-                "TestDefaultAttributeSet.attribute_set_id"
-        };
+    private static final String[] lookupStringsEntities = new String[] {
+        "TestAdminMenuCatalog",
+        "TestAdminMenuCatalog.pageTitle",
+        "TestDefaultAttributeSet",
+        "TestDefaultAttributeSet.attribute_set_id"
+      };
 
     public void testCreateDataActionGroupMustProvideCompletion () {
         String filePath = this.getFixturePath(
