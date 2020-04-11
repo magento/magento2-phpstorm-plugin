@@ -13,7 +13,7 @@ public class MftfEntityNameCompletionRegistrarTest extends CompletionXmlFixtureT
         "TestDefaultAttributeSet.attribute_set_id"
       };
 
-    public void testCreateDataActionGroupMustProvideCompletion () {
+    public void testCreateDataActionGroupMustProvideCompletion() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.copyFileToProject(filePath);
 
