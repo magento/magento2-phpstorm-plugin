@@ -19,48 +19,55 @@ public class MftfEntityNameCompletionRegistrarTest extends CompletionXmlFixtureT
         );
         myFixture.copyFileToProject(filePath);
 
-        assertCompletionMatchWithFilePositiveCase(filePath, lookupStringsEntities);
+        assertFileConatainsCompletions(filePath, lookupStringsEntities);
     }
 
     public void testCreateDataInTestMustProvideCompletion () {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.copyFileToProject(filePath);
 
-        assertCompletionMatchWithFilePositiveCase(filePath, lookupStringsEntities);
+        assertFileConatainsCompletions(filePath, lookupStringsEntities);
+    }
+
+    public void testCreateDataInTestWithSectionMustBeEmpty () {
+        String filePath = this.getFixturePath("TestMftfTest.xml");
+        myFixture.copyFileToProject(filePath);
+
+        assertCompletionNotShowing(filePath);
     }
 
     public void testUpdateDataActionGroupMustProvideCompletion () {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.copyFileToProject(filePath);
 
-        assertCompletionMatchWithFilePositiveCase(filePath, lookupStringsEntities);
+        assertFileConatainsCompletions(filePath, lookupStringsEntities);
     }
 
     public void testUpdateDataInTestMustProvideCompletion () {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.copyFileToProject(filePath);
 
-        assertCompletionMatchWithFilePositiveCase(filePath, lookupStringsEntities);
+        assertFileConatainsCompletions(filePath, lookupStringsEntities);
     }
 
     public void testUserInputInActionGroupMustProvideCompletion () {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.copyFileToProject(filePath);
 
-        assertCompletionMatchWithFilePositiveCase(filePath, lookupStringsEntities);
+        assertFileConatainsCompletions(filePath, lookupStringsEntities);
     }
 
     public void testUserInputInTestMustProvideCompletion () {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.copyFileToProject(filePath);
 
-        assertCompletionMatchWithFilePositiveCase(filePath, lookupStringsEntities);
+        assertFileConatainsCompletions(filePath, lookupStringsEntities);
     }
 
     public void testEntityExtendsInDataMustProvideCompletion () {
         String filePath = this.getFixturePath("TestData.xml");
         myFixture.copyFileToProject(filePath);
 
-        assertCompletionMatchWithFilePositiveCase(filePath, lookupStringsEntities);
+        assertFileConatainsCompletions(filePath, lookupStringsEntities);
     }
 }

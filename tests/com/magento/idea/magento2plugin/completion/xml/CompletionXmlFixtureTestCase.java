@@ -29,7 +29,7 @@ abstract public class CompletionXmlFixtureTestCase extends BaseProjectTestCase {
         checkContainsCompletion(lookupStrings);
     }
 
-    protected void assertCompletionMatchWithFilePositiveCase(
+    protected void assertFileConatainsCompletions(
             String positiveFilePath,
             String... lookupStrings
     ) {
@@ -42,7 +42,7 @@ abstract public class CompletionXmlFixtureTestCase extends BaseProjectTestCase {
         checkContainsCompletion(lookupStrings, messageEmptyLookup, messageCompletionContains);
     }
 
-    protected void assertCompletionMatchWithFileNegativeCase(
+    protected void assertFileNotConatainsCompletions(
             String negativeFilePath,
             String... lookupStrings
     ) {
