@@ -27,7 +27,7 @@ public class GraphQlResolverInspectionTest extends BasePlatformTestCase {
     }
 
     public void testWithInvalidResolverInterface() throws Exception {
-        myFixture.addFileToProject(getTestDataPath() + "/" + "schema.graphqls", "type Query {" +
+        myFixture.addFileToProject(getTestDataPath() + "/withInvalidResolverInterface/" + "schema.graphqls", "type Query {" +
                 "InvalidResolverTest: InvalidResolver @resolver(class: \"\\\\Magento\\\\Test\\\\InvalidResolverTest\")" +
                 "}");
         myFixture.configureByFile(getTestName(true) + "/" + "InvalidResolverTest.php");
@@ -35,7 +35,7 @@ public class GraphQlResolverInspectionTest extends BasePlatformTestCase {
     }
 
     public void testWithValidResolverInterface() throws Exception {
-        myFixture.addFileToProject(getTestDataPath() + "/" + "schema.graphqls", "type mutation {" +
+        myFixture.addFileToProject(getTestDataPath() + "/withValidResolverInterface/" + "schema.graphqls", "type mutation {" +
                 "    ValidResolverTest(): ValidResolver @resolver(class: \"\\\\Magento\\\\Test\\\\ValidResolverTest\")" +
                 "}");
         myFixture.configureByFile(getTestName(true) + "/" + "ValidResolverTest.php");
