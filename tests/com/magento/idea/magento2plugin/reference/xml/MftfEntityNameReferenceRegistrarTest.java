@@ -6,7 +6,7 @@ package com.magento.idea.magento2plugin.reference.xml;
 
 public class MftfEntityNameReferenceRegistrarTest extends ReferenceXmlFixtureTestCase {
 
-    public void testCreateDataActionGroupMustHaveReference () {
+    public void testCreateDataActionGroupMustHaveReference() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.configureByFile(filePath);
 
