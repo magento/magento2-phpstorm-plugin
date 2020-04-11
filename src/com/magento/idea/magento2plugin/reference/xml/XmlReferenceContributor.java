@@ -8,6 +8,7 @@ import com.intellij.patterns.XmlPatterns;
 import com.intellij.psi.PsiReferenceContributor;
 import com.intellij.psi.PsiReferenceRegistrar;
 import com.intellij.psi.xml.XmlTokenType;
+import com.magento.idea.magento2plugin.magento.files.MftfActionGroup;
 import com.magento.idea.magento2plugin.php.util.PhpRegex;
 import com.magento.idea.magento2plugin.reference.provider.*;
 import com.magento.idea.magento2plugin.reference.provider.mftf.*;
@@ -157,22 +158,28 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
                 )
         );
 
-        // <someXmlTag someAttribute="{{someValue}}" />
+        // <someXmlTag userInput="{{someValue}}" />
         registrar.registerReferenceProvider(
-            XmlPatterns.xmlAttributeValue().withValue(string().matches(".*\\{\\{[^\\}]+\\}\\}.*")),
+            XmlPatterns.xmlAttributeValue().withValue(
+                    string().matches(".*\\{\\{[^\\}]+\\}\\}.*")
+            ).withParent(XmlPatterns.xmlAttribute().withName(
+                    MftfActionGroup.USER_INPUT_TAG
+            )),
             new CompositeReferenceProvider(
-                new DataReferenceProvider(),
-                new PageReferenceProvider(),
-                new SectionReferenceProvider()
+                new DataReferenceProvider()
             )
         );
 
         // <createData entity="SimpleProduct" />
+        // <updateData entity="SimpleProduct" />
         registrar.registerReferenceProvider(
-            XmlPatterns.xmlAttributeValue().withParent(XmlPatterns.xmlAttribute().withName(string().oneOf("entity", "value", "userInput", "url"))),
+            XmlPatterns.xmlAttributeValue().withParent(XmlPatterns.xmlAttribute()
+                    .withName(MftfActionGroup.ENTITY_ATTRIBUTE).
+                    withParent(XmlPatterns.xmlTag().withName(
+                      string().oneOf(MftfActionGroup.CREATE_DATA_TAG, MftfActionGroup.UPDATE_DATA_TAG)
+                    ))),
             new CompositeReferenceProvider(
-                new DataReferenceProvider(),
-                new SectionReferenceProvider()
+                new DataReferenceProvider()
             )
         );
 

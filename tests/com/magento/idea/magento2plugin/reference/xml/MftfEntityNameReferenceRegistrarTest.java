@@ -70,4 +70,32 @@ public class MftfEntityNameReferenceRegistrarTest extends ReferenceXmlFixtureTes
 
         assertEmptyReference();
     }
+
+    public void testCreateDataInTestWithSectionMustBeEmpty () {
+        String filePath = this.getFixturePath("TestMftfTest.xml");
+        myFixture.configureByFile(filePath);
+
+        assertEmptyReference();
+    }
+
+    public void testUpdateDataInTestWithSectionMustBeEmpty () {
+        String filePath = this.getFixturePath("TestMftfTest.xml");
+        myFixture.configureByFile(filePath);
+
+        assertEmptyReference();
+    }
+
+    public void testUserInputInTestMustBeEmpty () {
+        String filePath = this.getFixturePath("TestMftfTest.xml");
+        myFixture.configureByFile(filePath);
+
+        assertEmptyReference();
+    }
+
+    public void testEntityExtendsInDataMustBeEmpty () {
+        String filePath = this.getFixturePath("TestData.xml");
+        myFixture.configureByFile(filePath);
+
+        assertEmptyReference();
+    }
 }
