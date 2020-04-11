@@ -17,6 +17,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.PreferenceDi
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
+import com.magento.idea.magento2plugin.validators.ValidatorBundle;
 import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.event.*;
@@ -123,7 +124,9 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog {
                 getPreferenceArea()
         ), project).generate(OverrideClassByAPreferenceAction.ACTION_NAME);
         if (diXml == null) {
-            JOptionPane.showMessageDialog(null, "Preference already declared in the target module!", "Error", JOptionPane.ERROR_MESSAGE);
+            String errorMessage = ValidatorBundle.message("validator.class.alreadyDeclared", "Preference");
+            JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+
             return;
         }
 
