@@ -174,10 +174,10 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
         // <updateData entity="SimpleProduct" />
         registrar.registerReferenceProvider(
             XmlPatterns.xmlAttributeValue().withParent(XmlPatterns.xmlAttribute()
-                    .withName(MftfActionGroup.ENTITY_ATTRIBUTE).
-                    withParent(XmlPatterns.xmlTag().withName(
-                      string().oneOf(MftfActionGroup.CREATE_DATA_TAG, MftfActionGroup.UPDATE_DATA_TAG)
-                    ))),
+                .withName(MftfActionGroup.ENTITY_ATTRIBUTE)
+                .withParent(XmlPatterns.xmlTag().withName(
+                    string().oneOf(MftfActionGroup.CREATE_DATA_TAG, MftfActionGroup.UPDATE_DATA_TAG)
+            ))),
             new CompositeReferenceProvider(
                 new DataReferenceProvider()
             )
