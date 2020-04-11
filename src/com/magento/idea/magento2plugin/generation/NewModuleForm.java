@@ -163,6 +163,21 @@ public class NewModuleForm implements ListSelectionListener {
                 listener.run();
             }
         });
+        this.moduleName.getDocument().addDocumentListener(new DocumentAdapter() {
+            protected void textChanged(@NotNull DocumentEvent e) {
+                listener.run();
+            }
+        });
+        this.packageName.getDocument().addDocumentListener(new DocumentAdapter() {
+            protected void textChanged(@NotNull DocumentEvent e) {
+                listener.run();
+            }
+        });
+        this.moduleVersion.getDocument().addDocumentListener(new DocumentAdapter() {
+            protected void textChanged(@NotNull DocumentEvent e) {
+                listener.run();
+            }
+        });
     }
 
     private void fireStateChanged() {
