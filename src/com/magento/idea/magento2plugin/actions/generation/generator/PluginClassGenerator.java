@@ -34,6 +34,7 @@ import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
@@ -46,6 +47,7 @@ import java.util.Set;
 public class PluginClassGenerator extends FileGenerator {
     private PluginFileData pluginFileData;
     private Project project;
+    private ValidatorBundle validatorBundle;
     private final FillTextBufferWithPluginMethods fillTextBuffer;
     private final CollectInsertedMethods collectInsertedMethods;
     private final DirectoryGenerator directoryGenerator;
@@ -61,6 +63,7 @@ public class PluginClassGenerator extends FileGenerator {
         this.collectInsertedMethods = CollectInsertedMethods.getInstance();
         this.pluginFileData = pluginFileData;
         this.project = project;
+        this.validatorBundle = new ValidatorBundle();
     }
 
     public PsiFile generate(String actionName)
@@ -72,7 +75,9 @@ public class PluginClassGenerator extends FileGenerator {
                 pluginClass = createPluginClass(actionName);
             }
             if (pluginClass == null) {
-                JOptionPane.showMessageDialog(null, "Plugin Class cant be created!", "Error", JOptionPane.ERROR_MESSAGE);
+                String errorMessage = validatorBundle.message("validator.file.cantBeCreated", "Plugin Class");
+                JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+
                 return;
             }
 
@@ -82,8 +87,10 @@ public class PluginClassGenerator extends FileGenerator {
             PluginMethodsGenerator pluginGenerator = new PluginMethodsGenerator(pluginClass, targetMethod, targetClassKey);
 
             PluginMethodData[] pluginMethodData = pluginGenerator.createPluginMethods(getPluginType());
-            if (checkIfMethodExist(pluginClass, pluginMethodData)){
-                JOptionPane.showMessageDialog(null, "Plugin method already exist!", "Error", JOptionPane.ERROR_MESSAGE);
+            if (checkIfMethodExist(pluginClass, pluginMethodData)) {
+                String errorMessage = validatorBundle.message("validator.file.alreadyExists", "Plugin Class");
+                JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+
                 return;
             }
 
@@ -116,6 +123,7 @@ public class PluginClassGenerator extends FileGenerator {
             }
             codeStyleSettings.restore();
         });
+
         return pluginFile[0];
     }
 

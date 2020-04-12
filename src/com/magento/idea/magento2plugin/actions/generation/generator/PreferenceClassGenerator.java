@@ -16,6 +16,7 @@ import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.PhpPreference;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.io.File;
@@ -24,6 +25,7 @@ import java.util.Properties;
 public class PreferenceClassGenerator extends FileGenerator {
     private PreferenceFileData preferenceFileData;
     private Project project;
+    private ValidatorBundle validatorBundle;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final GetFirstClassOfFile getFirstClassOfFile;
@@ -35,15 +37,20 @@ public class PreferenceClassGenerator extends FileGenerator {
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
         this.preferenceFileData = preferenceFileData;
         this.project = project;
+        this.validatorBundle = new ValidatorBundle();
     }
 
     public PsiFile generate(String actionName) {
         PhpClass pluginClass = GetPhpClassByFQN.getInstance(project).execute(preferenceFileData.getPreferenceFqn());
+
         if (pluginClass == null) {
             pluginClass = createPluginClass(actionName);
         }
+
         if (pluginClass == null) {
-            JOptionPane.showMessageDialog(null, "Preference Class cant be created!", "Error", JOptionPane.ERROR_MESSAGE);
+            String errorMessage = validatorBundle.message("validator.file.cantBeCreated", "Preference Class");
+            JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+
             return null;
         }
 
@@ -67,7 +74,7 @@ public class PreferenceClassGenerator extends FileGenerator {
 
     protected void fillAttributes(Properties attributes) {
         String preferenceClassName = preferenceFileData.getPreferenceClassName();
-        attributes.setProperty("NAME", preferenceFileData.getPreferenceClassName());
+        attributes.setProperty("NAME", preferenceClassName);
         attributes.setProperty("NAMESPACE", preferenceFileData.getNamespace());
         if (!preferenceFileData.isInheritClass()) {
             return;

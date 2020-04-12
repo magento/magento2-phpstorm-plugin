@@ -10,6 +10,7 @@ import com.intellij.patterns.XmlPatterns;
 import com.intellij.psi.xml.XmlTokenType;
 import com.magento.idea.magento2plugin.completion.provider.*;
 import com.magento.idea.magento2plugin.completion.provider.mftf.*;
+import com.magento.idea.magento2plugin.magento.files.*;
 
 import static com.intellij.patterns.PlatformPatterns.psiElement;
 import static com.intellij.patterns.StandardPatterns.string;
@@ -18,22 +19,62 @@ import static com.intellij.patterns.XmlPatterns.xmlFile;
 public class XmlCompletionContributor extends CompletionContributor {
 
     public XmlCompletionContributor() {
-        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN),
-            new CompositeCompletionProvider(
-                new PhpClassCompletionProvider(),
-                new PhpClassMemberCompletionProvider(),
-                new ModuleNameCompletionProvider(),
-                new FilePathCompletionProvider()
-            )
+
+        /* PHP class member completion provider */
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_DATA_CHARACTERS)
+                        .withParent(XmlPatterns.xmlText().withParent(XmlPatterns.xmlTag().withChild(
+                                XmlPatterns.xmlAttribute().withName(CommonXml.SCHEMA_VALIDATE_ATTRIBUTE)
+                                        .withValue(string().oneOf(CommonXml.INIT_PARAMETER))))
+                        ),
+                new PhpClassMemberCompletionProvider()
         );
 
-        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_DATA_CHARACTERS),
-            new CompositeCompletionProvider(
-                new PhpClassCompletionProvider(),
-                new PhpClassMemberCompletionProvider(),
-                new ModuleNameCompletionProvider(),
+        /* Module Completion provider */
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                        .inside(XmlPatterns.xmlAttribute().withName(ModuleAclXml.XML_ATTR_ID))
+                        .inFile(xmlFile().withName(string().endsWith(ModuleAclXml.FILE_NAME))),
+                new ModuleNameCompletionProvider()
+        );
+
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                        .inside(XmlPatterns.xmlAttribute().withName(ModuleXml.MODULE_ATTR_NAME))
+                        .inFile(xmlFile().withName(string().endsWith(ModuleXml.FILE_NAME))),
+                new ModuleNameCompletionProvider()
+        );
+
+        /* PHP Class completion provider */
+
+        // <randomTag xsi:type="completion">
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_DATA_CHARACTERS)
+                        .withParent(XmlPatterns.xmlText().withParent(XmlPatterns.xmlTag().withChild(
+                                XmlPatterns.xmlAttribute().withName(CommonXml.SCHEMA_VALIDATE_ATTRIBUTE).withValue(string().oneOf(CommonXml.OBJECT))))
+                        ),
+                new PhpClassCompletionProvider()
+        );
+
+        // <randomTag class="completion">
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                        .inside(XmlPatterns.xmlAttribute().withName(CommonXml.ATTR_CLASS)),
+                new PhpClassCompletionProvider()
+        );
+
+        // <preference for="completion">
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                        .inside(XmlPatterns.xmlAttribute().withName(ModuleDiXml.PREFERENCE_ATTR_FOR)),
+                new PhpClassCompletionProvider()
+        );
+
+        // <type name="completion">
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                        .inside(XmlPatterns.xmlAttribute().withName(ModuleDiXml.PLUGIN_TYPE_ATTR_NAME)
+                                .withParent(XmlPatterns.xmlTag().withName(ModuleDiXml.PLUGIN_TYPE_TAG))),
+                new PhpClassCompletionProvider()
+        );
+
+        /* File Path Completion provider */
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                        .inside(XmlPatterns.xmlAttribute().withName(LayoutXml.XML_ATTRIBUTE_TEMPLATE)),
                 new FilePathCompletionProvider()
-            )
         );
 
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
@@ -60,6 +101,45 @@ public class XmlCompletionContributor extends CompletionContributor {
                 )
             ).inFile(xmlFile().withName(string().endsWith("di.xml"))),
             new PhpConstructorArgumentCompletionProvider()
+        );
+
+        // <source_model>php class completion</source_model> in system.xml files.
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_DATA_CHARACTERS)
+            .inside(XmlPatterns.xmlTag().withName(ModuleSystemXml.XML_TAG_SOURCE_MODEL)
+                .withParent(XmlPatterns.xmlTag().withName(ModuleSystemXml.FIELD_ELEMENT_NAME))
+            ).inFile(xmlFile().withName(string().matches(ModuleSystemXml.FILE_NAME))),
+            new PhpClassCompletionProvider()
+        );
+
+        // <frontend_model>completion</frontend_model>
+        extend(CompletionType.BASIC,
+                psiElement(XmlTokenType.XML_DATA_CHARACTERS)
+                        .inside(XmlPatterns.xmlTag().withName(ModuleSystemXml.XML_TAG_FRONTEND_MODEL)),
+                new PhpClassCompletionProvider()
+        );
+
+        // <backend_model>completion</backend_model> in system.xml
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_DATA_CHARACTERS)
+            .inside(XmlPatterns.xmlTag().withName(ModuleSystemXml.XML_TAG_BACKEND_MODEL)
+                    .withParent(XmlPatterns.xmlTag().withName(ModuleSystemXml.FIELD_ELEMENT_NAME))
+            ).inFile(xmlFile().withName(string().matches(ModuleSystemXml.FILE_NAME))),
+            new PhpClassCompletionProvider()
+        );
+
+        // <randomTag backend_model="completion"> in config.xml
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+            .inside(XmlPatterns.xmlAttribute().withName(ModuleConfigXml.XML_ATTRIBUTE_BACKEND_MODEL))
+            .inFile(xmlFile().withName(string().matches(ModuleConfigXml.FILE_NAME))),
+            new PhpClassCompletionProvider()
+        );
+
+        // <parameter source_model="completion">...</parameter> in widget.xml files.
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+            .inside(XmlPatterns.xmlAttribute().withName(ModuleWidgetXml.ATTRIBUTE_SOURCE_MODEL_NAME)
+                .withParent(XmlPatterns.xmlTag().withName(ModuleWidgetXml.TAG_PARAMETER_NAME).
+                    withParent(XmlPatterns.xmlTag().withName(ModuleWidgetXml.TAG_PARAMETERS_NAME)))
+            ).inFile(xmlFile().withName(string().matches(ModuleWidgetXml.FILE_NAME))),
+                new PhpClassCompletionProvider()
         );
 
         // <service method="methodName"/>
@@ -129,7 +209,8 @@ public class XmlCompletionContributor extends CompletionContributor {
         // mftf selector completion contributor
         extend(CompletionType.BASIC,
             psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
-            .inside(XmlPatterns.xmlAttribute())
+            .inside(XmlPatterns.xmlAttribute()
+            .withName(MftfActionGroup.SELECTOR_ATTRIBUTE))
             .inFile(xmlFile().withName(string().endsWith("Test.xml"))),
             new SelectorCompletionProvider()
         );
