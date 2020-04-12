@@ -13,49 +13,49 @@ public class MftfEntityNameReferenceRegistrarTest extends ReferenceXmlFixtureTes
         assertHasReferenceToXmlAttributeValue("TestAdminMenuCatalog");
     }
 
-    public void testCreateDataInTestMustHaveReference () {
+    public void testCreateDataInTestMustHaveReference() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.configureByFile(filePath);
 
         assertHasReferenceToXmlAttributeValue("TestAdminMenuCatalog");
     }
 
-    public void testUpdateDataActionGroupMustHaveReference () {
+    public void testUpdateDataActionGroupMustHaveReference() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.configureByFile(filePath);
 
         assertHasReferenceToXmlAttributeValue("TestAdminMenuCatalog");
     }
 
-    public void testUpdateDataInTestMustHaveReference () {
+    public void testUpdateDataInTestMustHaveReference() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.configureByFile(filePath);
 
         assertHasReferenceToXmlAttributeValue("TestAdminMenuCatalog");
     }
 
-    public void testUserInputInActionGroupMustHaveReference () {
+    public void testUserInputInActionGroupMustHaveReference() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.configureByFile(filePath);
 
         assertHasReferenceToXmlAttributeValue("TestAdminMenuCatalog");
     }
 
-    public void testUserInputInTestMustHaveReference () {
+    public void testUserInputInTestMustHaveReference() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.configureByFile(filePath);
 
         assertHasReferenceToXmlAttributeValue("TestAdminMenuCatalog");
     }
 
-    public void testEntityExtendsInDataMustHaveReference () {
+    public void testEntityExtendsInDataMustHaveReference() {
         String filePath = this.getFixturePath("TestData.xml");
         myFixture.configureByFile(filePath);
 
         assertHasReferenceToXmlAttributeValue("TestAdminMenuCatalog");
     }
 
-    public void testCreateDataActionGroupPluginDisabled () {
+    public void testCreateDataActionGroupPluginDisabled() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.configureByFile(filePath);
         disablePluginAndReindex();
@@ -63,7 +63,7 @@ public class MftfEntityNameReferenceRegistrarTest extends ReferenceXmlFixtureTes
         assertEmptyReference();
     }
 
-    public void testCreateDataActionGroupMftfSupportDisabled () {
+    public void testCreateDataActionGroupMftfSupportDisabled() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.configureByFile(filePath);
         disableMftfSupportAndReindex();
@@ -71,28 +71,28 @@ public class MftfEntityNameReferenceRegistrarTest extends ReferenceXmlFixtureTes
         assertEmptyReference();
     }
 
-    public void testCreateDataInTestWithSectionMustBeEmpty () {
+    public void testCreateDataInTestWithSectionMustBeEmpty() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.configureByFile(filePath);
 
         assertEmptyReference();
     }
 
-    public void testUpdateDataInTestWithSectionMustBeEmpty () {
+    public void testUpdateDataInTestWithSectionMustBeEmpty() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.configureByFile(filePath);
 
         assertEmptyReference();
     }
 
-    public void testUserInputInTestMustBeEmpty () {
+    public void testUserInputInTestMustBeEmpty() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.configureByFile(filePath);
 
         assertEmptyReference();
     }
 
-    public void testEntityExtendsInDataMustBeEmpty () {
+    public void testEntityExtendsInDataMustBeEmpty() {
         String filePath = this.getFixturePath("TestData.xml");
         myFixture.configureByFile(filePath);
 
