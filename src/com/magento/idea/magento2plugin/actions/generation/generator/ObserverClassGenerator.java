@@ -21,7 +21,7 @@ import com.magento.idea.magento2plugin.magento.files.Observer;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-import com.magento.idea.magento2plugin.validators.ValidatorBundle;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import javax.swing.*;
 import java.io.File;
 import java.util.Properties;
@@ -32,6 +32,7 @@ public class ObserverClassGenerator extends FileGenerator {
     private final GetFirstClassOfFile getFirstClassOfFile;
     private ObserverFileData observerFileData;
     private Project project;
+    private ValidatorBundle validatorBundle;
 
     public ObserverClassGenerator(ObserverFileData observerFileData, Project project) {
         super(project);
@@ -41,6 +42,7 @@ public class ObserverClassGenerator extends FileGenerator {
         this.directoryGenerator = DirectoryGenerator.getInstance();
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
+        this.validatorBundle = new ValidatorBundle();
     }
 
     @Override
@@ -55,7 +57,7 @@ public class ObserverClassGenerator extends FileGenerator {
             }
 
             if (observerClass == null) {
-                String errorMessage = ValidatorBundle.message("validator.file.cantBeCreated", "Observer Class");
+                String errorMessage = validatorBundle.message("validator.file.cantBeCreated", "Observer Class");
                 JOptionPane.showMessageDialog(
                         null,
                         errorMessage,

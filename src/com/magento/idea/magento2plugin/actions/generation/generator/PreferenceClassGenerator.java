@@ -16,7 +16,7 @@ import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.PhpPreference;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-import com.magento.idea.magento2plugin.validators.ValidatorBundle;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.io.File;
@@ -25,6 +25,7 @@ import java.util.Properties;
 public class PreferenceClassGenerator extends FileGenerator {
     private PreferenceFileData preferenceFileData;
     private Project project;
+    private ValidatorBundle validatorBundle;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final GetFirstClassOfFile getFirstClassOfFile;
@@ -36,6 +37,7 @@ public class PreferenceClassGenerator extends FileGenerator {
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
         this.preferenceFileData = preferenceFileData;
         this.project = project;
+        this.validatorBundle = new ValidatorBundle();
     }
 
     public PsiFile generate(String actionName) {
@@ -46,7 +48,7 @@ public class PreferenceClassGenerator extends FileGenerator {
         }
 
         if (pluginClass == null) {
-            String errorMessage = ValidatorBundle.message("validator.file.cantBeCreated", "Preference Class");
+            String errorMessage = validatorBundle.message("validator.file.cantBeCreated", "Preference Class");
             JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
 
             return null;

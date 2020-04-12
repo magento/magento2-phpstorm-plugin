@@ -25,7 +25,7 @@ import com.magento.idea.magento2plugin.magento.files.GraphQlResolverPhp;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-import com.magento.idea.magento2plugin.validators.ValidatorBundle;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -35,6 +35,7 @@ import java.util.Properties;
 public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
     private GraphQlResolverFileData graphQlResolverFileData;
     private Project project;
+    private ValidatorBundle validatorBundle;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final GetFirstClassOfFile getFirstClassOfFile;
@@ -46,6 +47,7 @@ public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
         this.graphQlResolverFileData = graphQlResolverFileData;
         this.project = project;
+        this.validatorBundle = new ValidatorBundle();
     }
 
     @Override
@@ -59,7 +61,7 @@ public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
             }
 
             if (graphQlResolverClass == null) {
-                String errorMessage = ValidatorBundle.message("validator.file.cantBeCreated", "GraphQL Resolver Class");
+                String errorMessage = validatorBundle.message("validator.file.cantBeCreated", "GraphQL Resolver Class");
                 JOptionPane.showMessageDialog(
                         null,
                         errorMessage,

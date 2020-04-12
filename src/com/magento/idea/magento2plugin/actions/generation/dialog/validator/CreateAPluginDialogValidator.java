@@ -8,12 +8,13 @@ import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2plugin.actions.generation.dialog.CreateAPluginDialog;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.util.Regex;
-import com.magento.idea.magento2plugin.validators.ValidatorBundle;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import javax.swing.*;
 import java.util.List;
 
 public class CreateAPluginDialogValidator {
     private static CreateAPluginDialogValidator INSTANCE = null;
+    private ValidatorBundle validatorBundle;
     private CreateAPluginDialog dialog;
 
     public static CreateAPluginDialogValidator getInstance(CreateAPluginDialog dialog) {
@@ -25,27 +26,31 @@ public class CreateAPluginDialogValidator {
         return INSTANCE;
     }
 
+    public CreateAPluginDialogValidator() {
+        this.validatorBundle = new ValidatorBundle();
+    }
+
     public boolean validate(Project project)
     {
         String errorTitle = "Error";
         String pluginClassName = dialog.getPluginClassName();
 
         if (pluginClassName.length() == 0) {
-            String errorMessage = ValidatorBundle.message("validator.notEmpty", "Plugin Class Name");
+            String errorMessage = validatorBundle.message("validator.notEmpty", "Plugin Class Name");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return false;
         }
 
         if (!pluginClassName.matches(Regex.ALPHANUMERIC)) {
-            String errorMessage = ValidatorBundle.message("validator.alphaNumericCharacters", "Plugin Class Name");
+            String errorMessage = validatorBundle.message("validator.alphaNumericCharacters", "Plugin Class Name");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return false;
         }
 
         if (!Character.isUpperCase(pluginClassName.charAt(0)) && !Character.isDigit(pluginClassName.charAt(0))) {
-            String errorMessage = ValidatorBundle.message("validator.startWithNumberOrCapitalLetter", "Plugin Class Name");
+            String errorMessage = validatorBundle.message("validator.startWithNumberOrCapitalLetter", "Plugin Class Name");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return false;
@@ -53,14 +58,14 @@ public class CreateAPluginDialogValidator {
 
         String pluginDirectory = dialog.getPluginDirectory();
         if (pluginDirectory.length() == 0) {
-            String errorMessage = ValidatorBundle.message("validator.notEmpty", "Plugin Directory");
+            String errorMessage = validatorBundle.message("validator.notEmpty", "Plugin Directory");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return false;
         }
 
         if (!pluginDirectory.matches(Regex.DIRECTORY)) {
-            String errorMessage = ValidatorBundle.message("validator.directory.isNotValid", "Plugin Directory");
+            String errorMessage = validatorBundle.message("validator.directory.isNotValid", "Plugin Directory");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return false;
@@ -68,14 +73,14 @@ public class CreateAPluginDialogValidator {
 
         String pluginName = dialog.getPluginName();
         if (pluginName.length() == 0) {
-            String errorMessage = ValidatorBundle.message("validator.notEmpty", "Plugin Name");
+            String errorMessage = validatorBundle.message("validator.notEmpty", "Plugin Name");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return false;
         }
 
         if (!pluginName.matches(Regex.IDENTIFIER)) {
-            String errorMessage = ValidatorBundle.message("validator.identifier", "Plugin Name");
+            String errorMessage = validatorBundle.message("validator.identifier", "Plugin Name");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return false;
@@ -83,14 +88,14 @@ public class CreateAPluginDialogValidator {
 
         String sortOrder = dialog.getPluginSortOrder();
         if (sortOrder.length() == 0) {
-            String errorMessage = ValidatorBundle.message("validator.notEmpty", "Sort Order");
+            String errorMessage = validatorBundle.message("validator.notEmpty", "Sort Order");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return false;
         }
 
         if (!sortOrder.matches(Regex.NUMERIC)) {
-            String errorMessage = ValidatorBundle.message("validator.onlyNumbers", "Sort Order");
+            String errorMessage = validatorBundle.message("validator.onlyNumbers", "Sort Order");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return false;
@@ -98,7 +103,7 @@ public class CreateAPluginDialogValidator {
 
         String pluginModule = dialog.getPluginModule();
         if (pluginModule.length() == 0) {
-            String errorMessage = ValidatorBundle.message("validator.notEmpty", "Plugin Module");
+            String errorMessage = validatorBundle.message("validator.notEmpty", "Plugin Module");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return false;
@@ -106,7 +111,7 @@ public class CreateAPluginDialogValidator {
 
         List<String> allModulesList = ModuleIndex.getInstance(project).getEditableModuleNames();
         if (!allModulesList.contains(pluginModule)) {
-            String errorMessage = ValidatorBundle.message("validator.module.noSuchModule", pluginModule);
+            String errorMessage = validatorBundle.message("validator.module.noSuchModule", pluginModule);
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return false;
