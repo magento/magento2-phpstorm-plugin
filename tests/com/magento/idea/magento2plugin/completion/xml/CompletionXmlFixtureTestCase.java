@@ -4,12 +4,25 @@
  */
 package com.magento.idea.magento2plugin.completion.xml;
 
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import com.magento.idea.magento2plugin.BaseProjectTestCase;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-abstract public class CompletionLightJavaCodeInsightFixtureTestCase extends BasePlatformTestCase {
+abstract public class CompletionXmlFixtureTestCase extends BaseProjectTestCase {
+    private static final String testDataFolderPath = "testData" + File.separator + "completion" + File.separator;
+    private static final String fixturesFolderPath = "xml" + File.separator;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        myFixture.setTestDataPath(testDataFolderPath);
+    }
+
+    protected String getFixturePath(String fileName) {
+        return prepareFixturePath(fileName, fixturesFolderPath);
+    }
 
     public void assertCompletionContains(String filePath, String... lookupStrings) {
         myFixture.configureByFile(filePath);
@@ -18,7 +31,7 @@ abstract public class CompletionLightJavaCodeInsightFixtureTestCase extends Base
         checkContainsCompletion(lookupStrings);
     }
 
-    protected void assertCompletionMatchWithFilePositiveCase(
+    protected void assertFileContainsCompletions(
             String positiveFilePath,
             String... lookupStrings
     ) {
@@ -31,7 +44,7 @@ abstract public class CompletionLightJavaCodeInsightFixtureTestCase extends Base
         checkContainsCompletion(lookupStrings, messageEmptyLookup, messageCompletionContains);
     }
 
-    protected void assertCompletionMatchWithFileNegativeCase(
+    protected void assertFileNotContainsCompletions(
             String negativeFilePath,
             String... lookupStrings
     ) {

@@ -209,7 +209,8 @@ public class XmlCompletionContributor extends CompletionContributor {
         // mftf selector completion contributor
         extend(CompletionType.BASIC,
             psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
-            .inside(XmlPatterns.xmlAttribute())
+            .inside(XmlPatterns.xmlAttribute()
+            .withName(MftfActionGroup.SELECTOR_ATTRIBUTE))
             .inFile(xmlFile().withName(string().endsWith("Test.xml"))),
             new SelectorCompletionProvider()
         );
