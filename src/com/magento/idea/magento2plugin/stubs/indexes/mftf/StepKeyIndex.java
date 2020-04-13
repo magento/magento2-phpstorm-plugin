@@ -1,6 +1,7 @@
 package com.magento.idea.magento2plugin.stubs.indexes.mftf;
 
 import com.intellij.ide.highlighter.XmlFileType;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlDocument;
@@ -29,8 +30,9 @@ public class StepKeyIndex extends FileBasedIndexExtension<String, String> {
         return inputData -> {
             Map<String, String> map = new THashMap<>();
             PsiFile psiFile = inputData.getPsiFile();
+            Project project = psiFile.getProject();
 
-            if (!Settings.isEnabled(psiFile.getProject())) {
+            if (!Settings.isEnabled(project) || !Settings.isMftfSupportEnabled(project)) {
                 return map;
             }
 

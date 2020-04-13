@@ -17,6 +17,7 @@ import com.magento.idea.magento2plugin.magento.files.BlockPhp;
 import com.magento.idea.magento2plugin.magento.files.PhpPreference;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.io.File;
@@ -25,6 +26,7 @@ import java.util.Properties;
 public class ModuleBlockClassGenerator extends FileGenerator {
     private BlockFileData blockFileData;
     private Project project;
+    private ValidatorBundle validatorBundle;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
 
@@ -34,17 +36,25 @@ public class ModuleBlockClassGenerator extends FileGenerator {
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         this.blockFileData = blockFileData;
         this.project = project;
+        this.validatorBundle = new ValidatorBundle();
     }
 
     public PsiFile generate(String actionName) {
+        String errorTitle = "Error";
         PhpClass block = GetPhpClassByFQN.getInstance(project).execute(getBlockFqn());
+
         if (block != null) {
-            JOptionPane.showMessageDialog(null, "Block Class already exist!", "Error", JOptionPane.ERROR_MESSAGE);
+            String errorMessage = validatorBundle.message("validator.file.alreadyExists", "Block Class");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return null;
         }
+
         PhpFile blockFile = createBlockClass(actionName);
         if (blockFile == null) {
-            JOptionPane.showMessageDialog(null, "Block Class cant be created!", "Error", JOptionPane.ERROR_MESSAGE);
+            String errorMessage = validatorBundle.message("validator.file.cantBeCreated", "Block Class");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
             return null;
         }
 

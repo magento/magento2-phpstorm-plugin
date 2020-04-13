@@ -58,6 +58,7 @@
         <group id="MagentoNewModuleFileGroup" class="com.magento.idea.magento2plugin.actions.groups.NewModuleFileGroup" text="Module File" popup="true">
             <action id="MagentoCreateABlock" class="com.magento.idea.magento2plugin.actions.generation.NewBlockAction" />
             <action id="MagentoCreateAViewModel" class="com.magento.idea.magento2plugin.actions.generation.NewViewModelAction" />
+            <action id="MagentoCreateAGraphQlResolver" class="com.magento.idea.magento2plugin.actions.generation.NewGraphQlResolverAction" />
             <add-to-group group-id="NewGroup" anchor="last"/>
         </group>
 
@@ -79,16 +80,12 @@
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
-        <projectConfigurable instance="com.magento.idea.magento2plugin.project.SettingsForm"
-                             id="Magento2.SettingsForm"
-                             displayName="Magento"
-                             nonDefaultProject="true"
-                             groupId="language"
-                             parentId="reference.webide.settings.project.settings.php"
-        />
+        <directoryProjectGenerator implementation="com.magento.idea.magento2plugin.generation.MagentoModuleGenerator"/>
+        <projectTemplatesFactory implementation="com.magento.idea.magento2plugin.generation.MagentoTemplatesFactory"/>
+
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.Settings"/>
 
-        <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.completion.xml.XmlCompletionContributor" />
+        <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.completion.xml.XmlCompletionContributor" id="xml" />
 
         <psi.referenceContributor language="XML" implementation="com.magento.idea.magento2plugin.reference.xml.XmlReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.magento.idea.magento2plugin.reference.php.PhpReferenceContributor"/>
@@ -160,6 +157,11 @@
         <internalFileTemplate name="Magento Module Common Php Class"/>
         <internalFileTemplate name="Magento Observer Class"/>
         <internalFileTemplate name="Magento Module Events Xml"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="com.jetbrains.php">
+        <frameworkProjectConfigurableProvider implementation="com.magento.idea.magento2plugin.project.ConfigurableProvider"/>
+        <frameworkUsageProvider implementation="com.magento.idea.magento2plugin.project.UsagesProvider"/>
     </extensions>
 
 </idea-plugin>

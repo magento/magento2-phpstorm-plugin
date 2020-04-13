@@ -9,7 +9,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
-import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.actions.generation.NewModuleAction;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleComposerJsonData;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleRegistrationPhpData;
@@ -23,7 +22,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFro
 import com.magento.idea.magento2plugin.actions.generation.util.NavigateToCreatedFile;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.packages.Package;
-import com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex;
+import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,8 +30,6 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
@@ -100,7 +97,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         setModuleDependencies();
 
         moduleLicenseCustom.setToolTipText("Custom License Name");
-        moduleLicenseCustom.setText("proprietary");
+        moduleLicenseCustom.setText(Settings.getDefaultLicenseName(project));
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -167,7 +164,8 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
                 getComposerPackageName(),
                 getModuleVersion(),
                 getModuleLicense(),
-                getModuleDependencies()
+                getModuleDependencies(),
+                true
         ), project).generate(NewModuleAction.ACTION_NAME);
     }
 
@@ -175,7 +173,8 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         return new ModuleRegistrationPhpGenerator(new ModuleRegistrationPhpData(
                     getPackageName(),
                     getModuleName(),
-                    getBaseDir()
+                    getBaseDir(),
+                    true
             ), project).generate(NewModuleAction.ACTION_NAME);
     }
 
@@ -183,7 +182,8 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         new ModuleXmlGenerator(new ModuleXmlData(
                 getPackageName(),
                 getModuleName(),
-                getBaseDir()
+                getBaseDir(),
+                true
         ), project).generate(NewModuleAction.ACTION_NAME, true);
     }
 
