@@ -10,6 +10,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewCronjobDialog;
+import com.magento.idea.magento2plugin.indexes.CronGroupIndex;
 import org.jetbrains.annotations.NotNull;
 
 public class NewCronjobAction extends AnAction {
@@ -24,6 +25,7 @@ public class NewCronjobAction extends AnAction {
     public void actionPerformed(@NotNull AnActionEvent e) {
         DataContext dataContext = e.getDataContext();
         IdeView view = LangDataKeys.IDE_VIEW.getData(dataContext);
+
         if (view == null) {
             return;
         }
@@ -38,7 +40,7 @@ public class NewCronjobAction extends AnAction {
             return;
         }
 
-        NewCronjobDialog.open();
+        NewCronjobDialog.open(project, directory);
     }
 
     @Override

@@ -24,7 +24,7 @@ import java.util.Map;
  * CronGroupIndex collects all cron groups from cron_groups.xml files.
  * It's used for autocompleting groups during cronjob generation
  */
-public class CronGroupIndex extends FileBasedIndexExtension<String, String> {
+public class CronGroupIndexer extends FileBasedIndexExtension<String, String> {
     public static final ID<String, String> KEY
             = ID.create("com.magento.idea.magento2plugin.stubs.indexes.cron_tabs");
     private final KeyDescriptor<String> myKeyDescriptor = new EnumeratorStringDescriptor();
