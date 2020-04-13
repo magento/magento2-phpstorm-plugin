@@ -18,6 +18,7 @@ public class NewCronjobDialog extends AbstractDialog {
     private JPanel fixedSchedulePanel;
     private JTextField configPathField;
     private JPanel configurableSchedulePanel;
+    private JComboBox cronGroup;
 
     public NewCronjobDialog() {
         setContentPane(contentPane);
@@ -49,6 +50,7 @@ public class NewCronjobDialog extends AbstractDialog {
             public void actionPerformed(ActionEvent e) {
                 fixedSchedulePanel.setVisible(false);
                 configurableSchedulePanel.setVisible(true);
+                configPathField.grabFocus();
             }
         });
 
@@ -70,6 +72,7 @@ public class NewCronjobDialog extends AbstractDialog {
             public void actionPerformed(ActionEvent e) {
                 scheduleMask.setText("* * * * *");
                 scheduleMask.setEditable(true);
+                scheduleMask.grabFocus();
             }
         });
 
