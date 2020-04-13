@@ -12,6 +12,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.util.indexing.FileBasedIndex;
+import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.xml.XmlPsiTreeUtil;
 
 import java.util.ArrayList;
@@ -48,7 +49,7 @@ public class PluginIndex {
         for (VirtualFile virtualFile : virtualFiles) {
             XmlFile xmlFile = (XmlFile) PsiManager.getInstance(project).findFile(virtualFile);
             Collection<XmlAttributeValue> valueElements = XmlPsiTreeUtil
-                    .findAttributeValueElements(xmlFile, "type", "name", name);
+                    .findAttributeValueElements(xmlFile, ModuleDiXml.PLUGIN_TYPE_ATTRIBUTE, ModuleDiXml.PLUGIN_TYPE_ATTR_NAME, name);
             result.addAll(valueElements);
         }
         return result;

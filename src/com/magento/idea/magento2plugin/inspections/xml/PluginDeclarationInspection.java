@@ -18,13 +18,13 @@ import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlDocument;
 import com.intellij.psi.xml.XmlTag;
 import com.jetbrains.php.lang.inspections.PhpInspection;
+import com.magento.idea.magento2plugin.bundles.InspectionBundle;
 import com.magento.idea.magento2plugin.indexes.PluginIndex;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.magento.files.ModuleXml;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -37,9 +37,7 @@ public class PluginDeclarationInspection extends PhpInspection {
     public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder problemsHolder, boolean b) {
         return new XmlElementVisitor() {
             private final String moduleXmlFileName = ModuleXml.getInstance().getFileName();
-            private static final String duplicatedPluginNameSameFileProblemDescription = "The plugin name already used in this file. For more details see Inspection Description.";
-            private static final String duplicatedPluginNameProblemDescription =
-                    "The plugin name \"%s\" for targeted \"%s\" class is already used in the module \"%s\" (%s scope). For more details see Inspection Description.";
+            private InspectionBundle inspectionBundle = new InspectionBundle();
             private HashMap<String, VirtualFile> loadedFileHash = new HashMap<>();
             private final ProblemHighlightType errorSeverity = ProblemHighlightType.WARNING;
 
@@ -86,7 +84,7 @@ public class PluginDeclarationInspection extends PhpInspection {
                         if (targetPluginHash.containsKey(pluginTypeKey)) {
                             problemsHolder.registerProblem(
                                 pluginTypeNameAttribute.getValueElement(),
-                                duplicatedPluginNameSameFileProblemDescription,
+                                inspectionBundle.message("inspection.plugin.duplicateInSameFile"),
                                 errorSeverity
                             );
                         }
@@ -101,8 +99,8 @@ public class PluginDeclarationInspection extends PhpInspection {
                             if (!pluginProblems.containsKey(problemKey)){
                                 problemsHolder.registerProblem(
                                     pluginTypeNameAttribute.getValueElement(),
-                                    String.format(
-                                        duplicatedPluginNameProblemDescription,
+                                    inspectionBundle.message(
+                                        "inspection.plugin.duplicateInOtherPlaces",
                                         pluginTypeName,
                                         pluginNameAttributeValue,
                                         moduleName,
