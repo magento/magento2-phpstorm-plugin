@@ -17,6 +17,7 @@ import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlDocument;
 import com.intellij.psi.xml.XmlTag;
 import com.jetbrains.php.lang.inspections.PhpInspection;
+import com.magento.idea.magento2plugin.bundles.InspectionBundle;
 import com.magento.idea.magento2plugin.indexes.EventIndex;
 import com.magento.idea.magento2plugin.magento.files.ModuleXml;
 import com.magento.idea.magento2plugin.magento.packages.Package;
@@ -36,10 +37,8 @@ public class ObserverDeclarationInspection extends PhpInspection {
         return new XmlElementVisitor() {
             private final String moduleXmlFileName = ModuleXml.getInstance().getFileName();
             private static final String eventsXmlFileName = "events.xml";
-            private static final String duplicatedObserverNameSameFileProblemDescription = "The observer name already used in this file. For more details see Inspection Description.";
-            private static final String duplicatedObserverNameProblemDescription =
-                    "The observer name \"%s\" for event \"%s\" is already used in the module \"%s\" (%s scope). For more details see Inspection Description.";
             private HashMap<String, VirtualFile> loadedFileHash = new HashMap<>();
+            private InspectionBundle inspectionBundle = new InspectionBundle();
             private final ProblemHighlightType errorSeverity = ProblemHighlightType.WARNING;
 
             @Override
@@ -88,7 +87,7 @@ public class ObserverDeclarationInspection extends PhpInspection {
                         if (targetObserversHash.containsKey(observerKey)) {
                             problemsHolder.registerProblem(
                                 observerNameAttribute.getValueElement(),
-                                duplicatedObserverNameSameFileProblemDescription,
+                                inspectionBundle.message("inspection.observer.duplicateInSameFile"),
                                 errorSeverity
                             );
                         }
@@ -104,7 +103,7 @@ public class ObserverDeclarationInspection extends PhpInspection {
                                 problemsHolder.registerProblem(
                                     observerNameAttribute.getValueElement(),
                                     String.format(
-                                        duplicatedObserverNameProblemDescription,
+                                        inspectionBundle.message("inspection.observer.duplicateInOtherPlaces"),
                                         observerName,
                                         eventNameAttributeValue,
                                         moduleName,
