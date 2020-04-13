@@ -93,7 +93,6 @@
 
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.EventObserverIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.EventNameIndex" />
-        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.PluginNameIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.VirtualTypeIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.PluginIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.BlockNameIndex" />
