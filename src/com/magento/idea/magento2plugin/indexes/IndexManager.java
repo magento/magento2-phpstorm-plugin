@@ -24,6 +24,7 @@ public class IndexManager {
             ModulePackageIndex.KEY,
             // xml|di configuration
             PluginIndex.KEY,
+            VirtualTypeIndex.KEY,
             // layouts
             BlockNameIndex.KEY,
             ContainerNameIndex.KEY,
