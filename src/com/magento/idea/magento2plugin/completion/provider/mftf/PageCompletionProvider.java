@@ -11,28 +11,31 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
-import com.magento.idea.magento2plugin.stubs.indexes.mftf.SectionIndex;
+import com.magento.idea.magento2plugin.magento.files.MftfActionGroup;
+import com.magento.idea.magento2plugin.stubs.indexes.mftf.PageIndex;
 import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 
-public class SelectorCompletionProvider extends CompletionProvider<CompletionParameters> {
+public class PageCompletionProvider extends CompletionProvider<CompletionParameters> {
 
     @Override
-    protected void addCompletions(@NotNull CompletionParameters parameters,
-                                  ProcessingContext context,
-                                  @NotNull CompletionResultSet result)
-    {
+    protected void addCompletions(
+            @NotNull CompletionParameters parameters,
+            ProcessingContext context,
+            @NotNull CompletionResultSet result) {
         PsiElement position = parameters.getPosition().getOriginalElement();
 
         if (position == null) {
             return;
         }
 
-        Collection<String> selectorNames
-            = FileBasedIndex.getInstance().getAllKeys(SectionIndex.KEY, position.getProject());
+        Collection<String> allKeys
+            = FileBasedIndex.getInstance().getAllKeys(PageIndex.KEY, position.getProject());
 
-        for (String selectorName: selectorNames) {
-            result.addElement(LookupElementBuilder.create(selectorName));
+        for (String pageName: allKeys) {
+            result.addElement(LookupElementBuilder.create(
+                    pageName
+            ));
         }
     }
 }

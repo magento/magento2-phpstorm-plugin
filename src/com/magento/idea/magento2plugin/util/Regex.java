@@ -17,4 +17,7 @@ public class Regex {
 
     public static final String DIRECTORY
             = "^(?!\\/)[a-zA-Z0-9\\/]*[^\\/]$";
+
+    public static final String MFTF_CURLY_BRACES
+            = ".*\\{\\{[^\\}]+\\}\\}.*";
 }

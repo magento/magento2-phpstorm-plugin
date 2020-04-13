@@ -8,7 +8,7 @@
 
 <pages xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/PageObject.xsd">
-    <page name="TestAdminCategoryEditPage" url="catalog/category/edit/id/{{categoryId}}/" area="admin" module="Catalog" parameterized="true">
+    <page name="TestPage" url="test/catalog/category/edit/id/{{categoryId}}/" area="admin" module="Catalog" parameterized="true">
         <section name="TestAdminCategorySidebarActionSection"/>
         <section name="TestAdminCategoryMainActionsSection"/>
         <section name="TestAdminCategorySidebarTreeSection"/>
