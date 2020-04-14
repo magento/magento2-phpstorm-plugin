@@ -7,7 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2plugin.actions.generation.dialog.OverrideClassByAPreferenceDialog;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.util.Regex;
+import com.magento.idea.magento2plugin.util.RegExUtil;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import javax.swing.*;
 import java.util.List;
@@ -40,7 +40,7 @@ public class OverrideClassByAPreferenceDialogValidator {
             return false;
         }
 
-        if (!preferenceClassName.matches(Regex.ALPHANUMERIC)) {
+        if (!preferenceClassName.matches(RegExUtil.ALPHANUMERIC)) {
             String errorMessage = validatorBundle.message("validator.alphaNumericCharacters", "Preference Class");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
@@ -62,7 +62,7 @@ public class OverrideClassByAPreferenceDialogValidator {
             return false;
         }
 
-        if (!preferenceDirectory.matches(Regex.DIRECTORY)) {
+        if (!preferenceDirectory.matches(RegExUtil.DIRECTORY)) {
             String errorMessage = validatorBundle.message("validator.directory.isNotValid", "Preference Directory");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
             return false;

@@ -7,7 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2plugin.actions.generation.dialog.CreateAPluginDialog;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.util.Regex;
+import com.magento.idea.magento2plugin.util.RegExUtil;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import javax.swing.*;
 import java.util.List;
@@ -42,7 +42,7 @@ public class CreateAPluginDialogValidator {
             return false;
         }
 
-        if (!pluginClassName.matches(Regex.ALPHANUMERIC)) {
+        if (!pluginClassName.matches(RegExUtil.ALPHANUMERIC)) {
             String errorMessage = validatorBundle.message("validator.alphaNumericCharacters", "Plugin Class Name");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
@@ -64,7 +64,7 @@ public class CreateAPluginDialogValidator {
             return false;
         }
 
-        if (!pluginDirectory.matches(Regex.DIRECTORY)) {
+        if (!pluginDirectory.matches(RegExUtil.DIRECTORY)) {
             String errorMessage = validatorBundle.message("validator.directory.isNotValid", "Plugin Directory");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
@@ -79,7 +79,7 @@ public class CreateAPluginDialogValidator {
             return false;
         }
 
-        if (!pluginName.matches(Regex.IDENTIFIER)) {
+        if (!pluginName.matches(RegExUtil.IDENTIFIER)) {
             String errorMessage = validatorBundle.message("validator.identifier", "Plugin Name");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
@@ -94,7 +94,7 @@ public class CreateAPluginDialogValidator {
             return false;
         }
 
-        if (!sortOrder.matches(Regex.NUMERIC)) {
+        if (!sortOrder.matches(RegExUtil.NUMERIC)) {
             String errorMessage = validatorBundle.message("validator.onlyNumbers", "Sort Order");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 

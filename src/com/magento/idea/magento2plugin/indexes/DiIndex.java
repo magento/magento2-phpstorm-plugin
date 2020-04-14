@@ -17,7 +17,7 @@ import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.stubs.indexes.VirtualTypeIndex;
-import com.magento.idea.magento2plugin.xml.XmlPsiTreeUtil;
+import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

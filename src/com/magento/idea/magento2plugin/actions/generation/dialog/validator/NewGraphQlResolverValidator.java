@@ -5,7 +5,7 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewGraphQlResolverDialog;
-import com.magento.idea.magento2plugin.util.Regex;
+import com.magento.idea.magento2plugin.util.RegExUtil;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 
 import javax.swing.*;
@@ -39,7 +39,7 @@ public class NewGraphQlResolverValidator {
             return false;
         }
 
-        if (!resolverClassName.matches(Regex.ALPHANUMERIC)) {
+        if (!resolverClassName.matches(RegExUtil.ALPHANUMERIC)) {
             String errorMessage = validatorBundle.message("validator.alphaNumericCharacters", "GraphQL Resolver Name");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
@@ -61,7 +61,7 @@ public class NewGraphQlResolverValidator {
             return false;
         }
 
-        if (!graphQlResolverDirectory.matches(Regex.DIRECTORY)) {
+        if (!graphQlResolverDirectory.matches(RegExUtil.DIRECTORY)) {
             String errorMessage = validatorBundle.message("validator.directory.isNotValid", "GraphQL Resolver Directory");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 

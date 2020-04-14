@@ -12,10 +12,9 @@ import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpNamespace;
-import com.magento.idea.magento2plugin.php.util.PhpRegex;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
+import com.magento.idea.magento2plugin.util.RegExUtil;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,7 +30,7 @@ public class PhpClassReferenceProvider extends PsiReferenceProvider {
 
         String origValue = element.getText();
 
-        Pattern pattern = Pattern.compile(PhpRegex.FQN);
+        Pattern pattern = Pattern.compile(RegExUtil.PhpRegex.FQN);
         Matcher matcher = pattern.matcher(origValue);
         if (!matcher.find()) {
             return PsiReference.EMPTY_ARRAY;
