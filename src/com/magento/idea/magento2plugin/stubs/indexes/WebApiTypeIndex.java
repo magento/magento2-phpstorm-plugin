@@ -20,7 +20,7 @@ import com.jetbrains.php.lang.PhpLangUtil;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.project.Settings;
-import com.magento.idea.magento2plugin.xml.LineMarkerXmlTagDecorator;
+import com.magento.idea.magento2plugin.linemarker.xml.LineMarkerXmlTagDecorator;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 

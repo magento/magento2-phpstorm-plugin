@@ -9,11 +9,10 @@ import com.intellij.psi.PsiReferenceContributor;
 import com.intellij.psi.PsiReferenceRegistrar;
 import com.intellij.psi.xml.XmlTokenType;
 import com.magento.idea.magento2plugin.magento.files.MftfActionGroup;
-import com.magento.idea.magento2plugin.php.util.PhpRegex;
 import com.magento.idea.magento2plugin.reference.provider.*;
 import com.magento.idea.magento2plugin.reference.provider.mftf.*;
+import com.magento.idea.magento2plugin.util.RegExUtil;
 import org.jetbrains.annotations.NotNull;
-
 import static com.intellij.patterns.XmlPatterns.*;
 
 public class XmlReferenceContributor extends PsiReferenceContributor {
@@ -23,7 +22,7 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
 
         // <someXmlTag someAttribute="Some\Php\ClassName[::CONST|$property|method()]" />
         registrar.registerReferenceProvider(
-            XmlPatterns.xmlAttributeValue().withValue(string().matches(PhpRegex.Xml.CLASS_ELEMENT)),
+            XmlPatterns.xmlAttributeValue().withValue(string().matches(RegExUtil.XmlRegex.CLASS_ELEMENT)),
             new CompositeReferenceProvider(
                 new PhpClassReferenceProvider(),
                 new PhpClassMemberReferenceProvider()
@@ -33,7 +32,7 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
         // <someXmlTag>Some\Php\ClassName[::CONST|$property|method()]</someXmlTag>
         registrar.registerReferenceProvider(
             XmlPatterns.psiElement(XmlTokenType.XML_DATA_CHARACTERS)
-                .withText(string().matches(PhpRegex.Xml.CLASS_ELEMENT)),
+                .withText(string().matches(RegExUtil.XmlRegex.CLASS_ELEMENT)),
             new CompositeReferenceProvider(
                 new PhpClassReferenceProvider(),
                 new PhpClassMemberReferenceProvider()

@@ -6,7 +6,7 @@ package com.magento.idea.magento2plugin.reference.php;
 
 import com.intellij.psi.PsiReferenceContributor;
 import com.intellij.psi.PsiReferenceRegistrar;
-import com.magento.idea.magento2plugin.php.util.PhpPatternsHelper;
+import com.magento.idea.magento2plugin.util.php.PhpPatternsHelper;
 import com.magento.idea.magento2plugin.reference.provider.EventDispatchReferenceProvider;
 import org.jetbrains.annotations.NotNull;
 
