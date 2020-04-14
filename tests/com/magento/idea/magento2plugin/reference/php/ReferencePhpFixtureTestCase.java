@@ -8,6 +8,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.impl.source.xml.XmlAttributeValueImpl;
 import com.magento.idea.magento2plugin.BaseProjectTestCase;
+import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 import java.io.File;
 
 abstract public class ReferencePhpFixtureTestCase extends BaseProjectTestCase {
@@ -26,13 +27,23 @@ abstract public class ReferencePhpFixtureTestCase extends BaseProjectTestCase {
     }
 
     protected void assertHasReferenceToXmlAttributeValue(String attributeValue) {
+        String referenceNotFound = "Failed that documents contains reference to XML attribute with value `%s`";
+
         PsiElement element = getElementFromCaret();
         PsiReference[] references = element.getReferences();
-        assertEquals(
-                attributeValue,
-                ((XmlAttributeValueImpl) references[references.length - 1].resolve())
-                        .getValue()
-        );
+        for (PsiReference reference: references) {
+            if (!(reference instanceof PolyVariantReferenceBase)) {
+                continue;
+            }
+            assertEquals(
+                    attributeValue,
+                    ((XmlAttributeValueImpl) reference.resolve())
+                            .getValue()
+            );
+            return;
+        }
+
+        fail(String.format(referenceNotFound, attributeValue));
     }
 
     private PsiElement getElementFromCaret() {
