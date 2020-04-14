@@ -227,11 +227,37 @@ public class XmlCompletionContributor extends CompletionContributor {
             new ActionGroupCompletionProvider()
         );
 
+        // mftf page url completion contributor
+        extend(
+            CompletionType.BASIC,
+            psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(
+                    XmlPatterns.xmlAttribute().withName(MftfActionGroup.URL_ATTRIBUTE)
+                    .withParent(XmlPatterns.xmlTag().withParent(
+                            XmlPatterns.xmlTag().withName(
+                        string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.ROOT_TAG)
+                    )))
+                ),
+            new PageCompletionProvider()
+        );
+        extend(
+            CompletionType.BASIC,
+            psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(
+                    XmlPatterns.xmlAttribute().withName(MftfActionGroup.URL_ATTRIBUTE)
+                    .withParent(XmlPatterns.xmlTag().withParent(
+                        XmlPatterns.xmlTag().withParent(XmlPatterns.xmlTag().withName(
+                    string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.ROOT_TAG)
+                ))))
+            ),
+            new PageCompletionProvider()
+        );
+
         // mftf data entity completion contributor
         extend(
             CompletionType.BASIC,
             psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
-                .inside(XmlPatterns.xmlAttribute().withName(string().oneOf("entity", "value", "userInput", "url"))
+                .inside(XmlPatterns.xmlAttribute().withName(string().oneOf("entity", "value", "userInput"))
             ),
             new DataCompletionProvider()
         );
