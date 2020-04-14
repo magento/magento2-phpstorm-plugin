@@ -1,9 +1,14 @@
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 package com.magento.idea.magento2plugin.stubs.indexes.mftf;
 
 import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlDocument;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
@@ -11,6 +16,7 @@ import com.intellij.util.indexing.*;
 import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
+import com.magento.idea.magento2plugin.magento.files.MftfPage;
 import com.magento.idea.magento2plugin.project.Settings;
 import gnu.trove.THashMap;
 import org.jetbrains.annotations.NotNull;
@@ -48,7 +54,7 @@ public class PageIndex extends FileBasedIndexExtension<String, String> {
 
             XmlTag xmlRootTag = xmlDocument.getRootTag();
 
-            if (xmlRootTag == null || !xmlRootTag.getName().equals("pages")) {
+            if (xmlRootTag == null || !xmlRootTag.getName().equals(MftfPage.ROOT_TAG)) {
                 return map;
             }
 
@@ -58,8 +64,8 @@ public class PageIndex extends FileBasedIndexExtension<String, String> {
                 return map;
             }
 
-            for (XmlTag pageTag : xmlRootTag.findSubTags("page")) {
-                String name = pageTag.getAttributeValue("name");
+            for (XmlTag pageTag : xmlRootTag.findSubTags(MftfPage.PAGE_TAG)) {
+                String name = pageTag.getAttributeValue(MftfPage.NAME_ATTRIBUTE);
 
                 if (name == null || name.isEmpty()) {
                     continue;

@@ -9,9 +9,11 @@ import com.intellij.psi.PsiReferenceContributor;
 import com.intellij.psi.PsiReferenceRegistrar;
 import com.intellij.psi.xml.XmlTokenType;
 import com.magento.idea.magento2plugin.magento.files.MftfActionGroup;
+import com.magento.idea.magento2plugin.magento.files.MftfTest;
 import com.magento.idea.magento2plugin.php.util.PhpRegex;
 import com.magento.idea.magento2plugin.reference.provider.*;
 import com.magento.idea.magento2plugin.reference.provider.mftf.*;
+import com.magento.idea.magento2plugin.util.Regex;
 import org.jetbrains.annotations.NotNull;
 
 import static com.intellij.patterns.XmlPatterns.*;
@@ -161,12 +163,40 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
         // <someXmlTag userInput="{{someValue}}" />
         registrar.registerReferenceProvider(
             XmlPatterns.xmlAttributeValue().withValue(
-                    string().matches(".*\\{\\{[^\\}]+\\}\\}.*")
+                string().matches(Regex.MFTF_CURLY_BRACES)
             ).withParent(XmlPatterns.xmlAttribute().withName(
-                    MftfActionGroup.USER_INPUT_TAG
+                MftfActionGroup.USER_INPUT_TAG
             )),
             new CompositeReferenceProvider(
                 new DataReferenceProvider()
+            )
+        );
+
+        // <someXmlTag url="{{someValue}}" /> in MFTF Tests and ActionGroups
+        registrar.registerReferenceProvider(
+            XmlPatterns.xmlAttributeValue().withValue(
+                string().matches(Regex.MFTF_CURLY_BRACES)
+            ).withParent(XmlPatterns.xmlAttribute().withName(
+                MftfActionGroup.URL_ATTRIBUTE
+            ).withParent(XmlPatterns.xmlTag().withParent(XmlPatterns.xmlTag().withName(
+                string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.ROOT_TAG)
+            )))),
+            new CompositeReferenceProvider(
+                new PageReferenceProvider()
+            )
+        );
+        registrar.registerReferenceProvider(
+            XmlPatterns.xmlAttributeValue().withValue(
+                string().matches(Regex.MFTF_CURLY_BRACES)
+            ).withParent(XmlPatterns.xmlAttribute().withName(
+                MftfActionGroup.URL_ATTRIBUTE
+            ).withParent(XmlPatterns.xmlTag().withParent(XmlPatterns.xmlTag().withParent(
+                XmlPatterns.xmlTag().withName(
+                    string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.ROOT_TAG)
+                )
+            )))),
+            new CompositeReferenceProvider(
+                    new PageReferenceProvider()
             )
         );
 
