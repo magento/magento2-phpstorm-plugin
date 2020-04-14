@@ -11,7 +11,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
-import com.magento.idea.magento2plugin.magento.files.MftfActionGroup;
+import com.magento.idea.magento2plugin.magento.files.MftfPage;
 import com.magento.idea.magento2plugin.stubs.indexes.mftf.PageIndex;
 import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
@@ -35,6 +35,8 @@ public class PageCompletionProvider extends CompletionProvider<CompletionParamet
         for (String pageName: allKeys) {
             result.addElement(LookupElementBuilder.create(
                     pageName
+                        + MftfPage.REFERENCE_SEPARATOR
+                        + MftfPage.URL_ATTRIBUTE
             ));
         }
     }

@@ -8,6 +8,6 @@
 <actionGroups xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:mftf:Test/etc/actionGroupSchema.xsd">
     <actionGroup name="Test">
-        <amOnPage url="{{TestPage2.url<caret>}}" stepKey="goToProductPage"/>
+        <amOnPage url="{{AttributeSet<caret>}}" stepKey="goToProductPage"/>
     </actionGroup>
 </actionGroups>

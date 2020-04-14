@@ -72,11 +72,6 @@ public class PageIndex extends FileBasedIndexExtension<String, String> {
                 }
 
                 map.put(name, name);
-                XmlAttribute[] attributes = pageTag.getAttributes();
-                for (XmlAttribute attribute: attributes) {
-                    String childAttributeName = attribute.getName();
-                    map.put(name + MftfPage.REFERENCE_SEPARATOR + childAttributeName, name);
-                }
             }
 
             return map;

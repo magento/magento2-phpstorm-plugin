@@ -7,10 +7,8 @@ package com.magento.idea.magento2plugin.completion.xml;
 public class MftfPageUrlCompletionRegistrarTest extends CompletionXmlFixtureTestCase {
 
     private static final String[] lookupStrings = new String[] {
-        "TestPage",
         "TestPage.url",
-        "TestPage2",
-        "TestPage2.urlKey",
+        "TestPage2.url"
       };
 
     public void testPageUrlInActionGroupMustProvideCompletion() {
@@ -27,6 +25,13 @@ public class MftfPageUrlCompletionRegistrarTest extends CompletionXmlFixtureTest
     }
 
     public void testPageUrlInActionGroupMustBeEmptyForTestDocument() {
+        String filePath = this.getFixturePath("TestActionGroup.xml");
+        myFixture.copyFileToProject(filePath);
+
+        assertCompletionNotShowing(filePath);
+    }
+
+    public void testPageUrlInActionGroupMustBeEmptyForEntity() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.copyFileToProject(filePath);
 

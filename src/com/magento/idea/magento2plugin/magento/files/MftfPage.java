@@ -10,4 +10,5 @@ public class MftfPage {
     public static String PAGE_TAG = "page";
     public static String NAME_ATTRIBUTE = "name";
     public static String REFERENCE_SEPARATOR = ".";
+    public static String URL_ATTRIBUTE = "url";
 }
