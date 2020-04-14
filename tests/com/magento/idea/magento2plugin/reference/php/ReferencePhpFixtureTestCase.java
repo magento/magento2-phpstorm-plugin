@@ -2,19 +2,18 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
-package com.magento.idea.magento2plugin.reference.xml;
+package com.magento.idea.magento2plugin.reference.php;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
-import com.intellij.psi.xml.XmlAttributeValue;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.intellij.psi.impl.source.xml.XmlAttributeValueImpl;
 import com.magento.idea.magento2plugin.BaseProjectTestCase;
 import java.io.File;
 
-abstract public class ReferenceXmlFixtureTestCase extends BaseProjectTestCase {
+abstract public class ReferencePhpFixtureTestCase extends BaseProjectTestCase {
 
     private static final String testDataFolderPath = "testData" + File.separator + "reference" + File.separator;
-    private static final String fixturesFolderPath = "xml" + File.separator;
+    private static final String fixturesFolderPath = "php" + File.separator;
 
     @Override
     protected void setUp() throws Exception {
@@ -26,24 +25,14 @@ abstract public class ReferenceXmlFixtureTestCase extends BaseProjectTestCase {
         return prepareFixturePath(fileName, fixturesFolderPath);
     }
 
-    protected void assertHasReferenceToXmlAttributeValue(String reference) {
-        PsiElement element = getElementFromCaret();
-        assertEquals(reference, ((XmlAttributeValue) element.getReferences()[0].resolve()).getValue());
-    }
-
-    protected void assertHasReferencePhpClass(String phpClassFqn) {
+    protected void assertHasReferenceToXmlAttributeValue(String attributeValue) {
         PsiElement element = getElementFromCaret();
         PsiReference[] references = element.getReferences();
         assertEquals(
-                phpClassFqn,
-                ((PhpClass) references[references.length -1].resolve())
-                        .getPresentableFQN()
+                attributeValue,
+                ((XmlAttributeValueImpl) references[references.length - 1].resolve())
+                        .getValue()
         );
-    }
-
-    protected void assertEmptyReference() {
-        PsiElement element = getElementFromCaret();
-        assertEmpty(element.getReferences());
     }
 
     private PsiElement getElementFromCaret() {
