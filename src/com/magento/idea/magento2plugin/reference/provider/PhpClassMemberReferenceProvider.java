@@ -13,11 +13,10 @@ import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpClassMember;
-import com.magento.idea.magento2plugin.php.util.PhpRegex;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
+import com.magento.idea.magento2plugin.util.RegExUtil;
 import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -35,7 +34,7 @@ public class PhpClassMemberReferenceProvider extends PsiReferenceProvider {
         String origValue = element.getText();
         String value = StringUtil.unquoteString(element.getText());
 
-        Matcher matcher = Pattern.compile(PhpRegex.Xml.CLASS_MEMBER_NAME).matcher(value);
+        Matcher matcher = Pattern.compile(RegExUtil.XmlRegex.CLASS_MEMBER_NAME).matcher(value);
         if (!matcher.find()) {
             return PsiReference.EMPTY_ARRAY;
         }

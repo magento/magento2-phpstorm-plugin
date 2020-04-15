@@ -14,10 +14,9 @@ import com.intellij.psi.xml.XmlTagValue;
 import com.intellij.util.indexing.*;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
-import com.intellij.util.xml.impl.DomApplicationComponent;
 import com.jetbrains.php.lang.PhpLangUtil;
-import com.magento.idea.magento2plugin.php.util.PhpRegex;
 import com.magento.idea.magento2plugin.project.Settings;
+import com.magento.idea.magento2plugin.util.RegExUtil;
 import gnu.trove.THashMap;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +24,7 @@ import java.util.Map;
 
 public class PhpClassNameIndex extends ScalarIndexExtension<String> {
     private static final String CLASS_NAME_PATTERN =
-            "\\\\?" + PhpRegex.CLASS_NAME + "(\\\\" + PhpRegex.CLASS_NAME + ")+";
+            "\\\\?" + RegExUtil.PhpRegex.CLASS_NAME + "(\\\\" + RegExUtil.PhpRegex.CLASS_NAME + ")+";
 
     public static final ID<String, Void> KEY = ID.create(
             "com.magento.idea.magento2plugin.stubs.indexes.xml.php_class_name");

@@ -11,5 +11,6 @@ class Navigation extends \Magento\Framework\View\Element\Template implements
 {
     public function someMethod()
     {
+        $this->_eventManager->dispatch('test_event_in_block', ['response_object' => "test"]);
     }
 }

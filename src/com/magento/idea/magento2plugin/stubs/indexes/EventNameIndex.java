@@ -20,7 +20,7 @@ import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.magento.idea.magento2plugin.project.Settings;
-import com.magento.idea.magento2plugin.php.util.PhpPatternsHelper;
+import com.magento.idea.magento2plugin.util.php.PhpPatternsHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

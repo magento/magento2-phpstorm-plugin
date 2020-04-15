@@ -7,7 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2plugin.actions.generation.dialog.CreateAnObserverDialog;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.util.Regex;
+import com.magento.idea.magento2plugin.util.RegExUtil;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import javax.swing.*;
 import java.util.List;
@@ -40,7 +40,7 @@ public class CreateAnObserverDialogValidator {
             return false;
         }
 
-        if (!observerClassName.matches(Regex.ALPHANUMERIC)) {
+        if (!observerClassName.matches(RegExUtil.ALPHANUMERIC)) {
             String errorMessage = validatorBundle.message("validator.alphaNumericCharacters", "Observer Class Name");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
@@ -63,7 +63,7 @@ public class CreateAnObserverDialogValidator {
             return false;
         }
 
-        if (!observerDirectory.matches(Regex.DIRECTORY)) {
+        if (!observerDirectory.matches(RegExUtil.DIRECTORY)) {
             String errorMessage = validatorBundle.message("validator.directory.isNotValid", "Observer Directory");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 

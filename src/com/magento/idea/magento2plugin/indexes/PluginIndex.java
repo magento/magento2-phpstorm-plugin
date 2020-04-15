@@ -13,7 +13,7 @@ import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
-import com.magento.idea.magento2plugin.xml.XmlPsiTreeUtil;
+import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;

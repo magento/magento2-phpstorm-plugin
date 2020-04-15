@@ -15,7 +15,7 @@ import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.PhpFileType;
 import com.jetbrains.php.lang.psi.PhpFile;
-import com.magento.idea.magento2plugin.php.util.PhpPatternsHelper;
+import com.magento.idea.magento2plugin.util.php.PhpPatternsHelper;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 import com.magento.idea.magento2plugin.stubs.indexes.EventNameIndex;
 import org.jetbrains.annotations.NotNull;
