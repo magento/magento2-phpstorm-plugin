@@ -24,9 +24,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Created by dkvashnin on 11/10/15.
- */
 public class PluginIndex extends FileBasedIndexExtension<String, Set<String>> {
     public static final ID<String, Set<String>> KEY
             = ID.create("com.magento.idea.magento2plugin.stubs.indexes.plugin_to_type");
