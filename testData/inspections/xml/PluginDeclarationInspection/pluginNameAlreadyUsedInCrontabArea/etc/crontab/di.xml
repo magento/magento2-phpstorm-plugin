@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config>
+    <type name="Magento\CatalogRule\Model\Rule">
+        <plugin name=<warning descr="The plugin name \"configurableChildValidation\" for targeted \"Magento\CatalogRule\Model\Rule\" class is already used in the module \"Magento_CatalogRuleConfigurable\" (crontab scope). For more details see Inspection Description.">"configurableChildValidation"</warning> type="Magento\CatalogRuleConfigurable\Plugin\CatalogRule\Model\Rule\Validation"/>
+    </type>
+</config>

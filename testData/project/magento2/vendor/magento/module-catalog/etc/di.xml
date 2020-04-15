@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config>
+    <type name="Magento\Theme\Block\Html\Topmenu">
+        <plugin name="catalogTopmenu" type="Magento\Catalog\Plugin\Block\Topmenu" />
+    </type>
+</config>
