@@ -164,7 +164,7 @@ public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeIns
             PhpClass targetClass = GetPhpClassByFQN.getInstance(phpClass.getProject()).execute(targetClassName);
 
             if (targetClass == null) {
-                String errorMessage = validatorBundle.message("validator.magentoNotExistTargetClass");
+                String errorMessage = validatorBundle.message("validator.class.targetClassNotFound");
                 JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
                 continue;
             }
