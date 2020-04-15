@@ -44,6 +44,9 @@ public class CreateAPluginAction extends DumbAwareAction {
             Pair<PsiFile, PhpClass> pair = this.findPhpClass(event);
             PsiFile psiFile = pair.getFirst();
             PhpClass phpClass = pair.getSecond();
+            if (phpClass == null || psiFile == null) {
+                return;
+            }
             targetClass = phpClass;
             if (!(psiFile instanceof PhpFile) || phpClass.isFinal() || this.targetMethod == null) {
                 this.setStatus(event, false);

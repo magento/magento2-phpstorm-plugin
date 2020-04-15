@@ -5,13 +5,14 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewViewModelDialog;
-import com.magento.idea.magento2plugin.util.Regex;
-import com.magento.idea.magento2plugin.validators.ValidatorBundle;
+import com.magento.idea.magento2plugin.util.RegExUtil;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 
 import javax.swing.*;
 
 public class NewViewModelValidator {
     private static NewViewModelValidator INSTANCE = null;
+    private ValidatorBundle validatorBundle;
     private NewViewModelDialog dialog;
 
     public static NewViewModelValidator getInstance(NewViewModelDialog dialog) {
@@ -22,27 +23,31 @@ public class NewViewModelValidator {
         return INSTANCE;
     }
 
+    public NewViewModelValidator() {
+        this.validatorBundle = new ValidatorBundle();
+    }
+
     public boolean validate()
     {
         String errorTitle = "Error";
 
         String moduleName = dialog.getViewModelName();
         if (moduleName.length() == 0) {
-            String errorMessage = ValidatorBundle.message("validator.notEmpty", "View Model Name");
+            String errorMessage = validatorBundle.message("validator.notEmpty", "View Model Name");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return false;
         }
 
-        if (!moduleName.matches(Regex.ALPHANUMERIC)) {
-            String errorMessage = ValidatorBundle.message("validator.alphaNumericCharacters", "View Model Name");
+        if (!moduleName.matches(RegExUtil.ALPHANUMERIC)) {
+            String errorMessage = validatorBundle.message("validator.alphaNumericCharacters", "View Model Name");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return false;
         }
 
         if (!Character.isUpperCase(moduleName.charAt(0)) && !Character.isDigit(moduleName.charAt(0))) {
-            String errorMessage = ValidatorBundle.message("validator.startWithNumberOrCapitalLetter", "View Model Name");
+            String errorMessage = validatorBundle.message("validator.startWithNumberOrCapitalLetter", "View Model Name");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return false;
@@ -50,14 +55,14 @@ public class NewViewModelValidator {
 
         String pluginDirectory = dialog.getViewModelDirectory();
         if (pluginDirectory.length() == 0) {
-            String errorMessage = ValidatorBundle.message("validator.notEmpty", "View Model Directory");
+            String errorMessage = validatorBundle.message("validator.notEmpty", "View Model Directory");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return false;
         }
 
-        if (!pluginDirectory.matches(Regex.DIRECTORY)) {
-            String errorMessage = ValidatorBundle.message("validator.directory.isNotValid", "View Model Directory");
+        if (!pluginDirectory.matches(RegExUtil.DIRECTORY)) {
+            String errorMessage = validatorBundle.message("validator.directory.isNotValid", "View Model Directory");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return false;

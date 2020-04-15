@@ -11,7 +11,6 @@ import com.intellij.psi.xml.XmlTokenType;
 import com.magento.idea.magento2plugin.completion.provider.*;
 import com.magento.idea.magento2plugin.completion.provider.mftf.*;
 import com.magento.idea.magento2plugin.magento.files.*;
-
 import static com.intellij.patterns.PlatformPatterns.psiElement;
 import static com.intellij.patterns.StandardPatterns.string;
 import static com.intellij.patterns.XmlPatterns.xmlFile;
@@ -101,6 +100,16 @@ public class XmlCompletionContributor extends CompletionContributor {
                 )
             ).inFile(xmlFile().withName(string().endsWith("di.xml"))),
             new PhpConstructorArgumentCompletionProvider()
+        );
+
+        // <observer instance="Class">
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+            .inside(XmlPatterns.xmlAttribute().withName(ModuleEventsXml.INSTANCE_ATTRIBUTE)
+                .withParent(XmlPatterns.xmlTag().withName(ModuleEventsXml.OBSERVER_TAG)
+                    .withParent(XmlPatterns.xmlTag().withName(ModuleEventsXml.EVENT_TAG))
+                )
+            ).inFile(xmlFile().withName(string().matches(ModuleEventsXml.FILE_NAME))),
+            new PhpClassCompletionProvider()
         );
 
         // <source_model>php class completion</source_model> in system.xml files.
@@ -209,7 +218,8 @@ public class XmlCompletionContributor extends CompletionContributor {
         // mftf selector completion contributor
         extend(CompletionType.BASIC,
             psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
-            .inside(XmlPatterns.xmlAttribute())
+            .inside(XmlPatterns.xmlAttribute()
+            .withName(MftfActionGroup.SELECTOR_ATTRIBUTE))
             .inFile(xmlFile().withName(string().endsWith("Test.xml"))),
             new SelectorCompletionProvider()
         );
@@ -226,11 +236,37 @@ public class XmlCompletionContributor extends CompletionContributor {
             new ActionGroupCompletionProvider()
         );
 
+        // mftf page url completion contributor
+        extend(
+            CompletionType.BASIC,
+            psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(
+                    XmlPatterns.xmlAttribute().withName(MftfActionGroup.URL_ATTRIBUTE)
+                    .withParent(XmlPatterns.xmlTag().withParent(
+                            XmlPatterns.xmlTag().withName(
+                        string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.ROOT_TAG)
+                    )))
+                ),
+            new PageCompletionProvider()
+        );
+        extend(
+            CompletionType.BASIC,
+            psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(
+                    XmlPatterns.xmlAttribute().withName(MftfActionGroup.URL_ATTRIBUTE)
+                    .withParent(XmlPatterns.xmlTag().withParent(
+                        XmlPatterns.xmlTag().withParent(XmlPatterns.xmlTag().withName(
+                    string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.ROOT_TAG)
+                ))))
+            ),
+            new PageCompletionProvider()
+        );
+
         // mftf data entity completion contributor
         extend(
             CompletionType.BASIC,
             psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
-                .inside(XmlPatterns.xmlAttribute().withName(string().oneOf("entity", "value", "userInput", "url"))
+                .inside(XmlPatterns.xmlAttribute().withName(string().oneOf("entity", "value", "userInput"))
             ),
             new DataCompletionProvider()
         );

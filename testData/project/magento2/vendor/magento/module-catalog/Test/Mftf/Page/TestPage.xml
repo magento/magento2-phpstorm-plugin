@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ /**
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
+-->
+
+<pages xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/PageObject.xsd">
+    <page name="TestPage" url="test/catalog/category/edit/id/{{categoryId}}/" area="admin" module="Catalog" parameterized="true">
+        <section name="TestAdminCategorySidebarActionSection"/>
+        <section name="TestAdminCategoryMainActionsSection"/>
+        <section name="TestAdminCategorySidebarTreeSection"/>
+        <section name="TestAdminCategoryBasicFieldSection"/>
+        <section name="TestAdminCategorySEOSection"/>
+        <section name="TestAdminCategoryProductsSection"/>
+        <section name="TestAdminCategoryProductsGridSection"/>
+        <section name="TestAdminCategoryModalSection"/>
+        <section name="TestAdminCategoryMessagesSection"/>
+        <section name="TestAdminCategoryContentSection"/>
+    </page>
+</pages>

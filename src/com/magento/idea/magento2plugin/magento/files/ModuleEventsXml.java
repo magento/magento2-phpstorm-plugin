@@ -14,6 +14,11 @@ public class ModuleEventsXml implements ModuleFileInterface {
     //code templates
     public static String TEMPLATE_OBSERVER = "Magento Module Events Xml Observer";
 
+    //tags
+    public static String OBSERVER_TAG = "observer";
+    public static String INSTANCE_ATTRIBUTE = "instance";
+    public static String EVENT_TAG = "event";
+
     private static ModuleEventsXml INSTANCE = null;
 
     public static ModuleEventsXml getInstance() {

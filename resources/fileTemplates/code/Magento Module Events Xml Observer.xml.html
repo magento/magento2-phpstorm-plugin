@@ -6,5 +6,46 @@
 -->
 <html>
 <body>
+<table width="100%" border="0" cellpadding="5" cellspacing="0" style="border-collapse: collapse">
+    <tr>
+        <td><font face="verdana" size="-1">
+            Observers are a certain type of Magento class that can influence general behavior, performance, or change business logic.
+            Observers are executed whenever the event they are configured to watch is dispatched by the eobservent manager.
+        </font><br>
+        </td>
+    </tr>
+    <tr>
+        <td><font face="verdana" size="-1">
+            A observer is declared (registered) for a class in the di.xml file.
+        </font><br>
+        </td>
+    </tr>
+    <tr>
+        <td><font face="verdana" size="-1">
+            <a href="https://devdocs.magento.com/guides/v2.3/extension-dev-guide/events-and-observers.html#observers">Read more</a> about Observer, including when those can be used.
+        </font><br>
+        </td>
+    </tr>
+</table>
+<table width="100%" border="0" cellpadding="5" cellspacing="0" style="border-collapse: collapse">
+    <tr>
+        <td colspan="3"><font face="verdana" size="-1">Predefined variables will take the following values:</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${EVENT_NAME}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">The name of the observer for the event definition.</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${OBSERVER_NAME}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">Observer name.</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${OBSERVER_CLASS}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">The fully qualified class name of the observer.</font></td>
+    </tr>
+</table>
 </body>
 </html>

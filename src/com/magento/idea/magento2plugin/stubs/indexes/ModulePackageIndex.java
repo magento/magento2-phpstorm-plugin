@@ -12,8 +12,8 @@ import com.intellij.util.indexing.*;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.magento.idea.magento2plugin.project.Settings;
-import com.magento.idea.magento2plugin.php.module.ComposerPackageModel;
-import com.magento.idea.magento2plugin.php.module.ComposerPackageModelImpl;
+import com.magento.idea.magento2plugin.magento.packages.ComposerPackageModel;
+import com.magento.idea.magento2plugin.magento.packages.ComposerPackageModelImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;

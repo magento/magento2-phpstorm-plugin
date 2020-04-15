@@ -20,15 +20,20 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FilenameIndex;
 import com.jetbrains.php.frameworks.PhpFrameworkConfigurable;
-import com.magento.idea.magento2plugin.actions.generation.util.MagentoVersion;
+import com.magento.idea.magento2plugin.util.magento.MagentoVersion;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
 import com.magento.idea.magento2plugin.init.ConfigurationManager;
-import com.magento.idea.magento2plugin.php.module.*;
-import com.magento.idea.magento2plugin.util.magento.MagentoBasePathUtil;
+import com.magento.idea.magento2plugin.magento.packages.ComposerPackageModel;
+import com.magento.idea.magento2plugin.magento.packages.MagentoComponent;
+import com.magento.idea.magento2plugin.magento.packages.MagentoComponentManager;
+import com.magento.idea.magento2plugin.magento.packages.MagentoModule;
+import com.magento.idea.magento2plugin.project.validator.SettingsFormValidator;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
@@ -42,12 +47,14 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     private JButton buttonReindex;
     private JPanel jPanel;
     private JButton regenerateUrnMapButton;
-    private JLabel magentoVersion;
+    private JTextField magentoVersion;
     private JTextField moduleDefaultLicenseName;
     private JCheckBox mftfSupportEnabled;
     private JLabel magentoPathLabel;
     private TextFieldWithBrowseButton magentoPath;
-    private MagentoVersion magentoVersionModel = MagentoVersion.getInstance();
+    private JLabel magentoVersionLabel;
+    private MagentoVersion magentoVersionUtil = MagentoVersion.getInstance();
+    private SettingsFormValidator validator = SettingsFormValidator.getInstance(this);
 
     public SettingsForm(@NotNull final Project project) {
         this.project = project;
@@ -85,15 +92,13 @@ public class SettingsForm implements PhpFrameworkConfigurable {
             new RegenerateUrnMapListener(project)
         );
 
-        String version = magentoVersionModel.get();
-        if (version != null) {
-            magentoVersion.setText("Magento version: " . concat(version));
-        }
-
         moduleDefaultLicenseName.setText(getSettings().DEFAULT_LICENSE);
         mftfSupportEnabled.setSelected(getSettings().mftfSupportEnabled);
         magentoPath.getTextField().setText(getSettings().magentoPath);
+        resolveMagentoVersion();
+
         addPathListener();
+        addMagentoVersionListener();
 
         return (JComponent) jPanel;
     }
@@ -113,27 +118,48 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         return statusChanged || licenseChanged || mftfSupportChanged || magentoPathChanged;
     }
 
+    private void resolveMagentoVersion() {
+        if (getSettings().magentoVersion == null) {
+            this.updateMagentoVersion();
+            return;
+        }
+        magentoVersion.setText(getSettings().magentoVersion);
+    }
+
     private boolean isMagentoPathChanged() {
         return !magentoPath.getTextField().getText().equals(getSettings().magentoPath);
     }
 
     @Override
     public void apply() throws ConfigurationException {
-        getSettings().pluginEnabled = pluginEnabled.isSelected();
-        getSettings().DEFAULT_LICENSE = moduleDefaultLicenseName.getText();
-        getSettings().mftfSupportEnabled = mftfSupportEnabled.isSelected();
-        getSettings().magentoPath = magentoPath.getTextField().getText().trim();
-        buttonReindex.setEnabled(getSettings().pluginEnabled);
-        regenerateUrnMapButton.setEnabled(getSettings().pluginEnabled);
+        this.validator.validate();
+        saveSettings();
 
-        if (getSettings().pluginEnabled && !MagentoBasePathUtil.isMagentoFolderValid(getSettings().magentoPath)) {
-            throw new ConfigurationException("Please specify valid magento installation path!");
-        }
         ConfigurationManager.getInstance().refreshIncludePaths(getSettings().getState(), project);
 
         if (buttonReindex.isEnabled()) {
             reindex();
         }
+    }
+
+    private void saveSettings() {
+        getSettings().pluginEnabled = pluginEnabled.isSelected();
+        getSettings().DEFAULT_LICENSE = moduleDefaultLicenseName.getText();
+        getSettings().mftfSupportEnabled = mftfSupportEnabled.isSelected();
+        getSettings().magentoPath = getMagentoPath();
+        getSettings().magentoVersion = getMagentoVersion();
+        buttonReindex.setEnabled(getSettings().pluginEnabled);
+        regenerateUrnMapButton.setEnabled(getSettings().pluginEnabled);
+    }
+
+    @NotNull
+    public String getMagentoVersion() {
+        return magentoVersion.getText().trim();
+    }
+
+    @NotNull
+    public String getMagentoPath() {
+        return magentoPath.getTextField().getText().trim();
     }
 
     @Override
@@ -146,7 +172,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
 
     }
 
-    private Settings getSettings() {
+    public Settings getSettings() {
         return Settings.getInstance(project);
     }
 
@@ -166,6 +192,32 @@ public class SettingsForm implements PhpFrameworkConfigurable {
             }
         };
         this.magentoPath.addActionListener(browseFolderListener);
+    }
+
+    private void addMagentoVersionListener() {
+        DocumentListener onPathChange = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent documentEvent) {
+                updateMagentoVersion();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent documentEvent) {
+                updateMagentoVersion();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent documentEvent) {
+                updateMagentoVersion();
+            }
+        };
+        this.magentoPath.getTextField().getDocument().addDocumentListener(onPathChange);
+    }
+
+    public void updateMagentoVersion() {
+        String magentoPathValue = this.magentoPath.getTextField().getText();
+        String resolvedVersion = magentoVersionUtil.get(project, magentoPathValue);
+        magentoVersion.setText(resolvedVersion);
     }
 
     @Override

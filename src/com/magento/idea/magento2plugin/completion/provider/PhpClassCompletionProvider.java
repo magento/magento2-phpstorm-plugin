@@ -16,10 +16,9 @@ import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpNamespace;
-import com.magento.idea.magento2plugin.php.util.PhpRegex;
+import com.magento.idea.magento2plugin.util.RegExUtil;
 import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.regex.Matcher;
@@ -29,7 +28,7 @@ import java.util.stream.Collectors;
 public class PhpClassCompletionProvider extends CompletionProvider<CompletionParameters> {
 
     final private static String PHP_CLASS_COMPLETION_REGEX
-            = "\\\\?" + PhpRegex.FQN + "\\\\?";
+            = "\\\\?" + RegExUtil.PhpRegex.FQN + "\\\\?";
 
     @Override
     protected void addCompletions(@NotNull CompletionParameters parameters,

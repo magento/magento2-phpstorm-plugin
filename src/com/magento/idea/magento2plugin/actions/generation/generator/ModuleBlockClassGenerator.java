@@ -17,7 +17,7 @@ import com.magento.idea.magento2plugin.magento.files.BlockPhp;
 import com.magento.idea.magento2plugin.magento.files.PhpPreference;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-import com.magento.idea.magento2plugin.validators.ValidatorBundle;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.io.File;
@@ -26,6 +26,7 @@ import java.util.Properties;
 public class ModuleBlockClassGenerator extends FileGenerator {
     private BlockFileData blockFileData;
     private Project project;
+    private ValidatorBundle validatorBundle;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
 
@@ -35,6 +36,7 @@ public class ModuleBlockClassGenerator extends FileGenerator {
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         this.blockFileData = blockFileData;
         this.project = project;
+        this.validatorBundle = new ValidatorBundle();
     }
 
     public PsiFile generate(String actionName) {
@@ -42,7 +44,7 @@ public class ModuleBlockClassGenerator extends FileGenerator {
         PhpClass block = GetPhpClassByFQN.getInstance(project).execute(getBlockFqn());
 
         if (block != null) {
-            String errorMessage = ValidatorBundle.message("validator.file.alreadyExists", "Block Class");
+            String errorMessage = validatorBundle.message("validator.file.alreadyExists", "Block Class");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return null;
@@ -50,7 +52,7 @@ public class ModuleBlockClassGenerator extends FileGenerator {
 
         PhpFile blockFile = createBlockClass(actionName);
         if (blockFile == null) {
-            String errorMessage = ValidatorBundle.message("validator.file.cantBeCreated", "Block Class");
+            String errorMessage = validatorBundle.message("validator.file.cantBeCreated", "Block Class");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return null;
