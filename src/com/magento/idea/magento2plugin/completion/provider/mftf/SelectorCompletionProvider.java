@@ -1,3 +1,7 @@
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 package com.magento.idea.magento2plugin.completion.provider.mftf;
 
 import com.intellij.codeInsight.completion.CompletionParameters;
@@ -9,7 +13,6 @@ import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.mftf.SectionIndex;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.Collection;
 
 public class SelectorCompletionProvider extends CompletionProvider<CompletionParameters> {

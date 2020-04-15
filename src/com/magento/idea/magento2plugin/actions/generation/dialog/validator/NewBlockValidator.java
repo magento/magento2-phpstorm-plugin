@@ -5,7 +5,7 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewBlockDialog;
-import com.magento.idea.magento2plugin.util.Regex;
+import com.magento.idea.magento2plugin.util.RegExUtil;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import javax.swing.*;
 
@@ -38,7 +38,7 @@ public class NewBlockValidator {
             return false;
         }
 
-        if (!moduleName.matches(Regex.ALPHANUMERIC)) {
+        if (!moduleName.matches(RegExUtil.ALPHANUMERIC)) {
             String errorMessage = validatorBundle.message("validator.alphaNumericCharacters", "Block Name");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
@@ -60,7 +60,7 @@ public class NewBlockValidator {
             return false;
         }
 
-        if (!pluginDirectory.matches(Regex.DIRECTORY)) {
+        if (!pluginDirectory.matches(RegExUtil.DIRECTORY)) {
             String errorMessage = validatorBundle.message("validator.directory.isNotValid", "Block Directory");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 

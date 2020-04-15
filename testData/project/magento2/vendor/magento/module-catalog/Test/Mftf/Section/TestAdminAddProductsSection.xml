@@ -8,7 +8,7 @@
 
 <sections xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:mftf:Page/etc/SectionObject.xsd">
-    <section name="TestAdminProducts">
+    <section name="TestAdminProductsSection">
         <element name="testaddSelectedProducts" type="button" selector=".product_form_product_form_bundle-items_modal button.action-primary" timeout="30"/>
         <element name="testfilters" type="button" selector=".product_form_product_form_bundle-items_modal button[data-action='grid-filter-expand']" timeout="30"/>
         <element name="testapplyFilters" type="button" selector=".product_form_product_form_bundle-items_modal [data-action='grid-filter-apply']" timeout="30"/>

@@ -16,8 +16,9 @@ import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.vfs.*;
 import com.intellij.platform.DirectoryProjectConfigurator;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
-import com.magento.idea.magento2plugin.php.module.MagentoComponentManager;
+import com.magento.idea.magento2plugin.magento.packages.MagentoComponentManager;
 import com.magento.idea.magento2plugin.util.magento.MagentoBasePathUtil;
+import com.magento.idea.magento2plugin.util.magento.MagentoVersion;
 import org.jetbrains.annotations.NotNull;
 import javax.swing.event.HyperlinkEvent;
 
@@ -38,6 +39,7 @@ public class ProjectDetector implements DirectoryProjectConfigurator {
                         settings.pluginEnabled = true;
                         settings.mftfSupportEnabled = true;
                         settings.magentoPath = project.getBasePath();
+                        settings.magentoVersion = MagentoVersion.getInstance().get(project, project.getBasePath());
                         IndexManager.manualReindex();
                         MagentoComponentManager.getInstance(project).flushModules();
                         notification.expire();
