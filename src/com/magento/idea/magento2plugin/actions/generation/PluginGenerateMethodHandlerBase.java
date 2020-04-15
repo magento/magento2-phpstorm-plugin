@@ -25,14 +25,16 @@ import com.jetbrains.php.lang.parser.PhpStubElementTypes;
 import com.jetbrains.php.lang.psi.PhpCodeEditUtil;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.PhpPsiUtil;
-import com.jetbrains.php.lang.psi.elements.*;
-import java.util.*;
+import com.jetbrains.php.lang.psi.elements.Method;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.jetbrains.php.lang.psi.elements.PhpPsiElement;
 import com.magento.idea.magento2plugin.actions.generation.ImportReferences.PhpClassReferenceResolver;
 import com.magento.idea.magento2plugin.actions.generation.data.code.PluginMethodData;
 import com.magento.idea.magento2plugin.actions.generation.generator.code.PluginMethodsGenerator;
 import com.magento.idea.magento2plugin.actions.generation.util.CodeStyleSettings;
 import com.magento.idea.magento2plugin.actions.generation.util.CollectInsertedMethods;
 import com.magento.idea.magento2plugin.actions.generation.util.FillTextBufferWithPluginMethods;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.magento.plugin.GetTargetClassNamesByPluginClassName;
@@ -41,8 +43,12 @@ import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
+import java.util.*;
+
 public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeInsightActionHandler {
     private CollectInsertedMethods collectInsertedMethods;
+    private ValidatorBundle validatorBundle;
     public String type;
     public FillTextBufferWithPluginMethods fillTextBuffer;
 
@@ -50,6 +56,7 @@ public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeIns
         this.type = type.toString();
         this.fillTextBuffer = FillTextBufferWithPluginMethods.getInstance();
         this.collectInsertedMethods = CollectInsertedMethods.getInstance();
+        this.validatorBundle = new ValidatorBundle();
     }
 
     public boolean isValidFor(Editor editor, PsiFile file) {
@@ -155,9 +162,17 @@ public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeIns
         ArrayList<String> targetClassNames = targetClassesService.execute(currentClass);
         for (String targetClassName : targetClassNames) {
             PhpClass targetClass = GetPhpClassByFQN.getInstance(phpClass.getProject()).execute(targetClassName);
+
+            if (targetClass == null) {
+                String errorMessage = validatorBundle.message("validator.magentoNotExistTargetClass");
+                JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+                continue;
+            }
+
             if (targetClass.isFinal()) {
                 continue;
             }
+
             Collection<Method> methods = targetClass.getMethods();
             Iterator methodIterator = methods.iterator();
 
