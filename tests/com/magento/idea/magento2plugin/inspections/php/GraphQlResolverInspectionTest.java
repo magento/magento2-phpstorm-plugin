@@ -4,10 +4,7 @@
  */
 package com.magento.idea.magento2plugin.inspections.php;
 
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
-import java.io.File;
-
-public class GraphQlResolverInspectionTest extends BasePlatformTestCase {
+public class GraphQlResolverInspectionTest extends InspectionPhpFixtureTestCase {
 
     @Override
     public void setUp() throws Exception {
@@ -16,29 +13,23 @@ public class GraphQlResolverInspectionTest extends BasePlatformTestCase {
     }
 
     @Override
-    protected String getTestDataPath() {
-        return new File("testData/inspections/php/"
-                + getClass().getSimpleName().replace("Test", "")).getAbsolutePath();
-    }
-
-    @Override
     protected boolean isWriteActionRequired() {
         return false;
     }
 
     public void testWithInvalidResolverInterface() throws Exception {
-        myFixture.addFileToProject(getTestDataPath() + "/withInvalidResolverInterface/" + "schema.graphqls", "type Query {" +
+        myFixture.addFileToProject("schema.graphqls", "type Query {" +
                 "InvalidResolverTest: InvalidResolver @resolver(class: \"\\\\Magento\\\\Test\\\\InvalidResolverTest\")" +
                 "}");
-        myFixture.configureByFile(getTestName(true) + "/" + "InvalidResolverTest.php");
+        myFixture.configureByFile(getFixturePath("InvalidResolverTest.php"));
         myFixture.checkHighlighting();
     }
 
     public void testWithValidResolverInterface() throws Exception {
-        myFixture.addFileToProject(getTestDataPath() + "/withValidResolverInterface/" + "schema.graphqls", "type mutation {" +
+        myFixture.addFileToProject("schema.graphqls", "type mutation {" +
                 "    ValidResolverTest(): ValidResolver @resolver(class: \"\\\\Magento\\\\Test\\\\ValidResolverTest\")" +
                 "}");
-        myFixture.configureByFile(getTestName(true) + "/" + "ValidResolverTest.php");
+        myFixture.configureByFile(getFixturePath("ValidResolverTest.php"));
         myFixture.checkHighlighting();
     }
 }
