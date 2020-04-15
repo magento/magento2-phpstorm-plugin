@@ -8,8 +8,6 @@ package com.magento.idea.magento2plugin.inspections.xml;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.ide.highlighter.XmlFileType;
-import com.intellij.openapi.vfs.VfsUtil;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -21,14 +19,13 @@ import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.magento.idea.magento2plugin.bundles.InspectionBundle;
 import com.magento.idea.magento2plugin.indexes.PluginIndex;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
-import com.magento.idea.magento2plugin.magento.files.ModuleXml;
 import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.*;
+import com.intellij.openapi.util.Pair;
 
 public class PluginDeclarationInspection extends PhpInspection {
 
@@ -36,9 +33,7 @@ public class PluginDeclarationInspection extends PhpInspection {
     @Override
     public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder problemsHolder, boolean b) {
         return new XmlElementVisitor() {
-            private final String moduleXmlFileName = ModuleXml.getInstance().getFileName();
             private InspectionBundle inspectionBundle = new InspectionBundle();
-            private HashMap<String, VirtualFile> loadedFileHash = new HashMap<>();
             private final ProblemHighlightType errorSeverity = ProblemHighlightType.WARNING;
 
             @Override
@@ -86,7 +81,7 @@ public class PluginDeclarationInspection extends PhpInspection {
                         }
 
                         String pluginTypeName = pluginTypeNameAttribute.getValue();
-                        String pluginTypeKey = pluginNameAttributeValue.concat("_").concat(pluginTypeName);
+                        String pluginTypeKey = pluginNameAttributeValue.concat(Package.VENDOR_MODULE_NAME_SEPARATOR).concat(pluginTypeName);
                         if (targetPluginHash.containsKey(pluginTypeKey)) {
                             problemsHolder.registerProblem(
                                 pluginTypeNameAttribute.getValueElement(),
@@ -96,12 +91,12 @@ public class PluginDeclarationInspection extends PhpInspection {
                         }
                         targetPluginHash.put(pluginTypeKey, pluginTypeXmlTag);
 
-                        List<HashMap<String, String>> modulesWithSamePluginName = fetchModuleNamesWhereSamePluginNameUsed(pluginNameAttributeValue, pluginTypeName, pluginIndex, file);
-                        for (HashMap<String, String> moduleEntry: modulesWithSamePluginName) {
-                            Map.Entry<String, String> module = moduleEntry.entrySet().iterator().next();
-                            String moduleName = module.getKey();
-                            String scope = module.getValue();
-                            String problemKey = pluginTypeKey.concat("_").concat(moduleName).concat("_").concat(scope);
+                        List<Pair<String, String>> modulesWithSamePluginName = fetchModuleNamesWhereSamePluginNameUsed(pluginNameAttributeValue, pluginTypeName, pluginIndex, file);
+                        for (Pair<String, String> moduleEntry: modulesWithSamePluginName) {
+                            String scope = moduleEntry.getFirst();
+                            String moduleName = moduleEntry.getSecond();
+                            String problemKey = pluginTypeKey.concat(Package.VENDOR_MODULE_NAME_SEPARATOR)
+                                    .concat(moduleName).concat(Package.VENDOR_MODULE_NAME_SEPARATOR).concat(scope);
                             if (!pluginProblems.containsKey(problemKey)){
                                 problemsHolder.registerProblem(
                                     pluginTypeNameAttribute.getValueElement(),
@@ -121,8 +116,8 @@ public class PluginDeclarationInspection extends PhpInspection {
                 }
             }
 
-            private List<HashMap<String, String>> fetchModuleNamesWhereSamePluginNameUsed(String pluginNameAttributeValue, String pluginTypeName, PluginIndex pluginIndex, PsiFile file) {
-                List<HashMap<String, String>> modulesName = new ArrayList<>();
+            private List<Pair<String, String>> fetchModuleNamesWhereSamePluginNameUsed(String pluginNameAttributeValue, String pluginTypeName, PluginIndex pluginIndex, PsiFile file) {
+                List<Pair<String, String>> modulesName = new ArrayList<>();
                 String currentFileDirectory = file.getContainingDirectory().toString();
                 String currentFileFullPath = currentFileDirectory.concat(File.separator).concat(file.getName());
 
@@ -184,65 +179,15 @@ public class PluginDeclarationInspection extends PhpInspection {
                 return result;
             }
 
-            private void addModuleNameWhereSamePluginUsed(List<HashMap<String, String>> modulesName, PsiFile indexedFile, String scope) {
-                XmlTag moduleDeclarationTag = getModuleDeclarationTagByConfigFile(indexedFile);
-                if (moduleDeclarationTag == null) return;
+            private void addModuleNameWhereSamePluginUsed(
+                List<Pair<String, String>> modulesName,
+                PsiFile indexedFile,
+                String scope
+            ) {
+                String moduleName = GetModuleNameByDirectory.getInstance(problemsHolder.getProject())
+                        .execute(indexedFile.getContainingDirectory());
 
-                if (!moduleDeclarationTag.getName().equals("module")) {
-                    return;
-                }
-                XmlAttribute moduleNameAttribute = moduleDeclarationTag.getAttribute(ModuleXml.MODULE_ATTR_NAME);
-                if (moduleNameAttribute == null) {
-                    return;
-                }
-
-                HashMap<String, String> moduleEntry = new HashMap<>();
-
-                moduleEntry.put(moduleNameAttribute.getValue(), scope);
-                modulesName.add(moduleEntry);
-            }
-
-            @Nullable
-            private XmlTag getModuleDeclarationTagByConfigFile(PsiFile file) {
-                String fileDirectory = file.getContainingDirectory().toString();
-                String fileArea = file.getContainingDirectory().getName();
-                String moduleXmlFilePath = getModuleXmlFilePathByConfigFileDirectory(fileDirectory, fileArea);
-
-                VirtualFile virtualFile = getFileByPath(moduleXmlFilePath);
-                if (virtualFile == null) return null;
-
-                PsiFile moduleDeclarationFile = PsiManager.getInstance(file.getProject()).findFile(virtualFile);
-                XmlTag[] moduleDeclarationTags = getFileXmlTags(moduleDeclarationFile);
-                if (moduleDeclarationTags == null) {
-                    return null;
-                }
-                return moduleDeclarationTags[0];
-            }
-
-            @Nullable
-            private VirtualFile getFileByPath(String moduleXmlFilePath) {
-                if (loadedFileHash.containsKey(moduleXmlFilePath)) {
-                    return loadedFileHash.get(moduleXmlFilePath);
-                }
-                VirtualFile virtualFile;
-                try {
-                    virtualFile = VfsUtil.findFileByURL(new URL(moduleXmlFilePath));
-                } catch (MalformedURLException e) {
-                    return null;
-                }
-                if (virtualFile == null) {
-                    return null;
-                }
-                loadedFileHash.put(moduleXmlFilePath, virtualFile);
-                return virtualFile;
-            }
-
-            private String getModuleXmlFilePathByConfigFileDirectory(String fileDirectory, String fileArea) {
-                String moduleXmlFile = fileDirectory.replace(fileArea, "").concat(moduleXmlFileName);
-                if (fileDirectory.endsWith(Package.MODULE_BASE_AREA_DIR)) {
-                    moduleXmlFile = fileDirectory.concat(File.separator).concat(moduleXmlFileName);
-                }
-                return moduleXmlFile.replace("PsiDirectory:", "file:");
+                modulesName.add(Pair.create(scope, moduleName));
             }
 
             @Nullable
