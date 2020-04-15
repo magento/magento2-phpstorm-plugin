@@ -6,11 +6,11 @@
 
 namespace Magento\Catalog\Block;
 
-class Navigation extends \Magento\Framework\View\Element\Template implements
+class TestBlock extends \Magento\Framework\View\Element\Template implements
     \Magento\Framework\DataObject\IdentityInterface
 {
     public function someMethod()
     {
-        $this->_eventManager->dispatch('test_event_in_block', ['response_object' => "test"]);
+        $this->_eventManager->dispatch('test_event_in_test_class<caret>', ['response_object' => "test"]);
     }
 }
