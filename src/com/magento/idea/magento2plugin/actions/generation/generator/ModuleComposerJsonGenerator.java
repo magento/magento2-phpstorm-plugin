@@ -16,6 +16,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFro
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.ComposerJson;
 import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
+import com.intellij.openapi.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -82,20 +83,24 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
         String result = "";
         Object[] dependencies = dependenciesList.toArray();
         result = result.concat(ComposerJson.DEFAULT_DEPENDENCY);
-        if (dependencies.length == 0) {
+        boolean noDependency = dependencies.length == 1 && dependencies[0].equals(ComposerJson.NO_DEPENDENCY_LABEL);
+        if (dependencies.length == 0 || noDependency) {
             result = result.concat("\n");
         } else {
             result = result.concat(",\n");
         }
 
+        if (noDependency) {
+            return result;
+        }
+
         for (int i = 0; i < dependencies.length; i++) {
             String dependency = dependencies[i].toString();
+            Pair<String, String> dependencyData = getDependencyData(dependency);
             result = result.concat("\"");
-            result = result.concat(
-                    camelCaseToHyphen.convert(dependency).replace("_-", "/")
-            );
+            result = result.concat(dependencyData.getFirst());
             result = result.concat("\"");
-            result = result.concat(": \"" + getDependencyVersion(dependency) + "\"");
+            result = result.concat(": \"" + dependencyData.getSecond() + "\"");
 
             if (dependencies.length != (i + 1)) {
                 result = result.concat(",");
@@ -107,8 +112,9 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
         return result;
     }
 
-    private String getDependencyVersion(String dependency) {
+    private Pair<String, String> getDependencyData(String dependency) {
         String version = "*";
+        String moduleName = camelCaseToHyphen.convert(dependency).replace("_-", "/");
         try {
             VirtualFile virtualFile = moduleIndex.getModuleDirectoryByModuleName(dependency)
                     .findFile(ComposerJson.FILE_NAME)
@@ -116,6 +122,7 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
             if (virtualFile.exists()) {
                 JsonElement jsonElement = new JsonParser().parse(new FileReader(virtualFile.getPath()));
                 JsonElement versionJsonElement = jsonElement.getAsJsonObject().get("version");
+                JsonElement nameJsonElement = jsonElement.getAsJsonObject().get("name");
                 if (versionJsonElement != null) {
                     version = versionJsonElement.getAsString();
                     int minorVersionSeparator = version.lastIndexOf(".");
@@ -123,10 +130,14 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
                             .replace(minorVersionSeparator + 1, version.length(),"*")
                             .toString();
                 }
+                if (nameJsonElement != null) {
+                    moduleName = nameJsonElement.getAsString();
+                }
             }
         } catch (FileNotFoundException e) {
             // It's fine
         }
-        return version;
+
+        return Pair.create(moduleName, version);
     }
 }
