@@ -39,7 +39,7 @@ public class GraphQlResolverUsageLineMarkerProvider implements LineMarkerProvide
             if (psiElement instanceof PhpClass) {
                 List<? extends PsiElement> results;
 
-                if (GraphQlUtil.isResolver((PhpClass) psiElement)) {
+                if (GraphQlUtil.isNotResolver((PhpClass) psiElement)) {
                     return;
                 }
                 GraphQlUsagesCollector collector = new GraphQlUsagesCollector();

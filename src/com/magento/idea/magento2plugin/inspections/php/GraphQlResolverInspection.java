@@ -32,7 +32,7 @@ public class GraphQlResolverInspection extends PhpInspection {
                 GraphQlUsagesCollector collector = new GraphQlUsagesCollector();
                 results = collector.getGraphQLUsages(resolverClass);
                 if (results.size() > 0 ) {
-                    if (GraphQlUtil.isResolver(resolverClass)) {
+                    if (GraphQlUtil.isNotResolver(resolverClass)) {
                         PsiElement currentClassNameIdentifier = resolverClass.getNameIdentifier();
                         assert currentClassNameIdentifier != null;
                         problemsHolder.registerProblem(currentClassNameIdentifier,

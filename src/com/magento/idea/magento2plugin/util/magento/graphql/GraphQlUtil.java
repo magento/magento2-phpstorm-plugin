@@ -44,7 +44,7 @@ public class GraphQlUtil {
         return argumentStringValue;
     }
 
-    public static boolean isResolver(PhpClass psiElement) {
+    public static boolean isNotResolver(PhpClass psiElement) {
         PhpClass[] implementedInterfaces = psiElement.getImplementedInterfaces();
         for (PhpClass implementedInterface: implementedInterfaces) {
             if (!implementedInterface.getFQN().equals(GraphQlResolver.RESOLVER_INTERFACE)) {
