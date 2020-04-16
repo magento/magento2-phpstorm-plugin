@@ -96,11 +96,11 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
 
         for (int i = 0; i < dependencies.length; i++) {
             String dependency = dependencies[i].toString();
-            Pair<String, String> dependecyData = getDependencyData(dependency);
+            Pair<String, String> dependencyData = getDependencyData(dependency);
             result = result.concat("\"");
-            result = result.concat(dependecyData.getFirst());
+            result = result.concat(dependencyData.getFirst());
             result = result.concat("\"");
-            result = result.concat(": \"" + dependecyData.getSecond() + "\"");
+            result = result.concat(": \"" + dependencyData.getSecond() + "\"");
 
             if (dependencies.length != (i + 1)) {
                 result = result.concat(",");
