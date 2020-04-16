@@ -11,6 +11,7 @@ public class ComposerJson implements ModuleFileInterface {
     public static String FILE_NAME = "composer.json";
     public static String TEMPLATE = "Magento Module Composer";
     public static String DEFAULT_DEPENDENCY = "\"magento/framework\": \"*\"";
+    public static String NO_DEPENDENCY_LABEL = "None";
     private static ComposerJson INSTANCE = null;
 
     public static ComposerJson getInstance() {
