@@ -10,6 +10,7 @@ import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.icons.AllIcons;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.Method;
@@ -55,7 +56,7 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
                             .create(AllIcons.Nodes.Plugin)
                             .setTargets(results)
                             .setTooltipText("Navigate to plugins")
-                            .createLineMarkerInfo(psiElement)
+                            .createLineMarkerInfo(PsiTreeUtil.getDeepestFirst(psiElement))
                     );
                 }
             }

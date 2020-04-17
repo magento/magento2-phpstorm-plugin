@@ -14,9 +14,6 @@ import com.magento.idea.magento2plugin.stubs.indexes.graphql.GraphQlResolverInde
 import com.magento.idea.magento2plugin.stubs.indexes.mftf.*;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.PhpClassNameIndex;
 
-/**
- * Created by dkvashnin on 1/9/16.
- */
 public class IndexManager {
     public static void manualReindex() {
         ID<?, ?>[] indexIds = new ID<?, ?>[] {
@@ -49,8 +46,12 @@ public class IndexManager {
         };
 
         for (ID<?, ?> id: indexIds) {
-            FileBasedIndexImpl.getInstance().requestRebuild(id);
-            FileBasedIndexImpl.getInstance().scheduleRebuild(id, new Throwable());
+            try {
+                FileBasedIndexImpl.getInstance().requestRebuild(id);
+                FileBasedIndexImpl.getInstance().scheduleRebuild(id, new Throwable());
+            } catch (NullPointerException exception) {
+                //that's fine, indexer is not present in map java.util.Map.get
+            }
         }
     }
 }
