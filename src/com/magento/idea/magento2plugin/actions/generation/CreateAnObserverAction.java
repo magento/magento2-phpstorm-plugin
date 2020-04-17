@@ -12,21 +12,23 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.tree.IElementType;
 import com.jetbrains.php.lang.lexer.PhpTokenTypes;
 import com.jetbrains.php.lang.psi.PhpFile;
+import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.CreateAnObserverDialog;
+import com.magento.idea.magento2plugin.magento.files.Observer;
 import com.magento.idea.magento2plugin.project.Settings;
 import org.jetbrains.annotations.NotNull;
 
 public class CreateAnObserverAction extends DumbAwareAction {
     public static final String ACTION_NAME = "Create a Magento Observer...";
     static final String ACTION_DESCRIPTION = "Create a new Magento 2 Observer for the event";
-    static final String SIGNATURE_INTERFACE = "#M#C\\Magento\\Framework\\Event\\ManagerInterface.dispatch";
-    static final String SIGNATURE_CONTEXT = "#M#M#C\\Magento\\Framework\\App\\Action\\Context.getEventManager.dispatch";
     public String targetEvent;
 
     public CreateAnObserverAction() {
@@ -100,7 +102,23 @@ public class CreateAnObserverAction extends DumbAwareAction {
     }
 
     private boolean checkIsEventDispatchMethod(MethodReference element) {
-        return element.getSignature().equals(SIGNATURE_INTERFACE) || element.getSignature().equals(SIGNATURE_CONTEXT);
+        PsiReference elementReference = element.getReference();
+        if (elementReference == null) {
+            return false;
+        }
+        PsiElement method = elementReference.resolve();
+        if (!(method instanceof Method)) {
+            return false;
+        }
+        if (!((Method) method).getName().equals(Observer.DISPATCH_METHOD)) {
+            return false;
+        }
+        PsiElement phpClass = method.getParent();
+        if (!(phpClass instanceof PhpClass)) {
+            return false;
+        }
+        String fqn = ((PhpClass) phpClass).getPresentableFQN();
+        return fqn.equals(Observer.INTERFACE);
     }
 
     private boolean checkIsElementStringLiteral(@NotNull PsiElement element) {
