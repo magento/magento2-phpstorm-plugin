@@ -100,7 +100,20 @@ public class CreateAnObserverAction extends DumbAwareAction {
     }
 
     private boolean checkIsEventDispatchMethod(MethodReference element) {
-        return element.getSignature().equals(SIGNATURE_INTERFACE) || element.getSignature().equals(SIGNATURE_CONTEXT);
+        return element.getSignature().equals(SIGNATURE_INTERFACE) ||
+                element.getSignature().equals(SIGNATURE_CONTEXT) ||
+                checkIsDispatchMethodGiven(element);
+    }
+
+    private boolean checkIsDispatchMethodGiven(MethodReference element) {
+        String methodName = element.getName();
+        String elementType = element.getType().toString().replace("|?","");
+
+        if (element.getSignature().equals(elementType) && methodName.equals("dispatch")) {
+            return true;
+        }
+
+        return false;
     }
 
     private boolean checkIsElementStringLiteral(@NotNull PsiElement element) {
