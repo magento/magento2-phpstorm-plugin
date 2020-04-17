@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config>
+    <type name="Magento\Framework\App\ResourceConnection">
+        <plugin name="get_catalog_category_product_index_table_name_soap_api" type="Magento\Catalog\Model\Indexer\Category\Product\Plugin\TableResolver"/>
+    </type>
+</config>

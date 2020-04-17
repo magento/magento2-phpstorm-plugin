@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config>
+    <type name="Magento\Catalog\Block\Product\ImageFactory">
+        <plugin name=<warning descr="The plugin name \"designLoader\" for targeted \"Magento\Catalog\Block\Product\ImageFactory\" class is already used in the module \"Magento_CatalogGraphQl\" (graphql scope). For more details see Inspection Description.">"designLoader"</warning> type="Magento\CatalogGraphQl\Plugin\DesignLoader" />
+    </type>
+</config>

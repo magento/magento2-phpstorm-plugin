@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config>
+    <type name="Magento\Backend\App\AbstractAction">
+        <plugin name=<warning descr="The plugin name \"adminAuthentication\" for targeted \"Magento\Backend\App\AbstractAction\" class is already used in the module \"Magento_Backend\" (adminhtml scope). For more details see Inspection Description.">"adminAuthentication"</warning> type="Vendor\Module\Plugin\Authentication" />
+    </type>
+</config>
