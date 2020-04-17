@@ -10,6 +10,8 @@ import com.jetbrains.php.lang.PhpLanguage;
 public class Observer implements ModuleFileInterface {
 
     private String fileName;
+    public static final String INTERFACE = "Magento\\Framework\\Event\\ManagerInterface";
+    public static final String DISPATCH_METHOD = "dispatch";
 
     public Observer(String className) {
         fileName = className.concat(".php");
