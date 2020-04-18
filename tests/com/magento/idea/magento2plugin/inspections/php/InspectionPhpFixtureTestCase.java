@@ -47,7 +47,7 @@ abstract public class InspectionPhpFixtureTestCase extends BaseProjectTestCase {
     }
 
     protected void assertHasNoHighlighting(String message) {
-        String highlightingNotFound = "Failed that documents not contains highlighting with the description `%s`";
+        String highlightingFound = "Failed that documents not contains highlighting with the description `%s`";
 
         List<HighlightInfo> highlightingList = myFixture.doHighlighting();
         if (highlightingList.isEmpty()) {
@@ -57,7 +57,7 @@ abstract public class InspectionPhpFixtureTestCase extends BaseProjectTestCase {
         for (HighlightInfo highlighting :
             highlightingList) {
             if (highlighting.getDescription().equals(message)) {
-                fail(String.format(highlightingNotFound, message));
+                fail(String.format(highlightingFound, message));
             }
         }
     }
