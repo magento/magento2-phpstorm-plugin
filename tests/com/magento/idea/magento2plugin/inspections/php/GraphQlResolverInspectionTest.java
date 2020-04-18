@@ -4,7 +4,14 @@
  */
 package com.magento.idea.magento2plugin.inspections.php;
 
+import com.magento.idea.magento2plugin.bundles.InspectionBundle;
+
 public class GraphQlResolverInspectionTest extends InspectionPhpFixtureTestCase {
+
+    private final InspectionBundle inspectionBundle = new InspectionBundle();
+    private final String errorMessage =  inspectionBundle.message(
+        "inspection.graphql.resolver.mustImplement"
+    );
 
     @Override
     public void setUp() throws Exception {
@@ -18,18 +25,26 @@ public class GraphQlResolverInspectionTest extends InspectionPhpFixtureTestCase 
     }
 
     public void testWithInvalidResolverInterface() throws Exception {
-        myFixture.addFileToProject("schema.graphqls", "type Query {" +
-                "InvalidResolverTest: InvalidResolver @resolver(class: \"\\\\Magento\\\\Test\\\\InvalidResolverTest\")" +
-                "}");
         myFixture.configureByFile(getFixturePath("InvalidResolverTest.php"));
-        myFixture.checkHighlighting();
+
+        assertHasHighlighting(errorMessage);
     }
 
     public void testWithValidResolverInterface() throws Exception {
-        myFixture.addFileToProject("schema.graphqls", "type mutation {" +
-                "    ValidResolverTest(): ValidResolver @resolver(class: \"\\\\Magento\\\\Test\\\\ValidResolverTest\")" +
-                "}");
         myFixture.configureByFile(getFixturePath("ValidResolverTest.php"));
-        myFixture.checkHighlighting();
+
+        assertHasNoHighlighting(errorMessage);
+    }
+
+    public void testWithValidBatchResolverInterface() throws Exception {
+        myFixture.configureByFile(getFixturePath("ValidResolverTest.php"));
+
+        assertHasNoHighlighting(errorMessage);
+    }
+
+    public void testWithValidBatchServiceContractResolverInterface() throws Exception {
+        myFixture.configureByFile(getFixturePath("ValidResolverTest.php"));
+
+        assertHasNoHighlighting(errorMessage);
     }
 }
