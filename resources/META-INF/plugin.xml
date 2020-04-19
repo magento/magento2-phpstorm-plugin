@@ -150,6 +150,7 @@
         <internalFileTemplate name="Magento Module Common Php Class"/>
         <internalFileTemplate name="Magento Observer Class"/>
         <internalFileTemplate name="Magento Module Events Xml"/>
+        <internalFileTemplate name="Magento Cronjob Class"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.php">

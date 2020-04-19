@@ -6,6 +6,11 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
+import com.magento.idea.magento2plugin.actions.generation.NewBlockAction;
+import com.magento.idea.magento2plugin.actions.generation.NewCronjobAction;
+import com.magento.idea.magento2plugin.actions.generation.data.CronjobClassData;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewCronjobValidator;
+import com.magento.idea.magento2plugin.actions.generation.generator.CronjobClassGenerator;
 import com.magento.idea.magento2plugin.indexes.CronGroupIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
@@ -19,7 +24,7 @@ public class NewCronjobDialog extends AbstractDialog {
     private JButton buttonOK;
     private JButton buttonCancel;
     private JTextField cronjobName;
-    private JTextField cronjobPath;
+    private JTextField cronjobDirectory;
     private JRadioButton fixedScheduleRadioButton;
     private JRadioButton configurableScheduleRadioButton;
     private JRadioButton everyMinuteRadioButton;
@@ -30,17 +35,17 @@ public class NewCronjobDialog extends AbstractDialog {
     private JTextField configPathField;
     private JPanel configurableSchedulePanel;
     private FilteredComboBox cronGroupComboBox;
-    private JLabel defaultGroupUsageHint;
 
     private Project project;
     private PsiDirectory baseDir;
     private String moduleName;
+    private NewCronjobValidator validator;
 
     public NewCronjobDialog(Project project, PsiDirectory directory) {
         this.project = project;
         this.baseDir = directory;
-
         this.moduleName = GetModuleNameByDirectory.getInstance(project).execute(directory);
+        this.validator = NewCronjobValidator.getInstance(this);
 
         setContentPane(contentPane);
         setModal(true);
@@ -101,19 +106,57 @@ public class NewCronjobDialog extends AbstractDialog {
         dialog.setVisible(true);
     }
 
+    public String getCronjobClassName() {
+        return this.cronjobName.getText().trim();
+    }
+
+    public String getCronjobDirectory() {
+        return this.cronjobDirectory.getText().trim();
+    }
+
+    public String getCronjobModule() {
+        return this.moduleName;
+    }
+
+    protected void onCancel() {
+        dispose();
+    }
+
     private void createUIComponents() {
         List<String> cronGroups = CronGroupIndex.getInstance(project).getGroups();
 
         this.cronGroupComboBox = new FilteredComboBox(cronGroups);
     }
 
+    /**
+     * When new cronjob dialog is filled, validate the input data and generate a new crobjob
+     */
     private void onOK() {
-        // add your code here
-        dispose();
+        if (!validator.validate()) {
+            return;
+        }
+
+        CronjobClassData cronjobClassData = this.getCronjobClassData();
+        this.generate(cronjobClassData);
+
+        this.setVisible(false);
     }
 
-    protected void onCancel() {
-        // add your code here if necessary
-        dispose();
+
+    /**
+     * Generate new cronjob file and register it in crontab.xml
+     */
+    private void generate(CronjobClassData cronjobClassData) {
+        CronjobClassGenerator cronjobFileGenerator = new CronjobClassGenerator(project, cronjobClassData);
+
+        cronjobFileGenerator.generate(NewCronjobAction.ACTION_NAME, true);
+    }
+
+    private CronjobClassData getCronjobClassData() {
+        return new CronjobClassData(
+            this.getCronjobClassName(),
+            this.getCronjobDirectory(),
+            this.getCronjobModule()
+        );
     }
 }
