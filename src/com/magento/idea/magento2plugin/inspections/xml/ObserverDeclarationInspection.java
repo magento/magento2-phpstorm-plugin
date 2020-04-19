@@ -71,6 +71,9 @@ public class ObserverDeclarationInspection extends PhpInspection {
                     }
 
                     List<XmlTag> targetObservers = fetchObserverTagsFromEventTag(eventXmlTag);
+                    if (targetObservers.isEmpty()) {
+                        return;
+                    }
 
                     for (XmlTag observerXmlTag: targetObservers) {
                         XmlAttribute observerNameAttribute = observerXmlTag.getAttribute("name");
