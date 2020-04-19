@@ -160,6 +160,7 @@
         <internalFileTemplate name="Magento Module Events Xml"/>
         <internalFileTemplate name="Magento GraphQL Resolver Class"/>
         <internalFileTemplate name="Magento Cronjob Class"/>
+        <internalFileTemplate name="Magento Crontab Xml"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.php">
