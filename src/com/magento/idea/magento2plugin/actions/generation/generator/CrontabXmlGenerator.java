@@ -27,9 +27,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Properties;
 
-/**
- *
- */
 public class CrontabXmlGenerator extends FileGenerator {
     private Project project;
     private CrontabXmlData crontabXmlData;
@@ -55,6 +52,7 @@ public class CrontabXmlGenerator extends FileGenerator {
     }
 
     /**
+     * Register newly created cronjob in the crontab.xml. If there is not crontab.xml, it will create one.
      *
      * @param actionName
      *
@@ -81,7 +79,7 @@ public class CrontabXmlGenerator extends FileGenerator {
         }
 
         if (isCronjobDeclared) {
-            // todo: throw an exception / show validation error
+            throw new RuntimeException(cronjobName +" cronjob is already declared in the " + moduleName + " module");
         }
 
         WriteCommandAction.runWriteCommandAction(project, () -> {
@@ -106,7 +104,19 @@ public class CrontabXmlGenerator extends FileGenerator {
             if (textBuf.length() > 0 && insertPos >= 0) {
                 Document document = this.psiDocumentManager.getDocument(crontabXmlFile);
 
-                // todo: handle possible null pointers
+                if (document == null) {
+                    // practically this should not be possible as we tell to edit XML file
+                    throw new RuntimeException(
+                        crontabXmlFile.getVirtualFile().getPath() + " file is binary or has no document associations"
+                    );
+                }
+
+                if (!document.isWritable()) {
+                    throw new RuntimeException(
+                        crontabXmlFile.getVirtualFile().getPath() + " file is not writable. Please check file permission"
+                    );
+                }
+
                 document.insertString(insertPos, textBuf);
                 int endPos = insertPos + textBuf.length() + 1;
 

@@ -188,7 +188,7 @@ public class NewCronjobDialog extends AbstractDialog {
      * When new cronjob dialog is filled, validate the input data and generate a new crobjob
      */
     private void onOK() {
-        if (!validator.validate(this)) {
+        if (!validator.validate(this.project,this)) {
             return;
         }
 
@@ -216,8 +216,17 @@ public class NewCronjobDialog extends AbstractDialog {
         CronjobClassGenerator cronjobFileGenerator = new CronjobClassGenerator(project, cronjobClassData);
         CrontabXmlGenerator crontabXmlGenerator = new CrontabXmlGenerator(project, crontabXmlData);
 
-        cronjobFileGenerator.generate(NewCronjobAction.ACTION_NAME, true);
-        crontabXmlGenerator.generate(NewCronjobAction.ACTION_NAME);
+        try {
+            cronjobFileGenerator.generate(NewCronjobAction.ACTION_NAME, true);
+            crontabXmlGenerator.generate(NewCronjobAction.ACTION_NAME);
+        } catch (Exception exception) {
+            JOptionPane.showMessageDialog(
+                null,
+                exception.getMessage(),
+                "Generation Error",
+                JOptionPane.ERROR_MESSAGE
+            );
+        }
     }
 
     private CronjobClassData getCronjobClassData(String cronjobNamespace) {

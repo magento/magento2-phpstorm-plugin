@@ -50,26 +50,15 @@ public class CronjobClassGenerator extends FileGenerator {
      * @return void
      */
     public PsiFile generate(String actionName) {
-        String errorTitle = "Error";
-//        String cronjobFqn = this.getCronjobFqn();
-//        PhpClass cronjobClass = GetPhpClassByFQN.getInstance(project).execute(cronjobFqn);
-//
-//        // todo: move it to validator
-//        if (cronjobClass != null) {
-//            String errorMessage = validatorBundle.message("validator.file.alreadyExists", "Block Class");
-//            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
-//
-//            return null;
-//        }
-
         PhpFile cronjobFile = createCronjobClass(actionName);
 
-        // todo: throw an exception and remove validation
         if (cronjobFile == null) {
-            String errorMessage = validatorBundle.message("validator.file.cantBeCreated", "Cronjob Class");
-            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+            String errorMessage = validatorBundle.message(
+            "validator.file.cantBeCreated",
+            "Cronjob Class"
+            );
 
-            return null;
+            throw new RuntimeException(errorMessage);
         }
 
         return cronjobFile;

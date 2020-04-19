@@ -4,8 +4,12 @@
  */
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
+import com.intellij.openapi.project.Project;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewCronjobDialog;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
+import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 
 import javax.swing.*;
@@ -13,6 +17,7 @@ import javax.swing.*;
 public class NewCronjobValidator {
     private static NewCronjobValidator INSTANCE = null;
     private ValidatorBundle validatorBundle;
+    private GetPhpClassByFQN getPhpClassByFQN;
 
     public static NewCronjobValidator getInstance() {
         if (null == INSTANCE) {
@@ -31,11 +36,12 @@ public class NewCronjobValidator {
      *
      * @return boolean
      */
-    public boolean validate(NewCronjobDialog dialog) {
-        String errorTitle = "Error";
+    public boolean validate(Project project, NewCronjobDialog dialog) {
+        String errorTitle = "Validation Error";
         String cronjobClassName = dialog.getCronjobClassName();
         String cronjobDirectory = dialog.getCronjobDirectory();
         String cronjobName = dialog.getCronjobName();
+        String moduleName = dialog.getCronjobModule();
 
         boolean isFixedScheduleType = dialog.isFixedScheduleType();
         String cronjobSchedule = dialog.getCronjobSchedule();
@@ -154,6 +160,29 @@ public class NewCronjobValidator {
 
                 return false;
             }
+        }
+
+        NamespaceBuilder namespaceBuilder = new NamespaceBuilder(
+            moduleName,
+            cronjobClassName,
+            cronjobDirectory
+        );
+        PhpClass cronjobClassFile = GetPhpClassByFQN.getInstance(project).execute(namespaceBuilder.getClassFqn());
+
+        if (cronjobClassFile != null) {
+            String errorMessage = validatorBundle.message(
+                "validator.file.alreadyExists",
+                "Cronjob Class"
+            );
+
+            JOptionPane.showMessageDialog(
+                null,
+                errorMessage,
+                errorTitle,
+                JOptionPane.ERROR_MESSAGE
+            );
+
+            return false;
         }
 
         return true;
