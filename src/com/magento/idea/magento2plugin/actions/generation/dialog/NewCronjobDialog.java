@@ -14,7 +14,6 @@ import com.magento.idea.magento2plugin.actions.generation.generator.CronjobClass
 import com.magento.idea.magento2plugin.actions.generation.generator.CrontabXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.indexes.CronGroupIndex;
-import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
 
@@ -41,13 +40,11 @@ public class NewCronjobDialog extends AbstractDialog {
     private JTextField cronjobNameField;
 
     private Project project;
-    private PsiDirectory baseDir;
     private String moduleName;
     private NewCronjobValidator validator;
 
     public NewCronjobDialog(Project project, PsiDirectory directory) {
         this.project = project;
-        this.baseDir = directory;
         this.moduleName = GetModuleNameByDirectory.getInstance(project).execute(directory);
         this.validator = NewCronjobValidator.getInstance();
 
@@ -87,7 +84,19 @@ public class NewCronjobDialog extends AbstractDialog {
             cronjobScheduleField.grabFocus();
         });
 
-        cronjobNameField.setText(this.getDefaultCronjobName(this.moduleName));
+        // suggest unique cronjob name based on the module and class names
+        cronjobNameField.setText(this.suggestCronjobName(this.moduleName, "CleanTableCronjob"));
+        cronjobClassNameField.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                cronjobNameField.setText(suggestCronjobName(moduleName, cronjobClassNameField.getText()));
+            }
+        });
 
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -165,8 +174,14 @@ public class NewCronjobDialog extends AbstractDialog {
      *
      * @return String
      */
-    private String getDefaultCronjobName(String moduleName) {
-        return this.moduleName.toLowerCase() + "_clean_table_cronjob";
+    private String suggestCronjobName(String moduleName, String cronjobClassname) {
+        if (cronjobClassname == null || cronjobClassname.isEmpty()) {
+            return this.moduleName.toLowerCase();
+        }
+
+        String cronjobClassnameToSnakeCase = cronjobClassname.replaceAll("\\B([A-Z])", "_$1").toLowerCase();
+
+        return this.moduleName.toLowerCase() + "_" + cronjobClassnameToSnakeCase;
     }
 
     /**
