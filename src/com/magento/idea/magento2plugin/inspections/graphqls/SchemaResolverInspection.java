@@ -8,10 +8,8 @@ package com.magento.idea.magento2plugin.inspections.graphqls;
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
-import com.intellij.lang.jsgraphql.psi.GraphQLArgument;
-import com.intellij.lang.jsgraphql.psi.GraphQLArguments;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementVisitor;
+import com.intellij.lang.jsgraphql.psi.GraphQLValue;
+import com.intellij.lang.jsgraphql.psi.GraphQLVisitor;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.magento.graphql.GraphQlUtil;
@@ -23,43 +21,25 @@ public class SchemaResolverInspection extends LocalInspectionTool {
 
     @NotNull
     @Override
-    public PsiElementVisitor buildVisitor(@NotNull final ProblemsHolder holder, boolean isOnTheFly) {
-        return new PsiElementVisitor() {
+    public GraphQLVisitor buildVisitor(@NotNull final ProblemsHolder holder, boolean isOnTheFly) {
+        return new GraphQLVisitor() {
             @Override
-            public void visitElement(PsiElement element) {
-                PsiElement[] directiveChildren = element.getChildren();
+            public void visitValue(@NotNull GraphQLValue element) {
+                String getVisitedElementValue = element.getText();
+                if (getVisitedElementValue == null) {
+                    return;
+                }
 
-                for (PsiElement directiveChild : directiveChildren) {
-                    if (!(directiveChild instanceof GraphQLArguments)) {
-                        continue;
-                    }
-
-                    PsiElement[] argumentsChildren = directiveChild.getChildren();
-                    for (PsiElement argumentsChild : argumentsChildren) {
-                        if (!(argumentsChild instanceof GraphQLArgument)) {
-                            continue;
-                        }
-
-                        PsiElement argumentStringValue = GraphQlUtil.fetchResolverQuotedStringFromArgument(argumentsChild);
-                        if (argumentStringValue == null) continue;
-
-                        String resolverFQN = argumentStringValue.getText();
-                        if (resolverFQN == null) {
-                            continue;
-                        }
-
-                        resolverFQN = GraphQlUtil.resolverStringToPhpFQN(resolverFQN);
-                        GetPhpClassByFQN getPhpClassByFQN = GetPhpClassByFQN.getInstance(holder.getProject());
-                        PhpClass resolverClass = getPhpClassByFQN.execute(resolverFQN);
-                        if (resolverClass == null) {
-                            continue;
-                        }
-                        if (GraphQlUtil.isNotResolver(resolverClass)) {
-                            holder.registerProblem(argumentStringValue,
-                                    GraphQlResolverProblemDescription,
-                                    ProblemHighlightType.ERROR);
-                        }
-                    }
+                String resolverFQN = GraphQlUtil.resolverStringToPhpFQN(getVisitedElementValue);
+                GetPhpClassByFQN getPhpClassByFQN = GetPhpClassByFQN.getInstance(holder.getProject());
+                PhpClass resolverClass = getPhpClassByFQN.execute(resolverFQN);
+                if (resolverClass == null) {
+                    return;
+                }
+                if (GraphQlUtil.isNotResolver(resolverClass)) {
+                    holder.registerProblem(element,
+                            GraphQlResolverProblemDescription,
+                            ProblemHighlightType.ERROR);
                 }
             }
         };
