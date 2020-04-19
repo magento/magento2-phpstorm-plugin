@@ -124,14 +124,22 @@ public class CrontabXmlGenerator extends FileGenerator {
         String cronjobGroup = this.crontabXmlData.getCronGroup();
         String cronjobInstance = this.crontabXmlData.getCronjobInstance();
         String cronjobSchedule = this.crontabXmlData.getCronjobSchedule();
+        String cronjobScheduleConfigPath = this.crontabXmlData.getCronjobScheduleConfigPath();
 
         if (!this.isCronGroupDeclared) {
             attributes.setProperty("CRON_GROUP", cronjobGroup);
         }
 
+        if (cronjobSchedule != null) {
+            attributes.setProperty("CRONJOB_SCHEDULE", cronjobSchedule);
+        }
+
+        if (cronjobScheduleConfigPath != null) {
+            attributes.setProperty("CRONJOB_SCHEDULE_CONFIG_PATH", cronjobScheduleConfigPath);
+        }
+
         attributes.setProperty("CRONJOB_NAME", cronjobName);
         attributes.setProperty("CRONJOB_INSTANCE", cronjobInstance);
-        attributes.setProperty("CRONJOB_SCHEDULE", cronjobSchedule);
     }
 
     /**

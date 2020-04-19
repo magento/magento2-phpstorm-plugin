@@ -39,6 +39,8 @@ public class CronGroupIndex {
         FileBasedIndex index = FileBasedIndex.getInstance();
 
         List<String> cronGroups = new ArrayList<>(index.getAllKeys(CronGroupIndexer.KEY, project));
+
+        // todo: needs to show custom cron groups first and only than groups from bundled core modules
         Collections.sort(cronGroups);
 
        return cronGroups;

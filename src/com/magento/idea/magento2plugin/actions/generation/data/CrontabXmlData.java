@@ -10,6 +10,7 @@ public class CrontabXmlData {
     private String cronjobName;
     private String cronjobInstance;
     private String cronjobSchedule;
+    private String cronjobScheduleConfigPath;
 
     /**
      * @param moduleName
@@ -23,13 +24,15 @@ public class CrontabXmlData {
         String cronGroup,
         String cronjobName,
         String cronjobInstance,
-        String cronjobSchedule
+        String cronjobSchedule,
+        String cronjobScheduleConfigPath
     ) {
         this.moduleName = moduleName;
         this.cronGroup = cronGroup;
         this.cronjobName = cronjobName;
         this.cronjobInstance = cronjobInstance;
         this.cronjobSchedule = cronjobSchedule;
+        this.cronjobScheduleConfigPath = cronjobScheduleConfigPath;
     }
 
     public String getCronGroup() {
@@ -48,6 +51,14 @@ public class CrontabXmlData {
         this.cronjobName = cronjobName;
     }
 
+    public String getModuleName() {
+        return moduleName;
+    }
+
+    public void setModuleName(String moduleName) {
+        this.moduleName = moduleName;
+    }
+
     public String getCronjobInstance() {
         return cronjobInstance;
     }
@@ -64,11 +75,11 @@ public class CrontabXmlData {
         this.cronjobSchedule = cronjobSchedule;
     }
 
-    public String getModuleName() {
-        return moduleName;
+    public String getCronjobScheduleConfigPath() {
+        return cronjobScheduleConfigPath;
     }
 
-    public void setModuleName(String moduleName) {
-        this.moduleName = moduleName;
+    public void setCronjobScheduleConfigPath(String cronjobScheduleConfigPath) {
+        this.cronjobScheduleConfigPath = cronjobScheduleConfigPath;
     }
 }

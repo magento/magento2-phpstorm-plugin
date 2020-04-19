@@ -14,6 +14,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.CronjobClass
 import com.magento.idea.magento2plugin.actions.generation.generator.CrontabXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.indexes.CronGroupIndex;
+import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
 
@@ -48,7 +49,7 @@ public class NewCronjobDialog extends AbstractDialog {
         this.project = project;
         this.baseDir = directory;
         this.moduleName = GetModuleNameByDirectory.getInstance(project).execute(directory);
-        this.validator = NewCronjobValidator.getInstance(this);
+        this.validator = NewCronjobValidator.getInstance();
 
         setContentPane(contentPane);
         setModal(true);
@@ -85,6 +86,8 @@ public class NewCronjobDialog extends AbstractDialog {
             cronjobScheduleField.setEditable(true);
             cronjobScheduleField.grabFocus();
         });
+
+        cronjobNameField.setText(this.getDefaultCronjobName(this.moduleName));
 
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -129,8 +132,20 @@ public class NewCronjobDialog extends AbstractDialog {
         return this.cronGroupComboBox.getSelectedItem().toString();
     }
 
+    public boolean isFixedScheduleType() {
+        return this.fixedScheduleRadioButton.isSelected();
+    }
+
     public String getCronjobSchedule() {
         return this.cronjobScheduleField.getText().trim();
+    }
+
+    public boolean isConfigurableScheduleType() {
+        return this.configurableScheduleRadioButton.isSelected();
+    }
+
+    public String getCronjobScheduleConfigPath() {
+        return this.configPathField.getText().trim();
     }
 
     protected void onCancel() {
@@ -144,10 +159,21 @@ public class NewCronjobDialog extends AbstractDialog {
     }
 
     /**
+     * Retrieve the default cronjob name
+     *
+     * @param moduleName
+     *
+     * @return String
+     */
+    private String getDefaultCronjobName(String moduleName) {
+        return this.moduleName.toLowerCase() + "_clean_table_cronjob";
+    }
+
+    /**
      * When new cronjob dialog is filled, validate the input data and generate a new crobjob
      */
     private void onOK() {
-        if (!validator.validate()) {
+        if (!validator.validate(this)) {
             return;
         }
 
@@ -195,12 +221,18 @@ public class NewCronjobDialog extends AbstractDialog {
      * @return CrontabXmlData
      */
     private CrontabXmlData getCrontabXmlData(String cronjobInstance) {
+        String cronSchedule = this.isFixedScheduleType() ? this.getCronjobSchedule() : null;
+        String cronScheduleConfigPath = this.isConfigurableScheduleType()
+                ? this.getCronjobScheduleConfigPath()
+                : null;
+
         return new CrontabXmlData(
             this.getCronjobModule(),
             this.getCronjobGroup(),
             this.getCronjobName(),
             cronjobInstance,
-            this.getCronjobSchedule()
+            cronSchedule,
+            cronScheduleConfigPath
         );
     }
 }
