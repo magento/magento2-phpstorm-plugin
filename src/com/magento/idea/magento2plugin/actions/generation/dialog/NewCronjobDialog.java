@@ -15,6 +15,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.CrontabXmlGe
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.indexes.CronGroupIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
+import com.magento.idea.magento2plugin.util.CamelCaseToSnakeCase;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
 
 import javax.swing.*;
@@ -42,11 +43,13 @@ public class NewCronjobDialog extends AbstractDialog {
     private Project project;
     private String moduleName;
     private NewCronjobValidator validator;
+    private CamelCaseToSnakeCase camelCaseToSnakeCase;
 
     public NewCronjobDialog(Project project, PsiDirectory directory) {
         this.project = project;
         this.moduleName = GetModuleNameByDirectory.getInstance(project).execute(directory);
         this.validator = NewCronjobValidator.getInstance();
+        this.camelCaseToSnakeCase = CamelCaseToSnakeCase.getInstance();
 
         setContentPane(contentPane);
         setModal(true);
@@ -179,7 +182,7 @@ public class NewCronjobDialog extends AbstractDialog {
             return this.moduleName.toLowerCase();
         }
 
-        String cronjobClassnameToSnakeCase = cronjobClassname.replaceAll("\\B([A-Z])", "_$1").toLowerCase();
+        String cronjobClassnameToSnakeCase = this.camelCaseToSnakeCase.convert(cronjobClassname);
 
         return this.moduleName.toLowerCase() + "_" + cronjobClassnameToSnakeCase;
     }
