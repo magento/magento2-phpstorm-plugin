@@ -15,8 +15,6 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFro
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.CronjobTemplate;
-import com.magento.idea.magento2plugin.magento.files.PhpPreference;
-import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import org.jetbrains.annotations.NotNull;
 
@@ -53,16 +51,16 @@ public class CronjobClassGenerator extends FileGenerator {
      */
     public PsiFile generate(String actionName) {
         String errorTitle = "Error";
-        String cronjobFqn = this.getCronjobFqn();
-        PhpClass cronjobClass = GetPhpClassByFQN.getInstance(project).execute(cronjobFqn);
-
-        // todo: move it to validator
-        if (cronjobClass != null) {
-            String errorMessage = validatorBundle.message("validator.file.alreadyExists", "Block Class");
-            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
-
-            return null;
-        }
+//        String cronjobFqn = this.getCronjobFqn();
+//        PhpClass cronjobClass = GetPhpClassByFQN.getInstance(project).execute(cronjobFqn);
+//
+//        // todo: move it to validator
+//        if (cronjobClass != null) {
+//            String errorMessage = validatorBundle.message("validator.file.alreadyExists", "Block Class");
+//            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+//
+//            return null;
+//        }
 
         PhpFile cronjobFile = createCronjobClass(actionName);
 
@@ -83,7 +81,7 @@ public class CronjobClassGenerator extends FileGenerator {
      */
     protected void fillAttributes(Properties attributes) {
         String cronjobClassName = this.cronjobClassData.getClassName();
-        String cronjobNamespace = this.getCronjobNamespace();
+        String cronjobNamespace = this.cronjobClassData.getNamespace();
 
         attributes.setProperty("NAME", cronjobClassName);
         attributes.setProperty("NAMESPACE", cronjobNamespace);
@@ -120,27 +118,5 @@ public class CronjobClassGenerator extends FileGenerator {
         }
 
         return (PhpFile) blockFile;
-    }
-
-    @NotNull
-    private String getCronjobFqn() {
-        String cronjobClassName = this.cronjobClassData.getClassName();
-        String cronjobNamespace = this.getCronjobNamespace();
-
-        return cronjobNamespace + Package.FQN_SEPARATOR + cronjobClassName;
-    }
-
-    private String getCronjobNamespace() {
-        String moduleName = this.cronjobClassData.getModuleName();
-        String[] parts = moduleName.split(Package.VENDOR_MODULE_NAME_SEPARATOR);
-
-        if (parts[0] == null || parts[1] == null || parts.length > 2) {
-            return null;
-        }
-
-        String cronjobDirectory = this.cronjobClassData.getDirectory();
-        String directoryPart = cronjobDirectory.replace(File.separator, Package.FQN_SEPARATOR);
-
-        return parts[0] + Package.FQN_SEPARATOR + parts[1] + Package.FQN_SEPARATOR + directoryPart;
     }
 }

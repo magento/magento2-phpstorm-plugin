@@ -7,20 +7,24 @@ package com.magento.idea.magento2plugin.actions.generation.data;
 public class CronjobClassData {
     private String directory;
     private String className;
+    private String namespace;
     private String moduleName;
 
     /**
      * @param cronjobClassName
      * @param cronjobDirectory
+     * @param cronjobNamespace
      * @param cronjobModule
      */
     public CronjobClassData(
         String cronjobClassName,
         String cronjobDirectory,
+        String cronjobNamespace,
         String cronjobModule
     ) {
         this.className = cronjobClassName;
         this.directory = cronjobDirectory;
+        this.namespace = cronjobNamespace;
         this.moduleName = cronjobModule;
     }
 
@@ -46,5 +50,13 @@ public class CronjobClassData {
 
     public void setModuleName(String moduleName) {
         this.moduleName = moduleName;
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
     }
 }

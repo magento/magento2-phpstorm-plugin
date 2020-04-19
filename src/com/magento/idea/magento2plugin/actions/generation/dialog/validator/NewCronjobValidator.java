@@ -4,8 +4,10 @@
  */
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewCronjobDialog;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
+import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 
 import javax.swing.*;
 
@@ -32,8 +34,8 @@ public class NewCronjobValidator {
      *
      * @return boolean
      */
-    public boolean validate()
-    {
+    public boolean validate() {
+
         return true;
     }
 }

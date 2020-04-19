@@ -11,90 +11,159 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.xml.*;
-import com.jetbrains.php.lang.PhpLangUtil;
-import com.magento.idea.magento2plugin.actions.generation.data.PluginDiXmlData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateDiXml;
+import com.intellij.psi.xml.XmlAttribute;
+import com.intellij.psi.xml.XmlAttributeValue;
+import com.intellij.psi.xml.XmlFile;
+import com.intellij.psi.xml.XmlTag;
+import com.magento.idea.magento2plugin.actions.generation.data.CrontabXmlData;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateCrontabXml;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplate;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.XmlFilePositionUtil;
+import com.magento.idea.magento2plugin.magento.files.CrontabXmlTemplate;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.xml.XmlPsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Properties;
 
-public class PluginDiXmlGenerator extends FileGenerator {
-    private final GetCodeTemplate getCodeTemplate;
-    private final FindOrCreateDiXml findOrCreateDiXml;
-    private final XmlFilePositionUtil positionUtil;
-    private PluginDiXmlData pluginFileData;
+/**
+ *
+ */
+public class CrontabXmlGenerator extends FileGenerator {
     private Project project;
-    private boolean isTypeDeclared;
+    private CrontabXmlData crontabXmlData;
+    private boolean isCronGroupDeclared;
 
-    public PluginDiXmlGenerator(@NotNull PluginDiXmlData pluginFileData, Project project) {
+    private GetCodeTemplate getCodeTemplate;
+    private CodeStyleManager codeStyleManager;
+    private FindOrCreateCrontabXml findOrCreateCrontabXml;
+    private XmlFilePositionUtil positionUtil;
+    private PsiDocumentManager psiDocumentManager;
+
+    public CrontabXmlGenerator(Project project, @NotNull CrontabXmlData crontabXmlData) {
         super(project);
-        this.pluginFileData = pluginFileData;
+
         this.project = project;
+        this.crontabXmlData = crontabXmlData;
+
+        this.findOrCreateCrontabXml = new FindOrCreateCrontabXml(project);
         this.getCodeTemplate = GetCodeTemplate.getInstance(project);
-        this.findOrCreateDiXml = FindOrCreateDiXml.getInstance(project);
+        this.psiDocumentManager = PsiDocumentManager.getInstance(project);
+        this.codeStyleManager = CodeStyleManager.getInstance(project);
         this.positionUtil = XmlFilePositionUtil.getInstance();
     }
 
-    public PsiFile generate(String actionName)
-    {
-        PsiFile diXmlFile = findOrCreateDiXml.execute(actionName, pluginFileData.getPluginModule(), pluginFileData.getArea());
-        XmlAttributeValue typeAttributeValue = getTypeAttributeValue((XmlFile) diXmlFile);
-        boolean isPluginDeclared = false;
-        this.isTypeDeclared = false;
-        if (typeAttributeValue != null) {
-            this.isTypeDeclared = true;
-            isPluginDeclared = isPluginDeclared(typeAttributeValue);
+    /**
+     *
+     * @param actionName
+     *
+     * @return PsiFile
+     */
+    public PsiFile generate(String actionName) {
+        String moduleName = this.crontabXmlData.getModuleName();
+
+        XmlFile crontabXmlFile = (XmlFile) this.findOrCreateCrontabXml.execute(
+            actionName,
+            moduleName
+        );
+
+        String cronjobGroup = this.crontabXmlData.getCronGroup();
+        String cronjobName = this.crontabXmlData.getCronjobName();
+        XmlTag cronGroupTag = this.getCronGroupTag(crontabXmlFile, cronjobGroup);
+
+        this.isCronGroupDeclared = false;
+        boolean isCronjobDeclared = false;
+
+        if (cronGroupTag != null) {
+            isCronGroupDeclared = true;
+            isCronjobDeclared = this.isCronjobDeclared(cronGroupTag, cronjobName);
         }
-        if (isPluginDeclared) {
-            return null;
+
+        if (isCronjobDeclared) {
+            // todo: throw an exception / show validation error
         }
+
         WriteCommandAction.runWriteCommandAction(project, () -> {
             StringBuffer textBuf = new StringBuffer();
+
             try {
-                textBuf.append(getCodeTemplate.execute(ModuleDiXml.TEMPLATE_PLUGIN, getAttributes()));
+                String cronjobRegistrationTemplate = this.getCodeTemplate.execute(
+                    CrontabXmlTemplate.TEMPLATE_CRONJOB_REGISTRATION,
+                    getAttributes()
+                );
+
+                textBuf.append(cronjobRegistrationTemplate);
             } catch (IOException e) {
                 e.printStackTrace();
                 return;
             }
 
-            int insertPos = isTypeDeclared
-                    ? positionUtil.getEndPositionOfTag(PsiTreeUtil.getParentOfType(typeAttributeValue, XmlTag.class))
-                    : positionUtil.getRootInsertPosition((XmlFile) diXmlFile);
+            int insertPos = this.isCronGroupDeclared
+                    ? this.positionUtil.getEndPositionOfTag(cronGroupTag)
+                    : this.positionUtil.getRootInsertPosition(crontabXmlFile);
+
             if (textBuf.length() > 0 && insertPos >= 0) {
-                PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(project);
-                Document document = psiDocumentManager.getDocument(diXmlFile);
+                Document document = this.psiDocumentManager.getDocument(crontabXmlFile);
+
+                // todo: handle possible null pointers
                 document.insertString(insertPos, textBuf);
                 int endPos = insertPos + textBuf.length() + 1;
-                CodeStyleManager.getInstance(project).reformatText(diXmlFile, insertPos, endPos);
-                psiDocumentManager.commitDocument(document);
+
+                this.codeStyleManager.reformatText(crontabXmlFile, insertPos, endPos);
+                this.psiDocumentManager.commitDocument(document);
             }
         });
 
-        return diXmlFile;
+        return crontabXmlFile;
     }
 
-    private boolean isPluginDeclared(XmlAttributeValue typeAttributeValue) {
-        XmlTag xmlTag = PsiTreeUtil.getParentOfType(typeAttributeValue, XmlTag.class);
-        XmlTag[] xmlTags = PsiTreeUtil.getChildrenOfType(xmlTag, XmlTag.class);
-        if (xmlTags == null) {
+    protected void fillAttributes(Properties attributes) {
+        String cronjobName = this.crontabXmlData.getCronjobName();
+        String cronjobGroup = this.crontabXmlData.getCronGroup();
+        String cronjobInstance = this.crontabXmlData.getCronjobInstance();
+        String cronjobSchedule = this.crontabXmlData.getCronjobSchedule();
+
+        if (!this.isCronGroupDeclared) {
+            attributes.setProperty("CRON_GROUP", cronjobGroup);
+        }
+
+        attributes.setProperty("CRONJOB_NAME", cronjobName);
+        attributes.setProperty("CRONJOB_INSTANCE", cronjobInstance);
+        attributes.setProperty("CRONJOB_SCHEDULE", cronjobSchedule);
+    }
+
+    /**
+     * Check whenever cronjob with cronjobName is declared under cronGroupTag
+     *
+     * @param cronGroupTag
+     * @param cronjobName
+     *
+     * @return boolean
+     */
+    private boolean isCronjobDeclared(XmlTag cronGroupTag, String cronjobName) {
+        XmlTag[] cronjobTags = PsiTreeUtil.getChildrenOfType(cronGroupTag, XmlTag.class);
+
+        if (cronjobTags == null) {
             return false;
         }
-        for (XmlTag child: xmlTags) {
-            if (!child.getName().equals(ModuleDiXml.PLUGIN_TAG_NAME)) {
+
+        for (XmlTag cronjobTag: cronjobTags) {
+            if (!cronjobTag.getName().equals(CrontabXmlTemplate.CRON_JOB_TAG)) {
                 continue;
             }
-            XmlAttribute[] xmlAttributes = PsiTreeUtil.getChildrenOfType(child, XmlAttribute.class);
-            for (XmlAttribute xmlAttribute: xmlAttributes) {
-                if (!xmlAttribute.getName().equals(ModuleDiXml.PLUGIN_TYPE_ATTRIBUTE)) {
+
+            XmlAttribute[] cronjobAttributes = PsiTreeUtil.getChildrenOfType(cronjobTag, XmlAttribute.class);
+
+            // todo: handle null pointer
+
+            for (XmlAttribute cronjobAttribute: cronjobAttributes) {
+                if (!cronjobAttribute.getName().equals(CrontabXmlTemplate.CRON_JOB_NAME_ATTRIBUTE)) {
                     continue;
                 }
-                String declaredClass = PhpLangUtil.toPresentableFQN(xmlAttribute.getValue());
-                if (declaredClass.equals(pluginFileData.getPluginFqn())) {
+
+                if (cronjobName.equals(cronjobAttribute.getValue())) {
                     return true;
                 }
             }
@@ -103,26 +172,29 @@ public class PluginDiXmlGenerator extends FileGenerator {
         return false;
     }
 
-    private XmlAttributeValue getTypeAttributeValue(XmlFile diXml) {
-        Collection<XmlAttributeValue> pluginTypes = XmlPsiTreeUtil.findAttributeValueElements(diXml, ModuleDiXml.PLUGIN_TYPE_TAG, ModuleDiXml.PLUGIN_TYPE_ATTR_NAME);
-        String pluginClassFqn = pluginFileData.getTargetClass().getPresentableFQN();
-        for (XmlAttributeValue pluginType: pluginTypes) {
-            if (!PhpLangUtil.toPresentableFQN(pluginType.getValue()).equals(pluginClassFqn)) {
+    /**
+     * Retrieve cronGroup tag with cronjobGroup name if it registered in crontabXmlFile
+     *
+     * @param crontabXmlFile
+     * @param cronjobGroup
+     *
+     * @return XmlTag
+     */
+    private XmlTag getCronGroupTag(XmlFile crontabXmlFile, String cronjobGroup) {
+        Collection<XmlAttributeValue> cronGroupIdAttributes = XmlPsiTreeUtil.findAttributeValueElements(
+            crontabXmlFile,
+            CrontabXmlTemplate.CRON_GROUP_TAG,
+            CrontabXmlTemplate.CRON_GROUP_NAME_ATTRIBUTE
+        );
+
+        for (XmlAttributeValue cronGroupIdAttribute: cronGroupIdAttributes) {
+            if (!cronGroupIdAttribute.getValue().equals(cronjobGroup)) {
                 continue;
             }
-            return pluginType;
+
+            return PsiTreeUtil.getParentOfType(cronGroupIdAttribute, XmlTag.class);
         }
 
         return null;
-    }
-
-    protected void fillAttributes(Properties attributes) {
-        if (!isTypeDeclared) {
-            attributes.setProperty("TYPE", pluginFileData.getTargetClass().getPresentableFQN());
-        }
-        attributes.setProperty("NAME", pluginFileData.getPluginName());
-        attributes.setProperty("PLUGIN_TYPE", pluginFileData.getPluginFqn());
-        attributes.setProperty("PLUGIN_NAME", pluginFileData.getPluginName());
-        attributes.setProperty("SORT_ORDER", pluginFileData.getSortOrder());
     }
 }
