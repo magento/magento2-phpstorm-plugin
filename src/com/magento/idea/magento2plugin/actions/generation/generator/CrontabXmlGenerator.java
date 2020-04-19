@@ -20,8 +20,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrC
 import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplate;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.XmlFilePositionUtil;
 import com.magento.idea.magento2plugin.magento.files.CrontabXmlTemplate;
-import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
-import com.magento.idea.magento2plugin.xml.XmlPsiTreeUtil;
+import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
