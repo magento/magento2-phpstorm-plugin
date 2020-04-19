@@ -30,10 +30,18 @@ public class Settings implements PersistentStateComponent<Settings.State> {
     public String magentoPath;
     public boolean mftfSupportEnabled = false;
     public boolean myDoNotAskContentConfigAgain = false;
+    public String magentoVersion = null;
 
     @Nullable
     public Settings.State getState() {
-        return new Settings.State(this.pluginEnabled, this.magentoPath, DEFAULT_LICENSE, this.mftfSupportEnabled, this.myDoNotAskContentConfigAgain);
+        return new Settings.State(
+                this.pluginEnabled,
+                this.magentoPath,
+                DEFAULT_LICENSE,
+                this.mftfSupportEnabled,
+                this.myDoNotAskContentConfigAgain,
+                this.magentoVersion
+        );
     }
 
     public void setState(State state) {
@@ -48,6 +56,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         this.DEFAULT_LICENSE = state.getDefaultLicenseName();
         this.mftfSupportEnabled = state.isMftfSupportEnabled();
         this.myDoNotAskContentConfigAgain = state.isDoNotAskContentConfigAgain();
+        this.magentoVersion = state.getMagentoVersion();
     }
 
     public void addListener(MagentoModuleDataListener listener) {
@@ -116,16 +125,25 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         public String magentoPath;
         public boolean mftfSupportEnabled;
         public boolean myDoNotAskContentConfigAgain;
+        public String magentoVersion;
 
         public State() {
         }
 
-        public State(boolean pluginEnabled, String magentoPath, String defaultLicenseName, boolean mftfSupportEnabled, boolean myDoNotAskContentConfigAgain) {
+        public State(
+                boolean pluginEnabled,
+                String magentoPath,
+                String defaultLicenseName,
+                boolean mftfSupportEnabled,
+                boolean myDoNotAskContentConfigAgain,
+                String magentoVersion
+        ) {
             this.pluginEnabled = pluginEnabled;
             this.magentoPath = magentoPath;
             this.defaultLicenseName = defaultLicenseName;
             this.mftfSupportEnabled = mftfSupportEnabled;
             this.myDoNotAskContentConfigAgain = myDoNotAskContentConfigAgain;
+            this.magentoVersion = magentoVersion;
         }
 
         @Attribute("enabled")
@@ -146,10 +164,19 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             this.magentoPath = magentoPath;
         }
 
-        public void setMagentoPathAndUpdateLastUsed(String magetnoPath) {
-            this.setMagentoPath(magetnoPath);
-            if (!StringUtil.isEmptyOrSpaces(magetnoPath)) {
-                PropertiesComponent.getInstance().setValue("magento.support.magentoPath", magetnoPath);
+        public String getMagentoVersion() {
+            return this.magentoVersion;
+        }
+
+        @Tag("magentoVersion")
+        public void setMagentoVersion(String magentoVersion) {
+            this.magentoVersion = magentoVersion;
+        }
+
+        public void setMagentoPathAndUpdateLastUsed(String magentoPath) {
+            this.setMagentoPath(magentoPath);
+            if (!StringUtil.isEmptyOrSpaces(magentoPath)) {
+                PropertiesComponent.getInstance().setValue("magento.support.magentoPath", magentoPath);
             }
         }
 
