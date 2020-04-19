@@ -6,7 +6,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewCronjobDialog;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
-import com.magento.idea.magento2plugin.util.Regex;
+import com.magento.idea.magento2plugin.util.RegExUtil;
 
 import javax.swing.*;
 
@@ -49,7 +49,7 @@ public class NewCronjobValidator {
 
             return false;
         }
-        if (!cronjobClassName.matches(Regex.ALPHANUMERIC)) {
+        if (!cronjobClassName.matches(RegExUtil.ALPHANUMERIC)) {
             String errorMessage = validatorBundle.message(
                 "validator.alphaNumericCharacters",
                 "Cronjob ClassName"
@@ -74,7 +74,7 @@ public class NewCronjobValidator {
 
             return false;
         }
-        if (!cronjobName.matches(Regex.IDENTIFIER)) {
+        if (!cronjobName.matches(RegExUtil.IDENTIFIER)) {
             String errorMessage = validatorBundle.message("validator.identifier", "Cronjob Name");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
@@ -87,7 +87,7 @@ public class NewCronjobValidator {
 
             return false;
         }
-        if (!cronjobDirectory.matches(Regex.DIRECTORY)) {
+        if (!cronjobDirectory.matches(RegExUtil.DIRECTORY)) {
             String errorMessage = validatorBundle.message(
                 "validator.directory.isNotValid",
                 "Cronjob Directory"
@@ -108,7 +108,7 @@ public class NewCronjobValidator {
 
                 return false;
             }
-            if (!cronjobSchedule.matches(Regex.CRON_SCHEDULE)) {
+            if (!cronjobSchedule.matches(RegExUtil.Magento.CRON_SCHEDULE)) {
                 String errorMessage = validatorBundle.message(
                 "validator.cronSchedule.invalidExpression",
                 "Cronjob Schedule"
@@ -140,7 +140,7 @@ public class NewCronjobValidator {
                 return false;
             }
 
-            if (scheduleConfigPath.matches(Regex.CONFIG_PATH)) {
+            if (scheduleConfigPath.matches(RegExUtil.Magento.CONFIG_PATH)) {
                 String errorMessage = validatorBundle.message(
                     "validator.configPath.invalidFormat",
                     "Schedule Config Path"
