@@ -20,6 +20,7 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import com.magento.idea.magento2plugin.inspections.php.util.PhpClassImplementsInterfaceUtil;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
+import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.magento.plugin.GetTargetClassNamesByPluginClassName;
 import org.jetbrains.annotations.NotNull;
@@ -128,7 +129,7 @@ public class PluginInspection extends PhpInspection {
                     String declaredType = pluginMethodParameter.getDeclaredType().toString();
 
                     if (index == 1) {
-                        String targetClassFqn = "\\".concat(targetClassName);
+                        String targetClassFqn = Package.FQN_SEPARATOR.concat(targetClassName);
                         if (!checkTypeIncompatibility(targetClassFqn, declaredType, phpIndex)) {
                             problemsHolder.registerProblem(pluginMethodParameter, PhpBundle.message("inspection.wrong_param_type", new Object[]{declaredType, targetClassFqn}), ProblemHighlightType.ERROR);
                         }
@@ -138,7 +139,8 @@ public class PluginInspection extends PhpInspection {
                         continue;
                     }
                     if (index == 2 && pluginPrefix.equals(Plugin.PluginType.around.toString())) {
-                        if (!checkTypeIncompatibility("callable", declaredType, phpIndex)) {
+                        if (!checkTypeIncompatibility(Plugin.CALLABLE_PARAM, declaredType, phpIndex) &&
+                                !checkTypeIncompatibility(Package.FQN_SEPARATOR.concat(Plugin.CLOSURE_PARAM), declaredType, phpIndex)) {
                             problemsHolder.registerProblem(pluginMethodParameter, PhpBundle.message("inspection.wrong_param_type", new Object[]{declaredType, "callable"}), ProblemHighlightType.ERROR);
                         }
                         continue;
