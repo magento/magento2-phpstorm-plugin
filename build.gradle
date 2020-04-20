@@ -57,6 +57,7 @@ sourceSets {
 checkstyle {
     toolVersion = "8.31"
     ignoreFailures = false
+    maxWarnings = 0
 }
 
 pmd {
@@ -64,12 +65,12 @@ pmd {
     consoleOutput = true
     rulePriority = 5
     ruleSets = [
-            "category/java/codestyle.xml",
-            "category/java/design.xml",
-            "category/java/errorprone.xml",
-            "category/java/bestpractices.xml",
-            "category/java/performance.xml",
-            "category/java/security.xml",
+        "category/java/codestyle.xml",
+        "category/java/design.xml",
+        "category/java/errorprone.xml",
+        "category/java/bestpractices.xml",
+        "category/java/performance.xml",
+        "category/java/security.xml",
     ]
 }
 
