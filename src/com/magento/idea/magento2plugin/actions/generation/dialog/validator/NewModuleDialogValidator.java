@@ -66,6 +66,13 @@ public class NewModuleDialogValidator {
             return false;
         }
 
+        if (moduleName.equals(packageName)) {
+            String errorMessage = validatorBundle.message("validator.moduleNameIsTheSameAsPackage", "Module Name");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
+            return false;
+        }
+
         if (!Character.isUpperCase(moduleName.charAt(0)) && !Character.isDigit(moduleName.charAt(0))) {
             String errorMessage = validatorBundle.message("validator.startWithNumberOrCapitalLetter", "Module Name");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
