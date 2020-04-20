@@ -17,8 +17,10 @@ import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.magento.idea.magento2plugin.actions.generation.data.code.PluginMethodData;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
+import com.magento.idea.magento2plugin.magento.packages.Package;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -152,7 +154,17 @@ public class PluginMethodsGenerator {
             }
 
             sb.append("* @param ");
-            String typeStr = PhpDocUtil.getTypePresentation(project, element.getType(), PhpCodeInsightUtil.findScopeForUseOperator(element));
+
+            String typeStr;
+            if (i == 0) {
+                typeStr = PhpDocUtil.getTypePresentation(project, element.getType(), null);
+            } else {
+                typeStr = PhpDocUtil.getTypePresentation(project, element.getType(), PhpCodeInsightUtil.findScopeForUseOperator(element));
+                if (typeStr.indexOf(Package.FQN_SEPARATOR, 1) > 0) {
+                    String[] fqnArray = typeStr.split("\\\\");
+                    typeStr = fqnArray[fqnArray.length - 1];
+                }
+            }
 
             if (!typeStr.isEmpty()) {
                 sb.append(typeStr).append(' ');
@@ -202,9 +214,19 @@ public class PluginMethodsGenerator {
             }
 
             if (element instanceof Parameter) {
-                buf.append(PhpCodeUtil.paramToString(element));
+                String parameterText = PhpCodeUtil.paramToString(element);
+                if (parameterText.indexOf(Package.FQN_SEPARATOR, 1) > 0) {
+                    String[] fqnArray = parameterText.split("\\\\");
+                    parameterText = fqnArray[fqnArray.length - 1];
+                }
+                buf.append(parameterText);
             } else {
-                String typeHint = this.getTypeHint(element);
+                Boolean globalType = true;
+                if (i == 0) {
+                    globalType = false;
+                }
+
+                String typeHint = this.getTypeHint(element, globalType);
                 if (typeHint != null && !typeHint.isEmpty()) {
                     buf.append(typeHint).append(' ');
                 }
@@ -257,21 +279,21 @@ public class PluginMethodsGenerator {
     }
 
     @Nullable
-    private String getTypeHint(@NotNull PhpNamedElement element) {
+    private String getTypeHint(@NotNull PhpNamedElement element, Boolean globalType) {
         PhpType filedType = element.getType().global(this.pluginClass.getProject());
         Set<String> typeStrings = filedType.getTypes();
         String typeString = null;
         if (typeStrings.size() == 1) {
-            typeString = this.convertTypeToString(element, typeStrings);
+            typeString = this.convertTypeToString(element, typeStrings, globalType);
         }
 
         if (typeStrings.size() == 2) {
             PhpType filteredNullType = filterNullCaseInsensitive(filedType);
             if (filteredNullType.getTypes().size() == 1) {
                 if (PhpLanguageFeature.NULLABLES.isSupported(element.getProject())) {
-                    typeString = "?" + this.convertTypeToString(element, filteredNullType.getTypes());
+                    typeString = "?" + this.convertTypeToString(element, filteredNullType.getTypes(), globalType);
                 } else {
-                    typeString = this.convertTypeToString(element, filteredNullType.getTypes());
+                    typeString = this.convertTypeToString(element, filteredNullType.getTypes(), globalType);
                 }
             }
         }
@@ -280,11 +302,11 @@ public class PluginMethodsGenerator {
     }
 
     @Nullable
-    private String convertTypeToString(@NotNull PhpNamedElement element, Set<String> typeStrings) {
+    private String convertTypeToString(@NotNull PhpNamedElement element, Set<String> typeStrings, Boolean globalType) {
         String simpleType = typeStrings.iterator().next();
         simpleType = StringUtil.trimStart(simpleType, "\\");
         if (!PhpType.isPrimitiveType(simpleType) || PhpLanguageFeature.SCALAR_TYPE_HINTS.isSupported(element.getProject()) || "array".equalsIgnoreCase(simpleType) || "callable".equalsIgnoreCase(simpleType)) {
-            String typeString = simpleType.endsWith("]") ? "array" : this.getFieldTypeString(element, filterNullCaseInsensitive(element.getType()));
+            String typeString = simpleType.endsWith("]") ? "array" : this.getFieldTypeString(element, filterNullCaseInsensitive(element.getType()), globalType);
             if (!typeString.isEmpty()) {
                 return typeString;
             }
@@ -293,8 +315,9 @@ public class PluginMethodsGenerator {
         return null;
     }
 
-    private String getFieldTypeString(PhpNamedElement element, @NotNull PhpType type) {
-        return PhpDocUtil.getTypePresentation(this.pluginClass.getProject(), type, PhpCodeInsightUtil.findScopeForUseOperator(element));
+    private String getFieldTypeString(PhpNamedElement element, @NotNull PhpType type, Boolean globalType) {
+        PhpPsiElement scope = (globalType) ? PhpCodeInsightUtil.findScopeForUseOperator(element) : null;
+        return PhpDocUtil.getTypePresentation(this.pluginClass.getProject(), type, scope);
     }
 
     private static PhpType filterNullCaseInsensitive(PhpType filedType) {
