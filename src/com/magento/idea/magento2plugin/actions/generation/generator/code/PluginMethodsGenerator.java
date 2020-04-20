@@ -221,11 +221,7 @@ public class PluginMethodsGenerator {
                 }
                 buf.append(parameterText);
             } else {
-                Boolean globalType = true;
-                if (i == 0) {
-                    globalType = false;
-                }
-
+                Boolean globalType = i != 0;
                 String typeHint = this.getTypeHint(element, globalType);
                 if (typeHint != null && !typeHint.isEmpty()) {
                     buf.append(typeHint).append(' ');
@@ -290,10 +286,9 @@ public class PluginMethodsGenerator {
         if (typeStrings.size() == 2) {
             PhpType filteredNullType = filterNullCaseInsensitive(filedType);
             if (filteredNullType.getTypes().size() == 1) {
+                typeString = this.convertTypeToString(element, filteredNullType.getTypes(), globalType);
                 if (PhpLanguageFeature.NULLABLES.isSupported(element.getProject())) {
-                    typeString = "?" + this.convertTypeToString(element, filteredNullType.getTypes(), globalType);
-                } else {
-                    typeString = this.convertTypeToString(element, filteredNullType.getTypes(), globalType);
+                    typeString = "?" + typeString;
                 }
             }
         }
