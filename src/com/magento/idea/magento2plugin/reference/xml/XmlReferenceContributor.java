@@ -170,34 +170,6 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
             )
         );
 
-        // <someXmlTag url="{{someValue}}" /> in MFTF Tests and ActionGroups
-        registrar.registerReferenceProvider(
-            XmlPatterns.xmlAttributeValue().withValue(
-                string().matches(RegExUtil.Magento.MFTF_CURLY_BRACES)
-            ).withParent(XmlPatterns.xmlAttribute().withName(
-                MftfActionGroup.URL_ATTRIBUTE
-            ).withParent(XmlPatterns.xmlTag().withParent(XmlPatterns.xmlTag().withName(
-                string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.ROOT_TAG)
-            )))),
-            new CompositeReferenceProvider(
-                new PageReferenceProvider()
-            )
-        );
-        registrar.registerReferenceProvider(
-            XmlPatterns.xmlAttributeValue().withValue(
-                string().matches(RegExUtil.Magento.MFTF_CURLY_BRACES)
-            ).withParent(XmlPatterns.xmlAttribute().withName(
-                MftfActionGroup.URL_ATTRIBUTE
-            ).withParent(XmlPatterns.xmlTag().withParent(XmlPatterns.xmlTag().withParent(
-                XmlPatterns.xmlTag().withName(
-                    string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.ROOT_TAG)
-                )
-            )))),
-            new CompositeReferenceProvider(
-                    new PageReferenceProvider()
-            )
-        );
-
         // <createData entity="SimpleProduct" />
         // <updateData entity="SimpleProduct" />
         registrar.registerReferenceProvider(
@@ -273,5 +245,44 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
                 ),
                 new RequireJsPreferenceReferenceProvider()
         );
+
+        registerReferenceForDifferentNesting(registrar);
+    }
+
+    private void registerReferenceForDifferentNesting(@NotNull PsiReferenceRegistrar registrar) {
+        int i = 1;
+        int maxNesting = 10;
+        while( i < maxNesting) {
+
+            // <someXmlTag url="{{someValue}}" /> in MFTF Tests and ActionGroups
+            registrar.registerReferenceProvider(
+                XmlPatterns.xmlAttributeValue().withValue(
+                    string().matches(RegExUtil.Magento.MFTF_CURLY_BRACES)
+                ).withParent(XmlPatterns.xmlAttribute().withName(
+                    MftfActionGroup.URL_ATTRIBUTE
+                ).withParent(XmlPatterns.xmlTag().withSuperParent(i, XmlPatterns.xmlTag().withName(
+                    string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.ROOT_TAG)
+                )))),
+                new CompositeReferenceProvider(
+                    new PageReferenceProvider()
+                )
+            );
+
+            // <someXmlTag selector="{{someValue}}" /> in MFTF Tests and ActionGroups
+            registrar.registerReferenceProvider(
+                XmlPatterns.xmlAttributeValue().withValue(
+                    string().matches(RegExUtil.Magento.MFTF_CURLY_BRACES)
+                ).withParent(XmlPatterns.xmlAttribute().withName(
+                    MftfActionGroup.SELECTOR_ATTRIBUTE
+                ).withParent(XmlPatterns.xmlTag().withSuperParent(i, XmlPatterns.xmlTag().withName(
+                    string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.ROOT_TAG)
+                )))),
+                new CompositeReferenceProvider(
+                    new SectionReferenceProvider()
+                )
+            );
+
+            i++;
+        }
     }
 }
