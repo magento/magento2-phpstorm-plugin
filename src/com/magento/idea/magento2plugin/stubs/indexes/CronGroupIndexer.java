@@ -14,15 +14,14 @@ import com.intellij.util.indexing.*;
 import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
+import com.magento.idea.magento2plugin.magento.files.CronGroups;
 import com.magento.idea.magento2plugin.project.Settings;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * CronGroupIndex collects all cron groups from cron_groups.xml files.
- * It's used for autocompleting groups during cronjob generation
  */
 public class CronGroupIndexer extends FileBasedIndexExtension<String, String> {
     public static final ID<String, String> KEY
@@ -60,11 +59,10 @@ public class CronGroupIndexer extends FileBasedIndexExtension<String, String> {
                 return map;
             }
 
-            // cron_groups file is load, now it's time to collect group IDs
             for (XmlTag xmlTag: xmlTags) {
-                if (xmlTag.getName().equals("config")) {
-                    for (XmlTag typeNode: xmlTag.findSubTags("group")) {
-                        String groupId = typeNode.getAttributeValue("id");
+                if (xmlTag.getName().equals(CronGroups.CONFIG_TAG)) {
+                    for (XmlTag typeNode: xmlTag.findSubTags(CronGroups.GROUP_TAG)) {
+                        String groupId = typeNode.getAttributeValue(CronGroups.ID_ATTRIBUTE);
 
                         if (groupId != null) {
                             map.put(groupId, fileContent.getFile().getPath());
@@ -93,7 +91,7 @@ public class CronGroupIndexer extends FileBasedIndexExtension<String, String> {
     @Override
     public FileBasedIndex.InputFilter getInputFilter() {
         return virtualFile -> (virtualFile.getFileType() == XmlFileType.INSTANCE
-                && virtualFile.getNameWithoutExtension().equals("cron_groups"));
+                && virtualFile.getNameWithoutExtension().equals(CronGroups.FILE_NAME_NO_EXTENSION));
     }
 
     @Override

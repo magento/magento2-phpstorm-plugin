@@ -15,7 +15,6 @@ import com.magento.idea.magento2plugin.util.magento.FileBasedIndexUtil;
 import java.util.ArrayList;
 import java.util.Properties;
 
-// todo: should be converted to another generator
 public class FindOrCreateCrontabXml {
     private Project project;
     private DirectoryGenerator directoryGenerator;
