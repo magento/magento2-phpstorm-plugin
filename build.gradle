@@ -5,6 +5,13 @@
 
 plugins {
     id 'org.jetbrains.intellij' version '0.4.15'
+    id 'checkstyle'
+    id 'pmd'
+    id "com.github.spotbugs" version "3.0.0"
+}
+
+repositories {
+    mavenCentral()
 }
 
 group 'com.magento.idea'
@@ -40,5 +47,40 @@ sourceSets {
     test {
         java.srcDir 'tests'
         resources.srcDir 'testData'
+    }
+}
+
+/**
+ * Static Checks
+ */
+
+checkstyle {
+    ignoreFailures = false
+}
+
+pmd {
+    consoleOutput = true
+    toolVersion = "6.21.0"
+    rulePriority = 5
+    ruleSets = [
+            "category/java/codestyle.xml",
+            "category/java/design.xml",
+            "category/java/errorprone.xml",
+            "category/java/bestpractices.xml",
+            "category/java/performance.xml",
+            "category/java/security.xml",
+    ]
+}
+
+spotbugs {
+    ignoreFailures = false
+    showProgress = true
+    effort = 'default'
+}
+
+tasks.withType(Checkstyle) {
+    reports {
+        xml.enabled false
+        html.enabled true
     }
 }
