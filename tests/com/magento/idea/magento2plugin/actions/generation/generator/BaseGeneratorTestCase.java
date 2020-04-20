@@ -5,7 +5,6 @@
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.psi.PsiFile;
-import com.jetbrains.php.lang.psi.PhpFile;
 import com.magento.idea.magento2plugin.BaseProjectTestCase;
 import java.io.File;
 
@@ -28,8 +27,8 @@ abstract public class BaseGeneratorTestCase extends BaseProjectTestCase {
         String expectedDirectory,
         PsiFile resultFile) {
 
-//        assertTrue(resultFile.getContainingDirectory().getVirtualFile().getPresentableUrl()
-//            .endsWith(expectedDirectory));
+        assertTrue(resultFile.getContainingDirectory().getVirtualFile().getPresentableUrl()
+            .endsWith(expectedDirectory));
         assertEquals(expectedFile.getText(), resultFile.getText());
         assertEquals(expectedFile.getName(), resultFile.getName());
     }
