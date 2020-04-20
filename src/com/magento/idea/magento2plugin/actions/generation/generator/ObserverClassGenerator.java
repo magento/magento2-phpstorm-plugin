@@ -109,7 +109,7 @@ public class ObserverClassGenerator extends FileGenerator {
     private PhpClass createObserverClass(String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(observerFileData.getObserverModule());
-        String[] observerDirectories = observerFileData.getObserverDirectory().split(File.separator);
+        String[] observerDirectories = observerFileData.getObserverDirectory().split("/");
         for (String observerDirectory: observerDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, observerDirectory);
         }

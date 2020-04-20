@@ -107,7 +107,7 @@ public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
     private PhpClass createGraphQlResolverClass(String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(graphQlResolverFileData.getGraphQlResolverModule());
-        String[] graphQlResolverDirectories = graphQlResolverFileData.getGraphQlResolverDirectory().split(File.separator);
+        String[] graphQlResolverDirectories = graphQlResolverFileData.getGraphQlResolverDirectory().split("/");
         for (String graphQlResolverDirectory: graphQlResolverDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, graphQlResolverDirectory);
         }

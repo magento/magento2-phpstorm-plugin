@@ -69,7 +69,7 @@ public class ModuleBlockClassGenerator extends FileGenerator {
     private PhpFile createBlockClass(String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(getBlockModule());
-        String[] blockDirectories = blockFileData.getBlockDirectory().split(File.separator);
+        String[] blockDirectories = blockFileData.getBlockDirectory().split("/");
         for (String blockDirectory: blockDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, blockDirectory);
         }

@@ -66,7 +66,7 @@ public class ModuleViewModelClassGenerator extends FileGenerator {
     private PhpFile createViewModelClass(String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(getViewModelModule());
-        String[] viewModelDirectories = viewModelFileData.getViewModelDirectory().split(File.separator);
+        String[] viewModelDirectories = viewModelFileData.getViewModelDirectory().split("/");
         for (String viewModelDirectory: viewModelDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, viewModelDirectory);
         }

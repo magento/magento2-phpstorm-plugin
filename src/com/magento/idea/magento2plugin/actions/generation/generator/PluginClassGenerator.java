@@ -142,7 +142,7 @@ public class PluginClassGenerator extends FileGenerator {
 
     private PhpClass createPluginClass(String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project).getModuleDirectoryByModuleName(getPluginModule());
-        String[] pluginDirectories = pluginFileData.getPluginDirectory().split(File.separator);
+        String[] pluginDirectories = pluginFileData.getPluginDirectory().split("/");
         for (String pluginDirectory: pluginDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, pluginDirectory);
         }

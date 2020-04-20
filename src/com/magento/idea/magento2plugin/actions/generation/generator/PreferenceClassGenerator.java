@@ -59,7 +59,7 @@ public class PreferenceClassGenerator extends FileGenerator {
 
     private PhpClass createPluginClass(String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project).getModuleDirectoryByModuleName(getPreferenceModule());
-        String[] pluginDirectories = preferenceFileData.getPreferenceDirectory().split(File.separator);
+        String[] pluginDirectories = preferenceFileData.getPreferenceDirectory().split("/");
         for (String pluginDirectory: pluginDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, pluginDirectory);
         }
