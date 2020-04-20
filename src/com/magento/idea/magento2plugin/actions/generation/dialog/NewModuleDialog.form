@@ -36,7 +36,7 @@
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text resource-bundle="magento2/new_module_generation_dialog" key="ok"/>
+                  <text resource-bundle="magento2/common" key="common.ok"/>
                 </properties>
               </component>
               <component id="5723f" class="javax.swing.JButton" binding="buttonCancel">
@@ -44,7 +44,7 @@
                   <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text resource-bundle="magento2/new_module_generation_dialog" key="cancel"/>
+                  <text resource-bundle="magento2/common" key="common.cancel"/>
                 </properties>
               </component>
             </children>
@@ -69,7 +69,7 @@
             </constraints>
             <properties>
               <text value=""/>
-              <toolTipText resource-bundle="magento2/new_module_generation_dialog" key="must.not.be.empty.should.contain.letters.or.numbers"/>
+              <toolTipText resource-bundle="magento2/validation" key="validator.mustNotBeEmptyShouldContainLettersOrNumbers"/>
             </properties>
             <clientProperties>
               <html.disable class="java.lang.Boolean" value="true"/>
@@ -80,7 +80,7 @@
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text resource-bundle="magento2/new_module_generation_dialog" key="package.name"/>
+              <text resource-bundle="magento2/common" key="common.package.name"/>
               <toolTipText value=""/>
               <verifyInputWhenFocusTarget value="false"/>
             </properties>
@@ -93,7 +93,7 @@
             </constraints>
             <properties>
               <text value=""/>
-              <toolTipText resource-bundle="magento2/new_module_generation_dialog" key="must.not.be.empty.should.contain.letters.or.numbers"/>
+              <toolTipText resource-bundle="magento2/validation" key="validator.mustNotBeEmptyShouldContainLettersOrNumbers"/>
             </properties>
             <clientProperties>
               <html.disable class="java.lang.Boolean" value="true"/>
@@ -104,7 +104,7 @@
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text resource-bundle="magento2/new_module_generation_dialog" key="module.name"/>
+              <text resource-bundle="magento2/common" key="common.module.name"/>
               <toolTipText value=""/>
             </properties>
           </component>
@@ -126,7 +126,7 @@
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text resource-bundle="magento2/new_module_generation_dialog" key="module.version"/>
+              <text resource-bundle="magento2/common" key="common.module.version"/>
               <toolTipText value=""/>
             </properties>
           </component>
@@ -135,7 +135,7 @@
               <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text resource-bundle="magento2/new_module_generation_dialog" key="module.license"/>
+              <text resource-bundle="magento2/common" key="common.module.license"/>
               <toolTipText value=""/>
             </properties>
           </component>
@@ -177,7 +177,7 @@
               <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text resource-bundle="magento2/new_module_generation_dialog" key="module.dependencies"/>
+              <text resource-bundle="magento2/common" key="common.module.dependencies"/>
               <toolTipText value=""/>
             </properties>
           </component>
@@ -220,7 +220,7 @@
           <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text resource-bundle="magento2/new_module_generation_dialog" key="module.description"/>
+          <text resource-bundle="magento2/common" key="common.module.description"/>
           <toolTipText value=""/>
         </properties>
       </component>
