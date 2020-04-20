@@ -28,7 +28,8 @@ abstract public class BaseGeneratorTestCase extends BaseProjectTestCase {
         String expectedDirectory,
         PsiFile resultFile) {
 
-        assertEquals(expectedDirectory, resultFile.getContainingDirectory().getVirtualFile().getPresentableUrl());
+        assertTrue(resultFile.getContainingDirectory().getVirtualFile().getPresentableUrl()
+            .endsWith(expectedDirectory));
         assertEquals(expectedFile.getText(), resultFile.getText());
         assertEquals(expectedFile.getName(), resultFile.getName());
     }
