@@ -44,14 +44,19 @@ public class GraphQlUtil {
         return argumentStringValue;
     }
 
-    public static boolean isResolver(PhpClass psiElement) {
+    public static boolean  isResolver(PhpClass psiElement) {
         PhpClass[] implementedInterfaces = psiElement.getImplementedInterfaces();
         for (PhpClass implementedInterface: implementedInterfaces) {
-            if (!implementedInterface.getFQN().equals(GraphQlResolver.RESOLVER_INTERFACE)) {
-                continue;
+            if (implementedInterface.getFQN().equals(
+                GraphQlResolver.RESOLVER_INTERFACE
+            ) || implementedInterface.getFQN().equals(
+                GraphQlResolver.BATCH_RESOLVER_INTERFACE
+            ) || implementedInterface.getFQN().equals(
+                GraphQlResolver.BATCH_SERVICE_CONTRACT_RESOLVER_INTERFACE
+            )) {
+                return true;
             }
-            return false;
         }
-        return true;
+        return false;
     }
 }
