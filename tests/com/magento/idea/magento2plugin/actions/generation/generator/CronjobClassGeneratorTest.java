@@ -17,13 +17,13 @@ public class CronjobClassGeneratorTest extends BaseGeneratorTestCase {
         Project project = myFixture.getProject();
         CronjobClassData cronjobClassData = new CronjobClassData(
             "CleanTableCronjob",
-            "Cron",
-            "Foo\\Bar\\Cron",
+            "Cron/Test",
+            "Foo\\Bar\\Cron\\Test",
             "Foo_Bar"
         );
         CronjobClassGenerator cronjobClassGenerator = new CronjobClassGenerator(project, cronjobClassData);
         PsiFile cronJobFile = cronjobClassGenerator.generate("test");
 
-        assertGeneratedFileIsCorrect(expectedFile, "/src/app/code/Foo/Bar/Cron", cronJobFile);
+        assertGeneratedFileIsCorrect(expectedFile, "src/app/code/Foo/Bar/Cron/Test", cronJobFile);
     }
 }
