@@ -27,9 +27,7 @@ import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import org.jetbrains.annotations.NotNull;
-
 import javax.swing.*;
-import java.io.File;
 import java.util.Properties;
 
 public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
@@ -107,7 +105,7 @@ public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
     private PhpClass createGraphQlResolverClass(String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(graphQlResolverFileData.getGraphQlResolverModule());
-        String[] graphQlResolverDirectories = graphQlResolverFileData.getGraphQlResolverDirectory().split(File.separator);
+        String[] graphQlResolverDirectories = graphQlResolverFileData.getGraphQlResolverDirectory().split("/");
         for (String graphQlResolverDirectory: graphQlResolverDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, graphQlResolverDirectory);
         }
