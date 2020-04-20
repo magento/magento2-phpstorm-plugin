@@ -1,0 +1,21 @@
+<?php
+#parse("PHP File Header.php")
+
+#if (${NAMESPACE})
+
+namespace ${NAMESPACE};
+
+#end
+
+class ${NAME}
+{
+    /**
+     * Cronjob Description
+     *
+     * @return void
+     */
+    public function execute(): void
+    {
+        // todo: implement cronjob logic here
+    }
+}
