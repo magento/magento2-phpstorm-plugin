@@ -25,25 +25,25 @@ public class GraphQlResolverInspectionTest extends InspectionPhpFixtureTestCase 
     }
 
     public void testWithInvalidResolverInterface() throws Exception {
-        myFixture.configureByFile(getFixturePath("InvalidResolverTest.php"));
+        myFixture.configureByFile(getFixturePath("ResolverTest.php"));
 
         assertHasHighlighting(errorMessage);
     }
 
     public void testWithValidResolverInterface() throws Exception {
-        myFixture.configureByFile(getFixturePath("ValidResolverTest.php"));
+        myFixture.configureByFile(getFixturePath("ResolverTest.php"));
 
         assertHasNoHighlighting(errorMessage);
     }
 
     public void testWithValidBatchResolverInterface() throws Exception {
-        myFixture.configureByFile(getFixturePath("ValidResolverTest.php"));
+        myFixture.configureByFile(getFixturePath("ResolverTest.php"));
 
         assertHasNoHighlighting(errorMessage);
     }
 
     public void testWithValidBatchServiceContractResolverInterface() throws Exception {
-        myFixture.configureByFile(getFixturePath("ValidResolverTest.php"));
+        myFixture.configureByFile(getFixturePath("ResolverTest.php"));
 
         assertHasNoHighlighting(errorMessage);
     }
