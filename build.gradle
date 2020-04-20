@@ -55,12 +55,13 @@ sourceSets {
  */
 
 checkstyle {
+    toolVersion = "8.31"
     ignoreFailures = false
 }
 
 pmd {
-    consoleOutput = true
     toolVersion = "6.21.0"
+    consoleOutput = true
     rulePriority = 5
     ruleSets = [
             "category/java/codestyle.xml",
