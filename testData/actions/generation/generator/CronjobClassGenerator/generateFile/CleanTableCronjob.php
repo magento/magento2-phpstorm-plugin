@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Foo\Bar\Cron;
+namespace Foo\Bar\Cron\Test;
 
 
 class CleanTableCronjob
