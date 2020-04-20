@@ -24,6 +24,12 @@ jobs:
       run: chmod +x gradlew
     - name: Run automated tests
       run: ./gradlew test -i
+    - name: Run Code Style Check
+      run: ./gradlew checkstyleMain -i
+    - name: Run PMD Quality Check
+      run: ./gradlew pmdMain -i
+    - name: Run Spotbugs Quality Check
+      run: ./gradlew spotbugsMain -i
 
   build-windows:
 
@@ -41,6 +47,12 @@ jobs:
         run: chmod +x gradlew
       - name: Run automated tests
         run: ./gradlew test -i
+      - name: Run Code Style Check
+        run: ./gradlew checkstyleMain -i
+      - name: Run PMD Quality Check
+        run: ./gradlew pmdMain -i
+      - name: Run Spotbugs Quality Check
+        run: ./gradlew spotbugsMain -i
 
   build-macos:
 
@@ -58,3 +70,9 @@ jobs:
         run: chmod +x gradlew
       - name: Run automated tests
         run: ./gradlew test -i
+      - name: Run Code Style Check
+        run: ./gradlew checkstyleMain -i
+      - name: Run PMD Quality Check
+        run: ./gradlew pmdMain -i
+      - name: Run Spotbugs Quality Check
+        run: ./gradlew spotbugsMain -i
