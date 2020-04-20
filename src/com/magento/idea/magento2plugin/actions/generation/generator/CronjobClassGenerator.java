@@ -15,7 +15,6 @@ import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.CronjobTemplate;
 import org.jetbrains.annotations.NotNull;
-import java.io.File;
 import java.util.Properties;
 
 public class CronjobClassGenerator extends FileGenerator {

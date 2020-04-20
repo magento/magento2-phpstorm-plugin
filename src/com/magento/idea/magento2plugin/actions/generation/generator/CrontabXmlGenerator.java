@@ -22,7 +22,6 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.XmlFile
 import com.magento.idea.magento2plugin.magento.files.CrontabXmlTemplate;
 import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Properties;

@@ -27,9 +27,7 @@ import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import org.jetbrains.annotations.NotNull;
-
 import javax.swing.*;
-import java.io.File;
 import java.util.Properties;
 
 public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
