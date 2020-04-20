@@ -56,17 +56,8 @@ public class CreateAnObserverDialog extends AbstractDialog {
         pushToMiddle();
         fillTargetAreaOptions();
 
-        buttonOK.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onOK();
-            }
-        });
-
-        buttonCancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        });
+        buttonOK.addActionListener(e -> onOK());
+        buttonCancel.addActionListener(e -> onCancel());
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
@@ -83,7 +74,7 @@ public class CreateAnObserverDialog extends AbstractDialog {
     }
 
     private void fillTargetAreaOptions() {
-        for(Package.Areas area: Package.Areas.values()) {
+        for (Package.Areas area: Package.Areas.values()) {
             observerArea.addItem(area.toString());
         }
     }
