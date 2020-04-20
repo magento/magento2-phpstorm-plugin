@@ -57,6 +57,7 @@
         <!-- Module file generators -->
         <group id="MagentoNewModuleFileGroup" class="com.magento.idea.magento2plugin.actions.groups.NewModuleFileGroup" text="Module File" popup="true">
             <action id="MagentoCreateABlock" class="com.magento.idea.magento2plugin.actions.generation.NewBlockAction" />
+            <action id="MagentoCreateACronjob" class="com.magento.idea.magento2plugin.actions.generation.NewCronjobAction" />
             <action id="MagentoCreateAViewModel" class="com.magento.idea.magento2plugin.actions.generation.NewViewModelAction" />
             <action id="MagentoCreateAGraphQlResolver" class="com.magento.idea.magento2plugin.actions.generation.NewGraphQlResolverAction" />
             <add-to-group group-id="NewGroup" anchor="last"/>
@@ -95,6 +96,7 @@
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.EventNameIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.VirtualTypeIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.PluginIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.CronGroupIndexer" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.BlockNameIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ContainerNameIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.WebApiTypeIndex" />
@@ -157,6 +159,8 @@
         <internalFileTemplate name="Magento Observer Class"/>
         <internalFileTemplate name="Magento Module Events Xml"/>
         <internalFileTemplate name="Magento GraphQL Resolver Class"/>
+        <internalFileTemplate name="Magento Cronjob Class"/>
+        <internalFileTemplate name="Magento Crontab Xml"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.php">
