@@ -95,6 +95,9 @@ public class PluginDeclarationInspection extends PhpInspection {
                         for (Pair<String, String> moduleEntry: modulesWithSamePluginName) {
                             String scope = moduleEntry.getFirst();
                             String moduleName = moduleEntry.getSecond();
+                            if (scope == null || moduleName == null) {
+                                continue;
+                            }
                             String problemKey = pluginTypeKey.concat(Package.VENDOR_MODULE_NAME_SEPARATOR)
                                     .concat(moduleName).concat(Package.VENDOR_MODULE_NAME_SEPARATOR).concat(scope);
                             if (!pluginProblems.containsKey(problemKey)){
