@@ -10,6 +10,7 @@ import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogBuilder;
+import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.psi.PhpPsiElementFactory;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -36,10 +37,16 @@ public class PhpImplementResolverClassQuickFix implements LocalQuickFix {
         DialogBuilder dialogBox = createDialogBox(expectedInterfaceDropdown, project);
         if (dialogBox.showAndGet()) {
             String getSelectedInterface = expectedInterfaceDropdown.getSelectedItem().toString();
-            PsiElement correctInterface = PhpPsiElementFactory.createImplementsList(project, getSelectedInterface);
-            PhpClass graphQlResolverClass = (PhpClass) descriptor.getPsiElement().getParent();
-            WriteCommandAction.writeCommandAction(project).run(() -> {
-                graphQlResolverClass.getImplementsList().replace(correctInterface);
+            final PsiElement erroredElement = descriptor.getPsiElement();
+            final PsiElement correctInterface = PhpPsiElementFactory.createImplementsList(project, getSelectedInterface);
+            final PhpClass graphQlResolverClass = (PhpClass) erroredElement.getParent();
+            String[] implementedInterfaceNames = graphQlResolverClass.getInterfaceNames();
+            WriteCommandAction.runWriteCommandAction(project, () -> {
+                if (implementedInterfaceNames.length == 0) {
+                    graphQlResolverClass.getImplementsList().addAfter(correctInterface, erroredElement);
+                } else {
+                    graphQlResolverClass.getImplementsList().replace(correctInterface);
+                }
             });
         }
     }
