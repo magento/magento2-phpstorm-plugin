@@ -6,7 +6,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewModuleDialog;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
-import com.magento.idea.magento2plugin.util.Regex;
+import com.magento.idea.magento2plugin.util.RegExUtil;
 import javax.swing.*;
 
 public class NewModuleDialogValidator {
@@ -37,7 +37,7 @@ public class NewModuleDialogValidator {
             return false;
         }
 
-        if (!packageName.matches(Regex.ALPHANUMERIC)) {
+        if (!packageName.matches(RegExUtil.ALPHANUMERIC)) {
             String errorMessage = validatorBundle.message("validator.alphaNumericCharacters", "Package Name");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
@@ -59,8 +59,15 @@ public class NewModuleDialogValidator {
             return false;
         }
 
-        if (!moduleName.matches(Regex.ALPHANUMERIC)) {
+        if (!moduleName.matches(RegExUtil.ALPHANUMERIC)) {
             String errorMessage = validatorBundle.message("validator.alphaNumericCharacters", "Module Name");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
+            return false;
+        }
+
+        if (moduleName.equals(packageName)) {
+            String errorMessage = validatorBundle.message("validator.moduleNameIsTheSameAsPackage", "Module Name");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return false;

@@ -21,17 +21,21 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Directo
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.util.NavigateToCreatedFile;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
+import com.magento.idea.magento2plugin.magento.files.ComposerJson;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
+import org.apache.commons.lang.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+import java.util.stream.IntStream;
 
 public class NewModuleDialog extends AbstractDialog implements ListSelectionListener {
     @NotNull
@@ -254,7 +258,8 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
 
     private void setModuleDependencies() {
         List<String> moduleNames = moduleIndex.getModuleNames();
-        Vector<String> licenseNames = new Vector<>(moduleNames.size());
+        Vector<String> licenseNames = new Vector<>(moduleNames.size() + 1);
+        licenseNames.add(ComposerJson.NO_DEPENDENCY_LABEL);
         for (String name : moduleNames) {
             licenseNames.add(name);
         }
@@ -263,7 +268,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         moduleDependencies.addListSelectionListener(this);
     }
 
-    private void handleModuleCustomLicenseInputVisibility () {
+    private void handleModuleCustomLicenseInputVisibility() {
         boolean isCustomLicenseSelected = false;
 
         for (Object value: moduleLicense.getSelectedValuesList()) {
@@ -278,8 +283,18 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         moduleLicenseCustom.setEditable(isCustomLicenseSelected);
     }
 
+    private void handleModuleSelectedDependencies() {
+        // unselect the "None" dependency when others are selected
+        int[] selectedDependencies = moduleDependencies.getSelectedIndices();
+        if (moduleDependencies.getSelectedIndices().length > 1 && moduleDependencies.isSelectedIndex(0)) {
+            selectedDependencies = ArrayUtils.remove(selectedDependencies, 0);
+            moduleDependencies.setSelectedIndices(selectedDependencies);
+        }
+    }
+
     @Override
     public void valueChanged(ListSelectionEvent listSelectionEvent) {
         handleModuleCustomLicenseInputVisibility();
+        handleModuleSelectedDependencies();
     }
 }

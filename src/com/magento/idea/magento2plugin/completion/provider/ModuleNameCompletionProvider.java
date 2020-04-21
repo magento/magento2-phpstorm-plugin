@@ -8,14 +8,12 @@ import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.icons.AllIcons;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.Collection;
 
 public class ModuleNameCompletionProvider extends CompletionProvider<CompletionParameters> {
@@ -32,7 +30,6 @@ public class ModuleNameCompletionProvider extends CompletionProvider<CompletionP
 
         Collection<String> moduleNames
                 = FileBasedIndex.getInstance().getAllKeys(ModuleNameIndex.KEY, position.getProject());
-
 
         moduleNames.removeIf(m -> !m.startsWith(prefix));
         for (String moduleName : moduleNames) {

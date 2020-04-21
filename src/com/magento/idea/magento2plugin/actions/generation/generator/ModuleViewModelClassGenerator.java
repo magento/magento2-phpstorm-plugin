@@ -19,7 +19,6 @@ import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
-import java.io.File;
 import java.util.Properties;
 
 public class ModuleViewModelClassGenerator extends FileGenerator {
@@ -66,7 +65,7 @@ public class ModuleViewModelClassGenerator extends FileGenerator {
     private PhpFile createViewModelClass(String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(getViewModelModule());
-        String[] viewModelDirectories = viewModelFileData.getViewModelDirectory().split(File.separator);
+        String[] viewModelDirectories = viewModelFileData.getViewModelDirectory().split("/");
         for (String viewModelDirectory: viewModelDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, viewModelDirectory);
         }

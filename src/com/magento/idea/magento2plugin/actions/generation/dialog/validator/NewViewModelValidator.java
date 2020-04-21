@@ -5,7 +5,7 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewViewModelDialog;
-import com.magento.idea.magento2plugin.util.Regex;
+import com.magento.idea.magento2plugin.util.RegExUtil;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 
 import javax.swing.*;
@@ -39,7 +39,7 @@ public class NewViewModelValidator {
             return false;
         }
 
-        if (!moduleName.matches(Regex.ALPHANUMERIC)) {
+        if (!moduleName.matches(RegExUtil.ALPHANUMERIC)) {
             String errorMessage = validatorBundle.message("validator.alphaNumericCharacters", "View Model Name");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
@@ -61,7 +61,7 @@ public class NewViewModelValidator {
             return false;
         }
 
-        if (!pluginDirectory.matches(Regex.DIRECTORY)) {
+        if (!pluginDirectory.matches(RegExUtil.DIRECTORY)) {
             String errorMessage = validatorBundle.message("validator.directory.isNotValid", "View Model Directory");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 

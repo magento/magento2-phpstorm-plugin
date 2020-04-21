@@ -7,7 +7,7 @@
 <idea-plugin>
     <id>com.magento.idea.magento2plugin</id>
     <name>Magento PhpStorm</name>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <vendor url="https://github.com/magento/magento2-phpstorm-plugin">Magento Inc.</vendor>
 
     <description><![CDATA[
@@ -57,6 +57,7 @@
         <!-- Module file generators -->
         <group id="MagentoNewModuleFileGroup" class="com.magento.idea.magento2plugin.actions.groups.NewModuleFileGroup" text="Module File" popup="true">
             <action id="MagentoCreateABlock" class="com.magento.idea.magento2plugin.actions.generation.NewBlockAction" />
+            <action id="MagentoCreateACronjob" class="com.magento.idea.magento2plugin.actions.generation.NewCronjobAction" />
             <action id="MagentoCreateAViewModel" class="com.magento.idea.magento2plugin.actions.generation.NewViewModelAction" />
             <action id="MagentoCreateAGraphQlResolver" class="com.magento.idea.magento2plugin.actions.generation.NewGraphQlResolverAction" />
             <add-to-group group-id="NewGroup" anchor="last"/>
@@ -80,8 +81,8 @@
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
-        <directoryProjectGenerator implementation="com.magento.idea.magento2plugin.generation.MagentoModuleGenerator"/>
-        <projectTemplatesFactory implementation="com.magento.idea.magento2plugin.generation.MagentoTemplatesFactory"/>
+        <directoryProjectGenerator implementation="com.magento.idea.magento2plugin.generation.php.MagentoModuleGenerator"/>
+        <projectTemplatesFactory implementation="com.magento.idea.magento2plugin.generation.php.MagentoTemplatesFactory"/>
 
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.Settings"/>
 
@@ -95,6 +96,7 @@
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.EventNameIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.VirtualTypeIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.PluginIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.CronGroupIndexer" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.BlockNameIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ContainerNameIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.WebApiTypeIndex" />
@@ -109,10 +111,10 @@
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex" />
 
-        <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.PluginLineMarkerProvider"/>
-        <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.PluginTargetLineMarkerProvider"/>
-        <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.ClassConfigurationLineMarkerProvider"/>
-        <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.php.linemarker.WebApiLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.PluginLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.PluginTargetLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.ClassConfigurationLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.WebApiLineMarkerProvider"/>
 
         <directoryProjectConfigurator implementation="com.magento.idea.magento2plugin.project.ProjectDetector"/>
 
@@ -132,6 +134,14 @@
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.ObserverDeclarationInspection"/>
 
         <localInspection language="XML" groupPath="XML"
+                         shortName="PluginDeclarationInspection"
+                         displayName="Duplicated Plugin Usage in di XML"
+                         groupName="Magento 2"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.PluginDeclarationInspection"/>
+
+        <localInspection language="XML" groupPath="XML"
                          shortName="CacheableFalseInDefaultLayoutInspection"
                          displayName="Inspection for disabled cache site-wide"
                          groupName="Magento 2"
@@ -148,6 +158,9 @@
         <internalFileTemplate name="Magento Module Common Php Class"/>
         <internalFileTemplate name="Magento Observer Class"/>
         <internalFileTemplate name="Magento Module Events Xml"/>
+        <internalFileTemplate name="Magento GraphQL Resolver Class"/>
+        <internalFileTemplate name="Magento Cronjob Class"/>
+        <internalFileTemplate name="Magento Crontab Xml"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.php">

@@ -1,3 +1,7 @@
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.command.WriteCommandAction;
@@ -23,7 +27,6 @@ import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import javax.swing.*;
-import java.io.File;
 import java.util.Properties;
 
 public class ObserverClassGenerator extends FileGenerator {
@@ -109,7 +112,7 @@ public class ObserverClassGenerator extends FileGenerator {
     private PhpClass createObserverClass(String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(observerFileData.getObserverModule());
-        String[] observerDirectories = observerFileData.getObserverDirectory().split(File.separator);
+        String[] observerDirectories = observerFileData.getObserverDirectory().split("/");
         for (String observerDirectory: observerDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, observerDirectory);
         }

@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config>
+    <type name="Magento\Framework\View\Layout">
+        <plugin name=<warning descr="The plugin name \"catalog-session-depersonalize\" for targeted \"Magento\Framework\View\Layout\" class is already used in the module \"Magento_Catalog\" (frontend scope). For more details see Inspection Description.">"catalog-session-depersonalize"</warning> type="Vendor\Module\Plugin\Layout" />
+    </type>
+</config>
