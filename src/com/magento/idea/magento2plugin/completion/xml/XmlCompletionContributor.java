@@ -248,6 +248,20 @@ public class XmlCompletionContributor extends CompletionContributor {
             new DataCompletionProvider()
         );
 
+        // MFTF Test extends completion contributor
+        extend(
+            CompletionType.BASIC,
+            psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(
+                    XmlPatterns.xmlAttribute().withName(MftfTest.EXTENDS_ATTRIBUTE)
+                        .withParent(XmlPatterns.xmlTag().withName(MftfTest.TEST_TAG)
+                        .withParent(XmlPatterns.xmlTag().withName(MftfTest.ROOT_TAG)
+                        )
+                    )
+                ),
+            new TestNameCompletionProvider()
+        );
+
         registerCompletionsForDifferentNesting();
     }
 
@@ -264,7 +278,7 @@ public class XmlCompletionContributor extends CompletionContributor {
                             i,
                             XmlPatterns.xmlTag().withParent(
                                 XmlPatterns.xmlTag().withName(
-                                    string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.ROOT_TAG)
+                                    string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.TEST_TAG)
                                 )))
                     ),
                 new SelectorCompletionProvider()
@@ -278,7 +292,7 @@ public class XmlCompletionContributor extends CompletionContributor {
                         XmlPatterns.xmlAttribute().withName(MftfActionGroup.URL_ATTRIBUTE)
                             .withSuperParent(i ,XmlPatterns.xmlTag().withParent(
                                 XmlPatterns.xmlTag().withName(
-                                    string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.ROOT_TAG)
+                                    string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.TEST_TAG)
                                 )))
                     ),
                 new PageCompletionProvider()

@@ -192,20 +192,6 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
             )
         );
 
-        // <assert*><*Result type="variable">$someVariableReferenceToStepKey</*Result></assert*>
-        registrar.registerReferenceProvider(
-            XmlPatterns.psiElement(XmlTokenType.XML_DATA_CHARACTERS).withParent(
-                XmlPatterns.xmlText().withParent(
-                    XmlPatterns.xmlTag().withChild(
-                        XmlPatterns.xmlAttribute().withName("type")
-                    )
-                )
-            ),
-            new CompositeReferenceProvider(
-                new VariableToStepKeyProvider()
-            )
-        );
-
         // <actionGroup extends="parentActionGroup" />
         registrar.registerReferenceProvider(
             XmlPatterns.xmlAttributeValue().withParent(XmlPatterns.xmlAttribute().withName("extends")
@@ -221,6 +207,20 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
                 .withParent(XmlPatterns.xmlTag().withName("entity"))),
             new CompositeReferenceProvider(
                 new DataReferenceProvider()
+            )
+        );
+
+        // <test name="B" extends="A" />
+        registrar.registerReferenceProvider(
+            XmlPatterns.xmlAttributeValue().withParent(XmlPatterns.xmlAttribute()
+                .withName(MftfTest.EXTENDS_ATTRIBUTE)
+                .withParent(XmlPatterns.xmlTag().withName(MftfTest.TEST_TAG)
+                    .withParent(XmlPatterns.xmlTag().withName(MftfTest.ROOT_TAG)
+                    )
+                )
+            ),
+            new CompositeReferenceProvider(
+                new TestNameReferenceProvider()
             )
         );
 
@@ -261,7 +261,7 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
                 ).withParent(XmlPatterns.xmlAttribute().withName(
                     MftfActionGroup.URL_ATTRIBUTE
                 ).withParent(XmlPatterns.xmlTag().withSuperParent(i, XmlPatterns.xmlTag().withName(
-                    string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.ROOT_TAG)
+                    string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.TEST_TAG)
                 )))),
                 new CompositeReferenceProvider(
                     new PageReferenceProvider()
@@ -275,7 +275,7 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
                 ).withParent(XmlPatterns.xmlAttribute().withName(
                     MftfActionGroup.SELECTOR_ATTRIBUTE
                 ).withParent(XmlPatterns.xmlTag().withSuperParent(i, XmlPatterns.xmlTag().withName(
-                    string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.ROOT_TAG)
+                    string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.TEST_TAG)
                 )))),
                 new CompositeReferenceProvider(
                     new SectionReferenceProvider()

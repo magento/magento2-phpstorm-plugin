@@ -16,15 +16,16 @@ import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
+import com.magento.idea.magento2plugin.magento.files.MftfTest;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
-import com.magento.idea.magento2plugin.stubs.indexes.mftf.PageIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.mftf.TestNameIndex;
 import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class PageReferenceProvider extends PsiReferenceProvider {
+public class TestNameReferenceProvider extends PsiReferenceProvider {
 
     @NotNull
     @Override
@@ -32,12 +33,11 @@ public class PageReferenceProvider extends PsiReferenceProvider {
         List<PsiReference> psiReferences = new ArrayList<>();
 
         String origValue = StringUtil.unquoteString(element.getText());
-        String modifiedValue = origValue.replaceAll("\\{{2}([_A-Za-z0-9]+)([^}]+)?\\}{2}", "$1").toString();
 
         Collection<VirtualFile> containingFiles = FileBasedIndex.getInstance()
             .getContainingFiles(
-                PageIndex.KEY,
-                modifiedValue,
+                TestNameIndex.KEY,
+                origValue,
                 GlobalSearchScope.getScopeRestrictedByFileTypes(
                     GlobalSearchScope.allScope(element.getProject()),
                     XmlFileType.INSTANCE
@@ -45,7 +45,6 @@ public class PageReferenceProvider extends PsiReferenceProvider {
             );
 
         PsiManager psiManager = PsiManager.getInstance(element.getProject());
-
         List<PsiElement> psiElements = new ArrayList<>();
 
         for (VirtualFile virtualFile: containingFiles) {
@@ -56,7 +55,7 @@ public class PageReferenceProvider extends PsiReferenceProvider {
             }
 
             Collection<XmlAttributeValue> valueElements = XmlPsiTreeUtil
-                    .findAttributeValueElements(xmlFile, "page", "name", modifiedValue);
+                .findAttributeValueElements(xmlFile, MftfTest.TEST_TAG, MftfTest.NAME_ATTRIBUTE, origValue);
 
             psiElements.addAll(valueElements);
         }
