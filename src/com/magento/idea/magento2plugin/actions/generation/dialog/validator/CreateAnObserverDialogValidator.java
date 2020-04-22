@@ -5,6 +5,7 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
 import com.intellij.openapi.project.Project;
+import com.jetbrains.php.refactoring.PhpNameUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.CreateAnObserverDialog;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.util.RegExUtil;
@@ -33,6 +34,14 @@ public class CreateAnObserverDialogValidator {
     {
         String errorTitle = "Error";
         String observerClassName = dialog.getObserverClassName();
+
+        if (!PhpNameUtil.isValidClassName(observerClassName)) {
+            String errorMessage = this.validatorBundle.message("validator.class.isNotValid", "Observer Class Name");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
+            return false;
+        }
+
         if (observerClassName.length() == 0) {
             String errorMessage = validatorBundle.message("validator.notEmpty", "Observer Class Name");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);

@@ -5,6 +5,7 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
 import com.intellij.openapi.project.Project;
+import com.jetbrains.php.refactoring.PhpNameUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.CreateAPluginDialog;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.util.RegExUtil;
@@ -34,6 +35,13 @@ public class CreateAPluginDialogValidator {
     {
         String errorTitle = "Error";
         String pluginClassName = dialog.getPluginClassName();
+
+        if (!PhpNameUtil.isValidClassName(pluginClassName)) {
+            String errorMessage = this.validatorBundle.message("validator.class.isNotValid", "Plugin Class Name");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
+            return false;
+        }
 
         if (pluginClassName.length() == 0) {
             String errorMessage = validatorBundle.message("validator.notEmpty", "Plugin Class Name");

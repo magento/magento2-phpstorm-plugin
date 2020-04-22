@@ -6,6 +6,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
 import com.intellij.openapi.project.Project;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.jetbrains.php.refactoring.PhpNameUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewCronjobDialog;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
@@ -48,6 +49,13 @@ public class NewCronjobValidator {
 
         boolean isConfigurableScheduleType = dialog.isConfigurableScheduleType();
         String scheduleConfigPath = dialog.getCronjobScheduleConfigPath();
+
+        if (!PhpNameUtil.isValidClassName(cronjobClassName)) {
+            String errorMessage = this.validatorBundle.message("validator.class.isNotValid", "Cronjob ClassName");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
+            return false;
+        }
 
         if (cronjobClassName.length() == 0) {
             String errorMessage = validatorBundle.message("validator.notEmpty", "Cronjob ClassName");

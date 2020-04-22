@@ -5,6 +5,7 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
 import com.intellij.openapi.project.Project;
+import com.jetbrains.php.refactoring.PhpNameUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.OverrideClassByAPreferenceDialog;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.util.RegExUtil;
@@ -33,6 +34,14 @@ public class OverrideClassByAPreferenceDialogValidator {
     {
         String errorTitle = "Error";
         String preferenceClassName = dialog.getPreferenceClassName();
+
+        if (!PhpNameUtil.isValidClassName(preferenceClassName)) {
+            String errorMessage = this.validatorBundle.message("validator.class.isNotValid", "Preference Class Name");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
+            return false;
+        }
+
         if (preferenceClassName.length() == 0) {
             String errorMessage = validatorBundle.message("validator.notEmpty", "Preference Class Name");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);

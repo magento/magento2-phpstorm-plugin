@@ -4,6 +4,7 @@
  */
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
+import com.jetbrains.php.refactoring.PhpNameUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewGraphQlResolverDialog;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
@@ -32,6 +33,14 @@ public class NewGraphQlResolverValidator {
         String errorTitle = "Error";
 
         String resolverClassName = dialog.getGraphQlResolverClassName();
+
+        if (!PhpNameUtil.isValidClassName(resolverClassName)) {
+            String errorMessage = this.validatorBundle.message("validator.class.isNotValid", "GraphQL Resolver Name");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
+            return false;
+        }
+
         if (resolverClassName.length() == 0) {
             String errorMessage = validatorBundle.message("validator.notEmpty", "GraphQL Resolver Name");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);

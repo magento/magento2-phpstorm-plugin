@@ -4,6 +4,7 @@
  */
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
+import com.jetbrains.php.refactoring.PhpNameUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewBlockDialog;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
@@ -31,6 +32,14 @@ public class NewBlockValidator {
         String errorTitle = "Error";
 
         String moduleName = dialog.getBlockName();
+
+        if (!PhpNameUtil.isValidClassName(moduleName)) {
+            String errorMessage = this.validatorBundle.message("validator.class.isNotValid", "Block Name");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
+            return false;
+        }
+
         if (moduleName.length() == 0) {
             String errorMessage = validatorBundle.message("validator.notEmpty", "Block Name");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);

@@ -4,6 +4,7 @@
  */
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
+import com.jetbrains.php.refactoring.PhpNameUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewViewModelDialog;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
@@ -32,6 +33,14 @@ public class NewViewModelValidator {
         String errorTitle = "Error";
 
         String moduleName = dialog.getViewModelName();
+
+        if (!PhpNameUtil.isValidClassName(moduleName)) {
+            String errorMessage = this.validatorBundle.message("validator.class.isNotValid", "View Model Name");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+
+            return false;
+        }
+
         if (moduleName.length() == 0) {
             String errorMessage = validatorBundle.message("validator.notEmpty", "View Model Name");
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
