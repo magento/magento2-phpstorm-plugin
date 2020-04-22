@@ -40,7 +40,7 @@ public class IndexManager {
             DataIndex.KEY,
             PageIndex.KEY,
             SectionIndex.KEY,
-            StepKeyIndex.KEY,
+            TestNameIndex.KEY,
              //graphql
             GraphQlResolverIndex.KEY
         };

@@ -215,15 +215,6 @@ public class XmlCompletionContributor extends CompletionContributor {
             new RequireJsMappingCompletionProvider()
         );
 
-        // mftf selector completion contributor
-        extend(CompletionType.BASIC,
-            psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
-            .inside(XmlPatterns.xmlAttribute()
-            .withName(MftfActionGroup.SELECTOR_ATTRIBUTE))
-            .inFile(xmlFile().withName(string().endsWith("Test.xml"))),
-            new SelectorCompletionProvider()
-        );
-
         // mftf action group completion contributor
         extend(
             CompletionType.BASIC,
@@ -231,35 +222,9 @@ public class XmlCompletionContributor extends CompletionContributor {
                 .inside(
                     XmlPatterns.xmlAttribute().withName(string().oneOf("ref", "extends"))
                         .withParent(XmlPatterns.xmlTag().withName("actionGroup")
-                )
-            ),
-            new ActionGroupCompletionProvider()
-        );
-
-        // mftf page url completion contributor
-        extend(
-            CompletionType.BASIC,
-            psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
-                .inside(
-                    XmlPatterns.xmlAttribute().withName(MftfActionGroup.URL_ATTRIBUTE)
-                    .withParent(XmlPatterns.xmlTag().withParent(
-                            XmlPatterns.xmlTag().withName(
-                        string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.ROOT_TAG)
-                    )))
+                    )
                 ),
-            new PageCompletionProvider()
-        );
-        extend(
-            CompletionType.BASIC,
-            psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
-                .inside(
-                    XmlPatterns.xmlAttribute().withName(MftfActionGroup.URL_ATTRIBUTE)
-                    .withParent(XmlPatterns.xmlTag().withParent(
-                        XmlPatterns.xmlTag().withParent(XmlPatterns.xmlTag().withName(
-                    string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.ROOT_TAG)
-                ))))
-            ),
-            new PageCompletionProvider()
+            new ActionGroupCompletionProvider()
         );
 
         // mftf data entity completion contributor
@@ -282,5 +247,58 @@ public class XmlCompletionContributor extends CompletionContributor {
             ),
             new DataCompletionProvider()
         );
+
+        // MFTF Test extends completion contributor
+        extend(
+            CompletionType.BASIC,
+            psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(
+                    XmlPatterns.xmlAttribute().withName(MftfTest.EXTENDS_ATTRIBUTE)
+                        .withParent(XmlPatterns.xmlTag().withName(MftfTest.TEST_TAG)
+                        .withParent(XmlPatterns.xmlTag().withName(MftfTest.ROOT_TAG)
+                        )
+                    )
+                ),
+            new TestNameCompletionProvider()
+        );
+
+        registerCompletionsForDifferentNesting();
+    }
+
+    private void registerCompletionsForDifferentNesting() {
+        int i = 1;
+        int maxNesting = 10;
+        while( i < maxNesting) {
+
+            // mftf selector completion contributor
+            extend(CompletionType.BASIC,
+                psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                    .inside(XmlPatterns.xmlAttribute()
+                        .withName(MftfActionGroup.SELECTOR_ATTRIBUTE).withSuperParent(
+                            i,
+                            XmlPatterns.xmlTag().withParent(
+                                XmlPatterns.xmlTag().withName(
+                                    string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.TEST_TAG)
+                                )))
+                    ),
+                new SelectorCompletionProvider()
+            );
+
+            // mftf page url completion contributor
+            extend(
+                CompletionType.BASIC,
+                psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                    .inside(
+                        XmlPatterns.xmlAttribute().withName(MftfActionGroup.URL_ATTRIBUTE)
+                            .withSuperParent(i ,XmlPatterns.xmlTag().withParent(
+                                XmlPatterns.xmlTag().withName(
+                                    string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.TEST_TAG)
+                                )))
+                    ),
+                new PageCompletionProvider()
+            );
+
+            i++;
+        }
     }
 }
