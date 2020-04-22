@@ -14,26 +14,29 @@ import com.intellij.psi.PsiElement;
 import com.jetbrains.php.refactoring.extract.extractInterface.PhpExtractInterfaceProcessor;
 import com.jetbrains.php.lang.psi.PhpPsiElementFactory;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.magento.idea.magento2plugin.bundles.InspectionBundle;
 import com.magento.idea.magento2plugin.magento.files.GraphQlResolver;
 import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 
 public class PhpImplementResolverClassQuickFix implements LocalQuickFix {
-    public static final String FAMILY_NAME = "Implements Resolver interface";
-    public static final String DIALOG_TITLE = "Select one of the following interface";
+    private InspectionBundle inspectionBundle = new InspectionBundle();
+
     @NotNull
     @Override
     public String getFamilyName() {
-        return FAMILY_NAME;
+        return inspectionBundle.message("inspection.graphql.resolver.fix.family");
     }
 
     @Override
     public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
-        String[] expectedInterface = { GraphQlResolver.BATCH_RESOLVER_INTERFACE,
-                GraphQlResolver.BATCH_SERVICE_CONTRACT_RESOLVER_INTERFACE,
-                GraphQlResolver.RESOLVER_INTERFACE
+        String[] expectedInterface = {
+            GraphQlResolver.BATCH_RESOLVER_INTERFACE,
+            GraphQlResolver.BATCH_SERVICE_CONTRACT_RESOLVER_INTERFACE,
+            GraphQlResolver.RESOLVER_INTERFACE
         };
         final JComboBox expectedInterfaceDropdown = new JComboBox(expectedInterface);
+        ((JLabel)expectedInterfaceDropdown.getRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
         DialogBuilder dialogBox = createDialogBox(expectedInterfaceDropdown, project);
         if (dialogBox.showAndGet()) {
             String getSelectedInterface = expectedInterfaceDropdown.getSelectedItem().toString();
@@ -56,7 +59,7 @@ public class PhpImplementResolverClassQuickFix implements LocalQuickFix {
         JPanel panel = new JPanel();
         panel.add(selectedClass);
         DialogBuilder builder = new DialogBuilder(project);
-        builder.setTitle(DIALOG_TITLE);
+        builder.setTitle(inspectionBundle.message("inspection.graphql.resolver.fix.title"));
         builder.setCenterPanel(panel);
         builder.addOkAction();
         builder.addCancelAction();
