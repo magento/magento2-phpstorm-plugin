@@ -38,7 +38,7 @@ import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
-import java.io.File;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;

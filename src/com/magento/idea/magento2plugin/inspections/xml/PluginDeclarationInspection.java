@@ -23,7 +23,7 @@ import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import java.io.File;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.*;
 import com.intellij.openapi.util.Pair;
 
