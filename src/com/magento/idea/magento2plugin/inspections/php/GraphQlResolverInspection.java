@@ -12,6 +12,7 @@ import com.intellij.psi.PsiElementVisitor;
 import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
+import com.magento.idea.magento2plugin.bundles.InspectionBundle;
 import com.magento.idea.magento2plugin.inspections.php.fix.PhpImplementResolverClassQuickFix;
 import com.magento.idea.magento2plugin.util.magento.graphql.GraphQlUsagesCollector;
 import com.magento.idea.magento2plugin.util.magento.graphql.GraphQlUtil;
@@ -21,7 +22,7 @@ import java.util.List;
 
 public class GraphQlResolverInspection extends PhpInspection {
 
-    public static final String GraphQlResolverProblemDescription = "Class must implements \\Magento\\Framework\\GraphQl\\Query\\ResolverInterface";
+    private final InspectionBundle inspectionBundle = new InspectionBundle();
 
     @NotNull
     @Override
@@ -32,11 +33,13 @@ public class GraphQlResolverInspection extends PhpInspection {
                 GraphQlUsagesCollector collector = new GraphQlUsagesCollector();
                 results = collector.getGraphQLUsages(resolverClass);
                 if (results.size() > 0 ) {
-                    if (GraphQlUtil.isResolver(resolverClass)) {
+                    if (!GraphQlUtil.isResolver(resolverClass)) {
                         PsiElement currentClassNameIdentifier = resolverClass.getNameIdentifier();
                         assert currentClassNameIdentifier != null;
                         problemsHolder.registerProblem(currentClassNameIdentifier,
-                                GraphQlResolverProblemDescription,
+                                inspectionBundle.message(
+                                    "inspection.graphql.resolver.mustImplement"
+                                ),
                                 ProblemHighlightType.ERROR,
                                 new PhpImplementResolverClassQuickFix());
                     }
