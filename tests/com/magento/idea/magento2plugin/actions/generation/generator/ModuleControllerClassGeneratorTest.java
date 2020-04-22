@@ -8,7 +8,7 @@ public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
 
     public void testGenerateFrontendControllerFile() {
         Project project = myFixture.getProject();
-        ControllerFileData cronjobClassData = new ControllerFileData(
+        ControllerFileData controllerFileData = new ControllerFileData(
                 "Controller/Entity",
                 "GetAction",
                 "Foo_Bar",
@@ -19,23 +19,23 @@ public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
                 "Foo\\Bar\\Controller\\Entity"
         );
         ModuleControllerClassGenerator moduleControllerClassGenerator = new ModuleControllerClassGenerator(
-                cronjobClassData,
+                controllerFileData,
                 project
         );
-        PsiFile cronJobFile = moduleControllerClassGenerator.generate("test");
+        PsiFile controllerFile = moduleControllerClassGenerator.generate("test");
 
         String filePath = this.getFixturePath("GetAction.php");
         PsiFile expectedFile = myFixture.configureByFile(filePath);
         assertGeneratedFileIsCorrect(
                 expectedFile,
                 "src/app/code/Foo/Bar/Controller/Entity",
-                cronJobFile
+                controllerFile
         );
     }
 
     public void testGenerateFrontendInheritActionControllerFile() {
         Project project = myFixture.getProject();
-        ControllerFileData cronjobClassData = new ControllerFileData(
+        ControllerFileData controllerFileData = new ControllerFileData(
                 "Controller/Entity",
                 "DeleteAction",
                 "Foo_Bar",
@@ -46,23 +46,23 @@ public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
                 "Foo\\Bar\\Controller\\Entity"
         );
         ModuleControllerClassGenerator moduleControllerClassGenerator = new ModuleControllerClassGenerator(
-                cronjobClassData,
+                controllerFileData,
                 project
         );
-        PsiFile cronJobFile = moduleControllerClassGenerator.generate("test");
+        PsiFile controllerFile = moduleControllerClassGenerator.generate("test");
 
         String filePath = this.getFixturePath("DeleteAction.php");
         PsiFile expectedFile = myFixture.configureByFile(filePath);
         assertGeneratedFileIsCorrect(
                 expectedFile,
                 "src/app/code/Foo/Bar/Controller/Entity",
-                cronJobFile
+                controllerFile
         );
     }
 
     public void testGenerateBackendControllerFile() {
         Project project = myFixture.getProject();
-        ControllerFileData cronjobClassData = new ControllerFileData(
+        ControllerFileData controllerFileData = new ControllerFileData(
                 "Controller/Adminhtml/Entity",
                 "BackendSaveAction",
                 "Foo_Bar",
@@ -72,15 +72,18 @@ public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
                 true,
                 "Foo\\Bar\\Controller\\Adminhtml\\Entity"
         );
-        ModuleControllerClassGenerator moduleControllerClassGenerator = new ModuleControllerClassGenerator(cronjobClassData, project);
-        PsiFile cronJobFile = moduleControllerClassGenerator.generate("test");
+        ModuleControllerClassGenerator moduleControllerClassGenerator = new ModuleControllerClassGenerator(
+                controllerFileData,
+                project
+        );
+        PsiFile controllerFile = moduleControllerClassGenerator.generate("test");
 
         String filePath = this.getFixturePath("BackendSaveAction.php");
         PsiFile expectedFile = myFixture.configureByFile(filePath);
         assertGeneratedFileIsCorrect(
                 expectedFile,
                 "src/app/code/Foo/Bar/Controller/Adminhtml/Entity",
-                cronJobFile
+                controllerFile
         );
     }
 }
