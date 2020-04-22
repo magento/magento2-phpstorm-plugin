@@ -1,0 +1,17 @@
+#if (${ACL})
+/**
+ * Authorization level of a basic admin session
+ */
+const ADMIN_RESOURCE = '${ACL}';
+
+#end
+/**
+ * Execute action based on request and return result
+ *
+ * @return ResultInterface|ResponseInterface
+ * @throws NotFoundException
+ */
+public function execute()
+{
+    // TODO: Implement execute method.
+}
