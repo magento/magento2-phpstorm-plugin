@@ -22,7 +22,7 @@ public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
                 cronjobClassData,
                 project
         );
-        PsiFile cronJobFile = moduleControllerClassGenerator.generate("Magento 2 Controller");
+        PsiFile cronJobFile = moduleControllerClassGenerator.generate("test");
 
         String filePath = this.getFixturePath("GetAction.php");
         PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -49,7 +49,7 @@ public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
                 cronjobClassData,
                 project
         );
-        PsiFile cronJobFile = moduleControllerClassGenerator.generate("Magento 2 Controller");
+        PsiFile cronJobFile = moduleControllerClassGenerator.generate("test");
 
         String filePath = this.getFixturePath("DeleteAction.php");
         PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -73,7 +73,7 @@ public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
                 "Foo\\Bar\\Controller\\Adminhtml\\Entity"
         );
         ModuleControllerClassGenerator moduleControllerClassGenerator = new ModuleControllerClassGenerator(cronjobClassData, project);
-        PsiFile cronJobFile = moduleControllerClassGenerator.generate("Magento 2 Controller");
+        PsiFile cronJobFile = moduleControllerClassGenerator.generate("test");
 
         String filePath = this.getFixturePath("BackendSaveAction.php");
         PsiFile expectedFile = myFixture.configureByFile(filePath);
