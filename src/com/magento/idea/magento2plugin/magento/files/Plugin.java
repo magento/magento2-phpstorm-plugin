@@ -12,6 +12,9 @@ public class Plugin implements ModuleFileInterface {
     private static final String AROUND_METHOD_TEMPLATE_NAME = "Magento Plugin Around Method";
     private static final String AFTER_METHOD_TEMPLATE_NAME = "Magento Plugin After Method";
 
+    public static final String CALLABLE_PARAM = "callable";
+    public static final String CLOSURE_PARAM = "Closure";
+
     public enum PluginType {
         before,
         after,
