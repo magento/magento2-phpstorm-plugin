@@ -14,7 +14,7 @@ public class ConfigurationTypeClassLinemarkerRegistrarTest extends LinemarkerPhp
     }
 
     public void testRegularPhpClassShouldNotHaveLinemarker() {
-        String filePath = this.getFixturePath("TestNotLineMarker.php");
+        String filePath = this.getFixturePath("ClassNotConfiguredInDiXml.php");
         myFixture.configureByFile(filePath);
 
         assertHasNoLinemarkerWithTooltipAndIcon("Navigate to configuration", "/fileTypes/xml.svg");

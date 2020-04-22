@@ -6,7 +6,7 @@
 
 namespace Magento\Catalog\Model;
 
-class TestNotLineMarker
+class ClassNotConfiguredInDiXml
 {
     public function someMethod()
     {
