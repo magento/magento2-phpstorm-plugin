@@ -2,7 +2,7 @@ package com.magento.idea.magento2plugin.inspections.xml;
 
 import com.magento.idea.magento2plugin.BaseProjectTestCase;
 
-import java.io.File;
+import com.magento.idea.magento2plugin.magento.packages.File;
 
 abstract public class InspectionXmlFixtureTestCase extends BaseProjectTestCase {
 

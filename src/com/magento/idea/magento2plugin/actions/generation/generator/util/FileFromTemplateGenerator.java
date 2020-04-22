@@ -23,7 +23,7 @@ import com.intellij.util.IncorrectOperationException;
 import com.magento.idea.magento2plugin.magento.files.ModuleFileInterface;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import java.io.File;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;

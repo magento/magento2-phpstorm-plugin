@@ -6,7 +6,7 @@ package com.magento.idea.magento2plugin.inspections.php;
 
 import com.intellij.codeInsight.daemon.impl.HighlightInfo;
 import com.magento.idea.magento2plugin.BaseProjectTestCase;
-import java.io.File;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.List;
 
 abstract public class InspectionPhpFixtureTestCase extends BaseProjectTestCase {
