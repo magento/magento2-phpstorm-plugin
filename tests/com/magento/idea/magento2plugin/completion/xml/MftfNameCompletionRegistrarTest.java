@@ -24,4 +24,11 @@ public class MftfNameCompletionRegistrarTest extends CompletionXmlFixtureTestCas
 
         assertCompletionNotShowing(filePath);
     }
+
+    public void testExtendsSameNameMustBeEmpty() {
+        String filePath = this.getFixturePath("TestMftfTest.xml");
+        myFixture.copyFileToProject(filePath);
+
+        assertCompletionNotShowing(filePath);
+    }
 }
