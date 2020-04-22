@@ -140,7 +140,7 @@ public class NewControllerDialog extends AbstractDialog {
     }
 
     public String getActionDirectory() {
-        return getControllerDirectory() + File.separator + getControllerName();
+        return getControllerDirectory() + "/" + getControllerName();
     }
 
     private void suggestControllerDirectory() {
@@ -166,7 +166,7 @@ public class NewControllerDialog extends AbstractDialog {
         if (parts[0] == null || parts[1] == null || parts.length > 2) {
             return null;
         }
-        return parts[0] + File.separator + parts[1];
+        return parts[0] + "/" + parts[1];
     }
 
     private String getNamespace() {
@@ -174,7 +174,7 @@ public class NewControllerDialog extends AbstractDialog {
         if (parts[0] == null || parts[1] == null || parts.length > 2) {
             return null;
         }
-        String directoryPart = getControllerDirectory().replace(File.separator, Package.FQN_SEPARATOR);
+        String directoryPart = getControllerDirectory().replace("/", Package.FQN_SEPARATOR);
         String controllerPart = Package.FQN_SEPARATOR + getControllerName();
 
         return parts[0] + Package.FQN_SEPARATOR + parts[1] + Package.FQN_SEPARATOR + directoryPart + controllerPart;

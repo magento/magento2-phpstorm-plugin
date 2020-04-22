@@ -130,7 +130,7 @@ public class ModuleControllerClassGenerator extends FileGenerator {
     private PhpClass createControllerClass(String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(getControllerModule());
-        String[] controllerDirectories = controllerFileData.getActionDirectory().split(File.separator);
+        String[] controllerDirectories = controllerFileData.getActionDirectory().split("/");
         for (String controllerDirectory: controllerDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, controllerDirectory);
         }
