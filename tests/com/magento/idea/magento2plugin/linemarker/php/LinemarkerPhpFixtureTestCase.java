@@ -9,7 +9,7 @@ import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerImpl;
 import com.magento.idea.magento2plugin.BaseProjectTestCase;
 import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
-import java.io.File;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.List;
 
 abstract public class LinemarkerPhpFixtureTestCase extends BaseProjectTestCase {

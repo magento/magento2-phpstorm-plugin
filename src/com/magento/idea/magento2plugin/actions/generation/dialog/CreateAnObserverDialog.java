@@ -5,13 +5,10 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
-import com.jetbrains.php.lang.psi.elements.Method;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.CreateAPluginAction;
 import com.magento.idea.magento2plugin.actions.generation.CreateAnObserverAction;
 import com.magento.idea.magento2plugin.actions.generation.data.ObserverEventsXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.ObserverFileData;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.CreateAPluginDialogValidator;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.CreateAnObserverDialogValidator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ObserverClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ObserverEventsXmlGenerator;
@@ -19,7 +16,6 @@ import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import org.jetbrains.annotations.NotNull;
-
 import javax.swing.*;
 import java.awt.event.*;
 import com.magento.idea.magento2plugin.magento.packages.File;
