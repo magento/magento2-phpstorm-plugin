@@ -10,8 +10,8 @@ import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogBuilder;
-import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.PsiElement;
+import com.jetbrains.php.refactoring.extract.extractInterface.PhpExtractInterfaceProcessor;
 import com.jetbrains.php.lang.psi.PhpPsiElementFactory;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.magento.files.GraphQlResolver;
@@ -43,7 +43,7 @@ public class PhpImplementResolverClassQuickFix implements LocalQuickFix {
             String[] implementedInterfaceNames = graphQlResolverClass.getInterfaceNames();
             WriteCommandAction.runWriteCommandAction(project, () -> {
                 if (implementedInterfaceNames.length == 0) {
-                    graphQlResolverClass.getImplementsList().addAfter(correctInterface, erroredElement);
+                    PhpExtractInterfaceProcessor.addImplementClause(project, graphQlResolverClass, getSelectedInterface);
                 } else {
                     graphQlResolverClass.getImplementsList().replace(correctInterface);
                 }
