@@ -1,29 +1,27 @@
 1.0.0
 ============= 
 * Features:
-    * "Go to GraphQL schema" line marker in the scope of class/interface and method
-    * "Go to GraphQL resolver class" line marker in the scope of GraphQL schema type arguments
     * RequireJS mapping support (reference navigation, completion)
-    * Plugin class methods generation
-    * Code Inspection: Plugin declaration in the scope of a Plugin Class
     * MFTF support MVP (reference navigation, completion)
-    * Fixed support of 2020.* versions of IDE's
+    * Line markers for navigation from a plugin class to a target class
+    * Line markers for navigation from a GraphQl resolver to schema and vice versa
+    * Create a plugin for a class public method
     * Create a New Magento 2 Module action
-    * Code Inspection: Duplicated Observer Usage in events XML
-    * Code Inspection: Duplicated plugin Usage in di.xml
-    * Create a Plugin class for a class public method action
-    * Code Inspection: Warning regarding Cacheable false attribute in default XML
-    * Create a Preference for a class action
     * Create a Block action
     * Create a View Model action
-    * Line markers for navigation from a plugin class to a target class
-    * Magento 2 Module Project template on the start up
+    * Create a new Magento 2 module as a separate project
     * Create an observer for an event action
-    * Plugin - Target line markers 
-    * Code Inspection: GraphQL resolver in the scope of a PHP Class
-    * Moved plugin configuration from `Settings > Preferences > Languages & Frameworks > PHP > Magento` to
-    `Settings > Preferences > Languages & Frameworks > PHP > Frameworks > Magento`
     * Create a GraphQL resolver action
+    * Override class by reference action
+    * Plugin class methods generation
+    * Code Inspection: Duplicated plugin Usage in di.xml
+    * Code Inspection: Plugin declaration in the scope of a Plugin Class
+    * Code Inspection: Warning regarding Cacheable false attribute in default XML
+    * Code Inspection: GraphQL resolver in the scope of a PHP Class
+    * Code Inspection: Duplicated Observer Usage in events XML
+    * Moved plugin configuration from `Settings > Preferences > Languages & Frameworks > PHP > Magento` to
+        `Settings > Preferences > Languages & Frameworks > PHP > Frameworks > Magento`
+    * Fixed support of 2020.* versions of IDE's
 
 0.3.0
 ============= 
