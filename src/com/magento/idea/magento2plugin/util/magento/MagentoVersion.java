@@ -16,7 +16,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.magento.idea.magento2plugin.magento.files.ComposerJson;
 import com.magento.idea.magento2plugin.magento.packages.ComposerPackageModel;
 import com.magento.idea.magento2plugin.magento.packages.ComposerPackageModelImpl;
-import java.io.File;
+import com.magento.idea.magento2plugin.magento.packages.File;
 
 public class MagentoVersion {
     private static MagentoVersion INSTANCE = null;

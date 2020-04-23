@@ -27,6 +27,7 @@ import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import javax.swing.*;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.Properties;
 
 public class ObserverClassGenerator extends FileGenerator {
@@ -112,7 +113,7 @@ public class ObserverClassGenerator extends FileGenerator {
     private PhpClass createObserverClass(String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(observerFileData.getObserverModule());
-        String[] observerDirectories = observerFileData.getObserverDirectory().split("/");
+        String[] observerDirectories = observerFileData.getObserverDirectory().split(File.separator);
         for (String observerDirectory: observerDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, observerDirectory);
         }
