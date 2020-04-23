@@ -127,7 +127,7 @@
         </constraints>
         <properties>
           <labelFor value="bd654"/>
-          <text value="Target Module"/>
+          <text resource-bundle="magento2/common" key="common.module.target"/>
         </properties>
       </component>
       <component id="bd654" class="com.magento.idea.magento2plugin.ui.FilteredComboBox" binding="preferenceModule" custom-create="true">
@@ -149,7 +149,7 @@
           </grid>
         </constraints>
         <properties>
-          <text value="Target Area"/>
+          <text resource-bundle="magento2/common" key="common.area.target"/>
         </properties>
       </component>
     </children>
