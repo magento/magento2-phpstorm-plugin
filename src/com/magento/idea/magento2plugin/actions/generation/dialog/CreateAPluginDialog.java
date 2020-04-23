@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.List;
 
 public class CreateAPluginDialog extends AbstractDialog {
