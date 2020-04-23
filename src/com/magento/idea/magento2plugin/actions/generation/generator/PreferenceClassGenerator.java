@@ -12,6 +12,7 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.PreferenceFileData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
+import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.PhpPreference;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
@@ -25,6 +26,7 @@ public class PreferenceClassGenerator extends FileGenerator {
     private PreferenceFileData preferenceFileData;
     private Project project;
     private ValidatorBundle validatorBundle;
+    private CommonBundle commonBundle;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final GetFirstClassOfFile getFirstClassOfFile;
@@ -37,6 +39,7 @@ public class PreferenceClassGenerator extends FileGenerator {
         this.preferenceFileData = preferenceFileData;
         this.project = project;
         this.validatorBundle = new ValidatorBundle();
+        this.commonBundle = new CommonBundle();
     }
 
     public PsiFile generate(String actionName) {
@@ -48,7 +51,7 @@ public class PreferenceClassGenerator extends FileGenerator {
 
         if (pluginClass == null) {
             String errorMessage = validatorBundle.message("validator.file.cantBeCreated", "Preference Class");
-            JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, errorMessage, commonBundle.message("common.error"), JOptionPane.ERROR_MESSAGE);
 
             return null;
         }

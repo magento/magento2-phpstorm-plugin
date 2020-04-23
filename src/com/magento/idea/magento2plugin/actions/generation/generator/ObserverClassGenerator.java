@@ -20,6 +20,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.ObserverFileData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.util.CodeStyleSettings;
+import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.Observer;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
@@ -36,6 +37,7 @@ public class ObserverClassGenerator extends FileGenerator {
     private ObserverFileData observerFileData;
     private Project project;
     private ValidatorBundle validatorBundle;
+    private CommonBundle commonBundle;
 
     public ObserverClassGenerator(ObserverFileData observerFileData, Project project) {
         super(project);
@@ -46,6 +48,7 @@ public class ObserverClassGenerator extends FileGenerator {
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
         this.validatorBundle = new ValidatorBundle();
+        this.commonBundle = new CommonBundle();
     }
 
     @Override
@@ -64,7 +67,7 @@ public class ObserverClassGenerator extends FileGenerator {
                 JOptionPane.showMessageDialog(
                         null,
                         errorMessage,
-                        "Error",
+                        commonBundle.message("common.error"),
                         JOptionPane.ERROR_MESSAGE
                 );
 
