@@ -32,7 +32,7 @@ public class NewViewModelValidator {
 
     public boolean validate()
     {
-        String errorTitle =commonBundle.message("common.error");
+        String errorTitle = commonBundle.message("common.error");
 
         String moduleName = dialog.getViewModelName();
         if (moduleName.length() == 0) {
