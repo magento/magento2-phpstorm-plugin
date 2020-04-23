@@ -9,6 +9,8 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleXmlData;
 import com.magento.idea.magento2plugin.magento.files.ModuleXml;
+import com.magento.idea.magento2plugin.magento.packages.File;
+import com.magento.idea.magento2plugin.magento.packages.Package;
 
 public class ModuleXmlGeneratorTest extends BaseGeneratorTestCase {
 
@@ -24,12 +26,13 @@ public class ModuleXmlGeneratorTest extends BaseGeneratorTestCase {
             projectDir,
             true
         );
-        ModuleXmlGenerator cronjobClassGenerator = new ModuleXmlGenerator(moduleXmlData, project);
-        PsiFile moduleXml = cronjobClassGenerator.generate("test");
+        ModuleXmlGenerator moduleXmlGenerator = new ModuleXmlGenerator(moduleXmlData, project);
+        PsiFile moduleXml = moduleXmlGenerator.generate("test");
 
         assertGeneratedFileIsCorrect(
             expectedFile,
-            projectDir.getVirtualFile().getPath() + "/Test/Module/etc",
+            projectDir.getVirtualFile().getPath() +
+                "/Test/Module" + File.separator + Package.MODULE_BASE_AREA_DIR,
             moduleXml
         );
     }
@@ -46,12 +49,12 @@ public class ModuleXmlGeneratorTest extends BaseGeneratorTestCase {
             projectDir,
             false
         );
-        ModuleXmlGenerator cronjobClassGenerator = new ModuleXmlGenerator(moduleXmlData, project);
-        PsiFile moduleXml = cronjobClassGenerator.generate("test");
+        ModuleXmlGenerator moduleXmlGenerator = new ModuleXmlGenerator(moduleXmlData, project);
+        PsiFile moduleXml = moduleXmlGenerator.generate("test");
 
         assertGeneratedFileIsCorrect(
             expectedFile,
-            projectDir.getVirtualFile().getPath() + "/etc",
+            projectDir.getVirtualFile().getPath() + File.separator + Package.MODULE_BASE_AREA_DIR,
             moduleXml
         );
     }
