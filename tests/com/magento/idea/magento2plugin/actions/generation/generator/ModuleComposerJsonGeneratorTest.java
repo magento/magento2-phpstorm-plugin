@@ -20,22 +20,7 @@ public class ModuleComposerJsonGeneratorTest extends BaseGeneratorTestCase {
         PsiFile expectedFile = myFixture.configureByFile(filePath);
         PsiDirectory projectDir = getProjectDirectory();
 
-        Project project = myFixture.getProject();
-        List<String> dependencies = new ArrayList<>(Arrays.asList("Foo_Bar", "Magento_Backend"));
-        List<String> licenses = new ArrayList<>(Arrays.asList("Test License 1", "Test License 2"));
-        ModuleComposerJsonData composerJsonData = new ModuleComposerJsonData(
-            "Test",
-            "Module",
-            projectDir,
-            "test-description",
-            "test/module",
-            "1.0.0-dev",
-            licenses,
-            dependencies,
-            true
-        );
-        ModuleComposerJsonGenerator composerJsonGenerator = new ModuleComposerJsonGenerator(composerJsonData, project);
-        PsiFile composerJson = composerJsonGenerator.generate("test");
+        PsiFile composerJson = generateComposerJson(true, projectDir);
 
         assertGeneratedFileIsCorrect(
             expectedFile,
@@ -49,6 +34,16 @@ public class ModuleComposerJsonGeneratorTest extends BaseGeneratorTestCase {
         PsiFile expectedFile = myFixture.configureByFile(filePath);
         PsiDirectory projectDir = getProjectDirectory();
 
+        PsiFile composerJson = generateComposerJson(false, projectDir);
+
+        assertGeneratedFileIsCorrect(
+            expectedFile,
+            projectDir.getVirtualFile().getPath(),
+            composerJson
+        );
+    }
+
+    private PsiFile generateComposerJson(boolean createModuleDirectories, PsiDirectory projectDir) {
         Project project = myFixture.getProject();
         List<String> dependencies = new ArrayList<>(Arrays.asList("Foo_Bar", "Magento_Backend"));
         List<String> licenses = new ArrayList<>(Arrays.asList("Test License 1", "Test License 2"));
@@ -61,15 +56,9 @@ public class ModuleComposerJsonGeneratorTest extends BaseGeneratorTestCase {
             "1.0.0-dev",
             licenses,
             dependencies,
-            false
+            createModuleDirectories
         );
         ModuleComposerJsonGenerator composerJsonGenerator = new ModuleComposerJsonGenerator(composerJsonData, project);
-        PsiFile composerJson = composerJsonGenerator.generate("test");
-
-        assertGeneratedFileIsCorrect(
-            expectedFile,
-            projectDir.getVirtualFile().getPath(),
-            composerJson
-        );
+        return composerJsonGenerator.generate("test");
     }
 }
