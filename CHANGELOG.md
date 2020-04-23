@@ -5,20 +5,25 @@
     * "Go to GraphQL resolver class" line marker in the scope of GraphQL schema type arguments
     * RequireJS mapping support (reference navigation, completion)
     * Plugin class methods generation
-    * Plugin declaration inspection in the scope of a Plugin Class
+    * Code Inspection: Plugin declaration in the scope of a Plugin Class
     * MFTF support MVP (reference navigation, completion)
     * Fixed support of 2020.* versions of IDE's
     * Create a New Magento 2 Module action
     * Code Inspection: Duplicated Observer Usage in events XML
+    * Code Inspection: Duplicated plugin Usage in di.xml
     * Create a Plugin class for a class public method action
     * Code Inspection: Warning regarding Cacheable false attribute in default XML
     * Create a Preference for a class action
     * Create a Block action
+    * Create a View Model action
     * Line markers for navigation from a plugin class to a target class
     * Magento 2 Module Project template on the start up
     * Create an observer for an event action
     * Plugin - Target line markers 
-    * GraphQL resolver inspection in the scope of a PHP Class
+    * Code Inspection: GraphQL resolver in the scope of a PHP Class
+    * Moved plugin configuration from `Settings > Preferences > Languages & Frameworks > PHP > Magento` to
+    `Settings > Preferences > Languages & Frameworks > PHP > Frameworks > Magento`
+    * Create a GraphQL resolver action
 
 0.3.0
 ============= 
