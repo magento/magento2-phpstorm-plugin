@@ -6,7 +6,7 @@ package com.magento.idea.magento2plugin.completion.xml;
 
 import com.magento.idea.magento2plugin.BaseProjectTestCase;
 
-import java.io.File;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.Arrays;
 import java.util.List;
 

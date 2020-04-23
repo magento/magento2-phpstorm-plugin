@@ -8,27 +8,26 @@ import com.intellij.psi.xml.XmlDocument;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.indexing.*;
-import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
+import com.magento.idea.magento2plugin.magento.files.MftfTest;
 import com.magento.idea.magento2plugin.project.Settings;
 import gnu.trove.THashMap;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.Map;
 
-public class StepKeyIndex extends FileBasedIndexExtension<String, String> {
-    public static final ID<String, String> KEY = ID.create(
-        "com.magento.idea.magento2plugin.stubs.indexes.mftf.step_key_index"
+public class TestNameIndex extends ScalarIndexExtension<String> {
+    public static final ID<String, Void> KEY = ID.create(
+        "com.magento.idea.magento2plugin.stubs.indexes.mftf.test_name_index"
     );
 
     private final KeyDescriptor<String> myKeyDescriptor = new EnumeratorStringDescriptor();
 
     @NotNull
     @Override
-    public DataIndexer<String, String, FileContent> getIndexer() {
+    public DataIndexer<String, Void, FileContent> getIndexer() {
         return inputData -> {
-            Map<String, String> map = new THashMap<>();
+            Map<String, Void> map = new THashMap<>();
             PsiFile psiFile = inputData.getPsiFile();
             Project project = psiFile.getProject();
 
@@ -48,7 +47,7 @@ public class StepKeyIndex extends FileBasedIndexExtension<String, String> {
 
             XmlTag xmlRootTag = xmlDocument.getRootTag();
 
-            if (xmlRootTag == null || !xmlRootTag.getName().equals("tests")) {
+            if (xmlRootTag == null || !xmlRootTag.getName().equals(MftfTest.ROOT_TAG)) {
                 return map;
             }
 
@@ -59,41 +58,23 @@ public class StepKeyIndex extends FileBasedIndexExtension<String, String> {
             }
 
             for (XmlTag childTag : xmlRootTag.getSubTags()) {
-                if (childTag.getAttributeValue("name") == null ||
-                    childTag.getAttributeValue("name").isEmpty()
+                String name = childTag.getAttributeValue(MftfTest.NAME_ATTRIBUTE);
+                if (childTag.getAttributeValue(MftfTest.NAME_ATTRIBUTE) == null ||
+                    childTag.getAttributeValue(MftfTest.NAME_ATTRIBUTE).isEmpty()
                 ) {
                     continue;
                 }
 
-                fillResultMap(
-                    childTag.getName() + "." + childTag.getAttributeValue("name"),
-                    childTag,
-                    map
-                );
+                map.put(name, null);
             }
 
             return map;
         };
     }
 
-    private void fillResultMap(String namespacePrefix, XmlTag parentTag, Map<String, String> resultMap) {
-        for (XmlTag childTag: parentTag.getSubTags()) {
-            if (childTag.getAttributeValue("stepKey") == null ||
-                childTag.getAttributeValue("stepKey").isEmpty()
-            ) {
-                continue;
-            }
-
-            String stepKeyReference = childTag.getAttributeValue("stepKey");
-
-            resultMap.put(namespacePrefix + "." + stepKeyReference, stepKeyReference);
-            fillResultMap(namespacePrefix, childTag, resultMap);
-        }
-    }
-
     @NotNull
     @Override
-    public ID<String, String> getName() {
+    public ID<String, Void> getName() {
         return KEY;
     }
 
@@ -104,17 +85,11 @@ public class StepKeyIndex extends FileBasedIndexExtension<String, String> {
     }
 
     @NotNull
-    public DataExternalizer<String> getValueExternalizer() {
-        return EnumeratorStringDescriptor.INSTANCE;
-    }
-
-    @NotNull
     @Override
     public FileBasedIndex.InputFilter getInputFilter() {
         return file ->
                 file.getFileType() == XmlFileType.INSTANCE &&
-                file.getPath().contains("Test/Mftf")
-            ;
+                file.getPath().contains(MftfTest.FILE_DIR_PARENTS);
     }
 
     @Override

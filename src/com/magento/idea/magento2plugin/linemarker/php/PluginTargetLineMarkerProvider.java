@@ -169,6 +169,9 @@ public class PluginTargetLineMarkerProvider implements LineMarkerProvider {
             String pluginMethodName = pluginMethod.getName();
             String targetClassMethodName = pluginMethodName.
                     replace(pluginPrefix, "");
+            if (targetClassMethodName.isEmpty()) {
+                return null;
+            }
             char firstCharOfTargetName = targetClassMethodName.charAt(0);
             int charType = Character.getType(firstCharOfTargetName);
             if (charType == Character.LOWERCASE_LETTER) {

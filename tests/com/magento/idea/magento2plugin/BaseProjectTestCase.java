@@ -9,7 +9,7 @@ import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.project.util.GetProjectBasePath;
-import java.io.File;
+import com.magento.idea.magento2plugin.magento.packages.File;
 
 /**
  * Configure test environment with Magento 2 project

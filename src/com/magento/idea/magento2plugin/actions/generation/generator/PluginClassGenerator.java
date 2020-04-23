@@ -38,6 +38,7 @@ import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
@@ -141,7 +142,7 @@ public class PluginClassGenerator extends FileGenerator {
 
     private PhpClass createPluginClass(String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project).getModuleDirectoryByModuleName(getPluginModule());
-        String[] pluginDirectories = pluginFileData.getPluginDirectory().split("/");
+        String[] pluginDirectories = pluginFileData.getPluginDirectory().split(File.separator);
         for (String pluginDirectory: pluginDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, pluginDirectory);
         }
