@@ -102,8 +102,8 @@ public class ObserverDeclarationInspection extends PhpInspection {
                             if (!eventProblems.containsKey(problemKey)){
                                 problemsHolder.registerProblem(
                                     observerNameAttribute.getValueElement(),
-                                    String.format(
-                                        inspectionBundle.message("inspection.observer.duplicateInOtherPlaces"),
+                                    inspectionBundle.message(
+                                        "inspection.observer.duplicateInOtherPlaces",
                                         observerName,
                                         eventNameAttributeValue,
                                         moduleName,
