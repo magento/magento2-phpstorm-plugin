@@ -9,7 +9,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.impl.source.xml.XmlAttributeValueImpl;
 import com.magento.idea.magento2plugin.BaseProjectTestCase;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
-import java.io.File;
+import com.magento.idea.magento2plugin.magento.packages.File;
 
 abstract public class ReferencePhpFixtureTestCase extends BaseProjectTestCase {
 

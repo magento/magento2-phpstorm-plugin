@@ -20,6 +20,7 @@ import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.Properties;
 
 public class PreferenceClassGenerator extends FileGenerator {
@@ -61,7 +62,7 @@ public class PreferenceClassGenerator extends FileGenerator {
 
     private PhpClass createPluginClass(String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project).getModuleDirectoryByModuleName(getPreferenceModule());
-        String[] pluginDirectories = preferenceFileData.getPreferenceDirectory().split("/");
+        String[] pluginDirectories = preferenceFileData.getPreferenceDirectory().split(File.separator);
         for (String pluginDirectory: pluginDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, pluginDirectory);
         }

@@ -15,7 +15,7 @@ import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 
-import java.io.File;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.regex.Matcher;

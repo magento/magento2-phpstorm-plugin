@@ -21,6 +21,7 @@ import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.Properties;
 
 public class ModuleBlockClassGenerator extends FileGenerator {
@@ -71,7 +72,7 @@ public class ModuleBlockClassGenerator extends FileGenerator {
     private PhpFile createBlockClass(String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(getBlockModule());
-        String[] blockDirectories = blockFileData.getBlockDirectory().split("/");
+        String[] blockDirectories = blockFileData.getBlockDirectory().split(File.separator);
         for (String blockDirectory: blockDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, blockDirectory);
         }
