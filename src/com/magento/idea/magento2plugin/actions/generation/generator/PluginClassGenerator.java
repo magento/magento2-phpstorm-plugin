@@ -45,14 +45,14 @@ import java.util.Properties;
 import java.util.Set;
 
 public class PluginClassGenerator extends FileGenerator {
+    private PluginFileData pluginFileData;
+    private Project project;
+    private ValidatorBundle validatorBundle;
     private final FillTextBufferWithPluginMethods fillTextBuffer;
     private final CollectInsertedMethods collectInsertedMethods;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final GetFirstClassOfFile getFirstClassOfFile;
-    private PluginFileData pluginFileData;
-    private Project project;
-    private ValidatorBundle validatorBundle;
 
     public PluginClassGenerator(@NotNull PluginFileData pluginFileData, Project project) {
         super(project);

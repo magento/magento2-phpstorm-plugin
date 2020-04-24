@@ -47,74 +47,16 @@ import javax.swing.*;
 import java.util.*;
 
 public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeInsightActionHandler {
-    public String type;
-    public FillTextBufferWithPluginMethods fillTextBuffer;
     private CollectInsertedMethods collectInsertedMethods;
     private ValidatorBundle validatorBundle;
+    public String type;
+    public FillTextBufferWithPluginMethods fillTextBuffer;
 
     public PluginGenerateMethodHandlerBase(Plugin.PluginType type) {
         this.type = type.toString();
         this.fillTextBuffer = FillTextBufferWithPluginMethods.getInstance();
         this.collectInsertedMethods = CollectInsertedMethods.getInstance();
         this.validatorBundle = new ValidatorBundle();
-    }
-
-    public static Collection<PhpNamedElementNode> fixOrderToBeAsOriginalFiles(PhpNamedElementNode[] selected) {
-        List<PhpNamedElementNode> newSelected = ContainerUtil.newArrayList(selected);
-        Collections.sort(newSelected, (o1, o2) -> {
-            PsiElement psiElement = o1.getPsiElement();
-            PsiElement psiElement2 = o2.getPsiElement();
-            PsiFile containingFile = psiElement.getContainingFile();
-            PsiFile containingFile2 = psiElement2.getContainingFile();
-            return containingFile == containingFile2 ? psiElement.getTextOffset() - psiElement2.getTextOffset() : containingFile.getName().compareTo(containingFile2.getName());
-        });
-        return newSelected;
-    }
-
-    private static int getSuitableEditorPosition(Editor editor, PhpFile phpFile) {
-        PsiElement currElement = phpFile.findElementAt(editor.getCaretModel().getOffset());
-        if (currElement != null) {
-            PsiElement parent = currElement.getParent();
-
-            for (PsiElement prevParent = currElement; parent != null && !(parent instanceof PhpFile); parent = parent.getParent()) {
-                if (isClassMember(parent)) {
-                    return getNextPos(parent);
-                }
-
-                if (parent instanceof PhpClass) {
-                    while (prevParent != null) {
-                        if (isClassMember(prevParent) || PhpPsiUtil.isOfType(prevParent, PhpTokenTypes.chLBRACE)) {
-                            return getNextPos(prevParent);
-                        }
-
-                        prevParent = prevParent.getPrevSibling();
-                    }
-
-                    for (PsiElement classChild = parent.getFirstChild(); classChild != null; classChild = classChild.getNextSibling()) {
-                        if (PhpPsiUtil.isOfType(classChild, PhpTokenTypes.chLBRACE)) {
-                            return getNextPos(classChild);
-                        }
-                    }
-                }
-
-                prevParent = parent;
-            }
-        }
-
-        return -1;
-    }
-
-    private static boolean isClassMember(PsiElement element) {
-        if (element == null) {
-            return false;
-        }
-        IElementType elementType = element.getNode().getElementType();
-        return elementType == PhpElementTypes.CLASS_FIELDS || elementType == PhpElementTypes.CLASS_CONSTANTS || elementType == PhpStubElementTypes.CLASS_METHOD;
-    }
-
-    private static int getNextPos(PsiElement element) {
-        PsiElement next = element.getNextSibling();
-        return next != null ? next.getTextOffset() : -1;
     }
 
     public boolean isValidFor(Editor editor, PsiFile file) {
@@ -260,6 +202,64 @@ public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeIns
             return true;
         }
         return false;
+    }
+
+    public static Collection<PhpNamedElementNode> fixOrderToBeAsOriginalFiles(PhpNamedElementNode[] selected) {
+        List<PhpNamedElementNode> newSelected = ContainerUtil.newArrayList(selected);
+        Collections.sort(newSelected, (o1, o2) -> {
+            PsiElement psiElement = o1.getPsiElement();
+            PsiElement psiElement2 = o2.getPsiElement();
+            PsiFile containingFile = psiElement.getContainingFile();
+            PsiFile containingFile2 = psiElement2.getContainingFile();
+            return containingFile == containingFile2 ? psiElement.getTextOffset() - psiElement2.getTextOffset() : containingFile.getName().compareTo(containingFile2.getName());
+        });
+        return newSelected;
+    }
+
+    private static int getSuitableEditorPosition(Editor editor, PhpFile phpFile) {
+        PsiElement currElement = phpFile.findElementAt(editor.getCaretModel().getOffset());
+        if (currElement != null) {
+            PsiElement parent = currElement.getParent();
+
+            for (PsiElement prevParent = currElement; parent != null && !(parent instanceof PhpFile); parent = parent.getParent()) {
+                if (isClassMember(parent)) {
+                    return getNextPos(parent);
+                }
+
+                if (parent instanceof PhpClass) {
+                    while (prevParent != null) {
+                        if (isClassMember(prevParent) || PhpPsiUtil.isOfType(prevParent, PhpTokenTypes.chLBRACE)) {
+                            return getNextPos(prevParent);
+                        }
+
+                        prevParent = prevParent.getPrevSibling();
+                    }
+
+                    for (PsiElement classChild = parent.getFirstChild(); classChild != null; classChild = classChild.getNextSibling()) {
+                        if (PhpPsiUtil.isOfType(classChild, PhpTokenTypes.chLBRACE)) {
+                            return getNextPos(classChild);
+                        }
+                    }
+                }
+
+                prevParent = parent;
+            }
+        }
+
+        return -1;
+    }
+
+    private static boolean isClassMember(PsiElement element) {
+        if (element == null) {
+            return false;
+        }
+        IElementType elementType = element.getNode().getElementType();
+        return elementType == PhpElementTypes.CLASS_FIELDS || elementType == PhpElementTypes.CLASS_CONSTANTS || elementType == PhpStubElementTypes.CLASS_METHOD;
+    }
+
+    private static int getNextPos(PsiElement element) {
+        PsiElement next = element.getNextSibling();
+        return next != null ? next.getTextOffset() : -1;
     }
 
     private static class MyMemberChooser extends MemberChooser<PhpNamedElementNode> {

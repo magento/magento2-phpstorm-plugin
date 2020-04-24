@@ -18,16 +18,16 @@ public class CreateAnObserverDialogValidator {
     private ValidatorBundle validatorBundle;
     private CreateAnObserverDialog dialog;
 
-    public CreateAnObserverDialogValidator() {
-        this.validatorBundle = new ValidatorBundle();
-    }
-
     public static CreateAnObserverDialogValidator getInstance(CreateAnObserverDialog dialog) {
         if (null == INSTANCE) {
             INSTANCE = new CreateAnObserverDialogValidator();
         }
         INSTANCE.dialog = dialog;
         return INSTANCE;
+    }
+
+    public CreateAnObserverDialogValidator() {
+        this.validatorBundle = new ValidatorBundle();
     }
 
     public boolean validate(Project project) {

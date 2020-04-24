@@ -28,9 +28,9 @@ import java.util.List;
 public class OverrideClassByAPreferenceDialog extends AbstractDialog {
     @NotNull
     private final Project project;
+    private PhpClass targetClass;
     @NotNull
     private final OverrideClassByAPreferenceDialogValidator validator;
-    private PhpClass targetClass;
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -88,12 +88,6 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog {
                 onCancel();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-    }
-
-    public static void open(@NotNull Project project, PhpClass targetClass) {
-        OverrideClassByAPreferenceDialog dialog = new OverrideClassByAPreferenceDialog(project, targetClass);
-        dialog.pack();
-        dialog.setVisible(true);
     }
 
     private void suggestPreferenceDirectory(PhpClass targetClass) {
@@ -171,6 +165,12 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog {
 
     public boolean isInheritClass() {
         return this.inheritClass.isSelected();
+    }
+
+    public static void open(@NotNull Project project, PhpClass targetClass) {
+        OverrideClassByAPreferenceDialog dialog = new OverrideClassByAPreferenceDialog(project, targetClass);
+        dialog.pack();
+        dialog.setVisible(true);
     }
 
     private void createUIComponents() {

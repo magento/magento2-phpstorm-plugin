@@ -39,49 +39,6 @@ public class PluginMethodsGenerator {
         this.myTargetClass = (PhpClass) Objects.requireNonNull(method.getUserData(targetClassKey));
     }
 
-    private static boolean isDocTypeConvertable(String typeHint) {
-        return !typeHint.equalsIgnoreCase("mixed") && !typeHint.equalsIgnoreCase("static") && !typeHint.equalsIgnoreCase("true") && !typeHint.equalsIgnoreCase("false") && !typeHint.equalsIgnoreCase("null") && (!typeHint.contains("|") || typeWithNull(typeHint));
-    }
-
-    private static boolean typeWithNull(String typeHint) {
-        return typeHint.split(Pattern.quote("|")).length == 2 && StringUtil.toUpperCase(typeHint).contains("NULL");
-    }
-
-    private static String convertNullableType(Project project, String typeHint) {
-        String[] split = typeHint.split(Pattern.quote("|"));
-        boolean hasNullableTypeFeature = PhpLanguageFeature.NULLABLES.isSupported(project);
-        return split[0].equalsIgnoreCase("null") ? (hasNullableTypeFeature ? "?" : "") + split[1] : (hasNullableTypeFeature ? "?" : "") + split[0];
-    }
-
-    @NotNull
-    private static String convertDocTypeToHint(Project project, String typeHint) {
-        String hint = typeHint.contains("[]") ? "array" : typeHint;
-        hint = hint.contains("boolean") ? "bool" : hint;
-        if (typeWithNull(typeHint)) {
-            hint = convertNullableType(project, hint);
-        }
-
-        return hint;
-    }
-
-    private static PhpType filterNullCaseInsensitive(PhpType filedType) {
-        if (filedType.getTypes().isEmpty()) {
-            return PhpType.EMPTY;
-        } else {
-            PhpType phpType = new PhpType();
-            Iterator iterator = filedType.getTypes().iterator();
-
-            while (iterator.hasNext()) {
-                String type = (String) iterator.next();
-                if (!type.equalsIgnoreCase("\\null")) {
-                    phpType.add(type);
-                }
-            }
-
-            return phpType;
-        }
-    }
-
     @NotNull
     public PluginMethodData[] createPluginMethods(@NotNull Plugin.PluginType type) {
         List<PluginMethodData> pluginMethods = new ArrayList();
@@ -155,6 +112,31 @@ public class PluginMethodsGenerator {
             attributes.setProperty("RETURN_TYPE", convertDocTypeToHint(project, typeHint));
         }
 
+    }
+
+    private static boolean isDocTypeConvertable(String typeHint) {
+        return !typeHint.equalsIgnoreCase("mixed") && !typeHint.equalsIgnoreCase("static") && !typeHint.equalsIgnoreCase("true") && !typeHint.equalsIgnoreCase("false") && !typeHint.equalsIgnoreCase("null") && (!typeHint.contains("|") || typeWithNull(typeHint));
+    }
+
+    private static boolean typeWithNull(String typeHint) {
+        return typeHint.split(Pattern.quote("|")).length == 2 && StringUtil.toUpperCase(typeHint).contains("NULL");
+    }
+
+    private static String convertNullableType(Project project, String typeHint) {
+        String[] split = typeHint.split(Pattern.quote("|"));
+        boolean hasNullableTypeFeature = PhpLanguageFeature.NULLABLES.isSupported(project);
+        return split[0].equalsIgnoreCase("null") ? (hasNullableTypeFeature ? "?" : "") + split[1] : (hasNullableTypeFeature ? "?" : "") + split[0];
+    }
+
+    @NotNull
+    private static String convertDocTypeToHint(Project project, String typeHint) {
+        String hint = typeHint.contains("[]") ? "array" : typeHint;
+        hint = hint.contains("boolean") ? "bool" : hint;
+        if (typeWithNull(typeHint)) {
+            hint = convertNullableType(project, hint);
+        }
+
+        return hint;
     }
 
     private String getParameterDoc(Collection<PsiElement> parameters, @NotNull Plugin.PluginType type, Project project) {
@@ -314,5 +296,23 @@ public class PluginMethodsGenerator {
 
     private String getFieldTypeString(PhpNamedElement element, @NotNull PhpType type) {
         return PhpDocUtil.getTypePresentation(this.pluginClass.getProject(), type, PhpCodeInsightUtil.findScopeForUseOperator(element));
+    }
+
+    private static PhpType filterNullCaseInsensitive(PhpType filedType) {
+        if (filedType.getTypes().isEmpty()) {
+            return PhpType.EMPTY;
+        } else {
+            PhpType phpType = new PhpType();
+            Iterator iterator = filedType.getTypes().iterator();
+
+            while (iterator.hasNext()) {
+                String type = (String) iterator.next();
+                if (!type.equalsIgnoreCase("\\null")) {
+                    phpType.add(type);
+                }
+            }
+
+            return phpType;
+        }
     }
 }

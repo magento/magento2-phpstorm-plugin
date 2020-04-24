@@ -23,12 +23,12 @@ import javax.swing.*;
 import java.util.Properties;
 
 public class PreferenceClassGenerator extends FileGenerator {
-    private final DirectoryGenerator directoryGenerator;
-    private final FileFromTemplateGenerator fileFromTemplateGenerator;
-    private final GetFirstClassOfFile getFirstClassOfFile;
     private PreferenceFileData preferenceFileData;
     private Project project;
     private ValidatorBundle validatorBundle;
+    private final DirectoryGenerator directoryGenerator;
+    private final FileFromTemplateGenerator fileFromTemplateGenerator;
+    private final GetFirstClassOfFile getFirstClassOfFile;
 
     public PreferenceClassGenerator(@NotNull PreferenceFileData preferenceFileData, Project project) {
         super(project);

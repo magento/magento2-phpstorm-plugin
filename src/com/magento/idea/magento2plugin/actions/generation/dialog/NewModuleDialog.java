@@ -128,12 +128,6 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    public static void open(@NotNull Project project, @NotNull PsiDirectory initialBaseDir, @Nullable PsiFile file, @Nullable IdeView view, @Nullable Editor editor) {
-        NewModuleDialog dialog = new NewModuleDialog(project, initialBaseDir, file, view, editor);
-        dialog.pack();
-        dialog.setVisible(true);
-    }
-
     private void detectPackageName(@NotNull PsiDirectory initialBaseDir) {
         PsiDirectory parentDir = initialBaseDir.getParent();
         if (parentDir != null && parentDir.toString().endsWith(Package.PACKAGES_ROOT)) {
@@ -233,6 +227,12 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
 
     public List<String> getModuleDependencies() {
         return moduleDependencies.getSelectedValuesList();
+    }
+
+    public static void open(@NotNull Project project, @NotNull PsiDirectory initialBaseDir, @Nullable PsiFile file, @Nullable IdeView view, @Nullable Editor editor) {
+        NewModuleDialog dialog = new NewModuleDialog(project, initialBaseDir, file, view, editor);
+        dialog.pack();
+        dialog.setVisible(true);
     }
 
     @NotNull

@@ -18,16 +18,16 @@ public class OverrideClassByAPreferenceDialogValidator {
     private ValidatorBundle validatorBundle;
     private OverrideClassByAPreferenceDialog dialog;
 
-    public OverrideClassByAPreferenceDialogValidator() {
-        validatorBundle = new ValidatorBundle();
-    }
-
     public static OverrideClassByAPreferenceDialogValidator getInstance(OverrideClassByAPreferenceDialog dialog) {
         if (null == INSTANCE) {
             INSTANCE = new OverrideClassByAPreferenceDialogValidator();
         }
         INSTANCE.dialog = dialog;
         return INSTANCE;
+    }
+
+    public OverrideClassByAPreferenceDialogValidator() {
+        validatorBundle = new ValidatorBundle();
     }
 
     public boolean validate(Project project) {

@@ -19,16 +19,16 @@ public class FindOrCreateDiXml {
     private static FindOrCreateDiXml INSTANCE = null;
     private Project project;
 
-    FindOrCreateDiXml(Project project) {
-        this.project = project;
-    }
-
     public static FindOrCreateDiXml getInstance(Project project) {
         if (null == INSTANCE) {
             INSTANCE = new FindOrCreateDiXml(project);
         }
 
         return INSTANCE;
+    }
+
+    FindOrCreateDiXml(Project project) {
+        this.project = project;
     }
 
     public PsiFile execute(String actionName, String moduleName, String area) {

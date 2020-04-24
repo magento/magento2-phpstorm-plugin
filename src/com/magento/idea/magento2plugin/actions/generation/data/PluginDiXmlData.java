@@ -7,11 +7,11 @@ package com.magento.idea.magento2plugin.actions.generation.data;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 
 public class PluginDiXmlData {
-    private final String sortOrder;
-    private final String pluginName;
     private String area;
     private String pluginModule;
     private PhpClass targetClass;
+    private final String sortOrder;
+    private final String pluginName;
     private String pluginFqn;
 
     public PluginDiXmlData(

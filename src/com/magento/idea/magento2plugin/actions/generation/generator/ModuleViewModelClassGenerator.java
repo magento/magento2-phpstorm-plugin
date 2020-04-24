@@ -23,11 +23,11 @@ import javax.swing.*;
 import java.util.Properties;
 
 public class ModuleViewModelClassGenerator extends FileGenerator {
-    private final DirectoryGenerator directoryGenerator;
-    private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private ViewModelFileData viewModelFileData;
     private Project project;
     private ValidatorBundle validatorBundle;
+    private final DirectoryGenerator directoryGenerator;
+    private final FileFromTemplateGenerator fileFromTemplateGenerator;
 
     public ModuleViewModelClassGenerator(@NotNull ViewModelFileData viewModelFileData, Project project) {
         super(project);

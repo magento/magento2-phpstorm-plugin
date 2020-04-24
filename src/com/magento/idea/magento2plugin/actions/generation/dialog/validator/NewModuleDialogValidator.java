@@ -15,16 +15,16 @@ public class NewModuleDialogValidator {
     private ValidatorBundle validatorBundle;
     private NewModuleDialog dialog;
 
-    public NewModuleDialogValidator() {
-        this.validatorBundle = new ValidatorBundle();
-    }
-
     public static NewModuleDialogValidator getInstance(NewModuleDialog dialog) {
         if (null == INSTANCE) {
             INSTANCE = new NewModuleDialogValidator();
         }
         INSTANCE.dialog = dialog;
         return INSTANCE;
+    }
+
+    public NewModuleDialogValidator() {
+        this.validatorBundle = new ValidatorBundle();
     }
 
     public boolean validate() {
