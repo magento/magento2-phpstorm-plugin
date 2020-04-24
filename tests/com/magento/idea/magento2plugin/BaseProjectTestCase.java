@@ -4,12 +4,13 @@
  */
 package com.magento.idea.magento2plugin;
 
+import com.intellij.codeInsight.daemon.impl.HighlightInfo;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
 import com.magento.idea.magento2plugin.project.Settings;
-import com.magento.idea.magento2plugin.project.util.GetProjectBasePath;
 import com.magento.idea.magento2plugin.magento.packages.File;
+import java.util.List;
 
 /**
  * Configure test environment with Magento 2 project
@@ -64,5 +65,40 @@ abstract public class BaseProjectTestCase extends BasePlatformTestCase {
 
     private String name() {
         return StringUtil.trimEnd(getTestName(true), "Test");
+    }
+
+    protected void assertHasHighlighting(String message) {
+        String highlightingNotFound = "Failed that documents contains highlighting with the description `%s`";
+
+        List<HighlightInfo> highlightingList = myFixture.doHighlighting();
+        if (highlightingList.isEmpty()) {
+            fail(String.format(highlightingNotFound, message));
+        }
+
+        for (HighlightInfo highlighting :
+                highlightingList) {
+            if (highlighting.getDescription() == null) continue;
+            if (highlighting.getDescription().equals(message)) {
+                return;
+            }
+        }
+        fail(String.format(highlightingNotFound, message));
+    }
+
+    protected void assertHasNoHighlighting(String message) {
+        String highlightingNotFound = "Failed that documents not contains highlighting with the description `%s`";
+
+        List<HighlightInfo> highlightingList = myFixture.doHighlighting();
+        if (highlightingList.isEmpty()) {
+            return;
+        }
+
+        for (HighlightInfo highlighting :
+                highlightingList) {
+            if (highlighting.getDescription() == null) continue;
+            if (highlighting.getDescription().equals(message)) {
+                fail(String.format(highlightingNotFound, message));
+            }
+        }
     }
 }

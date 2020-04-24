@@ -2,16 +2,17 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
-package com.magento.idea.magento2plugin.inspections.php;
+
+package com.magento.idea.magento2plugin.inspections.graphqls;
 
 import com.magento.idea.magento2plugin.BaseProjectTestCase;
-import com.magento.idea.magento2plugin.magento.packages.File;
-import java.util.List;
+import com.intellij.codeInsight.daemon.impl.HighlightInfo;
+import java.io.File;
 
-abstract public class InspectionPhpFixtureTestCase extends BaseProjectTestCase {
+abstract public class InspectionGraphqlsFixtureTestCase extends BaseProjectTestCase {
 
     private static final String testDataFolderPath = "testData" + File.separator + "inspections" + File.separator;
-    private static final String fixturesFolderPath = "php" + File.separator;
+    private static final String fixturesFolderPath = "graphqls" + File.separator;
 
     @Override
     protected void setUp() throws Exception {

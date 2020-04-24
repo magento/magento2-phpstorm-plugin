@@ -36,7 +36,7 @@ public class SchemaResolverInspection extends LocalInspectionTool {
                 if (resolverClass == null) {
                     return;
                 }
-                if (GraphQlUtil.isNotResolver(resolverClass)) {
+                if (!GraphQlUtil.isResolver(resolverClass)) {
                     holder.registerProblem(element,
                             GraphQlResolverProblemDescription,
                             ProblemHighlightType.ERROR);
