@@ -42,3 +42,7 @@ sourceSets {
         resources.srcDir 'testData'
     }
 }
+
+publishPlugin {
+    token = System.getenv("MAGENTO_PHPSTORM_intellijPublishToken")
+}
