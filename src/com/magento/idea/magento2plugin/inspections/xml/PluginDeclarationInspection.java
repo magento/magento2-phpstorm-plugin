@@ -23,7 +23,7 @@ import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import java.io.File;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.*;
 import com.intellij.openapi.util.Pair;
 
@@ -95,6 +95,9 @@ public class PluginDeclarationInspection extends PhpInspection {
                         for (Pair<String, String> moduleEntry: modulesWithSamePluginName) {
                             String scope = moduleEntry.getFirst();
                             String moduleName = moduleEntry.getSecond();
+                            if (scope == null || moduleName == null) {
+                                continue;
+                            }
                             String problemKey = pluginTypeKey.concat(Package.VENDOR_MODULE_NAME_SEPARATOR)
                                     .concat(moduleName).concat(Package.VENDOR_MODULE_NAME_SEPARATOR).concat(scope);
                             if (!pluginProblems.containsKey(problemKey)){

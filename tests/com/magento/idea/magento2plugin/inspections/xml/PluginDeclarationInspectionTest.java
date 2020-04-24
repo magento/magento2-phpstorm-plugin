@@ -6,7 +6,7 @@ package com.magento.idea.magento2plugin.inspections.xml;
 
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.magento.packages.Package;
-import java.io.File;
+import com.magento.idea.magento2plugin.magento.packages.File;
 
 public class PluginDeclarationInspectionTest extends InspectionXmlFixtureTestCase {
 

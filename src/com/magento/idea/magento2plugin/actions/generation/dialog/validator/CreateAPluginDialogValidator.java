@@ -6,6 +6,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
 import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2plugin.actions.generation.dialog.CreateAPluginDialog;
+import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
@@ -15,6 +16,7 @@ import java.util.List;
 public class CreateAPluginDialogValidator {
     private static CreateAPluginDialogValidator INSTANCE = null;
     private ValidatorBundle validatorBundle;
+    private CommonBundle commonBundle;
     private CreateAPluginDialog dialog;
 
     public static CreateAPluginDialogValidator getInstance(CreateAPluginDialog dialog) {
@@ -28,11 +30,12 @@ public class CreateAPluginDialogValidator {
 
     public CreateAPluginDialogValidator() {
         this.validatorBundle = new ValidatorBundle();
+        this.commonBundle = new CommonBundle();
     }
 
     public boolean validate(Project project)
     {
-        String errorTitle = "Error";
+        String errorTitle = commonBundle.message("common.error");
         String pluginClassName = dialog.getPluginClassName();
 
         if (pluginClassName.length() == 0) {
