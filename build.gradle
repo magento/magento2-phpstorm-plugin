@@ -47,8 +47,7 @@ publishPlugin {
     token = System.getenv("MAGENTO_PHPSTORM_intellijPublishToken")
     if (System.getenv("MAGENTO_PHPSTORM_isAlpha") == true) {
         channels 'alpha'
-        packageNameSuffix ".alpha"
-        versionNameSuffix "-alpha" + "-build" + getDate()
+        version = version + "-alpha" + "-build" + getDate()
     }
 }
 
