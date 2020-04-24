@@ -27,10 +27,10 @@ import java.util.List;
 public class CreateAPluginDialog extends AbstractDialog {
     @NotNull
     private final Project project;
-    private Method targetMethod;
-    private PhpClass targetClass;
     @NotNull
     private final CreateAPluginDialogValidator validator;
+    private Method targetMethod;
+    private PhpClass targetClass;
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -86,6 +86,12 @@ public class CreateAPluginDialog extends AbstractDialog {
                 onCancel();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    }
+
+    public static void open(@NotNull Project project, Method targetMethod, PhpClass targetClass) {
+        CreateAPluginDialog dialog = new CreateAPluginDialog(project, targetMethod, targetClass);
+        dialog.pack();
+        dialog.setVisible(true);
     }
 
     private void fillPluginTypeOptions() {
@@ -153,12 +159,6 @@ public class CreateAPluginDialog extends AbstractDialog {
 
     public String getPluginModule() {
         return this.pluginModule.getSelectedItem().toString();
-    }
-
-    public static void open(@NotNull Project project, Method targetMethod, PhpClass targetClass) {
-        CreateAPluginDialog dialog = new CreateAPluginDialog(project, targetMethod, targetClass);
-        dialog.pack();
-        dialog.setVisible(true);
     }
 
     private void createUIComponents() {

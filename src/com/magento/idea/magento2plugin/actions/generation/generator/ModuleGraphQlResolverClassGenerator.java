@@ -32,12 +32,12 @@ import javax.swing.*;
 import java.util.Properties;
 
 public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
-    private GraphQlResolverFileData graphQlResolverFileData;
-    private Project project;
-    private ValidatorBundle validatorBundle;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final GetFirstClassOfFile getFirstClassOfFile;
+    private GraphQlResolverFileData graphQlResolverFileData;
+    private Project project;
+    private ValidatorBundle validatorBundle;
 
     public ModuleGraphQlResolverClassGenerator(@NotNull GraphQlResolverFileData graphQlResolverFileData, Project project) {
         super(project);

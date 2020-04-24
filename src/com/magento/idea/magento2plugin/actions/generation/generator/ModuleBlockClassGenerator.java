@@ -24,11 +24,11 @@ import javax.swing.*;
 import java.util.Properties;
 
 public class ModuleBlockClassGenerator extends FileGenerator {
+    private final DirectoryGenerator directoryGenerator;
+    private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private BlockFileData blockFileData;
     private Project project;
     private ValidatorBundle validatorBundle;
-    private final DirectoryGenerator directoryGenerator;
-    private final FileFromTemplateGenerator fileFromTemplateGenerator;
 
     public ModuleBlockClassGenerator(@NotNull BlockFileData blockFileData, Project project) {
         super(project);

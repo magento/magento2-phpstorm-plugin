@@ -34,16 +34,6 @@ public class PhpClassReferenceResolver extends PhpClassReferenceExtractor {
     public PhpClassReferenceResolver() {
     }
 
-    public void processElement(@NotNull PsiElement element) {
-        super.processElement(element);
-    }
-
-    protected void processReference(@NotNull String name, @NotNull String fqn, @NotNull PsiElement identifier) {
-        if (!PhpType.isPrimitiveType(name)) {
-            this.myCandidatesToImportStorage.processReference(name, fqn, identifier);
-        }
-    }
-
     @Nullable
     private static String alreadyImported(@NotNull PhpPsiElement scopeHolder, @NotNull Map<String, String> aliases, @NotNull String fqn, @NotNull String name) {
         boolean isSameNamespace = PhpCodeInsightUtil.isSameNamespace(scopeHolder, fqn);
@@ -71,6 +61,25 @@ public class PhpClassReferenceResolver extends PhpClassReferenceExtractor {
     public static boolean isNonCompoundUseName(@NotNull PhpPsiElement scopeHolder, @NotNull String fqn, @NotNull String name) {
         String currentNamespaceName = scopeHolder instanceof PhpNamespace ? ((PhpNamespace) scopeHolder).getFQN() : "";
         return "\\".equals(currentNamespaceName) && PhpLangUtil.equalsClassNames(fqn, PhpLangUtil.toFQN(name));
+    }
+
+    private static void insertUseStatement(PhpPsiElement scopeHolder, String name, String originalFqn) {
+        String originalName = PhpLangUtil.toShortName(originalFqn);
+        if (PhpLangUtil.equalsClassNames(originalName, name)) {
+            PhpAliasImporter.insertUseStatement(originalFqn, scopeHolder);
+            return;
+        }
+        PhpAliasImporter.insertUseStatement(originalFqn, name, scopeHolder);
+    }
+
+    public void processElement(@NotNull PsiElement element) {
+        super.processElement(element);
+    }
+
+    protected void processReference(@NotNull String name, @NotNull String fqn, @NotNull PsiElement identifier) {
+        if (!PhpType.isPrimitiveType(name)) {
+            this.myCandidatesToImportStorage.processReference(name, fqn, identifier);
+        }
     }
 
     public void importReferences(@NotNull PhpPsiElement scopeHolder, @NotNull List<PsiElement> movedElements) {
@@ -120,15 +129,6 @@ public class PhpClassReferenceResolver extends PhpClassReferenceExtractor {
         }
 
         return referencesToReplace;
-    }
-
-    private static void insertUseStatement(PhpPsiElement scopeHolder, String name, String originalFqn) {
-        String originalName = PhpLangUtil.toShortName(originalFqn);
-        if (PhpLangUtil.equalsClassNames(originalName, name)) {
-            PhpAliasImporter.insertUseStatement(originalFqn, scopeHolder);
-            return;
-        }
-        PhpAliasImporter.insertUseStatement(originalFqn, name, scopeHolder);
     }
 
     private static class PhpClassReferenceRenamer extends PhpClassReferenceExtractor {

@@ -9,7 +9,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader.LazyIcon;
-import javax.swing.Icon;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.magento.idea.magento2plugin.MagentoIcons;
@@ -17,6 +16,8 @@ import com.magento.idea.magento2plugin.actions.generation.util.IsClickedDirector
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
 import org.jetbrains.annotations.NotNull;
+
+import javax.swing.*;
 
 public class NewModuleFileGroup extends NonTrivialActionGroup {
     public NewModuleFileGroup() {
@@ -36,7 +37,7 @@ public class NewModuleFileGroup extends NonTrivialActionGroup {
             return;
         }
 
-        if(!IsClickedDirectoryInsideProject.getInstance().execute(project, (PsiDirectory) psiElement)) {
+        if (!IsClickedDirectoryInsideProject.getInstance().execute(project, (PsiDirectory) psiElement)) {
             event.getPresentation().setVisible(false);
             return;
         }

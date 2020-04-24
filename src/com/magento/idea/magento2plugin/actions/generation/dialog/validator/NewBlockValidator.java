@@ -15,16 +15,16 @@ public class NewBlockValidator {
     private ValidatorBundle validatorBundle;
     private NewBlockDialog dialog;
 
+    public NewBlockValidator() {
+        this.validatorBundle = new ValidatorBundle();
+    }
+
     public static NewBlockValidator getInstance(NewBlockDialog dialog) {
         if (null == INSTANCE) {
             INSTANCE = new NewBlockValidator();
         }
         INSTANCE.dialog = dialog;
         return INSTANCE;
-    }
-
-    public NewBlockValidator() {
-        this.validatorBundle = new ValidatorBundle();
     }
 
     public boolean validate() {

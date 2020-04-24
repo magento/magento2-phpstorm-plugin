@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -30,12 +31,19 @@ public class CreateAPluginAction extends DumbAwareAction {
     private Method targetMethod;
     private PhpClass targetClass;
 
+    /**
+     * Constructor
+     */
     public CreateAPluginAction() {
         super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
         this.isPluginAllowed = IsPluginAllowedForMethod.getInstance();
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
     }
 
+    /**
+     *
+     * @param event
+     */
     public void update(AnActionEvent event) {
         targetClass = null;
         targetMethod = null;

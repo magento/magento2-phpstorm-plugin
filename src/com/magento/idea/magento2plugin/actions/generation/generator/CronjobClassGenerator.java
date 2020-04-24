@@ -19,11 +19,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Properties;
 
 public class CronjobClassGenerator extends FileGenerator {
+    private final DirectoryGenerator directoryGenerator;
+    private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private CronjobClassData cronjobClassData;
     private Project project;
     private ValidatorBundle validatorBundle;
-    private final DirectoryGenerator directoryGenerator;
-    private final FileFromTemplateGenerator fileFromTemplateGenerator;
 
     /**
      * @param project

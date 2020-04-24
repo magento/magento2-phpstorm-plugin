@@ -18,6 +18,10 @@ public class CreateAPluginDialogValidator {
     private ValidatorBundle validatorBundle;
     private CreateAPluginDialog dialog;
 
+    public CreateAPluginDialogValidator() {
+        this.validatorBundle = new ValidatorBundle();
+    }
+
     public static CreateAPluginDialogValidator getInstance(CreateAPluginDialog dialog) {
         if (null == INSTANCE) {
             INSTANCE = new CreateAPluginDialogValidator();
@@ -25,10 +29,6 @@ public class CreateAPluginDialogValidator {
 
         INSTANCE.dialog = dialog;
         return INSTANCE;
-    }
-
-    public CreateAPluginDialogValidator() {
-        this.validatorBundle = new ValidatorBundle();
     }
 
     public boolean validate(Project project) {

@@ -15,16 +15,16 @@ public class NewGraphQlResolverValidator {
     private ValidatorBundle validatorBundle;
     private NewGraphQlResolverDialog dialog;
 
+    public NewGraphQlResolverValidator() {
+        this.validatorBundle = new ValidatorBundle();
+    }
+
     public static NewGraphQlResolverValidator getInstance(NewGraphQlResolverDialog dialog) {
         if (null == INSTANCE) {
             INSTANCE = new NewGraphQlResolverValidator();
         }
         INSTANCE.dialog = dialog;
         return INSTANCE;
-    }
-
-    public NewGraphQlResolverValidator() {
-        this.validatorBundle = new ValidatorBundle();
     }
 
     public boolean validate() {

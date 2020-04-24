@@ -25,9 +25,9 @@ import java.util.List;
 public class CreateAnObserverDialog extends AbstractDialog {
     @NotNull
     private final Project project;
-    private String targetEvent;
     @NotNull
     private final CreateAnObserverDialogValidator validator;
+    private String targetEvent;
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -68,6 +68,12 @@ public class CreateAnObserverDialog extends AbstractDialog {
                 onCancel();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    }
+
+    public static void open(@NotNull Project project, String targetEvent) {
+        CreateAnObserverDialog dialog = new CreateAnObserverDialog(project, targetEvent);
+        dialog.pack();
+        dialog.setVisible(true);
     }
 
     private void fillTargetAreaOptions() {
@@ -118,12 +124,6 @@ public class CreateAnObserverDialog extends AbstractDialog {
 
     public String getObserverModule() {
         return this.observerModule.getSelectedItem().toString();
-    }
-
-    public static void open(@NotNull Project project, String targetEvent) {
-        CreateAnObserverDialog dialog = new CreateAnObserverDialog(project, targetEvent);
-        dialog.pack();
-        dialog.setVisible(true);
     }
 
     private void createUIComponents() {

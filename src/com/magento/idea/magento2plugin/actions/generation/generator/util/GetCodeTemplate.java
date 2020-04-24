@@ -15,16 +15,16 @@ public class GetCodeTemplate {
     private static GetCodeTemplate INSTANCE = null;
     private Project project;
 
+    GetCodeTemplate(Project project) {
+        this.project = project;
+    }
+
     public static GetCodeTemplate getInstance(Project project) {
         if (null == INSTANCE) {
             INSTANCE = new GetCodeTemplate(project);
         }
 
         return INSTANCE;
-    }
-
-    GetCodeTemplate(Project project) {
-        this.project = project;
     }
 
     public String execute(String templateName, Properties properties) throws IOException {

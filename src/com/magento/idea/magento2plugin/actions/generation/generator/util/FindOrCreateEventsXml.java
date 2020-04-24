@@ -19,16 +19,16 @@ public class FindOrCreateEventsXml {
     private static FindOrCreateEventsXml INSTANCE = null;
     private Project project;
 
+    FindOrCreateEventsXml(Project project) {
+        this.project = project;
+    }
+
     public static FindOrCreateEventsXml getInstance(Project project) {
         if (null == INSTANCE) {
             INSTANCE = new FindOrCreateEventsXml(project);
         }
 
         return INSTANCE;
-    }
-
-    FindOrCreateEventsXml(Project project) {
-        this.project = project;
     }
 
     public PsiFile execute(String actionName, String moduleName, String area) {

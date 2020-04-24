@@ -11,13 +11,13 @@ import java.util.List;
 public class ModuleComposerJsonData {
     private final String packageName;
     private final String moduleName;
-    private PsiDirectory baseDir;
     private final String moduleDescription;
     private final String composerPackageName;
     private final String moduleVersion;
     private final List<String> moduleLicense;
     private final List<String> moduleDependencies;
     private final boolean createModuleDirs;
+    private PsiDirectory baseDir;
 
     public ModuleComposerJsonData(
             String packageName,

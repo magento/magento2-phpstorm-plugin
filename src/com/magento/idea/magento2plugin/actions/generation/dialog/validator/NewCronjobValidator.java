@@ -19,16 +19,16 @@ public class NewCronjobValidator {
     private ValidatorBundle validatorBundle;
     private GetPhpClassByFQN getPhpClassByFQN;
 
+    public NewCronjobValidator() {
+        this.validatorBundle = new ValidatorBundle();
+    }
+
     public static NewCronjobValidator getInstance() {
         if (null == INSTANCE) {
             INSTANCE = new NewCronjobValidator();
         }
 
         return INSTANCE;
-    }
-
-    public NewCronjobValidator() {
-        this.validatorBundle = new ValidatorBundle();
     }
 
     /**
