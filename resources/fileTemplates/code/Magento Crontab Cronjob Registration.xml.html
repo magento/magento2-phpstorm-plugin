@@ -1,0 +1,54 @@
+<!--
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<html>
+    <body>
+        <table width="100%" border="0" cellpadding="5" cellspacing="0" style="border-collapse: collapse">
+            <tr>
+                <td>
+                    <font face="verdana" size="-1">Each cronjob should be registered in crontab.xml in order to be executed on schedule.</font>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <font face="verdana" size="-1">
+                        <a href="https://devdocs.magento.com/guides/v2.3/config-guide/cron/custom-cron-tut.html">Configure a custom cron job and cron group (tutorial)</a>
+                    </font>
+                </td>
+            </tr>
+        </table>
+        <table width="100%" border="0" cellpadding="5" cellspacing="0" style="border-collapse: collapse">
+            <tr>
+                <td colspan="3"><font face="verdana" size="-1">Predefined variables explanation:</font></td>
+            </tr>
+            <tr>
+                <td valign="top"><nobr><font face="verdana" size="-2"><b>${CRON_GROUP}</b></font></nobr></td>
+                <td width="10">&nbsp;</td>
+                <td width="100%" valign="top"><font face="verdana" size="-1">A cron group in scope of which the cronjob will be executed.</font></td>
+            </tr>
+            <tr>
+                <td valign="top"><nobr><font face="verdana" size="-2"><b>${CRONJOB_NAME}</b></font></nobr></td>
+                <td width="10">&nbsp;</td>
+                <td width="100%" valign="top"><font face="verdana" size="-1">An arbitrary cronjob identifier. Also used to merge the configurations for cronjobs.</font></td>
+            </tr>
+            <tr>
+                <td valign="top"><nobr><font face="verdana" size="-2"><b>${CRONJOB_INSTANCE}</b></font></nobr></td>
+                <td width="10">&nbsp;</td>
+                <td width="100%" valign="top"><font face="verdana" size="-1">Classname of the cronjob</font></td>
+            </tr>
+            <tr>
+                <td valign="top"><nobr><font face="verdana" size="-2"><b>${CRONJOB_SCHEDULE}</b></font></nobr></td>
+                <td width="10">&nbsp;</td>
+                <td width="100%" valign="top"><font face="verdana" size="-1">The valid fixed cron schedule expression which defines when cronjob is planned to execute</font></td>
+            </tr>
+            <tr>
+                <td valign="top"><nobr><font face="verdana" size="-2"><b>${CRONJOB_SCHEDULE_CONFIG_PATH}</b></font></nobr></td>
+                <td width="10">&nbsp;</td>
+                <td width="100%" valign="top"><font face="verdana" size="-1">A valid Magento config path which defines a cron schedule expression which may be configured from Magento Admin</font></td>
+            </tr>
+        </table>
+    </body>
+</html>

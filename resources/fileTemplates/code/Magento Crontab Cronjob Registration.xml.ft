@@ -1,0 +1,14 @@
+#if (${CRON_GROUP})
+<group id="${CRON_GROUP}">
+#end
+    <job name="${CRONJOB_NAME}" instance="${CRONJOB_INSTANCE}" method="execute">
+        #if (${CRONJOB_SCHEDULE})
+        <schedule>${CRONJOB_SCHEDULE}</schedule>
+        #end
+        #if (${CRONJOB_SCHEDULE_CONFIG_PATH})
+        <config_path>${CRONJOB_SCHEDULE_CONFIG_PATH}</config_path>
+        #end
+    </job>
+#if (${CRON_GROUP})
+</group>
+#end

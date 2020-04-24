@@ -64,6 +64,7 @@ public class FileFromTemplateGenerator {
             };
             ApplicationManager.getApplication().runWriteAction(run);
         }, actionName, null);
+
         if (!exceptionRef.isNull()) {
             Messages.showErrorDialog(exceptionRef.get(), actionName);
             return null;

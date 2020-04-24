@@ -12,6 +12,7 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.ViewModelFileData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
+import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.ViewModelPhp;
 import com.magento.idea.magento2plugin.magento.packages.Package;
@@ -26,6 +27,7 @@ public class ModuleViewModelClassGenerator extends FileGenerator {
     private ViewModelFileData viewModelFileData;
     private Project project;
     private ValidatorBundle validatorBundle;
+    private CommonBundle commonBundle;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
 
@@ -36,13 +38,16 @@ public class ModuleViewModelClassGenerator extends FileGenerator {
         this.viewModelFileData = viewModelFileData;
         this.project = project;
         this.validatorBundle = new ValidatorBundle();
+        this.commonBundle = new CommonBundle();
     }
 
     public PsiFile generate(String actionName) {
         PhpClass block = GetPhpClassByFQN.getInstance(project).execute(getViewModelFqn());
+        String errorTitle = commonBundle.message("common.error");
+
         if (block != null) {
             String errorMessage = validatorBundle.message("validator.file.alreadyExists", "View Model");
-            JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return null;
         }
@@ -50,7 +55,7 @@ public class ModuleViewModelClassGenerator extends FileGenerator {
         PhpFile viewModelFile = createViewModelClass(actionName);
         if (viewModelFile == null) {
             String errorMessage = validatorBundle.message("validator.file.cantBeCreated", "View Model");
-            JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return null;
         }

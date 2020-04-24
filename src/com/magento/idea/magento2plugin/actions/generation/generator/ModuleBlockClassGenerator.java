@@ -18,6 +18,7 @@ import com.magento.idea.magento2plugin.magento.files.PhpPreference;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
+import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import com.magento.idea.magento2plugin.magento.packages.File;
@@ -27,6 +28,7 @@ public class ModuleBlockClassGenerator extends FileGenerator {
     private BlockFileData blockFileData;
     private Project project;
     private ValidatorBundle validatorBundle;
+    private CommonBundle commonBundle;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
 
@@ -37,10 +39,11 @@ public class ModuleBlockClassGenerator extends FileGenerator {
         this.blockFileData = blockFileData;
         this.project = project;
         this.validatorBundle = new ValidatorBundle();
+        this.commonBundle = new CommonBundle();
     }
 
     public PsiFile generate(String actionName) {
-        String errorTitle = "Error";
+        String errorTitle = commonBundle.message("common.error");
         PhpClass block = GetPhpClassByFQN.getInstance(project).execute(getBlockFqn());
 
         if (block != null) {
