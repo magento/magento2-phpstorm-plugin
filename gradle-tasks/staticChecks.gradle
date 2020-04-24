@@ -1,0 +1,125 @@
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
+/**
+ * Static Checks
+ */
+
+checkstyle {
+    toolVersion = "8.31"
+    ignoreFailures = false
+    maxWarnings = 0
+    configFile rootProject.file("gradle-tasks/checkstyle/checkstyle.xml")
+}
+
+pmd {
+    toolVersion = "6.21.0"
+    consoleOutput = true
+    rulePriority = 5
+    ruleSets = [
+        "category/java/codestyle.xml",
+        "category/java/design.xml",
+        "category/java/errorprone.xml",
+        "category/java/bestpractices.xml",
+        "category/java/performance.xml",
+        "category/java/security.xml",
+    ]
+}
+
+spotbugs {
+    ignoreFailures = false
+    showProgress = true
+    effort = 'default'
+}
+
+tasks.withType(Checkstyle) {
+    // Specify all files that should be checked
+    classpath = files()
+    source "${project.rootDir}"
+
+    reports {
+        xml.enabled false
+        html.enabled true
+    }
+}
+
+// Execute Checkstyle on all files
+task checkstyle(type: Checkstyle) {
+}
+
+// Execute Checkstyle on all modified files
+task checkstyleChanged(type: Checkstyle) {
+    def changedFiles = getChangedFiles()
+    include changedFiles
+}
+
+/**
+ * Get all files that are changed but not deleted nor renamed.
+ * Compares to master or the specified target branch.
+ *
+ * @return list of all changed files
+ */
+def getChangedFiles() {
+    // Get the target and source branch
+    def ghprbTargetBranch = System.getenv("ghprbTargetBranch")
+    def ghprbSourceBranch = System.getenv("ghprbSourceBranch")
+
+    // Compare to master if no branch specified
+    def targetBranch
+    if (project.hasProperty("branch")) {
+        targetBranch = project.property("branch")
+    } else {
+        targetBranch = ghprbTargetBranch ? "origin/${ghprbTargetBranch}" : getParentBranch()
+    }
+    def sourceBranch = ghprbSourceBranch ? "origin/${ghprbSourceBranch}" : ""
+
+    // Get list of all changed files including status
+    def systemOutStream = new ByteArrayOutputStream()
+    def command = "git diff --name-status --diff-filter=dr $targetBranch $sourceBranch"
+    command.execute().waitForProcessOutput(systemOutStream, System.err)
+    def allFiles = systemOutStream.toString().trim().split('\n')
+    systemOutStream.close()
+
+    // Remove the status prefix
+    Pattern statusPattern = Pattern.compile("(\\w)\\t+(.+)")
+    List<String> files = new ArrayList<>()
+    for (file in allFiles) {
+        Matcher matcher = statusPattern.matcher(file)
+        if (matcher.find()) {
+            files.add(matcher.group(2))
+        }
+    }
+
+    // Return the list of touched files
+    files
+}
+
+/**
+ * Determines the parent branch.
+ *
+ * @return the found parent branch or master if not possible
+ */
+def getParentBranch() {
+    def branch = ""
+    // Get short name of the HEAD branch
+    def branchDeterminer = "git rev-parse --abbrev-ref HEAD".execute()
+    branchDeterminer.in.eachLine { line -> branch = line }
+    branchDeterminer.err.eachLine { line -> println line }
+    branchDeterminer.waitFor()
+    // Search all branches for parent
+    def branchLine = 'git show-branch -a'.execute().text.readLines().find {
+        it.contains('*') && !(it ==~ ".*\\[$branch[~^\\]].*")
+    }
+    try {
+        // Filter parent branch name
+        def parent = (branchLine =~ /\[([^~^\]]*)[~^\]]/)[0][1]
+        return parent
+    } catch (Exception ignored) {
+        println "Could not determine parent branch, compare to master"
+        return "master"
+    }
+}

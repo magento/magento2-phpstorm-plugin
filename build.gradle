@@ -50,39 +50,4 @@ sourceSets {
     }
 }
 
-/**
- * Static Checks
- */
-
-checkstyle {
-    toolVersion = "8.31"
-    ignoreFailures = false
-    maxWarnings = 0
-}
-
-pmd {
-    toolVersion = "6.21.0"
-    consoleOutput = true
-    rulePriority = 5
-    ruleSets = [
-        "category/java/codestyle.xml",
-        "category/java/design.xml",
-        "category/java/errorprone.xml",
-        "category/java/bestpractices.xml",
-        "category/java/performance.xml",
-        "category/java/security.xml",
-    ]
-}
-
-spotbugs {
-    ignoreFailures = false
-    showProgress = true
-    effort = 'default'
-}
-
-tasks.withType(Checkstyle) {
-    reports {
-        xml.enabled false
-        html.enabled true
-    }
-}
+apply from: "${project.rootDir}/gradle-tasks/staticChecks.gradle"
