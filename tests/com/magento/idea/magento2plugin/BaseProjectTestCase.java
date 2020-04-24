@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin;
 import com.intellij.codeInsight.daemon.impl.HighlightInfo;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import com.magento.idea.magento2plugin.bundles.InspectionBundle;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.magento.packages.File;
@@ -18,6 +19,7 @@ import java.util.List;
 abstract public class BaseProjectTestCase extends BasePlatformTestCase {
     private static final String testDataProjectPath = "testData" + File.separator + "project";
     private static final String testDataProjectDirectory = "magento2";
+    protected final InspectionBundle inspectionBundle = new InspectionBundle();
 
     @Override
     protected void setUp() throws Exception {

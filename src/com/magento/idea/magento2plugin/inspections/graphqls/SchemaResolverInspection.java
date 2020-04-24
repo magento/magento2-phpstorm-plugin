@@ -11,13 +11,14 @@ import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.lang.jsgraphql.psi.GraphQLValue;
 import com.intellij.lang.jsgraphql.psi.GraphQLVisitor;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.magento.idea.magento2plugin.bundles.InspectionBundle;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.magento.graphql.GraphQlUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class SchemaResolverInspection extends LocalInspectionTool {
 
-    public static final String GraphQlResolverProblemDescription = "Class must implements \\Magento\\Framework\\GraphQl\\Query\\ResolverInterface";
+    private final InspectionBundle inspectionBundle = new InspectionBundle();
 
     @NotNull
     @Override
@@ -38,7 +39,9 @@ public class SchemaResolverInspection extends LocalInspectionTool {
                 }
                 if (!GraphQlUtil.isResolver(resolverClass)) {
                     holder.registerProblem(element,
-                            GraphQlResolverProblemDescription,
+                            inspectionBundle.message(
+                                    "inspection.graphql.resolver.mustImplement"
+                            ),
                             ProblemHighlightType.ERROR);
                 }
             }
