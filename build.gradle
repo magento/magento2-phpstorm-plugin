@@ -8,7 +8,7 @@ plugins {
 }
 
 group 'com.magento.idea'
-version '1.0.1'
+version '0.0.9'
 
 apply plugin: 'org.jetbrains.intellij'
 apply plugin: 'java'
@@ -47,7 +47,7 @@ publishPlugin {
     token = System.getenv("MAGENTO_PHPSTORM_intellijPublishToken")
     if (Boolean.valueOf(System.getenv("MAGENTO_PHPSTORM_isAlpha"))) {
         channels 'alpha'
-        version = version + "-alpha-" + getDate()
+        //version = version + "-alpha-" + getDate()
     }
 }
 
