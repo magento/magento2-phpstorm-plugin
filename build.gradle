@@ -45,7 +45,7 @@ sourceSets {
 
 publishPlugin {
     token = System.getenv("MAGENTO_PHPSTORM_intellijPublishToken")
-    if (System.getenv("MAGENTO_PHPSTORM_isAlpha").equals(true)) {
+    if (System.getenv("MAGENTO_PHPSTORM_isAlpha") == true) {
         channels 'alpha'
     }
 }
