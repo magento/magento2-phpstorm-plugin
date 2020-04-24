@@ -20,7 +20,7 @@ public class DirectoryGenerator {
         return INSTANCE;
     }
 
-    public ModuleDirectoriesData createOrFindModuleDirectories(@NotNull String packageName, @NotNull String moduleName, @NotNull PsiDirectory baseDirectory) {
+    public ModuleDirectoriesData createOrFindModuleDirectories(@NotNull String packageName, @NotNull String moduleName, @NotNull PsiDirectory baseDirectory){
         PsiDirectory packageDirectory = findOrCreateSubdirectory(baseDirectory, packageName);
         PsiDirectory moduleDirectory = findOrCreateSubdirectory(packageDirectory, moduleName);
         PsiDirectory moduleEtcDirectory = findOrCreateSubdirectory(moduleDirectory, Package.MODULE_BASE_AREA_DIR);

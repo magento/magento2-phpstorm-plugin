@@ -12,13 +12,12 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.PreferenceFileData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
-import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.PhpPreference;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import org.jetbrains.annotations.NotNull;
-
 import javax.swing.*;
 import java.util.Properties;
 
@@ -60,7 +59,7 @@ public class PreferenceClassGenerator extends FileGenerator {
     private PhpClass createPluginClass(String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project).getModuleDirectoryByModuleName(getPreferenceModule());
         String[] pluginDirectories = preferenceFileData.getPreferenceDirectory().split("/");
-        for (String pluginDirectory : pluginDirectories) {
+        for (String pluginDirectory: pluginDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, pluginDirectory);
         }
 

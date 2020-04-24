@@ -70,24 +70,35 @@ public class CreateAnObserverAction extends DumbAwareAction {
         }
         int offset = caret.getOffset();
         PsiElement element = psiFile.findElementAt(offset);
+        if (element == null) {
+            return null;
+        }
         return element;
     }
 
     private boolean isObserverEventNameClicked(@NotNull PsiElement element) {
         if (checkIsElementStringLiteral(element)) {
-            return checkIsParametersList(element.getParent().getParent()) &&
+            if (checkIsParametersList(element.getParent().getParent()) &&
                     checkIsMethodReference(element.getParent().getParent().getParent()) &&
-                    checkIsEventDispatchMethod((MethodReference) element.getParent().getParent().getParent());
+                    checkIsEventDispatchMethod((MethodReference) element.getParent().getParent().getParent())) {
+                return true;
+            }
         }
         return false;
     }
 
     private boolean checkIsParametersList(@NotNull PsiElement element) {
-        return element instanceof ParameterList;
+        if (element instanceof ParameterList) {
+            return true;
+        }
+        return false;
     }
 
     private boolean checkIsMethodReference(@NotNull PsiElement element) {
-        return element instanceof MethodReference;
+        if (element instanceof MethodReference) {
+            return true;
+        }
+        return false;
     }
 
     private boolean checkIsEventDispatchMethod(MethodReference element) {
@@ -117,7 +128,11 @@ public class CreateAnObserverAction extends DumbAwareAction {
         }
         IElementType elementType = astNode.getElementType();
 
-        return elementType == PhpTokenTypes.STRING_LITERAL || elementType == PhpTokenTypes.STRING_LITERAL_SINGLE_QUOTE;
+        if (elementType != PhpTokenTypes.STRING_LITERAL && elementType != PhpTokenTypes.STRING_LITERAL_SINGLE_QUOTE) {
+            return false;
+        }
+
+        return true;
     }
 
     private void setStatus(AnActionEvent event, boolean status) {

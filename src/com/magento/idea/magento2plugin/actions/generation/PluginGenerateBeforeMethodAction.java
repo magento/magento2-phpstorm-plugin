@@ -8,7 +8,6 @@ import com.intellij.codeInsight.CodeInsightActionHandler;
 import com.intellij.codeInsight.actions.CodeInsightAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -16,6 +15,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.code.PluginMethod
 import com.magento.idea.magento2plugin.actions.generation.generator.code.PluginMethodsGenerator;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
 import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.util.Key;
 
 public class PluginGenerateBeforeMethodAction extends CodeInsightAction {
     private final PluginGenerateMethodHandlerBase myHandler = new PluginGenerateMethodHandlerBase(Plugin.PluginType.before) {

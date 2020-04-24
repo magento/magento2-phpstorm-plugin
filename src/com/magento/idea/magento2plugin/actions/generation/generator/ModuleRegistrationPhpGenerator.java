@@ -12,7 +12,6 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Directo
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.magento.files.RegistrationPhp;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.Properties;
 
 public class ModuleRegistrationPhpGenerator extends FileGenerator {

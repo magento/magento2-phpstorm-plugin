@@ -20,14 +20,13 @@ import com.magento.idea.magento2plugin.actions.generation.data.GraphQlResolverFi
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.util.CodeStyleSettings;
-import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.GraphQlResolverPhp;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import org.jetbrains.annotations.NotNull;
-
 import javax.swing.*;
 import java.util.Properties;
 
@@ -94,7 +93,7 @@ public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
     private int getInsertPos(PhpClass graphQlResolverClass) {
         int insertPos = -1;
         LeafPsiElement[] leafElements = PsiTreeUtil.getChildrenOfType(graphQlResolverClass, LeafPsiElement.class);
-        for (LeafPsiElement leafPsiElement : leafElements) {
+        for (LeafPsiElement leafPsiElement: leafElements) {
             if (!leafPsiElement.getText().equals(MagentoPhpClass.CLOSING_TAG)) {
                 continue;
             }
@@ -107,7 +106,7 @@ public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(graphQlResolverFileData.getGraphQlResolverModule());
         String[] graphQlResolverDirectories = graphQlResolverFileData.getGraphQlResolverDirectory().split("/");
-        for (String graphQlResolverDirectory : graphQlResolverDirectories) {
+        for (String graphQlResolverDirectory: graphQlResolverDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, graphQlResolverDirectory);
         }
 

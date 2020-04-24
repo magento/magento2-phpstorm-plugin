@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleComposerJsonData;
@@ -17,12 +16,12 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFro
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.ComposerJson;
 import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
+import com.intellij.openapi.util.Pair;
 import org.jetbrains.annotations.NotNull;
-
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.List;
 import java.util.Properties;
+import java.util.List;
 
 public class ModuleComposerJsonGenerator extends FileGenerator {
 
@@ -128,7 +127,7 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
                     version = versionJsonElement.getAsString();
                     int minorVersionSeparator = version.lastIndexOf(".");
                     version = new StringBuilder(version)
-                            .replace(minorVersionSeparator + 1, version.length(), "*")
+                            .replace(minorVersionSeparator + 1, version.length(),"*")
                             .toString();
                 }
                 if (nameJsonElement != null) {

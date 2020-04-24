@@ -13,10 +13,10 @@ public class ModuleXmlData {
     private boolean createModuleDirs;
 
     public ModuleXmlData(
-            String packageName,
-            String moduleName,
-            PsiDirectory baseDir,
-            boolean createModuleDirs
+        String packageName,
+        String moduleName,
+        PsiDirectory baseDir,
+        boolean createModuleDirs
     ) {
         this.packageName = packageName;
         this.moduleName = moduleName;

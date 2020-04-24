@@ -23,7 +23,6 @@ import com.intellij.util.IncorrectOperationException;
 import com.magento.idea.magento2plugin.magento.files.ModuleFileInterface;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
@@ -47,7 +46,8 @@ public class FileFromTemplateGenerator {
             @NotNull ModuleFileInterface moduleFile,
             @NotNull Properties attributes,
             @NotNull PsiDirectory baseDir,
-            @NotNull String actionName) {
+            @NotNull String actionName)
+    {
         Ref<PsiFile> fileRef = new Ref<>(null);
         Ref<String> exceptionRef = new Ref<>(null);
         String filePath = baseDir.getText().concat("/").concat(moduleFile.getFileName());
@@ -92,7 +92,7 @@ public class FileFromTemplateGenerator {
 
             file = baseDir.add(fileTemplate);
             if (file instanceof PsiFile) {
-                return (PsiFile) file;
+                return (PsiFile)file;
             } else {
                 return null;
             }
@@ -111,7 +111,7 @@ public class FileFromTemplateGenerator {
         try {
             fileTemplate = templateManager.getInternalTemplate(templateName);
         } catch (IllegalStateException e) {
-            fileTemplate = FileTemplateManager.getInstance(project).getCodeTemplate(templateName);
+            fileTemplate = templateManager.getInstance(project).getCodeTemplate(templateName);
         }
 
         fillDefaultProperties(templateManager, properties, directory);
@@ -128,15 +128,15 @@ public class FileFromTemplateGenerator {
         Properties hardCodedProperties = templateManager.getDefaultProperties();
         Iterator iterator = hardCodedProperties.keySet().iterator();
 
-        while (iterator.hasNext()) {
+        while(iterator.hasNext()) {
             Object propertyKey = iterator.next();
-            props.setProperty((String) propertyKey, hardCodedProperties.getProperty((String) propertyKey));
+            props.setProperty((String)propertyKey, hardCodedProperties.getProperty((String)propertyKey));
         }
 
         iterator = DefaultTemplatePropertiesProvider.EP_NAME.getExtensionList().iterator();
 
-        while (iterator.hasNext()) {
-            DefaultTemplatePropertiesProvider provider = (DefaultTemplatePropertiesProvider) iterator.next();
+        while(iterator.hasNext()) {
+            DefaultTemplatePropertiesProvider provider = (DefaultTemplatePropertiesProvider)iterator.next();
             provider.fillProperties(directory, props);
         }
     }

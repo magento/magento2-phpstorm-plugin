@@ -11,7 +11,6 @@ import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.FileBasedIndexUtil;
-
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -41,7 +40,7 @@ public class FindOrCreateDiXml {
         if (!getArea(area).equals(Package.Areas.base)) {
             fileDirectories.add(getArea(area).toString());
         }
-        for (String fileDirectory : fileDirectories) {
+        for (String fileDirectory: fileDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, fileDirectory);
         }
         ModuleDiXml moduleDiXml = new ModuleDiXml();

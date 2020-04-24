@@ -5,14 +5,11 @@
 package com.magento.idea.magento2plugin.actions.generation.ImportReferences;
 
 import com.intellij.psi.PsiElement;
-import com.jetbrains.php.lang.psi.elements.Parameter;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.jetbrains.php.lang.psi.elements.PhpReturnType;
+import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Collection;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class PhpClassReferenceExtractor {
     private final PhpElementVisitor myCollectorVisitor = new PhpElementVisitor() {

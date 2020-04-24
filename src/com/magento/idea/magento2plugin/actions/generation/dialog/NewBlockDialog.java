@@ -14,7 +14,6 @@ import com.magento.idea.magento2plugin.actions.generation.generator.ModuleBlockC
 import com.magento.idea.magento2plugin.magento.files.BlockPhp;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
-
 import javax.swing.*;
 import java.awt.event.*;
 import java.io.File;
@@ -47,8 +46,17 @@ public class NewBlockDialog extends AbstractDialog {
         pushToMiddle();
         suggestBlockDirectory();
 
-        buttonOK.addActionListener(e -> onOK());
-        buttonCancel.addActionListener(e -> onCancel());
+        buttonOK.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onOK();
+            }
+        });
+
+        buttonCancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        });
 
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -122,7 +130,7 @@ public class NewBlockDialog extends AbstractDialog {
     }
 
     private String getModuleIdentifierPath() {
-        String[] parts = moduleName.split(Package.VENDOR_MODULE_NAME_SEPARATOR);
+        String[]parts = moduleName.split(Package.VENDOR_MODULE_NAME_SEPARATOR);
         if (parts[0] == null || parts[1] == null || parts.length > 2) {
             return null;
         }
@@ -130,12 +138,12 @@ public class NewBlockDialog extends AbstractDialog {
     }
 
     private String getNamespace() {
-        String[] parts = moduleName.split(Package.VENDOR_MODULE_NAME_SEPARATOR);
+        String[]parts = moduleName.split(Package.VENDOR_MODULE_NAME_SEPARATOR);
         if (parts[0] == null || parts[1] == null || parts.length > 2) {
             return null;
         }
         String directoryPart = getBlockDirectory().replace(File.separator, Package.FQN_SEPARATOR);
-        return parts[0] + Package.FQN_SEPARATOR + parts[1] + Package.FQN_SEPARATOR + directoryPart;
+        return parts[0] + Package.FQN_SEPARATOR + parts[1]+ Package.FQN_SEPARATOR + directoryPart;
     }
 
     public void onCancel() {

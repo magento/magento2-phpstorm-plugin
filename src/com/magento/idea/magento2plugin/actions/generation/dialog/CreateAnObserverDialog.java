@@ -5,10 +5,13 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
+import com.jetbrains.php.lang.psi.elements.Method;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.CreateAPluginAction;
 import com.magento.idea.magento2plugin.actions.generation.CreateAnObserverAction;
 import com.magento.idea.magento2plugin.actions.generation.data.ObserverEventsXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.ObserverFileData;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.CreateAPluginDialogValidator;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.CreateAnObserverDialogValidator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ObserverClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ObserverEventsXmlGenerator;
@@ -71,7 +74,7 @@ public class CreateAnObserverDialog extends AbstractDialog {
     }
 
     private void fillTargetAreaOptions() {
-        for (Package.Areas area : Package.Areas.values()) {
+        for (Package.Areas area: Package.Areas.values()) {
             observerArea.addItem(area.toString());
         }
     }

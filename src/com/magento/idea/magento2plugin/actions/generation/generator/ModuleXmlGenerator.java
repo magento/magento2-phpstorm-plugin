@@ -14,7 +14,6 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFro
 import com.magento.idea.magento2plugin.magento.files.ModuleXml;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.Properties;
 
 public class ModuleXmlGenerator extends FileGenerator {

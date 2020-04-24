@@ -37,9 +37,7 @@ public class GraphQlResolverFileData {
         return graphQlResolverModule;
     }
 
-    public String getGraphQlResolverClassFqn() {
-        return graphQlResolverModule;
-    }
+    public String getGraphQlResolverClassFqn() { return graphQlResolverModule; }
 
     public String getNamespace() {
         return namespace;

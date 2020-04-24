@@ -34,6 +34,7 @@ public class FindOrCreateCrontabXml {
      *
      * @param actionName
      * @param moduleName
+     *
      * @return PsiFile
      */
     public PsiFile execute(String actionName, String moduleName) {
@@ -42,16 +43,16 @@ public class FindOrCreateCrontabXml {
 
         fileDirectories.add(Package.MODULE_BASE_AREA_DIR);
 
-        for (String fileDirectory : fileDirectories) {
+        for (String fileDirectory: fileDirectories) {
             parentDirectory = this.directoryGenerator.findOrCreateSubdirectory(parentDirectory, fileDirectory);
         }
 
         CrontabXmlTemplate crontabXmlTemplate = new CrontabXmlTemplate();
         PsiFile crontabFile = FileBasedIndexUtil.findModuleConfigFile(
-                crontabXmlTemplate.getFileName(),
-                Package.Areas.base,
-                moduleName,
-                project
+            crontabXmlTemplate.getFileName(),
+            Package.Areas.base,
+            moduleName,
+            project
         );
 
         // crontab.xml is already declared
@@ -61,10 +62,10 @@ public class FindOrCreateCrontabXml {
 
         // create a new empty crontab.xml file
         crontabFile = fileFromTemplateGenerator.generate(
-                crontabXmlTemplate,
-                new Properties(),
-                parentDirectory,
-                actionName
+            crontabXmlTemplate,
+            new Properties(),
+            parentDirectory,
+            actionName
         );
 
         return crontabFile;

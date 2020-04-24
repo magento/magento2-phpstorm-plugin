@@ -16,7 +16,6 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrC
 import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplate;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.XmlFilePositionUtil;
 import com.magento.idea.magento2plugin.magento.files.ModuleEventsXml;
-
 import java.io.IOException;
 import java.util.Properties;
 
@@ -36,7 +35,8 @@ public class ObserverEventsXmlGenerator extends FileGenerator {
         this.getCodeTemplate = GetCodeTemplate.getInstance(project);
     }
 
-    public PsiFile generate(String actionName) {
+    public PsiFile generate(String actionName)
+    {
         PsiFile eventsXmlFile =
                 findOrCreateEventsXml.execute(
                         actionName,

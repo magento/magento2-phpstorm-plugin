@@ -20,13 +20,12 @@ import com.jetbrains.php.lang.psi.elements.Statement;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.refactoring.PhpAliasImporter;
 import gnu.trove.THashMap;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class PhpClassReferenceResolver extends PhpClassReferenceExtractor {
     private final PhpClassReferenceStorage myCandidatesToImportStorage = new PhpClassReferenceStorage();
@@ -69,7 +68,7 @@ public class PhpClassReferenceResolver extends PhpClassReferenceExtractor {
     }
 
     public static boolean isNonCompoundUseName(@NotNull PhpPsiElement scopeHolder, @NotNull String fqn, @NotNull String name) {
-        String currentNamespaceName = scopeHolder instanceof PhpNamespace ? ((PhpNamespace) scopeHolder).getFQN() : "";
+        String currentNamespaceName = scopeHolder instanceof PhpNamespace ? ((PhpNamespace)scopeHolder).getFQN() : "";
         return "\\".equals(currentNamespaceName) && PhpLangUtil.equalsClassNames(fqn, PhpLangUtil.toFQN(name));
     }
 
@@ -156,7 +155,7 @@ public class PhpClassReferenceResolver extends PhpClassReferenceExtractor {
 
                 assert oldReference != null;
 
-                PsiElement added = oldReference.addRange(((PsiElement) newReference).getFirstChild(), ((PsiElement) newReference).getLastChild());
+                PsiElement added = oldReference.addRange(((PsiElement)newReference).getFirstChild(), ((PsiElement)newReference).getLastChild());
                 oldReference.deleteChildRange(oldReference.getFirstChild(), added.getPrevSibling());
             }
         }

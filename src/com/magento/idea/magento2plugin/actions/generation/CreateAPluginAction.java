@@ -17,10 +17,10 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.CreateAPluginDialog;
-import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.magento.plugin.IsPluginAllowedForMethod;
 import org.jetbrains.annotations.NotNull;
+import com.magento.idea.magento2plugin.project.Settings;
 
 public class CreateAPluginAction extends DumbAwareAction {
     public static String ACTION_NAME = "Create a Plugin...";
@@ -96,13 +96,13 @@ public class CreateAPluginAction extends DumbAwareAction {
         if (element == null) {
             return;
         }
-        if (element instanceof Method && element.getParent() == phpClass && isPluginAllowed.check((Method) element)) {
-            this.targetMethod = (Method) element;
+        if (element instanceof Method && element.getParent() == phpClass && isPluginAllowed.check((Method)element)) {
+            this.targetMethod = (Method)element;
             return;
         }
         PsiElement parent = element.getParent();
-        if (parent instanceof Method && parent.getParent() == phpClass && isPluginAllowed.check((Method) parent)) {
-            this.targetMethod = (Method) parent;
+        if (parent instanceof Method && parent.getParent() == phpClass && isPluginAllowed.check((Method)parent)) {
+            this.targetMethod = (Method)parent;
         }
     }
 }

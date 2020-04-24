@@ -20,12 +20,12 @@ public class CrontabXmlData {
      * @param cronjobSchedule
      */
     public CrontabXmlData(
-            String moduleName,
-            String cronGroup,
-            String cronjobName,
-            String cronjobInstance,
-            String cronjobSchedule,
-            String cronjobScheduleConfigPath
+        String moduleName,
+        String cronGroup,
+        String cronjobName,
+        String cronjobInstance,
+        String cronjobSchedule,
+        String cronjobScheduleConfigPath
     ) {
         this.moduleName = moduleName;
         this.cronGroup = cronGroup;

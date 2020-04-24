@@ -14,7 +14,6 @@ import com.magento.idea.magento2plugin.actions.generation.generator.ModuleGraphQ
 import com.magento.idea.magento2plugin.magento.files.GraphQlResolverPhp;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
-
 import javax.swing.*;
 import java.awt.event.*;
 import java.io.File;
@@ -130,7 +129,7 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
     }
 
     private String getModuleIdentifierPath() {
-        String[] parts = moduleName.split(Package.VENDOR_MODULE_NAME_SEPARATOR);
+        String[]parts = moduleName.split(Package.VENDOR_MODULE_NAME_SEPARATOR);
         if (parts[0] == null || parts[1] == null || parts.length > 2) {
             return null;
         }
@@ -138,7 +137,7 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
     }
 
     private String getNamespace() {
-        String[] parts = moduleName.split(Package.VENDOR_MODULE_NAME_SEPARATOR);
+        String[]parts = moduleName.split(Package.VENDOR_MODULE_NAME_SEPARATOR);
         if (parts[0] == null || parts[1] == null || parts.length > 2) {
             return null;
         }

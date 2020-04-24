@@ -29,15 +29,14 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFro
 import com.magento.idea.magento2plugin.actions.generation.util.CodeStyleSettings;
 import com.magento.idea.magento2plugin.actions.generation.util.CollectInsertedMethods;
 import com.magento.idea.magento2plugin.actions.generation.util.FillTextBufferWithPluginMethods;
-import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
-
 import javax.swing.*;
 import java.util.Collection;
 import java.util.List;
@@ -66,7 +65,8 @@ public class PluginClassGenerator extends FileGenerator {
         this.validatorBundle = new ValidatorBundle();
     }
 
-    public PsiFile generate(String actionName) {
+    public PsiFile generate(String actionName)
+    {
         final PsiFile[] pluginFile = {null};
         WriteCommandAction.runWriteCommandAction(project, () -> {
             PhpClass pluginClass = GetPhpClassByFQN.getInstance(project).execute(pluginFileData.getPluginFqn());
@@ -128,9 +128,9 @@ public class PluginClassGenerator extends FileGenerator {
 
     private boolean checkIfMethodExist(PhpClass pluginClass, PluginMethodData[] pluginMethodData) {
         Collection<Method> currentPluginMethods = pluginClass.getMethods();
-        for (Method currentPluginMethod : currentPluginMethods) {
-            for (PluginMethodData pluginMethod : pluginMethodData) {
-                if (!pluginMethod.getMethod().getName().equals(currentPluginMethod.getName())) {
+        for (Method currentPluginMethod: currentPluginMethods) {
+            for (PluginMethodData pluginMethod: pluginMethodData) {
+                if (!pluginMethod.getMethod().getName().equals(currentPluginMethod.getName())){
                     continue;
                 }
                 return true;
@@ -142,7 +142,7 @@ public class PluginClassGenerator extends FileGenerator {
     private PhpClass createPluginClass(String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project).getModuleDirectoryByModuleName(getPluginModule());
         String[] pluginDirectories = pluginFileData.getPluginDirectory().split("/");
-        for (String pluginDirectory : pluginDirectories) {
+        for (String pluginDirectory: pluginDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, pluginDirectory);
         }
 
@@ -169,8 +169,8 @@ public class PluginClassGenerator extends FileGenerator {
 
     private int getInsertPos(PhpClass pluginClass) {
         int insertPos = -1;
-        LeafPsiElement[] leafElements = PsiTreeUtil.getChildrenOfType(pluginClass, LeafPsiElement.class);
-        for (LeafPsiElement leafPsiElement : leafElements) {
+        LeafPsiElement[] leafElements =  PsiTreeUtil.getChildrenOfType(pluginClass, LeafPsiElement.class);
+        for (LeafPsiElement leafPsiElement: leafElements) {
             if (!leafPsiElement.getText().equals(MagentoPhpClass.CLOSING_TAG)) {
                 continue;
             }

@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.actions.generation.generator.util;
 import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.openapi.project.Project;
-
 import java.io.IOException;
 import java.util.Properties;
 
@@ -23,7 +22,7 @@ public class GetCodeTemplate {
         return INSTANCE;
     }
 
-    GetCodeTemplate(Project project) {
+    GetCodeTemplate (Project project) {
         this.project = project;
     }
 

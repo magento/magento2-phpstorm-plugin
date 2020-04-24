@@ -17,10 +17,10 @@ public class CronjobClassData {
      * @param cronjobModule
      */
     public CronjobClassData(
-            String cronjobClassName,
-            String cronjobDirectory,
-            String cronjobNamespace,
-            String cronjobModule
+        String cronjobClassName,
+        String cronjobDirectory,
+        String cronjobNamespace,
+        String cronjobModule
     ) {
         this.className = cronjobClassName;
         this.directory = cronjobDirectory;

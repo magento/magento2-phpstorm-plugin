@@ -10,6 +10,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewCronjobDialog;
+import com.magento.idea.magento2plugin.indexes.CronGroupIndex;
 import org.jetbrains.annotations.NotNull;
 
 public class NewCronjobAction extends AnAction {

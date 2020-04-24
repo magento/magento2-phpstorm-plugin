@@ -15,7 +15,6 @@ import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.CronjobTemplate;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.Properties;
 
 public class CronjobClassGenerator extends FileGenerator {
@@ -40,7 +39,9 @@ public class CronjobClassGenerator extends FileGenerator {
     }
 
     /**
+     *
      * @param actionName
+     *
      * @return void
      */
     public PsiFile generate(String actionName) {
@@ -48,8 +49,8 @@ public class CronjobClassGenerator extends FileGenerator {
 
         if (cronjobFile == null) {
             String errorMessage = validatorBundle.message(
-                    "validator.file.cantBeCreated",
-                    "Cronjob Class"
+            "validator.file.cantBeCreated",
+            "Cronjob Class"
             );
 
             throw new RuntimeException(errorMessage);
@@ -59,6 +60,7 @@ public class CronjobClassGenerator extends FileGenerator {
     }
 
     /**
+     *
      * @param attributes
      */
     protected void fillAttributes(Properties attributes) {
@@ -73,6 +75,7 @@ public class CronjobClassGenerator extends FileGenerator {
      * Generate Cronjob Class according to data model
      *
      * @param actionName
+     *
      * @return PhpFile
      */
     private PhpFile createCronjobClass(String actionName) {
@@ -81,17 +84,17 @@ public class CronjobClassGenerator extends FileGenerator {
         String[] cronjobSubDirectories = this.cronjobClassData.getDirectory().split("/");
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project).getModuleDirectoryByModuleName(moduleName);
 
-        for (String cronjobSubDirectory : cronjobSubDirectories) {
+        for (String cronjobSubDirectory: cronjobSubDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, cronjobSubDirectory);
         }
 
         Properties attributes = getAttributes();
 
         PsiFile blockFile = fileFromTemplateGenerator.generate(
-                new CronjobTemplate(cronjobClassName),
-                attributes,
-                parentDirectory,
-                actionName
+            new CronjobTemplate(cronjobClassName),
+            attributes,
+            parentDirectory,
+            actionName
         );
 
         if (blockFile == null) {

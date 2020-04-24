@@ -174,6 +174,7 @@ public class NewCronjobDialog extends AbstractDialog {
      * Retrieve the default cronjob name
      *
      * @param moduleName
+     *
      * @return String
      */
     private String suggestCronjobName(String moduleName, String cronjobClassname) {
@@ -190,14 +191,14 @@ public class NewCronjobDialog extends AbstractDialog {
      * When new cronjob dialog is filled, validate the input data and generate a new crobjob
      */
     private void onOK() {
-        if (!validator.validate(this.project, this)) {
+        if (!validator.validate(this.project,this)) {
             return;
         }
 
         NamespaceBuilder namespaceBuilder = new NamespaceBuilder(
-                this.getCronjobModule(),
-                this.getCronjobClassName(),
-                this.getCronjobDirectory()
+            this.getCronjobModule(),
+            this.getCronjobClassName(),
+            this.getCronjobDirectory()
         );
 
         String cronjobNamespace = namespaceBuilder.getCronjobNamespace();
@@ -223,25 +224,27 @@ public class NewCronjobDialog extends AbstractDialog {
             crontabXmlGenerator.generate(NewCronjobAction.ACTION_NAME);
         } catch (Exception exception) {
             JOptionPane.showMessageDialog(
-                    null,
-                    exception.getMessage(),
-                    "Generation Error",
-                    JOptionPane.ERROR_MESSAGE
+                null,
+                exception.getMessage(),
+                "Generation Error",
+                JOptionPane.ERROR_MESSAGE
             );
         }
     }
 
     private CronjobClassData getCronjobClassData(String cronjobNamespace) {
         return new CronjobClassData(
-                this.getCronjobClassName(),
-                this.getCronjobDirectory(),
-                cronjobNamespace,
-                this.getCronjobModule()
+            this.getCronjobClassName(),
+            this.getCronjobDirectory(),
+            cronjobNamespace,
+            this.getCronjobModule()
         );
     }
 
     /**
+     *
      * @param cronjobInstance
+     *
      * @return CrontabXmlData
      */
     private CrontabXmlData getCrontabXmlData(String cronjobInstance) {
@@ -251,12 +254,12 @@ public class NewCronjobDialog extends AbstractDialog {
                 : null;
 
         return new CrontabXmlData(
-                this.getCronjobModule(),
-                this.getCronjobGroup(),
-                this.getCronjobName(),
-                cronjobInstance,
-                cronSchedule,
-                cronScheduleConfigPath
+            this.getCronjobModule(),
+            this.getCronjobGroup(),
+            this.getCronjobName(),
+            cronjobInstance,
+            cronSchedule,
+            cronScheduleConfigPath
         );
     }
 }
