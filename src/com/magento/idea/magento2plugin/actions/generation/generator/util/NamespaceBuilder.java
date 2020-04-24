@@ -14,7 +14,7 @@ public class NamespaceBuilder {
     private String className;
     private String classDirectory;
 
-    public NamespaceBuilder (String moduleName, String className, String classDirectory) {
+    public NamespaceBuilder(String moduleName, String className, String classDirectory) {
         this.moduleName = moduleName;
         this.className = className;
         this.classDirectory = classDirectory;

@@ -12,13 +12,14 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.BlockFileData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.BlockPhp;
 import com.magento.idea.magento2plugin.magento.files.PhpPreference;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import org.jetbrains.annotations.NotNull;
+
 import javax.swing.*;
 import java.util.Properties;
 
@@ -69,7 +70,7 @@ public class ModuleBlockClassGenerator extends FileGenerator {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(getBlockModule());
         String[] blockDirectories = blockFileData.getBlockDirectory().split("/");
-        for (String blockDirectory: blockDirectories) {
+        for (String blockDirectory : blockDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, blockDirectory);
         }
 

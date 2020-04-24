@@ -20,12 +20,13 @@ import com.magento.idea.magento2plugin.actions.generation.data.ObserverFileData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.util.CodeStyleSettings;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.Observer;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
+
 import javax.swing.*;
 import java.util.Properties;
 
@@ -100,7 +101,7 @@ public class ObserverClassGenerator extends FileGenerator {
     private int getInsertPos(PhpClass observerClass) {
         int insertPos = -1;
         LeafPsiElement[] leafElements = PsiTreeUtil.getChildrenOfType(observerClass, LeafPsiElement.class);
-        for (LeafPsiElement leafPsiElement: leafElements) {
+        for (LeafPsiElement leafPsiElement : leafElements) {
             if (!leafPsiElement.getText().equals(MagentoPhpClass.CLOSING_TAG)) {
                 continue;
             }
@@ -113,7 +114,7 @@ public class ObserverClassGenerator extends FileGenerator {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(observerFileData.getObserverModule());
         String[] observerDirectories = observerFileData.getObserverDirectory().split("/");
-        for (String observerDirectory: observerDirectories) {
+        for (String observerDirectory : observerDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, observerDirectory);
         }
 

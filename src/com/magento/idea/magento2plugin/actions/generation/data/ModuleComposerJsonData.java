@@ -5,6 +5,7 @@
 package com.magento.idea.magento2plugin.actions.generation.data;
 
 import com.intellij.psi.PsiDirectory;
+
 import java.util.List;
 
 public class ModuleComposerJsonData {
@@ -19,15 +20,15 @@ public class ModuleComposerJsonData {
     private final boolean createModuleDirs;
 
     public ModuleComposerJsonData(
-        String packageName,
-        String moduleName,
-        PsiDirectory baseDir,
-        String moduleDescription,
-        String composerPackageName,
-        String moduleVersion,
-        List<String> moduleLicense,
-        List<String> moduleDependencies,
-        boolean createModuleDirs
+            String packageName,
+            String moduleName,
+            PsiDirectory baseDir,
+            String moduleDescription,
+            String composerPackageName,
+            String moduleVersion,
+            List<String> moduleLicense,
+            List<String> moduleDependencies,
+            boolean createModuleDirs
     ) {
         this.packageName = packageName;
         this.moduleName = moduleName;

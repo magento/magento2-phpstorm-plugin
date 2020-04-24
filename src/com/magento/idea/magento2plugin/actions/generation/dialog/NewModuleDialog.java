@@ -28,14 +28,13 @@ import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
 import org.apache.commons.lang.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.event.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
-import java.util.stream.IntStream;
 
 public class NewModuleDialog extends AbstractDialog implements ListSelectionListener {
     @NotNull
@@ -175,11 +174,11 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
 
     private PsiFile generateRegistrationPhp() {
         return new ModuleRegistrationPhpGenerator(new ModuleRegistrationPhpData(
-                    getPackageName(),
-                    getModuleName(),
-                    getBaseDir(),
-                    true
-            ), project).generate(NewModuleAction.ACTION_NAME);
+                getPackageName(),
+                getModuleName(),
+                getBaseDir(),
+                true
+        ), project).generate(NewModuleAction.ACTION_NAME);
     }
 
     private void generateModuleXml() {
@@ -247,7 +246,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         Package.License[] licenses = Package.License.values();
         Vector<String> licenseNames = new Vector<>(licenses.length);
 
-        for (Package.License license: licenses) {
+        for (Package.License license : licenses) {
             licenseNames.add(license.getLicenseName());
         }
 
@@ -271,7 +270,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     private void handleModuleCustomLicenseInputVisibility() {
         boolean isCustomLicenseSelected = false;
 
-        for (Object value: moduleLicense.getSelectedValuesList()) {
+        for (Object value : moduleLicense.getSelectedValuesList()) {
             if (Package.License.CUSTOM.getLicenseName().equals(value.toString())) {
                 isCustomLicenseSelected = true;
 

@@ -14,11 +14,12 @@ import com.magento.idea.magento2plugin.actions.generation.data.PreferenceFileDat
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.OverrideClassByAPreferenceDialogValidator;
 import com.magento.idea.magento2plugin.actions.generation.generator.PreferenceClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.PreferenceDiXmlGenerator;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
-import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import org.jetbrains.annotations.NotNull;
+
 import javax.swing.*;
 import java.awt.event.*;
 import java.io.File;
@@ -109,7 +110,7 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog {
     }
 
     private void fillTargetAreaOptions() {
-        for(Package.Areas area: Package.Areas.values()) {
+        for (Package.Areas area : Package.Areas.values()) {
             preferenceArea.addItem(area.toString());
         }
     }

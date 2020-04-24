@@ -7,14 +7,14 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.util.NavigateToCreatedFile;
+
 import java.util.Properties;
 
 public abstract class FileGenerator {
     private final Project project;
     private final NavigateToCreatedFile navigateToCreatedFile;
 
-    public FileGenerator(Project project)
-    {
+    public FileGenerator(Project project) {
         this.project = project;
         this.navigateToCreatedFile = NavigateToCreatedFile.getInstance();
     }

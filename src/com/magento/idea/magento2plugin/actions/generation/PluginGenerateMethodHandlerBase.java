@@ -74,7 +74,7 @@ public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeIns
     }
 
     public void invoke(@NotNull Project project, @NotNull Editor editor, @NotNull PsiFile pluginFile) {
-        PhpFile pluginPhpFile = (PhpFile)pluginFile;
+        PhpFile pluginPhpFile = (PhpFile) pluginFile;
         PhpClass pluginClass = PhpCodeEditUtil.findClassAtCaret(editor, pluginPhpFile);
         Key<Object> targetClassKey = Key.create(PluginMethodsGenerator.originalTargetKey);
         if (pluginClass == null) {
@@ -176,7 +176,7 @@ public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeIns
             Collection<Method> methods = targetClass.getMethods();
             Iterator methodIterator = methods.iterator();
 
-            while(methodIterator.hasNext()) {
+            while (methodIterator.hasNext()) {
                 Method method = (Method) methodIterator.next();
                 if (IsPluginAllowedForMethod.getInstance().check(method) && !pluginAlreadyHasMethod(phpClass, method)) {
                     method.putUserData(targetClassKey, targetClass);
@@ -195,8 +195,8 @@ public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeIns
         String methodPrefix = type;
         String methodSuffix = methodName.substring(0, 1).toUpperCase() + methodName.substring(1);
         String pluginMethodName = methodPrefix.concat(methodSuffix);
-        for (Method currentMethod: currentMethods) {
-            if(!currentMethod.getName().equals(pluginMethodName)) {
+        for (Method currentMethod : currentMethods) {
+            if (!currentMethod.getName().equals(pluginMethodName)) {
                 continue;
             }
             return true;
@@ -221,13 +221,13 @@ public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeIns
         if (currElement != null) {
             PsiElement parent = currElement.getParent();
 
-            for(PsiElement prevParent = currElement; parent != null && !(parent instanceof PhpFile); parent = parent.getParent()) {
+            for (PsiElement prevParent = currElement; parent != null && !(parent instanceof PhpFile); parent = parent.getParent()) {
                 if (isClassMember(parent)) {
                     return getNextPos(parent);
                 }
 
                 if (parent instanceof PhpClass) {
-                    while(prevParent != null) {
+                    while (prevParent != null) {
                         if (isClassMember(prevParent) || PhpPsiUtil.isOfType(prevParent, PhpTokenTypes.chLBRACE)) {
                             return getNextPos(prevParent);
                         }
@@ -235,7 +235,7 @@ public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeIns
                         prevParent = prevParent.getPrevSibling();
                     }
 
-                    for(PsiElement classChild = parent.getFirstChild(); classChild != null; classChild = classChild.getNextSibling()) {
+                    for (PsiElement classChild = parent.getFirstChild(); classChild != null; classChild = classChild.getNextSibling()) {
                         if (PhpPsiUtil.isOfType(classChild, PhpTokenTypes.chLBRACE)) {
                             return getNextPos(classChild);
                         }

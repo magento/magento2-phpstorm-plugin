@@ -8,7 +8,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.magento.files.ModuleEventsXml;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.FileBasedIndexUtil;
@@ -33,6 +32,7 @@ public class FindOrCreateEventsXml {
     }
 
     public PsiFile execute(String actionName, String moduleName, String area) {
+        // todo: move these hidden dependencies to constructor
         DirectoryGenerator directoryGenerator = DirectoryGenerator.getInstance();
         FileFromTemplateGenerator fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project).getModuleDirectoryByModuleName(moduleName);
@@ -41,7 +41,7 @@ public class FindOrCreateEventsXml {
         if (!getArea(area).equals(Package.Areas.base)) {
             fileDirectories.add(getArea(area).toString());
         }
-        for (String fileDirectory: fileDirectories) {
+        for (String fileDirectory : fileDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, fileDirectory);
         }
         ModuleEventsXml moduleEventsXml = new ModuleEventsXml();

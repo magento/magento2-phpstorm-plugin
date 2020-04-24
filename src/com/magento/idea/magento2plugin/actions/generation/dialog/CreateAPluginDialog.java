@@ -18,8 +18,8 @@ import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import org.jetbrains.annotations.NotNull;
+
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.util.List;
@@ -89,13 +89,13 @@ public class CreateAPluginDialog extends AbstractDialog {
     }
 
     private void fillPluginTypeOptions() {
-        for (Plugin.PluginType pluginPrefixType: Plugin.PluginType.values()) {
+        for (Plugin.PluginType pluginPrefixType : Plugin.PluginType.values()) {
             pluginType.addItem(pluginPrefixType.toString());
         }
     }
 
     private void fillTargetAreaOptions() {
-        for(Package.Areas area: Package.Areas.values()) {
+        for (Package.Areas area : Package.Areas.values()) {
             pluginArea.addItem(area.toString());
         }
     }

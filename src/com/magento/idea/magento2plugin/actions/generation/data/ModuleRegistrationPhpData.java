@@ -13,10 +13,10 @@ public class ModuleRegistrationPhpData {
     private boolean createModuleDirs;
 
     public ModuleRegistrationPhpData(
-        String packageName,
-        String moduleName,
-        PsiDirectory baseDir,
-        boolean createModuleDirs
+            String packageName,
+            String moduleName,
+            PsiDirectory baseDir,
+            boolean createModuleDirs
     ) {
         this.packageName = packageName;
         this.moduleName = moduleName;

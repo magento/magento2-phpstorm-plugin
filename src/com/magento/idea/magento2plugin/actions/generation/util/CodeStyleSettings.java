@@ -15,7 +15,7 @@ public class CodeStyleSettings {
     private int currBlankLines;
     private CommonCodeStyleSettings settings;
 
-    public CodeStyleSettings(PhpFile phpFile){
+    public CodeStyleSettings(PhpFile phpFile) {
         this.phpFile = phpFile;
         this.settings = CodeStyle.getLanguageSettings(this.phpFile, PhpLanguage.INSTANCE);
     }
@@ -25,7 +25,7 @@ public class CodeStyleSettings {
         this.currBlankLines = settings.KEEP_BLANK_LINES_IN_CODE;
         settings.KEEP_LINE_BREAKS = false;
         settings.KEEP_BLANK_LINES_IN_CODE = 0;
-    };
+    }
 
     public void restore() {
         settings.KEEP_LINE_BREAKS = currLineBreaks;

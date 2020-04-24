@@ -11,7 +11,10 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.xml.*;
+import com.intellij.psi.xml.XmlAttribute;
+import com.intellij.psi.xml.XmlAttributeValue;
+import com.intellij.psi.xml.XmlFile;
+import com.intellij.psi.xml.XmlTag;
 import com.jetbrains.php.lang.PhpLangUtil;
 import com.magento.idea.magento2plugin.actions.generation.data.PluginDiXmlData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateDiXml;
@@ -20,8 +23,10 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.XmlFile
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Properties;
 
 public class PluginDiXmlGenerator extends FileGenerator {
     private final GetCodeTemplate getCodeTemplate;
@@ -40,8 +45,7 @@ public class PluginDiXmlGenerator extends FileGenerator {
         this.positionUtil = XmlFilePositionUtil.getInstance();
     }
 
-    public PsiFile generate(String actionName)
-    {
+    public PsiFile generate(String actionName) {
         PsiFile diXmlFile = findOrCreateDiXml.execute(actionName, pluginFileData.getPluginModule(), pluginFileData.getArea());
         XmlAttributeValue typeAttributeValue = getTypeAttributeValue((XmlFile) diXmlFile);
         boolean isPluginDeclared = false;
@@ -84,12 +88,12 @@ public class PluginDiXmlGenerator extends FileGenerator {
         if (xmlTags == null) {
             return false;
         }
-        for (XmlTag child: xmlTags) {
+        for (XmlTag child : xmlTags) {
             if (!child.getName().equals(ModuleDiXml.PLUGIN_TAG_NAME)) {
                 continue;
             }
             XmlAttribute[] xmlAttributes = PsiTreeUtil.getChildrenOfType(child, XmlAttribute.class);
-            for (XmlAttribute xmlAttribute: xmlAttributes) {
+            for (XmlAttribute xmlAttribute : xmlAttributes) {
                 if (!xmlAttribute.getName().equals(ModuleDiXml.PLUGIN_TYPE_ATTRIBUTE)) {
                     continue;
                 }
@@ -106,7 +110,7 @@ public class PluginDiXmlGenerator extends FileGenerator {
     private XmlAttributeValue getTypeAttributeValue(XmlFile diXml) {
         Collection<XmlAttributeValue> pluginTypes = XmlPsiTreeUtil.findAttributeValueElements(diXml, ModuleDiXml.PLUGIN_TYPE_TAG, ModuleDiXml.PLUGIN_TYPE_ATTR_NAME);
         String pluginClassFqn = pluginFileData.getTargetClass().getPresentableFQN();
-        for (XmlAttributeValue pluginType: pluginTypes) {
+        for (XmlAttributeValue pluginType : pluginTypes) {
             if (!PhpLangUtil.toPresentableFQN(pluginType.getValue()).equals(pluginClassFqn)) {
                 continue;
             }

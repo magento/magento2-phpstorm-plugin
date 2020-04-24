@@ -4,14 +4,11 @@
  */
 package com.magento.idea.magento2plugin.ui;
 
+import javax.swing.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 
 public class FilteredComboBox extends JComboBox {
     private List<String> entries;
@@ -22,26 +19,22 @@ public class FilteredComboBox extends JComboBox {
 
     public FilteredComboBox(List<String> entries) {
         super(entries.toArray());
+
         this.entries = entries;
         this.setEditable(true);
 
-        final JTextField textfield =
-                (JTextField) this.getEditor().getEditorComponent();
+        final JTextField textfield = (JTextField) this.getEditor().getEditorComponent();
 
         textfield.addKeyListener(new KeyAdapter() {
             public void keyReleased(KeyEvent ke) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        comboFilter(textfield.getText());
-                    }
-                });
+                SwingUtilities.invokeLater(() -> comboFilter(textfield.getText()));
             }
         });
 
     }
 
     public void comboFilter(String enteredText) {
-        List<String> entriesFiltered = new ArrayList<String>();
+        List<String> entriesFiltered = new ArrayList<>();
 
         for (String entry : getEntries()) {
             if (entry.toLowerCase().contains(enteredText.toLowerCase())) {
@@ -49,14 +42,13 @@ public class FilteredComboBox extends JComboBox {
             }
         }
 
-        if (entriesFiltered.size() > 0) {
-            this.setModel(
-                    new DefaultComboBoxModel(
-                            entriesFiltered.toArray()));
-            this.setSelectedItem(enteredText);
-            this.showPopup();
-        } else {
+        if (entriesFiltered.size() == 0) {
             this.hidePopup();
+            return;
         }
+
+        this.setModel(new DefaultComboBoxModel(entriesFiltered.toArray()));
+        this.setSelectedItem(enteredText);
+        this.showPopup();
     }
 }

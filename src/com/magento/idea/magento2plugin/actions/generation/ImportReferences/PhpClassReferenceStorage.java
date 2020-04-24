@@ -7,10 +7,11 @@ package com.magento.idea.magento2plugin.actions.generation.ImportReferences;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.refactoring.importReferences.PhpClassReferenceExtractor;
 import gnu.trove.THashMap;
-import java.util.Map;
-import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Map;
+import java.util.Set;
 
 public class PhpClassReferenceStorage extends PhpClassReferenceExtractor {
     private final Map<String, String> myReferences = new THashMap();

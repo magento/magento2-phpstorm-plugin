@@ -10,7 +10,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
-import com.intellij.psi.xml.*;
+import com.intellij.psi.xml.XmlAttributeValue;
+import com.intellij.psi.xml.XmlFile;
 import com.jetbrains.php.lang.PhpLangUtil;
 import com.magento.idea.magento2plugin.actions.generation.data.PreferenceDiXmFileData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateDiXml;
@@ -19,6 +20,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.XmlFile
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Properties;
@@ -39,8 +41,7 @@ public class PreferenceDiXmlGenerator extends FileGenerator {
         this.positionUtil = XmlFilePositionUtil.getInstance();
     }
 
-    public PsiFile generate(String actionName)
-    {
+    public PsiFile generate(String actionName) {
         PsiFile diXmlFile = findOrCreateDiXml.execute(actionName, preferenceDiXmFileData.getPreferenceModule(), preferenceDiXmFileData.getArea());
         boolean isPreferenceDeclared = getTypeAttributeValue((XmlFile) diXmlFile);
         if (isPreferenceDeclared) {
@@ -72,7 +73,7 @@ public class PreferenceDiXmlGenerator extends FileGenerator {
     private boolean getTypeAttributeValue(XmlFile diXml) {
         Collection<XmlAttributeValue> preferences = XmlPsiTreeUtil.findAttributeValueElements(diXml, ModuleDiXml.PREFERENCE_TAG_NAME, ModuleDiXml.PREFERENCE_ATTR_FOR);
         String fqn = preferenceDiXmFileData.getTargetClass().getPresentableFQN();
-        for (XmlAttributeValue preference: preferences) {
+        for (XmlAttributeValue preference : preferences) {
             if (!PhpLangUtil.toPresentableFQN(preference.getValue()).equals(fqn)) {
                 continue;
             }

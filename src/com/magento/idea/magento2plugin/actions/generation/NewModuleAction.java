@@ -8,12 +8,9 @@ import com.intellij.ide.IdeView;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.jetbrains.php.lang.psi.PhpFile;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewModuleDialog;
 import com.magento.idea.magento2plugin.actions.generation.util.IsClickedDirectoryInsideProject;
@@ -29,6 +26,7 @@ public class NewModuleAction extends com.intellij.openapi.actionSystem.AnAction 
     NewModuleAction() {
         super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
     }
+
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         DataContext dataContext = e.getDataContext();
@@ -77,7 +75,7 @@ public class NewModuleAction extends com.intellij.openapi.actionSystem.AnAction 
                 return;
             }
 
-            if(!IsClickedDirectoryInsideProject.getInstance().execute(project, (PsiDirectory) psiElement)) {
+            if (!IsClickedDirectoryInsideProject.getInstance().execute(project, (PsiDirectory) psiElement)) {
                 event.getPresentation().setVisible(false);
                 return;
             }

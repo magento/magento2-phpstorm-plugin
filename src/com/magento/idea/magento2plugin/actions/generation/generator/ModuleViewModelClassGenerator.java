@@ -12,12 +12,13 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.ViewModelFileData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.ViewModelPhp;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import org.jetbrains.annotations.NotNull;
+
 import javax.swing.*;
 import java.util.Properties;
 
@@ -66,7 +67,7 @@ public class ModuleViewModelClassGenerator extends FileGenerator {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(getViewModelModule());
         String[] viewModelDirectories = viewModelFileData.getViewModelDirectory().split("/");
-        for (String viewModelDirectory: viewModelDirectories) {
+        for (String viewModelDirectory : viewModelDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, viewModelDirectory);
         }
 

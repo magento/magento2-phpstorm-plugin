@@ -19,6 +19,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.code.PluginMethod
 import com.magento.idea.magento2plugin.magento.files.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -35,7 +36,7 @@ public class PluginMethodsGenerator {
         super();
         this.pluginClass = pluginClass;
         this.myMethod = method;
-        this.myTargetClass = (PhpClass)Objects.requireNonNull(method.getUserData(targetClassKey));
+        this.myTargetClass = (PhpClass) Objects.requireNonNull(method.getUserData(targetClassKey));
     }
 
     @NotNull
@@ -50,11 +51,11 @@ public class PluginMethodsGenerator {
             if (dummyClass != null) {
                 PhpDocComment currDocComment = null;
 
-                for(PsiElement child = dummyClass.getFirstChild(); child != null; child = child.getNextSibling()) {
+                for (PsiElement child = dummyClass.getFirstChild(); child != null; child = child.getNextSibling()) {
                     if (child instanceof PhpDocComment) {
-                        currDocComment = (PhpDocComment)child;
+                        currDocComment = (PhpDocComment) child;
                     } else if (child instanceof Method) {
-                        pluginMethods.add(new PluginMethodData(myMethod, currDocComment, (Method)child));
+                        pluginMethods.add(new PluginMethodData(myMethod, currDocComment, (Method) child));
                         currDocComment = null;
                     }
                 }
@@ -144,8 +145,8 @@ public class PluginMethodsGenerator {
 
         PhpNamedElement element;
         int i = 0;
-        for(Iterator iterator = parameters.iterator(); iterator.hasNext(); i++) {
-            element = (PhpNamedElement)iterator.next();
+        for (Iterator iterator = parameters.iterator(); iterator.hasNext(); i++) {
+            element = (PhpNamedElement) iterator.next();
 
             if (sb.length() > 0) {
                 sb.append("\n");
@@ -195,8 +196,8 @@ public class PluginMethodsGenerator {
         Iterator iterator = parameters.iterator();
 
         Integer i = 0;
-        while(iterator.hasNext()) {
-            PhpNamedElement element = (PhpNamedElement)iterator.next();
+        while (iterator.hasNext()) {
+            PhpNamedElement element = (PhpNamedElement) iterator.next();
             if (i != 0) {
                 buf.append(',');
             }
@@ -215,14 +216,14 @@ public class PluginMethodsGenerator {
                 }
                 buf.append("$").append(paramName);
             }
-            if (type.equals(Plugin.PluginType.after) && i == 0){
+            if (type.equals(Plugin.PluginType.after) && i == 0) {
                 if (returnType != null && !returnType.getText().equals("void")) {
                     buf.append(", ").append(returnType.getText()).append(" $result");
                 } else {
                     buf.append(", $result");
                 }
             }
-            if (type.equals(Plugin.PluginType.around) && i == 0){
+            if (type.equals(Plugin.PluginType.around) && i == 0) {
                 buf.append(", callable $proceed");
             }
             i++;
@@ -242,7 +243,7 @@ public class PluginMethodsGenerator {
         }
         boolean isFirst = true;
 
-        for (Parameter parameter: parameters) {
+        for (Parameter parameter : parameters) {
             if (isFirst) {
                 isFirst = false;
             } else {
@@ -304,8 +305,8 @@ public class PluginMethodsGenerator {
             PhpType phpType = new PhpType();
             Iterator iterator = filedType.getTypes().iterator();
 
-            while(iterator.hasNext()) {
-                String type = (String)iterator.next();
+            while (iterator.hasNext()) {
+                String type = (String) iterator.next();
                 if (!type.equalsIgnoreCase("\\null")) {
                     phpType.add(type);
                 }

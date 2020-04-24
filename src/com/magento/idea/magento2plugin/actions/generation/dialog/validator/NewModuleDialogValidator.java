@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewModuleDialog;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.util.RegExUtil;
+
 import javax.swing.*;
 
 public class NewModuleDialogValidator {
@@ -26,8 +27,7 @@ public class NewModuleDialogValidator {
         this.validatorBundle = new ValidatorBundle();
     }
 
-    public boolean validate()
-    {
+    public boolean validate() {
         String errorTitle = "Error";
         String packageName = dialog.getPackageName();
         if (packageName.length() == 0) {
