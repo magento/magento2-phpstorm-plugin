@@ -16,7 +16,7 @@ import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
 import javax.swing.*;
 import java.awt.event.*;
-import java.io.File;
+import com.magento.idea.magento2plugin.magento.packages.File;
 
 public class NewViewModelDialog extends AbstractDialog {
     private final NewViewModelValidator validator;

@@ -20,6 +20,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.GraphQlResolverFi
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.util.CodeStyleSettings;
+import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.GraphQlResolverPhp;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
@@ -28,12 +29,14 @@ import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.Properties;
 
 public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
     private GraphQlResolverFileData graphQlResolverFileData;
     private Project project;
     private ValidatorBundle validatorBundle;
+    private CommonBundle commonBundle;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final GetFirstClassOfFile getFirstClassOfFile;
@@ -46,6 +49,7 @@ public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
         this.graphQlResolverFileData = graphQlResolverFileData;
         this.project = project;
         this.validatorBundle = new ValidatorBundle();
+        this.commonBundle = new CommonBundle();
     }
 
     @Override
@@ -63,7 +67,7 @@ public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
                 JOptionPane.showMessageDialog(
                         null,
                         errorMessage,
-                        "Error",
+                        commonBundle.message("common.error"),
                         JOptionPane.ERROR_MESSAGE
                 );
 
@@ -105,7 +109,7 @@ public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
     private PhpClass createGraphQlResolverClass(String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(graphQlResolverFileData.getGraphQlResolverModule());
-        String[] graphQlResolverDirectories = graphQlResolverFileData.getGraphQlResolverDirectory().split("/");
+        String[] graphQlResolverDirectories = graphQlResolverFileData.getGraphQlResolverDirectory().split(File.separator);
         for (String graphQlResolverDirectory: graphQlResolverDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, graphQlResolverDirectory);
         }

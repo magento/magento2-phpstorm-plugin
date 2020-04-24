@@ -1,10 +1,13 @@
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 package com.magento.idea.magento2plugin.inspections.php;
 
-import com.magento.idea.magento2plugin.BaseProjectTestCase;
+import com.magento.idea.magento2plugin.inspections.BaseInspectionsTestCase;
+import com.magento.idea.magento2plugin.magento.packages.File;
 
-import java.io.File;
-
-abstract public class InspectionPhpFixtureTestCase extends BaseProjectTestCase {
+abstract public class InspectionPhpFixtureTestCase extends BaseInspectionsTestCase {
 
     private static final String testDataFolderPath = "testData" + File.separator + "inspections" + File.separator;
     private static final String fixturesFolderPath = "php" + File.separator;

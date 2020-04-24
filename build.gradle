@@ -50,4 +50,8 @@ sourceSets {
     }
 }
 
+publishPlugin {
+    token = System.getenv("MAGENTO_PHPSTORM_intellijPublishToken")
+}
+
 apply from: "${project.rootDir}/gradle-tasks/staticChecks.gradle"

@@ -29,6 +29,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFro
 import com.magento.idea.magento2plugin.actions.generation.util.CodeStyleSettings;
 import com.magento.idea.magento2plugin.actions.generation.util.CollectInsertedMethods;
 import com.magento.idea.magento2plugin.actions.generation.util.FillTextBufferWithPluginMethods;
+import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
@@ -38,6 +39,7 @@ import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import gnu.trove.THashSet;
 import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
@@ -47,6 +49,7 @@ public class PluginClassGenerator extends FileGenerator {
     private PluginFileData pluginFileData;
     private Project project;
     private ValidatorBundle validatorBundle;
+    private CommonBundle commonBundle;
     private final FillTextBufferWithPluginMethods fillTextBuffer;
     private final CollectInsertedMethods collectInsertedMethods;
     private final DirectoryGenerator directoryGenerator;
@@ -63,6 +66,7 @@ public class PluginClassGenerator extends FileGenerator {
         this.pluginFileData = pluginFileData;
         this.project = project;
         this.validatorBundle = new ValidatorBundle();
+        this.commonBundle = new CommonBundle();
     }
 
     public PsiFile generate(String actionName)
@@ -70,12 +74,13 @@ public class PluginClassGenerator extends FileGenerator {
         final PsiFile[] pluginFile = {null};
         WriteCommandAction.runWriteCommandAction(project, () -> {
             PhpClass pluginClass = GetPhpClassByFQN.getInstance(project).execute(pluginFileData.getPluginFqn());
+            String errorTitle = commonBundle.message("common.error");
             if (pluginClass == null) {
                 pluginClass = createPluginClass(actionName);
             }
             if (pluginClass == null) {
                 String errorMessage = validatorBundle.message("validator.file.cantBeCreated", "Plugin Class");
-                JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
                 return;
             }
@@ -88,7 +93,7 @@ public class PluginClassGenerator extends FileGenerator {
             PluginMethodData[] pluginMethodData = pluginGenerator.createPluginMethods(getPluginType());
             if (checkIfMethodExist(pluginClass, pluginMethodData)) {
                 String errorMessage = validatorBundle.message("validator.file.alreadyExists", "Plugin Class");
-                JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
                 return;
             }
@@ -141,7 +146,7 @@ public class PluginClassGenerator extends FileGenerator {
 
     private PhpClass createPluginClass(String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project).getModuleDirectoryByModuleName(getPluginModule());
-        String[] pluginDirectories = pluginFileData.getPluginDirectory().split("/");
+        String[] pluginDirectories = pluginFileData.getPluginDirectory().split(File.separator);
         for (String pluginDirectory: pluginDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, pluginDirectory);
         }

@@ -1,10 +1,9 @@
 package com.magento.idea.magento2plugin.inspections.xml;
 
-import com.magento.idea.magento2plugin.BaseProjectTestCase;
+import com.magento.idea.magento2plugin.inspections.BaseInspectionsTestCase;
+import com.magento.idea.magento2plugin.magento.packages.File;
 
-import java.io.File;
-
-abstract public class InspectionXmlFixtureTestCase extends BaseProjectTestCase {
+abstract public class InspectionXmlFixtureTestCase extends BaseInspectionsTestCase {
 
     private static final String testDataFolderPath = "testData" + File.separator + "inspections" + File.separator;
     private static final String fixturesFolderPath = "xml" + File.separator;

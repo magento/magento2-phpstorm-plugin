@@ -34,6 +34,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.code.PluginM
 import com.magento.idea.magento2plugin.actions.generation.util.CodeStyleSettings;
 import com.magento.idea.magento2plugin.actions.generation.util.CollectInsertedMethods;
 import com.magento.idea.magento2plugin.actions.generation.util.FillTextBufferWithPluginMethods;
+import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
@@ -49,6 +50,7 @@ import java.util.*;
 public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeInsightActionHandler {
     private CollectInsertedMethods collectInsertedMethods;
     private ValidatorBundle validatorBundle;
+    private CommonBundle commonBundle;
     public String type;
     public FillTextBufferWithPluginMethods fillTextBuffer;
 
@@ -57,6 +59,7 @@ public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeIns
         this.fillTextBuffer = FillTextBufferWithPluginMethods.getInstance();
         this.collectInsertedMethods = CollectInsertedMethods.getInstance();
         this.validatorBundle = new ValidatorBundle();
+        this.commonBundle = new CommonBundle();
     }
 
     public boolean isValidFor(Editor editor, PsiFile file) {
@@ -165,7 +168,7 @@ public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeIns
 
             if (targetClass == null) {
                 String errorMessage = validatorBundle.message("validator.class.targetClassNotFound");
-                JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, errorMessage, commonBundle.message("common.error"), JOptionPane.ERROR_MESSAGE);
                 continue;
             }
 

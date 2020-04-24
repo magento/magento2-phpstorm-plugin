@@ -18,8 +18,10 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
+import com.magento.idea.magento2plugin.bundles.InspectionBundle;
 import com.magento.idea.magento2plugin.inspections.php.util.PhpClassImplementsInterfaceUtil;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
+import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.magento.plugin.GetTargetClassNamesByPluginClassName;
 import org.jetbrains.annotations.NotNull;
@@ -31,15 +33,9 @@ public class PluginInspection extends PhpInspection {
     @Override
     public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder problemsHolder, boolean b) {
         return new PhpElementVisitor() {
-            private static final String pluginOnNotPublicMethodProblemDescription = "You can't declare a plugin for a not public method";
-            private static final String pluginOnFinalClassProblemDescription = "You can't declare a plugin for a final class!";
-            private static final String pluginOnFinalMethodProblemDescription = "You can't declare a plugin for a final method!";
-            private static final String pluginOnStaticMethodProblemDescription = "You can't declare a plugin for a static method!";
-            private static final String pluginOnConstructorMethodProblemDescription = "You can't declare a plugin for a __construct method!";
-            private static final String redundantParameterProblemDescription = "Redundant parameter";
-            private static final String possibleTypeIncompatibilityProblemDescription = "Possible type incompatibility. Consider changing the parameter according to the target method.";
             private final Integer beforePluginExtraParamsStart = 2;
             private final Integer afterAndAroundPluginExtraParamsStart = 3;
+            private InspectionBundle inspectionBundle = new InspectionBundle();
 
             private String getPluginPrefix(Method pluginMethod) {
                 String pluginMethodName = pluginMethod.getName();
@@ -98,23 +94,43 @@ public class PluginInspection extends PhpInspection {
                     ProblemDescriptor[] currentResults = problemsHolder.getResultsArray();
                     int finalClassProblems = getFinalClassProblems(currentResults);
                     if (finalClassProblems == 0) {
-                        problemsHolder.registerProblem(currentClassNameIdentifier, pluginOnFinalClassProblemDescription, ProblemHighlightType.ERROR);
+                        problemsHolder.registerProblem(
+                            currentClassNameIdentifier,
+                            inspectionBundle.message("inspection.plugin.error.finalClass"),
+                            ProblemHighlightType.ERROR
+                        );
                     }
                 }
             }
 
             private void checkTargetMethod(Method pluginMethod, String targetClassMethodName, Method targetMethod) {
                 if (targetClassMethodName.equals(Plugin.constructMethodName)) {
-                    problemsHolder.registerProblem(pluginMethod.getNameIdentifier(), pluginOnConstructorMethodProblemDescription, ProblemHighlightType.ERROR);
+                    problemsHolder.registerProblem(
+                        pluginMethod.getNameIdentifier(),
+                        inspectionBundle.message("inspection.plugin.error.constructMethod"),
+                        ProblemHighlightType.ERROR
+                    );
                 }
                 if (targetMethod.isFinal()) {
-                    problemsHolder.registerProblem(pluginMethod.getNameIdentifier(), pluginOnFinalMethodProblemDescription, ProblemHighlightType.ERROR);
+                    problemsHolder.registerProblem(
+                        pluginMethod.getNameIdentifier(),
+                        inspectionBundle.message("inspection.plugin.error.finalMethod"),
+                        ProblemHighlightType.ERROR
+                    );
                 }
                 if (targetMethod.isStatic()) {
-                    problemsHolder.registerProblem(pluginMethod.getNameIdentifier(), pluginOnStaticMethodProblemDescription, ProblemHighlightType.ERROR);
+                    problemsHolder.registerProblem(
+                        pluginMethod.getNameIdentifier(),
+                        inspectionBundle.message("inspection.plugin.error.staticMethod"),
+                        ProblemHighlightType.ERROR
+                    );
                 }
                 if (!targetMethod.getAccess().toString().equals(Plugin.publicAccess)) {
-                    problemsHolder.registerProblem(pluginMethod.getNameIdentifier(), pluginOnNotPublicMethodProblemDescription, ProblemHighlightType.ERROR);
+                    problemsHolder.registerProblem(
+                        pluginMethod.getNameIdentifier(),
+                        inspectionBundle.message("inspection.plugin.error.nonPublicMethod"),
+                        ProblemHighlightType.ERROR
+                    );
                 }
             }
 
@@ -128,17 +144,22 @@ public class PluginInspection extends PhpInspection {
                     String declaredType = pluginMethodParameter.getDeclaredType().toString();
 
                     if (index == 1) {
-                        String targetClassFqn = "\\".concat(targetClassName);
+                        String targetClassFqn = Package.FQN_SEPARATOR.concat(targetClassName);
                         if (!checkTypeIncompatibility(targetClassFqn, declaredType, phpIndex)) {
                             problemsHolder.registerProblem(pluginMethodParameter, PhpBundle.message("inspection.wrong_param_type", new Object[]{declaredType, targetClassFqn}), ProblemHighlightType.ERROR);
                         }
                         if (!checkPossibleTypeIncompatibility(targetClassFqn, declaredType, phpIndex)) {
-                            problemsHolder.registerProblem(pluginMethodParameter, possibleTypeIncompatibilityProblemDescription, ProblemHighlightType.WEAK_WARNING);
+                            problemsHolder.registerProblem(
+                                pluginMethodParameter,
+                                inspectionBundle.message("inspection.plugin.error.typeIncompatibility"),
+                                ProblemHighlightType.WEAK_WARNING
+                            );
                         }
                         continue;
                     }
                     if (index == 2 && pluginPrefix.equals(Plugin.PluginType.around.toString())) {
-                        if (!checkTypeIncompatibility("callable", declaredType, phpIndex)) {
+                        if (!checkTypeIncompatibility(Plugin.CALLABLE_PARAM, declaredType, phpIndex) &&
+                                !checkTypeIncompatibility(Package.FQN_SEPARATOR.concat(Plugin.CLOSURE_PARAM), declaredType, phpIndex)) {
                             problemsHolder.registerProblem(pluginMethodParameter, PhpBundle.message("inspection.wrong_param_type", new Object[]{declaredType, "callable"}), ProblemHighlightType.ERROR);
                         }
                         continue;
@@ -152,7 +173,11 @@ public class PluginInspection extends PhpInspection {
                             problemsHolder.registerProblem(pluginMethodParameter, PhpBundle.message("inspection.wrong_param_type", new Object[]{declaredType, targetMethod.getDeclaredType().toString()}), ProblemHighlightType.ERROR);
                         }
                         if (!checkPossibleTypeIncompatibility(targetMethod.getDeclaredType().toString(), declaredType, phpIndex)) {
-                            problemsHolder.registerProblem(pluginMethodParameter, possibleTypeIncompatibilityProblemDescription, ProblemHighlightType.WEAK_WARNING);
+                            problemsHolder.registerProblem(
+                                pluginMethodParameter,
+                                inspectionBundle.message("inspection.plugin.error.typeIncompatibility"),
+                                ProblemHighlightType.WEAK_WARNING
+                            );
                         }
                         continue;
                     }
@@ -170,7 +195,11 @@ public class PluginInspection extends PhpInspection {
                             beforePluginExtraParamsStart :
                             afterAndAroundPluginExtraParamsStart);
                     if (targetMethodParameters.length <= targetParameterKey) {
-                        problemsHolder.registerProblem(pluginMethodParameter, redundantParameterProblemDescription, ProblemHighlightType.ERROR);
+                        problemsHolder.registerProblem(
+                            pluginMethodParameter,
+                            inspectionBundle.message("inspection.plugin.error.redundantParameter"),
+                            ProblemHighlightType.ERROR
+                        );
                         continue;
                     }
                     Parameter targetMethodParameter = targetMethodParameters[targetParameterKey];
@@ -180,7 +209,11 @@ public class PluginInspection extends PhpInspection {
                         problemsHolder.registerProblem(pluginMethodParameter, PhpBundle.message("inspection.wrong_param_type", new Object[]{declaredType, targetMethodParameterDeclaredType}), ProblemHighlightType.ERROR);
                     }
                     if (!checkPossibleTypeIncompatibility(targetMethodParameterDeclaredType, declaredType, phpIndex)) {
-                        problemsHolder.registerProblem(pluginMethodParameter, possibleTypeIncompatibilityProblemDescription, ProblemHighlightType.WEAK_WARNING);
+                        problemsHolder.registerProblem(
+                            pluginMethodParameter,
+                            inspectionBundle.message("inspection.plugin.error.typeIncompatibility"),
+                            ProblemHighlightType.WEAK_WARNING
+                        );
                     }
                 }
             }
@@ -202,7 +235,7 @@ public class PluginInspection extends PhpInspection {
             private int getFinalClassProblems(ProblemDescriptor[] currentResults) {
                 int finalClassProblems = 0;
                 for (ProblemDescriptor currentProblem : currentResults) {
-                    if (currentProblem.getDescriptionTemplate().equals(pluginOnFinalClassProblemDescription)) {
+                    if (currentProblem.getDescriptionTemplate().equals(inspectionBundle.message("inspection.plugin.error.finalClass"))) {
                         finalClassProblems++;
                     }
                 }

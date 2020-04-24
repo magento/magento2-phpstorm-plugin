@@ -14,6 +14,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.PreferenceFileDat
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.OverrideClassByAPreferenceDialogValidator;
 import com.magento.idea.magento2plugin.actions.generation.generator.PreferenceClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.PreferenceDiXmlGenerator;
+import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
@@ -21,7 +22,7 @@ import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.event.*;
-import java.io.File;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.List;
 
 public class OverrideClassByAPreferenceDialog extends AbstractDialog {
@@ -44,12 +45,14 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog {
     private JLabel inheritClassLabel;
     private JLabel preferenceDirectoryLabel;
     private ValidatorBundle validatorBundle;
+    private CommonBundle commonBundle;
 
     public OverrideClassByAPreferenceDialog(@NotNull Project project, PhpClass targetClass) {
         this.project = project;
         this.targetClass = targetClass;
         this.validator = OverrideClassByAPreferenceDialogValidator.getInstance(this);
         this.validatorBundle = new ValidatorBundle();
+        this.commonBundle = new CommonBundle();
 
         setContentPane(contentPane);
         setModal(true);
@@ -127,7 +130,8 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog {
         ), project).generate(OverrideClassByAPreferenceAction.ACTION_NAME);
         if (diXml == null) {
             String errorMessage = validatorBundle.message("validator.class.alreadyDeclared", "Preference");
-            JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+            String errorTitle = commonBundle.message("common.error");
+            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return;
         }

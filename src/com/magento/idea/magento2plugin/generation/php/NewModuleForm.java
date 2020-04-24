@@ -25,7 +25,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.io.File;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

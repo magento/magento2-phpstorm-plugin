@@ -20,6 +20,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.ObserverFileData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.util.CodeStyleSettings;
+import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.Observer;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
@@ -27,6 +28,7 @@ import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import javax.swing.*;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.Properties;
 
 public class ObserverClassGenerator extends FileGenerator {
@@ -36,6 +38,7 @@ public class ObserverClassGenerator extends FileGenerator {
     private ObserverFileData observerFileData;
     private Project project;
     private ValidatorBundle validatorBundle;
+    private CommonBundle commonBundle;
 
     public ObserverClassGenerator(ObserverFileData observerFileData, Project project) {
         super(project);
@@ -46,6 +49,7 @@ public class ObserverClassGenerator extends FileGenerator {
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
         this.validatorBundle = new ValidatorBundle();
+        this.commonBundle = new CommonBundle();
     }
 
     @Override
@@ -64,7 +68,7 @@ public class ObserverClassGenerator extends FileGenerator {
                 JOptionPane.showMessageDialog(
                         null,
                         errorMessage,
-                        "Error",
+                        commonBundle.message("common.error"),
                         JOptionPane.ERROR_MESSAGE
                 );
 
@@ -112,7 +116,7 @@ public class ObserverClassGenerator extends FileGenerator {
     private PhpClass createObserverClass(String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(observerFileData.getObserverModule());
-        String[] observerDirectories = observerFileData.getObserverDirectory().split("/");
+        String[] observerDirectories = observerFileData.getObserverDirectory().split(File.separator);
         for (String observerDirectory: observerDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, observerDirectory);
         }

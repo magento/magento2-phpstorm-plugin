@@ -170,34 +170,6 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
             )
         );
 
-        // <someXmlTag url="{{someValue}}" /> in MFTF Tests and ActionGroups
-        registrar.registerReferenceProvider(
-            XmlPatterns.xmlAttributeValue().withValue(
-                string().matches(RegExUtil.Magento.MFTF_CURLY_BRACES)
-            ).withParent(XmlPatterns.xmlAttribute().withName(
-                MftfActionGroup.URL_ATTRIBUTE
-            ).withParent(XmlPatterns.xmlTag().withParent(XmlPatterns.xmlTag().withName(
-                string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.ROOT_TAG)
-            )))),
-            new CompositeReferenceProvider(
-                new PageReferenceProvider()
-            )
-        );
-        registrar.registerReferenceProvider(
-            XmlPatterns.xmlAttributeValue().withValue(
-                string().matches(RegExUtil.Magento.MFTF_CURLY_BRACES)
-            ).withParent(XmlPatterns.xmlAttribute().withName(
-                MftfActionGroup.URL_ATTRIBUTE
-            ).withParent(XmlPatterns.xmlTag().withParent(XmlPatterns.xmlTag().withParent(
-                XmlPatterns.xmlTag().withName(
-                    string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.ROOT_TAG)
-                )
-            )))),
-            new CompositeReferenceProvider(
-                    new PageReferenceProvider()
-            )
-        );
-
         // <createData entity="SimpleProduct" />
         // <updateData entity="SimpleProduct" />
         registrar.registerReferenceProvider(
@@ -220,20 +192,6 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
             )
         );
 
-        // <assert*><*Result type="variable">$someVariableReferenceToStepKey</*Result></assert*>
-        registrar.registerReferenceProvider(
-            XmlPatterns.psiElement(XmlTokenType.XML_DATA_CHARACTERS).withParent(
-                XmlPatterns.xmlText().withParent(
-                    XmlPatterns.xmlTag().withChild(
-                        XmlPatterns.xmlAttribute().withName("type")
-                    )
-                )
-            ),
-            new CompositeReferenceProvider(
-                new VariableToStepKeyProvider()
-            )
-        );
-
         // <actionGroup extends="parentActionGroup" />
         registrar.registerReferenceProvider(
             XmlPatterns.xmlAttributeValue().withParent(XmlPatterns.xmlAttribute().withName("extends")
@@ -249,6 +207,20 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
                 .withParent(XmlPatterns.xmlTag().withName("entity"))),
             new CompositeReferenceProvider(
                 new DataReferenceProvider()
+            )
+        );
+
+        // <test name="B" extends="A" />
+        registrar.registerReferenceProvider(
+            XmlPatterns.xmlAttributeValue().withParent(XmlPatterns.xmlAttribute()
+                .withName(MftfTest.EXTENDS_ATTRIBUTE)
+                .withParent(XmlPatterns.xmlTag().withName(MftfTest.TEST_TAG)
+                    .withParent(XmlPatterns.xmlTag().withName(MftfTest.ROOT_TAG)
+                    )
+                )
+            ),
+            new CompositeReferenceProvider(
+                new TestNameReferenceProvider()
             )
         );
 
@@ -273,5 +245,44 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
                 ),
                 new RequireJsPreferenceReferenceProvider()
         );
+
+        registerReferenceForDifferentNesting(registrar);
+    }
+
+    private void registerReferenceForDifferentNesting(@NotNull PsiReferenceRegistrar registrar) {
+        int i = 1;
+        int maxNesting = 10;
+        while( i < maxNesting) {
+
+            // <someXmlTag url="{{someValue}}" /> in MFTF Tests and ActionGroups
+            registrar.registerReferenceProvider(
+                XmlPatterns.xmlAttributeValue().withValue(
+                    string().matches(RegExUtil.Magento.MFTF_CURLY_BRACES)
+                ).withParent(XmlPatterns.xmlAttribute().withName(
+                    MftfActionGroup.URL_ATTRIBUTE
+                ).withParent(XmlPatterns.xmlTag().withSuperParent(i, XmlPatterns.xmlTag().withName(
+                    string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.TEST_TAG)
+                )))),
+                new CompositeReferenceProvider(
+                    new PageReferenceProvider()
+                )
+            );
+
+            // <someXmlTag selector="{{someValue}}" /> in MFTF Tests and ActionGroups
+            registrar.registerReferenceProvider(
+                XmlPatterns.xmlAttributeValue().withValue(
+                    string().matches(RegExUtil.Magento.MFTF_CURLY_BRACES)
+                ).withParent(XmlPatterns.xmlAttribute().withName(
+                    MftfActionGroup.SELECTOR_ATTRIBUTE
+                ).withParent(XmlPatterns.xmlTag().withSuperParent(i, XmlPatterns.xmlTag().withName(
+                    string().oneOf(MftfActionGroup.ROOT_TAG, MftfTest.TEST_TAG)
+                )))),
+                new CompositeReferenceProvider(
+                    new SectionReferenceProvider()
+                )
+            );
+
+            i++;
+        }
     }
 }

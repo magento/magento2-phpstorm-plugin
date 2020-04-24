@@ -4,9 +4,11 @@
  */
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.BaseProjectTestCase;
-import java.io.File;
+import com.magento.idea.magento2plugin.magento.packages.File;
+import com.magento.idea.magento2plugin.project.util.GetProjectBasePath;
 
 abstract public class BaseGeneratorTestCase extends BaseProjectTestCase {
     private static final String testDataFolderPath = "testData" + File.separator + "actions" + File.separator;
@@ -31,5 +33,11 @@ abstract public class BaseGeneratorTestCase extends BaseProjectTestCase {
             .endsWith(expectedDirectory));
         assertEquals(expectedFile.getText(), resultFile.getText());
         assertEquals(expectedFile.getName(), resultFile.getName());
+    }
+
+    protected PsiDirectory getProjectDirectory() {
+        return myFixture.getPsiManager().findDirectory(
+            GetProjectBasePath.execute(myFixture.getProject())
+        );
     }
 }
