@@ -35,14 +35,19 @@ public class SchemaResolverInspection extends LocalInspectionTool {
                 GetPhpClassByFQN getPhpClassByFQN = GetPhpClassByFQN.getInstance(holder.getProject());
                 PhpClass resolverClass = getPhpClassByFQN.execute(resolverFQN);
                 if (resolverClass == null) {
+                    holder.registerProblem(element,
+                        inspectionBundle.message(
+                            "inspection.graphql.resolver.notExist"
+                        ),
+                        ProblemHighlightType.ERROR);
                     return;
                 }
                 if (!GraphQlUtil.isResolver(resolverClass)) {
                     holder.registerProblem(element,
-                            inspectionBundle.message(
-                                    "inspection.graphql.resolver.mustImplement"
-                            ),
-                            ProblemHighlightType.ERROR);
+                        inspectionBundle.message(
+                            "inspection.graphql.resolver.mustImplement"
+                        ),
+                        ProblemHighlightType.ERROR);
                 }
             }
         };

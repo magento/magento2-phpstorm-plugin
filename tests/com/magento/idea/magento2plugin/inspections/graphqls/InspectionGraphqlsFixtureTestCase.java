@@ -6,8 +6,7 @@
 package com.magento.idea.magento2plugin.inspections.graphqls;
 
 import com.magento.idea.magento2plugin.BaseProjectTestCase;
-import com.intellij.codeInsight.daemon.impl.HighlightInfo;
-import java.io.File;
+import com.magento.idea.magento2plugin.magento.packages.File;
 
 abstract public class InspectionGraphqlsFixtureTestCase extends BaseProjectTestCase {
 

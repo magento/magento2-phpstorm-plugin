@@ -5,10 +5,10 @@
  */
 declare(strict_types=1);
 
-namespace Magento\InspectionTest\Model\GraphQl\WithValidSchemaResolverInterface;
+namespace Magento\CatalogGraphQl\Model\Resolver;
 
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 
-class Item implements ResolverInterface
+class ImplementsResolverInterface implements ResolverInterface
 {
 }

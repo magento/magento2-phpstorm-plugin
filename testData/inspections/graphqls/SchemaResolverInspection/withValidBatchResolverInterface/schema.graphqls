@@ -2,5 +2,5 @@
 # See COPYING.txt for license details.
 
 type Query {
-    test(input: test!): test @resolver(class: "\\Magento\\InspectionTest\\Model\\GraphQl\\WithValidBatchResolverInterface\\Item") @doc(description: "Test")
+    test(input: test!): test @resolver(class: "\\Magento\\CatalogGraphQl\\Model\\Resolver\\ImplementsBatchResolverInterface") @doc(description: "Test")
 }

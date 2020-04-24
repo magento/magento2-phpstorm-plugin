@@ -4,6 +4,8 @@
  */
 package com.magento.idea.magento2plugin.inspections.graphqls;
 
+import com.magento.idea.magento2plugin.magento.files.GraphQLSchema;
+
 public class SchemaResolverInspectionTest extends InspectionGraphqlsFixtureTestCase {
 
     private final String errorMessage =  inspectionBundle.message(
@@ -21,23 +23,23 @@ public class SchemaResolverInspectionTest extends InspectionGraphqlsFixtureTestC
     }
 
     public void testWithValidSchemaResolverInterface() throws Exception {
-        myFixture.configureByFile(getFixturePath("schema.graphqls"));
+        myFixture.configureByFile(getFixturePath(GraphQLSchema.FILE_NAME));
         assertHasNoHighlighting(errorMessage);
     }
 
     public void testWithInvalidSchemaResolverInterface() throws Exception {
-        myFixture.configureByFile(getFixturePath("schema.graphqls"));
+        myFixture.configureByFile(getFixturePath(GraphQLSchema.FILE_NAME));
         assertHasHighlighting(errorMessage);
     }
 
     public void testWithValidBatchResolverInterface() throws Exception {
-        myFixture.configureByFile(getFixturePath("schema.graphqls"));
+        myFixture.configureByFile(getFixturePath(GraphQLSchema.FILE_NAME));
 
         assertHasNoHighlighting(errorMessage);
     }
 
     public void testWithValidBatchServiceContractResolverInterface() throws Exception {
-        myFixture.configureByFile(getFixturePath("schema.graphqls"));
+        myFixture.configureByFile(getFixturePath(GraphQLSchema.FILE_NAME));
 
         assertHasNoHighlighting(errorMessage);
     }

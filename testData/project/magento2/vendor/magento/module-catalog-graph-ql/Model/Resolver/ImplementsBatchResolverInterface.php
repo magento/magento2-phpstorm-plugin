@@ -5,11 +5,10 @@
  */
 declare(strict_types=1);
 
-namespace Magento\InspectionTest\Model\GraphQl\WithValidBatchResolverInterface;
+namespace Magento\CatalogGraphQl\Model\Resolver;
 
 use Magento\Framework\GraphQl\Query\Resolver\BatchResolverInterface;
 
-class Item implements BatchResolverInterface
+class ImplementsBatchResolverInterface implements BatchResolverInterface
 {
 }
-?>
