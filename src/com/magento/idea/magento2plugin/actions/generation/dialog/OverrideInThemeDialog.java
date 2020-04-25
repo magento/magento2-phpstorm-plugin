@@ -5,21 +5,12 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.magento.idea.magento2plugin.actions.generation.CreateAPluginAction;
-import com.magento.idea.magento2plugin.actions.generation.data.PluginDiXmlData;
-import com.magento.idea.magento2plugin.actions.generation.data.PluginFileData;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.CreateAPluginDialogValidator;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.OverrideInThemeDialogValidator;
-import com.magento.idea.magento2plugin.actions.generation.generator.PluginClassGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.PluginDiXmlGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.OverrideInThemeGenerator;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.magento.files.Plugin;
-import com.magento.idea.magento2plugin.magento.packages.File;
-import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,8 +21,7 @@ import java.util.List;
 public class OverrideInThemeDialog extends AbstractDialog {
     @NotNull
     private final Project project;
-    private Method targetMethod;
-    private PhpClass targetClass;
+    private final PsiFile psiFile;
     @NotNull
     private final OverrideInThemeDialogValidator validator;
     private JPanel contentPane;
@@ -42,6 +32,7 @@ public class OverrideInThemeDialog extends AbstractDialog {
 
     public OverrideInThemeDialog(@NotNull Project project, PsiFile psiFile) {
         this.project = project;
+        this.psiFile = psiFile;
         this.validator = OverrideInThemeDialogValidator.getInstance(this);
 
         setContentPane(contentPane);
@@ -80,7 +71,8 @@ public class OverrideInThemeDialog extends AbstractDialog {
             return;
         }
 
-        // TODO: implement generator
+        OverrideInThemeGenerator overrideInThemeGenerator = OverrideInThemeGenerator.getInstance(project);
+        overrideInThemeGenerator.execute(psiFile, this.getTheme());
 
         this.setVisible(false);
     }
