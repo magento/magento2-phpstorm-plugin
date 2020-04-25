@@ -45,18 +45,30 @@ public class ModuleIndex {
         return getModuleNames(Package.VENDOR, true);
     }
 
+    public List<String> getEditableThemeNames() {
+        return getThemeNames("/" + Package.VENDOR + "/|/tests/|/test/", true);
+    }
+
     public List<String> getModuleNames() {
         return getModuleNames("/tests/|/test/", false);
     }
 
     public List<String> getModuleNames(String filterPattern, boolean withinProject) {
+        return getNames(filterPattern, withinProject, RegExUtil.Magento.MODULE_NAME);
+    }
+
+    public List<String> getThemeNames(String filterPattern, boolean withinProject) {
+        return getNames(filterPattern, withinProject, RegExUtil.Magento.THEME_NAME);
+    }
+
+    public List<String> getNames(String filterPattern, boolean withinProject, String pattern) {
         FileBasedIndex index = FileBasedIndex
                 .getInstance();
         List<String> allModulesList = new ArrayList<>();
         Collection<String> allModules = index.getAllKeys(ModuleNameIndex.KEY, project);
         Pattern p = Pattern.compile(filterPattern);
         for (String moduleName : allModules) {
-            if (!moduleName.matches(RegExUtil.Magento.MODULE_NAME)) {
+            if (!moduleName.matches(pattern)) {
                 continue;
             }
             Collection<VirtualFile> files = index.getContainingFiles(ModuleNameIndex.KEY, moduleName, GlobalSearchScope.getScopeRestrictedByFileTypes(
