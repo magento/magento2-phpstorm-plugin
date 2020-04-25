@@ -6,7 +6,9 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.util.RegExUtil;
+import com.magento.idea.magento2plugin.util.magento.ComponentType;
 import com.magento.idea.magento2plugin.util.magento.GetComponentNameByDirectory;
+import com.magento.idea.magento2plugin.util.magento.GetComponentTypeByName;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,12 +37,16 @@ public class OverrideInThemeGenerator {
         ModuleIndex moduleIndex = ModuleIndex.getInstance(project);
         PsiDirectory directory = moduleIndex.getModuleDirectoryByModuleName(themeName);
         GetComponentNameByDirectory getComponentNameByDirectory = GetComponentNameByDirectory.getInstance(project);
-        String componentName = getComponentNameByDirectory.execute(baseFile.getContainingDirectory());
+        String componentType = GetComponentTypeByName.execute(getComponentNameByDirectory
+                .execute(baseFile.getContainingDirectory()));
 
         List<String> pathComponents;
-        if (isModule(componentName)) {
-            pathComponents = getModulePathComponents(baseFile, componentName);
-        } else if (isTheme(componentName)) {
+        if (componentType.equals(ComponentType.TYPE_MODULE)) {
+            pathComponents = getModulePathComponents(
+                    baseFile,
+                    getComponentNameByDirectory.execute(baseFile.getContainingDirectory())
+            );
+        } else if (componentType.equals(ComponentType.TYPE_THEME)) {
             pathComponents = getThemePathComponents(baseFile);
         } else {
             return;

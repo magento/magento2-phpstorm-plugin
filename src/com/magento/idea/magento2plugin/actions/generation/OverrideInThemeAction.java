@@ -13,12 +13,10 @@ import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.OverrideInThemeDialog;
 import com.magento.idea.magento2plugin.project.Settings;
-import com.magento.idea.magento2plugin.util.RegExUtil;
+import com.magento.idea.magento2plugin.util.magento.ComponentType;
 import com.magento.idea.magento2plugin.util.magento.GetComponentNameByDirectory;
+import com.magento.idea.magento2plugin.util.magento.GetComponentTypeByName;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class OverrideInThemeAction extends DumbAwareAction {
     public static String ACTION_NAME = "Override in theme...";
@@ -56,29 +54,16 @@ public class OverrideInThemeAction extends DumbAwareAction {
         boolean isAllowed = false;
 
         GetComponentNameByDirectory getComponentNameByDirectory = GetComponentNameByDirectory.getInstance(project);
-        String componentName = getComponentNameByDirectory.execute(psiFile.getContainingDirectory());
+        String componentType = GetComponentTypeByName.execute(getComponentNameByDirectory
+                .execute(psiFile.getContainingDirectory()));
 
-        if (isModule(componentName)) {
+        if (componentType.equals(ComponentType.TYPE_MODULE)) {
             isAllowed = file.getPath().contains("view");
-        } else if (isTheme(componentName)) {
+        } else if (componentType.equals(ComponentType.TYPE_THEME)) {
             isAllowed = true;
         }
 
         return isAllowed;
-    }
-
-    private boolean isModule(String componentName) {
-        Pattern modulePattern = Pattern.compile(RegExUtil.Magento.MODULE_NAME);
-        Matcher moduleMatcher = modulePattern.matcher(componentName);
-
-        return moduleMatcher.find();
-    }
-
-    private boolean isTheme(String componentName) {
-        Pattern themePattern = Pattern.compile(RegExUtil.Magento.THEME_NAME);
-        Matcher themeMatcher = themePattern.matcher(componentName);
-
-        return themeMatcher.find();
     }
 
     private void setStatus(AnActionEvent event, boolean status) {
