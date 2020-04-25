@@ -5,9 +5,8 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.psi.PsiFile;
-import com.jetbrains.php.lang.psi.elements.Method;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.OverrideInThemeDialogValidator;
 import com.magento.idea.magento2plugin.actions.generation.generator.OverrideInThemeGenerator;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
@@ -68,6 +67,7 @@ public class OverrideInThemeDialog extends AbstractDialog {
 
     private void onOK() {
         if (!validator.validate(project)) {
+            JBPopupFactory.getInstance().createMessage("Invalid theme selection.").showCenteredInCurrentWindow(project);
             return;
         }
 
