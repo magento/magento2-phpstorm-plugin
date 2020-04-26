@@ -36,10 +36,10 @@ public class ActionGroupCompletionProvider extends CompletionProvider<Completion
 
         Collection<String> selectorNames
             = FileBasedIndex.getInstance().getAllKeys(ActionGroupIndex.KEY, position.getProject());
-        String currentTestName = getCurrentActionGroupName((XmlAttributeValue) parameters.getPosition().getParent());
+        String currentActionGroup = getCurrentActionGroupName((XmlAttributeValue) parameters.getPosition().getParent());
 
         for (String selectorName: selectorNames) {
-            if (selectorName.equals(currentTestName)) {
+            if (selectorName.equals(currentActionGroup)) {
                 continue;
             }
 
