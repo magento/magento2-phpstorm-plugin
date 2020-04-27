@@ -54,7 +54,6 @@ public class NewControllerDialog extends AbstractDialog {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
-        pushToMiddle();
         suggestControllerDirectory();
         controllerAreaSelect.addActionListener(e -> suggestControllerDirectory());
         controllerAreaSelect.addActionListener(e -> toggleAdminPanel());
@@ -105,6 +104,7 @@ public class NewControllerDialog extends AbstractDialog {
     public static void open(Project project, PsiDirectory directory) {
         NewControllerDialog dialog = new NewControllerDialog(project, directory);
         dialog.pack();
+        dialog.centerDialog(dialog);
         dialog.setVisible(true);
     }
 
