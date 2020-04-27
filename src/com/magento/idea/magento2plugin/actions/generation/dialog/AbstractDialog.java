@@ -11,9 +11,11 @@ import java.awt.*;
  * All code generate dialog should extend this class
  */
 public abstract class AbstractDialog extends JDialog {
-    protected void pushToMiddle() {
-        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        this.setLocation(dim.width / 2  -this.getSize().width / 2, dim.height / 2 - this.getSize().height / 2);
+    protected void centerDialog(AbstractDialog dialog) {
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int x = screenSize.width / 2  - dialog.getSize().width / 2;
+        int y = screenSize.height / 2 - dialog.getSize().height / 2;
+        dialog.setLocation(x, y);
     }
 
     protected void onCancel() {
