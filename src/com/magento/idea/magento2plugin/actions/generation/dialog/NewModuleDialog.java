@@ -96,7 +96,6 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
-        pushToMiddle();
         setLicenses();
         setModuleDependencies();
 
@@ -233,6 +232,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     public static void open(@NotNull Project project, @NotNull PsiDirectory initialBaseDir, @Nullable PsiFile file, @Nullable IdeView view, @Nullable Editor editor) {
         NewModuleDialog dialog = new NewModuleDialog(project, initialBaseDir, file, view, editor);
         dialog.pack();
+        dialog.centerDialog(dialog);
         dialog.setVisible(true);
     }
 
