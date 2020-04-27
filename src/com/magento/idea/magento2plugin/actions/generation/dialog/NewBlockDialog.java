@@ -43,7 +43,6 @@ public class NewBlockDialog extends AbstractDialog {
         setModal(true);
         setTitle("Create a new Magento 2 block..");
         getRootPane().setDefaultButton(buttonOK);
-        pushToMiddle();
         suggestBlockDirectory();
 
         buttonOK.addActionListener(new ActionListener() {
@@ -77,6 +76,7 @@ public class NewBlockDialog extends AbstractDialog {
     public static void open(Project project, PsiDirectory directory) {
         NewBlockDialog dialog = new NewBlockDialog(project, directory);
         dialog.pack();
+        dialog.centerDialog(dialog);
         dialog.setVisible(true);
     }
 
