@@ -8,6 +8,7 @@ import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlTag;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -62,7 +63,7 @@ public class WebApiLineMarkerProvider implements LineMarkerProvider {
                     .create(MagentoIcons.WEB_API)
                     .setTargets(results)
                     .setTooltipText(tooltipText.toString());
-            collection.add(builder.createLineMarkerInfo(psiElement));
+            collection.add(builder.createLineMarkerInfo(PsiTreeUtil.getDeepestFirst(psiElement)));
         }
     }
 
