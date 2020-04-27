@@ -162,6 +162,8 @@
         <internalFileTemplate name="Magento GraphQL Resolver Class"/>
         <internalFileTemplate name="Magento Cronjob Class"/>
         <internalFileTemplate name="Magento Crontab Xml"/>
+        <internalFileTemplate name="Magento Module Controller Backend Class"/>
+        <internalFileTemplate name="Magento Module Controller Frontend Class"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.php">

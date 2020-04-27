@@ -11,25 +11,20 @@ import com.magento.idea.magento2plugin.actions.generation.NewControllerAction;
 import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewControllerValidator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleControllerClassGenerator;
-import com.magento.idea.magento2plugin.magento.files.ControllerPhp;
+import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
+import com.magento.idea.magento2plugin.magento.files.ControllerFrontendPhp;
+import com.magento.idea.magento2plugin.magento.packages.File;
+import com.magento.idea.magento2plugin.magento.packages.HttpRequest;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
 
 import javax.swing.*;
 import java.awt.event.*;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class NewControllerDialog extends AbstractDialog {
-    public static String ADMINHTML_AREA = "adminhtml";
-    public static String FRONTEND_AREA = "frontend";
-    public static String HTTP_GET = "GET";
-    public static String HTTP_POST = "POST";
-    public static String HTTP_DELETE = "DELETE";
-    public static String HTTP_PUT = "PUT";
-
     private final NewControllerValidator validator;
     private final PsiDirectory baseDir;
     private final GetModuleNameByDirectory getModuleNameByDir;
@@ -140,21 +135,21 @@ public class NewControllerDialog extends AbstractDialog {
     }
 
     public String getActionDirectory() {
-        return getControllerDirectory() + "/" + getControllerName();
+        return getControllerDirectory() + File.separator + getControllerName();
     }
 
     private void suggestControllerDirectory() {
         String area = getArea();
-        if (area.equals(ADMINHTML_AREA)) {
-            controllerParentDir.setText(ControllerPhp.DEFAULT_ADMINHTML_DIR);
+        if (area.equals(Package.Areas.adminhtml.toString())) {
+            controllerParentDir.setText(ControllerBackendPhp.DEFAULT_DIR);
             return;
         }
-        controllerParentDir.setText(ControllerPhp.DEFAULT_FRONTEND_DIR);
+        controllerParentDir.setText(ControllerFrontendPhp.DEFAULT_DIR);
     }
 
     private void toggleAdminPanel() {
         String area = getArea();
-        if (area.equals(ADMINHTML_AREA) && inheritClass.isSelected()) {
+        if (area.equals(Package.Areas.adminhtml.toString()) && inheritClass.isSelected()) {
             AdminPanel.setVisible(true);
             return;
         }
@@ -166,7 +161,7 @@ public class NewControllerDialog extends AbstractDialog {
         if (parts[0] == null || parts[1] == null || parts.length > 2) {
             return null;
         }
-        return parts[0] + "/" + parts[1];
+        return parts[0] + File.separator + parts[1];
     }
 
     private String getNamespace() {
@@ -174,7 +169,7 @@ public class NewControllerDialog extends AbstractDialog {
         if (parts[0] == null || parts[1] == null || parts.length > 2) {
             return null;
         }
-        String directoryPart = getControllerDirectory().replace("/", Package.FQN_SEPARATOR);
+        String directoryPart = getControllerDirectory().replace(File.separator, Package.FQN_SEPARATOR);
         String controllerPart = Package.FQN_SEPARATOR + getControllerName();
 
         return parts[0] + Package.FQN_SEPARATOR + parts[1] + Package.FQN_SEPARATOR + directoryPart + controllerPart;
@@ -190,16 +185,11 @@ public class NewControllerDialog extends AbstractDialog {
 
     private ArrayList<String> getAreaList()
     {
-        return new ArrayList<>(Arrays.asList(FRONTEND_AREA, ADMINHTML_AREA));
-    }
-
-    private ArrayList<String> getHttpMethodList()
-    {
-        return new ArrayList<>(Arrays.asList(HTTP_GET, HTTP_POST, HTTP_DELETE, HTTP_PUT));
+        return new ArrayList<>(Arrays.asList(Package.Areas.frontend.toString(), Package.Areas.adminhtml.toString()));
     }
 
     private void createUIComponents() {
         this.controllerAreaSelect = new FilteredComboBox(getAreaList());
-        this.httpMethodSelect = new FilteredComboBox(getHttpMethodList());
+        this.httpMethodSelect = new FilteredComboBox(HttpRequest.getHttpMethodList());
     }
 }

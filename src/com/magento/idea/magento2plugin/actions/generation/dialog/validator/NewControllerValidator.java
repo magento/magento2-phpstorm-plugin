@@ -6,6 +6,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
 import com.jetbrains.php.refactoring.PhpNameUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewControllerDialog;
+import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 
@@ -15,6 +16,7 @@ public class NewControllerValidator {
     private static NewControllerValidator INSTANCE = null;
     private ValidatorBundle validatorBundle;
     private NewControllerDialog dialog;
+    private CommonBundle commonBundle;
 
     public static NewControllerValidator getInstance(NewControllerDialog dialog) {
         if (null == INSTANCE) {
@@ -28,11 +30,12 @@ public class NewControllerValidator {
     public NewControllerValidator()
     {
         this.validatorBundle = new ValidatorBundle();
+        this.commonBundle = new CommonBundle();
     }
 
     public boolean validate()
     {
-        String errorTitle = "Error";
+        String errorTitle = commonBundle.message("common.error");
         String actionName = dialog.getActionName();
         String controllerName = dialog.getControllerName();
 
