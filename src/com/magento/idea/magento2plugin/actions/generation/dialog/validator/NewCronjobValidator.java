@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewCronjobDialog;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
+import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.RegExUtil;
@@ -17,6 +18,7 @@ import javax.swing.*;
 public class NewCronjobValidator {
     private static NewCronjobValidator INSTANCE = null;
     private ValidatorBundle validatorBundle;
+    private CommonBundle commonBundle;
     private GetPhpClassByFQN getPhpClassByFQN;
 
     public static NewCronjobValidator getInstance() {
@@ -29,6 +31,7 @@ public class NewCronjobValidator {
 
     public NewCronjobValidator() {
         this.validatorBundle = new ValidatorBundle();
+        this.commonBundle = new CommonBundle();
     }
 
     /**
@@ -37,7 +40,7 @@ public class NewCronjobValidator {
      * @return boolean
      */
     public boolean validate(Project project, NewCronjobDialog dialog) {
-        String errorTitle = "Validation Error";
+        String errorTitle = commonBundle.message("common.error");
         String cronjobClassName = dialog.getCronjobClassName();
         String cronjobDirectory = dialog.getCronjobDirectory();
         String cronjobName = dialog.getCronjobName();

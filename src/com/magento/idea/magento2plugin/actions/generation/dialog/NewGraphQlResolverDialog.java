@@ -41,7 +41,6 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
         setModal(true);
         setTitle("Create a new Magento 2 GraphQL Resolver.");
         getRootPane().setDefaultButton(buttonOK);
-        pushToMiddle();
         suggestGraphQlResolverDirectory();
 
         buttonOK.addActionListener(new ActionListener() {
@@ -75,6 +74,7 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
     public static void open(Project project, PsiDirectory directory) {
         NewGraphQlResolverDialog dialog = new NewGraphQlResolverDialog(project, directory);
         dialog.pack();
+        dialog.centerDialog(dialog);
         dialog.setVisible(true);
     }
 
