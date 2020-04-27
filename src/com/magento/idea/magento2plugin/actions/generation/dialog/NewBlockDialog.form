@@ -3,7 +3,7 @@
   <grid id="cbd77" binding="contentPanel" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="10" left="10" bottom="10" right="10"/>
     <constraints>
-      <xy x="48" y="54" width="419" height="297"/>
+      <xy x="48" y="54" width="455" height="297"/>
     </constraints>
     <properties>
       <name value="New Magento2 Block.."/>
@@ -69,7 +69,7 @@
             </constraints>
             <properties>
               <labelFor value="2d9cc"/>
-              <text value="Block Name"/>
+              <text resource-bundle="magento2/common" key="common.name"/>
             </properties>
           </component>
           <component id="2d9cc" class="javax.swing.JTextField" binding="blockName">
@@ -100,7 +100,7 @@
             </constraints>
             <properties>
               <labelFor value="fdc52"/>
-              <text value="Block Directory"/>
+              <text resource-bundle="magento2/common" key="common.directory"/>
             </properties>
             <clientProperties>
               <html.disable class="java.lang.Boolean" value="true"/>
@@ -127,7 +127,7 @@
               <enabled value="false"/>
               <margin top="0" left="0" bottom="0" right="0"/>
               <opaque value="false"/>
-              <text value="Please consider creating a view model instead of a block if possible for your use case."/>
+              <text resource-bundle="magento2/common" key="common.hint.viewModelPreferredVersusBlock"/>
             </properties>
             <clientProperties>
               <html.disable class="java.lang.Boolean" value="false"/>
@@ -148,4 +148,7 @@
       <member id="e6153"/>
     </group>
   </buttonGroups>
+  <inspectionSuppressions>
+    <suppress inspection="InvalidPropertyKeyForm" id="be25f"/>
+  </inspectionSuppressions>
 </form>
