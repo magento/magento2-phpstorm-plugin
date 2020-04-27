@@ -4,11 +4,8 @@
  */
 package com.magento.idea.magento2plugin.inspections.php;
 
-import com.magento.idea.magento2plugin.bundles.InspectionBundle;
-
 public class GraphQlResolverInspectionTest extends InspectionPhpFixtureTestCase {
 
-    private final InspectionBundle inspectionBundle = new InspectionBundle();
     private final String errorMessage =  inspectionBundle.message(
         "inspection.graphql.resolver.mustImplement"
     );

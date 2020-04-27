@@ -8,7 +8,6 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
 import com.magento.idea.magento2plugin.project.Settings;
-import com.magento.idea.magento2plugin.project.util.GetProjectBasePath;
 import com.magento.idea.magento2plugin.magento.packages.File;
 
 /**
@@ -65,4 +64,5 @@ abstract public class BaseProjectTestCase extends BasePlatformTestCase {
     private String name() {
         return StringUtil.trimEnd(getTestName(true), "Test");
     }
+
 }

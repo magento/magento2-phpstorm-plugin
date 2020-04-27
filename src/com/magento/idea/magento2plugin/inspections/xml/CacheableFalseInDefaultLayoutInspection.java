@@ -10,17 +10,18 @@ import com.intellij.codeInspection.XmlSuppressableInspectionTool;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.XmlElementVisitor;
 import com.intellij.psi.xml.XmlAttribute;
+import com.magento.idea.magento2plugin.bundles.InspectionBundle;
 import com.magento.idea.magento2plugin.inspections.xml.fix.XmlRemoveCacheableAttributeQuickFix;
 import com.magento.idea.magento2plugin.magento.files.LayoutXml;
 import org.jetbrains.annotations.NotNull;
 
 public class CacheableFalseInDefaultLayoutInspection extends XmlSuppressableInspectionTool {
-    public static final String CacheDisableProblemDescription = "Cacheable false attribute on the default layout will disable cache site-wide";
-
     @NotNull
     @Override
     public PsiElementVisitor buildVisitor(final @NotNull ProblemsHolder holder, final boolean isOnTheFly) {
         return new XmlElementVisitor() {
+            private InspectionBundle inspectionBundle = new InspectionBundle();
+
             @Override
             public void visitXmlAttribute(XmlAttribute attribute) {
                 String fileName = holder.getFile().getName();
@@ -32,9 +33,12 @@ public class CacheableFalseInDefaultLayoutInspection extends XmlSuppressableInsp
                 && !attribute.getParent().getName().equals(LayoutXml.REFERENCE_BLOCK_ATTRIBUTE_TAG_NAME)) return;
                 if (text == null) return;
                 if (text.equals(LayoutXml.CACHEABLE_ATTRIBUTE_VALUE_FALSE)) {
-                    holder.registerProblem(attribute, CacheDisableProblemDescription,
-                            ProblemHighlightType.WARNING,
-                            new XmlRemoveCacheableAttributeQuickFix());
+                    holder.registerProblem(
+                        attribute,
+                        inspectionBundle.message("inspection.cache.disabledCache"),
+                        ProblemHighlightType.WARNING,
+                        new XmlRemoveCacheableAttributeQuickFix()
+                    );
                 }
             }
         };

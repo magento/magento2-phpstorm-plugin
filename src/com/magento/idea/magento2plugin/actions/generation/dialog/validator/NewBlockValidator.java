@@ -6,6 +6,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
 import com.jetbrains.php.refactoring.PhpNameUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewBlockDialog;
+import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import javax.swing.*;
@@ -13,6 +14,7 @@ import javax.swing.*;
 public class NewBlockValidator {
     private static NewBlockValidator INSTANCE = null;
     private ValidatorBundle validatorBundle;
+    private CommonBundle commonBundle;
     private NewBlockDialog dialog;
 
     public static NewBlockValidator getInstance(NewBlockDialog dialog) {
@@ -25,11 +27,12 @@ public class NewBlockValidator {
 
     public NewBlockValidator() {
         this.validatorBundle = new ValidatorBundle();
+        this.commonBundle = new CommonBundle();
     }
 
     public boolean validate()
     {
-        String errorTitle = "Error";
+        String errorTitle = commonBundle.message("common.error");
 
         String moduleName = dialog.getBlockName();
 

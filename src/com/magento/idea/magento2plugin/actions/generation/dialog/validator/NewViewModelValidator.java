@@ -6,6 +6,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
 import com.jetbrains.php.refactoring.PhpNameUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewViewModelDialog;
+import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 
@@ -14,6 +15,7 @@ import javax.swing.*;
 public class NewViewModelValidator {
     private static NewViewModelValidator INSTANCE = null;
     private ValidatorBundle validatorBundle;
+    private CommonBundle commonBundle;
     private NewViewModelDialog dialog;
 
     public static NewViewModelValidator getInstance(NewViewModelDialog dialog) {
@@ -26,11 +28,12 @@ public class NewViewModelValidator {
 
     public NewViewModelValidator() {
         this.validatorBundle = new ValidatorBundle();
+        this.commonBundle = new CommonBundle();
     }
 
     public boolean validate()
     {
-        String errorTitle = "Error";
+        String errorTitle = commonBundle.message("common.error");
 
         String moduleName = dialog.getViewModelName();
 

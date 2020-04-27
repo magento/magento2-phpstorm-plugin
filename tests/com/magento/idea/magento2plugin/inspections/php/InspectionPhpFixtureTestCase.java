@@ -4,12 +4,10 @@
  */
 package com.magento.idea.magento2plugin.inspections.php;
 
-import com.intellij.codeInsight.daemon.impl.HighlightInfo;
-import com.magento.idea.magento2plugin.BaseProjectTestCase;
+import com.magento.idea.magento2plugin.inspections.BaseInspectionsTestCase;
 import com.magento.idea.magento2plugin.magento.packages.File;
-import java.util.List;
 
-abstract public class InspectionPhpFixtureTestCase extends BaseProjectTestCase {
+abstract public class InspectionPhpFixtureTestCase extends BaseInspectionsTestCase {
 
     private static final String testDataFolderPath = "testData" + File.separator + "inspections" + File.separator;
     private static final String fixturesFolderPath = "php" + File.separator;
@@ -27,38 +25,5 @@ abstract public class InspectionPhpFixtureTestCase extends BaseProjectTestCase {
 
     protected String getFixturePath(String fileName) {
         return prepareFixturePath(fileName, fixturesFolderPath);
-    }
-
-    protected void assertHasHighlighting(String message) {
-        String highlightingNotFound = "Failed that documents contains highlighting with the description `%s`";
-
-        List<HighlightInfo> highlightingList = myFixture.doHighlighting();
-        if (highlightingList.isEmpty()) {
-            fail(String.format(highlightingNotFound, message));
-        }
-
-        for (HighlightInfo highlighting :
-            highlightingList) {
-            if (highlighting.getDescription().equals(message)) {
-                return;
-            }
-        }
-        fail(String.format(highlightingNotFound, message));
-    }
-
-    protected void assertHasNoHighlighting(String message) {
-        String highlightingFound = "Failed that documents not contains highlighting with the description `%s`";
-
-        List<HighlightInfo> highlightingList = myFixture.doHighlighting();
-        if (highlightingList.isEmpty()) {
-            return;
-        }
-
-        for (HighlightInfo highlighting :
-            highlightingList) {
-            if (highlighting.getDescription().equals(message)) {
-                fail(String.format(highlightingFound, message));
-            }
-        }
     }
 }
