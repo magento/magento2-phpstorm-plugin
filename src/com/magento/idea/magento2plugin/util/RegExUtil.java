@@ -17,6 +17,9 @@ public class RegExUtil {
     public static final String IDENTIFIER
             = "[a-zA-Z0-9_\\-]*";
 
+    public static final String CLI_COMMAND_NAME
+            = "[a-zA-Z0-9_\\-\\:]*";
+
     public static final String DIRECTORY
             = "^(?!\\/)[a-zA-Z0-9\\/]*[^\\/]$";
 

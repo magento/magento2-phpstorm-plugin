@@ -1,0 +1,38 @@
+<?php
+#parse("PHP File Header.php")
+
+#if (${NAMESPACE})
+
+namespace ${NAMESPACE};
+
+#end
+
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
+class ${NAME} extends Command
+{
+        /**
+         * @inheritDoc
+         */
+        protected function configure()
+        {
+            $this->setName('${CLI_COMMAND_NAME}');
+            $this->setDescription('${CLI_COMMAND_DESCRIPTION}');
+            parent::configure();
+        }
+
+        /**
+         * CLI command description
+         *
+         * @param InputInterface $input
+         * @param OutputInterface $output
+         *
+         * @return void
+         */
+        protected function execute(InputInterface $input, OutputInterface $output): void
+        {
+            // todo: implement CLI command logic here
+        }
+    }

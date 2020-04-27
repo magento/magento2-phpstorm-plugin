@@ -200,7 +200,7 @@ public class NewCronjobDialog extends AbstractDialog {
             this.getCronjobDirectory()
         );
 
-        String cronjobNamespace = namespaceBuilder.getCronjobNamespace();
+        String cronjobNamespace = namespaceBuilder.getNamespace();
         String cronjobInstance = namespaceBuilder.getClassFqn();
 
         CronjobClassData cronjobClassData = this.getCronjobClassData(cronjobNamespace);

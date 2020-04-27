@@ -10,9 +10,9 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 
 public class NamespaceBuilder {
-    private String moduleName;
-    private String className;
-    private String classDirectory;
+    private final String moduleName;
+    private final String className;
+    private final String classDirectory;
 
     public NamespaceBuilder (String moduleName, String className, String classDirectory) {
         this.moduleName = moduleName;
@@ -27,7 +27,7 @@ public class NamespaceBuilder {
      */
     @NotNull
     public String getClassFqn() {
-        String classNamespace = this.getCronjobNamespace();
+        String classNamespace = this.getNamespace();
 
         return classNamespace + Package.FQN_SEPARATOR + this.className;
     }
@@ -37,7 +37,7 @@ public class NamespaceBuilder {
      *
      * @return String
      */
-    public String getCronjobNamespace() {
+    public String getNamespace() {
         String[] parts = this.moduleName.split(Package.VENDOR_MODULE_NAME_SEPARATOR);
 
         if (parts[0] == null || parts[1] == null || parts.length > 2) {
