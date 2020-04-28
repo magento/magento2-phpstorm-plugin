@@ -19,6 +19,7 @@ import javax.swing.*;
 public class NewCronjobValidator {
     private static NewCronjobValidator INSTANCE = null;
     private ValidatorBundle validatorBundle;
+    private CommonBundle commonBundle;
     private GetPhpClassByFQN getPhpClassByFQN;
     private CommonBundle commonBundle;
 

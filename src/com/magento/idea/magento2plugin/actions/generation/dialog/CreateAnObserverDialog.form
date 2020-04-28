@@ -66,7 +66,7 @@
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Observer Class Name"/>
+              <text resource-bundle="magento2/common" key="common.className"/>
             </properties>
           </component>
           <component id="e4858" class="javax.swing.JTextField" binding="observerDirectory">
@@ -89,7 +89,7 @@
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Observer Directory Path"/>
+              <text resource-bundle="magento2/common" key="common.directoryPath"/>
             </properties>
           </component>
           <component id="54e7b" class="javax.swing.JLabel" binding="observerNameLabel">
@@ -97,7 +97,7 @@
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Observer Name"/>
+              <text resource-bundle="magento2/common" key="common.name"/>
             </properties>
           </component>
           <component id="ad3ba" class="javax.swing.JTextField" binding="observerClassName">
@@ -155,4 +155,7 @@
       </component>
     </children>
   </grid>
+  <inspectionSuppressions>
+    <suppress inspection="InvalidPropertyKeyForm" id="3fe2b"/>
+  </inspectionSuppressions>
 </form>
