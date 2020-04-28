@@ -14,7 +14,7 @@ public class ModuleGraphQlResolverClassGeneratorTest extends BaseGeneratorTestCa
     {
         Project project = myFixture.getProject();
         GraphQlResolverFileData graphQlResolverFileData = new GraphQlResolverFileData(
-            "Model",
+                "Model",
                 "TestResolver",
                 "Foo_Bar",
                 "Foo\\Bar\\Model\\TestResolver",
