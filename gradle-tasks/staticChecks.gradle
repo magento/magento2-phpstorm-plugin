@@ -67,11 +67,11 @@ task checkstyleCI(type: Checkstyle) {
  */
 def getChangedFiles() {
     // Get the target and source branch
-    def envTargetBranch = System.getenv("github.event.pull_request.base.ref")
-    def envSourceBranch = System.getenv("github.event.pull_request.head.ref")
+    def envTargetBranch = System.getenv("github.base_ref")
+    def envSourceBranch = System.getenv("github.head_ref")
 
-    logger.debug('github.event.pull_request.base.ref: {}', envTargetBranch)
-    logger.debug('github.event.pull_request.head.ref: {}', envSourceBranch)
+    logger.debug('Target Branch: {}', envTargetBranch)
+    logger.debug('Source Branch: {}', envSourceBranch)
 
     // Compare to master if no branch specified
     def targetBranch
