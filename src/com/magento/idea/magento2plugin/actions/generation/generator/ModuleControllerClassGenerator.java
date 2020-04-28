@@ -15,6 +15,7 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
+import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.Controller;
@@ -38,6 +39,7 @@ public class ModuleControllerClassGenerator extends FileGenerator {
     private ControllerFileData controllerFileData;
     private Project project;
     private ValidatorBundle validatorBundle;
+    private CommonBundle commonBundle;
     private final GetFirstClassOfFile getFirstClassOfFile;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
@@ -50,6 +52,7 @@ public class ModuleControllerClassGenerator extends FileGenerator {
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
         this.validatorBundle = new ValidatorBundle();
+        this.commonBundle = new CommonBundle();
     }
 
     public PsiFile generate(String actionName) {
@@ -63,7 +66,7 @@ public class ModuleControllerClassGenerator extends FileGenerator {
                 JOptionPane.showMessageDialog(
                         null,
                         errorMessage,
-                        "Error",
+                        commonBundle.message("common.error"),
                         JOptionPane.ERROR_MESSAGE
                 );
 
@@ -77,7 +80,7 @@ public class ModuleControllerClassGenerator extends FileGenerator {
                 JOptionPane.showMessageDialog(
                         null,
                         errorMessage,
-                        "Error",
+                        commonBundle.message("common.error"),
                         JOptionPane.ERROR_MESSAGE
                 );
 

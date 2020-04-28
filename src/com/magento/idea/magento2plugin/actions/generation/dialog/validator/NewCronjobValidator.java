@@ -21,7 +21,6 @@ public class NewCronjobValidator {
     private ValidatorBundle validatorBundle;
     private CommonBundle commonBundle;
     private GetPhpClassByFQN getPhpClassByFQN;
-    private CommonBundle commonBundle;
 
     public static NewCronjobValidator getInstance() {
         if (null == INSTANCE) {
