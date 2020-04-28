@@ -25,7 +25,7 @@ jobs:
     - name: Run automated tests
       run: ./gradlew test -i
     - name: Run Code Style Check
-      run: ./gradlew checkstyleChanged -i
+      run: ./gradlew checkstyleCI -i
     - name: Run PMD Quality Check
       run: ./gradlew pmdMain -i
     - name: Run Spotbugs Quality Check
@@ -48,7 +48,7 @@ jobs:
       - name: Run automated tests
         run: ./gradlew test -i
       - name: Run Code Style Check
-        run: ./gradlew checkstyleChanged -i
+        run: ./gradlew checkstyleCI -i
       - name: Run PMD Quality Check
         run: ./gradlew pmdMain -i
       - name: Run Spotbugs Quality Check
@@ -71,7 +71,7 @@ jobs:
       - name: Run automated tests
         run: ./gradlew test -i
       - name: Run Code Style Check
-        run: ./gradlew checkstyleChanged -i
+        run: ./gradlew checkstyleCI -i
       - name: Run PMD Quality Check
         run: ./gradlew pmdMain -i
       - name: Run Spotbugs Quality Check

@@ -52,7 +52,7 @@ task checkstyle(type: Checkstyle) {
 }
 
 // Execute Checkstyle on all modified files
-task checkstyleChanged(type: Checkstyle) {
+task checkstyleCI(type: Checkstyle) {
     def changedFiles = getChangedFiles()
     include changedFiles
 }
@@ -65,17 +65,17 @@ task checkstyleChanged(type: Checkstyle) {
  */
 def getChangedFiles() {
     // Get the target and source branch
-    def ghprbTargetBranch = System.getenv("ghprbTargetBranch")
-    def ghprbSourceBranch = System.getenv("ghprbSourceBranch")
+    def envTargetBranch = System.getenv("github.event.pull_request.head.ref")
+    def envSourceBranch = System.getenv("ghprbSourceBranch")
 
     // Compare to master if no branch specified
     def targetBranch
     if (project.hasProperty("branch")) {
         targetBranch = project.property("branch")
     } else {
-        targetBranch = ghprbTargetBranch ? "origin/${ghprbTargetBranch}" : getParentBranch()
+        targetBranch = envTargetBranch ? "origin/${envTargetBranch}" : getParentBranch()
     }
-    def sourceBranch = ghprbSourceBranch ? "origin/${ghprbSourceBranch}" : ""
+    def sourceBranch = envSourceBranch ? "origin/${envSourceBranch}" : ""
 
     // Get list of all changed files including status
     def systemOutStream = new ByteArrayOutputStream()
