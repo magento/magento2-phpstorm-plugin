@@ -67,8 +67,8 @@ task checkstyleCI(type: Checkstyle) {
  */
 def getChangedFiles() {
     // Get the target and source branch
-    def envTargetBranch = System.getenv("github.base_ref")
-    def envSourceBranch = System.getenv("github.head_ref")
+    def envTargetBranch = System.getenv("TARGET_BRANCH")
+    def envSourceBranch = System.getenv("WORKING_BRANCH")
 
     logger.debug('Target Branch: {}', envTargetBranch)
     logger.debug('Source Branch: {}', envSourceBranch)
