@@ -57,7 +57,6 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
-        pushToMiddle();
         fillTargetAreaOptions();
         if (targetClass.isFinal()) {
             inheritClass.setVisible(false);
@@ -173,6 +172,7 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog {
     public static void open(@NotNull Project project, PhpClass targetClass) {
         OverrideClassByAPreferenceDialog dialog = new OverrideClassByAPreferenceDialog(project, targetClass);
         dialog.pack();
+        dialog.centerDialog(dialog);
         dialog.setVisible(true);
     }
 

@@ -58,7 +58,6 @@ public class CreateAPluginDialog extends AbstractDialog {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
-        pushToMiddle();
         fillPluginTypeOptions();
         fillTargetAreaOptions();
 
@@ -158,6 +157,7 @@ public class CreateAPluginDialog extends AbstractDialog {
     public static void open(@NotNull Project project, Method targetMethod, PhpClass targetClass) {
         CreateAPluginDialog dialog = new CreateAPluginDialog(project, targetMethod, targetClass);
         dialog.pack();
+        dialog.centerDialog(dialog);
         dialog.setVisible(true);
     }
 
