@@ -5,7 +5,7 @@ name: Publish Plugin alpha version
 on:
   push:
     branches:
-      - 1.0.1-develop
+      - master
 
 jobs:
   build:
@@ -23,7 +23,6 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run publish plugin
-        if: contains(github.event.pull_request.labels.*.name, 'deploy-alpha')
         run: ./gradlew publishPlugin -i
         env:
           MAGENTO_PHPSTORM_intellijPublishToken: ${{ secrets.JET_BRAINS_TOKEN }}
