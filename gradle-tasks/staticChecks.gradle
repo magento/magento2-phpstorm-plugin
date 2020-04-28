@@ -53,6 +53,8 @@ task checkstyle(type: Checkstyle) {
 
 // Execute Checkstyle on all modified files
 task checkstyleCI(type: Checkstyle) {
+    logging.captureStandardOutput LogLevel.DEBUG
+
     def changedFiles = getChangedFiles()
     include changedFiles
 }
@@ -68,6 +70,9 @@ def getChangedFiles() {
     def envTargetBranch = System.getenv("github.event.pull_request.base.ref")
     def envSourceBranch = System.getenv("github.event.pull_request.head.ref")
 
+    logger.debug('github.event.pull_request.base.ref: {}', envTargetBranch)
+    logger.debug('github.event.pull_request.head.ref: {}', envSourceBranch)
+
     // Compare to master if no branch specified
     def targetBranch
     if (project.hasProperty("branch")) {
@@ -76,6 +81,8 @@ def getChangedFiles() {
         targetBranch = envTargetBranch ? "origin/${envTargetBranch}" : getParentBranch()
     }
     def sourceBranch = envSourceBranch ? "origin/${envSourceBranch}" : ""
+
+    logger.debug('Merging {} into {}', envTargetBranch, envSourceBranch)
 
     // Get list of all changed files including status
     def systemOutStream = new ByteArrayOutputStream()
