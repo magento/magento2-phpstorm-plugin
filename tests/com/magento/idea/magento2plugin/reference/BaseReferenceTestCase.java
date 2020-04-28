@@ -23,8 +23,21 @@ abstract public class BaseReferenceTestCase extends BaseInspectionsTestCase {
     }
 
     protected void assertHasReferenceToXmlAttributeValue(String reference) {
+        String referenceNotFound = "Failed that element contains reference to the attribute value `%s`";
+
         PsiElement element = getElementFromCaret();
-        assertEquals(reference, ((XmlAttributeValue) element.getReferences()[0].resolve()).getValue());
+        for (PsiReference psiReference: element.getReferences()) {
+            PsiElement resolved = psiReference.resolve();
+            if (!(resolved instanceof XmlAttributeValue)) {
+                continue;
+            }
+
+            if (((XmlAttributeValue) resolved).getValue().equals(reference)) {
+                return;
+            }
+        }
+
+        fail(String.format(referenceNotFound, reference));
     }
 
     protected void assertHasReferenceToFile(String reference) {
