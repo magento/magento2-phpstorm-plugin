@@ -53,8 +53,6 @@ task checkstyle(type: Checkstyle) {
 
 // Execute Checkstyle on all modified files
 task checkstyleCI(type: Checkstyle) {
-    logging.captureStandardOutput LogLevel.DEBUG
-
     def changedFiles = getChangedFiles()
     include changedFiles
 }
@@ -97,9 +95,12 @@ def getChangedFiles() {
     for (file in allFiles) {
         Matcher matcher = statusPattern.matcher(file)
         if (matcher.find()) {
+            println "+ ${matcher.group(2)}"
             files.add(matcher.group(2))
         }
     }
+
+    println "Changed Files: ${files.count()}"
 
     // Return the list of touched files
     files
