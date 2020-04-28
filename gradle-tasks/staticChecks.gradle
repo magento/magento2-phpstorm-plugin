@@ -70,8 +70,8 @@ def getChangedFiles() {
     def envTargetBranch = System.getenv("TARGET_BRANCH")
     def envSourceBranch = System.getenv("WORKING_BRANCH")
 
-    logger.debug('Target Branch: {}', envTargetBranch)
-    logger.debug('Source Branch: {}', envSourceBranch)
+    println "Target Branch: ${envTargetBranch}"
+    println "Source Branch: ${envSourceBranch}"
 
     // Compare to master if no branch specified
     def targetBranch
@@ -82,7 +82,7 @@ def getChangedFiles() {
     }
     def sourceBranch = envSourceBranch ? "origin/${envSourceBranch}" : ""
 
-    logger.debug('Merging {} into {}', envTargetBranch, envSourceBranch)
+    println "Merging ${envTargetBranch} into ${envSourceBranch}"
 
     // Get list of all changed files including status
     def systemOutStream = new ByteArrayOutputStream()
