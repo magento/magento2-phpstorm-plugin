@@ -1,3 +1,7 @@
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 package com.magento.idea.magento2plugin.actions.generation.data;
 
 public class ObserverFileData {
@@ -13,14 +17,14 @@ public class ObserverFileData {
             String observerClassName,
             String observerModule,
             String targetEvent,
-            String pluginClassFqn,
+            String observerClassFqn,
             String namespace
     ) {
         this.observerDirectory = observerDirectory;
         this.observerClassName = observerClassName;
         this.observerModule = observerModule;
         this.targetEvent = targetEvent;
-        this.observerClassFqn = pluginClassFqn;
+        this.observerClassFqn = observerClassFqn;
         this.namespace = namespace;
     }
 
