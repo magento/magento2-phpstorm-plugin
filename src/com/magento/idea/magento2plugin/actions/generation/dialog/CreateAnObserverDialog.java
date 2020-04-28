@@ -49,7 +49,6 @@ public class CreateAnObserverDialog extends AbstractDialog {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
-        pushToMiddle();
         fillTargetAreaOptions();
 
         buttonOK.addActionListener(e -> onOK());
@@ -122,6 +121,7 @@ public class CreateAnObserverDialog extends AbstractDialog {
     public static void open(@NotNull Project project, String targetEvent) {
         CreateAnObserverDialog dialog = new CreateAnObserverDialog(project, targetEvent);
         dialog.pack();
+        dialog.centerDialog(dialog);
         dialog.setVisible(true);
     }
 

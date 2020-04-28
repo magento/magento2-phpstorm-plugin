@@ -13,4 +13,5 @@ public class MftfActionGroup {
     public static String USER_INPUT_TAG = "userInput";
     public static String ROOT_TAG = "actionGroup";
     public static String URL_ATTRIBUTE = "url";
+    public static String NAME_ATTRIBUTE = "name";
 }
