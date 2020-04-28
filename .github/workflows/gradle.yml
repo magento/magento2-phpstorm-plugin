@@ -24,6 +24,13 @@ jobs:
       run: chmod +x gradlew
     - name: Run automated tests
       run: ./gradlew test -i
+    - name: Collects Pull Request Information
+      run: |
+        echo "Pull Request's Target Branch: ${TARGET_BRANCH}"
+        echo "Pull Request's Working Branch: ${WORKING_BRANCH}"
+      env:
+        TARGET_BRANCH: ${{ github.base_ref }}
+        WORKING_BRANCH: ${{ github.head_ref }}
     - name: Run Code Style Check
       run: ./gradlew checkstyleCI -i --debug
     - name: Run PMD Quality Check
