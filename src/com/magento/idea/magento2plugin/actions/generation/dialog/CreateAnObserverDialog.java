@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
@@ -18,8 +19,16 @@ import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.awt.event.*;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.List;
 
 public class CreateAnObserverDialog extends AbstractDialog {
@@ -62,13 +71,19 @@ public class CreateAnObserverDialog extends AbstractDialog {
             }
         });
 
-        contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPane.registerKeyboardAction(
+                e -> onCancel(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+        );
     }
 
+    /**
+     *  Open an action dialog
+     *
+     * @param project
+     * @param targetEvent
+     */
     public static void open(@NotNull Project project, String targetEvent) {
         CreateAnObserverDialog dialog = new CreateAnObserverDialog(project, targetEvent);
         dialog.pack();
@@ -76,12 +91,18 @@ public class CreateAnObserverDialog extends AbstractDialog {
         dialog.setVisible(true);
     }
 
+    /**
+     * Setup observer area combobox
+     */
     private void fillTargetAreaOptions() {
         for (Package.Areas area : Package.Areas.values()) {
             observerArea.addItem(area.toString());
         }
     }
 
+    /**
+     * Perform code generation using input data
+     */
     private void onOK() {
         if (!validator.validate(project)) {
             return;
@@ -126,6 +147,7 @@ public class CreateAnObserverDialog extends AbstractDialog {
         return this.observerModule.getSelectedItem().toString();
     }
 
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     private void createUIComponents() {
         List<String> allModulesList = ModuleIndex.getInstance(project).getEditableModuleNames();
 
