@@ -6,6 +6,7 @@ package com.magento.idea.magento2plugin.magento.packages;
 
 public class Package {
     public static String PACKAGES_ROOT = "app/code";
+    public static String LIB_WEB_ROOT = "lib/web";
     public static String APP = "app";
     public static String VENDOR = "vendor";
     public static String MODULE_BASE_AREA_DIR = "etc";
