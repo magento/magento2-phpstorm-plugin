@@ -5,7 +5,7 @@ name: Publish Plugin alpha version
 on:
   push:
     branches:
-      - 1.0.1-develop
+      - master
 
 jobs:
   build:

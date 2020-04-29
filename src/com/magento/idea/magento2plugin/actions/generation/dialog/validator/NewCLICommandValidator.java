@@ -15,7 +15,6 @@ import javax.swing.*;
 public class NewCLICommandValidator {
     private static NewCLICommandValidator INSTANCE = null;
     private ValidatorBundle validatorBundle;
-    private GetPhpClassByFQN getPhpClassByFQN;
 
     public static NewCLICommandValidator getInstance() {
         if (null == INSTANCE) {
@@ -102,30 +101,6 @@ public class NewCLICommandValidator {
 
             return false;
         }
-
-        /**
-        NamespaceBuilder namespaceBuilder = new NamespaceBuilder(
-            moduleName,
-            cronjobClassName,
-            cronjobDirectory
-        );
-        PhpClass cronjobClassFile = GetPhpClassByFQN.getInstance(project).execute(namespaceBuilder.getClassFqn());
-
-        if (cronjobClassFile != null) {
-            String errorMessage = validatorBundle.message(
-                "validator.file.alreadyExists",
-                "Cronjob Class"
-            );
-
-            JOptionPane.showMessageDialog(
-                null,
-                errorMessage,
-                errorTitle,
-                JOptionPane.ERROR_MESSAGE
-            );
-
-            return false;
-        }**/
 
         return true;
     }

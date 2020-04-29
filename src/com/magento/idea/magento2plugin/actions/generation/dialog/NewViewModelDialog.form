@@ -28,7 +28,7 @@
             </constraints>
             <properties>
               <labelFor value="2d9cc"/>
-              <text value="View Model Name"/>
+              <text resource-bundle="magento2/common" key="common.name"/>
             </properties>
           </component>
           <component id="1f03b" class="javax.swing.JTextField" binding="viewModelName">
@@ -59,7 +59,7 @@
             </constraints>
             <properties>
               <labelFor value="fdc52"/>
-              <text value="View Model Directory"/>
+              <text resource-bundle="magento2/common" key="common.directory"/>
             </properties>
             <clientProperties>
               <html.disable class="java.lang.Boolean" value="true"/>

@@ -40,6 +40,7 @@ abstract public class BaseProjectTestCase extends BasePlatformTestCase {
 
     protected void enablePluginAndReindex() {
         Settings settings = Settings.getInstance(myFixture.getProject());
+        settings.magentoPath = "/src";
         settings.pluginEnabled = true;
         settings.mftfSupportEnabled = true;
         IndexManager.manualReindex();
