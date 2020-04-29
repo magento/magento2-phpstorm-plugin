@@ -10,6 +10,10 @@ plugins {
     id "com.github.spotbugs" version "3.0.0"
 }
 
+ext {
+    SpotBugsTask = com.github.spotbugs.SpotBugsTask
+}
+
 repositories {
     mavenCentral()
 }

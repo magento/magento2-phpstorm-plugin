@@ -31,9 +31,11 @@ jobs:
         env:
           MODIFIED_FILES: ${{ steps.file_changes.outputs.files}}
       - name: Run PMD Quality Check
-        run: ./gradlew pmdMain -i
+        run: ./gradlew pmdCI -i
+        env:
+          MODIFIED_FILES: ${{ steps.file_changes.outputs.files}}
       - name: Run Spotbugs Quality Check
-        run: ./gradlew spotbugsMain -i
+        run: ./gradlew spotbugsCI -i
 
   build-windows:
 
@@ -59,9 +61,11 @@ jobs:
           TARGET_BRANCH: ${{ github.base_ref }}
           WORKING_BRANCH: ${{ github.head_ref }}
       - name: Run PMD Quality Check
-        run: ./gradlew pmdMain -i
+        run: ./gradlew pmdCI -i
+        env:
+          MODIFIED_FILES: ${{ steps.file_changes.outputs.files}}
       - name: Run Spotbugs Quality Check
-        run: ./gradlew spotbugsMain -i
+        run: ./gradlew spotbugsCI -i
 
   build-macos:
 
@@ -89,6 +93,8 @@ jobs:
           TARGET_BRANCH: ${{ github.base_ref }}
           WORKING_BRANCH: ${{ github.head_ref }}
       - name: Run PMD Quality Check
-        run: ./gradlew pmdMain -i
+        run: ./gradlew pmdCI -i
+        env:
+          MODIFIED_FILES: ${{ steps.file_changes.outputs.files}}
       - name: Run Spotbugs Quality Check
-        run: ./gradlew spotbugsMain -i
+        run: ./gradlew spotbugsCI -i

@@ -57,6 +57,53 @@ task checkstyleCI(type: Checkstyle) {
     include changedFiles
 }
 
+tasks.withType(Pmd) {
+    // Specify all files that should be checked
+    classpath = files()
+    source "${project.rootDir}"
+
+    reports {
+        xml.enabled false
+        html.enabled true
+    }
+}
+
+// Execute Checkstyle on all files
+task pmd(type: Pmd) {
+}
+
+// Execute Checkstyle on all modified files
+task pmdCI(type: Pmd) {
+    def changedFiles = getChangedFiles()
+    include changedFiles
+}
+
+tasks.withType(SpotBugsTask) {
+    // Specify all files that should be checked
+    classpath = files()
+    source "${project.rootDir}"
+
+    reports {
+        xml.enabled false
+        html.enabled true
+    }
+}
+
+task compileJava(overwrite: true) {
+    dependsOn 'compileDebugJavaWithJavac'
+    group = "build"
+}
+
+// Execute SpotBugsTask on all files
+task spotbugs(type: SpotBugsTask) {
+}
+
+// Execute Checkstyle on all modified files
+task spotbugsCI(type: SpotBugsTask) {
+    def changedFiles = getChangedFiles()
+    include changedFiles
+}
+
 /**
  * Get all files that are changed but not deleted nor renamed.
  * Compares to master or the specified target branch.
@@ -66,7 +113,7 @@ task checkstyleCI(type: Checkstyle) {
 def getChangedFiles() {
     def modifiedFilesJson = System.getenv("MODIFIED_FILES")
     List<String> files = new ArrayList<>()
-    
+
     if (modifiedFilesJson == null) {
         return files
     }
