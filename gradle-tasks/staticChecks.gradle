@@ -89,11 +89,6 @@ tasks.withType(SpotBugsTask) {
     }
 }
 
-task compileJava(overwrite: true) {
-    dependsOn 'compileDebugJavaWithJavac'
-    group = "build"
-}
-
 // Execute SpotBugsTask on all files
 task spotbugs(type: SpotBugsTask) {
 }
