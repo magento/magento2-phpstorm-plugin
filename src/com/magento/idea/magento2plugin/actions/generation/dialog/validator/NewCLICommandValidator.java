@@ -95,12 +95,6 @@ public class NewCLICommandValidator {
 
             return false;
         }
-        if (!cliCommandDescription.matches(RegExUtil.IDENTIFIER)) {
-            String errorMessage = validatorBundle.message("validator.identifier", "CLI Command Description");
-            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
-
-            return false;
-        }
 
         return true;
     }
