@@ -65,43 +65,46 @@ task checkstyleCI(type: Checkstyle) {
  */
 def getChangedFiles() {
     // Get the target and source branch
-    def envTargetBranch = System.getenv("TARGET_BRANCH")
-    def envSourceBranch = System.getenv("WORKING_BRANCH")
+    //def envTargetBranch = System.getenv("TARGET_BRANCH")
+    //def envSourceBranch = System.getenv("WORKING_BRANCH")
+    def modifiedFiles = System.getenv("MODIFIED_FILES")
 
-    println "Target Branch: ${envTargetBranch}"
-    println "Source Branch: ${envSourceBranch}"
+    println "Modified Files: ${modifiedFiles}"
+
+    //println "Target Branch: ${envTargetBranch}"
+    //println "Source Branch: ${envSourceBranch}"
 
     // Compare to master if no branch specified
-    def targetBranch
-    if (project.hasProperty("branch")) {
-        targetBranch = project.property("branch")
-    } else {
-        targetBranch = envTargetBranch ? "origin/${envTargetBranch}" : getParentBranch()
-    }
-    def sourceBranch = envSourceBranch ? "origin/${envSourceBranch}" : ""
-
-    println "Merging ${sourceBranch} into ${targetBranch}"
+//    def targetBranch
+//    if (project.hasProperty("branch")) {
+//        targetBranch = project.property("branch")
+//    } else {
+//        targetBranch = envTargetBranch ? "origin/${envTargetBranch}" : getParentBranch()
+//    }
+//    def sourceBranch = envSourceBranch ? "origin/${envSourceBranch}" : ""
+//
+//    println "Merging ${sourceBranch} into ${targetBranch}"
 
     // Get list of all changed files including status
-    def systemOutStream = new ByteArrayOutputStream()
-    def command = "git diff --name-status --diff-filter=dr $targetBranch $sourceBranch"
-    command.execute().waitForProcessOutput(systemOutStream, System.err)
-    def allFiles = systemOutStream.toString().trim().split('\n')
-    systemOutStream.close()
-
-    // Remove the status prefix
-    Pattern statusPattern = Pattern.compile("(\\w)\\t+(.+)")
+//    def systemOutStream = new ByteArrayOutputStream()
+//    def command = "git diff --name-status --diff-filter=dr $targetBranch $sourceBranch"
+//    command.execute().waitForProcessOutput(systemOutStream, System.err)
+//    def allFiles = systemOutStream.toString().trim().split('\n')
+//    systemOutStream.close()
+//
+//    // Remove the status prefix
+//    Pattern statusPattern = Pattern.compile("(\\w)\\t+(.+)")
     List<String> files = new ArrayList<>()
 
-    println "Changed files:"
+    //println "Changed files:"
 
-    for (file in allFiles) {
-        Matcher matcher = statusPattern.matcher(file)
-        if (matcher.find()) {
-            println "+ ${matcher.group(2)}"
-            files.add(matcher.group(2))
-        }
-    }
+//    for (file in allFiles) {
+//        Matcher matcher = statusPattern.matcher(file)
+//        if (matcher.find()) {
+//            println "+ ${matcher.group(2)}"
+//            files.add(matcher.group(2))
+//        }
+//    }
 
     // Return the list of touched files
     files
