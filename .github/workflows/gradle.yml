@@ -27,9 +27,6 @@ jobs:
       - id: file_changes
         uses: trilom/file-changes-action@v1.2.3
       - name: Run Code Style Check
-        run: |
-          echo 'Modified Files: ${{ steps.file_changes.outputs.files}}'
-      - name: Run Code Style Check
         run: ./gradlew checkstyleCI -i
         env:
           MODIFIED_FILES: ${{ steps.file_changes.outputs.files}}

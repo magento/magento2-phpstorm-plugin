@@ -2,8 +2,8 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
-import java.util.regex.Matcher
-import java.util.regex.Pattern
+
+import groovy.json.JsonSlurper
 
 /**
  * Static Checks
@@ -64,74 +64,19 @@ task checkstyleCI(type: Checkstyle) {
  * @return list of all changed files
  */
 def getChangedFiles() {
-    // Get the target and source branch
-    //def envTargetBranch = System.getenv("TARGET_BRANCH")
-    //def envSourceBranch = System.getenv("WORKING_BRANCH")
-    def modifiedFiles = System.getenv("MODIFIED_FILES")
+    def modifiedFilesJson = System.getenv("MODIFIED_FILES")
 
-    println "Modified Files: ${modifiedFiles}"
+    println "Modified Files: ${modifiedFilesJson}"
 
-    //println "Target Branch: ${envTargetBranch}"
-    //println "Source Branch: ${envSourceBranch}"
-
-    // Compare to master if no branch specified
-//    def targetBranch
-//    if (project.hasProperty("branch")) {
-//        targetBranch = project.property("branch")
-//    } else {
-//        targetBranch = envTargetBranch ? "origin/${envTargetBranch}" : getParentBranch()
-//    }
-//    def sourceBranch = envSourceBranch ? "origin/${envSourceBranch}" : ""
-//
-//    println "Merging ${sourceBranch} into ${targetBranch}"
-
-    // Get list of all changed files including status
-//    def systemOutStream = new ByteArrayOutputStream()
-//    def command = "git diff --name-status --diff-filter=dr $targetBranch $sourceBranch"
-//    command.execute().waitForProcessOutput(systemOutStream, System.err)
-//    def allFiles = systemOutStream.toString().trim().split('\n')
-//    systemOutStream.close()
-//
-//    // Remove the status prefix
-//    Pattern statusPattern = Pattern.compile("(\\w)\\t+(.+)")
     List<String> files = new ArrayList<>()
 
     //println "Changed files:"
-
-//    for (file in allFiles) {
-//        Matcher matcher = statusPattern.matcher(file)
-//        if (matcher.find()) {
-//            println "+ ${matcher.group(2)}"
-//            files.add(matcher.group(2))
-//        }
-//    }
+    def modifiedFiles = new JsonSlurper().parseText(modifiedFilesJson)
+    
+    modifiedFiles.each {
+        files.add(it.toString())
+    }
 
     // Return the list of touched files
     files
-}
-
-/**
- * Determines the parent branch.
- *
- * @return the found parent branch or master if not possible
- */
-def getParentBranch() {
-    def branch = ""
-    // Get short name of the HEAD branch
-    def branchDeterminer = "git rev-parse --abbrev-ref HEAD".execute()
-    branchDeterminer.in.eachLine { line -> branch = line }
-    branchDeterminer.err.eachLine { line -> println line }
-    branchDeterminer.waitFor()
-    // Search all branches for parent
-    def branchLine = 'git show-branch -a'.execute().text.readLines().find {
-        it.contains('*') && !(it ==~ ".*\\[$branch[~^\\]].*")
-    }
-    try {
-        // Filter parent branch name
-        def parent = (branchLine =~ /\[([^~^\]]*)[~^\]]/)[0][1]
-        return parent
-    } catch (Exception ignored) {
-        println "Could not determine parent branch, compare to master"
-        return "master"
-    }
 }
