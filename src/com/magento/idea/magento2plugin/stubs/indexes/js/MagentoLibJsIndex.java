@@ -9,6 +9,9 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.indexing.*;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
+import com.magento.idea.magento2plugin.magento.packages.File;
+import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.project.Settings;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -29,7 +32,8 @@ public class MagentoLibJsIndex extends ScalarIndexExtension<String> {
     public DataIndexer<String, Void, FileContent> getIndexer() {
         return inputData -> {
             Map<String, Void> map = new HashMap<>();
-            String libPath = inputData.getProject().getBasePath() + "/lib/web/";
+            String libPath = Settings.getMagentoPath(inputData.getProject()) +
+                File.separator + Package.LIB_WEB_ROOT + File.separator;
             VirtualFile file = inputData.getFile();
 
             if (!file.getPath().contains(libPath)){

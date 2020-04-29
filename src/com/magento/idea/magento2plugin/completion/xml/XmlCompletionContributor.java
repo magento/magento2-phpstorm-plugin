@@ -76,6 +76,16 @@ public class XmlCompletionContributor extends CompletionContributor {
                 new FilePathCompletionProvider()
         );
 
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_DATA_CHARACTERS)
+                .withParent(XmlPatterns.xmlText().withParent(
+                    XmlPatterns.xmlTag().withName(UiComponentXml.XML_TAG_ITEM).withChild(
+                        XmlPatterns.xmlAttribute().withValue(string()
+                            .matches(UiComponentXml.XML_ATTRIBUTE_TEMPLATE))
+                    ))
+                ),
+            new FilePathCompletionProvider()
+        );
+
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
                 .inside(XmlPatterns.xmlAttribute().withName("type")),
             new VirtualTypeCompletionProvider()
@@ -198,21 +208,28 @@ public class XmlCompletionContributor extends CompletionContributor {
 
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
             .inside(XmlPatterns.xmlAttributeValue().withParent(
-                XmlPatterns.xmlAttribute().withName("component")
+                XmlPatterns.xmlAttribute().withName(UiComponentXml.XML_ATTRIBUTE_COMPONENT)
             )),
-            new RequireJsMappingCompletionProvider()
+            new CompositeCompletionProvider(
+                new RequireJsMappingCompletionProvider(),
+                new FilePathCompletionProvider()
+            )
         );
 
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_DATA_CHARACTERS)
              .withParent(XmlPatterns.xmlText().withParent(
-                XmlPatterns.xmlTag().withName("item").withChild(
-                        XmlPatterns.xmlAttribute().withValue(string().matches("component"))
+                XmlPatterns.xmlTag().withName(UiComponentXml.XML_TAG_ITEM).withChild(
+                        XmlPatterns.xmlAttribute().withValue(string()
+                            .matches(UiComponentXml.XML_ATTRIBUTE_COMPONENT))
                     ).withChild(
-                        XmlPatterns.xmlAttribute().withName("name")
+                        XmlPatterns.xmlAttribute().withName(UiComponentXml.XML_ATTRIBUTE_NAME)
                     )
                 )
             ),
-            new RequireJsMappingCompletionProvider()
+            new CompositeCompletionProvider(
+                new RequireJsMappingCompletionProvider(),
+                new FilePathCompletionProvider()
+            )
         );
 
         // mftf action group completion contributor
