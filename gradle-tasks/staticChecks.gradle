@@ -80,7 +80,7 @@ def getChangedFiles() {
     }
     def sourceBranch = envSourceBranch ? "origin/${envSourceBranch}" : ""
 
-    println "Merging ${envTargetBranch} into ${envSourceBranch}"
+    println "Merging ${sourceBranch} into ${targetBranch}"
 
     // Get list of all changed files including status
     def systemOutStream = new ByteArrayOutputStream()
@@ -92,6 +92,9 @@ def getChangedFiles() {
     // Remove the status prefix
     Pattern statusPattern = Pattern.compile("(\\w)\\t+(.+)")
     List<String> files = new ArrayList<>()
+
+    println "Changed files:"
+
     for (file in allFiles) {
         Matcher matcher = statusPattern.matcher(file)
         if (matcher.find()) {
@@ -99,8 +102,6 @@ def getChangedFiles() {
             files.add(matcher.group(2))
         }
     }
-
-    println "Changed Files: ${files.count()}"
 
     // Return the list of touched files
     files
