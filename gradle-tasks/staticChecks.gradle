@@ -65,14 +65,17 @@ task checkstyleCI(type: Checkstyle) {
  */
 def getChangedFiles() {
     def modifiedFilesJson = System.getenv("MODIFIED_FILES")
+    List<String> files = new ArrayList<>()
+    
+    if (modifiedFilesJson == null) {
+        return files
+    }
 
     println "Modified Files: ${modifiedFilesJson}"
 
-    List<String> files = new ArrayList<>()
-
     //println "Changed files:"
     def modifiedFiles = new JsonSlurper().parseText(modifiedFilesJson)
-    
+
     modifiedFiles.each {
         files.add(it.toString())
     }
