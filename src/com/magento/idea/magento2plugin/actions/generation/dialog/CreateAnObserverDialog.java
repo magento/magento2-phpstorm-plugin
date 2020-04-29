@@ -17,8 +17,10 @@ import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
-import org.jetbrains.annotations.NotNull;
-
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -26,10 +28,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 public class CreateAnObserverDialog extends AbstractDialog {
     @NotNull
@@ -51,6 +50,12 @@ public class CreateAnObserverDialog extends AbstractDialog {
     private JLabel observerNameLabel;
     private JTextField observerName;
 
+    /**
+     * Constructor.
+     *
+     * @param project Project Scope
+     * @param targetEvent Action Event
+     */
     public CreateAnObserverDialog(@NotNull Project project, String targetEvent) {
         this.project = project;
         this.targetEvent = targetEvent;
@@ -79,10 +84,10 @@ public class CreateAnObserverDialog extends AbstractDialog {
     }
 
     /**
-     *  Open an action dialog
+     * Open an action dialog.
      *
-     * @param project
-     * @param targetEvent
+     * @param project Project Scope
+     * @param targetEvent Action Event
      */
     public static void open(@NotNull Project project, String targetEvent) {
         CreateAnObserverDialog dialog = new CreateAnObserverDialog(project, targetEvent);
@@ -92,7 +97,7 @@ public class CreateAnObserverDialog extends AbstractDialog {
     }
 
     /**
-     * Setup observer area combobox
+     * Setup observer area combobox.
      */
     private void fillTargetAreaOptions() {
         for (Package.Areas area : Package.Areas.values()) {
@@ -101,7 +106,7 @@ public class CreateAnObserverDialog extends AbstractDialog {
     }
 
     /**
-     * Perform code generation using input data
+     * Perform code generation using input data.
      */
     private void onOK() {
         if (!validator.validate(project)) {
@@ -147,8 +152,7 @@ public class CreateAnObserverDialog extends AbstractDialog {
         return this.observerModule.getSelectedItem().toString();
     }
 
-    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
-    private void createUIComponents() {
+    private void createUiComponents() {
         List<String> allModulesList = ModuleIndex.getInstance(project).getEditableModuleNames();
 
         this.observerModule = new FilteredComboBox(allModulesList);
@@ -156,9 +160,16 @@ public class CreateAnObserverDialog extends AbstractDialog {
 
     private String getNamespace() {
         String targetModule = getObserverModule();
-        String namespace = targetModule.replace(Package.VENDOR_MODULE_NAME_SEPARATOR, Package.FQN_SEPARATOR);
+        String namespace = targetModule.replace(
+                Package.VENDOR_MODULE_NAME_SEPARATOR,
+                Package.FQN_SEPARATOR
+        );
+
         namespace = namespace.concat(Package.FQN_SEPARATOR);
-        return namespace.concat(getObserverDirectory().replace(File.separator, Package.FQN_SEPARATOR));
+        return namespace.concat(getObserverDirectory().replace(
+                File.separator,
+                Package.FQN_SEPARATOR)
+        );
     }
 
     private String getObserverClassFqn() {
