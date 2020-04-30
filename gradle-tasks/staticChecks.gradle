@@ -21,7 +21,7 @@ pmd {
     consoleOutput = true
     rulePriority = 5
     ruleSets = [
-        "gradle-tasks/pmd/ruleset.xml"
+            rootProject.file("gradle-tasks/pmd/ruleset.xml")
     ]
 }
 
