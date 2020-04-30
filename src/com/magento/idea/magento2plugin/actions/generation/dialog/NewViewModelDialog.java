@@ -41,7 +41,6 @@ public class NewViewModelDialog extends AbstractDialog {
         setModal(true);
         setTitle("Create a new Magento 2 View Model.");
         getRootPane().setDefaultButton(buttonOK);
-        pushToMiddle();
         suggestViewModelDirectory();
 
         buttonOK.addActionListener(new ActionListener() {
@@ -75,6 +74,7 @@ public class NewViewModelDialog extends AbstractDialog {
     public static void open(Project project, PsiDirectory directory) {
         NewViewModelDialog dialog = new NewViewModelDialog(project, directory);
         dialog.pack();
+        dialog.centerDialog(dialog);
         dialog.setVisible(true);
     }
 

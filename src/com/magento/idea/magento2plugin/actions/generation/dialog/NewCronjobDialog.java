@@ -55,7 +55,6 @@ public class NewCronjobDialog extends AbstractDialog {
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
         setTitle("Create a new Magento 2 cronjob..");
-        pushToMiddle();
 
         buttonOK.addActionListener(e -> onOK());
         buttonCancel.addActionListener(e -> onCancel());
@@ -119,8 +118,8 @@ public class NewCronjobDialog extends AbstractDialog {
 
     public static void open(Project project, PsiDirectory directory) {
         NewCronjobDialog dialog = new NewCronjobDialog(project, directory);
-
         dialog.pack();
+        dialog.centerDialog(dialog);
         dialog.setVisible(true);
     }
 

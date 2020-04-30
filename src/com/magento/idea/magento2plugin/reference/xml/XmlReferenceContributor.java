@@ -10,6 +10,7 @@ import com.intellij.psi.PsiReferenceRegistrar;
 import com.intellij.psi.xml.XmlTokenType;
 import com.magento.idea.magento2plugin.magento.files.MftfActionGroup;
 import com.magento.idea.magento2plugin.magento.files.MftfTest;
+import com.magento.idea.magento2plugin.magento.files.UiComponentXml;
 import com.magento.idea.magento2plugin.reference.provider.*;
 import com.magento.idea.magento2plugin.reference.provider.mftf.*;
 import com.magento.idea.magento2plugin.util.RegExUtil;
@@ -226,24 +227,38 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
 
         // <someXmlTag component="requireJsMappingKey" />
         registrar.registerReferenceProvider(
-                XmlPatterns.xmlAttributeValue().withParent(
-                        XmlPatterns.xmlAttribute().withName("component")
-                ),
-                new RequireJsPreferenceReferenceProvider()
+            XmlPatterns.xmlAttributeValue().withParent(
+                XmlPatterns.xmlAttribute().withName(UiComponentXml.XML_ATTRIBUTE_COMPONENT)
+            ),
+            new RequireJsPreferenceReferenceProvider()
         );
 
         // <item name="component">requireJsMappingKey</item>
         registrar.registerReferenceProvider(
-                XmlPatterns.psiElement(XmlTokenType.XML_DATA_CHARACTERS).withParent(
-                        XmlPatterns.xmlText().withParent(
-                                XmlPatterns.xmlTag().withName("item").withChild(
-                                        XmlPatterns.xmlAttribute().withValue(string().matches("component"))
-                                ).withChild(
-                                        XmlPatterns.xmlAttribute().withName("name")
-                                )
-                        )
-                ),
-                new RequireJsPreferenceReferenceProvider()
+            XmlPatterns.psiElement(XmlTokenType.XML_DATA_CHARACTERS).withParent(
+                XmlPatterns.xmlText().withParent(
+                    XmlPatterns.xmlTag().withName(UiComponentXml.XML_TAG_ITEM).withChild(
+                        XmlPatterns.xmlAttribute().withValue(string().matches(UiComponentXml.XML_ATTRIBUTE_COMPONENT))
+                    ).withChild(
+                        XmlPatterns.xmlAttribute().withName(UiComponentXml.XML_ATTRIBUTE_NAME)
+                    )
+                )
+            ),
+            new RequireJsPreferenceReferenceProvider()
+        );
+
+        // <item name="template">reference</item>
+        registrar.registerReferenceProvider(
+            XmlPatterns.psiElement(XmlTokenType.XML_DATA_CHARACTERS).withParent(
+                XmlPatterns.xmlText().withParent(
+                    XmlPatterns.xmlTag().withName(UiComponentXml.XML_TAG_ITEM).withChild(
+                        XmlPatterns.xmlAttribute().withValue(string().matches(UiComponentXml.XML_ATTRIBUTE_TEMPLATE))
+                    ).withChild(
+                        XmlPatterns.xmlAttribute().withName(UiComponentXml.XML_ATTRIBUTE_NAME)
+                    )
+                )
+            ),
+            new FilePathReferenceProvider()
         );
 
         registerReferenceForDifferentNesting(registrar);

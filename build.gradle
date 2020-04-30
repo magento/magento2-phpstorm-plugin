@@ -5,10 +5,16 @@
 
 plugins {
     id 'org.jetbrains.intellij' version '0.4.15'
+    id 'checkstyle'
+    id 'pmd'
+}
+
+repositories {
+    mavenCentral()
 }
 
 group 'com.magento.idea'
-version '0.0.9'
+version '1.0.1'
 
 apply plugin: 'org.jetbrains.intellij'
 apply plugin: 'java'
@@ -47,7 +53,7 @@ publishPlugin {
     token = System.getenv("MAGENTO_PHPSTORM_intellijPublishToken")
     if (Boolean.valueOf(System.getenv("MAGENTO_PHPSTORM_isAlpha"))) {
         channels 'alpha'
-        //version = version + "-alpha-" + getDate()
+        version = version + "-alpha-" + getDate()
     }
 }
 
@@ -56,3 +62,5 @@ static def getDate() {
     def formattedDate = date.format('yyyy-MM-dd-HH-mm')
     return formattedDate
 }
+
+apply from: "${project.rootDir}/gradle-tasks/staticChecks.gradle"
