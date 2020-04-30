@@ -5,6 +5,12 @@
 
 plugins {
     id 'org.jetbrains.intellij' version '0.4.15'
+    id 'checkstyle'
+    id 'pmd'
+}
+
+repositories {
+    mavenCentral()
 }
 
 group 'com.magento.idea'
@@ -56,3 +62,5 @@ static def getDate() {
     def formattedDate = date.format('yyyy-MM-dd-HH-mm')
     return formattedDate
 }
+
+apply from: "${project.rootDir}/gradle-tasks/staticChecks.gradle"
