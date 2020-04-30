@@ -30,25 +30,25 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
 
-public class CreateAnObserverDialog extends AbstractDialog {
+public class CreateAnObserverDialog extends AbstractDialog {//NOPMD
     @NotNull
     private final Project project;
     @NotNull
     private final CreateAnObserverDialogValidator validator;
-    private String targetEvent;
+    private final String targetEvent;
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
     private JTextField observerClassName;
-    private JLabel observerClassNameLabel;
     private JTextField observerDirectory;
-    private JLabel observerDirectoryName;
-    private JLabel selectObserverModule;
     private FilteredComboBox observerModule;
     private JComboBox observerArea;
-    private JLabel observerAreaLabel;
-    private JLabel observerNameLabel;
     private JTextField observerName;
+    private JLabel observerClassNameLabel;//NOPMD
+    private JLabel observerDirectoryName;//NOPMD
+    private JLabel selectObserverModule;//NOPMD
+    private JLabel observerAreaLabel;//NOPMD
+    private JLabel observerNameLabel;//NOPMD
 
     /**
      * Constructor.
@@ -56,7 +56,9 @@ public class CreateAnObserverDialog extends AbstractDialog {
      * @param project Project Scope
      * @param targetEvent Action Event
      */
-    public CreateAnObserverDialog(@NotNull Project project, String targetEvent) {
+    public CreateAnObserverDialog(@NotNull final Project project, final String targetEvent) {
+        super();
+
         this.project = project;
         this.targetEvent = targetEvent;
         this.validator = CreateAnObserverDialogValidator.getInstance(this);
@@ -71,7 +73,7 @@ public class CreateAnObserverDialog extends AbstractDialog {
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
+            public void windowClosing(final WindowEvent event) {
                 onCancel();
             }
         });
@@ -89,8 +91,8 @@ public class CreateAnObserverDialog extends AbstractDialog {
      * @param project Project Scope
      * @param targetEvent Action Event
      */
-    public static void open(@NotNull Project project, String targetEvent) {
-        CreateAnObserverDialog dialog = new CreateAnObserverDialog(project, targetEvent);
+    public static void open(@NotNull final Project project, final String targetEvent) {
+        final CreateAnObserverDialog dialog = new CreateAnObserverDialog(project, targetEvent);
         dialog.pack();
         dialog.centerDialog(dialog);
         dialog.setVisible(true);
@@ -100,7 +102,7 @@ public class CreateAnObserverDialog extends AbstractDialog {
      * Setup observer area combobox.
      */
     private void fillTargetAreaOptions() {
-        for (Package.Areas area : Package.Areas.values()) {
+        for (final Package.Areas area : Package.Areas.values()) {
             observerArea.addItem(area.toString());
         }
     }
@@ -152,14 +154,14 @@ public class CreateAnObserverDialog extends AbstractDialog {
         return this.observerModule.getSelectedItem().toString();
     }
 
-    private void createUiComponents() {
-        List<String> allModulesList = ModuleIndex.getInstance(project).getEditableModuleNames();
+    private void createUiComponents() {//NOPMD
+        final List<String> allModulesList = ModuleIndex.getInstance(project).getEditableModuleNames();
 
         this.observerModule = new FilteredComboBox(allModulesList);
     }
 
     private String getNamespace() {
-        String targetModule = getObserverModule();
+        final String targetModule = getObserverModule();
         String namespace = targetModule.replace(
                 Package.VENDOR_MODULE_NAME_SEPARATOR,
                 Package.FQN_SEPARATOR
