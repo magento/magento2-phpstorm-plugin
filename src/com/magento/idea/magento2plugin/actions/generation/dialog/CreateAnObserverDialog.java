@@ -154,7 +154,7 @@ public class CreateAnObserverDialog extends AbstractDialog { //NOPMD
         return this.observerModule.getSelectedItem().toString();
     }
 
-    private void createUiComponents() { //NOPMD
+    private void createUIComponents() { //NOPMD
         final List<String> allModulesList = ModuleIndex.getInstance(project)
                 .getEditableModuleNames();
 
