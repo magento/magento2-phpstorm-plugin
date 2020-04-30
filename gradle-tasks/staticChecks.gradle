@@ -1,0 +1,95 @@
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+import groovy.json.JsonSlurper
+
+/**
+ * Static Checks
+ */
+
+checkstyle {
+    toolVersion = "8.31"
+    ignoreFailures = false
+    maxWarnings = 0
+    configFile rootProject.file("gradle-tasks/checkstyle/checkstyle.xml")
+}
+
+pmd {
+    toolVersion = "6.21.0"
+    consoleOutput = true
+    rulePriority = 5
+    ruleSets = [
+            rootProject.file("gradle-tasks/pmd/ruleset.xml")
+    ]
+}
+
+tasks.withType(Checkstyle) {
+    // Specify all files that should be checked
+    classpath = files()
+    source "${project.rootDir}"
+
+    reports {
+        xml.enabled false
+        html.enabled true
+    }
+}
+
+// Execute Checkstyle on all files
+task checkstyle(type: Checkstyle) {
+}
+
+// Execute Checkstyle on all modified files
+task checkstyleCI(type: Checkstyle) {
+    def changedFiles = getChangedFiles()
+    include changedFiles
+}
+
+tasks.withType(Pmd) {
+    // Specify all files that should be checked
+    classpath = files()
+    source "${project.rootDir}"
+
+    reports {
+        xml.enabled false
+        html.enabled true
+    }
+}
+
+// Execute Checkstyle on all files
+task pmd(type: Pmd) {
+}
+
+// Execute Checkstyle on all modified files
+task pmdCI(type: Pmd) {
+    def changedFiles = getChangedFiles()
+    include changedFiles
+}
+
+/**
+ * Get all files that are changed but not deleted nor renamed.
+ * Compares to master or the specified target branch.
+ *
+ * @return list of all changed files
+ */
+def getChangedFiles() {
+    def modifiedFilesJson = System.getenv("MODIFIED_FILES")
+    List<String> files = new ArrayList<>()
+
+    if (modifiedFilesJson == null) {
+        return files
+    }
+
+    println "Modified Files: ${modifiedFilesJson}"
+
+    //println "Changed files:"
+    def modifiedFiles = new JsonSlurper().parseText(modifiedFilesJson)
+
+    modifiedFiles.each {
+        files.add(it.toString())
+    }
+
+    // Return the list of touched files
+    files
+}
