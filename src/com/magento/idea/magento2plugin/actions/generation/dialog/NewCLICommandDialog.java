@@ -13,7 +13,6 @@ import com.magento.idea.magento2plugin.actions.generation.generator.CLICommandCl
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
 
-
 import javax.swing.*;
 import java.awt.event.*;
 

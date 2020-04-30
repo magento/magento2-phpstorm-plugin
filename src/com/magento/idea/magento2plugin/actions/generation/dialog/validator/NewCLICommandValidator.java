@@ -7,14 +7,15 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewCLICommandDialog;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
-import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
+import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 
 import javax.swing.*;
 
 public class NewCLICommandValidator {
     private static NewCLICommandValidator INSTANCE = null;
-    private ValidatorBundle validatorBundle;
+    private final ValidatorBundle validatorBundle;
+    private final CommonBundle commonBundle;
 
     public static NewCLICommandValidator getInstance() {
         if (null == INSTANCE) {
@@ -26,6 +27,7 @@ public class NewCLICommandValidator {
 
     public NewCLICommandValidator() {
         this.validatorBundle = new ValidatorBundle();
+        this.commonBundle = new CommonBundle();
     }
 
     public boolean validate(Project project, NewCLICommandDialog dialog) {
@@ -36,15 +38,18 @@ public class NewCLICommandValidator {
         String cliCommandDescription = dialog.getCLICommandDescription();
 
         if (cliCommandClassName.length() == 0) {
-            String errorMessage = validatorBundle.message("validator.notEmpty", "CLI Command Class Name");
+            String errorMessage = validatorBundle.message(
+                    "validator.notEmpty",
+                    this.commonBundle.message("common.cli.class.name")
+            );
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return false;
         }
         if (!cliCommandClassName.matches(RegExUtil.ALPHANUMERIC)) {
             String errorMessage = validatorBundle.message(
-                "validator.alphaNumericCharacters",
-                "CLI Command Class Name"
+                    "validator.alphaNumericCharacters",
+                    this.commonBundle.message("common.cli.class.name")
             );
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
@@ -52,8 +57,8 @@ public class NewCLICommandValidator {
         }
         if (!Character.isUpperCase(cliCommandClassName.charAt(0)) && !Character.isDigit(cliCommandClassName.charAt(0))) {
             String errorMessage = validatorBundle.message(
-                "validator.startWithNumberOrCapitalLetter",
-                "CLI Command Class Name"
+                    "validator.startWithNumberOrCapitalLetter",
+                    this.commonBundle.message("common.cli.class.name")
             );
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
@@ -61,7 +66,10 @@ public class NewCLICommandValidator {
         }
 
         if (cliCommandParentDirectory.length() == 0) {
-            String errorMessage = validatorBundle.message("validator.notEmpty", "CLI Command Parent Directory");
+            String errorMessage = validatorBundle.message(
+                    "validator.notEmpty",
+                    this.commonBundle.message("common.cli.parent.directory")
+            );
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return false;
@@ -69,7 +77,7 @@ public class NewCLICommandValidator {
         if (!cliCommandParentDirectory.matches(RegExUtil.DIRECTORY)) {
             String errorMessage = validatorBundle.message(
                     "validator.directory.isNotValid",
-                    "CLI Command Parent Directory"
+                    this.commonBundle.message("common.cli.parent.directory")
             );
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
@@ -77,20 +85,29 @@ public class NewCLICommandValidator {
         }
 
         if (cliCommandName.length() == 0) {
-            String errorMessage = validatorBundle.message("validator.notEmpty", "CLI Command Name");
+            String errorMessage = validatorBundle.message(
+                    "validator.notEmpty",
+                    this.commonBundle.message("common.cli.cli.name")
+            );
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return false;
         }
         if (!cliCommandName.matches(RegExUtil.CLI_COMMAND_NAME)) {
-            String errorMessage = validatorBundle.message("validator.identifier", "CLI Command Name");
+            String errorMessage = validatorBundle.message(
+                    "validator.identifier",
+                    this.commonBundle.message("common.cli.cli.name")
+            );
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return false;
         }
 
         if (cliCommandDescription.length() == 0) {
-            String errorMessage = validatorBundle.message("validator.notEmpty", "CLI Command Description");
+            String errorMessage = validatorBundle.message(
+                    "validator.notEmpty",
+                    this.commonBundle.message("common.cli.cli.description")
+            );
             JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
 
             return false;
