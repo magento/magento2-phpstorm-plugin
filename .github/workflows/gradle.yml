@@ -24,20 +24,6 @@ jobs:
         run: chmod +x gradlew
       - name: Run automated tests
         run: ./gradlew test -i --no-daemon
-      - id: file_changes
-        uses: trilom/file-changes-action@v1.2.3
-      - name: Run Code Style Check
-        run: ./gradlew checkstyleCI -i --no-daemon
-        env:
-          MODIFIED_FILES: ${{ steps.file_changes.outputs.files}}
-      - name: Run PMD Quality Check
-        run: ./gradlew pmdCI -i --no-daemon
-        env:
-          MODIFIED_FILES: ${{ steps.file_changes.outputs.files}}
-      - name: Run Spotbugs Quality Check
-        run: ./gradlew spotbugsCI -i --no-daemon
-        env:
-          MODIFIED_FILES: ${{ steps.file_changes.outputs.files}}
 
   build-windows:
 
@@ -72,3 +58,28 @@ jobs:
         run: chmod +x gradlew
       - name: Run automated tests
         run: ./gradlew test -i --no-daemon
+
+  static-tests:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Gradle wrapper
+        run: gradle wrapper
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - id: file_changes
+        uses: trilom/file-changes-action@v1.2.3
+      - name: Run Code Style Check
+        run: ./gradlew checkstyleCI -i --no-daemon
+        env:
+          MODIFIED_FILES: ${{ steps.file_changes.outputs.files}}
+      - name: Run PMD Quality Check
+        run: ./gradlew pmdCI -i --no-daemon
+        env:
+          MODIFIED_FILES: ${{ steps.file_changes.outputs.files}}
