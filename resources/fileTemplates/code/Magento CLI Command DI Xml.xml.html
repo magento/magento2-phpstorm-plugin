@@ -1,0 +1,42 @@
+<!--
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<html>
+    <body>
+        <table width="100%" border="0" cellpadding="5" cellspacing="0" style="border-collapse: collapse">
+            <tr>
+                <td>
+                    <font face="verdana" size="-1">
+                        Each CLI Command must be register in the related module di.xml.
+                        Declare your Command class in Magento\Framework\Console\CommandListInterface and configure the command name using dependency injection
+                    </font>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <font face="verdana" size="-1">
+                        <a href="https://devdocs.magento.com/guides/v2.3/extension-dev-guide/cli-cmds/cli-howto.html">Create a new CLI Command in Magento.</a>
+                    </font>
+                </td>
+            </tr>
+        </table>
+        <table width="100%" border="0" cellpadding="5" cellspacing="0" style="border-collapse: collapse">
+            <tr>
+                <td colspan="3"><font face="verdana" size="-1">Predefined variables explanation:</font></td>
+            </tr>
+            <tr>
+                <td valign="top"><nobr><font face="verdana" size="-2"><b>${CLI_COMMAND_DI_NAME}</b></font></nobr></td>
+                <td width="10">&nbsp;</td>
+                <td width="100%" valign="top"><font face="verdana" size="-1">A CLI Command name used for DI to the CommandListInterface.</font></td>
+            </tr>
+            <tr>
+                <td valign="top"><nobr><font face="verdana" size="-2"><b>${CLI_COMMAND_CLASS}</b></font></nobr></td>
+                <td width="10">&nbsp;</td>
+                <td width="100%" valign="top"><font face="verdana" size="-1">A class of the CLI Command.</font></td>
+            </tr>
+        </table>
+    </body>
+</html>

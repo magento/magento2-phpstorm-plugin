@@ -21,7 +21,7 @@ public class NewCLICommandDialog extends AbstractDialog {
     private JTextField cliCommandClassNameField;
     private JTextField cliCommandParentDirectoryField;
     private JTextField cliCommandNameField;
-    private JTextField cliCommandDescriptionField;
+    private JTextArea cliCommandDescriptionField;
     private JButton buttonCancel;
     private JButton buttonOK;
 

@@ -49,14 +49,6 @@
               <text value=""/>
             </properties>
           </component>
-          <component id="9e289" class="javax.swing.JTextField" binding="cliCommandDescriptionField">
-            <constraints>
-              <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                <preferred-size width="150" height="-1"/>
-              </grid>
-            </constraints>
-            <properties/>
-          </component>
           <component id="86880" class="javax.swing.JLabel">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -89,7 +81,7 @@
               <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <labelFor value="9e289"/>
+              <labelFor value="d786e"/>
               <text resource-bundle="magento2/common" key="common.cli.cli.description"/>
             </properties>
           </component>
@@ -129,6 +121,14 @@
               </component>
             </children>
           </grid>
+          <component id="d786e" class="javax.swing.JTextArea" binding="cliCommandDescriptionField">
+            <constraints>
+              <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                <preferred-size width="150" height="50"/>
+              </grid>
+            </constraints>
+            <properties/>
+          </component>
         </children>
       </grid>
     </children>

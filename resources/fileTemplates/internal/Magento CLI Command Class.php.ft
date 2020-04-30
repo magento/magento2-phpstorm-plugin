@@ -2,9 +2,7 @@
 #parse("PHP File Header.php")
 
 #if (${NAMESPACE})
-
 namespace ${NAMESPACE};
-
 #end
 
 use Symfony\Component\Console\Command\Command;
