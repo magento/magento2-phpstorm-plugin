@@ -30,7 +30,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
 
-public class CreateAnObserverDialog extends AbstractDialog {//NOPMD
+public class CreateAnObserverDialog extends AbstractDialog { //NOPMD
     @NotNull
     private final Project project;
     @NotNull
@@ -154,8 +154,9 @@ public class CreateAnObserverDialog extends AbstractDialog {//NOPMD
         return this.observerModule.getSelectedItem().toString();
     }
 
-    private void createUiComponents() {//NOPMD
-        final List<String> allModulesList = ModuleIndex.getInstance(project).getEditableModuleNames();
+    private void createUiComponents() { //NOPMD
+        final List<String> allModulesList = ModuleIndex.getInstance(project)
+            .getEditableModuleNames();
 
         this.observerModule = new FilteredComboBox(allModulesList);
     }
