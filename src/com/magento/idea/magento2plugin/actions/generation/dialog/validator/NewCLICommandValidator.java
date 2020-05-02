@@ -15,8 +15,8 @@ import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import javax.swing.JOptionPane;
 
-public class CLICommandValidator {
-    private static CLICommandValidator INSTANCE = null;
+public class NewCLICommandValidator {
+    private static NewCLICommandValidator INSTANCE = null;//NOPMD
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
 
@@ -25,15 +25,14 @@ public class CLICommandValidator {
      *
      * @return NewCLICommandValidator
      */
-    public static CLICommandValidator getInstance() {
-        if (null == INSTANCE) {
-            INSTANCE = new CLICommandValidator();
-        }
+    public static NewCLICommandValidator getInstance() {
+        if (null != INSTANCE) return INSTANCE;//NOPMD
+        INSTANCE = new NewCLICommandValidator();
 
         return INSTANCE;
     }
 
-    public CLICommandValidator() {
+    public NewCLICommandValidator() {
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
     }
@@ -46,16 +45,101 @@ public class CLICommandValidator {
      * @return boolen
      */
     public boolean validate(final Project project, final NewCLICommandDialog dialog) {
-        this.validateClassName(dialog);
-        this.validateParentDirectory(dialog);
-        this.validateCommandName(dialog);
-        this.validateCommandDescription(dialog);
-        this.validatePHPClassName(project, dialog);
+        if (this.isClassNameValid(dialog)
+                && this.isParentDirectoryValid(dialog)
+                && this.isCommandNameValid(dialog)
+                && this.isCommandDescriptionValid(dialog)
+                && this.isPHPClassValid(project, dialog)
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private Boolean isClassNameValid(final NewCLICommandDialog dialog) {
+        final String className = dialog.getCLICommandClassName();
+        if (className.length() == 0) {
+            this.showOptionPane(
+                    "validator.notEmpty",
+                    "common.className"
+            );
+            return false;
+        }
+        if (!className.matches(RegExUtil.ALPHANUMERIC)) {
+            this.showOptionPane(
+                    "validator.alphaNumericCharacters",
+                    "common.className"
+            );
+            return false;
+        }
+        if (!Character.isUpperCase(className.charAt(0))
+                && !Character.isDigit(className.charAt(0))
+        ) {
+            this.showOptionPane(
+                    "validator.startWithNumberOrCapitalLetter",
+                    "common.className"
+            );
+            return false;
+        }
 
         return true;
     }
 
-    private void validatePHPClassName(final Project project, final NewCLICommandDialog dialog) {
+    private Boolean isParentDirectoryValid(final NewCLICommandDialog dialog) {
+        final String directory = dialog.getCLICommandParentDirectory();
+        if (directory.length() == 0) {
+            this.showOptionPane(
+                    "validator.notEmpty",
+                    "common.parentDirectory"
+            );
+            return false;
+        }
+        if (!directory.matches(RegExUtil.DIRECTORY)) {
+            this.showOptionPane(
+                    "validator.directory.isNotValid",
+                    "common.parentDirectory"
+            );
+            return false;
+        }
+
+        return true;
+    }
+
+    private Boolean isCommandNameValid(final NewCLICommandDialog dialog) {
+        final String cliCommandName = dialog.getCLICommandName();
+        if (cliCommandName.length() == 0) {
+            this.showOptionPane(
+                    "validator.notEmpty",
+                    "common.cliCommandName"
+            );
+            return false;
+        }
+        if (!cliCommandName.matches(RegExUtil.CLI_COMMAND_NAME)) {
+            this.showOptionPane(
+                    "validator.directory.isNotValid",
+                    "common.cliCommandName"
+            );
+            return false;
+        }
+
+        return true;
+    }
+
+    private Boolean isCommandDescriptionValid(final NewCLICommandDialog dialog) {
+        final String description = dialog.getCLICommandDescription();
+        if (description.length() == 0) {
+            this.showOptionPane(
+                    "validator.notEmpty",//NOPMD
+                    "common.description"
+            );
+            return false;
+        }
+
+        return true;
+    }
+
+    private Boolean isPHPClassValid(final Project project, final NewCLICommandDialog dialog) {
         final String moduleName = dialog.getCLICommandModule();
         final NamespaceBuilder namespaceBuilder = new NamespaceBuilder(
                 moduleName,
@@ -65,89 +149,21 @@ public class CLICommandValidator {
         final String namespace = namespaceBuilder.getClassFqn();
         final PhpClass phpClass = GetPhpClassByFQN.getInstance(project).execute(namespace);
         if (phpClass != null) {
-            final String errorMessage = validatorBundle.message(
+            this.showOptionPane(
                     "validator.file.alreadyExists",
-                    this.commonBundle.message("common.cli.class.title")
+                    "common.cli.class.title"
             );
-            this.showOptionPane(errorMessage);
+            return false;
         }
+
+        return true;
     }
 
-    private void validateCommandDescription(final NewCLICommandDialog dialog) {
-        final String description = dialog.getCLICommandDescription();
-        if (description.length() == 0) {
-            final String errorMessage = validatorBundle.message(
-                    "validator.notEmpty",
-                    this.commonBundle.message("common.description")
-            );
-            this.showOptionPane(errorMessage);
-        }
-    }
-
-    private void validateCommandName(final NewCLICommandDialog dialog) {
-        final String cliCommandName = dialog.getCLICommandName();
-        if (cliCommandName.length() == 0) {
-            final String errorMessage = validatorBundle.message(
-                    "validator.notEmpty",
-                    this.commonBundle.message("common.cliCommandName")
-            );
-            this.showOptionPane(errorMessage);
-        }
-        if (!cliCommandName.matches(RegExUtil.CLI_COMMAND_NAME)) {
-            final String errorMessage = validatorBundle.message(
-                    "validator.directory.isNotValid",
-                    this.commonBundle.message("common.cliCommandName")
-            );
-            this.showOptionPane(errorMessage);
-        }
-    }
-
-    private void validateParentDirectory(final NewCLICommandDialog dialog) {
-        final String directory = dialog.getCLICommandParentDirectory();
-        if (directory.length() == 0) {
-            final String errorMessage = validatorBundle.message(
-                    "validator.notEmpty",
-                    this.commonBundle.message("common.parentDirectory")
-            );
-            this.showOptionPane(errorMessage);
-        }
-        if (!directory.matches(RegExUtil.DIRECTORY)) {
-            final String errorMessage = validatorBundle.message(
-                    "validator.directory.isNotValid",
-                    this.commonBundle.message("common.parentDirectory")
-            );
-            this.showOptionPane(errorMessage);
-        }
-    }
-
-    private void validateClassName(final NewCLICommandDialog dialog) {
-        final String className = dialog.getCLICommandClassName();
-        if (className.length() == 0) {
-            final String errorMessage = validatorBundle.message(
-                    "validator.notEmpty",
-                    this.commonBundle.message("common.className")
-            );
-            this.showOptionPane(errorMessage);
-        }
-        if (!className.matches(RegExUtil.ALPHANUMERIC)) {
-            final String errorMessage = validatorBundle.message(
-                    "validator.alphaNumericCharacters",
-                    this.commonBundle.message("common.className")
-            );
-            this.showOptionPane(errorMessage);
-        }
-        if (!Character.isUpperCase(className.charAt(0))
-                && !Character.isDigit(className.charAt(0))
-        ) {
-            final String errorMessage = validatorBundle.message(
-                    "validator.startWithNumberOrCapitalLetter",
-                    this.commonBundle.message("common.className")
-            );
-            this.showOptionPane(errorMessage);
-        }
-    }
-
-    private void showOptionPane(final String errorMessage) {
+    private void showOptionPane(final String key, final String resourceKey) {
+        final String errorMessage = validatorBundle.message(
+                key,
+                this.commonBundle.message(resourceKey)
+        );
         JOptionPane.showMessageDialog(
                 null,
                 errorMessage,

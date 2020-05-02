@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.command.WriteCommandAction;
@@ -11,7 +12,6 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
@@ -22,11 +22,10 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.XmlFile
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
-import org.jetbrains.annotations.NotNull;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Properties;
+import org.jetbrains.annotations.NotNull;
 
 public class CLICommandDiXmlGenerator extends FileGenerator {
     private final GetCodeTemplate getCodeTemplate;
@@ -34,9 +33,17 @@ public class CLICommandDiXmlGenerator extends FileGenerator {
     private final XmlFilePositionUtil positionUtil;
     private final CLICommandXmlData cliCommandXmlData;
     private final Project project;
-    private boolean isCLICommandDeclared;
+    private boolean isDeclared;
 
-    public CLICommandDiXmlGenerator(Project project, @NotNull CLICommandXmlData cliCommandXmlData) {
+    /**
+     * Initialize CLI command in the module's di.xml.
+     *
+     * @param project Project
+     * @param cliCommandXmlData ciCommandXmlData
+     */
+    public CLICommandDiXmlGenerator(
+            final Project project,
+            final @NotNull CLICommandXmlData cliCommandXmlData) {
         super(project);
         this.cliCommandXmlData = cliCommandXmlData;
         this.project = project;
@@ -45,57 +52,67 @@ public class CLICommandDiXmlGenerator extends FileGenerator {
         this.positionUtil = XmlFilePositionUtil.getInstance();
     }
 
-    public PsiFile generate(String actionName)
-    {
-        Package.Areas areas = Package.getAreaByString("base");
-        PsiFile diXmlFile = findOrCreateDiXml.execute(actionName, cliCommandXmlData.getCLICommandModule(), areas.toString());
-        XmlAttributeValue cliCommandsAttribute = getCLICommandArgumentsTag((XmlFile) diXmlFile);
-        this.isCLICommandDeclared = (cliCommandsAttribute != null);
+    @Override
+    public PsiFile generate(final String actionName) {
+        final Package.Areas areas = Package.getAreaByString("base");
+        final PsiFile diXmlFile = findOrCreateDiXml.execute(
+                actionName,
+                cliCommandXmlData.getCLICommandModule(),
+                areas.toString()
+        );
+        final XmlAttributeValue argumentsTag = getCLICommandArgumentsTag((XmlFile) diXmlFile);
+        this.isDeclared = (argumentsTag != null);
 
         WriteCommandAction.runWriteCommandAction(project, () -> {
-            StringBuffer textBuf = new StringBuffer();
+            final StringBuffer textBuf = new StringBuffer();
             try {
-                textBuf.append(getCodeTemplate.execute(ModuleDiXml.TEMPLATE_CLI_COMMAND, getAttributes()));
-            } catch (IOException e) {
-                e.printStackTrace();
+                final String template = getCodeTemplate.execute(
+                        ModuleDiXml.TEMPLATE_CLI_COMMAND,
+                        getAttributes()
+                );
+                textBuf.append(template);
+            } catch (IOException exception) {
+
                 return;
             }
 
-            int insertPos = this.isCLICommandDeclared
-                    ? positionUtil.getEndPositionOfTag(PsiTreeUtil.getParentOfType(cliCommandsAttribute, XmlTag.class))
+            final int insertPos = this.isDeclared
+                    ? positionUtil.getEndPositionOfTag(
+                            PsiTreeUtil.getParentOfType(argumentsTag,
+                                    XmlTag.class))
                     : positionUtil.getRootInsertPosition((XmlFile) diXmlFile);
             if (textBuf.length() > 0 && insertPos >= 0) {
-                PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(project);
-                Document document = psiDocumentManager.getDocument(diXmlFile);
+                final PsiDocumentManager manager = PsiDocumentManager.getInstance(project);
+                final Document document = manager.getDocument(diXmlFile);
                 assert document != null;
                 document.insertString(insertPos, textBuf);
-                int endPos = insertPos + textBuf.length() + 1;
+                final int endPos = insertPos + textBuf.length() + 1;
                 CodeStyleManager.getInstance(project).reformatText(diXmlFile, insertPos, endPos);
-                psiDocumentManager.commitDocument(document);
+                manager.commitDocument(document);
             }
         });
 
         return diXmlFile;
     }
 
-    private XmlAttributeValue getCLICommandArgumentsTag(XmlFile diXml) {
-        Collection<XmlAttributeValue> cliCommandArguments = XmlPsiTreeUtil.findTypeArgumentsItemValueElement(
-                diXml,
-                ModuleDiXml.CLI_COMMAND_TAG,
-                ModuleDiXml.CLI_COMMAND_ATTR_NAME,
-                ModuleDiXml.CLI_COMMAND_INTERFACE,
-                ModuleDiXml.CLI_COMMAND_ATTR_COMMANDS
-        );
-        return (cliCommandArguments.size() > 0) ?
-                cliCommandArguments.iterator().next()
-                : null;
-    }
-
-    protected void fillAttributes(Properties attributes) {
-        if (!this.isCLICommandDeclared) {
+    @Override
+    final protected void fillAttributes(final Properties attributes) {
+        if (!this.isDeclared) {
             attributes.setProperty("CLI_COMMAND_INTERFACE", ModuleDiXml.CLI_COMMAND_INTERFACE);
         }
         attributes.setProperty("CLI_COMMAND_DI_NAME", cliCommandXmlData.getCliCommandDiName());
         attributes.setProperty("CLI_COMMAND_CLASS", cliCommandXmlData.getCliCommandClass());
+    }
+
+    private XmlAttributeValue getCLICommandArgumentsTag(final XmlFile diXml) {
+        final Collection<XmlAttributeValue> argumentsTag =
+                XmlPsiTreeUtil.findTypeArgumentsItemValueElement(
+                    diXml,
+                    ModuleDiXml.CLI_COMMAND_TAG,
+                    ModuleDiXml.CLI_COMMAND_ATTR_NAME,
+                    ModuleDiXml.CLI_COMMAND_INTERFACE,
+                    ModuleDiXml.CLI_COMMAND_ATTR_COMMANDS
+                );
+        return (argumentsTag.size() > 0) ? argumentsTag.iterator().next() : null;
     }
 }

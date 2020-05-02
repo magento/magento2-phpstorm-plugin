@@ -6,7 +6,6 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.NewCLICommandAction;
 import com.magento.idea.magento2plugin.actions.generation.data.CLICommandClassData;
 import com.magento.idea.magento2plugin.actions.generation.data.CLICommandXmlData;
@@ -14,34 +13,31 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewCL
 import com.magento.idea.magento2plugin.actions.generation.generator.CLICommandClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.CLICommandDiXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
-import com.magento.idea.magento2plugin.magento.packages.File;
-import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.CamelCaseToSnakeCase;
-import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
-
 import javax.swing.*;
 import java.awt.event.*;
 
 public class NewCLICommandDialog extends AbstractDialog {
     private JPanel contentPane;
-    private JTextField cliCommandClassNameField;
-    private JTextField cliCommandParentDirectoryField;
-    private JTextField cliCommandNameField;
-    private JTextArea cliCommandDescriptionField;
+    private JTextField cliCommandClassNameField;//NOPMD
+    private JTextField cliCommandParentDirectoryField;//NOPMD
+    private JTextField cliCommandNameField;//NOPMD
+    private JTextArea cliCommandDescriptionField;//NOPMD
     private JButton buttonCancel;
     private JButton buttonOK;
 
     private final Project project;
     private final String moduleName;
     private final NewCLICommandValidator validator;
-    private final CamelCaseToSnakeCase camelCaseToSnakeCase;
+    private final CamelCaseToSnakeCase toSnakeCase;
 
-    public NewCLICommandDialog(Project project, PsiDirectory directory) {
+    public NewCLICommandDialog(final Project project, final PsiDirectory directory) {
+        super();
         this.project = project;
         this.moduleName = GetModuleNameByDirectory.getInstance(project).execute(directory);
-        this.validator = NewCLICommandValidator.getInstance();
-        this.camelCaseToSnakeCase = CamelCaseToSnakeCase.getInstance();
+        this.validator = new NewCLICommandValidator();
+        this.toSnakeCase = CamelCaseToSnakeCase.getInstance();
 
         setContentPane(contentPane);
         setModal(true);
@@ -53,20 +49,28 @@ public class NewCLICommandDialog extends AbstractDialog {
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
+            @Override
+            public void windowClosing(final WindowEvent event) {
                 onCancel();
             }
         });
 
         contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            @Override
+            public void actionPerformed(final ActionEvent event) {
                 onCancel();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    public static void open(Project project, PsiDirectory directory) {
-        NewCLICommandDialog dialog = new NewCLICommandDialog(project, directory);
+    /**
+     * Open a new CLI command dialog
+     *
+     * @param project Project
+     * @param directory Directory
+     */
+    public static void open(final Project project, final PsiDirectory directory) {
+        final NewCLICommandDialog dialog = new NewCLICommandDialog(project, directory);
 
         dialog.pack();
         dialog.centerDialog(dialog);
@@ -90,9 +94,9 @@ public class NewCLICommandDialog extends AbstractDialog {
     }
 
     public String getDIXmlItemName() {
-        String cliCommandClassNameToSnakeCase = this.camelCaseToSnakeCase.convert(this.getCLICommandClassName());
+        final String diItemName = this.toSnakeCase.convert(this.getCLICommandClassName());
 
-        return this.moduleName.toLowerCase() + "_" + cliCommandClassNameToSnakeCase;
+        return this.moduleName.toLowerCase() + "_" + diItemName;
     }
 
     public String getCLICommandModule() {
@@ -100,7 +104,7 @@ public class NewCLICommandDialog extends AbstractDialog {
     }
 
     public String getCLICommandClassFqn() {
-        NamespaceBuilder namespaceBuilder = new NamespaceBuilder(
+        final NamespaceBuilder namespaceBuilder = new NamespaceBuilder(
                 moduleName,
                 this.getCLICommandClassName(),
                 this.getCLICommandParentDirectory()
@@ -131,15 +135,15 @@ public class NewCLICommandDialog extends AbstractDialog {
     }
 
     private void generateCLICommandClass() {
-        CLICommandClassData cliCommandClassData = this.initializeCLICommandClassData();
-        CLICommandClassGenerator cliCommandClassGenerator = new CLICommandClassGenerator(project, cliCommandClassData);
-        cliCommandClassGenerator.generate(NewCLICommandAction.ACTION_NAME, true);
+        final CLICommandClassData dataClass = this.initializeCLICommandClassData();
+        final CLICommandClassGenerator classGenerator = new CLICommandClassGenerator(project, dataClass);
+        classGenerator.generate(NewCLICommandAction.ACTION_NAME, true);
     }
 
     private void generateCLICommandDiXmlRegistration() {
-        CLICommandXmlData cliCommandXmlData = this.initializeCLICommandDIXmlData();
-        CLICommandDiXmlGenerator cliCommandDiXmlGenerator = new CLICommandDiXmlGenerator(project, cliCommandXmlData);
-        cliCommandDiXmlGenerator.generate(NewCLICommandAction.ACTION_NAME);
+        final CLICommandXmlData cliCommandXmlData = this.initializeCLICommandDIXmlData();
+        final CLICommandDiXmlGenerator diGenerator = new CLICommandDiXmlGenerator(project, cliCommandXmlData);
+        diGenerator.generate(NewCLICommandAction.ACTION_NAME);
     }
 
     private CLICommandXmlData initializeCLICommandDIXmlData() {
@@ -162,7 +166,7 @@ public class NewCLICommandDialog extends AbstractDialog {
     }
 
     private String getCLICommandNamespace() {
-        NamespaceBuilder namespaceBuilder = new NamespaceBuilder(
+        final NamespaceBuilder namespaceBuilder = new NamespaceBuilder(
                 this.getCLICommandModule(),
                 this.getCLICommandClassName(),
                 this.getCLICommandParentDirectory()
