@@ -8,6 +8,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.xml.XmlAttributeValue;
+import com.intellij.psi.xml.XmlTag;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.inspections.BaseInspectionsTestCase;
 import com.magento.idea.magento2plugin.magento.packages.File;
@@ -38,6 +39,24 @@ abstract public class BaseReferenceTestCase extends BaseInspectionsTestCase {
         }
 
         fail(String.format(referenceNotFound, reference));
+    }
+
+    protected void assertHasReferenceToXmlTag(String tagName) {
+        String referenceNotFound = "Failed that element contains reference to the XML tag `%s`";
+
+        PsiElement element = getElementFromCaret();
+        for (PsiReference psiReference: element.getReferences()) {
+            PsiElement resolved = psiReference.resolve();
+            if (!(resolved instanceof XmlTag)) {
+                continue;
+            }
+
+            if (((XmlTag) resolved).getName().equals(tagName)) {
+                return;
+            }
+        }
+
+        fail(String.format(referenceNotFound, tagName));
     }
 
     protected void assertHasReferenceToFile(String reference) {
