@@ -3,9 +3,12 @@
   <grid id="27dc6" binding="contentPane" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="10" left="10" bottom="10" right="10"/>
     <constraints>
-      <xy x="20" y="20" width="678" height="289"/>
+      <xy x="20" y="20" width="904" height="497"/>
     </constraints>
-    <properties/>
+    <properties>
+      <minimumSize width="597" height="497"/>
+      <opaque value="false"/>
+    </properties>
     <border type="none"/>
     <children>
       <grid id="bce24" layout-manager="GridLayoutManager" row-count="6" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -55,7 +58,7 @@
             </constraints>
             <properties>
               <labelFor value="61353"/>
-              <text resource-bundle="magento2/common" key="common.cli.class.name"/>
+              <text resource-bundle="magento2/common" key="common.className"/>
             </properties>
           </component>
           <component id="f6c65" class="javax.swing.JLabel">
@@ -64,7 +67,7 @@
             </constraints>
             <properties>
               <labelFor value="82342"/>
-              <text resource-bundle="magento2/common" key="common.cli.parent.directory"/>
+              <text resource-bundle="magento2/common" key="common.parentDirectory"/>
             </properties>
           </component>
           <component id="8696b" class="javax.swing.JLabel">
@@ -73,7 +76,7 @@
             </constraints>
             <properties>
               <labelFor value="a06d9"/>
-              <text resource-bundle="magento2/common" key="common.cli.cli.name"/>
+              <text resource-bundle="magento2/common" key="common.cliCommandName"/>
             </properties>
           </component>
           <component id="abeb0" class="javax.swing.JLabel">
@@ -82,7 +85,7 @@
             </constraints>
             <properties>
               <labelFor value="d786e"/>
-              <text resource-bundle="magento2/common" key="common.cli.cli.description"/>
+              <text resource-bundle="magento2/common" key="common.description"/>
             </properties>
           </component>
           <grid id="5f3c" layout-manager="GridLayoutManager" row-count="2" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -127,7 +130,9 @@
                 <preferred-size width="150" height="50"/>
               </grid>
             </constraints>
-            <properties/>
+            <properties>
+              <wrapStyleWord value="false"/>
+            </properties>
           </component>
         </children>
       </grid>

@@ -47,4 +47,3 @@ public class NewCronjobAction extends AnAction {
         return false;
     }
 }
-

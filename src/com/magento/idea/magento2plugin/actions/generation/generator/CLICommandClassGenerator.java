@@ -43,8 +43,8 @@ public class CLICommandClassGenerator extends FileGenerator {
 
         if (cliCommandFile == null) {
             String errorMessage = validatorBundle.message(
-            "validator.file.cantBeCreated",
-            commonBundle.message("common.cli.class.title")
+                    "validator.file.cantBeCreated",
+                    commonBundle.message("common.cli.class.title")
             );
 
             throw new RuntimeException(errorMessage);

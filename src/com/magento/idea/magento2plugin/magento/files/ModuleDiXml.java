@@ -14,6 +14,7 @@ public class ModuleDiXml implements ModuleFileInterface {
     //code templates
     public static String TEMPLATE_PLUGIN = "Magento Module DI Xml Plugin";
     public static String TEMPLATE_PREFERENCE = "Magento Module DI Xml Preference";
+    public static String TEMPLATE_CLI_COMMAND = "Magento Module DI Xml CLI Command";
 
     //tags
     public static String PLUGIN_TYPE_TAG = "type";
@@ -23,6 +24,17 @@ public class ModuleDiXml implements ModuleFileInterface {
     public static String PREFERENCE_TAG_NAME = "preference";
     public static String PREFERENCE_ATTR_FOR = "for";
     public static String DISABLED_ATTR_NAME = "disabled";
+    public static String CLI_COMMAND_TAG = "type";
+    public static String CLI_COMMAND_ATTR_NAME = "name";
+    public static String CLI_COMMAND_ATTR_COMMANDS = "commands";
+    public static String CLI_COMMAND_ATTR_ITEM_TAG = "item";
+    public static String CLI_COMMAND_INTERFACE = "Magento\\Framework\\Console\\CommandListInterface";
+
+    // general tags
+    public static String ARGUMENTS_TAG = "arguments";
+    public static String ARGUMENT_TAG = "argument";
+    public static String NAME_TAG = "name";
+
 
     private static ModuleDiXml INSTANCE = null;
 
