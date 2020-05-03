@@ -11,7 +11,7 @@ public class LayoutContainerReferenceRegistrarTest extends ReferenceXmlFixtureTe
 
     /**
      * The `name` attribute of the `referenceContainer` tag in layout XML must
-     * have reference to the `name` attribute of `container` tag
+     * have reference to the `name` attribute of `container` tag.
      */
     public void testReferenceContainerMustHaveReference() {
         final String filePath = this.getFixturePath(LayoutXml.DEFAULT_FILENAME);
