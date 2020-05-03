@@ -18,9 +18,9 @@ public class LayoutContainerCompletionRegistrarTest extends CompletionXmlFixture
         myFixture.configureByFile(filePath);
 
         assertCompletionContains(
-            filePath,
-            "test_index_index_container",
-            "test_index_index_container2"
+                filePath,
+                "test_index_index_container",
+                "test_index_index_container2"
         );
     }
 }
