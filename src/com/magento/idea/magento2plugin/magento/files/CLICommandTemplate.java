@@ -11,7 +11,7 @@ import com.jetbrains.php.lang.PhpLanguage;
 public class CLICommandTemplate implements ModuleFileInterface {
     private final String fileName;
 
-    public CLICommandTemplate(String className) {
+    public CLICommandTemplate(final String className) {
         fileName = className.concat(".php");
     }
 

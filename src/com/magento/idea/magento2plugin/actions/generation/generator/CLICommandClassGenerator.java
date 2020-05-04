@@ -19,6 +19,12 @@ import com.magento.idea.magento2plugin.magento.files.CLICommandTemplate;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings({
+        "PMD.AvoidUncheckedExceptionsInSignatures",
+        "PMD.AvoidThrowingRawExceptionTypes",
+        "PMD.UselessParentheses",
+        "PMD.AvoidUncheckedExceptionsInSignatures"
+})
 public class CLICommandClassGenerator extends FileGenerator {
     private final CLICommandClassData phpClassData;
     private final Project project;

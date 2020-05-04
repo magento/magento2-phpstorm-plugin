@@ -5,7 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.data;
 
-public class CLICommandClassData { //NOPMD
+@SuppressWarnings({"PMD.CommentSize", "PMD.DataClass"})
+public class CLICommandClassData {
     private final String className;
     private final String parentDirectory;
     private final String commandName;

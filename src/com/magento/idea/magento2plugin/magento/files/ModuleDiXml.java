@@ -2,11 +2,18 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.magento.files;
 
 import com.intellij.lang.Language;
 import com.intellij.lang.xml.XMLLanguage;
 
+@SuppressWarnings({
+        "PMD.FieldNamingConventions",
+        "PMD.RedundantFieldInitializer",
+        "PMD.NonThreadSafeSingleton",
+        "PMD.TooManyFields"
+})
 public class ModuleDiXml implements ModuleFileInterface {
     public static String FILE_NAME = "di.xml";
     public static String TEMPLATE = "Magento Module DI Xml";
@@ -27,8 +34,8 @@ public class ModuleDiXml implements ModuleFileInterface {
     public static String CLI_COMMAND_TAG = "type";
     public static String CLI_COMMAND_ATTR_NAME = "name";
     public static String CLI_COMMAND_ATTR_COMMANDS = "commands";
-    public static String CLI_COMMAND_ATTR_ITEM_TAG = "item";
-    public static String CLI_COMMAND_INTERFACE = "Magento\\Framework\\Console\\CommandListInterface";
+    public static String CLI_COMMAND_INTERFACE =
+            "Magento\\Framework\\Console\\CommandListInterface";
 
     // general tags
     public static String ARGUMENTS_TAG = "arguments";
@@ -38,6 +45,11 @@ public class ModuleDiXml implements ModuleFileInterface {
 
     private static ModuleDiXml INSTANCE = null;
 
+    /**
+     * Get instance of the class.
+     *
+     * @return ModuleDiXml
+     */
     public static ModuleDiXml getInstance() {
         if (null == INSTANCE) {
             INSTANCE = new ModuleDiXml();

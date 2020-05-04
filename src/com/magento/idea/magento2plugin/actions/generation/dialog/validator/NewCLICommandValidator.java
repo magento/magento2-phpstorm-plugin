@@ -15,8 +15,14 @@ import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import javax.swing.JOptionPane;
 
+@SuppressWarnings({
+        "PMD.FieldNamingConventions",
+        "PMD.RedundantFieldInitializer",
+        "PMD.OnlyOneReturn",
+        "PMD.AvoidDuplicateLiterals",
+})
 public class NewCLICommandValidator {
-    private static NewCLICommandValidator INSTANCE = null;//NOPMD
+    private static NewCLICommandValidator INSTANCE = null;
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
 
@@ -26,7 +32,7 @@ public class NewCLICommandValidator {
      * @return NewCLICommandValidator
      */
     public static NewCLICommandValidator getInstance() {
-        if (null != INSTANCE) { //NOPMD
+        if (null != INSTANCE) {
             return INSTANCE;
         }
         INSTANCE = new NewCLICommandValidator();
@@ -47,16 +53,11 @@ public class NewCLICommandValidator {
      * @return boolen
      */
     public boolean validate(final Project project, final NewCLICommandDialog dialog) {
-        if (this.isClassNameValid(dialog)
+        return this.isClassNameValid(dialog)
                 && this.isParentDirectoryValid(dialog)
                 && this.isCommandNameValid(dialog)
                 && this.isCommandDescriptionValid(dialog)
-                && this.isPHPClassValid(project, dialog)
-        ) {
-            return true;
-        }
-
-        return false;
+                && this.isPHPClassValid(project, dialog);
     }
 
     private Boolean isClassNameValid(final NewCLICommandDialog dialog) {

@@ -27,6 +27,9 @@ import java.util.Collection;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings({
+        "PMD.UselessParentheses"
+})
 public class CLICommandDiXmlGenerator extends FileGenerator {
     private final GetCodeTemplate getCodeTemplate;
     private final FindOrCreateDiXml findOrCreateDiXml;
@@ -113,6 +116,6 @@ public class CLICommandDiXmlGenerator extends FileGenerator {
                     ModuleDiXml.CLI_COMMAND_INTERFACE,
                     ModuleDiXml.CLI_COMMAND_ATTR_COMMANDS
                 );
-        return (argumentsTag.size() > 0) ? argumentsTag.iterator().next() : null;
+        return (argumentsTag.isEmpty()) ? null : argumentsTag.iterator().next();
     }
 }

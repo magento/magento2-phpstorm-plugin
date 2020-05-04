@@ -17,9 +17,10 @@ import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewCLICommandDialog;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings({"PMD.FieldNamingConventions", "PMD.OnlyOneReturn"})
 public class NewCLICommandAction extends AnAction {
-    public static String ACTION_NAME = "Magento 2 CLI Command";//NOPMD
-    public static String ACTION_DESCRIPTION = "Create a new Magento 2 CLI Command";//NOPMD
+    public static String ACTION_NAME = "Magento 2 CLI Command";
+    public static String ACTION_DESCRIPTION = "Create a new Magento 2 CLI Command";
 
     public NewCLICommandAction() {
         super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
@@ -30,12 +31,12 @@ public class NewCLICommandAction extends AnAction {
         final DataContext context = event.getDataContext();
         final IdeView view = LangDataKeys.IDE_VIEW.getData(context);
         if (view == null) {
-            return;//NOPMD
+            return;
         }
 
         final Project project = CommonDataKeys.PROJECT.getData(context);
         if (project == null) {
-            return;//NOPMD
+            return;
         }
 
         final PsiDirectory directory = view.getOrChooseDirectory();

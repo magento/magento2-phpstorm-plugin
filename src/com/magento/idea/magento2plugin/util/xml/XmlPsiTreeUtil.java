@@ -2,33 +2,61 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.util.xml;
 
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.xml.*;
+import com.intellij.psi.xml.XmlAttribute;
+import com.intellij.psi.xml.XmlAttributeValue;
+import com.intellij.psi.xml.XmlElement;
+import com.intellij.psi.xml.XmlFile;
+import com.intellij.psi.xml.XmlTag;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import gnu.trove.THashSet;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Collection;
 import java.util.Objects;
+import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings({
+        "PMD.LocalVariableCouldBeFinal",
+        "PMD.CommentSize",
+        "PMD.MethodArgumentCouldBeFinal",
+        "PMD.UseUtilityClass",
+        "PMD.OnlyOneReturn",
+        "PMD.UseObjectForClearerAPI"
+})
 public class XmlPsiTreeUtil {
-
+    /**
+     * Get type tag of an argument.
+     *
+     * @param psiArgumentValueElement value element
+     * @return xml tag
+     */
     @Nullable
-    public static XmlTag getTypeTagOfArgument(XmlElement psiArgumentValueElement) {
+    public static XmlTag getTypeTagOfArgument(final XmlElement psiArgumentValueElement) {
 
-        XmlTag argumentTag = PsiTreeUtil.getParentOfType(psiArgumentValueElement, XmlTag.class);
-        XmlTag argumentsTag = PsiTreeUtil.getParentOfType(argumentTag, XmlTag.class);
+        final XmlTag argumentTag = PsiTreeUtil.getParentOfType(
+                psiArgumentValueElement,
+                XmlTag.class
+        );
+        final XmlTag argumentsTag = PsiTreeUtil.getParentOfType(argumentTag, XmlTag.class);
+
         return PsiTreeUtil.getParentOfType(argumentsTag, XmlTag.class);
     }
 
-    public static Collection<XmlAttributeValue> findAttributeValueElements(XmlFile xmlFile,
-                                                                    String tagName,
-                                                                    String attributeName) {
-        Collection<XmlAttributeValue> psiElements = new THashSet<>();
-
-
+    /**
+     * Find attribute value elements based on the tag name.
+     *
+     * @param xmlFile xml file
+     * @param tagName xml tag name
+     * @param attributeName xml attribute name
+     * @return Collection of xml attributes.
+     */
+    public static Collection<XmlAttributeValue> findAttributeValueElements(
+            final XmlFile xmlFile,
+            final String tagName,
+            final String attributeName) {
+        final Collection<XmlAttributeValue> psiElements = new THashSet<>();
         XmlTag rootTag = xmlFile.getRootTag();
         if (rootTag == null) {
             return psiElements;
@@ -41,17 +69,52 @@ public class XmlPsiTreeUtil {
                     psiElements.add(attribute.getValueElement());
                 }
             }
-        };
+        }
 
         return psiElements;
     }
 
+    /**
+     * Search for the attribute value elements.
+     *
+     * @param xmlFile xml file
+     * @param tagName tag name
+     * @param attributeName attribute name
+     * @param value value
+     * @return collection of xml elements
+     */
+    public static Collection<XmlAttributeValue> findAttributeValueElements(
+            final XmlFile xmlFile,
+            final String tagName,
+            final String attributeName,
+            final String value) {
+
+        Collection<XmlAttributeValue> psiElements = findAttributeValueElements(
+                xmlFile,
+                tagName,
+                attributeName
+        );
+
+        psiElements.removeIf(e -> e.getValue() == null || !e.getValue().equals(value));
+        return psiElements;
+    }
+
+    /**
+     * Return collection of arguments items.
+     *
+     * @param xmlFile xml file
+     * @param parentTagName parent node name
+     * @param parentTagAttributeName parent attribute name
+     * @param parentTagAttributeNameValue parent attribute name value
+     * @param argumentTagAttributeName argument attribute name
+     * @return collection of xml elements
+     */
     public static Collection<XmlAttributeValue> findTypeArgumentsItemValueElement(
-            XmlFile xmlFile,
-            String parentTagName,
-            String parentTagAttributeName,
-            String parentTagAttributeNameValue,
-            String argumentTagAttributeName) {
+            final XmlFile xmlFile,
+            final String parentTagName,
+            final String parentTagAttributeName,
+            final String parentTagAttributeNameValue,
+            final String argumentTagAttributeName) {
         Collection<XmlAttributeValue> psiElements = new THashSet<>();
 
         XmlTag rootTag = xmlFile.getRootTag();
@@ -66,32 +129,40 @@ public class XmlPsiTreeUtil {
                         && parentAttribute.getValueElement() != null
                         && Objects.equals(parentAttribute.getValue(), parentTagAttributeNameValue)
                 ) {
-                    for (XmlTag argumentsTag: parentTag.findSubTags(ModuleDiXml.ARGUMENTS_TAG)) {
-                        if (argumentsTag != null && argumentsTag.findSubTags(ModuleDiXml.ARGUMENT_TAG).length > 0) {
-                            for (XmlTag argumentTag: argumentsTag.findSubTags(ModuleDiXml.ARGUMENT_TAG)) {
-                                XmlAttribute argumentAttribute = argumentTag.getAttribute(ModuleDiXml.NAME_TAG);
-                                if (argumentAttribute != null
-                                        && argumentAttribute.getValueElement() != null
-                                        && Objects.equals(argumentAttribute.getValue(), argumentTagAttributeName)
-                                ) {
-                                    psiElements.add(argumentAttribute.getValueElement());
-                                }
-                            }
-                        }
-                    }
+                    iterateArgumentsNode(
+                            parentTag,
+                            argumentTagAttributeName,
+                            psiElements
+                    );
                 }
             }
-        };
+        }
 
         return psiElements;
     }
 
-    public static Collection<XmlAttributeValue> findAttributeValueElements(XmlFile xmlFile,
-                                                                    String tagName,
-                                                                    String attributeName,
-                                                                    String value) {
-        Collection<XmlAttributeValue> psiElements = findAttributeValueElements(xmlFile, tagName, attributeName);
-        psiElements.removeIf(e -> e.getValue() == null || !e.getValue().equals(value));
+    private static Collection<XmlAttributeValue> iterateArgumentsNode(
+            final XmlTag parentTag,
+            final String argumentTagAttributeName,
+            Collection<XmlAttributeValue> psiElements
+    ) {
+        for (XmlTag argumentsTag: parentTag.findSubTags(ModuleDiXml.ARGUMENTS_TAG)) {
+            if (argumentsTag != null
+                    && argumentsTag.findSubTags(ModuleDiXml.ARGUMENT_TAG).length > 0) {
+                for (XmlTag argumentTag: argumentsTag.findSubTags(ModuleDiXml.ARGUMENT_TAG)) {
+                    XmlAttribute argumentAttribute = argumentTag.getAttribute(ModuleDiXml.NAME_TAG);
+                    if (argumentAttribute != null
+                            && argumentAttribute.getValueElement() != null
+                            && Objects.equals(
+                                    argumentAttribute.getValue(),
+                            argumentTagAttributeName)
+                    ) {
+                        psiElements.add(argumentAttribute.getValueElement());
+                    }
+                }
+            }
+        }
+
         return psiElements;
     }
 }

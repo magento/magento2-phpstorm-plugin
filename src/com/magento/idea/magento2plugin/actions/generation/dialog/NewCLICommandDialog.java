@@ -28,12 +28,13 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
+@SuppressWarnings({"PMD.MissingSerialVersionUID"})
 public class NewCLICommandDialog extends AbstractDialog {
     private JPanel contentPane;
-    private JTextField cliCommandClassNameField;//NOPMD
-    private JTextField cliCommandParentDirectoryField;//NOPMD
-    private JTextField cliCommandNameField;//NOPMD
-    private JTextArea cliCommandDescriptionField;//NOPMD
+    private JTextField cliCommandClassNameField;
+    private JTextField cliCommandParentDirectoryField;
+    private JTextField cliCommandNameField;
+    private JTextArea cliCommandDescriptionField;
     private JButton buttonCancel;
     private JButton buttonOK;
 
