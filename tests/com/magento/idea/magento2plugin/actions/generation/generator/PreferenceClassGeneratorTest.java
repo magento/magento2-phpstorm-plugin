@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
@@ -15,8 +15,10 @@ public class PreferenceClassGeneratorTest extends BaseGeneratorTestCase {
     private static final String targetSimpleModelOneClassFqn = "Foo\\Bar\\Model\\SimpleModelOne";
     private static final String targetSimpleModelTwoClassFqn = "Foo\\Bar\\Model\\SimpleModelTwo";
 
-    public void testGeneratePreferenceClassFile()
-    {
+    /**
+     * Test preference class file generation
+     */
+    public void testGeneratePreferenceClassFile() {
         PsiFile preferenceClassFile = createPreferenceClassFile(
                 targetSimpleModelOneClassFqn,
                 "Model/Override",
@@ -35,8 +37,10 @@ public class PreferenceClassGeneratorTest extends BaseGeneratorTestCase {
         );
     }
 
-    public void testGeneratePreferenceClassFileWithInheritance()
-    {
+    /**
+     * Test preference class file generation with inheritance
+     */
+    public void testGeneratePreferenceClassFileWithInheritance() {
         PsiFile preferenceClassFile = createPreferenceClassFile(
                 targetSimpleModelTwoClassFqn,
                 "Model/Override",
@@ -55,6 +59,17 @@ public class PreferenceClassGeneratorTest extends BaseGeneratorTestCase {
         );
     }
 
+    /**
+     * Create preference class file
+     *
+     * @param targetClassFnq Target Class FQN
+     * @param preferenceDirectory Preference Directory
+     * @param preferenceClassName Preference Class Name
+     * @param preferenceFqn Preference FQN
+     * @param namespace Namespace
+     * @param inheritClass Inherit target class
+     * @return PsiFile
+     */
     private PsiFile createPreferenceClassFile(
             String targetClassFnq,
             String preferenceDirectory,

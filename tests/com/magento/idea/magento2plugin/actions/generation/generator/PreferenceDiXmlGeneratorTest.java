@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
@@ -19,6 +19,9 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
     private static final String targetSimpleModelOneClassFqn = "Foo\\Bar\\Model\\SimpleModelOne";
     private static final String targetSimpleModelTwoClassFqn = "Foo\\Bar\\Model\\SimpleModelTwo";
 
+    /**
+     * Test preference DI XML file generation
+     */
     public void testGeneratePreferenceDiXml()
     {
         String area = Package.Areas.base.toString();
@@ -39,6 +42,9 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
         );
     }
 
+    /**
+     * Test preference DI XML file generation for adminhtml area
+     */
     public void testGeneratePreferenceDiXmlForAdminhtmlArea()
     {
         String area = Package.Areas.adminhtml.toString();
@@ -59,6 +65,9 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
         );
     }
 
+    /**
+     * Test the adding of two preferences to one DI XML file
+     */
     public void testAddTwoPreferencesToOneDiXmlFile()
     {
         String area = Package.Areas.frontend.toString();
@@ -85,6 +94,15 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
         );
     }
 
+    /**
+     * Add preference to XML file
+     *
+     * @param targetClassFnq Target class FQN
+     * @param preferenceFqn Preference FQN
+     * @param area Area
+     * @param namespace Namespace
+     * @return PsiFile
+     */
     private PsiFile addPreferenceDiXml(
             String targetClassFnq,
             String preferenceFqn,
@@ -105,6 +123,12 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
         return moduleXmlGenerator.generate("test");
     }
 
+    /**
+     * Get expected directory based on provided area
+     *
+     * @param area Area name
+     * @return String
+     */
     private String getExpectedDirectory(String area)
     {
         if (area.equals(Package.Areas.base.toString())) {
