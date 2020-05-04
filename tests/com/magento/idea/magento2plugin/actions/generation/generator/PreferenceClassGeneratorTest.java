@@ -12,24 +12,24 @@ import com.magento.idea.magento2plugin.actions.generation.data.PreferenceFileDat
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 
 public class PreferenceClassGeneratorTest extends BaseGeneratorTestCase {
-    private static final String module = "Foo_Bar";
-    private static final String targetSimpleModelOneClassFqn = "Foo\\Bar\\Model\\SimpleModelOne";
-    private static final String targetSimpleModelTwoClassFqn = "Foo\\Bar\\Model\\SimpleModelTwo";
+    private static final String MODULE = "Foo_Bar";
+    private static final String TARGET_MODEL_ONE_CLASS_FQN = "Foo\\Bar\\Model\\SimpleModelOne";
+    private static final String TARGET_MODEL_TWO_CLASS_FQN = "Foo\\Bar\\Model\\SimpleModelTwo";
 
     /**
      * Test preference class file generation.
      */
     public void testGeneratePreferenceClassFile() {
-        PsiFile preferenceClassFile = createPreferenceClassFile(
-                targetSimpleModelOneClassFqn,
+        final PsiFile preferenceClassFile = createPreferenceClassFile(
+                TARGET_MODEL_ONE_CLASS_FQN,
                 "Model/Override",
                 "SimpleModelOneOverride",
                 "Foo\\Bar\\Model\\Override\\SimpleModelOneOverride",
                 "Foo\\Bar\\Model\\Override",
                 false
         );
-        String filePath = this.getFixturePath("SimpleModelOneOverride.php");
-        PsiFile expectedFile = myFixture.configureByFile(filePath);
+        final String filePath = this.getFixturePath("SimpleModelOneOverride.php");
+        final PsiFile expectedFile = myFixture.configureByFile(filePath);
 
         assertGeneratedFileIsCorrect(
                 expectedFile,
@@ -42,16 +42,16 @@ public class PreferenceClassGeneratorTest extends BaseGeneratorTestCase {
      * Test preference class file generation with inheritance.
      */
     public void testGeneratePreferenceClassFileWithInheritance() {
-        PsiFile preferenceClassFile = createPreferenceClassFile(
-                targetSimpleModelTwoClassFqn,
+        final PsiFile preferenceClassFile = createPreferenceClassFile(
+                TARGET_MODEL_TWO_CLASS_FQN,
                 "Model/Override",
                 "SimpleModelTwoOverride",
                 "Foo\\Bar\\Model\\Override\\SimpleModelTwoOverride",
                 "Foo\\Bar\\Model\\Override",
                 true
         );
-        String filePath = this.getFixturePath("SimpleModelTwoOverride.php");
-        PsiFile expectedFile = myFixture.configureByFile(filePath);
+        final String filePath = this.getFixturePath("SimpleModelTwoOverride.php");
+        final PsiFile expectedFile = myFixture.configureByFile(filePath);
 
         assertGeneratedFileIsCorrect(
                 expectedFile,
@@ -72,25 +72,25 @@ public class PreferenceClassGeneratorTest extends BaseGeneratorTestCase {
      * @return PsiFile
      */
     private PsiFile createPreferenceClassFile(
-            String targetClassFnq,
-            String preferenceDirectory,
-            String preferenceClassName,
-            String preferenceFqn,
-            String namespace,
-            Boolean inheritClass
+            final String targetClassFnq,
+            final String preferenceDirectory,
+            final String preferenceClassName,
+            final String preferenceFqn,
+            final String namespace,
+            final Boolean inheritClass
     ) {
-        Project project = myFixture.getProject();
-        PhpClass targetClass = GetPhpClassByFQN.getInstance(project).execute(targetClassFnq);
-        PreferenceFileData preferenceFileData = new PreferenceFileData(
+        final Project project = myFixture.getProject();
+        final PhpClass targetClass = GetPhpClassByFQN.getInstance(project).execute(targetClassFnq);
+        final PreferenceFileData preferenceFileData = new PreferenceFileData(
                 preferenceDirectory,
                 preferenceClassName,
-                module,
+                MODULE,
                 targetClass,
                 preferenceFqn,
                 namespace,
                 inheritClass
         );
-        PreferenceClassGenerator preferenceClassGenerator = new PreferenceClassGenerator(
+        final PreferenceClassGenerator preferenceClassGenerator = new PreferenceClassGenerator(
                 preferenceFileData,
                 project
         );

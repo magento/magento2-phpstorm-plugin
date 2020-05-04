@@ -15,25 +15,25 @@ import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 
 public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
-    private static final String module = "Foo_Bar";
-    private static final String moduleDir = "src/app/code/Foo/Bar/";
-    private static final String targetSimpleModelOneClassFqn = "Foo\\Bar\\Model\\SimpleModelOne";
-    private static final String targetSimpleModelTwoClassFqn = "Foo\\Bar\\Model\\SimpleModelTwo";
+    private static final String MODULE = "Foo_Bar";
+    private static final String MODULE_DIR = "src/app/code/Foo/Bar/";
+    private static final String TARGET_MODEL_ONE_CLASS_FQN = "Foo\\Bar\\Model\\SimpleModelOne";
+    private static final String TARGET_MODEL_TWO_CLASS_FQN = "Foo\\Bar\\Model\\SimpleModelTwo";
 
     /**
      * Test preference DI XML file generation.
      */
     public void testGeneratePreferenceDiXml() {
-        String area = Package.Areas.base.toString();
-        PsiFile preferenceDiXmlFile = addPreferenceDiXml(
-                targetSimpleModelOneClassFqn,
+        final String area = Package.Areas.base.toString();
+        final PsiFile preferenceDiXmlFile = addPreferenceDiXml(
+                TARGET_MODEL_ONE_CLASS_FQN,
                 "Foo\\Bar\\Model\\Override\\SimpleModelOne",
                 area,
                 "Foo\\Bar\\Model\\Override"
         );
 
-        String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
-        PsiFile expectedFile = myFixture.configureByFile(filePath);
+        final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
+        final PsiFile expectedFile = myFixture.configureByFile(filePath);
 
         assertGeneratedFileIsCorrect(
                 expectedFile,
@@ -46,16 +46,16 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
      * Test preference DI XML file generation for adminhtml area.
      */
     public void testGeneratePreferenceDiXmlForAdminhtmlArea() {
-        String area = Package.Areas.adminhtml.toString();
-        PsiFile preferenceDiXmlFile = addPreferenceDiXml(
-                targetSimpleModelTwoClassFqn,
+        final String area = Package.Areas.adminhtml.toString();
+        final PsiFile preferenceDiXmlFile = addPreferenceDiXml(
+                TARGET_MODEL_TWO_CLASS_FQN,
                 "Foo\\Bar\\Model\\Override\\SimpleModelTwo",
                 area,
                 "Foo\\Bar\\Model\\Override"
         );
 
-        String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
-        PsiFile expectedFile = myFixture.configureByFile(filePath);
+        final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
+        final PsiFile expectedFile = myFixture.configureByFile(filePath);
 
         assertGeneratedFileIsCorrect(
                 expectedFile,
@@ -68,22 +68,22 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
      * Test the adding of two preferences to one DI XML file.
      */
     public void testAddTwoPreferencesToOneDiXmlFile() {
-        String area = Package.Areas.frontend.toString();
+        final String area = Package.Areas.frontend.toString();
         addPreferenceDiXml(
-                targetSimpleModelOneClassFqn,
+                TARGET_MODEL_ONE_CLASS_FQN,
                 "Foo\\Bar\\Model\\Override\\SimpleModelOne",
                 area,
                 "Foo\\Bar\\Model\\Override"
         );
-        PsiFile preferenceDiXmlFile = addPreferenceDiXml(
-                targetSimpleModelTwoClassFqn,
+        final PsiFile preferenceDiXmlFile = addPreferenceDiXml(
+                TARGET_MODEL_TWO_CLASS_FQN,
                 "Foo\\Bar\\Model\\Override\\SimpleModelTwo",
                 area,
                 "Foo\\Bar\\Model\\Override"
         );
 
-        String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
-        PsiFile expectedFile = myFixture.configureByFile(filePath);
+        final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
+        final PsiFile expectedFile = myFixture.configureByFile(filePath);
 
         assertGeneratedFileIsCorrect(
                 expectedFile,
@@ -102,21 +102,21 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
      * @return PsiFile
      */
     private PsiFile addPreferenceDiXml(
-            String targetClassFnq,
-            String preferenceFqn,
-            String area,
-            String namespace
+            final String targetClassFnq,
+            final String preferenceFqn,
+            final String area,
+            final String namespace
     ) {
-        Project project = myFixture.getProject();
-        PhpClass targetClass = GetPhpClassByFQN.getInstance(project).execute(targetClassFnq);
-        PreferenceDiXmFileData preferenceDiXmlFileData = new PreferenceDiXmFileData(
-                module,
+        final Project project = myFixture.getProject();
+        final PhpClass targetClass = GetPhpClassByFQN.getInstance(project).execute(targetClassFnq);
+        final PreferenceDiXmFileData preferenceDiXmlFileData = new PreferenceDiXmFileData(
+                MODULE,
                 targetClass,
                 preferenceFqn,
                 namespace,
                 area
         );
-        PreferenceDiXmlGenerator moduleXmlGenerator = new PreferenceDiXmlGenerator(
+        final PreferenceDiXmlGenerator moduleXmlGenerator = new PreferenceDiXmlGenerator(
                 preferenceDiXmlFileData,
                 project
         );
@@ -130,11 +130,15 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
      * @param area Area name
      * @return String
      */
-    private String getExpectedDirectory(String area) {
+    private String getExpectedDirectory(final String area) {
+        String expectedDirectory;
+
         if (area.equals(Package.Areas.base.toString())) {
-            return moduleDir + Package.MODULE_BASE_AREA_DIR;
+            expectedDirectory = MODULE_DIR + Package.MODULE_BASE_AREA_DIR;
+        } else {
+            expectedDirectory = MODULE_DIR + Package.MODULE_BASE_AREA_DIR + File.separator + area;
         }
 
-        return moduleDir + Package.MODULE_BASE_AREA_DIR + File.separator + area;
+        return expectedDirectory;
     }
 }
