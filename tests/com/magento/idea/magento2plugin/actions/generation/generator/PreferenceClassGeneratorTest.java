@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
@@ -16,7 +17,7 @@ public class PreferenceClassGeneratorTest extends BaseGeneratorTestCase {
     private static final String targetSimpleModelTwoClassFqn = "Foo\\Bar\\Model\\SimpleModelTwo";
 
     /**
-     * Test preference class file generation
+     * Test preference class file generation.
      */
     public void testGeneratePreferenceClassFile() {
         PsiFile preferenceClassFile = createPreferenceClassFile(
@@ -38,7 +39,7 @@ public class PreferenceClassGeneratorTest extends BaseGeneratorTestCase {
     }
 
     /**
-     * Test preference class file generation with inheritance
+     * Test preference class file generation with inheritance.
      */
     public void testGeneratePreferenceClassFileWithInheritance() {
         PsiFile preferenceClassFile = createPreferenceClassFile(
@@ -60,7 +61,7 @@ public class PreferenceClassGeneratorTest extends BaseGeneratorTestCase {
     }
 
     /**
-     * Create preference class file
+     * Create preference class file.
      *
      * @param targetClassFnq Target Class FQN
      * @param preferenceDirectory Preference Directory
@@ -89,7 +90,10 @@ public class PreferenceClassGeneratorTest extends BaseGeneratorTestCase {
                 namespace,
                 inheritClass
         );
-        PreferenceClassGenerator preferenceClassGenerator = new PreferenceClassGenerator(preferenceFileData, project);
+        PreferenceClassGenerator preferenceClassGenerator = new PreferenceClassGenerator(
+                preferenceFileData,
+                project
+        );
 
         return preferenceClassGenerator.generate("test");
     }

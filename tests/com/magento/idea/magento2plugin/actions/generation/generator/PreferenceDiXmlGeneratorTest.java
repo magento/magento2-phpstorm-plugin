@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
@@ -20,10 +21,9 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
     private static final String targetSimpleModelTwoClassFqn = "Foo\\Bar\\Model\\SimpleModelTwo";
 
     /**
-     * Test preference DI XML file generation
+     * Test preference DI XML file generation.
      */
-    public void testGeneratePreferenceDiXml()
-    {
+    public void testGeneratePreferenceDiXml() {
         String area = Package.Areas.base.toString();
         PsiFile preferenceDiXmlFile = addPreferenceDiXml(
                 targetSimpleModelOneClassFqn,
@@ -43,10 +43,9 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
     }
 
     /**
-     * Test preference DI XML file generation for adminhtml area
+     * Test preference DI XML file generation for adminhtml area.
      */
-    public void testGeneratePreferenceDiXmlForAdminhtmlArea()
-    {
+    public void testGeneratePreferenceDiXmlForAdminhtmlArea() {
         String area = Package.Areas.adminhtml.toString();
         PsiFile preferenceDiXmlFile = addPreferenceDiXml(
                 targetSimpleModelTwoClassFqn,
@@ -66,10 +65,9 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
     }
 
     /**
-     * Test the adding of two preferences to one DI XML file
+     * Test the adding of two preferences to one DI XML file.
      */
-    public void testAddTwoPreferencesToOneDiXmlFile()
-    {
+    public void testAddTwoPreferencesToOneDiXmlFile() {
         String area = Package.Areas.frontend.toString();
         addPreferenceDiXml(
                 targetSimpleModelOneClassFqn,
@@ -95,7 +93,7 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
     }
 
     /**
-     * Add preference to XML file
+     * Add preference to XML file.
      *
      * @param targetClassFnq Target class FQN
      * @param preferenceFqn Preference FQN
@@ -118,19 +116,21 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
                 namespace,
                 area
         );
-        PreferenceDiXmlGenerator moduleXmlGenerator = new PreferenceDiXmlGenerator(preferenceDiXmlFileData, project);
+        PreferenceDiXmlGenerator moduleXmlGenerator = new PreferenceDiXmlGenerator(
+                preferenceDiXmlFileData,
+                project
+        );
 
         return moduleXmlGenerator.generate("test");
     }
 
     /**
-     * Get expected directory based on provided area
+     * Get expected directory based on provided area.
      *
      * @param area Area name
      * @return String
      */
-    private String getExpectedDirectory(String area)
-    {
+    private String getExpectedDirectory(String area) {
         if (area.equals(Package.Areas.base.toString())) {
             return moduleDir + Package.MODULE_BASE_AREA_DIR;
         }
