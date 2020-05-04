@@ -13,8 +13,12 @@
     <description>
         Magento PhpStorm rules
     </description>
-    <rule ref="category/java/bestpractices.xml" />
-    <rule ref="category/java/codestyle.xml"/>
+    <rule ref="category/java/bestpractices.xml">
+        <exclude name="JUnit4TestShouldUseTestAnnotation"/>
+    </rule>
+    <rule ref="category/java/codestyle.xml">
+        <exclude name="AtLeastOneConstructor" />
+    </rule>
     <rule ref="category/java/design.xml">
         <exclude name="LawOfDemeter"/>
     </rule>
