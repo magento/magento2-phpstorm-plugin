@@ -2,28 +2,39 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.data;
 
-public class CLICommandClassData {
+public class CLICommandClassData { //NOPMD
     private final String className;
     private final String parentDirectory;
     private final String commandName;
-    private final String commandDescription;
+    private final String description;
     private final String namespace;
     private final String moduleName;
 
+    /**
+     * CLI Command PHP class data class.
+     *
+     * @param cliClassName PHP class name
+     * @param parentDirectory Prent directory of a PHP class
+     * @param cliCommandName CLI Command name
+     * @param description CLI Command description
+     * @param namespace namespace of a PHP class
+     * @param moduleName CLI Command module name
+     */
     public CLICommandClassData(
-        String cliClassName,
-        String cliParentDirectory,
-        String cliCommandName,
-        String cliCommandDescription,
-        String namespace,
-        String moduleName
+            final String cliClassName,
+            final String parentDirectory,
+            final String cliCommandName,
+            final String description,
+            final String namespace,
+            final String moduleName
     ) {
         this.className = cliClassName;
-        this.parentDirectory = cliParentDirectory;
+        this.parentDirectory = parentDirectory;
         this.commandName = cliCommandName;
-        this.commandDescription = cliCommandDescription;
+        this.description = description;
         this.namespace = namespace;
         this.moduleName = moduleName;
     }
@@ -41,7 +52,7 @@ public class CLICommandClassData {
     }
 
     public String getCommandDescription() {
-        return commandDescription;
+        return description;
     }
 
     public String getNamespace() {

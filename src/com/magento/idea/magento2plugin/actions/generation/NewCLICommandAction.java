@@ -2,10 +2,15 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation;
 
 import com.intellij.ide.IdeView;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.MagentoIcons;
@@ -13,28 +18,27 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.NewCLICommandDi
 import org.jetbrains.annotations.NotNull;
 
 public class NewCLICommandAction extends AnAction {
-    public static String ACTION_NAME = "Magento 2 CLI Command";
-    public static String ACTION_DESCRIPTION = "Create a new Magento 2 CLI Command";
+    public static String ACTION_NAME = "Magento 2 CLI Command";//NOPMD
+    public static String ACTION_DESCRIPTION = "Create a new Magento 2 CLI Command";//NOPMD
 
-    NewCLICommandAction() {
+    public NewCLICommandAction() {
         super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        DataContext dataContext = e.getDataContext();
-        IdeView view = LangDataKeys.IDE_VIEW.getData(dataContext);
-
+    public void actionPerformed(@NotNull final AnActionEvent event) {
+        final DataContext context = event.getDataContext();
+        final IdeView view = LangDataKeys.IDE_VIEW.getData(context);
         if (view == null) {
-            return;
+            return;//NOPMD
         }
 
-        Project project = CommonDataKeys.PROJECT.getData(dataContext);
+        final Project project = CommonDataKeys.PROJECT.getData(context);
         if (project == null) {
-            return;
+            return;//NOPMD
         }
 
-        PsiDirectory directory = view.getOrChooseDirectory();
+        final PsiDirectory directory = view.getOrChooseDirectory();
         if (directory == null) {
             return;
         }

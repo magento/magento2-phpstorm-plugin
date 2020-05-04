@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
@@ -15,8 +16,17 @@ import com.magento.idea.magento2plugin.actions.generation.generator.CLICommandDi
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.util.CamelCaseToSnakeCase;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
-import javax.swing.*;
-import java.awt.event.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.Locale;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 
 public class NewCLICommandDialog extends AbstractDialog {
     private JPanel contentPane;
@@ -32,6 +42,12 @@ public class NewCLICommandDialog extends AbstractDialog {
     private final NewCLICommandValidator validator;
     private final CamelCaseToSnakeCase toSnakeCase;
 
+    /**
+     * Open new dialog for adding a new CLI Command.
+     *
+     * @param project Project
+     * @param directory PsiDirectory
+     */
     public NewCLICommandDialog(final Project project, final PsiDirectory directory) {
         super();
         this.project = project;
@@ -55,16 +71,15 @@ public class NewCLICommandDialog extends AbstractDialog {
             }
         });
 
-        contentPane.registerKeyboardAction(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPane.registerKeyboardAction(
+                event -> onCancel(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+        );
     }
 
     /**
-     * Open a new CLI command dialog
+     * Open a new CLI command dialog.
      *
      * @param project Project
      * @param directory Directory
@@ -93,16 +108,32 @@ public class NewCLICommandDialog extends AbstractDialog {
         return this.cliCommandDescriptionField.getText().trim();
     }
 
+    /**
+     * Get di.xml item nme for CLI command based on the module name and class name.
+     * @return di.xml item name
+     */
     public String getDIXmlItemName() {
         final String diItemName = this.toSnakeCase.convert(this.getCLICommandClassName());
 
-        return this.moduleName.toLowerCase() + "_" + diItemName;
+        return this.moduleName.toLowerCase(new Locale("en","EN"))
+                + "_"
+                + diItemName;
     }
 
+    /**
+     * Get current module name for which a CLI Command is being added.
+     *
+     * @return module name
+     */
     public String getCLICommandModule() {
         return this.moduleName;
     }
 
+    /**
+     * Get a CLI Command PHP class namespace.
+     *
+     * @return PHP class namespace
+     */
     public String getCLICommandClassFqn() {
         final NamespaceBuilder namespaceBuilder = new NamespaceBuilder(
                 moduleName,
@@ -124,7 +155,7 @@ public class NewCLICommandDialog extends AbstractDialog {
         try {
             this.generateCLICommandClass();
             this.generateCLICommandDiXmlRegistration();
-        } catch (Exception exception) {
+        } catch (Exception exception) { //NOPMD
             JOptionPane.showMessageDialog(
                     null,
                     exception.getMessage(),
@@ -136,13 +167,15 @@ public class NewCLICommandDialog extends AbstractDialog {
 
     private void generateCLICommandClass() {
         final CLICommandClassData dataClass = this.initializeCLICommandClassData();
-        final CLICommandClassGenerator classGenerator = new CLICommandClassGenerator(project, dataClass);
+        final CLICommandClassGenerator classGenerator =
+                new CLICommandClassGenerator(project, dataClass);
         classGenerator.generate(NewCLICommandAction.ACTION_NAME, true);
     }
 
     private void generateCLICommandDiXmlRegistration() {
         final CLICommandXmlData cliCommandXmlData = this.initializeCLICommandDIXmlData();
-        final CLICommandDiXmlGenerator diGenerator = new CLICommandDiXmlGenerator(project, cliCommandXmlData);
+        final CLICommandDiXmlGenerator diGenerator =
+                new CLICommandDiXmlGenerator(project, cliCommandXmlData);
         diGenerator.generate(NewCLICommandAction.ACTION_NAME);
     }
 

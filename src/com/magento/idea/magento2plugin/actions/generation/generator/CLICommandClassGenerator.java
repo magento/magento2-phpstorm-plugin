@@ -30,7 +30,7 @@ public class CLICommandClassGenerator extends FileGenerator {
     /**
      * Generates new CLI Command PHP Class based on provided data.
      *
-     * @param project             Project
+     * @param project      Project
      * @param phpClassData CLICommandClassData
      */
     public CLICommandClassGenerator(

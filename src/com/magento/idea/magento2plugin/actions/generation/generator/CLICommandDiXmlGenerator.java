@@ -96,7 +96,7 @@ public class CLICommandDiXmlGenerator extends FileGenerator {
     }
 
     @Override
-    final protected void fillAttributes(final Properties attributes) {
+    protected final void fillAttributes(final Properties attributes) {
         if (!this.isDeclared) {
             attributes.setProperty("CLI_COMMAND_INTERFACE", ModuleDiXml.CLI_COMMAND_INTERFACE);
         }

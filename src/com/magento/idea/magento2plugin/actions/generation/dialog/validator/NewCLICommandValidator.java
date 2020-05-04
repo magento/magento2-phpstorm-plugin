@@ -26,7 +26,9 @@ public class NewCLICommandValidator {
      * @return NewCLICommandValidator
      */
     public static NewCLICommandValidator getInstance() {
-        if (null != INSTANCE) return INSTANCE;//NOPMD
+        if (null != INSTANCE) { //NOPMD
+            return INSTANCE;
+        }
         INSTANCE = new NewCLICommandValidator();
 
         return INSTANCE;
