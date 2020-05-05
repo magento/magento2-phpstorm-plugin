@@ -20,7 +20,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrC
 import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplate;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.XmlFilePositionUtil;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
-import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
 import java.io.IOException;
 import java.util.Collection;
@@ -51,13 +51,13 @@ public class CLICommandDiXmlGenerator extends FileGenerator {
         this.cliCommandXmlData = cliCommandXmlData;
         this.project = project;
         this.getCodeTemplate = GetCodeTemplate.getInstance(project);
-        this.findOrCreateDiXml = FindOrCreateDiXml.getInstance(project);
+        this.findOrCreateDiXml = new FindOrCreateDiXml(project);
         this.positionUtil = XmlFilePositionUtil.getInstance();
     }
 
     @Override
     public PsiFile generate(final String actionName) {
-        final Package.Areas areas = Package.getAreaByString("base");
+        final Areas areas = Areas.getAreaByString("base");
         final PsiFile diXmlFile = findOrCreateDiXml.execute(
                 actionName,
                 cliCommandXmlData.getCLICommandModule(),

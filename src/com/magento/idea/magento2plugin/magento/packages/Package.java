@@ -5,7 +5,7 @@
 
 package com.magento.idea.magento2plugin.magento.packages;
 
-public class Package {
+public class Package {//NOPMD
     public static String packagesRoot = "app/code";
     public static String libWebRoot = "lib/web";
     public static String frameworkRootComposer = "vendor/magento/framework";
@@ -14,22 +14,5 @@ public class Package {
     public static String moduleBaseAreaDir = "etc";
     public static String vendorModuleNameSeparator = "_";
     public static String fqnSeparator = "\\";
-
-    /**
-     * Casts string to the certain area.
-     *
-     * @param string String
-     * @return Areas
-     */
-    public static Areas getAreaByString(String string) {
-        for (Areas area: Areas.values()) {
-            if (!area.toString().equals(string)) {
-                continue;
-            }
-
-            return area;
-        }
-
-        return null;
-    }
+    public static String composerType = "project";
 }

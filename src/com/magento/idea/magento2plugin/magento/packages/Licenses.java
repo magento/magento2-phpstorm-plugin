@@ -18,7 +18,7 @@ public enum Licenses {
 
     private String licenseName;
 
-    Licenses(String name) {
+    Licenses(final String name) {
         this.licenseName = name;
     }
 

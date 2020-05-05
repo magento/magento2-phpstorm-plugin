@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.project;
 
 import com.intellij.notification.Notification;
@@ -24,22 +25,30 @@ import javax.swing.event.HyperlinkEvent;
 
 public class ProjectDetector implements DirectoryProjectConfigurator {
     @Override
-    public void configureProject(@NotNull Project project, @NotNull VirtualFile baseDir, @NotNull Ref<Module> moduleRef, boolean newProject) {
+    public void configureProject(
+        final @NotNull Project project,
+        final @NotNull VirtualFile baseDir,
+        final @NotNull Ref<Module> moduleRef,
+        final boolean newProject
+    ) {
         StartupManager.getInstance(project).runWhenProjectIsInitialized(() -> {
             DumbService.getInstance(project).smartInvokeLater(() -> {
                 if (!MagentoBasePathUtil.isMagentoFolderValid(baseDir.getPath())) {
                     return;
                 }
-                Notification notification = new Notification("Magento", "Magento",
+                final Notification notification = new Notification("Magento", "Magento",
                         "<a href='enable'>Enable</a> Magento support for this project?",
                         NotificationType.INFORMATION, new NotificationListener.Adapter() {
                     @Override
-                    public void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent event) {
+                    public void hyperlinkActivated(
+                        final @NotNull Notification notification,
+                        final @NotNull HyperlinkEvent event
+                    ) {
                         Settings settings = Settings.getInstance(project);
                         settings.pluginEnabled = true;
                         settings.mftfSupportEnabled = true;
                         settings.magentoPath = project.getBasePath();
-                        settings.magentoVersion = MagentoVersion.getInstance().get(project, project.getBasePath());
+                        settings.magentoVersion = MagentoVersion.get(project, project.getBasePath());
                         IndexManager.manualReindex();
                         MagentoComponentManager.getInstance(project).flushModules();
                         notification.expire();

@@ -5,6 +5,7 @@
 package com.magento.idea.magento2plugin.inspections.xml;
 
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
+import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.magento.packages.File;
 
@@ -17,7 +18,7 @@ public class PluginDeclarationInspectionTest extends InspectionXmlFixtureTestCas
     }
 
     private String getAreaPath(String area) {
-        return Package.moduleBaseAreaDir + File.separator + Package.getAreaByString(area) + File.separator +
+        return Package.moduleBaseAreaDir + File.separator + Areas.getAreaByString(area) + File.separator +
                 ModuleDiXml.FILE_NAME;
     }
 

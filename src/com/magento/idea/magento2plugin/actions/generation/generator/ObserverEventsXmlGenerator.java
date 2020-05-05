@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.command.WriteCommandAction;
@@ -23,21 +24,33 @@ public class ObserverEventsXmlGenerator extends FileGenerator {
     private final FindOrCreateEventsXml findOrCreateEventsXml;
     private final XmlFilePositionUtil positionUtil;
     private final GetCodeTemplate getCodeTemplate;
-    private ObserverEventsXmlData observerEventsXmlData;
-    private Project project;
+    private final ObserverEventsXmlData observerEventsXmlData;
+    private final Project project;
 
-    public ObserverEventsXmlGenerator(ObserverEventsXmlData observerEventsXmlData, Project project) {
+    /**
+     * Constructor.
+     *
+     * @param observerEventsXmlData ObserverEventsXmlData
+     * @param project Project
+     */
+    public ObserverEventsXmlGenerator(final ObserverEventsXmlData observerEventsXmlData, final Project project) {
         super(project);
         this.observerEventsXmlData = observerEventsXmlData;
         this.project = project;
-        this.findOrCreateEventsXml = FindOrCreateEventsXml.getInstance(project);
+        this.findOrCreateEventsXml = new FindOrCreateEventsXml(project);
         this.positionUtil = XmlFilePositionUtil.getInstance();
         this.getCodeTemplate = GetCodeTemplate.getInstance(project);
     }
 
-    public PsiFile generate(String actionName)
-    {
-        PsiFile eventsXmlFile =
+    /**
+     * Creates an Observer file.
+     *
+     * @param actionName String
+     * @return PsiFile
+     */
+    @Override
+    public PsiFile generate(final String actionName) {
+        final PsiFile eventsXmlFile =
                 findOrCreateEventsXml.execute(
                         actionName,
                         observerEventsXmlData.getObserverModule(),
@@ -45,20 +58,19 @@ public class ObserverEventsXmlGenerator extends FileGenerator {
                 );
 
         WriteCommandAction.runWriteCommandAction(project, () -> {
-            StringBuffer textBuf = new StringBuffer();
+            final StringBuffer textBuf = new StringBuffer();
             try {
                 textBuf.append(getCodeTemplate.execute(ModuleEventsXml.TEMPLATE_OBSERVER, getAttributes()));
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException event) {
                 return;
             }
 
-            int insertPos = positionUtil.getRootInsertPosition((XmlFile) eventsXmlFile);
+            final int insertPos = positionUtil.getRootInsertPosition((XmlFile) eventsXmlFile);
             if (textBuf.length() > 0 && insertPos >= 0) {
-                PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(project);
-                Document document = psiDocumentManager.getDocument(eventsXmlFile);
+                final PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(project);
+                final Document document = psiDocumentManager.getDocument(eventsXmlFile);
                 document.insertString(insertPos, textBuf);
-                int endPos = insertPos + textBuf.length() + 1;
+                final int endPos = insertPos + textBuf.length() + 1;
                 CodeStyleManager.getInstance(project).reformatText(eventsXmlFile, insertPos, endPos);
                 psiDocumentManager.commitDocument(document);
             }
@@ -67,7 +79,8 @@ public class ObserverEventsXmlGenerator extends FileGenerator {
         return eventsXmlFile;
     }
 
-    protected void fillAttributes(Properties attributes) {
+    @Override
+    protected void fillAttributes(final Properties attributes) {
         attributes.setProperty("OBSERVER_NAME", observerEventsXmlData.getObserverName());
         attributes.setProperty("EVENT_NAME", observerEventsXmlData.getTargetEvent());
         attributes.setProperty("OBSERVER_CLASS", observerEventsXmlData.getObserverClassFqn());

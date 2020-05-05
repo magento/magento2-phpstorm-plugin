@@ -17,49 +17,54 @@ import com.magento.idea.magento2plugin.magento.files.ComposerJson;
 import com.magento.idea.magento2plugin.magento.packages.ComposerPackageModel;
 import com.magento.idea.magento2plugin.magento.packages.ComposerPackageModelImpl;
 import com.magento.idea.magento2plugin.magento.packages.File;
+import com.magento.idea.magento2plugin.magento.packages.Package;
 
-public class MagentoVersion {
-    private static MagentoVersion INSTANCE = null;
+public final class MagentoVersion {
+
     public static final String DEFAULT_VERSION = "any";
 
-    public static MagentoVersion getInstance() {
-        if (null == INSTANCE) {
-            INSTANCE = new MagentoVersion();
-        }
-        return INSTANCE;
-    }
+    private MagentoVersion() {}
 
-    public String get(Project project, String magentoPath) {
-        VirtualFile file = LocalFileSystem.getInstance().findFileByPath(
-            this.getFilePath(magentoPath)
+    /**
+     * Parse composer.json to detect Magento 2 version
+     *
+     * @param project Project
+     * @param magentoPath String
+     * @return String
+     */
+    public static String get(final Project project, final String magentoPath) {
+        final VirtualFile file = LocalFileSystem.getInstance().findFileByPath(
+                getFilePath(magentoPath)
         );
 
         if (file == null) {
             return DEFAULT_VERSION;
         }
 
-        PsiManager psiManager = PsiManager.getInstance(project);
-        PsiFile composerFile = psiManager.findFile(file);
+        final PsiManager psiManager = PsiManager.getInstance(project);
+        final PsiFile composerFile = psiManager.findFile(file);
 
         if (composerFile instanceof JsonFile) {
-            JsonFile composerJsonFile = (JsonFile) composerFile;
-            JsonObject jsonObject = PsiTreeUtil.getChildOfType(composerJsonFile, JsonObject.class);
+            final JsonFile composerJsonFile = (JsonFile) composerFile;
+            final JsonObject jsonObject = PsiTreeUtil.getChildOfType(composerJsonFile, JsonObject.class);
 
             if (jsonObject == null) {
                 return DEFAULT_VERSION;
             }
 
-            ComposerPackageModel composerObject = new ComposerPackageModelImpl(jsonObject);
+            final ComposerPackageModel composerObject = new ComposerPackageModelImpl(jsonObject);
 
-            if (composerObject.getType() != null && composerObject.getVersion() != null) {
-               return composerObject.getVersion();
+            if (composerObject.getType() != null
+                    && composerObject.getType().equals(Package.composerType)
+                    && composerObject.getVersion() != null) {
+                return composerObject.getVersion();
             }
         }
 
         return DEFAULT_VERSION;
     }
 
-    private String getFilePath(String magentoPath) {
+    private static String getFilePath(final String magentoPath) {
         return magentoPath + File.separator + ComposerJson.FILE_NAME;
     }
 }

@@ -19,6 +19,7 @@
     <rule ref="category/java/codestyle.xml">
         <exclude name="AtLeastOneConstructor" />
         <exclude name="LongVariable" />
+        <exclude name="OnlyOneReturn" />
     </rule>
     <rule ref="category/java/design.xml">
         <exclude name="LawOfDemeter"/>
@@ -28,6 +29,7 @@
     </rule>
     <rule ref="category/java/errorprone.xml">
         <exclude name="BeanMembersShouldSerialize"/>
+        <exclude name="DataflowAnomalyAnalysis"/>
     </rule>
     <exclude-pattern>.*/resources/.*</exclude-pattern>
     <exclude-pattern>.*/testData/.*</exclude-pattern>
