@@ -31,7 +31,13 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
 
-public class CreateAnObserverDialog extends AbstractDialog { //NOPMD
+@SuppressWarnings({
+        "PMD.TooManyFields",
+        "PMD.MissingSerialVersionUID",
+        "PMD.DataClass",
+        "PMD.UnusedPrivateField",
+})
+public class CreateAnObserverDialog extends AbstractDialog {
     @NotNull
     private final Project project;
     @NotNull
@@ -45,11 +51,11 @@ public class CreateAnObserverDialog extends AbstractDialog { //NOPMD
     private FilteredComboBox observerModule;
     private JComboBox observerArea;
     private JTextField observerName;
-    private JLabel observerClassNameLabel;//NOPMD
-    private JLabel observerDirectoryName;//NOPMD
-    private JLabel selectObserverModule;//NOPMD
-    private JLabel observerAreaLabel;//NOPMD
-    private JLabel observerNameLabel;//NOPMD
+    private JLabel observerClassNameLabel;
+    private JLabel observerDirectoryName;
+    private JLabel selectObserverModule;
+    private JLabel observerAreaLabel;
+    private JLabel observerNameLabel;
 
     /**
      * Constructor.
@@ -74,6 +80,7 @@ public class CreateAnObserverDialog extends AbstractDialog { //NOPMD
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(final WindowEvent event) {
                 onCancel();
             }
