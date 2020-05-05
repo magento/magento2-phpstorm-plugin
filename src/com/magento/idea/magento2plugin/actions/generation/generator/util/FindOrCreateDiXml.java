@@ -9,6 +9,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
+import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.FileBasedIndexUtil;
 import java.util.ArrayList;
@@ -36,8 +37,8 @@ public class FindOrCreateDiXml {
 
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project).getModuleDirectoryByModuleName(moduleName);
         ArrayList<String> fileDirectories = new ArrayList<>();
-        fileDirectories.add(Package.MODULE_BASE_AREA_DIR);
-        if (!getArea(area).equals(Package.Areas.base)) {
+        fileDirectories.add(Package.moduleBaseAreaDir);
+        if (!getArea(area).equals(Areas.base)) {
             fileDirectories.add(getArea(area).toString());
         }
         for (String fileDirectory: fileDirectories) {
@@ -56,7 +57,7 @@ public class FindOrCreateDiXml {
         return diXml;
     }
 
-    private Package.Areas getArea(String area) {
+    private Areas getArea(String area) {
         return Package.getAreaByString(area);
     }
 }

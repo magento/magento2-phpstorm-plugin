@@ -66,7 +66,7 @@ public class ModuleBlockClassGenerator extends FileGenerator {
 
     @NotNull
     private String getBlockFqn() {
-        return blockFileData.getNamespace() + Package.FQN_SEPARATOR + blockFileData.getBlockClassName();
+        return blockFileData.getNamespace() + Package.fqnSeparator + blockFileData.getBlockClassName();
     }
 
     private PhpFile createBlockClass(String actionName) {
@@ -94,7 +94,7 @@ public class ModuleBlockClassGenerator extends FileGenerator {
             attributes.setProperty("EXTENDS", BlockPhp.STOREFRONT_BLOCK_NAME);
             return;
         }
-        attributes.setProperty("EXTENDS", Package.FQN_SEPARATOR + BlockPhp.STOREFRONT_BLOCK_FQN);
+        attributes.setProperty("EXTENDS", Package.fqnSeparator + BlockPhp.STOREFRONT_BLOCK_FQN);
     }
 
     public String getBlockModule() {

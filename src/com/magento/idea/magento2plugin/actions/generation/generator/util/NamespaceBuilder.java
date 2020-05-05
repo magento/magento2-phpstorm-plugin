@@ -29,7 +29,7 @@ public class NamespaceBuilder {
     public String getClassFqn() {
         String classNamespace = this.getCronjobNamespace();
 
-        return classNamespace + Package.FQN_SEPARATOR + this.className;
+        return classNamespace + Package.fqnSeparator + this.className;
     }
 
     /**
@@ -38,14 +38,14 @@ public class NamespaceBuilder {
      * @return String
      */
     public String getCronjobNamespace() {
-        String[] parts = this.moduleName.split(Package.VENDOR_MODULE_NAME_SEPARATOR);
+        String[] parts = this.moduleName.split(Package.vendorModuleNameSeparator);
 
         if (parts[0] == null || parts[1] == null || parts.length > 2) {
             return null;
         }
 
-        String directoryPart = this.classDirectory.replace(File.separator, Package.FQN_SEPARATOR);
+        String directoryPart = this.classDirectory.replace(File.separator, Package.fqnSeparator);
 
-        return parts[0] + Package.FQN_SEPARATOR + parts[1] + Package.FQN_SEPARATOR + directoryPart;
+        return parts[0] + Package.fqnSeparator + parts[1] + Package.fqnSeparator + directoryPart;
     }
 }

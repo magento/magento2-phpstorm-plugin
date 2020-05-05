@@ -19,6 +19,7 @@ import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.magento.idea.magento2plugin.bundles.InspectionBundle;
 import com.magento.idea.magento2plugin.indexes.PluginIndex;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
+import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
 import org.jetbrains.annotations.NotNull;
@@ -81,7 +82,7 @@ public class PluginDeclarationInspection extends PhpInspection {
                         }
 
                         String pluginTypeName = pluginTypeNameAttribute.getValue();
-                        String pluginTypeKey = pluginNameAttributeValue.concat(Package.VENDOR_MODULE_NAME_SEPARATOR).concat(pluginTypeName);
+                        String pluginTypeKey = pluginNameAttributeValue.concat(Package.vendorModuleNameSeparator).concat(pluginTypeName);
                         if (targetPluginHash.containsKey(pluginTypeKey)) {
                             problemsHolder.registerProblem(
                                 pluginTypeNameAttribute.getValueElement(),
@@ -98,8 +99,8 @@ public class PluginDeclarationInspection extends PhpInspection {
                             if (scope == null || moduleName == null) {
                                 continue;
                             }
-                            String problemKey = pluginTypeKey.concat(Package.VENDOR_MODULE_NAME_SEPARATOR)
-                                    .concat(moduleName).concat(Package.VENDOR_MODULE_NAME_SEPARATOR).concat(scope);
+                            String problemKey = pluginTypeKey.concat(Package.vendorModuleNameSeparator)
+                                    .concat(moduleName).concat(Package.vendorModuleNameSeparator).concat(scope);
                             if (!pluginProblems.containsKey(problemKey)){
                                 problemsHolder.registerProblem(
                                     pluginTypeNameAttribute.getValueElement(),
@@ -207,11 +208,11 @@ public class PluginDeclarationInspection extends PhpInspection {
 
                 String areaFromFileDirectory = file.getParent().getName();
 
-                if (areaFromFileDirectory.equals(Package.MODULE_BASE_AREA_DIR)) {
-                    return Package.Areas.base.toString();
+                if (areaFromFileDirectory.equals(Package.moduleBaseAreaDir)) {
+                    return Areas.base.toString();
                 }
 
-                for (Package.Areas area: Package.Areas.values()) {
+                for (Areas area: Areas.values()) {
                     if (area.toString().equals(areaFromFileDirectory)) {
                         return area.toString();
                     }

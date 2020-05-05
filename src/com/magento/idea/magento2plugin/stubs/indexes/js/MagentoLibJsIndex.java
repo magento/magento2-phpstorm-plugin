@@ -33,7 +33,7 @@ public class MagentoLibJsIndex extends ScalarIndexExtension<String> {
         return inputData -> {
             Map<String, Void> map = new HashMap<>();
             String libPath = Settings.getMagentoPath(inputData.getProject()) +
-                File.separator + Package.LIB_WEB_ROOT + File.separator;
+                File.separator + Package.libWebRoot + File.separator;
             VirtualFile file = inputData.getFile();
 
             if (!file.getPath().contains(libPath)){

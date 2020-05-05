@@ -9,6 +9,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.CrontabXmlTemplate;
+import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.FileBasedIndexUtil;
 
@@ -41,7 +42,7 @@ public class FindOrCreateCrontabXml {
         PsiDirectory parentDirectory = this.moduleIndex.getModuleDirectoryByModuleName(moduleName);
         ArrayList<String> fileDirectories = new ArrayList<>();
 
-        fileDirectories.add(Package.MODULE_BASE_AREA_DIR);
+        fileDirectories.add(Package.moduleBaseAreaDir);
 
         for (String fileDirectory: fileDirectories) {
             parentDirectory = this.directoryGenerator.findOrCreateSubdirectory(parentDirectory, fileDirectory);
@@ -50,7 +51,7 @@ public class FindOrCreateCrontabXml {
         CrontabXmlTemplate crontabXmlTemplate = new CrontabXmlTemplate();
         PsiFile crontabFile = FileBasedIndexUtil.findModuleConfigFile(
             crontabXmlTemplate.getFileName(),
-            Package.Areas.base,
+            Areas.base,
             moduleName,
             project
         );

@@ -160,7 +160,7 @@ public class PluginMethodsGenerator {
                 typeStr = PhpDocUtil.getTypePresentation(project, element.getType(), null);
             } else {
                 typeStr = PhpDocUtil.getTypePresentation(project, element.getType(), PhpCodeInsightUtil.findScopeForUseOperator(element));
-                if (typeStr.indexOf(Package.FQN_SEPARATOR, 1) > 0) {
+                if (typeStr.indexOf(Package.fqnSeparator, 1) > 0) {
                     String[] fqnArray = typeStr.split("\\\\");
                     typeStr = fqnArray[fqnArray.length - 1];
                 }
@@ -215,7 +215,7 @@ public class PluginMethodsGenerator {
 
             if (element instanceof Parameter) {
                 String parameterText = PhpCodeUtil.paramToString(element);
-                if (parameterText.indexOf(Package.FQN_SEPARATOR, 1) > 0) {
+                if (parameterText.indexOf(Package.fqnSeparator, 1) > 0) {
                     String[] fqnArray = parameterText.split("\\\\");
                     parameterText = fqnArray[fqnArray.length - 1];
                 }

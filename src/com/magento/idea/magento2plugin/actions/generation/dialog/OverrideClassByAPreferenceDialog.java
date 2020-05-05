@@ -16,6 +16,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.PreferenceCl
 import com.magento.idea.magento2plugin.actions.generation.generator.PreferenceDiXmlGenerator;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
+import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
@@ -111,7 +112,7 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog {
     }
 
     private void fillTargetAreaOptions() {
-        for(Package.Areas area: Package.Areas.values()) {
+        for(Areas area: Areas.values()) {
             preferenceArea.addItem(area.toString());
         }
     }
@@ -184,12 +185,12 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog {
 
     private String getNamespace() {
         String targetModule = getPreferenceModule();
-        String namespace = targetModule.replace(Package.VENDOR_MODULE_NAME_SEPARATOR, Package.FQN_SEPARATOR);
-        namespace = namespace.concat(Package.FQN_SEPARATOR);
-        return namespace.concat(getPreferenceDirectory().replace(File.separator, Package.FQN_SEPARATOR));
+        String namespace = targetModule.replace(Package.vendorModuleNameSeparator, Package.fqnSeparator);
+        namespace = namespace.concat(Package.fqnSeparator);
+        return namespace.concat(getPreferenceDirectory().replace(File.separator, Package.fqnSeparator));
     }
 
     private String getPreferenceClassFqn() {
-        return getNamespace().concat(Package.FQN_SEPARATOR).concat(getPreferenceClassName());
+        return getNamespace().concat(Package.fqnSeparator).concat(getPreferenceClassName());
     }
 }

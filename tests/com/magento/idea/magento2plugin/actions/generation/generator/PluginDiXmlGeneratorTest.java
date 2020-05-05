@@ -9,6 +9,7 @@ import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.PluginDiXmlData;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
+import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
@@ -25,7 +26,7 @@ public class PluginDiXmlGeneratorTest extends BaseGeneratorTestCase {
     {
         String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
         PsiFile expectedFile = myFixture.configureByFile(filePath);
-        String area = Package.Areas.base.toString();
+        String area = Areas.base.toString();
 
         PsiFile diXml = addPluginDiXml(
                 pluginTargetClassOneFnq,
@@ -46,7 +47,7 @@ public class PluginDiXmlGeneratorTest extends BaseGeneratorTestCase {
     {
         String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
         PsiFile expectedFile = myFixture.configureByFile(filePath);
-        String area = Package.Areas.adminhtml.toString();
+        String area = Areas.adminhtml.toString();
 
         PsiFile diXml = addPluginDiXml(
                 pluginTargetClassTwoFnq,
@@ -67,7 +68,7 @@ public class PluginDiXmlGeneratorTest extends BaseGeneratorTestCase {
     {
         String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
         PsiFile expectedFile = myFixture.configureByFile(filePath);
-        String area = Package.Areas.frontend.toString();
+        String area = Areas.frontend.toString();
         addPluginDiXml(
                 pluginTargetClassOneFnq,
                 area,
@@ -94,7 +95,7 @@ public class PluginDiXmlGeneratorTest extends BaseGeneratorTestCase {
     {
         String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
         PsiFile expectedFile = myFixture.configureByFile(filePath);
-        String area = Package.Areas.frontend.toString();
+        String area = Areas.frontend.toString();
         addPluginDiXml(
                 pluginTargetClassOneFnq,
                 area,
@@ -141,10 +142,10 @@ public class PluginDiXmlGeneratorTest extends BaseGeneratorTestCase {
 
     private String getExpectedDirectory(String area)
     {
-        if (area.equals(Package.Areas.base.toString())) {
-            return moduleDir + Package.MODULE_BASE_AREA_DIR;
+        if (area.equals(Areas.base.toString())) {
+            return moduleDir + Package.moduleBaseAreaDir;
         }
 
-        return moduleDir + Package.MODULE_BASE_AREA_DIR + File.separator + area;
+        return moduleDir + Package.moduleBaseAreaDir + File.separator + area;
     }
 }

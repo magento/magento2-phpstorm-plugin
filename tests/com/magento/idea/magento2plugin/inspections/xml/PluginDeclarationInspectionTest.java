@@ -17,7 +17,7 @@ public class PluginDeclarationInspectionTest extends InspectionXmlFixtureTestCas
     }
 
     private String getAreaPath(String area) {
-        return Package.MODULE_BASE_AREA_DIR + File.separator + Package.getAreaByString(area) + File.separator +
+        return Package.moduleBaseAreaDir + File.separator + Package.getAreaByString(area) + File.separator +
                 ModuleDiXml.FILE_NAME;
     }
 

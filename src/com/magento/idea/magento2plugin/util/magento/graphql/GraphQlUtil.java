@@ -16,9 +16,9 @@ public class GraphQlUtil {
 
     @NotNull
     public static String resolverStringToPhpFQN(String resolverFQN) {
-        resolverFQN = resolverFQN.replace("\\\\", Package.FQN_SEPARATOR).replace("\"","");
-        if (!resolverFQN.startsWith(Package.FQN_SEPARATOR)) {
-            resolverFQN = Package.FQN_SEPARATOR.concat(resolverFQN);
+        resolverFQN = resolverFQN.replace("\\\\", Package.fqnSeparator).replace("\"","");
+        if (!resolverFQN.startsWith(Package.fqnSeparator)) {
+            resolverFQN = Package.fqnSeparator.concat(resolverFQN);
         }
         return resolverFQN;
     }

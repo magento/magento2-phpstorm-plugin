@@ -144,7 +144,7 @@ public class PluginInspection extends PhpInspection {
                     String declaredType = pluginMethodParameter.getDeclaredType().toString();
 
                     if (index == 1) {
-                        String targetClassFqn = Package.FQN_SEPARATOR.concat(targetClassName);
+                        String targetClassFqn = Package.fqnSeparator.concat(targetClassName);
                         if (!checkTypeIncompatibility(targetClassFqn, declaredType, phpIndex)) {
                             problemsHolder.registerProblem(pluginMethodParameter, PhpBundle.message("inspection.wrong_param_type", new Object[]{declaredType, targetClassFqn}), ProblemHighlightType.ERROR);
                         }
@@ -159,7 +159,7 @@ public class PluginInspection extends PhpInspection {
                     }
                     if (index == 2 && pluginPrefix.equals(Plugin.PluginType.around.toString())) {
                         if (!checkTypeIncompatibility(Plugin.CALLABLE_PARAM, declaredType, phpIndex) &&
-                                !checkTypeIncompatibility(Package.FQN_SEPARATOR.concat(Plugin.CLOSURE_PARAM), declaredType, phpIndex)) {
+                                !checkTypeIncompatibility(Package.fqnSeparator.concat(Plugin.CLOSURE_PARAM), declaredType, phpIndex)) {
                             problemsHolder.registerProblem(pluginMethodParameter, PhpBundle.message("inspection.wrong_param_type", new Object[]{declaredType, "callable"}), ProblemHighlightType.ERROR);
                         }
                         continue;

@@ -65,7 +65,7 @@ public class ModuleViewModelClassGenerator extends FileGenerator {
 
     @NotNull
     private String getViewModelFqn() {
-        return viewModelFileData.getNamespace() + Package.FQN_SEPARATOR + viewModelFileData.getViewModelClassName();
+        return viewModelFileData.getNamespace() + Package.fqnSeparator + viewModelFileData.getViewModelClassName();
     }
 
     private PhpFile createViewModelClass(String actionName) {

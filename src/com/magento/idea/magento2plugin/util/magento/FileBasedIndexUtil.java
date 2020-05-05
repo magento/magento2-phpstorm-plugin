@@ -11,6 +11,7 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.PhpFileType;
+import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex;
 import com.magento.idea.magento2plugin.util.RegExUtil;
@@ -47,7 +48,7 @@ public class FileBasedIndexUtil {
         return viewVfs;
     }
 
-    public static PsiFile findModuleConfigFile(String virtualFieName, Package.Areas area, String moduleName, Project project)
+    public static PsiFile findModuleConfigFile(String virtualFieName, Areas area, String moduleName, Project project)
     {
         Pattern pattern = Pattern.compile(RegExUtil.Magento.MODULE_NAME);
         Matcher matcher = pattern.matcher(moduleName);
@@ -68,8 +69,8 @@ public class FileBasedIndexUtil {
 
         VirtualFile moduleVf = moduleVfs.iterator().next();
 
-        String relativePath = File.separator.concat(Package.MODULE_BASE_AREA_DIR).concat(File.separator);
-        if (!area.equals(Package.Areas.base)) {
+        String relativePath = File.separator.concat(Package.moduleBaseAreaDir).concat(File.separator);
+        if (!area.equals(Areas.base)) {
             relativePath = relativePath.concat(area.toString()).concat(File.separator);
         }
         relativePath = relativePath.concat(virtualFieName);

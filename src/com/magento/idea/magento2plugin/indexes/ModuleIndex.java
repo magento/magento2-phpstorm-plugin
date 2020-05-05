@@ -42,7 +42,7 @@ public class ModuleIndex {
     }
 
     public List<String> getEditableModuleNames() {
-        return getModuleNames(Package.VENDOR, true);
+        return getModuleNames(Package.vendor, true);
     }
 
     public List<String> getModuleNames() {

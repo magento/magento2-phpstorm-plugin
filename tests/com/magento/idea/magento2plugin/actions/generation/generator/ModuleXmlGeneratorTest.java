@@ -32,7 +32,7 @@ public class ModuleXmlGeneratorTest extends BaseGeneratorTestCase {
         assertGeneratedFileIsCorrect(
             expectedFile,
             projectDir.getVirtualFile().getPath() +
-                "/Test/Module" + File.separator + Package.MODULE_BASE_AREA_DIR,
+                "/Test/Module" + File.separator + Package.moduleBaseAreaDir,
             moduleXml
         );
     }
@@ -54,7 +54,7 @@ public class ModuleXmlGeneratorTest extends BaseGeneratorTestCase {
 
         assertGeneratedFileIsCorrect(
             expectedFile,
-            projectDir.getVirtualFile().getPath() + File.separator + Package.MODULE_BASE_AREA_DIR,
+            projectDir.getVirtualFile().getPath() + File.separator + Package.moduleBaseAreaDir,
             moduleXml
         );
     }

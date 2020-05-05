@@ -17,7 +17,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.platform.ProjectGeneratorPeer;
 import com.intellij.ui.DocumentAdapter;
 import com.magento.idea.magento2plugin.generation.php.validator.NewModuleFormValidator;
-import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.magento.packages.Licenses;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
 import org.jetbrains.annotations.NotNull;
@@ -143,7 +143,7 @@ public class NewModuleForm implements ListSelectionListener {
 
     public List getModuleLicenses() {
         List selectedLicenses = this.moduleLicense.getSelectedValuesList();
-        Package.License customLicense = Package.License.CUSTOM;
+        Licenses customLicense = Licenses.CUSTOM;
 
         if (selectedLicenses.contains(customLicense.getLicenseName())) {
             selectedLicenses.remove(customLicense.getLicenseName());
@@ -191,10 +191,10 @@ public class NewModuleForm implements ListSelectionListener {
     }
 
     private void setLicenses() {
-        Package.License[] licenses = Package.License.values();
+        Licenses[] licenses = Licenses.values();
         Vector<String> licenseNames = new Vector<>(licenses.length);
 
-        for (Package.License license: licenses) {
+        for (Licenses license: licenses) {
             licenseNames.add(license.getLicenseName());
         }
 
@@ -207,7 +207,7 @@ public class NewModuleForm implements ListSelectionListener {
         boolean isCustomLicenseSelected = false;
 
         for (Object value: moduleLicense.getSelectedValuesList()) {
-            if (Package.License.CUSTOM.getLicenseName().equals(value.toString())) {
+            if (Licenses.CUSTOM.getLicenseName().equals(value.toString())) {
                 isCustomLicenseSelected = true;
 
                 break;

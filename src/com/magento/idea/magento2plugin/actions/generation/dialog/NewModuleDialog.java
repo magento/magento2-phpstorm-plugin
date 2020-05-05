@@ -22,6 +22,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFro
 import com.magento.idea.magento2plugin.actions.generation.util.NavigateToCreatedFile;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.ComposerJson;
+import com.magento.idea.magento2plugin.magento.packages.Licenses;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
@@ -32,10 +33,8 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.event.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
-import java.util.stream.IntStream;
 
 public class NewModuleDialog extends AbstractDialog implements ListSelectionListener {
     @NotNull
@@ -130,7 +129,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
 
     private void detectPackageName(@NotNull PsiDirectory initialBaseDir) {
         PsiDirectory parentDir = initialBaseDir.getParent();
-        if (parentDir != null && parentDir.toString().endsWith(Package.PACKAGES_ROOT)) {
+        if (parentDir != null && parentDir.toString().endsWith(Package.packagesRoot)) {
             packageName.setVisible(false);
             packageNameLabel.setVisible(false);
             this.detectedPackageName = initialBaseDir.getName();
@@ -215,7 +214,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
 
     public List getModuleLicense() {
         List selectedLicenses = this.moduleLicense.getSelectedValuesList();
-        Package.License customLicense = Package.License.CUSTOM;
+        Licenses customLicense = Licenses.CUSTOM;
 
         if (selectedLicenses.contains(customLicense.getLicenseName())) {
             selectedLicenses.remove(customLicense.getLicenseName());
@@ -244,10 +243,10 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     }
 
     private void setLicenses() {
-        Package.License[] licenses = Package.License.values();
+        Licenses[] licenses = Licenses.values();
         Vector<String> licenseNames = new Vector<>(licenses.length);
 
-        for (Package.License license: licenses) {
+        for (Licenses license: licenses) {
             licenseNames.add(license.getLicenseName());
         }
 
@@ -272,7 +271,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         boolean isCustomLicenseSelected = false;
 
         for (Object value: moduleLicense.getSelectedValuesList()) {
-            if (Package.License.CUSTOM.getLicenseName().equals(value.toString())) {
+            if (Licenses.CUSTOM.getLicenseName().equals(value.toString())) {
                 isCustomLicenseSelected = true;
 
                 break;

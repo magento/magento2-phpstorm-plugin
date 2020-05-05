@@ -20,6 +20,7 @@ import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.magento.idea.magento2plugin.bundles.InspectionBundle;
 import com.magento.idea.magento2plugin.indexes.EventIndex;
 import com.magento.idea.magento2plugin.magento.files.ModuleXml;
+import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import org.jetbrains.annotations.NotNull;
 import java.net.MalformedURLException;
@@ -256,11 +257,11 @@ public class ObserverDeclarationInspection extends PhpInspection {
 
                 String areaFromFileDirectory = file.getParent().getName();
 
-                if (areaFromFileDirectory.equals(Package.MODULE_BASE_AREA_DIR)) {
-                    return Package.Areas.base.toString();
+                if (areaFromFileDirectory.equals(Package.moduleBaseAreaDir)) {
+                    return Areas.base.toString();
                 }
 
-                for (Package.Areas area: Package.Areas.values()) {
+                for (Areas area: Areas.values()) {
                     if (area.toString().equals(areaFromFileDirectory)) {
                         return area.toString();
                     }

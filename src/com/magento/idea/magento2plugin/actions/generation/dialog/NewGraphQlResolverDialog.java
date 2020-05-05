@@ -129,7 +129,7 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
     }
 
     private String getModuleIdentifierPath() {
-        String[]parts = moduleName.split(Package.VENDOR_MODULE_NAME_SEPARATOR);
+        String[]parts = moduleName.split(Package.vendorModuleNameSeparator);
         if (parts[0] == null || parts[1] == null || parts.length > 2) {
             return null;
         }
@@ -137,16 +137,16 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
     }
 
     private String getNamespace() {
-        String[]parts = moduleName.split(Package.VENDOR_MODULE_NAME_SEPARATOR);
+        String[]parts = moduleName.split(Package.vendorModuleNameSeparator);
         if (parts[0] == null || parts[1] == null || parts.length > 2) {
             return null;
         }
-        String directoryPart = getGraphQlResolverDirectory().replace(File.separator, Package.FQN_SEPARATOR);
-        return parts[0] + Package.FQN_SEPARATOR + parts[1] + Package.FQN_SEPARATOR + directoryPart;
+        String directoryPart = getGraphQlResolverDirectory().replace(File.separator, Package.fqnSeparator);
+        return parts[0] + Package.fqnSeparator + parts[1] + Package.fqnSeparator + directoryPart;
     }
 
     private String getGraphQlResolverClassFqn() {
-        return getNamespace().concat(Package.FQN_SEPARATOR).concat(getGraphQlResolverClassName());
+        return getNamespace().concat(Package.fqnSeparator).concat(getGraphQlResolverClassName());
     }
 
     public void onCancel() {
