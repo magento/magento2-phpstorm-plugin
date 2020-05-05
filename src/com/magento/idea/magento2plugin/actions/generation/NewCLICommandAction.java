@@ -14,28 +14,27 @@ import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.MagentoIcons;
-import com.magento.idea.magento2plugin.actions.generation.dialog.NewCronjobDialog;
+import com.magento.idea.magento2plugin.actions.generation.dialog.NewCLICommandDialog;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({"PMD.FieldNamingConventions", "PMD.OnlyOneReturn"})
-public class NewCronjobAction extends AnAction {
-    public static String ACTION_NAME = "Magento 2 Cronjob";
-    public static String ACTION_DESCRIPTION = "Create a new Magento 2 cronjob";
+public class NewCLICommandAction extends AnAction {
+    public static String ACTION_NAME = "Magento 2 CLI Command";
+    public static String ACTION_DESCRIPTION = "Create a new Magento 2 CLI Command";
 
-    public NewCronjobAction() {
+    public NewCLICommandAction() {
         super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
     }
 
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent event) {
-        final DataContext dataContext = event.getDataContext();
-        final IdeView view = LangDataKeys.IDE_VIEW.getData(dataContext);
-
+    public void actionPerformed(@NotNull final AnActionEvent event) {
+        final DataContext context = event.getDataContext();
+        final IdeView view = LangDataKeys.IDE_VIEW.getData(context);
         if (view == null) {
             return;
         }
 
-        final Project project = CommonDataKeys.PROJECT.getData(dataContext);
+        final Project project = CommonDataKeys.PROJECT.getData(context);
         if (project == null) {
             return;
         }
@@ -45,7 +44,7 @@ public class NewCronjobAction extends AnAction {
             return;
         }
 
-        NewCronjobDialog.open(project, directory);
+        NewCLICommandDialog.open(project, directory);
     }
 
     @Override

@@ -1,0 +1,11 @@
+#if (${CLI_COMMAND_INTERFACE})
+<type name="${CLI_COMMAND_INTERFACE}">
+<arguments>
+    <argument name="commands" xsi:type="array">
+#end
+    <item name="${CLI_COMMAND_DI_NAME}" xsi:type="object">${CLI_COMMAND_CLASS}</item>
+#if (${CLI_COMMAND_INTERFACE})
+    </argument>
+</arguments>
+</type>
+#end

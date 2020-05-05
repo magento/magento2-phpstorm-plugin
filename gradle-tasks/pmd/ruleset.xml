@@ -18,6 +18,7 @@
     </rule>
     <rule ref="category/java/codestyle.xml">
         <exclude name="AtLeastOneConstructor" />
+        <exclude name="LongVariable" />
     </rule>
     <rule ref="category/java/design.xml">
         <exclude name="LawOfDemeter"/>
@@ -28,6 +29,8 @@
     <rule ref="category/java/errorprone.xml">
         <exclude name="BeanMembersShouldSerialize"/>
     </rule>
+    <exclude-pattern>.*/resources/.*</exclude-pattern>
+    <exclude-pattern>.*/testData/.*</exclude-pattern>
     <rule ref="category/java/multithreading.xml"/>
     <rule ref="category/java/performance.xml"/>
     <rule ref="category/java/security.xml" />
