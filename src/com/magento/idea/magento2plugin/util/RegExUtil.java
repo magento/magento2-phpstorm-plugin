@@ -26,7 +26,7 @@ public class RegExUtil {
             = "^(?!\\/)[a-zA-Z0-9\\/]*[^\\/]$";
 
     public static final String MAGENTO_VERSION
-            = "(\\d+)\\.(\\d+)\\.(\\d+)";
+            = "(\\d+)\\.(\\d+)\\.(\\d+)[a-zA-Z0-9_\\-]*";
 
     public static class Magento {
         public static final String MODULE_NAME
