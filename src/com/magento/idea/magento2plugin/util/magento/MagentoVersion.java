@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
@@ -46,7 +46,10 @@ public final class MagentoVersion {
 
         if (composerFile instanceof JsonFile) {
             final JsonFile composerJsonFile = (JsonFile) composerFile;
-            final JsonObject jsonObject = PsiTreeUtil.getChildOfType(composerJsonFile, JsonObject.class);
+            final JsonObject jsonObject = PsiTreeUtil.getChildOfType(
+                    composerJsonFile,
+                    JsonObject.class
+            );
 
             if (jsonObject == null) {
                 return DEFAULT_VERSION;

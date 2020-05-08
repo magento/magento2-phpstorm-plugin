@@ -28,8 +28,13 @@ public final class MagentoBasePathUtil {
         }
         final VirtualFile file = LocalFileSystem.getInstance().findFileByPath(path);
         if (file != null && file.isDirectory()) {
-            return VfsUtil.findRelativeFile(file, Package.frameworkRootComposer.split(File.separator)) != null
-                || VfsUtil.findRelativeFile(file, Package.frameworkRootGit.split(File.separator)) != null;
+            return VfsUtil.findRelativeFile(
+                    file,
+                    Package.frameworkRootComposer.split(File.separator)
+            ) != null
+                || VfsUtil.findRelativeFile(
+                        file,
+                    Package.frameworkRootGit.split(File.separator)) != null;
         }
         return false;
     }

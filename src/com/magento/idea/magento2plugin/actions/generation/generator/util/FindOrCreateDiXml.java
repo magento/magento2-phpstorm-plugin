@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator.util;
 
 import com.intellij.openapi.project.Project;
@@ -32,16 +33,19 @@ public final class FindOrCreateDiXml {
      */
     public PsiFile execute(final String actionName, final String moduleName, final String area) {
         final DirectoryGenerator directoryGenerator = DirectoryGenerator.getInstance();
-        final FileFromTemplateGenerator fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        final FileFromTemplateGenerator fileFromTemplateGenerator =
+                FileFromTemplateGenerator.getInstance(project);
 
-        PsiDirectory parentDirectory = ModuleIndex.getInstance(project).getModuleDirectoryByModuleName(moduleName);
+        PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+                .getModuleDirectoryByModuleName(moduleName);
         final ArrayList<String> fileDirectories = new ArrayList<>();
         fileDirectories.add(Package.moduleBaseAreaDir);
         if (!getArea(area).equals(Areas.base)) {
             fileDirectories.add(getArea(area).toString());
         }
         for (final String fileDirectory: fileDirectories) {
-            parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, fileDirectory);
+            parentDirectory = directoryGenerator
+                    .findOrCreateSubdirectory(parentDirectory, fileDirectory);
         }
         final ModuleDiXml moduleDiXml = new ModuleDiXml();
         PsiFile diXml = FileBasedIndexUtil.findModuleConfigFile(
@@ -51,7 +55,12 @@ public final class FindOrCreateDiXml {
                 project
         );
         if (diXml == null) {
-            diXml = fileFromTemplateGenerator.generate(moduleDiXml, new Properties(), parentDirectory, actionName);
+            diXml = fileFromTemplateGenerator.generate(
+                    moduleDiXml,
+                    new Properties(),
+                    parentDirectory,
+                    actionName
+            );
         }
         return diXml;
     }

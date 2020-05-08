@@ -33,7 +33,10 @@ public class ObserverEventsXmlGenerator extends FileGenerator {
      * @param observerEventsXmlData ObserverEventsXmlData
      * @param project Project
      */
-    public ObserverEventsXmlGenerator(final ObserverEventsXmlData observerEventsXmlData, final Project project) {
+    public ObserverEventsXmlGenerator(
+            final ObserverEventsXmlData observerEventsXmlData,
+            final Project project
+    ) {
         super(project);
         this.observerEventsXmlData = observerEventsXmlData;
         this.project = project;
@@ -60,18 +63,23 @@ public class ObserverEventsXmlGenerator extends FileGenerator {
         WriteCommandAction.runWriteCommandAction(project, () -> {
             final StringBuffer textBuf = new StringBuffer();
             try {
-                textBuf.append(getCodeTemplate.execute(ModuleEventsXml.TEMPLATE_OBSERVER, getAttributes()));
+                textBuf.append(getCodeTemplate.execute(
+                        ModuleEventsXml.TEMPLATE_OBSERVER,
+                        getAttributes())
+                );
             } catch (IOException event) {
                 return;
             }
 
             final int insertPos = positionUtil.getRootInsertPosition((XmlFile) eventsXmlFile);
             if (textBuf.length() > 0 && insertPos >= 0) {
-                final PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(project);
+                final PsiDocumentManager psiDocumentManager =
+                        PsiDocumentManager.getInstance(project);
                 final Document document = psiDocumentManager.getDocument(eventsXmlFile);
                 document.insertString(insertPos, textBuf);
                 final int endPos = insertPos + textBuf.length() + 1;
-                CodeStyleManager.getInstance(project).reformatText(eventsXmlFile, insertPos, endPos);
+                CodeStyleManager.getInstance(project)
+                        .reformatText(eventsXmlFile, insertPos, endPos);
                 psiDocumentManager.commitDocument(document);
             }
         });
