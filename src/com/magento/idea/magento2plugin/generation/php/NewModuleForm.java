@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2plugin.generation.php;
+package com.magento.idea.magento2plugin.generation.php;//NOPMD
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
@@ -86,6 +86,7 @@ public class NewModuleForm implements ListSelectionListener {
                 descriptor,
                 TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
         ) {
+                    @Override
                     protected VirtualFile getInitialFile() {
                         String directoryName = this.getComponentText();
                         if (!StringUtil.isEmptyOrSpaces(directoryName)) {
@@ -186,21 +187,25 @@ public class NewModuleForm implements ListSelectionListener {
 
     private void addComponentChangesListener(final Runnable listener) {
         this.magentoPath.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
             protected void textChanged(final @NotNull DocumentEvent event) {
                 listener.run();
             }
         });
         this.moduleName.getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
             protected void textChanged(final @NotNull DocumentEvent event) {
                 listener.run();
             }
         });
         this.packageName.getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
             protected void textChanged(final @NotNull DocumentEvent event) {
                 listener.run();
             }
         });
         this.moduleVersion.getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
             protected void textChanged(final @NotNull DocumentEvent event) {
                 listener.run();
             }
