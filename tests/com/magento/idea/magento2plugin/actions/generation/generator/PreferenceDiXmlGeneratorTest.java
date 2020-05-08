@@ -19,6 +19,7 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
     private static final String MODULE_DIR = "src/app/code/Foo/Bar/";
     private static final String TARGET_MODEL_ONE_CLASS_FQN = "Foo\\Bar\\Model\\SimpleModelOne";
     private static final String TARGET_MODEL_TWO_CLASS_FQN = "Foo\\Bar\\Model\\SimpleModelTwo";
+    private static final String NAMESPACE = "Foo\\Bar\\Model\\Override";
 
     /**
      * Test preference DI XML file generation.
@@ -28,8 +29,7 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
         final PsiFile preferenceDiXmlFile = addPreferenceDiXml(
                 TARGET_MODEL_ONE_CLASS_FQN,
                 "Foo\\Bar\\Model\\Override\\SimpleModelOne",
-                area,
-                "Foo\\Bar\\Model\\Override"
+                area
         );
 
         final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
@@ -50,8 +50,7 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
         final PsiFile preferenceDiXmlFile = addPreferenceDiXml(
                 TARGET_MODEL_TWO_CLASS_FQN,
                 "Foo\\Bar\\Model\\Override\\SimpleModelTwo",
-                area,
-                "Foo\\Bar\\Model\\Override"
+                area
         );
 
         final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
@@ -72,14 +71,12 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
         addPreferenceDiXml(
                 TARGET_MODEL_ONE_CLASS_FQN,
                 "Foo\\Bar\\Model\\Override\\SimpleModelOne",
-                area,
-                "Foo\\Bar\\Model\\Override"
+                area
         );
         final PsiFile preferenceDiXmlFile = addPreferenceDiXml(
                 TARGET_MODEL_TWO_CLASS_FQN,
                 "Foo\\Bar\\Model\\Override\\SimpleModelTwo",
-                area,
-                "Foo\\Bar\\Model\\Override"
+                area
         );
 
         final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
@@ -98,14 +95,12 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
      * @param targetClassFnq Target class FQN
      * @param preferenceFqn Preference FQN
      * @param area Area
-     * @param namespace Namespace
      * @return PsiFile
      */
     private PsiFile addPreferenceDiXml(
             final String targetClassFnq,
             final String preferenceFqn,
-            final String area,
-            final String namespace
+            final String area
     ) {
         final Project project = myFixture.getProject();
         final PhpClass targetClass = GetPhpClassByFQN.getInstance(project).execute(targetClassFnq);
@@ -113,7 +108,7 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
                 MODULE,
                 targetClass,
                 preferenceFqn,
-                namespace,
+                NAMESPACE,
                 area
         );
         final PreferenceDiXmlGenerator moduleXmlGenerator = new PreferenceDiXmlGenerator(
