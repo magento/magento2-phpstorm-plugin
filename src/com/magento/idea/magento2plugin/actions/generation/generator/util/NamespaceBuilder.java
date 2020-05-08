@@ -41,7 +41,7 @@ public class NamespaceBuilder {
     public String getClassFqn() {
         final String classNamespace = this.getNamespace();
 
-        return classNamespace + Package.FQN_SEPARATOR + this.className;
+        return classNamespace + Package.fqnSeparator + this.className;
     }
 
     /**
@@ -50,7 +50,7 @@ public class NamespaceBuilder {
      * @return String
      */
     public String getNamespace() {
-        final String[] parts = this.moduleName.split(Package.VENDOR_MODULE_NAME_SEPARATOR);
+        final String[] parts = this.moduleName.split(Package.vendorModuleNameSeparator);
 
         if (parts[0] == null || parts[1] == null || parts.length > 2) {
             return null;
@@ -58,9 +58,9 @@ public class NamespaceBuilder {
 
         final String directoryPart = this.classDirectory.replace(
                 File.separator,
-                Package.FQN_SEPARATOR
+                Package.fqnSeparator
         );
 
-        return parts[0] + Package.FQN_SEPARATOR + parts[1] + Package.FQN_SEPARATOR + directoryPart;
+        return parts[0] + Package.fqnSeparator + parts[1] + Package.fqnSeparator + directoryPart;
     }
 }

@@ -33,7 +33,7 @@ public class CLICommandDiXmlGeneratorTest extends BaseGeneratorTestCase {
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
         final PsiFile diXml = initializeCLICommandInDiXml(CLASS_NAME);
 
-        final String expectedDir = MODULE_DIR + Package.MODULE_BASE_AREA_DIR;
+        final String expectedDir = MODULE_DIR + Package.moduleBaseAreaDir;
         assertGeneratedFileIsCorrect(
                 expectedFile,
                 expectedDir,
@@ -50,7 +50,7 @@ public class CLICommandDiXmlGeneratorTest extends BaseGeneratorTestCase {
         initializeCLICommandInDiXml(CLASS_NAME);
         final PsiFile diXml = initializeCLICommandInDiXml(SECOND_CLASS_NAME);
 
-        final String expectedDir = MODULE_DIR + Package.MODULE_BASE_AREA_DIR;
+        final String expectedDir = MODULE_DIR + Package.moduleBaseAreaDir;
         assertGeneratedFileIsCorrect(
                 expectedFile,
                 expectedDir,

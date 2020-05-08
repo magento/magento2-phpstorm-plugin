@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.command.WriteCommandAction;
@@ -21,26 +22,35 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Directo
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.util.CodeStyleSettings;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.Observer;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
-import javax.swing.*;
-import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.Properties;
+import javax.swing.JOptionPane;
 
 public class ObserverClassGenerator extends FileGenerator {
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final GetFirstClassOfFile getFirstClassOfFile;
-    private ObserverFileData observerFileData;
-    private Project project;
-    private ValidatorBundle validatorBundle;
-    private CommonBundle commonBundle;
+    private final ObserverFileData observerFileData;
+    private final Project project;
+    private final ValidatorBundle validatorBundle;
+    private final CommonBundle commonBundle;
 
-    public ObserverClassGenerator(ObserverFileData observerFileData, Project project) {
+    /**
+     * Constructor.
+     *
+     * @param observerFileData ObserverFileData
+     * @param project Project
+     */
+    public ObserverClassGenerator(
+            final ObserverFileData observerFileData,
+            final Project project
+    ) {
         super(project);
         this.observerFileData = observerFileData;
         this.project = project;
@@ -53,7 +63,7 @@ public class ObserverClassGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(String actionName) {
+    public PsiFile generate(final String actionName) {
         WriteCommandAction.runWriteCommandAction(project, () -> {
             PhpClass observerClass = GetPhpClassByFQN.getInstance(project).execute(
                     observerFileData.getObserverClassFqn()
@@ -64,7 +74,10 @@ public class ObserverClassGenerator extends FileGenerator {
             }
 
             if (observerClass == null) {
-                String errorMessage = validatorBundle.message("validator.file.cantBeCreated", "Observer Class");
+                final String errorMessage = validatorBundle.message(
+                        "validator.file.cantBeCreated",
+                        "Observer Class"
+                );
                 JOptionPane.showMessageDialog(
                         null,
                         errorMessage,
@@ -75,36 +88,40 @@ public class ObserverClassGenerator extends FileGenerator {
                 return;
             }
 
-            Properties attributes = new Properties();
+            final Properties attributes = new Properties();
             attributes.setProperty("EVENT_NAME", observerFileData.getTargetEvent());
 
-            String methodTemplate = PhpCodeUtil.getCodeTemplate(
+            final String methodTemplate = PhpCodeUtil.getCodeTemplate(
                     Observer.OBSERVER_EXECUTE_TEMPLATE_NAME, attributes, project);
 
 
-            PsiFile observerFile = observerClass.getContainingFile();
-            CodeStyleSettings codeStyleSettings = new CodeStyleSettings((PhpFile) observerFile);
+            final PsiFile observerFile = observerClass.getContainingFile();
+            final CodeStyleSettings codeStyleSettings =
+                    new CodeStyleSettings((PhpFile) observerFile);
             codeStyleSettings.adjustBeforeWrite();
 
-            PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(project);
-            Document document = psiDocumentManager.getDocument(observerFile);
-            int insertPos = getInsertPos(observerClass);
+            final PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(project);
+            final Document document = psiDocumentManager.getDocument(observerFile);
+            final int insertPos = getInsertPos(observerClass);
             document.insertString(insertPos, methodTemplate);
-            int endPos = insertPos + methodTemplate.length() + 1;
+            final int endPos = insertPos + methodTemplate.length() + 1;
             CodeStyleManager.getInstance(project).reformatText(observerFile, insertPos, endPos);
             psiDocumentManager.commitDocument(document);
             codeStyleSettings.restore();
         });
-        PhpClass observerClass = GetPhpClassByFQN.getInstance(project).execute(
+        final PhpClass observerClass = GetPhpClassByFQN.getInstance(project).execute(
                 observerFileData.getObserverClassFqn()
         );
         return observerClass.getContainingFile();
     }
 
-    private int getInsertPos(PhpClass observerClass) {
+    private int getInsertPos(final PhpClass observerClass) {
         int insertPos = -1;
-        LeafPsiElement[] leafElements = PsiTreeUtil.getChildrenOfType(observerClass, LeafPsiElement.class);
-        for (LeafPsiElement leafPsiElement: leafElements) {
+        final LeafPsiElement[] leafElements = PsiTreeUtil.getChildrenOfType(
+                observerClass,
+                LeafPsiElement.class
+        );
+        for (final LeafPsiElement leafPsiElement: leafElements) {
             if (!leafPsiElement.getText().equals(MagentoPhpClass.CLOSING_TAG)) {
                 continue;
             }
@@ -113,17 +130,21 @@ public class ObserverClassGenerator extends FileGenerator {
         return insertPos;
     }
 
-    private PhpClass createObserverClass(String actionName) {
+    private PhpClass createObserverClass(final String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(observerFileData.getObserverModule());
-        String[] observerDirectories = observerFileData.getObserverDirectory().split(File.separator);
-        for (String observerDirectory: observerDirectories) {
-            parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, observerDirectory);
+        final String[] observerDirectories = observerFileData.getObserverDirectory()
+                .split(File.separator);
+        for (final String observerDirectory: observerDirectories) {
+            parentDirectory = directoryGenerator.findOrCreateSubdirectory(
+                    parentDirectory,
+                    observerDirectory
+            );
         }
 
-        Properties attributes = getAttributes();
-        PsiFile observerFile = fileFromTemplateGenerator.generate(
-                Observer.getInstance(observerFileData.getObserverClassName()),
+        final Properties attributes = getAttributes();
+        final PsiFile observerFile = fileFromTemplateGenerator.generate(
+                new Observer(observerFileData.getObserverClassName()),
                 attributes,
                 parentDirectory,
                 actionName
@@ -135,12 +156,8 @@ public class ObserverClassGenerator extends FileGenerator {
     }
 
     @Override
-    protected void fillAttributes(Properties attributes) {
+    protected void fillAttributes(final Properties attributes) {
         attributes.setProperty("NAME", observerFileData.getObserverClassName());
         attributes.setProperty("NAMESPACE", observerFileData.getNamespace());
-    }
-
-    private boolean checkIfMethodExist(PhpClass observerClass, String methodName) {
-        return observerClass.getMethods().stream().anyMatch((method) -> method.getName().equals(methodName));
     }
 }

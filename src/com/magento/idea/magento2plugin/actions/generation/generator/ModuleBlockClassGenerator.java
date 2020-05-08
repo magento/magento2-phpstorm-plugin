@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
@@ -12,27 +13,36 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.BlockFileData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
+import com.magento.idea.magento2plugin.bundles.CommonBundle;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.BlockPhp;
 import com.magento.idea.magento2plugin.magento.files.PhpPreference;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
-import com.magento.idea.magento2plugin.bundles.CommonBundle;
-import org.jetbrains.annotations.NotNull;
-import javax.swing.*;
-import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.Properties;
+import javax.swing.JOptionPane;
+import org.jetbrains.annotations.NotNull;
 
 public class ModuleBlockClassGenerator extends FileGenerator {
-    private BlockFileData blockFileData;
-    private Project project;
-    private ValidatorBundle validatorBundle;
-    private CommonBundle commonBundle;
+    private final BlockFileData blockFileData;
+    private final Project project;
+    private final ValidatorBundle validatorBundle;
+    private final CommonBundle commonBundle;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
 
-    public ModuleBlockClassGenerator(@NotNull BlockFileData blockFileData, Project project) {
+    /**
+     * Constructor.
+     *
+     * @param blockFileData BlockFileData
+     * @param project Project
+     */
+    public ModuleBlockClassGenerator(
+            final @NotNull BlockFileData blockFileData,
+            final Project project
+    ) {
         super(project);
         this.directoryGenerator = DirectoryGenerator.getInstance();
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
@@ -42,21 +52,43 @@ public class ModuleBlockClassGenerator extends FileGenerator {
         this.commonBundle = new CommonBundle();
     }
 
-    public PsiFile generate(String actionName) {
-        String errorTitle = commonBundle.message("common.error");
-        PhpClass block = GetPhpClassByFQN.getInstance(project).execute(getBlockFqn());
+    /**
+     * Generate a Block File.
+     *
+     * @param actionName String
+     * @return PsiFile
+     */
+    public PsiFile generate(final String actionName) {
+        final String errorTitle = commonBundle.message("common.error");
+        final PhpClass block = GetPhpClassByFQN.getInstance(project).execute(getBlockFqn());
 
         if (block != null) {
-            String errorMessage = validatorBundle.message("validator.file.alreadyExists", "Block Class");
-            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+            final String errorMessage = validatorBundle.message(
+                    "validator.file.alreadyExists",
+                    "Block Class"
+            );
+            JOptionPane.showMessageDialog(
+                    null,
+                    errorMessage,
+                    errorTitle,
+                    JOptionPane.ERROR_MESSAGE
+            );
 
             return null;
         }
 
-        PhpFile blockFile = createBlockClass(actionName);
+        final PhpFile blockFile = createBlockClass(actionName);
         if (blockFile == null) {
-            String errorMessage = validatorBundle.message("validator.file.cantBeCreated", "Block Class");
-            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+            final String errorMessage = validatorBundle.message(
+                    "validator.file.cantBeCreated",
+                    "Block Class"
+            );
+            JOptionPane.showMessageDialog(
+                    null,
+                    errorMessage,
+                    errorTitle,
+                    JOptionPane.ERROR_MESSAGE
+            );
 
             return null;
         }
@@ -66,27 +98,37 @@ public class ModuleBlockClassGenerator extends FileGenerator {
 
     @NotNull
     private String getBlockFqn() {
-        return blockFileData.getNamespace() + Package.FQN_SEPARATOR + blockFileData.getBlockClassName();
+        return blockFileData.getNamespace()
+                + Package.fqnSeparator
+                + blockFileData.getBlockClassName();
     }
 
-    private PhpFile createBlockClass(String actionName) {
+    private PhpFile createBlockClass(final String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(getBlockModule());
-        String[] blockDirectories = blockFileData.getBlockDirectory().split(File.separator);
-        for (String blockDirectory: blockDirectories) {
-            parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, blockDirectory);
+        final String[] blockDirectories = blockFileData.getBlockDirectory().split(File.separator);
+        for (final String blockDirectory: blockDirectories) {
+            parentDirectory = directoryGenerator.findOrCreateSubdirectory(
+                parentDirectory,
+                blockDirectory
+            );
         }
 
-        Properties attributes = getAttributes();
-        PsiFile blockFile = fileFromTemplateGenerator.generate(PhpPreference.getInstance(blockFileData.getBlockClassName()), attributes, parentDirectory, actionName);
+        final Properties attributes = getAttributes();
+        final PsiFile blockFile = fileFromTemplateGenerator.generate(
+                PhpPreference.getInstance(blockFileData.getBlockClassName()),
+                attributes,
+                parentDirectory,
+                actionName
+        );
         if (blockFile == null) {
             return null;
         }
         return (PhpFile) blockFile;
     }
 
-    protected void fillAttributes(Properties attributes) {
-        String blockClassName = blockFileData.getBlockClassName();
+    protected void fillAttributes(final Properties attributes) {
+        final String blockClassName = blockFileData.getBlockClassName();
         attributes.setProperty("NAME", blockClassName);
         attributes.setProperty("NAMESPACE", blockFileData.getNamespace());
         if (!BlockPhp.STOREFRONT_BLOCK_NAME.equals(blockClassName)) {
@@ -94,7 +136,7 @@ public class ModuleBlockClassGenerator extends FileGenerator {
             attributes.setProperty("EXTENDS", BlockPhp.STOREFRONT_BLOCK_NAME);
             return;
         }
-        attributes.setProperty("EXTENDS", Package.FQN_SEPARATOR + BlockPhp.STOREFRONT_BLOCK_FQN);
+        attributes.setProperty("EXTENDS", Package.fqnSeparator + BlockPhp.STOREFRONT_BLOCK_FQN);
     }
 
     public String getBlockModule() {
