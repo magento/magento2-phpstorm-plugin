@@ -18,73 +18,88 @@ import com.magento.idea.magento2plugin.magento.packages.ComposerPackageModel;
 import com.magento.idea.magento2plugin.magento.packages.MagentoComponent;
 import com.magento.idea.magento2plugin.magento.packages.MagentoComponentManager;
 import com.magento.idea.magento2plugin.magento.packages.MagentoModule;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.Stack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 class RegenerateUrnMapListener extends MouseAdapter {
-    private final static String MODULE = "urn:magento:module:";
-    private final static String FRAMEWORK = "urn:magento:framework:";
-
     protected final Project project;
+    private static final String FRAMEWORK = "urn:magento:framework:";
+    private static final String MODULE = "urn:magento:module:";
+
 
     public RegenerateUrnMapListener(final @NotNull Project project) {
         super();
         this.project = project;
     }
 
+    /**
+     * Handler for mouse click.
+     *
+     * @param event MouseEvent
+     */
     @Override
     public void mouseClicked(final MouseEvent event) {
-        final ExternalResourceManager externalResourceManager = ExternalResourceManager.getInstance();
+        final ExternalResourceManager externalResourceManager =
+                ExternalResourceManager.getInstance();
         final PsiManager psiManager = PsiManager.getInstance(project);
-        final MagentoComponentManager componentManager = MagentoComponentManager.getInstance(project);
+        final MagentoComponentManager componentManager =
+                MagentoComponentManager.getInstance(project);
 
         final Collection<VirtualFile> xsdFiles = FilenameIndex.getAllFilesByExt(project, "xsd");
         final Collection<MagentoComponent> components = componentManager.getAllComponents();
 
         ApplicationManager.getApplication().runWriteAction(
-            new Runnable() {
-                @Override
-                public void run() {
+                new Runnable() {
+                    @Override
+                    public void run() {
 
-                    for (final VirtualFile virtualFile: xsdFiles) {
-                        final PsiFile psiFile = psiManager.findFile(virtualFile);
-                        if (psiFile == null) {
-                            continue;
-                        }
+                        for (final VirtualFile virtualFile: xsdFiles) {
+                            final PsiFile psiFile = psiManager.findFile(virtualFile);
+                            if (psiFile == null) {
+                                continue;
+                            }
 
-                        final MagentoComponent xsdOwner = findComponentForXsd(psiFile, components);
-                        if (xsdOwner == null) {
-                            continue;
-                        }
+                            final MagentoComponent xsdOwner =
+                                    findComponentForXsd(psiFile, components);
+                            if (xsdOwner == null) {
+                                continue;
+                            }
 
-                        final String urnKey = buildUrnKeyForFile(psiFile, xsdOwner);
-                        if (urnKey == null) {
-                            continue;
-                        }
+                            final String urnKey = buildUrnKeyForFile(psiFile, xsdOwner);
+                            if (urnKey == null) {
+                                continue;
+                            }
 
-                        // we need to attach resource to a project scope
-                        // but with ExternalResourceManager itself it's not possible unfortunately
-                        if (externalResourceManager instanceof ExternalResourceManagerEx) {
-                            ((ExternalResourceManagerEx)externalResourceManager).addResource(
-                                urnKey, virtualFile.getCanonicalPath(), project
-                            );
-                        } else {
-                            externalResourceManager.addResource(urnKey, virtualFile.getCanonicalPath());
+                            // we need to attach resource to a project scope
+                            // but with ExternalResourceManager itself it's not
+                            // possible unfortunately
+                            if (externalResourceManager instanceof ExternalResourceManagerEx) {
+                                ((ExternalResourceManagerEx)externalResourceManager).addResource(
+                                        urnKey, virtualFile.getCanonicalPath(), project
+                                );
+                            } else {
+                                externalResourceManager.addResource(
+                                        urnKey,
+                                        virtualFile.getCanonicalPath()
+                                );
+                            }
                         }
                     }
                 }
-            }
         );
 
         super.mouseClicked(event);
     }
 
     @Nullable
-    protected MagentoComponent findComponentForXsd(final @NotNull PsiFile psiFile, final Collection<MagentoComponent> components) {
+    protected MagentoComponent findComponentForXsd(
+            final @NotNull PsiFile psiFile,
+            final Collection<MagentoComponent> components
+    ) {
         for (final MagentoComponent component: components) {
             if (component.isFileInContext(psiFile)) {
                 return component;
@@ -95,7 +110,10 @@ class RegenerateUrnMapListener extends MouseAdapter {
     }
 
     @Nullable
-    protected String buildUrnKeyForFile(final @NotNull PsiFile psiFile, final @NotNull MagentoComponent magentoComponent) {
+    protected String buildUrnKeyForFile(
+            final @NotNull PsiFile psiFile,
+            final @NotNull MagentoComponent magentoComponent
+    ) {
         String prefix = null;
 
         if (magentoComponent instanceof MagentoModule) {
@@ -116,7 +134,10 @@ class RegenerateUrnMapListener extends MouseAdapter {
 
         final PsiManager psiManager = magentoComponent.getDirectory().getManager();
         PsiDirectory parentDir = psiFile.getParent();
-        while (parentDir != null && !psiManager.areElementsEquivalent(parentDir, magentoComponent.getDirectory())) {
+        while (parentDir != null && !psiManager.areElementsEquivalent(
+                parentDir,
+                magentoComponent.getDirectory())
+        ) {
             relativePath.push("/");
             relativePath.push(parentDir.getName());
             parentDir = parentDir.getParentDirectory();

@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
@@ -13,15 +14,18 @@ import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 
 public class ObserverEventsXmlGeneratorTest extends BaseGeneratorTestCase {
-    private static final String moduleName = "Foo_Bar";
-    private static final String moduleDir = "src/app/code/Foo/Bar/";
+    private static final String MODULE_NAME = "Foo_Bar";
+    private static final String MODULE_DIR = "src/app/code/Foo/Bar/";
 
+    /**
+     * Test checks whether 2 events.xml is generated correctly for the base area.
+     */
     public void testGenerateEventsXmlInBaseAreaFile() {
-        String filePath = this.getFixturePath(ModuleEventsXml.FILE_NAME);
-        PsiFile expectedFile = myFixture.configureByFile(filePath);
-        Project project = myFixture.getProject();
-        String area = Areas.base.toString();
-        PsiFile eventsXml = addEventToEventsXml(
+        final String filePath = this.getFixturePath(ModuleEventsXml.FILE_NAME);
+        final PsiFile expectedFile = myFixture.configureByFile(filePath);
+        final Project project = myFixture.getProject();
+        final String area = Areas.base.toString();
+        final PsiFile eventsXml = addEventToEventsXml(
                 project,
                 area,
                 "test_event",
@@ -31,17 +35,20 @@ public class ObserverEventsXmlGeneratorTest extends BaseGeneratorTestCase {
 
         assertGeneratedFileIsCorrect(
                 expectedFile,
-                moduleDir + Package.moduleBaseAreaDir,
+                MODULE_DIR + Package.moduleBaseAreaDir,
                 eventsXml
         );
     }
 
+    /**
+     * Test checks whether 2 events.xml is generated correctly for the adminhtml area.
+     */
     public void testGenerateEventsXmlInAdminhtmlAreaFile() {
-        String filePath = this.getFixturePath(ModuleEventsXml.FILE_NAME);
-        PsiFile expectedFile = myFixture.configureByFile(filePath);
-        Project project = myFixture.getProject();
-        String area = Areas.adminhtml.toString();
-        PsiFile eventsXml = addEventToEventsXml(
+        final String filePath = this.getFixturePath(ModuleEventsXml.FILE_NAME);
+        final PsiFile expectedFile = myFixture.configureByFile(filePath);
+        final Project project = myFixture.getProject();
+        final String area = Areas.adminhtml.toString();
+        final PsiFile eventsXml = addEventToEventsXml(
                 project,
                 area,
                 "test_event",
@@ -51,15 +58,18 @@ public class ObserverEventsXmlGeneratorTest extends BaseGeneratorTestCase {
 
         assertGeneratedFileIsCorrect(
                 expectedFile,
-                moduleDir + Package.moduleBaseAreaDir + File.separator + area,
+                MODULE_DIR + Package.moduleBaseAreaDir + File.separator + area,
                 eventsXml
         );
     }
 
+    /**
+     * Test checks whether 2 events.xml is generated correctly with 2 observers.
+     */
     public void testAddTwoObserversToOneEventsXml() {
-        String filePath = this.getFixturePath(ModuleEventsXml.FILE_NAME);
-        PsiFile expectedFile = myFixture.configureByFile(filePath);
-        Project project = myFixture.getProject();
+        final String filePath = this.getFixturePath(ModuleEventsXml.FILE_NAME);
+        final PsiFile expectedFile = myFixture.configureByFile(filePath);
+        final Project project = myFixture.getProject();
         addEventToEventsXml(
                 project,
                 Areas.frontend.toString(),
@@ -67,7 +77,7 @@ public class ObserverEventsXmlGeneratorTest extends BaseGeneratorTestCase {
                 "test_observer",
                 "Foo\\Bar\\Observer\\Test\\TestEventObserver"
         );
-        PsiFile eventsXml = addEventToEventsXml(
+        final PsiFile eventsXml = addEventToEventsXml(
                 project,
                 Areas.frontend.toString(),
                 "test_event_2",
@@ -77,28 +87,29 @@ public class ObserverEventsXmlGeneratorTest extends BaseGeneratorTestCase {
 
         assertGeneratedFileIsCorrect(
                 expectedFile,
-                moduleDir + Package.moduleBaseAreaDir + File.separator + Areas.frontend.toString(),
+                MODULE_DIR + Package.moduleBaseAreaDir + File.separator + Areas.frontend.toString(),
                 eventsXml
         );
     }
 
     private PsiFile addEventToEventsXml(
-            Project project,
-            String area,
-            String eventName,
-            String observerName,
-            String observerClassFqn
+            final Project project,
+            final String area,
+            final String eventName,
+            final String observerName,
+            final String observerClassFqn
     ) {
-        ObserverEventsXmlData observerEventsXmlData = new ObserverEventsXmlData(
+        final ObserverEventsXmlData observerEventsXmlData = new ObserverEventsXmlData(
                 area,
-                moduleName,
+                MODULE_NAME,
                 eventName,
                 observerName,
                 observerClassFqn
         );
-        ObserverEventsXmlGenerator observerEventsXmlGenerator = new ObserverEventsXmlGenerator(
-                observerEventsXmlData,
-                project
+        final ObserverEventsXmlGenerator observerEventsXmlGenerator =
+                new ObserverEventsXmlGenerator(
+                    observerEventsXmlData,
+                    project
         );
 
         return  observerEventsXmlGenerator.generate("test");

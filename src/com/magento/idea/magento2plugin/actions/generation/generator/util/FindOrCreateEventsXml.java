@@ -23,17 +23,34 @@ public class FindOrCreateEventsXml {
         this.project = project;
     }
 
-    public PsiFile execute(final String actionName, final String moduleName, final String area) {
+    /**
+     * Find or create events.xml
+     *
+     * @param actionName String
+     * @param moduleName String
+     * @param area String
+     * @return PsiFile
+     */
+    public PsiFile execute(
+            final String actionName,
+            final String moduleName,
+            final String area
+    ) {
         final DirectoryGenerator directoryGenerator = DirectoryGenerator.getInstance();
-        final FileFromTemplateGenerator fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
-        PsiDirectory parentDirectory = ModuleIndex.getInstance(project).getModuleDirectoryByModuleName(moduleName);
+        final FileFromTemplateGenerator fileFromTemplateGenerator =
+                FileFromTemplateGenerator.getInstance(project);
+        PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+                .getModuleDirectoryByModuleName(moduleName);
         final ArrayList<String> fileDirectories = new ArrayList<>();
         fileDirectories.add(Package.moduleBaseAreaDir);
         if (!getArea(area).equals(Areas.base)) {
             fileDirectories.add(getArea(area).toString());
         }
         for (final String fileDirectory: fileDirectories) {
-            parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, fileDirectory);
+            parentDirectory = directoryGenerator.findOrCreateSubdirectory(
+                    parentDirectory,
+                    fileDirectory
+            );
         }
         final ModuleEventsXml moduleEventsXml = new ModuleEventsXml();
         PsiFile eventsXml = FileBasedIndexUtil.findModuleConfigFile(
@@ -43,7 +60,12 @@ public class FindOrCreateEventsXml {
                 project
         );
         if (eventsXml == null) {
-            eventsXml = fileFromTemplateGenerator.generate(moduleEventsXml, new Properties(), parentDirectory, actionName);
+            eventsXml = fileFromTemplateGenerator.generate(
+                    moduleEventsXml,
+                    new Properties(),
+                    parentDirectory,
+                    actionName
+            );
         }
         return eventsXml;
     }

@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.indexes;
 
 import com.intellij.openapi.project.Project;
@@ -23,22 +24,28 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ModuleIndex {
+public final class ModuleIndex {
 
-    private static ModuleIndex INSTANCE;
+    private static ModuleIndex instance;
 
     private Project project;
 
     private ModuleIndex() {
     }
 
-    public static ModuleIndex getInstance(Project project) {
-        if (null == INSTANCE) {
-            INSTANCE = new ModuleIndex();
+    /**
+     * Constructor.
+     *
+     * @param project Project
+     * @return ModuleIndex
+     */
+    public static ModuleIndex getInstance(final Project project) {
+        if (null == instance) { //NOPMD
+            instance = new ModuleIndex();
         }
-        INSTANCE.project = project;
+        instance.project = project;
 
-        return INSTANCE;
+        return instance;
     }
 
     public List<String> getEditableModuleNames() {
@@ -49,31 +56,42 @@ public class ModuleIndex {
         return getModuleNames("/tests/|/test/", false);
     }
 
-    public List<String> getModuleNames(String filterPattern, boolean withinProject) {
-        FileBasedIndex index = FileBasedIndex
+    /**
+     * Returns Module Names.
+     *
+     * @param filterPattern String
+     * @param withinProject boolean
+     * @return List
+     */
+    public List<String> getModuleNames(final String filterPattern, final boolean withinProject) {
+        final FileBasedIndex index = FileBasedIndex
                 .getInstance();
-        List<String> allModulesList = new ArrayList<>();
-        Collection<String> allModules = index.getAllKeys(ModuleNameIndex.KEY, project);
-        Pattern p = Pattern.compile(filterPattern);
-        for (String moduleName : allModules) {
+        final List<String> allModulesList = new ArrayList<>();
+        final Collection<String> allModules = index.getAllKeys(ModuleNameIndex.KEY, project);
+        final Pattern pattern = Pattern.compile(filterPattern);
+        for (final String moduleName : allModules) {
             if (!moduleName.matches(RegExUtil.Magento.MODULE_NAME)) {
                 continue;
             }
-            Collection<VirtualFile> files = index.getContainingFiles(ModuleNameIndex.KEY, moduleName, GlobalSearchScope.getScopeRestrictedByFileTypes(
-                    GlobalSearchScope.allScope(project),
-                    PhpFileType.INSTANCE
-            ));
+            final Collection<VirtualFile> files = index.getContainingFiles(
+                    ModuleNameIndex.KEY,
+                    moduleName,
+                    GlobalSearchScope.getScopeRestrictedByFileTypes(
+                        GlobalSearchScope.allScope(project),
+                        PhpFileType.INSTANCE
+                ));
             if (files.isEmpty()) {
                 continue;
             }
-            VirtualFile virtualFile = files.iterator().next();
-            if (withinProject) {
-                if (!VfsUtilCore.isAncestor(GetProjectBasePath.execute(project), virtualFile, false)) {
-                    continue;
-                }
+            final VirtualFile virtualFile = files.iterator().next();
+            if (withinProject
+                    && !VfsUtilCore.isAncestor(
+                            GetProjectBasePath.execute(project), virtualFile, false
+                )) {
+                continue;
             }
-            Matcher m = p.matcher(virtualFile.getPath());
-            if (m.find()) {
+            final Matcher matcher = pattern.matcher(virtualFile.getPath());
+            if (matcher.find()) {
                 continue;
             }
             allModulesList.add(moduleName);
@@ -82,14 +100,23 @@ public class ModuleIndex {
         return allModulesList;
     }
 
-    public PsiDirectory getModuleDirectoryByModuleName(String moduleName) {
-        FileBasedIndex index = FileBasedIndex
+    /**
+     * Returns PSI directory of the certain module.
+     *
+     * @param moduleName String
+     * @return PsiDirectory
+     */
+    public PsiDirectory getModuleDirectoryByModuleName(final String moduleName) {
+        final FileBasedIndex index = FileBasedIndex
                 .getInstance();
-        Collection<VirtualFile> files = index.getContainingFiles(ModuleNameIndex.KEY, moduleName, GlobalSearchScope.getScopeRestrictedByFileTypes(
-                GlobalSearchScope.allScope(project),
-                PhpFileType.INSTANCE
-        ));
-        VirtualFile virtualFile = files.iterator().next();
+        final Collection<VirtualFile> files = index.getContainingFiles(
+                ModuleNameIndex.KEY,
+                moduleName,
+                GlobalSearchScope.getScopeRestrictedByFileTypes(
+                    GlobalSearchScope.allScope(project),
+                    PhpFileType.INSTANCE
+            ));
+        final VirtualFile virtualFile = files.iterator().next();
 
         return PsiManager.getInstance(project).findDirectory(virtualFile.getParent());
     }

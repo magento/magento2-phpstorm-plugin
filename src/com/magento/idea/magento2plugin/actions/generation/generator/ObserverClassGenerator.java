@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.command.WriteCommandAction;
@@ -21,15 +22,15 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Directo
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.util.CodeStyleSettings;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.Observer;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
-import javax.swing.*;
-import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.Properties;
+import javax.swing.JOptionPane;
 
 public class ObserverClassGenerator extends FileGenerator {
     private final DirectoryGenerator directoryGenerator;
@@ -40,6 +41,12 @@ public class ObserverClassGenerator extends FileGenerator {
     private ValidatorBundle validatorBundle;
     private CommonBundle commonBundle;
 
+    /**
+     * Constructor.
+     *
+     * @param observerFileData ObserverFileData
+     * @param project Project
+     */
     public ObserverClassGenerator(ObserverFileData observerFileData, Project project) {
         super(project);
         this.observerFileData = observerFileData;
@@ -64,7 +71,10 @@ public class ObserverClassGenerator extends FileGenerator {
             }
 
             if (observerClass == null) {
-                String errorMessage = validatorBundle.message("validator.file.cantBeCreated", "Observer Class");
+                String errorMessage = validatorBundle.message(
+                        "validator.file.cantBeCreated",
+                        "Observer Class"
+                );
                 JOptionPane.showMessageDialog(
                         null,
                         errorMessage,
@@ -103,7 +113,10 @@ public class ObserverClassGenerator extends FileGenerator {
 
     private int getInsertPos(PhpClass observerClass) {
         int insertPos = -1;
-        LeafPsiElement[] leafElements = PsiTreeUtil.getChildrenOfType(observerClass, LeafPsiElement.class);
+        LeafPsiElement[] leafElements = PsiTreeUtil.getChildrenOfType(
+                observerClass,
+                LeafPsiElement.class
+        );
         for (LeafPsiElement leafPsiElement: leafElements) {
             if (!leafPsiElement.getText().equals(MagentoPhpClass.CLOSING_TAG)) {
                 continue;
@@ -116,14 +129,18 @@ public class ObserverClassGenerator extends FileGenerator {
     private PhpClass createObserverClass(String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(observerFileData.getObserverModule());
-        String[] observerDirectories = observerFileData.getObserverDirectory().split(File.separator);
+        String[] observerDirectories = observerFileData.getObserverDirectory()
+                .split(File.separator);
         for (String observerDirectory: observerDirectories) {
-            parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, observerDirectory);
+            parentDirectory = directoryGenerator.findOrCreateSubdirectory(
+                    parentDirectory,
+                    observerDirectory
+            );
         }
 
         Properties attributes = getAttributes();
         PsiFile observerFile = fileFromTemplateGenerator.generate(
-                Observer.getInstance(observerFileData.getObserverClassName()),
+                new Observer(observerFileData.getObserverClassName()),
                 attributes,
                 parentDirectory,
                 actionName
@@ -141,6 +158,7 @@ public class ObserverClassGenerator extends FileGenerator {
     }
 
     private boolean checkIfMethodExist(PhpClass observerClass, String methodName) {
-        return observerClass.getMethods().stream().anyMatch((method) -> method.getName().equals(methodName));
+        return observerClass.getMethods().stream().anyMatch((method)
+                -> method.getName().equals(methodName));
     }
 }

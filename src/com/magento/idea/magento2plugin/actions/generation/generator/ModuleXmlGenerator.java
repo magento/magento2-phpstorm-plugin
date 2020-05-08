@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
@@ -13,8 +14,8 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Directo
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.magento.files.ModuleXml;
 import com.magento.idea.magento2plugin.magento.packages.Package;
-import org.jetbrains.annotations.NotNull;
 import java.util.Properties;
+import org.jetbrains.annotations.NotNull;
 
 public class ModuleXmlGenerator extends FileGenerator {
 
@@ -22,7 +23,16 @@ public class ModuleXmlGenerator extends FileGenerator {
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final DirectoryGenerator directoryGenerator;
 
-    public ModuleXmlGenerator(@NotNull ModuleXmlData moduleXmlData, Project project) {
+    /**
+     * Constructor.
+     *
+     * @param moduleXmlData ModuleXmlData
+     * @param project Project
+     */
+    public ModuleXmlGenerator(
+            final @NotNull ModuleXmlData moduleXmlData,
+            final Project project
+    ) {
         super(project);
         this.moduleXmlData = moduleXmlData;
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
@@ -30,16 +40,34 @@ public class ModuleXmlGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(String actionName) {
+    public PsiFile generate(final String actionName) {
         if (moduleXmlData.getCreateModuleDirs()) {
-            ModuleDirectoriesData moduleDirectoriesData = directoryGenerator.createOrFindModuleDirectories(moduleXmlData.getPackageName(), moduleXmlData.getModuleName(), moduleXmlData.getBaseDir());
-            return fileFromTemplateGenerator.generate(ModuleXml.getInstance(), getAttributes(), moduleDirectoriesData.getModuleEtcDirectory(), actionName);
+            final ModuleDirectoriesData moduleDirectoriesData = directoryGenerator
+                    .createOrFindModuleDirectories(
+                            moduleXmlData.getPackageName(),
+                            moduleXmlData.getModuleName(),
+                            moduleXmlData.getBaseDir()
+                    );
+            return fileFromTemplateGenerator.generate(
+                    ModuleXml.getInstance(),
+                    getAttributes(),
+                    moduleDirectoriesData.getModuleEtcDirectory(),
+                    actionName
+            );
         }
-        PsiDirectory etcDirectory = directoryGenerator.findOrCreateSubdirectory(moduleXmlData.getBaseDir(), Package.moduleBaseAreaDir);
-        return fileFromTemplateGenerator.generate(ModuleXml.getInstance(), getAttributes(), etcDirectory, actionName);
+        final PsiDirectory etcDirectory = directoryGenerator.findOrCreateSubdirectory(
+                moduleXmlData.getBaseDir(),
+                Package.moduleBaseAreaDir
+        );
+        return fileFromTemplateGenerator.generate(
+                ModuleXml.getInstance(),
+                getAttributes(),
+                etcDirectory,
+                actionName
+        );
     }
 
-    protected void fillAttributes(Properties attributes) {
+    protected void fillAttributes(final Properties attributes) {
         attributes.setProperty("PACKAGE", moduleXmlData.getPackageName());
         attributes.setProperty("MODULE_NAME", moduleXmlData.getModuleName());
     }

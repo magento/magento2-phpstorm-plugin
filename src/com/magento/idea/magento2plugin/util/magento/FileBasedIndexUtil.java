@@ -1,7 +1,8 @@
-/**
+/*
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.util.magento;
 
 import com.intellij.openapi.project.Project;
@@ -12,29 +13,39 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.PhpFileType;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex;
 import com.magento.idea.magento2plugin.util.RegExUtil;
-
-import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class FileBasedIndexUtil {
+public final class FileBasedIndexUtil {
 
-    public static Collection<VirtualFile> findViewVfsByModuleName(String moduleName, Project project)
-    {
-        Collection<VirtualFile> viewVfs = new ArrayList<>();
+    private FileBasedIndexUtil() {}
 
-        Pattern pattern = Pattern.compile(RegExUtil.Magento.MODULE_NAME);
-        Matcher matcher = pattern.matcher(moduleName);
+    /**
+     * Find all modules virtual files.
+     *
+     * @param moduleName String
+     * @param project Project
+     * @return Collection
+     */
+    public static Collection<VirtualFile> findViewVfsByModuleName(
+            final String moduleName,
+            final Project project
+    ) {
+        final Collection<VirtualFile> viewVfs = new ArrayList<>();
+
+        final Pattern pattern = Pattern.compile(RegExUtil.Magento.MODULE_NAME);
+        final Matcher matcher = pattern.matcher(moduleName);
         if (!matcher.find()) {
             return viewVfs;
         }
 
-        Collection<VirtualFile> moduleVfs =
+        final Collection<VirtualFile> moduleVfs =
                 FileBasedIndex.getInstance().getContainingFiles(ModuleNameIndex.KEY, moduleName,
                     GlobalSearchScope.getScopeRestrictedByFileTypes(
                         GlobalSearchScope.allScope(project),
@@ -42,21 +53,34 @@ public class FileBasedIndexUtil {
                 )
         );
 
-        for (VirtualFile moduleVf : moduleVfs) {
+        for (final VirtualFile moduleVf : moduleVfs) {
             viewVfs.addAll(getValues(moduleName, moduleVf, project));
         }
         return viewVfs;
     }
 
-    public static PsiFile findModuleConfigFile(String virtualFieName, Areas area, String moduleName, Project project)
-    {
-        Pattern pattern = Pattern.compile(RegExUtil.Magento.MODULE_NAME);
-        Matcher matcher = pattern.matcher(moduleName);
+    /**
+     * Find module config file for the certain area.
+     *
+     * @param virtualFieName String
+     * @param area Areas
+     * @param moduleName String
+     * @param project Project
+     * @return PsiFile
+     */
+    public static PsiFile findModuleConfigFile(
+            final String virtualFieName,
+            final Areas area,
+            final String moduleName,
+            final Project project
+    ) {
+        final Pattern pattern = Pattern.compile(RegExUtil.Magento.MODULE_NAME);
+        final Matcher matcher = pattern.matcher(moduleName);
         if (!matcher.find()) {
             return null;
         }
 
-        Collection<VirtualFile> moduleVfs =
+        final Collection<VirtualFile> moduleVfs =
                 FileBasedIndex.getInstance().getContainingFiles(ModuleNameIndex.KEY, moduleName,
                         GlobalSearchScope.getScopeRestrictedByFileTypes(
                                 GlobalSearchScope.allScope(project),
@@ -67,39 +91,54 @@ public class FileBasedIndexUtil {
             return null;
         }
 
-        VirtualFile moduleVf = moduleVfs.iterator().next();
+        final VirtualFile moduleVf = moduleVfs.iterator().next();
 
-        String relativePath = File.separator.concat(Package.moduleBaseAreaDir).concat(File.separator);
+        String relativePath = File.separator.concat(Package.moduleBaseAreaDir)
+                .concat(File.separator);
         if (!area.equals(Areas.base)) {
             relativePath = relativePath.concat(area.toString()).concat(File.separator);
         }
         relativePath = relativePath.concat(virtualFieName);
 
-        VirtualFile configFile = moduleVf.getParent().findFileByRelativePath(relativePath);
+        final VirtualFile configFile = moduleVf.getParent().findFileByRelativePath(relativePath);
         if (configFile == null) {
             return null;
         }
         return PsiManager.getInstance(project).findFile(configFile);
     }
 
-    public static Collection<VirtualFile> findViewVfsByModuleVf(VirtualFile moduleVf, Project project)
-    {
-        Collection<VirtualFile> viewVfs = new ArrayList<>();
+    /**
+     * Find all modules virtual files by module virtual file.
+     *
+     * @param moduleVf VirtualFile
+     * @param project Project
+     * @return Collection
+     */
+    public static Collection<VirtualFile> findViewVfsByModuleVf(
+            final VirtualFile moduleVf,
+            final Project project
+    ) {
+        final Collection<VirtualFile> viewVfs = new ArrayList<>();
 
-        for (String moduleName : FileBasedIndex.getInstance().getAllKeys(ModuleNameIndex.KEY, project)) {
+        for (final String moduleName : FileBasedIndex.getInstance()
+                .getAllKeys(ModuleNameIndex.KEY, project)) {
             viewVfs.addAll(getValues(moduleName, moduleVf, project));
         }
         return viewVfs;
     }
 
-    private static Collection<VirtualFile> getValues(String moduleName, VirtualFile moduleVf, Project project)
-    {
-        Collection<VirtualFile> viewVfs = new ArrayList<>();
+    private static Collection<VirtualFile> getValues(
+            final String moduleName,
+            final VirtualFile moduleVf,
+            final Project project
+    ) {
+        final Collection<VirtualFile> viewVfs = new ArrayList<>();
         FileBasedIndex.getInstance()
                 .processValues(
                         ModuleNameIndex.KEY, moduleName, moduleVf,
                         (file, value) -> {
-                            VirtualFile viewVf = file.getParent().findFileByRelativePath(value.concat("/view"));
+                            final VirtualFile viewVf = file.getParent()
+                                    .findFileByRelativePath(value.concat("/view"));
                             if (viewVf != null) {
                                 viewVfs.add(viewVf);
                             }

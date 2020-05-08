@@ -184,6 +184,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
                 TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
             ) {
                     @Nullable
+                    @Override
                     protected VirtualFile getInitialFile() {
                         return super.getInitialFile();
                     }

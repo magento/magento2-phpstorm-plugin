@@ -2,13 +2,15 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.inspections.xml;
 
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
-import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.magento.packages.File;
+import com.magento.idea.magento2plugin.magento.packages.Package;
 
+@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert"})
 public class PluginDeclarationInspectionTest extends InspectionXmlFixtureTestCase {
 
     @Override
@@ -17,9 +19,12 @@ public class PluginDeclarationInspectionTest extends InspectionXmlFixtureTestCas
         myFixture.enableInspections(PluginDeclarationInspection.class);
     }
 
-    private String getAreaPath(String area) {
-        return Package.moduleBaseAreaDir + File.separator + Areas.getAreaByString(area) + File.separator +
-                ModuleDiXml.FILE_NAME;
+    private String getAreaPath(final String area) {
+        return Package.moduleBaseAreaDir
+                + File.separator
+                + Areas.getAreaByString(area)
+                + File.separator
+                + ModuleDiXml.FILE_NAME;
     }
 
     /**
@@ -40,8 +45,10 @@ public class PluginDeclarationInspectionTest extends InspectionXmlFixtureTestCas
     }
 
     /**
-     * Tests whenever the duplication warning occurs for a plugin name declared in the frontend area
-     * that is already defined in the frontend module area (Vendor/Module/etc/frontend/di.xml)
+     * Tests whenever the duplication warning occurs for a
+     * plugin name declared in the frontend area
+     * that is already defined in the frontend module
+     * area (Vendor/Module/etc/frontend/di.xml)
      */
     public void testPluginNameAlreadyUsedInFrontendArea() {
         myFixture.configureByFile(getFixturePath(getAreaPath("frontend")));
@@ -49,8 +56,10 @@ public class PluginDeclarationInspectionTest extends InspectionXmlFixtureTestCas
     }
 
     /**
-     * Tests whenever the duplication warning occurs for a plugin name declared in the adminhtml area
-     * that is already defined in the adminhtml module area (Vendor/Module/etc/adminhtml/di.xml)
+     * Tests whenever the duplication warning occurs for
+     * a plugin name declared in the adminhtml area
+     * that is already defined in the adminhtml module area
+     * (Vendor/Module/etc/adminhtml/di.xml)
      */
     public void testPluginNameAlreadyUsedInAdminhtmlArea() {
         myFixture.configureByFile(getFixturePath(getAreaPath("adminhtml")));
@@ -67,8 +76,10 @@ public class PluginDeclarationInspectionTest extends InspectionXmlFixtureTestCas
     }
 
     /**
-     * Tests whenever the duplication warning occurs for a plugin name declared in the webapi_rest area
-     * that is already defined in the webapi_rest module area (Vendor/Module/etc/webapi_rest/di.xml)
+     * Tests whenever the duplication warning occurs for
+     * a plugin name declared in the webapi_rest area
+     * that is already defined in the webapi_rest module
+     * area (Vendor/Module/etc/webapi_rest/di.xml)
      */
     public void testPluginNameAlreadyUsedInWebApiRestArea() {
         myFixture.configureByFile(getFixturePath(this.getAreaPath("webapi_rest")));
@@ -76,8 +87,10 @@ public class PluginDeclarationInspectionTest extends InspectionXmlFixtureTestCas
     }
 
     /**
-     * Tests whenever the duplication warning occurs for a plugin name declared in the webapi_soap area
-     * that is already defined in the webapi_soap module area (Vendor/Module/etc/webapi_soap/di.xml)
+     * Tests whenever the duplication warning occurs for
+     * a plugin name declared in the webapi_soap area
+     * that is already defined in the webapi_soap
+     * module area (Vendor/Module/etc/webapi_soap/di.xml)
      */
     public void testPluginNameAlreadyUsedInWebApiSoapArea() {
         myFixture.configureByFile(getFixturePath(getAreaPath("webapi_soap")));
@@ -85,8 +98,10 @@ public class PluginDeclarationInspectionTest extends InspectionXmlFixtureTestCas
     }
     
     /**
-     * Tests whenever the duplication warning occurs for a plugin name declared in the graphql area
-     * that is already defined in the graphql module area (Vendor/Module/etc/graphql/di.xml)
+     * Tests whenever the duplication warning occurs for
+     * a plugin name declared in the graphql area
+     * that is already defined in the graphql module
+     * area (Vendor/Module/etc/graphql/di.xml)
      */
     public void testPluginNameAlreadyUsedInGraphqlArea() {
         myFixture.configureByFile(getFixturePath(getAreaPath("graphql")));
@@ -94,8 +109,10 @@ public class PluginDeclarationInspectionTest extends InspectionXmlFixtureTestCas
     }
     
     /**
-     * Tests whenever the duplication warning occurs for a plugin name declared in the crontab area
-     * that is already defined in the crontab module area (Vendor/Module/etc/crontab/di.xml)
+     * Tests whenever the duplication warning occurs for
+     * a plugin name declared in the crontab area
+     * that is already defined in the crontab module
+     * area (Vendor/Module/etc/crontab/di.xml)
      */
     public void testPluginNameAlreadyUsedInCrontabArea() {
         myFixture.configureByFile(getFixturePath(getAreaPath("crontab")));

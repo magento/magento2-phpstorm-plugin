@@ -2,10 +2,9 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
-import com.intellij.ide.IdeView;
-import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
@@ -17,79 +16,78 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewMo
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleComposerJsonGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleRegistrationPhpGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleXmlGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
-import com.magento.idea.magento2plugin.actions.generation.util.NavigateToCreatedFile;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.ComposerJson;
 import com.magento.idea.magento2plugin.magento.packages.Licenses;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
-import org.apache.commons.lang.ArrayUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.Vector;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import org.apache.commons.lang.ArrayUtils;
+import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings({"PMD.TooManyFields", "PMD.DataClass", "PMD.UnusedPrivateMethod"})
 public class NewModuleDialog extends AbstractDialog implements ListSelectionListener {
     @NotNull
     private final Project project;
     @NotNull
     private final PsiDirectory initialBaseDir;
-    @Nullable
-    private final PsiFile file;
-    @Nullable
-    private final IdeView view;
-    @Nullable
-    private final Editor editor;
-    private final DirectoryGenerator directoryGenerator;
-    private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final NewModuleDialogValidator validator;
     private final CamelCaseToHyphen camelCaseToHyphen;
-    private final NavigateToCreatedFile navigateToCreatedFile;
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
     private JTextField packageName;
     private JLabel packageNameLabel;
     private JTextField moduleName;
-    private JLabel moduleNameLabel;
     private JTextArea moduleDescription;
-    private JLabel moduleDescriptionLabel;
+    private final ModuleIndex moduleIndex;
     private JTextField moduleVersion;
-    private JLabel moduleVersionLabel;
-    private JList moduleLicense;
-    private JLabel moduleLicenseLabel;
-    private JTextField moduleLicenseCustom;
-    private JScrollPane moduleLicenseScrollPanel;
-    private JList moduleDependencies;
-    private JLabel moduleDependenciesLabel;
-    private JScrollPane moduleDependenciesScrollPanel;
     private String detectedPackageName;
-    private ModuleIndex moduleIndex;
+    private JList moduleDependencies;
+    private JList moduleLicense;
+    private JTextField moduleLicenseCustom;
+    private JLabel moduleLicenseLabel;//NOPMD
+    private JScrollPane moduleLicenseScrollPanel;//NOPMD
+    private JLabel moduleVersionLabel;//NOPMD
+    private JLabel moduleDependenciesLabel;//NOPMD
+    private JScrollPane moduleDependenciesScrollPanel;//NOPMD
+    private JLabel moduleDescriptionLabel;//NOPMD
+    private JLabel moduleNameLabel;//NOPMD
 
+    /**
+     * Constructor.
+     *
+     * @param project Project
+     * @param initialBaseDir PsiDirectory
+     */
     public NewModuleDialog(
-            @NotNull Project project,
-            @NotNull PsiDirectory initialBaseDir,
-            @Nullable PsiFile file,
-            @Nullable IdeView view,
-            @Nullable Editor editor
+            final @NotNull Project project,
+            final @NotNull PsiDirectory initialBaseDir
     ) {
+        super();
+
         this.project = project;
         this.initialBaseDir = initialBaseDir;
-        this.file = file;
-        this.view = view;
-        this.editor = editor;
-        this.directoryGenerator = DirectoryGenerator.getInstance();
-        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         this.camelCaseToHyphen = CamelCaseToHyphen.getInstance();
         this.validator = NewModuleDialogValidator.getInstance(this);
-        this.navigateToCreatedFile = NavigateToCreatedFile.getInstance();
         this.moduleIndex = ModuleIndex.getInstance(project);
         detectPackageName(initialBaseDir);
         setContentPane(contentPane);
@@ -102,33 +100,34 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         moduleLicenseCustom.setText(Settings.getDefaultLicenseName(project));
 
         buttonOK.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent event) {
                 onOK();
             }
         });
 
         buttonCancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent event) {
                 onCancel();
             }
         });
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
+            public void windowClosing(final WindowEvent event) {
                 onCancel();
             }
         });
 
         contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent event) {
                 onCancel();
             }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    private void detectPackageName(@NotNull PsiDirectory initialBaseDir) {
-        PsiDirectory parentDir = initialBaseDir.getParent();
+    private void detectPackageName(final @NotNull PsiDirectory initialBaseDir) {
+        final PsiDirectory parentDir = initialBaseDir.getParent();
         if (parentDir != null && parentDir.toString().endsWith(Package.packagesRoot)) {
             packageName.setVisible(false);
             packageNameLabel.setVisible(false);
@@ -136,7 +135,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         }
     }
 
-    private void onOK() {
+    protected void onOK() {
         if (!validator.validate()) {
             return;
         }
@@ -145,12 +144,12 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     }
 
     private void generateFiles() {
-        PsiFile composerJson = generateComposerJson();
+        final PsiFile composerJson = generateComposerJson();
         if (composerJson == null) {
             return;
         }
 
-        PsiFile registrationPhp = generateRegistrationPhp();
+        final PsiFile registrationPhp = generateRegistrationPhp();
         if (registrationPhp == null) {
             return;
         }
@@ -168,7 +167,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
                 getModuleLicense(),
                 getModuleDependencies(),
                 true
-        ), project).generate(NewModuleAction.ACTION_NAME);
+        ), project).generate(NewModuleAction.actionName);
     }
 
     private PsiFile generateRegistrationPhp() {
@@ -177,7 +176,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
                     getModuleName(),
                     getBaseDir(),
                     true
-            ), project).generate(NewModuleAction.ACTION_NAME);
+            ), project).generate(NewModuleAction.actionName);
     }
 
     private void generateModuleXml() {
@@ -186,13 +185,21 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
                 getModuleName(),
                 getBaseDir(),
                 true
-        ), project).generate(NewModuleAction.ACTION_NAME, true);
+        ), project).generate(NewModuleAction.actionName, true);
     }
 
     private PsiDirectory getBaseDir() {
-        return detectedPackageName != null ? this.initialBaseDir.getParent() : this.initialBaseDir;
+        if (detectedPackageName != null) {
+            return this.initialBaseDir.getParent();
+        }
+        return this.initialBaseDir;
     }
 
+    /**
+     * Getter for Package Name.
+     *
+     * @return String
+     */
     public String getPackageName() {
         if (detectedPackageName != null) {
             return detectedPackageName;
@@ -204,6 +211,11 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         return this.moduleName.getText().trim();
     }
 
+    /**
+     * Getter for Module Description.
+     *
+     * @return String
+     */
     public String getModuleDescription() {
         return this.moduleDescription.getText().trim();
     }
@@ -212,9 +224,14 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         return this.moduleVersion.getText().trim();
     }
 
+    /**
+     * Getter for module license.
+     *
+     * @return String
+     */
     public List getModuleLicense() {
-        List selectedLicenses = this.moduleLicense.getSelectedValuesList();
-        Licenses customLicense = Licenses.CUSTOM;
+        final List selectedLicenses = this.moduleLicense.getSelectedValuesList();
+        final Licenses customLicense = Licenses.CUSTOM;
 
         if (selectedLicenses.contains(customLicense.getLicenseName())) {
             selectedLicenses.remove(customLicense.getLicenseName());
@@ -228,8 +245,17 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         return moduleDependencies.getSelectedValuesList();
     }
 
-    public static void open(@NotNull Project project, @NotNull PsiDirectory initialBaseDir, @Nullable PsiFile file, @Nullable IdeView view, @Nullable Editor editor) {
-        NewModuleDialog dialog = new NewModuleDialog(project, initialBaseDir, file, view, editor);
+    /**
+     * Open dialog.
+     *
+     * @param project Project
+     * @param initialBaseDir PsiDirectory
+     */
+    public static void open(
+            final @NotNull Project project,
+            final @NotNull PsiDirectory initialBaseDir
+    ) {
+        final NewModuleDialog dialog = new NewModuleDialog(project, initialBaseDir);
         dialog.pack();
         dialog.centerDialog(dialog);
         dialog.setVisible(true);
@@ -243,10 +269,10 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     }
 
     private void setLicenses() {
-        Licenses[] licenses = Licenses.values();
-        Vector<String> licenseNames = new Vector<>(licenses.length);
+        final Licenses[] licenses = Licenses.values();
+        Vector<String> licenseNames = new Vector<>(licenses.length);//NOPMD
 
-        for (Licenses license: licenses) {
+        for (final Licenses license: licenses) {
             licenseNames.add(license.getLicenseName());
         }
 
@@ -256,10 +282,10 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     }
 
     private void setModuleDependencies() {
-        List<String> moduleNames = moduleIndex.getModuleNames();
-        Vector<String> licenseNames = new Vector<>(moduleNames.size() + 1);
+        final List<String> moduleNames = moduleIndex.getModuleNames();
+        Vector<String> licenseNames = new Vector<>(moduleNames.size() + 1);//NOPMD
         licenseNames.add(ComposerJson.NO_DEPENDENCY_LABEL);
-        for (String name : moduleNames) {
+        for (final String name : moduleNames) {
             licenseNames.add(name);
         }
         moduleDependencies.setListData(licenseNames);
@@ -270,7 +296,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     private void handleModuleCustomLicenseInputVisibility() {
         boolean isCustomLicenseSelected = false;
 
-        for (Object value: moduleLicense.getSelectedValuesList()) {
+        for (final Object value: moduleLicense.getSelectedValuesList()) {
             if (Licenses.CUSTOM.getLicenseName().equals(value.toString())) {
                 isCustomLicenseSelected = true;
 
@@ -285,14 +311,15 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     private void handleModuleSelectedDependencies() {
         // unselect the "None" dependency when others are selected
         int[] selectedDependencies = moduleDependencies.getSelectedIndices();
-        if (moduleDependencies.getSelectedIndices().length > 1 && moduleDependencies.isSelectedIndex(0)) {
+        if (moduleDependencies.getSelectedIndices().length > 1
+                && moduleDependencies.isSelectedIndex(0)) {
             selectedDependencies = ArrayUtils.remove(selectedDependencies, 0);
             moduleDependencies.setSelectedIndices(selectedDependencies);
         }
     }
 
     @Override
-    public void valueChanged(ListSelectionEvent listSelectionEvent) {
+    public void valueChanged(final ListSelectionEvent listSelectionEvent) {
         handleModuleCustomLicenseInputVisibility();
         handleModuleSelectedDependencies();
     }

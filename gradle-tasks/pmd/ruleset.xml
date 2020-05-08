@@ -15,6 +15,7 @@
     </description>
     <rule ref="category/java/bestpractices.xml">
         <exclude name="JUnit4TestShouldUseTestAnnotation"/>
+        <exclude name="JUnit4TestShouldUseBeforeAnnotation"/>
     </rule>
     <rule ref="category/java/codestyle.xml">
         <exclude name="AtLeastOneConstructor" />
@@ -26,6 +27,7 @@
     </rule>
     <rule ref="category/java/documentation.xml">
         <exclude name="CommentRequired" />
+        <exclude name="CommentSize" />
     </rule>
     <rule ref="category/java/errorprone.xml">
         <exclude name="BeanMembersShouldSerialize"/>

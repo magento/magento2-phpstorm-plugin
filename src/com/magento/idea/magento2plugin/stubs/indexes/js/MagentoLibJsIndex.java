@@ -2,20 +2,24 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.stubs.indexes.js;
 
 import com.intellij.lang.javascript.JavaScriptFileType;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.util.indexing.*;
+import com.intellij.util.indexing.DataIndexer;
+import com.intellij.util.indexing.FileBasedIndex;
+import com.intellij.util.indexing.FileContent;
+import com.intellij.util.indexing.ID;
+import com.intellij.util.indexing.ScalarIndexExtension;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.project.Settings;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.HashMap;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
 
 public class MagentoLibJsIndex extends ScalarIndexExtension<String> {
     public static final ID<String, Void> KEY =
@@ -27,16 +31,21 @@ public class MagentoLibJsIndex extends ScalarIndexExtension<String> {
         return KEY;
     }
 
+    /**
+     * Indexer for `web/lib` JS files.
+     *
+     * @return this
+     */
     @NotNull
     @Override
     public DataIndexer<String, Void, FileContent> getIndexer() {
         return inputData -> {
-            Map<String, Void> map = new HashMap<>();
-            String libPath = Settings.getMagentoPath(inputData.getProject()) +
-                File.separator + Package.libWebRoot + File.separator;
-            VirtualFile file = inputData.getFile();
+            final Map<String, Void> map = new HashMap<>();//NOPMD
+            final String libPath = Settings.getMagentoPath(inputData.getProject())
+                    + File.separator + Package.libWebRoot + File.separator;
+            final VirtualFile file = inputData.getFile();
 
-            if (!file.getPath().contains(libPath)){
+            if (!file.getPath().contains(libPath)) {
                 return map;
             }
 
@@ -58,7 +67,8 @@ public class MagentoLibJsIndex extends ScalarIndexExtension<String> {
     @Override
     public FileBasedIndex.InputFilter getInputFilter() {
         return virtualFile -> (
-                virtualFile.getFileType().equals(JavaScriptFileType.INSTANCE) && virtualFile.getPath().contains("lib/web")
+                virtualFile.getFileType().equals(JavaScriptFileType.INSTANCE)//NOPMD
+                    && virtualFile.getPath().contains(Package.libWebRoot)
         );
     }
 
