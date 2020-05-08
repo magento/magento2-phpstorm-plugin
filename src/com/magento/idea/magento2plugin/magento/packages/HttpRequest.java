@@ -2,9 +2,8 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
-package com.magento.idea.magento2plugin.magento.packages;
 
-import org.jetbrains.annotations.NotNull;
+package com.magento.idea.magento2plugin.magento.packages;
 
 import java.util.ArrayList;
 
@@ -26,12 +25,22 @@ public class HttpRequest {
         }
     }
 
+    /**
+     * Get HTTP request interfaced FQN by method name.
+     *
+     * @param methodName HTTP Method name
+     * @return Request Interface
+     */
     public static String getRequestInterfaceFqnByMethodName(String methodName)
     {
         return HttpRequest.HttpMethod.valueOf(methodName).getInterfaceFqn();
     }
 
-    @NotNull
+    /**
+     * Get list of HTTP methods.
+     *
+     * @return List of HTTP methods.
+     */
     public static ArrayList<String> getHttpMethodList()
     {
         ArrayList<String> methodNameList = new ArrayList<String>();

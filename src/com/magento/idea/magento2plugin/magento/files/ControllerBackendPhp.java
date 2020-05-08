@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.magento.files;
 
 import com.intellij.lang.Language;
@@ -10,10 +11,15 @@ import com.jetbrains.php.lang.PhpLanguage;
 public class ControllerBackendPhp implements ModuleFileInterface {
     public static String TEMPLATE = "Magento Module Controller Backend Class";
     public static String DEFAULT_DIR = "Controller/Adminhtml";
-
     private static ControllerBackendPhp INSTANCE = null;
     private String fileName;
 
+    /**
+     * Returns a new instance of the class.
+     *
+     * @param className Controller class name
+     * @return ControllerBackendPhp
+     */
     public static ControllerBackendPhp getInstance(String className) {
         if (null == INSTANCE) {
             INSTANCE = new ControllerBackendPhp();
@@ -24,21 +30,38 @@ public class ControllerBackendPhp implements ModuleFileInterface {
         return INSTANCE;
     }
 
-    @Override
+    /**
+     * Get name of backend controller file.
+     *
+     * @return Name of the file.
+     */
     public String getFileName() {
         return this.fileName;
     }
 
-    @Override
+    /**
+     * Get name of backend controller template.
+     *
+     * @return Name of backend controller template.
+     */
     public String getTemplate() {
         return TEMPLATE;
     }
 
-    @Override
+    /**
+     * Get return language.
+     *
+     * @return PHP language
+     */
     public Language getLanguage() {
         return PhpLanguage.INSTANCE;
     }
 
+    /**
+     * Get name of controller file.
+     *
+     * @param filename Name of backend controller file.
+     */
     private void setFileName(String filename) {
         this.fileName = filename;
     }

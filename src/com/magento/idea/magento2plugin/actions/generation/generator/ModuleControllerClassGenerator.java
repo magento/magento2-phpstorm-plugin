@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.command.WriteCommandAction;
@@ -172,7 +173,7 @@ public class ModuleControllerClassGenerator extends FileGenerator {
         return new ArrayList<>(Arrays.asList(
                 Controller.RESPONSE_INTERFACE_FQN,
                 Controller.RESULT_INTERFACE_FQN,
-                Controller.NOT_FOUND_EXCEPTION_CLASS_FQN
+                Controller.EXCEPTION_CLASS_FQN
         ));
     }
 

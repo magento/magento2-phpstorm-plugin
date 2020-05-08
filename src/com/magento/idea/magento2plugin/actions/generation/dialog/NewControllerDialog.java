@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
@@ -18,9 +19,18 @@ import com.magento.idea.magento2plugin.magento.packages.HttpRequest;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
-
-import javax.swing.*;
-import java.awt.event.*;
+import javax.swing.JPanel;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -40,10 +50,16 @@ public class NewControllerDialog extends AbstractDialog {
     private JTextField controllerName;
     private JTextField controllerParentDir;
     private JCheckBox inheritClass;
-    private JPanel AdminPanel;
+    private JPanel adminPanel;
     private JTextField acl;
     private JTextField actionName;
 
+    /**
+     * Open new dialog for adding new controller.
+     *
+     * @param project Project
+     * @param directory PsiDirectory
+     */
     public NewControllerDialog(Project project, PsiDirectory directory) {
         this.project = project;
         this.baseDir = directory;
@@ -70,37 +86,90 @@ public class NewControllerDialog extends AbstractDialog {
         });
 
         // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPane.registerKeyboardAction(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        onCancel();
+                    }
+                },
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+        );
     }
 
     private String getModuleName() {
         return moduleName;
     }
 
+    /**
+     * Get controller name.
+     *
+     * @return String
+     */
     public String getControllerName() {
         return controllerName.getText().trim();
     }
 
+    /**
+     * Get HTTP method name.
+     *
+     * @return String
+     */
     public String getHttpMethodName() {
         return httpMethodSelect.getSelectedItem().toString();
     }
 
+    /**
+     * Get area.
+     *
+     * @return String
+     */
     public String getArea() {
         return controllerAreaSelect.getSelectedItem().toString();
     }
 
+    /**
+     * Get ACL.
+     *
+     * @return String
+     */
     public String getAcl() {
         return acl.getText().trim();
     }
 
+    /**
+     * Get action name.
+     *
+     * @return String
+     */
     public String getActionName() {
         return actionName.getText().trim();
     }
 
+    /**
+     * Get controller directory.
+     *
+     * @return String
+     */
+    public String getControllerDirectory() {
+        return controllerParentDir.getText().trim();
+    }
+
+    /**
+     * Get action directory.
+     *
+     * @return String
+     */
+    public String getActionDirectory() {
+        return getControllerDirectory() + File.separator + getControllerName();
+    }
+
+    /**
+     * Open new controller dialog.
+     *
+     * @param project Project
+     * @param directory PsiDirectory
+     */
     public static void open(Project project, PsiDirectory directory) {
         NewControllerDialog dialog = new NewControllerDialog(project, directory);
         dialog.pack();
@@ -130,14 +199,6 @@ public class NewControllerDialog extends AbstractDialog {
         ), project).generate(NewControllerAction.ACTION_NAME, true);
     }
 
-    public String getControllerDirectory() {
-        return controllerParentDir.getText().trim();
-    }
-
-    public String getActionDirectory() {
-        return getControllerDirectory() + File.separator + getControllerName();
-    }
-
     private void suggestControllerDirectory() {
         String area = getArea();
         if (area.equals(Package.Areas.adminhtml.toString())) {
@@ -150,10 +211,10 @@ public class NewControllerDialog extends AbstractDialog {
     private void toggleAdminPanel() {
         String area = getArea();
         if (area.equals(Package.Areas.adminhtml.toString()) && inheritClass.isSelected()) {
-            AdminPanel.setVisible(true);
+            adminPanel.setVisible(true);
             return;
         }
-        AdminPanel.setVisible(false);
+        adminPanel.setVisible(false);
     }
 
     private String getModuleIdentifierPath() {
@@ -169,10 +230,21 @@ public class NewControllerDialog extends AbstractDialog {
         if (parts[0] == null || parts[1] == null || parts.length > 2) {
             return null;
         }
-        String directoryPart = getControllerDirectory().replace(File.separator, Package.FQN_SEPARATOR);
+        String directoryPart = getControllerDirectory().replace(
+                File.separator,
+                Package.FQN_SEPARATOR
+        );
         String controllerPart = Package.FQN_SEPARATOR + getControllerName();
 
-        return parts[0] + Package.FQN_SEPARATOR + parts[1] + Package.FQN_SEPARATOR + directoryPart + controllerPart;
+        return String.format(
+                "%s%s%s%s%s%s",
+                parts[0],
+                Package.FQN_SEPARATOR,
+                parts[1],
+                Package.FQN_SEPARATOR,
+                directoryPart,
+                controllerPart
+        );
     }
 
     private Boolean getIsInheritClass() {
@@ -185,7 +257,12 @@ public class NewControllerDialog extends AbstractDialog {
 
     private ArrayList<String> getAreaList()
     {
-        return new ArrayList<>(Arrays.asList(Package.Areas.frontend.toString(), Package.Areas.adminhtml.toString()));
+        return new ArrayList<>(
+                Arrays.asList(
+                        Package.Areas.frontend.toString(),
+                        Package.Areas.adminhtml.toString()
+                )
+        );
     }
 
     private void createUIComponents() {

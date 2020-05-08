@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
@@ -9,7 +10,9 @@ import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
 
 public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
-
+    /**
+     * Test generation of frontend controller file.
+     */
     public void testGenerateFrontendControllerFile() {
         Project project = myFixture.getProject();
         ControllerFileData controllerFileData = new ControllerFileData(
@@ -22,11 +25,11 @@ public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
                 false,
                 "Foo\\Bar\\Controller\\Entity"
         );
-        ModuleControllerClassGenerator moduleControllerClassGenerator = new ModuleControllerClassGenerator(
+        ModuleControllerClassGenerator controllerGenerator = new ModuleControllerClassGenerator(
                 controllerFileData,
                 project
         );
-        PsiFile controllerFile = moduleControllerClassGenerator.generate("test");
+        PsiFile controllerFile = controllerGenerator.generate("test");
 
         String filePath = this.getFixturePath("GetAction.php");
         PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -37,6 +40,9 @@ public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
         );
     }
 
+    /**
+     * Test generation of frontend controller file with action class inheritance.
+     */
     public void testGenerateFrontendInheritActionControllerFile() {
         Project project = myFixture.getProject();
         ControllerFileData controllerFileData = new ControllerFileData(
@@ -49,11 +55,11 @@ public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
                 true,
                 "Foo\\Bar\\Controller\\Entity"
         );
-        ModuleControllerClassGenerator moduleControllerClassGenerator = new ModuleControllerClassGenerator(
+        ModuleControllerClassGenerator controllerGenerator = new ModuleControllerClassGenerator(
                 controllerFileData,
                 project
         );
-        PsiFile controllerFile = moduleControllerClassGenerator.generate("test");
+        PsiFile controllerFile = controllerGenerator.generate("test");
 
         String filePath = this.getFixturePath("DeleteAction.php");
         PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -64,6 +70,9 @@ public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
         );
     }
 
+    /**
+     * Test generation of backend controller file.
+     */
     public void testGenerateBackendControllerFile() {
         Project project = myFixture.getProject();
         ControllerFileData controllerFileData = new ControllerFileData(
@@ -76,11 +85,11 @@ public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
                 true,
                 "Foo\\Bar\\Controller\\Adminhtml\\Entity"
         );
-        ModuleControllerClassGenerator moduleControllerClassGenerator = new ModuleControllerClassGenerator(
+        ModuleControllerClassGenerator controllerGenerator = new ModuleControllerClassGenerator(
                 controllerFileData,
                 project
         );
-        PsiFile controllerFile = moduleControllerClassGenerator.generate("test");
+        PsiFile controllerFile = controllerGenerator.generate("test");
 
         String filePath = this.getFixturePath("BackendSaveAction.php");
         PsiFile expectedFile = myFixture.configureByFile(filePath);
