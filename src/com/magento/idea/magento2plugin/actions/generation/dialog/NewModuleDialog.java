@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2plugin.actions.generation.dialog;
+package com.magento.idea.magento2plugin.actions.generation.dialog;//NOPMD
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
@@ -44,7 +44,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({"PMD.TooManyFields", "PMD.DataClass", "PMD.UnusedPrivateMethod"})
-public class NewModuleDialog extends AbstractDialog implements ListSelectionListener {
+public class NewModuleDialog extends AbstractDialog implements ListSelectionListener {//NOPMD
     @NotNull
     private final Project project;
     @NotNull
@@ -100,12 +100,14 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         moduleLicenseCustom.setText(Settings.getDefaultLicenseName(project));
 
         buttonOK.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(final ActionEvent event) {
                 onOK();
             }
         });
 
         buttonCancel.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(final ActionEvent event) {
                 onCancel();
             }
@@ -113,12 +115,14 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(final WindowEvent event) {
                 onCancel();
             }
         });
 
         contentPane.registerKeyboardAction(new ActionListener() {
+            @Override
             public void actionPerformed(final ActionEvent event) {
                 onCancel();
             }

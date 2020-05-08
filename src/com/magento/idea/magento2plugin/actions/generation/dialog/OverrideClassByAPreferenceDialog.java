@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2plugin.actions.generation.dialog;
+package com.magento.idea.magento2plugin.actions.generation.dialog;//NOPMD
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
@@ -40,7 +40,7 @@ import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({"PMD.TooManyFields", "PMD.DataClass", "PMD.UnusedPrivateMethod"})
-public class OverrideClassByAPreferenceDialog extends AbstractDialog {
+public class OverrideClassByAPreferenceDialog extends AbstractDialog {//NOPMD
     @NotNull
     private final Project project;
     private final PhpClass targetClass;
@@ -92,12 +92,14 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog {
         suggestPreferenceDirectory(targetClass);
 
         buttonOK.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(final ActionEvent event) {
                 onOK();
             }
         });
 
         buttonCancel.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(final ActionEvent event) {
                 onCancel();
             }
@@ -105,12 +107,14 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog {
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(final WindowEvent event) {
                 onCancel();
             }
         });
 
         contentPane.registerKeyboardAction(new ActionListener() {
+            @Override
             public void actionPerformed(final ActionEvent event) {
                 onCancel();
             }
