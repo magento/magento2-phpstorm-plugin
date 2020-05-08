@@ -8,10 +8,10 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
-import com.magento.idea.magento2plugin.actions.generation.NewControllerAction;
 import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewControllerValidator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleControllerClassGenerator;
+import com.magento.idea.magento2plugin.actions.generation.NewControllerAction;
 import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.files.ControllerFrontendPhp;
 import com.magento.idea.magento2plugin.magento.packages.File;
@@ -19,20 +19,20 @@ import com.magento.idea.magento2plugin.magento.packages.HttpRequest;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 
 public class NewControllerDialog extends AbstractDialog {
     private final NewControllerValidator validator;
@@ -255,8 +255,7 @@ public class NewControllerDialog extends AbstractDialog {
         dispose();
     }
 
-    private ArrayList<String> getAreaList()
-    {
+    private ArrayList<String> getAreaList() {
         return new ArrayList<>(
                 Arrays.asList(
                         Package.Areas.frontend.toString(),

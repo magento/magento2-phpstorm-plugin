@@ -31,8 +31,7 @@ public class HttpRequest {
      * @param methodName HTTP Method name
      * @return Request Interface
      */
-    public static String getRequestInterfaceFqnByMethodName(String methodName)
-    {
+    public static String getRequestInterfaceFqnByMethodName(String methodName) {
         return HttpRequest.HttpMethod.valueOf(methodName).getInterfaceFqn();
     }
 
@@ -41,8 +40,7 @@ public class HttpRequest {
      *
      * @return List of HTTP methods.
      */
-    public static ArrayList<String> getHttpMethodList()
-    {
+    public static ArrayList<String> getHttpMethodList() {
         ArrayList<String> methodNameList = new ArrayList<String>();
 
         for (HttpMethod httpMethod: HttpMethod.values()) {

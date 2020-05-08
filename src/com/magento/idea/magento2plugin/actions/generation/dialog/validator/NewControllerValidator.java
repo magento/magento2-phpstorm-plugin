@@ -35,8 +35,10 @@ public class NewControllerValidator {
         return INSTANCE;
     }
 
-    public NewControllerValidator()
-    {
+    /**
+     * New controller validator constructor.
+     */
+    public NewControllerValidator() {
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
     }
@@ -46,8 +48,7 @@ public class NewControllerValidator {
      *
      * @return Boolean
      */
-    public boolean validate()
-    {
+    public boolean validate() {
         String errorTitle = commonBundle.message("common.error");
         String actionName = dialog.getActionName();
 

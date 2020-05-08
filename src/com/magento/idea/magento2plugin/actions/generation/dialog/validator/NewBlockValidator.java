@@ -8,8 +8,8 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 import com.jetbrains.php.refactoring.PhpNameUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewBlockDialog;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
-import com.magento.idea.magento2plugin.util.RegExUtil;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
+import com.magento.idea.magento2plugin.util.RegExUtil;
 import javax.swing.JOptionPane;
 
 @SuppressWarnings({"PMD.OnlyOneReturn"})
@@ -34,6 +34,9 @@ public class NewBlockValidator {
         return INSTANCE;
     }
 
+    /**
+     * New block validator constructor.
+     */
     public NewBlockValidator() {
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
@@ -44,8 +47,7 @@ public class NewBlockValidator {
      *
      * @return Boolean
      */
-    public boolean validate()
-    {
+    public boolean validate() {
         String errorTitle = commonBundle.message("common.error");
         String moduleName = dialog.getBlockName();
 

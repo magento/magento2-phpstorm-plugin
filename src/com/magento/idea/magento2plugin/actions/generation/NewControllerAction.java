@@ -2,20 +2,25 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation;
 
 import com.intellij.ide.IdeView;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewControllerDialog;
+import com.magento.idea.magento2plugin.MagentoIcons;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings({"PMD.OnlyOneReturn"})
 public class NewControllerAction extends AnAction {
     public static String ACTION_NAME = "Magento 2 Controller";
     public static String ACTION_DESCRIPTION = "Create a new Magento 2 controller";
 
+    /**
+     * New controller action constructor.
+     */
     NewControllerAction() {
         super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
     }

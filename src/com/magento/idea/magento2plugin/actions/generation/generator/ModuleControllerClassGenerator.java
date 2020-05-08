@@ -9,10 +9,8 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.impl.source.tree.LeafPsiElement;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.jetbrains.php.lang.psi.PhpFile;
 import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
@@ -24,17 +22,14 @@ import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.files.ControllerFrontendPhp;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.HttpRequest;
-import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Properties;
 import java.util.Collections;
+import java.util.Properties;
+import javax.swing.JOptionPane;
 
 public class ModuleControllerClassGenerator extends FileGenerator {
     private ControllerFileData controllerFileData;
@@ -45,7 +40,16 @@ public class ModuleControllerClassGenerator extends FileGenerator {
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
 
-    public ModuleControllerClassGenerator(@NotNull ControllerFileData controllerFileData, Project project) {
+    /**
+     * Generates new Controller PHP Class based on provided data.
+     *
+     * @param controllerFileData ControllerFileData
+     * @param project Project
+     */
+    public ModuleControllerClassGenerator(
+            ControllerFileData controllerFileData,
+            Project project
+    ) {
         super(project);
         this.project = project;
         this.controllerFileData = controllerFileData;
@@ -56,6 +60,12 @@ public class ModuleControllerClassGenerator extends FileGenerator {
         this.commonBundle = new CommonBundle();
     }
 
+    /**
+     * Generate controller class.
+     *
+     * @param actionName Action name
+     * @return PsiFile
+     */
     public PsiFile generate(String actionName) {
         final PsiFile[] controllerFiles = new PsiFile[1];
 
@@ -94,35 +104,51 @@ public class ModuleControllerClassGenerator extends FileGenerator {
         return controllerFiles[0];
     }
 
-    private int getInsertPos(PhpClass controllerClass) {
-        int insertPos = -1;
-        LeafPsiElement[] leafElements = PsiTreeUtil.getChildrenOfType(controllerClass, LeafPsiElement.class);
-        for (LeafPsiElement leafPsiElement: leafElements) {
-            if (!leafPsiElement.getText().equals(MagentoPhpClass.CLOSING_TAG)) {
-                continue;
-            }
-            insertPos = leafPsiElement.getTextOffset();
-        }
-        return insertPos;
+    /**
+     * Get controller module.
+     *
+     * @return String
+     */
+    public String getControllerModule() {
+        return controllerFileData.getControllerModule();
     }
 
-    @NotNull
+    /**
+     * Get HTTP method interface by method name.
+     *
+     * @param method HTTP Method name
+     * @return String
+     */
+    public static String getHttpMethodInterfaceByMethod(String method) {
+        return HttpRequest.getRequestInterfaceFqnByMethodName(method);
+    }
+
     private String getControllerFqn() {
-        return controllerFileData.getNamespace() + Package.FQN_SEPARATOR + controllerFileData.getActionClassName();
+        return String.format(
+                "%s%s%s",
+                controllerFileData.getNamespace(),
+                Package.FQN_SEPARATOR,
+                controllerFileData.getActionClassName()
+        );
     }
 
     private PhpClass createControllerClass(String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(getControllerModule());
         PsiFile controllerFile;
-        String[] controllerDirectories = controllerFileData.getActionDirectory().split(File.separator);
+        String[] controllerDirectories = controllerFileData.getActionDirectory().split(
+                File.separator
+        );
         for (String controllerDirectory: controllerDirectories) {
-            parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, controllerDirectory);
+            parentDirectory = directoryGenerator.findOrCreateSubdirectory(
+                    parentDirectory, controllerDirectory
+            );
         }
 
         Properties attributes = getAttributes();
+        String adminhtmlArea = Package.Areas.adminhtml.toString();
 
-        if (controllerFileData.getControllerArea().equals(Package.Areas.adminhtml.toString())) {
+        if (controllerFileData.getControllerArea().equals(adminhtmlArea)) {
             controllerFile = fileFromTemplateGenerator.generate(
                     ControllerBackendPhp.getInstance(controllerFileData.getActionClassName()),
                     attributes,
@@ -150,26 +176,38 @@ public class ModuleControllerClassGenerator extends FileGenerator {
         String actionClassName = controllerFileData.getActionClassName();
         attributes.setProperty("NAME", actionClassName);
         attributes.setProperty("NAMESPACE", controllerFileData.getNamespace());
-        String httpMethodInterface = getHttpMethodInterfaceByMethod(controllerFileData.getHttpMethodName());
+        String httpMethodInterface = getHttpMethodInterfaceByMethod(
+                controllerFileData.getHttpMethodName()
+        );
         attributes.setProperty("IMPLEMENTS", getNameFromFqn(httpMethodInterface));
         uses.add(httpMethodInterface);
 
         if (controllerFileData.getIsInheritClass()) {
-            if (controllerFileData.getControllerArea().equals(Package.Areas.adminhtml.toString())) {
+            final String adminhtmlArea = Package.Areas.adminhtml.toString();
+
+            if (controllerFileData.getControllerArea().equals(adminhtmlArea)) {
                 uses.add(Controller.ADMINHTML_CONTROLLER_FQN);
-                attributes.setProperty("EXTENDS", getNameFromFqn(Controller.ADMINHTML_CONTROLLER_FQN));
-                attributes.setProperty("ACL", getNameFromFqn(controllerFileData.getAcl()));
+                attributes.setProperty(
+                        "EXTENDS",
+                        getNameFromFqn(Controller.ADMINHTML_CONTROLLER_FQN)
+                );
+                attributes.setProperty(
+                        "ACL",
+                        getNameFromFqn(controllerFileData.getAcl())
+                );
             } else {
                 uses.add(Controller.FRONTEND_CONTROLLER_FQN);
-                attributes.setProperty("EXTENDS", getNameFromFqn(Controller.FRONTEND_CONTROLLER_FQN));
+                attributes.setProperty(
+                        "EXTENDS",
+                        getNameFromFqn(Controller.FRONTEND_CONTROLLER_FQN)
+                );
             }
         }
 
         attributes.setProperty("USES", formatUses(uses));
     }
 
-    private ArrayList<String> getUses()
-    {
+    private ArrayList<String> getUses() {
         return new ArrayList<>(Arrays.asList(
                 Controller.RESPONSE_INTERFACE_FQN,
                 Controller.RESULT_INTERFACE_FQN,
@@ -177,8 +215,7 @@ public class ModuleControllerClassGenerator extends FileGenerator {
         ));
     }
 
-    private String formatUses(ArrayList<String> uses)
-    {
+    private String formatUses(ArrayList<String> uses) {
         Collections.sort(uses);
 
         return String.join(",", uses);
@@ -187,14 +224,5 @@ public class ModuleControllerClassGenerator extends FileGenerator {
     private String getNameFromFqn(String fqn) {
         String[] fqnArray = fqn.split("\\\\");
         return fqnArray[fqnArray.length - 1];
-    }
-
-    public String getControllerModule() {
-        return controllerFileData.getControllerModule();
-    }
-
-    public static String getHttpMethodInterfaceByMethod(String method)
-    {
-        return HttpRequest.getRequestInterfaceFqnByMethodName(method);
     }
 }
