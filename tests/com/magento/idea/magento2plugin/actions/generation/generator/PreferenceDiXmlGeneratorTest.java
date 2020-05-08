@@ -10,6 +10,7 @@ import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.PreferenceDiXmFileData;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
+import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
@@ -25,7 +26,7 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
      * Test preference DI XML file generation.
      */
     public void testGeneratePreferenceDiXml() {
-        final String area = Package.Areas.base.toString();
+        final String area = Areas.base.toString();
         final PsiFile preferenceDiXmlFile = addPreferenceDiXml(
                 TARGET_MODEL_ONE_CLASS_FQN,
                 "Foo\\Bar\\Model\\Override\\SimpleModelOne",
@@ -46,7 +47,7 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
      * Test preference DI XML file generation for adminhtml area.
      */
     public void testGeneratePreferenceDiXmlForAdminhtmlArea() {
-        final String area = Package.Areas.adminhtml.toString();
+        final String area = Areas.adminhtml.toString();
         final PsiFile preferenceDiXmlFile = addPreferenceDiXml(
                 TARGET_MODEL_TWO_CLASS_FQN,
                 "Foo\\Bar\\Model\\Override\\SimpleModelTwo",
@@ -67,7 +68,7 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
      * Test the adding of two preferences to one DI XML file.
      */
     public void testAddTwoPreferencesToOneDiXmlFile() {
-        final String area = Package.Areas.frontend.toString();
+        final String area = Areas.frontend.toString();
         addPreferenceDiXml(
                 TARGET_MODEL_ONE_CLASS_FQN,
                 "Foo\\Bar\\Model\\Override\\SimpleModelOne",
@@ -128,10 +129,10 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
     private String getExpectedDirectory(final String area) {
         String expectedDirectory;
 
-        if (area.equals(Package.Areas.base.toString())) {
-            expectedDirectory = MODULE_DIR + Package.MODULE_BASE_AREA_DIR;
+        if (area.equals(Areas.base.toString())) {
+            expectedDirectory = MODULE_DIR + Package.moduleBaseAreaDir;
         } else {
-            expectedDirectory = MODULE_DIR + Package.MODULE_BASE_AREA_DIR + File.separator + area;
+            expectedDirectory = MODULE_DIR + Package.moduleBaseAreaDir + File.separator + area;
         }
 
         return expectedDirectory;
