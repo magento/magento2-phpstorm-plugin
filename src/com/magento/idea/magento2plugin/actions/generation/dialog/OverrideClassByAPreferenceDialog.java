@@ -40,7 +40,7 @@ import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({"PMD.TooManyFields", "PMD.DataClass", "PMD.UnusedPrivateMethod"})
-public class OverrideClassByAPreferenceDialog extends AbstractDialog {//NOPMD
+public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
     @NotNull
     private final Project project;
     private final PhpClass targetClass;

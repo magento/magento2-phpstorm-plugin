@@ -44,7 +44,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({"PMD.TooManyFields", "PMD.DataClass", "PMD.UnusedPrivateMethod"})
-public class NewModuleDialog extends AbstractDialog implements ListSelectionListener {//NOPMD
+public class NewModuleDialog extends AbstractDialog implements ListSelectionListener { //NOPMD
     @NotNull
     private final Project project;
     @NotNull
