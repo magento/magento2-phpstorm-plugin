@@ -33,6 +33,9 @@ public class NewModuleDialogValidator {
         return INSTANCE;
     }
 
+    /**
+     * New module dialog validator constructor.
+     */
     public NewModuleDialogValidator() {
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
@@ -43,8 +46,7 @@ public class NewModuleDialogValidator {
      *
      * @return Boolean
      */
-    public boolean validate()
-    {
+    public boolean validate() {
         String errorTitle = commonBundle.message("common.error");
         String packageName = dialog.getPackageName();
         if (packageName.length() == 0) {

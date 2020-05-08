@@ -9,11 +9,11 @@ import com.intellij.openapi.project.Project;
 import com.jetbrains.php.refactoring.PhpNameUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.OverrideClassByAPreferenceDialog;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.util.RegExUtil;
-import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
-import javax.swing.JOptionPane;
 import java.util.List;
+import javax.swing.JOptionPane;
 
 @SuppressWarnings({"PMD.OnlyOneReturn"})
 public class OverrideClassByAPreferenceDialogValidator {
@@ -51,8 +51,7 @@ public class OverrideClassByAPreferenceDialogValidator {
      *
      * @return boolean
      */
-    public boolean validate(Project project)
-    {
+    public boolean validate(Project project) {
         String errorTitle = commonBundle.message("common.error");
         String preferenceClassName = dialog.getPreferenceClassName();
 

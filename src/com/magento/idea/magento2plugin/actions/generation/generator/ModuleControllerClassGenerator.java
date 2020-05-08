@@ -9,8 +9,8 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.PhpFile;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
@@ -70,10 +70,15 @@ public class ModuleControllerClassGenerator extends FileGenerator {
         final PsiFile[] controllerFiles = new PsiFile[1];
 
         WriteCommandAction.runWriteCommandAction(project, () -> {
-            PhpClass controller = GetPhpClassByFQN.getInstance(project).execute(getControllerFqn());
+            PhpClass controller = GetPhpClassByFQN.getInstance(project).execute(
+                    getControllerFqn()
+            );
 
             if (controller != null) {
-                String errorMessage = this.validatorBundle.message("validator.file.alreadyExists", "Controller Class");
+                String errorMessage = this.validatorBundle.message(
+                        "validator.file.alreadyExists",
+                        "Controller Class"
+                );
                 JOptionPane.showMessageDialog(
                         null,
                         errorMessage,
@@ -87,7 +92,10 @@ public class ModuleControllerClassGenerator extends FileGenerator {
             controller = createControllerClass(actionName);
 
             if (controller == null) {
-                String errorMessage = this.validatorBundle.message("validator.file.cantBeCreated", "Controller Class");
+                String errorMessage = this.validatorBundle.message(
+                        "validator.file.cantBeCreated",
+                        "Controller Class"
+                );
                 JOptionPane.showMessageDialog(
                         null,
                         errorMessage,
@@ -172,7 +180,6 @@ public class ModuleControllerClassGenerator extends FileGenerator {
     }
 
     protected void fillAttributes(Properties attributes) {
-        ArrayList<String> uses = getUses();
         String actionClassName = controllerFileData.getActionClassName();
         attributes.setProperty("NAME", actionClassName);
         attributes.setProperty("NAMESPACE", controllerFileData.getNamespace());
@@ -180,6 +187,7 @@ public class ModuleControllerClassGenerator extends FileGenerator {
                 controllerFileData.getHttpMethodName()
         );
         attributes.setProperty("IMPLEMENTS", getNameFromFqn(httpMethodInterface));
+        ArrayList<String> uses = getUses();
         uses.add(httpMethodInterface);
 
         if (controllerFileData.getIsInheritClass()) {

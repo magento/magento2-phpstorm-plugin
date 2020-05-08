@@ -8,8 +8,8 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 import com.jetbrains.php.refactoring.PhpNameUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewGraphQlResolverDialog;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
-import com.magento.idea.magento2plugin.util.RegExUtil;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
+import com.magento.idea.magento2plugin.util.RegExUtil;
 import javax.swing.JOptionPane;
 
 @SuppressWarnings({"PMD.OnlyOneReturn"})
@@ -17,7 +17,6 @@ public class NewGraphQlResolverValidator {
     private static NewGraphQlResolverValidator INSTANCE = null;
     private ValidatorBundle validatorBundle;
     private CommonBundle commonBundle;
-
     private NewGraphQlResolverDialog dialog;
 
     /**
@@ -35,6 +34,9 @@ public class NewGraphQlResolverValidator {
         return INSTANCE;
     }
 
+    /**
+     * New Graph Ql Resolver validator constructor.
+     */
     public NewGraphQlResolverValidator() {
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
@@ -45,8 +47,7 @@ public class NewGraphQlResolverValidator {
      *
      * @return Boolean
      */
-    public boolean validate()
-    {
+    public boolean validate() {
         String errorTitle = commonBundle.message("common.error");
         String resolverClassName = dialog.getGraphQlResolverClassName();
 

@@ -8,8 +8,8 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 import com.jetbrains.php.refactoring.PhpNameUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewViewModelDialog;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
-import com.magento.idea.magento2plugin.util.RegExUtil;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
+import com.magento.idea.magento2plugin.util.RegExUtil;
 import javax.swing.JOptionPane;
 
 @SuppressWarnings({"PMD.OnlyOneReturn"})
@@ -34,6 +34,9 @@ public class NewViewModelValidator {
         return INSTANCE;
     }
 
+    /**
+     * New view model validator constructor.
+     */
     public NewViewModelValidator() {
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
@@ -44,8 +47,7 @@ public class NewViewModelValidator {
      *
      * @return Boolean
      */
-    public boolean validate()
-    {
+    public boolean validate() {
         String errorTitle = commonBundle.message("common.error");
 
         String moduleName = dialog.getViewModelName();
