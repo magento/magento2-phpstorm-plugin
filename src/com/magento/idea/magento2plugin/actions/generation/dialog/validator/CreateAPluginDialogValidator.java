@@ -15,11 +15,17 @@ import com.magento.idea.magento2plugin.util.RegExUtil;
 import java.util.List;
 import javax.swing.JOptionPane;
 
-@SuppressWarnings({"PMD.OnlyOneReturn", "PMD.FieldNamingConventions"})
+@SuppressWarnings({
+        "PMD.OnlyOneReturn",
+        "PMD.CyclomaticComplexity",
+        "PMD.NonThreadSafeSingleton",
+        "PMD.NPathComplexity",
+        "PMD.FieldNamingConventions"
+})
 public class CreateAPluginDialogValidator {
     private static final String NOT_EMPTY = "validator.notEmpty";
     private static final String PLUGIN_CLASS_NAME = "Plugin Class Name";
-    private static CreateAPluginDialogValidator INSTANCE = null;
+    private static CreateAPluginDialogValidator INSTANCE;
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
     private CreateAPluginDialog dialog;
@@ -31,7 +37,7 @@ public class CreateAPluginDialogValidator {
      *
      * @return CreateAPluginDialogValidator
      */
-    public static CreateAPluginDialogValidator getInstance(CreateAPluginDialog dialog) {
+    public static CreateAPluginDialogValidator getInstance(final CreateAPluginDialog dialog) {
         if (null == INSTANCE) {
             INSTANCE = new CreateAPluginDialogValidator();
         }
@@ -43,7 +49,7 @@ public class CreateAPluginDialogValidator {
     /**
      * Create a plugin dialog validator.
      */
-    private CreateAPluginDialogValidator() {
+    public CreateAPluginDialogValidator() {
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
     }

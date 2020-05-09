@@ -15,10 +15,14 @@ import javax.swing.JOptionPane;
         "PMD.OnlyOneReturn",
         "PMD.FieldNamingConventions",
         "PMD.DataflowAnomalyAnalysis",
+        "PMD.NonThreadSafeSingleton",
+        "PMD.CyclomaticComplexity",
         "PMD.NPathComplexity"
 })
 public class NewModuleDialogValidator {
-    private static NewModuleDialogValidator INSTANCE = null;
+    private static final String NOT_EMPTY = "validator.notEmpty";
+    private static final String MODULE_NAME = "Module Name";
+    private static NewModuleDialogValidator INSTANCE;
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
     private NewModuleDialog dialog;
@@ -41,7 +45,7 @@ public class NewModuleDialogValidator {
     /**
      * New module dialog validator constructor.
      */
-    private NewModuleDialogValidator() {
+    public NewModuleDialogValidator() {
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
     }
@@ -56,7 +60,7 @@ public class NewModuleDialogValidator {
         final String packageName = dialog.getPackageName();
         if (packageName.length() == 0) {
             final String errorMessage = validatorBundle.message(
-                    "validator.notEmpty",
+                    NOT_EMPTY,
                     "Package Name"
             );
             JOptionPane.showMessageDialog(
@@ -104,8 +108,8 @@ public class NewModuleDialogValidator {
         final String moduleName = dialog.getModuleName();
         if (moduleName.length() == 0) {
             final String errorMessage = validatorBundle.message(
-                    "validator.notEmpty",
-                    "Module Name"
+                    NOT_EMPTY,
+                    MODULE_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -120,7 +124,7 @@ public class NewModuleDialogValidator {
         if (!moduleName.matches(RegExUtil.ALPHANUMERIC)) {
             final String errorMessage = validatorBundle.message(
                     "validator.alphaNumericCharacters",
-                    "Module Name"
+                    MODULE_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -135,7 +139,7 @@ public class NewModuleDialogValidator {
         if (moduleName.equals(packageName)) {
             final String errorMessage = validatorBundle.message(
                     "validator.moduleNameIsTheSameAsPackage",
-                    "Module Name"
+                    MODULE_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -152,7 +156,7 @@ public class NewModuleDialogValidator {
         ) {
             final String errorMessage = validatorBundle.message(
                     "validator.startWithNumberOrCapitalLetter",
-                    "Module Name"
+                    MODULE_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -166,7 +170,7 @@ public class NewModuleDialogValidator {
 
         if (dialog.getModuleVersion().length() == 0) {
             final String errorMessage = validatorBundle.message(
-                    "validator.notEmpty",
+                    NOT_EMPTY,
                     "Module Version"
             );
             JOptionPane.showMessageDialog(
@@ -181,7 +185,7 @@ public class NewModuleDialogValidator {
 
         if (dialog.getModuleDescription().length() == 0) {
             final String errorMessage = validatorBundle.message(
-                    "validator.notEmpty",
+                    NOT_EMPTY,
                     "Module Description"
             );
             JOptionPane.showMessageDialog(

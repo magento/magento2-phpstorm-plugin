@@ -16,10 +16,12 @@ import javax.swing.JOptionPane;
         "PMD.OnlyOneReturn",
         "PMD.FieldNamingConventions",
         "PMD.DataflowAnomalyAnalysis",
+        "PMD.NonThreadSafeSingleton",
         "PMD.NPathComplexity"
 })
 public class NewGraphQlResolverValidator {
-    private static NewGraphQlResolverValidator INSTANCE = null;
+    private static final String GRAPHQL_RESOLVER_NAME = "GraphQL Resolver Name";
+    private static NewGraphQlResolverValidator INSTANCE;
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
     private NewGraphQlResolverDialog dialog;
@@ -59,7 +61,7 @@ public class NewGraphQlResolverValidator {
         if (!PhpNameUtil.isValidClassName(resolverClassName)) {
             final String errorMessage = this.validatorBundle.message(
                     "validator.class.isNotValid",
-                    "GraphQL Resolver Name"
+                    GRAPHQL_RESOLVER_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -74,7 +76,7 @@ public class NewGraphQlResolverValidator {
         if (resolverClassName.length() == 0) {
             final String errorMessage = validatorBundle.message(
                     "validator.notEmpty",
-                    "GraphQL Resolver Name"
+                    GRAPHQL_RESOLVER_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -89,7 +91,7 @@ public class NewGraphQlResolverValidator {
         if (!resolverClassName.matches(RegExUtil.ALPHANUMERIC)) {
             final String errorMessage = validatorBundle.message(
                     "validator.alphaNumericCharacters",
-                    "GraphQL Resolver Name"
+                    GRAPHQL_RESOLVER_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -106,7 +108,8 @@ public class NewGraphQlResolverValidator {
         ) {
             final String errorMessage = validatorBundle.message(
                     "validator.startWithNumberOrCapitalLetter",
-                    "GraphQL Resolver Name");
+                    GRAPHQL_RESOLVER_NAME
+            );
             JOptionPane.showMessageDialog(
                     null,
                     errorMessage,

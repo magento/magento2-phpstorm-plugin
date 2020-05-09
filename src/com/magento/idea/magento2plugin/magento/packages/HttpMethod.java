@@ -8,23 +8,30 @@ package com.magento.idea.magento2plugin.magento.packages;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings({"PMD.HideUtilityClassConstructor", "PMD.FieldNamingConventions"})
-public class HttpRequest {
-    public enum HttpMethod {
-        GET("Magento\\Framework\\App\\Action\\HttpGetActionInterface"),
-        POST("Magento\\Framework\\App\\Action\\HttpPostActionInterface"),
-        DELETE("Magento\\Framework\\App\\Action\\HttpDeleteActionInterface"),
-        PUT("Magento\\Framework\\App\\Action\\HttpPutActionInterface");
+public enum HttpMethod {
+    GET("Magento\\Framework\\App\\Action\\HttpGetActionInterface"),
+    POST("Magento\\Framework\\App\\Action\\HttpPostActionInterface"),
+    DELETE("Magento\\Framework\\App\\Action\\HttpDeleteActionInterface"),
+    PUT("Magento\\Framework\\App\\Action\\HttpPutActionInterface");
 
-        private String interfaceFqn;
+    private final String interfaceFqn;
 
-        HttpMethod(String interfaceFqn) {
-            this.interfaceFqn = interfaceFqn;
-        }
+    /**
+     * Http method constructor.
+     *
+     * @param interfaceFqn String
+     */
+    HttpMethod(String interfaceFqn) {
+        this.interfaceFqn = interfaceFqn;
+    }
 
-        public String getInterfaceFqn() {
-            return interfaceFqn;
-        }
+    /**
+     * Get interface FQN.
+     *
+     * @return String
+     */
+    public String getInterfaceFqn() {
+        return interfaceFqn;
     }
 
     /**
@@ -34,7 +41,7 @@ public class HttpRequest {
      * @return Request Interface
      */
     public static String getRequestInterfaceFqnByMethodName(final String methodName) {
-        return HttpRequest.HttpMethod.valueOf(methodName).getInterfaceFqn();
+        return HttpMethod.valueOf(methodName).getInterfaceFqn();
     }
 
     /**

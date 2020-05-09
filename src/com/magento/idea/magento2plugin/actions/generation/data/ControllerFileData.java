@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.actions.generation.data;
 
+@SuppressWarnings({"PMD.DataClass"})
 public class ControllerFileData {
     private final String actionDirectory;
     private final String actionClassName;
@@ -28,14 +29,14 @@ public class ControllerFileData {
      * @param namespace String
      */
     public ControllerFileData(
-            String actionDirectory,
-            String controllerClassName,
-            String controllerModule,
-            String controllerArea,
-            String httpMethodName,
-            String acl,
-            Boolean isInheritClass,
-            String namespace
+            final String actionDirectory,
+            final String controllerClassName,
+            final String controllerModule,
+            final String controllerArea,
+            final String httpMethodName,
+            final String acl,
+            final Boolean isInheritClass,
+            final String namespace
     ) {
         this.actionDirectory = actionDirectory;
         this.actionClassName = controllerClassName;

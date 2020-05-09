@@ -16,11 +16,12 @@ import javax.swing.JOptionPane;
         "PMD.OnlyOneReturn",
         "PMD.FieldNamingConventions",
         "PMD.DataflowAnomalyAnalysis",
+        "PMD.NonThreadSafeSingleton",
         "PMD.NPathComplexity"
 })
 public class NewControllerValidator {
     private static final String ACTION_NAME = "Action Name";
-    private static NewControllerValidator INSTANCE = null;
+    private static NewControllerValidator INSTANCE;
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
     private NewControllerDialog dialog;
@@ -32,7 +33,7 @@ public class NewControllerValidator {
      *
      * @return NewControllerValidator
      */
-    public static NewControllerValidator getInstance(NewControllerDialog dialog) {
+    public static NewControllerValidator getInstance(final NewControllerDialog dialog) {
         if (null == INSTANCE) {
             INSTANCE = new NewControllerValidator();
         }
@@ -44,7 +45,7 @@ public class NewControllerValidator {
     /**
      * New controller validator constructor.
      */
-    private NewControllerValidator() {
+    public NewControllerValidator() {
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
     }
@@ -120,7 +121,7 @@ public class NewControllerValidator {
             return false;
         }
 
-        String controllerName = dialog.getControllerName();
+        final String controllerName = dialog.getControllerName();
 
         if (!PhpNameUtil.isValidNamespaceName(controllerName)) {
             final String errorMessage = this.validatorBundle.message(

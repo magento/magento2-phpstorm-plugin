@@ -18,11 +18,14 @@ import javax.swing.JOptionPane;
 @SuppressWarnings({
         "PMD.OnlyOneReturn",
         "PMD.FieldNamingConventions",
+        "PMD.CyclomaticComplexity",
+        "PMD.NonThreadSafeSingleton",
         "PMD.DataflowAnomalyAnalysis",
         "PMD.NPathComplexity"
 })
 public class CreateAnObserverDialogValidator {
-    private static CreateAnObserverDialogValidator INSTANCE = null;
+    private static final String OBSERVER_CLASS_NAME = "Observer Class Name";
+    private static CreateAnObserverDialogValidator INSTANCE;
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
     private CreateAnObserverDialog dialog;
@@ -64,7 +67,7 @@ public class CreateAnObserverDialogValidator {
         if (!PhpNameUtil.isValidClassName(observerClassName)) {
             final String errorMessage = this.validatorBundle.message(
                     "validator.class.isNotValid",
-                    "Observer Class Name"
+                    OBSERVER_CLASS_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -79,7 +82,7 @@ public class CreateAnObserverDialogValidator {
         if (observerClassName.length() == 0) {
             final String errorMessage = validatorBundle.message(
                     "validator.notEmpty",
-                    "Observer Class Name"
+                    OBSERVER_CLASS_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -94,7 +97,7 @@ public class CreateAnObserverDialogValidator {
         if (!observerClassName.matches(RegExUtil.ALPHANUMERIC)) {
             final String errorMessage = validatorBundle.message(
                     "validator.alphaNumericCharacters",
-                    "Observer Class Name"
+                    OBSERVER_CLASS_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -111,7 +114,7 @@ public class CreateAnObserverDialogValidator {
         ) {
             final String errorMessage = validatorBundle.message(
                     "validator.startWithNumberOrCapitalLetter",
-                    "Observer Class Name"
+                    OBSERVER_CLASS_NAME
             );
             JOptionPane.showMessageDialog(
                     null,

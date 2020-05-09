@@ -8,18 +8,16 @@ package com.magento.idea.magento2plugin.magento.files;
 import com.intellij.lang.Language;
 import com.jetbrains.php.lang.PhpLanguage;
 
-@SuppressWarnings({"PMD.FieldNamingConventions"})
+@SuppressWarnings({
+        "PMD.FieldNamingConventions",
+        "PMD.NonThreadSafeSingleton",
+        "PMD.RedundantFieldInitializer"
+})
 public class ControllerFrontendPhp implements ModuleFileInterface {
     public static final String TEMPLATE = "Magento Module Controller Frontend Class";
     public static final String DEFAULT_DIR = "Controller";
     private static ControllerFrontendPhp INSTANCE = null;
     private String fileName;
-
-    /**
-     * Controller Frontend PHP constructor.
-     */
-    private ControllerFrontendPhp() {
-    }
 
     /**
      * Returns a new instance of the class.

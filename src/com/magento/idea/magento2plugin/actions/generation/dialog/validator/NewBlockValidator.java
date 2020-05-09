@@ -15,11 +15,13 @@ import javax.swing.JOptionPane;
 @SuppressWarnings({
         "PMD.OnlyOneReturn",
         "PMD.FieldNamingConventions",
+        "PMD.NonThreadSafeSingleton",
         "PMD.DataflowAnomalyAnalysis",
         "PMD.NPathComplexity"
 })
 public class NewBlockValidator {
-    private static NewBlockValidator INSTANCE = null;
+    private static final String BLOCK_NAME = "Block Name";
+    private static NewBlockValidator INSTANCE;
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
     private NewBlockDialog dialog;
@@ -42,7 +44,7 @@ public class NewBlockValidator {
     /**
      * New block validator constructor.
      */
-    private NewBlockValidator() {
+    public NewBlockValidator() {
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
     }
@@ -59,7 +61,7 @@ public class NewBlockValidator {
         if (!PhpNameUtil.isValidClassName(moduleName)) {
             final String errorMessage = this.validatorBundle.message(
                     "validator.class.isNotValid",
-                    "Block Name"
+                    BLOCK_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -74,7 +76,7 @@ public class NewBlockValidator {
         if (moduleName.length() == 0) {
             final String errorMessage = validatorBundle.message(
                     "validator.notEmpty",
-                    "Block Name"
+                    BLOCK_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -89,7 +91,7 @@ public class NewBlockValidator {
         if (!moduleName.matches(RegExUtil.ALPHANUMERIC)) {
             final String errorMessage = validatorBundle.message(
                     "validator.alphaNumericCharacters",
-                    "Block Name"
+                    BLOCK_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -106,7 +108,7 @@ public class NewBlockValidator {
         ) {
             final String errorMessage = validatorBundle.message(
                     "validator.startWithNumberOrCapitalLetter",
-                    "Block Name"
+                    BLOCK_NAME
             );
             JOptionPane.showMessageDialog(
                     null,

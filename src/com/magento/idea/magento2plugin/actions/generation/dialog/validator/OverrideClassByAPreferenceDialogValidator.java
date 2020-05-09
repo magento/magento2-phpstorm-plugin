@@ -19,10 +19,11 @@ import javax.swing.JOptionPane;
         "PMD.OnlyOneReturn",
         "PMD.FieldNamingConventions",
         "PMD.DataflowAnomalyAnalysis",
+        "PMD.NonThreadSafeSingleton",
         "PMD.NPathComplexity"
 })
 public class OverrideClassByAPreferenceDialogValidator {
-    private static OverrideClassByAPreferenceDialogValidator INSTANCE = null;
+    private static OverrideClassByAPreferenceDialogValidator INSTANCE;
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
     private OverrideClassByAPreferenceDialog dialog;
@@ -44,7 +45,7 @@ public class OverrideClassByAPreferenceDialogValidator {
         return INSTANCE;
     }
 
-    private OverrideClassByAPreferenceDialogValidator() {
+    public OverrideClassByAPreferenceDialogValidator() {
         validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
     }
@@ -56,7 +57,8 @@ public class OverrideClassByAPreferenceDialogValidator {
      *
      * @return boolean
      */
-    public boolean validate(Project project) {
+    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.ExcessiveMethodLength"})
+    public boolean validate(final Project project) {
         final String errorTitle = commonBundle.message("common.error");
         final String preferenceClassName = dialog.getPreferenceClassName();
 

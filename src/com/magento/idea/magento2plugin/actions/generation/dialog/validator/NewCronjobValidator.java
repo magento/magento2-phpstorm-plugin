@@ -20,12 +20,15 @@ import javax.swing.JOptionPane;
         "PMD.OnlyOneReturn",
         "PMD.FieldNamingConventions",
         "PMD.DataflowAnomalyAnalysis",
+        "PMD.CyclomaticComplexity",
+        "PMD.NonThreadSafeSingleton",
         "PMD.NcssCount",
         "PMD.NPathComplexity"
 })
 public class NewCronjobValidator {
     private static final String NOT_EMPTY = "validator.notEmpty";
-    private static NewCronjobValidator INSTANCE = null;
+    private static final String CRONJOB_CLASS_NAME = "Cronjob ClassName";
+    private static NewCronjobValidator INSTANCE;
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
 
@@ -42,7 +45,7 @@ public class NewCronjobValidator {
         return INSTANCE;
     }
 
-    private NewCronjobValidator() {
+    public NewCronjobValidator() {
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
     }
@@ -62,7 +65,7 @@ public class NewCronjobValidator {
         if (!PhpNameUtil.isValidClassName(cronjobClassName)) {
             final String errorMessage = this.validatorBundle.message(
                     "validator.class.isNotValid",
-                    "Cronjob ClassName"
+                    CRONJOB_CLASS_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -77,7 +80,7 @@ public class NewCronjobValidator {
         if (cronjobClassName.length() == 0) {
             final String errorMessage = validatorBundle.message(
                     NOT_EMPTY,
-                    "Cronjob ClassName"
+                    CRONJOB_CLASS_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -91,7 +94,7 @@ public class NewCronjobValidator {
         if (!cronjobClassName.matches(RegExUtil.ALPHANUMERIC)) {
             final String errorMessage = validatorBundle.message(
                     "validator.alphaNumericCharacters",
-                    "Cronjob ClassName"
+                    CRONJOB_CLASS_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -107,7 +110,7 @@ public class NewCronjobValidator {
         ) {
             final String errorMessage = validatorBundle.message(
                     "validator.startWithNumberOrCapitalLetter",
-                    "Cronjob ClassName"
+                    CRONJOB_CLASS_NAME
             );
             JOptionPane.showMessageDialog(
                     null,

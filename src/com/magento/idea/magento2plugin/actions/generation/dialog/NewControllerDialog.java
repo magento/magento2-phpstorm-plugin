@@ -16,7 +16,7 @@ import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.files.ControllerFrontendPhp;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
-import com.magento.idea.magento2plugin.magento.packages.HttpRequest;
+import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
@@ -27,26 +27,27 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
-@SuppressWarnings({"PMD.TooManyFields", "PMD.OnlyOneReturn"})
+@SuppressWarnings({
+        "PMD.TooManyFields",
+        "PMD.ConstructorCallsOverridableMethod"
+})
 public class NewControllerDialog extends AbstractDialog {
     private final NewControllerValidator validator;
     private final String moduleName;
+    private final Project project;
     private JPanel contentPane;
     private JButton buttonOK;
-    private Project project;
     private JButton buttonCancel;
     private FilteredComboBox controllerAreaSelect;
-    private JLabel controllerAreaLabel;
     private FilteredComboBox httpMethodSelect;
-    private JLabel controllerParentDirectoryLabel;
     private JTextField controllerName;
     private JTextField controllerParentDir;
     private JCheckBox inheritClass;
@@ -61,6 +62,7 @@ public class NewControllerDialog extends AbstractDialog {
      * @param directory PsiDirectory
      */
     public NewControllerDialog(final Project project, final PsiDirectory directory) {
+        super();
         this.project = project;
         this.moduleName = GetModuleNameByDirectory.getInstance(project).execute(directory);
         this.validator = NewControllerValidator.getInstance(this);
@@ -78,7 +80,7 @@ public class NewControllerDialog extends AbstractDialog {
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
+            public void windowClosing(final WindowEvent event) {
                 onCancel();
             }
         });
@@ -86,7 +88,7 @@ public class NewControllerDialog extends AbstractDialog {
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
                 new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
+                    public void actionPerformed(final ActionEvent event) {
                         onCancel();
                     }
                 },
@@ -169,7 +171,7 @@ public class NewControllerDialog extends AbstractDialog {
      * @param directory PsiDirectory
      */
     public static void open(final Project project, final PsiDirectory directory) {
-        NewControllerDialog dialog = new NewControllerDialog(project, directory);
+        final NewControllerDialog dialog = new NewControllerDialog(project, directory);
         dialog.pack();
         dialog.centerDialog(dialog);
         dialog.setVisible(true);
@@ -245,7 +247,7 @@ public class NewControllerDialog extends AbstractDialog {
         dispose();
     }
 
-    private ArrayList<String> getAreaList() {
+    private List<String> getAreaList() {
         return new ArrayList<>(
                 Arrays.asList(
                         Areas.frontend.toString(),
@@ -254,8 +256,9 @@ public class NewControllerDialog extends AbstractDialog {
         );
     }
 
+    @SuppressWarnings({"PMD.UnusedPrivateMethod"})
     private void createUIComponents() {
         this.controllerAreaSelect = new FilteredComboBox(getAreaList());
-        this.httpMethodSelect = new FilteredComboBox(HttpRequest.getHttpMethodList());
+        this.httpMethodSelect = new FilteredComboBox(HttpMethod.getHttpMethodList());
     }
 }

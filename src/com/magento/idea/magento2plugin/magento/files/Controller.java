@@ -5,7 +5,7 @@
 
 package com.magento.idea.magento2plugin.magento.files;
 
-@SuppressWarnings({"PMD.FieldNamingConventions"})
+@SuppressWarnings({"PMD.FieldNamingConventions", "PMD.UseUtilityClass"})
 public class Controller {
     public static final String ADMINHTML_CONTROLLER_FQN =
             "Magento\\Backend\\App\\Action";

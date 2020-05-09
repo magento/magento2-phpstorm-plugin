@@ -25,25 +25,25 @@ public class NewControllerAction extends AnAction {
     /**
      * New controller action constructor.
      */
-    NewControllerAction() {
+    public NewControllerAction() {
         super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        final DataContext dataContext = e.getDataContext();
+    public void actionPerformed(@NotNull AnActionEvent event) {
+        final DataContext dataContext = event.getDataContext();
         final IdeView view = LangDataKeys.IDE_VIEW.getData(dataContext);
 
         if (view == null) {
             return;
         }
 
-        Project project = CommonDataKeys.PROJECT.getData(dataContext);
+        final Project project = CommonDataKeys.PROJECT.getData(dataContext);
         if (project == null) {
             return;
         }
 
-        PsiDirectory directory = view.getOrChooseDirectory();
+        final PsiDirectory directory = view.getOrChooseDirectory();
         if (directory == null) {
             return;
         }

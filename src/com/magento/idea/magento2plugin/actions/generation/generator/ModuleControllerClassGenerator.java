@@ -22,7 +22,7 @@ import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.files.ControllerFrontendPhp;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
-import com.magento.idea.magento2plugin.magento.packages.HttpRequest;
+import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
@@ -35,10 +35,10 @@ import javax.swing.JOptionPane;
 
 @SuppressWarnings({"PMD.OnlyOneReturn", "PMD.DataflowAnomalyAnalysis"})
 public class ModuleControllerClassGenerator extends FileGenerator {
-    private ControllerFileData controllerFileData;
-    private Project project;
-    private ValidatorBundle validatorBundle;
-    private CommonBundle commonBundle;
+    private final ControllerFileData controllerFileData;
+    private final Project project;
+    private final ValidatorBundle validatorBundle;
+    private final CommonBundle commonBundle;
     private final GetFirstClassOfFile getFirstClassOfFile;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
@@ -131,7 +131,7 @@ public class ModuleControllerClassGenerator extends FileGenerator {
      * @return String
      */
     public static String getHttpMethodInterfaceByMethod(final String method) {
-        return HttpRequest.getRequestInterfaceFqnByMethodName(method);
+        return HttpMethod.getRequestInterfaceFqnByMethodName(method);
     }
 
     private String getControllerFqn() {
@@ -143,14 +143,14 @@ public class ModuleControllerClassGenerator extends FileGenerator {
         );
     }
 
-    private PhpClass createControllerClass(String actionName) {
+    private PhpClass createControllerClass(final String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(getControllerModule());
         final PsiFile controllerFile;
         final String[] controllerDirectories = controllerFileData.getActionDirectory().split(
                 File.separator
         );
-        for (String controllerDirectory: controllerDirectories) {
+        for (final String controllerDirectory: controllerDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(
                     parentDirectory, controllerDirectory
             );
