@@ -1,0 +1,24 @@
+<?php
+#parse("PHP File Header.php")
+#if (${NAMESPACE})
+
+namespace ${NAMESPACE};
+#end
+
+#set ($uses = ${USES})
+#foreach ($use in $uses.split(","))
+use $use;
+#end
+
+class ${NAME}#if (${EXTENDS}) extends ${EXTENDS}#end#if (${IMPLEMENTS}) implements ${IMPLEMENTS}#end {
+    /**
+     * Execute action based on request and return result
+     *
+     * @return ResultInterface|ResponseInterface
+     * @throws NotFoundException
+     */
+    public function execute()
+    {
+        // TODO: Implement execute method.
+    }
+}

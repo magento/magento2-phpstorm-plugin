@@ -1,0 +1,58 @@
+<!--
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<html>
+<body>
+<table width="100%" border="0" cellpadding="5" cellspacing="0" style="border-collapse: collapse">
+    <tr>
+        <td>
+            <font face="verdana" size="-1">
+                Action classes are extensions of the Action class that a router returns on matched requests.
+                Each Action should implement Magento\Framework\App\Action\HttpHTTP MethodActionInterface to declare which HTTP request methods it can process.
+                The <a href="https://github.com/magento/magento2/blob/2.3/lib/internal/Magento/Framework/App/ActionInterface.php#L34">execute()</a> function in these classes contain the logic for dispatching requests.
+                Action class should return a <a href="https://github.com/magento/magento2/blob/2.3/lib/internal/Magento/Framework/Controller/ResultInterface.php">result</a> object.
+            </font><br>
+        </td>
+    </tr>
+    <tr>
+        <td><font face="verdana" size="-1">
+            <a href="https://devdocs.magento.com/guides/v2.3/extension-dev-guide/routing.html#action-class">Read more</a> about Controller Action, including when those can be used.
+        </font><br>
+        </td>
+    </tr>
+</table>
+<table width="100%" border="0" cellpadding="5" cellspacing="0" style="border-collapse: collapse">
+    <tr>
+        <td colspan="3"><font face="verdana" size="-1">Predefined variables will take the following values:</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${NAMESPACE}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">Created PHP Controller Action class namespace.</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${NAME}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">PHP class for the Controller Action name.</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${EXTENDS}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">Name of PHP class that the Controller Action extends.</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${IMPLEMENTS}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">Name of PHP interface that the Controller Action implements.</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${USES}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">List of imports separated by comma.</font></td>
+    </tr>
+</table>
+</body>
+</html>
