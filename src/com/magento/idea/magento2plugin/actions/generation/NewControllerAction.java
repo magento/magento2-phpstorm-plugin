@@ -15,7 +15,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewControllerDialog;
-import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({"PMD.OnlyOneReturn", "PMD.FieldNamingConventions"})
 public class NewControllerAction extends AnAction {
@@ -30,7 +29,7 @@ public class NewControllerAction extends AnAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent event) {
+    public void actionPerformed(final AnActionEvent event) {
         final DataContext dataContext = event.getDataContext();
         final IdeView view = LangDataKeys.IDE_VIEW.getData(dataContext);
 

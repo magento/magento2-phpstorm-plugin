@@ -22,6 +22,7 @@ import javax.swing.JOptionPane;
         "PMD.DataflowAnomalyAnalysis",
         "PMD.CyclomaticComplexity",
         "PMD.NonThreadSafeSingleton",
+        "PMD.ExcessiveMethodLength",
         "PMD.NcssCount",
         "PMD.NPathComplexity"
 })

@@ -21,7 +21,7 @@ public enum HttpMethod {
      *
      * @param interfaceFqn String
      */
-    HttpMethod(String interfaceFqn) {
+    HttpMethod(final String interfaceFqn) {
         this.interfaceFqn = interfaceFqn;
     }
 

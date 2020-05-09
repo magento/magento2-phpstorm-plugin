@@ -19,6 +19,7 @@ import javax.swing.JOptionPane;
         "PMD.OnlyOneReturn",
         "PMD.CyclomaticComplexity",
         "PMD.NonThreadSafeSingleton",
+        "PMD.ExcessiveMethodLength",
         "PMD.NPathComplexity",
         "PMD.FieldNamingConventions"
 })

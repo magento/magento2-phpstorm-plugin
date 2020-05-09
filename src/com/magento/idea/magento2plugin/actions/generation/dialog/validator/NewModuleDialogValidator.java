@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
         "PMD.DataflowAnomalyAnalysis",
         "PMD.NonThreadSafeSingleton",
         "PMD.CyclomaticComplexity",
+        "PMD.ExcessiveMethodLength",
         "PMD.NPathComplexity"
 })
 public class NewModuleDialogValidator {
@@ -34,7 +35,7 @@ public class NewModuleDialogValidator {
      *
      * @return NewModuleDialogValidator
      */
-    public static NewModuleDialogValidator getInstance(NewModuleDialog dialog) {
+    public static NewModuleDialogValidator getInstance(final NewModuleDialog dialog) {
         if (null == INSTANCE) {
             INSTANCE = new NewModuleDialogValidator();
         }
