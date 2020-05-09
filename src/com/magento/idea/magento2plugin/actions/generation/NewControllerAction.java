@@ -17,10 +17,10 @@ import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewControllerDialog;
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings({"PMD.OnlyOneReturn"})
+@SuppressWarnings({"PMD.OnlyOneReturn", "PMD.FieldNamingConventions"})
 public class NewControllerAction extends AnAction {
-    public static String ACTION_NAME = "Magento 2 Controller";
-    public static String ACTION_DESCRIPTION = "Create a new Magento 2 controller";
+    public static final String ACTION_NAME = "Magento 2 Controller";
+    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 controller";
 
     /**
      * New controller action constructor.
@@ -31,8 +31,8 @@ public class NewControllerAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        DataContext dataContext = e.getDataContext();
-        IdeView view = LangDataKeys.IDE_VIEW.getData(dataContext);
+        final DataContext dataContext = e.getDataContext();
+        final IdeView view = LangDataKeys.IDE_VIEW.getData(dataContext);
 
         if (view == null) {
             return;

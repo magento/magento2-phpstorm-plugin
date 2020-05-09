@@ -8,11 +8,18 @@ package com.magento.idea.magento2plugin.magento.files;
 import com.intellij.lang.Language;
 import com.jetbrains.php.lang.PhpLanguage;
 
+@SuppressWarnings({"PMD.FieldNamingConventions"})
 public class ControllerFrontendPhp implements ModuleFileInterface {
-    public static String TEMPLATE = "Magento Module Controller Frontend Class";
-    public static String DEFAULT_DIR = "Controller";
+    public static final String TEMPLATE = "Magento Module Controller Frontend Class";
+    public static final String DEFAULT_DIR = "Controller";
     private static ControllerFrontendPhp INSTANCE = null;
     private String fileName;
+
+    /**
+     * Controller Frontend PHP constructor.
+     */
+    private ControllerFrontendPhp() {
+    }
 
     /**
      * Returns a new instance of the class.
@@ -20,7 +27,7 @@ public class ControllerFrontendPhp implements ModuleFileInterface {
      * @param className Controller class name
      * @return ControllerFrontendPhp
      */
-    public static ControllerFrontendPhp getInstance(String className) {
+    public static ControllerFrontendPhp getInstance(final String className) {
         if (null == INSTANCE) {
             INSTANCE = new ControllerFrontendPhp();
         }
@@ -62,7 +69,7 @@ public class ControllerFrontendPhp implements ModuleFileInterface {
      *
      * @param filename Name of frontend controller file.
      */
-    private void setFileName(String filename) {
+    private void setFileName(final String filename) {
         this.fileName = filename;
     }
 }

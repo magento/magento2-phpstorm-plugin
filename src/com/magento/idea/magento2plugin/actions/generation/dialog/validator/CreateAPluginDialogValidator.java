@@ -15,11 +15,13 @@ import com.magento.idea.magento2plugin.util.RegExUtil;
 import java.util.List;
 import javax.swing.JOptionPane;
 
-@SuppressWarnings({"PMD.OnlyOneReturn"})
+@SuppressWarnings({"PMD.OnlyOneReturn", "PMD.FieldNamingConventions"})
 public class CreateAPluginDialogValidator {
+    private static final String NOT_EMPTY = "validator.notEmpty";
+    private static final String PLUGIN_CLASS_NAME = "Plugin Class Name";
     private static CreateAPluginDialogValidator INSTANCE = null;
-    private ValidatorBundle validatorBundle;
-    private CommonBundle commonBundle;
+    private final ValidatorBundle validatorBundle;
+    private final CommonBundle commonBundle;
     private CreateAPluginDialog dialog;
 
     /**
@@ -41,7 +43,7 @@ public class CreateAPluginDialogValidator {
     /**
      * Create a plugin dialog validator.
      */
-    public CreateAPluginDialogValidator() {
+    private CreateAPluginDialogValidator() {
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
     }
@@ -53,14 +55,14 @@ public class CreateAPluginDialogValidator {
      *
      * @return Boolean
      */
-    public boolean validate(Project project) {
-        String errorTitle = commonBundle.message("common.error");
-        String pluginClassName = dialog.getPluginClassName();
+    public boolean validate(final Project project) {
+        final String errorTitle = commonBundle.message("common.error");
+        final String pluginClassName = dialog.getPluginClassName();
 
         if (!PhpNameUtil.isValidClassName(pluginClassName)) {
-            String errorMessage = this.validatorBundle.message(
+            final String errorMessage = this.validatorBundle.message(
                     "validator.class.isNotValid",
-                    "Plugin Class Name"
+                    PLUGIN_CLASS_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -73,9 +75,9 @@ public class CreateAPluginDialogValidator {
         }
 
         if (pluginClassName.length() == 0) {
-            String errorMessage = validatorBundle.message(
-                    "validator.notEmpty",
-                    "Plugin Class Name"
+            final String errorMessage = validatorBundle.message(
+                    NOT_EMPTY,
+                    PLUGIN_CLASS_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -88,9 +90,9 @@ public class CreateAPluginDialogValidator {
         }
 
         if (!pluginClassName.matches(RegExUtil.ALPHANUMERIC)) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.alphaNumericCharacters",
-                    "Plugin Class Name"
+                    PLUGIN_CLASS_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -105,9 +107,9 @@ public class CreateAPluginDialogValidator {
         if (!Character.isUpperCase(pluginClassName.charAt(0))
                 && !Character.isDigit(pluginClassName.charAt(0))
         ) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.startWithNumberOrCapitalLetter",
-                    "Plugin Class Name"
+                    PLUGIN_CLASS_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -119,10 +121,10 @@ public class CreateAPluginDialogValidator {
             return false;
         }
 
-        String pluginDirectory = dialog.getPluginDirectory();
+        final String pluginDirectory = dialog.getPluginDirectory();
         if (pluginDirectory.length() == 0) {
-            String errorMessage = validatorBundle.message(
-                    "validator.notEmpty",
+            final String errorMessage = validatorBundle.message(
+                    NOT_EMPTY,
                     "Plugin Directory"
             );
             JOptionPane.showMessageDialog(
@@ -136,7 +138,7 @@ public class CreateAPluginDialogValidator {
         }
 
         if (!pluginDirectory.matches(RegExUtil.DIRECTORY)) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.directory.isNotValid",
                     "Plugin Directory"
             );
@@ -150,10 +152,10 @@ public class CreateAPluginDialogValidator {
             return false;
         }
 
-        String pluginName = dialog.getPluginName();
+        final String pluginName = dialog.getPluginName();
         if (pluginName.length() == 0) {
-            String errorMessage = validatorBundle.message(
-                    "validator.notEmpty",
+            final String errorMessage = validatorBundle.message(
+                    NOT_EMPTY,
                     "Plugin Name"
             );
             JOptionPane.showMessageDialog(
@@ -167,7 +169,7 @@ public class CreateAPluginDialogValidator {
         }
 
         if (!pluginName.matches(RegExUtil.IDENTIFIER)) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.identifier",
                     "Plugin Name"
             );
@@ -181,10 +183,10 @@ public class CreateAPluginDialogValidator {
             return false;
         }
 
-        String sortOrder = dialog.getPluginSortOrder();
+        final String sortOrder = dialog.getPluginSortOrder();
         if (sortOrder.length() == 0) {
-            String errorMessage = validatorBundle.message(
-                    "validator.notEmpty",
+            final String errorMessage = validatorBundle.message(
+                    NOT_EMPTY,
                     "Sort Order"
             );
             JOptionPane.showMessageDialog(
@@ -198,7 +200,7 @@ public class CreateAPluginDialogValidator {
         }
 
         if (!sortOrder.matches(RegExUtil.NUMERIC)) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.onlyNumbers",
                     "Sort Order"
             );
@@ -212,10 +214,10 @@ public class CreateAPluginDialogValidator {
             return false;
         }
 
-        String pluginModule = dialog.getPluginModule();
+        final String pluginModule = dialog.getPluginModule();
         if (pluginModule.length() == 0) {
-            String errorMessage = validatorBundle.message(
-                    "validator.notEmpty",
+            final String errorMessage = validatorBundle.message(
+                    NOT_EMPTY,
                     "Plugin Module"
             );
             JOptionPane.showMessageDialog(
@@ -228,9 +230,9 @@ public class CreateAPluginDialogValidator {
             return false;
         }
 
-        List<String> allModulesList = ModuleIndex.getInstance(project).getEditableModuleNames();
+        final List<String> allModulesList = ModuleIndex.getInstance(project).getEditableModuleNames();
         if (!allModulesList.contains(pluginModule)) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.module.noSuchModule",
                     pluginModule
             );

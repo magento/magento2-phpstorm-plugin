@@ -15,11 +15,16 @@ import com.magento.idea.magento2plugin.util.RegExUtil;
 import java.util.List;
 import javax.swing.JOptionPane;
 
-@SuppressWarnings({"PMD.OnlyOneReturn"})
+@SuppressWarnings({
+        "PMD.OnlyOneReturn",
+        "PMD.FieldNamingConventions",
+        "PMD.DataflowAnomalyAnalysis",
+        "PMD.NPathComplexity"
+})
 public class OverrideClassByAPreferenceDialogValidator {
     private static OverrideClassByAPreferenceDialogValidator INSTANCE = null;
-    private ValidatorBundle validatorBundle;
-    private CommonBundle commonBundle;
+    private final ValidatorBundle validatorBundle;
+    private final CommonBundle commonBundle;
     private OverrideClassByAPreferenceDialog dialog;
 
     /**
@@ -30,7 +35,7 @@ public class OverrideClassByAPreferenceDialogValidator {
      * @return OverrideClassByAPreferenceDialogValidator
      */
     public static OverrideClassByAPreferenceDialogValidator getInstance(
-            OverrideClassByAPreferenceDialog dialog
+            final OverrideClassByAPreferenceDialog dialog
     ) {
         if (null == INSTANCE) {
             INSTANCE = new OverrideClassByAPreferenceDialogValidator();
@@ -39,7 +44,7 @@ public class OverrideClassByAPreferenceDialogValidator {
         return INSTANCE;
     }
 
-    public OverrideClassByAPreferenceDialogValidator() {
+    private OverrideClassByAPreferenceDialogValidator() {
         validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
     }
@@ -52,11 +57,11 @@ public class OverrideClassByAPreferenceDialogValidator {
      * @return boolean
      */
     public boolean validate(Project project) {
-        String errorTitle = commonBundle.message("common.error");
-        String preferenceClassName = dialog.getPreferenceClassName();
+        final String errorTitle = commonBundle.message("common.error");
+        final String preferenceClassName = dialog.getPreferenceClassName();
 
         if (!PhpNameUtil.isValidClassName(preferenceClassName)) {
-            String errorMessage = this.validatorBundle.message(
+            final String errorMessage = this.validatorBundle.message(
                     "validator.class.isNotValid",
                     "Preference Class Name"
             );
@@ -71,7 +76,7 @@ public class OverrideClassByAPreferenceDialogValidator {
         }
 
         if (preferenceClassName.length() == 0) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.notEmpty",
                     "Preference Class Name"
             );
@@ -86,7 +91,7 @@ public class OverrideClassByAPreferenceDialogValidator {
         }
 
         if (!preferenceClassName.matches(RegExUtil.ALPHANUMERIC)) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.alphaNumericCharacters",
                     "Preference Class"
             );
@@ -103,7 +108,7 @@ public class OverrideClassByAPreferenceDialogValidator {
         if (!Character.isUpperCase(preferenceClassName.charAt(0))
                 && !Character.isDigit(preferenceClassName.charAt(0))
         ) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.startWithNumberOrCapitalLetter",
                     "Preference Class"
             );
@@ -117,9 +122,9 @@ public class OverrideClassByAPreferenceDialogValidator {
             return false;
         }
 
-        String preferenceDirectory = dialog.getPreferenceDirectory();
+        final String preferenceDirectory = dialog.getPreferenceDirectory();
         if (preferenceDirectory.length() == 0) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.notEmpty",
                     "Preference Directory"
             );
@@ -134,7 +139,7 @@ public class OverrideClassByAPreferenceDialogValidator {
         }
 
         if (!preferenceDirectory.matches(RegExUtil.DIRECTORY)) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.directory.isNotValid",
                     "Preference Directory"
             );
@@ -147,9 +152,9 @@ public class OverrideClassByAPreferenceDialogValidator {
             return false;
         }
 
-        String preferenceModule = dialog.getPreferenceModule();
+        final String preferenceModule = dialog.getPreferenceModule();
         if (preferenceModule.length() == 0) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.notEmpty",
                     "Preference Module"
             );
@@ -163,9 +168,9 @@ public class OverrideClassByAPreferenceDialogValidator {
             return false;
         }
 
-        List<String> allModulesList = ModuleIndex.getInstance(project).getEditableModuleNames();
+        final List<String> allModulesList = ModuleIndex.getInstance(project).getEditableModuleNames();
         if (!allModulesList.contains(preferenceModule)) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.module.noSuchModule",
                     preferenceModule
             );

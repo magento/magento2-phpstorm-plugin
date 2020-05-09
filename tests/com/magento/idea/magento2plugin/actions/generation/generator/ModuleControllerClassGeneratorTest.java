@@ -14,8 +14,8 @@ public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
      * Test generation of frontend controller file.
      */
     public void testGenerateFrontendControllerFile() {
-        Project project = myFixture.getProject();
-        ControllerFileData controllerFileData = new ControllerFileData(
+        final Project project = myFixture.getProject();
+        final ControllerFileData controllerFileData = new ControllerFileData(
                 "Controller/Entity",
                 "GetAction",
                 "Foo_Bar",
@@ -25,14 +25,14 @@ public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
                 false,
                 "Foo\\Bar\\Controller\\Entity"
         );
-        ModuleControllerClassGenerator controllerGenerator = new ModuleControllerClassGenerator(
+        final ModuleControllerClassGenerator generator = new ModuleControllerClassGenerator(
                 controllerFileData,
                 project
         );
-        PsiFile controllerFile = controllerGenerator.generate("test");
+        final PsiFile controllerFile = generator.generate("test");
+        final String filePath = this.getFixturePath("GetAction.php");
+        final PsiFile expectedFile = myFixture.configureByFile(filePath);
 
-        String filePath = this.getFixturePath("GetAction.php");
-        PsiFile expectedFile = myFixture.configureByFile(filePath);
         assertGeneratedFileIsCorrect(
                 expectedFile,
                 "src/app/code/Foo/Bar/Controller/Entity",
@@ -44,8 +44,8 @@ public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
      * Test generation of frontend controller file with action class inheritance.
      */
     public void testGenerateFrontendInheritActionControllerFile() {
-        Project project = myFixture.getProject();
-        ControllerFileData controllerFileData = new ControllerFileData(
+        final Project project = myFixture.getProject();
+        final ControllerFileData controllerFileData = new ControllerFileData(
                 "Controller/Entity",
                 "DeleteAction",
                 "Foo_Bar",
@@ -55,14 +55,14 @@ public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
                 true,
                 "Foo\\Bar\\Controller\\Entity"
         );
-        ModuleControllerClassGenerator controllerGenerator = new ModuleControllerClassGenerator(
+        final ModuleControllerClassGenerator generator = new ModuleControllerClassGenerator(
                 controllerFileData,
                 project
         );
-        PsiFile controllerFile = controllerGenerator.generate("test");
+        final PsiFile controllerFile = generator.generate("test");
+        final String filePath = this.getFixturePath("DeleteAction.php");
+        final PsiFile expectedFile = myFixture.configureByFile(filePath);
 
-        String filePath = this.getFixturePath("DeleteAction.php");
-        PsiFile expectedFile = myFixture.configureByFile(filePath);
         assertGeneratedFileIsCorrect(
                 expectedFile,
                 "src/app/code/Foo/Bar/Controller/Entity",
@@ -74,8 +74,8 @@ public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
      * Test generation of backend controller file.
      */
     public void testGenerateBackendControllerFile() {
-        Project project = myFixture.getProject();
-        ControllerFileData controllerFileData = new ControllerFileData(
+        final Project project = myFixture.getProject();
+        final ControllerFileData controllerFileData = new ControllerFileData(
                 "Controller/Adminhtml/Entity",
                 "BackendSaveAction",
                 "Foo_Bar",
@@ -85,14 +85,14 @@ public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
                 true,
                 "Foo\\Bar\\Controller\\Adminhtml\\Entity"
         );
-        ModuleControllerClassGenerator controllerGenerator = new ModuleControllerClassGenerator(
+        final ModuleControllerClassGenerator generator = new ModuleControllerClassGenerator(
                 controllerFileData,
                 project
         );
-        PsiFile controllerFile = controllerGenerator.generate("test");
+        final PsiFile controllerFile = generator.generate("test");
+        final String filePath = this.getFixturePath("BackendSaveAction.php");
+        final PsiFile expectedFile = myFixture.configureByFile(filePath);
 
-        String filePath = this.getFixturePath("BackendSaveAction.php");
-        PsiFile expectedFile = myFixture.configureByFile(filePath);
         assertGeneratedFileIsCorrect(
                 expectedFile,
                 "src/app/code/Foo/Bar/Controller/Adminhtml/Entity",

@@ -12,11 +12,16 @@ import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import javax.swing.JOptionPane;
 
-@SuppressWarnings({"PMD.OnlyOneReturn"})
+@SuppressWarnings({
+        "PMD.OnlyOneReturn",
+        "PMD.FieldNamingConventions",
+        "PMD.DataflowAnomalyAnalysis",
+        "PMD.NPathComplexity"
+})
 public class NewBlockValidator {
     private static NewBlockValidator INSTANCE = null;
-    private ValidatorBundle validatorBundle;
-    private CommonBundle commonBundle;
+    private final ValidatorBundle validatorBundle;
+    private final CommonBundle commonBundle;
     private NewBlockDialog dialog;
 
     /**
@@ -26,7 +31,7 @@ public class NewBlockValidator {
      *
      * @return NewBlockValidator
      */
-    public static NewBlockValidator getInstance(NewBlockDialog dialog) {
+    public static NewBlockValidator getInstance(final NewBlockDialog dialog) {
         if (null == INSTANCE) {
             INSTANCE = new NewBlockValidator();
         }
@@ -37,7 +42,7 @@ public class NewBlockValidator {
     /**
      * New block validator constructor.
      */
-    public NewBlockValidator() {
+    private NewBlockValidator() {
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
     }
@@ -48,11 +53,11 @@ public class NewBlockValidator {
      * @return Boolean
      */
     public boolean validate() {
-        String errorTitle = commonBundle.message("common.error");
-        String moduleName = dialog.getBlockName();
+        final String errorTitle = commonBundle.message("common.error");
+        final String moduleName = dialog.getBlockName();
 
         if (!PhpNameUtil.isValidClassName(moduleName)) {
-            String errorMessage = this.validatorBundle.message(
+            final String errorMessage = this.validatorBundle.message(
                     "validator.class.isNotValid",
                     "Block Name"
             );
@@ -67,7 +72,7 @@ public class NewBlockValidator {
         }
 
         if (moduleName.length() == 0) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.notEmpty",
                     "Block Name"
             );
@@ -82,7 +87,7 @@ public class NewBlockValidator {
         }
 
         if (!moduleName.matches(RegExUtil.ALPHANUMERIC)) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.alphaNumericCharacters",
                     "Block Name"
             );
@@ -99,7 +104,7 @@ public class NewBlockValidator {
         if (!Character.isUpperCase(moduleName.charAt(0))
                 && !Character.isDigit(moduleName.charAt(0))
         ) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.startWithNumberOrCapitalLetter",
                     "Block Name"
             );
@@ -113,9 +118,9 @@ public class NewBlockValidator {
             return false;
         }
 
-        String pluginDirectory = dialog.getBlockDirectory();
+        final String pluginDirectory = dialog.getBlockDirectory();
         if (pluginDirectory.length() == 0) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.notEmpty",
                     "Block Directory"
             );
@@ -130,7 +135,7 @@ public class NewBlockValidator {
         }
 
         if (!pluginDirectory.matches(RegExUtil.DIRECTORY)) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.directory.isNotValid",
                     "Block Directory"
             );

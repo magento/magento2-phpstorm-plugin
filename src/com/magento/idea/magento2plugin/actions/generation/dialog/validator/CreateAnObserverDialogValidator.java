@@ -15,11 +15,16 @@ import com.magento.idea.magento2plugin.util.RegExUtil;
 import java.util.List;
 import javax.swing.JOptionPane;
 
-@SuppressWarnings({"PMD.OnlyOneReturn"})
+@SuppressWarnings({
+        "PMD.OnlyOneReturn",
+        "PMD.FieldNamingConventions",
+        "PMD.DataflowAnomalyAnalysis",
+        "PMD.NPathComplexity"
+})
 public class CreateAnObserverDialogValidator {
     private static CreateAnObserverDialogValidator INSTANCE = null;
-    private ValidatorBundle validatorBundle;
-    private CommonBundle commonBundle;
+    private final ValidatorBundle validatorBundle;
+    private final CommonBundle commonBundle;
     private CreateAnObserverDialog dialog;
 
     /**
@@ -29,7 +34,7 @@ public class CreateAnObserverDialogValidator {
      *
      * @return CreateAnObserverDialogValidator
      */
-    public static CreateAnObserverDialogValidator getInstance(CreateAnObserverDialog dialog) {
+    public static CreateAnObserverDialogValidator getInstance(final CreateAnObserverDialog dialog) {
         if (null == INSTANCE) {
             INSTANCE = new CreateAnObserverDialogValidator();
         }
@@ -52,12 +57,12 @@ public class CreateAnObserverDialogValidator {
      *
      * @return Boolean
      */
-    public boolean validate(Project project) {
-        String errorTitle = commonBundle.message("common.error");
-        String observerClassName = dialog.getObserverClassName();
+    public boolean validate(final Project project) {
+        final String errorTitle = commonBundle.message("common.error");
+        final String observerClassName = dialog.getObserverClassName();
 
         if (!PhpNameUtil.isValidClassName(observerClassName)) {
-            String errorMessage = this.validatorBundle.message(
+            final String errorMessage = this.validatorBundle.message(
                     "validator.class.isNotValid",
                     "Observer Class Name"
             );
@@ -72,7 +77,7 @@ public class CreateAnObserverDialogValidator {
         }
 
         if (observerClassName.length() == 0) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.notEmpty",
                     "Observer Class Name"
             );
@@ -87,7 +92,7 @@ public class CreateAnObserverDialogValidator {
         }
 
         if (!observerClassName.matches(RegExUtil.ALPHANUMERIC)) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.alphaNumericCharacters",
                     "Observer Class Name"
             );
@@ -104,7 +109,7 @@ public class CreateAnObserverDialogValidator {
         if (!Character.isUpperCase(observerClassName.charAt(0))
                 && !Character.isDigit(observerClassName.charAt(0))
         ) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.startWithNumberOrCapitalLetter",
                     "Observer Class Name"
             );
@@ -118,10 +123,10 @@ public class CreateAnObserverDialogValidator {
             return false;
         }
 
-        String observerDirectory = dialog.getObserverDirectory();
+        final String observerDirectory = dialog.getObserverDirectory();
 
         if (observerDirectory.length() == 0) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.notEmpty",
                     "Observer Directory"
             );
@@ -136,7 +141,7 @@ public class CreateAnObserverDialogValidator {
         }
 
         if (!observerDirectory.matches(RegExUtil.DIRECTORY)) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.directory.isNotValid",
                     "Observer Directory"
             );
@@ -151,9 +156,9 @@ public class CreateAnObserverDialogValidator {
         }
 
 
-        String observerModule = dialog.getObserverModule();
+        final String observerModule = dialog.getObserverModule();
         if (observerModule.length() == 0) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.notEmpty",
                     "Observer Module"
             );
@@ -167,9 +172,10 @@ public class CreateAnObserverDialogValidator {
             return false;
         }
 
-        List<String> allModulesList = ModuleIndex.getInstance(project).getEditableModuleNames();
+        final List<String> allModulesList = ModuleIndex.getInstance(project)
+                .getEditableModuleNames();
         if (!allModulesList.contains(observerModule)) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.module.noSuchModule",
                     observerModule
             );

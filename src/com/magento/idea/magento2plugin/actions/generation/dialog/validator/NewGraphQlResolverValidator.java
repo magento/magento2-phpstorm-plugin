@@ -12,11 +12,16 @@ import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import javax.swing.JOptionPane;
 
-@SuppressWarnings({"PMD.OnlyOneReturn"})
+@SuppressWarnings({
+        "PMD.OnlyOneReturn",
+        "PMD.FieldNamingConventions",
+        "PMD.DataflowAnomalyAnalysis",
+        "PMD.NPathComplexity"
+})
 public class NewGraphQlResolverValidator {
     private static NewGraphQlResolverValidator INSTANCE = null;
-    private ValidatorBundle validatorBundle;
-    private CommonBundle commonBundle;
+    private final ValidatorBundle validatorBundle;
+    private final CommonBundle commonBundle;
     private NewGraphQlResolverDialog dialog;
 
     /**
@@ -26,7 +31,7 @@ public class NewGraphQlResolverValidator {
      *
      * @return NewGraphQlResolverValidator
      */
-    public static NewGraphQlResolverValidator getInstance(NewGraphQlResolverDialog dialog) {
+    public static NewGraphQlResolverValidator getInstance(final NewGraphQlResolverDialog dialog) {
         if (null == INSTANCE) {
             INSTANCE = new NewGraphQlResolverValidator();
         }
@@ -48,11 +53,11 @@ public class NewGraphQlResolverValidator {
      * @return Boolean
      */
     public boolean validate() {
-        String errorTitle = commonBundle.message("common.error");
-        String resolverClassName = dialog.getGraphQlResolverClassName();
+        final String errorTitle = commonBundle.message("common.error");
+        final String resolverClassName = dialog.getGraphQlResolverClassName();
 
         if (!PhpNameUtil.isValidClassName(resolverClassName)) {
-            String errorMessage = this.validatorBundle.message(
+            final String errorMessage = this.validatorBundle.message(
                     "validator.class.isNotValid",
                     "GraphQL Resolver Name"
             );
@@ -67,7 +72,7 @@ public class NewGraphQlResolverValidator {
         }
 
         if (resolverClassName.length() == 0) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.notEmpty",
                     "GraphQL Resolver Name"
             );
@@ -82,7 +87,7 @@ public class NewGraphQlResolverValidator {
         }
 
         if (!resolverClassName.matches(RegExUtil.ALPHANUMERIC)) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.alphaNumericCharacters",
                     "GraphQL Resolver Name"
             );
@@ -99,7 +104,7 @@ public class NewGraphQlResolverValidator {
         if (!Character.isUpperCase(resolverClassName.charAt(0))
                 && !Character.isDigit(resolverClassName.charAt(0))
         ) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.startWithNumberOrCapitalLetter",
                     "GraphQL Resolver Name");
             JOptionPane.showMessageDialog(
@@ -112,9 +117,9 @@ public class NewGraphQlResolverValidator {
             return false;
         }
 
-        String graphQlResolverDirectory = dialog.getGraphQlResolverDirectory();
+        final String graphQlResolverDirectory = dialog.getGraphQlResolverDirectory();
         if (graphQlResolverDirectory.length() == 0) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.notEmpty",
                     "GraphQL Resolver Directory"
             );
@@ -129,7 +134,7 @@ public class NewGraphQlResolverValidator {
         }
 
         if (!graphQlResolverDirectory.matches(RegExUtil.DIRECTORY)) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.directory.isNotValid",
                     "GraphQL Resolver Directory"
             );

@@ -12,9 +12,16 @@ import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import javax.swing.JOptionPane;
 
-@SuppressWarnings({"PMD.OnlyOneReturn"})
+@SuppressWarnings({
+        "PMD.OnlyOneReturn",
+        "PMD.FieldNamingConventions",
+        "PMD.DataflowAnomalyAnalysis",
+        "PMD.NPathComplexity"
+})
 public class NewViewModelValidator {
     private static NewViewModelValidator INSTANCE = null;
+    private final static String VIEW_MODEL_NAME = "View Model Name";
+    private final static String VIEW_MODEL_DIR = "View Model Directory";
     private ValidatorBundle validatorBundle;
     private CommonBundle commonBundle;
     private NewViewModelDialog dialog;
@@ -26,7 +33,7 @@ public class NewViewModelValidator {
      *
      * @return NewViewModelValidator
      */
-    public static NewViewModelValidator getInstance(NewViewModelDialog dialog) {
+    public static NewViewModelValidator getInstance(final NewViewModelDialog dialog) {
         if (null == INSTANCE) {
             INSTANCE = new NewViewModelValidator();
         }
@@ -55,7 +62,7 @@ public class NewViewModelValidator {
         if (!PhpNameUtil.isValidClassName(moduleName)) {
             String errorMessage = this.validatorBundle.message(
                     "validator.class.isNotValid",
-                    "View Model Name"
+                    VIEW_MODEL_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -70,7 +77,7 @@ public class NewViewModelValidator {
         if (moduleName.length() == 0) {
             String errorMessage = validatorBundle.message(
                     "validator.notEmpty",
-                    "View Model Name"
+                    VIEW_MODEL_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -85,7 +92,7 @@ public class NewViewModelValidator {
         if (!moduleName.matches(RegExUtil.ALPHANUMERIC)) {
             String errorMessage = validatorBundle.message(
                     "validator.alphaNumericCharacters",
-                    "View Model Name"
+                    VIEW_MODEL_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -102,7 +109,7 @@ public class NewViewModelValidator {
         ) {
             String errorMessage = validatorBundle.message(
                     "validator.startWithNumberOrCapitalLetter",
-                    "View Model Name"
+                    VIEW_MODEL_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -118,7 +125,7 @@ public class NewViewModelValidator {
         if (pluginDirectory.length() == 0) {
             String errorMessage = validatorBundle.message(
                     "validator.notEmpty",
-                    "View Model Directory"
+                    VIEW_MODEL_DIR
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -133,7 +140,7 @@ public class NewViewModelValidator {
         if (!pluginDirectory.matches(RegExUtil.DIRECTORY)) {
             String errorMessage = validatorBundle.message(
                     "validator.directory.isNotValid",
-                    "View Model Directory"
+                    VIEW_MODEL_DIR
             );
             JOptionPane.showMessageDialog(
                     null,

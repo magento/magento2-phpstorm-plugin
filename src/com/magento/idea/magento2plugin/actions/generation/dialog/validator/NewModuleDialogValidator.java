@@ -11,11 +11,16 @@ import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import javax.swing.JOptionPane;
 
-@SuppressWarnings({"PMD.OnlyOneReturn"})
+@SuppressWarnings({
+        "PMD.OnlyOneReturn",
+        "PMD.FieldNamingConventions",
+        "PMD.DataflowAnomalyAnalysis",
+        "PMD.NPathComplexity"
+})
 public class NewModuleDialogValidator {
     private static NewModuleDialogValidator INSTANCE = null;
-    private ValidatorBundle validatorBundle;
-    private CommonBundle commonBundle;
+    private final ValidatorBundle validatorBundle;
+    private final CommonBundle commonBundle;
     private NewModuleDialog dialog;
 
     /**
@@ -36,7 +41,7 @@ public class NewModuleDialogValidator {
     /**
      * New module dialog validator constructor.
      */
-    public NewModuleDialogValidator() {
+    private NewModuleDialogValidator() {
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
     }
@@ -47,10 +52,10 @@ public class NewModuleDialogValidator {
      * @return Boolean
      */
     public boolean validate() {
-        String errorTitle = commonBundle.message("common.error");
-        String packageName = dialog.getPackageName();
+        final String errorTitle = commonBundle.message("common.error");
+        final String packageName = dialog.getPackageName();
         if (packageName.length() == 0) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.notEmpty",
                     "Package Name"
             );
@@ -65,7 +70,7 @@ public class NewModuleDialogValidator {
         }
 
         if (!packageName.matches(RegExUtil.ALPHANUMERIC)) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.alphaNumericCharacters",
                     "Package Name"
             );
@@ -82,7 +87,7 @@ public class NewModuleDialogValidator {
         if (!Character.isUpperCase(packageName.charAt(0))
                 && !Character.isDigit(packageName.charAt(0))
         ) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.startWithNumberOrCapitalLetter",
                     "Package Name"
             );
@@ -96,9 +101,9 @@ public class NewModuleDialogValidator {
             return false;
         }
 
-        String moduleName = dialog.getModuleName();
+        final String moduleName = dialog.getModuleName();
         if (moduleName.length() == 0) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.notEmpty",
                     "Module Name"
             );
@@ -113,7 +118,7 @@ public class NewModuleDialogValidator {
         }
 
         if (!moduleName.matches(RegExUtil.ALPHANUMERIC)) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.alphaNumericCharacters",
                     "Module Name"
             );
@@ -128,7 +133,7 @@ public class NewModuleDialogValidator {
         }
 
         if (moduleName.equals(packageName)) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.moduleNameIsTheSameAsPackage",
                     "Module Name"
             );
@@ -145,7 +150,7 @@ public class NewModuleDialogValidator {
         if (!Character.isUpperCase(moduleName.charAt(0))
                 && !Character.isDigit(moduleName.charAt(0))
         ) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.startWithNumberOrCapitalLetter",
                     "Module Name"
             );
@@ -160,7 +165,7 @@ public class NewModuleDialogValidator {
         }
 
         if (dialog.getModuleVersion().length() == 0) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.notEmpty",
                     "Module Version"
             );
@@ -175,7 +180,7 @@ public class NewModuleDialogValidator {
         }
 
         if (dialog.getModuleDescription().length() == 0) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.notEmpty",
                     "Module Description"
             );

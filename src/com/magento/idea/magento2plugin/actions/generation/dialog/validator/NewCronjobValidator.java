@@ -16,11 +16,18 @@ import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import javax.swing.JOptionPane;
 
-@SuppressWarnings({"PMD.OnlyOneReturn"})
+@SuppressWarnings({
+        "PMD.OnlyOneReturn",
+        "PMD.FieldNamingConventions",
+        "PMD.DataflowAnomalyAnalysis",
+        "PMD.NcssCount",
+        "PMD.NPathComplexity"
+})
 public class NewCronjobValidator {
+    private static final String NOT_EMPTY = "validator.notEmpty";
     private static NewCronjobValidator INSTANCE = null;
-    private ValidatorBundle validatorBundle;
-    private CommonBundle commonBundle;
+    private final ValidatorBundle validatorBundle;
+    private final CommonBundle commonBundle;
 
     /**
      * Get instance of a class.
@@ -35,7 +42,7 @@ public class NewCronjobValidator {
         return INSTANCE;
     }
 
-    public NewCronjobValidator() {
+    private NewCronjobValidator() {
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
     }
@@ -48,12 +55,12 @@ public class NewCronjobValidator {
      *
      * @return boolean
      */
-    public boolean validate(Project project, NewCronjobDialog dialog) {
-        String errorTitle = commonBundle.message("common.error");
-        String cronjobClassName = dialog.getCronjobClassName();
+    public boolean validate(final Project project, final NewCronjobDialog dialog) {
+        final String errorTitle = commonBundle.message("common.error");
+        final String cronjobClassName = dialog.getCronjobClassName();
 
         if (!PhpNameUtil.isValidClassName(cronjobClassName)) {
-            String errorMessage = this.validatorBundle.message(
+            final String errorMessage = this.validatorBundle.message(
                     "validator.class.isNotValid",
                     "Cronjob ClassName"
             );
@@ -68,8 +75,8 @@ public class NewCronjobValidator {
         }
 
         if (cronjobClassName.length() == 0) {
-            String errorMessage = validatorBundle.message(
-                    "validator.notEmpty",
+            final String errorMessage = validatorBundle.message(
+                    NOT_EMPTY,
                     "Cronjob ClassName"
             );
             JOptionPane.showMessageDialog(
@@ -82,7 +89,7 @@ public class NewCronjobValidator {
             return false;
         }
         if (!cronjobClassName.matches(RegExUtil.ALPHANUMERIC)) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.alphaNumericCharacters",
                     "Cronjob ClassName"
             );
@@ -98,7 +105,7 @@ public class NewCronjobValidator {
         if (!Character.isUpperCase(cronjobClassName.charAt(0))
                 && !Character.isDigit(cronjobClassName.charAt(0))
         ) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.startWithNumberOrCapitalLetter",
                     "Cronjob ClassName"
             );
@@ -112,11 +119,11 @@ public class NewCronjobValidator {
             return false;
         }
 
-        String cronjobName = dialog.getCronjobName();
+        final String cronjobName = dialog.getCronjobName();
 
         if (cronjobName.length() == 0) {
-            String errorMessage = validatorBundle.message(
-                    "validator.notEmpty",
+            final String errorMessage = validatorBundle.message(
+                    NOT_EMPTY,
                     "Cronjob Name"
             );
             JOptionPane.showMessageDialog(
@@ -129,7 +136,7 @@ public class NewCronjobValidator {
             return false;
         }
         if (!cronjobName.matches(RegExUtil.IDENTIFIER)) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.identifier",
                     "Cronjob Name"
             );
@@ -143,11 +150,11 @@ public class NewCronjobValidator {
             return false;
         }
 
-        String cronjobDirectory = dialog.getCronjobDirectory();
+        final String cronjobDirectory = dialog.getCronjobDirectory();
 
         if (cronjobDirectory.length() == 0) {
-            String errorMessage = validatorBundle.message(
-                    "validator.notEmpty",
+            final String errorMessage = validatorBundle.message(
+                    NOT_EMPTY,
                     "Cronjob Directory"
             );
             JOptionPane.showMessageDialog(
@@ -160,7 +167,7 @@ public class NewCronjobValidator {
             return false;
         }
         if (!cronjobDirectory.matches(RegExUtil.DIRECTORY)) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.directory.isNotValid",
                     "Cronjob Directory"
             );
@@ -174,13 +181,13 @@ public class NewCronjobValidator {
             return false;
         }
 
-        boolean isFixedScheduleType = dialog.isFixedScheduleType();
-        String cronjobSchedule = dialog.getCronjobSchedule();
+        final boolean isFixedScheduleType = dialog.isFixedScheduleType();
+        final String cronjobSchedule = dialog.getCronjobSchedule();
 
         if (isFixedScheduleType) {
             if (cronjobSchedule.length() == 0) {
-                String errorMessage = validatorBundle.message(
-                        "validator.notEmpty",
+                final String errorMessage = validatorBundle.message(
+                        NOT_EMPTY,
                         "Cronjob Schedule"
                 );
                 JOptionPane.showMessageDialog(
@@ -193,7 +200,7 @@ public class NewCronjobValidator {
                 return false;
             }
             if (!cronjobSchedule.matches(RegExUtil.Magento.CRON_SCHEDULE)) {
-                String errorMessage = validatorBundle.message(
+                final String errorMessage = validatorBundle.message(
                         "validator.cronSchedule.invalidExpression",
                         "Cronjob Schedule"
                 );
@@ -208,13 +215,13 @@ public class NewCronjobValidator {
             }
         }
 
-        boolean isConfigurableScheduleType = dialog.isConfigurableScheduleType();
-        String scheduleConfigPath = dialog.getCronjobScheduleConfigPath();
+        final boolean isConfigurableScheduleType = dialog.isConfigurableScheduleType();
+        final String scheduleConfigPath = dialog.getCronjobScheduleConfigPath();
 
         if (isConfigurableScheduleType) {
             if (scheduleConfigPath.length() == 0) {
-                String errorMessage = validatorBundle.message(
-                        "validator.notEmpty",
+                final String errorMessage = validatorBundle.message(
+                        NOT_EMPTY,
                         "Schedule Config Path"
                 );
                 JOptionPane.showMessageDialog(
@@ -228,7 +235,7 @@ public class NewCronjobValidator {
             }
 
             if (scheduleConfigPath.matches(RegExUtil.Magento.CONFIG_PATH)) {
-                String errorMessage = validatorBundle.message(
+                final String errorMessage = validatorBundle.message(
                         "validator.configPath.invalidFormat",
                         "Schedule Config Path"
                 );
@@ -243,19 +250,18 @@ public class NewCronjobValidator {
             }
         }
 
-        String moduleName = dialog.getCronjobModule();
-
-        NamespaceBuilder namespaceBuilder = new NamespaceBuilder(
+        final String moduleName = dialog.getCronjobModule();
+        final NamespaceBuilder namespaceBuilder = new NamespaceBuilder(
                 moduleName,
                 cronjobClassName,
                 cronjobDirectory
         );
-        PhpClass cronjobClassFile = GetPhpClassByFQN.getInstance(project).execute(
+        final PhpClass cronjobClassFile = GetPhpClassByFQN.getInstance(project).execute(
                 namespaceBuilder.getClassFqn()
         );
 
         if (cronjobClassFile != null) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.file.alreadyExists",
                     "Cronjob Class"
             );

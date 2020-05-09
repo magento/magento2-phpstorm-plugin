@@ -8,11 +8,18 @@ package com.magento.idea.magento2plugin.magento.files;
 import com.intellij.lang.Language;
 import com.jetbrains.php.lang.PhpLanguage;
 
+@SuppressWarnings({"PMD.FieldNamingConventions"})
 public class ControllerBackendPhp implements ModuleFileInterface {
-    public static String TEMPLATE = "Magento Module Controller Backend Class";
-    public static String DEFAULT_DIR = "Controller/Adminhtml";
+    public static final String TEMPLATE = "Magento Module Controller Backend Class";
+    public static final String DEFAULT_DIR = "Controller/Adminhtml";
     private static ControllerBackendPhp INSTANCE = null;
     private String fileName;
+
+    /**
+     * Controller Backend PHP constructor.
+     */
+    private ControllerBackendPhp() {
+    }
 
     /**
      * Returns a new instance of the class.

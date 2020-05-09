@@ -34,10 +34,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
+@SuppressWarnings({"PMD.TooManyFields", "PMD.OnlyOneReturn"})
 public class NewControllerDialog extends AbstractDialog {
     private final NewControllerValidator validator;
-    private final PsiDirectory baseDir;
-    private final GetModuleNameByDirectory getModuleNameByDir;
     private final String moduleName;
     private JPanel contentPane;
     private JButton buttonOK;
@@ -60,12 +59,10 @@ public class NewControllerDialog extends AbstractDialog {
      * @param project Project
      * @param directory PsiDirectory
      */
-    public NewControllerDialog(Project project, PsiDirectory directory) {
+    public NewControllerDialog(final Project project, final PsiDirectory directory) {
         this.project = project;
-        this.baseDir = directory;
         this.moduleName = GetModuleNameByDirectory.getInstance(project).execute(directory);
         this.validator = NewControllerValidator.getInstance(this);
-        this.getModuleNameByDir = GetModuleNameByDirectory.getInstance(project);
 
         setContentPane(contentPane);
         setModal(true);
@@ -170,7 +167,7 @@ public class NewControllerDialog extends AbstractDialog {
      * @param project Project
      * @param directory PsiDirectory
      */
-    public static void open(Project project, PsiDirectory directory) {
+    public static void open(final Project project, final PsiDirectory directory) {
         NewControllerDialog dialog = new NewControllerDialog(project, directory);
         dialog.pack();
         dialog.centerDialog(dialog);
@@ -200,7 +197,7 @@ public class NewControllerDialog extends AbstractDialog {
     }
 
     private void suggestControllerDirectory() {
-        String area = getArea();
+        final String area = getArea();
         if (area.equals(Package.Areas.adminhtml.toString())) {
             controllerParentDir.setText(ControllerBackendPhp.DEFAULT_DIR);
             return;
@@ -209,7 +206,7 @@ public class NewControllerDialog extends AbstractDialog {
     }
 
     private void toggleAdminPanel() {
-        String area = getArea();
+        final String area = getArea();
         if (area.equals(Package.Areas.adminhtml.toString()) && inheritClass.isSelected()) {
             adminPanel.setVisible(true);
             return;
@@ -217,24 +214,16 @@ public class NewControllerDialog extends AbstractDialog {
         adminPanel.setVisible(false);
     }
 
-    private String getModuleIdentifierPath() {
-        String[]parts = moduleName.split(Package.VENDOR_MODULE_NAME_SEPARATOR);
-        if (parts[0] == null || parts[1] == null || parts.length > 2) {
-            return null;
-        }
-        return parts[0] + File.separator + parts[1];
-    }
-
     private String getNamespace() {
-        String[]parts = moduleName.split(Package.VENDOR_MODULE_NAME_SEPARATOR);
+        final String[]parts = moduleName.split(Package.VENDOR_MODULE_NAME_SEPARATOR);
         if (parts[0] == null || parts[1] == null || parts.length > 2) {
             return null;
         }
-        String directoryPart = getControllerDirectory().replace(
+        final String directoryPart = getControllerDirectory().replace(
                 File.separator,
                 Package.FQN_SEPARATOR
         );
-        String controllerPart = Package.FQN_SEPARATOR + getControllerName();
+        final String controllerPart = Package.FQN_SEPARATOR + getControllerName();
 
         return String.format(
                 "%s%s%s%s%s%s",

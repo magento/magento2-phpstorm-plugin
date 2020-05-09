@@ -12,12 +12,18 @@ import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import javax.swing.JOptionPane;
 
-@SuppressWarnings({"PMD.OnlyOneReturn"})
+@SuppressWarnings({
+        "PMD.OnlyOneReturn",
+        "PMD.FieldNamingConventions",
+        "PMD.DataflowAnomalyAnalysis",
+        "PMD.NPathComplexity"
+})
 public class NewControllerValidator {
+    private static final String ACTION_NAME = "Action Name";
     private static NewControllerValidator INSTANCE = null;
-    private ValidatorBundle validatorBundle;
+    private final ValidatorBundle validatorBundle;
+    private final CommonBundle commonBundle;
     private NewControllerDialog dialog;
-    private CommonBundle commonBundle;
 
     /**
      * Get instance of a class.
@@ -38,7 +44,7 @@ public class NewControllerValidator {
     /**
      * New controller validator constructor.
      */
-    public NewControllerValidator() {
+    private NewControllerValidator() {
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
     }
@@ -49,13 +55,13 @@ public class NewControllerValidator {
      * @return Boolean
      */
     public boolean validate() {
-        String errorTitle = commonBundle.message("common.error");
-        String actionName = dialog.getActionName();
+        final String errorTitle = commonBundle.message("common.error");
+        final String actionName = dialog.getActionName();
 
         if (!PhpNameUtil.isValidClassName(actionName)) {
-            String errorMessage = this.validatorBundle.message(
+            final String errorMessage = this.validatorBundle.message(
                     "validator.class.isNotValid",
-                    "Action Name"
+                    ACTION_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -68,9 +74,9 @@ public class NewControllerValidator {
         }
 
         if (actionName.length() == 0) {
-            String errorMessage = this.validatorBundle.message(
+            final String errorMessage = this.validatorBundle.message(
                     "validator.notEmpty",
-                    "Action Name"
+                    ACTION_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -83,9 +89,9 @@ public class NewControllerValidator {
         }
 
         if (!actionName.matches(RegExUtil.ALPHANUMERIC)) {
-            String errorMessage = this.validatorBundle.message(
+            final String errorMessage = this.validatorBundle.message(
                     "validator.alphaNumericCharacters",
-                    "Action Name"
+                    ACTION_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -100,9 +106,9 @@ public class NewControllerValidator {
         if (!Character.isUpperCase(actionName.charAt(0))
                 && !Character.isDigit(actionName.charAt(0))
         ) {
-            String errorMessage = this.validatorBundle.message(
+            final String errorMessage = this.validatorBundle.message(
                     "validator.startWithNumberOrCapitalLetter",
-                    "Action Name"
+                    ACTION_NAME
             );
             JOptionPane.showMessageDialog(
                     null,
@@ -117,7 +123,7 @@ public class NewControllerValidator {
         String controllerName = dialog.getControllerName();
 
         if (!PhpNameUtil.isValidNamespaceName(controllerName)) {
-            String errorMessage = this.validatorBundle.message(
+            final String errorMessage = this.validatorBundle.message(
                     "validator.namespace.isNotValid",
                     "Controller Name"
             );

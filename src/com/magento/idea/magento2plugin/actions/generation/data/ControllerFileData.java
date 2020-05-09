@@ -6,14 +6,14 @@
 package com.magento.idea.magento2plugin.actions.generation.data;
 
 public class ControllerFileData {
-    private String actionDirectory;
-    private String actionClassName;
-    private String controllerModule;
-    private String controllerArea;
-    private String httpMethodName;
-    private String acl;
-    private Boolean isInheritClass;
-    private String namespace;
+    private final String actionDirectory;
+    private final String actionClassName;
+    private final String controllerModule;
+    private final String controllerArea;
+    private final String httpMethodName;
+    private final String acl;
+    private final Boolean isInheritClass;
+    private final String namespace;
 
     /**
      * Controller data file constructor.

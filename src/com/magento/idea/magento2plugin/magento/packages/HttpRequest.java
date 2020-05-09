@@ -6,15 +6,17 @@
 package com.magento.idea.magento2plugin.magento.packages;
 
 import java.util.ArrayList;
+import java.util.List;
 
+@SuppressWarnings({"PMD.HideUtilityClassConstructor", "PMD.FieldNamingConventions"})
 public class HttpRequest {
-    public static enum HttpMethod {
+    public enum HttpMethod {
         GET("Magento\\Framework\\App\\Action\\HttpGetActionInterface"),
         POST("Magento\\Framework\\App\\Action\\HttpPostActionInterface"),
         DELETE("Magento\\Framework\\App\\Action\\HttpDeleteActionInterface"),
         PUT("Magento\\Framework\\App\\Action\\HttpPutActionInterface");
 
-        private String interfaceFqn;
+        final private String interfaceFqn;
 
         HttpMethod(String interfaceFqn) {
             this.interfaceFqn = interfaceFqn;
@@ -31,7 +33,7 @@ public class HttpRequest {
      * @param methodName HTTP Method name
      * @return Request Interface
      */
-    public static String getRequestInterfaceFqnByMethodName(String methodName) {
+    public static String getRequestInterfaceFqnByMethodName(final String methodName) {
         return HttpRequest.HttpMethod.valueOf(methodName).getInterfaceFqn();
     }
 
@@ -40,10 +42,11 @@ public class HttpRequest {
      *
      * @return List of HTTP methods.
      */
-    public static ArrayList<String> getHttpMethodList() {
-        ArrayList<String> methodNameList = new ArrayList<String>();
+    public static List<String> getHttpMethodList() {
+        final String a;
+        final List<String> methodNameList = new ArrayList<>();
 
-        for (HttpMethod httpMethod: HttpMethod.values()) {
+        for (final HttpMethod httpMethod: HttpMethod.values()) {
             methodNameList.add(httpMethod.name());
         }
 
