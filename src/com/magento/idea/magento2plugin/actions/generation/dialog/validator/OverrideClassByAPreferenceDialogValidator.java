@@ -168,7 +168,8 @@ public class OverrideClassByAPreferenceDialogValidator {
             return false;
         }
 
-        final List<String> allModulesList = ModuleIndex.getInstance(project).getEditableModuleNames();
+        final List<String> allModulesList = ModuleIndex.getInstance(project)
+                .getEditableModuleNames();
         if (!allModulesList.contains(preferenceModule)) {
             final String errorMessage = validatorBundle.message(
                     "validator.module.noSuchModule",

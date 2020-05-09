@@ -230,7 +230,8 @@ public class CreateAPluginDialogValidator {
             return false;
         }
 
-        final List<String> allModulesList = ModuleIndex.getInstance(project).getEditableModuleNames();
+        final List<String> allModulesList = ModuleIndex
+                .getInstance(project).getEditableModuleNames();
         if (!allModulesList.contains(pluginModule)) {
             final String errorMessage = validatorBundle.message(
                     "validator.module.noSuchModule",

@@ -20,8 +20,8 @@ import javax.swing.JOptionPane;
 })
 public class NewViewModelValidator {
     private static NewViewModelValidator INSTANCE = null;
-    private final static String VIEW_MODEL_NAME = "View Model Name";
-    private final static String VIEW_MODEL_DIR = "View Model Directory";
+    private static final String VIEW_MODEL_NAME = "View Model Name";
+    private static final String VIEW_MODEL_DIR = "View Model Directory";
     private ValidatorBundle validatorBundle;
     private CommonBundle commonBundle;
     private NewViewModelDialog dialog;
