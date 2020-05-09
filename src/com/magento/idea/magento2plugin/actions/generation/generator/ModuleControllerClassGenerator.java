@@ -20,6 +20,7 @@ import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.Controller;
 import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.files.ControllerFrontendPhp;
+import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.HttpRequest;
 import com.magento.idea.magento2plugin.magento.packages.Package;
@@ -137,7 +138,7 @@ public class ModuleControllerClassGenerator extends FileGenerator {
         return String.format(
                 "%s%s%s",
                 controllerFileData.getNamespace(),
-                Package.FQN_SEPARATOR,
+                Package.fqnSeparator,
                 controllerFileData.getActionClassName()
         );
     }
@@ -156,7 +157,7 @@ public class ModuleControllerClassGenerator extends FileGenerator {
         }
 
         final Properties attributes = getAttributes();
-        final String adminhtmlArea = Package.Areas.adminhtml.toString();
+        final String adminhtmlArea = Areas.adminhtml.toString();
 
         if (controllerFileData.getControllerArea().equals(adminhtmlArea)) {
             controllerFile = fileFromTemplateGenerator.generate(
@@ -193,7 +194,7 @@ public class ModuleControllerClassGenerator extends FileGenerator {
         uses.add(httpMethodInterface);
 
         if (controllerFileData.getIsInheritClass()) {
-            final String adminhtmlArea = Package.Areas.adminhtml.toString();
+            final String adminhtmlArea = Areas.adminhtml.toString();
 
             if (controllerFileData.getControllerArea().equals(adminhtmlArea)) {
                 uses.add(Controller.ADMINHTML_CONTROLLER_FQN);

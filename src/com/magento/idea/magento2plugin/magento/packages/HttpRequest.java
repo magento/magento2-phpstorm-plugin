@@ -16,7 +16,7 @@ public class HttpRequest {
         DELETE("Magento\\Framework\\App\\Action\\HttpDeleteActionInterface"),
         PUT("Magento\\Framework\\App\\Action\\HttpPutActionInterface");
 
-        final private String interfaceFqn;
+        private String interfaceFqn;
 
         HttpMethod(String interfaceFqn) {
             this.interfaceFqn = interfaceFqn;
@@ -43,7 +43,6 @@ public class HttpRequest {
      * @return List of HTTP methods.
      */
     public static List<String> getHttpMethodList() {
-        final String a;
         final List<String> methodNameList = new ArrayList<>();
 
         for (final HttpMethod httpMethod: HttpMethod.values()) {

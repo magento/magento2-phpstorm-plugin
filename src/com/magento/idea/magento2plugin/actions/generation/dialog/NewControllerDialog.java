@@ -14,6 +14,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewCo
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleControllerClassGenerator;
 import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.files.ControllerFrontendPhp;
+import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.HttpRequest;
 import com.magento.idea.magento2plugin.magento.packages.Package;
@@ -198,7 +199,7 @@ public class NewControllerDialog extends AbstractDialog {
 
     private void suggestControllerDirectory() {
         final String area = getArea();
-        if (area.equals(Package.Areas.adminhtml.toString())) {
+        if (area.equals(Areas.adminhtml.toString())) {
             controllerParentDir.setText(ControllerBackendPhp.DEFAULT_DIR);
             return;
         }
@@ -207,7 +208,7 @@ public class NewControllerDialog extends AbstractDialog {
 
     private void toggleAdminPanel() {
         final String area = getArea();
-        if (area.equals(Package.Areas.adminhtml.toString()) && inheritClass.isSelected()) {
+        if (area.equals(Areas.adminhtml.toString()) && inheritClass.isSelected()) {
             adminPanel.setVisible(true);
             return;
         }
@@ -215,22 +216,22 @@ public class NewControllerDialog extends AbstractDialog {
     }
 
     private String getNamespace() {
-        final String[]parts = moduleName.split(Package.VENDOR_MODULE_NAME_SEPARATOR);
+        final String[]parts = moduleName.split(Package.vendorModuleNameSeparator);
         if (parts[0] == null || parts[1] == null || parts.length > 2) {
             return null;
         }
         final String directoryPart = getControllerDirectory().replace(
                 File.separator,
-                Package.FQN_SEPARATOR
+                Package.fqnSeparator
         );
-        final String controllerPart = Package.FQN_SEPARATOR + getControllerName();
+        final String controllerPart = Package.fqnSeparator + getControllerName();
 
         return String.format(
                 "%s%s%s%s%s%s",
                 parts[0],
-                Package.FQN_SEPARATOR,
+                Package.fqnSeparator,
                 parts[1],
-                Package.FQN_SEPARATOR,
+                Package.fqnSeparator,
                 directoryPart,
                 controllerPart
         );
@@ -247,8 +248,8 @@ public class NewControllerDialog extends AbstractDialog {
     private ArrayList<String> getAreaList() {
         return new ArrayList<>(
                 Arrays.asList(
-                        Package.Areas.frontend.toString(),
-                        Package.Areas.adminhtml.toString()
+                        Areas.frontend.toString(),
+                        Areas.adminhtml.toString()
                 )
         );
     }
