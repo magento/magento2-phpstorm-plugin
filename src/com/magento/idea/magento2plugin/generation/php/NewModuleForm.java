@@ -2,7 +2,8 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
-package com.magento.idea.magento2plugin.generation.php;
+
+package com.magento.idea.magento2plugin.generation.php;//NOPMD
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
@@ -17,46 +18,55 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.platform.ProjectGeneratorPeer;
 import com.intellij.ui.DocumentAdapter;
 import com.magento.idea.magento2plugin.generation.php.validator.NewModuleFormValidator;
-import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.magento.packages.File;
+import com.magento.idea.magento2plugin.magento.packages.Licenses;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
-import org.jetbrains.annotations.NotNull;
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings({"PMD.TooManyFields", "PMD.UnusedPrivateMethod"})
 public class NewModuleForm implements ListSelectionListener {
-    private NewModuleFormValidator newModuleFormValidator;
+    private final NewModuleFormValidator newModuleFormValidator;
     private JPanel contentPane;
     private JTextField packageName;
-    private JLabel packageNameLabel;
     private JTextField moduleName;
-    private JLabel moduleNameLabel;
+    private final CamelCaseToHyphen camelCaseToHyphen;
     private JTextArea moduleDescription;
-    private JLabel moduleDescriptionLabel;
+    private final List<ProjectGeneratorPeer.SettingsListener> myStateListeners;
     private JTextField moduleVersion;
-    private JLabel moduleVersionLabel;
-    private JList moduleLicense;
-    private JLabel moduleLicenseLabel;
-    private JTextField moduleLicenseCustom;
-    private JScrollPane moduleLicenseScrollPanel;
-    private JLabel magentoPathLabel;
     private TextFieldWithBrowseButton magentoPath;
-    private List<ProjectGeneratorPeer.SettingsListener> myStateListeners;
-    private CamelCaseToHyphen camelCaseToHyphen;
+    private JList moduleLicense;
+    private JTextField moduleLicenseCustom;
+    private JLabel moduleLicenseLabel;//NOPMD
+    private JLabel moduleVersionLabel;//NOPMD
+    private JScrollPane moduleLicenseScrollPanel;//NOPMD
+    private JLabel magentoPathLabel;//NOPMD
+    private JLabel moduleDescriptionLabel;//NOPMD
+    private JLabel moduleNameLabel;//NOPMD
+    private JLabel packageNameLabel;//NOPMD
 
-    public NewModuleForm(
-    ) {
+    /**
+     * Constructor.
+     */
+    public NewModuleForm() {
         this.camelCaseToHyphen = CamelCaseToHyphen.getInstance();
         this.newModuleFormValidator = NewModuleFormValidator.getInstance(this);
         this.myStateListeners = new ArrayList();
-        Runnable listener = () -> {
+        final Runnable listener = () -> {
             this.fireStateChanged();
         };
         addPathListener();
@@ -65,8 +75,10 @@ public class NewModuleForm implements ListSelectionListener {
     }
 
     private void addPathListener() {
-        FileChooserDescriptor descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor();
-        ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseFolderListener = new ComponentWithBrowseButton.BrowseFolderActionListener<JTextField>(
+        final FileChooserDescriptor descriptor =
+                FileChooserDescriptorFactory.createSingleFolderDescriptor();
+        final ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseFolderListener
+                = new ComponentWithBrowseButton.BrowseFolderActionListener<JTextField>(
                 "Magento Root Directory",
                 "Choose Magento root directory",
                 this.magentoPath,
@@ -74,19 +86,20 @@ public class NewModuleForm implements ListSelectionListener {
                 descriptor,
                 TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
         ) {
-            protected VirtualFile getInitialFile() {
-                String directoryName = this.getComponentText();
-                if (!StringUtil.isEmptyOrSpaces(directoryName)) {
-                    String lastSavedPath = Settings.getLastMagentoPath();
-                    if (!StringUtil.isEmptyOrSpaces(lastSavedPath)) {
-                        lastSavedPath = FileUtil.toSystemIndependentName(lastSavedPath);
-                        return LocalFileSystem.getInstance().findFileByPath(lastSavedPath);
-                    }
-                }
+                    @Override
+                    protected VirtualFile getInitialFile() {
+                        String directoryName = this.getComponentText();
+                        if (!StringUtil.isEmptyOrSpaces(directoryName)) {
+                            String lastSavedPath = Settings.getLastMagentoPath();
+                            if (!StringUtil.isEmptyOrSpaces(lastSavedPath)) {
+                                lastSavedPath = FileUtil.toSystemIndependentName(lastSavedPath);
+                                return LocalFileSystem.getInstance().findFileByPath(lastSavedPath);
+                            }
+                        }
 
-                return super.getInitialFile();
-            }
-        };
+                        return super.getInitialFile();
+                    }
+                };
         this.magentoPath.addActionListener(browseFolderListener);
     }
 
@@ -94,8 +107,13 @@ public class NewModuleForm implements ListSelectionListener {
         return this.contentPane;
     }
 
+    /**
+     * Returns project generation settings.
+     *
+     * @return MagentoProjectGeneratorSettings
+     */
     public MagentoProjectGeneratorSettings getSettings() {
-        Settings.State state = new Settings.State();
+        final Settings.State state = new Settings.State();
         state.setPluginEnabled(true);
         state.setMftfSupportEnabled(true);
         state.setDefaultLicenseName(Settings.DEFAULT_LICENSE);
@@ -132,8 +150,13 @@ public class NewModuleForm implements ListSelectionListener {
         return this.magentoPath.getTextField().getText().trim();
     }
 
+    /**
+     * Validate settings.
+     *
+     * @return ValidationInfo
+     */
     public ValidationInfo validate() {
-        String message = newModuleFormValidator.validate();
+        final String message = newModuleFormValidator.validate();
         if (message == null) {
             return null;
         }
@@ -141,9 +164,14 @@ public class NewModuleForm implements ListSelectionListener {
         return new ValidationInfo(message, getContentPane());
     }
 
+    /**
+     * Get Licenses.
+     *
+     * @return List
+     */
     public List getModuleLicenses() {
-        List selectedLicenses = this.moduleLicense.getSelectedValuesList();
-        Package.License customLicense = Package.License.CUSTOM;
+        final List selectedLicenses = this.moduleLicense.getSelectedValuesList();
+        final Licenses customLicense = Licenses.CUSTOM;
 
         if (selectedLicenses.contains(customLicense.getLicenseName())) {
             selectedLicenses.remove(customLicense.getLicenseName());
@@ -153,48 +181,53 @@ public class NewModuleForm implements ListSelectionListener {
         return selectedLicenses;
     }
 
-    public void addSettingsStateListener(ProjectGeneratorPeer.SettingsListener listener) {
+    public void addSettingsStateListener(final ProjectGeneratorPeer.SettingsListener listener) {
         this.myStateListeners.add(listener);
     }
 
-    public void addComponentChangesListener(final Runnable listener) {
+    private void addComponentChangesListener(final Runnable listener) {
         this.magentoPath.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
-            protected void textChanged(@NotNull DocumentEvent e) {
+            @Override
+            protected void textChanged(final @NotNull DocumentEvent event) {
                 listener.run();
             }
         });
         this.moduleName.getDocument().addDocumentListener(new DocumentAdapter() {
-            protected void textChanged(@NotNull DocumentEvent e) {
+            @Override
+            protected void textChanged(final @NotNull DocumentEvent event) {
                 listener.run();
             }
         });
         this.packageName.getDocument().addDocumentListener(new DocumentAdapter() {
-            protected void textChanged(@NotNull DocumentEvent e) {
+            @Override
+            protected void textChanged(final @NotNull DocumentEvent event) {
                 listener.run();
             }
         });
         this.moduleVersion.getDocument().addDocumentListener(new DocumentAdapter() {
-            protected void textChanged(@NotNull DocumentEvent e) {
+            @Override
+            protected void textChanged(final @NotNull DocumentEvent event) {
                 listener.run();
             }
         });
     }
 
     private void fireStateChanged() {
-        boolean validSettings = this.validate() == null;
-        Iterator iterator = this.myStateListeners.iterator();
+        final boolean validSettings = this.validate() == null;
+        final Iterator iterator = this.myStateListeners.iterator();
 
-        while(iterator.hasNext()) {
-            ProjectGeneratorPeer.SettingsListener listener = (ProjectGeneratorPeer.SettingsListener)iterator.next();
+        while (iterator.hasNext()) {
+            final ProjectGeneratorPeer.SettingsListener listener =
+                    (ProjectGeneratorPeer.SettingsListener)iterator.next();
             listener.stateChanged(validSettings);
         }
     }
 
     private void setLicenses() {
-        Package.License[] licenses = Package.License.values();
-        Vector<String> licenseNames = new Vector<>(licenses.length);
+        final Licenses[] licenses = Licenses.values();
+        Vector<String> licenseNames = new Vector<>(licenses.length);//NOPMD
 
-        for (Package.License license: licenses) {
+        for (final Licenses license: licenses) {
             licenseNames.add(license.getLicenseName());
         }
 
@@ -203,11 +236,11 @@ public class NewModuleForm implements ListSelectionListener {
         moduleLicense.addListSelectionListener(this);
     }
 
-    private void handleModuleCustomLicenseInputVisibility () {
+    private void handleModuleCustomLicenseInputVisibility() {
         boolean isCustomLicenseSelected = false;
 
-        for (Object value: moduleLicense.getSelectedValuesList()) {
-            if (Package.License.CUSTOM.getLicenseName().equals(value.toString())) {
+        for (final Object value: moduleLicense.getSelectedValuesList()) {
+            if (Licenses.CUSTOM.getLicenseName().equals(value.toString())) {
                 isCustomLicenseSelected = true;
 
                 break;
@@ -230,7 +263,7 @@ public class NewModuleForm implements ListSelectionListener {
     }
 
     @Override
-    public void valueChanged(ListSelectionEvent listSelectionEvent) {
+    public void valueChanged(final ListSelectionEvent listSelectionEvent) {
         handleModuleCustomLicenseInputVisibility();
     }
 }
