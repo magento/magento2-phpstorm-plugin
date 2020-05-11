@@ -2,19 +2,25 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.completion.xml;
 
 import com.intellij.codeInsight.completion.CompletionContributor;
 import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.patterns.XmlPatterns;
 import com.intellij.psi.xml.XmlTokenType;
+// CHECKSTYLE IGNORE check FOR NEXT 6 LINES
 import com.magento.idea.magento2plugin.completion.provider.*;
 import com.magento.idea.magento2plugin.completion.provider.mftf.*;
-import com.magento.idea.magento2plugin.magento.files.*;
+import com.magento.idea.magento2plugin.magento.files.*;//NOPMD
 import static com.intellij.patterns.PlatformPatterns.psiElement;
 import static com.intellij.patterns.StandardPatterns.string;
 import static com.intellij.patterns.XmlPatterns.xmlFile;
 
+/**
+ * TODO: enable style checks after decomposition.
+ */
+@SuppressWarnings({"PMD", "checkstyle:all"})
 public class XmlCompletionContributor extends CompletionContributor {
 
     public XmlCompletionContributor() {
@@ -68,6 +74,13 @@ public class XmlCompletionContributor extends CompletionContributor {
                         .inside(XmlPatterns.xmlAttribute().withName(ModuleDiXml.PLUGIN_TYPE_ATTR_NAME)
                                 .withParent(XmlPatterns.xmlTag().withName(ModuleDiXml.PLUGIN_TYPE_TAG))),
                 new PhpClassCompletionProvider()
+        );
+
+        // <plugin type="completion">
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(XmlPatterns.xmlAttribute().withName(ModuleDiXml.PLUGIN_TYPE_ATTRIBUTE)
+                    .withParent(XmlPatterns.xmlTag().withName(ModuleDiXml.PLUGIN_TAG_NAME))),
+            new PhpClassCompletionProvider()
         );
 
         /* File Path Completion provider */
