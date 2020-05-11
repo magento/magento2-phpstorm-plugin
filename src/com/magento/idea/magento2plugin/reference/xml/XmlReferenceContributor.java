@@ -13,11 +13,11 @@ import com.magento.idea.magento2plugin.magento.files.MftfActionGroup;
 import com.magento.idea.magento2plugin.magento.files.MftfTest;
 import com.magento.idea.magento2plugin.magento.files.UiComponentXml;
 // CHECKSTYLE IGNORE check FOR NEXT 5 LINES
-import com.magento.idea.magento2plugin.reference.provider.*;
-import com.magento.idea.magento2plugin.reference.provider.mftf.*;
+import com.magento.idea.magento2plugin.reference.provider.*;//NOPMD
+import com.magento.idea.magento2plugin.reference.provider.mftf.*;//NOPMD
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import org.jetbrains.annotations.NotNull;
-import static com.intellij.patterns.XmlPatterns.*;
+import static com.intellij.patterns.XmlPatterns.*;//NOPMD
 
 /**
  * TODO: enable style checks after decomposition.

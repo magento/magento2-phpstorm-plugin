@@ -10,8 +10,8 @@ import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.patterns.XmlPatterns;
 import com.intellij.psi.xml.XmlTokenType;
 // CHECKSTYLE IGNORE check FOR NEXT 6 LINES
-import com.magento.idea.magento2plugin.completion.provider.*;
-import com.magento.idea.magento2plugin.completion.provider.mftf.*;
+import com.magento.idea.magento2plugin.completion.provider.*;//NOPMD
+import com.magento.idea.magento2plugin.completion.provider.mftf.*;//NOPMD
 import com.magento.idea.magento2plugin.magento.files.*;//NOPMD
 import static com.intellij.patterns.PlatformPatterns.psiElement;
 import static com.intellij.patterns.StandardPatterns.string;
