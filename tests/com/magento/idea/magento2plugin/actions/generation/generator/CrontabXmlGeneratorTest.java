@@ -11,16 +11,16 @@ import com.magento.idea.magento2plugin.actions.generation.data.CrontabXmlData;
 import com.magento.idea.magento2plugin.magento.files.CrontabXmlTemplate;
 
 public class CrontabXmlGeneratorTest extends BaseGeneratorTestCase {
-    private static final String expectedDirectory = "src/app/code/Foo/Bar/etc";
-    private static final String moduleName = "Foo_Bar";
-    private static final String defaultCronGroup = "default";
-    private static final String indexCronGroup = "index";
-    private static final String cronjobInstanceOne = "Foo\\Bar\\Cron\\TestOne";
-    private static final String cronjobNameOne = "test_cron_job_one";
-    private static final String cronjobInstanceTwo = "Foo\\Bar\\Cron\\TestTwo";
-    private static final String cronjobNameTwo = "test_cron_job_two";
-    private static final String cronjobSchedule = "* * * * *";
-    private static final String cronjobScheduleConfigPath = "path/to/config";
+    private static final String EXPECTED_DIRECTORY = "src/app/code/Foo/Bar/etc";
+    private static final String MODULE_NAME = "Foo_Bar";
+    private static final String DEFAULT_CRON_GROUP = "default";
+    private static final String INDEX_CRON_GROUP = "index";
+    private static final String CRONJOB_INSTANCE_ONE = "Foo\\Bar\\Cron\\TestOne";
+    private static final String CRONJOB_NAME_ONE = "test_cron_job_one";
+    private static final String CRONJOB_INSTANCE_TWO = "Foo\\Bar\\Cron\\TestTwo";
+    private static final String CRONJOB_NAME_TWO = "test_cron_job_two";
+    private static final String CRONJOB_SCHEDULE = "* * * * *";
+    private static final String CRONJOB_SCHEDULE_CONFIG_PATH = "path/to/config";
 
     /**
      * Test generating crontab with schedule.
@@ -29,14 +29,14 @@ public class CrontabXmlGeneratorTest extends BaseGeneratorTestCase {
         final String filePath = this.getFixturePath(CrontabXmlTemplate.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
         final PsiFile cronJobFile = addCronJobToCronTabXml(
-                defaultCronGroup,
-                cronjobNameOne,
-                cronjobInstanceOne,
-                cronjobSchedule,
+                DEFAULT_CRON_GROUP,
+                CRONJOB_NAME_ONE,
+                CRONJOB_INSTANCE_ONE,
+                CRONJOB_SCHEDULE,
                 null
         );
 
-        assertGeneratedFileIsCorrect(expectedFile, expectedDirectory, cronJobFile);
+        assertGeneratedFileIsCorrect(expectedFile, EXPECTED_DIRECTORY, cronJobFile);
     }
 
     /**
@@ -46,14 +46,14 @@ public class CrontabXmlGeneratorTest extends BaseGeneratorTestCase {
         final String filePath = this.getFixturePath(CrontabXmlTemplate.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
         final PsiFile cronJobFile = addCronJobToCronTabXml(
-                defaultCronGroup,
-                cronjobNameTwo,
-                cronjobInstanceTwo,
+                DEFAULT_CRON_GROUP,
+                CRONJOB_NAME_TWO,
+                CRONJOB_INSTANCE_TWO,
                 null,
-                cronjobScheduleConfigPath
+                CRONJOB_SCHEDULE_CONFIG_PATH
         );
 
-        assertGeneratedFileIsCorrect(expectedFile, expectedDirectory, cronJobFile);
+        assertGeneratedFileIsCorrect(expectedFile, EXPECTED_DIRECTORY, cronJobFile);
     }
 
     /**
@@ -63,21 +63,21 @@ public class CrontabXmlGeneratorTest extends BaseGeneratorTestCase {
         final String filePath = this.getFixturePath(CrontabXmlTemplate.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
         addCronJobToCronTabXml(
-                defaultCronGroup,
-                cronjobNameOne,
-                cronjobInstanceOne,
-                cronjobSchedule,
+                DEFAULT_CRON_GROUP,
+                CRONJOB_NAME_ONE,
+                CRONJOB_INSTANCE_ONE,
+                CRONJOB_SCHEDULE,
                 null
         );
         final PsiFile cronJobFile = addCronJobToCronTabXml(
-                defaultCronGroup,
-                cronjobNameTwo,
-                cronjobInstanceTwo,
+                DEFAULT_CRON_GROUP,
+                CRONJOB_NAME_TWO,
+                CRONJOB_INSTANCE_TWO,
                 null,
-                cronjobScheduleConfigPath
+                CRONJOB_SCHEDULE_CONFIG_PATH
         );
 
-        assertGeneratedFileIsCorrect(expectedFile, expectedDirectory, cronJobFile);
+        assertGeneratedFileIsCorrect(expectedFile, EXPECTED_DIRECTORY, cronJobFile);
     }
 
     /**
@@ -87,21 +87,21 @@ public class CrontabXmlGeneratorTest extends BaseGeneratorTestCase {
         final String filePath = this.getFixturePath(CrontabXmlTemplate.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
         addCronJobToCronTabXml(
-                defaultCronGroup,
-                cronjobNameOne,
-                cronjobInstanceOne,
-                cronjobSchedule,
+                DEFAULT_CRON_GROUP,
+                CRONJOB_NAME_ONE,
+                CRONJOB_INSTANCE_ONE,
+                CRONJOB_SCHEDULE,
                 null
         );
         final PsiFile cronJobFile = addCronJobToCronTabXml(
-                indexCronGroup,
-                cronjobNameTwo,
-                cronjobInstanceTwo,
+                INDEX_CRON_GROUP,
+                CRONJOB_NAME_TWO,
+                CRONJOB_INSTANCE_TWO,
                 null,
-                cronjobScheduleConfigPath
+                CRONJOB_SCHEDULE_CONFIG_PATH
         );
 
-        assertGeneratedFileIsCorrect(expectedFile, expectedDirectory, cronJobFile);
+        assertGeneratedFileIsCorrect(expectedFile, EXPECTED_DIRECTORY, cronJobFile);
     }
 
     /**
@@ -123,7 +123,7 @@ public class CrontabXmlGeneratorTest extends BaseGeneratorTestCase {
     ) {
         final Project project = myFixture.getProject();
         final CrontabXmlData crontabXmlData = new CrontabXmlData(
-                moduleName,
+                MODULE_NAME,
                 cronGroup,
                 cronjobName,
                 cronjobInstance,
