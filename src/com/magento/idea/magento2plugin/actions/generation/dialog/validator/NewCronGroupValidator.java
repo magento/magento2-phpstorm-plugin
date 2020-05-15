@@ -12,10 +12,10 @@ import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import javax.swing.JOptionPane;
 
-@SuppressWarnings({"PMD.OnlyOneReturn"})
+@SuppressWarnings({"PMD.OnlyOneReturn", "PMD.NonThreadSafeSingleton"})
 public class NewCronGroupValidator {
     private static final String MUST_NOT_BE_NEGATIVE = "validator.mustNotBeNegative";
-    private static NewCronGroupValidator INSTANCE;
+    private static NewCronGroupValidator instance;
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
 
@@ -25,11 +25,11 @@ public class NewCronGroupValidator {
      * @return NewCronGroupValidator
      */
     public static NewCronGroupValidator getInstance() {
-        if (null == INSTANCE) {
-            INSTANCE = new NewCronGroupValidator();
+        if (null == instance) {
+            instance = new NewCronGroupValidator();
         }
 
-        return INSTANCE;
+        return instance;
     }
 
     /**

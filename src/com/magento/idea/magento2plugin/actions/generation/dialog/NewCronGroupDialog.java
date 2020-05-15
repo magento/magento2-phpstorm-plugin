@@ -27,6 +27,10 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
+@SuppressWarnings({
+        "PMD.TooManyFields",
+        "PMD.TooManyMethods"
+})
 public class NewCronGroupDialog extends AbstractDialog {
     private final NewCronGroupValidator validator;
     private final String moduleName;
@@ -57,6 +61,7 @@ public class NewCronGroupDialog extends AbstractDialog {
      * @param directory Directory
      */
     public NewCronGroupDialog(final Project project, final PsiDirectory directory) {
+        super();
         this.project = project;
         setContentPane(contentPanel);
         setModal(true);
@@ -90,6 +95,7 @@ public class NewCronGroupDialog extends AbstractDialog {
      *
      * @return CronGroupXmlData
      */
+    @SuppressWarnings({"PMD.NullAssignment"})
     public CronGroupXmlData getCronGroupXmlData() {
         return new CronGroupXmlData(
                 getModuleName(),
@@ -249,6 +255,7 @@ public class NewCronGroupDialog extends AbstractDialog {
         return addUseSeparateProcess.isSelected();
     }
 
+    @SuppressWarnings({"PMD.UnusedPrivateMethod"})
     private void createUIComponents() {
         this.useSeparateProcess = new FilteredComboBox(getYesNoOptions());
     }

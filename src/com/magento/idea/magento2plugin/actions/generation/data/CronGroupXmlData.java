@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.actions.generation.data;
 
+@SuppressWarnings({"PMD.DataClass"})
 public class CronGroupXmlData {
     private final String module;
     private final String groupName;
@@ -30,15 +31,15 @@ public class CronGroupXmlData {
      * @param useSeparateProcess Use separate process
      */
     public CronGroupXmlData(
-            String module,
-            String groupName,
-            Integer scheduleGenerateEvery,
-            Integer scheduleAheadFor,
-            Integer scheduleLifetime,
-            Integer historyCleanupEvery,
-            Integer historySuccessLifetime,
-            Integer historyFailureLifetime,
-            Integer useSeparateProcess
+            final String module,
+            final String groupName,
+            final Integer scheduleGenerateEvery,
+            final Integer scheduleAheadFor,
+            final Integer scheduleLifetime,
+            final Integer historyCleanupEvery,
+            final Integer historySuccessLifetime,
+            final Integer historyFailureLifetime,
+            final Integer useSeparateProcess
     ) {
         this.module = module;
         this.groupName = groupName;

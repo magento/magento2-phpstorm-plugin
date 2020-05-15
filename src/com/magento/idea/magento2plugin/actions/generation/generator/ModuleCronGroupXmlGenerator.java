@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Properties;
 import javax.swing.JOptionPane;
 
+@SuppressWarnings({"PMD.AvoidPrintStackTrace"})
 public class ModuleCronGroupXmlGenerator extends FileGenerator {
     private final CronGroupXmlData cronGroupXmlData;
     private final Project project;
@@ -101,8 +102,8 @@ public class ModuleCronGroupXmlGenerator extends FileGenerator {
                 );
 
                 textBuf.append(cronjobRegistrationTemplate);
-            } catch (final IOException e) {
-                e.printStackTrace();
+            } catch (final IOException exception) {
+                exception.printStackTrace();
                 return;
             }
 
@@ -144,7 +145,7 @@ public class ModuleCronGroupXmlGenerator extends FileGenerator {
                 }
 
                 document.insertString(insertPos, textBuf);
-                int endPos = insertPos + textBuf.length() + 1;
+                final int endPos = insertPos + textBuf.length() + 1;
 
                 this.codeStyleManager.reformatText(cronGroupXmlFile, insertPos, endPos);
                 this.psiDocumentManager.commitDocument(document);
@@ -220,13 +221,13 @@ public class ModuleCronGroupXmlGenerator extends FileGenerator {
      * @return XmlTag
      */
     private XmlTag getCronGroupTag(final XmlFile cronGroupXmlFile, final String cronGroupName) {
-        Collection<XmlAttributeValue> attributes = XmlPsiTreeUtil.findAttributeValueElements(
+        final Collection<XmlAttributeValue> attributes = XmlPsiTreeUtil.findAttributeValueElements(
                 cronGroupXmlFile,
                 CrontabXmlTemplate.CRON_GROUP_TAG,
                 CrontabXmlTemplate.CRON_GROUP_NAME_ATTRIBUTE
         );
 
-        for (XmlAttributeValue cronGroupIdAttribute: attributes) {
+        for (final XmlAttributeValue cronGroupIdAttribute: attributes) {
             if (!cronGroupIdAttribute.getValue().equals(cronGroupName)) {
                 continue;
             }

@@ -49,7 +49,7 @@ public class FindOrCreateCronGroupXml {
 
         fileDirectories.add(Package.moduleBaseAreaDir);
 
-        for (String fileDirectory: fileDirectories) {
+        for (final String fileDirectory: fileDirectories) {
             parentDirectory = this.directoryGenerator.findOrCreateSubdirectory(
                     parentDirectory,
                     fileDirectory
