@@ -228,11 +228,9 @@ public class ModuleCronGroupXmlGenerator extends FileGenerator {
         );
 
         for (final XmlAttributeValue cronGroupIdAttribute: attributes) {
-            if (!cronGroupIdAttribute.getValue().equals(cronGroupName)) {
-                continue;
+            if (cronGroupIdAttribute.getValue().equals(cronGroupName)) {
+                return PsiTreeUtil.getParentOfType(cronGroupIdAttribute, XmlTag.class);
             }
-
-            return PsiTreeUtil.getParentOfType(cronGroupIdAttribute, XmlTag.class);
         }
 
         return null;
