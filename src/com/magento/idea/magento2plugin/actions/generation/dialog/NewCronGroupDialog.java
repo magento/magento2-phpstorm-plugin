@@ -248,7 +248,9 @@ public class NewCronGroupDialog extends AbstractDialog {
     }
 
     private int getUseSeparateProcess() {
-        return useSeparateProcess.getSelectedItem().toString().equals("Yes") ? 1 : 0;
+        final String yesString = bundle.message("common.yes");
+
+        return useSeparateProcess.getSelectedItem().toString().equals(yesString) ? 1 : 0;
     }
 
     private Boolean getAddUseSeparateProcess() {
@@ -261,6 +263,9 @@ public class NewCronGroupDialog extends AbstractDialog {
     }
 
     private List<String> getYesNoOptions() {
-        return new ArrayList<>(Arrays.asList("Yes", "No"));
+        return new ArrayList<>(Arrays.asList(
+                bundle.message("common.yes"),
+                bundle.message("common.no")
+        ));
     }
 }

@@ -146,7 +146,7 @@
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Option Name"/>
+              <text resource-bundle="magento2/common" key="common.optionName"/>
             </properties>
           </component>
           <component id="d5e85" class="javax.swing.JLabel">
@@ -154,7 +154,7 @@
               <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Option Value"/>
+              <text resource-bundle="magento2/common" key="common.optionValue"/>
             </properties>
           </component>
           <component id="2697c" class="javax.swing.JCheckBox" binding="addScheduleGenerateEvery">
@@ -216,7 +216,7 @@
               <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Add Option"/>
+              <text resource-bundle="magento2/common" key="common.optionAdd"/>
             </properties>
           </component>
           <component id="f1e69" class="javax.swing.JLabel">
@@ -224,7 +224,7 @@
               <grid row="3" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Frequency (in minutes) that schedules are written to the cron_schedule table."/>
+              <text resource-bundle="magento2/common" key="common.cronGroup.description.scheduleGenerateEvery"/>
             </properties>
           </component>
           <component id="fa5bf" class="javax.swing.JTextField" binding="cronGroupName">
@@ -242,7 +242,7 @@
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text resource-bundle="magento2/common" key="common.cronGroup"/>
+              <text resource-bundle="magento2/common" key="common.name"/>
             </properties>
           </component>
           <component id="cff9e" class="javax.swing.JLabel">
@@ -250,7 +250,7 @@
               <grid row="4" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Time (in minutes) in advance that schedules are written to the cron_schedule table."/>
+              <text resource-bundle="magento2/common" key="common.cronGroup.description.scheduleAheadFor"/>
             </properties>
           </component>
           <component id="86513" class="javax.swing.JLabel">
@@ -258,7 +258,7 @@
               <grid row="5" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Window of time (in minutes) that cron job must start or will be considered missed (“too late” to run)."/>
+              <text resource-bundle="magento2/common" key="common.cronGroup.description.scheduleLifetime"/>
             </properties>
           </component>
           <component id="47d4e" class="javax.swing.JLabel">
@@ -266,7 +266,7 @@
               <grid row="6" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Time (in minutes) that cron history is kept in the database."/>
+              <text resource-bundle="magento2/common" key="common.cronGroup.description.historyCleanupEvery"/>
             </properties>
           </component>
           <component id="24201" class="javax.swing.JLabel">
@@ -274,7 +274,7 @@
               <grid row="7" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Time (in minutes) that the record of successfully completed cron jobs are kept in the database."/>
+              <text resource-bundle="magento2/common" key="common.cronGroup.description.historySuccessLifetime"/>
             </properties>
           </component>
           <component id="28f5e" class="javax.swing.JLabel">
@@ -282,7 +282,7 @@
               <grid row="8" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Time (in minutes) that the record of failed cron jobs are kept in the database."/>
+              <text resource-bundle="magento2/common" key="common.cronGroup.description.historyFailureLifetime"/>
             </properties>
           </component>
           <component id="217ce" class="javax.swing.JLabel">
@@ -307,7 +307,7 @@
               <grid row="9" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Run this crongroup’s jobs in a separate php process"/>
+              <text resource-bundle="magento2/common" key="common.cronGroup.description.useSeparateProcess"/>
             </properties>
           </component>
           <component id="e05a0" class="javax.swing.JLabel">
@@ -315,7 +315,7 @@
               <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Option Description"/>
+              <text resource-bundle="magento2/common" key="common.optionDescription"/>
             </properties>
           </component>
           <component id="8d0ed" class="com.magento.idea.magento2plugin.ui.FilteredComboBox" binding="useSeparateProcess" custom-create="true">
