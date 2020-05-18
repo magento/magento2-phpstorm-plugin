@@ -14,7 +14,6 @@ import javax.swing.JOptionPane;
 
 @SuppressWarnings({"PMD.OnlyOneReturn", "PMD.NonThreadSafeSingleton"})
 public class NewCronGroupValidator {
-    private static final String MUST_NOT_BE_NEGATIVE = "validator.mustNotBeNegative";
     private static NewCronGroupValidator instance;
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
