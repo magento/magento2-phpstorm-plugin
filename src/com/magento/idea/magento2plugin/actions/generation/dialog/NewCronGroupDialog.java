@@ -19,13 +19,7 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
@@ -155,12 +149,12 @@ public class NewCronGroupDialog extends AbstractDialog {
     }
 
     private void addDefaultValuesToCronGroupOptions() {
-        scheduleGenerateEvery.setValue(1);
-        scheduleAheadFor.setValue(4);
-        scheduleLifetime.setValue(2);
-        historyCleanupEvery.setValue(10);
-        historySuccessLifetime.setValue(60);
-        historyFailureLifetime.setValue(600);
+        scheduleGenerateEvery.setModel(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
+        scheduleAheadFor.setModel(new SpinnerNumberModel(4, 1, Integer.MAX_VALUE, 1));
+        scheduleLifetime.setModel(new SpinnerNumberModel(2, 1, Integer.MAX_VALUE, 1));
+        historyCleanupEvery.setModel(new SpinnerNumberModel(10, 1, Integer.MAX_VALUE, 1));
+        historySuccessLifetime.setModel(new SpinnerNumberModel(60, 1, Integer.MAX_VALUE, 1));
+        historyFailureLifetime.setModel(new SpinnerNumberModel(600, 1, Integer.MAX_VALUE, 1));
     }
 
     private void onAddScheduleGenerateEveryChanges() {
