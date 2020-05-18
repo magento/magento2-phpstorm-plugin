@@ -15,7 +15,7 @@ public final class IsFileInEditableModuleUtil {
     private IsFileInEditableModuleUtil() {}
 
     /**
-     * Module is considered editable if it is declared within `MAGENTO_ROOT/app/code` directory
+     * Module is considered editable if it is declared within `MAGENTO_ROOT/app/code` directory.
      *
      * @param file PsiFile
      * @return boolean
