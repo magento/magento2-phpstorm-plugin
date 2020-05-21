@@ -132,7 +132,7 @@
                          displayName="Inspection for the Module declaration in the `registration.php` file"
                          groupName="Magento 2"
                          enabledByDefault="true"
-                         level="WARNING"
+                         level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.php.ModuleDeclarationInRegistrationPhpInspection"/>
 
         <localInspection language="XML" groupPath="XML"
@@ -162,7 +162,7 @@
                          shortName="ModuleDeclarationInModuleXmlInspection"
                          displayName="Inspection for the Module declaration in the `etc/module.xml` file"
                          groupName="Magento 2"
-                         enabledByDefault="true" level="WARNING"
+                         enabledByDefault="true" level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.ModuleDeclarationInModuleXmlInspection"/>
 
         <libraryRoot id=".phpstorm.meta.php" path=".phpstorm.meta.php/" runtime="false"/>
