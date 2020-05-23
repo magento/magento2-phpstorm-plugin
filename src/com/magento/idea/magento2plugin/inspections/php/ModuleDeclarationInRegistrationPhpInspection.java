@@ -53,7 +53,7 @@ public class ModuleDeclarationInRegistrationPhpInspection extends PhpInspection 
                                 actualName,
                                 expectedName
                         ),
-                        ProblemHighlightType.WARNING,
+                        ProblemHighlightType.ERROR,
                         new PhpModuleNameQuickFix(expectedName)
                 );
             }

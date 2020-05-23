@@ -69,7 +69,7 @@ public class ModuleDeclarationInModuleXmlInspection extends XmlSuppressableInspe
                                 actualName,
                                 expectedName
                         ),
-                        ProblemHighlightType.WARNING,
+                        ProblemHighlightType.ERROR,
                         new XmlModuleNameQuickFix(expectedName)
                 );
             }
