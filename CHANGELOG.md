@@ -10,7 +10,7 @@
     * Fixed the positioning of all dialog popups
     * Adjusted Magento root validation for consider `magento/framework` as a requirement
     * Adjusted Magento version validation RegExp to support patch versions
- * Fixed bugs:
+* Fixed bugs:
      * The `create a plugin action` is accessible from the wrong context
      * Null pointer exception on the new module group
 
