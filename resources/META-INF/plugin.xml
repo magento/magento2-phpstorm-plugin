@@ -128,6 +128,14 @@
                          level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.php.PluginInspection"/>
 
+        <localInspection language="PHP" groupPath="PHP"
+                         shortName="ModuleDeclarationInRegistrationPhpInspection"
+                         displayName="Inspection for the Module declaration in the `registration.php` file"
+                         groupName="Magento 2"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.php.ModuleDeclarationInRegistrationPhpInspection"/>
+
         <localInspection language="XML" groupPath="XML"
                          shortName="ObserverDeclarationInspection"
                          displayName="Duplicated Observer Usage in events XML"
@@ -150,6 +158,13 @@
                          groupName="Magento 2"
                          enabledByDefault="true" level="WARNING"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.CacheableFalseInDefaultLayoutInspection"/>
+
+        <localInspection language="XML" groupPath="XML"
+                         shortName="ModuleDeclarationInModuleXmlInspection"
+                         displayName="Inspection for the Module declaration in the `etc/module.xml` file"
+                         groupName="Magento 2"
+                         enabledByDefault="true" level="ERROR"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.ModuleDeclarationInModuleXmlInspection"/>
 
         <libraryRoot id=".phpstorm.meta.php" path=".phpstorm.meta.php/" runtime="false"/>
 
