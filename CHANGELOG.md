@@ -3,6 +3,8 @@
 * Features:
     * Create a CLI command action
     * Create a CRON group action
+    * Create a CRON job action
+    * Create a Controller action
     * Module declaration inspections in the scope of`module.xml` and `registration.php`
 * Improvements:
     * Fixed the positioning of all dialog popups
