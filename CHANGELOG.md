@@ -1,3 +1,17 @@
+1.0.1
+============= 
+* Features:
+    * Create a CLI command action
+    * Create a CRON group action
+    * Module declaration inspections in the scope of`module.xml` and `registration.php`
+* Improvements:
+    * Fixed the positioning of all dialog popups
+    * Adjusted Magento root validation for consider `magento/framework` as a requirement
+    * Adjusted Magento version validation RegExp to support patch versions
+ * Fixed bugs:
+     * The `create a plugin action` is accessible from the wrong context
+     * Null pointer exception on the new module group
+
 1.0.0
 ============= 
 * Features:

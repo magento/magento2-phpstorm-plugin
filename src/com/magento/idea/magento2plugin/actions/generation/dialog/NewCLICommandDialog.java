@@ -15,7 +15,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.CLICommandCl
 import com.magento.idea.magento2plugin.actions.generation.generator.CLICommandDiXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.util.CamelCaseToSnakeCase;
-import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
+import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -52,7 +52,7 @@ public class NewCLICommandDialog extends AbstractDialog {
     public NewCLICommandDialog(final Project project, final PsiDirectory directory) {
         super();
         this.project = project;
-        this.moduleName = GetModuleNameByDirectory.getInstance(project).execute(directory);
+        this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
         this.validator = new NewCLICommandValidator();
         this.toSnakeCase = CamelCaseToSnakeCase.getInstance();
 
