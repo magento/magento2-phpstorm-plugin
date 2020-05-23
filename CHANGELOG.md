@@ -11,8 +11,8 @@
     * Adjusted Magento root validation for consider `magento/framework` as a requirement
     * Adjusted Magento version validation RegExp to support patch versions
 * Fixed bugs:
-     * The `create a plugin action` is accessible from the wrong context
-     * Null pointer exception on the new module group
+    * The `create a plugin action` is accessible from the wrong context
+    * Null pointer exception on the new module group
 
 1.0.0
 ============= 
