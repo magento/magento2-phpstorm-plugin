@@ -59,6 +59,7 @@
             <action id="MagentoCreateABlock" class="com.magento.idea.magento2plugin.actions.generation.NewBlockAction" />
             <action id="MagentoCreateAController" class="com.magento.idea.magento2plugin.actions.generation.NewControllerAction" />
             <action id="MagentoCreateACronjob" class="com.magento.idea.magento2plugin.actions.generation.NewCronjobAction" />
+            <action id="MagentoCreateACronGroup" class="com.magento.idea.magento2plugin.actions.generation.NewCronGroupAction" />
             <action id="MagentoCreateAViewModel" class="com.magento.idea.magento2plugin.actions.generation.NewViewModelAction" />
             <action id="MagentoCreateAGraphQlResolver" class="com.magento.idea.magento2plugin.actions.generation.NewGraphQlResolverAction" />
             <action id="MagentoCreateCLICommand" class="com.magento.idea.magento2plugin.actions.generation.NewCLICommandAction" />
@@ -129,6 +130,14 @@
                          level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.php.PluginInspection"/>
 
+        <localInspection language="PHP" groupPath="PHP"
+                         shortName="ModuleDeclarationInRegistrationPhpInspection"
+                         displayName="Inspection for the Module declaration in the `registration.php` file"
+                         groupName="Magento 2"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.php.ModuleDeclarationInRegistrationPhpInspection"/>
+
         <localInspection language="XML" groupPath="XML"
                          shortName="ObserverDeclarationInspection"
                          displayName="Duplicated Observer Usage in events XML"
@@ -152,6 +161,13 @@
                          enabledByDefault="true" level="WARNING"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.CacheableFalseInDefaultLayoutInspection"/>
 
+        <localInspection language="XML" groupPath="XML"
+                         shortName="ModuleDeclarationInModuleXmlInspection"
+                         displayName="Inspection for the Module declaration in the `etc/module.xml` file"
+                         groupName="Magento 2"
+                         enabledByDefault="true" level="ERROR"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.ModuleDeclarationInModuleXmlInspection"/>
+
         <libraryRoot id=".phpstorm.meta.php" path=".phpstorm.meta.php/" runtime="false"/>
 
         <internalFileTemplate name="Magento Module Composer"/>
@@ -168,6 +184,7 @@
         <internalFileTemplate name="Magento CLI Command"/>
         <internalFileTemplate name="Magento Module Controller Backend Class"/>
         <internalFileTemplate name="Magento Module Controller Frontend Class"/>
+        <internalFileTemplate name="Magento Module Cron Groups Xml"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.php">
