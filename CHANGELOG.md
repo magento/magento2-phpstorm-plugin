@@ -5,7 +5,7 @@
     * Create a CRON group action
     * Create a CRON job action
     * Create a Controller action
-    * Code Inspection: Module declaration inspections in the scope of`module.xml` and `registration.php`
+    * Code Inspection: Module declaration inspections in the scope of `module.xml` and `registration.php`
     * Code Inspection: GraphQL resolver in the scope of a schema file
 * Improvements:
     * Fixed the positioning of all dialog popups
