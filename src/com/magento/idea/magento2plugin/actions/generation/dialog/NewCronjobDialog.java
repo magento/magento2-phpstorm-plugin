@@ -17,7 +17,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Namespa
 import com.magento.idea.magento2plugin.indexes.CronGroupIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.CamelCaseToSnakeCase;
-import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
+import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -77,7 +77,7 @@ public class NewCronjobDialog extends AbstractDialog {
     public NewCronjobDialog(final Project project, final PsiDirectory directory) {
         super();
         this.project = project;
-        this.moduleName = GetModuleNameByDirectory.getInstance(project).execute(directory);
+        this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
         this.validator = NewCronjobValidator.getInstance();
         this.camelCaseToSnakeCase = CamelCaseToSnakeCase.getInstance();
 

@@ -18,7 +18,7 @@ import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewModuleDialog;
 import com.magento.idea.magento2plugin.actions.generation.util.IsClickedDirectoryInsideProject;
 import com.magento.idea.magento2plugin.project.Settings;
-import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
+import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class NewModuleAction extends com.intellij.openapi.actionSystem.AnAction {
@@ -86,9 +86,8 @@ public class NewModuleAction extends com.intellij.openapi.actionSystem.AnAction 
                 return;
             }
 
-            final GetModuleNameByDirectory getModuleName = GetModuleNameByDirectory
-                    .getInstance(project);
-            final String moduleName = getModuleName.execute((PsiDirectory) psiElement);
+            final String moduleName = GetModuleNameByDirectoryUtil
+                    .execute((PsiDirectory) psiElement, project);
             if (moduleName == null) {
                 event.getPresentation().setVisible(true);
                 return;
