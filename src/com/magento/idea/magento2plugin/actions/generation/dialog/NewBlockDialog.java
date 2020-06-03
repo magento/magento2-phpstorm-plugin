@@ -15,7 +15,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.ModuleBlockC
 import com.magento.idea.magento2plugin.magento.files.BlockPhp;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
-import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
+import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -53,7 +53,7 @@ public class NewBlockDialog extends AbstractDialog {
 
         this.project = project;
         this.baseDir = directory;
-        this.moduleName = GetModuleNameByDirectory.getInstance(project).execute(directory);
+        this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
         this.validator = NewBlockValidator.getInstance(this);
 
         setContentPane(contentPanel);
