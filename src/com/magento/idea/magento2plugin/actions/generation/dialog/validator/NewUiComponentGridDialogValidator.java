@@ -14,8 +14,7 @@ import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.magento.files.UiComponentGridDataProviderPhp;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.util.RegExUtil;
-
-import javax.swing.*;
+import javax.swing.JOptionPane;
 
 @SuppressWarnings({"PMD.OnlyOneReturn", "PMD.NonThreadSafeSingleton"})
 public class NewUiComponentGridDialogValidator {

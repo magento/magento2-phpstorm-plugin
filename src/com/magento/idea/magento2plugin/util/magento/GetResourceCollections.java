@@ -18,6 +18,13 @@ public class GetResourceCollections {
     private static GetResourceCollections INSTANCE = null;
     private Project project;
 
+    /**
+     * Get instance of a class.
+     *
+     * @param project Project
+     *
+     * @return GetResourceCollections
+     */
     public static GetResourceCollections getInstance(Project project) {
         if (null == INSTANCE) {
             INSTANCE = new GetResourceCollections();
@@ -29,7 +36,7 @@ public class GetResourceCollections {
     /**
      * Get Magento resource collection list.
      *
-     * @return List<PhpClass>
+     * @return List
      */
     public List<PhpClass> execute() {
         PhpIndex phpIndex = PhpIndex.getInstance(project);

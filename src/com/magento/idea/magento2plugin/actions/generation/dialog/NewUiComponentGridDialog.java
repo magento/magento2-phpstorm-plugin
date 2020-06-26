@@ -8,30 +8,33 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.magento.idea.magento2plugin.actions.generation.NewUiComponentGridAction;
-import com.magento.idea.magento2plugin.actions.generation.data.CronGroupXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridDataProviderData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridToolbarData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewUiComponentGridDialogValidator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentGridDataProviderGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentGridXmlGenerator;
+import com.magento.idea.magento2plugin.actions.generation.NewUiComponentGridAction;
 import com.magento.idea.magento2plugin.magento.files.UiComponentGridDataProviderPhp;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
-import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import com.magento.idea.magento2plugin.util.magento.GetResourceCollections;
-
-import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 
 public class NewUiComponentGridDialog extends AbstractDialog {
     private final Project project;
@@ -181,8 +184,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         dataProviderType.addActionListener(event -> onDataProviderTypeChange());
     }
 
-    private void generateFile()
-    {
+    private void generateFile() {
         final UiComponentGridDataProviderGenerator DataProviderGenerator;
         DataProviderGenerator = new UiComponentGridDataProviderGenerator(
                 getGridDataProviderData(),
@@ -237,8 +239,11 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         if (this.collectionOptions == null) {
             this.collectionOptions = new ArrayList<>();
             this.collectionOptions.add("");
+            GetResourceCollections getResourceCollections = GetResourceCollections.getInstance(
+                    this.project
+            );
 
-            for (final PhpClass collectionClass: GetResourceCollections.getInstance(this.project).execute()) {
+            for (final PhpClass collectionClass: getResourceCollections.execute()) {
                 this.collectionOptions.add(collectionClass.getFQN());
             }
         }

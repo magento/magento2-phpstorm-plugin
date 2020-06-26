@@ -9,11 +9,12 @@ import com.intellij.lang.Language;
 import com.jetbrains.php.lang.PhpLanguage;
 
 public class UiComponentGridDataProviderPhp implements ModuleFileInterface {
-    public final static String COLLECTION_TEMPLATE = "Magento Module Ui Grid Collection Data Provider Php";
-    public final static String CUSTOM_TEMPLATE = "Magento Module Ui Grid Custom Data Provider Php";
-    public final static String FILE_EXTENSION = "php";
-    public final static String CUSTOM_TYPE = "custom";
-    public final static String COLLECTION_TYPE = "collection";
+    public static final String COLLECTION_TEMPLATE =
+            "Magento Module Ui Grid Collection Data Provider Php";
+    public static final String CUSTOM_TEMPLATE = "Magento Module Ui Grid Custom Data Provider Php";
+    public static final String FILE_EXTENSION = "php";
+    public static final String CUSTOM_TYPE = "custom";
+    public static final String COLLECTION_TYPE = "collection";
     private static UiComponentGridDataProviderPhp INSTANCE = null;
     private String className;
     private String providerType;
@@ -43,7 +44,6 @@ public class UiComponentGridDataProviderPhp implements ModuleFileInterface {
      * Set class name.
      *
      * @param className String
-     * @return void
      */
     public void setClassName(final String className) {
         this.className = className;
@@ -53,7 +53,6 @@ public class UiComponentGridDataProviderPhp implements ModuleFileInterface {
      * Set provided type.
      *
      * @param providerType String
-     * @return void
      */
     public void setProviderType(final String providerType) {
         this.providerType = providerType;

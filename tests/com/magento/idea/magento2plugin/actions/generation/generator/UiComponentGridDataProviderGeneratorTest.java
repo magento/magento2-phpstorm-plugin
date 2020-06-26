@@ -21,8 +21,7 @@ public class UiComponentGridDataProviderGeneratorTest extends BaseGeneratorTestC
     /**
      * Test data provider class file generation with custom type.
      */
-    public void testGenerateCustomDataProvider()
-    {
+    public void testGenerateCustomDataProvider() {
         final PsiFile dataProviderFile = generateDataProvider(
                 UiComponentGridDataProviderPhp.CUSTOM_TYPE,
                 null
@@ -40,8 +39,7 @@ public class UiComponentGridDataProviderGeneratorTest extends BaseGeneratorTestC
     /**
      * Test data provider class file generation with collection type.
      */
-    public void testGenerateCollectionDataProvider()
-    {
+    public void testGenerateCollectionDataProvider() {
         final PsiFile dataProviderFile = generateDataProvider(
                 UiComponentGridDataProviderPhp.COLLECTION_TYPE,
                 COLLECTION_FQN

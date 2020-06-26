@@ -52,7 +52,7 @@ public class UiComponentGridData {
     }
 
     /**
-     * Get area
+     * Get area.
      *
      * @return String
      */
@@ -61,7 +61,7 @@ public class UiComponentGridData {
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return String
      */

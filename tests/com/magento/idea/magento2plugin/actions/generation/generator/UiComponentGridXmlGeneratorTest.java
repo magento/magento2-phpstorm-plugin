@@ -21,6 +21,9 @@ public class UiComponentGridXmlGeneratorTest extends BaseGeneratorTestCase {
     private static final String ACL = "Foo_Bar::custom_entity";
     private static final String PROVIDER_CLASS_NAME = "Foo\\Bar\\Ui\\Listing\\DataProvider";
 
+    /**
+     * Test UI component listing file generation for specific area.
+     */
     public void testGenerateUiGridForBaseArea() {
         final String area = Areas.base.toString();
         final PsiFile cronGroupsXmlFile = generateComponentGridXml(
@@ -33,6 +36,9 @@ public class UiComponentGridXmlGeneratorTest extends BaseGeneratorTestCase {
         assertGeneratedFileIsCorrect(expectedFile, getExpectedDirectory(area), cronGroupsXmlFile);
     }
 
+    /**
+     * Test UI component listing file generation without toolbar.
+     */
     public void testGenerateUiGridWithoutToolbar() {
         final String area = Areas.adminhtml.toString();
         final PsiFile cronGroupsXmlFile = generateComponentGridXml(
