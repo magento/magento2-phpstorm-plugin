@@ -63,6 +63,7 @@
             <action id="MagentoCreateAViewModel" class="com.magento.idea.magento2plugin.actions.generation.NewViewModelAction" />
             <action id="MagentoCreateAGraphQlResolver" class="com.magento.idea.magento2plugin.actions.generation.NewGraphQlResolverAction" />
             <action id="MagentoCreateCLICommand" class="com.magento.idea.magento2plugin.actions.generation.NewCLICommandAction" />
+            <action id="MagentoCreateUiComponentGrid" class="com.magento.idea.magento2plugin.actions.generation.NewUiComponentGridAction" />
             <add-to-group group-id="NewGroup" anchor="last"/>
         </group>
 
@@ -183,6 +184,9 @@
         <internalFileTemplate name="Magento Module Controller Backend Class"/>
         <internalFileTemplate name="Magento Module Controller Frontend Class"/>
         <internalFileTemplate name="Magento Module Cron Groups Xml"/>
+        <internalFileTemplate name="Magento Module UI Component Grid Xml"/>
+        <internalFileTemplate name="Magento Module Ui Grid Collection Data Provider Php"/>
+        <internalFileTemplate name="Magento Module Ui Grid Custom Data Provider Php"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.php">

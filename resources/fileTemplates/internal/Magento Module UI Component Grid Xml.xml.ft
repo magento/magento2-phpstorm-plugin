@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">${NAME}.${NAME}_data_source</item>
+            <item name="deps" xsi:type="string">${NAME}.${NAME}_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <spinner>${NAME}_columns</spinner>
+        <deps>
+            <dep>${NAME}.${NAME}_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="${NAME}_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">${ID_FIELD_NAME}</param>
+            </storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+#if (${ACL})
+        <aclResource>${ACL}</aclResource>
+#end
+        <dataProvider class="${PROVIDER_CLASS}" name="${NAME}_data_source">
+            <settings>
+                <requestFieldName>${ID_FIELD_NAME}</requestFieldName>
+                <primaryFieldName>${ID_FIELD_NAME}</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+#if (${TOOLBAR})
+    <listingToolbar name="listing_top">
+#if (${BOOKMARKS})
+        <bookmark name="bookmarks"/>
+#end
+#if (${COLUMNS_CONTROLS})
+        <columnsControls name="columns_controls"/>
+#end
+#if (${FULLTEXT_SEARCH})
+        <filterSearch name="fulltext"/>
+#end
+#if (${LISTING_FILTERS})
+        <filters name="listing_filters"/>
+#end
+#if (${LISTING_PAGING})
+        <paging name="listing_paging"/>
+#end
+    </listingToolbar>
+#end
+    <columns name="${NAME}_columns">
+        <column name="${ID_FIELD_NAME}">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">ID</label>
+                <sorting>desc</sorting>
+            </settings>
+        </column>
+    </columns>
+</listing>

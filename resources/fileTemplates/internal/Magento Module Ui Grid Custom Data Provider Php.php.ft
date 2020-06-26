@@ -1,0 +1,20 @@
+<?php
+#parse("PHP File Header.php")
+#if (${NAMESPACE})
+
+namespace ${NAMESPACE};
+#end
+
+use Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider;
+
+class ${CLASS_NAME} extends DataProvider
+{
+    /**
+     * @inheritDoc
+     */
+    public function getData()
+    {
+        // todo: implement data retrieving here based on search criteria
+        return parent::getData();
+    }
+}
