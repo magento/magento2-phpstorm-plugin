@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.magento.files;
 
+@SuppressWarnings({"PMD.FieldNamingConventions", "PMD.ClassNamingConventions"})
 public class LayoutXml {
     public static String DEFAULT_FILENAME = "default.xml";
     public static String CACHEABLE_ATTRIBUTE_NAME = "cacheable";
