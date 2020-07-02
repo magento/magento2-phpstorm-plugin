@@ -13,9 +13,7 @@ import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import javax.swing.JOptionPane;
 
-@SuppressWarnings({
-    "PMD.NPathComplexity"
-})
+@SuppressWarnings({"PMD.NPathComplexity"})
 public class InjectAViewModelDialogValidator {
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
