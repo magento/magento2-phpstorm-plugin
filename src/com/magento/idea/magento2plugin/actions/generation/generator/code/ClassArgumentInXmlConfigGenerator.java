@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.actions.generation.generator.code;
 
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiDocumentManager;
@@ -19,8 +18,6 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCode
 import com.magento.idea.magento2plugin.actions.generation.generator.util.XmlFilePositionUtil;
 import com.magento.idea.magento2plugin.magento.files.CommonXml;
 import com.magento.idea.magento2plugin.magento.files.LayoutXml;
-import org.jetbrains.annotations.NotNull;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
@@ -96,7 +93,7 @@ public class ClassArgumentInXmlConfigGenerator {
                 document.insertString(insertPos, textBuf);
 
                 final int endPos = insertPos + textBuf.length() - 1;
-                List<TextRange> ranges = getSelectedRanges(insertPos, endPos);
+                final List<TextRange> ranges = getSelectedRanges(insertPos, endPos);
 
                 CodeStyleManager.getInstance(project).reformatText(
                         layoutFile,
@@ -110,19 +107,19 @@ public class ClassArgumentInXmlConfigGenerator {
         return layoutFile;
     }
 
-    protected List<TextRange> getSelectedRanges(int insertPosition, int endPosition) {
+    protected List<TextRange> getSelectedRanges(final int insertPosition, final int endPosition) {
         final int argumentsTagLength = 13;
         final List<TextRange> ranges = new SmartList<>();
 
-        TextRange insertRange = TextRange.create(
-            insertPosition - argumentsTagLength,
-            insertPosition + 1
+        final TextRange insertRange = TextRange.create(
+                insertPosition - argumentsTagLength,
+                insertPosition + 1
         );
         ranges.add(insertRange);
 
-        TextRange endRange = TextRange.create(
-            endPosition,
-            endPosition + argumentsTagLength
+        final TextRange endRange = TextRange.create(
+                endPosition,
+                endPosition + argumentsTagLength
         );
         ranges.add(endRange);
 
