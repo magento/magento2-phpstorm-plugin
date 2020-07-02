@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.magento.files;
 
 public class CommonXml {
@@ -9,4 +10,5 @@ public class CommonXml {
     public static String INIT_PARAMETER = "init_parameter";
     public static String OBJECT = "object";
     public static String ATTR_CLASS = "class";
+    public static String ATTRIBUTE_ARGUMENTS = "arguments";
 }
