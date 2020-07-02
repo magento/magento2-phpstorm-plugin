@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.magento.files;
 
+@SuppressWarnings({"PMD.FieldNamingConventions", "PMD.ClassNamingConventions"})
 public class CommonXml {
     public static String SCHEMA_VALIDATE_ATTRIBUTE = "xsi:type";
     public static String INIT_PARAMETER = "init_parameter";
