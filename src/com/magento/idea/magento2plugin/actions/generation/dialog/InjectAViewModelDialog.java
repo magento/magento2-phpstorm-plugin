@@ -8,6 +8,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.xml.XmlTag;
+import com.intellij.ui.DocumentAdapter;
 import com.magento.idea.magento2plugin.actions.generation.InjectAViewModelAction;
 import com.magento.idea.magento2plugin.actions.generation.data.ViewModelFileData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.InjectAViewModelDialogValidator;
@@ -17,6 +18,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Namespa
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.magento.packages.XsiTypes;
+import com.magento.idea.magento2plugin.util.FirstLetterToLowercaseUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,6 +32,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.event.DocumentEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class InjectAViewModelDialog extends AbstractDialog {
@@ -69,7 +72,12 @@ public class InjectAViewModelDialog extends AbstractDialog {
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
 
-        this.viewModelArgumentName.setText("viewModel");
+        this.viewModelClassName.getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
+            protected void textChanged(final @NotNull DocumentEvent event) {
+                updateArgumentText();
+            }
+        });
         this.viewModelDirectory.setText("ViewModel");
 
         setContentPane(contentPane);
@@ -105,6 +113,13 @@ public class InjectAViewModelDialog extends AbstractDialog {
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    }
+
+    protected void updateArgumentText() {
+        final String classNameText = this.viewModelClassName.getText();
+        this.viewModelArgumentName.setText(
+                FirstLetterToLowercaseUtil.convert(classNameText)
+        );
     }
 
     protected void onOK() {
