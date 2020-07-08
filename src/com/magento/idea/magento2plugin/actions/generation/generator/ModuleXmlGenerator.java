@@ -14,8 +14,10 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Directo
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.magento.files.ModuleXml;
 import com.magento.idea.magento2plugin.magento.packages.Package;
-import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.Properties;
 
 public class ModuleXmlGenerator extends FileGenerator {
 
@@ -70,5 +72,23 @@ public class ModuleXmlGenerator extends FileGenerator {
     protected void fillAttributes(final Properties attributes) {
         attributes.setProperty("PACKAGE", moduleXmlData.getPackageName());
         attributes.setProperty("MODULE_NAME", moduleXmlData.getModuleName());
+        attributes.setProperty("SEQUENCES", this.getDependenciesString(moduleXmlData.getModuleDependencies()));
+    }
+
+    private String getDependenciesString(List dependenciesList) {
+        String result = "";
+        Object[] dependencies = dependenciesList.toArray();
+        boolean noDependency = dependencies.length == 1 && dependencies[0].equals(ModuleXml.NO_DEPENDENCY_LABEL);
+
+        if (noDependency) {
+            return result;
+        }
+
+        for (int i = 0; i < dependencies.length; i++) {
+            String dependency = dependencies[i].toString();
+            result = result.concat("<module name=\"" + dependency + "\"/>");
+        }
+
+        return result;
     }
 }
