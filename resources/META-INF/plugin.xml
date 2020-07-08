@@ -81,6 +81,9 @@
         <action id="OverrideClassByAPreference.Menu" class="com.magento.idea.magento2plugin.actions.generation.OverrideClassByAPreferenceAction">
             <add-to-group group-id="EditorPopupMenu"/>
         </action>
+        <action id="InjectAViewModelAction.Menu" class="com.magento.idea.magento2plugin.actions.generation.InjectAViewModelAction">
+            <add-to-group group-id="EditorPopupMenu"/>
+        </action>
 
     </actions>
 
