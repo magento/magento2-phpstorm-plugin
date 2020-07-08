@@ -239,7 +239,8 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         if (this.collectionOptions == null) {
             this.collectionOptions = new ArrayList<>();
             this.collectionOptions.add("");
-            final GetResourceCollections getResourceCollections = GetResourceCollections.getInstance(
+            final GetResourceCollections getResourceCollections;
+            getResourceCollections = GetResourceCollections.getInstance(
                     this.project
             );
 
