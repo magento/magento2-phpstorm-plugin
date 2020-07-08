@@ -73,12 +73,12 @@ public class UiComponentGridXmlGeneratorTest extends BaseGeneratorTestCase {
                 ACL,
                 uiGridToolbarData
         );
-        final UiComponentGridXmlGenerator UiGridXmlGenerator = new UiComponentGridXmlGenerator(
+        final UiComponentGridXmlGenerator uiGridXmlGenerator = new UiComponentGridXmlGenerator(
                 uiGridData,
                 project
         );
 
-        return UiGridXmlGenerator.generate("test");
+        return uiGridXmlGenerator.generate("test");
     }
 
     /**

@@ -27,14 +27,14 @@ import javax.swing.JOptionPane;
 
 @SuppressWarnings({"PMD.OnlyOneReturn", "PMD.DataflowAnomalyAnalysis"})
 public class UiComponentGridDataProviderGenerator extends FileGenerator {
-    final UiComponentGridDataProviderData uiComponentGridDataProviderData;
-    final Project project;
-    final DirectoryGenerator directoryGenerator;
-    final FileFromTemplateGenerator fileFromTemplateGenerator;
-    final ValidatorBundle validatorBundle;
-    final CommonBundle commonBundle;
-    final String moduleName;
-    final GetFirstClassOfFile getFirstClassOfFile;
+    private final UiComponentGridDataProviderData uiComponentGridDataProviderData;
+    private final Project project;
+    private final DirectoryGenerator directoryGenerator;
+    private final FileFromTemplateGenerator fileFromTemplateGenerator;
+    private final ValidatorBundle validatorBundle;
+    private final CommonBundle commonBundle;
+    private final String moduleName;
+    private final GetFirstClassOfFile getFirstClassOfFile;
 
     /**
      * Ui component grid data provider constructor.
@@ -61,7 +61,7 @@ public class UiComponentGridDataProviderGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(String actionName) {
+    public PsiFile generate(final String actionName) {
         final PsiFile[] dataProviderFiles = new PsiFile[1];
 
         WriteCommandAction.runWriteCommandAction(project, () -> {
@@ -108,7 +108,7 @@ public class UiComponentGridDataProviderGenerator extends FileGenerator {
     }
 
     @Override
-    protected void fillAttributes(Properties attributes) {
+    protected void fillAttributes(final Properties attributes) {
         attributes.setProperty("NAMESPACE", uiComponentGridDataProviderData.getNamespace());
         attributes.setProperty("CLASS_NAME", uiComponentGridDataProviderData.getName());
         final String dataProviderType = uiComponentGridDataProviderData.getType();

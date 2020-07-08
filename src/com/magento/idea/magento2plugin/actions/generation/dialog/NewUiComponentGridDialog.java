@@ -36,11 +36,12 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
+@SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveImports", "PMD.UnusedPrivateMethod"})
 public class NewUiComponentGridDialog extends AbstractDialog {
     private final Project project;
     private final String moduleName;
     private final NewUiComponentGridDialogValidator validator;
-    private ArrayList<String> collectionOptions;
+    private List<String> collectionOptions;
     private JPanel contentPanel;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -58,7 +59,6 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     private JTextField providerClassName;
     private JTextField dataProviderParentDirectory;
     private JTextField acl;
-    private JPanel toolbarOptionsPanel;
     private JLabel aclLabel;
     private JLabel collectionLabel;
 
@@ -185,17 +185,17 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     }
 
     private void generateFile() {
-        final UiComponentGridDataProviderGenerator DataProviderGenerator;
-        DataProviderGenerator = new UiComponentGridDataProviderGenerator(
+        final UiComponentGridDataProviderGenerator dataProviderGenerator;
+        dataProviderGenerator = new UiComponentGridDataProviderGenerator(
                 getGridDataProviderData(),
                 getModuleName(),
                 project
         );
-        UiComponentGridXmlGenerator gridXmlGenerator = new UiComponentGridXmlGenerator(
+        final UiComponentGridXmlGenerator gridXmlGenerator = new UiComponentGridXmlGenerator(
                 getUiComponentGridData(),
                 project
         );
-        DataProviderGenerator.generate(NewUiComponentGridAction.ACTION_NAME);
+        dataProviderGenerator.generate(NewUiComponentGridAction.ACTION_NAME);
         gridXmlGenerator.generate(NewUiComponentGridAction.ACTION_NAME, true);
     }
 
@@ -239,7 +239,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         if (this.collectionOptions == null) {
             this.collectionOptions = new ArrayList<>();
             this.collectionOptions.add("");
-            GetResourceCollections getResourceCollections = GetResourceCollections.getInstance(
+            final GetResourceCollections getResourceCollections = GetResourceCollections.getInstance(
                     this.project
             );
 

@@ -16,9 +16,16 @@ import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import javax.swing.JOptionPane;
 
-@SuppressWarnings({"PMD.OnlyOneReturn", "PMD.NonThreadSafeSingleton"})
+@SuppressWarnings({
+        "PMD.OnlyOneReturn",
+        "PMD.NonThreadSafeSingleton",
+        "PMD.LongMethodRule",
+        "PMD.CyclomaticComplexity",
+        "PMD.NPathComplexity"
+})
 public class NewUiComponentGridDialogValidator {
     private static final String DATA_PROVIDER_NAME = "Data Provider Name";
+    private static final String NOT_EMPTY = "validator.notEmpty";
     private static NewUiComponentGridDialogValidator instance;
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
@@ -61,7 +68,7 @@ public class NewUiComponentGridDialogValidator {
 
         if (name.length() == 0) {
             final String errorMessage = this.validatorBundle.message(
-                    "validator.notEmpty",
+                    NOT_EMPTY,
                     "Name"
             );
             JOptionPane.showMessageDialog(
@@ -93,7 +100,7 @@ public class NewUiComponentGridDialogValidator {
 
         if (idFieldName.length() == 0) {
             final String errorMessage = this.validatorBundle.message(
-                    "validator.notEmpty",
+                    NOT_EMPTY,
                     "Entity ID field"
             );
             JOptionPane.showMessageDialog(
@@ -126,7 +133,7 @@ public class NewUiComponentGridDialogValidator {
 
         if (area.length() == 0) {
             final String errorMessage = this.validatorBundle.message(
-                    "validator.notEmpty",
+                    NOT_EMPTY,
                     "Area"
             );
             JOptionPane.showMessageDialog(
@@ -143,7 +150,7 @@ public class NewUiComponentGridDialogValidator {
 
         if (area.equals(Areas.adminhtml.toString()) && acl.length() == 0) {
             final String errorMessage = this.validatorBundle.message(
-                    "validator.notEmpty",
+                    NOT_EMPTY,
                     "Acl"
             );
             JOptionPane.showMessageDialog(
@@ -165,7 +172,7 @@ public class NewUiComponentGridDialogValidator {
 
         if (type.length() == 0) {
             final String errorMessage = this.validatorBundle.message(
-                    "validator.notEmpty",
+                    NOT_EMPTY,
                     "Data Provider Type"
             );
             JOptionPane.showMessageDialog(
@@ -184,7 +191,7 @@ public class NewUiComponentGridDialogValidator {
                 && collection.length() == 0
         ) {
             final String errorMessage = this.validatorBundle.message(
-                    "validator.notEmpty",
+                    NOT_EMPTY,
                     "Data Provider Collection"
             );
             JOptionPane.showMessageDialog(
@@ -201,7 +208,7 @@ public class NewUiComponentGridDialogValidator {
 
         if (name.length() == 0) {
             final String errorMessage = this.validatorBundle.message(
-                    "validator.notEmpty",
+                    NOT_EMPTY,
                     DATA_PROVIDER_NAME
             );
             JOptionPane.showMessageDialog(
@@ -265,7 +272,7 @@ public class NewUiComponentGridDialogValidator {
 
         if (parentDirectory.length() == 0) {
             final String errorMessage = validatorBundle.message(
-                    "validator.notEmpty",
+                    NOT_EMPTY,
                     "Data Provider Parent Directory"
             );
             JOptionPane.showMessageDialog(

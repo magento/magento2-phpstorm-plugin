@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@SuppressWarnings({"PMD.NonThreadSafeSingleton", "PMD.FieldNamingConventions"})
 public class GetResourceCollections {
     private static final String ABSTRACT_COLLECTION_FQN =
             "Magento\\Framework\\Model\\ResourceModel\\Db\\Collection\\AbstractCollection";
@@ -25,7 +26,7 @@ public class GetResourceCollections {
      *
      * @return GetResourceCollections
      */
-    public static GetResourceCollections getInstance(Project project) {
+    public static GetResourceCollections getInstance(final Project project) {
         if (null == INSTANCE) {
             INSTANCE = new GetResourceCollections();
         }
@@ -39,14 +40,14 @@ public class GetResourceCollections {
      * @return List
      */
     public List<PhpClass> execute() {
-        PhpIndex phpIndex = PhpIndex.getInstance(project);
-        Collection<PhpClass> collections = phpIndex.getAllSubclasses(ABSTRACT_COLLECTION_FQN);
-        List<PhpClass> resourceCollectionList = new ArrayList<>();
+        final PhpIndex phpIndex = PhpIndex.getInstance(project);
+        final Collection<PhpClass> collections = phpIndex.getAllSubclasses(ABSTRACT_COLLECTION_FQN);
 
         if (collections.isEmpty()) {
             return null;
         }
 
+        final List<PhpClass> resourceCollectionList = new ArrayList<>();
         resourceCollectionList.addAll(collections);
 
         return resourceCollectionList;

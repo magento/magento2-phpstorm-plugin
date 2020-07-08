@@ -65,11 +65,11 @@ public class UiComponentGridDataProviderPhp implements ModuleFileInterface {
 
     @Override
     public String getTemplate() {
-        if (providerType.equals("collection")) {
+        if (providerType.equals(COLLECTION_TYPE)) {
             return COLLECTION_TEMPLATE;
         }
 
-        if (providerType.equals("custom")) {
+        if (providerType.equals(CUSTOM_TYPE)) {
             return CUSTOM_TEMPLATE;
         }
 

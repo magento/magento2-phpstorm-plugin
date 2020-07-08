@@ -19,8 +19,8 @@ import com.magento.idea.magento2plugin.magento.packages.Package;
 import java.util.Properties;
 
 public class UiComponentGridXmlGenerator extends FileGenerator {
+    public static final String TRUE = "true";
     private final UiComponentGridData uiComponentGridData;
-    private final Project project;
     private final DirectoryGenerator directoryGenerator;
     private final ModuleIndex moduleIndex;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
@@ -38,14 +38,13 @@ public class UiComponentGridXmlGenerator extends FileGenerator {
         super(project);
 
         this.uiComponentGridData = uiComponentGridData;
-        this.project = project;
         this.directoryGenerator = DirectoryGenerator.getInstance();
         this.moduleIndex = ModuleIndex.getInstance(project);
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
     }
 
     @Override
-    public PsiFile generate(String actionName) {
+    public PsiFile generate(final String actionName) {
         final String moduleName = this.uiComponentGridData.getModuleName();
         PsiDirectory uiComponentDirectory = this.moduleIndex.getModuleDirectoryByModuleName(
                 moduleName
@@ -64,7 +63,7 @@ public class UiComponentGridXmlGenerator extends FileGenerator {
             );
         }
 
-        UiComponentGridXml uiGridXml = new UiComponentGridXml(uiComponentGridData.getName());
+        final UiComponentGridXml uiGridXml = new UiComponentGridXml(uiComponentGridData.getName());
 
         return this.fileFromTemplateGenerator.generate(
                 uiGridXml,
@@ -75,7 +74,7 @@ public class UiComponentGridXmlGenerator extends FileGenerator {
     }
 
     @Override
-    protected void fillAttributes(Properties attributes) {
+    protected void fillAttributes(final Properties attributes) {
         attributes.setProperty("NAME", uiComponentGridData.getName());
         attributes.setProperty("ID_FIELD_NAME", uiComponentGridData.getIdFieldName());
         attributes.setProperty("ID_FIELD_NAME", uiComponentGridData.getIdFieldName());
@@ -84,26 +83,26 @@ public class UiComponentGridXmlGenerator extends FileGenerator {
         final UiComponentGridToolbarData toolbarData = uiComponentGridData.getGridToolbarData();
 
         if (toolbarData.isAddToolbar()) {
-            attributes.setProperty("TOOLBAR", "true");
+            attributes.setProperty("TOOLBAR", TRUE);
 
             if (toolbarData.isAddBookmarks()) {
-                attributes.setProperty("BOOKMARKS", "true");
+                attributes.setProperty("BOOKMARKS", TRUE);
             }
 
             if (toolbarData.isAddColumnsControls()) {
-                attributes.setProperty("COLUMNS_CONTROLS", "true");
+                attributes.setProperty("COLUMNS_CONTROLS", TRUE);
             }
 
             if (toolbarData.isAddFulltextSearch()) {
-                attributes.setProperty("FULLTEXT_SEARCH", "true");
+                attributes.setProperty("FULLTEXT_SEARCH", TRUE);
             }
 
             if (toolbarData.isAddListingFilters()) {
-                attributes.setProperty("LISTING_FILTERS", "true");
+                attributes.setProperty("LISTING_FILTERS", TRUE);
             }
 
             if (toolbarData.isAddListingPaging()) {
-                attributes.setProperty("LISTING_PAGING", "true");
+                attributes.setProperty("LISTING_PAGING", TRUE);
             }
         }
     }
