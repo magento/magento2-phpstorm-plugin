@@ -12,7 +12,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@SuppressWarnings({"PMD.NonThreadSafeSingleton", "PMD.FieldNamingConventions"})
+@SuppressWarnings({
+        "PMD.NonThreadSafeSingleton",
+        "PMD.FieldNamingConventions",
+        "PMD.RedundantFieldInitializer"
+})
 public class GetResourceCollections {
     private static final String ABSTRACT_COLLECTION_FQN =
             "Magento\\Framework\\Model\\ResourceModel\\Db\\Collection\\AbstractCollection";

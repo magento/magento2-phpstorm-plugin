@@ -20,6 +20,7 @@ import javax.swing.JOptionPane;
         "PMD.OnlyOneReturn",
         "PMD.NonThreadSafeSingleton",
         "PMD.LongMethodRule",
+        "PMD.ExcessiveMethodLength",
         "PMD.CyclomaticComplexity",
         "PMD.NPathComplexity"
 })

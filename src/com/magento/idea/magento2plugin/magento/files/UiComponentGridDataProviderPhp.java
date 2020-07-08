@@ -8,6 +8,11 @@ package com.magento.idea.magento2plugin.magento.files;
 import com.intellij.lang.Language;
 import com.jetbrains.php.lang.PhpLanguage;
 
+@SuppressWarnings({
+        "PMD.FieldNamingConventions",
+        "PMD.NonThreadSafeSingleton",
+        "PMD.RedundantFieldInitializer"
+})
 public class UiComponentGridDataProviderPhp implements ModuleFileInterface {
     public static final String COLLECTION_TEMPLATE =
             "Magento Module Ui Grid Collection Data Provider Php";
