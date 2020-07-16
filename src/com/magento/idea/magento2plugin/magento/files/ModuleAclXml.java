@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.magento.files;
 
+@SuppressWarnings({"PMD.ClassNamingConventions", "PMD.FieldNamingConventions"})
 public class ModuleAclXml {
     public static String XML_ATTR_ID = "id";
     public static String XML_ATTR_TITLE = "title";
