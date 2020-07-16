@@ -12,7 +12,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.CronGroupXmlData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewCronGroupValidator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleCronGroupXmlGenerator;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
-import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
+import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -68,7 +68,7 @@ public class NewCronGroupDialog extends AbstractDialog {
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
         this.validator = NewCronGroupValidator.getInstance();
-        this.moduleName = GetModuleNameByDirectory.getInstance(project).execute(directory);
+        this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
         buttonOK.addActionListener(event -> onOK());
         buttonCancel.addActionListener(event -> onCancel());

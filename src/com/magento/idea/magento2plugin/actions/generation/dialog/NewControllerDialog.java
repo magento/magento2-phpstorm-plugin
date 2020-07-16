@@ -19,7 +19,7 @@ import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
-import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
+import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -64,7 +64,7 @@ public class NewControllerDialog extends AbstractDialog {
     public NewControllerDialog(final Project project, final PsiDirectory directory) {
         super();
         this.project = project;
-        this.moduleName = GetModuleNameByDirectory.getInstance(project).execute(directory);
+        this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
         this.validator = NewControllerValidator.getInstance(this);
 
         setContentPane(contentPane);
