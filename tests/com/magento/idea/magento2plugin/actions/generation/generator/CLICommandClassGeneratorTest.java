@@ -11,7 +11,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.CLICommandClassDa
 
 public class CLICommandClassGeneratorTest extends BaseGeneratorTestCase {
     private static final String CLASS_NAME = "TestCLICommandPHPClass";
-    private static final String PARENT_DIRECTORY = "Console";
+    private static final String PARENT_DIRECTORY = "Console/Command";
     private static final String COMMAND_NAME = "bar:test-command";
     private static final String DESCRIPTION = "This is the test command";
     private static final String NAMESPACE = "Foo\\Bar\\Console\\Command";
