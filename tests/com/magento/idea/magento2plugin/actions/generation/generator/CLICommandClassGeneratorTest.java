@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import static java.lang.System.out;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.CLICommandClassData;
@@ -36,6 +38,7 @@ public class CLICommandClassGeneratorTest extends BaseGeneratorTestCase {
         final String filePath = this.getFixturePath(CLASS_NAME.concat(".php"));
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
 
+        out.println(expectedFile.getContainingDirectory().getVirtualFile().getPath());
         assertGeneratedFileIsCorrect(
                 expectedFile,
                 "src/app/code/Foo/Bar/Console/Command",
