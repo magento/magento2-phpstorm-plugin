@@ -116,6 +116,7 @@
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.TestNameIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.AclResourceIndex" />
 
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.PluginLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.PluginTargetLineMarkerProvider"/>
@@ -168,6 +169,13 @@
                          groupName="Magento 2"
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.ModuleDeclarationInModuleXmlInspection"/>
+
+        <localInspection language="XML" groupPath="XML"
+                         shortName="AclResourceXmlInspection"
+                         displayName="Inspection for the Title XML required attribute in the `etc/acl.xml` file"
+                         groupName="Magento 2"
+                         enabledByDefault="true" level="ERROR"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.AclResourceXmlInspection"/>
 
         <libraryRoot id=".phpstorm.meta.php" path=".phpstorm.meta.php/" runtime="false"/>
 
