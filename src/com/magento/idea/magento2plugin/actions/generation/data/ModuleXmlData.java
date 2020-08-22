@@ -9,17 +9,20 @@ import com.intellij.psi.PsiDirectory;
 public class ModuleXmlData {
     private final String packageName;
     private final String moduleName;
+    private final String moduleVersion;
     private PsiDirectory baseDir;
     private boolean createModuleDirs;
 
     public ModuleXmlData(
-        String packageName,
-        String moduleName,
-        PsiDirectory baseDir,
-        boolean createModuleDirs
+            String packageName,
+            String moduleName,
+            String moduleVersion,
+            PsiDirectory baseDir,
+            boolean createModuleDirs
     ) {
         this.packageName = packageName;
         this.moduleName = moduleName;
+        this.moduleVersion = moduleVersion;
         this.baseDir = baseDir;
         this.createModuleDirs = createModuleDirs;
     }
@@ -34,6 +37,10 @@ public class ModuleXmlData {
 
     public PsiDirectory getBaseDir() {
         return this.baseDir;
+    }
+
+    public String getModuleVersion() {
+        return this.moduleVersion;
     }
 
     public boolean getCreateModuleDirs() {

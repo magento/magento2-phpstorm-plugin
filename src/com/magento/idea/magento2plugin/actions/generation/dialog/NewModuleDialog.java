@@ -187,6 +187,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         new ModuleXmlGenerator(new ModuleXmlData(
                 getPackageName(),
                 getModuleName(),
+                getModuleVersion(),
                 getBaseDir(),
                 true
         ), project).generate(NewModuleAction.actionName, true);

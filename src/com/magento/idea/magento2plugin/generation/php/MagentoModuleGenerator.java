@@ -106,6 +106,7 @@ public class MagentoModuleGenerator extends WebProjectTemplate<MagentoProjectGen
         ModuleXmlData moduleXmlData = new ModuleXmlData(
                 settings.getPackageName(),
                 settings.getModuleName(),
+                settings.getModuleVersion(),
                 baseDir,
                 false
         );
