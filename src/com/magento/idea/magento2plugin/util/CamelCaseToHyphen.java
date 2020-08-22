@@ -18,14 +18,6 @@ public class CamelCaseToHyphen {
     }
 
     public String convert(String string) {
-        String regex = "(?=[A-Z][a-z])";
-        String subst = "-";
-
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(string);
-
-        String result = matcher.replaceAll(subst);
-
-        return result.toLowerCase().substring(1);
+        return string.toLowerCase();
     }
 }
