@@ -155,7 +155,7 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
             final String dependency
     ) {
         String version = "*";
-        String moduleName = camelCaseToHyphen.convert(dependency).replace("_", "/");
+        String moduleName = camelCaseToHyphen.convert(dependency).replace("_-", "/");
         try {
             final VirtualFile virtualFile = moduleIndex.getModuleDirectoryByModuleName(dependency)
                     .findFile(ComposerJson.FILE_NAME)
