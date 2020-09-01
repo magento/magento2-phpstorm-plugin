@@ -14,14 +14,14 @@ repositories {
 }
 
 group 'com.magento.idea'
-version '1.0.2'
+version '2.0.0'
 
 apply plugin: 'org.jetbrains.intellij'
 apply plugin: 'java'
 apply plugin: 'groovy'
 
-def phpPluginVersion = System.getProperty("phpPluginVersion", "193.6494.35")
-def ideaVersion = System.getProperty("ideaVersion", "2019.3.3")
+def phpPluginVersion = System.getProperty("phpPluginVersion", "201.7223.91")
+def ideaVersion = System.getProperty("ideaVersion", "2020.1.1")
 def javaVersion = 1.8
 
 sourceCompatibility = javaVersion
