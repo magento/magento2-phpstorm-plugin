@@ -35,28 +35,30 @@ import org.jetbrains.annotations.Nullable;
 public class MagentoModuleGenerator extends WebProjectTemplate<MagentoProjectGeneratorSettings> {
     public static String ACTION_NAME = "Magento 2 Module";
 
-    public MagentoModuleGenerator() {
-    }
-
     @Nls
     @NotNull
+    @Override
     public String getName() {
         return ACTION_NAME;
     }
 
+    @Override
     public String getDescription() {
         return "Create a Magento 2 Module";
     }
 
+    @Override
     public Icon getIcon() {
         return MagentoIcons.MODULE;
     }
 
     @NotNull
+    @Override
     public ProjectGeneratorPeer<MagentoProjectGeneratorSettings> createPeer() {
         return new MagentoProjectPeer();
     }
 
+    @Override
     public boolean isPrimaryGenerator() {
         return PlatformUtils.isPhpStorm();
     }
@@ -69,16 +71,17 @@ public class MagentoModuleGenerator extends WebProjectTemplate<MagentoProjectGen
      * @param settings Settings
      * @param module Module
      */
+    @Override
     public void generateProject(
-            @NotNull Project project,
-            @NotNull VirtualFile baseDir,
-            @NotNull MagentoProjectGeneratorSettings settings,
-            @NotNull Module module
+            @NotNull final Project project,
+            @NotNull final VirtualFile baseDir,
+            @NotNull final MagentoProjectGeneratorSettings settings,
+            @NotNull final Module module
     ) {
-        Settings dataService = Settings.getInstance(project);
+        final Settings dataService = Settings.getInstance(project);
         dataService.setState(settings.getMagentoState());
 
-        Runnable generate = () -> {
+        final Runnable generate = () -> {
             ApplicationManager.getApplication().runWriteAction(() -> {
                 PsiDirectory baseDirElement = PsiManager
                         .getInstance(project)
@@ -107,9 +110,9 @@ public class MagentoModuleGenerator extends WebProjectTemplate<MagentoProjectGen
      * @return
      */
     private PsiFile generateComposerJson(
-            @NotNull Project project,
-            @NotNull PsiDirectory baseDir,
-            @NotNull MagentoProjectGeneratorSettings settings
+            @NotNull final Project project,
+            @NotNull final PsiDirectory baseDir,
+            @NotNull final MagentoProjectGeneratorSettings settings
     ) {
         return new ModuleComposerJsonGenerator(new ModuleComposerJsonData(
                 settings.getPackageName(),
@@ -132,9 +135,9 @@ public class MagentoModuleGenerator extends WebProjectTemplate<MagentoProjectGen
      * @return
      */
     private PsiFile generateRegistrationPhp(
-            @NotNull Project project,
-            @NotNull PsiDirectory baseDir,
-            @NotNull MagentoProjectGeneratorSettings settings
+            @NotNull final Project project,
+            @NotNull final PsiDirectory baseDir,
+            @NotNull final MagentoProjectGeneratorSettings settings
     ) {
         return new ModuleRegistrationPhpGenerator(new ModuleRegistrationPhpData(
                 settings.getPackageName(),
@@ -152,22 +155,24 @@ public class MagentoModuleGenerator extends WebProjectTemplate<MagentoProjectGen
      * @param settings Settings
      */
     private void generateModuleXml(
-            @NotNull Project project,
-            @NotNull PsiDirectory baseDir,
-            @NotNull MagentoProjectGeneratorSettings settings
+            @NotNull final Project project,
+            @NotNull final PsiDirectory baseDir,
+            @NotNull final MagentoProjectGeneratorSettings settings
     ) {
-        ModuleXmlData moduleXmlData = new ModuleXmlData(
+        final ModuleXmlData moduleXmlData = new ModuleXmlData(
                 settings.getPackageName(),
                 settings.getModuleName(),
                 settings.getModuleVersion(),
                 baseDir,
                 false
         );
-        ModuleXmlGenerator moduleXmlGenerator = new ModuleXmlGenerator(moduleXmlData, project);
+        final ModuleXmlGenerator moduleXmlGenerator =
+                new ModuleXmlGenerator(moduleXmlData, project);
         moduleXmlGenerator.generate(ACTION_NAME, true);
     }
 
     @Nullable
+    @Override
     public String getHelpId() {
         return null;
     }

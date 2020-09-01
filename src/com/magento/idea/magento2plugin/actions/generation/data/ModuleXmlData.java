@@ -11,8 +11,8 @@ public class ModuleXmlData {
     private final String packageName;
     private final String moduleName;
     private final String moduleVersion;
-    private PsiDirectory baseDir;
-    private boolean createModuleDirs;
+    private final PsiDirectory baseDir;
+    private final boolean createModuleDirs;
 
     /**
      * Constructor ModuleXmlData.
@@ -24,11 +24,11 @@ public class ModuleXmlData {
      * @param createModuleDirs Create module Dirs
      */
     public ModuleXmlData(
-            String packageName,
-            String moduleName,
-            String moduleVersion,
-            PsiDirectory baseDir,
-            boolean createModuleDirs
+            final String packageName,
+            final String moduleName,
+            final String moduleVersion,
+            final PsiDirectory baseDir,
+            final boolean createModuleDirs
     ) {
         this.packageName = packageName;
         this.moduleName = moduleName;
