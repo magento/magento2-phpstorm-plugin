@@ -20,6 +20,9 @@ apply plugin: 'org.jetbrains.intellij'
 apply plugin: 'java'
 apply plugin: 'groovy'
 
+import org.gradle.logging.ShowStacktrace
+gradle.startParameter.showStacktrace = ShowStacktrace.ALWAYS
+
 def phpPluginVersion = System.getProperty("phpPluginVersion", "193.6494.35")
 def ideaVersion = System.getProperty("ideaVersion", "2019.3.3")
 def javaVersion = 1.8
