@@ -203,6 +203,4 @@
         <frameworkUsageProvider implementation="com.magento.idea.magento2plugin.project.UsagesProvider"/>
     </extensions>
 
-
-
 </idea-plugin>
