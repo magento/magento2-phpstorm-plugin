@@ -1,91 +1,79 @@
-/*
+/**
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
-
 package com.magento.idea.magento2plugin.project;
 
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.components.State;
-import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.components.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.EventDispatcher;
 import com.intellij.util.xmlb.annotations.Attribute;
 import com.intellij.util.xmlb.annotations.Tag;
-import java.util.EventListener;
+import com.magento.idea.magento2plugin.init.ConfigurationManager;
+import com.magento.idea.magento2plugin.util.magento.MagentoBasePathUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import java.util.EventListener;
 
 @State(
-        name = "Magento2PluginSettings",
-        storages = {
-            @Storage("magento2plugin.xml")
-        }
+    name = "Magento2PluginSettings",
+    storages = {
+        @Storage("magento2plugin.xml")
+    }
 )
 public class Settings implements PersistentStateComponent<Settings.State> {
-    private final EventDispatcher<MagentoModuleDataListener> myEventDispatcher
-            = EventDispatcher.create(MagentoModuleDataListener.class);
-    public boolean pluginEnabled;
-    public static String defaultLicense = "Proprietary";
+    private final EventDispatcher<MagentoModuleDataListener> myEventDispatcher = EventDispatcher.create(MagentoModuleDataListener.class);
+    public boolean pluginEnabled = false;
+    public static String DEFAULT_LICENSE = "Proprietary";
     public String magentoPath;
-    public boolean mftfSupportEnabled;
-    public boolean myDoNotAskContentConfigAgain;
-    public String magentoVersion;
+    public boolean mftfSupportEnabled = false;
+    public boolean myDoNotAskContentConfigAgain = false;
+    public String magentoVersion = null;
 
-    @Override
     @Nullable
     public Settings.State getState() {
         return new Settings.State(
                 this.pluginEnabled,
                 this.magentoPath,
-                defaultLicense,
+                DEFAULT_LICENSE,
                 this.mftfSupportEnabled,
                 this.myDoNotAskContentConfigAgain,
                 this.magentoVersion
         );
     }
 
-    /**
-     * State setter.
-     *
-     * @param state State
-     */
-    public void setState(final State state) {
-        final State oldState = this.getState();
+    public void setState(State state) {
+        State oldState = this.getState();
         this.loadState(state);
         this.notifyListeners(state, oldState);
     }
 
-    @Override
-    public void loadState(final @NotNull Settings.State state) {
+    public void loadState(@NotNull Settings.State state) {
         this.pluginEnabled = state.isPluginEnabled();
         this.magentoPath = state.getMagentoPath();
-        this.defaultLicense = state.getDefaultLicenseName();
+        this.DEFAULT_LICENSE = state.getDefaultLicenseName();
         this.mftfSupportEnabled = state.isMftfSupportEnabled();
         this.myDoNotAskContentConfigAgain = state.isDoNotAskContentConfigAgain();
         this.magentoVersion = state.getMagentoVersion();
     }
 
-    public void addListener(final MagentoModuleDataListener listener) {
+    public void addListener(MagentoModuleDataListener listener) {
         this.myEventDispatcher.addListener(listener);
     }
 
-    private void notifyListeners(final State state, final State oldState) {
+    private void notifyListeners(State state, State oldState) {
         if (!state.equals(oldState)) {
             this.myEventDispatcher.getMulticaster().stateChanged(state, oldState);
         }
     }
 
-    public void setDoNotAskContentConfigurationAgain(
-            final boolean doNotAskContentConfigurationAgain
-    ) {
+    public void setDoNotAskContentConfigurationAgain(boolean doNotAskContentConfigurationAgain) {
         this.myDoNotAskContentConfigAgain = doNotAskContentConfigurationAgain;
     }
 
-    public void setMagentoPath(final String magentoPath) {
+    public void setMagentoPath(String magentoPath) {
         this.magentoPath = magentoPath;
     }
 
@@ -93,19 +81,19 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         void stateChanged(State state, State oldState);
     }
 
-    public static Settings getInstance(final Project project) {
+    public static Settings getInstance(Project project) {
         return ServiceManager.getService(project, Settings.class);
     }
 
-    public static boolean isEnabled(final @NotNull Project project) {
+    public static boolean isEnabled(@NotNull Project project) {
         return getInstance(project).pluginEnabled;
     }
 
-    public static String getDefaultLicenseName(final @NotNull Project project) {
-        return getInstance(project).defaultLicense;
+    public static String getDefaultLicenseName(@NotNull Project project) {
+        return getInstance(project).DEFAULT_LICENSE;
     }
 
-    public static boolean isMftfSupportEnabled(final @NotNull Project project) {
+    public static boolean isMftfSupportEnabled(@NotNull Project project) {
         return getInstance(project).mftfSupportEnabled;
     }
 
@@ -115,11 +103,21 @@ public class Settings implements PersistentStateComponent<Settings.State> {
     }
 
     @Nullable
-    public static String getMagentoPath(final @NotNull Project project) {
-        return getInstance(project).magentoPath;
+    public static String getMagentoPath(@NotNull Project project) {
+        Settings settings = getInstance(project);
+        String path = settings.magentoPath;
+        if (path == null || path.isEmpty()) {
+            if (MagentoBasePathUtil.isMagentoFolderValid(project.getBasePath())) {
+                settings.setMagentoPath(project.getBasePath());
+            } else {
+                settings.pluginEnabled = false;
+                ConfigurationManager.suggestToConfigureMagentoPath(project);
+                return null;
+            }
+        }
+        return settings.magentoPath;
     }
 
-    @SuppressWarnings({"PMD.DataClass"})
     @Tag
     public static class State {
         public boolean pluginEnabled;
@@ -129,26 +127,16 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         public boolean myDoNotAskContentConfigAgain;
         public String magentoVersion;
 
-        public State() {//NOPMD
+        public State() {
         }
 
-        /**
-         * Settings State.
-         *
-         * @param pluginEnabled boolean
-         * @param magentoPath String
-         * @param defaultLicenseName String
-         * @param mftfSupportEnabled boolean
-         * @param myDoNotAskContentConfigAgain boolean
-         * @param magentoVersion String
-         */
         public State(
-                final boolean pluginEnabled,
-                final String magentoPath,
-                final String defaultLicenseName,
-                final boolean mftfSupportEnabled,
-                final boolean myDoNotAskContentConfigAgain,
-                final String magentoVersion
+                boolean pluginEnabled,
+                String magentoPath,
+                String defaultLicenseName,
+                boolean mftfSupportEnabled,
+                boolean myDoNotAskContentConfigAgain,
+                String magentoVersion
         ) {
             this.pluginEnabled = pluginEnabled;
             this.magentoPath = magentoPath;
@@ -163,7 +151,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             return this.pluginEnabled;
         }
 
-        public void setPluginEnabled(final boolean enabled) {
+        public void setPluginEnabled(boolean enabled) {
             this.pluginEnabled = enabled;
         }
 
@@ -172,7 +160,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         }
 
         @Tag("magentoPath")
-        public void setMagentoPath(final String magentoPath) {
+        public void setMagentoPath(String magentoPath) {
             this.magentoPath = magentoPath;
         }
 
@@ -181,20 +169,14 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         }
 
         @Tag("magentoVersion")
-        public void setMagentoVersion(final String magentoVersion) {
+        public void setMagentoVersion(String magentoVersion) {
             this.magentoVersion = magentoVersion;
         }
 
-        /**
-         * Last Used Magento Path setter.
-         *
-         * @param magentoPath String
-         */
-        public void setMagentoPathAndUpdateLastUsed(final String magentoPath) {
+        public void setMagentoPathAndUpdateLastUsed(String magentoPath) {
             this.setMagentoPath(magentoPath);
             if (!StringUtil.isEmptyOrSpaces(magentoPath)) {
-                PropertiesComponent.getInstance()
-                        .setValue("magento.support.magentoPath", magentoPath);
+                PropertiesComponent.getInstance().setValue("magento.support.magentoPath", magentoPath);
             }
         }
 
@@ -202,7 +184,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             return this.defaultLicenseName;
         }
 
-        public void setDefaultLicenseName(final String defaultLicenseName) {
+        public void setDefaultLicenseName(String defaultLicenseName) {
             this.defaultLicenseName = defaultLicenseName;
         }
 
@@ -214,24 +196,20 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             return this.myDoNotAskContentConfigAgain;
         }
 
-        public void setMftfSupportEnabled(final boolean mftfSupportEnabled) {
+        public void setMftfSupportEnabled(boolean mftfSupportEnabled) {
             this.mftfSupportEnabled = mftfSupportEnabled;
         }
 
-        @SuppressWarnings({"PMD.ConfusingTernary"})
-        @Override
-        public boolean equals(final Object objectToCompare) {
+        public boolean equals(Object objectToCompare) {
             if (this == objectToCompare) {
                 return true;
             } else if (objectToCompare != null && this.getClass() == objectToCompare.getClass()) {
-                final State state = (State) objectToCompare;
+                State state = (State) objectToCompare;
                 if (this.isPluginEnabled() != state.isPluginEnabled()) {
                     return false;
                 } else if (this.isMftfSupportEnabled() != state.isMftfSupportEnabled()) {
                     return false;
-                } else if (
-                        this.isDoNotAskContentConfigAgain() != state.isDoNotAskContentConfigAgain()
-                ) {
+                } else if (this.isDoNotAskContentConfigAgain() != state.isDoNotAskContentConfigAgain()) {
                     return false;
                 } else {
                     if (this.magentoPath != null) {
@@ -239,25 +217,19 @@ public class Settings implements PersistentStateComponent<Settings.State> {
                     }
                     if (this.defaultLicenseName != null) {
                         return this.defaultLicenseName.equals(state.defaultLicenseName);
-                    } else {
-                        return state.defaultLicenseName == null;
-                    }
+                    } else return state.defaultLicenseName == null;
                 }
             } else {
                 return false;
             }
         }
 
-        @SuppressWarnings({"PMD.ConfusingTernary"})
-        @Override
         public int hashCode() {
             int result = this.isPluginEnabled() ? 1 : 0;
             result = 31 * result + (this.magentoPath != null ? this.magentoPath.hashCode() : 0);
             result = 31 * result + (this.isMftfSupportEnabled() ? 1 : 0);
             result = 31 * result + (this.isDoNotAskContentConfigAgain() ? 1 : 0);
-            result = 31 * result + (
-                        this.defaultLicenseName != null ? this.defaultLicenseName.hashCode() : 0
-                );
+            result = 31 * result + (this.defaultLicenseName != null ? this.defaultLicenseName.hashCode() : 0);
             return result;
         }
     }

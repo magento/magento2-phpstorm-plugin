@@ -116,7 +116,7 @@ public class NewModuleForm implements ListSelectionListener {
         final Settings.State state = new Settings.State();
         state.setPluginEnabled(true);
         state.setMftfSupportEnabled(true);
-        state.setDefaultLicenseName(Settings.defaultLicense);
+        state.setDefaultLicenseName(Settings.DEFAULT_LICENSE);
         state.setMagentoPathAndUpdateLastUsed(this.magentoPath.getTextField().getText().trim());
 
         return new MagentoProjectGeneratorSettings(
