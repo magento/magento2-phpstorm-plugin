@@ -194,6 +194,8 @@
         <internalFileTemplate name="Magento Module Controller Backend Class"/>
         <internalFileTemplate name="Magento Module Controller Frontend Class"/>
         <internalFileTemplate name="Magento Module Cron Groups Xml"/>
+
+        <postStartupActivity implementation="com.magento.idea.magento2plugin.project.startup.CheckIfMagentoPathIsValidActivity"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.php">

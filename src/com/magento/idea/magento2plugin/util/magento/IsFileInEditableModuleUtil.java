@@ -22,6 +22,9 @@ public final class IsFileInEditableModuleUtil {
      */
     public static boolean execute(final PsiFile file) {
         final String magentoPath = Settings.getMagentoPath(file.getProject());
+        if (magentoPath == null) {
+            return false;
+        }
         final String editablePath = magentoPath + File.separator + Package.packagesRoot;
         final String filePath = file.getVirtualFile().getPath();
 
