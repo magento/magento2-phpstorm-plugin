@@ -84,7 +84,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
                 new RegenerateUrnMapListener(project)
         );
 
-        moduleDefaultLicenseName.setText(getSettings().DEFAULT_LICENSE);
+        moduleDefaultLicenseName.setText(getSettings().defaultLicense);
         mftfSupportEnabled.setSelected(getSettings().mftfSupportEnabled);
         magentoPath.getTextField().setText(getSettings().magentoPath);
         resolveMagentoVersion();
@@ -103,7 +103,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     @Override
     public boolean isModified() {
         final boolean licenseChanged = !moduleDefaultLicenseName.getText().equals(
-                Settings.DEFAULT_LICENSE
+                Settings.defaultLicense
         );
         final boolean statusChanged = !pluginEnabled.isSelected() == getSettings().pluginEnabled;
         final boolean mftfSupportChanged = mftfSupportEnabled.isSelected()
@@ -139,7 +139,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
 
     private void saveSettings() {
         getSettings().pluginEnabled = pluginEnabled.isSelected();
-        getSettings().DEFAULT_LICENSE = moduleDefaultLicenseName.getText();
+        getSettings().defaultLicense = moduleDefaultLicenseName.getText();
         getSettings().mftfSupportEnabled = mftfSupportEnabled.isSelected();
         getSettings().magentoPath = getMagentoPath();
         getSettings().magentoVersion = getMagentoVersion();
