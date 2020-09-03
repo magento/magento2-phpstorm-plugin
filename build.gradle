@@ -4,7 +4,7 @@
  */
 
 plugins {
-    id 'org.jetbrains.intellij' version '0.4.15'
+    id 'org.jetbrains.intellij' version '0.4.22'
     id 'checkstyle'
     id 'pmd'
 }
@@ -31,7 +31,16 @@ intellij {
     version ideaVersion
     type 'IU'
     pluginName 'com.magento.idea.magento2plugin'
-    plugins = ["com.jetbrains.php:$phpPluginVersion", 'yaml', 'java-i18n', 'properties', 'CSS', 'JavaScriptLanguage', 'com.intellij.lang.jsgraphql:2.3.0']
+    plugins = [
+            "com.jetbrains.php:$phpPluginVersion",
+            'yaml',
+            'java-i18n',
+            'properties',
+            'CSS',
+            'JavaScriptLanguage',
+            'com.intellij.lang.jsgraphql:2.3.0',
+            'platform-images'
+    ]
     updateSinceUntilBuild false
     sameSinceUntilBuild false
     downloadSources !Boolean.valueOf(System.getenv('CI'))
