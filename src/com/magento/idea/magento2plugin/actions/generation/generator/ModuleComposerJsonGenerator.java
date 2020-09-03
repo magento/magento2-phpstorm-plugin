@@ -136,10 +136,12 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
         for (int i = 0; i < dependencies.length; i++) {
             final String dependency = dependencies[i].toString();
             final Pair<String, String> dependencyData = getDependencyData(dependency);
-            result = result.concat("\"");
-            result = result.concat(dependencyData.getFirst());
-            result = result.concat("\"");
-            result = result.concat(": \"" + dependencyData.getSecond() + "\"");
+            if (!dependencyData.getFirst().isEmpty()) {
+                result = result.concat("\"");
+                result = result.concat(dependencyData.getFirst());
+                result = result.concat("\"");
+                result = result.concat(": \"" + dependencyData.getSecond() + "\"");
+            }
 
             if (dependencies.length != i + 1) {
                 result = result.concat(",");
@@ -157,24 +159,29 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
         String version = "*";
         String moduleName = camelCaseToHyphen.convert(dependency).replace("_-", "/");
         try {
-            final VirtualFile virtualFile = moduleIndex.getModuleDirectoryByModuleName(dependency)
-                    .findFile(ComposerJson.FILE_NAME)
-                    .getVirtualFile();//NOPMD
-            if (virtualFile.exists()) {
-                final JsonElement jsonElement =
-                        new JsonParser().parse(new FileReader(virtualFile.getPath()));//NOPMD
-                final JsonElement versionJsonElement = jsonElement.getAsJsonObject().get("version");
-                final JsonElement nameJsonElement = jsonElement.getAsJsonObject().get("name");
-                if (versionJsonElement != null) {
-                    version = versionJsonElement.getAsString();
-                    final int minorVersionSeparator = version.lastIndexOf('.');
-                    version = new StringBuilder(version)
-                            .replace(minorVersionSeparator + 1, version.length(),"*")
-                            .toString();
+            final PsiFile virtualFile = moduleIndex.getModuleDirectoryByModuleName(dependency)
+                    .findFile(ComposerJson.FILE_NAME);
+
+            if (virtualFile != null) {
+                final VirtualFile composerJsonFile = virtualFile.getVirtualFile();//NOPMD
+                if (composerJsonFile.exists()) {
+                    final JsonElement jsonElement =
+                            new JsonParser().parse(new FileReader(composerJsonFile.getPath()));//NOPMD
+                    final JsonElement versionJsonElement = jsonElement.getAsJsonObject().get("version");
+                    final JsonElement nameJsonElement = jsonElement.getAsJsonObject().get("name");
+                    if (versionJsonElement != null) {
+                        version = versionJsonElement.getAsString();
+                        final int minorVersionSeparator = version.lastIndexOf('.');
+                        version = new StringBuilder(version)
+                                .replace(minorVersionSeparator + 1, version.length(),"*")
+                                .toString();
+                    }
+                    if (nameJsonElement != null) {
+                        moduleName = nameJsonElement.getAsString();
+                    }
                 }
-                if (nameJsonElement != null) {
-                    moduleName = nameJsonElement.getAsString();
-                }
+            } else {
+                return Pair.create("", "");
             }
         } catch (FileNotFoundException e) { //NOPMD
             // It's fine
