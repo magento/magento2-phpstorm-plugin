@@ -190,7 +190,7 @@
         <internalFileTemplate name="Magento GraphQL Resolver Class"/>
         <internalFileTemplate name="Magento Cronjob Class"/>
         <internalFileTemplate name="Magento Crontab Xml"/>
-        <internalFileTemplate name="Magento CLI Command"/>
+        <internalFileTemplate name="Magento CLI Command Class"/>
         <internalFileTemplate name="Magento Module Controller Backend Class"/>
         <internalFileTemplate name="Magento Module Controller Frontend Class"/>
         <internalFileTemplate name="Magento Module Cron Groups Xml"/>
