@@ -34,6 +34,7 @@
     <depends>com.jetbrains.php</depends>
     <depends>JavaScript</depends>
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.platform.images</depends>
     <depends optional="true" config-file="withJsGraphQl.xml">com.intellij.lang.jsgraphql</depends>
 
     <actions>
@@ -194,6 +195,8 @@
         <internalFileTemplate name="Magento Module Controller Backend Class"/>
         <internalFileTemplate name="Magento Module Controller Frontend Class"/>
         <internalFileTemplate name="Magento Module Cron Groups Xml"/>
+
+        <postStartupActivity implementation="com.magento.idea.magento2plugin.project.startup.CheckIfMagentoPathIsValidActivity"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.php">
