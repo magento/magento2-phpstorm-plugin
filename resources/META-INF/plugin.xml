@@ -34,6 +34,7 @@
     <depends>com.jetbrains.php</depends>
     <depends>JavaScript</depends>
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.platform.images</depends>
     <depends optional="true" config-file="withJsGraphQl.xml">com.intellij.lang.jsgraphql</depends>
 
     <actions>
