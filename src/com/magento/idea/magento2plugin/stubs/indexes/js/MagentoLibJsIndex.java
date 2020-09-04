@@ -41,7 +41,11 @@ public class MagentoLibJsIndex extends ScalarIndexExtension<String> {
     public DataIndexer<String, Void, FileContent> getIndexer() {
         return inputData -> {
             final Map<String, Void> map = new HashMap<>();//NOPMD
-            final String libPath = Settings.getMagentoPath(inputData.getProject())
+            final String magentoPath = Settings.getMagentoPath(inputData.getProject());
+            if (magentoPath ==  null) {
+                return map;
+            }
+            final String libPath = magentoPath
                     + File.separator + Package.libWebRoot + File.separator;
             final VirtualFile file = inputData.getFile();
 

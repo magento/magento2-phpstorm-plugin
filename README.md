@@ -15,7 +15,7 @@ This is a plugin for Magento 2 development in the PhpStorm IDE. It is available 
 6. Check `Enable` and `OK` button.
 
 ## Works with
-* PhpStorm >= 2019.3.3
+* PhpStorm >= 2020.1.1
 * JRE >= 1.8
 
 ## Features

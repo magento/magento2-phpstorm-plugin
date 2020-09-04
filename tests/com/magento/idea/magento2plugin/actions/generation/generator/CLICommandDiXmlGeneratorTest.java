@@ -22,7 +22,7 @@ public class CLICommandDiXmlGeneratorTest extends BaseGeneratorTestCase {
     private static final String CLASS_NAME = "TestCommand";
     private static final String SECOND_CLASS_NAME = "OneMoreCLICommand";
     private static final String MODULE_NAME = "Foo_Bar";
-    private static final String PARENT_DIR = "Console";
+    private static final String PARENT_DIR = "Console\\Command";
     private static final String MODULE_DIR = "src/app/code/Foo/Bar/";
 
     /**
