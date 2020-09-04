@@ -59,7 +59,8 @@ class GridDataProvider extends DataProvider
         SearchResultInterfaceFactory $searchResultFactory,
         array $meta = [],
         array $data = []
-    ) {
+    )
+    {
         parent::__construct(
             $name,
             $primaryFieldName,
