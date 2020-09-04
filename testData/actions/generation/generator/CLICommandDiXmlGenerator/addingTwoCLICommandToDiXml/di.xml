@@ -4,8 +4,10 @@
     <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>
             <argument name="commands" xsi:type="array">
-                <item name="foo_bar_test_command" xsi:type="object">Foo\Bar\Console\TestCommand</item>
-                <item name="foo_bar_one_more_c_l_i_command" xsi:type="object">Foo\Bar\Console\OneMoreCLICommand</item>
+                <item name="foo_bar_test_command" xsi:type="object">Foo\Bar\Console\Command\TestCommand</item>
+                <item name="foo_bar_one_more_c_l_i_command" xsi:type="object">
+                    Foo\Bar\Console\Command\OneMoreCLICommand
+                </item>
             </argument>
         </arguments>
     </type>
