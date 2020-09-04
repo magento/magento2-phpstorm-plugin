@@ -175,7 +175,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     }
 
     private void setDefaultValues() {
-        dataProviderParentDirectory.setText("Ui/Listing");
+        dataProviderParentDirectory.setText("Ui/Component/Listing");
     }
 
     private void addActionListeners() {

@@ -106,7 +106,7 @@ class ${CLASS_NAME} extends DataProvider
      *
      * @param SearchResultInterface $searchResult
      *
-     * @return array|array[]
+     * @return array
      */
     public function searchResultToOutput(SearchResultInterface $searchResult)
     {

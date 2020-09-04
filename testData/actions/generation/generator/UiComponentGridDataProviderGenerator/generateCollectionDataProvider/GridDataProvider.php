@@ -59,8 +59,7 @@ class GridDataProvider extends DataProvider
         SearchResultInterfaceFactory $searchResultFactory,
         array $meta = [],
         array $data = []
-    )
-    {
+    ) {
         parent::__construct(
             $name,
             $primaryFieldName,
@@ -104,7 +103,7 @@ class GridDataProvider extends DataProvider
      *
      * @param SearchResultInterface $searchResult
      *
-     * @return array|array[]
+     * @return array
      */
     public function searchResultToOutput(SearchResultInterface $searchResult)
     {

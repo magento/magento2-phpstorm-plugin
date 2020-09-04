@@ -25,7 +25,7 @@ import javax.swing.JOptionPane;
         "PMD.NPathComplexity"
 })
 public class NewUiComponentGridDialogValidator {
-    private static final String DATA_PROVIDER_NAME = "Data Provider Name";
+    private static final String DATA_PROVIDER_NAME = "Data Provider Class";
     private static final String NOT_EMPTY = "validator.notEmpty";
     private static NewUiComponentGridDialogValidator instance;
     private final ValidatorBundle validatorBundle;

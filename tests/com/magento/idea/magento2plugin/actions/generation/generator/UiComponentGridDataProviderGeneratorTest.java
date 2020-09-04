@@ -11,11 +11,11 @@ import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridDa
 import com.magento.idea.magento2plugin.magento.files.UiComponentGridDataProviderPhp;
 
 public class UiComponentGridDataProviderGeneratorTest extends BaseGeneratorTestCase {
-    private static final String EXPECTED_DIRECTORY = "src/app/code/Foo/Bar/Ui/Listing";
+    private static final String EXPECTED_DIRECTORY = "src/app/code/Foo/Bar/Ui/Component/Listing";
     private static final String MODULE_NAME = "Foo_Bar";
     private static final String PROVIDER_CLASS_NAME = "GridDataProvider";
     private static final String PROVIDER_NAMESPACE = "Foo\\Bar\\Ui\\Listing";
-    private static final String PROVIDER_PATH = "Ui/Listing";
+    private static final String PROVIDER_PATH = "Ui/Component/Listing";
     private static final String COLLECTION_FQN = "Foo\\Bar\\Model\\Resource\\Entity\\Collection";
 
     /**
