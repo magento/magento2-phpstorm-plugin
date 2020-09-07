@@ -70,4 +70,26 @@ public final class MagentoVersion {
     private static String getFilePath(final String magentoPath) {
         return magentoPath + File.separator + ComposerJson.FILE_NAME;
     }
+
+    /**
+     * compare Magento Version.
+     *
+     * @param str1 String
+     * @param str2 String
+     * @return boolean
+     */
+    public static boolean compareMagentoVersion(final String str1, final String str2) {
+        if (str1.equals(str2)) return true;
+
+        final String[] str1s = str1.split("\\.");
+        final String[] str2s = str2.split("\\.");
+        for (int i = 0; i < 2; i++) {
+            final Integer value1 = Integer.parseInt(str1s[i]);
+            final Integer value2 = Integer.parseInt(str2s[i]);
+            if (value1 > value2) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

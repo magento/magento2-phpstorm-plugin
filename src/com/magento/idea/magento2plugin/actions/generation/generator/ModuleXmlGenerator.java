@@ -67,9 +67,12 @@ public class ModuleXmlGenerator extends FileGenerator {
         );
     }
 
+    @Override
     protected void fillAttributes(final Properties attributes) {
         attributes.setProperty("PACKAGE", moduleXmlData.getPackageName());
         attributes.setProperty("MODULE_NAME", moduleXmlData.getModuleName());
-        attributes.setProperty("SETUP_VERSION", moduleXmlData.getModuleVersion());
+        if (moduleXmlData.getSetupVersion() != null) {
+            attributes.setProperty("SETUP_VERSION", moduleXmlData.getSetupVersion());
+        }
     }
 }
