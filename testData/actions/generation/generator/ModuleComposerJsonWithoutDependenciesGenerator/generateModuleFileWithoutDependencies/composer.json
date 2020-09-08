@@ -4,9 +4,7 @@
   "description": "test-description",
   "type": "magento2-module",
   "require": {
-    "magento/framework": "*",
-    "foo/bar": "*",
-    "magento/backend": "*"
+    "magento/framework": "*"
   },
   "license": [
     "Test License 1",

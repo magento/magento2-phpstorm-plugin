@@ -157,17 +157,22 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
             final String dependency
     ) {
         String version = "*";
-        String moduleName = camelCaseToHyphen.convert(dependency).replace("_-", "/");
+        String moduleName = camelCaseToHyphen.convert(dependency).replace(
+                "_-", "/"
+        );
         try {
             final PsiFile virtualFile = moduleIndex.getModuleDirectoryByModuleName(dependency)
                     .findFile(ComposerJson.FILE_NAME);
 
-            if (virtualFile != null) {
-                final VirtualFile composerJsonFile = virtualFile.getVirtualFile();//NOPMD
+            if (virtualFile != null) { //NOPMD
+                final VirtualFile composerJsonFile = virtualFile.getVirtualFile();
                 if (composerJsonFile.exists()) {
                     final JsonElement jsonElement =
-                            new JsonParser().parse(new FileReader(composerJsonFile.getPath()));//NOPMD
-                    final JsonElement versionJsonElement = jsonElement.getAsJsonObject().get("version");
+                            new JsonParser().parse(
+                                    new FileReader(composerJsonFile.getPath())//NOPMD
+                            );
+                    final JsonElement versionJsonElement =
+                            jsonElement.getAsJsonObject().get("version");
                     final JsonElement nameJsonElement = jsonElement.getAsJsonObject().get("name");
                     if (versionJsonElement != null) {
                         version = versionJsonElement.getAsString();

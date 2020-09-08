@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
@@ -15,38 +16,21 @@ import java.util.List;
 
 public class ModuleComposerJsonGeneratorTest extends BaseGeneratorTestCase {
 
-    public void testGenerateModuleFileWithDependencies() {
-        String filePath = this.getFixturePath(ComposerJson.FILE_NAME);
-        PsiFile expectedFile = myFixture.configureByFile(filePath);
-        PsiDirectory projectDir = getProjectDirectory();
+    /**
+     * Test for the module composer.json generation with dependencies.
+     */
+    public void testGenerateModuleFile() {
+        final String filePath = this.getFixturePath(ComposerJson.FILE_NAME);
+        final PsiFile expectedFile = myFixture.configureByFile(filePath);
+        final PsiDirectory projectDir = getProjectDirectory();
 
-        String expectedDirectory = projectDir.getVirtualFile().getPath() + "/Test/Module";
-        PsiFile composerJson = generateComposerJson(true, projectDir, true);
-
-        assertGeneratedFileIsCorrect(
-            expectedFile,
-            expectedDirectory,
-            composerJson
-        );
-    }
-
-    public void testGenerateFileInRootWithDependencies() {
-        String filePath = this.getFixturePath(ComposerJson.FILE_NAME);
-        PsiFile expectedFile = myFixture.configureByFile(filePath);
-        PsiDirectory projectDir = getProjectDirectory();
-
-        String composerJsonDirPath = projectDir.getVirtualFile().getPath();
-        PsiFile composerJson = generateComposerJson(false, projectDir, true);
-
-        assertGeneratedFileIsCorrect(expectedFile, composerJsonDirPath, composerJson);
-    }
-
-    public void testGenerateModuleFileWithoutDependencies() {
-        String filePath = this.getFixturePath(ComposerJson.FILE_NAME);
-        PsiFile expectedFile = myFixture.configureByFile(filePath);
-        PsiDirectory projectDir = getProjectDirectory();
-        String expectedDirectory = projectDir.getVirtualFile().getPath() + "/Test/Module";
-        PsiFile composerJson = generateComposerJson(true, projectDir, false);
+        final String expectedDirectory =
+                projectDir.getVirtualFile().getPath() + "/TestWithDependencies/Module";
+        final PsiFile composerJson = generateComposerJson(
+                true,
+                projectDir,
+                true,
+                "TestWithDependencies");
 
         assertGeneratedFileIsCorrect(
                 expectedFile,
@@ -55,40 +39,80 @@ public class ModuleComposerJsonGeneratorTest extends BaseGeneratorTestCase {
         );
     }
 
-    public void testGenerateFileInRootWithoutDependencies() {
-        String filePath = this.getFixturePath(ComposerJson.FILE_NAME);
-        PsiFile expectedFile = myFixture.configureByFile(filePath);
-        PsiDirectory projectDir = getProjectDirectory();
-        PsiFile composerJson = generateComposerJson(false, projectDir, false);
+    /**
+     * Test for generation the composer.json with dependencies in the root directory.
+     */
+    public void testGenerateFileInRoot() {
+        final String filePath = this.getFixturePath(ComposerJson.FILE_NAME);
+        final PsiFile expectedFile = myFixture.configureByFile(filePath);
+        final PsiDirectory projectDir = getProjectDirectory();
+
+        final String composerJsonDirPath = projectDir.getVirtualFile().getPath();
+        final PsiFile composerJson = generateComposerJson(
+                false,
+                projectDir,
+                true,
+                "TestWithDependencies");
+
+        assertGeneratedFileIsCorrect(expectedFile, composerJsonDirPath, composerJson);
+    }
+
+    /**
+     * Test case for the composer.json generation without dependencies.
+     */
+    public void testGenerateModuleFileWithoutDependencies() {
+        final String filePath = this.getFixturePath(ComposerJson.FILE_NAME);
+        final PsiFile expectedFile = myFixture.configureByFile(filePath);
+        final PsiDirectory projectDir = getProjectDirectory();
+        final String expectedDirectory = projectDir.getVirtualFile().getPath()
+                + "/TestWithoutDependencies/Module";
+        final PsiFile composerJson = generateComposerJson(
+                true,
+                projectDir,
+                false,
+                "TestWithoutDependencies");
 
         assertGeneratedFileIsCorrect(
                 expectedFile,
-                projectDir.getVirtualFile().getPath(),
+                expectedDirectory,
                 composerJson
         );
     }
 
+    /**
+     * Generate composer.json file for tests.
+     *
+     * @param createModuleDirectories create module directory flag
+     * @param projectDir project directory
+     * @param withDependencies generate composer.json with dependencies or not
+     * @param packageName the package name of the test module
+     * @return PsiFile
+     */
     private PsiFile generateComposerJson(
-            boolean createModuleDirectories,
-            PsiDirectory projectDir,
-            boolean withDependencies) {
-        Project project = myFixture.getProject();
-        List<String> dependencies = withDependencies ?
-                new ArrayList<>(Arrays.asList("Foo_Bar", "Magento_Backend"))
+            final boolean createModuleDirectories,
+            final PsiDirectory projectDir,
+            final boolean withDependencies,
+            final String packageName) {
+        final Project project = myFixture.getProject();
+        final List<String> dependencies = withDependencies
+                ? new ArrayList<>(Arrays.asList("Foo_Bar", "Magento_Backend"))
                 : new ArrayList<>(Arrays.asList("Foo_BarWithOutComposer"));
-        List<String> licenses = new ArrayList<>(Arrays.asList("Test License 1", "Test License 2"));
-        ModuleComposerJsonData composerJsonData = new ModuleComposerJsonData(
-            "Test",
-            "Module",
-            projectDir,
-            "test-description",
-            "test/module",
-            "1.0.0-dev",
-            licenses,
-            dependencies,
-            createModuleDirectories
+        final List<String> licenses = new ArrayList<>(
+                Arrays.asList("Test License 1", "Test License 2")
         );
-        ModuleComposerJsonGenerator composerJsonGenerator = new ModuleComposerJsonGenerator(composerJsonData, project);
+        final ModuleComposerJsonData composerJsonData = new ModuleComposerJsonData(
+                packageName,
+                "Module",
+                projectDir,
+                "test-description",
+                "test/module",
+                "1.0.0-dev",
+                licenses,
+                dependencies,
+                createModuleDirectories
+        );
+        final ModuleComposerJsonGenerator composerJsonGenerator =
+                new ModuleComposerJsonGenerator(composerJsonData, project);
         return composerJsonGenerator.generate("test");
     }
 }
