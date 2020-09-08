@@ -73,7 +73,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     private JLabel moduleDescriptionLabel;//NOPMD
     private JLabel moduleNameLabel;//NOPMD
 
-    private static final String MAGENTO_OLD_VERSION = "2.2.11";
+    private static final String MAGENTO_BEFORE_DECLARATIVE_SCHEMA_VERSION = "2.2.11";
 
     /**
      * Constructor.
@@ -238,22 +238,20 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     }
 
     /**
-     * get Module Version.
+     * Get module version.
      *
      * @return string|null
      */
     public String getSetupVersion() {
-        String setupVersion = null;
         final String magentoVersion = getMagentoVersion();
-
-        if (!MagentoVersion.compareMagentoVersion(magentoVersion, MAGENTO_OLD_VERSION)) {
-            setupVersion = this.moduleVersion.getText().trim();
+        if (!MagentoVersion.compare(magentoVersion, MAGENTO_BEFORE_DECLARATIVE_SCHEMA_VERSION)) {
+            return this.moduleVersion.getText().trim();
         }
-        return setupVersion;
+        return null;
     }
 
     /**
-     * get Magento Version.
+     * Get magento version.
      *
      * @return string
      */
@@ -362,7 +360,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     }
 
     /**
-     * get setting.
+     * Get settings.
      *
      * @return Settings
      */

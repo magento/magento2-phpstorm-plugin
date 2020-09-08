@@ -72,20 +72,23 @@ public final class MagentoVersion {
     }
 
     /**
-     * compare Magento Version.
+     * Compare two magento version.
      *
-     * @param str1 String
-     * @param str2 String
-     * @return boolean
+     * @param version1 String
+     * @param version2 String
+     * @return the value {@code true} if the argument version1 is greater than equal to version2;
+     *         the value {@code false} if the argument version1 is less than to version2.
      */
-    public static boolean compareMagentoVersion(final String str1, final String str2) {
-        if (str1.equals(str2)) return true;
+    public static boolean compare(final String version1, final String version2) {
+        if (version1.equals(version2)) {
+            return true;
+        }
 
-        final String[] str1s = str1.split("\\.");
-        final String[] str2s = str2.split("\\.");
+        final String[] version1s = version1.split("\\.");
+        final String[] version2s = version2.split("\\.");
         for (int i = 0; i < 2; i++) {
-            final Integer value1 = Integer.parseInt(str1s[i]);
-            final Integer value2 = Integer.parseInt(str2s[i]);
+            final int value1 = Integer.parseInt(version1s[i]);
+            final int value2 = Integer.parseInt(version2s[i]);
             if (value1 > value2) {
                 return true;
             }

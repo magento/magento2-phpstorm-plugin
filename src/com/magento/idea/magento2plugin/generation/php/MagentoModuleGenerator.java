@@ -64,7 +64,7 @@ public class MagentoModuleGenerator extends WebProjectTemplate<MagentoProjectGen
     }
 
     /**
-     * generateProject.
+     * Generate project.
      *
      * @param project Project
      * @param baseDir Base directory
@@ -102,7 +102,7 @@ public class MagentoModuleGenerator extends WebProjectTemplate<MagentoProjectGen
     }
 
     /**
-     * generateComposerJson.
+     * Generate composer json.
      *
      * @param project Project
      * @param baseDir Base directory
@@ -128,7 +128,8 @@ public class MagentoModuleGenerator extends WebProjectTemplate<MagentoProjectGen
     }
 
     /**
-     * generateRegistrationPhp.
+     * Generate registration php.
+     *
      * @param project Project
      * @param baseDir Base directory
      * @param settings Settings
@@ -148,7 +149,7 @@ public class MagentoModuleGenerator extends WebProjectTemplate<MagentoProjectGen
     }
 
     /**
-     * generateModuleXml.
+     * Generate module xml.
      *
      * @param project Project
      * @param baseDir Base directory
