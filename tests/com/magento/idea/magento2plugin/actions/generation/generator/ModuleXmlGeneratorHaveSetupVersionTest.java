@@ -22,7 +22,7 @@ public class ModuleXmlGeneratorHaveSetupVersionTest extends BaseGeneratorTestCas
         final Project project = myFixture.getProject();
         final ModuleXmlData moduleXmlData = new ModuleXmlData(
                 "Test",
-                "Module",
+                "Module1",
                 "1.0.0",
                 projectDir,
                 true
@@ -36,37 +36,7 @@ public class ModuleXmlGeneratorHaveSetupVersionTest extends BaseGeneratorTestCas
         assertGeneratedFileIsCorrect(
                 expectedFile,
                 projectDir.getVirtualFile().getPath()
-                        + "/Test/Module" + File.separator + Package.moduleBaseAreaDir,
-                moduleXml
-        );
-    }
-
-    /**
-     * Test checks whether module.xml is generated
-     * correctly for module as a separate project.
-     */
-    public void testGenerateFileInRoot() {
-        final String filePath = this.getFixturePath(ModuleXml.FILE_NAME);
-        final PsiFile expectedFile = myFixture.configureByFile(filePath);
-        final PsiDirectory projectDir = getProjectDirectory();
-
-        final Project project = myFixture.getProject();
-        final ModuleXmlData moduleXmlData = new ModuleXmlData(
-                "Test",
-                "Module",
-                "1.0.0",
-                projectDir,
-                false
-        );
-        final ModuleXmlGenerator moduleXmlGenerator = new ModuleXmlGenerator(
-                moduleXmlData,
-                project
-        );
-        final PsiFile moduleXml = moduleXmlGenerator.generate("test");
-
-        assertGeneratedFileIsCorrect(
-                expectedFile,
-                projectDir.getVirtualFile().getPath() + File.separator + Package.moduleBaseAreaDir,
+                        + "/Test/Module1" + File.separator + Package.moduleBaseAreaDir,
                 moduleXml
         );
     }
