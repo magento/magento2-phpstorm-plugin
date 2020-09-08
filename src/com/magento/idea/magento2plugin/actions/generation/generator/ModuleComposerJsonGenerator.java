@@ -143,11 +143,11 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
                 result = result.concat(": \"" + dependencyData.getSecond() + "\"");
             }
 
-            if (dependencies.length != i + 1) {
+            if (!dependencyData.getFirst().isEmpty() && dependencies.length != i + 1) {
                 result = result.concat(",");
+                result = result.concat("\n");
             }
 
-            result = result.concat("\n");
         }
 
         return result;

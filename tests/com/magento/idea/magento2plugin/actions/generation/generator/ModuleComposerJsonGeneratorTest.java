@@ -15,37 +15,67 @@ import java.util.List;
 
 public class ModuleComposerJsonGeneratorTest extends BaseGeneratorTestCase {
 
-    public void testGenerateModuleFile() {
+    public void testGenerateModuleFileWithDependencies() {
         String filePath = this.getFixturePath(ComposerJson.FILE_NAME);
         PsiFile expectedFile = myFixture.configureByFile(filePath);
         PsiDirectory projectDir = getProjectDirectory();
 
-        PsiFile composerJson = generateComposerJson(true, projectDir);
+        String expectedDirectory = projectDir.getVirtualFile().getPath() + "/Test/Module";
+        PsiFile composerJson = generateComposerJson(true, projectDir, true);
 
         assertGeneratedFileIsCorrect(
             expectedFile,
-            projectDir.getVirtualFile().getPath() + "/Test/Module",
+            expectedDirectory,
             composerJson
         );
     }
 
-    public void testGenerateFileInRoot() {
+    public void testGenerateFileInRootWithDependencies() {
         String filePath = this.getFixturePath(ComposerJson.FILE_NAME);
         PsiFile expectedFile = myFixture.configureByFile(filePath);
         PsiDirectory projectDir = getProjectDirectory();
 
-        PsiFile composerJson = generateComposerJson(false, projectDir);
+        String composerJsonDirPath = projectDir.getVirtualFile().getPath();
+        PsiFile composerJson = generateComposerJson(false, projectDir, true);
+
+        assertGeneratedFileIsCorrect(expectedFile, composerJsonDirPath, composerJson);
+    }
+
+    public void testGenerateModuleFileWithoutDependencies() {
+        String filePath = this.getFixturePath(ComposerJson.FILE_NAME);
+        PsiFile expectedFile = myFixture.configureByFile(filePath);
+        PsiDirectory projectDir = getProjectDirectory();
+        String expectedDirectory = projectDir.getVirtualFile().getPath() + "/Test/Module";
+        PsiFile composerJson = generateComposerJson(true, projectDir, false);
 
         assertGeneratedFileIsCorrect(
-            expectedFile,
-            projectDir.getVirtualFile().getPath(),
-            composerJson
+                expectedFile,
+                expectedDirectory,
+                composerJson
         );
     }
 
-    private PsiFile generateComposerJson(boolean createModuleDirectories, PsiDirectory projectDir) {
+    public void testGenerateFileInRootWithoutDependencies() {
+        String filePath = this.getFixturePath(ComposerJson.FILE_NAME);
+        PsiFile expectedFile = myFixture.configureByFile(filePath);
+        PsiDirectory projectDir = getProjectDirectory();
+        PsiFile composerJson = generateComposerJson(false, projectDir, false);
+
+        assertGeneratedFileIsCorrect(
+                expectedFile,
+                projectDir.getVirtualFile().getPath(),
+                composerJson
+        );
+    }
+
+    private PsiFile generateComposerJson(
+            boolean createModuleDirectories,
+            PsiDirectory projectDir,
+            boolean withDependencies) {
         Project project = myFixture.getProject();
-        List<String> dependencies = new ArrayList<>(Arrays.asList("Foo_Bar", "Magento_Backend"));
+        List<String> dependencies = withDependencies ?
+                new ArrayList<>(Arrays.asList("Foo_Bar", "Magento_Backend"))
+                : new ArrayList<>(Arrays.asList("Foo_BarWithOutComposer"));
         List<String> licenses = new ArrayList<>(Arrays.asList("Test License 1", "Test License 2"));
         ModuleComposerJsonData composerJsonData = new ModuleComposerJsonData(
             "Test",
