@@ -105,12 +105,16 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         final boolean licenseChanged = !moduleDefaultLicenseName.getText().equals(
                 Settings.defaultLicense
         );
+        final boolean versionChanged = !magentoVersion.getText().equals(
+                getSettings().magentoVersion
+        );
         final boolean statusChanged = !pluginEnabled.isSelected() == getSettings().pluginEnabled;
         final boolean mftfSupportChanged = mftfSupportEnabled.isSelected()
                 != getSettings().mftfSupportEnabled;
         final boolean magentoPathChanged = isMagentoPathChanged();
 
-        return statusChanged || licenseChanged || mftfSupportChanged || magentoPathChanged;
+        return statusChanged || licenseChanged || mftfSupportChanged
+                || magentoPathChanged || versionChanged;
     }
 
     private void resolveMagentoVersion() {
