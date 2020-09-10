@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.data;
 
 import com.intellij.psi.PsiDirectory;
 
+@SuppressWarnings({"PMD.DataClass"})
 public class ModuleXmlData {
     private final String packageName;
     private final String moduleName;
@@ -53,7 +54,7 @@ public class ModuleXmlData {
         return this.setupVersion;
     }
 
-    public boolean getCreateModuleDirs() {
+    public boolean isCreateModuleDirs() {
         return this.createModuleDirs;
     }
 }

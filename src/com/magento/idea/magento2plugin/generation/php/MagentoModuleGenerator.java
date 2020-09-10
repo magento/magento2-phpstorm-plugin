@@ -33,13 +33,13 @@ import org.jetbrains.annotations.Nullable;
 
 
 public class MagentoModuleGenerator extends WebProjectTemplate<MagentoProjectGeneratorSettings> {
-    public static String ACTION_NAME = "Magento 2 Module";
+    public static String actionName = "Magento 2 Module";
 
     @Nls
     @NotNull
     @Override
     public String getName() {
-        return ACTION_NAME;
+        return actionName;
     }
 
     @Override
@@ -124,7 +124,7 @@ public class MagentoModuleGenerator extends WebProjectTemplate<MagentoProjectGen
                 settings.getModuleLicenses(),
                 new ArrayList<>(),
                 false
-        ), project).generate(ACTION_NAME);
+        ), project).generate(actionName);
     }
 
     /**
@@ -145,7 +145,7 @@ public class MagentoModuleGenerator extends WebProjectTemplate<MagentoProjectGen
                 settings.getModuleName(),
                 baseDir,
                 false
-        ), project).generate(ACTION_NAME);
+        ), project).generate(actionName);
     }
 
     /**
@@ -169,7 +169,7 @@ public class MagentoModuleGenerator extends WebProjectTemplate<MagentoProjectGen
         );
         final ModuleXmlGenerator moduleXmlGenerator =
                 new ModuleXmlGenerator(moduleXmlData, project);
-        moduleXmlGenerator.generate(ACTION_NAME, true);
+        moduleXmlGenerator.generate(actionName, true);
     }
 
     @Nullable

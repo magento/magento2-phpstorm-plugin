@@ -19,11 +19,11 @@ import com.magento.idea.magento2plugin.magento.packages.ComposerPackageModelImpl
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 
-public final class MagentoVersion {
+public final class MagentoVersionUtil {
 
     public static final String DEFAULT_VERSION = "any";
 
-    private MagentoVersion() {}
+    private MagentoVersionUtil() {}
 
     /**
      * Parse composer.json to detect Magento 2 version

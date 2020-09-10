@@ -19,7 +19,7 @@ import com.intellij.platform.DirectoryProjectConfigurator;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
 import com.magento.idea.magento2plugin.magento.packages.MagentoComponentManager;
 import com.magento.idea.magento2plugin.util.magento.MagentoBasePathUtil;
-import com.magento.idea.magento2plugin.util.magento.MagentoVersion;
+import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
 import javax.swing.event.HyperlinkEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,7 +48,7 @@ public class ProjectDetector implements DirectoryProjectConfigurator {
                                 settings.pluginEnabled = true;
                                 settings.mftfSupportEnabled = true;
                                 settings.magentoPath = project.getBasePath();
-                                settings.magentoVersion = MagentoVersion.get(
+                                settings.magentoVersion = MagentoVersionUtil.get(
                                         project,
                                         project.getBasePath()
                                 );

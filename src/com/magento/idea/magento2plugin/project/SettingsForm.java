@@ -18,7 +18,7 @@ import com.magento.idea.magento2plugin.indexes.IndexManager;
 import com.magento.idea.magento2plugin.init.ConfigurationManager;
 import com.magento.idea.magento2plugin.magento.packages.MagentoComponentManager;
 import com.magento.idea.magento2plugin.project.validator.SettingsFormValidator;
-import com.magento.idea.magento2plugin.util.magento.MagentoVersion;
+import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JButton;
@@ -217,7 +217,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
      */
     public void updateMagentoVersion() {
         final String magentoPathValue = this.magentoPath.getTextField().getText();
-        final String resolvedVersion = MagentoVersion.get(project, magentoPathValue);
+        final String resolvedVersion = MagentoVersionUtil.get(project, magentoPathValue);
         magentoVersion.setText(resolvedVersion);
     }
 

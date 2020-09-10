@@ -22,7 +22,7 @@ import com.magento.idea.magento2plugin.magento.packages.Licenses;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
-import com.magento.idea.magento2plugin.util.magento.MagentoVersion;
+import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -244,7 +244,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
      */
     public String getSetupVersion() {
         final String magentoVersion = getMagentoVersion();
-        if (!MagentoVersion.compare(magentoVersion, MAGENTO_BEFORE_DECLARATIVE_SCHEMA_VERSION)) {
+        if (!MagentoVersionUtil.compare(magentoVersion, MAGENTO_BEFORE_DECLARATIVE_SCHEMA_VERSION)) {
             return this.moduleVersion.getText().trim();
         }
         return null;

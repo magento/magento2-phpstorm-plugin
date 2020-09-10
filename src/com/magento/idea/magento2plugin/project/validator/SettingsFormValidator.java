@@ -5,7 +5,7 @@
 package com.magento.idea.magento2plugin.project.validator;
 
 import com.intellij.openapi.options.ConfigurationException;
-import com.magento.idea.magento2plugin.util.magento.MagentoVersion;
+import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.project.SettingsForm;
 import com.magento.idea.magento2plugin.util.RegExUtil;
@@ -42,7 +42,7 @@ public class SettingsFormValidator {
             throw new ConfigurationException(validatorBundle.message("validator.notEmpty", "Magento Version"));
         }
 
-        if (!magentoVersion.matches(RegExUtil.MAGENTO_VERSION) && !magentoVersion.equals(MagentoVersion.DEFAULT_VERSION)) {
+        if (!magentoVersion.matches(RegExUtil.MAGENTO_VERSION) && !magentoVersion.equals(MagentoVersionUtil.DEFAULT_VERSION)) {
             throw new ConfigurationException(validatorBundle.message("validator.magentoVersionInvalid"));
         }
     }
