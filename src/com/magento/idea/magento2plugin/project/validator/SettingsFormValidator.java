@@ -26,7 +26,7 @@ public class SettingsFormValidator {
     /**
      * Validate form.
      *
-     * @throws ConfigurationException
+     * @throws ConfigurationException Exception
      */
     public void validate() throws ConfigurationException {
         if (!form.getSettings().pluginEnabled) {
@@ -46,8 +46,8 @@ public class SettingsFormValidator {
             );
         }
 
-        if (!magentoVersion.matches(RegExUtil.MAGENTO_VERSION) &&
-                !magentoVersion.equals(MagentoVersionUtil.DEFAULT_VERSION)) {
+        if (!magentoVersion.matches(RegExUtil.MAGENTO_VERSION)
+                && !magentoVersion.equals(MagentoVersionUtil.DEFAULT_VERSION)) {
             throw new ConfigurationException(
                     validatorBundle.message("validator.magentoVersionInvalid")
             );

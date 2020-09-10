@@ -244,7 +244,9 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
      */
     public String getSetupVersion() {
         final String magentoVersion = getMagentoVersion();
-        if (!MagentoVersionUtil.compare(magentoVersion, MAGENTO_BEFORE_DECLARATIVE_SCHEMA_VERSION)) {
+        if (!MagentoVersionUtil.compare(
+                magentoVersion, MAGENTO_BEFORE_DECLARATIVE_SCHEMA_VERSION)
+        ) {
             return this.moduleVersion.getText().trim();
         }
         return null;
