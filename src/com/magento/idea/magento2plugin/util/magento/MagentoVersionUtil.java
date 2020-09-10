@@ -19,11 +19,11 @@ import com.magento.idea.magento2plugin.magento.packages.ComposerPackageModelImpl
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 
-public final class MagentoVersion {
+public final class MagentoVersionUtil {
 
     public static final String DEFAULT_VERSION = "any";
 
-    private MagentoVersion() {}
+    private MagentoVersionUtil() {}
 
     /**
      * Parse composer.json to detect Magento 2 version
@@ -69,5 +69,30 @@ public final class MagentoVersion {
 
     private static String getFilePath(final String magentoPath) {
         return magentoPath + File.separator + ComposerJson.FILE_NAME;
+    }
+
+    /**
+     * Compare two magento version.
+     *
+     * @param version1 String
+     * @param version2 String
+     * @return the value {@code true} if the argument version1 is greater than equal to version2;
+     *         the value {@code false} if the argument version1 is less than to version2.
+     */
+    public static boolean compare(final String version1, final String version2) {
+        if (version1.equals(version2)) {
+            return true;
+        }
+
+        final String[] version1s = version1.split("\\.");
+        final String[] version2s = version2.split("\\.");
+        for (int i = 0; i < 2; i++) {
+            final int value1 = Integer.parseInt(version1s[i]);
+            final int value2 = Integer.parseInt(version2s[i]);
+            if (value1 > value2) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -22,6 +22,7 @@ import com.magento.idea.magento2plugin.magento.packages.Licenses;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
+import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -71,6 +72,8 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     private JScrollPane moduleDependenciesScrollPanel;//NOPMD
     private JLabel moduleDescriptionLabel;//NOPMD
     private JLabel moduleNameLabel;//NOPMD
+
+    private static final String MAGENTO_BEFORE_DECLARATIVE_SCHEMA_VERSION = "2.2.11";
 
     /**
      * Constructor.
@@ -187,6 +190,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         new ModuleXmlGenerator(new ModuleXmlData(
                 getPackageName(),
                 getModuleName(),
+                getSetupVersion(),
                 getBaseDir(),
                 true
         ), project).generate(NewModuleAction.actionName, true);
@@ -224,8 +228,37 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         return this.moduleDescription.getText().trim();
     }
 
+    /**
+     * get Module Version.
+     *
+     * @return string
+     */
     public String getModuleVersion() {
         return this.moduleVersion.getText().trim();
+    }
+
+    /**
+     * Get module version.
+     *
+     * @return string|null
+     */
+    public String getSetupVersion() {
+        final String magentoVersion = getMagentoVersion();
+        if (!MagentoVersionUtil.compare(
+                magentoVersion, MAGENTO_BEFORE_DECLARATIVE_SCHEMA_VERSION)
+        ) {
+            return this.moduleVersion.getText().trim();
+        }
+        return null;
+    }
+
+    /**
+     * Get magento version.
+     *
+     * @return string
+     */
+    public String getMagentoVersion() {
+        return this.getSettings().magentoVersion;
     }
 
     /**
@@ -327,4 +360,14 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         handleModuleCustomLicenseInputVisibility();
         handleModuleSelectedDependencies();
     }
+
+    /**
+     * Get settings.
+     *
+     * @return Settings
+     */
+    public Settings getSettings() {
+        return Settings.getInstance(project);
+    }
+
 }
