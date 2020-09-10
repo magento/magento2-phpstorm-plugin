@@ -4,9 +4,7 @@
   "description": "test-description",
   "type": "magento2-module",
   "require": {
-    "magento/framework": "*",
-    "foo/bar": "*",
-    "magento/backend": "*"
+    "magento/framework": "*"
   },
   "license": [
     "Test License 1",
@@ -17,7 +15,7 @@
       "registration.php"
     ],
     "psr-4": {
-      "TestWithDependencies\\Module\\": ""
+      "Test\\Module\\": ""
     }
   }
 }
