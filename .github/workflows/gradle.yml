@@ -74,7 +74,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - id: file_changes
-        uses: trilom/file-changes-action@v1.2.3
+        uses: trilom/file-changes-action@v1.2.4
       - name: Run Code Style Check
         run: ./gradlew checkstyleCI -i --no-daemon
         env:
