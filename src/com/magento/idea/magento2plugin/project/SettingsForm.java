@@ -44,7 +44,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     private JTextField moduleDefaultLicenseName;
     private JCheckBox mftfSupportEnabled;
     private TextFieldWithBrowseButton magentoPath;
-    private final SettingsFormValidator validator = SettingsFormValidator.getInstance(this);
+    private final SettingsFormValidator validator = new SettingsFormValidator(this);
     private JLabel magentoVersionLabel;//NOPMD
     private JLabel magentoPathLabel;//NOPMD
 
