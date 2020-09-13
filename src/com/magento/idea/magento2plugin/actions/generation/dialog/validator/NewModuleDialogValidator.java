@@ -2,21 +2,40 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewModuleDialog;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.util.RegExUtil;
-import javax.swing.*;
+import javax.swing.JOptionPane;
 
+@SuppressWarnings({
+        "PMD.OnlyOneReturn",
+        "PMD.FieldNamingConventions",
+        "PMD.DataflowAnomalyAnalysis",
+        "PMD.NonThreadSafeSingleton",
+        "PMD.CyclomaticComplexity",
+        "PMD.ExcessiveMethodLength",
+        "PMD.NPathComplexity"
+})
 public class NewModuleDialogValidator {
-    private static NewModuleDialogValidator INSTANCE = null;
-    private ValidatorBundle validatorBundle;
-    private CommonBundle commonBundle;
+    private static final String NOT_EMPTY = "validator.notEmpty";
+    private static final String MODULE_NAME = "Module Name";
+    private static NewModuleDialogValidator INSTANCE;
+    private final ValidatorBundle validatorBundle;
+    private final CommonBundle commonBundle;
     private NewModuleDialog dialog;
 
-    public static NewModuleDialogValidator getInstance(NewModuleDialog dialog) {
+    /**
+     * Get instance of a class.
+     *
+     * @param dialog New module dialog
+     *
+     * @return NewModuleDialogValidator
+     */
+    public static NewModuleDialogValidator getInstance(final NewModuleDialog dialog) {
         if (null == INSTANCE) {
             INSTANCE = new NewModuleDialogValidator();
         }
@@ -24,75 +43,158 @@ public class NewModuleDialogValidator {
         return INSTANCE;
     }
 
+    /**
+     * New module dialog validator constructor.
+     */
     public NewModuleDialogValidator() {
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
     }
 
-    public boolean validate()
-    {
-        String errorTitle = commonBundle.message("common.error");
-        String packageName = dialog.getPackageName();
+    /**
+     * Validate whenever new module dialog data is ready for generation.
+     *
+     * @return Boolean
+     */
+    public boolean validate() {
+        final String errorTitle = commonBundle.message("common.error");
+        final String packageName = dialog.getPackageName();
         if (packageName.length() == 0) {
-            String errorMessage = validatorBundle.message("validator.notEmpty", "Package Name");
-            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+            final String errorMessage = validatorBundle.message(
+                    NOT_EMPTY,
+                    "Package Name"
+            );
+            JOptionPane.showMessageDialog(
+                    null,
+                    errorMessage,
+                    errorTitle,
+                    JOptionPane.ERROR_MESSAGE
+            );
 
             return false;
         }
 
         if (!packageName.matches(RegExUtil.ALPHANUMERIC)) {
-            String errorMessage = validatorBundle.message("validator.alphaNumericCharacters", "Package Name");
-            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+            final String errorMessage = validatorBundle.message(
+                    "validator.alphaNumericCharacters",
+                    "Package Name"
+            );
+            JOptionPane.showMessageDialog(
+                    null,
+                    errorMessage,
+                    errorTitle,
+                    JOptionPane.ERROR_MESSAGE
+            );
 
             return false;
         }
 
-        if (!Character.isUpperCase(packageName.charAt(0)) && !Character.isDigit(packageName.charAt(0))) {
-            String errorMessage = validatorBundle.message("validator.startWithNumberOrCapitalLetter", "Package Name");
-            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+        if (!Character.isUpperCase(packageName.charAt(0))
+                && !Character.isDigit(packageName.charAt(0))
+        ) {
+            final String errorMessage = validatorBundle.message(
+                    "validator.startWithNumberOrCapitalLetter",
+                    "Package Name"
+            );
+            JOptionPane.showMessageDialog(
+                    null,
+                    errorMessage,
+                    errorTitle,
+                    JOptionPane.ERROR_MESSAGE
+            );
 
             return false;
         }
 
-        String moduleName = dialog.getModuleName();
+        final String moduleName = dialog.getModuleName();
         if (moduleName.length() == 0) {
-            String errorMessage = validatorBundle.message("validator.notEmpty", "Module Name");
-            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+            final String errorMessage = validatorBundle.message(
+                    NOT_EMPTY,
+                    MODULE_NAME
+            );
+            JOptionPane.showMessageDialog(
+                    null,
+                    errorMessage,
+                    errorTitle,
+                    JOptionPane.ERROR_MESSAGE
+            );
 
             return false;
         }
 
         if (!moduleName.matches(RegExUtil.ALPHANUMERIC)) {
-            String errorMessage = validatorBundle.message("validator.alphaNumericCharacters", "Module Name");
-            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+            final String errorMessage = validatorBundle.message(
+                    "validator.alphaNumericCharacters",
+                    MODULE_NAME
+            );
+            JOptionPane.showMessageDialog(
+                    null,
+                    errorMessage,
+                    errorTitle,
+                    JOptionPane.ERROR_MESSAGE
+            );
 
             return false;
         }
 
         if (moduleName.equals(packageName)) {
-            String errorMessage = validatorBundle.message("validator.moduleNameIsTheSameAsPackage", "Module Name");
-            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+            final String errorMessage = validatorBundle.message(
+                    "validator.moduleNameIsTheSameAsPackage",
+                    MODULE_NAME
+            );
+            JOptionPane.showMessageDialog(
+                    null,
+                    errorMessage,
+                    errorTitle,
+                    JOptionPane.ERROR_MESSAGE
+            );
 
             return false;
         }
 
-        if (!Character.isUpperCase(moduleName.charAt(0)) && !Character.isDigit(moduleName.charAt(0))) {
-            String errorMessage = validatorBundle.message("validator.startWithNumberOrCapitalLetter", "Module Name");
-            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+        if (!Character.isUpperCase(moduleName.charAt(0))
+                && !Character.isDigit(moduleName.charAt(0))
+        ) {
+            final String errorMessage = validatorBundle.message(
+                    "validator.startWithNumberOrCapitalLetter",
+                    MODULE_NAME
+            );
+            JOptionPane.showMessageDialog(
+                    null,
+                    errorMessage,
+                    errorTitle,
+                    JOptionPane.ERROR_MESSAGE
+            );
 
             return false;
         }
 
         if (dialog.getModuleVersion().length() == 0) {
-            String errorMessage = validatorBundle.message("validator.notEmpty", "Module Version");
-            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+            final String errorMessage = validatorBundle.message(
+                    NOT_EMPTY,
+                    "Module Version"
+            );
+            JOptionPane.showMessageDialog(
+                    null,
+                    errorMessage,
+                    errorTitle,
+                    JOptionPane.ERROR_MESSAGE
+            );
 
             return false;
         }
 
         if (dialog.getModuleDescription().length() == 0) {
-            String errorMessage = validatorBundle.message("validator.notEmpty", "Module Description");
-            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+            final String errorMessage = validatorBundle.message(
+                    NOT_EMPTY,
+                    "Module Description"
+            );
+            JOptionPane.showMessageDialog(
+                    null,
+                    errorMessage,
+                    errorTitle,
+                    JOptionPane.ERROR_MESSAGE
+            );
 
             return false;
         }

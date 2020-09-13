@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
@@ -12,30 +13,44 @@ import com.magento.idea.magento2plugin.actions.generation.data.GraphQlResolverFi
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewGraphQlResolverValidator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleGraphQlResolverClassGenerator;
 import com.magento.idea.magento2plugin.magento.files.GraphQlResolverPhp;
-import com.magento.idea.magento2plugin.magento.packages.Package;
-import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
-import javax.swing.*;
-import java.awt.event.*;
 import com.magento.idea.magento2plugin.magento.packages.File;
+import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 
 public class NewGraphQlResolverDialog extends AbstractDialog {
     private final NewGraphQlResolverValidator validator;
     private final PsiDirectory baseDir;
-    private final GetModuleNameByDirectory getModuleNameByDir;
     private final String moduleName;
     private JPanel contentPanel;
     private JButton buttonOK;
     private JButton buttonCancel;
     private JTextField graphQlResolverClassName;
     private JTextField graphQlResolverParentDir;
-    private Project project;
+    private final Project project;
 
-    public NewGraphQlResolverDialog(Project project, PsiDirectory directory) {
+    /**
+     * Constructor.
+     *
+     * @param project Project
+     * @param directory PsiDirectory
+     */
+    public NewGraphQlResolverDialog(final Project project, final PsiDirectory directory) {
+        super();
+
         this.project = project;
         this.baseDir = directory;
-        this.moduleName = GetModuleNameByDirectory.getInstance(project).execute(directory);
+        this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
         this.validator = NewGraphQlResolverValidator.getInstance(this);
-        this.getModuleNameByDir = GetModuleNameByDirectory.getInstance(project);
 
         setContentPane(contentPanel);
         setModal(true);
@@ -44,13 +59,13 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
         suggestGraphQlResolverDirectory();
 
         buttonOK.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent event) {
                 onOK();
             }
         });
 
         buttonCancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent event) {
                 onCancel();
             }
         });
@@ -58,27 +73,34 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
+            public void windowClosing(final WindowEvent event) {
                 onCancel();
             }
         });
 
         // call onCancel() on ESCAPE
         contentPanel.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent event) {
                 onCancel();
             }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    public static void open(Project project, PsiDirectory directory) {
-        NewGraphQlResolverDialog dialog = new NewGraphQlResolverDialog(project, directory);
+    /**
+     * Open dialog.
+     *
+     * @param project Project
+     * @param directory PsiDirectory
+     */
+    public static void open(final Project project, final PsiDirectory directory) {
+        final NewGraphQlResolverDialog dialog = new NewGraphQlResolverDialog(project, directory);
         dialog.pack();
         dialog.centerDialog(dialog);
         dialog.setVisible(true);
     }
 
-    private void onOK() {
+    protected void onOK() {
         if (!validator.validate()) {
             return;
         }
@@ -109,14 +131,16 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
     }
 
     private void suggestGraphQlResolverDirectory() {
-        String path = baseDir.getVirtualFile().getPath();
-        String moduleIdentifierPath = getModuleIdentifierPath();
+        final String moduleIdentifierPath = getModuleIdentifierPath();
         if (moduleIdentifierPath == null) {
             graphQlResolverParentDir.setText(GraphQlResolverPhp.DEFAULT_DIR);
             return;
         }
-        String[] pathParts = path.split(moduleIdentifierPath);
-        if (pathParts.length != 2) {
+
+        final String path = baseDir.getVirtualFile().getPath();
+        final String[] pathParts = path.split(moduleIdentifierPath);
+        final int partsMaxLength = 2;
+        if (pathParts.length != partsMaxLength) {
             graphQlResolverParentDir.setText(GraphQlResolverPhp.DEFAULT_DIR);
             return;
         }
@@ -129,7 +153,7 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
     }
 
     private String getModuleIdentifierPath() {
-        String[]parts = moduleName.split(Package.VENDOR_MODULE_NAME_SEPARATOR);
+        final String[]parts = moduleName.split(Package.vendorModuleNameSeparator);
         if (parts[0] == null || parts[1] == null || parts.length > 2) {
             return null;
         }
@@ -137,16 +161,19 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
     }
 
     private String getNamespace() {
-        String[]parts = moduleName.split(Package.VENDOR_MODULE_NAME_SEPARATOR);
+        final String[]parts = moduleName.split(Package.vendorModuleNameSeparator);
         if (parts[0] == null || parts[1] == null || parts.length > 2) {
             return null;
         }
-        String directoryPart = getGraphQlResolverDirectory().replace(File.separator, Package.FQN_SEPARATOR);
-        return parts[0] + Package.FQN_SEPARATOR + parts[1] + Package.FQN_SEPARATOR + directoryPart;
+        final String directoryPart = getGraphQlResolverDirectory().replace(
+                File.separator,
+                Package.fqnSeparator
+        );
+        return parts[0] + Package.fqnSeparator + parts[1] + Package.fqnSeparator + directoryPart;
     }
 
     private String getGraphQlResolverClassFqn() {
-        return getNamespace().concat(Package.FQN_SEPARATOR).concat(getGraphQlResolverClassName());
+        return getNamespace().concat(Package.fqnSeparator).concat(getGraphQlResolverClassName());
     }
 
     public void onCancel() {

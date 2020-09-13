@@ -1,0 +1,1 @@
+<argument name="${ARGUMENT_NAME}" xsi:type="${ARGUMENT_TYPE}">${ARGUMENT_VALUE}</argument>

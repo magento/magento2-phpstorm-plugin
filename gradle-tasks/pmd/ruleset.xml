@@ -13,17 +13,29 @@
     <description>
         Magento PhpStorm rules
     </description>
-    <rule ref="category/java/bestpractices.xml" />
-    <rule ref="category/java/codestyle.xml"/>
+    <rule ref="category/java/bestpractices.xml">
+        <exclude name="JUnit4TestShouldUseTestAnnotation"/>
+        <exclude name="JUnit4TestShouldUseBeforeAnnotation"/>
+    </rule>
+    <rule ref="category/java/codestyle.xml">
+        <exclude name="AtLeastOneConstructor" />
+        <exclude name="LongVariable" />
+        <exclude name="OnlyOneReturn" />
+    </rule>
     <rule ref="category/java/design.xml">
         <exclude name="LawOfDemeter"/>
     </rule>
     <rule ref="category/java/documentation.xml">
         <exclude name="CommentRequired" />
+        <exclude name="CommentSize" />
     </rule>
     <rule ref="category/java/errorprone.xml">
         <exclude name="BeanMembersShouldSerialize"/>
+        <exclude name="DataflowAnomalyAnalysis"/>
+        <exclude name="MissingSerialVersionUID"/>
     </rule>
+    <exclude-pattern>.*/resources/.*</exclude-pattern>
+    <exclude-pattern>.*/testData/.*</exclude-pattern>
     <rule ref="category/java/multithreading.xml"/>
     <rule ref="category/java/performance.xml"/>
     <rule ref="category/java/security.xml" />

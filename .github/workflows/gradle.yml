@@ -5,7 +5,7 @@ name: Run automated tests
 
 on:
   pull_request:
-    branches: [ master, 1.0.0-develop, 1.0.1-develop ]
+    branches: [ master, 1.0.2-develop,  2.0.0-develop ]
 
 jobs:
   build-linux:
@@ -74,7 +74,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - id: file_changes
-        uses: trilom/file-changes-action@v1.2.3
+        uses: trilom/file-changes-action@v1.2.4
       - name: Run Code Style Check
         run: ./gradlew checkstyleCI -i --no-daemon
         env:

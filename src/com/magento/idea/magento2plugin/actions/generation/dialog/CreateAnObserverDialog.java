@@ -14,6 +14,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.Creat
 import com.magento.idea.magento2plugin.actions.generation.generator.ObserverClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ObserverEventsXmlGenerator;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
+import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
@@ -30,7 +31,13 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
 
-public class CreateAnObserverDialog extends AbstractDialog { //NOPMD
+@SuppressWarnings({
+        "PMD.TooManyFields",
+        "PMD.MissingSerialVersionUID",
+        "PMD.DataClass",
+        "PMD.UnusedPrivateField",
+})
+public class CreateAnObserverDialog extends AbstractDialog {
     @NotNull
     private final Project project;
     @NotNull
@@ -44,11 +51,11 @@ public class CreateAnObserverDialog extends AbstractDialog { //NOPMD
     private FilteredComboBox observerModule;
     private JComboBox observerArea;
     private JTextField observerName;
-    private JLabel observerClassNameLabel;//NOPMD
-    private JLabel observerDirectoryName;//NOPMD
-    private JLabel selectObserverModule;//NOPMD
-    private JLabel observerAreaLabel;//NOPMD
-    private JLabel observerNameLabel;//NOPMD
+    private JLabel observerClassNameLabel;
+    private JLabel observerDirectoryName;
+    private JLabel selectObserverModule;
+    private JLabel observerAreaLabel;
+    private JLabel observerNameLabel;
 
     /**
      * Constructor.
@@ -73,6 +80,7 @@ public class CreateAnObserverDialog extends AbstractDialog { //NOPMD
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(final WindowEvent event) {
                 onCancel();
             }
@@ -102,7 +110,7 @@ public class CreateAnObserverDialog extends AbstractDialog { //NOPMD
      * Setup observer area combobox.
      */
     private void fillTargetAreaOptions() {
-        for (final Package.Areas area : Package.Areas.values()) {
+        for (final Areas area : Areas.values()) {
             observerArea.addItem(area.toString());
         }
     }
@@ -164,19 +172,19 @@ public class CreateAnObserverDialog extends AbstractDialog { //NOPMD
     private String getNamespace() {
         final String targetModule = getObserverModule();
         String namespace = targetModule.replace(
-                Package.VENDOR_MODULE_NAME_SEPARATOR,
-                Package.FQN_SEPARATOR
+                Package.vendorModuleNameSeparator,
+                Package.fqnSeparator
         );
 
-        namespace = namespace.concat(Package.FQN_SEPARATOR);
+        namespace = namespace.concat(Package.fqnSeparator);
         return namespace.concat(getObserverDirectory().replace(
                 File.separator,
-                Package.FQN_SEPARATOR)
+                Package.fqnSeparator)
         );
     }
 
     private String getObserverClassFqn() {
-        return getNamespace().concat(Package.FQN_SEPARATOR).concat(getObserverClassName());
+        return getNamespace().concat(Package.fqnSeparator).concat(getObserverClassName());
     }
 }
 

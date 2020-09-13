@@ -1,12 +1,24 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
     #if (${SEQUENCES})
-        <module name="${PACKAGE}_${MODULE_NAME}">
-            <sequence>
-                ${SEQUENCES}
-            </sequence>
-        </module>
+        #if (${SETUP_VERSION})
+            <module name="${PACKAGE}_${MODULE_NAME}" setup_version="${SETUP_VERSION}">
+                <sequence>
+                    ${SEQUENCES}
+                </sequence>
+            </module>
+        #else
+            <module name="${PACKAGE}_${MODULE_NAME}">
+                <sequence>
+                    ${SEQUENCES}
+                </sequence>
+            </module>
+        #end
     #else
-        <module name="${PACKAGE}_${MODULE_NAME}" />
+        #if (${SETUP_VERSION})
+            <module name="${PACKAGE}_${MODULE_NAME}" setup_version="${SETUP_VERSION}"/>
+        #else
+            <module name="${PACKAGE}_${MODULE_NAME}"/>
+        #end
     #end
 </config>

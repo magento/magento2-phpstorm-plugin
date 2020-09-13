@@ -2,11 +2,9 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.project;
 
-import com.intellij.javaee.ExternalResourceManager;
-import com.intellij.javaee.ExternalResourceManagerEx;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
@@ -15,46 +13,40 @@ import com.intellij.openapi.ui.ComponentWithBrowseButton;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
-import com.intellij.psi.search.FilenameIndex;
 import com.jetbrains.php.frameworks.PhpFrameworkConfigurable;
-import com.magento.idea.magento2plugin.util.magento.MagentoVersion;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
 import com.magento.idea.magento2plugin.init.ConfigurationManager;
-import com.magento.idea.magento2plugin.magento.packages.ComposerPackageModel;
-import com.magento.idea.magento2plugin.magento.packages.MagentoComponent;
 import com.magento.idea.magento2plugin.magento.packages.MagentoComponentManager;
-import com.magento.idea.magento2plugin.magento.packages.MagentoModule;
 import com.magento.idea.magento2plugin.project.validator.SettingsFormValidator;
+import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.Collection;
-import java.util.Stack;
 
 public class SettingsForm implements PhpFrameworkConfigurable {
 
-    private final static String DISPLAY_NAME = "Magento";
     private final Project project;
     private JCheckBox pluginEnabled;
     private JButton buttonReindex;
-    private JPanel jPanel;
+    private JPanel panel;
     private JButton regenerateUrnMapButton;
     private JTextField magentoVersion;
     private JTextField moduleDefaultLicenseName;
     private JCheckBox mftfSupportEnabled;
-    private JLabel magentoPathLabel;
     private TextFieldWithBrowseButton magentoPath;
-    private JLabel magentoVersionLabel;
-    private MagentoVersion magentoVersionUtil = MagentoVersion.getInstance();
-    private SettingsFormValidator validator = SettingsFormValidator.getInstance(this);
+    private final SettingsFormValidator validator = new SettingsFormValidator(this);
+    private JLabel magentoVersionLabel;//NOPMD
+    private JLabel magentoPathLabel;//NOPMD
 
     public SettingsForm(@NotNull final Project project) {
         this.project = project;
@@ -63,7 +55,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     @Nls
     @Override
     public String getDisplayName() {
-        return SettingsForm.DISPLAY_NAME;
+        return "Magento";
     }
 
     @Nullable
@@ -76,23 +68,23 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     @Override
     public JComponent createComponent() {
         buttonReindex.addMouseListener(
-            new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    reindex();
-                    super.mouseClicked(e);
+                new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(final MouseEvent event) {
+                        reindex();
+                        super.mouseClicked(event);
+                    }
                 }
-            }
         );
 
         buttonReindex.setEnabled(getSettings().pluginEnabled);
         regenerateUrnMapButton.setEnabled(getSettings().pluginEnabled);
 
         regenerateUrnMapButton.addMouseListener(
-            new RegenerateUrnMapListener(project)
+                new RegenerateUrnMapListener(project)
         );
 
-        moduleDefaultLicenseName.setText(getSettings().DEFAULT_LICENSE);
+        moduleDefaultLicenseName.setText(getSettings().defaultLicense);
         mftfSupportEnabled.setSelected(getSettings().mftfSupportEnabled);
         magentoPath.getTextField().setText(getSettings().magentoPath);
         resolveMagentoVersion();
@@ -100,22 +92,29 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         addPathListener();
         addMagentoVersionListener();
 
-        return (JComponent) jPanel;
+        return (JComponent) panel;
     }
 
-    private void reindex() {
+    protected void reindex() {
         IndexManager.manualReindex();
         MagentoComponentManager.getInstance(project).flushModules();
     }
 
     @Override
     public boolean isModified() {
-        boolean licenseChanged = !moduleDefaultLicenseName.getText().equals(getSettings().DEFAULT_LICENSE);
-        boolean statusChanged = !pluginEnabled.isSelected() == getSettings().pluginEnabled;
-        boolean mftfSupportChanged = mftfSupportEnabled.isSelected() != getSettings().mftfSupportEnabled;
-        boolean magentoPathChanged = isMagentoPathChanged();
+        final boolean licenseChanged = !moduleDefaultLicenseName.getText().equals(
+                Settings.defaultLicense
+        );
+        final boolean versionChanged = !magentoVersion.getText().equals(
+                getSettings().magentoVersion
+        );
+        final boolean statusChanged = !pluginEnabled.isSelected() == getSettings().pluginEnabled;
+        final boolean mftfSupportChanged = mftfSupportEnabled.isSelected()
+                != getSettings().mftfSupportEnabled;
+        final boolean magentoPathChanged = isMagentoPathChanged();
 
-        return statusChanged || licenseChanged || mftfSupportChanged || magentoPathChanged;
+        return statusChanged || licenseChanged || mftfSupportChanged
+                || magentoPathChanged || versionChanged;
     }
 
     private void resolveMagentoVersion() {
@@ -144,7 +143,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
 
     private void saveSettings() {
         getSettings().pluginEnabled = pluginEnabled.isSelected();
-        getSettings().DEFAULT_LICENSE = moduleDefaultLicenseName.getText();
+        getSettings().defaultLicense = moduleDefaultLicenseName.getText();
         getSettings().mftfSupportEnabled = mftfSupportEnabled.isSelected();
         getSettings().magentoPath = getMagentoPath();
         getSettings().magentoVersion = getMagentoVersion();
@@ -169,7 +168,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
 
     @Override
     public void disposeUIResources() {
-
+        //do nothing
     }
 
     public Settings getSettings() {
@@ -177,46 +176,52 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     }
 
     private void addPathListener() {
-        FileChooserDescriptor descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor();
-        ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseFolderListener = new ComponentWithBrowseButton.BrowseFolderActionListener<JTextField>(
+        final FileChooserDescriptor descriptor =
+                FileChooserDescriptorFactory.createSingleFolderDescriptor();
+        final ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseFolderListener
+                = new ComponentWithBrowseButton.BrowseFolderActionListener<JTextField>(
                 "Magento Root Directory",
                 "Choose Magento root directory",
                 this.magentoPath,
                 null,
                 descriptor,
                 TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
-        ) {
-            @Nullable
-            protected VirtualFile getInitialFile() {
-                return super.getInitialFile();
-            }
-        };
+            ) {
+                    @Nullable
+                    @Override
+                    protected VirtualFile getInitialFile() {
+                        return super.getInitialFile();
+                    }
+                };
         this.magentoPath.addActionListener(browseFolderListener);
     }
 
     private void addMagentoVersionListener() {
-        DocumentListener onPathChange = new DocumentListener() {
+        final DocumentListener onPathChange = new DocumentListener() {
             @Override
-            public void insertUpdate(DocumentEvent documentEvent) {
+            public void insertUpdate(final DocumentEvent documentEvent) {
                 updateMagentoVersion();
             }
 
             @Override
-            public void removeUpdate(DocumentEvent documentEvent) {
+            public void removeUpdate(final DocumentEvent documentEvent) {
                 updateMagentoVersion();
             }
 
             @Override
-            public void changedUpdate(DocumentEvent documentEvent) {
+            public void changedUpdate(final DocumentEvent documentEvent) {
                 updateMagentoVersion();
             }
         };
         this.magentoPath.getTextField().getDocument().addDocumentListener(onPathChange);
     }
 
+    /**
+     * Updates Magento version according to root composer.json.
+     */
     public void updateMagentoVersion() {
-        String magentoPathValue = this.magentoPath.getTextField().getText();
-        String resolvedVersion = magentoVersionUtil.get(project, magentoPathValue);
+        final String magentoPathValue = this.magentoPath.getTextField().getText();
+        final String resolvedVersion = MagentoVersionUtil.get(project, magentoPathValue);
         magentoVersion.setText(resolvedVersion);
     }
 
@@ -232,106 +237,3 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     }
 }
 
-class RegenerateUrnMapListener extends MouseAdapter {
-    private final static String MODULE = "urn:magento:module:";
-    private final static String FRAMEWORK = "urn:magento:framework:";
-
-    private Project project;
-
-    public RegenerateUrnMapListener(@NotNull Project project) {
-        this.project = project;
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        ApplicationManager.getApplication().runWriteAction(
-            new Runnable() {
-                @Override
-                public void run() {
-                    ExternalResourceManager externalResourceManager = ExternalResourceManager.getInstance();
-                    PsiManager psiManager = PsiManager.getInstance(project);
-                    MagentoComponentManager componentManager = MagentoComponentManager.getInstance(project);
-
-                    Collection<VirtualFile> xsdFiles = FilenameIndex.getAllFilesByExt(project, "xsd");
-                    Collection<MagentoComponent> components = componentManager.getAllComponents();
-
-                    for (VirtualFile virtualFile: xsdFiles) {
-                        PsiFile psiFile = psiManager.findFile(virtualFile);
-                        if (psiFile == null) {
-                            continue;
-                        }
-
-                        MagentoComponent xsdOwner = findComponentForXsd(psiFile, components);
-                        if (xsdOwner == null) {
-                            continue;
-                        }
-
-                        String urnKey = buildUrnKeyForFile(psiFile, xsdOwner);
-                        if (urnKey == null) {
-                            continue;
-                        }
-
-                        // we need to attach resource to a project scope
-                        // but with ExternalResourceManager itself it's not possible unfortunately
-                        if (externalResourceManager instanceof ExternalResourceManagerEx) {
-                            ((ExternalResourceManagerEx)externalResourceManager).addResource(
-                                urnKey, virtualFile.getCanonicalPath(), project
-                            );
-                        } else {
-                            externalResourceManager.addResource(urnKey, virtualFile.getCanonicalPath());
-                        }
-                    }
-                }
-            }
-        );
-
-        super.mouseClicked(e);
-    }
-
-    @Nullable
-    private MagentoComponent findComponentForXsd(@NotNull PsiFile psiFile, Collection<MagentoComponent> components) {
-        for (MagentoComponent component: components) {
-            if (component.isFileInContext(psiFile)) {
-                return component;
-            }
-        }
-
-        return null;
-    }
-
-    @Nullable
-    private String buildUrnKeyForFile(@NotNull PsiFile psiFile, @NotNull MagentoComponent magentoComponent) {
-        String prefix = null;
-
-        if (magentoComponent instanceof MagentoModule) {
-            prefix = MODULE + ((MagentoModule)magentoComponent).getMagentoName() + ":";
-        } else {
-            ComposerPackageModel composerPackageModel = magentoComponent.getComposerModel();
-            if ("magento2-library".equals(composerPackageModel.getType())) {
-                prefix = FRAMEWORK;
-            }
-        }
-
-        if (prefix == null) {
-            return null;
-        }
-
-        Stack<String> relativePath = new Stack<>();
-        relativePath.push(psiFile.getName());
-
-        PsiManager psiManager = magentoComponent.getDirectory().getManager();
-        PsiDirectory parentDir = psiFile.getParent();
-        while (parentDir != null && !psiManager.areElementsEquivalent(parentDir, magentoComponent.getDirectory())) {
-            relativePath.push("/");
-            relativePath.push(parentDir.getName());
-            parentDir = parentDir.getParentDirectory();
-        }
-
-        StringBuilder stringBuilder = new StringBuilder(prefix);
-        while (!relativePath.empty()) {
-            stringBuilder.append(relativePath.pop());
-        }
-
-        return stringBuilder.toString();
-    }
-}

@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
@@ -16,12 +17,34 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Namespa
 import com.magento.idea.magento2plugin.indexes.CronGroupIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.CamelCaseToSnakeCase;
-import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
-
-import javax.swing.*;
-import java.awt.event.*;
+import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.List;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 
+@SuppressWarnings({
+        "PMD.UncommentedEmptyMethodBody",
+        "PMD.OnlyOneReturn",
+        "PMD.UnusedPrivateMethod",
+        "PMD.CommentSize",
+        "PMD.TooManyFields",
+        "PMD.MissingSerialVersionUID",
+        "PMD.AvoidCatchingGenericException",
+        "PMD.ImmutableField",
+        "PMD.AccessorMethodGeneration",
+})
 public class NewCronjobDialog extends AbstractDialog {
     private JPanel contentPane;
     private JButton buttonOK;
@@ -45,9 +68,16 @@ public class NewCronjobDialog extends AbstractDialog {
     private NewCronjobValidator validator;
     private CamelCaseToSnakeCase camelCaseToSnakeCase;
 
-    public NewCronjobDialog(Project project, PsiDirectory directory) {
+    /**
+     * Open a new cronjob generation dialog form.
+     *
+     * @param project Project
+     * @param directory Directory
+     */
+    public NewCronjobDialog(final Project project, final PsiDirectory directory) {
+        super();
         this.project = project;
-        this.moduleName = GetModuleNameByDirectory.getInstance(project).execute(directory);
+        this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
         this.validator = NewCronjobValidator.getInstance();
         this.camelCaseToSnakeCase = CamelCaseToSnakeCase.getInstance();
 
@@ -87,37 +117,51 @@ public class NewCronjobDialog extends AbstractDialog {
         });
 
         // suggest unique cronjob name based on the module and class names
-        cronjobNameField.setText(this.suggestCronjobName(this.moduleName, "CleanTableCronjob"));
+        cronjobNameField.setText(this.suggestCronjobName("CleanTableCronjob"));
         cronjobClassNameField.addFocusListener(new FocusListener() {
             @Override
-            public void focusGained(FocusEvent e) {
+            public void focusGained(final FocusEvent event) {
 
             }
 
             @Override
-            public void focusLost(FocusEvent e) {
-                cronjobNameField.setText(suggestCronjobName(moduleName, cronjobClassNameField.getText()));
+            public void focusLost(final FocusEvent event) {
+                cronjobNameField.setText(suggestCronjobName(cronjobClassNameField.getText()));
             }
         });
 
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
+            @Override
+            public void windowClosing(final WindowEvent event) {
                 onCancel();
             }
         });
 
-        // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        final ActionListener actionListener = new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent event) {
                 onCancel();
             }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        };
+
+        // call onCancel() on ESCAPE
+        contentPane.registerKeyboardAction(
+                actionListener,
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+        );
     }
 
-    public static void open(Project project, PsiDirectory directory) {
-        NewCronjobDialog dialog = new NewCronjobDialog(project, directory);
+    /**
+     * Open a new cronjib dialog form.
+     *
+     * @param project Project
+     * @param directory PsiDirectory
+     */
+    public static void open(final Project project, final PsiDirectory directory) {
+        final NewCronjobDialog dialog = new NewCronjobDialog(project, directory);
         dialog.pack();
         dialog.centerDialog(dialog);
         dialog.setVisible(true);
@@ -159,52 +203,55 @@ public class NewCronjobDialog extends AbstractDialog {
         return this.configPathField.getText().trim();
     }
 
+    @Override
     protected void onCancel() {
         dispose();
     }
 
     private void createUIComponents() {
-        List<String> cronGroups = CronGroupIndex.getInstance(project).getGroups();
+        final List<String> cronGroups = CronGroupIndex.getInstance(project).getGroups();
 
         this.cronGroupComboBox = new FilteredComboBox(cronGroups);
     }
 
     /**
-     * Retrieve the default cronjob name
-     *
-     * @param moduleName
+     * Retrieve the default cronjob name.
      *
      * @return String
      */
-    private String suggestCronjobName(String moduleName, String cronjobClassname) {
+    private String suggestCronjobName(final String cronjobClassname) {
         if (cronjobClassname == null || cronjobClassname.isEmpty()) {
-            return this.moduleName.toLowerCase();
+            return this.moduleName.toLowerCase(new java.util.Locale("en","EN"));
         }
 
-        String cronjobClassnameToSnakeCase = this.camelCaseToSnakeCase.convert(cronjobClassname);
+        final String cronjobClassnameToSnakeCase = this.camelCaseToSnakeCase.convert(
+                cronjobClassname
+        );
 
-        return this.moduleName.toLowerCase() + "_" + cronjobClassnameToSnakeCase;
+        return this.moduleName.toLowerCase(new java.util.Locale("en","EN"))
+                + "_"
+                + cronjobClassnameToSnakeCase;
     }
 
     /**
-     * When new cronjob dialog is filled, validate the input data and generate a new crobjob
+     * When new cronjob dialog is filled, validate the input data and generate a new cronjob.
      */
     private void onOK() {
         if (!validator.validate(this.project,this)) {
             return;
         }
 
-        NamespaceBuilder namespaceBuilder = new NamespaceBuilder(
-            this.getCronjobModule(),
-            this.getCronjobClassName(),
-            this.getCronjobDirectory()
+        final NamespaceBuilder namespaceBuilder = new NamespaceBuilder(
+                this.getCronjobModule(),
+                this.getCronjobClassName(),
+                this.getCronjobDirectory()
         );
 
-        String cronjobNamespace = namespaceBuilder.getCronjobNamespace();
-        String cronjobInstance = namespaceBuilder.getClassFqn();
+        final String cronjobNamespace = namespaceBuilder.getNamespace();
+        final String cronjobInstance = namespaceBuilder.getClassFqn();
 
-        CronjobClassData cronjobClassData = this.getCronjobClassData(cronjobNamespace);
-        CrontabXmlData crontabXmlData = this.getCrontabXmlData(cronjobInstance);
+        final CronjobClassData cronjobClassData = this.getCronjobClassData(cronjobNamespace);
+        final CrontabXmlData crontabXmlData = this.getCrontabXmlData(cronjobInstance);
 
         // todo: catch validation exceptions
         this.generate(cronjobClassData, crontabXmlData);
@@ -212,26 +259,36 @@ public class NewCronjobDialog extends AbstractDialog {
     }
 
     /**
-     * Generate new cronjob file and register it in crontab.xml
+     * Generate new cronjob file and register it in crontab.xml.
      */
-    private void generate(CronjobClassData cronjobClassData, CrontabXmlData crontabXmlData) {
-        CronjobClassGenerator cronjobFileGenerator = new CronjobClassGenerator(project, cronjobClassData);
-        CrontabXmlGenerator crontabXmlGenerator = new CrontabXmlGenerator(project, crontabXmlData);
+    private void generate(
+            final CronjobClassData cronjobClassData,
+            final CrontabXmlData crontabXmlData) {
+
+        final CronjobClassGenerator cronjobFileGenerator = new CronjobClassGenerator(
+                project,
+                cronjobClassData
+        );
+
+        final CrontabXmlGenerator crontabXmlGenerator = new CrontabXmlGenerator(
+                project,
+                crontabXmlData
+        );
 
         try {
             cronjobFileGenerator.generate(NewCronjobAction.ACTION_NAME, true);
             crontabXmlGenerator.generate(NewCronjobAction.ACTION_NAME);
         } catch (Exception exception) {
             JOptionPane.showMessageDialog(
-                null,
-                exception.getMessage(),
-                "Generation Error",
-                JOptionPane.ERROR_MESSAGE
+                    null,
+                    exception.getMessage(),
+                    "Generation Error",
+                    JOptionPane.ERROR_MESSAGE
             );
         }
     }
 
-    private CronjobClassData getCronjobClassData(String cronjobNamespace) {
+    private CronjobClassData getCronjobClassData(final String cronjobNamespace) {
         return new CronjobClassData(
             this.getCronjobClassName(),
             this.getCronjobDirectory(),
@@ -241,14 +298,15 @@ public class NewCronjobDialog extends AbstractDialog {
     }
 
     /**
+     * Get new crontab xml data object.
      *
-     * @param cronjobInstance
+     * @param cronjobInstance Cron job instance
      *
      * @return CrontabXmlData
      */
-    private CrontabXmlData getCrontabXmlData(String cronjobInstance) {
-        String cronSchedule = this.isFixedScheduleType() ? this.getCronjobSchedule() : null;
-        String cronScheduleConfigPath = this.isConfigurableScheduleType()
+    private CrontabXmlData getCrontabXmlData(final String cronjobInstance) {
+        final String cronSchedule = this.isFixedScheduleType() ? this.getCronjobSchedule() : null;
+        final String cronScheduleConfigPath = this.isConfigurableScheduleType()
                 ? this.getCronjobScheduleConfigPath()
                 : null;
 

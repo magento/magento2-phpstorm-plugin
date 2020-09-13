@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator.util;
 
 import com.intellij.openapi.application.WriteAction;
@@ -11,23 +12,53 @@ import com.magento.idea.magento2plugin.magento.packages.Package;
 import org.jetbrains.annotations.NotNull;
 
 public class DirectoryGenerator {
-    private static DirectoryGenerator INSTANCE = null;
+    private static DirectoryGenerator instance;
 
+    /**
+     * Get Singleton.
+     *
+     * @return this
+     */
     public static DirectoryGenerator getInstance() {
-        if (null == INSTANCE) {
-            INSTANCE = new DirectoryGenerator();
+        if (null == instance) { //NOPMD
+            instance = new DirectoryGenerator();
         }
-        return INSTANCE;
+        return instance;
     }
 
-    public ModuleDirectoriesData createOrFindModuleDirectories(@NotNull String packageName, @NotNull String moduleName, @NotNull PsiDirectory baseDirectory){
-        PsiDirectory packageDirectory = findOrCreateSubdirectory(baseDirectory, packageName);
-        PsiDirectory moduleDirectory = findOrCreateSubdirectory(packageDirectory, moduleName);
-        PsiDirectory moduleEtcDirectory = findOrCreateSubdirectory(moduleDirectory, Package.MODULE_BASE_AREA_DIR);
+    /**
+     * Create or find module directories.
+     *
+     * @param packageName String
+     * @param moduleName String
+     * @param baseDirectory PsiDirectory
+     * @return ModuleDirectoriesData
+     */
+    public ModuleDirectoriesData createOrFindModuleDirectories(
+            final @NotNull String packageName,
+            final @NotNull String moduleName,
+            final @NotNull PsiDirectory baseDirectory
+    ) {
+        final PsiDirectory packageDirectory = findOrCreateSubdirectory(baseDirectory, packageName);
+        final PsiDirectory moduleDirectory = findOrCreateSubdirectory(packageDirectory, moduleName);
+        final PsiDirectory moduleEtcDirectory = findOrCreateSubdirectory(
+                moduleDirectory,
+                Package.moduleBaseAreaDir
+        );
         return new ModuleDirectoriesData(moduleDirectory, moduleEtcDirectory);
     }
 
-    public PsiDirectory findOrCreateSubdirectory(@NotNull PsiDirectory parent, @NotNull String subdirName) {
+    /**
+     * Find or create subdirectory.
+     *
+     * @param parent PsiDirectory
+     * @param subdirName String
+     * @return PsiDirectory
+     */
+    public PsiDirectory findOrCreateSubdirectory(
+            final @NotNull PsiDirectory parent,
+            final @NotNull String subdirName
+    ) {
         final PsiDirectory sub = parent.findSubdirectory(subdirName);
         return sub == null ? WriteAction.compute(() -> parent.createSubdirectory(subdirName)) : sub;
     }

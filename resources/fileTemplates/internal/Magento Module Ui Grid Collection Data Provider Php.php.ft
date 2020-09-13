@@ -1,0 +1,130 @@
+<?php
+#parse("PHP File Header.php")
+#if (${NAMESPACE})
+
+namespace ${NAMESPACE};
+#end
+
+use Magento\Framework\Api\FilterBuilder;
+use Magento\Framework\Api\Search\ReportingInterface;
+use Magento\Framework\Api\Search\SearchCriteriaBuilder;
+use Magento\Framework\Api\Search\SearchResultInterface;
+use Magento\Framework\Api\Search\SearchResultInterfaceFactory;
+use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
+use Magento\Framework\App\RequestInterface;
+use ${COLLECTION_CLASS_FQN};
+use ${COLLECTION_CLASS_FQN}Factory;
+use Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider;
+
+class ${CLASS_NAME} extends DataProvider
+{
+    /**
+     * @var ${COLLECTION_CLASS_NAME}Factory
+     */
+    private $collectionFactory;
+
+    /**
+     * @var CollectionProcessorInterface
+     */
+    private $collectionProcessor;
+
+    /**
+     * @var SearchResultInterfaceFactory
+     */
+    private $searchResultFactory;
+
+    /**
+     * ${CLASS_NAME} constructor.
+     *
+     * @param string $name
+     * @param string $primaryFieldName
+     * @param string $requestFieldName
+     * @param ReportingInterface $reporting
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param RequestInterface $request
+     * @param FilterBuilder $filterBuilder
+     * @param ${COLLECTION_CLASS_NAME}Factory $collectionFactory
+     * @param CollectionProcessorInterface $collectionProcessor
+     * @param SearchResultInterfaceFactory $searchResultFactory
+     * @param array $meta
+     * @param array $data
+     */
+    public function __construct(
+        string $name = '',
+        string $primaryFieldName = '',
+        string $requestFieldName = '',
+        ReportingInterface $reporting,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        RequestInterface $request,
+        FilterBuilder $filterBuilder,
+        ${COLLECTION_CLASS_NAME}Factory $collectionFactory,
+        CollectionProcessorInterface $collectionProcessor,
+        SearchResultInterfaceFactory $searchResultFactory,
+        array $meta = [],
+        array $data = []
+    ) {
+        parent::__construct(
+            $name,
+            $primaryFieldName,
+            $requestFieldName,
+            $reporting,
+            $searchCriteriaBuilder,
+            $request,
+            $filterBuilder,
+            $meta,
+            $data
+        );
+
+        $this->collectionFactory = $collectionFactory;
+        $this->collectionProcessor = $collectionProcessor;
+        $this->searchResultFactory = $searchResultFactory;
+    }
+
+    /**
+     * Get search result
+     *
+     * @return SearchResultInterface
+     */
+    public function getSearchResult()
+    {
+        /** @var SearchResultInterface $searchResults */
+        $searchResults = $this->searchResultFactory->create();
+        $searchCriteria = $this->getSearchCriteria();
+        /** @var ${COLLECTION_CLASS_NAME} $collection */
+        $collection = $this->collectionFactory->create();
+        $this->collectionProcessor->process($this->getSearchCriteria(), $collection);
+        $items = $collection->getItems();
+        $searchResults->setItems($items);
+        $searchResults->setTotalCount($collection->getSize());
+        $searchResults->setSearchCriteria($searchCriteria);
+
+        return $searchResults;
+    }
+
+    /**
+     * Search result to output
+     *
+     * @param SearchResultInterface $searchResult
+     *
+     * @return array
+     */
+    public function searchResultToOutput(SearchResultInterface $searchResult)
+    {
+        $result = ['items' => []];
+        $items = $searchResult->getItems();
+
+        if (!$items || !count($items)) {
+            $result['totalRecords'] = 0;
+
+            return $result;
+        }
+
+        foreach ($items as $index => $item) {
+            $result['items'][$index] = $item->getData();
+        }
+
+        $result['totalRecords'] = $searchResult->getTotalCount();
+
+        return $result;
+    }
+}

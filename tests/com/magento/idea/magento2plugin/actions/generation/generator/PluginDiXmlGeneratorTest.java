@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
@@ -9,30 +10,35 @@ import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.PluginDiXmlData;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
+import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 
 public class PluginDiXmlGeneratorTest extends BaseGeneratorTestCase {
-    private static final String pluginTargetClassOneFnq = "Foo\\Bar\\Model\\PluginTargetClassOne";
-    private static final String pluginTargetClassTwoFnq = "Foo\\Bar\\Model\\PluginTargetClassTwo";
-    private static final String pluginClassOneFnq = "Foo\\Bar\\Plugin\\TestOnePlugin";
-    private static final String pluginClassTwoFnq = "Foo\\Bar\\Plugin\\TestTwoPlugin";
-    private static final String module = "Foo_Bar";
-    private static final String moduleDir = "src/app/code/Foo/Bar/";
+    private static final String PLUGIN_TARGET_CLASS_ONE_FNQ
+            = "Foo\\Bar\\Model\\PluginTargetClassOne";
+    private static final String PLUGIN_TARGET_CLASS_TWO_FNQ
+            = "Foo\\Bar\\Model\\PluginTargetClassTwo";
+    private static final String PLUGIN_CLASS_ONE_FNQ = "Foo\\Bar\\Plugin\\TestOnePlugin";
+    private static final String PLUGIN_CLASS_TWO_FNQ = "Foo\\Bar\\Plugin\\TestTwoPlugin";
+    private static final String MODULE = "Foo_Bar";
+    private static final String MODULE_DIR = "src/app/code/Foo/Bar/";
 
-    public void testGeneratePluginDiXmlFileForBaseArea()
-    {
-        String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
-        PsiFile expectedFile = myFixture.configureByFile(filePath);
-        String area = Package.Areas.base.toString();
+    /**
+     * Test checks whether di.xml is generated correctly for the base area
+     */
+    public void testGeneratePluginDiXmlFileForBaseArea() {
+        final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
+        final PsiFile expectedFile = myFixture.configureByFile(filePath);
+        final String area = Areas.base.toString();
 
-        PsiFile diXml = addPluginDiXml(
-                pluginTargetClassOneFnq,
+        final PsiFile diXml = addPluginDiXml(
+                PLUGIN_TARGET_CLASS_ONE_FNQ,
                 area,
                 "10",
                 "test_plugin_name_1",
-                pluginClassOneFnq
+                PLUGIN_CLASS_ONE_FNQ
         );
 
         assertGeneratedFileIsCorrect(
@@ -42,18 +48,20 @@ public class PluginDiXmlGeneratorTest extends BaseGeneratorTestCase {
         );
     }
 
-    public void testGeneratePluginDiXmlFileForAdminhtmlArea()
-    {
-        String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
-        PsiFile expectedFile = myFixture.configureByFile(filePath);
-        String area = Package.Areas.adminhtml.toString();
+    /**
+     * Test checks whether di.xml is generated correctly for the adminhtml area
+     */
+    public void testGeneratePluginDiXmlFileForAdminhtmlArea() {
+        final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
+        final PsiFile expectedFile = myFixture.configureByFile(filePath);
+        final String area = Areas.adminhtml.toString();
 
-        PsiFile diXml = addPluginDiXml(
-                pluginTargetClassTwoFnq,
+        final PsiFile diXml = addPluginDiXml(
+                PLUGIN_TARGET_CLASS_TWO_FNQ,
                 area,
                 "20",
                 "test_plugin_name_2",
-                pluginClassTwoFnq
+                PLUGIN_CLASS_TWO_FNQ
         );
 
         assertGeneratedFileIsCorrect(
@@ -63,24 +71,26 @@ public class PluginDiXmlGeneratorTest extends BaseGeneratorTestCase {
         );
     }
 
-    public void testAddTwoPluginsToOneDiXml()
-    {
-        String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
-        PsiFile expectedFile = myFixture.configureByFile(filePath);
-        String area = Package.Areas.frontend.toString();
+    /**
+     * Test checks whether 2 di.xml is generated correctly
+     */
+    public void testAddTwoPluginsToOneDiXml() {
+        final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
+        final PsiFile expectedFile = myFixture.configureByFile(filePath);
+        final String area = Areas.frontend.toString();
         addPluginDiXml(
-                pluginTargetClassOneFnq,
+                PLUGIN_TARGET_CLASS_ONE_FNQ,
                 area,
                 "10",
                 "test_plugin_name_1",
-                pluginClassOneFnq
+                PLUGIN_CLASS_ONE_FNQ
         );
-        PsiFile diXml = addPluginDiXml(
-                pluginTargetClassTwoFnq,
+        final PsiFile diXml = addPluginDiXml(
+                PLUGIN_TARGET_CLASS_TWO_FNQ,
                 area,
                 "20",
                 "test_plugin_name_2",
-                pluginClassTwoFnq
+                PLUGIN_CLASS_TWO_FNQ
         );
 
         assertGeneratedFileIsCorrect(
@@ -90,24 +100,26 @@ public class PluginDiXmlGeneratorTest extends BaseGeneratorTestCase {
         );
     }
 
-    public void testAddTwoPluginsToOneTargetClass()
-    {
-        String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
-        PsiFile expectedFile = myFixture.configureByFile(filePath);
-        String area = Package.Areas.frontend.toString();
+    /**
+     * Test checks whether 2 di.xml is generated correctly for one target clas
+     */
+    public void testAddTwoPluginsToOneTargetClass() {
+        final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
+        final PsiFile expectedFile = myFixture.configureByFile(filePath);
+        final String area = Areas.frontend.toString();
         addPluginDiXml(
-                pluginTargetClassOneFnq,
+                PLUGIN_TARGET_CLASS_ONE_FNQ,
                 area,
                 "10",
                 "test_plugin_name_1",
-                pluginClassOneFnq
+                PLUGIN_CLASS_ONE_FNQ
         );
-        PsiFile diXml = addPluginDiXml(
-                pluginTargetClassOneFnq,
+        final PsiFile diXml = addPluginDiXml(
+                PLUGIN_TARGET_CLASS_ONE_FNQ,
                 area,
                 "20",
                 "test_plugin_name_2",
-                pluginClassTwoFnq
+                PLUGIN_CLASS_TWO_FNQ
         );
 
         assertGeneratedFileIsCorrect(
@@ -118,33 +130,35 @@ public class PluginDiXmlGeneratorTest extends BaseGeneratorTestCase {
     }
 
     private PsiFile addPluginDiXml(
-            String targetClassFnq,
-            String area,
-            String SortOrder,
-            String pluginName,
-            String pluginClassFnq
+            final String targetClassFnq,
+            final String area,
+            final String sortOrder,
+            final String pluginName,
+            final String pluginClassFnq
     ) {
-        Project project = myFixture.getProject();
-        PhpClass targetClass = GetPhpClassByFQN.getInstance(project).execute(targetClassFnq);
-        PluginDiXmlData pluginDiXmlData = new PluginDiXmlData(
+        final Project project = myFixture.getProject();
+        final PhpClass targetClass = GetPhpClassByFQN.getInstance(project).execute(targetClassFnq);
+        final PluginDiXmlData pluginDiXmlData = new PluginDiXmlData(
                 area,
-                module,
+                MODULE,
                 targetClass,
-                SortOrder,
+                sortOrder,
                 pluginName,
                 pluginClassFnq
         );
-        PluginDiXmlGenerator moduleXmlGenerator = new PluginDiXmlGenerator(pluginDiXmlData, project);
+        final PluginDiXmlGenerator moduleXmlGenerator = new PluginDiXmlGenerator(
+                pluginDiXmlData,
+                project
+        );
 
         return moduleXmlGenerator.generate("test");
     }
 
-    private String getExpectedDirectory(String area)
-    {
-        if (area.equals(Package.Areas.base.toString())) {
-            return moduleDir + Package.MODULE_BASE_AREA_DIR;
+    private String getExpectedDirectory(final String area) {
+        if (area.equals(Areas.base.toString())) {
+            return MODULE_DIR + Package.moduleBaseAreaDir;
         }
 
-        return moduleDir + Package.MODULE_BASE_AREA_DIR + File.separator + area;
+        return MODULE_DIR + Package.moduleBaseAreaDir + File.separator + area;
     }
 }

@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator.util;
 
 import com.intellij.openapi.project.Project;
@@ -9,41 +10,44 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
+import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.FileBasedIndexUtil;
 import java.util.ArrayList;
 import java.util.Properties;
 
-public class FindOrCreateDiXml {
-    private static FindOrCreateDiXml INSTANCE = null;
-    private Project project;
+public final class FindOrCreateDiXml {
+    private final Project project;
 
-    public static FindOrCreateDiXml getInstance(Project project) {
-        if (null == INSTANCE) {
-            INSTANCE = new FindOrCreateDiXml(project);
-        }
-
-        return INSTANCE;
-    }
-
-    FindOrCreateDiXml(Project project) {
+    public FindOrCreateDiXml(final Project project) {
         this.project = project;
     }
 
-    public PsiFile execute(String actionName, String moduleName, String area) {
-        DirectoryGenerator directoryGenerator = DirectoryGenerator.getInstance();
-        FileFromTemplateGenerator fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+    /**
+     * Finds or creates module di.xml.
+     *
+     * @param actionName String
+     * @param moduleName String
+     * @param area String
+     * @return PsiFile
+     */
+    public PsiFile execute(final String actionName, final String moduleName, final String area) {
+        final DirectoryGenerator directoryGenerator = DirectoryGenerator.getInstance();
+        final FileFromTemplateGenerator fileFromTemplateGenerator =
+                FileFromTemplateGenerator.getInstance(project);
 
-        PsiDirectory parentDirectory = ModuleIndex.getInstance(project).getModuleDirectoryByModuleName(moduleName);
-        ArrayList<String> fileDirectories = new ArrayList<>();
-        fileDirectories.add(Package.MODULE_BASE_AREA_DIR);
-        if (!getArea(area).equals(Package.Areas.base)) {
+        PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+                .getModuleDirectoryByModuleName(moduleName);
+        final ArrayList<String> fileDirectories = new ArrayList<>();
+        fileDirectories.add(Package.moduleBaseAreaDir);
+        if (!getArea(area).equals(Areas.base)) {
             fileDirectories.add(getArea(area).toString());
         }
-        for (String fileDirectory: fileDirectories) {
-            parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, fileDirectory);
+        for (final String fileDirectory: fileDirectories) {
+            parentDirectory = directoryGenerator
+                    .findOrCreateSubdirectory(parentDirectory, fileDirectory);
         }
-        ModuleDiXml moduleDiXml = new ModuleDiXml();
+        final ModuleDiXml moduleDiXml = new ModuleDiXml();
         PsiFile diXml = FileBasedIndexUtil.findModuleConfigFile(
                 moduleDiXml.getFileName(),
                 getArea(area),
@@ -51,12 +55,17 @@ public class FindOrCreateDiXml {
                 project
         );
         if (diXml == null) {
-            diXml = fileFromTemplateGenerator.generate(moduleDiXml, new Properties(), parentDirectory, actionName);
+            diXml = fileFromTemplateGenerator.generate(
+                    moduleDiXml,
+                    new Properties(),
+                    parentDirectory,
+                    actionName
+            );
         }
         return diXml;
     }
 
-    private Package.Areas getArea(String area) {
-        return Package.getAreaByString(area);
+    private Areas getArea(final String area) {
+        return Areas.getAreaByString(area);
     }
 }

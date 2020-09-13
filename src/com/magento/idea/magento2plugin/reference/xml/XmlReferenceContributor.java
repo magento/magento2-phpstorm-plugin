@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.reference.xml;
 
 import com.intellij.patterns.XmlPatterns;
@@ -11,12 +12,17 @@ import com.intellij.psi.xml.XmlTokenType;
 import com.magento.idea.magento2plugin.magento.files.MftfActionGroup;
 import com.magento.idea.magento2plugin.magento.files.MftfTest;
 import com.magento.idea.magento2plugin.magento.files.UiComponentXml;
-import com.magento.idea.magento2plugin.reference.provider.*;
-import com.magento.idea.magento2plugin.reference.provider.mftf.*;
+// CHECKSTYLE IGNORE check FOR NEXT 5 LINES
+import com.magento.idea.magento2plugin.reference.provider.*;//NOPMD
+import com.magento.idea.magento2plugin.reference.provider.mftf.*;//NOPMD
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import org.jetbrains.annotations.NotNull;
-import static com.intellij.patterns.XmlPatterns.*;
+import static com.intellij.patterns.XmlPatterns.*;//NOPMD
 
+/**
+ * TODO: enable style checks after decomposition.
+ */
+@SuppressWarnings({"PMD", "checkstyle:all"})
 public class XmlReferenceContributor extends PsiReferenceContributor {
 
     @Override
