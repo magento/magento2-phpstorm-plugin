@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.magento.packages;
 
+@SuppressWarnings({"PMD.FieldNamingConventions"})
 public enum  ComponentType {
     module,
     theme
