@@ -48,7 +48,7 @@ public class OverrideInThemeDialog extends AbstractDialog {
 
         this.project = project;
         this.psiFile = psiFile;
-        this.validator = OverrideInThemeDialogValidator.getInstance(this);
+        this.validator = new OverrideInThemeDialogValidator(this);
 
         setContentPane(contentPane);
         setModal(true);

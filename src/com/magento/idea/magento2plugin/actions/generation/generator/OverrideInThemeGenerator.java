@@ -42,8 +42,9 @@ public class OverrideInThemeGenerator {
      * @param themeName String
      */
     public void execute(final PsiFile baseFile, final String themeName) {
-        final String componentType = GetComponentTypeByNameUtil.execute(GetComponentNameByDirectoryUtil
-                .execute(baseFile.getContainingDirectory(), project));
+        final String componentType = GetComponentTypeByNameUtil.execute(
+                GetComponentNameByDirectoryUtil
+                    .execute(baseFile.getContainingDirectory(), project));
 
         List<String> pathComponents;
         if (componentType.equals(ComponentType.module.toString())) {

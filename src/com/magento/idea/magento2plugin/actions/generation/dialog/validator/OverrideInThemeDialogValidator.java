@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
 import com.intellij.openapi.project.Project;
@@ -9,46 +10,60 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.OverrideInTheme
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-
-import javax.swing.*;
 import java.util.List;
+import javax.swing.JOptionPane;
 
 public class OverrideInThemeDialogValidator {
-    private static OverrideInThemeDialogValidator INSTANCE = null;
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
-    private OverrideInThemeDialog dialog;
+    private final OverrideInThemeDialog dialog;
 
-    public static OverrideInThemeDialogValidator getInstance(OverrideInThemeDialog dialog) {
-        if (null == INSTANCE) {
-            INSTANCE = new OverrideInThemeDialogValidator();
-        }
-
-        INSTANCE.dialog = dialog;
-        return INSTANCE;
-    }
-
-    public OverrideInThemeDialogValidator() {
+    /**
+     * Constructor.
+     *
+     * @param dialog OverrideInThemeDialog
+     */
+    public OverrideInThemeDialogValidator(final OverrideInThemeDialog dialog) {
+        this.dialog = dialog;
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
     }
 
-    public boolean validate(Project project)
-    {
-        String errorTitle = commonBundle.message("common.error");
+    /**
+     * Validate dialog.
+     *
+     * @param project Project
+     * @return boolean
+     */
+    public boolean validate(final Project project) {
+        final String errorTitle = commonBundle.message("common.error");
 
-        String theme = dialog.getTheme();
+        final String theme = dialog.getTheme();
         if (theme.length() == 0) {
-            String errorMessage = validatorBundle.message("validator.notEmpty", "Target Theme");
-            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+            final String errorMessage = validatorBundle.message(
+                    "validator.notEmpty",
+                    "Target Theme"
+            );
+            JOptionPane.showMessageDialog(
+                    null,
+                    errorMessage,
+                    errorTitle,
+                    JOptionPane.ERROR_MESSAGE
+            );
 
             return false;
         }
 
-        List<String> allThemesList = ModuleIndex.getInstance(project).getEditableThemeNames();
+        final List<String> allThemesList = ModuleIndex.getInstance(project).getEditableThemeNames();
         if (!allThemesList.contains(theme)) {
-            String errorMessage = validatorBundle.message("validator.module.noSuchModule", theme);
-            JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
+            final String errorMessage = validatorBundle
+                    .message("validator.module.noSuchModule", theme);
+            JOptionPane.showMessageDialog(
+                    null,
+                    errorMessage,
+                    errorTitle,
+                    JOptionPane.ERROR_MESSAGE
+            );
 
             return false;
         }
