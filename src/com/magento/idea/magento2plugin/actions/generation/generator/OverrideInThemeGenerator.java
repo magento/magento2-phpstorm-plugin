@@ -18,7 +18,7 @@ import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.ComponentType;
 import com.magento.idea.magento2plugin.util.RegExUtil;
-import com.magento.idea.magento2plugin.util.magento.GetComponentNameByDirectory;
+import com.magento.idea.magento2plugin.util.magento.GetComponentNameByDirectoryUtil;
 import com.magento.idea.magento2plugin.util.magento.GetComponentTypeByNameUtil;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,16 +42,17 @@ public class OverrideInThemeGenerator {
      * @param themeName String
      */
     public void execute(final PsiFile baseFile, final String themeName) {
-        final GetComponentNameByDirectory getComponentNameByDirectory = GetComponentNameByDirectory
-                .getInstance(project);
-        final String componentType = GetComponentTypeByNameUtil.execute(getComponentNameByDirectory
-                .execute(baseFile.getContainingDirectory()));
+        final String componentType = GetComponentTypeByNameUtil.execute(GetComponentNameByDirectoryUtil
+                .execute(baseFile.getContainingDirectory(), project));
 
         List<String> pathComponents;
         if (componentType.equals(ComponentType.module.toString())) {
             pathComponents = getModulePathComponents(
                     baseFile,
-                    getComponentNameByDirectory.execute(baseFile.getContainingDirectory())
+                    GetComponentNameByDirectoryUtil.execute(
+                            baseFile.getContainingDirectory(),
+                            project
+                    )
             );
         } else if (componentType.equals(ComponentType.theme.toString())) {
             pathComponents = getThemePathComponents(baseFile);

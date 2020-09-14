@@ -16,7 +16,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.OverrideInTheme
 import com.magento.idea.magento2plugin.magento.packages.ComponentType;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.project.Settings;
-import com.magento.idea.magento2plugin.util.magento.GetComponentNameByDirectory;
+import com.magento.idea.magento2plugin.util.magento.GetComponentNameByDirectoryUtil;
 import com.magento.idea.magento2plugin.util.magento.GetComponentTypeByNameUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -60,10 +60,9 @@ public class OverrideInThemeAction extends DumbAwareAction {
 
         boolean isAllowed = false;
 
-        final GetComponentNameByDirectory getComponentNameByDirectory = GetComponentNameByDirectory
-                .getInstance(project);
-        final String componentType = GetComponentTypeByNameUtil.execute(getComponentNameByDirectory
-                .execute(psiFile.getContainingDirectory()));
+        final String componentType = GetComponentTypeByNameUtil.execute(
+                GetComponentNameByDirectoryUtil.execute(psiFile.getContainingDirectory(), project)
+        );
 
         if (componentType.equals(ComponentType.module.toString())) {
             isAllowed = file.getPath().contains(Package.moduleViewDir);
