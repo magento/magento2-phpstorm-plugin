@@ -88,7 +88,7 @@ public final class GetComponentNameByDirectoryUtil {
      * @param elements PsiElement...
      * @return MethodReference[]
      */
-    public static MethodReference[] parseRegistrationPhpElements(final PsiElement... elements) {
+    public static MethodReference[] parseRegistrationPhpElements(final PsiElement... elements) { //NOPMD
         for (final PsiElement element: elements) {
             MethodReference[] methods = PsiTreeUtil
                     .getChildrenOfType(element, MethodReference.class);
@@ -100,7 +100,7 @@ public final class GetComponentNameByDirectoryUtil {
                 return methods;
             }
         }
-        return new MethodReference[0];
+        return null;
     }
 
     @Nullable
