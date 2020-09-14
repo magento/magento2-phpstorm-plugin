@@ -1,90 +1,101 @@
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
+import com.maddyhome.idea.copyright.actions.UpdateCopyrightProcessor;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
+import com.magento.idea.magento2plugin.magento.packages.Areas;
+import com.magento.idea.magento2plugin.magento.packages.ComponentType;
 import com.magento.idea.magento2plugin.util.RegExUtil;
-import com.magento.idea.magento2plugin.util.magento.ComponentType;
 import com.magento.idea.magento2plugin.util.magento.GetComponentNameByDirectory;
-import com.magento.idea.magento2plugin.util.magento.GetComponentTypeByName;
-
+import com.magento.idea.magento2plugin.util.magento.GetComponentTypeByNameUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class OverrideInThemeGenerator {
-
-    private static OverrideInThemeGenerator INSTANCE = null;
+    private final ValidatorBundle validatorBundle;
 
     private final Project project;
 
-    public static OverrideInThemeGenerator getInstance(Project project) {
-        if (null == INSTANCE) {
-            INSTANCE = new OverrideInThemeGenerator(project);
-        }
-        return INSTANCE;
-    }
-
-    public OverrideInThemeGenerator(Project project) {
+    public OverrideInThemeGenerator(final Project project) {
         this.project = project;
+        this.validatorBundle = new ValidatorBundle();
     }
 
-    public void execute(PsiFile baseFile, String themeName) {
-        ModuleIndex moduleIndex = ModuleIndex.getInstance(project);
-        PsiDirectory directory = moduleIndex.getModuleDirectoryByModuleName(themeName);
-        GetComponentNameByDirectory getComponentNameByDirectory = GetComponentNameByDirectory.getInstance(project);
-        String componentType = GetComponentTypeByName.execute(getComponentNameByDirectory
+    /**
+     * Action entry point.
+     *
+     * @param baseFile PsiFile
+     * @param themeName String
+     */
+    public void execute(final PsiFile baseFile, final String themeName) {
+        final GetComponentNameByDirectory getComponentNameByDirectory = GetComponentNameByDirectory
+                .getInstance(project);
+        final String componentType = GetComponentTypeByNameUtil.execute(getComponentNameByDirectory
                 .execute(baseFile.getContainingDirectory()));
 
         List<String> pathComponents;
-        if (componentType.equals(ComponentType.TYPE_MODULE)) {
+        if (componentType.equals(ComponentType.module.toString())) {
             pathComponents = getModulePathComponents(
                     baseFile,
                     getComponentNameByDirectory.execute(baseFile.getContainingDirectory())
             );
-        } else if (componentType.equals(ComponentType.TYPE_THEME)) {
+        } else if (componentType.equals(ComponentType.theme.toString())) {
             pathComponents = getThemePathComponents(baseFile);
         } else {
             return;
         }
 
+        final ModuleIndex moduleIndex = ModuleIndex.getInstance(project);
+        PsiDirectory directory = moduleIndex.getModuleDirectoryByModuleName(themeName);
         directory = getTargetDirectory(directory, pathComponents);
 
         if (directory.findFile(baseFile.getName()) != null) {
             JBPopupFactory.getInstance()
-                    .createMessage("Override already exists in selected theme.")
+                    .createMessage(
+                        validatorBundle.message("validator.file.alreadyExists", baseFile.getName())
+                    )
                     .showCenteredInCurrentWindow(project);
             directory.findFile(baseFile.getName()).navigate(true);
             return;
         }
 
-        directory.copyFileFrom(baseFile.getName(), baseFile);
-        PsiFile newFile = directory.findFile(baseFile.getName());
+        final PsiDirectory finalDirectory = directory;
+        ApplicationManager.getApplication().runWriteAction(() -> {
+            finalDirectory.copyFileFrom(baseFile.getName(), baseFile);
+        });
+
+        final PsiFile newFile = directory.findFile(baseFile.getName());
+        assert newFile != null;
+        final Module module = ModuleUtilCore.findModuleForPsiElement(newFile);
+        final UpdateCopyrightProcessor processor = new UpdateCopyrightProcessor(
+                project,
+                module,
+                newFile
+        );
+        processor.run();
+
         newFile.navigate(true);
     }
 
-    private boolean isModule(String componentName) {
-        Pattern modulePattern = Pattern.compile(RegExUtil.Magento.MODULE_NAME);
-        Matcher moduleMatcher = modulePattern.matcher(componentName);
-
-        return moduleMatcher.find();
-    }
-
-    private boolean isTheme(String componentName) {
-        Pattern themePattern = Pattern.compile(RegExUtil.Magento.THEME_NAME);
-        Matcher themeMatcher = themePattern.matcher(componentName);
-
-        return themeMatcher.find();
-    }
-
-    private List<String> getModulePathComponents(PsiFile file, String componentName) {
-        List<String> pathComponents = new ArrayList<>();
+    private List<String> getModulePathComponents(final PsiFile file, final String componentName) {
+        final List<String> pathComponents = new ArrayList<>();
         PsiDirectory parent = file.getParent();
-        while (!parent.getName().equals("frontend") && !parent.getName().equals("adminhtml")) {
+        while (!parent.getName().equals(Areas.frontend.toString())
+                && !parent.getName().equals(Areas.adminhtml.toString())) {
             pathComponents.add(parent.getName());
             parent = parent.getParent();
         }
@@ -94,9 +105,9 @@ public class OverrideInThemeGenerator {
         return pathComponents;
     }
 
-    private List<String> getThemePathComponents(PsiFile file) {
-        List<String> pathComponents = new ArrayList<>();
-        Pattern pattern = Pattern.compile(RegExUtil.Magento.MODULE_NAME);
+    private List<String> getThemePathComponents(final PsiFile file) {
+        final List<String> pathComponents = new ArrayList<>();
+        final Pattern pattern = Pattern.compile(RegExUtil.Magento.MODULE_NAME);
 
         PsiDirectory parent = file.getParent();
         do {
@@ -109,13 +120,19 @@ public class OverrideInThemeGenerator {
         return pathComponents;
     }
 
-    private PsiDirectory getTargetDirectory(PsiDirectory directory, List<String> pathComponents) {
-        for (int i = 0; i < pathComponents.size(); i++) {
-            String directoryName = pathComponents.get(i);
-            if (directory.findSubdirectory(directoryName) != null) {
+    private PsiDirectory getTargetDirectory(
+            PsiDirectory directory, //NOPMD
+            final List<String> pathComponents
+    ) {
+        for (final String directoryName : pathComponents) {
+            if (directory.findSubdirectory(directoryName) != null) { //NOPMD
                 directory = directory.findSubdirectory(directoryName);
             } else {
-                directory = directory.createSubdirectory(directoryName);
+                final PsiDirectory finalDirectory = directory;
+                ApplicationManager.getApplication().runWriteAction(() -> {
+                    finalDirectory.createSubdirectory(directoryName);
+                });
+                return finalDirectory;
             }
         }
 

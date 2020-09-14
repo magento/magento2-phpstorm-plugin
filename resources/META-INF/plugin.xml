@@ -35,6 +35,7 @@
     <depends>JavaScript</depends>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.platform.images</depends>
+    <depends>com.intellij.copyright</depends>
     <depends optional="true" config-file="withJsGraphQl.xml">com.intellij.lang.jsgraphql</depends>
 
     <actions>

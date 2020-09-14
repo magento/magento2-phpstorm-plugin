@@ -39,7 +39,8 @@ intellij {
             'CSS',
             'JavaScriptLanguage',
             'com.intellij.lang.jsgraphql:2.3.0',
-            'platform-images'
+            'platform-images',
+            'copyright'
     ]
     updateSinceUntilBuild false
     sameSinceUntilBuild false
