@@ -18,7 +18,7 @@ import com.magento.idea.magento2plugin.indexes.IndexManager;
 import com.magento.idea.magento2plugin.init.ConfigurationManager;
 import com.magento.idea.magento2plugin.magento.packages.MagentoComponentManager;
 import com.magento.idea.magento2plugin.project.validator.SettingsFormValidator;
-import com.magento.idea.magento2plugin.util.magento.MagentoVersion;
+import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JButton;
@@ -44,7 +44,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     private JTextField moduleDefaultLicenseName;
     private JCheckBox mftfSupportEnabled;
     private TextFieldWithBrowseButton magentoPath;
-    private final SettingsFormValidator validator = SettingsFormValidator.getInstance(this);
+    private final SettingsFormValidator validator = new SettingsFormValidator(this);
     private JLabel magentoVersionLabel;//NOPMD
     private JLabel magentoPathLabel;//NOPMD
 
@@ -84,7 +84,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
                 new RegenerateUrnMapListener(project)
         );
 
-        moduleDefaultLicenseName.setText(getSettings().DEFAULT_LICENSE);
+        moduleDefaultLicenseName.setText(getSettings().defaultLicense);
         mftfSupportEnabled.setSelected(getSettings().mftfSupportEnabled);
         magentoPath.getTextField().setText(getSettings().magentoPath);
         resolveMagentoVersion();
@@ -103,14 +103,18 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     @Override
     public boolean isModified() {
         final boolean licenseChanged = !moduleDefaultLicenseName.getText().equals(
-                Settings.DEFAULT_LICENSE
+                Settings.defaultLicense
+        );
+        final boolean versionChanged = !magentoVersion.getText().equals(
+                getSettings().magentoVersion
         );
         final boolean statusChanged = !pluginEnabled.isSelected() == getSettings().pluginEnabled;
         final boolean mftfSupportChanged = mftfSupportEnabled.isSelected()
                 != getSettings().mftfSupportEnabled;
         final boolean magentoPathChanged = isMagentoPathChanged();
 
-        return statusChanged || licenseChanged || mftfSupportChanged || magentoPathChanged;
+        return statusChanged || licenseChanged || mftfSupportChanged
+                || magentoPathChanged || versionChanged;
     }
 
     private void resolveMagentoVersion() {
@@ -139,7 +143,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
 
     private void saveSettings() {
         getSettings().pluginEnabled = pluginEnabled.isSelected();
-        getSettings().DEFAULT_LICENSE = moduleDefaultLicenseName.getText();
+        getSettings().defaultLicense = moduleDefaultLicenseName.getText();
         getSettings().mftfSupportEnabled = mftfSupportEnabled.isSelected();
         getSettings().magentoPath = getMagentoPath();
         getSettings().magentoVersion = getMagentoVersion();
@@ -217,7 +221,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
      */
     public void updateMagentoVersion() {
         final String magentoPathValue = this.magentoPath.getTextField().getText();
-        final String resolvedVersion = MagentoVersion.get(project, magentoPathValue);
+        final String resolvedVersion = MagentoVersionUtil.get(project, magentoPathValue);
         magentoVersion.setText(resolvedVersion);
     }
 

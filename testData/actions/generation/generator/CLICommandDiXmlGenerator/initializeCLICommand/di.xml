@@ -4,7 +4,7 @@
     <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>
             <argument name="commands" xsi:type="array">
-                <item name="foo_bar_test_command" xsi:type="object">Foo\Bar\Console\TestCommand</item>
+                <item name="foo_bar_test_command" xsi:type="object">Foo\Bar\Console\Command\TestCommand</item>
             </argument>
         </arguments>
     </type>

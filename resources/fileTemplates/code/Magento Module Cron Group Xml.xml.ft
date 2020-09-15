@@ -1,0 +1,9 @@
+<group id="${GROUP_NAME}">
+    #if (${SCHEDULE_GENERATE_EVERY})<schedule_generate_every>${SCHEDULE_GENERATE_EVERY}</schedule_generate_every>#end
+    #if (${SCHEDULE_AHEAD_FOR})<schedule_ahead_for>${SCHEDULE_AHEAD_FOR}</schedule_ahead_for>#end
+    #if (${SCHEDULE_LIFETIME})<schedule_lifetime>${SCHEDULE_LIFETIME}</schedule_lifetime>#end
+    #if (${HISTORY_CLEANUP_EVERY})<history_cleanup_every>${HISTORY_CLEANUP_EVERY}</history_cleanup_every>#end
+    #if (${HISTORY_SUCCESS_LIFETIME})<history_success_lifetime>${HISTORY_SUCCESS_LIFETIME}</history_success_lifetime>#end
+    #if (${HISTORY_FAILURE_LIFETIME})<history_failure_lifetime>${HISTORY_FAILURE_LIFETIME}</history_failure_lifetime>#end
+    #if (${USE_SEPARATE_PROCESS})<use_separate_process>${USE_SEPARATE_PROCESS}</use_separate_process>#end
+</group>

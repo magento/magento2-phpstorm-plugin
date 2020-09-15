@@ -7,7 +7,7 @@
 <idea-plugin>
     <id>com.magento.idea.magento2plugin</id>
     <name>Magento PhpStorm</name>
-    <version>1.0.1</version>
+    <version>2.0.0</version>
     <vendor url="https://github.com/magento/magento2-phpstorm-plugin">Magento Inc.</vendor>
 
     <description><![CDATA[
@@ -24,7 +24,7 @@
     </change-notes>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="193.6494.35"/>
+    <idea-version since-build="201.7223.91"/>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
@@ -34,6 +34,8 @@
     <depends>com.jetbrains.php</depends>
     <depends>JavaScript</depends>
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.platform.images</depends>
+    <depends>com.intellij.copyright</depends>
     <depends optional="true" config-file="withJsGraphQl.xml">com.intellij.lang.jsgraphql</depends>
 
     <actions>
@@ -59,10 +61,11 @@
             <action id="MagentoCreateABlock" class="com.magento.idea.magento2plugin.actions.generation.NewBlockAction" />
             <action id="MagentoCreateAController" class="com.magento.idea.magento2plugin.actions.generation.NewControllerAction" />
             <action id="MagentoCreateACronjob" class="com.magento.idea.magento2plugin.actions.generation.NewCronjobAction" />
+            <action id="MagentoCreateACronGroup" class="com.magento.idea.magento2plugin.actions.generation.NewCronGroupAction" />
             <action id="MagentoCreateAViewModel" class="com.magento.idea.magento2plugin.actions.generation.NewViewModelAction" />
             <action id="MagentoCreateAGraphQlResolver" class="com.magento.idea.magento2plugin.actions.generation.NewGraphQlResolverAction" />
             <action id="MagentoCreateCLICommand" class="com.magento.idea.magento2plugin.actions.generation.NewCLICommandAction" />
-            <action id="MagentoCreateAController" class="com.magento.idea.magento2plugin.actions.generation.NewUiFormAction" />
+            <action id="MagentoCreateUiComponentGrid" class="com.magento.idea.magento2plugin.actions.generation.NewUiComponentGridAction" />
             <add-to-group group-id="NewGroup" anchor="last"/>
         </group>
 
@@ -79,6 +82,12 @@
         </action>
         <action id="OverrideClassByAPreference.Menu" class="com.magento.idea.magento2plugin.actions.generation.OverrideClassByAPreferenceAction">
             <add-to-group group-id="EditorPopupMenu"/>
+        </action>
+        <action id="InjectAViewModelAction.Menu" class="com.magento.idea.magento2plugin.actions.generation.InjectAViewModelAction">
+            <add-to-group group-id="EditorPopupMenu"/>
+        </action>
+        <action id="OverrideInTheme.Menu" class="com.magento.idea.magento2plugin.actions.generation.OverrideInThemeAction">
+            <add-to-group group-id="ProjectViewPopupMenu"/>
         </action>
 
     </actions>
@@ -113,6 +122,7 @@
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.TestNameIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.AclResourceIndex" />
 
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.PluginLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.PluginTargetLineMarkerProvider"/>
@@ -127,6 +137,14 @@
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.php.PluginInspection"/>
+
+        <localInspection language="PHP" groupPath="PHP"
+                         shortName="ModuleDeclarationInRegistrationPhpInspection"
+                         displayName="Inspection for the Module declaration in the `registration.php` file"
+                         groupName="Magento 2"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.php.ModuleDeclarationInRegistrationPhpInspection"/>
 
         <localInspection language="XML" groupPath="XML"
                          shortName="ObserverDeclarationInspection"
@@ -151,6 +169,20 @@
                          enabledByDefault="true" level="WARNING"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.CacheableFalseInDefaultLayoutInspection"/>
 
+        <localInspection language="XML" groupPath="XML"
+                         shortName="ModuleDeclarationInModuleXmlInspection"
+                         displayName="Inspection for the Module declaration in the `etc/module.xml` file"
+                         groupName="Magento 2"
+                         enabledByDefault="true" level="ERROR"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.ModuleDeclarationInModuleXmlInspection"/>
+
+        <localInspection language="XML" groupPath="XML"
+                         shortName="AclResourceXmlInspection"
+                         displayName="Inspection for the Title XML required attribute in the `etc/acl.xml` file"
+                         groupName="Magento 2"
+                         enabledByDefault="true" level="ERROR"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.AclResourceXmlInspection"/>
+
         <libraryRoot id=".phpstorm.meta.php" path=".phpstorm.meta.php/" runtime="false"/>
 
         <internalFileTemplate name="Magento Module Composer"/>
@@ -164,9 +196,15 @@
         <internalFileTemplate name="Magento GraphQL Resolver Class"/>
         <internalFileTemplate name="Magento Cronjob Class"/>
         <internalFileTemplate name="Magento Crontab Xml"/>
-        <internalFileTemplate name="Magento CLI Command"/>
+        <internalFileTemplate name="Magento CLI Command Class"/>
         <internalFileTemplate name="Magento Module Controller Backend Class"/>
         <internalFileTemplate name="Magento Module Controller Frontend Class"/>
+        <internalFileTemplate name="Magento Module Cron Groups Xml"/>
+        <internalFileTemplate name="Magento Module UI Component Grid Xml"/>
+        <internalFileTemplate name="Magento Module Ui Grid Collection Data Provider Php"/>
+        <internalFileTemplate name="Magento Module Ui Grid Custom Data Provider Php"/>
+
+        <postStartupActivity implementation="com.magento.idea.magento2plugin.project.startup.CheckIfMagentoPathIsValidActivity"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.php">

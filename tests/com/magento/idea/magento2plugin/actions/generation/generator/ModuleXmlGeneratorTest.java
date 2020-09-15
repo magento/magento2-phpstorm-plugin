@@ -27,6 +27,7 @@ public class ModuleXmlGeneratorTest extends BaseGeneratorTestCase {
         final ModuleXmlData moduleXmlData = new ModuleXmlData(
                 "Test",
                 "Module",
+                null,
                 projectDir,
                 true
         );
@@ -57,6 +58,7 @@ public class ModuleXmlGeneratorTest extends BaseGeneratorTestCase {
         final ModuleXmlData moduleXmlData = new ModuleXmlData(
                 "Test",
                 "Module",
+                null,
                 projectDir,
                 false
         );

@@ -1,0 +1,76 @@
+<!--
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<html>
+<body>
+<table width="100%" border="0" cellpadding="5" cellspacing="0" style="border-collapse: collapse">
+    <tr>
+        <td>
+            <font face="verdana" size="-1">Each CRON group should be registered in cron_groups.xml in order to group CRON jobs with specific CRON group properties.</font>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <font face="verdana" size="-1">
+                <a href="https://devdocs.magento.com/guides/v2.3/config-guide/cron/custom-cron-tut.html">Configure a custom cron job and cron group (tutorial)</a>
+            </font>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <font face="verdana" size="-1">
+                <a href="https://devdocs.magento.com/guides/v2.3/config-guide/cron/custom-cron-ref.html#specify-cron-group-options">Specifying Cron group options</a>
+            </font>
+        </td>
+    </tr>
+</table>
+<table width="100%" border="0" cellpadding="5" cellspacing="0" style="border-collapse: collapse">
+    <tr>
+        <td colspan="3"><font face="verdana" size="-1">Predefined variables explanation:</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${GROUP_NAME}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">A cron group name.</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${SCHEDULE_GENERATE_EVERY}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">Frequency (in minutes) that schedules are written to the cron_schedule table.</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${SCHEDULE_AHEAD_FOR}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">Time (in minutes) in advance that schedules are written to the cron_schedule table.</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${SCHEDULE_LIFETIME}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">Window of time (in minutes) that cron job must start or will be considered missed (“too late” to run).</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${HISTORY_CLEANUP_EVERY}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">Time (in minutes) that cron history is kept in the database.</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${HISTORY_SUCCESS_LIFETIME}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">Time (in minutes) that the record of successfully completed cron jobs are kept in the database.</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${HISTORY_FAILURE_LIFETIME}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">Time (in minutes) that the record of failed cron jobs are kept in the database.</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${USE_SEPARATE_PROCESS}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">Run this crongroup’s jobs in a separate php process</font></td>
+    </tr>
+</table>
+</body>
+</html>

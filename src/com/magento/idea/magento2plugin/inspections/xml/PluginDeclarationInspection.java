@@ -26,7 +26,7 @@ import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
-import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectory;
+import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -235,9 +235,11 @@ public class PluginDeclarationInspection extends PhpInspection {
                     final PsiFile indexedFile,
                     final String scope
             ) {
-                final String moduleName = GetModuleNameByDirectory.getInstance(
-                        problemsHolder.getProject()
-                ).execute(indexedFile.getContainingDirectory());
+                final String moduleName = GetModuleNameByDirectoryUtil
+                        .execute(
+                                indexedFile.getContainingDirectory(),
+                                problemsHolder.getProject()
+                        );
 
                 modulesName.add(Pair.create(scope, moduleName));
             }

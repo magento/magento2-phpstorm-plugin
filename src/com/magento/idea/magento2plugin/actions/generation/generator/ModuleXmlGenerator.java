@@ -41,7 +41,7 @@ public class ModuleXmlGenerator extends FileGenerator {
 
     @Override
     public PsiFile generate(final String actionName) {
-        if (moduleXmlData.getCreateModuleDirs()) {
+        if (moduleXmlData.isCreateModuleDirs()) {
             final ModuleDirectoriesData moduleDirectoriesData = directoryGenerator
                     .createOrFindModuleDirectories(
                             moduleXmlData.getPackageName(),
@@ -67,8 +67,12 @@ public class ModuleXmlGenerator extends FileGenerator {
         );
     }
 
+    @Override
     protected void fillAttributes(final Properties attributes) {
         attributes.setProperty("PACKAGE", moduleXmlData.getPackageName());
         attributes.setProperty("MODULE_NAME", moduleXmlData.getModuleName());
+        if (moduleXmlData.getSetupVersion() != null) {
+            attributes.setProperty("SETUP_VERSION", moduleXmlData.getSetupVersion());
+        }
     }
 }

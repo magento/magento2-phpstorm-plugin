@@ -2,11 +2,13 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleComposerJsonData;
@@ -16,12 +18,11 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFro
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.ComposerJson;
 import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
-import com.intellij.openapi.util.Pair;
-import org.jetbrains.annotations.NotNull;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.Properties;
 import java.util.List;
+import java.util.Properties;
+import org.jetbrains.annotations.NotNull;
 
 public class ModuleComposerJsonGenerator extends FileGenerator {
 
@@ -29,47 +30,82 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final DirectoryGenerator directoryGenerator;
     private final CamelCaseToHyphen camelCaseToHyphen;
-    private final Project project;
     private final ModuleIndex moduleIndex;
 
-    public ModuleComposerJsonGenerator(@NotNull ModuleComposerJsonData moduleComposerJsonData, Project project) {
+    /**
+     * Constructor.
+     *
+     * @param moduleComposerJsonData ModuleComposerJsonData
+     * @param project Project
+     */
+    public ModuleComposerJsonGenerator(
+            final @NotNull ModuleComposerJsonData moduleComposerJsonData,
+            final Project project
+    ) {
         super(project);
         this.moduleComposerJsonData = moduleComposerJsonData;
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         this.directoryGenerator = DirectoryGenerator.getInstance();
         this.camelCaseToHyphen = CamelCaseToHyphen.getInstance();
-        this.project = project;
         this.moduleIndex = ModuleIndex.getInstance(project);
     }
 
-    public PsiFile generate(String actionName) {
+    @Override
+    public PsiFile generate(final String actionName) {
         if (moduleComposerJsonData.getCreateModuleDirs()) {
-            ModuleDirectoriesData moduleDirectoriesData = directoryGenerator.createOrFindModuleDirectories(moduleComposerJsonData.getPackageName(), moduleComposerJsonData.getModuleName(), moduleComposerJsonData.getBaseDir());
-            return fileFromTemplateGenerator.generate(ComposerJson.getInstance(), getAttributes(), moduleDirectoriesData.getModuleDirectory(), actionName);
+            final ModuleDirectoriesData moduleDirectoriesData =
+                    directoryGenerator.createOrFindModuleDirectories(
+                        moduleComposerJsonData.getPackageName(),
+                        moduleComposerJsonData.getModuleName(),
+                        moduleComposerJsonData.getBaseDir()
+            );
+            return fileFromTemplateGenerator.generate(
+                    ComposerJson.getInstance(),
+                    getAttributes(),
+                    moduleDirectoriesData.getModuleDirectory(),
+                    actionName
+            );
         }
-        return fileFromTemplateGenerator.generate(ComposerJson.getInstance(), getAttributes(), moduleComposerJsonData.getBaseDir(), actionName);
+        return fileFromTemplateGenerator.generate(
+                ComposerJson.getInstance(),
+                getAttributes(),
+                moduleComposerJsonData.getBaseDir(),
+                actionName
+        );
     }
 
-    protected void fillAttributes(Properties attributes) {
+    @Override
+    protected void fillAttributes(final Properties attributes) {
         attributes.setProperty("PACKAGE", moduleComposerJsonData.getPackageName());
         attributes.setProperty("MODULE_NAME", moduleComposerJsonData.getModuleName());
         attributes.setProperty("MODULE_DESCRIPTION", moduleComposerJsonData.getModuleDescription());
-        attributes.setProperty("COMPOSER_PACKAGE_NAME", moduleComposerJsonData.getComposerPackageName());
+        attributes.setProperty(
+                "COMPOSER_PACKAGE_NAME",
+                moduleComposerJsonData.getComposerPackageName()
+        );
         attributes.setProperty("MODULE_VERSION", moduleComposerJsonData.getModuleVersion());
-        attributes.setProperty("LICENSE", this.getLicensesString(moduleComposerJsonData.getModuleLicense()));
-        attributes.setProperty("DEPENDENCIES", this.getDependenciesString(moduleComposerJsonData.getModuleDependencies()));
+        attributes.setProperty(
+                "LICENSE",
+                this.getLicensesString(moduleComposerJsonData.getModuleLicense())
+        );
+        attributes.setProperty(
+                "DEPENDENCIES",
+                this.getDependenciesString(moduleComposerJsonData.getModuleDependencies())
+        );
     }
 
-    protected String getLicensesString(List licensesList) {
+    protected String getLicensesString(final List licensesList) {
         String license = "[\n";
-        Object[] licenses = licensesList.toArray();
+        final Object[] licenses = licensesList.toArray();
 
         for (int i = 0; i < licenses.length; i++) {
             license = license.concat("\"");
             license = license.concat(licenses[i].toString());
             license = license.concat("\"");
 
-            if (licenses.length != (i + 1)) license = license.concat(",");
+            if (licenses.length != i + 1) {
+                license = license.concat(",");
+            }
 
             license = license.concat("\n");
         }
@@ -79,11 +115,14 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
         return license;
     }
 
-    private String getDependenciesString(List dependenciesList) {
+    private String getDependenciesString(final List dependenciesList) {
         String result = "";
-        Object[] dependencies = dependenciesList.toArray();
+        final Object[] dependencies = dependenciesList.toArray();
         result = result.concat(ComposerJson.DEFAULT_DEPENDENCY);
-        boolean noDependency = dependencies.length == 1 && dependencies[0].equals(ComposerJson.NO_DEPENDENCY_LABEL);
+        final boolean noDependency =
+                dependencies.length == 1 && dependencies[0].equals(
+                        ComposerJson.NO_DEPENDENCY_LABEL
+                );
         if (dependencies.length == 0 || noDependency) {
             result = result.concat("\n");
         } else {
@@ -95,46 +134,61 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
         }
 
         for (int i = 0; i < dependencies.length; i++) {
-            String dependency = dependencies[i].toString();
-            Pair<String, String> dependencyData = getDependencyData(dependency);
-            result = result.concat("\"");
-            result = result.concat(dependencyData.getFirst());
-            result = result.concat("\"");
-            result = result.concat(": \"" + dependencyData.getSecond() + "\"");
-
-            if (dependencies.length != (i + 1)) {
-                result = result.concat(",");
+            final String dependency = dependencies[i].toString();
+            final Pair<String, String> dependencyData = getDependencyData(dependency);
+            if (!dependencyData.getFirst().isEmpty()) {
+                result = result.concat("\"");
+                result = result.concat(dependencyData.getFirst());
+                result = result.concat("\"");
+                result = result.concat(": \"" + dependencyData.getSecond() + "\"");
             }
 
-            result = result.concat("\n");
+            if (!dependencyData.getFirst().isEmpty() && dependencies.length != i + 1) {
+                result = result.concat(",");
+                result = result.concat("\n");
+            }
+
         }
 
         return result;
     }
 
-    private Pair<String, String> getDependencyData(String dependency) {
+    private Pair<String, String> getDependencyData(
+            final String dependency
+    ) {
         String version = "*";
-        String moduleName = camelCaseToHyphen.convert(dependency).replace("_-", "/");
+        String moduleName = camelCaseToHyphen.convert(dependency).replace(
+                "_-", "/"
+        );
         try {
-            VirtualFile virtualFile = moduleIndex.getModuleDirectoryByModuleName(dependency)
-                    .findFile(ComposerJson.FILE_NAME)
-                    .getVirtualFile();
-            if (virtualFile.exists()) {
-                JsonElement jsonElement = new JsonParser().parse(new FileReader(virtualFile.getPath()));
-                JsonElement versionJsonElement = jsonElement.getAsJsonObject().get("version");
-                JsonElement nameJsonElement = jsonElement.getAsJsonObject().get("name");
-                if (versionJsonElement != null) {
-                    version = versionJsonElement.getAsString();
-                    int minorVersionSeparator = version.lastIndexOf(".");
-                    version = new StringBuilder(version)
-                            .replace(minorVersionSeparator + 1, version.length(),"*")
-                            .toString();
+            final PsiFile virtualFile = moduleIndex.getModuleDirectoryByModuleName(dependency)
+                    .findFile(ComposerJson.FILE_NAME);
+
+            if (virtualFile != null) { //NOPMD
+                final VirtualFile composerJsonFile = virtualFile.getVirtualFile();
+                if (composerJsonFile.exists()) {
+                    final JsonElement jsonElement =
+                            new JsonParser().parse(
+                                    new FileReader(composerJsonFile.getPath())//NOPMD
+                            );
+                    final JsonElement versionJsonElement =
+                            jsonElement.getAsJsonObject().get("version");
+                    final JsonElement nameJsonElement = jsonElement.getAsJsonObject().get("name");
+                    if (versionJsonElement != null) {
+                        version = versionJsonElement.getAsString();
+                        final int minorVersionSeparator = version.lastIndexOf('.');
+                        version = new StringBuilder(version)
+                                .replace(minorVersionSeparator + 1, version.length(),"*")
+                                .toString();
+                    }
+                    if (nameJsonElement != null) {
+                        moduleName = nameJsonElement.getAsString();
+                    }
                 }
-                if (nameJsonElement != null) {
-                    moduleName = nameJsonElement.getAsString();
-                }
+            } else {
+                return Pair.create("", "");
             }
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) { //NOPMD
             // It's fine
         }
 
