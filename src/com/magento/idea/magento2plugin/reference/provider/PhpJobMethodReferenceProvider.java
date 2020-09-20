@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.reference.provider;
 
 import com.intellij.openapi.util.text.StringUtil;
@@ -14,12 +15,16 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.indexes.DiIndex;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
-import org.jetbrains.annotations.NotNull;
-
+// CHECKSTYLE IGNORE check FOR NEXT 1 LINES
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
+/**
+ * TODO: enable style checks after decomposition.
+ */
+@SuppressWarnings({"PMD", "checkstyle:all"})
 public class PhpJobMethodReferenceProvider extends PsiReferenceProvider {
 
     @NotNull
