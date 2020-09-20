@@ -20,17 +20,17 @@ import org.jetbrains.annotations.NotNull;
 public class PhpJobMethodCompletionContributor extends CompletionProvider<CompletionParameters> {
 
     @Override
-    protected void addCompletions(@NotNull CompletionParameters parameters,
-                                  ProcessingContext context,
-                                  @NotNull CompletionResultSet result) {
-        PsiElement position = parameters.getPosition().getOriginalElement();
+    protected void addCompletions(@NotNull final CompletionParameters parameters,
+                                  final ProcessingContext context,
+                                  @NotNull final CompletionResultSet result) {
+        final PsiElement position = parameters.getPosition().getOriginalElement();
         if (position == null) {
             return;
         }
 
-        PhpClass phpClass = DiIndex.getPhpClassOfJobMethod((XmlElement) position);
+        final PhpClass phpClass = DiIndex.getPhpClassOfJobMethod((XmlElement) position);
         if (phpClass != null) {
-            for (Method method : phpClass.getMethods()) {
+            for (final Method method : phpClass.getMethods()) {
                 result.addElement(
                         LookupElementBuilder
                                 .create(method.getName())
