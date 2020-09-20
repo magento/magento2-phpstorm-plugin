@@ -87,6 +87,16 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
             new PhpServiceMethodReferenceProvider()
         );
 
+        // <job method="methodName"/>
+        registrar.registerReferenceProvider(
+                XmlPatterns.xmlAttributeValue().withParent(
+                        XmlPatterns.xmlAttribute().withName("method").withParent(
+                                XmlPatterns.xmlTag().withName("job")
+                        )
+                ).inFile(xmlFile().withName(string().endsWith("crontab.xml"))),
+                new PhpJobMethodReferenceProvider()
+        );
+
         registrar.registerReferenceProvider(
             XmlPatterns.xmlAttributeValue().withParent(
                 XmlPatterns.xmlAttribute().withName("name").withParent(

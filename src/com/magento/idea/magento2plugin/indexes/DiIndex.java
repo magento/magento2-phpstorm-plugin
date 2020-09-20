@@ -95,6 +95,35 @@ public class DiIndex {
         return null;
     }
 
+    @Nullable
+    public static PhpClass getPhpClassOfJobMethod(XmlElement psiMethodValueElement) {
+        XmlTag serviceTag = PsiTreeUtil.getParentOfType(psiMethodValueElement, XmlTag.class);
+        if (serviceTag == null) {
+            return null;
+        }
+
+        XmlAttribute attribute = serviceTag.getAttribute("instance");
+        if (attribute == null) {
+            return null;
+        }
+
+        XmlAttributeValue valueElement = attribute.getValueElement();
+        if (valueElement == null) {
+            return null;
+        }
+
+        for (PsiReference reference : valueElement.getReferences()) {
+            if (reference != null) {
+                PsiElement element = reference.resolve();
+                if (element instanceof PhpClass) {
+                    return (PhpClass) element;
+                }
+            }
+        }
+
+        return null;
+    }
+
     public Collection<PsiElement> getVirtualTypeElements(final String name, final GlobalSearchScope scope) {
         Collection<PsiElement> result = new ArrayList<>();
 

@@ -63,6 +63,12 @@ public class XmlCompletionContributor extends CompletionContributor {
                 new PhpClassCompletionProvider()
         );
 
+        // <randomTag instance="completion">
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                        .inside(XmlPatterns.xmlAttribute().withName(CommonXml.ATTR_INSTANCE)),
+                new PhpClassCompletionProvider()
+        );
+
         // <preference for="completion">
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
                         .inside(XmlPatterns.xmlAttribute().withName(ModuleDiXml.PREFERENCE_ATTR_FOR)),
@@ -180,6 +186,14 @@ public class XmlCompletionContributor extends CompletionContributor {
                     .withParent(XmlPatterns.xmlTag().withName("service"))
                 ).inFile(xmlFile().withName(string().endsWith("webapi.xml"))),
             new PhpServiceMethodCompletionContributor()
+        );
+
+        // <job method="methodName"/>
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(XmlPatterns.xmlAttribute().withName("method")
+                    .withParent(XmlPatterns.xmlTag().withName("job"))
+                ).inFile(xmlFile().withName(string().endsWith("crontab.xml"))),
+            new PhpJobMethodCompletionContributor()
         );
 
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
