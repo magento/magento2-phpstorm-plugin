@@ -52,6 +52,10 @@ public final class ModuleIndex {
         return getModuleNames(Package.vendor, true);
     }
 
+    public List<String> getEditableThemeNames() {
+        return getThemeNames("/" + Package.vendor + "/|/tests/|/test/", true);
+    }
+
     public List<String> getModuleNames() {
         return getModuleNames("/tests/|/test/", false);
     }
@@ -64,33 +68,50 @@ public final class ModuleIndex {
      * @return List
      */
     public List<String> getModuleNames(final String filterPattern, final boolean withinProject) {
+        return getNames(filterPattern, withinProject, RegExUtil.Magento.MODULE_NAME);
+    }
+
+    /**
+     * Returns Theme Names.
+     *
+     * @param filterPattern String
+     * @param withinProject boolean
+     * @return List
+     */
+    public List<String> getThemeNames(final String filterPattern, final boolean withinProject) {
+        return getNames(filterPattern, withinProject, RegExUtil.Magento.THEME_NAME);
+    }
+
+    private List<String> getNames(
+            final String filterPattern,
+            final boolean withinProject,
+            final String pattern
+    ) {
         final FileBasedIndex index = FileBasedIndex
                 .getInstance();
         final List<String> allModulesList = new ArrayList<>();
         final Collection<String> allModules = index.getAllKeys(ModuleNameIndex.KEY, project);
-        final Pattern pattern = Pattern.compile(filterPattern);
+        final Pattern compiled = Pattern.compile(filterPattern);
         for (final String moduleName : allModules) {
-            if (!moduleName.matches(RegExUtil.Magento.MODULE_NAME)) {
+            if (!moduleName.matches(pattern)) {
                 continue;
             }
             final Collection<VirtualFile> files = index.getContainingFiles(
-                    ModuleNameIndex.KEY,
-                    moduleName,
-                    GlobalSearchScope.getScopeRestrictedByFileTypes(
-                        GlobalSearchScope.allScope(project),
-                        PhpFileType.INSTANCE
-                ));
+                        ModuleNameIndex.KEY, moduleName,
+                        GlobalSearchScope.getScopeRestrictedByFileTypes(
+                    GlobalSearchScope.allScope(project),
+                    PhpFileType.INSTANCE
+            ));
             if (files.isEmpty()) {
                 continue;
             }
             final VirtualFile virtualFile = files.iterator().next();
-            if (withinProject
-                    && !VfsUtilCore.isAncestor(
-                            GetProjectBasePath.execute(project), virtualFile, false
-                )) {
+            if (withinProject && !VfsUtilCore
+                    .isAncestor(GetProjectBasePath.execute(project), virtualFile, false)) {
                 continue;
             }
-            final Matcher matcher = pattern.matcher(virtualFile.getPath());
+
+            final Matcher matcher = compiled.matcher(virtualFile.getPath());
             if (matcher.find()) {
                 continue;
             }

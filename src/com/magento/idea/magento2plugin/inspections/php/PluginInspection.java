@@ -175,7 +175,11 @@ public class PluginInspection extends PhpInspection {
                 int index = 0;
                 for (final Parameter pluginMethodParameter : pluginMethodParameters) {
                     index++;
-                    final String declaredType = pluginMethodParameter.getDeclaredType().toString();
+                    String declaredType = pluginMethodParameter.getDeclaredType().toString();
+
+                    if (declaredType.isEmpty()) {
+                        declaredType = pluginMethodParameter.getDocType().toString();
+                    }
 
                     if (index == 1) { //NOPMD
                         final String targetClassFqn = Package.fqnSeparator.concat(targetClassName);
@@ -283,9 +287,8 @@ public class PluginInspection extends PhpInspection {
                     final String targetMethodParameterDeclaredType =
                             targetMethodParameter.getDeclaredType().toString();
 
-                    if (!checkTypeIncompatibility(
-                            targetMethodParameterDeclaredType,
-                            declaredType)
+                    if (!checkTypeIncompatibility(targetMethodParameterDeclaredType, declaredType)
+                            && !pluginMethodParameter.getText().contains("...$")
                     ) {
                         problemsHolder.registerProblem(
                                 pluginMethodParameter,
