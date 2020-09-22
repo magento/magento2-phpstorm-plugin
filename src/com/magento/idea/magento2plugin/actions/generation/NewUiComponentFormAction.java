@@ -14,16 +14,16 @@ import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.MagentoIcons;
-import com.magento.idea.magento2plugin.actions.generation.dialog.NewUiFormDialog;
+import com.magento.idea.magento2plugin.actions.generation.dialog.NewUiComponentFormDialog;
 
-public class NewUiFormAction extends AnAction {
+public class NewUiComponentFormAction extends AnAction {
     public static final String ACTION_NAME = "Magento 2 UI Form";
     public static final String ACTION_DESCRIPTION = "Create a new Magento 2 UI Form";
 
     /**
      * Constructor.
      */
-    public NewUiFormAction() {
+    public NewUiComponentFormAction() {
         super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
     }
 
@@ -46,7 +46,7 @@ public class NewUiFormAction extends AnAction {
             return;
         }
 
-        NewUiFormDialog.open(project, directory);
+        NewUiComponentFormDialog.open(project, directory);
     }
 
     @Override
