@@ -13,7 +13,6 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
-import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.GroupStatement;
@@ -175,6 +174,9 @@ public class UiComponentFormButtonPhpClassGenerator extends FileGenerator {
         attributes.setProperty("NAME", CamelCaseToHyphen.getInstance()
                 .convert(buttonData.getButtonClassName()));
         attributes.setProperty("FQN", buttonData.getFqn());
+        attributes.setProperty("BUTTON_SORT_ORDER", buttonData.getButtonSortOrder());
+        attributes.setProperty("FORM_NAME", buttonData.getFormName());
+        attributes.setProperty("BUTTON_LABEL", buttonData.getButtonLabel());
         return attributes;
     }
 

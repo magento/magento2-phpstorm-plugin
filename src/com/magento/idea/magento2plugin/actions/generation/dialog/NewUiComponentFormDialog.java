@@ -14,7 +14,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormBu
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldsetData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFileData;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewUiFormValidator;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewUiComponentFormValidator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentFormGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.magento.files.FormButtonBlockPhp;
@@ -41,7 +41,7 @@ import javax.swing.table.TableColumn;
         "PMD.ConstructorCallsOverridableMethod"
 })
 public class NewUiComponentFormDialog extends AbstractDialog {
-    private final NewUiFormValidator validator;
+    private final NewUiComponentFormValidator validator;
     private final Project project;
     private final String moduleName;
     private JPanel contentPane;
@@ -61,6 +61,8 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     private JTable fields;
     private JButton addFieldset;
     private JButton addField;
+    private JTextField route;
+    private JLabel routeLabel;
 
     /**
      * Open new dialog for adding new controller.
@@ -71,7 +73,7 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     public NewUiComponentFormDialog(final Project project, final PsiDirectory directory) {
         super();
         this.project = project;
-        this.validator = new NewUiFormValidator(this);
+        this.validator = new NewUiComponentFormValidator(this);
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
         setContentPane(contentPane);
@@ -283,7 +285,8 @@ public class NewUiComponentFormDialog extends AbstractDialog {
                 getFormLabel(),
                 getButtons(),
                 getFieldsets(),
-                getFields()
+                getFields(),
+                getRoute()
         ), project).generate(NewUiComponentFormAction.ACTION_NAME, true);
     }
 
@@ -295,8 +298,7 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         return new ArrayList<>(
                 Arrays.asList(
                         Areas.adminhtml.toString(),
-                        Areas.frontend.toString(),
-                        Areas.base.toString()
+                        Areas.frontend.toString()
                 )
         );
     }
@@ -405,5 +407,9 @@ public class NewUiComponentFormDialog extends AbstractDialog {
 
     protected DefaultTableModel getFieldsModel() {
         return (DefaultTableModel) fields.getModel();
+    }
+
+    public String getRoute() {
+        return route.getText().trim();
     }
 }

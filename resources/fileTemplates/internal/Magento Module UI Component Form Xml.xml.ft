@@ -22,5 +22,4 @@
         </settings>
         <dataProvider class="Atwix\CustomerQuotes\Ui\Component\CustomerQuoteVersion\Form\DataProvider\CustomerQuoteVersionDataProvider" name="${NAME}_data_source"/>
     </dataSource>
-
 </form>

@@ -5,7 +5,6 @@
 
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
-import com.intellij.openapi.util.Pair;
 import com.jetbrains.php.refactoring.PhpNameUtil;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormButtonData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewUiComponentFormDialog;
@@ -16,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import javax.swing.JOptionPane;
 
-public class NewUiFormValidator {
+public class NewUiComponentFormValidator {
     private static final String NOT_EMPTY = "validator.notEmpty";
     private static final String BUTTON_CLASS_NAME = "Button ClassName";
     private static final String BUTTON_DIRECTORY = "Button Directory";
@@ -27,7 +26,7 @@ public class NewUiFormValidator {
     /**
      * New UI form validator constructor.
      */
-    public NewUiFormValidator(final NewUiComponentFormDialog dialog) {
+    public NewUiComponentFormValidator(final NewUiComponentFormDialog dialog) {
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
         this.dialog = dialog;

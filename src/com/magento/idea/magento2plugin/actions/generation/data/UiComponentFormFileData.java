@@ -16,6 +16,7 @@ public class UiComponentFormFileData {
     private final ArrayList<UiComponentFormButtonData> buttons;
     private final ArrayList<UiComponentFormFieldsetData> fieldsets;
     private final ArrayList<UiComponentFormFieldData> fields;
+    private String route;
 
     /**
      * UI Form data file constructor.
@@ -34,7 +35,8 @@ public class UiComponentFormFileData {
             final String label,
             final ArrayList<UiComponentFormButtonData> buttons,
             final ArrayList<UiComponentFormFieldsetData> fieldsets,
-            final ArrayList<UiComponentFormFieldData> fields
+            final ArrayList<UiComponentFormFieldData> fields,
+            final String route
     ) {
         this.formName = formName;
         this.formArea = formArea;
@@ -43,6 +45,7 @@ public class UiComponentFormFileData {
         this.buttons = buttons;
         this.fieldsets = fieldsets;
         this.fields = fields;
+        this.route = route;
     }
 
     /**
@@ -106,5 +109,9 @@ public class UiComponentFormFileData {
      */
     public ArrayList<UiComponentFormFieldData> getFields() {
         return fields;
+    }
+
+    public String getRoute() {
+        return route;
     }
 }

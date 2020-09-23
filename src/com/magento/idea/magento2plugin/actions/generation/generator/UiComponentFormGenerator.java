@@ -14,6 +14,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormButtonData;
+import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldsetData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFileData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.*;
@@ -23,6 +24,7 @@ import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.FirstLetterToLowercaseUtil;
 import com.magento.idea.magento2plugin.util.magento.FileBasedIndexUtil;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
@@ -63,6 +65,8 @@ public class UiComponentFormGenerator extends FileGenerator {
         );
 
         createButtonClasses(actionName);
+
+
 
         return formFile;
     }
@@ -149,7 +153,23 @@ public class UiComponentFormGenerator extends FileGenerator {
             }
 
             for (UiComponentFormFieldsetData formFieldsetData : uiFormFileData.getFieldsets()) {
-                XmlTag fieldsetTag = rootTag.createChildTag("fieldset", null, null, false);
+                final StringBuffer fieldsStringBuffer = new StringBuffer();
+
+                for (UiComponentFormFieldData formFieldData : uiFormFileData.getFields()) {
+                    if (!formFieldData.getFieldset().equals(formFieldsetData.getLabel())) {
+                        continue;
+                    }
+                    try {
+                        fieldsStringBuffer.append(getCodeTemplate.execute(
+                                UiComponentFormXml.FIELD_TEMPLATE,
+                                getFieldTemplateAttributes(formFieldData))
+                        );
+                    } catch (IOException e) {
+                        return;
+                    }
+                }
+
+                XmlTag fieldsetTag = rootTag.createChildTag("fieldset", null, fieldsStringBuffer.toString(), false);
                 fieldsetTag.setAttribute("label", formFieldsetData.getLabel());
                 fieldsetTag.setAttribute("sortOrder",formFieldsetData.getSortOrder());
                 rootTag.addSubTag(fieldsetTag, false);
@@ -157,6 +177,17 @@ public class UiComponentFormGenerator extends FileGenerator {
 
             psiDocumentManager.commitDocument(document);
         });
+    }
+
+    private Properties getFieldTemplateAttributes(UiComponentFormFieldData formFieldData) {
+        final Properties attributes = new Properties();
+        attributes.setProperty("NAME", formFieldData.getName());
+        attributes.setProperty("FORM_ELEMENT", formFieldData.getFormElementType());
+        attributes.setProperty("SOURCE", formFieldData.getSource());
+        attributes.setProperty("DATA_TYPE", formFieldData.getDataType());
+        attributes.setProperty("LABEL", formFieldData.getLabel());
+        attributes.setProperty("SORT_ORDER", formFieldData.getSortOrder());
+        return attributes;
     }
 
     @Override
