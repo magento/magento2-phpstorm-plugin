@@ -9,29 +9,39 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.magento.files.RoutesXml;
+import com.magento.idea.magento2plugin.magento.files.LayoutXml;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.FileBasedIndexUtil;
 import java.util.ArrayList;
 import java.util.Properties;
 
-public final class FindOrCreateRoutesXml {
+public final class FindOrCreateLayoutXml {
     private final Project project;
 
-    public FindOrCreateRoutesXml(final Project project) {
+    public FindOrCreateLayoutXml(final Project project) {
         this.project = project;
     }
 
     /**
-     * Finds or creates module routes.xml.
+     * Finds or creates module layout XML.
      *
      * @param actionName String
+     * @param routeId String
+     * @param controllerName String
+     * @param controllerActionName String
      * @param moduleName String
      * @param area String
      * @return PsiFile
      */
-    public PsiFile execute(final String actionName, final String moduleName, final String area) {
+    public PsiFile execute(
+            final String actionName,
+            final String routeId,
+            final String controllerName,
+            final String controllerActionName,
+            final String moduleName,
+            final String area
+    ) {
         final DirectoryGenerator directoryGenerator = DirectoryGenerator.getInstance();
         final FileFromTemplateGenerator fileFromTemplateGenerator =
                 FileFromTemplateGenerator.getInstance(project);
@@ -39,23 +49,25 @@ public final class FindOrCreateRoutesXml {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(moduleName);
         final ArrayList<String> fileDirectories = new ArrayList<>();
-        fileDirectories.add(Package.moduleBaseAreaDir);
+        fileDirectories.add(Package.moduleViewDir);
         fileDirectories.add(getArea(area).toString());
+        fileDirectories.add(LayoutXml.PARENT_DIR);
         for (final String fileDirectory: fileDirectories) {
             parentDirectory = directoryGenerator
                     .findOrCreateSubdirectory(parentDirectory, fileDirectory);
         }
-        final RoutesXml moduleRoutesXml = new RoutesXml();
-        PsiFile routesXml = FileBasedIndexUtil.findModuleConfigFile(
-                moduleRoutesXml.getFileName(),
+        final LayoutXml layoutXml = new  LayoutXml(routeId, controllerName, controllerActionName);
+        PsiFile routesXml = FileBasedIndexUtil.findModuleViewFile(
+                layoutXml.getFileName(),
                 getArea(area),
                 moduleName,
-                project
+                project,
+                LayoutXml.PARENT_DIR
         );
         if (routesXml == null) {
             routesXml = fileFromTemplateGenerator.generate(
-                    moduleRoutesXml,
-                    getAttributes(area),
+                    layoutXml,
+                    new Properties(),
                     parentDirectory,
                     actionName
             );
@@ -65,14 +77,5 @@ public final class FindOrCreateRoutesXml {
 
     private Areas getArea(final String area) {
         return Areas.getAreaByString(area);
-    }
-
-    protected Properties getAttributes(String area) {
-        Properties attributes = new Properties();
-        attributes.setProperty("ROUTER_ID", area.equals(Areas.frontend.toString())
-                ? RoutesXml.ROUTER_ID_STANDART
-                : RoutesXml.ROUTER_ID_ADMIN
-        );
-        return attributes;
     }
 }

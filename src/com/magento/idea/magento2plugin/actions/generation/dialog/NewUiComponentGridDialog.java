@@ -10,12 +10,12 @@ import com.intellij.psi.PsiDirectory;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.NewUiComponentGridAction;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridData;
-import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridDataProviderData;
+import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataProviderData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridToolbarData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewUiComponentGridDialogValidator;
-import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentGridDataProviderGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentDataProviderGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentGridXmlGenerator;
-import com.magento.idea.magento2plugin.magento.files.UiComponentGridDataProviderPhp;
+import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
@@ -118,8 +118,8 @@ public class NewUiComponentGridDialog extends AbstractDialog {
      *
      * @return UiComponentGridDataProviderData
      */
-    public UiComponentGridDataProviderData getGridDataProviderData() {
-        return new UiComponentGridDataProviderData(
+    public UiComponentDataProviderData getGridDataProviderData() {
+        return new UiComponentDataProviderData(
                 getDataProviderType(),
                 getDataProviderClass(),
                 getDataProviderNamespace(),
@@ -185,8 +185,8 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     }
 
     private void generateFile() {
-        final UiComponentGridDataProviderGenerator dataProviderGenerator;
-        dataProviderGenerator = new UiComponentGridDataProviderGenerator(
+        final UiComponentDataProviderGenerator dataProviderGenerator;
+        dataProviderGenerator = new UiComponentDataProviderGenerator(
                 getGridDataProviderData(),
                 getModuleName(),
                 project
@@ -221,7 +221,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
 
     private void onDataProviderTypeChange() {
         final boolean visible = getDataProviderType().equals(
-                UiComponentGridDataProviderPhp.COLLECTION_TYPE
+                UiComponentDataProviderPhp.COLLECTION_TYPE
         );
 
         collection.setVisible(visible);
@@ -255,8 +255,8 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     private List<String> getProviderTypeOptions() {
         return new ArrayList<>(
                 Arrays.asList(
-                        UiComponentGridDataProviderPhp.CUSTOM_TYPE,
-                        UiComponentGridDataProviderPhp.COLLECTION_TYPE
+                        UiComponentDataProviderPhp.CUSTOM_TYPE,
+                        UiComponentDataProviderPhp.COLLECTION_TYPE
                 )
         );
     }

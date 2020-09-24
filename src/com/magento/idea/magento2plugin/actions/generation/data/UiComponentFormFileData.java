@@ -17,6 +17,9 @@ public class UiComponentFormFileData {
     private final ArrayList<UiComponentFormFieldsetData> fieldsets;
     private final ArrayList<UiComponentFormFieldData> fields;
     private String route;
+    private String submitControllerName;
+    private String submitActionName;
+    private String dataProviderFqn;
 
     /**
      * UI Form data file constructor.
@@ -36,7 +39,10 @@ public class UiComponentFormFileData {
             final ArrayList<UiComponentFormButtonData> buttons,
             final ArrayList<UiComponentFormFieldsetData> fieldsets,
             final ArrayList<UiComponentFormFieldData> fields,
-            final String route
+            final String route,
+            String submitControllerName,
+            String submitActionName,
+            String dataProviderFqn
     ) {
         this.formName = formName;
         this.formArea = formArea;
@@ -46,6 +52,9 @@ public class UiComponentFormFileData {
         this.fieldsets = fieldsets;
         this.fields = fields;
         this.route = route;
+        this.submitControllerName = submitControllerName;
+        this.submitActionName = submitActionName;
+        this.dataProviderFqn = dataProviderFqn;
     }
 
     /**
@@ -113,5 +122,17 @@ public class UiComponentFormFileData {
 
     public String getRoute() {
         return route;
+    }
+
+    public String getSubmitControllerName() {
+        return submitControllerName;
+    }
+
+    public String getSubmitActionName() {
+        return submitActionName;
+    }
+
+    public String getDataProviderFqn() {
+        return dataProviderFqn;
     }
 }

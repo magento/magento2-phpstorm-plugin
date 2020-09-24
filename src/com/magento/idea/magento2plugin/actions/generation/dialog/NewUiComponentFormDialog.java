@@ -10,20 +10,35 @@ import com.intellij.openapi.ui.ComboBoxTableRenderer;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.NewUiComponentFormAction;
+import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
+import com.magento.idea.magento2plugin.actions.generation.data.LayoutXmlData;
+import com.magento.idea.magento2plugin.actions.generation.data.RoutesXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormButtonData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldsetData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFileData;
+import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataProviderData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewUiComponentFormValidator;
+import com.magento.idea.magento2plugin.actions.generation.generator.LayoutXmlGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.ModuleControllerClassGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.RoutesXmlGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentDataProviderGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentFormGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
+import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
+import com.magento.idea.magento2plugin.magento.files.ControllerFrontendPhp;
 import com.magento.idea.magento2plugin.magento.files.FormButtonBlockPhp;
+import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
+import com.magento.idea.magento2plugin.magento.packages.File;
+import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.ui.table.ComboBoxEditor;
 import com.magento.idea.magento2plugin.ui.table.DeleteRowButton;
 import com.magento.idea.magento2plugin.ui.table.TableButton;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+import org.jetbrains.annotations.NotNull;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -63,6 +78,21 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     private JButton addField;
     private JTextField route;
     private JLabel routeLabel;
+    private JLabel viewControllerLabel;
+    private JLabel controllerNameLabel;
+    private JTextField viewControllerName;
+    private JTextField viewActionName;
+    private JLabel actionNameLabel;
+    private JLabel saveControllerLabel;
+    private JLabel submitControllerNameLabel;
+    private JTextField submitControllerName;
+    private JLabel submitActionNameLabel;
+    private JTextField submitActionName;
+    private JTextField dataProviderClassName;
+    private JLabel dataProviderLabel;
+    private JLabel dataProviderClassNameLabel;
+    private JLabel dataProviderDirectoryLabel;
+    private JTextField dataProviderDirectory;
 
     /**
      * Open new dialog for adding new controller.
@@ -273,11 +303,32 @@ public class NewUiComponentFormDialog extends AbstractDialog {
             return;
         }
 
-        generateFile();
+        generateRoutesXmlFile();
+        generateViewControllerFile();
+        generateSubmitControllerFile();
+        generateDataProviderFile();
+        generateLayoutFile();
+        generateFormFile();
         this.setVisible(false);
     }
 
-    private PsiFile generateFile() {
+    private PsiFile generateDataProviderFile() {
+        NamespaceBuilder namespace = getDataProviderNamespace();
+        return new UiComponentDataProviderGenerator(new UiComponentDataProviderData(
+            UiComponentDataProviderPhp.CUSTOM_TYPE,
+            getDataProviderClassName(),
+            namespace.getNamespace(),
+            getDataProviderDirectory(),
+            ""
+        ), getModuleName(), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
+    }
+
+    @NotNull
+    private NamespaceBuilder getDataProviderNamespace() {
+        return new NamespaceBuilder(getModuleName(), getDataProviderClassName(), getDataProviderDirectory());
+    }
+
+    private PsiFile generateFormFile() {
         return new UiComponentFormGenerator(new UiComponentFormFileData(
                 getFormName(),
                 getArea(),
@@ -286,8 +337,58 @@ public class NewUiComponentFormDialog extends AbstractDialog {
                 getButtons(),
                 getFieldsets(),
                 getFields(),
-                getRoute()
+                getRoute(),
+                getSubmitControllerName(),
+                getSubmitActionName(),
+                getDataProviderNamespace().getClassFqn()
         ), project).generate(NewUiComponentFormAction.ACTION_NAME, true);
+    }
+
+    private PsiFile generateRoutesXmlFile() {
+        return new RoutesXmlGenerator(new RoutesXmlData(
+            getArea(),
+            getRoute(),
+            getModuleName()
+        ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
+    }
+
+    private PsiFile generateViewControllerFile() {
+        NamespaceBuilder namespace = new NamespaceBuilder(getModuleName(), getViewActionName(), getViewControllerDirectory());
+        return new ModuleControllerClassGenerator(new ControllerFileData(
+            getViewControllerDirectory(),
+            getViewActionName(),
+            getModuleName(),
+            getArea(),
+            HttpMethod.GET.toString(),
+            null,
+            true,
+            namespace.getNamespace()
+        ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
+    }
+
+    private PsiFile generateSubmitControllerFile() {
+        NamespaceBuilder namespace = new NamespaceBuilder(getModuleName(), getViewActionName(), getSubmitControllerDirectory());
+        return new ModuleControllerClassGenerator(new ControllerFileData(
+            getSubmitControllerDirectory(),
+            getSubmitActionName(),
+            getModuleName(),
+            getArea(),
+            HttpMethod.POST.toString(),
+            null,
+            true,
+            namespace.getNamespace()
+        ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
+    }
+
+    private PsiFile generateLayoutFile() {
+        return new LayoutXmlGenerator(new LayoutXmlData(
+            getArea(),
+            getRoute(),
+            getModuleName(),
+            getViewControllerName(),
+            getViewActionName(),
+            getFormName()
+        ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
     }
 
     protected void onCancel() {
@@ -411,5 +512,45 @@ public class NewUiComponentFormDialog extends AbstractDialog {
 
     public String getRoute() {
         return route.getText().trim();
+    }
+
+    public String getViewActionName() {
+        return viewActionName.getText().trim();
+    }
+
+    public String getViewControllerName() {
+        return viewControllerName.getText().trim();
+    }
+
+    public String getSubmitActionName() {
+        return submitActionName.getText().trim();
+    }
+
+    public String getSubmitControllerName() {
+        return submitControllerName.getText().trim();
+    }
+
+    private String getViewControllerDirectory() {
+        return getControllerDirectory() + getViewControllerName();
+    }
+
+    private String getSubmitControllerDirectory() {
+        return getControllerDirectory() + getSubmitControllerName();
+    }
+
+    public String getDataProviderClassName() {
+        return dataProviderClassName.getText().trim();
+    }
+
+    public String getDataProviderDirectory() {
+        return dataProviderDirectory.getText().trim();
+    }
+
+    private String getControllerDirectory() {
+        final String area = getArea();
+        String directory = area.equals(Areas.adminhtml.toString())
+            ? ControllerBackendPhp.DEFAULT_DIR : ControllerFrontendPhp.DEFAULT_DIR;
+
+        return directory + File.separator;
     }
 }

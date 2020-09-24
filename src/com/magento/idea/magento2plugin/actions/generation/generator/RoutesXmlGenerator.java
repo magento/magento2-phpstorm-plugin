@@ -8,61 +8,38 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiDocumentManager;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.codeStyle.CodeStyleManager;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.jetbrains.php.lang.psi.PhpFile;
-import com.jetbrains.php.lang.psi.elements.GroupStatement;
-import com.jetbrains.php.lang.psi.elements.Method;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormButtonData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplate;
-import com.magento.idea.magento2plugin.actions.generation.util.CodeStyleSettings;
-import com.magento.idea.magento2plugin.bundles.CommonBundle;
-import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
-import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.magento.files.FormButtonBlockPhp;
-import com.magento.idea.magento2plugin.magento.packages.File;
-import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
-import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
-import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
+import com.intellij.psi.xml.XmlAttribute;
+import com.intellij.psi.xml.XmlFile;
+import com.intellij.psi.xml.XmlTag;
+import com.magento.idea.magento2plugin.actions.generation.data.RoutesXmlData;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateRoutesXml;
+import com.magento.idea.magento2plugin.magento.files.RoutesXml;
+import com.magento.idea.magento2plugin.magento.packages.Areas;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import javax.swing.*;
-import java.io.IOException;
 import java.util.Properties;
 
 public class RoutesXmlGenerator extends FileGenerator {
-    private final UiComponentFormButtonData buttonData;
+    private final RoutesXmlData routesXmlData;
     private final Project project;
-    private final GetFirstClassOfFile getFirstClassOfFile;
-    private final ValidatorBundle validatorBundle;
-    private final CommonBundle commonBundle;
-    private final GetCodeTemplate getCodeTemplate;
+    private final FindOrCreateRoutesXml findOrCreateRoutesXml;
 
     /**
      * Constructor.
      *
-     * @param buttonData UiComponentFormButtonData
+     * @param routesXmlData RoutesXmlData
      * @param project Project
      */
     public RoutesXmlGenerator(
-            final @NotNull UiComponentFormButtonData buttonData,
+            final @NotNull RoutesXmlData routesXmlData,
             final Project project
     ) {
         super(project);
-        this.buttonData = buttonData;
+        this.routesXmlData = routesXmlData;
         this.project = project;
-        this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
-        this.validatorBundle = new ValidatorBundle();
-        this.commonBundle = new CommonBundle();
-        this.getCodeTemplate = GetCodeTemplate.getInstance(project);
+        this.findOrCreateRoutesXml = new FindOrCreateRoutesXml(project);
     }
 
     /**
@@ -73,12 +50,53 @@ public class RoutesXmlGenerator extends FileGenerator {
      */
     @Override
     public PsiFile generate(final String actionName) {
-        return null;
+        XmlFile routesXml = (XmlFile) findOrCreateRoutesXml.execute(actionName, routesXmlData.getModuleName(), routesXmlData.getArea());
+        final PsiDocumentManager psiDocumentManager =
+                PsiDocumentManager.getInstance(project);
+        final Document document = psiDocumentManager.getDocument(routesXml);
+        WriteCommandAction.runWriteCommandAction(project, () -> {
+            XmlTag rootTag = routesXml.getRootTag();
+            if (rootTag == null) {
+                return;
+            }
+            XmlTag routerTag = rootTag.findFirstSubTag("router");
+            boolean routerTagIsGenerated = false;
+            if (routerTag == null) {
+                routerTagIsGenerated = true;
+                routerTag = rootTag.createChildTag("router", null, "", false);
+                routerTag.setAttribute("id", routesXmlData.getArea().equals(Areas.frontend.toString())
+                    ? RoutesXml.ROUTER_ID_STANDART
+                    : RoutesXml.ROUTER_ID_ADMIN);
+            }
+            @NotNull XmlTag[] buttonsTags = routerTag.findSubTags("route");
+            boolean isDeclared = false;
+            for (XmlTag buttonsTag: buttonsTags) {
+                @Nullable XmlAttribute frontName = buttonsTag.getAttribute("frontName");
+                if (frontName.getValue().equals(routesXmlData.getRoute())) {
+                    isDeclared = true;
+                }
+            }
+
+            if (!isDeclared) {
+                XmlTag routeTag = routerTag.createChildTag("route", null, "", false);
+                routeTag.setAttribute("id", routesXmlData.getRoute());
+                routeTag.setAttribute("frontName",routesXmlData.getRoute());
+                XmlTag moduleTag = routeTag.createChildTag("module", null, null, false);
+                moduleTag.setAttribute("name", routesXmlData.getModuleName());
+                routeTag.addSubTag(moduleTag, false);
+                routerTag.addSubTag(routeTag, false);
+
+                if (!routerTagIsGenerated) {
+                    rootTag.addSubTag(routerTag, false);
+                }
+            }
+
+            psiDocumentManager.commitDocument(document);
+        });
+        return routesXml;
     }
 
     @Override
     protected void fillAttributes(final Properties attributes) {
-        attributes.setProperty("NAME", buttonData.getButtonClassName());
-        attributes.setProperty("NAMESPACE", buttonData.getNamespace());
     }
 }

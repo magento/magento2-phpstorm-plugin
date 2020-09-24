@@ -7,8 +7,8 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
-import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridDataProviderData;
-import com.magento.idea.magento2plugin.magento.files.UiComponentGridDataProviderPhp;
+import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataProviderData;
+import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
 
 public class UiComponentGridDataProviderGeneratorTest extends BaseGeneratorTestCase {
     private static final String EXPECTED_DIRECTORY = "src/app/code/Foo/Bar/Ui/Component/Listing";
@@ -23,7 +23,7 @@ public class UiComponentGridDataProviderGeneratorTest extends BaseGeneratorTestC
      */
     public void testGenerateCustomDataProvider() {
         final PsiFile dataProviderFile = generateDataProvider(
-                UiComponentGridDataProviderPhp.CUSTOM_TYPE,
+                UiComponentDataProviderPhp.CUSTOM_TYPE,
                 null
         );
         final String filePath = this.getFixturePath("GridDataProvider.php");
@@ -41,7 +41,7 @@ public class UiComponentGridDataProviderGeneratorTest extends BaseGeneratorTestC
      */
     public void testGenerateCollectionDataProvider() {
         final PsiFile dataProviderFile = generateDataProvider(
-                UiComponentGridDataProviderPhp.COLLECTION_TYPE,
+                UiComponentDataProviderPhp.COLLECTION_TYPE,
                 COLLECTION_FQN
         );
         final String filePath = this.getFixturePath("GridDataProvider.php");
@@ -59,15 +59,15 @@ public class UiComponentGridDataProviderGeneratorTest extends BaseGeneratorTestC
             final String collectionFqn
     ) {
         final Project project = myFixture.getProject();
-        final UiComponentGridDataProviderData providerData = new UiComponentGridDataProviderData(
+        final UiComponentDataProviderData providerData = new UiComponentDataProviderData(
                 providerType,
                 PROVIDER_CLASS_NAME,
                 PROVIDER_NAMESPACE,
                 PROVIDER_PATH,
                 collectionFqn
         );
-        final UiComponentGridDataProviderGenerator generator;
-        generator = new UiComponentGridDataProviderGenerator(
+        final UiComponentDataProviderGenerator generator;
+        generator = new UiComponentDataProviderGenerator(
                 providerData,
                 MODULE_NAME,
                 project

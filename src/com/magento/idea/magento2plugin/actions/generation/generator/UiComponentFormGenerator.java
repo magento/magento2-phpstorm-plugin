@@ -195,6 +195,10 @@ public class UiComponentFormGenerator extends FileGenerator {
         attributes.setProperty("NAME", uiFormFileData.getFormName());
         attributes.setProperty("LABEL", uiFormFileData.getLabel());
         attributes.setProperty("BUTTONS", uiFormFileData.getButtons().isEmpty() ? "" : "true");
+        attributes.setProperty("ROUTE", uiFormFileData.getRoute());
+        attributes.setProperty("SUBMIT_CONTROLLER", uiFormFileData.getSubmitControllerName().toLowerCase());
+        attributes.setProperty("SUBMIT_ACTION", uiFormFileData.getSubmitActionName().toLowerCase());
+        attributes.setProperty("DATA_PROVIDER", uiFormFileData.getDataProviderFqn());
     }
 
     private Areas getArea(final String area) {

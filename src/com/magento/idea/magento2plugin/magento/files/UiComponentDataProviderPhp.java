@@ -13,14 +13,14 @@ import com.jetbrains.php.lang.PhpLanguage;
         "PMD.NonThreadSafeSingleton",
         "PMD.RedundantFieldInitializer"
 })
-public class UiComponentGridDataProviderPhp implements ModuleFileInterface {
+public class UiComponentDataProviderPhp implements ModuleFileInterface {
     public static final String COLLECTION_TEMPLATE =
             "Magento Module Ui Grid Collection Data Provider Php";
-    public static final String CUSTOM_TEMPLATE = "Magento Module Ui Grid Custom Data Provider Php";
+    public static final String CUSTOM_TEMPLATE = "Magento Module Ui Custom Data Provider Php";
     public static final String FILE_EXTENSION = "php";
     public static final String CUSTOM_TYPE = "custom";
     public static final String COLLECTION_TYPE = "collection";
-    private static UiComponentGridDataProviderPhp INSTANCE = null;
+    private static UiComponentDataProviderPhp INSTANCE = null;
     private String className;
     private String providerType;
 
@@ -31,12 +31,12 @@ public class UiComponentGridDataProviderPhp implements ModuleFileInterface {
      * @param providerType DataProvider type
      * @return UiComponentGridDataProviderPhp
      */
-    public static UiComponentGridDataProviderPhp getInstance(
+    public static UiComponentDataProviderPhp getInstance(
             final String className,
             final String providerType
     ) {
         if (null == INSTANCE) {
-            INSTANCE = new UiComponentGridDataProviderPhp();
+            INSTANCE = new UiComponentDataProviderPhp();
         }
 
         INSTANCE.setClassName(className);

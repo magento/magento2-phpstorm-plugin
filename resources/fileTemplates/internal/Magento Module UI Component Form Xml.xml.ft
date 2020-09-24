@@ -18,8 +18,8 @@
     </settings>
     <dataSource name="${NAME}_data_source" component="Magento_Ui/js/form/provider">
         <settings>
-            <submitUrl path="customerquote/CustomerQuoteVersion/save"/>
+            <submitUrl path="${ROUTE}/${SUBMIT_CONTROLLER}/${SUBMIT_ACTION}"/>
         </settings>
-        <dataProvider class="Atwix\CustomerQuotes\Ui\Component\CustomerQuoteVersion\Form\DataProvider\CustomerQuoteVersionDataProvider" name="${NAME}_data_source"/>
+        <dataProvider class="${DATA_PROVIDER}" name="${NAME}_data_source"/>
     </dataSource>
 </form>

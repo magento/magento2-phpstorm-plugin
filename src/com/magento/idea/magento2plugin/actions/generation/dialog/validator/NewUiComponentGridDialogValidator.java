@@ -7,11 +7,11 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
 import com.jetbrains.php.refactoring.PhpNameUtil;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridData;
-import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridDataProviderData;
+import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataProviderData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewUiComponentGridDialog;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
-import com.magento.idea.magento2plugin.magento.files.UiComponentGridDataProviderPhp;
+import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import javax.swing.JOptionPane;
@@ -167,7 +167,7 @@ public class NewUiComponentGridDialogValidator {
         return true;
     }
 
-    private boolean validateDataProviderData(final UiComponentGridDataProviderData providerData) {
+    private boolean validateDataProviderData(final UiComponentDataProviderData providerData) {
         final String errorTitle = commonBundle.message("common.error");
         final String type = providerData.getType();
 
@@ -188,7 +188,7 @@ public class NewUiComponentGridDialogValidator {
 
         final String collection = providerData.getCollectionFqn();
 
-        if (type.equals(UiComponentGridDataProviderPhp.COLLECTION_TYPE)
+        if (type.equals(UiComponentDataProviderPhp.COLLECTION_TYPE)
                 && collection.length() == 0
         ) {
             final String errorMessage = this.validatorBundle.message(

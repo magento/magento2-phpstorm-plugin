@@ -6,7 +6,7 @@
 package com.magento.idea.magento2plugin.actions.generation.data;
 
 @SuppressWarnings({"PMD.DataClass"})
-public class UiComponentGridDataProviderData {
+public class UiComponentDataProviderData {
     private final String type;
     private final String name;
     private final String namespace;
@@ -22,7 +22,7 @@ public class UiComponentGridDataProviderData {
      * @param path String
      * @param collectionFqn String
      */
-    public UiComponentGridDataProviderData(
+    public UiComponentDataProviderData(
             final String type,
             final String name,
             final String namespace,
