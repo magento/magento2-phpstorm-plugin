@@ -86,7 +86,7 @@ public class RoutesXmlGenerator extends FileGenerator {
                 routeTag.addSubTag(moduleTag, false);
                 routerTag.addSubTag(routeTag, false);
 
-                if (!routerTagIsGenerated) {
+                if (routerTagIsGenerated) {
                     rootTag.addSubTag(routerTag, false);
                 }
             }

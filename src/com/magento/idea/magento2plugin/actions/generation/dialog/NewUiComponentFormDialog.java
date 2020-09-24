@@ -93,6 +93,8 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     private JLabel dataProviderClassNameLabel;
     private JLabel dataProviderDirectoryLabel;
     private JTextField dataProviderDirectory;
+    private JLabel aclLabel;
+    private JTextField acl;
 
     /**
      * Open new dialog for adding new controller.
@@ -135,6 +137,8 @@ public class NewUiComponentFormDialog extends AbstractDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
+
+        formAreaSelect.addActionListener(e -> toggleAcl());
     }
 
     protected void initButtonsTable() {
@@ -360,7 +364,7 @@ public class NewUiComponentFormDialog extends AbstractDialog {
             getModuleName(),
             getArea(),
             HttpMethod.GET.toString(),
-            null,
+            getAcl(),
             true,
             namespace.getNamespace()
         ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
@@ -374,7 +378,7 @@ public class NewUiComponentFormDialog extends AbstractDialog {
             getModuleName(),
             getArea(),
             HttpMethod.POST.toString(),
-            null,
+            getAcl(),
             true,
             namespace.getNamespace()
         ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
@@ -546,11 +550,26 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         return dataProviderDirectory.getText().trim();
     }
 
+    public String getAcl() {
+        return acl.getText().trim();
+    }
+
     private String getControllerDirectory() {
         final String area = getArea();
         String directory = area.equals(Areas.adminhtml.toString())
             ? ControllerBackendPhp.DEFAULT_DIR : ControllerFrontendPhp.DEFAULT_DIR;
 
         return directory + File.separator;
+    }
+
+    private void toggleAcl() {
+        final String area = getArea();
+        if (area.equals(Areas.adminhtml.toString())) {
+            acl.setVisible(true);
+            aclLabel.setVisible(true);
+            return;
+        }
+        acl.setVisible(false);
+        aclLabel.setVisible(false);
     }
 }
