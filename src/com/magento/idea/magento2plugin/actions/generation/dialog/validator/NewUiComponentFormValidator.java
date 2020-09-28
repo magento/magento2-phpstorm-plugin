@@ -12,7 +12,7 @@ import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
 import javax.swing.JOptionPane;
 
 public class NewUiComponentFormValidator {
@@ -106,19 +106,22 @@ public class NewUiComponentFormValidator {
         return validateButtons();
     }
 
+    @SuppressWarnings({
+            "PMD.NPathComplexity",
+            "PMD.CyclomaticComplexity",
+            "PMD.ExcessiveMethodLength"
+    })
     protected boolean validateButtons() {
-        final String errorTitle = commonBundle.message("common.error");
-
-        final ArrayList<UiComponentFormButtonData> buttons = dialog.getButtons();
-        if (buttons.size() == 0) {
+        final List<UiComponentFormButtonData> buttons = dialog.getButtons();
+        if (buttons.isEmpty()) {
             return true;
         }
 
         boolean result = true;
-        ArrayList<String> buttonFqns = new ArrayList<>();
-        for (Iterator iterator = buttons.iterator(); iterator.hasNext(); ) {
-            UiComponentFormButtonData button = (UiComponentFormButtonData) iterator.next();
-            String className = button.getButtonClassName();
+        final ArrayList<String> buttonFqns = new ArrayList<>();
+        final String errorTitle = commonBundle.message("common.error");
+        for (final UiComponentFormButtonData button : buttons) {
+            final String className = button.getButtonClassName();
 
             if (className.length() == 0) {
                 final String errorMessage = validatorBundle.message(
@@ -187,7 +190,7 @@ public class NewUiComponentFormValidator {
                 break;
             }
 
-            String directory = button.getButtonDirectory();
+            final String directory = button.getButtonDirectory();
 
             if (directory.length() == 0) {
                 final String errorMessage = validatorBundle.message(

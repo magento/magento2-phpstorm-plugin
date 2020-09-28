@@ -5,27 +5,29 @@
 
 package com.magento.idea.magento2plugin.ui.table;
 
-import javax.swing.*;
+import java.awt.Component;
+import javax.swing.JButton;
+import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
-import java.awt.*;
 
 public class TableButton extends JButton implements TableCellRenderer {
-    private String defaultValue;
+    private final String defaultValue;
 
-    public TableButton(String defaultValue) {
+    public TableButton(final String defaultValue) {
+        super();
         this.defaultValue = defaultValue;
         setOpaque(true);
     }
 
-    public Component getTableCellRendererComponent(JTable table, Object value,
-                                                   boolean isSelected, boolean hasFocus, int row, int column) {
-//        if (isSelected) {
-//            setForeground(table.getSelectionForeground());
-//            setBackground(table.getSelectionBackground());
-//        } else {
-//            setForeground(table.getForeground());
-//            setBackground(UIManager.getColor("Button.background"));
-//        }
+    @Override
+    public Component getTableCellRendererComponent(
+            final JTable table,
+            final Object value,
+            final boolean isSelected,
+            final boolean hasFocus,
+            final int row,
+            final int column
+    ) {
         setText(defaultValue);
         return this;
     }

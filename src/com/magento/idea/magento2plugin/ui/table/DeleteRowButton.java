@@ -5,21 +5,35 @@
 
 package com.magento.idea.magento2plugin.ui.table;
 
-import javax.swing.*;
+import java.awt.Component;
+import javax.swing.DefaultCellEditor;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 
 public class DeleteRowButton extends DefaultCellEditor {
     protected JButton button;
 
-    public DeleteRowButton(JCheckBox checkBox) {
+    /**
+     * Delete Row editor.
+     *
+     * @param checkBox JCheckBox
+     */
+    public DeleteRowButton(final JCheckBox checkBox) {
         super(checkBox);
         button = new JButton();
         button.setOpaque(true);
     }
 
-    public Component getTableCellEditorComponent(JTable table, Object value,
-                                                 boolean isSelected, int row, int column) {
+    @Override
+    public Component getTableCellEditorComponent(
+            final JTable table,
+            final Object value,
+            final boolean isSelected,
+            final int row,
+            final int column
+    ) {
         ((DefaultTableModel)table.getModel()).removeRow(row);
         return null;
     }

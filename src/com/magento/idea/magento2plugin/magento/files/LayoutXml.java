@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.magento.files;
 
 import com.intellij.lang.Language;
 import com.intellij.lang.xml.XMLLanguage;
+import java.util.Locale;
 
 @SuppressWarnings({"PMD.FieldNamingConventions", "PMD.ClassNamingConventions"})
 public class LayoutXml implements ModuleFileInterface {
@@ -15,20 +16,32 @@ public class LayoutXml implements ModuleFileInterface {
     public static String CACHEABLE_ATTRIBUTE_VALUE_FALSE = "false";
     public static String BLOCK_ATTRIBUTE_TAG_NAME = "block";
     public static String REFERENCE_BLOCK_ATTRIBUTE_TAG_NAME = "referenceBlock";
+    public static String ROOT_TAG_NAME = "referenceBlock";
+    public static String REFERENCE_CONTAINER_TAG_NAME = "referenceContainer";
+    public static String UI_COMPONENT_TAG_NAME = "uiComponent";
     public static String XML_ATTRIBUTE_TEMPLATE = "template";
     public static String ARGUMENTS_TEMPLATE = "Magento Module Class Arguments In Xml";
     public static String PARENT_DIR = "layout";
+    public static String NAME_ATTRIBUTE = "name";
+    public static String CONTENT_CONTAINER_NAME = "content";
 
     public static String TEMPLATE = "Magento Module Layout Xml";
     private String fileName;
 
+    /**
+     * Layout XML file.
+     *
+     * @param routeId String
+     * @param controllerName String
+     * @param actionName String
+     */
     public LayoutXml(final String routeId, final String controllerName, final String actionName) {
         this.setFileName(
                 routeId
                 + "_"
-                + controllerName.toLowerCase()
+                + controllerName.toLowerCase(new Locale("en","EN"))
                 + "_"
-                + actionName.toLowerCase()
+                + actionName.toLowerCase(new Locale("en","EN"))
                 + ".xml"
         );
     }
@@ -38,6 +51,7 @@ public class LayoutXml implements ModuleFileInterface {
      *
      * @return String
      */
+    @Override
     public String getFileName() {
         return this.fileName;
     }
@@ -47,6 +61,7 @@ public class LayoutXml implements ModuleFileInterface {
      *
      * @return String
      */
+    @Override
     public String getTemplate() {
         return TEMPLATE;
     }
@@ -56,6 +71,7 @@ public class LayoutXml implements ModuleFileInterface {
      *
      * @return Language
      */
+    @Override
     public Language getLanguage() {
         return XMLLanguage.INSTANCE;
     }

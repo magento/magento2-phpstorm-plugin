@@ -197,7 +197,9 @@
                     <preferred-size width="150" height="-1"/>
                   </grid>
                 </constraints>
-                <properties/>
+                <properties>
+                  <text value="Save"/>
+                </properties>
               </component>
               <component id="5065a" class="javax.swing.JLabel" binding="saveControllerLabel">
                 <constraints>
@@ -249,7 +251,9 @@
                     <preferred-size width="150" height="-1"/>
                   </grid>
                 </constraints>
-                <properties/>
+                <properties>
+                  <text value="Edit"/>
+                </properties>
               </component>
               <component id="e2e73" class="javax.swing.JLabel" binding="actionNameLabel">
                 <constraints>
@@ -312,7 +316,9 @@
                     <preferred-size width="150" height="-1"/>
                   </grid>
                 </constraints>
-                <properties/>
+                <properties>
+                  <text value="Ui/Component/Form"/>
+                </properties>
               </component>
             </children>
           </grid>

@@ -8,40 +8,20 @@ package com.magento.idea.magento2plugin.magento.files;
 import com.intellij.lang.Language;
 import com.intellij.lang.xml.XMLLanguage;
 
-@SuppressWarnings({
-        "PMD.FieldNamingConventions",
-        "PMD.RedundantFieldInitializer",
-        "PMD.NonThreadSafeSingleton",
-        "PMD.TooManyFields"
-})
 public class RoutesXml implements ModuleFileInterface {
-    public static String FILE_NAME = "routes.xml";
-    public static String TEMPLATE = "Magento Routes Xml";
-    public static String ROUTER_ID_STANDART = "standart";
-    public static String ROUTER_ID_ADMIN = "admin";
-
-    private static RoutesXml INSTANCE = null;
-
-    /**
-     * Get instance of the class.
-     *
-     * @return ModuleDiXml
-     */
-    public static RoutesXml getInstance() {
-        if (null == INSTANCE) {
-            INSTANCE = new RoutesXml();
-        }
-        return INSTANCE;
-    }
+    public static String fileName = "routes.xml";
+    public static String template = "Magento Routes Xml";
+    public static String routerIdStandart = "standart";
+    public static String routerIdAdmin = "admin";
 
     @Override
     public String getFileName() {
-        return FILE_NAME;
+        return fileName;
     }
 
     @Override
     public String getTemplate() {
-        return TEMPLATE;
+        return template;
     }
 
     @Override

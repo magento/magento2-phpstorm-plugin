@@ -7,12 +7,18 @@ package com.magento.idea.magento2plugin.actions.generation.data;
 
 public class UiComponentFormFieldsetData {
 
-    private String label;
-    private String sortOrder;
+    private final String label;
+    private final String sortOrder;
 
+    /**
+     * Fieldset data.
+     *
+     * @param label String
+     * @param sortOrder String
+     */
     public UiComponentFormFieldsetData(
-            String label,
-            String sortOrder
+            final String label,
+            final String sortOrder
     ) {
         this.label = label;
         this.sortOrder = sortOrder;

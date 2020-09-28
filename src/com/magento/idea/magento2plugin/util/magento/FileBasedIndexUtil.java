@@ -102,7 +102,15 @@ public final class FileBasedIndexUtil {
             final String subdirectory
     ) {
 
-        return findModuleFile(virtualFieName, area, moduleName, project, Package.moduleViewDir, subdirectory, true);
+        return findModuleFile(
+                virtualFieName,
+                area,
+                moduleName,
+                project,
+                Package.moduleViewDir,
+                subdirectory,
+                true
+        );
     }
 
     /**
@@ -114,6 +122,7 @@ public final class FileBasedIndexUtil {
      * @param project Project
      * @return PsiFile
      */
+    @SuppressWarnings({"PMD.UseObjectForClearerAPI"})
     public static PsiFile findModuleFile(
             final String virtualFieName,
             final Areas area,
@@ -130,12 +139,12 @@ public final class FileBasedIndexUtil {
         }
 
         final Collection<VirtualFile> moduleVfs =
-            FileBasedIndex.getInstance().getContainingFiles(ModuleNameIndex.KEY, moduleName,
-                GlobalSearchScope.getScopeRestrictedByFileTypes(
-                    GlobalSearchScope.allScope(project),
-                    PhpFileType.INSTANCE
-                )
-            );
+                FileBasedIndex.getInstance().getContainingFiles(ModuleNameIndex.KEY, moduleName,
+                    GlobalSearchScope.getScopeRestrictedByFileTypes(
+                        GlobalSearchScope.allScope(project),
+                        PhpFileType.INSTANCE
+                    )
+                );
         if (moduleVfs.isEmpty()) {
             return null;
         }

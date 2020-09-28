@@ -17,9 +17,9 @@ import com.magento.idea.magento2plugin.actions.generation.data.RoutesXmlData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateRoutesXml;
 import com.magento.idea.magento2plugin.magento.files.RoutesXml;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
+import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import java.util.Properties;
 
 public class RoutesXmlGenerator extends FileGenerator {
     private final RoutesXmlData routesXmlData;
@@ -50,12 +50,16 @@ public class RoutesXmlGenerator extends FileGenerator {
      */
     @Override
     public PsiFile generate(final String actionName) {
-        XmlFile routesXml = (XmlFile) findOrCreateRoutesXml.execute(actionName, routesXmlData.getModuleName(), routesXmlData.getArea());
+        final XmlFile routesXml = (XmlFile) findOrCreateRoutesXml.execute(
+                actionName,
+                routesXmlData.getModuleName(),
+                routesXmlData.getArea()
+        );
         final PsiDocumentManager psiDocumentManager =
                 PsiDocumentManager.getInstance(project);
         final Document document = psiDocumentManager.getDocument(routesXml);
         WriteCommandAction.runWriteCommandAction(project, () -> {
-            XmlTag rootTag = routesXml.getRootTag();
+            final XmlTag rootTag = routesXml.getRootTag();
             if (rootTag == null) {
                 return;
             }
@@ -64,24 +68,27 @@ public class RoutesXmlGenerator extends FileGenerator {
             if (routerTag == null) {
                 routerTagIsGenerated = true;
                 routerTag = rootTag.createChildTag("router", null, "", false);
-                routerTag.setAttribute("id", routesXmlData.getArea().equals(Areas.frontend.toString())
-                    ? RoutesXml.ROUTER_ID_STANDART
-                    : RoutesXml.ROUTER_ID_ADMIN);
+                routerTag.setAttribute(
+                        "id",
+                        routesXmlData.getArea().equals(Areas.frontend.toString())
+                            ? RoutesXml.routerIdStandart
+                            : RoutesXml.routerIdAdmin
+                );
             }
-            @NotNull XmlTag[] buttonsTags = routerTag.findSubTags("route");
+            @NotNull final XmlTag[] buttonsTags = routerTag.findSubTags("route");
             boolean isDeclared = false;
-            for (XmlTag buttonsTag: buttonsTags) {
-                @Nullable XmlAttribute frontName = buttonsTag.getAttribute("frontName");
+            for (final XmlTag buttonsTag: buttonsTags) {
+                @Nullable final XmlAttribute frontName = buttonsTag.getAttribute("frontName");
                 if (frontName.getValue().equals(routesXmlData.getRoute())) {
                     isDeclared = true;
                 }
             }
 
             if (!isDeclared) {
-                XmlTag routeTag = routerTag.createChildTag("route", null, "", false);
+                final XmlTag routeTag = routerTag.createChildTag("route", null, "", false);
                 routeTag.setAttribute("id", routesXmlData.getRoute());
                 routeTag.setAttribute("frontName",routesXmlData.getRoute());
-                XmlTag moduleTag = routeTag.createChildTag("module", null, null, false);
+                final XmlTag moduleTag = routeTag.createChildTag("module", null, null, false);
                 moduleTag.setAttribute("name", routesXmlData.getModuleName());
                 routeTag.addSubTag(moduleTag, false);
                 routerTag.addSubTag(routeTag, false);
@@ -97,6 +104,5 @@ public class RoutesXmlGenerator extends FileGenerator {
     }
 
     @Override
-    protected void fillAttributes(final Properties attributes) {
-    }
+    protected void fillAttributes(final Properties attributes) {}//NOPMD
 }

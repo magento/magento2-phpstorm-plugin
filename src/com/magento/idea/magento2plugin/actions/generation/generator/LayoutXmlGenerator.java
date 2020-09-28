@@ -15,9 +15,10 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.magento.idea.magento2plugin.actions.generation.data.LayoutXmlData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateLayoutXml;
+import com.magento.idea.magento2plugin.magento.files.LayoutXml;
+import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import java.util.Properties;
 
 public class LayoutXmlGenerator extends FileGenerator {
     private final LayoutXmlData layoutXmlData;
@@ -48,7 +49,7 @@ public class LayoutXmlGenerator extends FileGenerator {
      */
     @Override
     public PsiFile generate(final String actionName) {
-        XmlFile layoutXml = (XmlFile) findOrCreateLayoutXml.execute(
+        final XmlFile layoutXml = (XmlFile) findOrCreateLayoutXml.execute(
                 actionName,
                 layoutXmlData.getRoute(),
                 layoutXmlData.getControllerName(),
@@ -60,27 +61,31 @@ public class LayoutXmlGenerator extends FileGenerator {
                 PsiDocumentManager.getInstance(project);
         final Document document = psiDocumentManager.getDocument(layoutXml);
         WriteCommandAction.runWriteCommandAction(project, () -> {
-            XmlTag rootTag = layoutXml.getRootTag();
+            final XmlTag rootTag = layoutXml.getRootTag();
             if (rootTag == null) {
                 return;
             }
 
-            XmlTag bodyTag = rootTag.findFirstSubTag("body");
+            XmlTag bodyTag = rootTag.findFirstSubTag(LayoutXml.ROOT_TAG_NAME);
             boolean bodyTagIsGenerated = false;
             if (bodyTag == null) {
                 bodyTagIsGenerated = true;
-                bodyTag = rootTag.createChildTag("body", null, "", false);
+                bodyTag = rootTag.createChildTag(LayoutXml.ROOT_TAG_NAME, null, "", false);
             }
-            @NotNull XmlTag[] referenceContainers = bodyTag.findSubTags("referenceContainer");
+            @NotNull final XmlTag[] referenceContainers =
+                    bodyTag.findSubTags(LayoutXml.REFERENCE_CONTAINER_TAG_NAME);
             boolean isDeclared = false;
             XmlTag contentContainer = null;
-            for (XmlTag referenceContainerTag: referenceContainers) {
-                @Nullable XmlAttribute containerName = referenceContainerTag.getAttribute("name");
-                if (containerName.getValue().equals("content")) {
+            for (final XmlTag referenceContainerTag: referenceContainers) {
+                @Nullable final XmlAttribute containerName =
+                        referenceContainerTag.getAttribute(LayoutXml.NAME_ATTRIBUTE);
+                if (containerName.getValue().equals(LayoutXml.CONTENT_CONTAINER_NAME)) {
                     contentContainer = referenceContainerTag;
-                    @NotNull XmlTag[] uiComponents = bodyTag.findSubTags("uiComponent");
-                    for (XmlTag uiComponent: uiComponents) {
-                        @Nullable XmlAttribute uiComponentName = uiComponent.getAttribute("name");
+                    @NotNull final XmlTag[] uiComponents =
+                            bodyTag.findSubTags(LayoutXml.UI_COMPONENT_TAG_NAME);
+                    for (final XmlTag uiComponent: uiComponents) {
+                        @Nullable final XmlAttribute uiComponentName
+                                = uiComponent.getAttribute(LayoutXml.NAME_ATTRIBUTE);
                         if (uiComponentName.getValue().equals(layoutXmlData.getFormName())) {
                             isDeclared = true;
                         }
@@ -93,11 +98,24 @@ public class LayoutXmlGenerator extends FileGenerator {
                 boolean contentContainerIsGenerated = false;
                 if (contentContainer == null) {
                     contentContainerIsGenerated = true;
-                    contentContainer = bodyTag.createChildTag("referenceContainer", null, "", false);
-                    contentContainer.setAttribute("name", "content");
+                    contentContainer = bodyTag.createChildTag(
+                        LayoutXml.REFERENCE_CONTAINER_TAG_NAME,
+                        null,
+                        "",
+                        false
+                    );
+                    contentContainer.setAttribute(
+                            LayoutXml.NAME_ATTRIBUTE,
+                            LayoutXml.CONTENT_CONTAINER_NAME
+                    );
                 }
-                XmlTag uiComponentTag = contentContainer.createChildTag("uiComponent", null, null, false);
-                uiComponentTag.setAttribute("name", layoutXmlData.getFormName());
+                final XmlTag uiComponentTag = contentContainer.createChildTag(
+                        LayoutXml.UI_COMPONENT_TAG_NAME,
+                        null,
+                        null,
+                        false
+                );
+                uiComponentTag.setAttribute(LayoutXml.NAME_ATTRIBUTE, layoutXmlData.getFormName());
                 contentContainer.addSubTag(uiComponentTag, false);
 
                 if (contentContainerIsGenerated) {
@@ -115,6 +133,5 @@ public class LayoutXmlGenerator extends FileGenerator {
     }
 
     @Override
-    protected void fillAttributes(final Properties attributes) {
-    }
+    protected void fillAttributes(final Properties attributes) {}//NOPMD
 }

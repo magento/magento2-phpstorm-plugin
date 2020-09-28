@@ -5,17 +5,35 @@
 
 package com.magento.idea.magento2plugin.ui.table;
 
-import javax.swing.*;
+import java.awt.Component;
+import javax.swing.JComboBox;
+import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
-import java.awt.*;
 
 public class ComboBoxRenderer extends JComboBox implements TableCellRenderer {
-    public ComboBoxRenderer(String[] items) {
+    public ComboBoxRenderer(final String... items) {
         super(items);
     }
 
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                   boolean hasFocus, int row, int column) {
+    /**
+     * Custom table cell renderer.
+     *
+     * @param table JTable
+     * @param value Object
+     * @param isSelected boolean
+     * @param hasFocus boolean
+     * @param row int
+     * @param column int
+     * @return this
+     */
+    public Component getTableCellRendererComponent(
+            final JTable table,
+            final Object value,
+            final boolean isSelected,
+            final boolean hasFocus,
+            final int row,
+            final int column
+    ) {
         if (isSelected) {
             setForeground(table.getSelectionForeground());
             super.setBackground(table.getSelectionBackground());

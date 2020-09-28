@@ -5,34 +5,50 @@
 
 package com.magento.idea.magento2plugin.ui.table;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Component;
+import java.util.Arrays;
+import javax.swing.DefaultCellEditor;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JTable;
 
 public class ComboBoxEditor extends DefaultCellEditor {
-    private DefaultComboBoxModel model;
 
-    private String[] obtainedList;
+    private final DefaultComboBoxModel model;
+    private final String[] obtainedList;
 
-    public ComboBoxEditor(String[] items) {
+    /**
+     * Custom ComboBox.
+     *
+     * @param items String[]
+     */
+    public ComboBoxEditor(final String... items) {
         super(new JComboBox(items));
         this.model = (DefaultComboBoxModel)((JComboBox)getComponent()).getModel();
-        obtainedList = items;
+        this.obtainedList = Arrays.copyOf(items, items.length);
     }
 
     @Override
-    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-        if(column == 0) {
+    public Component getTableCellEditorComponent(
+            final JTable table,
+            final Object value,
+            final boolean isSelected,
+            final int row,
+            final int column
+    ) {
+        if (column == 0) {
             model.removeAllElements();
-            for(int i = 0; i < obtainedList.length; i++) {
-                model.addElement(obtainedList[i]);
+            for (final String obtained : obtainedList) {
+                model.addElement(obtained);
             }
         } else {
 
             model.removeAllElements();
-            String selectedItem = (String) table.getValueAt(row, 0);
-            for(int i = 0; i < obtainedList.length; i++) {
-                if(!selectedItem.equals(obtainedList[i]))
-                    model.addElement(obtainedList[i]);
+            final String selectedItem = (String) table.getValueAt(row, 0);
+            for (final String obtained : obtainedList) {
+                if (!selectedItem.equals(obtained)) {
+                    model.addElement(obtained);
+                }
             }
         }
 

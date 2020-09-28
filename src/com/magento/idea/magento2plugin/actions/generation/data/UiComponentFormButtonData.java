@@ -6,26 +6,39 @@
 package com.magento.idea.magento2plugin.actions.generation.data;
 
 public class UiComponentFormButtonData {
-    private String buttonDirectory;
-    private String buttonClassName;
-    private String buttonModule;
-    private String buttonType;
-    private String namespace;
-    private String buttonLabel;
-    private String buttonSortOrder;
-    private String formName;
-    private String fqn;
+    private final String buttonDirectory;
+    private final String buttonClassName;
+    private final String buttonModule;
+    private final String buttonType;
+    private final String namespace;
+    private final String buttonLabel;
+    private final String buttonSortOrder;
+    private final String formName;
+    private final String fqn;
 
+    /**
+     * UI component form button data.
+     *
+     * @param buttonDirectory String
+     * @param buttonClassName String
+     * @param buttonModule String
+     * @param buttonType String
+     * @param namespace String
+     * @param buttonLabel String
+     * @param buttonSortOrder String
+     * @param formName String
+     * @param fqn String
+     */
     public UiComponentFormButtonData(
-            String buttonDirectory,
-            String buttonClassName,
-            String buttonModule,
-            String buttonType,
-            String namespace,
-            String buttonLabel,
-            String buttonSortOrder,
-            String formName,
-            String fqn
+            final String buttonDirectory,
+            final String buttonClassName,
+            final String buttonModule,
+            final String buttonType,
+            final String namespace,
+            final String buttonLabel,
+            final String buttonSortOrder,
+            final String formName,
+            final String fqn
     ) {
         this.buttonDirectory = buttonDirectory;
         this.buttonClassName = buttonClassName;

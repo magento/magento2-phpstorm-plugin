@@ -13,11 +13,11 @@ import com.magento.idea.magento2plugin.actions.generation.NewUiComponentFormActi
 import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
 import com.magento.idea.magento2plugin.actions.generation.data.LayoutXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.RoutesXmlData;
+import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataProviderData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormButtonData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldsetData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFileData;
-import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataProviderData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewUiComponentFormValidator;
 import com.magento.idea.magento2plugin.actions.generation.generator.LayoutXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleControllerClassGenerator;
@@ -37,8 +37,6 @@ import com.magento.idea.magento2plugin.ui.table.ComboBoxEditor;
 import com.magento.idea.magento2plugin.ui.table.DeleteRowButton;
 import com.magento.idea.magento2plugin.ui.table.TableButton;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-import org.jetbrains.annotations.NotNull;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -47,13 +45,24 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
-        "PMD.ConstructorCallsOverridableMethod"
+        "PMD.TooManyMethods",
+        "PMD.ConstructorCallsOverridableMethod",
+        "PMD.ExcessiveImports",
+        "PMD.GodClass"
 })
 public class NewUiComponentFormDialog extends AbstractDialog {
     private final NewUiComponentFormValidator validator;
@@ -67,34 +76,47 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     private JTextField formLabel;
     private JTable formButtons;
     private JButton addButton;
-    private JLabel formButtonsLabel;
-    private JLabel formNameLabel;
-    private JLabel formLabelLabel;
-    private JLabel fieldsetsLabel;
     private JTable fieldsets;
-    private JLabel fieldsLabel;
     private JTable fields;
     private JButton addFieldset;
     private JButton addField;
     private JTextField route;
-    private JLabel routeLabel;
-    private JLabel viewControllerLabel;
-    private JLabel controllerNameLabel;
     private JTextField viewControllerName;
     private JTextField viewActionName;
-    private JLabel actionNameLabel;
-    private JLabel saveControllerLabel;
-    private JLabel submitControllerNameLabel;
     private JTextField submitControllerName;
-    private JLabel submitActionNameLabel;
     private JTextField submitActionName;
     private JTextField dataProviderClassName;
-    private JLabel dataProviderLabel;
-    private JLabel dataProviderClassNameLabel;
-    private JLabel dataProviderDirectoryLabel;
     private JTextField dataProviderDirectory;
     private JLabel aclLabel;
     private JTextField acl;
+    private JLabel formButtonsLabel;//NOPMD
+    private JLabel formNameLabel;//NOPMD
+    private JLabel formLabelLabel;//NOPMD
+    private JLabel fieldsetsLabel;//NOPMD
+    private JLabel fieldsLabel;//NOPMD
+    private JLabel routeLabel;//NOPMD
+    private JLabel viewControllerLabel;//NOPMD
+    private JLabel controllerNameLabel;//NOPMD
+    private JLabel actionNameLabel;//NOPMD
+    private JLabel saveControllerLabel;//NOPMD
+    private JLabel submitControllerNameLabel;//NOPMD
+    private JLabel submitActionNameLabel;//NOPMD
+    private JLabel dataProviderLabel;//NOPMD
+    private JLabel dataProviderClassNameLabel;//NOPMD
+    private JLabel dataProviderDirectoryLabel;//NOPMD
+
+    private static final String CLASS_COLUMN = "Class";
+    private static final String DIRECTORY_COLUMN = "Directory";
+    private static final String TYPE_COLUMN = "Type";
+    private static final String LABEL_COLUMN = "Label";
+    private static final String SORT_ORDER_COLUMN = "Sort Order";
+    private static final String ACTION_COLUMN = "Action";
+    private static final String DELETE_COLUMN = "Delete";
+    private static final String NAME_COLUMN = "Name";
+    private static final String FIELDSET_COLUMN = "Fieldset";
+    private static final String FORM_ELEMENT_TYPE_COLUMN = "Form Element Type";
+    private static final String DATA_TYPE_COLUMN = "Data Type";
+    private static final String SOURCE_COLUMN = "Source";
 
     /**
      * Open new dialog for adding new controller.
@@ -118,6 +140,7 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(final WindowEvent event) {
                 onCancel();
             }
@@ -130,6 +153,7 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
                 new ActionListener() {
+                    @Override
                     public void actionPerformed(final ActionEvent event) {
                         onCancel();
                     }
@@ -139,76 +163,86 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         );
 
         formAreaSelect.addActionListener(e -> toggleAcl());
+        acl.setText(getModuleName() + "::manage");
     }
 
     protected void initButtonsTable() {
-        DefaultTableModel model = getFormButtonsModel();
+        final DefaultTableModel model = getFormButtonsModel();
         model.setDataVector(
                 new Object[][] {},
-                new Object[] { "Class", "Directory", "Type", "Label", "Sort Order", "Action" }
+                new Object[] {
+                        CLASS_COLUMN,
+                        DIRECTORY_COLUMN,
+                        TYPE_COLUMN,
+                        LABEL_COLUMN,
+                        SORT_ORDER_COLUMN,
+                        ACTION_COLUMN
+                }
         );
 
-        TableColumn column = formButtons.getColumn("Action");
-        column.setCellRenderer(new TableButton("Delete"));
+        final TableColumn column = formButtons.getColumn(ACTION_COLUMN);
+        column.setCellRenderer(new TableButton(DELETE_COLUMN));
         column.setCellEditor(
                 new DeleteRowButton(new JCheckBox()));
 
         addButton.addActionListener(e -> {
-            model.addRow(new Object[] {"Button","Block/Adminhtml/Form","Save","","0","Delete"});
+            model.addRow(
+                    new Object[] {"Button","Block/Adminhtml/Form","Save","","0",DELETE_COLUMN}
+            );
         });
 
-        String[] buttonTypes = new String[] {
+        final String[] buttonTypes = {
             FormButtonBlockPhp.TYPE_SAVE,
             FormButtonBlockPhp.TYPE_BACK,
             FormButtonBlockPhp.TYPE_DELETE,
             FormButtonBlockPhp.TYPE_CUSTOM
         };
 
-        TableColumn typeColumn = formButtons.getColumn("Type");
-        typeColumn.setCellEditor(new ComboBoxEditor(buttonTypes));
-        typeColumn.setCellRenderer(new ComboBoxTableRenderer<>(buttonTypes));
+        final TableColumn typeColumnObject = formButtons.getColumn(TYPE_COLUMN);
+        typeColumnObject.setCellEditor(new ComboBoxEditor(buttonTypes));
+        typeColumnObject.setCellRenderer(new ComboBoxTableRenderer<>(buttonTypes));
     }
 
     protected void initFieldSetsTable() {
-        DefaultTableModel model = getFieldsetsModel();
+        final DefaultTableModel model = getFieldsetsModel();
         model.setDataVector(
-                new Object[][] {{"General","10","Delete"}},
-                new Object[] { "Label", "SortOrder", "Action"}
+                new Object[][] {{"General","10",DELETE_COLUMN}},
+                new Object[] { LABEL_COLUMN, SORT_ORDER_COLUMN, ACTION_COLUMN}
         );
 
-        TableColumn column = fieldsets.getColumn("Action");
-        column.setCellRenderer(new TableButton("Delete"));
+        final TableColumn column = fieldsets.getColumn(ACTION_COLUMN);
+        column.setCellRenderer(new TableButton(DELETE_COLUMN));
         column.setCellEditor(
                 new DeleteRowButton(new JCheckBox()));
 
         addFieldset.addActionListener(e -> {
-            model.addRow(new Object[] {"","","Delete"});
+            model.addRow(new Object[] {"","",DELETE_COLUMN});
         });
         model.addTableModelListener(
-            e -> {
-                initFieldsetsColumn();
-            }
+                event -> {
+                    initFieldsetsColumn();
+                }
         );
     }
 
     protected void initFieldTable() {
-        DefaultTableModel model = getFieldsModel();
+        final DefaultTableModel model = getFieldsModel();
         model.setDataVector(
                 new Object[][] {},
                 new Object[] {
-                    "Name",
-                    "Label",
-                    "SortOrder",
-                    "Fieldset",
-                    "Form Element Type",
-                    "Data Type",
-                    "Source",
-                    "Action"
+                    NAME_COLUMN,
+                    LABEL_COLUMN,
+                    SORT_ORDER_COLUMN,
+                    FIELDSET_COLUMN,
+                    FORM_ELEMENT_TYPE_COLUMN,
+                    DATA_TYPE_COLUMN,
+                    SOURCE_COLUMN,
+                    ACTION_COLUMN
                 }
         );
 
-        TableColumn column = fields.getColumn("Action");
-        column.setCellRenderer(new TableButton("Delete"));
+        final TableColumn column = fields.getColumn(ACTION_COLUMN);
+        column.setCellRenderer(new TableButton(DELETE_COLUMN));
         column.setCellEditor(
                 new DeleteRowButton(new JCheckBox()));
 
@@ -221,7 +255,7 @@ public class NewUiComponentFormDialog extends AbstractDialog {
                     "input",
                     "text",
                     "",
-                    "Delete"
+                    DELETE_COLUMN
             });
         });
 
@@ -230,7 +264,7 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     }
 
     private void initFormElementTypeColumn() {
-        String[] formElementTypes = new String[]{
+        final String[] formElementTypes = {
             "hidden",
             "file",
             "input",
@@ -248,21 +282,21 @@ public class NewUiComponentFormDialog extends AbstractDialog {
             "wysiwyg"
         };
 
-        TableColumn formElementTypeColumn = fields.getColumn("Form Element Type");
+        final TableColumn formElementTypeColumn = fields.getColumn(FORM_ELEMENT_TYPE_COLUMN);
         formElementTypeColumn.setCellEditor(new ComboBoxEditor(formElementTypes));
         formElementTypeColumn.setCellRenderer(new ComboBoxTableRenderer<>(formElementTypes));
     }
 
     private void initFieldsetsColumn() {
-        String[] fieldsets = getFieldsetLabels();
+        final String[] fieldsets = getFieldsetLabels();
 
-        TableColumn fieldsetColumn = fields.getColumn("Fieldset");
+        final TableColumn fieldsetColumn = fields.getColumn(FIELDSET_COLUMN);
         fieldsetColumn.setCellEditor(new ComboBoxEditor(fieldsets));
         fieldsetColumn.setCellRenderer(new ComboBoxTableRenderer<>(fieldsets));
     }
 
     private String[] getFieldsetLabels() {
-        DefaultTableModel model = getFieldsetsModel();
+        final DefaultTableModel model = getFieldsetsModel();
         String[] fieldsets = new String[model.getRowCount()];
         for (int count = 0; count < model.getRowCount(); count++) {
             fieldsets[count] = model.getValueAt(count, 0).toString();
@@ -317,7 +351,7 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     }
 
     private PsiFile generateDataProviderFile() {
-        NamespaceBuilder namespace = getDataProviderNamespace();
+        final NamespaceBuilder namespace = getDataProviderNamespace();
         return new UiComponentDataProviderGenerator(new UiComponentDataProviderData(
             UiComponentDataProviderPhp.CUSTOM_TYPE,
             getDataProviderClassName(),
@@ -329,7 +363,11 @@ public class NewUiComponentFormDialog extends AbstractDialog {
 
     @NotNull
     private NamespaceBuilder getDataProviderNamespace() {
-        return new NamespaceBuilder(getModuleName(), getDataProviderClassName(), getDataProviderDirectory());
+        return new NamespaceBuilder(
+                getModuleName(),
+                getDataProviderClassName(),
+                getDataProviderDirectory()
+        );
     }
 
     private PsiFile generateFormFile() {
@@ -357,7 +395,11 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     }
 
     private PsiFile generateViewControllerFile() {
-        NamespaceBuilder namespace = new NamespaceBuilder(getModuleName(), getViewActionName(), getViewControllerDirectory());
+        final NamespaceBuilder namespace = new NamespaceBuilder(
+                getModuleName(),
+                getViewActionName(),
+                getViewControllerDirectory()
+        );
         return new ModuleControllerClassGenerator(new ControllerFileData(
             getViewControllerDirectory(),
             getViewActionName(),
@@ -371,7 +413,11 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     }
 
     private PsiFile generateSubmitControllerFile() {
-        NamespaceBuilder namespace = new NamespaceBuilder(getModuleName(), getViewActionName(), getSubmitControllerDirectory());
+        final NamespaceBuilder namespace = new NamespaceBuilder(
+                getModuleName(),
+                getViewActionName(),
+                getSubmitControllerDirectory()
+        );
         return new ModuleControllerClassGenerator(new ControllerFileData(
             getSubmitControllerDirectory(),
             getSubmitActionName(),
@@ -421,18 +467,27 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         return formLabel.getText().trim();
     }
 
-    public ArrayList<UiComponentFormButtonData> getButtons() {
-        DefaultTableModel model = getFormButtonsModel();
-        ArrayList<UiComponentFormButtonData> buttons = new ArrayList<UiComponentFormButtonData>();
+    /**
+     * Return form buttons list.
+     *
+     * @return List[UiComponentFormButtonData]
+     */
+    public List<UiComponentFormButtonData> getButtons() {
+        final DefaultTableModel model = getFormButtonsModel();
+        final List<UiComponentFormButtonData> buttons = new ArrayList<>();
         for (int count = 0; count < model.getRowCount(); count++) {
-            String buttonDirectory = model.getValueAt(count, 1).toString();
-            String buttonClassName = model.getValueAt(count, 0).toString();
-            String buttonType = model.getValueAt(count, 2).toString();
-            String buttonLabel = model.getValueAt(count, 3).toString();
-            String buttonSortOrder = model.getValueAt(count, 4).toString();
-            final NamespaceBuilder namespaceBuilder = new NamespaceBuilder(getModuleName(), buttonClassName, buttonDirectory);
+            final String buttonDirectory = model.getValueAt(count, 1).toString();
+            final String buttonClassName = model.getValueAt(count, 0).toString();
+            final String buttonType = model.getValueAt(count, 2).toString();
+            final String buttonLabel = model.getValueAt(count, 3).toString();
+            final String buttonSortOrder = model.getValueAt(count, 4).toString();
+            final NamespaceBuilder namespaceBuilder = new NamespaceBuilder(//NOPMD
+                    getModuleName(),
+                    buttonClassName,
+                    buttonDirectory
+            );
 
-            UiComponentFormButtonData buttonData = new UiComponentFormButtonData(
+            final UiComponentFormButtonData buttonData = new UiComponentFormButtonData(//NOPMD
                     buttonDirectory,
                     buttonClassName,
                     getModuleName(),
@@ -452,14 +507,20 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         return buttons;
     }
 
-    public ArrayList<UiComponentFormFieldsetData> getFieldsets() {
-        DefaultTableModel model = getFieldsetsModel();
-        ArrayList<UiComponentFormFieldsetData> fieldsets = new ArrayList<UiComponentFormFieldsetData>();
+    /**
+     * Returns form fieldsets.
+     *
+     * @return List[UiComponentFormFieldsetData]
+     */
+    public List<UiComponentFormFieldsetData> getFieldsets() {
+        final DefaultTableModel model = getFieldsetsModel();
+        final ArrayList<UiComponentFormFieldsetData> fieldsets =
+                new ArrayList<>();
         for (int count = 0; count < model.getRowCount(); count++) {
-            String label = model.getValueAt(count, 0).toString();
-            String sortOrder = model.getValueAt(count, 1).toString();
+            final String label = model.getValueAt(count, 0).toString();
+            final String sortOrder = model.getValueAt(count, 1).toString();
 
-            UiComponentFormFieldsetData fieldsetData = new UiComponentFormFieldsetData(
+            final UiComponentFormFieldsetData fieldsetData = new UiComponentFormFieldsetData(//NOPMD
                     label,
                     sortOrder
             );
@@ -472,19 +533,24 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         return fieldsets;
     }
 
-    public ArrayList<UiComponentFormFieldData> getFields() {
-        DefaultTableModel model = getFieldsModel();
-        ArrayList<UiComponentFormFieldData> fieldsets = new ArrayList<UiComponentFormFieldData>();
+    /**
+     * Returns form fields list.
+     *
+     * @return List[UiComponentFormFieldData]
+     */
+    public List<UiComponentFormFieldData> getFields() {
+        final DefaultTableModel model = getFieldsModel();
+        final ArrayList<UiComponentFormFieldData> fieldsets = new ArrayList<>();
         for (int count = 0; count < model.getRowCount(); count++) {
-            String name = model.getValueAt(count, 0).toString();
-            String label = model.getValueAt(count, 1).toString();
-            String sortOrder = model.getValueAt(count, 2).toString();
-            String fieldset = model.getValueAt(count, 3).toString();
-            String formElementType = model.getValueAt(count, 4).toString();
-            String dataType = model.getValueAt(count, 5).toString();
-            String source = model.getValueAt(count, 6).toString();
+            final String name = model.getValueAt(count, 0).toString();
+            final String label = model.getValueAt(count, 1).toString();
+            final String sortOrder = model.getValueAt(count, 2).toString();
+            final String fieldset = model.getValueAt(count, 3).toString();
+            final String formElementType = model.getValueAt(count, 4).toString();
+            final String dataType = model.getValueAt(count, 5).toString();
+            final String source = model.getValueAt(count, 6).toString();
 
-            UiComponentFormFieldData fieldsetData = new UiComponentFormFieldData(
+            final UiComponentFormFieldData fieldsetData = new UiComponentFormFieldData(//NOPMD
                     name,
                     label,
                     sortOrder,
@@ -556,8 +622,8 @@ public class NewUiComponentFormDialog extends AbstractDialog {
 
     private String getControllerDirectory() {
         final String area = getArea();
-        String directory = area.equals(Areas.adminhtml.toString())
-            ? ControllerBackendPhp.DEFAULT_DIR : ControllerFrontendPhp.DEFAULT_DIR;
+        final String directory = area.equals(Areas.adminhtml.toString())
+                ? ControllerBackendPhp.DEFAULT_DIR : ControllerFrontendPhp.DEFAULT_DIR;
 
         return directory + File.separator;
     }

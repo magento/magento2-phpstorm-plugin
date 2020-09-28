@@ -9,11 +9,11 @@ import com.intellij.lang.Language;
 import com.jetbrains.php.lang.PhpLanguage;
 
 public class FormButtonBlockPhp implements ModuleFileInterface {
-    public static String TEMPLATE = "Magento Php Form Button Block Class";
+    public static String template = "Magento Php Form Button Block Class";
 
-    public static String SAVE_METHOD_TEMPLATE = "Magento Php Form Button Block Type Save";
-    public static String DELETE_METHOD_TEMPLATE = "Magento Php Form Button Block Type Delete";
-    public static String BACK_METHOD_TEMPLATE = "Magento Php Form Button Block Type Back";
+    public static String saveMethodTemplate = "Magento Php Form Button Block Type Save";
+    public static String deleteMethodTemplate = "Magento Php Form Button Block Type Delete";
+    public static String backMethodTemplate = "Magento Php Form Button Block Type Back";
 
     public static final String TYPE_SAVE = "Save";
     public static final String TYPE_DELETE = "Delete";
@@ -21,16 +21,10 @@ public class FormButtonBlockPhp implements ModuleFileInterface {
     public static final String TYPE_CUSTOM = "Custom";
 
     public static final String DEFAULT_METHOD = "getButtonData";
-
-    private static FormButtonBlockPhp INSTANCE = null;
     private String fileName;
 
-    public static FormButtonBlockPhp getInstance(String className) {
-        if (null == INSTANCE) {
-            INSTANCE = new FormButtonBlockPhp();
-        }
-        INSTANCE.setFileName(className.concat(".php"));
-        return INSTANCE;
+    public FormButtonBlockPhp(final String className) {
+        this.setFileName(className.concat(".php"));
     }
 
     @Override
@@ -40,7 +34,7 @@ public class FormButtonBlockPhp implements ModuleFileInterface {
 
     @Override
     public String getTemplate() {
-        return TEMPLATE;
+        return template;
     }
 
     @Override
@@ -48,7 +42,7 @@ public class FormButtonBlockPhp implements ModuleFileInterface {
         return PhpLanguage.INSTANCE;
     }
 
-    private void setFileName(String filename) {
+    private void setFileName(final String filename) {
         this.fileName = filename;
     }
 }

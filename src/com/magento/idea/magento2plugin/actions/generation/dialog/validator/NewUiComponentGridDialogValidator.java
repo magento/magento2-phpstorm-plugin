@@ -6,8 +6,8 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator;
 
 import com.jetbrains.php.refactoring.PhpNameUtil;
-import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataProviderData;
+import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewUiComponentGridDialog;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;

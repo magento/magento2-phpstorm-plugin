@@ -5,21 +5,20 @@
 
 package com.magento.idea.magento2plugin.actions.generation.data;
 
-import java.util.ArrayList;
+import java.util.List;
 
-@SuppressWarnings({"PMD.DataClass"})
 public class UiComponentFormFileData {
     private final String formName;
     private final String formArea;
     private final String moduleName;
     private final String label;
-    private final ArrayList<UiComponentFormButtonData> buttons;
-    private final ArrayList<UiComponentFormFieldsetData> fieldsets;
-    private final ArrayList<UiComponentFormFieldData> fields;
-    private String route;
-    private String submitControllerName;
-    private String submitActionName;
-    private String dataProviderFqn;
+    private final List<UiComponentFormButtonData> buttons;
+    private final List<UiComponentFormFieldsetData> fieldsets;
+    private final List<UiComponentFormFieldData> fields;
+    private final String route;
+    private final String submitControllerName;
+    private final String submitActionName;
+    private final String dataProviderFqn;
 
     /**
      * UI Form data file constructor.
@@ -27,22 +26,27 @@ public class UiComponentFormFileData {
      * @param formName String
      * @param formArea String
      * @param moduleName String
-     * @param buttons ArrayList<UiComponentFormButtonData>
-     * @param fieldsets ArrayList<UiComponentFormFieldsetData>
-     * @param fields ArrayList<UiComponentFormFieldData>
+     * @param buttons List[UiComponentFormButtonData]
+     * @param fieldsets List[UiComponentFormFieldsetData]
+     * @param fields List[UiComponentFormFieldData]
+     * @param route String
+     * @param submitControllerName String
+     * @param submitActionName String
+     * @param dataProviderFqn String
      */
+    @SuppressWarnings({"PMD.ExcessiveParameterList"})
     public UiComponentFormFileData(
             final String formName,
             final String formArea,
             final String moduleName,
             final String label,
-            final ArrayList<UiComponentFormButtonData> buttons,
-            final ArrayList<UiComponentFormFieldsetData> fieldsets,
-            final ArrayList<UiComponentFormFieldData> fields,
+            final List<UiComponentFormButtonData> buttons,
+            final List<UiComponentFormFieldsetData> fieldsets,
+            final List<UiComponentFormFieldData> fields,
             final String route,
-            String submitControllerName,
-            String submitActionName,
-            String dataProviderFqn
+            final String submitControllerName,
+            final String submitActionName,
+            final String dataProviderFqn
     ) {
         this.formName = formName;
         this.formArea = formArea;
@@ -96,42 +100,62 @@ public class UiComponentFormFileData {
     /**
      * Get buttons.
      *
-     * @return ArrayList<UiComponentFormButtonData>
+     * @return List[UiComponentFormButtonData]
      */
-    public ArrayList<UiComponentFormButtonData> getButtons() {
+    public List<UiComponentFormButtonData> getButtons() {
         return buttons;
     }
 
     /**
      * Get fieldsets.
      *
-     * @return ArrayList<UiComponentFormFieldsetData>
+     * @return List[UiComponentFormFieldsetData]
      */
-    public ArrayList<UiComponentFormFieldsetData> getFieldsets() {
+    public List<UiComponentFormFieldsetData> getFieldsets() {
         return fieldsets;
     }
 
     /**
      * Get fields.
      *
-     * @return ArrayList<UiComponentFormFieldData>
+     * @return List[UiComponentFormFieldData]
      */
-    public ArrayList<UiComponentFormFieldData> getFields() {
+    public List<UiComponentFormFieldData> getFields() {
         return fields;
     }
 
+    /**
+     * Get route.
+     *
+     * @return String
+     */
     public String getRoute() {
         return route;
     }
 
+    /**
+     * Get submit action name.
+     *
+     * @return String
+     */
     public String getSubmitControllerName() {
         return submitControllerName;
     }
 
+    /**
+     * Get submit action name.
+     *
+     * @return String
+     */
     public String getSubmitActionName() {
         return submitActionName;
     }
 
+    /**
+     * Get data provider FQN.
+     *
+     * @return String
+     */
     public String getDataProviderFqn() {
         return dataProviderFqn;
     }

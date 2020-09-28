@@ -6,26 +6,30 @@
 package com.magento.idea.magento2plugin.actions.generation.data;
 
 public class LayoutXmlData {
-    private String area;
-    private String route;
-    private String moduleName;
-    private String controllerName;
-    private String actionName;
-    private String formName;
+    private final String area;
+    private final String route;
+    private final String moduleName;
+    private final String controllerName;
+    private final String actionName;
+    private final String formName;
 
     /**
-     * Routes XML Data.
+     * Layout XML data.
      *
      * @param area String
      * @param route String
+     * @param moduleName String
+     * @param controllerName String
+     * @param actionName String
+     * @param formName String
      */
     public LayoutXmlData(
-            String area,
-            String route,
-            String moduleName,
-            String controllerName,
-            String actionName,
-            String formName
+            final String area,
+            final String route,
+            final String moduleName,
+            final String controllerName,
+            final String actionName,
+            final String formName
     ) {
         this.area = area;
         this.route = route;

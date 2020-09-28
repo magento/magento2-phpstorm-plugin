@@ -34,6 +34,7 @@ public final class FindOrCreateLayoutXml {
      * @param area String
      * @return PsiFile
      */
+    @SuppressWarnings({"PMD.UseObjectForClearerAPI"})
     public PsiFile execute(
             final String actionName,
             final String routeId,

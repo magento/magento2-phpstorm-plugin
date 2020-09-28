@@ -7,22 +7,33 @@ package com.magento.idea.magento2plugin.actions.generation.data;
 
 public class UiComponentFormFieldData {
 
-    private String name;
-    private String label;
-    private String sortOrder;
-    private String fieldset;
-    private String formElementType;
-    private String dataType;
-    private String source;
+    private final String name;
+    private final String label;
+    private final String sortOrder;
+    private final String fieldset;
+    private final String formElementType;
+    private final String dataType;
+    private final String source;
 
+    /**
+     * Form field data.
+     *
+     * @param name String
+     * @param label String
+     * @param sortOrder String
+     * @param fieldset String
+     * @param formElementType String
+     * @param dataType String
+     * @param source String
+     */
     public UiComponentFormFieldData(
-            String name,
-            String label,
-            String sortOrder,
-            String fieldset,
-            String formElementType,
-            String dataType,
-            String source
+            final String name,
+            final String label,
+            final String sortOrder,
+            final String fieldset,
+            final String formElementType,
+            final String dataType,
+            final String source
     ) {
         this.name = name;
         this.label = label;
