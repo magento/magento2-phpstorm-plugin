@@ -9,8 +9,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.NewUiComponentGridAction;
-import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataProviderData;
+import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridToolbarData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewUiComponentGridDialogValidator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentDataProviderGenerator;
@@ -87,6 +87,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(final WindowEvent event) {
                 onCancel();
             }

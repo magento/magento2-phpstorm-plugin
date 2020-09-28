@@ -13,6 +13,11 @@ import javax.swing.table.TableCellRenderer;
 public class TableButton extends JButton implements TableCellRenderer {
     private final String defaultValue;
 
+    /**
+     * Table button renderer.
+     *
+     * @param defaultValue String
+     */
     public TableButton(final String defaultValue) {
         super();
         this.defaultValue = defaultValue;
