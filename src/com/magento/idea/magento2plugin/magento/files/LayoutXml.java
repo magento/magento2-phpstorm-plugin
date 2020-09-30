@@ -16,7 +16,7 @@ public class LayoutXml implements ModuleFileInterface {
     public static String CACHEABLE_ATTRIBUTE_VALUE_FALSE = "false";
     public static String BLOCK_ATTRIBUTE_TAG_NAME = "block";
     public static String REFERENCE_BLOCK_ATTRIBUTE_TAG_NAME = "referenceBlock";
-    public static String ROOT_TAG_NAME = "referenceBlock";
+    public static String ROOT_TAG_NAME = "body";
     public static String REFERENCE_CONTAINER_TAG_NAME = "referenceContainer";
     public static String UI_COMPONENT_TAG_NAME = "uiComponent";
     public static String XML_ATTRIBUTE_TEMPLATE = "template";

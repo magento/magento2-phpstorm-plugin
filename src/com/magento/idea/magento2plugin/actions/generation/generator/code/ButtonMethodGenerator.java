@@ -62,6 +62,10 @@ public class ButtonMethodGenerator {
      * @param buttonClass PhpClass
      */
     public void generate(PsiFile[] buttonClassFile, final PhpClass buttonClass) {
+        final String template = getMethodTemplateByButtonType(buttonData.getButtonType());
+        if (template.equals("")) {
+            return;
+        }
         WriteCommandAction.runWriteCommandAction(project, () -> {
             if (buttonClass == null) {
                 final String errorTitle = commonBundle.message("common.error");
@@ -79,10 +83,6 @@ public class ButtonMethodGenerator {
                 return;
             }
 
-            final String template = getMethodTemplateByButtonType(buttonData.getButtonType());
-            if (template == null) {
-                return;
-            }
             final StringBuffer textBuf = new StringBuffer();
             try {
                 textBuf.append(getCodeTemplate.execute(

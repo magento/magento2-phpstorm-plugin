@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">my_form.my_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">My Form</item>
+    </argument>
+    <settings>
+        <namespace>my_form</namespace>
+        <deps>
+            <dep>my_form.my_form_data_source</dep>
+        </deps>
+        <buttons>
+            <button name="saveEntity" class="Foo/Bar/Block/Form/Save"/>
+            <button name="backToEntity" class="Foo/Bar/Block/Form/Back"/>
+            <button name="deleteEntity" class="Foo/Bar/Block/Form/Delete"/>
+            <button name="customController" class="Foo/Bar/Block/Form/Custom"/>
+        </buttons>
+    </settings>
+    <dataSource name="my_form_data_source" component="Magento_Ui/js/form/provider">
+        <settings>
+            <submitUrl path="customroute/myentity/save"/>
+        </settings>
+        <dataProvider class="Foo/Bar/Ui/MyEntity/DataProvider" name="my_form_data_source"/>
+    </dataSource>
+    <fieldset label="General" sortOrder="10">
+        <field name="my_field" sortOrder="10" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">entity</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">My Field</label>
+                <dataScope>my_field</dataScope>
+            </settings>
+        </field>
+    </fieldset>
+    <fieldset label="Test Fieldset" sortOrder="20">
+        <field name="my_field_2" sortOrder="10" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">entity</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">My Field 2</label>
+                <dataScope>my_field_2</dataScope>
+            </settings>
+        </field>
+    </fieldset>
+</form>

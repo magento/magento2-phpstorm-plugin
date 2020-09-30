@@ -57,8 +57,6 @@ public class UiComponentFormGenerator extends FileGenerator {
 
         createButtonClasses(actionName);
 
-
-
         return formFile;
     }
 

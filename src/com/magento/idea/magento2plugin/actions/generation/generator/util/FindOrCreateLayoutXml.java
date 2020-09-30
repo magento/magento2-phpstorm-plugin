@@ -58,22 +58,22 @@ public final class FindOrCreateLayoutXml {
                     .findOrCreateSubdirectory(parentDirectory, fileDirectory);
         }
         final LayoutXml layoutXml = new  LayoutXml(routeId, controllerName, controllerActionName);
-        PsiFile routesXml = FileBasedIndexUtil.findModuleViewFile(
+        PsiFile layoutXmlFile = FileBasedIndexUtil.findModuleViewFile(
                 layoutXml.getFileName(),
                 getArea(area),
                 moduleName,
                 project,
                 LayoutXml.PARENT_DIR
         );
-        if (routesXml == null) {
-            routesXml = fileFromTemplateGenerator.generate(
+        if (layoutXmlFile == null) {
+            layoutXmlFile = fileFromTemplateGenerator.generate(
                     layoutXml,
                     new Properties(),
                     parentDirectory,
                     actionName
             );
         }
-        return routesXml;
+        return layoutXmlFile;
     }
 
     private Areas getArea(final String area) {

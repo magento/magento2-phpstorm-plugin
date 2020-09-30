@@ -55,7 +55,7 @@ public class UiComponentFormButtonPhpClassGenerator extends FileGenerator {
         final PhpClass buttonClass = createButton(actionName);
         new ButtonMethodGenerator(buttonData, project).generate(buttonClassFile, buttonClass);
 
-        return buttonClassFile[0];
+        return buttonClass.getContainingFile();
     }
 
     /**

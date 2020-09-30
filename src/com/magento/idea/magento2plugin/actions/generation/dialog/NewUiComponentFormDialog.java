@@ -164,6 +164,7 @@ public class NewUiComponentFormDialog extends AbstractDialog {
 
         formAreaSelect.addActionListener(e -> toggleAcl());
         acl.setText(getModuleName() + "::manage");
+        formAreaSelect.setEnabled(false);
     }
 
     protected void initButtonsTable() {
