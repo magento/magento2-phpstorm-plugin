@@ -63,7 +63,7 @@ public class ButtonMethodGenerator {
      */
     public void generate(PsiFile[] buttonClassFile, final PhpClass buttonClass) {
         final String template = getMethodTemplateByButtonType(buttonData.getButtonType());
-        if (template.equals("")) {
+        if (template.isEmpty()) {
             return;
         }
         WriteCommandAction.runWriteCommandAction(project, () -> {
