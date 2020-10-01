@@ -11,13 +11,13 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridDataProviderData;
+import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataProviderData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.magento.files.UiComponentGridDataProviderPhp;
+import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
@@ -26,8 +26,8 @@ import java.util.Properties;
 import javax.swing.JOptionPane;
 
 @SuppressWarnings({"PMD.OnlyOneReturn", "PMD.DataflowAnomalyAnalysis"})
-public class UiComponentGridDataProviderGenerator extends FileGenerator {
-    private final UiComponentGridDataProviderData uiComponentGridDataProviderData;
+public class UiComponentDataProviderGenerator extends FileGenerator {
+    private final UiComponentDataProviderData uiComponentGridDataProviderData;
     private final Project project;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
@@ -43,8 +43,8 @@ public class UiComponentGridDataProviderGenerator extends FileGenerator {
      * @param moduleName String
      * @param project Project
      */
-    public UiComponentGridDataProviderGenerator(
-            final UiComponentGridDataProviderData uiComponentGridDataProviderData,
+    public UiComponentDataProviderGenerator(
+            final UiComponentDataProviderData uiComponentGridDataProviderData,
             final String moduleName,
             final Project project
     ) {
@@ -113,7 +113,7 @@ public class UiComponentGridDataProviderGenerator extends FileGenerator {
         attributes.setProperty("CLASS_NAME", uiComponentGridDataProviderData.getName());
         final String dataProviderType = uiComponentGridDataProviderData.getType();
 
-        if (dataProviderType.equals(UiComponentGridDataProviderPhp.COLLECTION_TYPE)) {
+        if (dataProviderType.equals(UiComponentDataProviderPhp.COLLECTION_TYPE)) {
             attributes.setProperty(
                     "COLLECTION_CLASS_FQN",
                     uiComponentGridDataProviderData.getCollectionFqn()
@@ -141,7 +141,7 @@ public class UiComponentGridDataProviderGenerator extends FileGenerator {
         final Properties attributes = getAttributes();
 
         dataProviderFile = fileFromTemplateGenerator.generate(
-                UiComponentGridDataProviderPhp.getInstance(
+                UiComponentDataProviderPhp.getInstance(
                         uiComponentGridDataProviderData.getName(),
                         uiComponentGridDataProviderData.getType()
                 ),

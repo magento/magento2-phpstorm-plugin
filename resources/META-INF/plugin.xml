@@ -66,6 +66,7 @@
             <action id="MagentoCreateAGraphQlResolver" class="com.magento.idea.magento2plugin.actions.generation.NewGraphQlResolverAction" />
             <action id="MagentoCreateCLICommand" class="com.magento.idea.magento2plugin.actions.generation.NewCLICommandAction" />
             <action id="MagentoCreateUiComponentGrid" class="com.magento.idea.magento2plugin.actions.generation.NewUiComponentGridAction" />
+            <action id="MagentoCreateUiComponentForm" class="com.magento.idea.magento2plugin.actions.generation.NewUiComponentFormAction" />
             <add-to-group group-id="NewGroup" anchor="last"/>
         </group>
 
@@ -202,7 +203,11 @@
         <internalFileTemplate name="Magento Module Cron Groups Xml"/>
         <internalFileTemplate name="Magento Module UI Component Grid Xml"/>
         <internalFileTemplate name="Magento Module Ui Grid Collection Data Provider Php"/>
-        <internalFileTemplate name="Magento Module Ui Grid Custom Data Provider Php"/>
+        <internalFileTemplate name="Magento Module Ui Custom Data Provider Php"/>
+        <internalFileTemplate name="Magento Module UI Component Form Xml"/>
+        <internalFileTemplate name="Magento Php Form Button Block Class"/>
+        <internalFileTemplate name="Magento Routes Xml"/>
+        <internalFileTemplate name="Magento Module Layout Xml"/>
 
         <postStartupActivity implementation="com.magento.idea.magento2plugin.project.startup.CheckIfMagentoPathIsValidActivity"/>
     </extensions>

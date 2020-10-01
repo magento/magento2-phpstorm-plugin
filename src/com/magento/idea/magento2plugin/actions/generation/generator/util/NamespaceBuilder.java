@@ -5,8 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator.util;
 
+import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
-import java.io.File;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({"PMD.OnlyOneReturn"})

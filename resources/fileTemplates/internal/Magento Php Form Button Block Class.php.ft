@@ -1,0 +1,22 @@
+<?php
+#parse("PHP File Header.php")
+
+#if (${NAMESPACE})
+
+namespace ${NAMESPACE};
+
+#end
+use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
+
+/**
+ * @inheritdoc
+ */
+class ${NAME} implements ButtonProviderInterface
+{
+    /**
+     * @inheritDoc
+     */
+    public function getButtonData()
+    {
+    }
+}
