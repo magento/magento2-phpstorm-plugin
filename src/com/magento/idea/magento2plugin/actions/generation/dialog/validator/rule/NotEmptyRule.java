@@ -1,8 +1,8 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule;
 
-public class NotEmptyValidationRule implements ValidationRule {
-    public static final String DEFAULT_BUNDLE_MESSAGE_KEY = "validator.notEmpty";
-    private static final ValidationRule instance = new NotEmptyValidationRule();
+public class NotEmptyRule implements ValidationRule {
+    public static final String MESSAGE = "validator.notEmpty";
+    private static final ValidationRule instance = new NotEmptyRule();
 
     @Override
     public boolean check(String value) {

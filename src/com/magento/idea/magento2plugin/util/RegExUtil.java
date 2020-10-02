@@ -13,6 +13,9 @@ public class RegExUtil {
     public static final String ALPHANUMERIC
             = "[a-zA-Z0-9]*";
 
+    public static final String ALPHANUMERIC_WITH_UNDERSCORE
+            = "[a-zA-Z0-9_]*";
+
     public static final String NUMERIC
             = "[0-9]*";
 
@@ -42,6 +45,11 @@ public class RegExUtil {
                 "^((\\*|\\?|\\d+((\\/|\\-){0,1}(\\d+))*)\\s*){5}$";
 
         public static final String CONFIG_PATH = "^(.+)\\/(.+)\\/(.+)$";
+
+        public static final String ROUTE_ID = "^[A-Za-z0-9_]{3,}$";
+
+        public static final String ACL_RESOURCE_ID
+                = "^([A-Z]+[a-zA-Z0-9]{1,}){1,}_[A-Z]+[A-Z0-9a-z]{1,}::[A-Za-z_0-9]{1,}$";
     }
 
     public class PhpRegex {

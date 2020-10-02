@@ -97,7 +97,7 @@ public abstract class AbstractDialog extends JDialog {
                             getMessageFromAnnotation(validation)
                     );
                 } catch (Exception exception) {
-                    // Do nothing.
+                    // NOPMD
                 }
             }
             field.setAccessible(false);
@@ -116,16 +116,9 @@ public abstract class AbstractDialog extends JDialog {
 
     private ValidationRule getRuleFromAnnotation(FieldValidation validation) throws NoSuchMethodException,
             IllegalAccessException, InvocationTargetException, InstantiationException {
-        ValidationRule rule;
         Class<?> ruleType = validation.rule().getRule();
-        String[] ruleParams = validation.properties();
 
-        if (ruleParams.length >= 1 && !ruleParams[0].isEmpty()) {
-            rule = (ValidationRule)ruleType.getConstructor(String.class).newInstance(ruleParams);
-        } else {
-            rule = (ValidationRule)ruleType.getConstructor().newInstance();
-        }
-        return rule;
+        return (ValidationRule) ruleType.getConstructor().newInstance();
     }
 
     protected void addValidationRuleToField(Object field, ValidationRule rule, String message) {

@@ -1,0 +1,17 @@
+package com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule;
+
+import com.magento.idea.magento2plugin.util.RegExUtil;
+
+public class DirectoryRule implements ValidationRule {
+    public static final String MESSAGE = "validator.directory.isNotValid";
+    private static final ValidationRule instance = new DirectoryRule();
+
+    @Override
+    public boolean check(String value) {
+        return value.matches(RegExUtil.DIRECTORY);
+    }
+
+    public static ValidationRule getInstance() {
+        return instance;
+    }
+}

@@ -6,7 +6,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface FieldValidation {
-    public RuleRegister rule();
-    public String[] properties() default "";
+    public RuleRegistry rule();
     public String[] message();
 }

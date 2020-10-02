@@ -2,17 +2,14 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.validator.uiCo
 
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormButtonData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewUiComponentFormDialog;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IsValidPhpClassValidationRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.MatchRegexValidationRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyValidationRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.ValidationRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.*;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
-import com.magento.idea.magento2plugin.util.RegExUtil;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class FormButtonsValidator {
     private final ValidatorBundle validatorBundle;
@@ -35,60 +32,57 @@ public class FormButtonsValidator {
                 UiComponentFormButtonData button = buttonsIterator.next();
 
                 String buttonClassName = button.getButtonClassName();
-                if (!NotEmptyValidationRule.getInstance().check(buttonClassName)) {
-                    showErrorMessage(
-                            validatorBundle.message(
-                                    NotEmptyValidationRule.DEFAULT_BUNDLE_MESSAGE_KEY,
-                                    "Button Class"
-                            )
-                    );
+                if (!NotEmptyRule.getInstance().check(buttonClassName)) {
+                    showErrorMessage(validatorBundle.message(NotEmptyRule.MESSAGE, "Button Class"));
                     valid = false;
                     break;
                 }
-                if (!IsValidPhpClassValidationRule.getInstance().check(buttonClassName)) {
-                    showErrorMessage(
-                            validatorBundle.message(
-                                    IsValidPhpClassValidationRule.DEFAULT_BUNDLE_MESSAGE_KEY,
-                                    "Button Class"
-                            )
-                    );
+                if (!PhpClassRule.getInstance().check(buttonClassName)) {
+                    showErrorMessage(validatorBundle.message(PhpClassRule.MESSAGE, "Button Class"));
                     valid = false;
                     break;
                 }
-                if (!MatchRegexValidationRule.getInstance(RegExUtil.ALPHANUMERIC).check(buttonClassName)) {
-                    showErrorMessage(
-                            validatorBundle.message("validator.alphaNumericCharacters", "Button Class")
-                    );
+                if (!AlphanumericRule.getInstance().check(buttonClassName)) {
+                    showErrorMessage(validatorBundle.message(AlphanumericRule.MESSAGE, "Button Class"));
                     valid = false;
                     break;
                 }
-                boolean startWithNumberOrCapitalLetterValidationResult = (
-                        (ValidationRule) value -> Character.isUpperCase(value.charAt(0))
-                                || Character.isDigit(value.charAt(0))
-                ).check(buttonClassName);
-                if (!startWithNumberOrCapitalLetterValidationResult) {
+                if (!StartWithNumberOrCapitalLetterRule.getInstance().check(buttonClassName)) {
                     showErrorMessage(
-                            validatorBundle.message("validator.startWithNumberOrCapitalLetter", "Button Class")
+                            validatorBundle.message(StartWithNumberOrCapitalLetterRule.MESSAGE, "Button Class")
                     );
                     valid = false;
                     break;
                 }
 
                 String buttonDirectory = button.getButtonDirectory();
-                if (!NotEmptyValidationRule.getInstance().check(buttonDirectory)) {
-                    showErrorMessage(
-                            validatorBundle.message(
-                                    NotEmptyValidationRule.DEFAULT_BUNDLE_MESSAGE_KEY,
-                                    "Button Directory"
-                            )
-                    );
+                if (!NotEmptyRule.getInstance().check(buttonDirectory)) {
+                    showErrorMessage(validatorBundle.message(NotEmptyRule.MESSAGE, "Button Directory"));
                     valid = false;
                     break;
                 }
-                if (!MatchRegexValidationRule.getInstance(RegExUtil.DIRECTORY).check(buttonDirectory)) {
-                    showErrorMessage(
-                            validatorBundle.message("validator.directory.isNotValid", "Button Directory")
-                    );
+                if (!DirectoryRule.getInstance().check(buttonDirectory)) {
+                    showErrorMessage(validatorBundle.message(DirectoryRule.MESSAGE, "Button Directory"));
+                    valid = false;
+                    break;
+                }
+
+                String buttonLabel = button.getButtonLabel();
+                if (!NotEmptyRule.getInstance().check(buttonLabel)) {
+                    showErrorMessage(validatorBundle.message(NotEmptyRule.MESSAGE, "Button Label"));
+                    valid = false;
+                    break;
+                }
+
+                String buttonSortOrder = button.getButtonSortOrder();
+                if (!NotEmptyRule.getInstance().check(buttonSortOrder)) {
+                    showErrorMessage(validatorBundle.message(NotEmptyRule.MESSAGE, "Button Sort Order"));
+                    valid = false;
+                    break;
+                }
+                if (!NumericRule.getInstance().check(buttonSortOrder)) {
+                    showErrorMessage(validatorBundle.message(NumericRule.MESSAGE, "Button Sort Order"));
+                    valid = false;
                     break;
                 }
 
@@ -101,25 +95,18 @@ public class FormButtonsValidator {
                 buttonFqns.add(buttonFqn);
             }
         }
-
         return valid;
     }
 
     private Iterator<UiComponentFormButtonData> getButtonsIterator() {
-        final ArrayList<UiComponentFormButtonData> buttons = dialog.getButtons();
+        final List<UiComponentFormButtonData> buttons = dialog.getButtons();
         if (buttons.size() == 0) {
             return null;
         }
-
         return buttons.iterator();
     }
 
     private void showErrorMessage(String errorMessage) {
-        JOptionPane.showMessageDialog(
-                null,
-                errorMessage,
-                errorTitle,
-                JOptionPane.ERROR_MESSAGE
-        );
+        JOptionPane.showMessageDialog(null, errorMessage, errorTitle, JOptionPane.ERROR_MESSAGE);
     }
 }
