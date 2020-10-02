@@ -1,6 +1,22 @@
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation;
 
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.*;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AclResourceIdRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericWithUnderscoreRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.Lowercase;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NumericRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpNamespaceNameRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.RouteIdRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.StartWithNumberOrCapitalLetterRule;
 
 public enum RuleRegistry {
     NOT_EMPTY(NotEmptyRule.class),

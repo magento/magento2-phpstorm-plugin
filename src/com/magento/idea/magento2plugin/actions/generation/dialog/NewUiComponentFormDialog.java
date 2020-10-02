@@ -20,10 +20,18 @@ import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFi
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFileData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.*;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.uiComponent.FormButtonsValidator;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.uiComponent.FormFieldsValidator;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.uiComponent.FormFieldsetsValidator;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AclResourceIdRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpNamespaceNameRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.RouteIdRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.StartWithNumberOrCapitalLetterRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.ui.component.FormButtonsValidator;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.ui.component.FormFieldsValidator;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.ui.component.FormFieldsetsValidator;
 import com.magento.idea.magento2plugin.actions.generation.generator.LayoutXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleControllerClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.RoutesXmlGenerator;
@@ -42,8 +50,7 @@ import com.magento.idea.magento2plugin.ui.table.ComboBoxEditor;
 import com.magento.idea.magento2plugin.ui.table.DeleteRowButton;
 import com.magento.idea.magento2plugin.ui.table.TableButton;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-
-import java.awt.*;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -82,6 +89,11 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     private JButton buttonCancel;
     private FilteredComboBox formAreaSelect;
 
+    private static final String VIEW_ACTION_NAME = "View Action Name";
+    private static final String SUBMIT_ACTION_NAME = "Submit Action Name";
+    private static final String DATA_PROVIDER_CLASS_NAME = "Data Provider class name";
+    private static final String DATA_PROVIDER_DIRECTORY = "Data Provider directory";
+
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, "Name"})
     @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE, "Name"})
     private JTextField formName;
@@ -103,34 +115,44 @@ public class NewUiComponentFormDialog extends AbstractDialog {
             message = {PhpNamespaceNameRule.MESSAGE, "View Controller Name"})
     private JTextField viewControllerName;
 
-    @FieldValidation(rule = RuleRegistry.PHP_CLASS, message = {PhpClassRule.MESSAGE, "View Action Name"})
-    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, "View Action Name"})
-    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC, message = {AlphanumericRule.MESSAGE, "View Action Name"})
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
+            message = {PhpClassRule.MESSAGE, VIEW_ACTION_NAME})
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, VIEW_ACTION_NAME})
+    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC,
+            message = {AlphanumericRule.MESSAGE, VIEW_ACTION_NAME})
     @FieldValidation(rule = RuleRegistry.START_WITH_NUMBER_OR_CAPITAL_LETTER,
-            message = {StartWithNumberOrCapitalLetterRule.MESSAGE, "View Action Name"})
+            message = {StartWithNumberOrCapitalLetterRule.MESSAGE, VIEW_ACTION_NAME})
     private JTextField viewActionName;
 
     @FieldValidation(rule = RuleRegistry.PHP_NAMESPACE_NAME,
             message = {PhpNamespaceNameRule.MESSAGE, "Submit Controller Name"})
     private JTextField submitControllerName;
 
-    @FieldValidation(rule = RuleRegistry.PHP_CLASS, message = {PhpClassRule.MESSAGE, "Submit Action Name"})
-    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, "Submit Action Name"})
-    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC, message = {AlphanumericRule.MESSAGE, "Submit Action Name"})
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
+            message = {PhpClassRule.MESSAGE, SUBMIT_ACTION_NAME})
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, SUBMIT_ACTION_NAME})
+    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC,
+            message = {AlphanumericRule.MESSAGE, SUBMIT_ACTION_NAME})
     @FieldValidation(rule = RuleRegistry.START_WITH_NUMBER_OR_CAPITAL_LETTER,
-            message = {StartWithNumberOrCapitalLetterRule.MESSAGE, "Submit Action Name"})
+            message = {StartWithNumberOrCapitalLetterRule.MESSAGE, SUBMIT_ACTION_NAME})
     private JTextField submitActionName;
 
-    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, "Data Provider class name"})
-    @FieldValidation(rule = RuleRegistry.PHP_CLASS, message = {PhpClassRule.MESSAGE, "Data Provider class name"})
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, DATA_PROVIDER_CLASS_NAME})
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
+            message = {PhpClassRule.MESSAGE, DATA_PROVIDER_CLASS_NAME})
     @FieldValidation(rule = RuleRegistry.ALPHANUMERIC,
-            message = {AlphanumericRule.MESSAGE, "Data Provider class name"})
+            message = {AlphanumericRule.MESSAGE, DATA_PROVIDER_CLASS_NAME})
     private JTextField dataProviderClassName;
 
-    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, "Data Provider directory"})
-    @FieldValidation(rule = RuleRegistry.DIRECTORY, message = {DirectoryRule.MESSAGE, "Data Provider directory"})
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, DATA_PROVIDER_DIRECTORY})
+    @FieldValidation(rule = RuleRegistry.DIRECTORY,
+            message = {DirectoryRule.MESSAGE, DATA_PROVIDER_DIRECTORY})
     @FieldValidation(rule = RuleRegistry.START_WITH_NUMBER_OR_CAPITAL_LETTER,
-            message = {AlphanumericRule.MESSAGE, "Data Provider directory"})
+            message = {AlphanumericRule.MESSAGE, DATA_PROVIDER_DIRECTORY})
     private JTextField dataProviderDirectory;
 
     private JLabel aclLabel;
@@ -494,6 +516,7 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
     }
 
+    @Override
     protected void onCancel() {
         dispose();
     }
@@ -701,7 +724,7 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     }
 
     private void updateDialogSizeToDefaults() {
-        Dimension screenSize = getToolkit().getScreenSize();
-        setPreferredSize(new Dimension(screenSize.width/2, screenSize.height/2));
+        final Dimension screenSize = getToolkit().getScreenSize();
+        setPreferredSize(new Dimension(screenSize.width / 2, screenSize.height / 2));
     }
 }
