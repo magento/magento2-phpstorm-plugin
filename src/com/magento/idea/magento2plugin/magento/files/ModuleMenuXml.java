@@ -10,6 +10,10 @@ import com.intellij.lang.xml.XMLLanguage;
 
 public class ModuleMenuXml implements ModuleFileInterface {
     public static String fileName = "menu.xml";
+    public static String menuTag = "menu";
+    public static String addTag = "add";
+    public static String idTagAttribute = "id";
+    public static String parentTagAttribute = "parent";
     public static String template = "Magento Module Xml";
 
     @Override
