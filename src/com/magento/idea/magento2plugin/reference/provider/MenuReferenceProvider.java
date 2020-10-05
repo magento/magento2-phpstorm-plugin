@@ -64,7 +64,7 @@ public class MenuReferenceProvider extends PsiReferenceProvider {
             }
         }
 
-        if (psiElements.isEmpty()) {
+        if (!psiElements.isEmpty()) {
             psiReferences.add(
                     new PolyVariantReferenceBase(element, psiElements)
             );
