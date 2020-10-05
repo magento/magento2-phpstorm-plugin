@@ -20,9 +20,11 @@ import org.jetbrains.annotations.NotNull;
 public class MenuCompletionProvider extends CompletionProvider<CompletionParameters> {
 
     @Override
-    protected void addCompletions(final @NotNull CompletionParameters parameters,
-                                  final ProcessingContext context,
-                                  final @NotNull CompletionResultSet result) {
+    protected void addCompletions(
+            final @NotNull CompletionParameters parameters,
+            final ProcessingContext context,
+            final @NotNull CompletionResultSet result
+    ) {
         final PsiElement position = parameters.getPosition().getOriginalElement();
         if (position == null) {
             return;
