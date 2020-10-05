@@ -20,8 +20,8 @@ import com.intellij.util.io.KeyDescriptor;
 import com.intellij.util.xml.impl.DomApplicationComponent;
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 import com.magento.idea.magento2plugin.project.Settings;
+import gnu.trove.THashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,7 +34,7 @@ public class MenuIndex extends ScalarIndexExtension<String> {
     @Override
     public DataIndexer<String, Void, FileContent> getIndexer() {
         return inputData -> {
-            final ConcurrentHashMap<String, Void> map = new ConcurrentHashMap<>();
+            final Map<String, Void> map = new THashMap<>();//NOPMD
             final PsiFile psiFile = inputData.getPsiFile();
             if (!Settings.isEnabled(psiFile.getProject())) {
                 return map;
