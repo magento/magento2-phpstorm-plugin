@@ -11,6 +11,8 @@ import com.intellij.psi.PsiReferenceRegistrar;
 import com.intellij.psi.xml.XmlTokenType;
 import com.magento.idea.magento2plugin.magento.files.MftfActionGroup;
 import com.magento.idea.magento2plugin.magento.files.MftfTest;
+import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
+import com.magento.idea.magento2plugin.magento.files.ModuleXml;
 import com.magento.idea.magento2plugin.magento.files.UiComponentXml;
 // CHECKSTYLE IGNORE check FOR NEXT 5 LINES
 import com.magento.idea.magento2plugin.reference.provider.*;//NOPMD
@@ -265,6 +267,18 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
                 )
             ),
             new FilePathReferenceProvider()
+        );
+
+        // <add parent="reference" />
+        registrar.registerReferenceProvider(
+            XmlPatterns.xmlAttributeValue().withParent(
+                XmlPatterns.xmlAttribute().withName(ModuleMenuXml.parentTagAttribute).withParent(
+                    XmlPatterns.xmlTag().withName(ModuleMenuXml.addTag)
+                )
+            ).inFile(
+                xmlFile().withName(string().endsWith(ModuleMenuXml.fileName))
+            ),
+            new MenuReferenceProvider()
         );
 
         registerReferenceForDifferentNesting(registrar);
