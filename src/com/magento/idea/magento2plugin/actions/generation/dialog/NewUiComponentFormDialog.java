@@ -18,7 +18,20 @@ import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormBu
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldsetData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFileData;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewUiComponentFormValidator;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AclResourceIdRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpNamespaceNameRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.RouteIdRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.StartWithNumberOrCapitalLetterRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.ui.component.FormButtonsValidator;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.ui.component.FormFieldsValidator;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.ui.component.FormFieldsetsValidator;
 import com.magento.idea.magento2plugin.actions.generation.generator.LayoutXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleControllerClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.RoutesXmlGenerator;
@@ -37,6 +50,7 @@ import com.magento.idea.magento2plugin.ui.table.ComboBoxEditor;
 import com.magento.idea.magento2plugin.ui.table.DeleteRowButton;
 import com.magento.idea.magento2plugin.ui.table.TableButton;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -65,30 +79,87 @@ import org.jetbrains.annotations.NotNull;
         "PMD.GodClass"
 })
 public class NewUiComponentFormDialog extends AbstractDialog {
-    private final NewUiComponentFormValidator validator;
+    private final FormButtonsValidator formButtonsValidator;
+    private final FormFieldsetsValidator formFieldsetsValidator;
+    private final FormFieldsValidator formFieldsValidator;
     private final Project project;
     private final String moduleName;
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
     private FilteredComboBox formAreaSelect;
+
+    private static final String VIEW_ACTION_NAME = "View Action Name";
+    private static final String SUBMIT_ACTION_NAME = "Submit Action Name";
+    private static final String DATA_PROVIDER_CLASS_NAME = "Data Provider class name";
+    private static final String DATA_PROVIDER_DIRECTORY = "Data Provider directory";
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, "Name"})
+    @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE, "Name"})
     private JTextField formName;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, "Label"})
     private JTextField formLabel;
+
     private JTable formButtons;
     private JButton addButton;
     private JTable fieldsets;
     private JTable fields;
     private JButton addFieldset;
     private JButton addField;
+
+    @FieldValidation(rule = RuleRegistry.ROUTE_ID, message = {RouteIdRule.MESSAGE})
     private JTextField route;
+
+    @FieldValidation(rule = RuleRegistry.PHP_NAMESPACE_NAME,
+            message = {PhpNamespaceNameRule.MESSAGE, "View Controller Name"})
     private JTextField viewControllerName;
+
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
+            message = {PhpClassRule.MESSAGE, VIEW_ACTION_NAME})
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, VIEW_ACTION_NAME})
+    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC,
+            message = {AlphanumericRule.MESSAGE, VIEW_ACTION_NAME})
+    @FieldValidation(rule = RuleRegistry.START_WITH_NUMBER_OR_CAPITAL_LETTER,
+            message = {StartWithNumberOrCapitalLetterRule.MESSAGE, VIEW_ACTION_NAME})
     private JTextField viewActionName;
+
+    @FieldValidation(rule = RuleRegistry.PHP_NAMESPACE_NAME,
+            message = {PhpNamespaceNameRule.MESSAGE, "Submit Controller Name"})
     private JTextField submitControllerName;
+
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
+            message = {PhpClassRule.MESSAGE, SUBMIT_ACTION_NAME})
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, SUBMIT_ACTION_NAME})
+    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC,
+            message = {AlphanumericRule.MESSAGE, SUBMIT_ACTION_NAME})
+    @FieldValidation(rule = RuleRegistry.START_WITH_NUMBER_OR_CAPITAL_LETTER,
+            message = {StartWithNumberOrCapitalLetterRule.MESSAGE, SUBMIT_ACTION_NAME})
     private JTextField submitActionName;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, DATA_PROVIDER_CLASS_NAME})
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
+            message = {PhpClassRule.MESSAGE, DATA_PROVIDER_CLASS_NAME})
+    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC,
+            message = {AlphanumericRule.MESSAGE, DATA_PROVIDER_CLASS_NAME})
     private JTextField dataProviderClassName;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, DATA_PROVIDER_DIRECTORY})
+    @FieldValidation(rule = RuleRegistry.DIRECTORY,
+            message = {DirectoryRule.MESSAGE, DATA_PROVIDER_DIRECTORY})
+    @FieldValidation(rule = RuleRegistry.START_WITH_NUMBER_OR_CAPITAL_LETTER,
+            message = {AlphanumericRule.MESSAGE, DATA_PROVIDER_DIRECTORY})
     private JTextField dataProviderDirectory;
+
     private JLabel aclLabel;
+
+    @FieldValidation(rule = RuleRegistry.ACL_RESOURCE_ID, message = {AclResourceIdRule.MESSAGE})
     private JTextField acl;
+
     private JLabel formButtonsLabel;//NOPMD
     private JLabel formNameLabel;//NOPMD
     private JLabel formLabelLabel;//NOPMD
@@ -127,7 +198,10 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     public NewUiComponentFormDialog(final Project project, final PsiDirectory directory) {
         super();
         this.project = project;
-        this.validator = new NewUiComponentFormValidator(this);
+        updateDialogSizeToDefaults();
+        formButtonsValidator = new FormButtonsValidator(this);
+        formFieldsetsValidator = new FormFieldsetsValidator(this);
+        formFieldsValidator = new FormFieldsValidator(this);
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
         setContentPane(contentPane);
@@ -338,7 +412,7 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     }
 
     private void onOK() {
-        if (!validator.validate()) {
+        if (!validateFormFields()) {
             return;
         }
 
@@ -442,6 +516,7 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
     }
 
+    @Override
     protected void onCancel() {
         dispose();
     }
@@ -638,5 +713,18 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         }
         acl.setVisible(false);
         aclLabel.setVisible(false);
+    }
+
+    @Override
+    protected boolean validateFormFields() {
+        return super.validateFormFields()
+                && formButtonsValidator.validate()
+                && formFieldsetsValidator.validate()
+                && formFieldsValidator.validate();
+    }
+
+    private void updateDialogSizeToDefaults() {
+        final Dimension screenSize = getToolkit().getScreenSize();
+        setPreferredSize(new Dimension(screenSize.width / 2, screenSize.height / 2));
     }
 }
