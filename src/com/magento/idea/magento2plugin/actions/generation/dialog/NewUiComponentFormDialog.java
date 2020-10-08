@@ -10,6 +10,7 @@ import com.intellij.openapi.ui.ComboBoxTableRenderer;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.NewUiComponentFormAction;
+import com.magento.idea.magento2plugin.actions.generation.data.AclXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
 import com.magento.idea.magento2plugin.actions.generation.data.LayoutXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.RoutesXmlData;
@@ -32,6 +33,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.ui.component.FormButtonsValidator;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.ui.component.FormFieldsValidator;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.ui.component.FormFieldsetsValidator;
+import com.magento.idea.magento2plugin.actions.generation.generator.AclXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.LayoutXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleControllerClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.RoutesXmlGenerator;
@@ -49,6 +51,7 @@ import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.ui.table.ComboBoxEditor;
 import com.magento.idea.magento2plugin.ui.table.DeleteRowButton;
 import com.magento.idea.magento2plugin.ui.table.TableButton;
+import com.magento.idea.magento2plugin.util.magento.GetAclResourcesListUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -159,6 +162,10 @@ public class NewUiComponentFormDialog extends AbstractDialog {
 
     @FieldValidation(rule = RuleRegistry.ACL_RESOURCE_ID, message = {AclResourceIdRule.MESSAGE})
     private JTextField acl;
+    @FieldValidation(rule = RuleRegistry.ACL_RESOURCE_ID, message = {AclResourceIdRule.MESSAGE})
+    private FilteredComboBox parentAcl;
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, "Acl Title"})
+    private JTextField aclTitle;
 
     private JLabel formButtonsLabel;//NOPMD
     private JLabel formNameLabel;//NOPMD
@@ -422,6 +429,7 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         generateDataProviderFile();
         generateLayoutFile();
         generateFormFile();
+        generateAclXmlFile();
         this.setVisible(false);
     }
 
@@ -516,6 +524,14 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
     }
 
+    private PsiFile generateAclXmlFile() {
+        return new AclXmlGenerator(new AclXmlData(
+            getParentAcl(),
+            getAcl(),
+            getAclTitle()
+        ), getModuleName(), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
+    }
+
     @Override
     protected void onCancel() {
         dispose();
@@ -530,9 +546,14 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         );
     }
 
+    private List<String> getAclResourcesList() {
+        return GetAclResourcesListUtil.getInstance().execute(project);
+    }
+
     @SuppressWarnings({"PMD.UnusedPrivateMethod"})
     private void createUIComponents() {
         this.formAreaSelect = new FilteredComboBox(getAreaList());
+        this.parentAcl = new FilteredComboBox(getAclResourcesList());
     }
 
     private String getModuleName() {
@@ -694,6 +715,14 @@ public class NewUiComponentFormDialog extends AbstractDialog {
 
     public String getAcl() {
         return acl.getText().trim();
+    }
+
+    public String getParentAcl() {
+        return parentAcl.getSelectedItem().toString().trim();
+    }
+
+    public String getAclTitle() {
+        return aclTitle.getText().trim();
     }
 
     private String getControllerDirectory() {
