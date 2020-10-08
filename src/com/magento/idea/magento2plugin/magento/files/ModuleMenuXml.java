@@ -14,6 +14,13 @@ public class ModuleMenuXml implements ModuleFileInterface {
     public static String addTag = "add";
     public static String idTagAttribute = "id";
     public static String parentTagAttribute = "parent";
+    public static String sortOrderTagAttribute = "sortOrder";
+    public static String titleTagAttribute = "title";
+    public static String moduleTagAttribute = "module";
+    public static String resourceTagAttribute = "resource";
+    public static String translateTagAttribute = "translate";
+    public static String actionTagAttribute = "action";
+
     public static String template = "Magento Module Xml";
 
     @Override

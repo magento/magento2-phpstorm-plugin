@@ -15,10 +15,10 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.magento.idea.magento2plugin.actions.generation.data.MenuXmlData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateMenuXml;
+import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
+import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Properties;
 
 public class MenuXmlGenerator extends FileGenerator {
     private final MenuXmlData menuXmlData;
@@ -61,31 +61,38 @@ public class MenuXmlGenerator extends FileGenerator {
             if (rootTag == null) {
                 return;
             }
-            XmlTag menuTag = rootTag.findFirstSubTag("menu");
+            XmlTag menuTag = rootTag.findFirstSubTag(ModuleMenuXml.menuTag);
             boolean menuTagIsGenerated = false;
             if (menuTag == null) {
                 menuTagIsGenerated = true;
-                menuTag = rootTag.createChildTag("menu", null, "", false);
+                menuTag = rootTag.createChildTag(ModuleMenuXml.menuTag, null, "", false);
             }
-            @NotNull final XmlTag[] buttonsTags = menuTag.findSubTags("add");
+            @NotNull final XmlTag[] buttonsTags = menuTag.findSubTags(ModuleMenuXml.addTag);
             boolean isDeclared = false;
             for (final XmlTag buttonsTag: buttonsTags) {
-                @Nullable final XmlAttribute frontName = buttonsTag.getAttribute("id");
+                @Nullable final XmlAttribute frontName =
+                        buttonsTag.getAttribute(ModuleMenuXml.idTagAttribute);
                 if (frontName.getValue().equals(menuXmlData.getMenuIdentifier())) {
                     isDeclared = true;
                 }
             }
 
             if (!isDeclared) {
-                final XmlTag addTag = menuTag.createChildTag("add", null, "", false);
-                addTag.setAttribute("id", menuXmlData.getMenuIdentifier());
-                addTag.setAttribute("sortOrder", menuXmlData.getSortOrder());
-                addTag.setAttribute("title", menuXmlData.getTitle());
-                addTag.setAttribute("module", menuXmlData.getModuleName());
-                addTag.setAttribute("parent", menuXmlData.getParentMenuItem());
-                addTag.setAttribute("resource", menuXmlData.getAcl());
-                addTag.setAttribute("translate", "title");
-                addTag.setAttribute("action", menuXmlData.getAction());
+                final XmlTag addTag = menuTag.createChildTag(ModuleMenuXml.addTag, null, "", false);
+                addTag.setAttribute(ModuleMenuXml.idTagAttribute, menuXmlData.getMenuIdentifier());
+                addTag.setAttribute(
+                        ModuleMenuXml.sortOrderTagAttribute,
+                        menuXmlData.getSortOrder()
+                );
+                addTag.setAttribute(ModuleMenuXml.titleTagAttribute, menuXmlData.getTitle());
+                addTag.setAttribute(ModuleMenuXml.moduleTagAttribute, menuXmlData.getModuleName());
+                addTag.setAttribute(
+                        ModuleMenuXml.parentTagAttribute,
+                        menuXmlData.getParentMenuItem()
+                );
+                addTag.setAttribute(ModuleMenuXml.resourceTagAttribute, menuXmlData.getAcl());
+                addTag.setAttribute(ModuleMenuXml.translateTagAttribute, "title");
+                addTag.setAttribute(ModuleMenuXml.actionTagAttribute, menuXmlData.getAction());
 
                 menuTag.addSubTag(addTag, false);
 

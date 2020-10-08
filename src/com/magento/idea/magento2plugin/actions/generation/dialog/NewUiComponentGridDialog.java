@@ -8,6 +8,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
+import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.NewUiComponentFormAction;
 import com.magento.idea.magento2plugin.actions.generation.NewUiComponentGridAction;
@@ -24,20 +25,26 @@ import com.magento.idea.magento2plugin.actions.generation.generator.ModuleContro
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentDataProviderGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentGridXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
+import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.stubs.indexes.xml.MenuIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import com.magento.idea.magento2plugin.util.magento.GetResourceCollections;
+import org.jetbrains.annotations.NotNull;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.*;
 
@@ -71,7 +78,6 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     private JTextField route;
     private JTextField controllerName;
     private JTextField actionName;
-    private JComboBox parentMenuItem;
     private JLabel parentMenuItemLabel;
     private JTextField sortOrder;
     private JTextField menuIdentifier;
@@ -79,6 +85,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     private JLabel menuIdentifierLabel;
     private JTextField menuTitle;
     private JLabel menuTitleLabel;
+    private FilteredComboBox parentMenu;
     private JLabel collectionLabel;
 
     /**
@@ -118,6 +125,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
+        menuIdentifier.setText(getModuleName() + "::listing");
     }
 
     /**
@@ -297,6 +305,16 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         this.collection = new FilteredComboBox(getCollectionOptions());
         this.dataProviderType = new FilteredComboBox(getProviderTypeOptions());
         this.areaSelect = new FilteredComboBox(getAreaOptions());
+        this.parentMenu = new FilteredComboBox(getMenuReferences());
+    }
+
+    @NotNull
+    private ArrayList<String> getMenuReferences() {
+        final Collection<String> menuReferences
+                = FileBasedIndex.getInstance().getAllKeys(MenuIndex.KEY, project);
+        ArrayList<String> menuReferencesList = new ArrayList<>(menuReferences);
+        Collections.sort(menuReferencesList);
+        return menuReferencesList;
     }
 
     private List<String> getCollectionOptions() {
@@ -445,7 +463,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     }
 
     private String getParentMenuItem() {
-        return parentMenuItem.getSelectedItem().toString();
+        return parentMenu.getSelectedItem().toString();
     }
 
     public String getSortOrder() {
