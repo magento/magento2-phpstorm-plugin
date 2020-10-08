@@ -7,20 +7,23 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.google.common.collect.Lists;
 import com.intellij.openapi.command.WriteCommandAction;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
+import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.actions.generation.data.AclXmlData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateAclXml;
 import com.magento.idea.magento2plugin.magento.files.ModuleAclXml;
+import com.magento.idea.magento2plugin.util.magento.GetAclResourcesTreeUtil;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 public class AclXmlGenerator extends FileGenerator {
@@ -43,7 +46,7 @@ public class AclXmlGenerator extends FileGenerator {
             final @NotNull AclXmlData aclXmlData,
             final String moduleName,
             final Project project
-            ) {
+    ) {
         super(project);
         this.project = project;
         this.moduleName = moduleName;
@@ -60,7 +63,9 @@ public class AclXmlGenerator extends FileGenerator {
                 actionName,
                 moduleName
         );
-        if (aclXml == null) {
+        if (aclXml == null
+                || aclXmlData.getResourceId() == null
+                || aclXmlData.getResourceTitle() == null) {
             return null;
         }
 
@@ -80,9 +85,71 @@ public class AclXmlGenerator extends FileGenerator {
             addSubTagsQueue.add(resourcesTag);
             childParentRelationMap.put(resourcesTag, aclTag);
         }
-        return commitAclXmlFile(aclXml);
+
+        final List<AclXmlData> tree = GetAclResourcesTreeUtil.getInstance().execute(
+                project,
+                aclXmlData.getParentResourceId()
+        );
+        XmlTag parent = resourcesTag;
+        for (final AclXmlData resourceTagData : tree) {
+            if (resourceTagData.getParentResourceId() != null) {
+                parent = resourcesTag.createChildTag(
+                        ModuleAclXml.XML_TAG_RESOURCE,
+                        null,
+                        "",
+                        false
+                );
+                parent.setAttribute(ModuleAclXml.XML_ATTR_ID, resourceTagData.getResourceId());
+            }
+            parent = createOrGetResourceTag(parent, resourceTagData.getResourceId());
+        }
+        final XmlTag targetTag = parent.createChildTag(
+                ModuleAclXml.XML_TAG_RESOURCE,
+                null,
+                null,
+                false
+        );
+        targetTag.setAttribute(ModuleAclXml.XML_ATTR_ID, aclXmlData.getResourceId());
+        targetTag.setAttribute(ModuleAclXml.XML_ATTR_TITLE, aclXmlData.getResourceTitle());
+
+        addSubTagsQueue.add(targetTag);
+        childParentRelationMap.put(targetTag, parent);
+        commitAclXmlFile(aclXml);
+        FileBasedIndex.getInstance().requestReindex(aclXml.getVirtualFile());
+
+        return aclXml;
     }
 
+    /**
+     * Create new tag or get existing one.
+     *
+     * @param parent XmlTag
+     * @param targetResourceId String
+     *
+     * @return XmlTag
+     */
+    private XmlTag createOrGetResourceTag(final XmlTag parent, final String targetResourceId) {
+        for (final XmlTag tag : parent.getSubTags()) {
+            final XmlAttribute idAttribute = tag.getAttribute(ModuleAclXml.XML_ATTR_ID);
+            if (idAttribute != null && idAttribute.getValue().equals(targetResourceId)) {
+                return tag;
+            }
+        }
+        final XmlTag newTag = parent.createChildTag(ModuleAclXml.XML_TAG_RESOURCE, null, "", false);
+        newTag.setAttribute(ModuleAclXml.XML_ATTR_ID, targetResourceId);
+        addSubTagsQueue.add(newTag);
+        childParentRelationMap.put(newTag, parent);
+
+        return newTag;
+    }
+
+    /**
+     * Save XML file.
+     *
+     * @param aclXml XmlFile
+     *
+     * @return XmlFile
+     */
     private XmlFile commitAclXmlFile(final XmlFile aclXml) {
         WriteCommandAction.runWriteCommandAction(project, () -> {
             for (final XmlTag tag : Lists.reverse(addSubTagsQueue)) {
