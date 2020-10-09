@@ -91,17 +91,20 @@ public class AclXmlGenerator extends FileGenerator {
                 aclXmlData.getParentResourceId()
         );
         XmlTag parent = resourcesTag;
-        for (final AclXmlData resourceTagData : tree) {
-            if (resourceTagData.getParentResourceId() != null) {
-                parent = resourcesTag.createChildTag(
-                        ModuleAclXml.XML_TAG_RESOURCE,
-                        null,
-                        "",
-                        false
-                );
-                parent.setAttribute(ModuleAclXml.XML_ATTR_ID, resourceTagData.getResourceId());
+
+        if (tree != null) {
+            for (final AclXmlData resourceTagData : tree) {
+                if (resourceTagData.getParentResourceId() != null) {
+                    parent = resourcesTag.createChildTag(
+                            ModuleAclXml.XML_TAG_RESOURCE,
+                            null,
+                            "",
+                            false
+                    );
+                    parent.setAttribute(ModuleAclXml.XML_ATTR_ID, resourceTagData.getResourceId());
+                }
+                parent = createOrGetResourceTag(parent, resourceTagData.getResourceId());
             }
-            parent = createOrGetResourceTag(parent, resourceTagData.getResourceId());
         }
         final XmlTag targetTag = parent.createChildTag(
                 ModuleAclXml.XML_TAG_RESOURCE,
