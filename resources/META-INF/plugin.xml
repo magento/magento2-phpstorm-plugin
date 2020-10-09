@@ -208,6 +208,7 @@
         <internalFileTemplate name="Magento Php Form Button Block Class"/>
         <internalFileTemplate name="Magento Routes Xml"/>
         <internalFileTemplate name="Magento Module Layout Xml"/>
+        <internalFileTemplate name="Magento Module ACL XML"/>
 
         <postStartupActivity implementation="com.magento.idea.magento2plugin.project.startup.CheckIfMagentoPathIsValidActivity"/>
     </extensions>
