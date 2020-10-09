@@ -13,7 +13,10 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import gnu.trove.THashSet;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import org.jetbrains.annotations.Nullable;
 
@@ -164,5 +167,20 @@ public class XmlPsiTreeUtil {
         }
 
         return psiElements;
+    }
+
+    /**
+     * Get child tags of parent.
+     *
+     * @param parentTag XmlTag
+     * @param subTagsName String
+     *
+     * @return List
+     */
+    public static List<XmlTag> findSubTagsOfParent(
+            final XmlTag parentTag,
+            final String subTagsName
+    ) {
+        return new LinkedList<>(Arrays.asList(parentTag.findSubTags(subTagsName)));
     }
 }
