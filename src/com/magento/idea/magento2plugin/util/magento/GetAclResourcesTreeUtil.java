@@ -40,11 +40,12 @@ public final class GetAclResourcesTreeUtil {
                         targetAclResourceId,
                         GlobalSearchScope.allScope(project)
                 );
-        final VirtualFile virtualFile = virtualFiles.iterator().next();
 
-        if (virtualFile == null) {
+        if (virtualFiles.isEmpty()) {
             return null;
         }
+        final VirtualFile virtualFile = virtualFiles.iterator().next();
+
         final XmlFile aclXml = (XmlFile) PsiManager.getInstance(project).findFile(virtualFile);
         final XmlTag rootTag = aclXml.getRootTag();
         final List<AclXmlData> aclXmlDataList = new LinkedList<>();
