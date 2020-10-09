@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 public final class GetAclResourcesListUtil {
     private static final String TEST_MODULE_ID_PART = "Magento_TestModule";
 
+    private GetAclResourcesListUtil() {}
+
     /**
      * Get acl resources list.
      *

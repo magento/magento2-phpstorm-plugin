@@ -23,6 +23,8 @@ import java.util.List;
 
 public final class GetAclResourcesTreeUtil {
 
+    private GetAclResourcesTreeUtil() {}
+
     /**
      * Get acl resources tree list for specified acl resource id.
      *
