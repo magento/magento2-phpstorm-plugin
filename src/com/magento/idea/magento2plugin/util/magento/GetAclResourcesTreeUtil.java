@@ -21,24 +21,17 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-public class GetAclResourcesTreeUtil {
-    private static final GetAclResourcesTreeUtil INSTANCE = new GetAclResourcesTreeUtil();
-
-    /**
-     * Get GetAclResourcesTreeUtil instance.
-     *
-     * @return GetAclResourcesUtil
-     */
-    public static GetAclResourcesTreeUtil getInstance() {
-        return INSTANCE;
-    }
+public final class GetAclResourcesTreeUtil {
 
     /**
      * Get acl resources tree list for specified acl resource id.
      *
      * @return List
      */
-    public List<AclXmlData> execute(final Project project, final String targetAclResourceId) {
+    public static List<AclXmlData> execute(
+            final Project project,
+            final String targetAclResourceId
+    ) {
         final Collection<VirtualFile> virtualFiles =
                 FileBasedIndex.getInstance().getContainingFiles(
                         AclResourceIndex.KEY,
@@ -89,7 +82,7 @@ public class GetAclResourcesTreeUtil {
      *
      * @return List
      */
-    private List<XmlTag> addAclXmlDataRecursively(
+    private static List<XmlTag> addAclXmlDataRecursively(
             final String targetAclResourceId,
             final XmlTag parentTag,
             List<XmlTag> resourceTagsList//NOPMD

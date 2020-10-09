@@ -12,18 +12,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class GetAclResourcesListUtil {
+public final class GetAclResourcesListUtil {
     private static final String TEST_MODULE_ID_PART = "Magento_TestModule";
-    private static final GetAclResourcesListUtil INSTANCE = new GetAclResourcesListUtil();
-
-    /**
-     * Get GetAclResourcesListUtil instance.
-     *
-     * @return GetAclResourcesUtil
-     */
-    public static GetAclResourcesListUtil getInstance() {
-        return INSTANCE;
-    }
 
     /**
      * Get acl resources list.
@@ -32,7 +22,7 @@ public class GetAclResourcesListUtil {
      *
      * @return List
      */
-    public List<String> execute(final Project project) {
+    public static List<String> execute(final Project project) {
         final Collection<String> allAclResources =
                 FileBasedIndex.getInstance().getAllKeys(AclResourceIndex.KEY, project);
         return sortAclResources(filterTestModules(allAclResources));
@@ -45,7 +35,7 @@ public class GetAclResourcesListUtil {
      *
      * @return List
      */
-    private List<String> filterTestModules(final Collection<String> allAclResources) {
+    private static List<String> filterTestModules(final Collection<String> allAclResources) {
         return allAclResources
                 .stream()
                 .filter(aclResource -> !aclResource.contains(TEST_MODULE_ID_PART))
@@ -59,7 +49,7 @@ public class GetAclResourcesListUtil {
      *
      * @return List
      */
-    private List<String> sortAclResources(final List<String> aclResources) {
+    private static List<String> sortAclResources(final List<String> aclResources) {
         return aclResources.stream().sorted().collect(Collectors.toList());
     }
 }

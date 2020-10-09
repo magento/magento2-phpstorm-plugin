@@ -547,7 +547,7 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     }
 
     private List<String> getAclResourcesList() {
-        return GetAclResourcesListUtil.getInstance().execute(project);
+        return GetAclResourcesListUtil.execute(project);
     }
 
     @SuppressWarnings({"PMD.UnusedPrivateMethod"})

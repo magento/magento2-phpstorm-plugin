@@ -86,7 +86,7 @@ public class AclXmlGenerator extends FileGenerator {
             childParentRelationMap.put(resourcesTag, aclTag);
         }
 
-        final List<AclXmlData> tree = GetAclResourcesTreeUtil.getInstance().execute(
+        final List<AclXmlData> tree = GetAclResourcesTreeUtil.execute(
                 project,
                 aclXmlData.getParentResourceId()
         );
