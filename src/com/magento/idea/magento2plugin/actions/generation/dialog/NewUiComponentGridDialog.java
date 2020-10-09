@@ -12,6 +12,7 @@ import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.NewUiComponentFormAction;
 import com.magento.idea.magento2plugin.actions.generation.NewUiComponentGridAction;
+import com.magento.idea.magento2plugin.actions.generation.data.AclXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
 import com.magento.idea.magento2plugin.actions.generation.data.LayoutXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.MenuXmlData;
@@ -20,6 +21,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridDa
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridToolbarData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AclResourceIdRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierRule;
@@ -29,6 +31,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpNamespaceNameRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.RouteIdRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.StartWithNumberOrCapitalLetterRule;
+import com.magento.idea.magento2plugin.actions.generation.generator.AclXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.LayoutXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.MenuXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleControllerClassGenerator;
@@ -43,6 +46,7 @@ import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.MenuIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
+import com.magento.idea.magento2plugin.util.magento.GetAclResourcesListUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import com.magento.idea.magento2plugin.util.magento.GetResourceCollections;
 import java.awt.event.KeyEvent;
@@ -110,7 +114,14 @@ public class NewUiComponentGridDialog extends AbstractDialog {
             message = {AlphanumericRule.MESSAGE, DATA_PROVIDER_DIRECTORY})
     private JTextField dataProviderParentDirectory;
 
+    @FieldValidation(rule = RuleRegistry.ACL_RESOURCE_ID, message = {AclResourceIdRule.MESSAGE})
     private JTextField acl;
+
+    @FieldValidation(rule = RuleRegistry.ACL_RESOURCE_ID, message = {AclResourceIdRule.MESSAGE})
+    private FilteredComboBox parentAcl;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, "Acl Title"})
+    private JTextField aclTitle;
 
     @FieldValidation(rule = RuleRegistry.ROUTE_ID, message = {RouteIdRule.MESSAGE})
     private JTextField route;
@@ -154,6 +165,9 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     private JLabel menuIdentifierLabel;//NOPMD
     private JLabel menuTitleLabel;//NOPMD
     private JLabel formMenuLabel;//NOPMD
+    private JLabel aclGeneralLabel;//NOPMD
+    private JLabel parentAclID;//NOPMD
+    private JLabel aclTitleLabel;//NOPMD
     private JLabel collectionLabel;//NOPMD
 
     /**
@@ -268,6 +282,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         generateViewControllerFile();
         generateLayoutFile();
         generateMenuFile();
+        generateAclXmlFile();
         generateUiComponentFile();
         this.setVisible(false);
     }
@@ -338,6 +353,14 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
     }
 
+    private PsiFile generateAclXmlFile() {
+        return new AclXmlGenerator(new AclXmlData(
+            getParentAcl(),
+            getAcl(),
+            getAclTitle()
+        ), getModuleName(), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
+    }
+
     private String getModuleName() {
         return moduleName;
     }
@@ -373,6 +396,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         this.dataProviderType = new FilteredComboBox(getProviderTypeOptions());
         this.areaSelect = new FilteredComboBox(getAreaOptions());
         this.parentMenu = new FilteredComboBox(getMenuReferences());
+        this.parentAcl = new FilteredComboBox(getAclResourcesList());
     }
 
     @NotNull
@@ -551,5 +575,17 @@ public class NewUiComponentGridDialog extends AbstractDialog {
 
     public String getMenuTitle() {
         return menuTitle.getText().trim();
+    }
+
+    private List<String> getAclResourcesList() {
+        return GetAclResourcesListUtil.execute(project);
+    }
+
+    public String getParentAcl() {
+        return parentAcl.getSelectedItem().toString().trim();
+    }
+
+    public String getAclTitle() {
+        return aclTitle.getText().trim();
     }
 }
