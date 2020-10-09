@@ -91,8 +91,8 @@ public class NewUiComponentFormDialog extends AbstractDialog {
 
     private static final String VIEW_ACTION_NAME = "View Action Name";
     private static final String SUBMIT_ACTION_NAME = "Submit Action Name";
-    private static final String DATA_PROVIDER_CLASS_NAME = "Data Provider class name";
-    private static final String DATA_PROVIDER_DIRECTORY = "Data Provider directory";
+    private static final String DATA_PROVIDER_CLASS_NAME = "Data Provider Class Name";
+    private static final String DATA_PROVIDER_DIRECTORY = "Data Provider Directory";
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, "Name"})
     @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE, "Name"})

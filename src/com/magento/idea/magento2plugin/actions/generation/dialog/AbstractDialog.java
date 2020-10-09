@@ -132,7 +132,7 @@ public abstract class AbstractDialog extends JDialog {
         } else {
             params = new String[]{};
         }
-        return validatorBundle.message(validation.message()[0], params);
+        return validatorBundle.message(validation.message()[0], (Object[]) params);
     }
 
     private ValidationRule getRuleFromAnnotation(final FieldValidation validation)

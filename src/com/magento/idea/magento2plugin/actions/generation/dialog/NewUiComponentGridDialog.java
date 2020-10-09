@@ -18,14 +18,23 @@ import com.magento.idea.magento2plugin.actions.generation.data.MenuXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataProviderData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridToolbarData;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewUiComponentGridDialogValidator;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NumericRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpNamespaceNameRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.RouteIdRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.StartWithNumberOrCapitalLetterRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.LayoutXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.MenuXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleControllerClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentDataProviderGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentGridXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
-import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
@@ -36,8 +45,6 @@ import com.magento.idea.magento2plugin.stubs.indexes.xml.MenuIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import com.magento.idea.magento2plugin.util.magento.GetResourceCollections;
-import org.jetbrains.annotations.NotNull;
-
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -46,47 +53,108 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveImports", "PMD.UnusedPrivateMethod"})
 public class NewUiComponentGridDialog extends AbstractDialog {
+    private static final String ACTION_NAME = "Action Name";
+    private static final String DATA_PROVIDER_CLASS_NAME = "Data Provider Class Name";
+    private static final String DATA_PROVIDER_DIRECTORY = "Data Provider Directory";
+
     private final Project project;
     private final String moduleName;
-    private final NewUiComponentGridDialogValidator validator;
     private List<String> collectionOptions;
     private JPanel contentPanel;
     private JButton buttonOK;
     private JButton buttonCancel;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, "Name"})
+    @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE, "Name"})
     private JTextField uiComponentName;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, "Name"})
+    @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE, "Name"})
     private JTextField idField;
+
     private JCheckBox addToolBar;
     private JCheckBox addBookmarksCheckBox;
     private JCheckBox addColumnsControlCheckBox;
     private JCheckBox addFullTextSearchCheckBox;
     private JCheckBox addListingFiltersCheckBox;
     private JCheckBox addListingPagingCheckBox;
+
     private FilteredComboBox collection;
     private FilteredComboBox dataProviderType;
     private FilteredComboBox areaSelect;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, DATA_PROVIDER_CLASS_NAME})
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
+            message = {PhpClassRule.MESSAGE, DATA_PROVIDER_CLASS_NAME})
+    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC,
+            message = {AlphanumericRule.MESSAGE, DATA_PROVIDER_CLASS_NAME})
     private JTextField providerClassName;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, DATA_PROVIDER_DIRECTORY})
+    @FieldValidation(rule = RuleRegistry.DIRECTORY,
+            message = {DirectoryRule.MESSAGE, DATA_PROVIDER_DIRECTORY})
+    @FieldValidation(rule = RuleRegistry.START_WITH_NUMBER_OR_CAPITAL_LETTER,
+            message = {AlphanumericRule.MESSAGE, DATA_PROVIDER_DIRECTORY})
     private JTextField dataProviderParentDirectory;
+
     private JTextField acl;
-    private JLabel aclLabel;
-    private JLabel routeLabel;
-    private JLabel controllerLabel;
-    private JLabel actionLabel;
+
+    @FieldValidation(rule = RuleRegistry.ROUTE_ID, message = {RouteIdRule.MESSAGE})
     private JTextField route;
+
+    @FieldValidation(rule = RuleRegistry.PHP_NAMESPACE_NAME,
+            message = {PhpNamespaceNameRule.MESSAGE, "Controller Name"})
     private JTextField controllerName;
+
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
+            message = {PhpClassRule.MESSAGE, ACTION_NAME})
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, ACTION_NAME})
+    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC,
+            message = {AlphanumericRule.MESSAGE, ACTION_NAME})
+    @FieldValidation(rule = RuleRegistry.START_WITH_NUMBER_OR_CAPITAL_LETTER,
+            message = {StartWithNumberOrCapitalLetterRule.MESSAGE, ACTION_NAME})
     private JTextField actionName;
-    private JLabel parentMenuItemLabel;
+
+    @FieldValidation(rule = RuleRegistry.NUMERIC,
+            message = {NumericRule.MESSAGE, "Sort Order"})
     private JTextField sortOrder;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, "Menu Identifier"})
     private JTextField menuIdentifier;
-    private JLabel sortOrderLabel;
-    private JLabel menuIdentifierLabel;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, "Menu Title"})
     private JTextField menuTitle;
-    private JLabel menuTitleLabel;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, "Parent Menu"})
     private FilteredComboBox parentMenu;
-    private JLabel collectionLabel;
+
+    private JLabel aclLabel;
+    private JLabel routeLabel;//NOPMD
+    private JLabel controllerLabel;//NOPMD
+    private JLabel actionLabel;//NOPMD
+    private JLabel parentMenuItemLabel;//NOPMD
+    private JLabel sortOrderLabel;//NOPMD
+    private JLabel menuIdentifierLabel;//NOPMD
+    private JLabel menuTitleLabel;//NOPMD
+    private JLabel formMenuLabel;//NOPMD
+    private JLabel collectionLabel;//NOPMD
 
     /**
      * New UI component grid dialog constructor.
@@ -97,7 +165,6 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     public NewUiComponentGridDialog(final Project project, final PsiDirectory directory) {
         super();
         this.project = project;
-        this.validator = NewUiComponentGridDialogValidator.getInstance();
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
         setContentPane(contentPanel);
@@ -194,7 +261,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     }
 
     private void onOK() {
-        if (!validator.validate(this)) {
+        if (!validateFormFields()) {
             return;
         }
 
@@ -309,10 +376,10 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     }
 
     @NotNull
-    private ArrayList<String> getMenuReferences() {
+    private List<String> getMenuReferences() {
         final Collection<String> menuReferences
                 = FileBasedIndex.getInstance().getAllKeys(MenuIndex.KEY, project);
-        ArrayList<String> menuReferencesList = new ArrayList<>(menuReferences);
+        final ArrayList<String> menuReferencesList = new ArrayList<>(menuReferences);
         Collections.sort(menuReferencesList);
         return menuReferencesList;
     }
@@ -477,9 +544,9 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     private String getMenuAction() {
         return getRoute()
             + File.separator
-            + getControllerName().toLowerCase()
+            + getControllerName().toLowerCase(new java.util.Locale("en","EN"))
             + File.separator
-            + getActionName().toLowerCase();
+            + getActionName().toLowerCase(new java.util.Locale("en","EN"));
     }
 
     public String getMenuTitle() {
