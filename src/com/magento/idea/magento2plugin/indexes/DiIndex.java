@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.indexes;
 
 import com.intellij.codeInsight.completion.PrefixMatcher;
@@ -12,19 +13,24 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.xml.*;
+// CHECKSTYLE IGNORE check FOR NEXT 1 LINES
+import com.intellij.psi.xml.*;//NOPMD
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.stubs.indexes.VirtualTypeIndex;
 import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
+// CHECKSTYLE IGNORE check FOR NEXT 1 LINES
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+/**
+ * TODO: enable style checks after decomposition.
+ */
+@SuppressWarnings({"PMD", "checkstyle:all"})
 public class DiIndex {
 
     private static DiIndex INSTANCE;
@@ -34,6 +40,12 @@ public class DiIndex {
     private DiIndex() {
     }
 
+    /**
+     * Get Instance.
+     *
+     * @param project
+     * @return DiIndex
+     */
     public static DiIndex getInstance(final Project project) {
         if (null == INSTANCE) {
             INSTANCE = new DiIndex();
@@ -42,6 +54,12 @@ public class DiIndex {
         return INSTANCE;
     }
 
+    /**
+     * Get Php Class Of Argument.
+     *
+     * @param psiArgumentValueElement
+     * @return PhpClass
+     */
     @Nullable
     public PhpClass getPhpClassOfArgument(XmlElement psiArgumentValueElement) {
 
@@ -66,6 +84,12 @@ public class DiIndex {
         return null;
     }
 
+    /**
+     * Get Php Class Of Service Method.
+     *
+     * @param psiMethodValueElement
+     * @return PhpClass
+     */
     @Nullable
     public static PhpClass getPhpClassOfServiceMethod(XmlElement psiMethodValueElement) {
         XmlTag serviceTag = PsiTreeUtil.getParentOfType(psiMethodValueElement, XmlTag.class);
@@ -95,6 +119,48 @@ public class DiIndex {
         return null;
     }
 
+    /**
+     * Get Php Class Of Job Method.
+     *
+     * @param psiMethodValueElement
+     * @return PhpClass
+     */
+    @Nullable
+    public static PhpClass getPhpClassOfJobMethod(XmlElement psiMethodValueElement) {
+        XmlTag serviceTag = PsiTreeUtil.getParentOfType(psiMethodValueElement, XmlTag.class);
+        if (serviceTag == null) {
+            return null;
+        }
+
+        XmlAttribute attribute = serviceTag.getAttribute("instance");
+        if (attribute == null) {
+            return null;
+        }
+
+        XmlAttributeValue valueElement = attribute.getValueElement();
+        if (valueElement == null) {
+            return null;
+        }
+
+        for (PsiReference reference : valueElement.getReferences()) {
+            if (reference != null) {
+                PsiElement element = reference.resolve();
+                if (element instanceof PhpClass) {
+                    return (PhpClass) element;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get Virtual Type Elements.
+     *
+     * @param name
+     * @param scope
+     * @return Collection<PsiElement>
+     */
     public Collection<PsiElement> getVirtualTypeElements(final String name, final GlobalSearchScope scope) {
         Collection<PsiElement> result = new ArrayList<>();
 
@@ -112,6 +178,13 @@ public class DiIndex {
         return result;
     }
 
+    /**
+     * Get All Virtual Type Element Names.
+     *
+     * @param prefixMatcher
+     * @param scope
+     * @return Collection<String>
+     */
     public Collection<String> getAllVirtualTypeElementNames(PrefixMatcher prefixMatcher, final GlobalSearchScope scope) {
         Collection<String> keys =
                 FileBasedIndex.getInstance().getAllKeys(VirtualTypeIndex.KEY, project);
@@ -120,6 +193,12 @@ public class DiIndex {
         return keys;
     }
 
+    /**
+     * Get Top Type Of Virtual Type.
+     *
+     * @param name
+     * @return String
+     */
     @NotNull
     private String getTopTypeOfVirtualType(@NotNull String name) {
         List<String> values;
