@@ -193,7 +193,7 @@ public class XmlCompletionContributor extends CompletionContributor {
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
                 .inside(XmlPatterns.xmlAttribute().withName("method")
                     .withParent(XmlPatterns.xmlTag().withName("job"))
-                ).inFile(xmlFile().withName(string().endsWith("crontab.xml"))),
+                ).inFile(xmlFile().withName(string().matches("crontab.xml"))),
             new PhpJobMethodCompletionContributor()
         );
 
