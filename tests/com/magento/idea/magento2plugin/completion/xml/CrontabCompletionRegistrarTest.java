@@ -27,7 +27,7 @@ public class CrontabCompletionRegistrarTest extends CompletionXmlFixtureTestCase
      */
     public void testNotCrontabXmlMustHaveNotCompletion() {
         final String filePath = this.getFixturePath(WRONG_FILE_NAME);
-        assertCompletionNotShowing(filePath);
+        assertFileNotContainsCompletions(filePath, EXPECTED_INSTANCE);
     }
 
     /**
@@ -36,7 +36,7 @@ public class CrontabCompletionRegistrarTest extends CompletionXmlFixtureTestCase
      */
     public void testNotInstanceAttrMustHaveNotCompletion() {
         final String filePath = this.getFixturePath(CrontabXmlTemplate.FILE_NAME);
-        assertCompletionNotShowing(filePath);
+        assertFileNotContainsCompletions(filePath, EXPECTED_INSTANCE);
     }
 
     /**
@@ -45,7 +45,7 @@ public class CrontabCompletionRegistrarTest extends CompletionXmlFixtureTestCase
      */
     public void testNotJobTagMustHaveNotCompletion() {
         final String filePath = this.getFixturePath(CrontabXmlTemplate.FILE_NAME);
-        assertCompletionNotShowing(filePath);
+        assertFileNotContainsCompletions(filePath, EXPECTED_INSTANCE);
     }
 
     /**
@@ -63,6 +63,6 @@ public class CrontabCompletionRegistrarTest extends CompletionXmlFixtureTestCase
      */
     public void testNotCrontabXmlMethodMustHaveNotCompletion() {
         final String filePath = this.getFixturePath(WRONG_FILE_NAME);
-        assertCompletionNotShowing(filePath);
+        assertFileNotContainsCompletions(filePath, EXPECTED_METHOD);
     }
 }
