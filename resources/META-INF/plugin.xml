@@ -225,6 +225,7 @@
         <internalFileTemplate name="Magento Resource Model Class"/>
         <internalFileTemplate name="Magento Data Model"/>
         <internalFileTemplate name="Magento Data Model Interface"/>
+        <internalFileTemplate name="Magento Module Declarative Schema XML"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 
