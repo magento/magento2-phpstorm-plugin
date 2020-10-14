@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
+import com.magento.idea.magento2plugin.actions.generation.dialog.util.HighlightDialogFieldOnErrorUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidations;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.ValidationRule;
@@ -74,6 +75,7 @@ public abstract class AbstractDialog extends JDialog {
                     if (errorMessageFieldValidationRuleMap.containsKey(field)
                             && errorMessageFieldValidationRuleMap.get(field).containsKey(rule)) {
                         showErrorMessage(errorMessageFieldValidationRuleMap.get(field).get(rule));
+                        highlightFieldWithErrorStyle(field);
                     }
                     return false;
                 }
@@ -185,5 +187,18 @@ public abstract class AbstractDialog extends JDialog {
             return ((JComboBox) field).getSelectedItem().toString();
         }
         return null;
+    }
+
+    /**
+     * Highlight field with error style.
+     *
+     * @param field Object
+     */
+    private void highlightFieldWithErrorStyle(final Object field) {
+        if (field instanceof JTextField) {
+            HighlightDialogFieldOnErrorUtil.execute((JTextField) field);
+        } else if (field instanceof JComboBox) {
+            HighlightDialogFieldOnErrorUtil.execute((JComboBox) field);
+        }
     }
 }

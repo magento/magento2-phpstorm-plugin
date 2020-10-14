@@ -62,7 +62,6 @@ public class XmlCompletionContributor extends CompletionContributor {
                         .inside(XmlPatterns.xmlAttribute().withName(CommonXml.ATTR_CLASS)),
                 new PhpClassCompletionProvider()
         );
-
         // <preference for="completion">
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
                         .inside(XmlPatterns.xmlAttribute().withName(ModuleDiXml.PREFERENCE_ATTR_FOR)),
@@ -129,9 +128,17 @@ public class XmlCompletionContributor extends CompletionContributor {
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
             .inside(XmlPatterns.xmlAttribute().withName(ModuleEventsXml.INSTANCE_ATTRIBUTE)
                 .withParent(XmlPatterns.xmlTag().withName(ModuleEventsXml.OBSERVER_TAG)
-                    .withParent(XmlPatterns.xmlTag().withName(ModuleEventsXml.EVENT_TAG))
                 )
             ).inFile(xmlFile().withName(string().matches(ModuleEventsXml.FILE_NAME))),
+            new PhpClassCompletionProvider()
+        );
+
+        // <job instance="class">
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+            .inside(XmlPatterns.xmlAttribute().withName(CommonXml.ATTR_INSTANCE)
+                .withParent(XmlPatterns.xmlTag().withName(CrontabXmlTemplate.CRON_JOB_TAG)
+                )
+            ).inFile(xmlFile().withName(string().matches(CrontabXmlTemplate.FILE_NAME))),
             new PhpClassCompletionProvider()
         );
 
@@ -180,6 +187,14 @@ public class XmlCompletionContributor extends CompletionContributor {
                     .withParent(XmlPatterns.xmlTag().withName("service"))
                 ).inFile(xmlFile().withName(string().endsWith("webapi.xml"))),
             new PhpServiceMethodCompletionContributor()
+        );
+
+        // <job method="methodName"/>
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(XmlPatterns.xmlAttribute().withName("method")
+                    .withParent(XmlPatterns.xmlTag().withName("job"))
+                ).inFile(xmlFile().withName(string().matches("crontab.xml"))),
+            new PhpJobMethodCompletionContributor()
         );
 
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
