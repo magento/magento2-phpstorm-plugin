@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
@@ -15,7 +15,6 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.indexes.DiIndex;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
-// CHECKSTYLE IGNORE check FOR NEXT 1 LINES
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -41,7 +40,7 @@ public class PhpJobMethodReferenceProvider extends PsiReferenceProvider {
         PhpClass phpClass = DiIndex.getPhpClassOfJobMethod((XmlElement) element);
         if (phpClass != null) {
             Collection<Method> methods = phpClass.getMethods();
-            methods.removeIf(m -> !m.getName().equalsIgnoreCase(methodName));
+            methods.removeIf(method -> !method.getName().contains(methodName));
             psiReferences.add(new PolyVariantReferenceBase(element, methods));
         }
 

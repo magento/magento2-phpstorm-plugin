@@ -93,7 +93,7 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
                         XmlPatterns.xmlAttribute().withName("method").withParent(
                                 XmlPatterns.xmlTag().withName("job")
                         )
-                ).inFile(xmlFile().withName(string().endsWith("crontab.xml"))),
+                ).inFile(xmlFile().withName(string().matches("crontab.xml"))),
                 new PhpJobMethodReferenceProvider()
         );
 
