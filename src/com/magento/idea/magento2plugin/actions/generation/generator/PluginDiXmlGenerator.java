@@ -123,7 +123,7 @@ public class PluginDiXmlGenerator extends FileGenerator {
                     XmlAttribute.class
                 );
             for (final XmlAttribute xmlAttribute: xmlAttributes) {
-                if (!xmlAttribute.getName().equals(ModuleDiXml.PLUGIN_TYPE_ATTRIBUTE)) {
+                if (!xmlAttribute.getName().equals(ModuleDiXml.TYPE_ATTR)) {
                     continue;
                 }
                 final String declaredClass = PhpLangUtil.toPresentableFQN(xmlAttribute.getValue());
@@ -140,8 +140,8 @@ public class PluginDiXmlGenerator extends FileGenerator {
         final Collection<XmlAttributeValue> pluginTypes =
                 XmlPsiTreeUtil.findAttributeValueElements(
                         diXml,
-                        ModuleDiXml.PLUGIN_TYPE_TAG,
-                        ModuleDiXml.PLUGIN_TYPE_ATTR_NAME
+                        ModuleDiXml.TYPE_TAG,
+                        ModuleDiXml.NAME_ATTR
                     );
         final String pluginClassFqn = pluginFileData.getTargetClass().getPresentableFQN();
         for (final XmlAttributeValue pluginType: pluginTypes) {

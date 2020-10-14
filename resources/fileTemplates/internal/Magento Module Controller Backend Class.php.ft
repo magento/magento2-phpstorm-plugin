@@ -26,6 +26,6 @@ class ${NAME}#if (${EXTENDS}) extends ${EXTENDS}#end#if (${IMPLEMENTS}) implemen
      */
     public function execute()
     {
-        // TODO: Implement execute method.
+        return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_PAGE);
     }
 }

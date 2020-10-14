@@ -23,6 +23,8 @@ public class UiComponentDataProviderPhp implements ModuleFileInterface {
     private static UiComponentDataProviderPhp INSTANCE = null;
     private String className;
     private String providerType;
+    public static final String DEFAULT_DATA_PROVIDER =
+            "Magento\\Framework\\View\\Element\\UiComponent\\DataProvider\\DataProvider";
 
     /**
      * Returns a new instance of the class.

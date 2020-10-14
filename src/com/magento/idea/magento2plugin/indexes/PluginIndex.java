@@ -49,7 +49,7 @@ public class PluginIndex {
         for (VirtualFile virtualFile : virtualFiles) {
             XmlFile xmlFile = (XmlFile) PsiManager.getInstance(project).findFile(virtualFile);
             Collection<XmlAttributeValue> valueElements = XmlPsiTreeUtil
-                    .findAttributeValueElements(xmlFile, ModuleDiXml.PLUGIN_TYPE_ATTRIBUTE, ModuleDiXml.PLUGIN_TYPE_ATTR_NAME, name);
+                    .findAttributeValueElements(xmlFile, ModuleDiXml.TYPE_ATTR, ModuleDiXml.NAME_ATTR, name);
             result.addAll(valueElements);
         }
         return result;

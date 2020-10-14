@@ -64,12 +64,12 @@ public class PluginDeclarationInspection extends PhpInspection {
 
                 for (final XmlTag pluginXmlTag: xmlTags) {
                     final HashMap<String, XmlTag> pluginProblems = new HashMap<>();
-                    if (!pluginXmlTag.getName().equals(ModuleDiXml.PLUGIN_TYPE_TAG)) {
+                    if (!pluginXmlTag.getName().equals(ModuleDiXml.TYPE_TAG)) {
                         continue;
                     }
 
                     final XmlAttribute pluginNameAttribute =
-                            pluginXmlTag.getAttribute(ModuleDiXml.PLUGIN_TYPE_ATTR_NAME);
+                            pluginXmlTag.getAttribute(ModuleDiXml.NAME_ATTR);
 
                     final String pluginNameAttributeValue = pluginNameAttribute.getValue();
                     if (pluginNameAttributeValue == null) {
@@ -80,7 +80,7 @@ public class PluginDeclarationInspection extends PhpInspection {
 
                     for (final XmlTag pluginTypeXmlTag: targetPlugin) {
                         final XmlAttribute pluginTypeNameAttribute
-                                = pluginTypeXmlTag.getAttribute(ModuleDiXml.PLUGIN_TYPE_ATTR_NAME);
+                                = pluginTypeXmlTag.getAttribute(ModuleDiXml.NAME_ATTR);
                         final XmlAttribute pluginTypeDisabledAttribute
                                 = pluginTypeXmlTag.getAttribute(ModuleDiXml.DISABLED_ATTR_NAME);
 
@@ -193,7 +193,7 @@ public class PluginDeclarationInspection extends PhpInspection {
                                     .getParent().getParent());
                     for (final XmlTag indexPluginTag: indexPluginTags) {
                         final XmlAttribute indexedPluginNameAttribute =
-                                indexPluginTag.getAttribute(ModuleDiXml.PLUGIN_TYPE_ATTR_NAME);
+                                indexPluginTag.getAttribute(ModuleDiXml.NAME_ATTR);
                         if (indexedPluginNameAttribute == null) {
                             continue;
                         }

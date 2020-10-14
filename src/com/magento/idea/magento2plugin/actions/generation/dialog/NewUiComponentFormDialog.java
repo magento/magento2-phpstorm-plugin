@@ -43,6 +43,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Namespa
 import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.files.ControllerFrontendPhp;
 import com.magento.idea.magento2plugin.magento.files.FormButtonBlockPhp;
+import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
@@ -554,6 +555,10 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     private void createUIComponents() {
         this.formAreaSelect = new FilteredComboBox(getAreaList());
         this.parentAcl = new FilteredComboBox(getAclResourcesList());
+
+        if (getAclResourcesList().contains(ModuleMenuXml.defaultAcl)) {
+            parentAcl.setSelectedItem(ModuleMenuXml.defaultAcl);
+        }
     }
 
     private String getModuleName() {

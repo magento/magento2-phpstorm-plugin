@@ -17,7 +17,7 @@ import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewUiComponentFormDialog;
 
 public class NewUiComponentFormAction extends AnAction {
-    public static final String ACTION_NAME = "Magento 2 UI Form";
+    public static final String ACTION_NAME = "Magento 2 UI Component Form";
     public static final String ACTION_DESCRIPTION = "Create a new Magento 2 UI Form";
 
     /**

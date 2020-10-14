@@ -78,7 +78,12 @@ public class MenuXmlGenerator extends FileGenerator {
             }
 
             if (!isDeclared) {
-                final XmlTag addTag = menuTag.createChildTag(ModuleMenuXml.addTag, null, "", false);
+                final XmlTag addTag = menuTag.createChildTag(
+                        ModuleMenuXml.addTag,
+                        null,
+                        null,
+                        false
+                );
                 addTag.setAttribute(ModuleMenuXml.idTagAttribute, menuXmlData.getMenuIdentifier());
                 addTag.setAttribute(
                         ModuleMenuXml.sortOrderTagAttribute,

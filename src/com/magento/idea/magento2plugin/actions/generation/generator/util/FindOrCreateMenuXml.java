@@ -44,16 +44,16 @@ public final class FindOrCreateMenuXml {
             parentDirectory = directoryGenerator
                     .findOrCreateSubdirectory(parentDirectory, fileDirectory);
         }
-        final ModuleMenuXml moduleRoutesXml = new ModuleMenuXml();
+        final ModuleMenuXml moduleMenuXml = new ModuleMenuXml();
         PsiFile routesXml = FileBasedIndexUtil.findModuleConfigFile(
-                moduleRoutesXml.getFileName(),
+                moduleMenuXml.getFileName(),
                 Areas.adminhtml,
                 moduleName,
                 project
         );
         if (routesXml == null) {
             routesXml = fileFromTemplateGenerator.generate(
-                    moduleRoutesXml,
+                    moduleMenuXml,
                     new Properties(),
                     parentDirectory,
                     actionName
