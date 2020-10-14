@@ -307,6 +307,16 @@ public class XmlCompletionContributor extends CompletionContributor {
             new TestNameCompletionProvider()
         );
 
+        // <add parent="completion" />
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(XmlPatterns.xmlAttribute().withName(ModuleMenuXml.parentTagAttribute)
+                    .withParent(XmlPatterns.xmlTag().withName(ModuleMenuXml.addTag)
+                        .withParent(XmlPatterns.xmlTag().withName(ModuleMenuXml.menuTag))
+                    )
+                ).inFile(xmlFile().withName(string().matches(ModuleMenuXml.fileName))),
+            new MenuCompletionProvider()
+        );
+
         registerCompletionsForDifferentNesting();
     }
 
