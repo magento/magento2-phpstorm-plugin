@@ -8,7 +8,6 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.DataProviderDeclarationData;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
-import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 
 public class DataProviderDeclarationGeneratorTest extends BaseGeneratorTestCase {
     private static final String EXPECTED_DIRECTORY = "src/app/code/Foo/Bar/etc";

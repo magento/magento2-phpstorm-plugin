@@ -76,7 +76,7 @@ import org.jetbrains.annotations.NotNull;
         "PMD.TooManyFields",
         "PMD.ExcessiveImports",
         "PMD.UnusedPrivateMethod",
-        "PMD.ToManyMethods",
+        "PMD.TooManyMethods",
         "PMD.GodClass"
 })
 public class NewUiComponentGridDialog extends AbstractDialog {

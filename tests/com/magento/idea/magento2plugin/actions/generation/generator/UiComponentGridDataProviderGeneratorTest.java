@@ -8,7 +8,6 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataProviderData;
-import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
 
 public class UiComponentGridDataProviderGeneratorTest extends BaseGeneratorTestCase {
     private static final String EXPECTED_DIRECTORY = "src/app/code/Foo/Bar/Ui/Component/Listing";
