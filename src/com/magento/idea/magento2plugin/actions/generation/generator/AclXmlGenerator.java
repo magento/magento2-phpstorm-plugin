@@ -114,7 +114,7 @@ public class AclXmlGenerator extends FileGenerator {
 
         addSubTagsQueue.add(targetTag);
         childParentRelationMap.put(targetTag, parent);
-        CommitXmlFileUtil.execute(aclXml, addSubTagsQueue, childParentRelationMap);;
+        CommitXmlFileUtil.execute(aclXml, addSubTagsQueue, childParentRelationMap);
         FileBasedIndex.getInstance().requestReindex(aclXml.getVirtualFile());
 
         return aclXml;

@@ -11,7 +11,7 @@ public class DataProviderDeclarationData {
     private final String virtualTypeName;
     private final String collectionFqn;
     private final String dataSource;
-    private String tableName;
+    private final String tableName;
 
     /**
      * Data Provider XML declaration data.

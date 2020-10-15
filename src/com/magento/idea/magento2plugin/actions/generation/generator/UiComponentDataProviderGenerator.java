@@ -152,10 +152,4 @@ public class UiComponentDataProviderGenerator extends FileGenerator {
                 uiComponentGridDataProviderData.getName()
         );
     }
-
-    private String getNameFromFqn(final String fqn) {
-        final String[] fqnArray = fqn.split("\\\\");
-
-        return fqnArray[fqnArray.length - 1];
-    }
 }
