@@ -115,7 +115,10 @@ public class LayoutXmlGenerator extends FileGenerator {
                         null,
                         false
                 );
-                uiComponentTag.setAttribute(LayoutXml.NAME_ATTRIBUTE, layoutXmlData.getUiComponentName());
+                uiComponentTag.setAttribute(
+                        LayoutXml.NAME_ATTRIBUTE,
+                        layoutXmlData.getUiComponentName()
+                );
                 contentContainer.addSubTag(uiComponentTag, false);
 
                 if (contentContainerIsGenerated) {
