@@ -16,16 +16,12 @@ public class UiComponentGridDataProviderGeneratorTest extends BaseGeneratorTestC
     private static final String PROVIDER_CLASS_NAME = "GridDataProvider";
     private static final String PROVIDER_NAMESPACE = "Foo\\Bar\\Ui\\Listing";
     private static final String PROVIDER_PATH = "Ui/Component/Listing";
-    private static final String COLLECTION_FQN = "Foo\\Bar\\Model\\Resource\\Entity\\Collection";
 
     /**
      * Test data provider class file generation with custom type.
      */
     public void testGenerateCustomDataProvider() {
-        final PsiFile dataProviderFile = generateDataProvider(
-                UiComponentDataProviderPhp.CUSTOM_TYPE,
-                null
-        );
+        final PsiFile dataProviderFile = generateDataProvider();
         final String filePath = this.getFixturePath("GridDataProvider.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
 
@@ -36,35 +32,12 @@ public class UiComponentGridDataProviderGeneratorTest extends BaseGeneratorTestC
         );
     }
 
-    /**
-     * Test data provider class file generation with collection type.
-     */
-    public void testGenerateCollectionDataProvider() {
-        final PsiFile dataProviderFile = generateDataProvider(
-                UiComponentDataProviderPhp.COLLECTION_TYPE,
-                COLLECTION_FQN
-        );
-        final String filePath = this.getFixturePath("GridDataProvider.php");
-        final PsiFile expectedFile = myFixture.configureByFile(filePath);
-
-        assertGeneratedFileIsCorrect(
-                expectedFile,
-                EXPECTED_DIRECTORY,
-                dataProviderFile
-        );
-    }
-
-    private PsiFile generateDataProvider(
-            final String providerType,
-            final String collectionFqn
-    ) {
+    private PsiFile generateDataProvider() {
         final Project project = myFixture.getProject();
         final UiComponentDataProviderData providerData = new UiComponentDataProviderData(
-                providerType,
                 PROVIDER_CLASS_NAME,
                 PROVIDER_NAMESPACE,
-                PROVIDER_PATH,
-                collectionFqn
+                PROVIDER_PATH
         );
         final UiComponentDataProviderGenerator generator;
         generator = new UiComponentDataProviderGenerator(

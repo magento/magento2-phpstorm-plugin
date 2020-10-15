@@ -437,11 +437,9 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     private PsiFile generateDataProviderFile() {
         final NamespaceBuilder namespace = getDataProviderNamespace();
         return new UiComponentDataProviderGenerator(new UiComponentDataProviderData(
-            UiComponentDataProviderPhp.CUSTOM_TYPE,
             getDataProviderClassName(),
             namespace.getNamespace(),
-            getDataProviderDirectory(),
-            ""
+            getDataProviderDirectory()
         ), getModuleName(), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
     }
 

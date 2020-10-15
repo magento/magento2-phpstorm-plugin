@@ -14,15 +14,12 @@ import com.jetbrains.php.lang.PhpLanguage;
         "PMD.RedundantFieldInitializer"
 })
 public class UiComponentDataProviderPhp implements ModuleFileInterface {
-    public static final String COLLECTION_TEMPLATE =
-            "Magento Module Ui Grid Collection Data Provider Php";
     public static final String CUSTOM_TEMPLATE = "Magento Module Ui Custom Data Provider Php";
     public static final String FILE_EXTENSION = "php";
     public static final String CUSTOM_TYPE = "custom";
     public static final String COLLECTION_TYPE = "collection";
     private static UiComponentDataProviderPhp INSTANCE = null;
     private String className;
-    private String providerType;
     public static final String DEFAULT_DATA_PROVIDER =
             "Magento\\Framework\\View\\Element\\UiComponent\\DataProvider\\DataProvider";
 
@@ -30,19 +27,16 @@ public class UiComponentDataProviderPhp implements ModuleFileInterface {
      * Returns a new instance of the class.
      *
      * @param className DataProvider class name
-     * @param providerType DataProvider type
      * @return UiComponentGridDataProviderPhp
      */
     public static UiComponentDataProviderPhp getInstance(
-            final String className,
-            final String providerType
+            final String className
     ) {
         if (null == INSTANCE) {
             INSTANCE = new UiComponentDataProviderPhp();
         }
 
         INSTANCE.setClassName(className);
-        INSTANCE.setProviderType(providerType);
 
         return INSTANCE;
     }
@@ -56,15 +50,6 @@ public class UiComponentDataProviderPhp implements ModuleFileInterface {
         this.className = className;
     }
 
-    /**
-     * Set provided type.
-     *
-     * @param providerType String
-     */
-    public void setProviderType(final String providerType) {
-        this.providerType = providerType;
-    }
-
     @Override
     public String getFileName() {
         return String.format("%s.%s", className, FILE_EXTENSION);
@@ -72,15 +57,7 @@ public class UiComponentDataProviderPhp implements ModuleFileInterface {
 
     @Override
     public String getTemplate() {
-        if (providerType.equals(COLLECTION_TYPE)) {
-            return COLLECTION_TEMPLATE;
-        }
-
-        if (providerType.equals(CUSTOM_TYPE)) {
-            return CUSTOM_TEMPLATE;
-        }
-
-        return null;
+        return CUSTOM_TEMPLATE;
     }
 
     @Override

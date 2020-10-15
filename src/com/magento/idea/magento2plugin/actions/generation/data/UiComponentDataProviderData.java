@@ -7,33 +7,25 @@ package com.magento.idea.magento2plugin.actions.generation.data;
 
 @SuppressWarnings({"PMD.DataClass"})
 public class UiComponentDataProviderData {
-    private final String type;
     private final String name;
     private final String namespace;
     private final String path;
-    private final String collectionFqn;
 
     /**
      * UiComponentGridDataProviderData constructor.
      *
-     * @param type String
      * @param name String
      * @param namespace String
      * @param path String
-     * @param collectionFqn String
      */
     public UiComponentDataProviderData(
-            final String type,
             final String name,
             final String namespace,
-            final String path,
-            final String collectionFqn
+            final String path
     ) {
-        this.type = type;
         this.name = name;
         this.namespace = namespace;
         this.path = path;
-        this.collectionFqn = collectionFqn;
     }
 
     /**
@@ -52,24 +44,6 @@ public class UiComponentDataProviderData {
      */
     public String getNamespace() {
         return namespace;
-    }
-
-    /**
-     * Get collection FQN.
-     *
-     * @return String
-     */
-    public String getCollectionFqn() {
-        return collectionFqn;
-    }
-
-    /**
-     * Get type of data provider.
-     *
-     * @return String
-     */
-    public String getType() {
-        return type;
     }
 
     /**

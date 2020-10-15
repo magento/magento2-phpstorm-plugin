@@ -254,11 +254,9 @@ public class NewUiComponentGridDialog extends AbstractDialog {
      */
     public UiComponentDataProviderData getGridDataProviderData() {
         return new UiComponentDataProviderData(
-                getDataProviderType(),
                 getDataProviderClass(),
                 getDataProviderNamespace(),
-                getDataProviderDirectory(),
-                getCollection()
+                getDataProviderDirectory()
         );
     }
 
