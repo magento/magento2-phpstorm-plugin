@@ -11,7 +11,7 @@ public class LayoutXmlData {
     private final String moduleName;
     private final String controllerName;
     private final String actionName;
-    private final String formName;
+    private final String uiComponentName;
 
     /**
      * Layout XML data.
@@ -21,7 +21,7 @@ public class LayoutXmlData {
      * @param moduleName String
      * @param controllerName String
      * @param actionName String
-     * @param formName String
+     * @param uiComponentName String
      */
     public LayoutXmlData(
             final String area,
@@ -29,14 +29,14 @@ public class LayoutXmlData {
             final String moduleName,
             final String controllerName,
             final String actionName,
-            final String formName
+            final String uiComponentName
     ) {
         this.area = area;
         this.route = route;
         this.moduleName = moduleName;
         this.controllerName = controllerName;
         this.actionName = actionName;
-        this.formName = formName;
+        this.uiComponentName = uiComponentName;
     }
 
     public String getArea() {
@@ -59,7 +59,7 @@ public class LayoutXmlData {
         return actionName;
     }
 
-    public String getFormName() {
-        return formName;
+    public String getUiComponentName() {
+        return uiComponentName;
     }
 }

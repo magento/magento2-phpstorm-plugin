@@ -5,17 +5,14 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
-import com.google.common.collect.Lists;
-import com.intellij.openapi.command.WriteCommandAction;
-import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.actions.generation.data.AclXmlData;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.CommitXmlFileUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateAclXml;
 import com.magento.idea.magento2plugin.magento.files.ModuleAclXml;
 import com.magento.idea.magento2plugin.util.magento.GetAclResourcesTreeUtil;
@@ -117,7 +114,7 @@ public class AclXmlGenerator extends FileGenerator {
 
         addSubTagsQueue.add(targetTag);
         childParentRelationMap.put(targetTag, parent);
-        commitAclXmlFile(aclXml);
+        CommitXmlFileUtil.execute(aclXml, addSubTagsQueue, childParentRelationMap);
         FileBasedIndex.getInstance().requestReindex(aclXml.getVirtualFile());
 
         return aclXml;
@@ -144,31 +141,6 @@ public class AclXmlGenerator extends FileGenerator {
         childParentRelationMap.put(newTag, parent);
 
         return newTag;
-    }
-
-    /**
-     * Save XML file.
-     *
-     * @param aclXml XmlFile
-     *
-     * @return XmlFile
-     */
-    private XmlFile commitAclXmlFile(final XmlFile aclXml) {
-        WriteCommandAction.runWriteCommandAction(project, () -> {
-            for (final XmlTag tag : Lists.reverse(addSubTagsQueue)) {
-                if (childParentRelationMap.containsKey(tag)) {
-                    final XmlTag parent = childParentRelationMap.get(tag);
-                    parent.addSubTag(tag, false);
-                }
-            }
-        });
-        final PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(project);
-        final Document document = psiDocumentManager.getDocument(aclXml);
-
-        if (document != null) {
-            psiDocumentManager.commitDocument(document);
-        }
-        return aclXml;
     }
 
     @Override

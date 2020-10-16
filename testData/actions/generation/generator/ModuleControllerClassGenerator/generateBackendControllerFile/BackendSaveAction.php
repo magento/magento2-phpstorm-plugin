@@ -23,6 +23,6 @@ class BackendSaveAction extends Action implements HttpPostActionInterface
      */
     public function execute()
     {
-        // TODO: Implement execute method.
+        return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_PAGE);
     }
 }

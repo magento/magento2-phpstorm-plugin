@@ -43,7 +43,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Namespa
 import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.files.ControllerFrontendPhp;
 import com.magento.idea.magento2plugin.magento.files.FormButtonBlockPhp;
-import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
+import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
@@ -94,8 +94,8 @@ public class NewUiComponentFormDialog extends AbstractDialog {
 
     private static final String VIEW_ACTION_NAME = "View Action Name";
     private static final String SUBMIT_ACTION_NAME = "Submit Action Name";
-    private static final String DATA_PROVIDER_CLASS_NAME = "Data Provider class name";
-    private static final String DATA_PROVIDER_DIRECTORY = "Data Provider directory";
+    private static final String DATA_PROVIDER_CLASS_NAME = "Data Provider Class Name";
+    private static final String DATA_PROVIDER_DIRECTORY = "Data Provider Directory";
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, "Name"})
     @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE, "Name"})
@@ -436,11 +436,9 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     private PsiFile generateDataProviderFile() {
         final NamespaceBuilder namespace = getDataProviderNamespace();
         return new UiComponentDataProviderGenerator(new UiComponentDataProviderData(
-            UiComponentDataProviderPhp.CUSTOM_TYPE,
             getDataProviderClassName(),
             namespace.getNamespace(),
-            getDataProviderDirectory(),
-            ""
+            getDataProviderDirectory()
         ), getModuleName(), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
     }
 
@@ -554,6 +552,10 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     private void createUIComponents() {
         this.formAreaSelect = new FilteredComboBox(getAreaList());
         this.parentAcl = new FilteredComboBox(getAclResourcesList());
+
+        if (getAclResourcesList().contains(ModuleMenuXml.defaultAcl)) {
+            parentAcl.setSelectedItem(ModuleMenuXml.defaultAcl);
+        }
     }
 
     private String getModuleName() {

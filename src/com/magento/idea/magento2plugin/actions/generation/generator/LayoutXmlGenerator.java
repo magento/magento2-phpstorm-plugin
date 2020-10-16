@@ -86,7 +86,7 @@ public class LayoutXmlGenerator extends FileGenerator {
                     for (final XmlTag uiComponent: uiComponents) {
                         @Nullable final XmlAttribute uiComponentName
                                 = uiComponent.getAttribute(LayoutXml.NAME_ATTRIBUTE);
-                        if (uiComponentName.getValue().equals(layoutXmlData.getFormName())) {
+                        if (uiComponentName.getValue().equals(layoutXmlData.getUiComponentName())) {
                             isDeclared = true;
                         }
                     }
@@ -115,7 +115,10 @@ public class LayoutXmlGenerator extends FileGenerator {
                         null,
                         false
                 );
-                uiComponentTag.setAttribute(LayoutXml.NAME_ATTRIBUTE, layoutXmlData.getFormName());
+                uiComponentTag.setAttribute(
+                        LayoutXml.NAME_ATTRIBUTE,
+                        layoutXmlData.getUiComponentName()
+                );
                 contentContainer.addSubTag(uiComponentTag, false);
 
                 if (contentContainerIsGenerated) {

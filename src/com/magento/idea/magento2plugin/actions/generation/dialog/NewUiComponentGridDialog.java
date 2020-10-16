@@ -7,19 +7,52 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiFile;
+import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.magento.idea.magento2plugin.actions.generation.NewUiComponentFormAction;
 import com.magento.idea.magento2plugin.actions.generation.NewUiComponentGridAction;
+import com.magento.idea.magento2plugin.actions.generation.data.AclXmlData;
+import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
+import com.magento.idea.magento2plugin.actions.generation.data.DataProviderDeclarationData;
+import com.magento.idea.magento2plugin.actions.generation.data.LayoutXmlData;
+import com.magento.idea.magento2plugin.actions.generation.data.MenuXmlData;
+import com.magento.idea.magento2plugin.actions.generation.data.RoutesXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataProviderData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridToolbarData;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewUiComponentGridDialogValidator;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AclResourceIdRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NumericRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpNamespaceNameRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.RouteIdRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.StartWithNumberOrCapitalLetterRule;
+import com.magento.idea.magento2plugin.actions.generation.generator.AclXmlGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.DataProviderDeclarationGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.LayoutXmlGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.MenuXmlGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.ModuleControllerClassGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.RoutesXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentDataProviderGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentGridXmlGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
+import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
+import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
+import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.stubs.indexes.xml.MenuIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
+import com.magento.idea.magento2plugin.util.FirstLetterToLowercaseUtil;
+import com.magento.idea.magento2plugin.util.magento.GetAclResourcesListUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import com.magento.idea.magento2plugin.util.magento.GetResourceCollections;
 import java.awt.event.KeyEvent;
@@ -27,6 +60,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -35,32 +70,124 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveImports", "PMD.UnusedPrivateMethod"})
+@SuppressWarnings({
+        "PMD.TooManyFields",
+        "PMD.ExcessiveImports",
+        "PMD.UnusedPrivateMethod",
+        "PMD.TooManyMethods",
+        "PMD.GodClass"
+})
 public class NewUiComponentGridDialog extends AbstractDialog {
+    private static final String ACTION_NAME = "Action Name";
+    private static final String DATA_PROVIDER_CLASS_NAME = "Data Provider Class Name";
+    private static final String DATA_PROVIDER_DIRECTORY = "Data Provider Directory";
+    private static final String NAME = "Name";
+
     private final Project project;
     private final String moduleName;
-    private final NewUiComponentGridDialogValidator validator;
     private List<String> collectionOptions;
     private JPanel contentPanel;
     private JButton buttonOK;
     private JButton buttonCancel;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, NAME})
+    @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE, NAME})
     private JTextField uiComponentName;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, NAME})
+    @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE, NAME})
     private JTextField idField;
+
     private JCheckBox addToolBar;
     private JCheckBox addBookmarksCheckBox;
     private JCheckBox addColumnsControlCheckBox;
     private JCheckBox addFullTextSearchCheckBox;
     private JCheckBox addListingFiltersCheckBox;
     private JCheckBox addListingPagingCheckBox;
+
     private FilteredComboBox collection;
     private FilteredComboBox dataProviderType;
     private FilteredComboBox areaSelect;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, DATA_PROVIDER_CLASS_NAME})
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
+            message = {PhpClassRule.MESSAGE, DATA_PROVIDER_CLASS_NAME})
+    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC,
+            message = {AlphanumericRule.MESSAGE, DATA_PROVIDER_CLASS_NAME})
     private JTextField providerClassName;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, DATA_PROVIDER_DIRECTORY})
+    @FieldValidation(rule = RuleRegistry.DIRECTORY,
+            message = {DirectoryRule.MESSAGE, DATA_PROVIDER_DIRECTORY})
+    @FieldValidation(rule = RuleRegistry.START_WITH_NUMBER_OR_CAPITAL_LETTER,
+            message = {AlphanumericRule.MESSAGE, DATA_PROVIDER_DIRECTORY})
     private JTextField dataProviderParentDirectory;
+
+    @FieldValidation(rule = RuleRegistry.ACL_RESOURCE_ID, message = {AclResourceIdRule.MESSAGE})
     private JTextField acl;
+
+    @FieldValidation(rule = RuleRegistry.ACL_RESOURCE_ID, message = {AclResourceIdRule.MESSAGE})
+    private FilteredComboBox parentAcl;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, "Acl Title"})
+    private JTextField aclTitle;
+
+    @FieldValidation(rule = RuleRegistry.ROUTE_ID, message = {RouteIdRule.MESSAGE})
+    private JTextField route;
+
+    @FieldValidation(rule = RuleRegistry.PHP_NAMESPACE_NAME,
+            message = {PhpNamespaceNameRule.MESSAGE, "Controller Name"})
+    private JTextField controllerName;
+
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
+            message = {PhpClassRule.MESSAGE, ACTION_NAME})
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, ACTION_NAME})
+    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC,
+            message = {AlphanumericRule.MESSAGE, ACTION_NAME})
+    @FieldValidation(rule = RuleRegistry.START_WITH_NUMBER_OR_CAPITAL_LETTER,
+            message = {StartWithNumberOrCapitalLetterRule.MESSAGE, ACTION_NAME})
+    private JTextField actionName;
+
+    @FieldValidation(rule = RuleRegistry.NUMERIC,
+            message = {NumericRule.MESSAGE, "Sort Order"})
+    private JTextField sortOrder;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, "Menu Identifier"})
+    private JTextField menuIdentifier;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, "Menu Title"})
+    private JTextField menuTitle;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, "Parent Menu"})
+    private FilteredComboBox parentMenu;
+
     private JLabel aclLabel;
-    private JLabel collectionLabel;
+    private JLabel routeLabel;//NOPMD
+    private JLabel controllerLabel;//NOPMD
+    private JLabel actionLabel;//NOPMD
+    private JLabel parentMenuItemLabel;//NOPMD
+    private JLabel sortOrderLabel;//NOPMD
+    private JLabel menuIdentifierLabel;//NOPMD
+    private JLabel menuTitleLabel;//NOPMD
+    private JLabel formMenuLabel;//NOPMD
+    private JLabel aclGeneralLabel;//NOPMD
+    private JLabel parentAclID;//NOPMD
+    private JLabel aclTitleLabel;//NOPMD
+    private JLabel controllerGeneralLabel;//NOPMD
+    private JLabel dataProviderGeneralLabel;//NOPMD
+    private JLabel general;//NOPMD
+    private JLabel collectionLabel;//NOPMD
+    private JLabel dataProviderParentDirectoryLabel;
+    private JLabel tableNameLabel;
+    private JTextField tableName;
 
     /**
      * New UI component grid dialog constructor.
@@ -71,7 +198,6 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     public NewUiComponentGridDialog(final Project project, final PsiDirectory directory) {
         super();
         this.project = project;
-        this.validator = NewUiComponentGridDialogValidator.getInstance();
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
         setContentPane(contentPanel);
@@ -99,6 +225,13 @@ public class NewUiComponentGridDialog extends AbstractDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
+
+        final String componentIdentifierSuffix = "::listing";
+        menuIdentifier.setText(getModuleName() + componentIdentifierSuffix);
+        acl.setText(getModuleName() + componentIdentifierSuffix);
+
+        dataProviderParentDirectory.setVisible(false);
+        dataProviderParentDirectoryLabel.setVisible(false);
     }
 
     /**
@@ -121,11 +254,9 @@ public class NewUiComponentGridDialog extends AbstractDialog {
      */
     public UiComponentDataProviderData getGridDataProviderData() {
         return new UiComponentDataProviderData(
-                getDataProviderType(),
                 getDataProviderClass(),
                 getDataProviderNamespace(),
-                getDataProviderDirectory(),
-                getCollection()
+                getDataProviderDirectory()
         );
     }
 
@@ -167,11 +298,18 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     }
 
     private void onOK() {
-        if (!validator.validate(this)) {
+        if (!validateFormFields()) {
             return;
         }
 
-        generateFile();
+        generateViewControllerFile();
+        generateLayoutFile();
+        generateMenuFile();
+        generateAclXmlFile();
+        generateRoutesXmlFile();
+        generateDataProviderClass();
+        generateDataProviderDeclaration();
+        generateUiComponentFile();
         this.setVisible(false);
     }
 
@@ -185,19 +323,96 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         dataProviderType.addActionListener(event -> onDataProviderTypeChange());
     }
 
-    private void generateFile() {
-        final UiComponentDataProviderGenerator dataProviderGenerator;
-        dataProviderGenerator = new UiComponentDataProviderGenerator(
-                getGridDataProviderData(),
-                getModuleName(),
-                project
-        );
+    private PsiFile generateRoutesXmlFile() {
+        return new RoutesXmlGenerator(new RoutesXmlData(
+            getArea(),
+            getRoute(),
+            getModuleName()
+        ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
+    }
+
+    private void generateUiComponentFile() {
         final UiComponentGridXmlGenerator gridXmlGenerator = new UiComponentGridXmlGenerator(
                 getUiComponentGridData(),
                 project
         );
-        dataProviderGenerator.generate(NewUiComponentGridAction.ACTION_NAME);
         gridXmlGenerator.generate(NewUiComponentGridAction.ACTION_NAME, true);
+    }
+
+    private void generateDataProviderClass() {
+        if (getDataProviderType().equals(UiComponentDataProviderPhp.CUSTOM_TYPE)) {
+            final UiComponentDataProviderGenerator dataProviderGenerator;
+            dataProviderGenerator = new UiComponentDataProviderGenerator(
+                getGridDataProviderData(),
+                getModuleName(),
+                project
+            );
+            dataProviderGenerator.generate(NewUiComponentGridAction.ACTION_NAME);
+        }
+    }
+
+    private void generateDataProviderDeclaration() {
+        if (getDataProviderType().equals(UiComponentDataProviderPhp.COLLECTION_TYPE)) {
+            final DataProviderDeclarationGenerator dataProviderGenerator;
+            dataProviderGenerator = new DataProviderDeclarationGenerator(
+                new DataProviderDeclarationData(
+                    getModuleName(),
+                    getDataProviderClass(),
+                    getCollection(),
+                    getUiComponentName() + "_data_source",
+                    getTableName()
+                ), project);
+            dataProviderGenerator.generate(NewUiComponentGridAction.ACTION_NAME);
+        }
+    }
+
+    private PsiFile generateViewControllerFile() {
+        final NamespaceBuilder namespace = new NamespaceBuilder(
+                getModuleName(),
+                getActionName(),
+                getControllerDirectory()
+        );
+        return new ModuleControllerClassGenerator(new ControllerFileData(
+                getControllerDirectory(),
+                getActionName(),
+                getModuleName(),
+                getArea(),
+                HttpMethod.GET.toString(),
+                getAcl(),
+                true,
+                namespace.getNamespace()
+        ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
+    }
+
+    private PsiFile generateLayoutFile() {
+        return new LayoutXmlGenerator(new LayoutXmlData(
+            getArea(),
+            getRoute(),
+            getModuleName(),
+            getControllerName(),
+            getActionName(),
+            getUiComponentName()
+        ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
+    }
+
+    private PsiFile generateMenuFile() {
+        return new MenuXmlGenerator(new MenuXmlData(
+            getParentMenuItem(),
+            getSortOrder(),
+            getModuleName(),
+            getMenuIdentifier(),
+            getMenuTitle(),
+            getAcl(),
+            getMenuAction()
+        ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
+    }
+
+    private PsiFile generateAclXmlFile() {
+        return new AclXmlGenerator(new AclXmlData(
+            getParentAcl(),
+            getAcl(),
+            getAclTitle()
+        ), getModuleName(), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
     }
 
     private String getModuleName() {
@@ -227,6 +442,10 @@ public class NewUiComponentGridDialog extends AbstractDialog {
 
         collection.setVisible(visible);
         collectionLabel.setVisible(visible);
+        tableName.setVisible(visible);
+        tableNameLabel.setVisible(visible);
+        dataProviderParentDirectory.setVisible(!visible);
+        dataProviderParentDirectoryLabel.setVisible(!visible);
     }
 
     @SuppressWarnings({"PMD.UnusedPrivateMethod"})
@@ -234,12 +453,27 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         this.collection = new FilteredComboBox(getCollectionOptions());
         this.dataProviderType = new FilteredComboBox(getProviderTypeOptions());
         this.areaSelect = new FilteredComboBox(getAreaOptions());
+        areaSelect.setEnabled(false);
+        this.parentMenu = new FilteredComboBox(getMenuReferences());
+        this.parentAcl = new FilteredComboBox(getAclResourcesList());
+
+        if (getAclResourcesList().contains(ModuleMenuXml.defaultAcl)) {
+            parentAcl.setSelectedItem(ModuleMenuXml.defaultAcl);
+        }
+    }
+
+    @NotNull
+    private List<String> getMenuReferences() {
+        final Collection<String> menuReferences
+                = FileBasedIndex.getInstance().getAllKeys(MenuIndex.KEY, project);
+        final ArrayList<String> menuReferencesList = new ArrayList<>(menuReferences);
+        Collections.sort(menuReferencesList);
+        return menuReferencesList;
     }
 
     private List<String> getCollectionOptions() {
         if (this.collectionOptions == null) {
             this.collectionOptions = new ArrayList<>();
-            this.collectionOptions.add("");
             final GetResourceCollections getResourceCollections;
             getResourceCollections = GetResourceCollections.getInstance(
                     this.project
@@ -256,8 +490,8 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     private List<String> getProviderTypeOptions() {
         return new ArrayList<>(
                 Arrays.asList(
-                        UiComponentDataProviderPhp.CUSTOM_TYPE,
-                        UiComponentDataProviderPhp.COLLECTION_TYPE
+                        UiComponentDataProviderPhp.COLLECTION_TYPE,
+                        UiComponentDataProviderPhp.CUSTOM_TYPE
                 )
         );
     }
@@ -293,6 +527,9 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     }
 
     private String getDataProviderClassFqn() {
+        if (!getDataProviderType().equals(UiComponentDataProviderPhp.CUSTOM_TYPE)) {
+            return UiComponentDataProviderPhp.DEFAULT_DATA_PROVIDER;
+        }
         return String.format(
                 "%s%s%s",
                 getDataProviderNamespace(),
@@ -361,5 +598,63 @@ public class NewUiComponentGridDialog extends AbstractDialog {
 
     private String getDataProviderDirectory() {
         return dataProviderParentDirectory.getText().trim();
+    }
+
+    public String getActionName() {
+        return actionName.getText().trim();
+    }
+
+    private String getControllerDirectory() {
+        final String directory = ControllerBackendPhp.DEFAULT_DIR;
+
+        return directory + File.separator + getControllerName();
+    }
+
+    public String getControllerName() {
+        return controllerName.getText().trim();
+    }
+
+    public String getRoute() {
+        return route.getText().trim();
+    }
+
+    private String getParentMenuItem() {
+        return parentMenu.getSelectedItem().toString();
+    }
+
+    public String getSortOrder() {
+        return sortOrder.getText().trim();
+    }
+
+    public String getMenuIdentifier() {
+        return menuIdentifier.getText().trim();
+    }
+
+    private String getMenuAction() {
+        return getRoute()
+            + File.separator
+            + FirstLetterToLowercaseUtil.convert(getControllerName())
+            + File.separator
+            + FirstLetterToLowercaseUtil.convert(getActionName());
+    }
+
+    public String getMenuTitle() {
+        return menuTitle.getText().trim();
+    }
+
+    private List<String> getAclResourcesList() {
+        return GetAclResourcesListUtil.execute(project);
+    }
+
+    public String getParentAcl() {
+        return parentAcl.getSelectedItem().toString().trim();
+    }
+
+    public String getAclTitle() {
+        return aclTitle.getText().trim();
+    }
+
+    public String getTableName() {
+        return tableName.getText().trim();
     }
 }

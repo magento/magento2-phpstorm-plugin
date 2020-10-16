@@ -111,18 +111,6 @@ public class UiComponentDataProviderGenerator extends FileGenerator {
     protected void fillAttributes(final Properties attributes) {
         attributes.setProperty("NAMESPACE", uiComponentGridDataProviderData.getNamespace());
         attributes.setProperty("CLASS_NAME", uiComponentGridDataProviderData.getName());
-        final String dataProviderType = uiComponentGridDataProviderData.getType();
-
-        if (dataProviderType.equals(UiComponentDataProviderPhp.COLLECTION_TYPE)) {
-            attributes.setProperty(
-                    "COLLECTION_CLASS_FQN",
-                    uiComponentGridDataProviderData.getCollectionFqn()
-            );
-            attributes.setProperty(
-                    "COLLECTION_CLASS_NAME",
-                    getNameFromFqn(uiComponentGridDataProviderData.getCollectionFqn())
-            );
-        }
     }
 
     private PhpClass createDataProviderClass(final String actionName) {
@@ -142,8 +130,7 @@ public class UiComponentDataProviderGenerator extends FileGenerator {
 
         dataProviderFile = fileFromTemplateGenerator.generate(
                 UiComponentDataProviderPhp.getInstance(
-                        uiComponentGridDataProviderData.getName(),
-                        uiComponentGridDataProviderData.getType()
+                        uiComponentGridDataProviderData.getName()
                 ),
                 attributes,
                 parentDirectory,
@@ -164,11 +151,5 @@ public class UiComponentDataProviderGenerator extends FileGenerator {
                 Package.fqnSeparator,
                 uiComponentGridDataProviderData.getName()
         );
-    }
-
-    private String getNameFromFqn(final String fqn) {
-        final String[] fqnArray = fqn.split("\\\\");
-
-        return fqnArray[fqnArray.length - 1];
     }
 }

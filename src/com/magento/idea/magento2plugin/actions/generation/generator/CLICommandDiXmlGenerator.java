@@ -111,8 +111,8 @@ public class CLICommandDiXmlGenerator extends FileGenerator {
         final Collection<XmlAttributeValue> argumentsTag =
                 XmlPsiTreeUtil.findTypeArgumentsItemValueElement(
                     diXml,
-                    ModuleDiXml.CLI_COMMAND_TAG,
-                    ModuleDiXml.CLI_COMMAND_ATTR_NAME,
+                    ModuleDiXml.TYPE_TAG,
+                    ModuleDiXml.NAME_ATTR,
                     ModuleDiXml.CLI_COMMAND_INTERFACE,
                     ModuleDiXml.CLI_COMMAND_ATTR_COMMANDS
                 );

@@ -70,14 +70,14 @@ public class XmlCompletionContributor extends CompletionContributor {
 
         // <type name="completion">
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
-                        .inside(XmlPatterns.xmlAttribute().withName(ModuleDiXml.PLUGIN_TYPE_ATTR_NAME)
-                                .withParent(XmlPatterns.xmlTag().withName(ModuleDiXml.PLUGIN_TYPE_TAG))),
+                        .inside(XmlPatterns.xmlAttribute().withName(ModuleDiXml.NAME_ATTR)
+                                .withParent(XmlPatterns.xmlTag().withName(ModuleDiXml.TYPE_TAG))),
                 new PhpClassCompletionProvider()
         );
 
         // <plugin type="completion">
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
-                .inside(XmlPatterns.xmlAttribute().withName(ModuleDiXml.PLUGIN_TYPE_ATTRIBUTE)
+                .inside(XmlPatterns.xmlAttribute().withName(ModuleDiXml.TYPE_ATTR)
                     .withParent(XmlPatterns.xmlTag().withName(ModuleDiXml.PLUGIN_TAG_NAME))),
             new PhpClassCompletionProvider()
         );

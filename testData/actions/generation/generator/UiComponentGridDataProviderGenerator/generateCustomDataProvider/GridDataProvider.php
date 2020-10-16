@@ -11,7 +11,9 @@ class GridDataProvider extends DataProvider
      */
     public function getData()
     {
-        // todo: implement data retrieving here based on search criteria
-        return parent::getData();
+        //TODO: implement data retrieving here based on search criteria
+        return [
+            []
+        ];
     }
 }
