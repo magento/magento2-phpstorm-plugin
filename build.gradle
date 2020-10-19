@@ -49,6 +49,9 @@ intellij {
     downloadSources !Boolean.valueOf(System.getenv('CI'))
     sandboxDirectory "${project.rootDir}/.idea-sandbox"
 
+    patchPluginXml {
+        changeNotes({ changelog.getLatest().toHTML() })
+    }
 }
 
 sourceSets {
@@ -63,9 +66,6 @@ sourceSets {
 }
 
 publishPlugin {
-    patchPluginXml {
-        changeNotes(closure { changelog.getLatest().toHTML() })
-    }
     token = System.getenv("MAGENTO_PHPSTORM_intellijPublishToken")
     if (Boolean.valueOf(System.getenv("MAGENTO_PHPSTORM_isAlpha"))) {
         channels 'alpha'
