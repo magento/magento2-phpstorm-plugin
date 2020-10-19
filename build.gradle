@@ -63,7 +63,9 @@ sourceSets {
 }
 
 publishPlugin {
-    changeNotes({ changelog.getLatest().toHTML() })
+    patchPluginXml {
+        changeNotes(closure { changelog.getLatest().toHTML() })
+    }
     token = System.getenv("MAGENTO_PHPSTORM_intellijPublishToken")
     if (Boolean.valueOf(System.getenv("MAGENTO_PHPSTORM_isAlpha"))) {
         channels 'alpha'
