@@ -84,7 +84,7 @@ public class XmlDeclarationsGenerator {
         return attributes;
     }
 
-    protected void renderFieldsets(XmlTag rootTag) {
+    protected void renderFieldsets(final XmlTag rootTag) {
         for (final UiComponentFormFieldsetData formFieldsetData
                 : uiFormFileData.getFieldsets()) {
             final StringBuffer fieldsStringBuffer = new StringBuffer();//NOPMD
