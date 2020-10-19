@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
-public class ButtonsXmlDeclarationGenerator {
+public class XmlDeclarationsGenerator {
     private final UiComponentFormFileData uiFormFileData;
     private final Project project;
     private final GetCodeTemplate getCodeTemplate;
@@ -28,7 +28,7 @@ public class ButtonsXmlDeclarationGenerator {
      * @param uiFormFileData UiFormFileData
      * @param project Project
      */
-    public ButtonsXmlDeclarationGenerator(
+    public XmlDeclarationsGenerator(
             final @NotNull UiComponentFormFileData uiFormFileData,
             final Project project
     ) {
@@ -38,7 +38,7 @@ public class ButtonsXmlDeclarationGenerator {
     }
 
     /**
-     * Injects button declarations to file.
+     * Injects buttons and fields declarations to file.
      *
      * @param formFile XmlFile
      */
@@ -67,35 +67,7 @@ public class ButtonsXmlDeclarationGenerator {
                 buttonsTag.addSubTag(buttonTag, false);
             }
 
-            for (final UiComponentFormFieldsetData formFieldsetData
-                    : uiFormFileData.getFieldsets()) {
-                final StringBuffer fieldsStringBuffer = new StringBuffer();//NOPMD
-
-                for (final UiComponentFormFieldData formFieldData : uiFormFileData.getFields()) {
-                    if (!formFieldData.getFieldset().equals(formFieldsetData.getLabel())) {
-                        continue;
-                    }
-                    try {
-                        fieldsStringBuffer.append(getCodeTemplate.execute(
-                                    UiComponentFormXml.FIELD_TEMPLATE,
-                                    fillAttributes(formFieldData)
-                            )
-                        );
-                    } catch (IOException e) {
-                        return;
-                    }
-                }
-
-                final XmlTag fieldsetTag = rootTag.createChildTag(
-                        "fieldset",
-                        null,
-                        fieldsStringBuffer.toString(),
-                        false
-                );
-                fieldsetTag.setAttribute("label", formFieldsetData.getLabel());
-                fieldsetTag.setAttribute("sortOrder",formFieldsetData.getSortOrder());
-                rootTag.addSubTag(fieldsetTag, false);
-            }
+            renderFieldsets(rootTag);
 
             psiDocumentManager.commitDocument(document);
         });
@@ -110,5 +82,55 @@ public class ButtonsXmlDeclarationGenerator {
         attributes.setProperty("LABEL", formFieldData.getLabel());
         attributes.setProperty("SORT_ORDER", formFieldData.getSortOrder());
         return attributes;
+    }
+
+    protected void renderFieldsets(XmlTag rootTag) {
+        for (final UiComponentFormFieldsetData formFieldsetData
+                : uiFormFileData.getFieldsets()) {
+            final StringBuffer fieldsStringBuffer = new StringBuffer();//NOPMD
+
+            for (final UiComponentFormFieldData formFieldData : uiFormFileData.getFields()) {
+                if (!formFieldData.getFieldset().equals(formFieldsetData.getName())) {
+                    continue;
+                }
+                try {
+                    fieldsStringBuffer.append(getCodeTemplate.execute(
+                            UiComponentFormXml.FIELD_TEMPLATE,
+                            fillAttributes(formFieldData)
+                        )
+                    );
+                } catch (IOException e) {
+                    return;
+                }
+            }
+
+            final XmlTag fieldsetTag = rootTag.createChildTag(
+                    "fieldset",
+                    null,
+                    fieldsStringBuffer.toString(),
+                    false
+            );
+            fieldsetTag.setAttribute("name", formFieldsetData.getName());
+            fieldsetTag.setAttribute("sortOrder", formFieldsetData.getSortOrder());
+
+            final XmlTag settings = fieldsetTag.createChildTag(
+                    "settings",
+                    null,
+                    "",
+                    false
+            );
+
+            final XmlTag label = settings.createChildTag(
+                    "label",
+                    null,
+                    formFieldsetData.getLabel(),
+                    false
+            );
+            label.setAttribute("translate", "true");
+
+            settings.addSubTag(label, false);
+            fieldsetTag.addSubTag(settings, true);
+            rootTag.addSubTag(fieldsetTag, false);
+        }
     }
 }

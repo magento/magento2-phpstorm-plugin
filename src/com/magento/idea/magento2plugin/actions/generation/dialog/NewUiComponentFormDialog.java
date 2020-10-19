@@ -288,8 +288,8 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     protected void initFieldSetsTable() {
         final DefaultTableModel model = getFieldsetsModel();
         model.setDataVector(
-                new Object[][] {{"General","10",DELETE_COLUMN}},
-                new Object[] { LABEL_COLUMN, SORT_ORDER_COLUMN, ACTION_COLUMN}
+                new Object[][] {{"general", "General","10",DELETE_COLUMN}},
+                new Object[] { NAME_COLUMN, LABEL_COLUMN, SORT_ORDER_COLUMN, ACTION_COLUMN}
         );
 
         final TableColumn column = fieldsets.getColumn(ACTION_COLUMN);
@@ -616,10 +616,12 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         final ArrayList<UiComponentFormFieldsetData> fieldsets =
                 new ArrayList<>();
         for (int count = 0; count < model.getRowCount(); count++) {
-            final String label = model.getValueAt(count, 0).toString();
-            final String sortOrder = model.getValueAt(count, 1).toString();
+            final String name = model.getValueAt(count, 0).toString();
+            final String label = model.getValueAt(count, 1).toString();
+            final String sortOrder = model.getValueAt(count, 2).toString();
 
             final UiComponentFormFieldsetData fieldsetData = new UiComponentFormFieldsetData(//NOPMD
+                    name,
                     label,
                     sortOrder
             );
