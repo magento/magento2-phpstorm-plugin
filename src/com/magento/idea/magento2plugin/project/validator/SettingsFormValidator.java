@@ -24,7 +24,7 @@ public class SettingsFormValidator {
     }
 
     /**
-     * Validates form if plugin is enabled
+     * Validates form if plugin is enabled.
      *
      * @throws ConfigurationException Exception
      */
