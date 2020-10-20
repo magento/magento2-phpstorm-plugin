@@ -38,7 +38,8 @@ import javax.swing.KeyStroke;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
-        "PMD.ConstructorCallsOverridableMethod"
+        "PMD.ConstructorCallsOverridableMethod",
+        "PMD.ExcessiveImports"
 })
 public class NewControllerDialog extends AbstractDialog {
     private final String moduleName;
