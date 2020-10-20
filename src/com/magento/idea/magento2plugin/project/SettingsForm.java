@@ -33,8 +33,11 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings({
+        "PMD.TooManyFields",
+        "PMD.TooManyMethods"
+})
 public class SettingsForm implements PhpFrameworkConfigurable {
-
     private final Project project;
     private JCheckBox pluginEnabled;
     private JButton buttonReindex;
@@ -95,7 +98,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         return (JComponent) panel;
     }
 
-    private void refreshFormStatus(boolean isEnabled) {
+    private void refreshFormStatus(final boolean isEnabled) {
         buttonReindex.setEnabled(isEnabled);
         regenerateUrnMapButton.setEnabled(isEnabled);
         magentoVersion.setEnabled(isEnabled);
