@@ -54,22 +54,21 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     private static final String MODULE_NAME = "module name";
     private static final String PACKAGE_NAME = "package name";
 
-    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC,
-            message = {AlphanumericRule.MESSAGE, MODULE_NAME})
-    @FieldValidation(rule = RuleRegistry.START_WITH_NUMBER_OR_CAPITAL_LETTER,
-            message = {StartWithNumberOrCapitalLetterRule.MESSAGE, PACKAGE_NAME})
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, PACKAGE_NAME})
+    @FieldValidation(rule = RuleRegistry.START_WITH_NUMBER_OR_CAPITAL_LETTER,
+            message = {StartWithNumberOrCapitalLetterRule.MESSAGE, PACKAGE_NAME})
+    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC,
+            message = {AlphanumericRule.MESSAGE, PACKAGE_NAME})
     private JTextField packageName;
 
-
     /* TODO: module name !== package name */
-    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC,
-            message = {AlphanumericRule.MESSAGE, MODULE_NAME})
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, MODULE_NAME})
     @FieldValidation(rule = RuleRegistry.START_WITH_NUMBER_OR_CAPITAL_LETTER,
             message = {StartWithNumberOrCapitalLetterRule.MESSAGE, MODULE_NAME})
+    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC,
+            message = {AlphanumericRule.MESSAGE, MODULE_NAME})
     private JTextField moduleName;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
@@ -163,7 +162,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     }
 
     protected void onOK() {
-        if (!validateFormFields) {
+        if (!validateFormFields()) {
             return;
         }
         generateFiles();
