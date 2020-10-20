@@ -33,7 +33,7 @@
               <forms/>
             </constraints>
             <properties>
-              <text value="Xml configuration"/>
+              <text value="XML configuration:"/>
             </properties>
           </component>
           <component id="7bde6" class="javax.swing.JLabel">
@@ -42,7 +42,7 @@
               <forms/>
             </constraints>
             <properties>
-              <text value="Module Default License Name"/>
+              <text value="Default license name for new modules:"/>
             </properties>
           </component>
           <component id="87330" class="javax.swing.JTextField" binding="moduleDefaultLicenseName">
@@ -63,7 +63,7 @@
               <forms/>
             </constraints>
             <properties>
-              <text value="Magento Installation Path"/>
+              <text value="Magento installation path:"/>
             </properties>
           </component>
           <component id="99b4d" class="com.intellij.openapi.ui.TextFieldWithBrowseButton" binding="magentoPath">
@@ -80,7 +80,7 @@
             </constraints>
             <properties>
               <horizontalAlignment value="0"/>
-              <text value="Regenerate urn map"/>
+              <text value="Regenerate URN mappings:"/>
             </properties>
           </component>
           <component id="aad3b" class="javax.swing.JTextField" binding="magentoVersion">
@@ -98,7 +98,7 @@
               <forms/>
             </constraints>
             <properties>
-              <text value="Magento Version"/>
+              <text value="Magento version:"/>
             </properties>
           </component>
         </children>
@@ -109,7 +109,7 @@
         </constraints>
         <properties>
           <selected value="false"/>
-          <text value="Enable Plugin for this Project"/>
+          <text value="Enable Magento integration"/>
         </properties>
       </component>
       <component id="47a96" class="javax.swing.JButton" binding="buttonReindex">
@@ -131,7 +131,7 @@
           <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Enable MFTF Support"/>
+          <text value="Enable MFTF support"/>
         </properties>
       </component>
     </children>
