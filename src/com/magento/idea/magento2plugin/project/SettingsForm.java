@@ -77,12 +77,12 @@ public class SettingsForm implements PhpFrameworkConfigurable {
                 }
         );
 
-        buttonReindex.setEnabled(getSettings().pluginEnabled);
-        regenerateUrnMapButton.setEnabled(getSettings().pluginEnabled);
-
         regenerateUrnMapButton.addMouseListener(
                 new RegenerateUrnMapListener(project)
         );
+
+        refreshFormStatus(getSettings().pluginEnabled);
+        pluginEnabled.addActionListener(e -> refreshFormStatus(pluginEnabled.isSelected()));
 
         moduleDefaultLicenseName.setText(getSettings().defaultLicense);
         mftfSupportEnabled.setSelected(getSettings().mftfSupportEnabled);
@@ -93,6 +93,15 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         addMagentoVersionListener();
 
         return (JComponent) panel;
+    }
+
+    private void refreshFormStatus(boolean isEnabled) {
+        buttonReindex.setEnabled(isEnabled);
+        regenerateUrnMapButton.setEnabled(isEnabled);
+        magentoVersion.setEnabled(isEnabled);
+        mftfSupportEnabled.setEnabled(isEnabled);
+        magentoPath.setEnabled(isEnabled);
+        moduleDefaultLicenseName.setEnabled(isEnabled);
     }
 
     protected void reindex() {
