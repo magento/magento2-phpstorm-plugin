@@ -12,7 +12,6 @@ import com.magento.idea.magento2plugin.actions.generation.NewModuleAction;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleComposerJsonData;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleRegistrationPhpData;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleXmlData;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewModuleDialogValidator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleComposerJsonGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleRegistrationPhpGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleXmlGenerator;
@@ -24,7 +23,6 @@ import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
 import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -50,7 +48,6 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     private final Project project;
     @NotNull
     private final PsiDirectory initialBaseDir;
-    private final NewModuleDialogValidator validator;
     private final CamelCaseToHyphen camelCaseToHyphen;
     private JPanel contentPane;
     private JButton buttonOK;
@@ -90,7 +87,6 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         this.project = project;
         this.initialBaseDir = initialBaseDir;
         this.camelCaseToHyphen = CamelCaseToHyphen.getInstance();
-        this.validator = NewModuleDialogValidator.getInstance(this);
         this.moduleIndex = ModuleIndex.getInstance(project);
         detectPackageName(initialBaseDir);
         setContentPane(contentPane);
@@ -102,19 +98,8 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         moduleLicenseCustom.setToolTipText("Custom License Name");
         moduleLicenseCustom.setText(Settings.getDefaultLicenseName(project));
 
-        buttonOK.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                onOK();
-            }
-        });
-
-        buttonCancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                onCancel();
-            }
-        });
+        buttonOK.addActionListener((final ActionEvent event) -> onOK());
+        buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
@@ -124,13 +109,11 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
             }
         });
 
-        contentPane.registerKeyboardAction(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPane.registerKeyboardAction(
+                (final ActionEvent event) -> onCancel(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+        );
     }
 
     private void detectPackageName(final @NotNull PsiDirectory initialBaseDir) {
@@ -143,7 +126,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     }
 
     protected void onOK() {
-        if (!validator.validate()) {
+        if (!validateFormFields) {
             return;
         }
         generateFiles();
