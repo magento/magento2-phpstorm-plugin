@@ -205,7 +205,6 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     public NewUiComponentFormDialog(final Project project, final PsiDirectory directory) {
         super();
         this.project = project;
-        updateDialogSizeToDefaults();
         formButtonsValidator = new FormButtonsValidator(this);
         formFieldsetsValidator = new FormFieldsetsValidator(this);
         formFieldsValidator = new FormFieldsValidator(this);
@@ -286,9 +285,10 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     }
 
     protected void initFieldSetsTable() {
+        Integer rowPosition = 10;
         final DefaultTableModel model = getFieldsetsModel();
         model.setDataVector(
-                new Object[][] {{"General","10",DELETE_COLUMN}},
+                new Object[][] {{"General", rowPosition, DELETE_COLUMN}},
                 new Object[] { LABEL_COLUMN, SORT_ORDER_COLUMN, ACTION_COLUMN}
         );
 
@@ -298,7 +298,7 @@ public class NewUiComponentFormDialog extends AbstractDialog {
                 new DeleteRowButton(new JCheckBox()));
 
         addFieldset.addActionListener(e -> {
-            model.addRow(new Object[] {"","",DELETE_COLUMN});
+            model.addRow(new Object[] {"", rowPosition + 10, DELETE_COLUMN});
         });
         model.addTableModelListener(
                 event -> {
@@ -752,10 +752,5 @@ public class NewUiComponentFormDialog extends AbstractDialog {
                 && formButtonsValidator.validate()
                 && formFieldsetsValidator.validate()
                 && formFieldsValidator.validate();
-    }
-
-    private void updateDialogSizeToDefaults() {
-        final Dimension screenSize = getToolkit().getScreenSize();
-        setPreferredSize(new Dimension(screenSize.width / 2, screenSize.height / 2));
     }
 }
