@@ -13,13 +13,11 @@ import com.magento.idea.magento2plugin.actions.generation.data.PluginDiXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.PluginFileData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NumericRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.StartWithNumberOrCapitalLetterRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.PluginClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.PluginDiXmlGenerator;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
@@ -73,10 +71,6 @@ public class CreateAPluginDialog extends AbstractDialog {
             message = {NotEmptyRule.MESSAGE, CLASS_NAME})
     @FieldValidation(rule = RuleRegistry.PHP_CLASS,
             message = {PhpClassRule.MESSAGE, CLASS_NAME})
-    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC,
-            message = {AlphanumericRule.MESSAGE, CLASS_NAME})
-    @FieldValidation(rule = RuleRegistry.START_WITH_NUMBER_OR_CAPITAL_LETTER,
-            message = {StartWithNumberOrCapitalLetterRule.MESSAGE, CLASS_NAME})
     private JTextField pluginClassName;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
