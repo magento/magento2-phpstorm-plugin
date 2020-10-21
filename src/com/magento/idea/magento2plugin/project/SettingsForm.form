@@ -80,7 +80,7 @@
             </constraints>
             <properties>
               <horizontalAlignment value="0"/>
-              <text value="Regenerate URN mappings:"/>
+              <text value="Regenerate URN mappings"/>
             </properties>
           </component>
           <component id="aad3b" class="javax.swing.JTextField" binding="magentoVersion">
