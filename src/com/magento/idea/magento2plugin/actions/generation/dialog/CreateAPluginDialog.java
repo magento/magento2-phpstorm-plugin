@@ -42,7 +42,12 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings({"PMD.TooManyFields", "PMD.DataClass", "PMD.UnusedPrivateMethod"})
+@SuppressWarnings({
+        "PMD.TooManyFields",
+        "PMD.DataClass",
+        "PMD.UnusedPrivateMethod",
+        "PMD.ExcessiveImports"
+})
 public class CreateAPluginDialog extends AbstractDialog {
     @NotNull
     private final Project project;
