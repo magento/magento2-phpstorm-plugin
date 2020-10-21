@@ -12,7 +12,11 @@ import com.magento.idea.magento2plugin.actions.generation.NewControllerAction;
 import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpNamespaceNameRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.StartWithNumberOrCapitalLetterRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleControllerClassGenerator;
 import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.files.ControllerFrontendPhp;
@@ -59,18 +63,18 @@ public class NewControllerDialog extends AbstractDialog {
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, CONTROLLER_NAME})
-    @FieldValidation(rule = RuleRegistry.START_WITH_NUMBER_OR_CAPITAL_LETTER,
-            message = {NotEmptyRule.MESSAGE, CONTROLLER_NAME})
-    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC,
-            message = {NotEmptyRule.MESSAGE, CONTROLLER_NAME})
-    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
-            message = {NotEmptyRule.MESSAGE, CONTROLLER_NAME})
+    @FieldValidation(rule = RuleRegistry.PHP_NAMESPACE_NAME,
+            message = {PhpNamespaceNameRule.MESSAGE, CONTROLLER_NAME})
     private JTextField controllerName;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, ACTION_NAME})
-    @FieldValidation(rule = RuleRegistry.PHP_NAMESPACE_NAME,
-            message = {NotEmptyRule.MESSAGE, ACTION_NAME})
+    @FieldValidation(rule = RuleRegistry.START_WITH_NUMBER_OR_CAPITAL_LETTER,
+            message = {StartWithNumberOrCapitalLetterRule.MESSAGE, ACTION_NAME})
+    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC,
+            message = {AlphanumericRule.MESSAGE, ACTION_NAME})
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
+            message = {PhpClassRule.MESSAGE, ACTION_NAME})
     private JTextField actionName;
 
     /**
