@@ -92,6 +92,10 @@ public class PluginTargetLineMarkerProvider implements LineMarkerProvider {
             for (String targetClassName : targetClassNames) {
                 Collection<PhpClass> targets = phpIndex.getClassesByFQN(targetClassName);
 
+                if (targets.isEmpty()) {
+                    targets = phpIndex.getInterfacesByFQN(targetClassName);
+                }
+
                 results.addAll(targets);
             }
 
