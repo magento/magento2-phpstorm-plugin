@@ -8,7 +8,9 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.psi.PsiFile;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.OverrideInThemeDialogValidator;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.OverrideInThemeGenerator;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
@@ -29,12 +31,14 @@ public class OverrideInThemeDialog extends AbstractDialog {
     @NotNull
     private final Project project;
     private final PsiFile psiFile;
-    @NotNull
-    private final OverrideInThemeDialogValidator validator;
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
     private JLabel selectTheme; //NOPMD
+    private static final String THEME_NAME = "target theme";
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, THEME_NAME})
     private FilteredComboBox theme;
 
     /**
@@ -48,23 +52,13 @@ public class OverrideInThemeDialog extends AbstractDialog {
 
         this.project = project;
         this.psiFile = psiFile;
-        this.validator = new OverrideInThemeDialogValidator(this);
 
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
-        buttonOK.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent event) {
-                onOK(); //NOPMD
-            }
-        });
-
-        buttonCancel.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent event) {
-                onCancel();
-            }
-        });
+        buttonOK.addActionListener((final ActionEvent event) -> onOK());
+        buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
@@ -73,18 +67,15 @@ public class OverrideInThemeDialog extends AbstractDialog {
             }
         });
 
-        contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(final ActionEvent event) {
-                onCancel();
-            }
-            }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPane.registerKeyboardAction(
+                (final ActionEvent event) -> onCancel(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+        );
     }
 
     private void onOK() {
-        if (!validator.validate(project)) {
-            JBPopupFactory.getInstance().createMessage("Invalid theme selection.")
-                    .showCenteredInCurrentWindow(project);
+        if (!validateFormFields()) {
             return;
         }
 
