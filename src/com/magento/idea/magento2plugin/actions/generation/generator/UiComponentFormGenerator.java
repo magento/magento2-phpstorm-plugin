@@ -11,7 +11,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.xml.XmlFile;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormButtonData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFileData;
-import com.magento.idea.magento2plugin.actions.generation.generator.code.ButtonsXmlDeclarationGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.code.XmlDeclarationsGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
@@ -111,7 +111,7 @@ public class UiComponentFormGenerator extends FileGenerator {
             );
         }
 
-        new ButtonsXmlDeclarationGenerator(uiFormFileData, project).generate(formFile);
+        new XmlDeclarationsGenerator(uiFormFileData, project).generate(formFile);
 
         return formFile;
     }
@@ -131,6 +131,7 @@ public class UiComponentFormGenerator extends FileGenerator {
                 uiFormFileData.getSubmitActionName().toLowerCase(new Locale("en","EN"))
         );
         attributes.setProperty("DATA_PROVIDER", uiFormFileData.getDataProviderFqn());
+        attributes.setProperty("PRIMARY_FIELD", uiFormFileData.getFields().get(0).getName());
     }
 
     private Areas getArea(final String area) {
