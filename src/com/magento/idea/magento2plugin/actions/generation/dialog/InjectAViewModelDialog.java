@@ -39,6 +39,9 @@ import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings({
+        "PMD.ExcessiveImports"
+})
 public class InjectAViewModelDialog extends AbstractDialog {
     @NotNull
     private final Project project;
