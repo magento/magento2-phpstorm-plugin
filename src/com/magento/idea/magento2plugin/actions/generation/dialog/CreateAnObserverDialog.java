@@ -41,6 +41,7 @@ import org.jetbrains.annotations.NotNull;
         "PMD.MissingSerialVersionUID",
         "PMD.DataClass",
         "PMD.UnusedPrivateField",
+        "PMD.ExcessiveImports",
 })
 public class CreateAnObserverDialog extends AbstractDialog {
     @NotNull
