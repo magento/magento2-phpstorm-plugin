@@ -158,6 +158,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
             packageName.setVisible(false);
             packageNameLabel.setVisible(false);
             this.detectedPackageName = initialBaseDir.getName();
+            packageName.setText(this.detectedPackageName);
         }
     }
 
