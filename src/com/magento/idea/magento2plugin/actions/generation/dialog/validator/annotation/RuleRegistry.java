@@ -14,6 +14,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NumericRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpDirectoryRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpNamespaceNameRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.RouteIdRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.StartWithNumberOrCapitalLetterRule;
@@ -25,6 +26,7 @@ public enum RuleRegistry {
     ALPHANUMERIC(AlphanumericRule.class),
     ALPHANUMERIC_WITH_UNDERSCORE(AlphanumericWithUnderscoreRule.class),
     DIRECTORY(DirectoryRule.class),
+    PHP_DIRECTORY(PhpDirectoryRule.class),
     IDENTIFIER(IdentifierRule.class),
     PHP_NAMESPACE_NAME(PhpNamespaceNameRule.class),
     START_WITH_NUMBER_OR_CAPITAL_LETTER(StartWithNumberOrCapitalLetterRule.class),
