@@ -287,8 +287,8 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         final Integer rowPosition = 10;
         final DefaultTableModel model = getFieldsetsModel();
         model.setDataVector(
-                new Object[][] {{"General", rowPosition, DELETE_COLUMN}},
-                new Object[] { LABEL_COLUMN, SORT_ORDER_COLUMN, ACTION_COLUMN}
+                new Object[][] {{"general", "General", rowPosition, DELETE_COLUMN}},
+                new Object[] { NAME_COLUMN, LABEL_COLUMN, SORT_ORDER_COLUMN, ACTION_COLUMN}
         );
 
         final TableColumn column = fieldsets.getColumn(ACTION_COLUMN);
@@ -297,7 +297,7 @@ public class NewUiComponentFormDialog extends AbstractDialog {
                 new DeleteRowButton(new JCheckBox()));
 
         addFieldset.addActionListener(e -> {
-            model.addRow(new Object[] {"", rowPosition + 10, DELETE_COLUMN});
+            model.addRow(new Object[] {"", "", rowPosition + 10, DELETE_COLUMN});
         });
         model.addTableModelListener(
                 event -> {
