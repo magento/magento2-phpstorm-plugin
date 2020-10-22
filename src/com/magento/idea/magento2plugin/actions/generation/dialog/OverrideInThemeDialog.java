@@ -12,13 +12,13 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annot
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.OverrideInThemeGenerator;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -37,7 +37,7 @@ public class OverrideInThemeDialog extends AbstractDialog {
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, THEME_NAME})
-    private FilteredComboBox theme;
+    private JComboBox theme;
 
     /**
      * Constructor.
@@ -54,6 +54,7 @@ public class OverrideInThemeDialog extends AbstractDialog {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
+        fillThemeOptions();
 
         buttonOK.addActionListener((final ActionEvent event) -> onOK());
         buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
@@ -101,9 +102,10 @@ public class OverrideInThemeDialog extends AbstractDialog {
         dialog.setVisible(true);
     }
 
-    private void createUIComponents() { //NOPMD
-        final List<String> allThemesList = ModuleIndex.getInstance(project).getEditableThemeNames();
-
-        this.theme = new FilteredComboBox(allThemesList);
+    private void fillThemeOptions() {
+        final List<String> themeNames = ModuleIndex.getInstance(project).getEditableThemeNames();
+        for (final String themeName: themeNames) {
+            theme.addItem(themeName);
+        }
     }
 }
