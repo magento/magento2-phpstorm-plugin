@@ -53,7 +53,6 @@ import com.magento.idea.magento2plugin.ui.table.DeleteRowButton;
 import com.magento.idea.magento2plugin.ui.table.TableButton;
 import com.magento.idea.magento2plugin.util.magento.GetAclResourcesListUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -285,7 +284,7 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     }
 
     protected void initFieldSetsTable() {
-        Integer rowPosition = 10;
+        final Integer rowPosition = 10;
         final DefaultTableModel model = getFieldsetsModel();
         model.setDataVector(
                 new Object[][] {{"General", rowPosition, DELETE_COLUMN}},
