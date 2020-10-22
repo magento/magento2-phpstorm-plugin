@@ -27,7 +27,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Fixed endless loop of notifications on launch
 - Fix `composer.json` generation with module dependency that doesn't have `composer.json`
 
-## ## 1.0.1
+## 1.0.1
 
 ### Added
 
