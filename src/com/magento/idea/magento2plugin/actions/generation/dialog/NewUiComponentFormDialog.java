@@ -616,10 +616,12 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         final ArrayList<UiComponentFormFieldsetData> fieldsets =
                 new ArrayList<>();
         for (int count = 0; count < model.getRowCount(); count++) {
-            final String label = model.getValueAt(count, 0).toString();
-            final String sortOrder = model.getValueAt(count, 1).toString();
+            final String name = model.getValueAt(count, 0).toString();
+            final String label = model.getValueAt(count, 1).toString();
+            final String sortOrder = model.getValueAt(count, 2).toString();
 
             final UiComponentFormFieldsetData fieldsetData = new UiComponentFormFieldsetData(//NOPMD
+                    name,
                     label,
                     sortOrder
             );

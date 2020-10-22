@@ -74,6 +74,7 @@
           <grid row="2" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <font style="1"/>
           <text value="Buttons"/>
         </properties>
       </component>
@@ -106,6 +107,7 @@
           <grid row="5" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <font style="1"/>
           <text value="Fieldsets"/>
         </properties>
       </component>
@@ -114,6 +116,7 @@
           <grid row="8" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <font style="1"/>
           <text value="Fields"/>
         </properties>
       </component>
@@ -208,6 +211,7 @@
                   </grid>
                 </constraints>
                 <properties>
+                  <font style="1"/>
                   <text value="Submit Controller"/>
                 </properties>
               </component>
@@ -242,6 +246,7 @@
                   <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
+                  <font style="1"/>
                   <text value="View Controller"/>
                 </properties>
               </component>
@@ -278,6 +283,7 @@
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
+                  <font style="1"/>
                   <text value="Data Provider"/>
                 </properties>
               </component>
