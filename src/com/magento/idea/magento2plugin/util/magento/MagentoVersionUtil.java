@@ -80,6 +80,9 @@ public final class MagentoVersionUtil {
      *         the value {@code false} if the argument version1 is less than to version2.
      */
     public static boolean compare(final String version1, final String version2) {
+        if (version1.equals(DEFAULT_VERSION)) {
+            return true;
+        }
         if (version1.equals(version2)) {
             return true;
         }
