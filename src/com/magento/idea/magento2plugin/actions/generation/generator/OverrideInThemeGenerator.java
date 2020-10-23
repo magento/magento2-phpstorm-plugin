@@ -13,6 +13,7 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.maddyhome.idea.copyright.actions.UpdateCopyrightProcessor;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
@@ -126,16 +127,9 @@ public class OverrideInThemeGenerator {
             PsiDirectory directory, //NOPMD
             final List<String> pathComponents
     ) {
+        DirectoryGenerator generator = DirectoryGenerator.getInstance();
         for (final String directoryName : pathComponents) {
-            if (directory.findSubdirectory(directoryName) != null) { //NOPMD
-                directory = directory.findSubdirectory(directoryName);
-            } else {
-                final PsiDirectory finalDirectory = directory;
-                ApplicationManager.getApplication().runWriteAction(() -> {
-                    finalDirectory.createSubdirectory(directoryName);
-                });
-                return finalDirectory;
-            }
+            directory = generator.findOrCreateSubdirectory(directory, directoryName);
         }
 
         return directory;
