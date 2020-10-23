@@ -41,7 +41,7 @@ If applicable, add screenshots to help explain your problem.
 
  - OS: [e.g. MacOS or Ubuntu Linux 20.04]
  - PhpStorm/Intellij version: [e.g. 2019.3.3]
- - Module Version: [e.g. 1.0.0]
+ - Plugin Version: [e.g. 1.0.0]
 
 **Additional context**
 
