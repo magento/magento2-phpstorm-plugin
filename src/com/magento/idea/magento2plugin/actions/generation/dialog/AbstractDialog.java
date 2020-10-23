@@ -184,10 +184,10 @@ public abstract class AbstractDialog extends JDialog {
         if (field instanceof JTextField) {
             return ((JTextField) field).isEditable() ? ((JTextField) field).getText() : null;
         } else if (field instanceof JComboBox) {
-            try {
-                return ((JComboBox) field).getSelectedItem().toString();
-            } catch (NullPointerException exception) {
+            if (((JComboBox<?>) field).getSelectedIndex() == -1) {
                 return "";
+            } else {
+                return ((JComboBox) field).getSelectedItem().toString();
             }
         }
         return null;
