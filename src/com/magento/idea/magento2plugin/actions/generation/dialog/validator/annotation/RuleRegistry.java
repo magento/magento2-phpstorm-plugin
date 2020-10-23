@@ -9,6 +9,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericWithUnderscoreRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.BoxNotEmptyRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.CliCommandRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.ConfigPathRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.CronScheduleRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
@@ -38,6 +39,7 @@ public enum RuleRegistry {
     LOWERCASE(Lowercase.class),
     CRON_SCHEDULE(CronScheduleRule.class),
     CONFIG_PATH(ConfigPathRule.class),
+    CLI_COMMAND(CliCommandRule.class),
     NUMERIC(NumericRule.class);
 
     private Class<?> rule;
