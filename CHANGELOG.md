@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0). 
 
+## 2.0.1
+
+### Fixed
+
+- Directories structure for the override in theme action
+- Constant disabling plugin on startup if Magento not in the root
+- New module generation for the default Magento version
+
 ## 2.0.0
 
 ### Added
