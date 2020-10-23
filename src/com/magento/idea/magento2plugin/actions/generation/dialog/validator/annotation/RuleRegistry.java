@@ -8,6 +8,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.validator.anno
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AclResourceIdRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericWithUnderscoreRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.CliCommandRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.Lowercase;
@@ -32,6 +33,7 @@ public enum RuleRegistry {
     START_WITH_NUMBER_OR_CAPITAL_LETTER(StartWithNumberOrCapitalLetterRule.class),
     ACL_RESOURCE_ID(AclResourceIdRule.class),
     LOWERCASE(Lowercase.class),
+    CLI_COMMAND(CliCommandRule.class),
     NUMERIC(NumericRule.class);
 
     private Class<?> rule;
