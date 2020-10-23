@@ -9,7 +9,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.actions.generation.NewCronGroupAction;
 import com.magento.idea.magento2plugin.actions.generation.data.CronGroupXmlData;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewCronGroupValidator;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleCronGroupXmlGenerator;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
@@ -30,16 +33,23 @@ import javax.swing.SpinnerNumberModel;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
-        "PMD.TooManyMethods"
+        "PMD.TooManyMethods",
+        "PMD.ExcessiveImports,"
 })
 public class NewCronGroupDialog extends AbstractDialog {
-    private final NewCronGroupValidator validator;
     private final String moduleName;
     private final Project project;
     private JPanel contentPanel;
     private JButton buttonOK;
     private JButton buttonCancel;
+    private static final String NAME = "name";
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, NAME})
+    @FieldValidation(rule = RuleRegistry.IDENTIFIER,
+            message = {IdentifierRule.MESSAGE, NAME})
     private JTextField cronGroupName;
+
     private JSpinner scheduleGenerateEvery;
     private JSpinner scheduleAheadFor;
     private JSpinner scheduleLifetime;
@@ -67,7 +77,6 @@ public class NewCronGroupDialog extends AbstractDialog {
         setContentPane(contentPanel);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
-        this.validator = NewCronGroupValidator.getInstance();
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
         buttonOK.addActionListener(event -> onOK());
@@ -125,7 +134,7 @@ public class NewCronGroupDialog extends AbstractDialog {
     }
 
     private void onOK() {
-        if (!validator.validate(this)) {
+        if (!validateFormFields()) {
             return;
         }
 
@@ -133,6 +142,7 @@ public class NewCronGroupDialog extends AbstractDialog {
         this.setVisible(false);
     }
 
+    @Override
     protected void onCancel() {
         dispose();
     }
