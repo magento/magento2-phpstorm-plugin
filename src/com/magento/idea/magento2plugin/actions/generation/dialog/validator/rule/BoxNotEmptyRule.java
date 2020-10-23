@@ -5,9 +5,9 @@
 
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule;
 
-public class NotEmptyRule implements ValidationRule {
-    public static final String MESSAGE = "validator.notEmpty";
-    private static final ValidationRule INSTANCE = new NotEmptyRule();
+public class BoxNotEmptyRule implements ValidationRule {
+    public static final String MESSAGE = "validator.box.notEmpty";
+    private static final ValidationRule INSTANCE = new BoxNotEmptyRule();
 
     @Override
     public boolean check(final String value) {

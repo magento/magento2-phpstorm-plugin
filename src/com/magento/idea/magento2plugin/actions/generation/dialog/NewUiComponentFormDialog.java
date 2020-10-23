@@ -53,7 +53,6 @@ import com.magento.idea.magento2plugin.ui.table.DeleteRowButton;
 import com.magento.idea.magento2plugin.ui.table.TableButton;
 import com.magento.idea.magento2plugin.util.magento.GetAclResourcesListUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -205,7 +204,6 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     public NewUiComponentFormDialog(final Project project, final PsiDirectory directory) {
         super();
         this.project = project;
-        updateDialogSizeToDefaults();
         formButtonsValidator = new FormButtonsValidator(this);
         formFieldsetsValidator = new FormFieldsetsValidator(this);
         formFieldsValidator = new FormFieldsValidator(this);
@@ -286,10 +284,11 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     }
 
     protected void initFieldSetsTable() {
+        final Integer rowPosition = 10;
         final DefaultTableModel model = getFieldsetsModel();
         model.setDataVector(
-                new Object[][] {{"General","10",DELETE_COLUMN}},
-                new Object[] { LABEL_COLUMN, SORT_ORDER_COLUMN, ACTION_COLUMN}
+                new Object[][] {{"general", "General", rowPosition, DELETE_COLUMN}},
+                new Object[] { NAME_COLUMN, LABEL_COLUMN, SORT_ORDER_COLUMN, ACTION_COLUMN}
         );
 
         final TableColumn column = fieldsets.getColumn(ACTION_COLUMN);
@@ -298,7 +297,7 @@ public class NewUiComponentFormDialog extends AbstractDialog {
                 new DeleteRowButton(new JCheckBox()));
 
         addFieldset.addActionListener(e -> {
-            model.addRow(new Object[] {"","",DELETE_COLUMN});
+            model.addRow(new Object[] {"", "", rowPosition + 10, DELETE_COLUMN});
         });
         model.addTableModelListener(
                 event -> {
@@ -616,10 +615,12 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         final ArrayList<UiComponentFormFieldsetData> fieldsets =
                 new ArrayList<>();
         for (int count = 0; count < model.getRowCount(); count++) {
-            final String label = model.getValueAt(count, 0).toString();
-            final String sortOrder = model.getValueAt(count, 1).toString();
+            final String name = model.getValueAt(count, 0).toString();
+            final String label = model.getValueAt(count, 1).toString();
+            final String sortOrder = model.getValueAt(count, 2).toString();
 
             final UiComponentFormFieldsetData fieldsetData = new UiComponentFormFieldsetData(//NOPMD
+                    name,
                     label,
                     sortOrder
             );
@@ -752,10 +753,5 @@ public class NewUiComponentFormDialog extends AbstractDialog {
                 && formButtonsValidator.validate()
                 && formFieldsetsValidator.validate()
                 && formFieldsValidator.validate();
-    }
-
-    private void updateDialogSizeToDefaults() {
-        final Dimension screenSize = getToolkit().getScreenSize();
-        setPreferredSize(new Dimension(screenSize.width / 2, screenSize.height / 2));
     }
 }
