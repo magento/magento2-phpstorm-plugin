@@ -26,6 +26,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 /**
@@ -185,6 +186,8 @@ public abstract class AbstractDialog extends JDialog {
             return ((JTextField) field).getText();
         } else if (field instanceof JComboBox) {
             return ((JComboBox) field).getSelectedItem().toString();
+        } else if (field instanceof JTextArea) {
+            return ((JTextArea) field).getText();
         }
         return null;
     }
