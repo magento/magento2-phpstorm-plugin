@@ -44,6 +44,15 @@ public class FormFieldsetsValidator {
             while (fieldsetIterator.hasNext()) {
                 final UiComponentFormFieldsetData fieldset = fieldsetIterator.next();
 
+                final String name = fieldset.getName();
+                if (!NotEmptyRule.getInstance().check(name)) {
+                    showErrorMessage(
+                            validatorBundle.message(NotEmptyRule.MESSAGE, "Fieldset Name")
+                    );
+                    valid = false;
+                    break;
+                }
+
                 final String label = fieldset.getLabel();
                 if (!NotEmptyRule.getInstance().check(label)) {
                     showErrorMessage(
