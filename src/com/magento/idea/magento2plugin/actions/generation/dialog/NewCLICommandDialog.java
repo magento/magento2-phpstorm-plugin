@@ -36,7 +36,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
-@SuppressWarnings({"PMD.MissingSerialVersionUID"})
+@SuppressWarnings({"PMD.MissingSerialVersionUID", "PMD.ExcessiveImports"})
 public class NewCLICommandDialog extends AbstractDialog {
     private JPanel contentPane;
     private JButton buttonCancel;
