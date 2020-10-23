@@ -100,6 +100,7 @@
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.Settings"/>
 
         <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.completion.xml.XmlCompletionContributor" id="xml" />
+        <completion.contributor language="PHP" implementationClass="com.magento.idea.magento2plugin.completion.php.PhpCompletionContributor" id="php" />
 
         <psi.referenceContributor language="XML" implementation="com.magento.idea.magento2plugin.reference.xml.XmlReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.magento.idea.magento2plugin.reference.php.PhpReferenceContributor"/>
