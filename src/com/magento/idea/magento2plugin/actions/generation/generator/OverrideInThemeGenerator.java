@@ -127,7 +127,7 @@ public class OverrideInThemeGenerator {
             PsiDirectory directory, //NOPMD
             final List<String> pathComponents
     ) {
-        DirectoryGenerator generator = DirectoryGenerator.getInstance();
+        final DirectoryGenerator generator = DirectoryGenerator.getInstance();
         for (final String directoryName : pathComponents) {
             directory = generator.findOrCreateSubdirectory(directory, directoryName);
         }
