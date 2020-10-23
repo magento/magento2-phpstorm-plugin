@@ -8,19 +8,17 @@ package com.magento.idea.magento2plugin.reference;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.ResolveResult;
 import com.intellij.psi.xml.XmlAttributeValue;
-import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.inspections.BaseInspectionsTestCase;
 import com.magento.idea.magento2plugin.magento.packages.File;
+import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 
 public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
-
-    private static final String testDataFolderPath = "testData" //NOPMD
-            + File.separator
-            + "reference"
-            + File.separator;
+    private static final String testDataFolderPath = "testData" + File.separator//NOPMD
+            + "reference" + File.separator;
 
     @Override
     protected void setUp() throws Exception {
@@ -29,11 +27,8 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
     }
 
     protected void assertHasReferenceToXmlAttributeValue(final String reference) {
-        final String referenceNotFound //NOPMD
-                = "Failed that element contains reference to the attribute value `%s`";
-
         final PsiElement element = getElementFromCaret();
-        for (final PsiReference psiReference : element.getReferences()) {
+        for (final PsiReference psiReference: element.getReferences()) {
             final PsiElement resolved = psiReference.resolve();
             if (!(resolved instanceof XmlAttributeValue)) {
                 continue;
@@ -43,54 +38,49 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
                 return;
             }
         }
+        final String referenceNotFound =
+                "Failed that element contains reference to the attribute value `%s`";
 
         fail(String.format(referenceNotFound, reference));
     }
 
     protected void assertHasReferenceToXmlTag(final String tagName) {
-        final String referenceNotFound //NOPMD
-                = "Failed that element contains reference to the XML tag `%s`";
-
         final PsiElement element = getElementFromCaret();
-        for (final PsiReference psiReference : element.getReferences()) {
-            final PsiElement resolved = psiReference.resolve();
-            if (!(resolved instanceof XmlTag)) {
-                continue;
-            }
+        for (final PsiReference psiReference: element.getReferences()) {
+            if (psiReference instanceof PolyVariantReferenceBase) {
+                final ResolveResult[] resolveResults
+                        = ((PolyVariantReferenceBase) psiReference).multiResolve(true);
 
-            if (((XmlTag) resolved).getName().equals(tagName)) {
-                return;
+                for (final ResolveResult resolveResult : resolveResults) {
+                    final PsiElement resolved = resolveResult.getElement();
+                    if (!(resolved instanceof XmlTag)) {
+                        continue;
+                    }
+
+                    if (((XmlTag) resolved).getName().equals(tagName)) {
+                        return;
+                    }
+                }
+            } else {
+                final PsiElement resolved = psiReference.resolve();
+                if (!(resolved instanceof XmlTag)) {
+                    continue;
+                }
+
+                if (((XmlTag) resolved).getName().equals(tagName)) {
+                    return;
+                }
             }
         }
+        final String referenceNotFound
+                = "Failed that element contains reference to the XML tag `%s`";
 
         fail(String.format(referenceNotFound, tagName));
     }
 
-    protected void assertHasReferenceToXmlFile(final String fileName) {
-        final String referenceNotFound //NOPMD
-                = "Failed that element contains reference to the XML tag `%s`";
-
-        final PsiElement element = getElementFromCaret();
-        for (final PsiReference psiReference : element.getReferences()) {
-            final PsiElement resolved = psiReference.resolve();
-            if (!(resolved instanceof XmlFile)) {
-                continue;
-            }
-
-            if (((XmlFile) resolved).getName().equals(fileName)) {
-                return;
-            }
-        }
-
-        fail(String.format(referenceNotFound, fileName));
-    }
-
     protected void assertHasReferenceToFile(final String reference) {
-        final String referenceNotFound //NOPMD
-                = "Failed that element contains reference to the file `%s`";
-
         final PsiElement element = getElementFromCaret();
-        for (final PsiReference psiReference : element.getReferences()) {
+        for (final PsiReference psiReference: element.getReferences()) {
             final PsiElement resolved = psiReference.resolve();
             if (!(resolved instanceof PsiFile)) {
                 continue;
@@ -99,20 +89,18 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
                 return;
             }
         }
+        final String referenceNotFound = "Failed that element contains reference to the file `%s`";
 
         fail(String.format(referenceNotFound, reference));
     }
 
-    @SuppressWarnings("PMD")
     protected void assertHasReferencePhpClass(final String phpClassFqn) {
         final PsiElement element = getElementFromCaret();
         final PsiReference[] references = element.getReferences();
-        String result = ((PhpClass) references[references.length - 1]
-                .resolve())
-                .getPresentableFQN();
-        assertEquals(
+        assertEquals(//NOPMD
                 phpClassFqn,
-                result
+                ((PhpClass) references[references.length - 1].resolve())
+                        .getPresentableFQN()
         );
     }
 

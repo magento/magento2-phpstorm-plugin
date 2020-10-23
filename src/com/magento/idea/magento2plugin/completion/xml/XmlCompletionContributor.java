@@ -324,6 +324,64 @@ public class XmlCompletionContributor extends CompletionContributor {
             new MenuCompletionProvider()
         );
 
+        // <table name="completion" /> in db_schema.xml
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(XmlPatterns.xmlAttribute().withName(ModuleDbSchemaXml.XML_ATTR_TABLE_NAME)
+                        .withParent(XmlPatterns.xmlTag().withName(ModuleDbSchemaXml.XML_TAG_TABLE)
+                                .withParent(XmlPatterns.xmlTag()
+                                        .withName(ModuleDbSchemaXml.XML_TAG_SCHEMA))))
+                        .inFile(xmlFile().withName(string().matches(ModuleDbSchemaXml.FILE_NAME))),
+            new TableNameCompletionProvider()
+        );
+
+        // <constraint table="completion" /> in db_schema.xml
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(XmlPatterns.xmlAttribute()
+                        .withName(ModuleDbSchemaXml.XML_ATTR_CONSTRAINT_TABLE_NAME)
+                        .withParent(XmlPatterns.xmlTag()
+                                .withName(ModuleDbSchemaXml.XML_TAG_CONSTRAINT)
+                        .withParent(XmlPatterns.xmlTag()
+                                .withName(ModuleDbSchemaXml.XML_TAG_TABLE))))
+                .inFile(xmlFile().withName(string().matches(ModuleDbSchemaXml.FILE_NAME))),
+                new TableNameCompletionProvider()
+        );
+
+        // <constraint referenceTable="completion" /> in db_schema.xml
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(XmlPatterns.xmlAttribute()
+                        .withName(ModuleDbSchemaXml.XML_ATTR_CONSTRAINT_REFERENCE_TABLE_NAME)
+                        .withParent(XmlPatterns.xmlTag()
+                                .withName(ModuleDbSchemaXml.XML_TAG_CONSTRAINT)
+                                .withParent(XmlPatterns.xmlTag()
+                                        .withName(ModuleDbSchemaXml.XML_TAG_TABLE))))
+                .inFile(xmlFile().withName(string().matches(ModuleDbSchemaXml.FILE_NAME))),
+                new TableNameCompletionProvider()
+        );
+
+        // <constraint column="completion" /> in db_schema.xml
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(XmlPatterns.xmlAttribute()
+                        .withName(ModuleDbSchemaXml.XML_ATTR_CONSTRAINT_COLUMN_NAME)
+                        .withParent(XmlPatterns.xmlTag()
+                                .withName(ModuleDbSchemaXml.XML_TAG_CONSTRAINT)
+                                .withParent(XmlPatterns.xmlTag()
+                                        .withName(ModuleDbSchemaXml.XML_TAG_TABLE))))
+                .inFile(xmlFile().withName(string().matches(ModuleDbSchemaXml.FILE_NAME))),
+                new ColumnNameCompletionProvider()
+        );
+
+        // <constraint referenceColumn="completion" /> in db_schema.xml
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(XmlPatterns.xmlAttribute()
+                        .withName(ModuleDbSchemaXml.XML_ATTR_CONSTRAINT_REFERENCE_COLUMN_NAME)
+                        .withParent(XmlPatterns.xmlTag()
+                                .withName(ModuleDbSchemaXml.XML_TAG_CONSTRAINT)
+                                .withParent(XmlPatterns.xmlTag()
+                                        .withName(ModuleDbSchemaXml.XML_TAG_TABLE))))
+                .inFile(xmlFile().withName(string().matches(ModuleDbSchemaXml.FILE_NAME))),
+                new ColumnNameCompletionProvider()
+        );
+
         registerCompletionsForDifferentNesting();
     }
 

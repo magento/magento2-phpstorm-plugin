@@ -27,6 +27,7 @@ import com.magento.idea.magento2plugin.stubs.indexes.mftf.TestNameIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.AclResourceIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.MenuIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.PhpClassNameIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.xml.TableAndColumnNameIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.UIComponentIndex;
 
 @SuppressWarnings({"PMD.ClassNamingConventions", "PMD.UseUtilityClass"})
@@ -42,6 +43,7 @@ public class IndexManager {
             // xml|di configuration
             PluginIndex.KEY,
             VirtualTypeIndex.KEY,
+            TableAndColumnNameIndex.KEY,
             // layouts
             BlockNameIndex.KEY,
             ContainerNameIndex.KEY,
