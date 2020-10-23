@@ -8,6 +8,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.validator.anno
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AclResourceIdRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericWithUnderscoreRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.BoxNotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.ConfigPathRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.CronScheduleRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
@@ -23,6 +24,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 
 public enum RuleRegistry {
     NOT_EMPTY(NotEmptyRule.class),
+    BOX_NOT_EMPTY(BoxNotEmptyRule.class),
     PHP_CLASS(PhpClassRule.class),
     ROUTE_ID(RouteIdRule.class),
     ALPHANUMERIC(AlphanumericRule.class),

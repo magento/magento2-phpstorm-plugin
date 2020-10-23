@@ -12,6 +12,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.CronjobClassData;
 import com.magento.idea.magento2plugin.actions.generation.data.CrontabXmlData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.BoxNotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.ConfigPathRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.CronScheduleRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
@@ -100,6 +101,8 @@ public class NewCronjobDialog extends AbstractDialog {
             message = {ConfigPathRule.MESSAGE, CONFIG_PATH})
     private JTextField configPathField;
 
+    @FieldValidation(rule = RuleRegistry.BOX_NOT_EMPTY,
+            message = {BoxNotEmptyRule.MESSAGE, CRON_GROUP})
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, CRON_GROUP})
     private FilteredComboBox cronGroupComboBox;
