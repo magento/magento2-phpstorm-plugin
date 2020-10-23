@@ -87,10 +87,12 @@ public class UiComponentFormGeneratorTest extends BaseGeneratorTestCase {
     protected List getFieldsets() {
         final List fieldsets = new ArrayList();
         fieldsets.add(new UiComponentFormFieldsetData(
+                "general",
                 "General",
                 "10"
         ));
         fieldsets.add(new UiComponentFormFieldsetData(
+                "test_fieldset",
                 "Test Fieldset",
                 "20"
         ));

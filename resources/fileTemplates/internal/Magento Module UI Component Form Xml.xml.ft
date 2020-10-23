@@ -5,6 +5,7 @@
             <item name="provider" xsi:type="string">${NAME}.${NAME}_data_source</item>
         </item>
         <item name="label" xsi:type="string" translate="true">${LABEL}</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
     </argument>
     <settings>
         <namespace>${NAME}</namespace>
@@ -20,6 +21,11 @@
         <settings>
             <submitUrl path="${ROUTE}/${SUBMIT_CONTROLLER}/${SUBMIT_ACTION}"/>
         </settings>
-        <dataProvider class="${DATA_PROVIDER}" name="${NAME}_data_source"/>
+        <dataProvider class="${DATA_PROVIDER}" name="${NAME}_data_source">
+            <settings>
+                <requestFieldName>${PRIMARY_FIELD}</requestFieldName>
+                <primaryFieldName>${PRIMARY_FIELD}</primaryFieldName>
+            </settings>
+        </dataProvider>
     </dataSource>
 </form>
