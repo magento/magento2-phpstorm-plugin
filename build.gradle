@@ -15,7 +15,7 @@ repositories {
 }
 
 group 'com.magento.idea'
-version '2.0.1'
+version '2.0.2'
 
 apply plugin: 'org.jetbrains.intellij'
 apply plugin: 'java'
