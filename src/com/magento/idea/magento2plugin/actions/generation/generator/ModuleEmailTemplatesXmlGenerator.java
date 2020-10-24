@@ -8,9 +8,9 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlFile;
@@ -23,10 +23,10 @@ import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.magento.files.EmailTemplatesXml;
 import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
-import javax.swing.JOptionPane;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Properties;
+import javax.swing.JOptionPane;
 
 @SuppressWarnings({"PMD.AvoidPrintStackTrace"})
 public class ModuleEmailTemplatesXmlGenerator extends FileGenerator {

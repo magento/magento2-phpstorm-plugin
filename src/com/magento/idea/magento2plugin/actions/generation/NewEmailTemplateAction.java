@@ -6,11 +6,15 @@
 package com.magento.idea.magento2plugin.actions.generation;
 
 import com.intellij.ide.IdeView;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewEmailTemplateDialog;
+import com.magento.idea.magento2plugin.MagentoIcons;
 
 @SuppressWarnings({"PMD.OnlyOneReturn", "PMD.FieldNamingConventions"})
 public class NewEmailTemplateAction extends AnAction {

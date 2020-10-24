@@ -39,7 +39,11 @@ public class ModuleEmailTemplateHtmlGeneratorTest extends BaseGeneratorTestCase 
                 area
         );
 
-        assertGeneratedFileIsCorrect(expectedFile, getExpectedDirectory(area), emailTemplateXmlFile);
+        assertGeneratedFileIsCorrect(
+                expectedFile,
+                getExpectedDirectory(area),
+                emailTemplateXmlFile
+        );
     }
 
     /**
@@ -62,7 +66,11 @@ public class ModuleEmailTemplateHtmlGeneratorTest extends BaseGeneratorTestCase 
                 area
         );
 
-        assertGeneratedFileIsCorrect(expectedFile, getExpectedDirectory(area), emailTemplateXmlFile);
+        assertGeneratedFileIsCorrect(
+                expectedFile,
+                getExpectedDirectory(area),
+                emailTemplateXmlFile
+        );
     }
 
     /**

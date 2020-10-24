@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import com.magento.idea.magento2plugin.actions.generation.NewEmailTemplateAction;
 import com.magento.idea.magento2plugin.actions.generation.data.EmailTemplateHtmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.EmailTemplatesXmlData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
@@ -16,23 +15,24 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleEmailTemplateHtmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleEmailTemplatesXmlGenerator;
+import com.magento.idea.magento2plugin.actions.generation.NewEmailTemplateAction;
 import com.magento.idea.magento2plugin.magento.files.EmailTemplateHtml;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.JButton;
-import javax.swing.KeyStroke;
-import javax.swing.JTextField;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 
 public class NewEmailTemplateDialog extends AbstractDialog {
     private final String moduleName;
@@ -60,6 +60,12 @@ public class NewEmailTemplateDialog extends AbstractDialog {
     private FilteredComboBox templateType;
     private JTextField subject;
 
+    /**
+     * New email template dialog.
+     *
+     * @param project Project
+     * @param directory Directory
+     */
     public NewEmailTemplateDialog(final Project project, final PsiDirectory directory) {
         setContentPane(contentPane);
         setModal(true);
@@ -79,11 +85,15 @@ public class NewEmailTemplateDialog extends AbstractDialog {
         });
 
         // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPane.registerKeyboardAction(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        onCancel();
+                    }
+                },
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+        );
     }
 
     /**
