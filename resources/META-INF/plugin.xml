@@ -211,6 +211,8 @@
         <internalFileTemplate name="Magento Module Layout Xml"/>
         <internalFileTemplate name="Magento Module ACL XML"/>
 
+        <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
+
         <postStartupActivity implementation="com.magento.idea.magento2plugin.project.startup.CheckIfMagentoPathIsValidActivity"/>
     </extensions>
 
