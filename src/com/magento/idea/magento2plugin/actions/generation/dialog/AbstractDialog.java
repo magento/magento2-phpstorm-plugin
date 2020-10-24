@@ -26,6 +26,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 /**
@@ -182,9 +183,15 @@ public abstract class AbstractDialog extends JDialog {
 
     private String resolveFieldValueByComponentType(final Object field) {
         if (field instanceof JTextField) {
-            return ((JTextField) field).getText();
+            return ((JTextField) field).isEditable() ? ((JTextField) field).getText() : null;
         } else if (field instanceof JComboBox) {
-            return ((JComboBox) field).getSelectedItem().toString();
+            if (((JComboBox<?>) field).getSelectedIndex() == -1) {
+                return "";
+            } else {
+                return ((JComboBox) field).getSelectedItem().toString();
+            }
+        } else if (field instanceof JTextArea) {
+            return ((JTextArea) field).getText();
         }
         return null;
     }

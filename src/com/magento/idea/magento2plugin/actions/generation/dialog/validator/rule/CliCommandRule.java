@@ -5,13 +5,15 @@
 
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule;
 
-public class NotEmptyRule implements ValidationRule {
-    public static final String MESSAGE = "validator.notEmpty";
-    private static final ValidationRule INSTANCE = new NotEmptyRule();
+import com.magento.idea.magento2plugin.util.RegExUtil;
+
+public class CliCommandRule implements ValidationRule {
+    public static final String MESSAGE = "validator.command.isNotValid";
+    private static final ValidationRule INSTANCE = new CliCommandRule();
 
     @Override
     public boolean check(final String value) {
-        return !value.isEmpty();
+        return value.matches(RegExUtil.CLI_COMMAND_NAME);
     }
 
     public static ValidationRule getInstance() {
