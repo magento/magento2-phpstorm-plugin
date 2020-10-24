@@ -88,6 +88,13 @@ public class XmlCompletionContributor extends CompletionContributor {
                 new FilePathCompletionProvider()
         );
 
+        // <uiComponent name="completion"/>
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                        .inside(XmlPatterns.xmlAttribute().withName(LayoutXml.NAME_ATTRIBUTE)
+                                .withParent(XmlPatterns.xmlTag().withName(LayoutXml.UI_COMPONENT_TAG_NAME))),
+                new UiComponentCompletionProvider()
+        );
+
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_DATA_CHARACTERS)
                 .withParent(XmlPatterns.xmlText().withParent(
                     XmlPatterns.xmlTag().withName(UiComponentXml.XML_TAG_ITEM).withChild(
@@ -126,19 +133,17 @@ public class XmlCompletionContributor extends CompletionContributor {
 
         // <observer instance="Class">
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
-            .inside(XmlPatterns.xmlAttribute().withName(ModuleEventsXml.INSTANCE_ATTRIBUTE)
-                .withParent(XmlPatterns.xmlTag().withName(ModuleEventsXml.OBSERVER_TAG)
-                )
-            ).inFile(xmlFile().withName(string().matches(ModuleEventsXml.FILE_NAME))),
+                    .inside(XmlPatterns.xmlAttribute().withName(ModuleEventsXml.INSTANCE_ATTRIBUTE)
+                    .withParent(XmlPatterns.xmlTag().withName(ModuleEventsXml.OBSERVER_TAG)))
+                        .inFile(xmlFile().withName(string().matches(ModuleEventsXml.FILE_NAME))),
             new PhpClassCompletionProvider()
         );
 
         // <job instance="class">
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
             .inside(XmlPatterns.xmlAttribute().withName(CommonXml.ATTR_INSTANCE)
-                .withParent(XmlPatterns.xmlTag().withName(CrontabXmlTemplate.CRON_JOB_TAG)
-                )
-            ).inFile(xmlFile().withName(string().matches(CrontabXmlTemplate.FILE_NAME))),
+                .withParent(XmlPatterns.xmlTag().withName(CrontabXmlTemplate.CRON_JOB_TAG)))
+                        .inFile(xmlFile().withName(string().matches(CrontabXmlTemplate.FILE_NAME))),
             new PhpClassCompletionProvider()
         );
 
