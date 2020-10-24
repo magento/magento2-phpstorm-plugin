@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
+import com.magento.idea.magento2plugin.actions.generation.NewEmailTemplateAction;
 import com.magento.idea.magento2plugin.actions.generation.data.EmailTemplateHtmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.EmailTemplatesXmlData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
@@ -15,7 +16,6 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleEmailTemplateHtmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleEmailTemplatesXmlGenerator;
-import com.magento.idea.magento2plugin.actions.generation.NewEmailTemplateAction;
 import com.magento.idea.magento2plugin.magento.files.EmailTemplateHtml;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
