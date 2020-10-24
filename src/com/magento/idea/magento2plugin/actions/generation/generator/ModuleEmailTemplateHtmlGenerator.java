@@ -14,7 +14,6 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFro
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.EmailTemplateHtml;
 import com.magento.idea.magento2plugin.magento.packages.Package;
-
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -24,6 +23,12 @@ public class ModuleEmailTemplateHtmlGenerator extends FileGenerator {
     private final ModuleIndex moduleIndex;
     private final DirectoryGenerator directoryGenerator;
 
+    /**
+     * Constructor.
+     *
+     * @param emailTemplateData EmailTemplateData
+     * @param project Project
+     */
     public ModuleEmailTemplateHtmlGenerator(
             final EmailTemplateHtmlData emailTemplateData,
             final Project project
