@@ -8,7 +8,11 @@ package com.magento.idea.magento2plugin.stubs.indexes.xml;
 import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
-import com.intellij.util.indexing.*;
+import com.intellij.util.indexing.DataIndexer;
+import com.intellij.util.indexing.FileBasedIndex;
+import com.intellij.util.indexing.FileContent;
+import com.intellij.util.indexing.ID;
+import com.intellij.util.indexing.ScalarIndexExtension;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.intellij.util.xml.impl.DomApplicationComponent;
@@ -41,7 +45,7 @@ public class UIComponentIndex extends ScalarIndexExtension<String> {
             final Map<String, Void> map = new HashMap<>();//NOPMD
 
             final PsiFile psiFile = inputData.getPsiFile();
-            if (!Settings.isEnabled(psiFile.getProject() )) {
+            if (!Settings.isEnabled(psiFile.getProject())) {
                 return map;
             }
 
