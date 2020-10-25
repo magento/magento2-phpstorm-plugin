@@ -12,7 +12,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
-import com.magento.idea.magento2plugin.stubs.indexes.xml.TableAndColumnNameIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.xml.DeclarativeSchemaElementsIndex;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,7 +34,7 @@ public class TableNameCompletionProvider extends CompletionProvider<CompletionPa
         }
 
         final Collection<String> tableNames = FileBasedIndex.getInstance().getAllKeys(
-                TableAndColumnNameIndex.KEY, position.getProject()
+                DeclarativeSchemaElementsIndex.KEY, position.getProject()
         );
         final List<String> filteredTableNames = tableNames.stream()
                 .filter(name -> !name.contains(".")).collect(Collectors.toList());

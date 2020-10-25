@@ -16,7 +16,7 @@ import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaXml;
-import com.magento.idea.magento2plugin.stubs.indexes.xml.TableAndColumnNameIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.xml.DeclarativeSchemaElementsIndex;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,7 +58,7 @@ public class ColumnNameCompletionProvider extends CompletionProvider<CompletionP
             return;
         }
         final Collection<String> tableAndColumnNames = FileBasedIndex.getInstance().getAllKeys(
-                TableAndColumnNameIndex.KEY, position.getProject()
+                DeclarativeSchemaElementsIndex.KEY, position.getProject()
         );
         final List<String> filteredColumnNames = tableAndColumnNames.stream()
                 .filter(name -> name.contains(targetTableName + ".")).collect(Collectors.toList())

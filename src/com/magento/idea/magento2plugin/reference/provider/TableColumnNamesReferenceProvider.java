@@ -23,7 +23,7 @@ import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaXml;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
-import com.magento.idea.magento2plugin.stubs.indexes.xml.TableAndColumnNameIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.xml.DeclarativeSchemaElementsIndex;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -80,7 +80,7 @@ public class TableColumnNamesReferenceProvider extends PsiReferenceProvider {
             }
         }
         final Collection<VirtualFile> files = FileBasedIndex.getInstance()
-                .getContainingFiles(TableAndColumnNameIndex.KEY, identifier,
+                .getContainingFiles(DeclarativeSchemaElementsIndex.KEY, identifier,
                         GlobalSearchScope.getScopeRestrictedByFileTypes(
                                 GlobalSearchScope.allScope(element.getProject()),
                                 XmlFileType.INSTANCE

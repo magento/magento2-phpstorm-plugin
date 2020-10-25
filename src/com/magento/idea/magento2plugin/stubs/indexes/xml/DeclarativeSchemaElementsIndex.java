@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Index to store table names and column names from db_schema.xml files.
  */
-public class TableAndColumnNameIndex extends FileBasedIndexExtension<String, Void> {
+public class DeclarativeSchemaElementsIndex extends FileBasedIndexExtension<String, Void> {
     public static final ID<String, Void> KEY = ID.create(
             "com.magento.idea.magento2plugin.stubs.indexes.db_schema.tables_and_columns");
     private final KeyDescriptor<String> myKeyDescriptor = new EnumeratorStringDescriptor();
