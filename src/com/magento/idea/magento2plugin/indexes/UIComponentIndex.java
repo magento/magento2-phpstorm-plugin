@@ -92,4 +92,45 @@ public final class UIComponentIndex {
     ) {
         return FileBasedIndex.getInstance().getAllKeys(identifier, project);
     }
+
+    /**
+     * Get ui component files.
+     *
+     * @param project Project
+     * @param fileName String
+     * @return List
+     */
+    public static List<XmlFile> getUIComponentFiles(Project project, @Nullable String fileName) {
+        List<XmlFile> results = new ArrayList<XmlFile>();
+        Collection<VirtualFile> xmlFiles = FilenameIndex.getAllFilesByExt(project, "xml");
+
+        PsiManager psiManager = PsiManager.getInstance(project);
+        for (VirtualFile xmlFile: xmlFiles) {
+            if (isUIComponentFile(xmlFile)) {
+                if (fileName != null && !xmlFile.getNameWithoutExtension().equals(fileName)) {
+                    continue;
+                }
+
+                PsiFile file = psiManager.findFile(xmlFile);
+                if (file != null) {
+                    results.add((XmlFile)file);
+                }
+            }
+        }
+
+        return results;
+    }
+
+    /**
+     * Available ui component file.
+     *
+     * @param virtualFile VirtualFile
+     * @return boolean
+     */
+    public static boolean isUIComponentFile(VirtualFile virtualFile) {
+        VirtualFile parent = virtualFile.getParent();
+        return virtualFile.getFileType() == XmlFileType.INSTANCE && parent.isDirectory()
+                && parent.getName().endsWith("ui_component");
+    }
+
 }
