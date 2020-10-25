@@ -133,18 +133,20 @@ public class XmlCompletionContributor extends CompletionContributor {
 
         // <observer instance="Class">
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
-                    .inside(XmlPatterns.xmlAttribute().withName(ModuleEventsXml.INSTANCE_ATTRIBUTE)
-                    .withParent(XmlPatterns.xmlTag().withName(ModuleEventsXml.OBSERVER_TAG)))
-                        .inFile(xmlFile().withName(string().matches(ModuleEventsXml.FILE_NAME))),
-            new PhpClassCompletionProvider()
+                        .inside(XmlPatterns.xmlAttribute().withName(ModuleEventsXml.INSTANCE_ATTRIBUTE)
+                                .withParent(XmlPatterns.xmlTag().withName(ModuleEventsXml.OBSERVER_TAG)
+                                )
+                        ).inFile(xmlFile().withName(string().matches(ModuleEventsXml.FILE_NAME))),
+                new PhpClassCompletionProvider()
         );
 
         // <job instance="class">
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
-            .inside(XmlPatterns.xmlAttribute().withName(CommonXml.ATTR_INSTANCE)
-                .withParent(XmlPatterns.xmlTag().withName(CrontabXmlTemplate.CRON_JOB_TAG)))
-                        .inFile(xmlFile().withName(string().matches(CrontabXmlTemplate.FILE_NAME))),
-            new PhpClassCompletionProvider()
+                        .inside(XmlPatterns.xmlAttribute().withName(CommonXml.ATTR_INSTANCE)
+                                .withParent(XmlPatterns.xmlTag().withName(CrontabXmlTemplate.CRON_JOB_TAG)
+                                )
+                        ).inFile(xmlFile().withName(string().matches(CrontabXmlTemplate.FILE_NAME))),
+                new PhpClassCompletionProvider()
         );
 
         // <source_model>php class completion</source_model> in system.xml files.
