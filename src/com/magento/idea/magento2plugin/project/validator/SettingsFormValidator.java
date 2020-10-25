@@ -24,33 +24,31 @@ public class SettingsFormValidator {
     }
 
     /**
-     * Validate form.
+     * Validates form if plugin is enabled.
      *
      * @throws ConfigurationException Exception
      */
     public void validate() throws ConfigurationException {
-        if (!form.getSettings().pluginEnabled) {
-            return;
-        }
+        if (form.isBeingUsed()) {
+            if (!MagentoBasePathUtil.isMagentoFolderValid(form.getMagentoPath())) {
+                throw new ConfigurationException(
+                        validatorBundle.message("validator.package.validPath")
+                );
+            }
 
-        if (!MagentoBasePathUtil.isMagentoFolderValid(form.getMagentoPath())) {
-            throw new ConfigurationException(
-                    validatorBundle.message("validator.package.validPath")
-            );
-        }
+            final String magentoVersion = form.getMagentoVersion();
+            if (magentoVersion.length() == 0) {
+                throw new ConfigurationException(
+                        validatorBundle.message("validator.notEmpty", "Magento Version")
+                );
+            }
 
-        final String magentoVersion = form.getMagentoVersion();
-        if (magentoVersion.length() == 0) {
-            throw new ConfigurationException(
-                    validatorBundle.message("validator.notEmpty", "Magento Version")
-            );
-        }
-
-        if (!magentoVersion.matches(RegExUtil.MAGENTO_VERSION)
-                && !magentoVersion.equals(MagentoVersionUtil.DEFAULT_VERSION)) {
-            throw new ConfigurationException(
-                    validatorBundle.message("validator.magentoVersionInvalid")
-            );
+            if (!magentoVersion.matches(RegExUtil.MAGENTO_VERSION)
+                    && !magentoVersion.equals(MagentoVersionUtil.DEFAULT_VERSION)) {
+                throw new ConfigurationException(
+                        validatorBundle.message("validator.magentoVersionInvalid")
+                );
+            }
         }
     }
 }

@@ -20,7 +20,7 @@
     If relevant, please provide a list of fixed issues in the format magento/magento2-phpstorm-plugin#<issue_number>.
     There could be 1 or more issues linked here and it will help us find some more information about the reasoning behind this change.
 -->
-1. magento/magento2-phpstorm-plugin#<issue_number>: Issue title
+1. Fixes magento/magento2-phpstorm-plugin#<issue_number>
 
 **Questions or comments**
 <!---
