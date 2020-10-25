@@ -19,8 +19,12 @@ import java.util.Collection;
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings("PMD")
+public final class UIComponentIndex {
 
-public class UiComponentIndex {
+    private UIComponentIndex() {
+        throw new AssertionError("Instantiating utility class...");
+    }
 
     /**
      * Available ui component file.
@@ -41,7 +45,10 @@ public class UiComponentIndex {
      * @param fileName String
      * @return List
      */
-    public static List<XmlFile> getUiComponentFiles(final Project project, final @Nullable String fileName) {
+    public static List<XmlFile> getUiComponentFiles(
+            final Project project,
+            final @Nullable String fileName
+    ) {
         final List<XmlFile> results = new ArrayList<XmlFile>();//NOPMD
         final Collection<VirtualFile> xmlFiles = FilenameIndex.getAllFilesByExt(project, "xml");
 
@@ -62,11 +69,27 @@ public class UiComponentIndex {
         return results;
     }
 
+    /**
+     * Get ui component files.
+     *
+     * @param project Project
+     * @return List
+     */
     public static List<XmlFile> getUiComponentFiles(final Project project) {
         return getUiComponentFiles(project, null);
     }
 
-    public static Collection<String> getAllKeys(final ID<String, Void> id, final Project project) {
-        return FileBasedIndex.getInstance().getAllKeys(id, project);
+    /**
+     * Get All Keys.
+     *
+     * @param identifier ID
+     * @param project Project
+     * @return Collection
+     */
+    public static Collection<String> getAllKeys(
+            final ID<String, Void> identifier,
+            final Project project
+    ) {
+        return FileBasedIndex.getInstance().getAllKeys(identifier, project);
     }
 }

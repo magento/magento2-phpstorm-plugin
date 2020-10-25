@@ -18,7 +18,7 @@ import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 
 
-public class UiComponentIndex extends ScalarIndexExtension<String> {
+public class UIComponentIndex extends ScalarIndexExtension<String> {
 
     public static final ID<String, Void> KEY =
             ID.create("com.magento.idea.magento2plugin.stubs.indexes.ui_component");
@@ -41,7 +41,7 @@ public class UiComponentIndex extends ScalarIndexExtension<String> {
             final Map<String, Void> map = new HashMap<>();//NOPMD
 
             final PsiFile psiFile = inputData.getPsiFile();
-            if (!Settings.isEnabled(psiFile.getProject())) {
+            if (!Settings.isEnabled(psiFile.getProject() )) {
                 return map;
             }
 

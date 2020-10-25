@@ -13,7 +13,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.PhpIcons;
-import com.magento.idea.magento2plugin.indexes.UiComponentIndex;
+import com.magento.idea.magento2plugin.indexes.UIComponentIndex;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,17 +21,17 @@ import org.jetbrains.annotations.NotNull;
 public class UiComponentCompletionProvider extends CompletionProvider<CompletionParameters> {
 
     @Override
-    protected void addCompletions(@NotNull CompletionParameters parameters,
-                                  ProcessingContext context,
-                                  @NotNull CompletionResultSet result) {
-        PsiElement position = parameters.getPosition().getOriginalElement();
+    protected void addCompletions(@NotNull final CompletionParameters parameters,
+                                  final ProcessingContext context,
+                                  @NotNull final CompletionResultSet result) {
+        final PsiElement position = parameters.getPosition().getOriginalElement();
         if (position == null) {
             return;
         }
 
-        List<XmlFile> targets = UiComponentIndex.getUiComponentFiles(position.getProject());
-        if (targets.size() > 0) {
-            for (XmlFile file : targets) {
+        final List<XmlFile> targets = UIComponentIndex.getUiComponentFiles(position.getProject());
+        if (!targets.isEmpty()) {
+            for (final XmlFile file : targets) {
                 result.addElement(LookupElementBuilder
                             .create(file.getVirtualFile().getNameWithoutExtension())
                             .withIcon(PhpIcons.XML_TAG_ICON)
