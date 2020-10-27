@@ -13,7 +13,7 @@ public class LayoutContainerCompletionRegistrarTest extends CompletionXmlFixture
      * The `name` attribute of the `referenceContainer` tag in layout XML must
      * have completion based on `name` attribute of `container` tags.
      */
-    public void testXReferenceContainerMustHaveCompletion() {
+    public void testReferenceContainerMustHaveCompletion() {
         final String filePath = this.getFixturePath(LayoutXml.DEFAULT_FILENAME);
         myFixture.configureByFile(filePath);
 

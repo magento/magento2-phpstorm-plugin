@@ -8,8 +8,5 @@
         <container name="test_index_index_container2">
             <block name="test_index_index_block2" />
         </container>
-        <container name="test_index_index_container3">
-            <uiComponent name="test_index_index" />
-        </container>
     </body>
 </page>

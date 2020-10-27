@@ -13,8 +13,8 @@ public class LayoutUIComponentCompletionRegistrarTest extends CompletionXmlFixtu
         myFixture.configureByFile(filePath);
 
         assertCompletionContains(filePath,
-            "test_index_i",
-            "test_index_index"
+                "recently_viewed",
+                "recently_viewed_2"
         );
     }
 }
