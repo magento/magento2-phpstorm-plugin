@@ -7,7 +7,7 @@ package com.magento.idea.magento2plugin.completion.xml;
 
 import com.magento.idea.magento2plugin.magento.files.LayoutXml;
 
-public class XLayoutContainerCompletionRegistrarTest extends CompletionXmlFixtureTestCase {
+public class LayoutContainerCompletionRegistrarTest extends CompletionXmlFixtureTestCase {
 
     /**
      * The `name` attribute of the `referenceContainer` tag in layout XML must
