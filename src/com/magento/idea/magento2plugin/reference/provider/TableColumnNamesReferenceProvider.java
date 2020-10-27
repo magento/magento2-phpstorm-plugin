@@ -91,6 +91,9 @@ public class TableColumnNamesReferenceProvider extends PsiReferenceProvider {
         final PsiManager psiManager = PsiManager.getInstance(element.getProject());
 
         for (final VirtualFile virtualFile : files) {
+            if (virtualFile.equals(element.getContainingFile().getVirtualFile())) {
+                continue;
+            }
             final XmlDocument xmlDocument = ((XmlFile) Objects.requireNonNull(
                     psiManager.findFile(virtualFile))
             ).getDocument();

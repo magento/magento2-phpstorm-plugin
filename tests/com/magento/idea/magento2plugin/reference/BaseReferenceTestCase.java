@@ -10,6 +10,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveResult;
 import com.intellij.psi.xml.XmlAttributeValue;
+import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.inspections.BaseInspectionsTestCase;
@@ -80,7 +81,7 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
 
     protected void assertHasReferenceToFile(final String reference) {
         final PsiElement element = getElementFromCaret();
-        for (final PsiReference psiReference: element.getReferences()) {
+        for (final PsiReference psiReference : element.getReferences()) {
             final PsiElement resolved = psiReference.resolve();
             if (!(resolved instanceof PsiFile)) {
                 continue;
@@ -94,13 +95,34 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
         fail(String.format(referenceNotFound, reference));
     }
 
+    protected void assertHasReferenceToXmlFile(final String fileName) {
+        final PsiElement element = getElementFromCaret();
+        for (final PsiReference psiReference : element.getReferences()) {
+            final PsiElement resolved = psiReference.resolve();
+            if (!(resolved instanceof XmlFile)) {
+                continue;
+            }
+
+            if (((XmlFile) resolved).getName().equals(fileName)) {
+                return;
+            }
+        }
+        final String referenceNotFound
+                = "Failed that element contains reference to the XML tag `%s`";
+
+        fail(String.format(referenceNotFound, fileName));
+    }
+
+    @SuppressWarnings("PMD")
     protected void assertHasReferencePhpClass(final String phpClassFqn) {
         final PsiElement element = getElementFromCaret();
         final PsiReference[] references = element.getReferences();
-        assertEquals(//NOPMD
+        String result = ((PhpClass) references[references.length - 1]
+                .resolve())
+                .getPresentableFQN();
+        assertEquals(
                 phpClassFqn,
-                ((PhpClass) references[references.length - 1].resolve())
-                        .getPresentableFQN()
+                result
         );
     }
 
