@@ -6,6 +6,7 @@
             <item name="provider" xsi:type="string">my_form.my_form_data_source</item>
         </item>
         <item name="label" xsi:type="string" translate="true">My Form</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
     </argument>
     <settings>
         <namespace>my_form</namespace>
@@ -23,34 +24,21 @@
         <settings>
             <submitUrl path="customroute/myentity/save"/>
         </settings>
-        <dataProvider class="Foo/Bar/Ui/MyEntity/DataProvider" name="my_form_data_source"/>
+        <dataProvider class="Foo/Bar/Ui/MyEntity/DataProvider" name="my_form_data_source">
+            <settings>
+                <requestFieldName>my_field</requestFieldName>
+                <primaryFieldName>my_field</primaryFieldName>
+            </settings>
+        </dataProvider>
     </dataSource>
-    <fieldset label="General" sortOrder="10">
-        <field name="my_field" sortOrder="10" formElement="input">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="source" xsi:type="string">entity</item>
-                </item>
-            </argument>
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">My Field</label>
-                <dataScope>my_field</dataScope>
-            </settings>
-        </field>
+    <fieldset name="general" sortOrder="10">
+        <settings>
+            <label translate="true">General</label>
+        </settings>
     </fieldset>
-    <fieldset label="Test Fieldset" sortOrder="20">
-        <field name="my_field_2" sortOrder="10" formElement="input">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="source" xsi:type="string">entity</item>
-                </item>
-            </argument>
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">My Field 2</label>
-                <dataScope>my_field_2</dataScope>
-            </settings>
-        </field>
+    <fieldset name="test_fieldset" sortOrder="20">
+        <settings>
+            <label translate="true">Test Fieldset</label>
+        </settings>
     </fieldset>
 </form>

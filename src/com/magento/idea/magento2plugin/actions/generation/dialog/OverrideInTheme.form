@@ -72,7 +72,7 @@
               <text resource-bundle="magento2/common" key="common.theme.target"/>
             </properties>
           </component>
-          <component id="bd654" class="com.magento.idea.magento2plugin.ui.FilteredComboBox" binding="theme" custom-create="true">
+          <component id="bd654" class="javax.swing.JComboBox" binding="theme">
             <constraints>
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
                 <preferred-size width="319" height="30"/>

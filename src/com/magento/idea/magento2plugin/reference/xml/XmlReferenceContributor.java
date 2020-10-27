@@ -132,6 +132,16 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
             new LayoutUpdateReferenceProvider()
         );
 
+        // <uiComponent name="completion"/>
+        registrar.registerReferenceProvider(
+                XmlPatterns.xmlAttributeValue().withParent(
+                        XmlPatterns.xmlAttribute().withName("name").withParent(
+                                XmlPatterns.xmlTag().withName("uiComponent")
+                        )
+                ),
+                new UIComponentReferenceProvider()
+        );
+
         // <event name="reference" />
         registrar.registerReferenceProvider(
             XmlPatterns.xmlAttributeValue().withParent(
