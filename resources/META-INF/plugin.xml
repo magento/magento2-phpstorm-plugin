@@ -185,8 +185,6 @@
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.AclResourceXmlInspection"/>
 
-        <libraryRoot id=".phpstorm.meta.php" path=".phpstorm.meta.php/" runtime="false"/>
-
         <internalFileTemplate name="Magento Module Composer"/>
         <internalFileTemplate name="Magento Module Registration Php"/>
         <internalFileTemplate name="Magento Module Xml"/>
@@ -219,6 +217,7 @@
     <extensions defaultExtensionNs="com.jetbrains.php">
         <frameworkProjectConfigurableProvider implementation="com.magento.idea.magento2plugin.project.ConfigurableProvider"/>
         <frameworkUsageProvider implementation="com.magento.idea.magento2plugin.project.UsagesProvider"/>
+        <libraryRoot id="phpstorm.meta.php" path="/phpstorm.meta.php/" runtime="false"/>
     </extensions>
 
 </idea-plugin>
