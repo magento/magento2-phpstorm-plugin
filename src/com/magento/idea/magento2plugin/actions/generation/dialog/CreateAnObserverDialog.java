@@ -13,6 +13,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.ObserverFileData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericWithUnderscoreRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.BoxNotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
@@ -63,6 +64,8 @@ public class CreateAnObserverDialog extends AbstractDialog {
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, OBSERVER_MODULE})
+    @FieldValidation(rule = RuleRegistry.BOX_NOT_EMPTY,
+            message = {BoxNotEmptyRule.MESSAGE, OBSERVER_MODULE})
     private FilteredComboBox observerModule;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,

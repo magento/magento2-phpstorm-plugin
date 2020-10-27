@@ -13,6 +13,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.PluginDiXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.PluginFileData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.BoxNotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
@@ -65,6 +66,8 @@ public class CreateAPluginDialog extends AbstractDialog {
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, TARGET_MODULE})
+    @FieldValidation(rule = RuleRegistry.BOX_NOT_EMPTY,
+            message = {BoxNotEmptyRule.MESSAGE, TARGET_MODULE})
     private FilteredComboBox pluginModule;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
