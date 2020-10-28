@@ -88,6 +88,13 @@ public class XmlCompletionContributor extends CompletionContributor {
                 new FilePathCompletionProvider()
         );
 
+        // <uiComponent name="completion"/>
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                        .inside(XmlPatterns.xmlAttribute().withName(LayoutXml.NAME_ATTRIBUTE)
+                                .withParent(XmlPatterns.xmlTag().withName(LayoutXml.UI_COMPONENT_TAG_NAME))),
+                new UiComponentCompletionProvider()
+        );
+
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_DATA_CHARACTERS)
                 .withParent(XmlPatterns.xmlText().withParent(
                     XmlPatterns.xmlTag().withName(UiComponentXml.XML_TAG_ITEM).withChild(
@@ -126,20 +133,20 @@ public class XmlCompletionContributor extends CompletionContributor {
 
         // <observer instance="Class">
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
-            .inside(XmlPatterns.xmlAttribute().withName(ModuleEventsXml.INSTANCE_ATTRIBUTE)
-                .withParent(XmlPatterns.xmlTag().withName(ModuleEventsXml.OBSERVER_TAG)
-                )
-            ).inFile(xmlFile().withName(string().matches(ModuleEventsXml.FILE_NAME))),
-            new PhpClassCompletionProvider()
+                        .inside(XmlPatterns.xmlAttribute().withName(ModuleEventsXml.INSTANCE_ATTRIBUTE)
+                                .withParent(XmlPatterns.xmlTag().withName(ModuleEventsXml.OBSERVER_TAG)
+                                )
+                        ).inFile(xmlFile().withName(string().matches(ModuleEventsXml.FILE_NAME))),
+                new PhpClassCompletionProvider()
         );
 
         // <job instance="class">
         extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
-            .inside(XmlPatterns.xmlAttribute().withName(CommonXml.ATTR_INSTANCE)
-                .withParent(XmlPatterns.xmlTag().withName(CrontabXmlTemplate.CRON_JOB_TAG)
-                )
-            ).inFile(xmlFile().withName(string().matches(CrontabXmlTemplate.FILE_NAME))),
-            new PhpClassCompletionProvider()
+                        .inside(XmlPatterns.xmlAttribute().withName(CommonXml.ATTR_INSTANCE)
+                                .withParent(XmlPatterns.xmlTag().withName(CrontabXmlTemplate.CRON_JOB_TAG)
+                                )
+                        ).inFile(xmlFile().withName(string().matches(CrontabXmlTemplate.FILE_NAME))),
+                new PhpClassCompletionProvider()
         );
 
         // <source_model>php class completion</source_model> in system.xml files.
@@ -315,6 +322,64 @@ public class XmlCompletionContributor extends CompletionContributor {
                     )
                 ).inFile(xmlFile().withName(string().matches(ModuleMenuXml.fileName))),
             new MenuCompletionProvider()
+        );
+
+        // <table name="completion" /> in db_schema.xml
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(XmlPatterns.xmlAttribute().withName(ModuleDbSchemaXml.XML_ATTR_TABLE_NAME)
+                        .withParent(XmlPatterns.xmlTag().withName(ModuleDbSchemaXml.XML_TAG_TABLE)
+                                .withParent(XmlPatterns.xmlTag()
+                                        .withName(ModuleDbSchemaXml.XML_TAG_SCHEMA))))
+                        .inFile(xmlFile().withName(string().matches(ModuleDbSchemaXml.FILE_NAME))),
+            new TableNameCompletionProvider()
+        );
+
+        // <constraint table="completion" /> in db_schema.xml
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(XmlPatterns.xmlAttribute()
+                        .withName(ModuleDbSchemaXml.XML_ATTR_CONSTRAINT_TABLE_NAME)
+                        .withParent(XmlPatterns.xmlTag()
+                                .withName(ModuleDbSchemaXml.XML_TAG_CONSTRAINT)
+                        .withParent(XmlPatterns.xmlTag()
+                                .withName(ModuleDbSchemaXml.XML_TAG_TABLE))))
+                .inFile(xmlFile().withName(string().matches(ModuleDbSchemaXml.FILE_NAME))),
+                new TableNameCompletionProvider()
+        );
+
+        // <constraint referenceTable="completion" /> in db_schema.xml
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(XmlPatterns.xmlAttribute()
+                        .withName(ModuleDbSchemaXml.XML_ATTR_CONSTRAINT_REFERENCE_TABLE_NAME)
+                        .withParent(XmlPatterns.xmlTag()
+                                .withName(ModuleDbSchemaXml.XML_TAG_CONSTRAINT)
+                                .withParent(XmlPatterns.xmlTag()
+                                        .withName(ModuleDbSchemaXml.XML_TAG_TABLE))))
+                .inFile(xmlFile().withName(string().matches(ModuleDbSchemaXml.FILE_NAME))),
+                new TableNameCompletionProvider()
+        );
+
+        // <constraint column="completion" /> in db_schema.xml
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(XmlPatterns.xmlAttribute()
+                        .withName(ModuleDbSchemaXml.XML_ATTR_CONSTRAINT_COLUMN_NAME)
+                        .withParent(XmlPatterns.xmlTag()
+                                .withName(ModuleDbSchemaXml.XML_TAG_CONSTRAINT)
+                                .withParent(XmlPatterns.xmlTag()
+                                        .withName(ModuleDbSchemaXml.XML_TAG_TABLE))))
+                .inFile(xmlFile().withName(string().matches(ModuleDbSchemaXml.FILE_NAME))),
+                new ColumnNameCompletionProvider()
+        );
+
+        // <constraint referenceColumn="completion" /> in db_schema.xml
+        extend(CompletionType.BASIC, psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                .inside(XmlPatterns.xmlAttribute()
+                        .withName(ModuleDbSchemaXml.XML_ATTR_CONSTRAINT_REFERENCE_COLUMN_NAME)
+                        .withParent(XmlPatterns.xmlTag()
+                                .withName(ModuleDbSchemaXml.XML_TAG_CONSTRAINT)
+                                .withParent(XmlPatterns.xmlTag()
+                                        .withName(ModuleDbSchemaXml.XML_TAG_TABLE))))
+                .inFile(xmlFile().withName(string().matches(ModuleDbSchemaXml.FILE_NAME))),
+                new ColumnNameCompletionProvider()
         );
 
         registerCompletionsForDifferentNesting();

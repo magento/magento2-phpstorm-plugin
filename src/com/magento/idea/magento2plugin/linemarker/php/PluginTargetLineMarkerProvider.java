@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.linemarker.php;
 
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
@@ -9,43 +10,48 @@ import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.icons.AllIcons;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.project.Settings;
+import com.magento.idea.magento2plugin.util.magento.plugin.GetTargetClassNamesByPluginClassName;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import com.magento.idea.magento2plugin.util.magento.plugin.GetTargetClassNamesByPluginClassName;
-import com.intellij.psi.util.PsiTreeUtil;
-
-import java.util.*;
 
 public class PluginTargetLineMarkerProvider implements LineMarkerProvider {
     @Nullable
     @Override
-    public LineMarkerInfo getLineMarkerInfo(@NotNull PsiElement psiElement) {
+    public LineMarkerInfo getLineMarkerInfo(@NotNull final PsiElement psiElement) {
         return null;
     }
 
     @Override
-    public void collectSlowLineMarkers(@NotNull List<PsiElement> psiElements, @NotNull Collection<LineMarkerInfo> collection) {
-        if (psiElements.size() > 0) {
-            if (!Settings.isEnabled(psiElements.get(0).getProject())) {
-                return;
-            }
+    public void collectSlowLineMarkers(
+            @NotNull final List<PsiElement> psiElements,
+            @NotNull final Collection<LineMarkerInfo> collection
+    ) {
+        if (!psiElements.isEmpty() && !Settings.isEnabled(psiElements.get(0).getProject())) {
+            return;
         }
-        PluginClassCache pluginClassCache = new PluginClassCache();
-        TargetClassesCollector TargetClassesCollector = new TargetClassesCollector(pluginClassCache);
-        TargetMethodsCollector TargetMethodsCollector = new TargetMethodsCollector(pluginClassCache);
+        final PluginClassCache pluginClassCache = new PluginClassCache();
+        final TargetClassesCollector targetClassesCollector =
+                new TargetClassesCollector(pluginClassCache);
+        final TargetMethodsCollector targetMethodsCollector =
+                new TargetMethodsCollector(pluginClassCache);
 
-        for (PsiElement psiElement : psiElements) {
+        for (final PsiElement psiElement : psiElements) {
             if (psiElement instanceof PhpClass || psiElement instanceof Method) {
                 List<? extends PsiElement> results;
 
                 if (psiElement instanceof PhpClass) {
-                    results = TargetClassesCollector.collect((PhpClass) psiElement);
-                    if (results.size() > 0 ) {
+                    results = targetClassesCollector.collect((PhpClass) psiElement);
+                    if (!results.isEmpty()) {
                         collection.add(NavigationGutterIconBuilder
                                 .create(AllIcons.Nodes.Class)
                                 .setTargets(results)
@@ -54,8 +60,8 @@ public class PluginTargetLineMarkerProvider implements LineMarkerProvider {
                         );
                     }
                 } else {
-                    results = TargetMethodsCollector.collect((Method) psiElement);
-                    if (results.size() > 0 ) {
+                    results = targetMethodsCollector.collect((Method) psiElement);
+                    if (!results.isEmpty()) {
                         collection.add(NavigationGutterIconBuilder
                                 .create(AllIcons.Nodes.Method)
                                 .setTargets(results)
@@ -70,27 +76,37 @@ public class PluginTargetLineMarkerProvider implements LineMarkerProvider {
     }
 
     private static class PluginClassCache {
-        private HashMap<String, List<PhpClass>> pluginClassesMap = new HashMap<String, List<PhpClass>>();
+        private final HashMap<String, List<PhpClass>> pluginClassesMap = // NOPMD
+                new HashMap<>();
 
-        List<PhpClass> getTargetClassesForPlugin(@NotNull PhpClass phpClass, @NotNull String classFQN) {
-            List<PhpClass> results = new ArrayList<>();
+        private List<PhpClass> getTargetClassesForPlugin(
+                @NotNull final PhpClass phpClass,
+                @NotNull final String classFQN
+        ) {
 
             if (pluginClassesMap.containsKey(classFQN)) {
                 return pluginClassesMap.get(classFQN);
             }
 
-            GetTargetClassNamesByPluginClassName targetClassesService = GetTargetClassNamesByPluginClassName.getInstance(phpClass.getProject());
-            ArrayList<String> targetClassNames = targetClassesService.execute(classFQN);
+            final GetTargetClassNamesByPluginClassName targetClassesService =
+                    GetTargetClassNamesByPluginClassName.getInstance(phpClass.getProject());
+            final ArrayList<String> targetClassNames = targetClassesService.execute(classFQN);
 
-            if (targetClassNames.size() == 0) {
+            final List<PhpClass> results = new ArrayList<>();
+
+            if (targetClassNames.isEmpty()) {
                 pluginClassesMap.put(classFQN, results);
                 return results;
             }
 
-            PhpIndex phpIndex = PhpIndex.getInstance(phpClass.getProject());
+            final PhpIndex phpIndex = PhpIndex.getInstance(phpClass.getProject());
 
-            for (String targetClassName : targetClassNames) {
-                Collection<PhpClass> targets = phpIndex.getClassesByFQN(targetClassName);
+            for (final String targetClassName : targetClassNames) {
+                Collection<PhpClass> targets = phpIndex.getInterfacesByFQN(targetClassName);
+
+                if (targets.isEmpty()) {
+                    targets = phpIndex.getClassesByFQN(targetClassName);
+                }
 
                 results.addAll(targets);
             }
@@ -98,9 +114,11 @@ public class PluginTargetLineMarkerProvider implements LineMarkerProvider {
             return results;
         }
 
-        List<PhpClass> getTargetClassesForPlugin(@NotNull PhpClass phpClass) {
-            List<PhpClass> classesForPlugin = getTargetClassesForPlugin(phpClass, phpClass.getPresentableFQN());
-            for (PhpClass parent: phpClass.getSupers()) {
+        protected List<PhpClass> getTargetClassesForPlugin(@NotNull final PhpClass phpClass) {
+            final List<PhpClass> classesForPlugin = getTargetClassesForPlugin(
+                    phpClass, phpClass.getPresentableFQN()
+            );
+            for (final PhpClass parent: phpClass.getSupers()) {
                 classesForPlugin.addAll(getTargetClassesForPlugin(parent));
             }
 
@@ -109,52 +127,59 @@ public class PluginTargetLineMarkerProvider implements LineMarkerProvider {
     }
 
     private static class TargetClassesCollector implements Collector<PhpClass, PhpClass> {
-        private PluginTargetLineMarkerProvider.PluginClassCache pluginClassCache;
+        private final PluginTargetLineMarkerProvider.PluginClassCache pluginClassCache;
 
-        TargetClassesCollector(PluginTargetLineMarkerProvider.PluginClassCache pluginClassCache) {
+        TargetClassesCollector(// NOPMD
+                final PluginTargetLineMarkerProvider.PluginClassCache pluginClassCache
+        ) {
             this.pluginClassCache = pluginClassCache;
         }
 
         @Override
-        public List<PhpClass> collect(@NotNull PhpClass psiElement) {
+        public List<PhpClass> collect(@NotNull final PhpClass psiElement) {
             return pluginClassCache.getTargetClassesForPlugin(psiElement);
         }
     }
 
     private static class TargetMethodsCollector implements Collector<Method, Method> {
-        private PluginTargetLineMarkerProvider.PluginClassCache pluginClassCache;
+        private final PluginTargetLineMarkerProvider.PluginClassCache pluginClassCache;
 
-        TargetMethodsCollector(PluginTargetLineMarkerProvider.PluginClassCache pluginClassCache) {
+        TargetMethodsCollector(// NOPMD
+                final PluginTargetLineMarkerProvider.PluginClassCache pluginClassCache
+        ) {
             this.pluginClassCache = pluginClassCache;
         }
 
         @Override
-        public List<Method> collect(@NotNull Method pluginMethod) {
-            List<Method> results = new ArrayList<>();
+        public List<Method> collect(@NotNull final Method pluginMethod) {
+            final List<Method> results = new ArrayList<>();
 
             /* Check if the method is a plugin */
             if (null == getPluginPrefix(pluginMethod)) {
                 return results;
             }
 
-            PhpClass pluginClass = pluginMethod.getContainingClass();
+            final PhpClass pluginClass = pluginMethod.getContainingClass();
             if (pluginClass == null) {
                 return results;
             }
 
-            List<PhpClass> targetClasses = pluginClassCache.getTargetClassesForPlugin(pluginClass);
-            if (targetClasses.size() == 0) {
+            final List<PhpClass> targetClasses
+                    = pluginClassCache.getTargetClassesForPlugin(pluginClass);
+            if (targetClasses.isEmpty()) {
                 return results;
             }
 
-            for (PhpClass targetClass: targetClasses) {
-                String pluginPrefix = getPluginPrefix(pluginMethod);
-                String targetClassMethodName = getTargetMethodName(pluginMethod, pluginPrefix);
+            for (final PhpClass targetClass: targetClasses) {
+                final String pluginPrefix = getPluginPrefix(pluginMethod);
+                final String targetClassMethodName = getTargetMethodName(
+                        pluginMethod, pluginPrefix
+                );
                 if (targetClassMethodName == null) {
                     continue;
                 }
 
-                Method targetMethod = targetClass.findMethodByName(targetClassMethodName);
+                final Method targetMethod = targetClass.findMethodByName(targetClassMethodName);
                 if (targetMethod == null) {
                     continue;
                 }
@@ -165,23 +190,21 @@ public class PluginTargetLineMarkerProvider implements LineMarkerProvider {
             return results;
         }
 
-        private String getTargetMethodName(Method pluginMethod, String pluginPrefix) {
-            String pluginMethodName = pluginMethod.getName();
-            String targetClassMethodName = pluginMethodName.
-                    replace(pluginPrefix, "");
+        private String getTargetMethodName(final Method pluginMethod, final String pluginPrefix) {
+            final String targetClassMethodName = pluginMethod.getName().replace(pluginPrefix, "");
             if (targetClassMethodName.isEmpty()) {
                 return null;
             }
-            char firstCharOfTargetName = targetClassMethodName.charAt(0);
-            int charType = Character.getType(firstCharOfTargetName);
-            if (charType == Character.LOWERCASE_LETTER) {
+            final char firstCharOfTargetName = targetClassMethodName.charAt(0);
+            if (Character.getType(firstCharOfTargetName) == Character.LOWERCASE_LETTER) {
                 return null;
             }
-            return Character.toLowerCase(firstCharOfTargetName) + targetClassMethodName.substring(1);
+            return Character.toLowerCase(firstCharOfTargetName)
+                    + targetClassMethodName.substring(1);
         }
 
-        private String getPluginPrefix(Method pluginMethod) {
-            String pluginMethodName = pluginMethod.getName();
+        private String getPluginPrefix(final Method pluginMethod) {
+            final String pluginMethodName = pluginMethod.getName();
             if (pluginMethodName.startsWith(Plugin.PluginType.around.toString())) {
                 return Plugin.PluginType.around.toString();
             }

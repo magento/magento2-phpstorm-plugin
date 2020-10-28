@@ -14,6 +14,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.PreferenceDiXmFil
 import com.magento.idea.magento2plugin.actions.generation.data.PreferenceFileData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.BoxNotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
@@ -65,6 +66,8 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, MODULE})
+    @FieldValidation(rule = RuleRegistry.BOX_NOT_EMPTY,
+            message = {BoxNotEmptyRule.MESSAGE, MODULE})
     private FilteredComboBox preferenceModule;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
