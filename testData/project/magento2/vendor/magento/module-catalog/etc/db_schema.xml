@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="catalog_product_entity" resource="default" engine="innodb" comment="Catalog Product Table">
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="true"
+                comment="Entity ID"/>
+        <column xsi:type="smallint" name="attribute_set_id" padding="5" unsigned="true" nullable="false"
+                identity="false" default="0" comment="Attribute Set ID"/>
+        <column xsi:type="varchar" name="type_id" nullable="false" length="32" default="simple" comment="Type ID"/>
+        <column xsi:type="varchar" name="sku" nullable="true" length="64" comment="SKU"/>
+        <column xsi:type="smallint" name="has_options" padding="6" unsigned="false" nullable="false" identity="false"
+                default="0" comment="Has Options"/>
+        <column xsi:type="smallint" name="required_options" padding="5" unsigned="true" nullable="false"
+                identity="false" default="0" comment="Required Options"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Creation Time"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Update Time"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <index referenceId="CATALOG_PRODUCT_ENTITY_ATTRIBUTE_SET_ID" indexType="btree">
+            <column name="attribute_set_id"/>
+        </index>
+        <index referenceId="CATALOG_PRODUCT_ENTITY_SKU" indexType="btree">
+            <column name="sku"/>
+        </index>
+    </table>
+    <table name="catalog_category_entity" resource="default" engine="innodb" comment="Catalog Category Table">
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="true"
+                comment="Entity ID"/>
+        <column xsi:type="smallint" name="attribute_set_id" padding="5" unsigned="true" nullable="false"
+                identity="false" default="0" comment="Attribute Set ID"/>
+        <column xsi:type="int" name="parent_id" padding="10" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Parent Category ID"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Creation Time"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Update Time"/>
+        <column xsi:type="varchar" name="path" nullable="false" length="255" comment="Tree Path"/>
+        <column xsi:type="int" name="position" padding="11" unsigned="false" nullable="false" identity="false"
+                comment="Position"/>
+        <column xsi:type="int" name="level" padding="11" unsigned="false" nullable="false" identity="false" default="0"
+                comment="Tree Level"/>
+        <column xsi:type="int" name="children_count" padding="11" unsigned="false" nullable="false" identity="false"
+                comment="Child Count"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <index referenceId="CATALOG_CATEGORY_ENTITY_LEVEL" indexType="btree">
+            <column name="level"/>
+        </index>
+        <index referenceId="CATALOG_CATEGORY_ENTITY_PATH" indexType="btree">
+            <column name="path"/>
+        </index>
+    </table>
+</schema>
