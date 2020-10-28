@@ -76,7 +76,7 @@ public class PluginTargetLineMarkerProvider implements LineMarkerProvider {
     }
 
     private static class PluginClassCache {
-        private final HashMap<String, List<PhpClass>> pluginClassesMap =
+        private final HashMap<String, List<PhpClass>> pluginClassesMap = // NOPMD
                 new HashMap<>();
 
         private List<PhpClass> getTargetClassesForPlugin(
@@ -129,7 +129,7 @@ public class PluginTargetLineMarkerProvider implements LineMarkerProvider {
     private static class TargetClassesCollector implements Collector<PhpClass, PhpClass> {
         private final PluginTargetLineMarkerProvider.PluginClassCache pluginClassCache;
 
-        TargetClassesCollector(
+        TargetClassesCollector(// NOPMD
                 final PluginTargetLineMarkerProvider.PluginClassCache pluginClassCache
         ) {
             this.pluginClassCache = pluginClassCache;
@@ -144,7 +144,7 @@ public class PluginTargetLineMarkerProvider implements LineMarkerProvider {
     private static class TargetMethodsCollector implements Collector<Method, Method> {
         private final PluginTargetLineMarkerProvider.PluginClassCache pluginClassCache;
 
-        TargetMethodsCollector(
+        TargetMethodsCollector(// NOPMD
                 final PluginTargetLineMarkerProvider.PluginClassCache pluginClassCache
         ) {
             this.pluginClassCache = pluginClassCache;
