@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">widget_recently_viewed.recently_viewed_datasource</item>
+        </item>
+    </argument>
+    <settings>
+        <deps>
+            <dep>widget_recently_viewed.recently_viewed_datasource</dep>
+        </deps>
+        <spinner>widget_columns</spinner>
+    </settings>
+    <dataSource name="recently_viewed_datasource" component="Magento_Catalog/js/product/provider">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="productStorageConfig" xsi:type="array">
+                        <item name="namespace" xsi:type="string">product_data_storage</item>
+                        <item name="className" xsi:type="string">DataStorage</item>
+                        <item name="updateRequestConfig" xsi:type="array">
+                            <item name="url" xsi:type="serviceUrl" path="/products-render-info"/>
+                        </item>
+                    </item>
+                    <item name="identifiersConfig" xsi:type="array">
+                        <item name="namespace" xsi:type="string">recently_viewed_product</item>
+                    </item>
+                </item>
+            </argument>
+        </argument>
+        <dataProvider class="\Magento\Catalog\Ui\DataProvider\Product\Listing\DataProvider" name="recently_viewed_datasource">
+            <settings>
+                <requestFieldName/>
+                <primaryFieldName/>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <columns name="widget_columns" component="Magento_Catalog/js/product/list/listing" template="Magento_Catalog/product/list/listing">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="label" xsi:type="string" translate="true">Recently Viewed</item>
+                <item name="additionalClasses" xsi:type="string">widget block-viewed-products-grid</item>
+                <item name="listTemplate" xsi:type="string">Magento_Catalog/product/list/listing</item>
+            </item>
+        </argument>
+        <settings>
+            <displayMode>grid</displayMode>
+        </settings>
+        <column name="image" component="Magento_Catalog/js/product/list/columns/image" sortOrder="0" displayArea="general-area">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="imageCode" xsi:type="string">recently_viewed_products_grid_content_widget</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Image</label>
+                <bodyTmpl>Magento_Catalog/product/list/columns/image_with_borders</bodyTmpl>
+            </settings>
+        </column>
+    </columns>
+</listing>
