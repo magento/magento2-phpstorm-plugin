@@ -2,7 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
-package com.magento.idea.magento2plugin.linemarker.php;
+package com.magento.idea.magento2plugin.linemarker;
 
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerImpl;
@@ -12,10 +12,9 @@ import javax.swing.*;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.List;
 
-abstract public class LinemarkerPhpFixtureTestCase extends BaseProjectTestCase {
+abstract public class LinemarkerFixtureTestCase extends BaseProjectTestCase {
 
     private static final String testDataFolderPath = "testData" + File.separator + "linemarker" + File.separator;
-    private static final String fixturesFolderPath = "php" + File.separator;
 
     @Override
     protected void setUp() throws Exception {
@@ -23,8 +22,8 @@ abstract public class LinemarkerPhpFixtureTestCase extends BaseProjectTestCase {
         myFixture.setTestDataPath(testDataFolderPath);
     }
 
-    protected String getFixturePath(String fileName) {
-        return prepareFixturePath(fileName, fixturesFolderPath);
+    protected String getFixturePath(String fileName, String folder) {
+        return prepareFixturePath(fileName, folder + File.separator);
     }
 
     protected void assertHasLinemarkerWithTooltipAndIcon(String tooltip, String icon) {

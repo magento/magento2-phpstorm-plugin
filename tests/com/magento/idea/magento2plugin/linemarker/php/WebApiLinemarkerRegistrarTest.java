@@ -6,8 +6,9 @@ package com.magento.idea.magento2plugin.linemarker.php;
 
 import com.intellij.openapi.application.impl.ApplicationInfoImpl;
 import com.magento.idea.magento2plugin.MagentoIcons;
+import com.magento.idea.magento2plugin.linemarker.LinemarkerFixtureTestCase;
 
-public class WebApiLinemarkerRegistrarTest extends LinemarkerPhpFixtureTestCase {
+public class WebApiLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
 
     private static final String expectedClassLineMarkerTooltip =
         "Navigate to Web API configuration:<pre>  PUT     /V1/blog/post\n" +
@@ -26,7 +27,7 @@ public class WebApiLinemarkerRegistrarTest extends LinemarkerPhpFixtureTestCase 
      * Class configured as WEB API service in web_api.xml should have WEB API line markers
      */
     public void testWebApiServiceShouldHaveLinemarker() {
-        String filePath = this.getFixturePath("TestService.php");
+        String filePath = this.getFixturePath("TestService.php", "php");
 
         //work around for issue caused by com.magento.idea.magento2plugin.linemarker.xml.LineMarkerXmlTagDecorator
         //in com.intellij.psi.impl.smartPointers.SmartPsiElementPointerImpl.createElementInfo
@@ -50,7 +51,7 @@ public class WebApiLinemarkerRegistrarTest extends LinemarkerPhpFixtureTestCase 
      * Regular class should not have WEB API line markers
      */
     public void testRegularPhpClassShouldNotHaveLinemarker() {
-        String filePath = this.getFixturePath("ClassNotConfiguredInWebApiXml.php");
+        String filePath = this.getFixturePath("ClassNotConfiguredInWebApiXml.php", "php");
         myFixture.configureByFile(filePath);
 
         //assert class line marker
