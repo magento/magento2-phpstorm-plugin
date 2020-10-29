@@ -10,7 +10,7 @@ import com.magento.idea.magento2plugin.linemarker.LinemarkerFixtureTestCase;
 public class GraphQlResolverClassLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
 
     /**
-     * Tests linemarkers in the schema.graphqls file for PHP resolver classes
+     * Tests linemarkers in the schema.graphqls file for PHP resolver classes.
      */
     public void testWithValidSchemaResolver() {
         myFixture.configureByFile(this.getFixturePath("schema.graphqls", "graphqls"));

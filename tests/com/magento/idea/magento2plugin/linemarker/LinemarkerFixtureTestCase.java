@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.linemarker;
 
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
@@ -14,27 +15,26 @@ import java.util.List;
 
 abstract public class LinemarkerFixtureTestCase extends BaseProjectTestCase {
 
-    private static final String testDataFolderPath = "testData" + File.separator + "linemarker" + File.separator;
+    private static final String TEST_DATA_PATH = "testData" + File.separator + "linemarker" + File.separator;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        myFixture.setTestDataPath(testDataFolderPath);
+        myFixture.setTestDataPath(TEST_DATA_PATH);
     }
 
-    protected String getFixturePath(String fileName, String folder) {
+    protected String getFixturePath(final String fileName, final String folder) {
         return prepareFixturePath(fileName, folder + File.separator);
     }
 
-    protected void assertHasLinemarkerWithTooltipAndIcon(String tooltip, String icon) {
+    protected void assertHasLinemarkerWithTooltipAndIcon(final String tooltip, final String icon) {
         myFixture.doHighlighting();
-        String lineMarkerNotFound = "Failed that documents contains linemarker with the tooltip `%s`";
 
-        List<LineMarkerInfo<?>> lineMarkers = getDocumentLineMarkers();
+        final List<LineMarkerInfo<?>> lineMarkers = getDocumentLineMarkers();
         assertNotEmpty(lineMarkers);
-        for (LineMarkerInfo lineMarkerInfo: lineMarkers) {
-            String lineMarkerTooltip = lineMarkerInfo.getLineMarkerTooltip();
-            Icon lineMarkerIcon = lineMarkerInfo.getIcon();
+        for (final LineMarkerInfo lineMarkerInfo: lineMarkers) {
+            final String lineMarkerTooltip = lineMarkerInfo.getLineMarkerTooltip();
+            final Icon lineMarkerIcon = lineMarkerInfo.getIcon();
             if (lineMarkerTooltip == null || lineMarkerIcon == null) {
                 continue;
             }
@@ -44,18 +44,19 @@ abstract public class LinemarkerFixtureTestCase extends BaseProjectTestCase {
             }
         }
 
+        final String lineMarkerNotFound = "Failed that documents contains linemarker with the tooltip `%s`";
         fail(String.format(lineMarkerNotFound, tooltip));
     }
 
-    protected void assertHasNoLinemarkerWithTooltipAndIcon(String tooltip, String icon) {
+    protected void assertHasNoLinemarkerWithTooltipAndIcon(final String tooltip, final String icon) {
         myFixture.doHighlighting();
-        String lineMarkerExist = "Failed that documents not contains linemarker with the tooltip `%s`";
+        final String lineMarkerExist = "Failed that documents not contains linemarker with the tooltip `%s`";
 
-        List<LineMarkerInfo<?>> lineMarkers = getDocumentLineMarkers();
+        final List<LineMarkerInfo<?>> lineMarkers = getDocumentLineMarkers();
         assertNotEmpty(lineMarkers);
-        for (LineMarkerInfo lineMarkerInfo: lineMarkers) {
-            String lineMarkerTooltip = lineMarkerInfo.getLineMarkerTooltip();
-            Icon lineMarkerIcon = lineMarkerInfo.getIcon();
+        for (final LineMarkerInfo lineMarkerInfo: lineMarkers) {
+            final String lineMarkerTooltip = lineMarkerInfo.getLineMarkerTooltip();
+            final Icon lineMarkerIcon = lineMarkerInfo.getIcon();
             if (lineMarkerTooltip == null || lineMarkerIcon == null) {
                 continue;
             }
