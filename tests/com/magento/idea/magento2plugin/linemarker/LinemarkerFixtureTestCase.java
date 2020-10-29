@@ -8,14 +8,15 @@ package com.magento.idea.magento2plugin.linemarker;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerImpl;
 import com.magento.idea.magento2plugin.BaseProjectTestCase;
-import org.jetbrains.annotations.NotNull;
-import javax.swing.*;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.List;
+import javax.swing.Icon;
+import org.jetbrains.annotations.NotNull;
 
-abstract public class LinemarkerFixtureTestCase extends BaseProjectTestCase {
+public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
 
-    private static final String TEST_DATA_PATH = "testData" + File.separator + "linemarker" + File.separator;
+    private static final String TEST_DATA_PATH
+            = "testData" + File.separator + "linemarker" + File.separator;
 
     @Override
     protected void setUp() throws Exception {
@@ -38,19 +39,24 @@ abstract public class LinemarkerFixtureTestCase extends BaseProjectTestCase {
             if (lineMarkerTooltip == null || lineMarkerIcon == null) {
                 continue;
             }
-            if (lineMarkerTooltip.equals(tooltip) &&
-                    lineMarkerIcon.toString().equals(icon)) {
+            if (lineMarkerTooltip.equals(tooltip)
+                    && lineMarkerIcon.toString().equals(icon)) {
                 return;
             }
         }
 
-        final String lineMarkerNotFound = "Failed that documents contains linemarker with the tooltip `%s`";
+        final String lineMarkerNotFound
+                = "Failed that documents contains linemarker with the tooltip `%s`";
         fail(String.format(lineMarkerNotFound, tooltip));
     }
 
-    protected void assertHasNoLinemarkerWithTooltipAndIcon(final String tooltip, final String icon) {
+    protected void assertHasNoLinemarkerWithTooltipAndIcon(
+            final String tooltip,
+            final String icon
+    ) {
         myFixture.doHighlighting();
-        final String lineMarkerExist = "Failed that documents not contains linemarker with the tooltip `%s`";
+        final String lineMarkerExist
+                = "Failed that documents not contains linemarker with the tooltip `%s`";
 
         final List<LineMarkerInfo<?>> lineMarkers = getDocumentLineMarkers();
         assertNotEmpty(lineMarkers);
@@ -60,8 +66,8 @@ abstract public class LinemarkerFixtureTestCase extends BaseProjectTestCase {
             if (lineMarkerTooltip == null || lineMarkerIcon == null) {
                 continue;
             }
-            if (lineMarkerTooltip.equals(tooltip) &&
-                    lineMarkerIcon.toString().equals(icon)) {
+            if (lineMarkerTooltip.equals(tooltip)
+                    && lineMarkerIcon.toString().equals(icon)) {
                 fail(String.format(lineMarkerExist, tooltip));
             }
         }
@@ -69,6 +75,9 @@ abstract public class LinemarkerFixtureTestCase extends BaseProjectTestCase {
 
     @NotNull
     private List<LineMarkerInfo<?>> getDocumentLineMarkers() {
-        return DaemonCodeAnalyzerImpl.getLineMarkers(myFixture.getEditor().getDocument(), getProject());
+        return DaemonCodeAnalyzerImpl.getLineMarkers(
+                myFixture.getEditor().getDocument(),
+                getProject()
+        );
     }
 }
