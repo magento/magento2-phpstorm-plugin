@@ -9,7 +9,7 @@ package com.magento.idea.magento2plugin.linemarker.php;
 public class PluginTargetLinemarkerRegistrarTest extends LinemarkerPhpFixtureTestCase {
 
     /**
-     * Tests linemarkers in a class which plugs in to a class and its method
+     * Tests linemarkers in a class which plugs in to a class and its method.
      */
     public void testPluginToClassShouldHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("Topmenu.php"));
@@ -19,7 +19,7 @@ public class PluginTargetLinemarkerRegistrarTest extends LinemarkerPhpFixtureTes
     }
 
     /**
-     * Tests linemarkers in a class which plugs in to an interface and its method
+     * Tests linemarkers in a class which plugs in to an interface and its method.
      */
     public void testPluginToInterfaceShouldHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("MviewState.php"));
@@ -29,7 +29,7 @@ public class PluginTargetLinemarkerRegistrarTest extends LinemarkerPhpFixtureTes
     }
 
     /**
-     * Tests linemarkers in a regular class which does not plug in to any class or interface
+     * Tests linemarkers in a regular class which does not plug in to any class or interface.
      */
     public void testRegularClassShouldNotHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("ClassNotConfiguredInDiXml.php"));
