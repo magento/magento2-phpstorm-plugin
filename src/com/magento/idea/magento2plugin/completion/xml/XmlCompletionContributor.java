@@ -7,12 +7,17 @@ package com.magento.idea.magento2plugin.completion.xml;
 
 import com.intellij.codeInsight.completion.CompletionContributor;
 import com.intellij.codeInsight.completion.CompletionType;
+import com.intellij.patterns.PatternCondition;
 import com.intellij.patterns.XmlPatterns;
+import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlTokenType;
 // CHECKSTYLE IGNORE check FOR NEXT 6 LINES
+import com.intellij.util.ProcessingContext;
 import com.magento.idea.magento2plugin.completion.provider.*;//NOPMD
 import com.magento.idea.magento2plugin.completion.provider.mftf.*;//NOPMD
 import com.magento.idea.magento2plugin.magento.files.*;//NOPMD
+import org.jetbrains.annotations.NotNull;
+
 import static com.intellij.patterns.PlatformPatterns.psiElement;
 import static com.intellij.patterns.StandardPatterns.string;
 import static com.intellij.patterns.XmlPatterns.xmlFile;
@@ -282,8 +287,15 @@ public class XmlCompletionContributor extends CompletionContributor {
         // mftf data entity completion contributor
         extend(
             CompletionType.BASIC,
-            psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
-                .inside(XmlPatterns.xmlAttribute().withName(string().oneOf("entity", "value", "userInput"))
+            psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN).inside(XmlPatterns.xmlAttribute()
+                .withName(string().oneOf("entity", "value", "userInput"))
+                .without(new PatternCondition<XmlAttribute>("value attribute of general text tag") {
+                    @Override
+                    public boolean accepts(@NotNull XmlAttribute attribute, ProcessingContext context) {
+                        final String tagName = attribute.getParent().getName();
+                        return tagName.matches("stories|title|description");
+                    }
+                })
             ),
             new DataCompletionProvider()
         );
