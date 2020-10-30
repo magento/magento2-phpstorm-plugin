@@ -81,6 +81,7 @@ public class NewBlockDialog extends AbstractDialog {
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(final WindowEvent event) {
                 onCancel();
             }

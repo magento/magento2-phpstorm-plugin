@@ -34,6 +34,7 @@ public class OverrideInThemeAction extends DumbAwareAction {
      *
      * @param event AnActionEvent
      */
+    @Override
     public void update(final @NotNull AnActionEvent event) {
         boolean status = false;
         final Project project = event.getData(PlatformDataKeys.PROJECT);

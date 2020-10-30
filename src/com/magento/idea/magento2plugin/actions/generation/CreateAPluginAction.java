@@ -23,9 +23,9 @@ import org.jetbrains.annotations.NotNull;
 import com.magento.idea.magento2plugin.project.Settings;
 
 public class CreateAPluginAction extends DumbAwareAction {
-    public static String ACTION_NAME = "Create a new Plugin for this method";
-    public static String ACTION_DESCRIPTION = "Create a new Magento 2 Plugin";
-    private final IsPluginAllowedForMethod isPluginAllowed;
+    public static final String ACTION_NAME = "Create a new Plugin for this method";
+    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Plugin";
+    private final IsPluginAllowedForMethod isPluginAllowed;// NOPMD
     private final GetFirstClassOfFile getFirstClassOfFile;
     private Method targetMethod;
     private PhpClass targetClass;
@@ -36,18 +36,19 @@ public class CreateAPluginAction extends DumbAwareAction {
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
     }
 
-    public void update(AnActionEvent event) {
-        targetClass = null;
-        targetMethod = null;
-        Project project = event.getData(PlatformDataKeys.PROJECT);
+    @Override
+    public void update(final AnActionEvent event) {
+        targetClass = null;// NOPMD
+        targetMethod = null;// NOPMD
+        final Project project = event.getData(PlatformDataKeys.PROJECT);
         if (Settings.isEnabled(project)) {
-            Pair<PsiFile, PhpClass> pair = this.findPhpClass(event);
-            PsiFile psiFile = pair.getFirst();
-            PhpClass phpClass = pair.getSecond();
-         if ((phpClass == null || psiFile == null)
-            || !(psiFile instanceof PhpFile) 
-            || phpClass.isFinal() 
-            || this.targetMethod == null
+            final Pair<PsiFile, PhpClass> pair = this.findPhpClass(event);
+            final PsiFile psiFile = pair.getFirst();
+            final PhpClass phpClass = pair.getSecond();
+            if (phpClass == null
+                || !(psiFile instanceof PhpFile)
+                || phpClass.isFinal()
+                || this.targetMethod == null
             ) {
                 this.setStatus(event, false);
                 return;
@@ -60,14 +61,14 @@ public class CreateAPluginAction extends DumbAwareAction {
         this.setStatus(event, false);
     }
 
-    private void setStatus(AnActionEvent event, boolean status) {
+    private void setStatus(final AnActionEvent event, final boolean status) {
         event.getPresentation().setVisible(status);
         event.getPresentation().setEnabled(status);
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        CreateAPluginDialog.open(e.getProject(), this.targetMethod, this.targetClass);
+    public void actionPerformed(@NotNull final AnActionEvent event) {
+        CreateAPluginDialog.open(event.getProject(), this.targetMethod, this.targetClass);
     }
 
     @Override
@@ -75,8 +76,8 @@ public class CreateAPluginAction extends DumbAwareAction {
         return false;
     }
 
-    private Pair<PsiFile, PhpClass> findPhpClass(@NotNull AnActionEvent event) {
-        PsiFile psiFile = event.getData(PlatformDataKeys.PSI_FILE);
+    private Pair<PsiFile, PhpClass> findPhpClass(@NotNull final AnActionEvent event) {
+        final PsiFile psiFile = event.getData(PlatformDataKeys.PSI_FILE);
 
         PhpClass phpClass = null;
         if (psiFile instanceof PhpFile) {
@@ -87,23 +88,23 @@ public class CreateAPluginAction extends DumbAwareAction {
         return Pair.create(psiFile, phpClass);
     }
 
-    private void fetchTargetMethod(@NotNull AnActionEvent event, PsiFile psiFile, PhpClass phpClass) {
-        Caret caret = event.getData(PlatformDataKeys.CARET);
+    private void fetchTargetMethod(@NotNull final AnActionEvent event, final PsiFile psiFile, final PhpClass phpClass) {
+        final Caret caret = event.getData(PlatformDataKeys.CARET);
         if (caret == null) {
             return;
         }
-        int offset = caret.getOffset();
-        PsiElement element = psiFile.findElementAt(offset);
+        final int offset = caret.getOffset();
+        final PsiElement element = psiFile.findElementAt(offset);
         if (element == null) {
             return;
         }
-        if (element instanceof Method && element.getParent() == phpClass && isPluginAllowed.check((Method)element)) {
-            this.targetMethod = (Method)element;
+        if (element instanceof Method && element.getParent() == phpClass && isPluginAllowed.check((Method) element)) {
+            this.targetMethod = (Method) element;
             return;
         }
-        PsiElement parent = element.getParent();
-        if (parent instanceof Method && parent.getParent() == phpClass && isPluginAllowed.check((Method)parent)) {
-            this.targetMethod = (Method)parent;
+        final PsiElement parent = element.getParent();
+        if (parent instanceof Method && parent.getParent() == phpClass && isPluginAllowed.check((Method) parent)) {
+            this.targetMethod = (Method) parent;
         }
     }
 }

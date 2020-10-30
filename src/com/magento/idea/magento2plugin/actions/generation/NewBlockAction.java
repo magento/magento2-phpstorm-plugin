@@ -13,27 +13,27 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.NewBlockDialog;
 import org.jetbrains.annotations.NotNull;
 
 public class NewBlockAction extends AnAction {
-    public static String ACTION_NAME = "Magento 2 Block";
-    public static String ACTION_DESCRIPTION = "Create a new Magento 2 Block";
+    public static final String ACTION_NAME = "Magento 2 Block";
+    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Block";
 
-    NewBlockAction() {
+    public NewBlockAction() {
         super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        DataContext dataContext = e.getDataContext();
-        IdeView view = LangDataKeys.IDE_VIEW.getData(dataContext);
+    public void actionPerformed(@NotNull final AnActionEvent event) {
+        final DataContext dataContext = event.getDataContext();
+        final IdeView view = LangDataKeys.IDE_VIEW.getData(dataContext);
         if (view == null) {
             return;
         }
 
-        Project project = CommonDataKeys.PROJECT.getData(dataContext);
+        final Project project = CommonDataKeys.PROJECT.getData(dataContext);
         if (project == null) {
             return;
         }
 
-        PsiDirectory directory = view.getOrChooseDirectory();
+        final PsiDirectory directory = view.getOrChooseDirectory();
         if (directory == null) {
             return;
         }

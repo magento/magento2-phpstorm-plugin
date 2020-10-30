@@ -63,6 +63,7 @@ public class OverrideInThemeDialog extends AbstractDialog {
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(final WindowEvent event) {
                 onCancel();
             }

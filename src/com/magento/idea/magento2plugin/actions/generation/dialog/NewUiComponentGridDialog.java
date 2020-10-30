@@ -294,6 +294,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         );
     }
 
+    @Override
     protected void onCancel() {
         dispose();
     }

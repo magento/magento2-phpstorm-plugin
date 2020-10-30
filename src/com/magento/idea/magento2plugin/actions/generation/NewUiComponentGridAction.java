@@ -33,6 +33,7 @@ public class NewUiComponentGridAction extends AnAction {
      *
      * @param event Action event
      */
+    @Override
     public void actionPerformed(final AnActionEvent event) {
         final DataContext dataContext = event.getDataContext();
         final IdeView view = LangDataKeys.IDE_VIEW.getData(dataContext);
