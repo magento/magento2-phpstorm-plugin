@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -17,10 +18,10 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.CreateAPluginDialog;
+import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.magento.plugin.IsPluginAllowedForMethod;
 import org.jetbrains.annotations.NotNull;
-import com.magento.idea.magento2plugin.project.Settings;
 
 public class CreateAPluginAction extends DumbAwareAction {
     public static final String ACTION_NAME = "Create a new Plugin for this method";
@@ -30,12 +31,18 @@ public class CreateAPluginAction extends DumbAwareAction {
     private Method targetMethod;
     private PhpClass targetClass;
 
+    /**
+     * Constructor.
+     */
     public CreateAPluginAction() {
         super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
         this.isPluginAllowed = IsPluginAllowedForMethod.getInstance();
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
     }
 
+    /**
+     * Updates the state of action.
+     */
     @Override
     public void update(final AnActionEvent event) {
         targetClass = null;// NOPMD
@@ -46,9 +53,9 @@ public class CreateAPluginAction extends DumbAwareAction {
             final PsiFile psiFile = pair.getFirst();
             final PhpClass phpClass = pair.getSecond();
             if (phpClass == null
-                || !(psiFile instanceof PhpFile)
-                || phpClass.isFinal()
-                || this.targetMethod == null
+                    || !(psiFile instanceof PhpFile)
+                    || phpClass.isFinal()
+                    || this.targetMethod == null
             ) {
                 this.setStatus(event, false);
                 return;
@@ -88,7 +95,11 @@ public class CreateAPluginAction extends DumbAwareAction {
         return Pair.create(psiFile, phpClass);
     }
 
-    private void fetchTargetMethod(@NotNull final AnActionEvent event, final PsiFile psiFile, final PhpClass phpClass) {
+    private void fetchTargetMethod(
+            @NotNull final AnActionEvent event,
+            final PsiFile psiFile,
+            final PhpClass phpClass
+    ) {
         final Caret caret = event.getData(PlatformDataKeys.CARET);
         if (caret == null) {
             return;
@@ -98,12 +109,14 @@ public class CreateAPluginAction extends DumbAwareAction {
         if (element == null) {
             return;
         }
-        if (element instanceof Method && element.getParent() == phpClass && isPluginAllowed.check((Method) element)) {
+        if (element instanceof Method && element.getParent()
+                == phpClass && isPluginAllowed.check((Method) element)) {
             this.targetMethod = (Method) element;
             return;
         }
         final PsiElement parent = element.getParent();
-        if (parent instanceof Method && parent.getParent() == phpClass && isPluginAllowed.check((Method) parent)) {
+        if (parent instanceof Method && parent.getParent()
+                == phpClass && isPluginAllowed.check((Method) parent)) {
             this.targetMethod = (Method) parent;
         }
     }

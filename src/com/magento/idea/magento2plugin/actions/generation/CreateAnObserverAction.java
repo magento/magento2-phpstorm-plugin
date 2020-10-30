@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation;
 
 import com.intellij.lang.ASTNode;
@@ -35,6 +36,9 @@ public class CreateAnObserverAction extends DumbAwareAction {
         super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
     }
 
+    /**
+     * Updates the state of action.
+     */
     @Override
     public void update(final AnActionEvent event) {
         final Project project = event.getData(PlatformDataKeys.PROJECT);
@@ -78,10 +82,12 @@ public class CreateAnObserverAction extends DumbAwareAction {
     }
 
     private boolean isObserverEventNameClicked(@NotNull final PsiElement element) {
-        return checkIsElementStringLiteral(element) &&
-                checkIsParametersList(element.getParent().getParent()) &&
-                checkIsMethodReference(element.getParent().getParent().getParent()) &&
-                checkIsEventDispatchMethod((MethodReference) element.getParent().getParent().getParent());
+        return checkIsElementStringLiteral(element)
+                && checkIsParametersList(element.getParent().getParent())
+                && checkIsMethodReference(element.getParent().getParent().getParent())
+                && checkIsEventDispatchMethod(
+                        (MethodReference) element.getParent().getParent().getParent()
+                );
     }
 
     private boolean checkIsParametersList(@NotNull final PsiElement element) {
@@ -119,7 +125,8 @@ public class CreateAnObserverAction extends DumbAwareAction {
         }
         final IElementType elementType = astNode.getElementType();
 
-        return elementType == PhpTokenTypes.STRING_LITERAL || elementType == PhpTokenTypes.STRING_LITERAL_SINGLE_QUOTE;
+        return elementType == PhpTokenTypes.STRING_LITERAL
+                || elementType == PhpTokenTypes.STRING_LITERAL_SINGLE_QUOTE;
     }
 
     private void setStatus(final AnActionEvent event, final boolean status) {
