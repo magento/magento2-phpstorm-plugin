@@ -121,6 +121,7 @@ public class CreateAPluginDialog extends AbstractDialog {
 
         setContentPane(contentPane);
         setModal(true);
+        setTitle(CreateAPluginAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
         fillPluginTypeOptions();
         fillTargetAreaOptions();

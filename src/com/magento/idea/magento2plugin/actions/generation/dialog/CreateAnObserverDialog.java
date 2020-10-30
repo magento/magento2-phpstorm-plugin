@@ -100,6 +100,7 @@ public class CreateAnObserverDialog extends AbstractDialog {
 
         setContentPane(contentPane);
         setModal(true);
+        setTitle(CreateAnObserverAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
         fillTargetAreaOptions();
 

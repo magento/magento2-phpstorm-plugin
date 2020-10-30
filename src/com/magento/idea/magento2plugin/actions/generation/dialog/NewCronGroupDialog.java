@@ -76,6 +76,7 @@ public class NewCronGroupDialog extends AbstractDialog {
         this.project = project;
         setContentPane(contentPanel);
         setModal(true);
+        setTitle(NewCronGroupAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 

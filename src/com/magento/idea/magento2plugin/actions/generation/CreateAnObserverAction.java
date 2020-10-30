@@ -27,8 +27,8 @@ import com.magento.idea.magento2plugin.project.Settings;
 import org.jetbrains.annotations.NotNull;
 
 public class CreateAnObserverAction extends DumbAwareAction {
-    public static final String ACTION_NAME = "Create a Magento Observer...";
-    static final String ACTION_DESCRIPTION = "Create a new Magento 2 Observer for the event";
+    public static final String ACTION_NAME = "Create a new Observer for this event";
+    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Observer";
     public String targetEvent;
 
     public CreateAnObserverAction() {

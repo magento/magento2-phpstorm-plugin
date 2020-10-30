@@ -71,7 +71,7 @@ public class NewBlockDialog extends AbstractDialog {
 
         setContentPane(contentPanel);
         setModal(true);
-        setTitle("Create a new Magento 2 block..");
+        setTitle(NewBlockAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
         suggestBlockDirectory();
 

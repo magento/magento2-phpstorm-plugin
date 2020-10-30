@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class NewBlockAction extends AnAction {
     public static String ACTION_NAME = "Magento 2 Block";
-    public static String ACTION_DESCRIPTION = "Create a new Magento 2 block";
+    public static String ACTION_DESCRIPTION = "Create a new Magento 2 Block";
 
     NewBlockAction() {
         super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);

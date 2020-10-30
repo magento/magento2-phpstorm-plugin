@@ -21,8 +21,8 @@ import com.magento.idea.magento2plugin.util.magento.GetComponentTypeByNameUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class OverrideInThemeAction extends DumbAwareAction {
-    public static String actionName = "Override in theme...";
-    public static String actionDescription = "Override template in project theme.";
+    public static String actionName = "Override this template in a project theme";
+    public static String actionDescription = "Override in project theme";
     private PsiFile psiFile;
 
     public OverrideInThemeAction() {

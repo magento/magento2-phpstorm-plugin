@@ -19,8 +19,8 @@ import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import org.jetbrains.annotations.NotNull;
 
 public class OverrideClassByAPreferenceAction extends DumbAwareAction {
-    public static String ACTION_NAME = "Override Class By a Preference...";
-    public static String ACTION_DESCRIPTION = "Create a new Magento 2 preference for the class";
+    public static String ACTION_NAME = "Override this class by a new Preference";
+    public static String ACTION_DESCRIPTION = "Create a new Magento 2 Preference";
     private final GetFirstClassOfFile getFirstClassOfFile;
     private PhpClass targetClass;
 

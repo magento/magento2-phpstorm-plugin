@@ -84,6 +84,7 @@ public class NewControllerDialog extends AbstractDialog {
 
         setContentPane(contentPane);
         setModal(true);
+        setTitle(NewControllerAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
         suggestControllerDirectory();
         controllerAreaSelect.addActionListener(e -> suggestControllerDirectory());

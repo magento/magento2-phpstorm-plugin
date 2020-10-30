@@ -23,8 +23,8 @@ import org.jetbrains.annotations.NotNull;
 import com.magento.idea.magento2plugin.project.Settings;
 
 public class CreateAPluginAction extends DumbAwareAction {
-    public static String ACTION_NAME = "Create a Plugin...";
-    public static String ACTION_DESCRIPTION = "Create a new Magento 2 plugin for the class";
+    public static String ACTION_NAME = "Create a new Plugin for this method";
+    public static String ACTION_DESCRIPTION = "Create a new Magento 2 Plugin";
     private final IsPluginAllowedForMethod isPluginAllowed;
     private final GetFirstClassOfFile getFirstClassOfFile;
     private Method targetMethod;
