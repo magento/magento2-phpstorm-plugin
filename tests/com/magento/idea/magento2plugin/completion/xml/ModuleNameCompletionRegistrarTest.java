@@ -6,7 +6,7 @@
 package com.magento.idea.magento2plugin.completion.xml;
 
 public class ModuleNameCompletionRegistrarTest extends CompletionXmlFixtureTestCase {
-    private static final String[] LOOKUP_MODULE_NAMES = new String[] {
+    private static final String[] LOOKUP_MODULE_NAMES = {
             "Magento_Catalog",
             "Magento_Config"
     };

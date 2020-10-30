@@ -118,7 +118,7 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
         for (final PsiReference psiReference : getElementFromCaret().getReferences()) {
             final PsiElement resolvedElement = psiReference.resolve();
             if (resolvedElement instanceof PsiDirectoryImpl
-                && ((PsiDirectoryImpl) resolvedElement).getName().equals(directoryName)) {
+                    && ((PsiDirectoryImpl) resolvedElement).getName().equals(directoryName)) {
                 return;
             }
         }
