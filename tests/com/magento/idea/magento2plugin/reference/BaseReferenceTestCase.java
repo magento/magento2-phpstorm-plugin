@@ -9,6 +9,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveResult;
+import com.intellij.psi.impl.file.PsiDirectoryImpl;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
@@ -111,6 +112,20 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
                 = "Failed that element contains reference to the XML tag `%s`";
 
         fail(String.format(referenceNotFound, fileName));
+    }
+
+    protected void assertHasReferenceToDirectory(final String directoryName) {
+        for (final PsiReference psiReference : getElementFromCaret().getReferences()) {
+            final PsiElement resolvedElement = psiReference.resolve();
+            if (resolvedElement instanceof PsiDirectoryImpl
+                    && ((PsiDirectoryImpl) resolvedElement).getName().equals(directoryName)) {
+                return;
+            }
+        }
+
+        final String referenceNotFound
+                = "Failed that element contains reference to the directory `%s`";
+        fail(String.format(referenceNotFound, directoryName));
     }
 
     @SuppressWarnings("PMD")
