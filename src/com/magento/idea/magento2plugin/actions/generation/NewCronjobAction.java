@@ -19,8 +19,8 @@ import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({"PMD.FieldNamingConventions", "PMD.OnlyOneReturn"})
 public class NewCronjobAction extends AnAction {
-    public static String ACTION_NAME = "Magento 2 Cronjob";
-    public static String ACTION_DESCRIPTION = "Create a new Magento 2 cronjob";
+    public static String ACTION_NAME = "Magento 2 Cron Job";
+    public static String ACTION_DESCRIPTION = "Create a new Magento 2 Cron Job";
 
     public NewCronjobAction() {
         super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);

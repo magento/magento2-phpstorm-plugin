@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
+import com.magento.idea.magento2plugin.actions.generation.OverrideInThemeAction;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
@@ -53,6 +54,7 @@ public class OverrideInThemeDialog extends AbstractDialog {
 
         setContentPane(contentPane);
         setModal(true);
+        setTitle(OverrideInThemeAction.actionDescription);
         getRootPane().setDefaultButton(buttonOK);
         fillThemeOptions();
 
@@ -61,6 +63,7 @@ public class OverrideInThemeDialog extends AbstractDialog {
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(final WindowEvent event) {
                 onCancel();
             }
