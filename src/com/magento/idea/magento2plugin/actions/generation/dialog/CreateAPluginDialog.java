@@ -121,6 +121,7 @@ public class CreateAPluginDialog extends AbstractDialog {
 
         setContentPane(contentPane);
         setModal(true);
+        setTitle(CreateAPluginAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
         fillPluginTypeOptions();
         fillTargetAreaOptions();
@@ -130,6 +131,7 @@ public class CreateAPluginDialog extends AbstractDialog {
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(final WindowEvent event) {
                 onCancel();
             }

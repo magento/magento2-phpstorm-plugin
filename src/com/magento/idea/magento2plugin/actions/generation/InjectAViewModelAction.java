@@ -22,8 +22,8 @@ import com.magento.idea.magento2plugin.project.Settings;
 import org.jetbrains.annotations.NotNull;
 
 public class InjectAViewModelAction extends DumbAwareAction {
-    public static String actionName = "Inject a View Model...";
-    public static String actionDescription = "Inject a View Model as an argument of block";
+    public static String actionName = "Inject a new View Model for this block";
+    public static String actionDescription = "Inject a new Magento 2 View Model";
     private XmlTag targetXmlTag;
 
     public InjectAViewModelAction() {

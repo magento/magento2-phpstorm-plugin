@@ -126,7 +126,7 @@ public class NewCronjobDialog extends AbstractDialog {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
-        setTitle("Create a new Magento 2 cronjob..");
+        setTitle(NewCronjobAction.ACTION_DESCRIPTION);
         configPathField.setEditable(false);
 
         buttonOK.addActionListener(e -> onOK());
