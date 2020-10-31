@@ -104,6 +104,7 @@ public class InjectAViewModelDialog extends AbstractDialog {
 
         setContentPane(contentPane);
         setModal(true);
+        setTitle(InjectAViewModelAction.actionDescription);
         getRootPane().setDefaultButton(buttonOK);
 
         buttonOK.addActionListener((final ActionEvent event) -> onOK());

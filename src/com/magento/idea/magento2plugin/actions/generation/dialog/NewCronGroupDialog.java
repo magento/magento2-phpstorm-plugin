@@ -76,6 +76,7 @@ public class NewCronGroupDialog extends AbstractDialog {
         this.project = project;
         setContentPane(contentPanel);
         setModal(true);
+        setTitle(NewCronGroupAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
@@ -87,6 +88,7 @@ public class NewCronGroupDialog extends AbstractDialog {
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(final WindowEvent event) {
                 onCancel();
             }

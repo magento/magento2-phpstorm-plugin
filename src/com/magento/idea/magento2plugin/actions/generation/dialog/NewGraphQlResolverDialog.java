@@ -67,7 +67,7 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
 
         setContentPane(contentPanel);
         setModal(true);
-        setTitle("Create a new Magento 2 GraphQL Resolver.");
+        setTitle(NewGraphQlResolverAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
         suggestGraphQlResolverDirectory();
 
@@ -77,6 +77,7 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(final WindowEvent event) {
                 onCancel();
             }

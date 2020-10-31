@@ -101,6 +101,7 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
 
         setContentPane(contentPane);
         setModal(true);
+        setTitle(OverrideClassByAPreferenceAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
         fillTargetAreaOptions();
         if (targetClass.isFinal()) {
