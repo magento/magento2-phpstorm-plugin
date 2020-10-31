@@ -75,7 +75,7 @@ public class NewViewModelDialog extends AbstractDialog {
 
         setContentPane(contentPanel);
         setModal(true);
-        setTitle("Create a new Magento 2 View Model.");
+        setTitle(NewViewModelAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
         suggestViewModelDirectory();
 
