@@ -369,6 +369,18 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
             new TableColumnNamesReferenceProvider()
         );
 
+        // <plugin name="pluginName" disabled="true" /> in di.xml
+        registrar.registerReferenceProvider(
+            XmlPatterns.xmlAttributeValue().withParent(
+                XmlPatterns.xmlAttribute().withName("name").withParent(
+                    XmlPatterns.xmlTag().withName("plugin").withChild(
+                        XmlPatterns.xmlAttribute().withName("disabled")
+                    )
+                )
+            ).inFile(xmlFile().withName(string().endsWith("di.xml"))),
+            new PluginReferenceProvider()
+        );
+
         registerReferenceForDifferentNesting(registrar);
     }
 
