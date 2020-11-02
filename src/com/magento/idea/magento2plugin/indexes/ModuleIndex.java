@@ -53,7 +53,7 @@ public final class ModuleIndex {
     }
 
     public List<String> getEditableThemeNames() {
-        return getThemeNames("/" + Package.vendor + "/|/tests/|/test/", true);
+        return getThemeNames("/" + Package.vendor + "/magento/|/tests/|/test/", true);
     }
 
     public List<String> getModuleNames() {
