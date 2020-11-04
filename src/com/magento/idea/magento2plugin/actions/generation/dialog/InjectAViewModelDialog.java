@@ -13,7 +13,7 @@ import com.magento.idea.magento2plugin.actions.generation.InjectAViewModelAction
 import com.magento.idea.magento2plugin.actions.generation.data.ViewModelFileData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericWithUnderscoreRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
@@ -73,8 +73,8 @@ public class InjectAViewModelDialog extends AbstractDialog {
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, ARGUMENT_NAME})
-    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC,
-            message = {AlphanumericRule.MESSAGE, ARGUMENT_NAME})
+    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC_WITH_UNDERSCORE,
+            message = {AlphanumericWithUnderscoreRule.MESSAGE, ARGUMENT_NAME})
     private JTextField viewModelArgumentName;
 
     /**
