@@ -16,17 +16,16 @@ import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.ProcessingContext;
 import com.magento.idea.magento2plugin.indexes.PluginIndex;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 public class PluginReferenceProvider extends PsiReferenceProvider {
     @Override
     public @NotNull PsiReference[] getReferencesByElement(
-        @NotNull final PsiElement element,
-        @NotNull final ProcessingContext context
+            @NotNull final PsiElement element,
+            @NotNull final ProcessingContext context
     ) {
         final List<PsiReference> psiReferences = new ArrayList<>();
         final Project project = element.getProject();
@@ -38,10 +37,10 @@ public class PluginReferenceProvider extends PsiReferenceProvider {
         final String originalTypeName = originalTypeTag.getAttribute("name").getValue();
 
         final Collection<PsiElement> types = PluginIndex.getInstance(project).getPluginElements(
-            originalTypeName,
-            GlobalSearchScope.getScopeRestrictedByFileTypes(
-                GlobalSearchScope.allScope(project), XmlFileType.INSTANCE
-            )
+                originalTypeName,
+                GlobalSearchScope.getScopeRestrictedByFileTypes(
+                        GlobalSearchScope.allScope(project), XmlFileType.INSTANCE
+                )
         );
 
         for (final PsiElement type: types) {
