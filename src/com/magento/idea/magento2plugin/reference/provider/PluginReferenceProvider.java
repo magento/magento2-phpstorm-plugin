@@ -12,6 +12,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceProvider;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.ProcessingContext;
 import com.magento.idea.magento2plugin.indexes.PluginIndex;
@@ -47,9 +48,9 @@ public class PluginReferenceProvider extends PsiReferenceProvider {
             final XmlTag typeTag = (XmlTag) type.getParent().getParent();
             final XmlTag[] pluginTags = typeTag.findSubTags("plugin");
             for (final XmlTag pluginTag: pluginTags) {
-                final String pluginName = pluginTag.getAttribute("name").getValue();
-                if (pluginName.equals(originalPluginName)) {
-                    psiElements.add(pluginTag);
+                final XmlAttribute pluginNameAttribute = pluginTag.getAttribute("name");
+                if (pluginNameAttribute.getValue().equals(originalPluginName)) {
+                    psiElements.add(pluginNameAttribute.getValueElement());
                 }
             }
         }
