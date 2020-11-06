@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0). 
 
+## 2.0.2
+
+### Added
+
+- PWA pure function Live Template 
+
+### Fixed
+
+- Library root for object manager autocomplete
+- Line marker for interface plugin target
+- Allowed theme override of non-magento composer themes
+- Issue with ` Magento Module Ui Grid Collection Data Provider Php`
+
 ## 2.0.1
 
 ### Fixed
