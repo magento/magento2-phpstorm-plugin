@@ -205,7 +205,6 @@
         <internalFileTemplate name="Magento Module Controller Frontend Class"/>
         <internalFileTemplate name="Magento Module Cron Groups Xml"/>
         <internalFileTemplate name="Magento Module UI Component Grid Xml"/>
-        <internalFileTemplate name="Magento Module Ui Grid Collection Data Provider Php"/>
         <internalFileTemplate name="Magento Module Ui Custom Data Provider Php"/>
         <internalFileTemplate name="Magento Module UI Component Form Xml"/>
         <internalFileTemplate name="Magento Php Form Button Block Class"/>
