@@ -8,7 +8,7 @@ package com.magento.idea.magento2plugin.completion.php;
 import com.magento.idea.magento2plugin.completion.BaseCompletionTestCase;
 import com.magento.idea.magento2plugin.magento.packages.File;
 
-abstract public class CompletionPhpFixtureTestCase extends BaseCompletionTestCase {
+public abstract class CompletionPhpFixtureTestCase extends BaseCompletionTestCase {
     private static final String FIXTURES_FOLDER_PATH = "php" + File.separator;
 
     @Override

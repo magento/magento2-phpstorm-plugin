@@ -8,7 +8,7 @@ package com.magento.idea.magento2plugin.completion.xml;
 import com.magento.idea.magento2plugin.completion.BaseCompletionTestCase;
 import com.magento.idea.magento2plugin.magento.packages.File;
 
-abstract public class CompletionXmlFixtureTestCase extends BaseCompletionTestCase {
+public abstract class CompletionXmlFixtureTestCase extends BaseCompletionTestCase {
     private static final String FIXTURES_FOLDER_PATH = "xml" + File.separator;
 
     @Override

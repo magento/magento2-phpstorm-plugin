@@ -8,10 +8,16 @@ package com.magento.idea.magento2plugin.completion.php;
 import com.intellij.codeInsight.completion.CompletionContributor;
 import com.intellij.codeInsight.completion.CompletionType;
 import com.magento.idea.magento2plugin.completion.provider.ModuleNameCompletionProvider;
+import com.magento.idea.magento2plugin.util.php.PhpPatternsHelper;
 
-import static com.magento.idea.magento2plugin.util.php.PhpPatternsHelper.CONFIGPHP_COMPLETION;
-
+@SuppressWarnings({
+        "PMD.CallSuperInConstructor",
+})
 public class PhpCompletionContributor extends CompletionContributor {
+
+    /**
+     * Constructor.
+     */
     public PhpCompletionContributor() {
         /*
           'modules' => [
@@ -19,9 +25,9 @@ public class PhpCompletionContributor extends CompletionContributor {
           ]
          */
         extend(
-            CompletionType.BASIC,
-            CONFIGPHP_COMPLETION,
-            new ModuleNameCompletionProvider()
+                CompletionType.BASIC,
+                PhpPatternsHelper.CONFIGPHP_COMPLETION,
+                new ModuleNameCompletionProvider()
         );
     }
 }

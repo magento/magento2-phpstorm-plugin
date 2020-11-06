@@ -7,9 +7,9 @@ package com.magento.idea.magento2plugin.reference.php;
 
 import com.intellij.psi.PsiReferenceContributor;
 import com.intellij.psi.PsiReferenceRegistrar;
+import com.magento.idea.magento2plugin.reference.provider.EventDispatchReferenceProvider;
 import com.magento.idea.magento2plugin.reference.provider.ModuleNameReferenceProvider;
 import com.magento.idea.magento2plugin.util.php.PhpPatternsHelper;
-import com.magento.idea.magento2plugin.reference.provider.EventDispatchReferenceProvider;
 import org.jetbrains.annotations.NotNull;
 
 public class PhpReferenceContributor extends PsiReferenceContributor {
@@ -27,8 +27,8 @@ public class PhpReferenceContributor extends PsiReferenceContributor {
           ]
          */
         registrar.registerReferenceProvider(
-            PhpPatternsHelper.CONFIGPHP_MODULENAME,
-            new ModuleNameReferenceProvider()
+                PhpPatternsHelper.CONFIGPHP_MODULENAME,
+                new ModuleNameReferenceProvider()
         );
     }
 }

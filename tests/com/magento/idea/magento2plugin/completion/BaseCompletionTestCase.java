@@ -10,7 +10,7 @@ import com.magento.idea.magento2plugin.magento.packages.File;
 import java.util.Arrays;
 import java.util.List;
 
-abstract public class BaseCompletionTestCase extends BaseProjectTestCase {
+public abstract class BaseCompletionTestCase extends BaseProjectTestCase {
     private static final String MESSAGE_NO_LOOKUP = "No lookup element was provided";
     private final String testDataFolderPath
             = "testData" + File.separator + "completion" + File.separator;
@@ -26,6 +26,9 @@ abstract public class BaseCompletionTestCase extends BaseProjectTestCase {
         myFixture.completeBasic();
     }
 
+    /**
+     * Assert that completion suggestions contains the given lookup strings.
+     */
     public void assertCompletionContains(final String filePath, final String... lookupStrings) {
         configureFixture(filePath);
 
@@ -55,13 +58,11 @@ abstract public class BaseCompletionTestCase extends BaseProjectTestCase {
     ) {
         configureFixture(filePath);
 
-        final String messageEmptyLookup
-                = "Failed that completion does not contain `%s` for file " + filePath;
         final String messageCompletionNotContains
                 = "Failed that completion does not contain `%s` in `%s` for file " + filePath;
 
         checkDoesNotContainCompletion(
-                lookupStrings, messageEmptyLookup, messageCompletionNotContains
+                lookupStrings, messageCompletionNotContains
         );
     }
 
@@ -104,7 +105,6 @@ abstract public class BaseCompletionTestCase extends BaseProjectTestCase {
 
     protected void checkDoesNotContainCompletion(
             final String[] lookupStrings,
-            final String emptyLookupError,
             final String completionDoesNotContainError
     ) {
         if (lookupStrings.length == 0) {
@@ -113,15 +113,13 @@ abstract public class BaseCompletionTestCase extends BaseProjectTestCase {
 
         final List<String> lookupElements = myFixture.getLookupElementStrings();
 
-        if (lookupElements == null || lookupElements.isEmpty()) {
-            fail(String.format(emptyLookupError, Arrays.toString(lookupStrings)));
-        }
-
-        for (final String lookupString : lookupStrings) {
-            if (lookupElements.contains(lookupString)) {
-                fail(String.format(
-                        completionDoesNotContainError, lookupString, lookupElements.toString())
-                );
+        if (lookupElements != null) {
+            for (final String lookupString : lookupStrings) {
+                if (lookupElements.contains(lookupString)) {
+                    fail(String.format(
+                            completionDoesNotContainError, lookupString, lookupElements.toString())
+                    );
+                }
             }
         }
     }
