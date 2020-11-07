@@ -14,17 +14,16 @@ import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
-public class FixtureIndex {
-    private static FixtureIndex INSTANCE;
+public final class FixtureIndex {
+    private static final FixtureIndex INSTANCE = new FixtureIndex();
     private Project project;
 
     private FixtureIndex() {}
 
-    public static FixtureIndex getInstance(Project project) {
-        if (INSTANCE == null) {
-            INSTANCE = new FixtureIndex();
-        }
-
+    /**
+     * Getter for class instance.
+     */
+    public static FixtureIndex getInstance(final Project project) {
         INSTANCE.project = project;
 
         return INSTANCE;
@@ -39,9 +38,13 @@ public class FixtureIndex {
         final String[] fixturePathParts = fixturePath.split("/");
         final String fixtureName = fixturePathParts[fixturePathParts.length - 1];
 
-        final @NotNull PsiFile[] psiFiles = FilenameIndex.getFilesByName(project, fixtureName, GlobalSearchScope.allScope(project));
+        final @NotNull PsiFile[] psiFiles = FilenameIndex.getFilesByName(
+                project,
+                fixtureName,
+                GlobalSearchScope.allScope(project)
+        );
 
-        for (PsiFile psiFile: psiFiles) {
+        for (final PsiFile psiFile: psiFiles) {
             if (!psiFile.getVirtualFile().getPath().contains("vendor")) {
                 result.add((PhpFile) psiFile);
             }

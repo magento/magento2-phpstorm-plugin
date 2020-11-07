@@ -13,39 +13,32 @@ import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.tags.PhpDocTag;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.magento.idea.magento2plugin.indexes.FixtureIndex;
+import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 import org.jetbrains.annotations.NotNull;
 
 public class DataFixtureReferenceProvider extends PsiReferenceProvider {
     @Override
     public @NotNull PsiReference[] getReferencesByElement(
-            @NotNull PsiElement element,
-            @NotNull ProcessingContext context
+            @NotNull final PsiElement element,
+            @NotNull final ProcessingContext context
     ) {
         final List<PsiReference> psiReferences = new ArrayList<>();
-
-        String text = element.getText();
         final @NotNull String tag = ((PhpDocTag) element.getParent().getParent()).getName();
 
-        System.out.println(text);
-        System.out.println(tag);
+        if ("@magentoApiDataFixture".equals(tag)) {
+            final String name = element.getParent().getText();
 
-        if (tag.equals("@magentoApiDataFixture")) {
-            String name = element.getParent().getText();
+            final List<PhpFile> dataFixtures = FixtureIndex.getInstance(element.getProject())
+                    .getDataFixtures(name);
 
-            final List<PhpFile> dataFixtures = FixtureIndex.getInstance(element.getProject()).getDataFixtures(name);
-
-            if (dataFixtures.size() > 0) {
+            if (!dataFixtures.isEmpty()) {
                 final List<PsiElement> files = new ArrayList<>(dataFixtures);
-                TextRange range = new TextRange(0, name.length());
+                final TextRange range = new TextRange(0, name.length());
                 psiReferences.add(new PolyVariantReferenceBase(element, range, files));
             }
         }
-
-        final String hello = "hello";
 
         return psiReferences.toArray(new PsiReference[0]);
     }
