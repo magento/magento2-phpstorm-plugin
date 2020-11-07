@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation;
 
 import com.intellij.lang.ASTNode;
@@ -27,27 +28,31 @@ import com.magento.idea.magento2plugin.project.Settings;
 import org.jetbrains.annotations.NotNull;
 
 public class CreateAnObserverAction extends DumbAwareAction {
-    public static final String ACTION_NAME = "Create a Magento Observer...";
-    static final String ACTION_DESCRIPTION = "Create a new Magento 2 Observer for the event";
+    public static final String ACTION_NAME = "Create a new Observer for this event";
+    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Observer";
     public String targetEvent;
 
     public CreateAnObserverAction() {
         super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
     }
 
-    public void update(AnActionEvent event) {
-        Project project = event.getData(PlatformDataKeys.PROJECT);
+    /**
+     * Updates the state of action.
+     */
+    @Override
+    public void update(final AnActionEvent event) {
+        final Project project = event.getData(PlatformDataKeys.PROJECT);
         if (!Settings.isEnabled(project)) {
             this.setStatus(event, false);
             return;
         }
-        PsiFile psiFile = event.getData(PlatformDataKeys.PSI_FILE);
+        final PsiFile psiFile = event.getData(PlatformDataKeys.PSI_FILE);
         if (!(psiFile instanceof PhpFile)) {
             this.setStatus(event, false);
             return;
         }
 
-        PsiElement element = getElement(event);
+        final PsiElement element = getElement(event);
         if (element == null) {
             this.setStatus(event, false);
             return;
@@ -62,87 +67,76 @@ public class CreateAnObserverAction extends DumbAwareAction {
         this.setStatus(event, false);
     }
 
-    private PsiElement getElement(@NotNull AnActionEvent event) {
-        Caret caret = event.getData(PlatformDataKeys.CARET);
-        PsiFile psiFile = event.getData(PlatformDataKeys.PSI_FILE);
+    private PsiElement getElement(@NotNull final AnActionEvent event) {
+        final Caret caret = event.getData(PlatformDataKeys.CARET);
         if (caret == null) {
             return null;
         }
-        int offset = caret.getOffset();
-        PsiElement element = psiFile.findElementAt(offset);
+        final int offset = caret.getOffset();
+        final PsiFile psiFile = event.getData(PlatformDataKeys.PSI_FILE);
+        final PsiElement element = psiFile.findElementAt(offset);
         if (element == null) {
             return null;
         }
         return element;
     }
 
-    private boolean isObserverEventNameClicked(@NotNull PsiElement element) {
-        if (checkIsElementStringLiteral(element)) {
-            if (checkIsParametersList(element.getParent().getParent()) &&
-                    checkIsMethodReference(element.getParent().getParent().getParent()) &&
-                    checkIsEventDispatchMethod((MethodReference) element.getParent().getParent().getParent())) {
-                return true;
-            }
-        }
-        return false;
+    private boolean isObserverEventNameClicked(@NotNull final PsiElement element) {
+        return checkIsElementStringLiteral(element)
+                && checkIsParametersList(element.getParent().getParent())
+                && checkIsMethodReference(element.getParent().getParent().getParent())
+                && checkIsEventDispatchMethod(
+                        (MethodReference) element.getParent().getParent().getParent()
+                );
     }
 
-    private boolean checkIsParametersList(@NotNull PsiElement element) {
-        if (element instanceof ParameterList) {
-            return true;
-        }
-        return false;
+    private boolean checkIsParametersList(@NotNull final PsiElement element) {
+        return element instanceof ParameterList;
     }
 
-    private boolean checkIsMethodReference(@NotNull PsiElement element) {
-        if (element instanceof MethodReference) {
-            return true;
-        }
-        return false;
+    private boolean checkIsMethodReference(@NotNull final PsiElement element) {
+        return element instanceof MethodReference;
     }
 
-    private boolean checkIsEventDispatchMethod(MethodReference element) {
-        PsiReference elementReference = element.getReference();
+    private boolean checkIsEventDispatchMethod(final MethodReference element) {
+        final PsiReference elementReference = element.getReference();
         if (elementReference == null) {
             return false;
         }
-        PsiElement method = elementReference.resolve();
+        final PsiElement method = elementReference.resolve();
         if (!(method instanceof Method)) {
             return false;
         }
         if (!((Method) method).getName().equals(Observer.DISPATCH_METHOD)) {
             return false;
         }
-        PsiElement phpClass = method.getParent();
+        final PsiElement phpClass = method.getParent();
         if (!(phpClass instanceof PhpClass)) {
             return false;
         }
-        String fqn = ((PhpClass) phpClass).getPresentableFQN();
+        final String fqn = ((PhpClass) phpClass).getPresentableFQN();
         return fqn.equals(Observer.INTERFACE);
     }
 
-    private boolean checkIsElementStringLiteral(@NotNull PsiElement element) {
-        ASTNode astNode = element.getNode();
+    private boolean checkIsElementStringLiteral(@NotNull final PsiElement element) {
+        final ASTNode astNode = element.getNode();
         if (astNode == null) {
             return false;
         }
-        IElementType elementType = astNode.getElementType();
+        final IElementType elementType = astNode.getElementType();
 
-        if (elementType != PhpTokenTypes.STRING_LITERAL && elementType != PhpTokenTypes.STRING_LITERAL_SINGLE_QUOTE) {
-            return false;
-        }
-
-        return true;
+        return elementType == PhpTokenTypes.STRING_LITERAL
+                || elementType == PhpTokenTypes.STRING_LITERAL_SINGLE_QUOTE;
     }
 
-    private void setStatus(AnActionEvent event, boolean status) {
+    private void setStatus(final AnActionEvent event, final boolean status) {
         event.getPresentation().setVisible(status);
         event.getPresentation().setEnabled(status);
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        CreateAnObserverDialog.open(e.getProject(), this.targetEvent);
+    public void actionPerformed(@NotNull final AnActionEvent event) {
+        CreateAnObserverDialog.open(event.getProject(), this.targetEvent);
     }
 
     @Override

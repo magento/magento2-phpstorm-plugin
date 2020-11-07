@@ -11,6 +11,7 @@ import com.intellij.psi.PsiReferenceRegistrar;
 import com.intellij.psi.xml.XmlTokenType;
 import com.magento.idea.magento2plugin.magento.files.MftfActionGroup;
 import com.magento.idea.magento2plugin.magento.files.MftfTest;
+import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaXml;
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 import com.magento.idea.magento2plugin.magento.files.UiComponentXml;
 // CHECKSTYLE IGNORE check FOR NEXT 5 LINES
@@ -130,6 +131,16 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
                 )
             ),
             new LayoutUpdateReferenceProvider()
+        );
+
+        // <uiComponent name="completion"/>
+        registrar.registerReferenceProvider(
+                XmlPatterns.xmlAttributeValue().withParent(
+                        XmlPatterns.xmlAttribute().withName("name").withParent(
+                                XmlPatterns.xmlTag().withName("uiComponent")
+                        )
+                ),
+                new UIComponentReferenceProvider()
         );
 
         // <event name="reference" />
@@ -288,6 +299,86 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
                 xmlFile().withName(string().endsWith(ModuleMenuXml.fileName))
             ),
             new MenuReferenceProvider()
+        );
+
+        // <table name="reference" /> in db_schema.xml
+        registrar.registerReferenceProvider(
+            XmlPatterns.xmlAttributeValue().withParent(
+                XmlPatterns.xmlAttribute().withName(ModuleDbSchemaXml.XML_ATTR_TABLE_NAME)
+                    .withParent(XmlPatterns.xmlTag().withName(ModuleDbSchemaXml.XML_TAG_TABLE)
+                )
+            ).inFile(
+                xmlFile().withName(string().matches(ModuleDbSchemaXml.FILE_NAME))
+            ),
+            new TableColumnNamesReferenceProvider()
+        );
+
+        // <constraint table="reference" /> in db_schema.xml
+        registrar.registerReferenceProvider(
+            XmlPatterns.xmlAttributeValue().withParent(
+                XmlPatterns.xmlAttribute()
+                    .withName(ModuleDbSchemaXml.XML_ATTR_CONSTRAINT_TABLE_NAME)
+                    .withParent(XmlPatterns.xmlTag().withName(
+                        ModuleDbSchemaXml.XML_TAG_CONSTRAINT)
+                    )
+            ).inFile(
+                xmlFile().withName(string().matches(ModuleDbSchemaXml.FILE_NAME))
+            ),
+            new TableColumnNamesReferenceProvider()
+        );
+
+        // <constraint referenceTable="reference" /> in db_schema.xml
+        registrar.registerReferenceProvider(
+            XmlPatterns.xmlAttributeValue().withParent(
+                XmlPatterns.xmlAttribute()
+                    .withName(ModuleDbSchemaXml.XML_ATTR_CONSTRAINT_REFERENCE_TABLE_NAME)
+                    .withParent(XmlPatterns.xmlTag().withName(
+                            ModuleDbSchemaXml.XML_TAG_CONSTRAINT)
+                    )
+            ).inFile(
+                xmlFile().withName(string().matches(ModuleDbSchemaXml.FILE_NAME))
+            ),
+            new TableColumnNamesReferenceProvider()
+        );
+
+        // <constraint column="reference" /> in db_schema.xml
+        registrar.registerReferenceProvider(
+            XmlPatterns.xmlAttributeValue().withParent(
+                XmlPatterns.xmlAttribute()
+                    .withName(ModuleDbSchemaXml.XML_ATTR_CONSTRAINT_COLUMN_NAME)
+                    .withParent(XmlPatterns.xmlTag().withName(
+                            ModuleDbSchemaXml.XML_TAG_CONSTRAINT)
+                    )
+            ).inFile(
+                xmlFile().withName(string().matches(ModuleDbSchemaXml.FILE_NAME))
+            ),
+            new TableColumnNamesReferenceProvider()
+        );
+
+        // <constraint referenceColumn="reference" /> in db_schema.xml
+        registrar.registerReferenceProvider(
+            XmlPatterns.xmlAttributeValue().withParent(
+                XmlPatterns.xmlAttribute()
+                    .withName(ModuleDbSchemaXml.XML_ATTR_CONSTRAINT_REFERENCE_COLUMN_NAME)
+                    .withParent(XmlPatterns.xmlTag().withName(
+                            ModuleDbSchemaXml.XML_TAG_CONSTRAINT)
+                    )
+            ).inFile(
+                xmlFile().withName(string().matches(ModuleDbSchemaXml.FILE_NAME))
+            ),
+            new TableColumnNamesReferenceProvider()
+        );
+
+        // <plugin name="pluginName" disabled="true" /> in di.xml
+        registrar.registerReferenceProvider(
+            XmlPatterns.xmlAttributeValue().withParent(
+                XmlPatterns.xmlAttribute().withName("name").withParent(
+                    XmlPatterns.xmlTag().withName("plugin").withChild(
+                        XmlPatterns.xmlAttribute().withName("disabled")
+                    )
+                )
+            ).inFile(xmlFile().withName(string().endsWith("di.xml"))),
+            new PluginReferenceProvider()
         );
 
         registerReferenceForDifferentNesting(registrar);

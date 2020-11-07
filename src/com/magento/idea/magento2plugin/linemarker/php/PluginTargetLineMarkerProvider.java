@@ -118,7 +118,7 @@ public class PluginTargetLineMarkerProvider implements LineMarkerProvider {
             final List<PhpClass> classesForPlugin = getTargetClassesForPlugin(
                     phpClass, phpClass.getPresentableFQN()
             );
-            for (final PhpClass parent : phpClass.getSupers()) {
+            for (final PhpClass parent: phpClass.getSupers()) {
                 classesForPlugin.addAll(getTargetClassesForPlugin(parent));
             }
 
@@ -170,7 +170,7 @@ public class PluginTargetLineMarkerProvider implements LineMarkerProvider {
                 return results;
             }
 
-            for (final PhpClass targetClass : targetClasses) {
+            for (final PhpClass targetClass: targetClasses) {
                 final String pluginPrefix = getPluginPrefix(pluginMethod);
                 final String targetClassMethodName = getTargetMethodName(
                         pluginMethod, pluginPrefix

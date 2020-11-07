@@ -7,14 +7,22 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.NewCLICommandAction;
 import com.magento.idea.magento2plugin.actions.generation.data.CLICommandClassData;
 import com.magento.idea.magento2plugin.actions.generation.data.CLICommandXmlData;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewCLICommandValidator;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.CliCommandRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.CLICommandClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.CLICommandDiXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
+import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.util.CamelCaseToSnakeCase;
+import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -28,19 +36,41 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
-@SuppressWarnings({"PMD.MissingSerialVersionUID"})
+@SuppressWarnings({"PMD.MissingSerialVersionUID", "PMD.ExcessiveImports"})
 public class NewCLICommandDialog extends AbstractDialog {
     private JPanel contentPane;
-    private JTextField cliCommandClassNameField;
-    private JTextField cliCommandParentDirectoryField;
-    private JTextField cliCommandNameField;
-    private JTextArea cliCommandDescriptionField;
     private JButton buttonCancel;
     private JButton buttonOK;
+    private static final String CLASS_NAME = "class name";
+    private static final String PARENT_DIRECTORY = "parent directory";
+    private static final String COMMAND_NAME = "command name";
+    private static final String COMMAND_DESCRIPTION = "description";
 
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, CLASS_NAME})
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
+            message = {PhpClassRule.MESSAGE, CLASS_NAME})
+    private JTextField cliCommandClassNameField;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, PARENT_DIRECTORY})
+    @FieldValidation(rule = RuleRegistry.DIRECTORY,
+            message = {DirectoryRule.MESSAGE, PARENT_DIRECTORY})
+    private JTextField cliCommandParentDirectoryField;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, COMMAND_NAME})
+    @FieldValidation(rule = RuleRegistry.CLI_COMMAND,
+            message = {CliCommandRule.MESSAGE, COMMAND_NAME})
+    private JTextField cliCommandNameField;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, COMMAND_DESCRIPTION})
+    private JTextArea cliCommandDescriptionField;
+
+    private final CommonBundle commonBundle;
     private final Project project;
     private final String moduleName;
-    private final NewCLICommandValidator validator;
     private final CamelCaseToSnakeCase toSnakeCase;
 
     /**
@@ -53,13 +83,13 @@ public class NewCLICommandDialog extends AbstractDialog {
         super();
         this.project = project;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
-        this.validator = new NewCLICommandValidator();
         this.toSnakeCase = CamelCaseToSnakeCase.getInstance();
+        this.commonBundle = new CommonBundle();
 
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
-        setTitle(this.bundle.message("common.cli.create.new.cli.command.title"));
+        setTitle(NewCLICommandAction.ACTION_DESCRIPTION);
 
         buttonOK.addActionListener(e -> onOK());
         buttonCancel.addActionListener(e -> onCancel());
@@ -145,11 +175,36 @@ public class NewCLICommandDialog extends AbstractDialog {
     }
 
     private void onOK() {
-        if (!validator.validate(this.project,this)) {
+        if (!validateFormFields() || !isPHPClassValid()) {
             return;
         }
         this.generate();
         this.setVisible(false);
+    }
+
+    private Boolean isPHPClassValid() {
+        final NamespaceBuilder namespaceBuilder = new NamespaceBuilder(
+                moduleName,
+                getCLICommandClassName(),
+                getCLICommandParentDirectory()
+        );
+        final String namespace = namespaceBuilder.getClassFqn();
+        final PhpClass phpClass = GetPhpClassByFQN.getInstance(project).execute(namespace);
+        if (phpClass != null) {
+            final String errorMessage = validatorBundle.message(
+                    "validator.file.alreadyExists",
+                    commonBundle.message("common.cli.class.title")
+            );
+            JOptionPane.showMessageDialog(
+                    null,
+                    errorMessage,
+                    commonBundle.message("common.validationErrorTitle"),
+                    JOptionPane.ERROR_MESSAGE
+            );
+            return false;
+        }
+
+        return true;
     }
 
     private void generate() {

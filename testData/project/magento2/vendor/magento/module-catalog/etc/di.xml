@@ -1,6 +1,19 @@
 <?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
 <config>
     <type name="Magento\Theme\Block\Html\Topmenu">
         <plugin name="catalogTopmenu" type="Magento\Catalog\Plugin\Block\Topmenu" />
+    </type>
+    <type name="Magento\Theme\Block\PluginClass">
+        <plugin name="pluginClass" type="Magento\Catalog\Plugin\PluginClass" />
+    </type>
+    <type name="Magento\Framework\Mview\View\StateInterface">
+        <plugin name="setStatusForMview"
+                type="Magento\Catalog\Model\Indexer\Category\Product\Plugin\MviewState"/>
     </type>
 </config>

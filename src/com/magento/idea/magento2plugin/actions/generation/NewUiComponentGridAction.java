@@ -19,7 +19,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.NewUiComponentG
 @SuppressWarnings({"PMD.OnlyOneReturn"})
 public class NewUiComponentGridAction extends AnAction {
     public static final String ACTION_NAME = "Magento 2 UI Component Grid";
-    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 UI Component grid";
+    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 UI Component Grid";
 
     /**
      * New UI component grid action constructor.
@@ -33,6 +33,7 @@ public class NewUiComponentGridAction extends AnAction {
      *
      * @param event Action event
      */
+    @Override
     public void actionPerformed(final AnActionEvent event) {
         final DataContext dataContext = event.getDataContext();
         final IdeView view = LangDataKeys.IDE_VIEW.getData(dataContext);

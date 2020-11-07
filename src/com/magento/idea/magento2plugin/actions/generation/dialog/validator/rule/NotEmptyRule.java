@@ -11,7 +11,7 @@ public class NotEmptyRule implements ValidationRule {
 
     @Override
     public boolean check(final String value) {
-        return value.length() != 0;
+        return !value.isEmpty();
     }
 
     public static ValidationRule getInstance() {

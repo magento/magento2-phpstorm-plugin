@@ -11,7 +11,12 @@ import com.intellij.psi.xml.XmlTag;
 import com.intellij.ui.DocumentAdapter;
 import com.magento.idea.magento2plugin.actions.generation.InjectAViewModelAction;
 import com.magento.idea.magento2plugin.actions.generation.data.ViewModelFileData;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.InjectAViewModelDialogValidator;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericWithUnderscoreRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleViewModelClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.code.ClassArgumentInXmlConfigGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
@@ -21,7 +26,6 @@ import com.magento.idea.magento2plugin.magento.packages.XsiTypes;
 import com.magento.idea.magento2plugin.util.FirstLetterToLowercaseUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -35,24 +39,43 @@ import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings({
+        "PMD.ExcessiveImports"
+})
 public class InjectAViewModelDialog extends AbstractDialog {
     @NotNull
     private final Project project;
-    @NotNull
-    private final InjectAViewModelDialogValidator validator;
     private final XmlTag targetBlockTag;
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
-    private JTextField viewModelClassName;
-    private JTextField viewModelDirectory;
     private final CommonBundle commonBundle;
     private final ValidatorBundle validatorBundle;
-    private JTextField viewModelArgumentName;
     private JLabel inheritClassLabel;//NOPMD
     private JLabel viewModelDirectoryLabel;//NOPMD
     private JLabel viewModelClassNameLabel;//NOPMD
     private JLabel viewModelArgumentNameLabel;//NOPMD
+    private static final String CLASS_NAME = "class name";
+    private static final String DIRECTORY = "directory";
+    private static final String ARGUMENT_NAME = "argument name";
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, CLASS_NAME})
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
+            message = {PhpClassRule.MESSAGE, CLASS_NAME})
+    private JTextField viewModelClassName;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, DIRECTORY})
+    @FieldValidation(rule = RuleRegistry.DIRECTORY,
+            message = {DirectoryRule.MESSAGE, DIRECTORY})
+    private JTextField viewModelDirectory;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, ARGUMENT_NAME})
+    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC_WITH_UNDERSCORE,
+            message = {AlphanumericWithUnderscoreRule.MESSAGE, ARGUMENT_NAME})
+    private JTextField viewModelArgumentName;
 
     /**
      * Constructor.
@@ -68,7 +91,6 @@ public class InjectAViewModelDialog extends AbstractDialog {
 
         this.project = project;
         this.targetBlockTag = targetBlockTag;
-        this.validator = new InjectAViewModelDialogValidator(this);
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
 
@@ -82,21 +104,11 @@ public class InjectAViewModelDialog extends AbstractDialog {
 
         setContentPane(contentPane);
         setModal(true);
+        setTitle(InjectAViewModelAction.actionDescription);
         getRootPane().setDefaultButton(buttonOK);
 
-        buttonOK.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                onOK();
-            }
-        });
-
-        buttonCancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                onCancel();
-            }
-        });
+        buttonOK.addActionListener((final ActionEvent event) -> onOK());
+        buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
@@ -106,13 +118,11 @@ public class InjectAViewModelDialog extends AbstractDialog {
             }
         });
 
-        contentPane.registerKeyboardAction(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPane.registerKeyboardAction(
+                (final ActionEvent event) -> onCancel(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+        );
     }
 
     protected void updateArgumentText() {
@@ -123,7 +133,7 @@ public class InjectAViewModelDialog extends AbstractDialog {
     }
 
     protected void onOK() {
-        if (!validator.validate(project)) {
+        if (!validateFormFields()) {
             return;
         }
         final String moduleName = GetModuleNameByDirectoryUtil.execute(

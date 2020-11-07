@@ -10,7 +10,15 @@ import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.actions.generation.NewCronjobAction;
 import com.magento.idea.magento2plugin.actions.generation.data.CronjobClassData;
 import com.magento.idea.magento2plugin.actions.generation.data.CrontabXmlData;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewCronjobValidator;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.BoxNotEmptyRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.ConfigPathRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.CronScheduleRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.CronjobClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.CrontabXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
@@ -19,7 +27,6 @@ import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.CamelCaseToSnakeCase;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -44,28 +51,64 @@ import javax.swing.KeyStroke;
         "PMD.AvoidCatchingGenericException",
         "PMD.ImmutableField",
         "PMD.AccessorMethodGeneration",
+        "PMD.ExcessiveImports",
 })
 public class NewCronjobDialog extends AbstractDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
-    private JTextField cronjobClassNameField;
-    private JTextField cronjobDirectoryField;
     private JRadioButton fixedScheduleRadioButton;
     private JRadioButton configurableScheduleRadioButton;
     private JRadioButton everyMinuteRadioButton;
     private JRadioButton customScheduleRadioButton;
-    private JTextField cronjobScheduleField;
     private JRadioButton atMidnightRadioButton;
     private JPanel fixedSchedulePanel;
-    private JTextField configPathField;
     private JPanel configurableSchedulePanel;
-    private FilteredComboBox cronGroupComboBox;
+    private static final String CLASS_NAME = "class name";
+    private static final String DIRECTORY = "directory";
+    private static final String CRON_NAME = "name";
+    private static final String SCHEDULE = "schedule";
+    private static final String CONFIG_PATH = "config path";
+    private static final String CRON_GROUP = "cron group";
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, CLASS_NAME})
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
+            message = {PhpClassRule.MESSAGE, CLASS_NAME})
+    private JTextField cronjobClassNameField;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, DIRECTORY})
+    @FieldValidation(rule = RuleRegistry.DIRECTORY,
+            message = {DirectoryRule.MESSAGE, DIRECTORY})
+    private JTextField cronjobDirectoryField;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, CRON_NAME})
+    @FieldValidation(rule = RuleRegistry.IDENTIFIER,
+            message = {IdentifierRule.MESSAGE, CRON_NAME})
     private JTextField cronjobNameField;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, SCHEDULE})
+    @FieldValidation(rule = RuleRegistry.CRON_SCHEDULE,
+            message = {CronScheduleRule.MESSAGE, SCHEDULE})
+    private JTextField cronjobScheduleField;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, CONFIG_PATH})
+    @FieldValidation(rule = RuleRegistry.CONFIG_PATH,
+            message = {ConfigPathRule.MESSAGE, CONFIG_PATH})
+    private JTextField configPathField;
+
+    @FieldValidation(rule = RuleRegistry.BOX_NOT_EMPTY,
+            message = {BoxNotEmptyRule.MESSAGE, CRON_GROUP})
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, CRON_GROUP})
+    private FilteredComboBox cronGroupComboBox;
 
     private Project project;
     private String moduleName;
-    private NewCronjobValidator validator;
     private CamelCaseToSnakeCase camelCaseToSnakeCase;
 
     /**
@@ -78,13 +121,13 @@ public class NewCronjobDialog extends AbstractDialog {
         super();
         this.project = project;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
-        this.validator = NewCronjobValidator.getInstance();
         this.camelCaseToSnakeCase = CamelCaseToSnakeCase.getInstance();
 
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
-        setTitle("Create a new Magento 2 cronjob..");
+        setTitle(NewCronjobAction.ACTION_DESCRIPTION);
+        configPathField.setEditable(false);
 
         buttonOK.addActionListener(e -> onOK());
         buttonCancel.addActionListener(e -> onCancel());
@@ -92,12 +135,15 @@ public class NewCronjobDialog extends AbstractDialog {
         fixedScheduleRadioButton.addActionListener(e -> {
             configurableSchedulePanel.setVisible(false);
             fixedSchedulePanel.setVisible(true);
+            configPathField.setEditable(false);
         });
 
         configurableScheduleRadioButton.addActionListener(e -> {
             fixedSchedulePanel.setVisible(false);
             configurableSchedulePanel.setVisible(true);
+            configPathField.setEditable(true);
             configPathField.grabFocus();
+            everyMinuteRadioButton.doClick();
         });
 
         everyMinuteRadioButton.addActionListener(e -> {
@@ -139,16 +185,9 @@ public class NewCronjobDialog extends AbstractDialog {
             }
         });
 
-        final ActionListener actionListener = new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                onCancel();
-            }
-        };
-
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
-                actionListener,
+                (final ActionEvent event) -> onCancel(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
@@ -237,7 +276,7 @@ public class NewCronjobDialog extends AbstractDialog {
      * When new cronjob dialog is filled, validate the input data and generate a new cronjob.
      */
     private void onOK() {
-        if (!validator.validate(this.project,this)) {
+        if (!validateFormFields()) {
             return;
         }
 

@@ -6,19 +6,20 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.psi.PsiFile;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.OverrideInThemeDialogValidator;
+import com.magento.idea.magento2plugin.actions.generation.OverrideInThemeAction;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.OverrideInThemeGenerator;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -29,13 +30,15 @@ public class OverrideInThemeDialog extends AbstractDialog {
     @NotNull
     private final Project project;
     private final PsiFile psiFile;
-    @NotNull
-    private final OverrideInThemeDialogValidator validator;
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
     private JLabel selectTheme; //NOPMD
-    private FilteredComboBox theme;
+    private static final String THEME_NAME = "target theme";
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, THEME_NAME})
+    private JComboBox theme;
 
     /**
      * Constructor.
@@ -48,43 +51,33 @@ public class OverrideInThemeDialog extends AbstractDialog {
 
         this.project = project;
         this.psiFile = psiFile;
-        this.validator = new OverrideInThemeDialogValidator(this);
 
         setContentPane(contentPane);
         setModal(true);
+        setTitle(OverrideInThemeAction.actionDescription);
         getRootPane().setDefaultButton(buttonOK);
+        fillThemeOptions();
 
-        buttonOK.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent event) {
-                onOK(); //NOPMD
-            }
-        });
-
-        buttonCancel.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent event) {
-                onCancel();
-            }
-        });
+        buttonOK.addActionListener((final ActionEvent event) -> onOK());
+        buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(final WindowEvent event) {
                 onCancel();
             }
         });
 
-        contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(final ActionEvent event) {
-                onCancel();
-            }
-            }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPane.registerKeyboardAction(
+                (final ActionEvent event) -> onCancel(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+        );
     }
 
     private void onOK() {
-        if (!validator.validate(project)) {
-            JBPopupFactory.getInstance().createMessage("Invalid theme selection.")
-                    .showCenteredInCurrentWindow(project);
+        if (!validateFormFields()) {
             return;
         }
 
@@ -112,9 +105,10 @@ public class OverrideInThemeDialog extends AbstractDialog {
         dialog.setVisible(true);
     }
 
-    private void createUIComponents() { //NOPMD
-        final List<String> allThemesList = ModuleIndex.getInstance(project).getEditableThemeNames();
-
-        this.theme = new FilteredComboBox(allThemesList);
+    private void fillThemeOptions() {
+        final List<String> themeNames = ModuleIndex.getInstance(project).getEditableThemeNames();
+        for (final String themeName: themeNames) {
+            theme.addItem(themeName);
+        }
     }
 }
