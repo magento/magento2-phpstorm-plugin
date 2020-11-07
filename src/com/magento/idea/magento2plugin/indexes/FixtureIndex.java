@@ -45,7 +45,8 @@ public final class FixtureIndex {
         );
 
         for (final PsiFile psiFile: psiFiles) {
-            if (!psiFile.getVirtualFile().getPath().contains("vendor")) {
+            @NotNull final String filePath = psiFile.getVirtualFile().getPath();
+            if (!filePath.contains("vendor") && filePath.contains(fixturePath)) {
                 result.add((PhpFile) psiFile);
             }
         }
