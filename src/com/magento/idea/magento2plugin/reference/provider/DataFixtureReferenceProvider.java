@@ -36,6 +36,7 @@ public class DataFixtureReferenceProvider extends PsiReferenceProvider {
             if (!dataFixtures.isEmpty()) {
                 final List<PsiElement> files = new ArrayList<>(dataFixtures);
                 final TextRange range = new TextRange(0, name.length());
+
                 psiReferences.add(new PolyVariantReferenceBase(element, range, files));
             }
         }

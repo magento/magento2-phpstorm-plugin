@@ -38,7 +38,7 @@ public final class FixtureIndex {
         final String[] fixturePathParts = fixturePath.split("/");
         final String fixtureName = fixturePathParts[fixturePathParts.length - 1];
 
-        final @NotNull PsiFile[] psiFiles = FilenameIndex.getFilesByName(
+        @NotNull final PsiFile[] psiFiles = FilenameIndex.getFilesByName(
                 project,
                 fixtureName,
                 GlobalSearchScope.allScope(project)
