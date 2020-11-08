@@ -61,9 +61,10 @@ public class PluginDeclarationInspection extends PhpInspection {
 
                 final HashMap<String, XmlTag> targetPluginHash = new HashMap<>();
                 final PluginIndex pluginIndex = PluginIndex.getInstance(file.getProject());
+                final HashMap<String, XmlTag> pluginProblems = new HashMap<>();
 
                 for (final XmlTag pluginXmlTag: xmlTags) {
-                    final HashMap<String, XmlTag> pluginProblems = new HashMap<>();
+                    pluginProblems.clear();
                     if (!pluginXmlTag.getName().equals(ModuleDiXml.TYPE_TAG)) {
                         continue;
                     }
