@@ -18,6 +18,5 @@ class ${NAME} implements ButtonProviderInterface
      */
     public function getButtonData()
     {
-        // TODO: Implement getButtonData method.
     }
 }
