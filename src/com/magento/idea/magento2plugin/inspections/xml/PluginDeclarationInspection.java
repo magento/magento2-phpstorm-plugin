@@ -84,13 +84,7 @@ public class PluginDeclarationInspection extends PhpInspection {
                         final XmlAttribute pluginTypeDisabledAttribute
                                 = pluginTypeXmlTag.getAttribute(ModuleDiXml.DISABLED_ATTR_NAME);
 
-                        if (pluginTypeNameAttribute == null
-                                || (
-                                    pluginTypeDisabledAttribute != null //NOPMD
-                                    && pluginTypeDisabledAttribute.getValue() != null
-                                    && pluginTypeDisabledAttribute.getValue().equals("true")
-                                )
-                        ) {
+                        if (pluginTypeNameAttribute == null) {
                             continue;
                         }
 
@@ -116,6 +110,21 @@ public class PluginDeclarationInspection extends PhpInspection {
                                     pluginIndex,
                                     file
                         );
+
+                        if (pluginTypeDisabledAttribute != null
+                                && pluginTypeDisabledAttribute.getValue() != null
+                                && pluginTypeDisabledAttribute.getValue().equals("true")
+                                && modulesWithSamePluginName.isEmpty()
+                        ) {
+                            problemsHolder.registerProblem(
+                                    pluginTypeNameAttribute.getValueElement(),
+                                    inspectionBundle.message(
+                                            "inspection.plugin.disabledPluginDoesNotExist"
+                                    ),
+                                    errorSeverity
+                            );
+                        }
+
                         for (final Pair<String, String> moduleEntry: modulesWithSamePluginName) {
                             final String scope = moduleEntry.getFirst();
                             final String moduleName = moduleEntry.getSecond();
