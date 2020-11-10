@@ -9,10 +9,10 @@ import com.intellij.lang.Language;
 import com.jetbrains.php.lang.PhpLanguage;
 
 public class CronjobTemplate implements ModuleFileInterface {
-    private String fileName;
+    private String fileName;// NOPMD
 
-    public CronjobTemplate(String className) {
-        fileName = className.concat(".php");
+    public CronjobTemplate(final String className) {
+        this.fileName = className.concat(".php");
     }
 
     @Override

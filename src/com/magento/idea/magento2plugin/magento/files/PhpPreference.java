@@ -9,19 +9,16 @@ import com.intellij.lang.Language;
 import com.jetbrains.php.lang.PhpLanguage;
 
 public class PhpPreference implements ModuleFileInterface {
-    public static String TEMPLATE = "Magento Preference Class";
-
-    private static PhpPreference INSTANCE = null;
+    public static final String TEMPLATE = "Magento Preference Class";
     private String fileName;
+    private static final PhpPreference INSTANCE = new PhpPreference();
 
     /**
      * Getter for singleton instance of class.
      */
-    public static PhpPreference getInstance(String className) {
-        if (null == INSTANCE) {
-            INSTANCE = new PhpPreference();
-        }
-        INSTANCE.setFileName(className.concat(".php"));
+    public static PhpPreference getInstance(final String className) {
+        INSTANCE.fileName = className.concat(".php");
+
         return INSTANCE;
     }
 
@@ -38,9 +35,5 @@ public class PhpPreference implements ModuleFileInterface {
     @Override
     public Language getLanguage() {
         return PhpLanguage.INSTANCE;
-    }
-
-    private void setFileName(String filename) {
-        this.fileName = filename;
     }
 }
