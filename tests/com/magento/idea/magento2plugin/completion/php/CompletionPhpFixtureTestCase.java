@@ -3,13 +3,13 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2plugin.completion.xml;
+package com.magento.idea.magento2plugin.completion.php;
 
 import com.magento.idea.magento2plugin.completion.BaseCompletionTestCase;
 import com.magento.idea.magento2plugin.magento.packages.File;
 
-public abstract class CompletionXmlFixtureTestCase extends BaseCompletionTestCase {
-    private static final String FIXTURES_FOLDER_PATH = "xml" + File.separator;
+public abstract class CompletionPhpFixtureTestCase extends BaseCompletionTestCase {
+    private static final String FIXTURES_FOLDER_PATH = "php" + File.separator;
 
     @Override
     protected String getFixturePath(final String fileName) {
