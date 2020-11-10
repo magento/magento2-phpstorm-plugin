@@ -61,9 +61,10 @@ public class PluginDeclarationInspection extends PhpInspection {
 
                 final HashMap<String, XmlTag> targetPluginHash = new HashMap<>();
                 final PluginIndex pluginIndex = PluginIndex.getInstance(file.getProject());
+                final HashMap<String, XmlTag> pluginProblems = new HashMap<>();
 
                 for (final XmlTag pluginXmlTag: xmlTags) {
-                    final HashMap<String, XmlTag> pluginProblems = new HashMap<>();
+                    pluginProblems.clear();
                     if (!pluginXmlTag.getName().equals(ModuleDiXml.TYPE_TAG)) {
                         continue;
                     }
@@ -84,13 +85,7 @@ public class PluginDeclarationInspection extends PhpInspection {
                         final XmlAttribute pluginTypeDisabledAttribute
                                 = pluginTypeXmlTag.getAttribute(ModuleDiXml.DISABLED_ATTR_NAME);
 
-                        if (pluginTypeNameAttribute == null
-                                || (
-                                    pluginTypeDisabledAttribute != null //NOPMD
-                                    && pluginTypeDisabledAttribute.getValue() != null
-                                    && pluginTypeDisabledAttribute.getValue().equals("true")
-                                )
-                        ) {
+                        if (pluginTypeNameAttribute == null) {
                             continue;
                         }
 
@@ -116,6 +111,21 @@ public class PluginDeclarationInspection extends PhpInspection {
                                     pluginIndex,
                                     file
                         );
+
+                        if (pluginTypeDisabledAttribute != null
+                                && pluginTypeDisabledAttribute.getValue() != null
+                                && pluginTypeDisabledAttribute.getValue().equals("true")
+                                && modulesWithSamePluginName.isEmpty()
+                        ) {
+                            problemsHolder.registerProblem(
+                                    pluginTypeNameAttribute.getValueElement(),
+                                    inspectionBundle.message(
+                                            "inspection.plugin.disabledPluginDoesNotExist"
+                                    ),
+                                    errorSeverity
+                            );
+                        }
+
                         for (final Pair<String, String> moduleEntry: modulesWithSamePluginName) {
                             final String scope = moduleEntry.getFirst();
                             final String moduleName = moduleEntry.getSecond();

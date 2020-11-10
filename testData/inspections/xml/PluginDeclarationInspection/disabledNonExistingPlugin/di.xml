@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!--
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config>
+    <type name="Magento\CatalogSearch\Helper\Data">
+        <plugin name=<warning descr="This plugin does not exist to be disabled.">"plugin_which_does_not_exist"</warning> disabled="true" />
+    </type>
+</config>
