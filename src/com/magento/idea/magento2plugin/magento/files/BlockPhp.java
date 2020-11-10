@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.magento.files;
 
 import com.intellij.lang.Language;
@@ -16,6 +17,9 @@ public class BlockPhp implements ModuleFileInterface {
     private static BlockPhp INSTANCE = null;
     private String fileName;
 
+    /**
+     * Getter for singleton instance of class.
+     */
     public static BlockPhp getInstance(String className) {
         if (null == INSTANCE) {
             INSTANCE = new BlockPhp();

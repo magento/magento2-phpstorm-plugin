@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.magento.files;
 
 import com.intellij.lang.Language;
@@ -21,6 +22,9 @@ public class ModuleEventsXml implements ModuleFileInterface {
 
     private static ModuleEventsXml INSTANCE = null;
 
+    /**
+     * Getter for singleton instance of class.
+     */
     public static ModuleEventsXml getInstance() {
         if (null == INSTANCE) {
             INSTANCE = new ModuleEventsXml();
