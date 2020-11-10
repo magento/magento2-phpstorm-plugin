@@ -8,7 +8,7 @@ import com.intellij.lang.Language;
 import com.jetbrains.php.lang.PhpLanguage;
 
 public class PhpPreference implements ModuleFileInterface {
-    public static String TEMPLATE = "Magento Php Preference Class";
+    public static String TEMPLATE = "Magento Preference Class";
 
     private static PhpPreference INSTANCE = null;
     private String fileName;

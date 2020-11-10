@@ -9,7 +9,7 @@ import com.intellij.lang.xml.XMLLanguage;
 
 public class ModuleEventsXml implements ModuleFileInterface {
     public static String FILE_NAME = "events.xml";
-    public static String TEMPLATE = "Magento Module Events Xml";
+    public static String TEMPLATE = "Magento Events XML";
 
     //code templates
     public static String TEMPLATE_OBSERVER = "Magento Module Events Xml Observer";

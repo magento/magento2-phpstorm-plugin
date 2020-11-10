@@ -21,7 +21,7 @@ public class CronjobTemplate implements ModuleFileInterface {
 
     @Override
     public String getTemplate() {
-        return "Magento Cronjob Class";
+        return "Magento Cron Job Class";
     }
 
     @Override

@@ -9,7 +9,7 @@ import com.intellij.lang.xml.XMLLanguage;
 
 public class CrontabXmlTemplate implements ModuleFileInterface {
     public static String FILE_NAME = "crontab.xml";
-    public static String TEMPLATE = "Magento Crontab Xml";
+    public static String TEMPLATE = "Magento Cron Tab XML";
 
     // code templates
     public static String TEMPLATE_CRONJOB_REGISTRATION = "Magento Crontab Cronjob Registration";

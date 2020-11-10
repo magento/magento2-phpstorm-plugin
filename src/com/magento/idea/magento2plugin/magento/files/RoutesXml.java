@@ -10,7 +10,7 @@ import com.intellij.lang.xml.XMLLanguage;
 
 public class RoutesXml implements ModuleFileInterface {
     public static String fileName = "routes.xml";
-    public static String template = "Magento Routes Xml";
+    public static String template = "Magento Routes XML";
     public static String routerIdStandart = "standart";
     public static String routerIdAdmin = "admin";
 
