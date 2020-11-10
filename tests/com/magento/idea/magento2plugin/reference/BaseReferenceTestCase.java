@@ -128,6 +128,18 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
         fail(String.format(referenceNotFound, directoryName));
     }
 
+    protected void assertHasNoReferenceToDirectory(final String directoryName) {
+        for (final PsiReference psiReference : getElementFromCaret().getReferences()) {
+            final PsiElement resolvedElement = psiReference.resolve();
+            if (resolvedElement instanceof PsiDirectoryImpl
+                    && ((PsiDirectoryImpl) resolvedElement).getName().equals(directoryName)) {
+                final String referenceNotFound
+                        = "Failed that element does not contain reference to the directory `%s`";
+                fail(String.format(referenceNotFound, directoryName));
+            }
+        }
+    }
+
     @SuppressWarnings("PMD")
     protected void assertHasReferencePhpClass(final String phpClassFqn) {
         final PsiElement element = getElementFromCaret();
