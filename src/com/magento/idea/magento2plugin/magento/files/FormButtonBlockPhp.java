@@ -9,7 +9,7 @@ import com.intellij.lang.Language;
 import com.jetbrains.php.lang.PhpLanguage;
 
 public class FormButtonBlockPhp implements ModuleFileInterface {
-    public static String template = "Magento Php Form Button Block Class";
+    public static String template = "Magento Form Button Block Class";
 
     public static String saveMethodTemplate = "Magento Php Form Button Block Type Save";
     public static String deleteMethodTemplate = "Magento Php Form Button Block Type Delete";

@@ -11,7 +11,7 @@ import com.intellij.lang.xml.XMLLanguage;
 public class ModuleAclXml implements ModuleFileInterface {
     private static final ModuleAclXml INSTANCE = new ModuleAclXml();
     public static final String FILE_NAME = "acl.xml";
-    public static final String TEMPLATE = "Magento Module ACL XML";
+    public static final String TEMPLATE = "Magento ACL XML";
 
     //attributes
     public static final String XML_ATTR_ID = "id";

@@ -2,25 +2,28 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.magento.files;
 
 import com.intellij.lang.Language;
 import com.jetbrains.php.lang.PhpLanguage;
 
 public class ViewModelPhp implements ModuleFileInterface {
-    public static String TEMPLATE = "Magento Module Common Php Class";
-    public static String DEFAULT_DIR = "ViewModel";
-    public static String INTERFACE_FQN = "Magento\\Framework\\View\\Element\\Block\\ArgumentInterface";
-    public static String INTERFACE_NAME = "ArgumentInterface";
+    public static final String TEMPLATE = "Magento Regular Class";
+    public static final String DEFAULT_DIR = "ViewModel";
+    public static final String INTERFACE_FQN
+            = "Magento\\Framework\\View\\Element\\Block\\ArgumentInterface";
+    public static final String INTERFACE_NAME = "ArgumentInterface";
 
-    private static ViewModelPhp INSTANCE = null;
+    private static final ViewModelPhp INSTANCE = new ViewModelPhp();
     private String fileName;
 
-    public static ViewModelPhp getInstance(String className) {
-        if (null == INSTANCE) {
-            INSTANCE = new ViewModelPhp();
-        }
-        INSTANCE.setFileName(className.concat(".php"));
+    /**
+     * Getter for singleton instance of class.
+     */
+    public static ViewModelPhp getInstance(final String className) {
+        INSTANCE.fileName = className.concat(".php");
+
         return INSTANCE;
     }
 
@@ -37,9 +40,5 @@ public class ViewModelPhp implements ModuleFileInterface {
     @Override
     public Language getLanguage() {
         return PhpLanguage.INSTANCE;
-    }
-
-    private void setFileName(String filename) {
-        this.fileName = filename;
     }
 }
