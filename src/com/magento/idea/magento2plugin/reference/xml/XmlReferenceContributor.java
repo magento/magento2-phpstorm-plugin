@@ -67,7 +67,6 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
             new VirtualTypeReferenceProvider()
         );
 
-        /* TODO: Cover with tests */
         // arguments
         registrar.registerReferenceProvider(
             XmlPatterns.xmlAttributeValue().withParent(
@@ -80,7 +79,6 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
             new PhpConstructorArgumentReferenceProvider()
         );
 
-        /* TODO: Cover with tests */
         // <service method="methodName"/>
         registrar.registerReferenceProvider(
             XmlPatterns.xmlAttributeValue().withParent(
@@ -91,7 +89,6 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
             new PhpServiceMethodReferenceProvider()
         );
 
-        /* TODO: Cover with tests */
         // <job method="methodName"/>
         registrar.registerReferenceProvider(
                 XmlPatterns.xmlAttributeValue().withParent(
@@ -146,7 +143,6 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
                 new UIComponentReferenceProvider()
         );
 
-        /* TODO: Cover with tests */
         // <event name="reference" />
         registrar.registerReferenceProvider(
             XmlPatterns.xmlAttributeValue().withParent(
