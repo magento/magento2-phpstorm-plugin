@@ -28,9 +28,13 @@ public class EventNameReferenceProvider  extends PsiReferenceProvider {
 
     @NotNull
     @Override
-    public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
-        String value = StringUtil.unquoteString(element.getText());
-        Collection<VirtualFile> containingFiles = FileBasedIndex.getInstance()
+    public PsiReference[] getReferencesByElement(
+            @NotNull final PsiElement element,
+            @NotNull final ProcessingContext context
+    ) {
+        final String value = StringUtil.unquoteString(element.getText());
+        final List<PsiReference> psiReferences = new ArrayList<>();
+        final Collection<VirtualFile> containingFiles = FileBasedIndex.getInstance()
             .getContainingFiles(EventNameIndex.KEY, value,
                     GlobalSearchScope.getScopeRestrictedByFileTypes(
                             GlobalSearchScope.allScope(element.getProject()),
@@ -38,21 +42,27 @@ public class EventNameReferenceProvider  extends PsiReferenceProvider {
                     )
             );
 
-        PsiManager psiManager = PsiManager.getInstance(element.getProject());
-        for (VirtualFile virtualFile: containingFiles) {
-            PhpFile phpFile = (PhpFile) psiManager.findFile(virtualFile);
+        final PsiManager psiManager = PsiManager.getInstance(element.getProject());
+        final List<PsiElement> psiElements = new ArrayList<>();
+        for (final VirtualFile virtualFile: containingFiles) {
+            final PhpFile phpFile = (PhpFile) psiManager.findFile(virtualFile);
             if (phpFile != null) {
-                List<PsiElement> psiElements = new ArrayList<>();
                 recursiveFill(psiElements, phpFile, value);
-                if (psiElements.size() > 0) {
-                    return new PsiReference[] {new PolyVariantReferenceBase(element, psiElements)};
+                if (!psiElements.isEmpty()) {
+                    psiReferences.add(new PolyVariantReferenceBase(element, psiElements));
+                    break;
                 }
             }
         }
-        return PsiReference.EMPTY_ARRAY;
+
+        return psiReferences.toArray(new PsiReference[0]);
     }
 
-    private void recursiveFill(List<PsiElement> psiElements, PsiElement psiElement, String typeName) {
+    private void recursiveFill(
+            final List<PsiElement> psiElements,
+            final PsiElement psiElement,
+            final String typeName
+    ) {
         if (PhpPatternsHelper.STRING_METHOD_ARGUMENT.accepts(psiElement)) {
             if (StringUtil.unquoteString(psiElement.getText()).equals(typeName)) {
                 psiElements.add(psiElement);
@@ -60,7 +70,7 @@ public class EventNameReferenceProvider  extends PsiReferenceProvider {
             return;
         }
 
-        for (PsiElement child: psiElement.getChildren()) {
+        for (final PsiElement child: psiElement.getChildren()) {
             recursiveFill(psiElements, child, typeName);
         }
     }

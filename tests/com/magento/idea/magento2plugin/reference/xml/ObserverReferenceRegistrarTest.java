@@ -10,7 +10,7 @@ import com.magento.idea.magento2plugin.magento.files.ModuleEventsXml;
 public class ObserverReferenceRegistrarTest extends ReferenceXmlFixtureTestCase {
 
     /**
-     * Tests for observer instance reference in events.xml
+     * Tests for observer instance reference in events.xml.
      */
     public void testObserverInstanceMustHaveReference() {
         myFixture.configureByFile(this.getFixturePath(ModuleEventsXml.FILE_NAME));
@@ -19,11 +19,20 @@ public class ObserverReferenceRegistrarTest extends ReferenceXmlFixtureTestCase 
     }
 
     /**
-     * Tests for event name reference in events.xml
+     * Tests for event name reference in events.xml.
      */
     public void testEventNameMustHaveReference() {
         myFixture.configureByFile(this.getFixturePath(ModuleEventsXml.FILE_NAME));
 
         assertHasReferenceToMethodArgument("test_event_in_block");
+    }
+
+    /**
+     * Tests for no event name reference in events.xml.
+     */
+    public void testEventNameMustNotHaveReference() {
+        myFixture.configureByFile(this.getFixturePath(ModuleEventsXml.FILE_NAME));
+
+        assertEmptyReference();
     }
 }

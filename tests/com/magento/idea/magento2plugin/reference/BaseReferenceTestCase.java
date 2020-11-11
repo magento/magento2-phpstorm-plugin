@@ -23,6 +23,9 @@ import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings({
+        "PMD.TooManyMethods",
+})
 public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
     private static final String testDataFolderPath = "testData" + File.separator//NOPMD
             + "reference" + File.separator;
