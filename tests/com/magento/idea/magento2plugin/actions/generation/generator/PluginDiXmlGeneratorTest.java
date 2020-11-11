@@ -24,6 +24,7 @@ public class PluginDiXmlGeneratorTest extends BaseGeneratorTestCase {
     private static final String PLUGIN_CLASS_TWO_FNQ = "Foo\\Bar\\Plugin\\TestTwoPlugin";
     private static final String MODULE = "Foo_Bar";
     private static final String MODULE_DIR = "src/app/code/Foo/Bar/";
+    private static final String TEST_PLUGIN_NAME = "test_plugin_name_1";
 
     /**
      * Test checks whether di.xml is generated correctly for the base area
@@ -38,7 +39,7 @@ public class PluginDiXmlGeneratorTest extends BaseGeneratorTestCase {
                 PLUGIN_TARGET_CLASS_ONE_FNQ,
                 area,
                 "",
-                "test_plugin_name_1",
+                TEST_PLUGIN_NAME,
                 PLUGIN_CLASS_ONE_FNQ
         );
 
@@ -61,7 +62,7 @@ public class PluginDiXmlGeneratorTest extends BaseGeneratorTestCase {
                 PLUGIN_TARGET_CLASS_ONE_FNQ,
                 area,
                 "10",
-                "test_plugin_name_1",
+                TEST_PLUGIN_NAME,
                 PLUGIN_CLASS_ONE_FNQ
         );
 
@@ -106,7 +107,7 @@ public class PluginDiXmlGeneratorTest extends BaseGeneratorTestCase {
                 PLUGIN_TARGET_CLASS_ONE_FNQ,
                 area,
                 "10",
-                "test_plugin_name_1",
+                TEST_PLUGIN_NAME,
                 PLUGIN_CLASS_ONE_FNQ
         );
         final PsiFile diXml = addPluginDiXml(
@@ -135,7 +136,7 @@ public class PluginDiXmlGeneratorTest extends BaseGeneratorTestCase {
                 PLUGIN_TARGET_CLASS_ONE_FNQ,
                 area,
                 "10",
-                "test_plugin_name_1",
+                TEST_PLUGIN_NAME,
                 PLUGIN_CLASS_ONE_FNQ
         );
         final PsiFile diXml = addPluginDiXml(
