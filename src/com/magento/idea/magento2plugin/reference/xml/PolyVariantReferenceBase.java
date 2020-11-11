@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.reference.xml;
 
 import com.intellij.openapi.util.TextRange;
@@ -9,14 +10,13 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementResolveResult;
 import com.intellij.psi.PsiPolyVariantReferenceBase;
 import com.intellij.psi.ResolveResult;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Collection;
+import org.jetbrains.annotations.NotNull;
 
 public class PolyVariantReferenceBase extends PsiPolyVariantReferenceBase<PsiElement> {
 
     /**
-     * Target elements
+     * Target elements.
      */
     private Collection<? extends PsiElement> targets;
 
@@ -25,7 +25,11 @@ public class PolyVariantReferenceBase extends PsiPolyVariantReferenceBase<PsiEle
         this.targets = targets;
     }
 
-    public PolyVariantReferenceBase(PsiElement element, TextRange range, Collection<? extends PsiElement> targets) {
+    public PolyVariantReferenceBase(
+            PsiElement element,
+            TextRange range,
+            Collection<? extends PsiElement> targets
+    ) {
         super(element, range);
         this.targets = targets;
     }

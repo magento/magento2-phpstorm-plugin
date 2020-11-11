@@ -155,7 +155,10 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
         );
     }
 
-    protected void assertHasReferencetoConstructorParameter(final String argumentClassFqn, final String argumentName) {
+    protected void assertHasReferencetoConstructorParameter(
+            final String argumentClassFqn,
+            final String argumentName
+    ) {
         final PsiElement element = getElementFromCaret();
         final @Nullable PsiReference reference = element.getReference();
 
@@ -165,7 +168,8 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
             fail(referenceNotFound);
         }
 
-        String parameterClassFqn = ((Parameter) reference.resolve()).getLocalType().toStringResolved();
+        String parameterClassFqn = ((Parameter) reference.resolve())
+                .getLocalType().toStringResolved();
         String parameterName = ((Parameter) reference.resolve()).getName();
 
         assertEquals(parameterClassFqn, argumentClassFqn);
