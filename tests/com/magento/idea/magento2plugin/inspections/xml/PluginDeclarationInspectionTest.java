@@ -36,6 +36,14 @@ public class PluginDeclarationInspectionTest extends InspectionXmlFixtureTestCas
     }
 
     /**
+     * Tests warning for disabling of non-existing plugin.
+     */
+    public void testDisabledNonExistingPlugin() {
+        myFixture.configureByFile(getFixturePath(ModuleDiXml.FILE_NAME));
+        myFixture.testHighlighting(true, false, false);
+    }
+
+    /**
      * Tests whenever the duplication warning shows when the plugin name already
      * defined in the same di.xml file
      */

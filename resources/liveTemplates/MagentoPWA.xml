@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templateSet group="MagentoPWA">
+    <template name="pwac" value="import React from 'react';&#10;import {mergeClasses} from '@magento/venia-ui/lib/classify';&#10;import { shape, string } from 'prop-types';&#10;&#10;import defaultClasses from './$CSS_FILENAME_BASE$.css';&#10;&#10;const $TM_FILENAME_BASE$ = props =&gt; {&#10;    const classes = mergeClasses(defaultClasses, props.classes);&#10;    return (&lt;div className={classes.root}&gt;$END$&lt;/div&gt;);&#10;}&#10;&#10;$TM_FILENAME_BASE$.propTypes = {&#10;  classes: shape({root: string})&#10;};&#10;$TM_FILENAME_BASE$.defaultProps = {};&#10;export default $TM_FILENAME_BASE$;" description="Creates a PWA Studio pure function component" toReformat="true" toShortenFQNames="true">
+        <variable name="CSS_FILENAME_BASE" expression="decapitalize(camelCase(fileNameWithoutExtension()))" defaultValue="" alwaysStopAt="true" />
+        <variable name="TM_FILENAME_BASE" expression="capitalize(camelCase(fileNameWithoutExtension()))" defaultValue="" alwaysStopAt="true" />
+        <context>
+            <option name="JAVA_SCRIPT" value="true" />
+            <option name="TypeScript" value="true" />
+        </context>
+    </template>
+</templateSet>
