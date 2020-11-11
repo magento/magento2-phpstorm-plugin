@@ -10,7 +10,7 @@ import com.intellij.lang.xml.XMLLanguage;
 
 public class UiComponentGridXml implements ModuleFileInterface {
     public static final String FILE_EXTENSION = "xml";
-    public static final String TEMPLATE = "Magento Module UI Component Grid Xml";
+    public static final String TEMPLATE = "Magento UI Component Grid XML";
     private final String componentName;
 
     /**

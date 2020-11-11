@@ -188,28 +188,28 @@
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.AclResourceXmlInspection"/>
 
-        <internalFileTemplate name="Magento Module Composer"/>
-        <internalFileTemplate name="Magento Module Registration Php"/>
-        <internalFileTemplate name="Magento Module Xml"/>
-        <internalFileTemplate name="Magento Module DI Xml"/>
-        <internalFileTemplate name="Magento Php Preference Class"/>
-        <internalFileTemplate name="Magento Module Common Php Class"/>
+        <internalFileTemplate name="Magento Composer JSON"/>
+        <internalFileTemplate name="Magento Registration PHP"/>
+        <internalFileTemplate name="Magento Module XML"/>
+        <internalFileTemplate name="Magento DI XML"/>
+        <internalFileTemplate name="Magento Preference Class"/>
+        <internalFileTemplate name="Magento Regular Class"/>
         <internalFileTemplate name="Magento Observer Class"/>
-        <internalFileTemplate name="Magento Module Events Xml"/>
+        <internalFileTemplate name="Magento Events XML"/>
         <internalFileTemplate name="Magento GraphQL Resolver Class"/>
-        <internalFileTemplate name="Magento Cronjob Class"/>
-        <internalFileTemplate name="Magento Crontab Xml"/>
+        <internalFileTemplate name="Magento Cron Job Class"/>
+        <internalFileTemplate name="Magento Cron Tab XML"/>
         <internalFileTemplate name="Magento CLI Command Class"/>
-        <internalFileTemplate name="Magento Module Controller Backend Class"/>
-        <internalFileTemplate name="Magento Module Controller Frontend Class"/>
-        <internalFileTemplate name="Magento Module Cron Groups Xml"/>
-        <internalFileTemplate name="Magento Module UI Component Grid Xml"/>
-        <internalFileTemplate name="Magento Module Ui Custom Data Provider Php"/>
-        <internalFileTemplate name="Magento Module UI Component Form Xml"/>
-        <internalFileTemplate name="Magento Php Form Button Block Class"/>
-        <internalFileTemplate name="Magento Routes Xml"/>
-        <internalFileTemplate name="Magento Module Layout Xml"/>
-        <internalFileTemplate name="Magento Module ACL XML"/>
+        <internalFileTemplate name="Magento Backend Controller Class"/>
+        <internalFileTemplate name="Magento Frontend Controller Class"/>
+        <internalFileTemplate name="Magento Cron Groups XML"/>
+        <internalFileTemplate name="Magento UI Component Grid XML"/>
+        <internalFileTemplate name="Magento UI Component Custom Data Provider Class"/>
+        <internalFileTemplate name="Magento UI Component Form XML"/>
+        <internalFileTemplate name="Magento Form Button Block Class"/>
+        <internalFileTemplate name="Magento Routes XML"/>
+        <internalFileTemplate name="Magento Layout XML"/>
+        <internalFileTemplate name="Magento ACL XML"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 

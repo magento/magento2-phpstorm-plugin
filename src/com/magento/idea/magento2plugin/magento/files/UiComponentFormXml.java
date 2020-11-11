@@ -10,7 +10,7 @@ import com.intellij.lang.xml.XMLLanguage;
 
 public class UiComponentFormXml implements ModuleFileInterface {
     public static final String FILE_EXTENSION = "xml";
-    public static final String TEMPLATE = "Magento Module UI Component Form Xml";
+    public static final String TEMPLATE = "Magento UI Component Form XML";
     public static final String FIELD_TEMPLATE = "Magento Module UI Component Form Field Xml";
     private final String componentName;
 
