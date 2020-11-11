@@ -2,21 +2,22 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.magento.files;
 
 import com.intellij.lang.Language;
 import com.intellij.lang.xml.XMLLanguage;
 
 public class ModuleXml implements ModuleFileInterface {
-    public static String FILE_NAME = "module.xml";
-    public static String MODULE_ATTR_NAME = "name";
-    public static String TEMPLATE = "Magento Module Xml";
-    private static ModuleXml INSTANCE = null;
+    public static final String FILE_NAME = "module.xml";
+    public static final String MODULE_ATTR_NAME = "name";
+    public static final String TEMPLATE = "Magento Module XML";
+    private static final ModuleXml INSTANCE = new ModuleXml();
 
+    /**
+     * Getter for singleton instance of class.
+     */
     public static ModuleXml getInstance() {
-        if (null == INSTANCE) {
-            INSTANCE = new ModuleXml();
-        }
         return INSTANCE;
     }
 
