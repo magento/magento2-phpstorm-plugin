@@ -28,6 +28,30 @@ public class PluginDiXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test checks whether di.xml is generated correctly for the base area
      */
+    public void testGeneratePluginDiXmlFileWithoutSortOrder() {
+        final PsiFile expectedFile = myFixture.configureByFile(
+                this.getFixturePath(ModuleDiXml.FILE_NAME)
+        );
+        final String area = Areas.base.toString();
+
+        final PsiFile diXml = addPluginDiXml(
+                PLUGIN_TARGET_CLASS_ONE_FNQ,
+                area,
+                "",
+                "test_plugin_name_1",
+                PLUGIN_CLASS_ONE_FNQ
+        );
+
+        assertGeneratedFileIsCorrect(
+                expectedFile,
+                getExpectedDirectory(area),
+                diXml
+        );
+    }
+
+    /**
+     * Test checks whether di.xml is generated correctly for the base area
+     */
     public void testGeneratePluginDiXmlFileForBaseArea() {
         final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
