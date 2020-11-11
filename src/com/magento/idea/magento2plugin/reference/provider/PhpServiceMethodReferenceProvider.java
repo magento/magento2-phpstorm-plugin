@@ -15,11 +15,10 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.indexes.DiIndex;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 public class PhpServiceMethodReferenceProvider  extends PsiReferenceProvider {
 
