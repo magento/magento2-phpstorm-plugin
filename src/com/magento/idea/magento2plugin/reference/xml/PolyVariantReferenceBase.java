@@ -41,10 +41,4 @@ public class PolyVariantReferenceBase extends PsiPolyVariantReferenceBase<PsiEle
         }
         return resolveResults;
     }
-
-    @NotNull
-    @Override
-    public Object[] getVariants() {
-        return new Object[0];
-    }
 }
