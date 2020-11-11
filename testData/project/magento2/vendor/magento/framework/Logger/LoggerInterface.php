@@ -18,8 +18,6 @@ interface LoggerInterface
      * @param mixed[] $context
      *
      * @return void
-     *
-     * @throws \Psr\Log\InvalidArgumentException
      */
     public function log($level, $message, array $context = array());
 }
