@@ -168,12 +168,16 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
             fail(referenceNotFound);
         }
 
-        String parameterClassFqn = ((Parameter) reference.resolve())
+        final String parameterClassFqn = ((Parameter) reference.resolve())
                 .getLocalType().toStringResolved();
-        String parameterName = ((Parameter) reference.resolve()).getName();
+        final String parameterName = ((Parameter) reference.resolve()).getName();
 
-        assertEquals(parameterClassFqn, argumentClassFqn);
-        assertEquals(parameterName, argumentName);
+        assertEquals("Class name in argument equals class name in parameter",
+                parameterClassFqn,
+                argumentClassFqn);
+        assertEquals("Variable name in argument equals variable name in parameter",
+                parameterName,
+                argumentName);
     }
 
     protected void assertEmptyReference() {

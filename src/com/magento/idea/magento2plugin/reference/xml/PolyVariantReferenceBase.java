@@ -18,17 +18,20 @@ public class PolyVariantReferenceBase extends PsiPolyVariantReferenceBase<PsiEle
     /**
      * Target elements.
      */
-    private Collection<? extends PsiElement> targets;
+    private final Collection<? extends PsiElement> targets;
 
-    public PolyVariantReferenceBase(PsiElement element, Collection<? extends PsiElement> targets) {
+    public PolyVariantReferenceBase(
+            final PsiElement element,
+            final Collection<? extends PsiElement> targets
+    ) {
         super(element);
         this.targets = targets;
     }
 
     public PolyVariantReferenceBase(
-            PsiElement element,
-            TextRange range,
-            Collection<? extends PsiElement> targets
+            final PsiElement element,
+            final TextRange range,
+            final Collection<? extends PsiElement> targets
     ) {
         super(element, range);
         this.targets = targets;
@@ -36,12 +39,12 @@ public class PolyVariantReferenceBase extends PsiPolyVariantReferenceBase<PsiEle
 
     @NotNull
     @Override
-    public ResolveResult[] multiResolve(boolean incompleteCode) {
+    public ResolveResult[] multiResolve(final boolean incompleteCode) {
         ResolveResult[] resolveResults = new ResolveResult[targets.size()];
 
-        int i = 0;
-        for (PsiElement target : targets) {
-            resolveResults[i++] = new PsiElementResolveResult(target);
+        int index = 0;
+        for (final PsiElement target : targets) {
+            resolveResults[index++] = new PsiElementResolveResult(target);//NOPMD
         }
         return resolveResults;
     }
