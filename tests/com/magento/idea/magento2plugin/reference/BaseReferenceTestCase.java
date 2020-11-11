@@ -13,6 +13,7 @@ import com.intellij.psi.impl.file.PsiDirectoryImpl;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
+import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.inspections.BaseInspectionsTestCase;
 import com.magento.idea.magento2plugin.magento.packages.File;
@@ -150,6 +151,29 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
         assertEquals(
                 phpClassFqn,
                 result
+        );
+    }
+
+    protected void assertHasReferenceToClassMethod(
+            final String className,
+            final String methodName
+    ) {
+        final PsiElement element = getElementFromCaret();
+        final PsiReference[] references = element.getReferences();
+        final String actualClassName = ((PhpClass) references[references.length - 1].resolve()
+                .getParent()).getFQN();
+        final String actualMethodName = ((Method) references[references.length - 1].resolve())
+                .getName();
+
+        assertEquals(
+                "Class name",
+                className,
+                actualClassName
+        );
+        assertEquals(
+                "Method name",
+                methodName,
+                actualMethodName
         );
     }
 

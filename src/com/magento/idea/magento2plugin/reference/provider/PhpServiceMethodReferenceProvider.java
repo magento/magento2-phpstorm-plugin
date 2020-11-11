@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.reference.provider;
 
 import com.intellij.openapi.util.text.StringUtil;
@@ -24,22 +25,22 @@ public class PhpServiceMethodReferenceProvider  extends PsiReferenceProvider {
 
     @NotNull
     @Override
-    public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
-        if (!(element instanceof XmlElement)) {
-            return PsiReference.EMPTY_ARRAY;
-        }
+    public PsiReference[] getReferencesByElement(
+            @NotNull final PsiElement element,
+            @NotNull final ProcessingContext context
+    ) {
+        final List<PsiReference> psiReferences = new ArrayList<>();
+        final String methodName = StringUtil.unquoteString(element.getText());
+        final PhpClass phpClass = DiIndex.getPhpClassOfServiceMethod((XmlElement) element);
 
-        List<PsiReference> psiReferences = new ArrayList<>();
-
-        String methodName = StringUtil.unquoteString(element.getText());
-
-        PhpClass phpClass = DiIndex.getPhpClassOfServiceMethod((XmlElement) element);
         if (phpClass != null) {
-            Collection<Method> methods = phpClass.getMethods();
+            final Collection<Method> methods = phpClass.getMethods();
             methods.removeIf(m -> !m.getName().equalsIgnoreCase(methodName));
-            psiReferences.add(new PolyVariantReferenceBase(element, methods));
+            if (!methods.isEmpty()) {
+                psiReferences.add(new PolyVariantReferenceBase(element, methods));
+            }
         }
 
-        return psiReferences.toArray(new PsiReference[psiReferences.size()]);
+        return psiReferences.toArray(new PsiReference[0]);
     }
 }
