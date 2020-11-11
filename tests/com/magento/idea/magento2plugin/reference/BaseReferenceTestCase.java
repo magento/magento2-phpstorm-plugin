@@ -211,7 +211,8 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
 
     protected void assertHasReferenceToMethodArgument(final String argument) {
         final PsiReference[] references = getElementFromCaret().getReferences();
-        final String actualArgument = StringUtil.unquoteString(references[references.length - 1].resolve().getText());
+        final String actualArgument
+                = StringUtil.unquoteString(references[references.length - 1].resolve().getText());
         final PsiElement parameterList = references[0].resolve().getParent();
 
         if (!(parameterList instanceof ParameterList)) {

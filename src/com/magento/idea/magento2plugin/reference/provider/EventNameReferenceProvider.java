@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.reference.provider;
 
 import com.intellij.openapi.util.text.StringUtil;
@@ -15,14 +16,13 @@ import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.PhpFileType;
 import com.jetbrains.php.lang.psi.PhpFile;
-import com.magento.idea.magento2plugin.util.php.PhpPatternsHelper;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 import com.magento.idea.magento2plugin.stubs.indexes.EventNameIndex;
-import org.jetbrains.annotations.NotNull;
-
+import com.magento.idea.magento2plugin.util.php.PhpPatternsHelper;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 public class EventNameReferenceProvider  extends PsiReferenceProvider {
 
@@ -35,12 +35,14 @@ public class EventNameReferenceProvider  extends PsiReferenceProvider {
         final String value = StringUtil.unquoteString(element.getText());
         final List<PsiReference> psiReferences = new ArrayList<>();
         final Collection<VirtualFile> containingFiles = FileBasedIndex.getInstance()
-            .getContainingFiles(EventNameIndex.KEY, value,
-                    GlobalSearchScope.getScopeRestrictedByFileTypes(
-                            GlobalSearchScope.allScope(element.getProject()),
-                            PhpFileType.INSTANCE
-                    )
-            );
+                .getContainingFiles(
+                        EventNameIndex.KEY,
+                        value,
+                        GlobalSearchScope.getScopeRestrictedByFileTypes(
+                                GlobalSearchScope.allScope(element.getProject()),
+                                PhpFileType.INSTANCE
+                        )
+                );
 
         final PsiManager psiManager = PsiManager.getInstance(element.getProject());
         final List<PsiElement> psiElements = new ArrayList<>();
@@ -49,7 +51,7 @@ public class EventNameReferenceProvider  extends PsiReferenceProvider {
             if (phpFile != null) {
                 recursiveFill(psiElements, phpFile, value);
                 if (!psiElements.isEmpty()) {
-                    psiReferences.add(new PolyVariantReferenceBase(element, psiElements));
+                    psiReferences.add(new PolyVariantReferenceBase(element, psiElements));//NOPMD
                     break;
                 }
             }
