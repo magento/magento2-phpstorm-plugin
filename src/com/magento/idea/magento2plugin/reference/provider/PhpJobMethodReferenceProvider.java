@@ -28,22 +28,22 @@ public class PhpJobMethodReferenceProvider extends PsiReferenceProvider {
 
     @NotNull
     @Override
-    public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
-        if (!(element instanceof XmlElement)) {
-            return PsiReference.EMPTY_ARRAY;
-        }
+    public PsiReference[] getReferencesByElement(
+            @NotNull final PsiElement element,
+            @NotNull final ProcessingContext context
+    ) {
+        final List<PsiReference> psiReferences = new ArrayList<>();
+        final String methodName = StringUtil.unquoteString(element.getText());
+        final PhpClass phpClass = DiIndex.getPhpClassOfJobMethod((XmlElement) element);
 
-        List<PsiReference> psiReferences = new ArrayList<>();
-
-        String methodName = StringUtil.unquoteString(element.getText());
-
-        PhpClass phpClass = DiIndex.getPhpClassOfJobMethod((XmlElement) element);
         if (phpClass != null) {
-            Collection<Method> methods = phpClass.getMethods();
-            methods.removeIf(method -> !method.getName().contains(methodName));
-            psiReferences.add(new PolyVariantReferenceBase(element, methods));
+            final Collection<Method> methods = phpClass.getMethods();
+            methods.removeIf(method -> !method.getName().matches(methodName));
+            if (!methods.isEmpty()) {
+                psiReferences.add(new PolyVariantReferenceBase(element, methods));
+            }
         }
 
-        return psiReferences.toArray(new PsiReference[psiReferences.size()]);
+        return psiReferences.toArray(new PsiReference[0]);
     }
 }
