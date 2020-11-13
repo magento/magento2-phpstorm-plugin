@@ -188,7 +188,7 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
         final PsiElement element = getElementFromCaret();
         final PsiReference[] references = element.getReferences();
         final String actualClassName = ((PhpClass) references[references.length - 1].resolve()
-                .getParent()).getFQN();
+                .getParent()).getPresentableFQN();
         final String actualMethodName = ((Method) references[references.length - 1].resolve())
                 .getName();
 
