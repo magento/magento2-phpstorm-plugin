@@ -9,7 +9,7 @@ public class CollectionPhp extends AbstractPhpClass {
     public static final String ABSTRACT_COLLECTION
             = "Magento\\Framework\\Model\\ResourceModel\\Db\\Collection\\AbstractCollection";
 
-    public CollectionPhp(String className) {
+    public CollectionPhp(final String className) {
         super(className);
     }
 

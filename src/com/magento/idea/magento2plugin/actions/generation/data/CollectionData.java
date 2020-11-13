@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.actions.generation.data;
 
+@SuppressWarnings({"PMD.ExcessiveParameterList"})
 public class CollectionData {
     private final String moduleName;
     private final String dbTableName;

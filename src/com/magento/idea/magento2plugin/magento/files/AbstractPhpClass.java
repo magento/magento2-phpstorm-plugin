@@ -11,7 +11,7 @@ import com.jetbrains.php.lang.PhpLanguage;
 public abstract class AbstractPhpClass implements ModuleFileInterface {
     private final String fileName;
 
-    public AbstractPhpClass(String className) {
+    public AbstractPhpClass(final String className) {
         fileName = className.concat(".php");
     }
 

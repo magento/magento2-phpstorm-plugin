@@ -10,7 +10,7 @@ public class ModelPhp extends AbstractPhpClass {
             "Magento\\Framework\\Model\\AbstractModel";
     public static final String MODEL_DIRECTORY = "Model";
 
-    public ModelPhp(String className) {
+    public ModelPhp(final String className) {
         super(className);
     }
 
