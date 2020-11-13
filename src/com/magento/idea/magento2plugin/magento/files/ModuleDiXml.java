@@ -16,7 +16,7 @@ import com.intellij.lang.xml.XMLLanguage;
 })
 public class ModuleDiXml implements ModuleFileInterface {
     public static String FILE_NAME = "di.xml";
-    public static String TEMPLATE = "Magento Module DI Xml";
+    public static String TEMPLATE = "Magento DI XML";
 
     //code templates
     public static String TEMPLATE_PLUGIN = "Magento Module DI Xml Plugin";

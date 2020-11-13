@@ -14,7 +14,7 @@ import com.jetbrains.php.lang.PhpLanguage;
         "PMD.RedundantFieldInitializer"
 })
 public class UiComponentDataProviderPhp implements ModuleFileInterface {
-    public static final String CUSTOM_TEMPLATE = "Magento Module Ui Custom Data Provider Php";
+    public static final String CUSTOM_TEMPLATE = "Magento UI Component Custom Data Provider Class";
     public static final String FILE_EXTENSION = "php";
     public static final String CUSTOM_TYPE = "custom";
     public static final String COLLECTION_TYPE = "collection";

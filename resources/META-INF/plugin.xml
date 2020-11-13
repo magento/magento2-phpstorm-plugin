@@ -101,6 +101,7 @@
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.Settings"/>
 
         <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.completion.xml.XmlCompletionContributor" id="xml" />
+        <completion.contributor language="PHP" implementationClass="com.magento.idea.magento2plugin.completion.php.PhpCompletionContributor" id="php" />
 
         <psi.referenceContributor language="XML" implementation="com.magento.idea.magento2plugin.reference.xml.XmlReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.magento.idea.magento2plugin.reference.php.PhpReferenceContributor"/>
@@ -188,34 +189,33 @@
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.AclResourceXmlInspection"/>
 
-        <libraryRoot id=".phpstorm.meta.php" path=".phpstorm.meta.php/" runtime="false"/>
-
-        <internalFileTemplate name="Magento Module Composer"/>
-        <internalFileTemplate name="Magento Module Registration Php"/>
-        <internalFileTemplate name="Magento Module Xml"/>
-        <internalFileTemplate name="Magento Module DI Xml"/>
-        <internalFileTemplate name="Magento Php Preference Class"/>
-        <internalFileTemplate name="Magento Module Common Php Class"/>
+        <internalFileTemplate name="Magento Composer JSON"/>
+        <internalFileTemplate name="Magento Registration PHP"/>
+        <internalFileTemplate name="Magento Module XML"/>
+        <internalFileTemplate name="Magento DI XML"/>
+        <internalFileTemplate name="Magento Preference Class"/>
+        <internalFileTemplate name="Magento Regular Class"/>
         <internalFileTemplate name="Magento Observer Class"/>
-        <internalFileTemplate name="Magento Module Events Xml"/>
+        <internalFileTemplate name="Magento Events XML"/>
         <internalFileTemplate name="Magento GraphQL Resolver Class"/>
-        <internalFileTemplate name="Magento Cronjob Class"/>
-        <internalFileTemplate name="Magento Crontab Xml"/>
+        <internalFileTemplate name="Magento Cron Job Class"/>
+        <internalFileTemplate name="Magento Cron Tab XML"/>
         <internalFileTemplate name="Magento CLI Command Class"/>
-        <internalFileTemplate name="Magento Module Controller Backend Class"/>
-        <internalFileTemplate name="Magento Module Controller Frontend Class"/>
-        <internalFileTemplate name="Magento Module Cron Groups Xml"/>
-        <internalFileTemplate name="Magento Module UI Component Grid Xml"/>
-        <internalFileTemplate name="Magento Module Ui Grid Collection Data Provider Php"/>
-        <internalFileTemplate name="Magento Module Ui Custom Data Provider Php"/>
-        <internalFileTemplate name="Magento Module UI Component Form Xml"/>
-        <internalFileTemplate name="Magento Php Form Button Block Class"/>
-        <internalFileTemplate name="Magento Routes Xml"/>
-        <internalFileTemplate name="Magento Module Layout Xml"/>
-        <internalFileTemplate name="Magento Module ACL XML"/>
+        <internalFileTemplate name="Magento Backend Controller Class"/>
+        <internalFileTemplate name="Magento Frontend Controller Class"/>
+        <internalFileTemplate name="Magento Cron Groups XML"/>
+        <internalFileTemplate name="Magento UI Component Grid XML"/>
+        <internalFileTemplate name="Magento UI Component Custom Data Provider Class"/>
+        <internalFileTemplate name="Magento UI Component Form XML"/>
+        <internalFileTemplate name="Magento Form Button Block Class"/>
+        <internalFileTemplate name="Magento Routes XML"/>
+        <internalFileTemplate name="Magento Layout XML"/>
+        <internalFileTemplate name="Magento ACL XML"/>
         <internalFileTemplate name="Magento Module Collection Class"/>
         <internalFileTemplate name="Magento Module Model Class"/>
         <internalFileTemplate name="Magento Module Resource Model Class"/>
+
+        <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 
         <postStartupActivity implementation="com.magento.idea.magento2plugin.project.startup.CheckIfMagentoPathIsValidActivity"/>
     </extensions>
@@ -223,6 +223,7 @@
     <extensions defaultExtensionNs="com.jetbrains.php">
         <frameworkProjectConfigurableProvider implementation="com.magento.idea.magento2plugin.project.ConfigurableProvider"/>
         <frameworkUsageProvider implementation="com.magento.idea.magento2plugin.project.UsagesProvider"/>
+        <libraryRoot id="phpstorm.meta.php" path="/phpstorm.meta.php/" runtime="false"/>
     </extensions>
 
 </idea-plugin>

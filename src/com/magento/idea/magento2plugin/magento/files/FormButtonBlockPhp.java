@@ -6,7 +6,7 @@
 package com.magento.idea.magento2plugin.magento.files;
 
 public class FormButtonBlockPhp extends AbstractPhpClass {
-    public static String template = "Magento Php Form Button Block Class";
+    public static String template = "Magento Form Button Block Class";
 
     public static String saveMethodTemplate = "Magento Php Form Button Block Type Save";
     public static String deleteMethodTemplate = "Magento Php Form Button Block Type Delete";
