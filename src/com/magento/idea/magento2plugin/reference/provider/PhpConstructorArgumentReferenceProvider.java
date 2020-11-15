@@ -42,7 +42,7 @@ public class PhpConstructorArgumentReferenceProvider extends PsiReferenceProvide
                 final Collection<Parameter> parameterList
                         = new THashSet<>(Arrays.asList(constructor.getParameters()));
                 parameterList.removeIf(p -> !p.getName().contains(parameterName));
-                if (!parameterList.isEmpty()) {// NOPMD
+                if (!parameterList.isEmpty()) { // NOPMD
                     psiReferences.add(new PolyVariantReferenceBase(element, parameterList));
                 }
             }

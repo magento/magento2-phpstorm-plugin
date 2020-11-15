@@ -27,7 +27,8 @@ public class VirtualTypeReferenceProvider extends PsiReferenceProvider {
     ) {
         final String value = StringUtil.unquoteString(element.getText());
         final DiIndex index = DiIndex.getInstance(element.getProject());
-        final Collection<PsiElement> targets = index.getVirtualTypeElements(value, element.getResolveScope());
+        final Collection<PsiElement> targets
+                = index.getVirtualTypeElements(value, element.getResolveScope());
         final List<PsiReference> psiReferences = new ArrayList<>();
 
         if (!targets.isEmpty()) {
