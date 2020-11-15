@@ -13,7 +13,7 @@ public class ConstructorArgumentCompletionRegistrarTest extends CompletionXmlFix
      * Tests for completion of constructor argument in di.xml.
      */
     public void testDiXmlMustHaveCompletion() {
-        String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
+        final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
         myFixture.copyFileToProject(filePath);
 
         assertFileContainsCompletions(filePath, "logger");
