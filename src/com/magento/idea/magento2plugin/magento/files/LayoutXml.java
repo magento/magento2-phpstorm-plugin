@@ -25,7 +25,7 @@ public class LayoutXml implements ModuleFileInterface {
     public static String NAME_ATTRIBUTE = "name";
     public static String CONTENT_CONTAINER_NAME = "content";
 
-    public static String TEMPLATE = "Magento Module Layout Xml";
+    public static String TEMPLATE = "Magento Layout XML";
     private String fileName;
 
     /**

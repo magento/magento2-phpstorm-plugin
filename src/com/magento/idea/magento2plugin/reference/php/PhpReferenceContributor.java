@@ -11,6 +11,7 @@ import com.intellij.psi.PsiReferenceRegistrar;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.tags.PhpDocTag;
 import com.magento.idea.magento2plugin.reference.provider.DataFixtureReferenceProvider;
 import com.magento.idea.magento2plugin.reference.provider.EventDispatchReferenceProvider;
+import com.magento.idea.magento2plugin.reference.provider.ModuleNameReferenceProvider;
 import com.magento.idea.magento2plugin.util.php.PhpPatternsHelper;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,6 +22,16 @@ public class PhpReferenceContributor extends PsiReferenceContributor {
         registrar.registerReferenceProvider(
                 PhpPatternsHelper.STRING_METHOD_ARGUMENT,
                 new EventDispatchReferenceProvider()
+        );
+
+        /*
+          'modules' => [
+            'Vendor_Module' => 1
+          ]
+         */
+        registrar.registerReferenceProvider(
+                PhpPatternsHelper.CONFIGPHP_MODULENAME,
+                new ModuleNameReferenceProvider()
         );
 
         // @magentoApiDataFixture Vendor/Module/_files/data_fixture.php
