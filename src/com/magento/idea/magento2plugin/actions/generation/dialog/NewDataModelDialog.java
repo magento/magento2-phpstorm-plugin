@@ -33,7 +33,6 @@ import java.awt.event.WindowEvent;
 
 public class NewDataModelDialog extends AbstractDialog {
     private final Project project;
-    private final PsiDirectory directory;
     private final String moduleName;
     private NamespaceBuilder interfaceNamespace;
     private NamespaceBuilder modelNamespace;
@@ -54,7 +53,6 @@ public class NewDataModelDialog extends AbstractDialog {
         super();
 
         this.project = project;
-        this.directory = directory;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
         setContentPane(contentPanel);
@@ -108,7 +106,8 @@ public class NewDataModelDialog extends AbstractDialog {
                 getInterfaceNamespace(),
                 getInterfaceName(),
                 getModuleName(),
-                getInterfaceFQN()
+                getInterfaceFQN(),
+                getProperties()
         )).generate(NewDataModelAction.ACTION_NAME, true);
     }
 
@@ -118,7 +117,8 @@ public class NewDataModelDialog extends AbstractDialog {
                 getModelName(),
                 getModuleName(),
                 getModelFQN(),
-                getInterfaceFQN()
+                getInterfaceFQN(),
+                getProperties()
         )).generate(NewDataModelAction.ACTION_NAME, true);
     }
 
@@ -157,5 +157,9 @@ public class NewDataModelDialog extends AbstractDialog {
 
     private String getModelFQN() {
         return modelNamespace.getClassFqn();
+    }
+
+    private String getProperties() {
+        return "";
     }
 }
