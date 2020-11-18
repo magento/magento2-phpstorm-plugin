@@ -95,6 +95,7 @@ public class DataModelInterfaceGenerator extends FileGenerator {
     protected void fillAttributes(Properties attributes) {
         attributes.setProperty("NAME", interfaceData.getName());
         attributes.setProperty("NAMESPACE", interfaceData.getNamespace());
+        attributes.setProperty("PROPERTIES", interfaceData.getProperties());
     }
 
     private PhpClass createInterface(String actionName) {

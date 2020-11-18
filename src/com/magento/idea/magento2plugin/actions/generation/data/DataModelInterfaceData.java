@@ -10,17 +10,20 @@ public class DataModelInterfaceData {
     private final String name;
     private final String moduleName;
     private final String fqn;
+    private final String properties;
 
     public DataModelInterfaceData(
             final String namespace,
             final String name,
             final String moduleName,
-            final String fqn
+            final String fqn,
+            final String properties
     ) {
         this.namespace = namespace;
         this.name = name;
         this.moduleName = moduleName;
         this.fqn = fqn;
+        this.properties = properties;
     }
 
     public String getNamespace() {
@@ -37,5 +40,9 @@ public class DataModelInterfaceData {
 
     public String getFQN() {
         return fqn;
+    }
+
+    public String getProperties() {
+        return properties;
     }
 }

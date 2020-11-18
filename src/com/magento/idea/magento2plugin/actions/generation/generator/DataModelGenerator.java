@@ -105,6 +105,7 @@ public class DataModelGenerator extends FileGenerator {
                 "IMPLEMENTS",
                 PhpClassGeneratorUtil.getNameFromFqn(modelData.getInterfaceFQN())
         );
+        attributes.setProperty("PROPERTIES", modelData.getProperties());
     }
 
     private List<String> getUses() {
