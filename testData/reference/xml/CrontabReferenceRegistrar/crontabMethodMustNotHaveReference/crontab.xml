@@ -10,7 +10,7 @@
     <group id="default">
         <job name="catalog_index_refresh_price"
              instance="Magento\Catalog\Cron\RefreshSpecialPrices"
-             method="execute<caret>">
+             method="notExecute<caret>">
             <schedule>* * * * *</schedule>
         </job>
     </group>

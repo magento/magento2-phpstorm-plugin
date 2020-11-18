@@ -14,7 +14,7 @@ public class WebApiMethodReferenceRegistrarTest extends ReferenceXmlFixtureTestC
         myFixture.configureByFile(this.getFixturePath("webapi.xml"));
 
         assertHasReferenceToClassMethod(
-                "\\Magento\\Catalog\\Api\\ProductRepositoryInterface",
+                "Magento\\Catalog\\Api\\ProductRepositoryInterface",
                 "save"
         );
     }
