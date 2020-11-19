@@ -131,7 +131,6 @@
               </grid>
             </constraints>
             <properties>
-              <text value="10"/>
               <toolTipText value="Plugin sort order in di.xml"/>
             </properties>
             <clientProperties>

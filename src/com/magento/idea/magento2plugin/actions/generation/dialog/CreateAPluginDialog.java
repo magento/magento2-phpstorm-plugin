@@ -82,8 +82,6 @@ public class CreateAPluginDialog extends AbstractDialog {
             message = {DirectoryRule.MESSAGE, DIRECTORY})
     private JTextField pluginDirectory;
 
-    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, SORT_ORDER})
     @FieldValidation(rule = RuleRegistry.NUMERIC,
             message = {NumericRule.MESSAGE, SORT_ORDER})
     private JTextField pluginSortOrder;
