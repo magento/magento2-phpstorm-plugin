@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.ComboBoxTableRenderer;
 import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.actions.generation.NewDataModelAction;
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelData;
@@ -19,13 +20,20 @@ import com.magento.idea.magento2plugin.actions.generation.generator.DataModelInt
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.magento.files.DataModel;
 import com.magento.idea.magento2plugin.magento.files.DataModelInterface;
+import com.magento.idea.magento2plugin.ui.table.ComboBoxEditor;
+import com.magento.idea.magento2plugin.ui.table.DeleteRowButton;
+import com.magento.idea.magento2plugin.ui.table.TableButton;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -38,10 +46,18 @@ public class NewDataModelDialog extends AbstractDialog {
     private NamespaceBuilder modelNamespace;
 
     private static final String MODEL_NAME = "Model Name";
+    private static final String PROPERTY_NAME = "Name";
+    private static final String PROPERTY_TYPE = "Type";
+    private static final String PROPERTY_ACTION = "Action";
+    private static final String PROPERTY_DELETE = "Delete";
+
+    private static final String[] PROPERTY_TYPES = {"int", "float", "string", "bool"};
 
     private JPanel contentPanel;
     private JButton buttonOK;
     private JButton buttonCancel;
+    private JTable properties;
+    private JButton addProperty;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, MODEL_NAME})
@@ -72,6 +88,8 @@ public class NewDataModelDialog extends AbstractDialog {
             }
         });
 
+        initPropertiesTable();
+
         // call onCancel() on ESCAPE KEY press
         contentPanel.registerKeyboardAction(
                 (final ActionEvent event) -> onCancel(),
@@ -87,7 +105,7 @@ public class NewDataModelDialog extends AbstractDialog {
         dialog.setVisible(true);
     }
 
-    protected void onOK() {
+    private void onOK() {
         if (validateFormFields()) {
             buildNamespaces();
             generateModelInterfaceFile();
@@ -161,5 +179,41 @@ public class NewDataModelDialog extends AbstractDialog {
 
     private String getProperties() {
         return "";
+    }
+
+    private void initPropertiesTable() {
+        final DefaultTableModel propertiesTable = getPropertiesTable();
+        propertiesTable.setDataVector(
+                new Object[][]{},
+                new Object[]{
+                        PROPERTY_NAME,
+                        PROPERTY_TYPE,
+                        PROPERTY_ACTION
+                }
+        );
+
+        final TableColumn column = properties.getColumn(PROPERTY_ACTION);
+        column.setCellRenderer(new TableButton(PROPERTY_DELETE));
+        column.setCellEditor(new DeleteRowButton(new JCheckBox()));
+
+        addProperty.addActionListener(e -> {
+            propertiesTable.addRow(new Object[]{
+                    "",
+                    PROPERTY_TYPES[0],
+                    PROPERTY_DELETE
+            });
+        });
+
+        initPropertyTypeColumn();
+    }
+
+    private void initPropertyTypeColumn() {
+        final TableColumn formElementTypeColumn = properties.getColumn(PROPERTY_TYPE);
+        formElementTypeColumn.setCellEditor(new ComboBoxEditor(PROPERTY_TYPES));
+        formElementTypeColumn.setCellRenderer(new ComboBoxTableRenderer<>(PROPERTY_TYPES));
+    }
+
+    private DefaultTableModel getPropertiesTable() {
+        return (DefaultTableModel) properties.getModel();
     }
 }
