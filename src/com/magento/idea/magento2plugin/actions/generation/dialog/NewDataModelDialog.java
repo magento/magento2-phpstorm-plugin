@@ -10,20 +10,24 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBoxTableRenderer;
 import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.actions.generation.NewDataModelAction;
+import com.magento.idea.magento2plugin.actions.generation.OverrideClassByAPreferenceAction;
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelInterfaceData;
+import com.magento.idea.magento2plugin.actions.generation.data.PreferenceDiXmFileData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.DataModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DataModelInterfaceGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.PreferenceDiXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.magento.files.DataModel;
 import com.magento.idea.magento2plugin.magento.files.DataModelInterface;
 import com.magento.idea.magento2plugin.ui.table.ComboBoxEditor;
 import com.magento.idea.magento2plugin.ui.table.DeleteRowButton;
 import com.magento.idea.magento2plugin.ui.table.TableButton;
+import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -123,6 +127,7 @@ public class NewDataModelDialog extends AbstractDialog {
             formatProperties();
             generateModelInterfaceFile();
             generateModelFile();
+            generatePreference();
             this.setVisible(false);
         }
     }
@@ -151,6 +156,16 @@ public class NewDataModelDialog extends AbstractDialog {
                 getInterfaceFQN(),
                 getProperties()
         )).generate(NewDataModelAction.ACTION_NAME, true);
+    }
+
+    private void generatePreference() {
+        new PreferenceDiXmlGenerator(new PreferenceDiXmFileData(
+                getModuleName(),
+                GetPhpClassByFQN.getInstance(project).execute(getInterfaceFQN()),
+                getModelFQN(),
+                getModelNamespace(),
+                "base"
+        ), project).generate(OverrideClassByAPreferenceAction.ACTION_NAME);
     }
 
     private void buildNamespaces() {
