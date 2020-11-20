@@ -41,9 +41,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import org.apache.commons.lang.StringUtils;
 
-
 @SuppressWarnings({
-        "PMD.ExcessiveImports"
+        "PMD.ExcessiveImports",
 })
 public class NewDataModelDialog extends AbstractDialog {
     private final Project project;
@@ -72,6 +71,9 @@ public class NewDataModelDialog extends AbstractDialog {
             message = {PhpClassRule.MESSAGE, MODEL_NAME})
     private JTextField modelName;
 
+    /**
+     * Constructor.
+     */
     public NewDataModelDialog(final Project project, final PsiDirectory directory) {
         super();
 
@@ -105,6 +107,9 @@ public class NewDataModelDialog extends AbstractDialog {
         );
     }
 
+    /**
+     * Opens the dialog window.
+     */
     public static void open(final Project project, final PsiDirectory directory) {
         final NewDataModelDialog dialog = new NewDataModelDialog(project, directory);
         dialog.pack();

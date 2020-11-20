@@ -21,11 +21,10 @@ import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.DataModel;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-
-import javax.swing.JOptionPane;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import javax.swing.JOptionPane;
 
 public class DataModelGenerator extends FileGenerator {
     private final Project project;
@@ -36,6 +35,9 @@ public class DataModelGenerator extends FileGenerator {
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
 
+    /**
+     * Constructor.
+     */
     public DataModelGenerator(Project project, DataModelData modelData) {
         super(project);
 

@@ -13,6 +13,9 @@ public class DataModelData {
     private final String interfaceFQN;
     private final String properties;
 
+    /**
+     * Constructor.
+     */
     public DataModelData(
             final String namespace,
             final String name,

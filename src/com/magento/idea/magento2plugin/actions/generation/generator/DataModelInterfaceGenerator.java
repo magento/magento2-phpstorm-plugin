@@ -20,9 +20,8 @@ import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.DataModelInterface;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-
-import javax.swing.JOptionPane;
 import java.util.Properties;
+import javax.swing.JOptionPane;
 
 public class DataModelInterfaceGenerator extends FileGenerator {
     private final Project project;
@@ -33,6 +32,9 @@ public class DataModelInterfaceGenerator extends FileGenerator {
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
 
+    /**
+     * Constructor.
+     */
     public DataModelInterfaceGenerator(
             final Project project,
             final DataModelInterfaceData interfaceData

@@ -12,6 +12,9 @@ public class DataModelInterfaceData {
     private final String fqn;
     private final String properties;
 
+    /**
+     * Constructor.
+     */
     public DataModelInterfaceData(
             final String namespace,
             final String name,
