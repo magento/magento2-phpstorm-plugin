@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.reference;
 
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
@@ -15,12 +16,16 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.Parameter;
+import com.jetbrains.php.lang.psi.elements.ParameterList;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.inspections.BaseInspectionsTestCase;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings({
+        "PMD.TooManyMethods",
+})
 public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
     private static final String testDataFolderPath = "testData" + File.separator//NOPMD
             + "reference" + File.separator;
@@ -201,6 +206,23 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
                 "Method name",
                 methodName,
                 actualMethodName
+        );
+    }
+
+    protected void assertHasReferenceToMethodArgument(final String argument) {
+        final PsiReference[] references = getElementFromCaret().getReferences();
+        final String actualArgument
+                = StringUtil.unquoteString(references[references.length - 1].resolve().getText());
+        final PsiElement parameterList = references[0].resolve().getParent();
+
+        if (!(parameterList instanceof ParameterList)) {
+            fail("Element doesn't have a reference to a method parameter");
+        }
+
+        assertEquals(
+                "Event dispatch argument",
+                argument,
+                actualArgument
         );
     }
 

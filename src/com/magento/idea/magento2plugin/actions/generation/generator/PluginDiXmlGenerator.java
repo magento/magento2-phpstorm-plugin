@@ -161,6 +161,9 @@ public class PluginDiXmlGenerator extends FileGenerator {
         attributes.setProperty("NAME", pluginFileData.getPluginName());
         attributes.setProperty("PLUGIN_TYPE", pluginFileData.getPluginFqn());
         attributes.setProperty("PLUGIN_NAME", pluginFileData.getPluginName());
-        attributes.setProperty("SORT_ORDER", pluginFileData.getSortOrder());
+        final String sortOrder = pluginFileData.getSortOrder();
+        if (!sortOrder.isEmpty()) {
+            attributes.setProperty("SORT_ORDER", sortOrder);
+        }
     }
 }
