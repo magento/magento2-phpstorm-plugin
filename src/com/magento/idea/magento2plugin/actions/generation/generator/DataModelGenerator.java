@@ -38,7 +38,7 @@ public class DataModelGenerator extends FileGenerator {
     /**
      * Constructor.
      */
-    public DataModelGenerator(Project project, DataModelData modelData) {
+    public DataModelGenerator(final Project project, final DataModelData modelData) {
         super(project);
 
         this.project = project;
@@ -51,7 +51,7 @@ public class DataModelGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(String actionName) {
+    public PsiFile generate(final String actionName) {
         final PsiFile[] files = new PsiFile[1];
 
         WriteCommandAction.runWriteCommandAction(project, () -> {
@@ -59,18 +59,7 @@ public class DataModelGenerator extends FileGenerator {
                     modelData.getFQN()
             );
 
-            if (model != null) {
-                final String errorMessage = this.validatorBundle.message(
-                        "validator.file.alreadyExists",
-                        "Data Model"
-                );
-                JOptionPane.showMessageDialog(
-                        null,
-                        errorMessage,
-                        commonBundle.message("common.error"),
-                        JOptionPane.ERROR_MESSAGE
-                );
-            } else {
+            if (model == null) {
                 model = createModel(actionName);
 
                 if (model == null) {
@@ -87,6 +76,17 @@ public class DataModelGenerator extends FileGenerator {
                 } else {
                     files[0] = model.getContainingFile();
                 }
+            } else {
+                final String errorMessage = this.validatorBundle.message(
+                        "validator.file.alreadyExists",
+                        "Data Model"
+                );
+                JOptionPane.showMessageDialog(
+                        null,
+                        errorMessage,
+                        commonBundle.message("common.error"),
+                        JOptionPane.ERROR_MESSAGE
+                );
             }
         });
 
@@ -94,7 +94,7 @@ public class DataModelGenerator extends FileGenerator {
     }
 
     @Override
-    protected void fillAttributes(Properties attributes) {
+    protected void fillAttributes(final Properties attributes) {
         final List<String> uses = getUses();
         attributes.setProperty("NAMESPACE", modelData.getNamespace());
         attributes.setProperty("USES", PhpClassGeneratorUtil.formatUses(uses));
@@ -117,13 +117,13 @@ public class DataModelGenerator extends FileGenerator {
         );
     }
 
-    private PhpClass createModel(String actionName) {
+    private PhpClass createModel(final String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(modelData.getModuleName());
         final PsiFile interfaceFile;
         final Properties attributes = getAttributes();
 
-        for (String directory: DataModel.DIRECTORY.split("/")) {
+        for (final String directory: DataModel.DIRECTORY.split("/")) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(
                     parentDirectory, directory
             );

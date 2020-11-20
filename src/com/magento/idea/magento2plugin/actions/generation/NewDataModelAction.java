@@ -29,7 +29,7 @@ public class NewDataModelAction extends AnAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent event) {
+    public void actionPerformed(@NotNull final AnActionEvent event) {
         final DataContext dataContext = event.getDataContext();
 
         final IdeView view = LangDataKeys.IDE_VIEW.getData(dataContext);

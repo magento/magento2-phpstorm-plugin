@@ -51,7 +51,7 @@ public class DataModelInterfaceGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(String actionName) {
+    public PsiFile generate(final String actionName) {
         final PsiFile[] files = new PsiFile[1];
 
         WriteCommandAction.runWriteCommandAction(project, () -> {
@@ -59,18 +59,7 @@ public class DataModelInterfaceGenerator extends FileGenerator {
                     interfaceData.getFQN()
             );
 
-            if (modelInterface != null) {
-                final String errorMessage = this.validatorBundle.message(
-                        "validator.file.alreadyExists",
-                        "Data Model Interface"
-                );
-                JOptionPane.showMessageDialog(
-                        null,
-                        errorMessage,
-                        commonBundle.message("common.error"),
-                        JOptionPane.ERROR_MESSAGE
-                );
-            } else {
+            if (modelInterface == null) {
                 modelInterface = createInterface(actionName);
 
                 if (modelInterface == null) {
@@ -87,6 +76,17 @@ public class DataModelInterfaceGenerator extends FileGenerator {
                 } else {
                     files[0] = modelInterface.getContainingFile();
                 }
+            } else {
+                final String errorMessage = this.validatorBundle.message(
+                        "validator.file.alreadyExists",
+                        "Data Model Interface"
+                );
+                JOptionPane.showMessageDialog(
+                        null,
+                        errorMessage,
+                        commonBundle.message("common.error"),
+                        JOptionPane.ERROR_MESSAGE
+                );
             }
         });
 
@@ -94,19 +94,19 @@ public class DataModelInterfaceGenerator extends FileGenerator {
     }
 
     @Override
-    protected void fillAttributes(Properties attributes) {
+    protected void fillAttributes(final Properties attributes) {
         attributes.setProperty("NAME", interfaceData.getName());
         attributes.setProperty("NAMESPACE", interfaceData.getNamespace());
         attributes.setProperty("PROPERTIES", interfaceData.getProperties());
     }
 
-    private PhpClass createInterface(String actionName) {
+    private PhpClass createInterface(final String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(interfaceData.getModuleName());
         final PsiFile interfaceFile;
         final Properties attributes = getAttributes();
 
-        for (String directory: DataModelInterface.DIRECTORY.split("/")) {
+        for (final String directory: DataModelInterface.DIRECTORY.split("/")) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(
                     parentDirectory, directory
             );
