@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
+import com.google.common.base.CaseFormat;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBoxTableRenderer;
 import com.intellij.psi.PsiDirectory;
@@ -24,7 +25,11 @@ import com.magento.idea.magento2plugin.ui.table.ComboBoxEditor;
 import com.magento.idea.magento2plugin.ui.table.DeleteRowButton;
 import com.magento.idea.magento2plugin.ui.table.TableButton;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -34,16 +39,18 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import org.apache.commons.lang.StringUtils;
 
+
+@SuppressWarnings({
+        "PMD.ExcessiveImports"
+})
 public class NewDataModelDialog extends AbstractDialog {
     private final Project project;
     private final String moduleName;
     private NamespaceBuilder interfaceNamespace;
     private NamespaceBuilder modelNamespace;
+    private String formattedProperties;
 
     private static final String MODEL_NAME = "Model Name";
     private static final String PROPERTY_NAME = "Name";
@@ -108,6 +115,7 @@ public class NewDataModelDialog extends AbstractDialog {
     private void onOK() {
         if (validateFormFields()) {
             buildNamespaces();
+            formatProperties();
             generateModelInterfaceFile();
             generateModelFile();
             this.setVisible(false);
@@ -149,6 +157,32 @@ public class NewDataModelDialog extends AbstractDialog {
         );
     }
 
+    /**
+     * Formats properties into a string format, ready for templating.
+     * "UPPER_SNAKE;lower_snake;type;UpperCamel;lowerCamel".
+     */
+    private void formatProperties() {
+        final DefaultTableModel propertiesTable = getPropertiesTable();
+        final ArrayList<String> properties = new ArrayList<>();
+        final ArrayList<String> propertyData = new ArrayList<>();
+        final int rowCount = propertiesTable.getRowCount();
+        String name;
+        String type;
+
+        for (int index = 0; index < rowCount; index++, propertyData.clear()) {
+            name = propertiesTable.getValueAt(index, 0).toString();
+            type = propertiesTable.getValueAt(index, 1).toString();
+            propertyData.add(CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_UNDERSCORE, name));
+            propertyData.add(name);
+            propertyData.add(type);
+            propertyData.add(CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name));
+            propertyData.add(CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name));
+            properties.add(StringUtils.join(propertyData, ";"));
+        }
+
+        formattedProperties = StringUtils.join(properties, ",");
+    }
+
     private String getModuleName() {
         return moduleName;
     }
@@ -178,7 +212,7 @@ public class NewDataModelDialog extends AbstractDialog {
     }
 
     private String getProperties() {
-        return "";
+        return formattedProperties;
     }
 
     private void initPropertiesTable() {
