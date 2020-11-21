@@ -16,6 +16,6 @@ public class ResourceModelPhp extends AbstractPhpClass {
 
     @Override
     public String getTemplate() {
-        return "Magento Module Resource Model Class";
+        return "Magento Resource Model Class";
     }
 }

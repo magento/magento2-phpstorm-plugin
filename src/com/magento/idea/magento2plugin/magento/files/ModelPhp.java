@@ -16,6 +16,6 @@ public class ModelPhp extends AbstractPhpClass {
 
     @Override
     public String getTemplate() {
-        return "Magento Module Model Class";
+        return "Magento Model Class";
     }
 }

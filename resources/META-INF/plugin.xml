@@ -211,9 +211,9 @@
         <internalFileTemplate name="Magento Routes XML"/>
         <internalFileTemplate name="Magento Layout XML"/>
         <internalFileTemplate name="Magento ACL XML"/>
-        <internalFileTemplate name="Magento Module Collection Class"/>
-        <internalFileTemplate name="Magento Module Model Class"/>
-        <internalFileTemplate name="Magento Module Resource Model Class"/>
+        <internalFileTemplate name="Magento Collection Class"/>
+        <internalFileTemplate name="Magento Model Class"/>
+        <internalFileTemplate name="Magento Resource Model Class"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 

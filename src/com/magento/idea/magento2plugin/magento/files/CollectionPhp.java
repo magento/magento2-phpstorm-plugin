@@ -15,6 +15,6 @@ public class CollectionPhp extends AbstractPhpClass {
 
     @Override
     public String getTemplate() {
-        return "Magento Module Collection Class";
+        return "Magento Collection Class";
     }
 }
