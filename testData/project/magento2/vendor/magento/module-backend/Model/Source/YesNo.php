@@ -16,6 +16,11 @@ class YesNo implements ArrayInterface
     private $logger;
 
     /**
+     * Constant to hold test string
+     */
+    public const TEST_STRING = "Test string";
+
+    /**
      * YesNo constructor.
      *
      * @param LoggerInterface $logger
