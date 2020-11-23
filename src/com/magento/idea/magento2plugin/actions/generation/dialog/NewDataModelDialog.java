@@ -22,12 +22,15 @@ import com.magento.idea.magento2plugin.actions.generation.generator.DataModelGen
 import com.magento.idea.magento2plugin.actions.generation.generator.DataModelInterfaceGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.PreferenceDiXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
+import com.magento.idea.magento2plugin.bundles.CommonBundle;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.magento.files.DataModel;
 import com.magento.idea.magento2plugin.magento.files.DataModelInterface;
 import com.magento.idea.magento2plugin.ui.table.ComboBoxEditor;
 import com.magento.idea.magento2plugin.ui.table.DeleteRowButton;
 import com.magento.idea.magento2plugin.ui.table.TableButton;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
+import com.magento.idea.magento2plugin.util.RegExUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -37,6 +40,7 @@ import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -47,10 +51,13 @@ import org.apache.commons.lang.StringUtils;
 
 @SuppressWarnings({
         "PMD.ExcessiveImports",
+        "PMD.TooManyMethods",
 })
 public class NewDataModelDialog extends AbstractDialog {
     private final Project project;
     private final String moduleName;
+    private final ValidatorBundle validatorBundle;
+    private final CommonBundle commonBundle;
     private NamespaceBuilder interfaceNamespace;
     private NamespaceBuilder modelNamespace;
     private String formattedProperties;
@@ -83,6 +90,8 @@ public class NewDataModelDialog extends AbstractDialog {
 
         this.project = project;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
+        this.validatorBundle = new ValidatorBundle();
+        this.commonBundle = new CommonBundle();
 
         setContentPane(contentPanel);
         setModal(true);
@@ -130,6 +139,46 @@ public class NewDataModelDialog extends AbstractDialog {
             generatePreference();
             this.setVisible(false);
         }
+    }
+
+    @Override
+    protected boolean validateFormFields() {
+        boolean valid = false;
+        if (super.validateFormFields()) {
+            valid = true;
+            final String errorTitle = commonBundle.message("common.error");
+            final int column = 0;
+            for (int row = 0; row < properties.getRowCount(); row++) {
+                final String propertyName = ((String) properties.getValueAt(row, column)).trim();
+                if (propertyName.isEmpty()) {
+                    valid = false;
+                    final String errorMessage = validatorBundle.message(
+                            "validator.notEmpty", "name"
+                    );
+                    JOptionPane.showMessageDialog(
+                            null,
+                            errorMessage,
+                            errorTitle,
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    break;
+                } else if (!propertyName.matches(RegExUtil.LOWER_SNAKE_CASE)) {
+                    valid = false;
+                    final String errorMessage = validatorBundle.message(
+                            "validator.lowerSnakeCase", "name"
+                    );
+                    JOptionPane.showMessageDialog(
+                            null,
+                            errorMessage,
+                            errorTitle,
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    break;
+                }
+            }
+        }
+
+        return valid;
     }
 
     @Override
