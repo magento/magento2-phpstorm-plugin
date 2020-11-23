@@ -13,9 +13,9 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.util.ProcessingContext;
 import com.magento.idea.magento2plugin.indexes.UIComponentIndex;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
+import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
-
 
 public class UIComponentReferenceProvider extends PsiReferenceProvider {
 
@@ -30,9 +30,12 @@ public class UIComponentReferenceProvider extends PsiReferenceProvider {
                 element.getProject(),
                 value
         );
+        final List<PsiReference> psiReferences = new ArrayList<>();
+
         if (!targets.isEmpty()) {
-            return new PsiReference[] {new PolyVariantReferenceBase(element, targets)};
+            psiReferences.add(new PolyVariantReferenceBase(element, targets));
         }
-        return PsiReference.EMPTY_ARRAY;
+
+        return psiReferences.toArray(new PsiReference[0]);
     }
 }
