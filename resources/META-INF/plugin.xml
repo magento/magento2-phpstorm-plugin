@@ -67,6 +67,7 @@
             <action id="MagentoCreateCLICommand" class="com.magento.idea.magento2plugin.actions.generation.NewCLICommandAction" />
             <action id="MagentoCreateUiComponentGrid" class="com.magento.idea.magento2plugin.actions.generation.NewUiComponentGridAction" />
             <action id="MagentoCreateUiComponentForm" class="com.magento.idea.magento2plugin.actions.generation.NewUiComponentFormAction" />
+            <action id="NewModelsAction" class="com.magento.idea.magento2plugin.actions.generation.NewModelsAction" />
             <add-to-group group-id="NewGroup" anchor="last"/>
         </group>
 
@@ -210,6 +211,9 @@
         <internalFileTemplate name="Magento Routes XML"/>
         <internalFileTemplate name="Magento Layout XML"/>
         <internalFileTemplate name="Magento ACL XML"/>
+        <internalFileTemplate name="Magento Collection Class"/>
+        <internalFileTemplate name="Magento Model Class"/>
+        <internalFileTemplate name="Magento Resource Model Class"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 
