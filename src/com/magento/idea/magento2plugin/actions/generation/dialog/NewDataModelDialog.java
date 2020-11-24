@@ -241,13 +241,13 @@ public class NewDataModelDialog extends AbstractDialog {
         for (int index = 0; index < rowCount; index++) {
             name = propertiesTable.getValueAt(index, 0).toString();
             type = propertiesTable.getValueAt(index, 1).toString();
-            properties.add((new ClassPropertyData(
+            properties.add(new ClassPropertyData(// NOPMD
                     type,
                     CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name),
                     CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name),
                     name,
                     CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_UNDERSCORE, name)
-            )).string());
+            ).string());
         }
     }
 
