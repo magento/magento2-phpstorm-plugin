@@ -48,14 +48,14 @@ public class SchemaResolverInspection extends LocalInspectionTool {
                             ),
                             ProblemHighlightType.ERROR,
                             new CreateResolverClassQuickFix());
-                    return;
-                }
-                if (!GraphQlUtil.isResolver(resolverClass)) {
-                    holder.registerProblem(element,
-                        inspectionBundle.message(
-                            "inspection.graphql.resolver.mustImplement"
-                        ),
-                        ProblemHighlightType.ERROR);
+                } else if (!GraphQlUtil.isResolver(resolverClass)) {
+                    holder.registerProblem(
+                            element,
+                            inspectionBundle.message(
+                                    "inspection.graphql.resolver.mustImplement"
+                            ),
+                            ProblemHighlightType.ERROR
+                    );
                 }
             }
         };
