@@ -53,7 +53,7 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="df4c9" class="javax.swing.JTable" binding="properties">
+              <component id="df4c9" class="javax.swing.JTable" binding="propertyTable">
                 <constraints/>
                 <properties>
                   <intercellSpacing width="1" height="3"/>

@@ -14,6 +14,7 @@ import com.magento.idea.magento2plugin.actions.generation.OverrideClassByAPrefer
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelInterfaceData;
 import com.magento.idea.magento2plugin.actions.generation.data.PreferenceDiXmFileData;
+import com.magento.idea.magento2plugin.actions.generation.data.code.ClassPropertyData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
@@ -37,6 +38,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -58,9 +60,9 @@ public class NewDataModelDialog extends AbstractDialog {
     private final String moduleName;
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
+    private final List<String> properties;
     private NamespaceBuilder interfaceNamespace;
     private NamespaceBuilder modelNamespace;
-    private String formattedProperties;
 
     private static final String MODEL_NAME = "Model Name";
     private static final String PROPERTY_NAME = "Name";
@@ -73,7 +75,7 @@ public class NewDataModelDialog extends AbstractDialog {
     private JPanel contentPanel;
     private JButton buttonOK;
     private JButton buttonCancel;
-    private JTable properties;
+    private JTable propertyTable;
     private JButton addProperty;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
@@ -92,6 +94,7 @@ public class NewDataModelDialog extends AbstractDialog {
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
+        this.properties = new ArrayList<>();
 
         setContentPane(contentPanel);
         setModal(true);
@@ -148,8 +151,8 @@ public class NewDataModelDialog extends AbstractDialog {
             valid = true;
             final String errorTitle = commonBundle.message("common.error");
             final int column = 0;
-            for (int row = 0; row < properties.getRowCount(); row++) {
-                final String propertyName = ((String) properties.getValueAt(row, column)).trim();
+            for (int row = 0; row < propertyTable.getRowCount(); row++) {
+                final String propertyName = ((String) propertyTable.getValueAt(row, column)).trim();
                 if (propertyName.isEmpty()) {
                     valid = false;
                     final String errorMessage = validatorBundle.message(
@@ -227,29 +230,25 @@ public class NewDataModelDialog extends AbstractDialog {
     }
 
     /**
-     * Formats properties into a string format, ready for templating.
-     * "UPPER_SNAKE;lower_snake;type;UpperCamel;lowerCamel".
+     * Formats properties into an array of ClassPropertyData objects.
      */
     private void formatProperties() {
         final DefaultTableModel propertiesTable = getPropertiesTable();
-        final ArrayList<String> properties = new ArrayList<>();
-        final ArrayList<String> propertyData = new ArrayList<>();
         final int rowCount = propertiesTable.getRowCount();
         String name;
         String type;
 
-        for (int index = 0; index < rowCount; index++, propertyData.clear()) {
+        for (int index = 0; index < rowCount; index++) {
             name = propertiesTable.getValueAt(index, 0).toString();
             type = propertiesTable.getValueAt(index, 1).toString();
-            propertyData.add(CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_UNDERSCORE, name));
-            propertyData.add(name);
-            propertyData.add(type);
-            propertyData.add(CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name));
-            propertyData.add(CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name));
-            properties.add(StringUtils.join(propertyData, ";"));
+            properties.add((new ClassPropertyData(
+                    type,
+                    CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name),
+                    CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name),
+                    name,
+                    CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_UNDERSCORE, name)
+            )).string());
         }
-
-        formattedProperties = StringUtils.join(properties, ",");
     }
 
     private String getModuleName() {
@@ -280,8 +279,12 @@ public class NewDataModelDialog extends AbstractDialog {
         return modelNamespace.getClassFqn();
     }
 
+    /**
+     * Gets properties as a string, ready for templating.
+     * "UPPER_SNAKE;lower_snake;type;UpperCamel;lowerCamel".
+     */
     private String getProperties() {
-        return formattedProperties;
+        return StringUtils.join(properties, ",");
     }
 
     private void initPropertiesTable() {
@@ -295,7 +298,7 @@ public class NewDataModelDialog extends AbstractDialog {
                 }
         );
 
-        final TableColumn column = properties.getColumn(PROPERTY_ACTION);
+        final TableColumn column = propertyTable.getColumn(PROPERTY_ACTION);
         column.setCellRenderer(new TableButton(PROPERTY_DELETE));
         column.setCellEditor(new DeleteRowButton(new JCheckBox()));
 
@@ -311,12 +314,12 @@ public class NewDataModelDialog extends AbstractDialog {
     }
 
     private void initPropertyTypeColumn() {
-        final TableColumn formElementTypeColumn = properties.getColumn(PROPERTY_TYPE);
+        final TableColumn formElementTypeColumn = propertyTable.getColumn(PROPERTY_TYPE);
         formElementTypeColumn.setCellEditor(new ComboBoxEditor(PROPERTY_TYPES));
         formElementTypeColumn.setCellRenderer(new ComboBoxTableRenderer<>(PROPERTY_TYPES));
     }
 
     private DefaultTableModel getPropertiesTable() {
-        return (DefaultTableModel) properties.getModel();
+        return (DefaultTableModel) propertyTable.getModel();
     }
 }
