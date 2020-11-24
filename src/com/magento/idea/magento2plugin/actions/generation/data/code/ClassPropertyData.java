@@ -12,6 +12,9 @@ import org.apache.commons.lang.StringUtils;
 public class ClassPropertyData {
     private final List<String> data = new ArrayList<>();
 
+    /**
+     * Constructor.
+     */
     public ClassPropertyData(
             final String type,
             final String lowerCamelName,
