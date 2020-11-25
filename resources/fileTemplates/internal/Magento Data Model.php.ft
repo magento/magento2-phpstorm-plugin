@@ -1,0 +1,42 @@
+<?php
+#parse("PHP File Header.php")
+
+#if (${NAMESPACE})
+    namespace ${NAMESPACE};
+#end
+
+#set ($uses = ${USES})
+#foreach ($use in $uses.split(","))
+    use $use;
+#end
+
+class ${NAME} #if (${EXTENDS})extends ${EXTENDS} #end #if (${IMPLEMENTS})implements ${IMPLEMENTS}#end
+{
+    #if (${PROPERTIES})
+        #set ($properties = ${PROPERTIES})
+        #foreach ($property in $properties.split(","))
+            #set ($propertyData = $property.split(";"))
+            #set ($propertyUpperSnake = $propertyData.get(0))
+            #set ($propertyUpperCamel = $propertyData.get(3))
+            #set ($propertyLowerCamel = $propertyData.get(4))
+            #if(!($foreach.first))
+
+            #end
+            /**
+             * @inheritDoc
+             */
+            public function get$propertyUpperCamel()
+            {
+                return $this->getData(self::$propertyUpperSnake);
+            }
+
+            /**
+             * @inheritDoc
+             */
+            public function set$propertyUpperCamel($$propertyLowerCamel)
+            {
+                return $this->setData(self::$propertyUpperSnake, $$propertyLowerCamel);
+            }
+        #end
+    #end
+}
