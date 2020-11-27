@@ -13,7 +13,7 @@ public final class PhpClassGeneratorUtil {
     private PhpClassGeneratorUtil() {}
 
     /**
-     * Format PHP class uses.
+     * Formats PHP class uses.
      *
      * @param uses List
      * @return String
@@ -25,7 +25,7 @@ public final class PhpClassGeneratorUtil {
     }
 
     /**
-     * Fetches class name from a fully qualified name.
+     * Fetches the class name from a fully qualified name.
      *
      * @param fqn FQN
      * @return String

@@ -1,0 +1,42 @@
+<?php
+#parse("PHP File Header.php")
+
+#if (${NAMESPACE})
+    namespace ${NAMESPACE};
+#end
+
+interface ${NAME}
+{
+    #if (${PROPERTIES})
+        /**
+         * String constants for property names
+         */
+        #set ($properties = ${PROPERTIES})
+        #foreach ($property in $properties.split(","))
+            #set ($propertyData = $property.split(";"))
+            #set ($propertyUpperSnake = $propertyData.get(0))
+            #set ($propertyLowerSnake = $propertyData.get(1))
+            const $propertyUpperSnake = "$propertyLowerSnake";
+        #end
+    #end
+    #if (${PROPERTIES})
+        #set ($properties = ${PROPERTIES})
+        #foreach ($property in $properties.split(","))
+            #set ($propertyData = $property.split(";"))
+            #set ($propertyType = $propertyData.get(2))
+            #set ($propertyUpperCamel = $propertyData.get(3))
+            #set ($propertyLowerCamel = $propertyData.get(4))
+
+            /**
+             * @return $propertyType
+             */
+            public function get$propertyUpperCamel();
+
+            /**
+             * @param $propertyType $$propertyLowerCamel
+             * @return $this
+             */
+            public function set$propertyUpperCamel($$propertyLowerCamel);
+        #end
+    #end
+}
