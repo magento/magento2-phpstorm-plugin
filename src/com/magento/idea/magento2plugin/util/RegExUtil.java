@@ -16,6 +16,12 @@ public class RegExUtil {
     public static final String ALPHANUMERIC_WITH_UNDERSCORE
             = "[a-zA-Z0-9_]*";
 
+    public static final String ALPHA_WITH_PERIOD
+            = "[a-zA-Z.]*";
+
+    public static final String ALPHA_WITH_DASH
+            = "[a-zA-Z-]*";
+
     public static final String NUMERIC
             = "[0-9]*";
 
