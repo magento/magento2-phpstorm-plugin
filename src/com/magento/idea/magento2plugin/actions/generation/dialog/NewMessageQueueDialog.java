@@ -3,6 +3,11 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.actions.generation.NewDataModelAction;
+import com.magento.idea.magento2plugin.actions.generation.NewMessageQueueAction;
+import com.magento.idea.magento2plugin.actions.generation.data.QueueCommunicationData;
+import com.magento.idea.magento2plugin.actions.generation.data.QueueConsumerData;
+import com.magento.idea.magento2plugin.actions.generation.data.QueuePublisherData;
+import com.magento.idea.magento2plugin.actions.generation.data.QueueTopologyData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphaWithDashRule;
@@ -31,11 +36,13 @@ public class NewMessageQueueDialog extends AbstractDialog {
     private static final String HANDLER_TYPE = "Handler Type";
     private static final String HANDLER_METHOD = "Handler Method";
     private static final String CONSUMER_NAME = "Consumer Name";
-    private static final String MAX_MESSAGES = "Maximum Messages";
+    private static final String QUEUE_NAME = "Queue Name";
     private static final String CONSUMER_TYPE = "Consumer Type";
+    private static final String MAX_MESSAGES = "Maximum Messages";
     private static final String CONNECTION_NAME = "Connection Name";
     private static final String EXCHANGE_NAME = "Exchange Name";
-    private static final String QUEUE_NAME = "Queue Name";
+    private static final String BINDING_ID = "Binding ID";
+    private static final String BINDING_TOPIC = "Binding Topic";
 
     /* TODO: Improve validation */
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
@@ -72,16 +79,24 @@ public class NewMessageQueueDialog extends AbstractDialog {
     private JTextField consumerName;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, MAX_MESSAGES})
-    @FieldValidation(rule = RuleRegistry.NUMERIC,
-            message = {NumericRule.MESSAGE, MAX_MESSAGES})
-    private JTextField maxMessages;
+            message = {NotEmptyRule.MESSAGE, QUEUE_NAME})
+    @FieldValidation(rule = RuleRegistry.ALPHA_WITH_PERIOD,
+            message = {AlphaWithPeriodRule.MESSAGE, QUEUE_NAME})
+    @FieldValidation(rule = RuleRegistry.LOWERCASE,
+            message = {Lowercase.MESSAGE, QUEUE_NAME})
+    private JTextField queueName;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, CONSUMER_TYPE})
     @FieldValidation(rule = RuleRegistry.PHP_CLASS,
             message = {PhpClassRule.MESSAGE, CONSUMER_TYPE})
     private JTextField consumerType;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, MAX_MESSAGES})
+    @FieldValidation(rule = RuleRegistry.NUMERIC,
+            message = {NumericRule.MESSAGE, MAX_MESSAGES})
+    private JTextField maxMessages;
 
     /* TODO: Can this be made a dropdown? */
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
@@ -97,12 +112,15 @@ public class NewMessageQueueDialog extends AbstractDialog {
     private JTextField exchangeName;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, QUEUE_NAME})
-    @FieldValidation(rule = RuleRegistry.ALPHA_WITH_PERIOD,
-            message = {AlphaWithPeriodRule.MESSAGE, QUEUE_NAME})
-    @FieldValidation(rule = RuleRegistry.LOWERCASE,
-            message = {Lowercase.MESSAGE, QUEUE_NAME})
-    private JTextField queueName;
+            message = {NotEmptyRule.MESSAGE, EXCHANGE_NAME})
+    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC_WITH_UNDERSCORE,
+            message = {AlphaWithDashRule.MESSAGE, EXCHANGE_NAME})
+    private JTextField bindingId;
+
+    /* TODO: New validation rule */
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, EXCHANGE_NAME})
+    private JTextField bindingTopic;
 
     private JPanel contentPanel;
     private JButton buttonOK;
@@ -175,14 +193,86 @@ public class NewMessageQueueDialog extends AbstractDialog {
     }
 
     private void generateCommunication() {
+        new QueueCommunicationGenerator(project, new QueueCommunicationData(
+                getTopicName(),
+                getHandlerName(),
+                getHandlerType(),
+                getHandlerMethod()
+        )).generate(NewMessageQueueAction.ACTION_NAME, true);
     }
 
     private void generateConsumer() {
+        new QueueConsumerGenerator(project, new QueueConsumerData(
+                getConsumerName(),
+                getQueueName(),
+                getConsumerType(),
+                getMaxMessages(),
+                getConnectionName()
+        )).generate(NewMessageQueueAction.ACTION_NAME, true);
     }
 
     private void generateTopology() {
+        new QueueTopologyGenerator(project, new QueueTopologyData(
+                getExchangeName(),
+                getBindingId(),
+                getBindingTopic(),
+                getQueueName()
+        )).generate(NewMessageQueueAction.ACTION_NAME, true);
     }
 
     private void generatePublisher() {
+        new QueuePublisherGenerator(project, new QueuePublisherData(
+                getTopicName(),
+                getConnectionName(),
+                getExchangeName()
+        )).generate(NewMessageQueueAction.ACTION_NAME, true);
+    }
+
+    public String getTopicName() {
+        return topicName.getText().trim();
+    }
+
+    public String getHandlerName() {
+        return handlerName.getText().trim();
+    }
+
+    public String getHandlerType() {
+        return handlerType.getText().trim();
+    }
+
+    public String getHandlerMethod() {
+        return handlerMethod.getText().trim();
+    }
+
+    public String getConsumerName() {
+        return consumerName.getText().trim();
+    }
+
+    public String getQueueName() {
+        return queueName.getText().trim();
+    }
+
+    public String getConsumerType() {
+        return consumerType.getText().trim();
+    }
+
+    public String getMaxMessages() {
+        return maxMessages.getText().trim();
+    }
+
+    public String getConnectionName() {
+        return connectionName.getText().trim();
+    }
+
+    public String getExchangeName() {
+        return exchangeName.getText().trim();
+    }
+
+    public String getBindingId() {
+        return bindingId.getText().trim();
+    }
+
+    public String getBindingTopic() {
+        return bindingTopic.getText().trim();
     }
 }
