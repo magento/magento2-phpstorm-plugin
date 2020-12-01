@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.inspections.xml;
 
 import com.magento.idea.magento2plugin.magento.files.ModuleEventsXml;
 
+@SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert"})
 public class ObserverDeclarationInspectionTest extends InspectionXmlFixtureTestCase {
 
     @Override
