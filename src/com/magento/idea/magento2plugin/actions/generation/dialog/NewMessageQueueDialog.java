@@ -17,6 +17,9 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NumericRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpNamespaceNameRule;
+import com.magento.idea.magento2plugin.actions.generation.generator.QueueCommunicationGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.QueueConsumerGenerator;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
@@ -61,14 +64,9 @@ public class NewMessageQueueDialog extends AbstractDialog {
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, HANDLER_TYPE})
-    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
-            message = {PhpClassRule.MESSAGE, HANDLER_TYPE})
+    @FieldValidation(rule = RuleRegistry.PHP_NAMESPACE_NAME,
+            message = {PhpNamespaceNameRule.MESSAGE, HANDLER_TYPE})
     private JTextField handlerType;
-
-    /* TODO: Rule to validate PHP method? */
-    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, HANDLER_METHOD})
-    private JTextField handlerMethod;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, CONSUMER_NAME})
@@ -98,7 +96,7 @@ public class NewMessageQueueDialog extends AbstractDialog {
             message = {NumericRule.MESSAGE, MAX_MESSAGES})
     private JTextField maxMessages;
 
-    /* TODO: Can this be made a dropdown? */
+    // TODO: Can this be made a dropdown?
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, CONNECTION_NAME})
     @FieldValidation(rule = RuleRegistry.PHP_CLASS,
@@ -117,7 +115,7 @@ public class NewMessageQueueDialog extends AbstractDialog {
             message = {AlphaWithDashRule.MESSAGE, EXCHANGE_NAME})
     private JTextField bindingId;
 
-    /* TODO: New validation rule */
+    // TODO: New validation rule
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, EXCHANGE_NAME})
     private JTextField bindingTopic;
@@ -186,8 +184,8 @@ public class NewMessageQueueDialog extends AbstractDialog {
         if (validateFormFields()) {
             generateCommunication();
             generateConsumer();
-            generateTopology();
-            generatePublisher();
+            /*generateTopology();
+            generatePublisher();*/
             this.setVisible(false);
         }
     }
@@ -197,7 +195,8 @@ public class NewMessageQueueDialog extends AbstractDialog {
                 getTopicName(),
                 getHandlerName(),
                 getHandlerType(),
-                getHandlerMethod()
+                getHandlerMethod(),
+                getModuleName()
         )).generate(NewMessageQueueAction.ACTION_NAME, true);
     }
 
@@ -211,7 +210,7 @@ public class NewMessageQueueDialog extends AbstractDialog {
         )).generate(NewMessageQueueAction.ACTION_NAME, true);
     }
 
-    private void generateTopology() {
+    /*private void generateTopology() {
         new QueueTopologyGenerator(project, new QueueTopologyData(
                 getExchangeName(),
                 getBindingId(),
@@ -226,7 +225,7 @@ public class NewMessageQueueDialog extends AbstractDialog {
                 getConnectionName(),
                 getExchangeName()
         )).generate(NewMessageQueueAction.ACTION_NAME, true);
-    }
+    }*/
 
     public String getTopicName() {
         return topicName.getText().trim();
@@ -241,7 +240,7 @@ public class NewMessageQueueDialog extends AbstractDialog {
     }
 
     public String getHandlerMethod() {
-        return handlerMethod.getText().trim();
+        return "execute";
     }
 
     public String getConsumerName() {
@@ -274,5 +273,9 @@ public class NewMessageQueueDialog extends AbstractDialog {
 
     public String getBindingTopic() {
         return bindingTopic.getText().trim();
+    }
+
+    public String getModuleName() {
+        return moduleName;
     }
 }

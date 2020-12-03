@@ -5,12 +5,20 @@ public class QueueTopologyData {
     private String bindingId;
     private String bindingTopic;
     private String bindingQueue;
+    private String moduleName;
 
-    public QueueTopologyData(String exchangeName, String bindingId, String bindingTopic, String bindingQueue) {
+    public QueueTopologyData(
+            String exchangeName,
+            String bindingId,
+            String bindingTopic,
+            String bindingQueue,
+            String moduleName
+    ) {
         this.exchangeName = exchangeName;
         this.bindingId = bindingId;
         this.bindingTopic = bindingTopic;
         this.bindingQueue = bindingQueue;
+        this.moduleName = moduleName;
     }
 
     public String getExchangeName() {
@@ -27,5 +35,9 @@ public class QueueTopologyData {
 
     public String getBindingQueue() {
         return bindingQueue;
+    }
+
+    public String getModuleName() {
+        return moduleName;
     }
 }
