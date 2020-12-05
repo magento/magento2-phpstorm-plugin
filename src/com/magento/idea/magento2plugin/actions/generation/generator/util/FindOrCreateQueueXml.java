@@ -11,7 +11,7 @@ import com.magento.idea.magento2plugin.util.magento.FileBasedIndexUtil;
 import java.util.ArrayList;
 import java.util.Properties;
 
-abstract public class FindOrCreateQueueXml {
+public abstract class FindOrCreateQueueXml {
     private final Project project;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
@@ -28,6 +28,9 @@ abstract public class FindOrCreateQueueXml {
         this.moduleIndex = ModuleIndex.getInstance(project);
     }
 
+    /**
+     * Finds or creates message queue XML file.
+     */
     public PsiFile execute(final String actionName, final String moduleName) {
         PsiDirectory parentDirectory = this.moduleIndex.getModuleDirectoryByModuleName(moduleName);
         final ArrayList<String> fileDirectories = new ArrayList<>();

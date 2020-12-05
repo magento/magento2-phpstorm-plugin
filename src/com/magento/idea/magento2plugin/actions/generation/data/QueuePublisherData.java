@@ -6,6 +6,9 @@ public class QueuePublisherData {
     private String exchangeName;
     private String moduleName;
 
+    /**
+     * Constructor.
+     */
     public QueuePublisherData(
             String topicName,
             String connectionName,

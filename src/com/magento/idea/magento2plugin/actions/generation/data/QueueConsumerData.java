@@ -8,6 +8,9 @@ public class QueueConsumerData {
     private String connectionName;
     private String moduleName;
 
+    /**
+     * Constructor.
+     */
     public QueueConsumerData(
             String consumerName,
             String queueName,

@@ -19,6 +19,9 @@ public class QueueCommunicationGenerator extends FileGenerator {
     private final Project project;
     private final FindOrCreateCommunicationXml findOrCreateCommunicationXml;
 
+    /**
+     * Constructor.
+     */
     public QueueCommunicationGenerator(
             final Project project,
             final @NotNull QueueCommunicationData communicationData

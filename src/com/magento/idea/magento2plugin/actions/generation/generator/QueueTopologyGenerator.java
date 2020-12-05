@@ -19,6 +19,9 @@ public class QueueTopologyGenerator extends FileGenerator {
     private final Project project;
     private final FindOrCreateQueueTopologyXml findOrCreateQueueTopologyXml;
 
+    /**
+     * Constructor.
+     */
     public QueueTopologyGenerator(Project project, QueueTopologyData topologyData) {
         super(project);
 

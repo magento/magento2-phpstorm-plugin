@@ -16,6 +16,9 @@ public class QueueConsumerGenerator extends FileGenerator {
     private final Project project;
     private final FindOrCreateQueueConsumerXml findOrCreateQueueConsumerXml;
 
+    /**
+     * Constructor.
+     */
     public QueueConsumerGenerator(Project project, QueueConsumerData consumerData) {
         super(project);
 

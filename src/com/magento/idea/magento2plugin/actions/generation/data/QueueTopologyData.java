@@ -8,6 +8,9 @@ public class QueueTopologyData {
     private String bindingQueue;
     private String moduleName;
 
+    /**
+     * Constructor.
+     */
     public QueueTopologyData(
             String exchangeName,
             String connectionName,

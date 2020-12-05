@@ -7,6 +7,9 @@ public class QueueCommunicationData {
     private String handlerMethod;
     private String moduleName;
 
+    /**
+     * Constructor.
+     */
     public QueueCommunicationData(
             String topicName,
             String handlerName,

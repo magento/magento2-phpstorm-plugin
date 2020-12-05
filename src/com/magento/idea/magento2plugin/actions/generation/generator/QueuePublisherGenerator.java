@@ -19,6 +19,9 @@ public class QueuePublisherGenerator extends FileGenerator {
     private final Project project;
     private final FindOrCreateQueuePublisherXml findOrCreateQueuePublisherXml;
 
+    /**
+     * Constructor.
+     */
     public QueuePublisherGenerator(
             final Project project,
             final QueuePublisherData publisherData
@@ -70,7 +73,9 @@ public class QueuePublisherGenerator extends FileGenerator {
             }
 
             if (!isDeclared) {
-                final XmlTag connectionTag = publisherTag.createChildTag("connection", null, null, false);
+                final XmlTag connectionTag = publisherTag.createChildTag(
+                        "connection", null, null, false
+                );
 
                 connectionTag.setAttribute("name", publisherData.getConnectionName());
                 connectionTag.setAttribute("exchange",publisherData.getExchangeName());
