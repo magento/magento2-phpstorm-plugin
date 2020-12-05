@@ -57,7 +57,9 @@ public class QueueCommunicationGenerator extends FileGenerator {
             boolean topicTagIsGenerated = true;
             XmlTag topicTag = null;
             for (final XmlTag tag: topicTags) {
-                if (communicationData.getTopicName().equals(tag.getAttribute(ATTRIBUTE_NAME).getValue())) {
+                if (communicationData.getTopicName().equals(
+                        tag.getAttribute(ATTRIBUTE_NAME).getValue())
+                ) {
                     topicTagIsGenerated = false;
                     topicTag = tag;
                     break;
