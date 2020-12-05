@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class QueueCommunicationGenerator extends FileGenerator {
+    public static final String ATTRIBUTE_NAME = "name";
     private final QueueCommunicationData communicationData;
     private final Project project;
     private final FindOrCreateCommunicationXml findOrCreateCommunicationXml;
@@ -39,7 +40,7 @@ public class QueueCommunicationGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(String actionName) {
+    public PsiFile generate(final String actionName) {
         final XmlFile communicationXml = (XmlFile) findOrCreateCommunicationXml.execute(
                 actionName,
                 communicationData.getModuleName()
@@ -52,11 +53,11 @@ public class QueueCommunicationGenerator extends FileGenerator {
             if (rootTag == null) {
                 return;
             }
-            XmlTag[] topicTags = rootTag.findSubTags("topic");
+            final XmlTag[] topicTags = rootTag.findSubTags("topic");
             boolean topicTagIsGenerated = true;
             XmlTag topicTag = null;
             for (final XmlTag tag: topicTags) {
-                if (communicationData.getTopicName().equals(tag.getAttribute("name").getValue())) {
+                if (communicationData.getTopicName().equals(tag.getAttribute(ATTRIBUTE_NAME).getValue())) {
                     topicTagIsGenerated = false;
                     topicTag = tag;
                     break;
@@ -64,7 +65,7 @@ public class QueueCommunicationGenerator extends FileGenerator {
             }
             if (topicTagIsGenerated) {
                 topicTag = rootTag.createChildTag("topic", null, "", false);
-                topicTag.setAttribute("name", communicationData.getTopicName());
+                topicTag.setAttribute(ATTRIBUTE_NAME, communicationData.getTopicName());
                 topicTag.setAttribute("request", "string");
                 topicTag.setAttribute("response", "string");
             }
@@ -72,7 +73,7 @@ public class QueueCommunicationGenerator extends FileGenerator {
             @NotNull final XmlTag[] handlerTags = topicTag.findSubTags("handler");
             boolean isDeclared = false;
             for (final XmlTag handlerTag: handlerTags) {
-                @Nullable final XmlAttribute handlerName = handlerTag.getAttribute("name");
+                @Nullable final XmlAttribute handlerName = handlerTag.getAttribute(ATTRIBUTE_NAME);
                 if (communicationData.getHandlerName().equals(handlerName.getValue())) {
                     isDeclared = true;
                 }
@@ -81,7 +82,7 @@ public class QueueCommunicationGenerator extends FileGenerator {
             if (!isDeclared) {
                 final XmlTag handlerTag = topicTag.createChildTag("handler", null, null, false);
 
-                handlerTag.setAttribute("name", communicationData.getHandlerName());
+                handlerTag.setAttribute(ATTRIBUTE_NAME, communicationData.getHandlerName());
                 handlerTag.setAttribute("type",communicationData.getHandlerType());
                 handlerTag.setAttribute("method",communicationData.getHandlerMethod());
 

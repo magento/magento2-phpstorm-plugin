@@ -6,23 +6,23 @@
 package com.magento.idea.magento2plugin.actions.generation.data;
 
 public class QueueTopologyData {
-    private String exchangeName;
-    private String connectionName;
-    private String bindingId;
-    private String bindingTopic;
-    private String bindingQueue;
-    private String moduleName;
+    private final String exchangeName;
+    private final String connectionName;
+    private final String bindingId;
+    private final String bindingTopic;
+    private final String bindingQueue;
+    private final String moduleName;
 
     /**
      * Constructor.
      */
     public QueueTopologyData(
-            String exchangeName,
-            String connectionName,
-            String bindingId,
-            String bindingTopic,
-            String bindingQueue,
-            String moduleName
+            final String exchangeName,
+            final String connectionName,
+            final String bindingId,
+            final String bindingTopic,
+            final String bindingQueue,
+            final String moduleName
     ) {
         this.exchangeName = exchangeName;
         this.connectionName = connectionName;

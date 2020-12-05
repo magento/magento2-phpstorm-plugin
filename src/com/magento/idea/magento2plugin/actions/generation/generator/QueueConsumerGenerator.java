@@ -46,7 +46,7 @@ public class QueueConsumerGenerator extends FileGenerator {
             if (rootTag == null) {
                 return;
             }
-            XmlTag[] consumerTags = rootTag.findSubTags("consumer");
+            final XmlTag[] consumerTags = rootTag.findSubTags("consumer");
             boolean tagIsGenerated = true;
             for (final XmlTag tag: consumerTags) {
                 if (consumerData.getConsumerName().equals(tag.getAttribute("name").getValue())) {
@@ -55,7 +55,7 @@ public class QueueConsumerGenerator extends FileGenerator {
                 }
             }
             if (tagIsGenerated) {
-                XmlTag consumerTag = rootTag.createChildTag("consumer", null, null, false);
+                final XmlTag consumerTag = rootTag.createChildTag("consumer", null, null, false);
                 consumerTag.setAttribute("name", consumerData.getConsumerName());
                 consumerTag.setAttribute("queue", consumerData.getQueueName());
                 consumerTag.setAttribute("consumerInstance", consumerData.getConsumerType());
@@ -72,5 +72,5 @@ public class QueueConsumerGenerator extends FileGenerator {
     }
 
     @Override
-    protected void fillAttributes(Properties attributes) {}
+    protected void fillAttributes(Properties attributes) {}//NOPMD
 }

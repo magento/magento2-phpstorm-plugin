@@ -27,7 +27,7 @@ public class QueueTopologyGenerator extends FileGenerator {
     /**
      * Constructor.
      */
-    public QueueTopologyGenerator(Project project, QueueTopologyData topologyData) {
+    public QueueTopologyGenerator(final Project project, final QueueTopologyData topologyData) {
         super(project);
 
         this.topologyData = topologyData;
@@ -36,7 +36,7 @@ public class QueueTopologyGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(String actionName) {
+    public PsiFile generate(final String actionName) {
         final XmlFile topologyXml = (XmlFile) findOrCreateQueueTopologyXml.execute(
                 actionName,
                 topologyData.getModuleName()
@@ -49,7 +49,7 @@ public class QueueTopologyGenerator extends FileGenerator {
             if (rootTag == null) {
                 return;
             }
-            XmlTag[] exchangeTags = rootTag.findSubTags("exchange");
+            final XmlTag[] exchangeTags = rootTag.findSubTags("exchange");
             boolean exchangeTagIsGenerated = true;
             XmlTag exchangeTag = null;
             for (final XmlTag tag: exchangeTags) {
@@ -98,5 +98,5 @@ public class QueueTopologyGenerator extends FileGenerator {
     }
 
     @Override
-    protected void fillAttributes(Properties attributes) {}
+    protected void fillAttributes(Properties attributes) {}//NOPMD
 }

@@ -6,23 +6,23 @@
 package com.magento.idea.magento2plugin.actions.generation.data;
 
 public class QueueConsumerData {
-    private String consumerName;
-    private String queueName;
-    private String consumerType;
-    private String maxMessages;
-    private String connectionName;
-    private String moduleName;
+    private final String consumerName;
+    private final String queueName;
+    private final String consumerType;
+    private final String maxMessages;
+    private final String connectionName;
+    private final String moduleName;
 
     /**
      * Constructor.
      */
     public QueueConsumerData(
-            String consumerName,
-            String queueName,
-            String consumerType,
-            String maxMessages,
-            String connectionName,
-            String moduleName
+            final String consumerName,
+            final String queueName,
+            final String consumerType,
+            final String maxMessages,
+            final String connectionName,
+            final String moduleName
     ) {
         this.consumerName = consumerName;
         this.queueName = queueName;

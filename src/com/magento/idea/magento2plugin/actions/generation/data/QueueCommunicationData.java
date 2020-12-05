@@ -6,21 +6,21 @@
 package com.magento.idea.magento2plugin.actions.generation.data;
 
 public class QueueCommunicationData {
-    private String topicName;
-    private String handlerName;
-    private String handlerType;
-    private String handlerMethod;
-    private String moduleName;
+    private final String topicName;
+    private final String handlerName;
+    private final String handlerType;
+    private final String handlerMethod;
+    private final String moduleName;
 
     /**
      * Constructor.
      */
     public QueueCommunicationData(
-            String topicName,
-            String handlerName,
-            String handlerType,
-            String handlerMethod,
-            String moduleName
+            final String topicName,
+            final String handlerName,
+            final String handlerType,
+            final String handlerMethod,
+            final String moduleName
     ) {
         this.topicName = topicName;
         this.handlerName = handlerName;

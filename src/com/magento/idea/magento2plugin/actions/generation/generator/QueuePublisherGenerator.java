@@ -39,7 +39,7 @@ public class QueuePublisherGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(String actionName) {
+    public PsiFile generate(final String actionName) {
         final XmlFile publisherXml = (XmlFile) findOrCreateQueuePublisherXml.execute(
                 actionName,
                 publisherData.getModuleName()
@@ -52,7 +52,7 @@ public class QueuePublisherGenerator extends FileGenerator {
             if (rootTag == null) {
                 return;
             }
-            XmlTag[] publisherTags = rootTag.findSubTags("publisher");
+            final XmlTag[] publisherTags = rootTag.findSubTags("publisher");
             boolean publisherTagIsGenerated = true;
             XmlTag publisherTag = null;
             for (final XmlTag tag: publisherTags) {
@@ -99,5 +99,5 @@ public class QueuePublisherGenerator extends FileGenerator {
     }
 
     @Override
-    protected void fillAttributes(Properties attributes) {}
+    protected void fillAttributes(final Properties attributes) {}//NOPMD
 }

@@ -37,6 +37,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
+@SuppressWarnings({
+        "PMD.TooManyFields",
+        "PMD.ExcessiveImports",
+})
 public class NewMessageQueueDialog extends AbstractDialog {
     private static final String TOPIC_NAME = "Topic Name";
     private static final String HANDLER_NAME = "Handler Name";
@@ -131,7 +135,7 @@ public class NewMessageQueueDialog extends AbstractDialog {
     /**
      * Constructor.
      */
-    public NewMessageQueueDialog(Project project, PsiDirectory directory) {
+    public NewMessageQueueDialog(final Project project, final PsiDirectory directory) {
         super();
 
         this.project = project;
