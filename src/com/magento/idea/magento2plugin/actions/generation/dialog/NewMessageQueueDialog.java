@@ -16,8 +16,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.Lowercase;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NumericRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpNamespaceNameRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassFqnRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.QueueCommunicationGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.QueueConsumerGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.QueuePublisherGenerator;
@@ -63,8 +62,8 @@ public class NewMessageQueueDialog extends AbstractDialog {
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, HANDLER_TYPE})
-    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
-            message = {PhpClassRule.MESSAGE, HANDLER_TYPE})
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS_FQN,
+            message = {PhpClassFqnRule.MESSAGE, HANDLER_TYPE})
     private JTextField handlerType;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
@@ -85,8 +84,8 @@ public class NewMessageQueueDialog extends AbstractDialog {
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, CONSUMER_TYPE})
-    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
-            message = {PhpClassRule.MESSAGE, CONSUMER_TYPE})
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS_FQN,
+            message = {PhpClassFqnRule.MESSAGE, CONSUMER_TYPE})
     private JTextField consumerType;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,

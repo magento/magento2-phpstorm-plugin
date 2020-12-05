@@ -44,6 +44,9 @@ public class RegExUtil {
         public static final String PHP_CLASS
                 = "[A-Z][a-zA-Z0-9]+";
 
+        public static final String PHP_CLASS_FQN
+                = "(" + PHP_CLASS + ")?(\\" + PHP_CLASS + ")+";
+
         public static final String MODULE_NAME
                 = "[A-Z][a-zA-Z0-9]+_[A-Z][a-zA-Z0-9]+";
 
