@@ -1,10 +1,4 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/topology.xsd">
-    <exchange name="${EXCHANGE_NAME}" type="topic" connection="${CONNECTION}">
-        <binding id="${BINDING_ID}"
-                 topic="${TOPIC}"
-                 destinationType="queue"
-                 destination="${QUEUE}"/>
-    </exchange>
 </config>

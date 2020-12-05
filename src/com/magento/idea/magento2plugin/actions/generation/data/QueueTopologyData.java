@@ -2,6 +2,7 @@ package com.magento.idea.magento2plugin.actions.generation.data;
 
 public class QueueTopologyData {
     private String exchangeName;
+    private String connectionName;
     private String bindingId;
     private String bindingTopic;
     private String bindingQueue;
@@ -9,12 +10,14 @@ public class QueueTopologyData {
 
     public QueueTopologyData(
             String exchangeName,
+            String connectionName,
             String bindingId,
             String bindingTopic,
             String bindingQueue,
             String moduleName
     ) {
         this.exchangeName = exchangeName;
+        this.connectionName = connectionName;
         this.bindingId = bindingId;
         this.bindingTopic = bindingTopic;
         this.bindingQueue = bindingQueue;
@@ -23,6 +26,10 @@ public class QueueTopologyData {
 
     public String getExchangeName() {
         return exchangeName;
+    }
+
+    public String getConnectionName() {
+        return connectionName;
     }
 
     public String getBindingId() {

@@ -20,8 +20,8 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpNamespaceNameRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.QueueCommunicationGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.QueueConsumerGenerator;
-import com.magento.idea.magento2plugin.bundles.CommonBundle;
-import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
+import com.magento.idea.magento2plugin.actions.generation.generator.QueuePublisherGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.QueueTopologyGenerator;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -99,8 +99,6 @@ public class NewMessageQueueDialog extends AbstractDialog {
     // TODO: Can this be made a dropdown?
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, CONNECTION_NAME})
-    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
-            message = {PhpClassRule.MESSAGE, CONNECTION_NAME})
     private JTextField connectionName;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
@@ -126,8 +124,6 @@ public class NewMessageQueueDialog extends AbstractDialog {
 
     private final Project project;
     private final String moduleName;
-    private final ValidatorBundle validatorBundle;
-    private final CommonBundle commonBundle;
 
     /**
      * Constructor.
@@ -137,8 +133,6 @@ public class NewMessageQueueDialog extends AbstractDialog {
 
         this.project = project;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
-        this.validatorBundle = new ValidatorBundle();
-        this.commonBundle = new CommonBundle();
 
         setContentPane(contentPanel);
         setModal(true);
@@ -184,8 +178,8 @@ public class NewMessageQueueDialog extends AbstractDialog {
         if (validateFormFields()) {
             generateCommunication();
             generateConsumer();
-            /*generateTopology();
-            generatePublisher();*/
+            generateTopology();
+            generatePublisher();
             this.setVisible(false);
         }
     }
@@ -206,16 +200,19 @@ public class NewMessageQueueDialog extends AbstractDialog {
                 getQueueName(),
                 getConsumerType(),
                 getMaxMessages(),
-                getConnectionName()
+                getConnectionName(),
+                getModuleName()
         )).generate(NewMessageQueueAction.ACTION_NAME, true);
     }
 
-    /*private void generateTopology() {
+    private void generateTopology() {
         new QueueTopologyGenerator(project, new QueueTopologyData(
                 getExchangeName(),
+                getConnectionName(),
                 getBindingId(),
                 getBindingTopic(),
-                getQueueName()
+                getQueueName(),
+                getModuleName()
         )).generate(NewMessageQueueAction.ACTION_NAME, true);
     }
 
@@ -223,9 +220,10 @@ public class NewMessageQueueDialog extends AbstractDialog {
         new QueuePublisherGenerator(project, new QueuePublisherData(
                 getTopicName(),
                 getConnectionName(),
-                getExchangeName()
+                getExchangeName(),
+                getModuleName()
         )).generate(NewMessageQueueAction.ACTION_NAME, true);
-    }*/
+    }
 
     public String getTopicName() {
         return topicName.getText().trim();

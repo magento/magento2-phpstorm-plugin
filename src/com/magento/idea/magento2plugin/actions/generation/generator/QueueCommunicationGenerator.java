@@ -10,8 +10,6 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.magento.idea.magento2plugin.actions.generation.data.QueueCommunicationData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateCommunicationXml;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplate;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.XmlFilePositionUtil;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,9 +17,7 @@ import org.jetbrains.annotations.Nullable;
 public class QueueCommunicationGenerator extends FileGenerator {
     private final QueueCommunicationData communicationData;
     private final Project project;
-    private final GetCodeTemplate getCodeTemplate;
     private final FindOrCreateCommunicationXml findOrCreateCommunicationXml;
-    private final XmlFilePositionUtil positionUtil;
 
     public QueueCommunicationGenerator(
             final Project project,
@@ -31,9 +27,7 @@ public class QueueCommunicationGenerator extends FileGenerator {
 
         this.communicationData = communicationData;
         this.project = project;
-        this.getCodeTemplate = GetCodeTemplate.getInstance(project);
         this.findOrCreateCommunicationXml = new FindOrCreateCommunicationXml(project);
-        this.positionUtil = XmlFilePositionUtil.getInstance();
     }
 
     @Override
