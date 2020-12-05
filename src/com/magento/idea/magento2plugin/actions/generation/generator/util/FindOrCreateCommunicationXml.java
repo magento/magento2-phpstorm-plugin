@@ -13,7 +13,7 @@ public class FindOrCreateCommunicationXml extends FindOrCreateQueueXml {
     /**
      * Constructor.
      */
-    public FindOrCreateCommunicationXml(Project project) {
+    public FindOrCreateCommunicationXml(final Project project) {
         super(project);
     }
 

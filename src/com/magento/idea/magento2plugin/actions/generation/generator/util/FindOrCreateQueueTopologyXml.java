@@ -13,7 +13,7 @@ public class FindOrCreateQueueTopologyXml extends FindOrCreateQueueXml {
     /**
      * Constructor.
      */
-    public FindOrCreateQueueTopologyXml(Project project) {
+    public FindOrCreateQueueTopologyXml(final Project project) {
         super(project);
     }
 

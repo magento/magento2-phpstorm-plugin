@@ -13,7 +13,7 @@ public class FindOrCreateQueueConsumerXml extends FindOrCreateQueueXml {
     /**
      * Constructor.
      */
-    public FindOrCreateQueueConsumerXml(Project project) {
+    public FindOrCreateQueueConsumerXml(final Project project) {
         super(project);
     }
 

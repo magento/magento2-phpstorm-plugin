@@ -24,7 +24,7 @@ public class QueueConsumerGenerator extends FileGenerator {
     /**
      * Constructor.
      */
-    public QueueConsumerGenerator(Project project, QueueConsumerData consumerData) {
+    public QueueConsumerGenerator(final Project project, final QueueConsumerData consumerData) {
         super(project);
 
         this.consumerData = consumerData;
@@ -33,7 +33,7 @@ public class QueueConsumerGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(String actionName) {
+    public PsiFile generate(final String actionName) {
         final XmlFile consumerXml = (XmlFile) findOrCreateQueueConsumerXml.execute(
                 actionName,
                 consumerData.getModuleName()
