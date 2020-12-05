@@ -37,7 +37,6 @@ public class NewMessageQueueDialog extends AbstractDialog {
     private static final String TOPIC_NAME = "Topic Name";
     private static final String HANDLER_NAME = "Handler Name";
     private static final String HANDLER_TYPE = "Handler Type";
-    private static final String HANDLER_METHOD = "Handler Method";
     private static final String CONSUMER_NAME = "Consumer Name";
     private static final String QUEUE_NAME = "Queue Name";
     private static final String CONSUMER_TYPE = "Consumer Type";
@@ -108,14 +107,14 @@ public class NewMessageQueueDialog extends AbstractDialog {
     private JTextField exchangeName;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, EXCHANGE_NAME})
+            message = {NotEmptyRule.MESSAGE, BINDING_ID})
     @FieldValidation(rule = RuleRegistry.ALPHANUMERIC_WITH_UNDERSCORE,
-            message = {AlphaWithDashRule.MESSAGE, EXCHANGE_NAME})
+            message = {AlphaWithDashRule.MESSAGE, BINDING_ID})
     private JTextField bindingId;
 
     // TODO: New validation rule
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, EXCHANGE_NAME})
+            message = {NotEmptyRule.MESSAGE, BINDING_TOPIC})
     private JTextField bindingTopic;
 
     private JPanel contentPanel;
