@@ -63,8 +63,8 @@ public class NewMessageQueueDialog extends AbstractDialog {
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, HANDLER_TYPE})
-    @FieldValidation(rule = RuleRegistry.PHP_NAMESPACE_NAME,
-            message = {PhpNamespaceNameRule.MESSAGE, HANDLER_TYPE})
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
+            message = {PhpClassRule.MESSAGE, HANDLER_TYPE})
     private JTextField handlerType;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
