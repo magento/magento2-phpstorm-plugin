@@ -22,8 +22,8 @@ apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'org.jetbrains.changelog'
 
-def phpPluginVersion = System.getProperty("phpPluginVersion", "202.8194.11")
-def ideaVersion = System.getProperty("ideaVersion", "2020.2.4")
+def phpPluginVersion = System.getProperty("phpPluginVersion", "203.5981.175")
+def ideaVersion = System.getProperty("ideaVersion", "2020.3")
 def javaVersion = 1.8
 
 sourceCompatibility = javaVersion
