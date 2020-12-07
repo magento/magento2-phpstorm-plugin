@@ -31,7 +31,7 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
     }
 
     @Override
-    public void collectSlowLineMarkers(@NotNull List<PsiElement> psiElements, @NotNull Collection<LineMarkerInfo> collection) {
+    public void collectSlowLineMarkers(@NotNull List<? extends PsiElement> psiElements, @NotNull Collection<? super LineMarkerInfo<?>> collection) {
         if (psiElements.size() > 0) {
             if (!Settings.isEnabled(psiElements.get(0).getProject())) {
                 return;
