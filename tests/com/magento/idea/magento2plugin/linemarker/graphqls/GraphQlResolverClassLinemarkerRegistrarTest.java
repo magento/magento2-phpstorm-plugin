@@ -15,6 +15,6 @@ public class GraphQlResolverClassLinemarkerRegistrarTest extends LinemarkerFixtu
     public void testWithValidSchemaResolver() {
         myFixture.configureByFile(this.getFixturePath("schema.graphqls", "graphqls"));
 
-        assertHasLinemarkerWithTooltipAndIcon("Navigate to class", "/nodes/class.svg");
+        assertHasLinemarkerWithTooltipAndIcon("Navigate to class", "nodes/class.svg");
     }
 }

@@ -40,7 +40,7 @@ public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
                 continue;
             }
             if (lineMarkerTooltip.equals(tooltip)
-                    && lineMarkerIcon.toString().endsWith(icon)) {
+                    && lineMarkerIcon.toString().contains(icon)) {
                 return;
             }
         }
