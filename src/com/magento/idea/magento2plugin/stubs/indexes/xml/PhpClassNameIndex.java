@@ -20,6 +20,7 @@ import com.intellij.util.indexing.ID;
 import com.intellij.util.indexing.ScalarIndexExtension;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
+import com.intellij.xml.util.XmlIncludeHandler;
 import com.jetbrains.php.lang.PhpLangUtil;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.RegExUtil;
@@ -76,7 +77,7 @@ public class PhpClassNameIndex extends ScalarIndexExtension<String> {
                     resultMap.put(PhpLangUtil.toPresentableFQN(xmlAttributeValue), null);
                 }
             }
-            if (!XmlTagImpl.shouldProcessIncludesNow()) {
+            if (XmlIncludeHandler.isXInclude(childTag)) {
                 return;
             }
             final XmlTagValue childTagValue = childTag.getValue();
