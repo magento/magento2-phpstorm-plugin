@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.stubs.indexes.xml;
 
 import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.impl.source.xml.XmlTagImpl;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlFile;
