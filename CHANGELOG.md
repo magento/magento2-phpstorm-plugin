@@ -12,7 +12,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Code completion and reference navigation for table names and column names in `db_schema.xml` file in [#351](https://github.com/magento/magento2-phpstorm-plugin/pull/351)
 - Code completion and reference navigation for UI Component names in layout XMLs in [#354](https://github.com/magento/magento2-phpstorm-plugin/pull/354)
 - Description for "Magento Layout XML" code template in [#365](https://github.com/magento/magento2-phpstorm-plugin/pull/365)
-- Code completion and reference navigation for Magento module names in `module.xml` in [#367](https://github.com/magento/magento2-phpstorm-plugin/pull/367)
 - Reference navigation for disabled plugins in `di.xml` in [#373](https://github.com/magento/magento2-phpstorm-plugin/pull/373)
 - Code completion and reference navigation for Magento module names in `config.php` in [#374](https://github.com/magento/magento2-phpstorm-plugin/pull/374)
 - Inspection warning when disabling a nonexistent plugin in `di.xml` in [#382](https://github.com/magento/magento2-phpstorm-plugin/pull/382)
