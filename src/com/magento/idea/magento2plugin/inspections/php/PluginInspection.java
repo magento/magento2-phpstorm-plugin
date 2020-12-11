@@ -323,6 +323,9 @@ public class PluginInspection extends PhpInspection {
                 final String pluginMethodName = pluginMethod.getName();
                 final String targetClassMethodName = pluginMethodName
                         .replace(pluginPrefix, "");
+                if (targetClassMethodName.isEmpty()) {
+                    return null;
+                }
                 final char firstCharOfTargetName = targetClassMethodName.charAt(0);
                 final int charType = Character.getType(firstCharOfTargetName);
                 if (charType == Character.LOWERCASE_LETTER) {
