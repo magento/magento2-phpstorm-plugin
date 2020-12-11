@@ -7,7 +7,7 @@
 <idea-plugin>
     <id>com.magento.idea.magento2plugin</id>
     <name>Magento PhpStorm</name>
-    <version>2.1.0</version>
+    <version>3.0.0</version>
     <vendor url="https://github.com/magento/magento2-phpstorm-plugin">Magento Inc.</vendor>
 
     <description><![CDATA[
@@ -24,7 +24,7 @@
     </change-notes>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="201.7223.91"/>
+    <idea-version since-build="203.5981.155"/>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
@@ -67,6 +67,8 @@
             <action id="MagentoCreateCLICommand" class="com.magento.idea.magento2plugin.actions.generation.NewCLICommandAction" />
             <action id="MagentoCreateUiComponentGrid" class="com.magento.idea.magento2plugin.actions.generation.NewUiComponentGridAction" />
             <action id="MagentoCreateUiComponentForm" class="com.magento.idea.magento2plugin.actions.generation.NewUiComponentFormAction" />
+            <action id="NewModelsAction" class="com.magento.idea.magento2plugin.actions.generation.NewModelsAction" />
+            <action id="MagentoCreateADataModel" class="com.magento.idea.magento2plugin.actions.generation.NewDataModelAction" />
             <add-to-group group-id="NewGroup" anchor="last"/>
         </group>
 
@@ -210,6 +212,11 @@
         <internalFileTemplate name="Magento Routes XML"/>
         <internalFileTemplate name="Magento Layout XML"/>
         <internalFileTemplate name="Magento ACL XML"/>
+        <internalFileTemplate name="Magento Collection Class"/>
+        <internalFileTemplate name="Magento Model Class"/>
+        <internalFileTemplate name="Magento Resource Model Class"/>
+        <internalFileTemplate name="Magento Data Model"/>
+        <internalFileTemplate name="Magento Data Model Interface"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 

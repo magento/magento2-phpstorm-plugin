@@ -15,7 +15,7 @@ public class ConfigurationTypeClassLinemarkerRegistrarTest extends LinemarkerFix
     public void testTypeNameClassShouldHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("Topmenu.php", "php"));
 
-        assertHasLinemarkerWithTooltipAndIcon("Navigate to configuration", "/fileTypes/xml.svg");
+        assertHasLinemarkerWithTooltipAndIcon("Navigate to configuration", "fileTypes/xml.svg");
     }
 
     /**
@@ -24,6 +24,6 @@ public class ConfigurationTypeClassLinemarkerRegistrarTest extends LinemarkerFix
     public void testRegularPhpClassShouldNotHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("ClassNotConfiguredInDiXml.php", "php"));
 
-        assertHasNoLinemarkerWithTooltipAndIcon("Navigate to configuration", "/fileTypes/xml.svg");
+        assertHasNoLinemarkerWithTooltipAndIcon("Navigate to configuration", "fileTypes/xml.svg");
     }
 }

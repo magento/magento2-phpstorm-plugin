@@ -14,6 +14,7 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
@@ -28,7 +29,6 @@ import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import javax.swing.JOptionPane;
@@ -189,7 +189,10 @@ public class ModuleControllerClassGenerator extends FileGenerator {
         final String httpMethodInterface = getHttpMethodInterfaceByMethod(
                 controllerFileData.getHttpMethodName()
         );
-        attributes.setProperty("IMPLEMENTS", getNameFromFqn(httpMethodInterface));
+        attributes.setProperty(
+                "IMPLEMENTS",
+                PhpClassGeneratorUtil.getNameFromFqn(httpMethodInterface)
+        );
         final List<String> uses = getUses();
         uses.add(httpMethodInterface);
 
@@ -200,22 +203,22 @@ public class ModuleControllerClassGenerator extends FileGenerator {
                 uses.add(Controller.ADMINHTML_CONTROLLER_FQN);
                 attributes.setProperty(
                         "EXTENDS",
-                        getNameFromFqn(Controller.ADMINHTML_CONTROLLER_FQN)
+                        PhpClassGeneratorUtil.getNameFromFqn(Controller.ADMINHTML_CONTROLLER_FQN)
                 );
                 attributes.setProperty(
                         "ACL",
-                        getNameFromFqn(controllerFileData.getAcl())
+                        PhpClassGeneratorUtil.getNameFromFqn(controllerFileData.getAcl())
                 );
             } else {
                 uses.add(Controller.FRONTEND_CONTROLLER_FQN);
                 attributes.setProperty(
                         "EXTENDS",
-                        getNameFromFqn(Controller.FRONTEND_CONTROLLER_FQN)
+                        PhpClassGeneratorUtil.getNameFromFqn(Controller.FRONTEND_CONTROLLER_FQN)
                 );
             }
         }
 
-        attributes.setProperty("USES", formatUses(uses));
+        attributes.setProperty("USES", PhpClassGeneratorUtil.formatUses(uses));
     }
 
     private List<String> getUses() {
@@ -224,17 +227,5 @@ public class ModuleControllerClassGenerator extends FileGenerator {
                 Controller.RESULT_INTERFACE_FQN,
                 Controller.EXCEPTION_CLASS_FQN
         ));
-    }
-
-    private String formatUses(final List<String> uses) {
-        Collections.sort(uses);
-
-        return String.join(",", uses);
-    }
-
-    private String getNameFromFqn(final String fqn) {
-        final String[] fqnArray = fqn.split("\\\\");
-
-        return fqnArray[fqnArray.length - 1];
     }
 }
