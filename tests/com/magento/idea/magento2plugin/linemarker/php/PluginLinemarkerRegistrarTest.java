@@ -15,7 +15,7 @@ public class PluginLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
     public void testClassWithPluginShouldHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("PluginClass.php", "php"));
 
-        assertHasLinemarkerWithTooltipAndIcon("Navigate to plugins", "/nodes/plugin.svg");
+        assertHasLinemarkerWithTooltipAndIcon("Navigate to plugins", "nodes/plugin.svg");
     }
 
     /**
@@ -24,6 +24,6 @@ public class PluginLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
     public void testClassWithoutPluginShouldNotHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("RegularClass.php", "php"));
 
-        assertHasNoLinemarkerWithTooltipAndIcon("Navigate to plugins", "/nodes/plugin.svg");
+        assertHasNoLinemarkerWithTooltipAndIcon("Navigate to plugins", "nodes/plugin.svg");
     }
 }
