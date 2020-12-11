@@ -15,7 +15,7 @@ public class ObserverClassLinemarkerRegistrarTest extends LinemarkerFixtureTestC
     public void testObserverClassShouldHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("TestObserver.php", "php"));
 
-        assertHasLinemarkerWithTooltipAndIcon("Navigate to configuration", "/fileTypes/xml.svg");
+        assertHasLinemarkerWithTooltipAndIcon("Navigate to configuration", "fileTypes/xml.svg");
     }
 
     /**
@@ -24,6 +24,6 @@ public class ObserverClassLinemarkerRegistrarTest extends LinemarkerFixtureTestC
     public void testRegularPhpClassShouldNotHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("TestNotObserver.php", "php"));
 
-        assertHasNoLinemarkerWithTooltipAndIcon("Navigate to configuration", "/fileTypes/xml.svg");
+        assertHasNoLinemarkerWithTooltipAndIcon("Navigate to configuration", "fileTypes/xml.svg");
     }
 }
