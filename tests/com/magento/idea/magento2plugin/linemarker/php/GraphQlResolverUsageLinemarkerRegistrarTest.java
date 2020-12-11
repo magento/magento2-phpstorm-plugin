@@ -15,7 +15,7 @@ public class GraphQlResolverUsageLinemarkerRegistrarTest extends LinemarkerFixtu
     public void testResolverClassShouldHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("Resolver.php", "php"));
 
-        assertHasNoLinemarkerWithTooltipAndIcon("Navigate to schema", "/icons/graphqlFile.svg");
+        assertHasNoLinemarkerWithTooltipAndIcon("Navigate to schema", "icons/graphqlFile.svg");
     }
 
     /**
@@ -24,6 +24,6 @@ public class GraphQlResolverUsageLinemarkerRegistrarTest extends LinemarkerFixtu
     public void testRegularClassShouldNotHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("ClassNotConfiguredInSchema.php", "php"));
 
-        assertHasNoLinemarkerWithTooltipAndIcon("Navigate to schema", "/icons/graphqlFile.svg");
+        assertHasNoLinemarkerWithTooltipAndIcon("Navigate to schema", "icons/graphqlFile.svg");
     }
 }

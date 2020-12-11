@@ -16,8 +16,8 @@ public class PluginTargetLinemarkerRegistrarTest extends LinemarkerFixtureTestCa
     public void testPluginToClassShouldHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("Topmenu.php", "php"));
 
-        assertHasLinemarkerWithTooltipAndIcon("Navigate to target method", "/nodes/method.svg");
-        assertHasLinemarkerWithTooltipAndIcon("Navigate to target class", "/nodes/class.svg");
+        assertHasLinemarkerWithTooltipAndIcon("Navigate to target method", "nodes/method.svg");
+        assertHasLinemarkerWithTooltipAndIcon("Navigate to target class", "nodes/class.svg");
     }
 
     /**
@@ -26,8 +26,8 @@ public class PluginTargetLinemarkerRegistrarTest extends LinemarkerFixtureTestCa
     public void testPluginToInterfaceShouldHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("MviewState.php", "php"));
 
-        assertHasLinemarkerWithTooltipAndIcon("Navigate to target method", "/nodes/method.svg");
-        assertHasLinemarkerWithTooltipAndIcon("Navigate to target class", "/nodes/class.svg");
+        assertHasLinemarkerWithTooltipAndIcon("Navigate to target method", "nodes/method.svg");
+        assertHasLinemarkerWithTooltipAndIcon("Navigate to target class", "nodes/class.svg");
     }
 
     /**
@@ -37,6 +37,6 @@ public class PluginTargetLinemarkerRegistrarTest extends LinemarkerFixtureTestCa
         myFixture.configureByFile(this.getFixturePath("ClassNotConfiguredInDiXml.php", "php"));
 
         assertHasNoLinemarkerWithTooltipAndIcon("Navigate to target method", "/nodes/method.svg");
-        assertHasNoLinemarkerWithTooltipAndIcon("Navigate to target class", "/nodes/class.svg");
+        assertHasNoLinemarkerWithTooltipAndIcon("Navigate to target class", "nodes/class.svg");
     }
 }
