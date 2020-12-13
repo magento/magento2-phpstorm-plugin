@@ -23,7 +23,9 @@ import com.intellij.xml.util.XmlIncludeHandler;
 import com.jetbrains.php.lang.PhpLangUtil;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.RegExUtil;
+import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
 import gnu.trove.THashMap;
+import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 
@@ -65,7 +67,7 @@ public class PhpClassNameIndex extends ScalarIndexExtension<String> {
         };
     }
 
-    private void fillMap(final XmlTag parentTag, final Map<String, Void> resultMap) {
+    private void fillMap(final XmlTag parentTag, final Map<String, Void> resultMap) { //NOPMD
         for (final XmlTag childTag: parentTag.getSubTags()) {
             for (final XmlAttribute xmlAttribute: childTag.getAttributes()) {
                 final String xmlAttributeValue = xmlAttribute.getValue();
@@ -79,6 +81,16 @@ public class PhpClassNameIndex extends ScalarIndexExtension<String> {
             if (XmlIncludeHandler.isXInclude(childTag)) {
                 return;
             }
+
+            //skipping IDEA include tag
+            final List<XmlTag> ideaIncludeTags = XmlPsiTreeUtil.findSubTagsOfParent(
+                    childTag,
+                    "xi:include"
+            );
+            if (!ideaIncludeTags.isEmpty()) {
+                return;
+            }
+
             final XmlTagValue childTagValue = childTag.getValue();
             final String tagValue = childTagValue.getTrimmedText();
             if (!tagValue.isEmpty() && tagValue.matches(CLASS_NAME_PATTERN)) {
