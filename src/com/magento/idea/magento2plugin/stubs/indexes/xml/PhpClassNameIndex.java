@@ -67,7 +67,7 @@ public class PhpClassNameIndex extends ScalarIndexExtension<String> {
         };
     }
 
-    private void fillMap(final XmlTag parentTag, final Map<String, Void> resultMap) {
+    private void fillMap(final XmlTag parentTag, final Map<String, Void> resultMap) { //NOPMD
         for (final XmlTag childTag: parentTag.getSubTags()) {
             for (final XmlAttribute xmlAttribute: childTag.getAttributes()) {
                 final String xmlAttributeValue = xmlAttribute.getValue();
@@ -83,7 +83,7 @@ public class PhpClassNameIndex extends ScalarIndexExtension<String> {
             }
 
             //skipping IDEA include tag
-            List<XmlTag> ideaIncludeTags = XmlPsiTreeUtil.findSubTagsOfParent(
+            final List<XmlTag> ideaIncludeTags = XmlPsiTreeUtil.findSubTagsOfParent(
                     childTag,
                     "xi:include"
             );
