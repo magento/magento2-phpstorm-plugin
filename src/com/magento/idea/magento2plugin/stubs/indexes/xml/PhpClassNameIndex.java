@@ -83,7 +83,10 @@ public class PhpClassNameIndex extends ScalarIndexExtension<String> {
             }
 
             //skipping IDEA include tag
-            List<XmlTag> ideaIncludeTags = XmlPsiTreeUtil.findSubTagsOfParent(childTag, "xi:include");
+            List<XmlTag> ideaIncludeTags = XmlPsiTreeUtil.findSubTagsOfParent(
+                    childTag,
+                    "xi:include"
+            );
             if (!ideaIncludeTags.isEmpty()) {
                 return;
             }
