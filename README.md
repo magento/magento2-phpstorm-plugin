@@ -17,8 +17,8 @@ This is a PhpStorm IDE plugin for a better Magento 2 development workflow. It is
 
 ## Works with
 
-* PhpStorm >= 2020.1.1
-* JRE >= 1.8
+* PhpStorm >= 2020.3
+* JRE >= 11
 
 ## Features
 
