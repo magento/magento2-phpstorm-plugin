@@ -11,7 +11,7 @@
     <vendor url="https://github.com/magento/magento2-phpstorm-plugin">Magento Inc.</vendor>
 
     <description><![CDATA[
-        Magento PhpStorm plugin, created to improve life-work balance while working with Magento 2
+        This is a PhpStorm IDE plugin for a better Magento 2 development workflow.
     ]]></description>
 
     <change-notes><![CDATA[
@@ -69,6 +69,7 @@
             <action id="MagentoCreateUiComponentForm" class="com.magento.idea.magento2plugin.actions.generation.NewUiComponentFormAction" />
             <action id="NewModelsAction" class="com.magento.idea.magento2plugin.actions.generation.NewModelsAction" />
             <action id="MagentoCreateADataModel" class="com.magento.idea.magento2plugin.actions.generation.NewDataModelAction" />
+            <action id="MagentoMessageQueue" class="com.magento.idea.magento2plugin.actions.generation.NewMessageQueueAction" />
             <add-to-group group-id="NewGroup" anchor="last"/>
         </group>
 
