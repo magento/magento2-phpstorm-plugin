@@ -16,7 +16,7 @@ import com.intellij.psi.xml.XmlFile;
 import com.jetbrains.php.lang.PhpLangUtil;
 import com.magento.idea.magento2plugin.actions.generation.data.PreferenceDiXmFileData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateDiXml;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplate;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplateUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.XmlFilePositionUtil;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
@@ -26,7 +26,7 @@ import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
 public class PreferenceDiXmlGenerator extends FileGenerator {
-    private final GetCodeTemplate getCodeTemplate;
+    private final GetCodeTemplateUtil getCodeTemplateUtil;
     private final FindOrCreateDiXml findOrCreateDiXml;
     private final XmlFilePositionUtil positionUtil;
     private final PreferenceDiXmFileData preferenceDiXmFileData;
@@ -46,7 +46,7 @@ public class PreferenceDiXmlGenerator extends FileGenerator {
 
         this.preferenceDiXmFileData = preferenceDiXmFileData;
         this.project = project;
-        this.getCodeTemplate = GetCodeTemplate.getInstance(project);
+        this.getCodeTemplateUtil = new GetCodeTemplateUtil(project);
         this.findOrCreateDiXml = new FindOrCreateDiXml(project);
         this.positionUtil = XmlFilePositionUtil.getInstance();
     }
@@ -66,7 +66,7 @@ public class PreferenceDiXmlGenerator extends FileGenerator {
         WriteCommandAction.runWriteCommandAction(project, () -> {
             final StringBuffer textBuf = new StringBuffer();
             try {
-                textBuf.append(getCodeTemplate.execute(
+                textBuf.append(getCodeTemplateUtil.execute(
                         ModuleDiXml.TEMPLATE_PREFERENCE,
                         getAttributes())
                 );

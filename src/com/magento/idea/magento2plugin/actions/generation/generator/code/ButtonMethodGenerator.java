@@ -18,7 +18,7 @@ import com.jetbrains.php.lang.psi.elements.GroupStatement;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormButtonData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplate;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplateUtil;
 import com.magento.idea.magento2plugin.actions.generation.util.CodeStyleSettings;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
@@ -34,7 +34,7 @@ public class ButtonMethodGenerator {
 
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
-    private final GetCodeTemplate getCodeTemplate;
+    private final GetCodeTemplateUtil getCodeTemplateUtil;
     private final UiComponentFormButtonData buttonData;
     private final Project project;
 
@@ -52,7 +52,7 @@ public class ButtonMethodGenerator {
         this.project = project;
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
-        this.getCodeTemplate = GetCodeTemplate.getInstance(project);
+        this.getCodeTemplateUtil = new GetCodeTemplateUtil(project);
     }
 
     /**
@@ -85,7 +85,7 @@ public class ButtonMethodGenerator {
 
             final StringBuffer textBuf = new StringBuffer();
             try {
-                textBuf.append(getCodeTemplate.execute(
+                textBuf.append(getCodeTemplateUtil.execute(
                         template,
                         fillCodeTemplateAttributes()
                     )
