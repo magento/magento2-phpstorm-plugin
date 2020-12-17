@@ -14,7 +14,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.SmartList;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplate;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplateUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.XmlFilePositionUtil;
 import com.magento.idea.magento2plugin.magento.files.CommonXml;
 import com.magento.idea.magento2plugin.magento.files.LayoutXml;
@@ -24,7 +24,7 @@ import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ClassArgumentInXmlConfigGenerator {
-    private final GetCodeTemplate getCodeTemplate;
+    private final GetCodeTemplateUtil getCodeTemplateUtil;
     private final String argumentName;
     private final String argumentType;
     private final String argumentValue;
@@ -46,7 +46,7 @@ public class ClassArgumentInXmlConfigGenerator {
             final String argumentValue
     ) {
         this.project = project;
-        this.getCodeTemplate = GetCodeTemplate.getInstance(project);
+        this.getCodeTemplateUtil = new GetCodeTemplateUtil(project);
         this.argumentName = argumentName;
         this.argumentType = argumentType;
         this.argumentValue = argumentValue;
@@ -67,7 +67,7 @@ public class ClassArgumentInXmlConfigGenerator {
         WriteCommandAction.runWriteCommandAction(project, () -> {
             final StringBuffer textBuf = new StringBuffer();
             try {
-                textBuf.append(getCodeTemplate.execute(
+                textBuf.append(getCodeTemplateUtil.execute(
                         LayoutXml.ARGUMENTS_TEMPLATE,
                         fillAttributes()
                     )

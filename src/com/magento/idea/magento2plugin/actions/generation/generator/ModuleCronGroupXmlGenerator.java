@@ -17,7 +17,7 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.magento.idea.magento2plugin.actions.generation.data.CronGroupXmlData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateCronGroupXml;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplate;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplateUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.XmlFilePositionUtil;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
@@ -33,7 +33,7 @@ import javax.swing.JOptionPane;
 public class ModuleCronGroupXmlGenerator extends FileGenerator {
     private final CronGroupXmlData cronGroupXmlData;
     private final Project project;
-    private final GetCodeTemplate getCodeTemplate;
+    private final GetCodeTemplateUtil getCodeTemplateUtil;
     private final XmlFilePositionUtil positionUtil;
     private final PsiDocumentManager psiDocumentManager;
     private final FindOrCreateCronGroupXml findOrCreateCronGroupsXml;
@@ -54,7 +54,7 @@ public class ModuleCronGroupXmlGenerator extends FileGenerator {
         super(project);
         this.project = project;
         this.cronGroupXmlData = cronGroupXmlData;
-        this.getCodeTemplate = GetCodeTemplate.getInstance(project);
+        this.getCodeTemplateUtil = new GetCodeTemplateUtil(project);
         this.findOrCreateCronGroupsXml = new FindOrCreateCronGroupXml(project);
         this.positionUtil = XmlFilePositionUtil.getInstance();
         this.psiDocumentManager = PsiDocumentManager.getInstance(project);
@@ -96,7 +96,7 @@ public class ModuleCronGroupXmlGenerator extends FileGenerator {
             final StringBuffer textBuf = new StringBuffer();
 
             try {
-                final String cronjobRegistrationTemplate = this.getCodeTemplate.execute(
+                final String cronjobRegistrationTemplate = this.getCodeTemplateUtil.execute(
                         CronGroupXmlTemplate.TEMPLATE_CRON_GROUP_REGISTRATION,
                         getAttributes()
                 );
