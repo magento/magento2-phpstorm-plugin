@@ -103,3 +103,13 @@ idea {
         generatedSourceDirs += file('gen')
     }
 }
+
+dependencies {
+    testImplementation 'junit:junit:4.13'
+}
+
+test {
+    useJUnit()
+
+    maxHeapSize = '1G'
+}
