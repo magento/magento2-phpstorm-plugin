@@ -14,6 +14,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.CronScheduleRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierWithColonRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.Lowercase;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NumericRule;
@@ -33,6 +34,7 @@ public enum RuleRegistry {
     DIRECTORY(DirectoryRule.class),
     PHP_DIRECTORY(PhpDirectoryRule.class),
     IDENTIFIER(IdentifierRule.class),
+    IDENTIFIER_WITH_COLON(IdentifierWithColonRule.class),
     PHP_NAMESPACE_NAME(PhpNamespaceNameRule.class),
     START_WITH_NUMBER_OR_CAPITAL_LETTER(StartWithNumberOrCapitalLetterRule.class),
     ACL_RESOURCE_ID(AclResourceIdRule.class),
