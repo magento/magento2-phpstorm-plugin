@@ -12,9 +12,9 @@ import com.magento.idea.magento2plugin.actions.generation.data.ObserverEventsXml
 import com.magento.idea.magento2plugin.actions.generation.data.ObserverFileData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericWithUnderscoreRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.BoxNotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierWithColonRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.ObserverClassGenerator;
@@ -82,8 +82,8 @@ public class CreateAnObserverDialog extends AbstractDialog {
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, OBSERVER_NAME})
-    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC_WITH_UNDERSCORE,
-            message = {AlphanumericWithUnderscoreRule.MESSAGE, OBSERVER_NAME})
+    @FieldValidation(rule = RuleRegistry.IDENTIFIER_WITH_COLON,
+            message = {IdentifierWithColonRule.MESSAGE, OBSERVER_NAME})
     private JTextField observerName;
 
     /**
