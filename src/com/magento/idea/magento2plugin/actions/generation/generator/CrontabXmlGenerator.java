@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.command.WriteCommandAction;
@@ -17,57 +18,68 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.magento.idea.magento2plugin.actions.generation.data.CrontabXmlData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateCrontabXml;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplate;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplateUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.XmlFilePositionUtil;
 import com.magento.idea.magento2plugin.magento.files.CrontabXmlTemplate;
 import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
-import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Properties;
+import org.jetbrains.annotations.NotNull;
 
 public class CrontabXmlGenerator extends FileGenerator {
-    private Project project;
-    private CrontabXmlData crontabXmlData;
+    private final Project project;
+    private final CrontabXmlData crontabXmlData;
     private boolean isCronGroupDeclared;
 
-    private GetCodeTemplate getCodeTemplate;
-    private CodeStyleManager codeStyleManager;
-    private FindOrCreateCrontabXml findOrCreateCrontabXml;
-    private XmlFilePositionUtil positionUtil;
-    private PsiDocumentManager psiDocumentManager;
+    private final GetCodeTemplateUtil getCodeTemplateUtil;
+    private final CodeStyleManager codeStyleManager;
+    private final FindOrCreateCrontabXml findOrCreateCrontabXml;
+    private final XmlFilePositionUtil positionUtil;
+    private final PsiDocumentManager psiDocumentManager;
 
-    public CrontabXmlGenerator(Project project, @NotNull CrontabXmlData crontabXmlData) {
+    /**
+     * Generator for crontab.xml.
+     *
+     * @param project Project
+     * @param crontabXmlData CrontabXmlData
+     */
+    public CrontabXmlGenerator(
+            final Project project,
+            final @NotNull CrontabXmlData crontabXmlData
+    ) {
         super(project);
 
         this.project = project;
         this.crontabXmlData = crontabXmlData;
 
         this.findOrCreateCrontabXml = new FindOrCreateCrontabXml(project);
-        this.getCodeTemplate = GetCodeTemplate.getInstance(project);
+        this.getCodeTemplateUtil = new GetCodeTemplateUtil(project);
         this.psiDocumentManager = PsiDocumentManager.getInstance(project);
         this.codeStyleManager = CodeStyleManager.getInstance(project);
         this.positionUtil = XmlFilePositionUtil.getInstance();
     }
 
     /**
-     * Register newly created cronjob in the crontab.xml. If there is not crontab.xml, it will create one.
+     * Register newly created cronjob in the crontab.xml.
+     * If there is not crontab.xml, it will create one.
      *
-     * @param actionName
+     * @param actionName String
      *
      * @return PsiFile
      */
-    public PsiFile generate(String actionName) {
-        String moduleName = this.crontabXmlData.getModuleName();
+    @Override
+    public PsiFile generate(final String actionName) {
+        final String moduleName = this.crontabXmlData.getModuleName();
 
-        XmlFile crontabXmlFile = (XmlFile) this.findOrCreateCrontabXml.execute(
-            actionName,
-            moduleName
+        final XmlFile crontabXmlFile = (XmlFile) this.findOrCreateCrontabXml.execute(
+                actionName,
+                moduleName
         );
 
-        String cronjobGroup = this.crontabXmlData.getCronGroup();
-        String cronjobName = this.crontabXmlData.getCronjobName();
-        XmlTag cronGroupTag = this.getCronGroupTag(crontabXmlFile, cronjobGroup);
+        final String cronjobGroup = this.crontabXmlData.getCronGroup();
+        final String cronjobName = this.crontabXmlData.getCronjobName();
+        final XmlTag cronGroupTag = this.getCronGroupTag(crontabXmlFile, cronjobGroup);
 
         this.isCronGroupDeclared = false;
         boolean isCronjobDeclared = false;
@@ -78,46 +90,49 @@ public class CrontabXmlGenerator extends FileGenerator {
         }
 
         if (isCronjobDeclared) {
-            throw new RuntimeException(cronjobName +" cronjob is already declared in the " + moduleName + " module");
+            throw new RuntimeException(cronjobName//NOPMD
+                + " cronjob is already declared in the " + moduleName + " module");
         }
 
         WriteCommandAction.runWriteCommandAction(project, () -> {
-            StringBuffer textBuf = new StringBuffer();
+            final StringBuffer textBuf = new StringBuffer();
 
             try {
-                String cronjobRegistrationTemplate = this.getCodeTemplate.execute(
-                    CrontabXmlTemplate.TEMPLATE_CRONJOB_REGISTRATION,
-                    getAttributes()
+                final String cronjobRegistrationTemplate = this.getCodeTemplateUtil.execute(
+                        CrontabXmlTemplate.TEMPLATE_CRONJOB_REGISTRATION,
+                        getAttributes()
                 );
 
                 textBuf.append(cronjobRegistrationTemplate);
             } catch (IOException e) {
-                e.printStackTrace();
+                e.printStackTrace();//NOPMD
                 return;
             }
 
-            int insertPos = this.isCronGroupDeclared
+            final int insertPos = this.isCronGroupDeclared
                     ? this.positionUtil.getEndPositionOfTag(cronGroupTag)
                     : this.positionUtil.getRootInsertPosition(crontabXmlFile);
 
             if (textBuf.length() > 0 && insertPos >= 0) {
-                Document document = this.psiDocumentManager.getDocument(crontabXmlFile);
+                final Document document = this.psiDocumentManager.getDocument(crontabXmlFile);
 
                 if (document == null) {
                     // practically this should not be possible as we tell to edit XML file
-                    throw new RuntimeException(
-                        crontabXmlFile.getVirtualFile().getPath() + " file is binary or has no document associations"
+                    throw new RuntimeException(//NOPMD
+                            crontabXmlFile.getVirtualFile().getPath()
+                                + " file is binary or has no document associations"
                     );
                 }
 
                 if (!document.isWritable()) {
-                    throw new RuntimeException(
-                        crontabXmlFile.getVirtualFile().getPath() + " file is not writable. Please check file permission"
+                    throw new RuntimeException(//NOPMD
+                            crontabXmlFile.getVirtualFile().getPath()
+                                + " file is not writable. Please check file permission"
                     );
                 }
 
                 document.insertString(insertPos, textBuf);
-                int endPos = insertPos + textBuf.length() + 1;
+                final int endPos = insertPos + textBuf.length() + 1;
 
                 this.codeStyleManager.reformatText(crontabXmlFile, insertPos, endPos);
                 this.psiDocumentManager.commitDocument(document);
@@ -127,12 +142,11 @@ public class CrontabXmlGenerator extends FileGenerator {
         return crontabXmlFile;
     }
 
-    protected void fillAttributes(Properties attributes) {
-        String cronjobName = this.crontabXmlData.getCronjobName();
-        String cronjobGroup = this.crontabXmlData.getCronGroup();
-        String cronjobInstance = this.crontabXmlData.getCronjobInstance();
-        String cronjobSchedule = this.crontabXmlData.getCronjobSchedule();
-        String cronjobScheduleConfigPath = this.crontabXmlData.getCronjobScheduleConfigPath();
+    @Override
+    protected void fillAttributes(final Properties attributes) {
+        final String cronjobGroup = this.crontabXmlData.getCronGroup();
+        final String cronjobSchedule = this.crontabXmlData.getCronjobSchedule();
+        final String cronjobScheduleConfigPath = this.crontabXmlData.getCronjobScheduleConfigPath();
 
         if (!this.isCronGroupDeclared) {
             attributes.setProperty("CRON_GROUP", cronjobGroup);
@@ -146,36 +160,43 @@ public class CrontabXmlGenerator extends FileGenerator {
             attributes.setProperty("CRONJOB_SCHEDULE_CONFIG_PATH", cronjobScheduleConfigPath);
         }
 
+        final String cronjobName = this.crontabXmlData.getCronjobName();
         attributes.setProperty("CRONJOB_NAME", cronjobName);
+
+        final String cronjobInstance = this.crontabXmlData.getCronjobInstance();
         attributes.setProperty("CRONJOB_INSTANCE", cronjobInstance);
     }
 
     /**
-     * Check whenever cronjob with cronjobName is declared under cronGroupTag
+     * Check whenever cronjob with cronjobName is declared under cronGroupTag.
      *
-     * @param cronGroupTag
-     * @param cronjobName
+     * @param cronGroupTag XmlTag
+     * @param cronjobName String
      *
      * @return boolean
      */
-    private boolean isCronjobDeclared(XmlTag cronGroupTag, String cronjobName) {
-        XmlTag[] cronjobTags = PsiTreeUtil.getChildrenOfType(cronGroupTag, XmlTag.class);
+    private boolean isCronjobDeclared(final XmlTag cronGroupTag, final String cronjobName) {
+        final XmlTag[] cronjobTags = PsiTreeUtil.getChildrenOfType(cronGroupTag, XmlTag.class);
 
         if (cronjobTags == null) {
             return false;
         }
 
-        for (XmlTag cronjobTag: cronjobTags) {
+        for (final XmlTag cronjobTag: cronjobTags) {
             if (!cronjobTag.getName().equals(CrontabXmlTemplate.CRON_JOB_TAG)) {
                 continue;
             }
 
-            XmlAttribute[] cronjobAttributes = PsiTreeUtil.getChildrenOfType(cronjobTag, XmlAttribute.class);
+            final XmlAttribute[] cronjobAttributes = PsiTreeUtil.getChildrenOfType(
+                    cronjobTag,
+                    XmlAttribute.class
+            );
 
             // todo: handle null pointer
 
-            for (XmlAttribute cronjobAttribute: cronjobAttributes) {
-                if (!cronjobAttribute.getName().equals(CrontabXmlTemplate.CRON_JOB_NAME_ATTRIBUTE)) {
+            for (final XmlAttribute cronjobAttribute: cronjobAttributes) {
+                if (!cronjobAttribute.getName()
+                        .equals(CrontabXmlTemplate.CRON_JOB_NAME_ATTRIBUTE)) {
                     continue;
                 }
 
@@ -189,26 +210,27 @@ public class CrontabXmlGenerator extends FileGenerator {
     }
 
     /**
-     * Retrieve cronGroup tag with cronjobGroup name if it registered in crontabXmlFile
+     * Retrieve cronGroup tag with cronjobGroup name if it registered in crontabXmlFile.
      *
-     * @param crontabXmlFile
-     * @param cronjobGroup
+     * @param crontabXmlFile XmlFile
+     * @param cronjobGroup String
      *
      * @return XmlTag
      */
-    private XmlTag getCronGroupTag(XmlFile crontabXmlFile, String cronjobGroup) {
-        Collection<XmlAttributeValue> cronGroupIdAttributes = XmlPsiTreeUtil.findAttributeValueElements(
-            crontabXmlFile,
-            CrontabXmlTemplate.CRON_GROUP_TAG,
-            CrontabXmlTemplate.CRON_GROUP_NAME_ATTRIBUTE
+    private XmlTag getCronGroupTag(final XmlFile crontabXmlFile, final String cronjobGroup) {
+        final Collection<XmlAttributeValue> cronGroupIdAttributes
+                = XmlPsiTreeUtil.findAttributeValueElements(
+                    crontabXmlFile,
+                    CrontabXmlTemplate.CRON_GROUP_TAG,
+                    CrontabXmlTemplate.CRON_GROUP_NAME_ATTRIBUTE
         );
 
-        for (XmlAttributeValue cronGroupIdAttribute: cronGroupIdAttributes) {
+        for (final XmlAttributeValue cronGroupIdAttribute: cronGroupIdAttributes) {
             if (!cronGroupIdAttribute.getValue().equals(cronjobGroup)) {
                 continue;
             }
 
-            return PsiTreeUtil.getParentOfType(cronGroupIdAttribute, XmlTag.class);
+            return PsiTreeUtil.getParentOfType(cronGroupIdAttribute, XmlTag.class);//NOPMD
         }
 
         return null;

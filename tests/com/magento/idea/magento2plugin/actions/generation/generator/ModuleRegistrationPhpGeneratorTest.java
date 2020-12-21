@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
@@ -12,6 +13,9 @@ import com.magento.idea.magento2plugin.magento.files.RegistrationPhp;
 
 public class ModuleRegistrationPhpGeneratorTest extends BaseGeneratorTestCase {
 
+    /**
+     * Test for generation of registration.php file.
+     */
     public void testGenerateRegistrationPhpFile() {
         final String filePath = this.getFixturePath(RegistrationPhp.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -23,9 +27,10 @@ public class ModuleRegistrationPhpGeneratorTest extends BaseGeneratorTestCase {
                 projectDir,
                 true
         );
-        final ModuleRegistrationPhpGenerator moduleRegistrationPhpGenerator = new ModuleRegistrationPhpGenerator(
-                moduleRegistrationPhpData,
-                project
+        final ModuleRegistrationPhpGenerator moduleRegistrationPhpGenerator
+                = new ModuleRegistrationPhpGenerator(
+                    moduleRegistrationPhpData,
+                    project
         );
         final PsiFile registrationPhp = moduleRegistrationPhpGenerator.generate("test");
         assertGeneratedFileIsCorrect(
@@ -35,8 +40,10 @@ public class ModuleRegistrationPhpGeneratorTest extends BaseGeneratorTestCase {
         );
     }
 
-    public void testGenerateRegistrationPhpFileInRoot()
-    {
+    /**
+     * Test for generation of registration.php file for a module project.
+     */
+    public void testGenerateRegistrationPhpFileInRoot() {
         final String filePath = this.getFixturePath(RegistrationPhp.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
         final Project project = myFixture.getProject();
@@ -47,9 +54,10 @@ public class ModuleRegistrationPhpGeneratorTest extends BaseGeneratorTestCase {
                 projectDir,
                 false
         );
-        final ModuleRegistrationPhpGenerator moduleRegistrationPhpGenerator = new ModuleRegistrationPhpGenerator(
-                moduleRegistrationPhpData,
-                project
+        final ModuleRegistrationPhpGenerator moduleRegistrationPhpGenerator
+                = new ModuleRegistrationPhpGenerator(
+                    moduleRegistrationPhpData,
+                    project
         );
         final PsiFile registrationPhp = moduleRegistrationPhpGenerator.generate("test");
         assertGeneratedFileIsCorrect(

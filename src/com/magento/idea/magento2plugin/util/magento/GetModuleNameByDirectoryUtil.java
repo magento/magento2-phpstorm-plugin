@@ -18,6 +18,9 @@ import org.jetbrains.annotations.Nullable;
 
 public final class GetModuleNameByDirectoryUtil {
 
+    public static final int THEME_SPLIT_COUNT = 1;
+    public static final String THEME_DIRECTORY_REGEX = "app\\/design\\/(adminhtml|frontend)\\/";
+
     private GetModuleNameByDirectoryUtil() {}
 
     /**
@@ -31,6 +34,13 @@ public final class GetModuleNameByDirectoryUtil {
             final PsiDirectory psiDirectory,
             final Project project
     ) {
+        // Check if directory is theme directory and return module name from directory path if yes
+        final String[] splits = psiDirectory.getVirtualFile().getPath()
+                .split(THEME_DIRECTORY_REGEX);
+        if (splits.length > THEME_SPLIT_COUNT) {
+            return splits[1].split("\\/")[2];
+        }
+
         final PhpFile registrationPhp = getRegistrationPhpRecursively(
                 psiDirectory,
                 project

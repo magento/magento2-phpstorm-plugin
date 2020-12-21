@@ -14,7 +14,7 @@ import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.xml.XmlFile;
 import com.magento.idea.magento2plugin.actions.generation.data.ObserverEventsXmlData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateEventsXml;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplate;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplateUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.XmlFilePositionUtil;
 import com.magento.idea.magento2plugin.magento.files.ModuleEventsXml;
 import java.io.IOException;
@@ -23,7 +23,7 @@ import java.util.Properties;
 public class ObserverEventsXmlGenerator extends FileGenerator {
     private final FindOrCreateEventsXml findOrCreateEventsXml;
     private final XmlFilePositionUtil positionUtil;
-    private final GetCodeTemplate getCodeTemplate;
+    private final GetCodeTemplateUtil getCodeTemplateUtil;
     private final ObserverEventsXmlData observerEventsXmlData;
     private final Project project;
 
@@ -42,7 +42,7 @@ public class ObserverEventsXmlGenerator extends FileGenerator {
         this.project = project;
         this.findOrCreateEventsXml = new FindOrCreateEventsXml(project);
         this.positionUtil = XmlFilePositionUtil.getInstance();
-        this.getCodeTemplate = GetCodeTemplate.getInstance(project);
+        this.getCodeTemplateUtil = new GetCodeTemplateUtil(project);
     }
 
     /**
@@ -63,7 +63,7 @@ public class ObserverEventsXmlGenerator extends FileGenerator {
         WriteCommandAction.runWriteCommandAction(project, () -> {
             final StringBuffer textBuf = new StringBuffer();
             try {
-                textBuf.append(getCodeTemplate.execute(
+                textBuf.append(getCodeTemplateUtil.execute(
                         ModuleEventsXml.TEMPLATE_OBSERVER,
                         getAttributes())
                 );
