@@ -223,14 +223,22 @@ public class NewModelsDialog extends AbstractDialog {
     private PsiFile generateModelFile() {
         final NamespaceBuilder modelNamespace = getModelNamespace();
         final NamespaceBuilder resourceModelNamespace = getResourceModelNamespace();
+        String resourceModelFqn = resourceModelNamespace.getClassFqn();
+        String resorceModelName = getResourceModelName();
+
+        if (getModelName().equals(getResourceModelName())) {
+            resourceModelFqn += " as ResourceModel";
+            resorceModelName = "ResourceModel";
+        }
+
         return new ModuleModelGenerator(new ModelData(
                 getModuleName(),
                 getDbTableName(),
                 getModelName(),
-                getResourceModelName(),
+                resorceModelName,
                 modelNamespace.getClassFqn(),
                 modelNamespace.getNamespace(),
-                resourceModelNamespace.getClassFqn()
+                resourceModelFqn
         ), project).generate(NewModelsDialog.ACTION_NAME, true);
     }
 
@@ -250,17 +258,30 @@ public class NewModelsDialog extends AbstractDialog {
         final NamespaceBuilder resourceModelNamespace = getResourceModelNamespace();
         final NamespaceBuilder modelNamespace = getModelNamespace();
         final NamespaceBuilder collectionNamespace = getCollectionNamespace();
+        String modelFqn = modelNamespace.getClassFqn();
+        String modelName = getModelName();
+        String resourceModelFqn = resourceModelNamespace.getClassFqn();
+        String resorceModelName = getResourceModelName();
+
+
+        if (getModelName().equals(getResourceModelName())) {
+            modelFqn += " as Model";
+            modelName = "Model";
+            resourceModelFqn += " as ResourceModel";
+            resorceModelName = "ResourceModel";
+        }
+
         return new ModuleCollectionGenerator(new CollectionData(
             getModuleName(),
             getDbTableName(),
-            getModelName(),
+            modelName,
             getCollectionName(),
             collectionNamespace.getClassFqn(),
             getCollectionDirectory(),
             collectionNamespace.getNamespace(),
-            getResourceModelName(),
-            resourceModelNamespace.getClassFqn(),
-            modelNamespace.getClassFqn()
+            resorceModelName,
+            resourceModelFqn,
+            modelFqn
         ), project).generate(NewModelsDialog.ACTION_NAME, true);
     }
 
