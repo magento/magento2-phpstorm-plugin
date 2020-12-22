@@ -51,7 +51,10 @@ public class XmlPsiTreeUtil {
         return PsiTreeUtil.getParentOfType(argumentsTag, XmlTag.class);
     }
 
-    public static Collection<XmlAttributeValue> findObserverTag(
+    /**
+     * Finds observer tags by event-observer name combination.
+     */
+    public static Collection<XmlAttributeValue> findObserverTags(
             final XmlFile xmlFile,
             final String eventName,
             final String observerName
