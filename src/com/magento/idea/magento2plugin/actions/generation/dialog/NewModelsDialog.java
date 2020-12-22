@@ -223,7 +223,8 @@ public class NewModelsDialog extends AbstractDialog {
     private PsiFile generateModelFile() {
         final NamespaceBuilder modelNamespace = getModelNamespace();
         final NamespaceBuilder resourceModelNamespace = getResourceModelNamespace();
-        final StringBuilder resourceModelFqn = new StringBuilder(resourceModelNamespace.getClassFqn());
+        final StringBuilder resourceModelFqn
+                = new StringBuilder(resourceModelNamespace.getClassFqn());
         String resorceModelName = getResourceModelName();
 
         if (getModelName().equals(getResourceModelName())) {
@@ -260,7 +261,8 @@ public class NewModelsDialog extends AbstractDialog {
         final NamespaceBuilder collectionNamespace = getCollectionNamespace();
         final StringBuilder modelFqn = new StringBuilder(modelNamespace.getClassFqn());
         String modelName = getModelName();
-        final StringBuilder resourceModelFqn = new StringBuilder(resourceModelNamespace.getClassFqn());
+        final StringBuilder resourceModelFqn
+                = new StringBuilder(resourceModelNamespace.getClassFqn());
         String resorceModelName = getResourceModelName();
 
 
