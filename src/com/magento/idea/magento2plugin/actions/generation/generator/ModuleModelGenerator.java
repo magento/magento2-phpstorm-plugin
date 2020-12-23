@@ -150,9 +150,7 @@ public class ModuleModelGenerator extends FileGenerator {
         attributes.setProperty("NAMESPACE", modelData.getNamespace());
 
         attributes.setProperty("DB_NAME", modelData.getDbTableName());
-        attributes.setProperty("RESOURCE_MODEL", PhpClassGeneratorUtil.getNameFromFqn(
-                modelData.getResourceModelFqn())
-        );
+        attributes.setProperty("RESOURCE_MODEL", modelData.getResourceName());
         final List<String> uses = getUses();
 
         attributes.setProperty(
