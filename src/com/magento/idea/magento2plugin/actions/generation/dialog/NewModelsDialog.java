@@ -53,6 +53,9 @@ public class NewModelsDialog extends AbstractDialog {
     private static final String ENTITY_ID_COLUMN_NAME = "Entity ID Column Name";
     private static final String COLLECTION_NAME = "Collection Name";
     private static final String COLLECTION_DIRECTORY = "Collection Directory";
+    public static final String RESOURCE_MODEL = "ResourceModel";
+    public static final String MODEL = "Model";
+    public static final String FQN_ALIAS_KEYWORD = " as ";
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, MODEL_NAME})
@@ -225,18 +228,19 @@ public class NewModelsDialog extends AbstractDialog {
         final NamespaceBuilder resourceModelNamespace = getResourceModelNamespace();
         final StringBuilder resourceModelFqn
                 = new StringBuilder(resourceModelNamespace.getClassFqn());
-        String resorceModelName = getResourceModelName();
+        String resourceModelName = getResourceModelName();
 
         if (getModelName().equals(getResourceModelName())) {
-            resourceModelFqn.append(" as ResourceModel");
-            resorceModelName = "ResourceModel";
+            resourceModelFqn.append(FQN_ALIAS_KEYWORD);
+            resourceModelFqn.append(RESOURCE_MODEL);
+            resourceModelName = RESOURCE_MODEL;
         }
 
         return new ModuleModelGenerator(new ModelData(
                 getModuleName(),
                 getDbTableName(),
                 getModelName(),
-                resorceModelName,
+                resourceModelName,
                 modelNamespace.getClassFqn(),
                 modelNamespace.getNamespace(),
                 resourceModelFqn.toString()
@@ -263,14 +267,16 @@ public class NewModelsDialog extends AbstractDialog {
         String modelName = getModelName();
         final StringBuilder resourceModelFqn
                 = new StringBuilder(resourceModelNamespace.getClassFqn());
-        String resorceModelName = getResourceModelName();
+        String resourceModelName = getResourceModelName();
 
 
         if (getModelName().equals(getResourceModelName())) {
-            modelFqn.append(" as Model");
-            modelName = "Model";
-            resourceModelFqn.append(" as ResourceModel");
-            resorceModelName = "ResourceModel";
+            modelFqn.append(FQN_ALIAS_KEYWORD);
+            modelFqn.append(MODEL);
+            modelName = MODEL;
+            resourceModelFqn.append(FQN_ALIAS_KEYWORD);
+            resourceModelFqn.append(RESOURCE_MODEL);
+            resourceModelName = RESOURCE_MODEL;
         }
 
         return new ModuleCollectionGenerator(new CollectionData(
@@ -281,7 +287,7 @@ public class NewModelsDialog extends AbstractDialog {
             collectionNamespace.getClassFqn(),
             getCollectionDirectory(),
             collectionNamespace.getNamespace(),
-            resorceModelName,
+            resourceModelName,
             resourceModelFqn.toString(),
             modelFqn.toString()
         ), project).generate(NewModelsDialog.ACTION_NAME, true);
