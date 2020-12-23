@@ -5,7 +5,7 @@ name: Run automated tests
 
 on:
   pull_request:
-    branches: [ master, 3.0.3-develop ]
+    branches: [ master, 3.0.4-develop ]
 
 jobs:
   build-linux:
