@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 3.0.3
 
+### Fixed
+
+- Fixed model generation with same names
+- Fixed NPTR exception in theme directory view model action
+- Fixed observer name validator
+- Fixed plugin name validator
+
 ## 3.0.2
 
 ### Fixed
