@@ -98,7 +98,9 @@ public class OverrideInThemeGenerator {
         final List<String> pathComponents = new ArrayList<>();
         PsiDirectory parent = file.getParent();
         while (!parent.getName().equals(Areas.frontend.toString())
-                && !parent.getName().equals(Areas.adminhtml.toString())) {
+                && !parent.getName().equals(Areas.adminhtml.toString())
+                && !parent.getName().equals(Areas.base.toString())
+        ) {
             pathComponents.add(parent.getName());
             parent = parent.getParent();
         }
