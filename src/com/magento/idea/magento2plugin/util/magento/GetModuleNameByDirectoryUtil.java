@@ -17,7 +17,6 @@ import com.magento.idea.magento2plugin.util.RegExUtil;
 import org.jetbrains.annotations.Nullable;
 
 public final class GetModuleNameByDirectoryUtil {
-
     public static final int THEME_SPLIT_COUNT = 1;
     public static final String THEME_DIRECTORY_REGEX = "app\\/design\\/(adminhtml|frontend)\\/";
 
