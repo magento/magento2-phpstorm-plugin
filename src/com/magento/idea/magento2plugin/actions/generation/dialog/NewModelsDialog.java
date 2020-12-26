@@ -53,6 +53,9 @@ public class NewModelsDialog extends AbstractDialog {
     private static final String ENTITY_ID_COLUMN_NAME = "Entity ID Column Name";
     private static final String COLLECTION_NAME = "Collection Name";
     private static final String COLLECTION_DIRECTORY = "Collection Directory";
+    public static final String RESOURCE_MODEL = "ResourceModel";
+    public static final String MODEL = "Model";
+    public static final String FQN_ALIAS_KEYWORD = " as ";
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, MODEL_NAME})
@@ -223,14 +226,24 @@ public class NewModelsDialog extends AbstractDialog {
     private PsiFile generateModelFile() {
         final NamespaceBuilder modelNamespace = getModelNamespace();
         final NamespaceBuilder resourceModelNamespace = getResourceModelNamespace();
+        final StringBuilder resourceModelFqn
+                = new StringBuilder(resourceModelNamespace.getClassFqn());
+        String resourceModelName = getResourceModelName();
+
+        if (getModelName().equals(getResourceModelName())) {
+            resourceModelFqn.append(FQN_ALIAS_KEYWORD);
+            resourceModelFqn.append(RESOURCE_MODEL);
+            resourceModelName = RESOURCE_MODEL;
+        }
+
         return new ModuleModelGenerator(new ModelData(
                 getModuleName(),
                 getDbTableName(),
                 getModelName(),
-                getResourceModelName(),
+                resourceModelName,
                 modelNamespace.getClassFqn(),
                 modelNamespace.getNamespace(),
-                resourceModelNamespace.getClassFqn()
+                resourceModelFqn.toString()
         ), project).generate(NewModelsDialog.ACTION_NAME, true);
     }
 
@@ -250,17 +263,33 @@ public class NewModelsDialog extends AbstractDialog {
         final NamespaceBuilder resourceModelNamespace = getResourceModelNamespace();
         final NamespaceBuilder modelNamespace = getModelNamespace();
         final NamespaceBuilder collectionNamespace = getCollectionNamespace();
+        final StringBuilder modelFqn = new StringBuilder(modelNamespace.getClassFqn());
+        String modelName = getModelName();
+        final StringBuilder resourceModelFqn
+                = new StringBuilder(resourceModelNamespace.getClassFqn());
+        String resourceModelName = getResourceModelName();
+
+
+        if (getModelName().equals(getResourceModelName())) {
+            modelFqn.append(FQN_ALIAS_KEYWORD);
+            modelFqn.append(MODEL);
+            modelName = MODEL;
+            resourceModelFqn.append(FQN_ALIAS_KEYWORD);
+            resourceModelFqn.append(RESOURCE_MODEL);
+            resourceModelName = RESOURCE_MODEL;
+        }
+
         return new ModuleCollectionGenerator(new CollectionData(
             getModuleName(),
             getDbTableName(),
-            getModelName(),
+            modelName,
             getCollectionName(),
             collectionNamespace.getClassFqn(),
             getCollectionDirectory(),
             collectionNamespace.getNamespace(),
-            getResourceModelName(),
-            resourceModelNamespace.getClassFqn(),
-            modelNamespace.getClassFqn()
+            resourceModelName,
+            resourceModelFqn.toString(),
+            modelFqn.toString()
         ), project).generate(NewModelsDialog.ACTION_NAME, true);
     }
 
