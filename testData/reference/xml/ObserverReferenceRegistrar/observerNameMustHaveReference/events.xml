@@ -8,6 +8,6 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
     <event name="test_event_in_test_class">
-        <observer name="test_obs<caret>erver" disabled="true"/>
+        <observer name="test_observer<caret>" disabled="true"/>
     </event>
 </config>
