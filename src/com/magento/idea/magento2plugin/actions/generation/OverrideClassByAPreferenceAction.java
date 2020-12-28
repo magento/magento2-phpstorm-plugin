@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 public class OverrideClassByAPreferenceAction extends DumbAwareAction {
     public static final String ACTION_NAME = "Override this class by a new Preference";
     public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Preference";
+    public static final String INTERFACE_ACTION = "Override this interface by a new Preference";
     private final GetFirstClassOfFile getFirstClassOfFile;
     private PhpClass targetClass;
 
@@ -44,6 +45,9 @@ public class OverrideClassByAPreferenceAction extends DumbAwareAction {
             targetClass = phpClass;
             if (psiFile instanceof PhpFile && phpClass != null) {
                 this.setStatus(event, true);
+                if (phpClass.isInterface()) {
+                    event.getPresentation().setText(INTERFACE_ACTION);
+                }
             } else  {
                 this.setStatus(event, false);
             }

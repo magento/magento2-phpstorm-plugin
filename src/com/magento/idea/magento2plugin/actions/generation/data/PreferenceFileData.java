@@ -14,6 +14,7 @@ public class PreferenceFileData {
     private String preferenceFqn;
     private String namespace;
     private boolean inheritClass;
+    private boolean isInterface;
 
     public PreferenceFileData(
             String preferenceDirectory,
@@ -22,7 +23,8 @@ public class PreferenceFileData {
             PhpClass targetClass,
             String preferenceFqn,
             String namespace,
-            boolean inheritClass
+            boolean inheritClass,
+            boolean isInterface
     ) {
         this.preferenceDirectory = preferenceDirectory;
         this.preferenceClassName = preferenceClassName;
@@ -31,6 +33,7 @@ public class PreferenceFileData {
         this.preferenceFqn = preferenceFqn;
         this.namespace = namespace;
         this.inheritClass = inheritClass;
+        this.isInterface = isInterface;
     }
 
     public String getPreferenceClassName() {
@@ -59,5 +62,9 @@ public class PreferenceFileData {
 
     public boolean isInheritClass() {
         return inheritClass;
+    }
+
+    public boolean isInterface() {
+        return isInterface;
     }
 }
