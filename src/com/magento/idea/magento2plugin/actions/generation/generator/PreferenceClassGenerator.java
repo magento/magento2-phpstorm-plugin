@@ -25,17 +25,20 @@ import javax.swing.JOptionPane;
 import org.jetbrains.annotations.NotNull;
 
 public class PreferenceClassGenerator extends FileGenerator {
-    private PreferenceFileData preferenceFileData;
-    private Project project;
-    private ValidatorBundle validatorBundle;
-    private CommonBundle commonBundle;
+    private final PreferenceFileData preferenceFileData;
+    private final Project project;
+    private final ValidatorBundle validatorBundle;
+    private final CommonBundle commonBundle;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final GetFirstClassOfFile getFirstClassOfFile;
 
+    /**
+     * Constructor.
+     */
     public PreferenceClassGenerator(
-            @NotNull PreferenceFileData preferenceFileData,
-            Project project
+            @NotNull final PreferenceFileData preferenceFileData,
+            final Project project
     ) {
         super(project);
         this.directoryGenerator = DirectoryGenerator.getInstance();
@@ -47,7 +50,9 @@ public class PreferenceClassGenerator extends FileGenerator {
         this.commonBundle = new CommonBundle();
     }
 
-    public PsiFile generate(String actionName) {
+
+    @Override
+    public PsiFile generate(final String actionName) {
         PhpClass pluginClass = GetPhpClassByFQN.getInstance(project).execute(
                 preferenceFileData.getPreferenceFqn()
         );
@@ -57,7 +62,7 @@ public class PreferenceClassGenerator extends FileGenerator {
         }
 
         if (pluginClass == null) {
-            String errorMessage = validatorBundle.message(
+            final String errorMessage = validatorBundle.message(
                     "validator.file.cantBeCreated",
                     "Preference Class"
             );
@@ -74,18 +79,18 @@ public class PreferenceClassGenerator extends FileGenerator {
         return pluginClass.getContainingFile();
     }
 
-    private PhpClass createPluginClass(String actionName) {
+    private PhpClass createPluginClass(final String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(getPreferenceModule());
-        String[] pluginDirectories = preferenceFileData.getPreferenceDirectory()
+        final String[] pluginDirectories = preferenceFileData.getPreferenceDirectory()
                 .split(File.separator);
-        for (String pluginDirectory: pluginDirectories) {
+        for (final String pluginDirectory: pluginDirectories) {
             parentDirectory = directoryGenerator
                     .findOrCreateSubdirectory(parentDirectory, pluginDirectory);
         }
 
-        Properties attributes = getAttributes();
-        PsiFile pluginFile = fileFromTemplateGenerator.generate(
+        final Properties attributes = getAttributes();
+        final PsiFile pluginFile = fileFromTemplateGenerator.generate(
                 PhpPreference.getInstance(preferenceFileData.getPreferenceClassName()),
                 attributes,
                 parentDirectory,
@@ -97,8 +102,9 @@ public class PreferenceClassGenerator extends FileGenerator {
         return getFirstClassOfFile.execute((PhpFile) pluginFile);
     }
 
-    protected void fillAttributes(Properties attributes) {
-        String preferenceClassName = preferenceFileData.getPreferenceClassName();
+    @Override
+    protected void fillAttributes(final Properties attributes) {
+        final String preferenceClassName = preferenceFileData.getPreferenceClassName();
         attributes.setProperty("NAME", preferenceClassName);
         attributes.setProperty("NAMESPACE", preferenceFileData.getNamespace());
         if (preferenceFileData.isInterface()) {
@@ -107,7 +113,7 @@ public class PreferenceClassGenerator extends FileGenerator {
         if (!preferenceFileData.isInheritClass()) {
             return;
         }
-        String parentClassName = preferenceFileData.getTargetClass().getName();
+        final String parentClassName = preferenceFileData.getTargetClass().getName();
         if (!parentClassName.equals(preferenceClassName)) {
             attributes.setProperty("USE", preferenceFileData.getTargetClass().getPresentableFQN());
             attributes.setProperty("EXTENDS", parentClassName);
