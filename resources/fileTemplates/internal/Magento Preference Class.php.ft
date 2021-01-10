@@ -9,6 +9,6 @@ namespace ${NAMESPACE};
 use ${USE};
 #end
 
-class ${NAME} #if (${EXTENDS})extends ${EXTENDS}#end {
+#if (${INTERFACE})interface#else class#end ${NAME} #if (${EXTENDS})extends ${EXTENDS}#end {
 
 }
