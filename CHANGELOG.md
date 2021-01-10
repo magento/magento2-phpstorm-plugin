@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 3.0.4
 
+### Fixed
+
+- Overriding the interface generates invalid php code
+- Overriding a template from the base area
+- Disabled an ability to create a plugin for a class that implements `NoninterceptableInterface`
+
+### Added
+
+- `NoninterceptableInterface` case warning to the plugin inspection
+
 ## 3.0.3
 
 ### Fixed
