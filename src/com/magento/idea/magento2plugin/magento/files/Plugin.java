@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.magento.files;
 
 import com.intellij.lang.Language;
@@ -14,28 +15,30 @@ public class Plugin implements ModuleFileInterface {
 
     public static final String CALLABLE_PARAM = "callable";
     public static final String CLOSURE_PARAM = "Closure";
+    public static final String NON_INTERCEPTABLE_FQN
+            = "\\Magento\\Framework\\ObjectManager\\NoninterceptableInterface";
 
     public enum PluginType {
-        before,
-        after,
-        around
+        before,//NOPMD
+        after,//NOPMD
+        around//NOPMD
     }
 
     //forbidden target method
-    public static final String constructMethodName = "__construct";
+    public static final String CONSTRUCT_METHOD_NAME = "__construct";
 
     //allowed methods access type
-    public static final String publicAccess = "public";
+    public static final String PUBLIC_ACCESS = "public";
 
-    private static Plugin INSTANCE = null;
     private String fileName;
 
-    public static Plugin getInstance(String className) {
-        if (null == INSTANCE) {
-            INSTANCE = new Plugin();
-        }
-        INSTANCE.setFileName(className.concat(".php"));
-        return INSTANCE;
+    /**
+     * Constructor.
+     *
+     * @param className String
+     */
+    public Plugin(final String className) {
+        this.setFileName(className.concat(".php"));
     }
 
     @Override
@@ -53,12 +56,17 @@ public class Plugin implements ModuleFileInterface {
         return PhpLanguage.INSTANCE;
     }
 
-    private void setFileName(String filename) {
+    private void setFileName(final String filename) {
         this.fileName = filename;
     }
 
-    public static String getMethodTemplateByPluginType(PluginType pluginType)
-    {
+    /**
+     * Get Method Template.
+     *
+     * @param pluginType PluginType
+     * @return String
+     */
+    public static String getMethodTemplateByPluginType(final PluginType pluginType) {
         if (pluginType.equals(PluginType.after)) {
             return AFTER_METHOD_TEMPLATE_NAME;
         }
@@ -71,14 +79,17 @@ public class Plugin implements ModuleFileInterface {
         return null;
     }
 
-    public static Plugin.PluginType getPluginTypeByString(String string)
-    {
-        for (Plugin.PluginType pluginType: Plugin.PluginType.values()) {
-            if (!pluginType.toString().equals(string))
-            {
-                continue;
+    /**
+     * Get Plugin Type.
+     *
+     * @param string String
+     * @return Plugin.PluginType
+     */
+    public static Plugin.PluginType getPluginTypeByString(final String string) {
+        for (final Plugin.PluginType pluginType: Plugin.PluginType.values()) {
+            if (pluginType.toString().equals(string)) {
+                return pluginType;
             }
-            return pluginType;
         }
         return null;
     }
