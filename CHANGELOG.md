@@ -8,9 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Fixed
 
-- Overriding the interface generates invalid php code
+- Overriding the interface that generates invalid php code
 - Overriding a template from the base area
-- Disabled an ability to create a plugin for a class that implements `NoninterceptableInterface`
+- Disabled the ability to create a plugin for a class that implements `\Magento\Framework\ObjectManager\NoninterceptableInterface`
 
 ### Added
 
