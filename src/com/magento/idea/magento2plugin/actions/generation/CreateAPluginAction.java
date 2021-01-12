@@ -18,15 +18,15 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.CreateAPluginDialog;
+import com.magento.idea.magento2plugin.inspections.php.util.PhpClassImplementsNoninterceptableInterfaceUtil;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
-import com.magento.idea.magento2plugin.util.magento.plugin.IsPluginAllowedForMethod;
+import com.magento.idea.magento2plugin.util.magento.plugin.IsPluginAllowedForMethodUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class CreateAPluginAction extends DumbAwareAction {
     public static final String ACTION_NAME = "Create a new Plugin for this method";
     public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Plugin";
-    private final IsPluginAllowedForMethod isPluginAllowed;// NOPMD
     private final GetFirstClassOfFile getFirstClassOfFile;
     private Method targetMethod;
     private PhpClass targetClass;
@@ -36,7 +36,6 @@ public class CreateAPluginAction extends DumbAwareAction {
      */
     public CreateAPluginAction() {
         super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
-        this.isPluginAllowed = IsPluginAllowedForMethod.getInstance();
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
     }
 
@@ -55,6 +54,7 @@ public class CreateAPluginAction extends DumbAwareAction {
             if (phpClass == null
                     || !(psiFile instanceof PhpFile)
                     || phpClass.isFinal()
+                    || PhpClassImplementsNoninterceptableInterfaceUtil.execute(phpClass)
                     || this.targetMethod == null
             ) {
                 this.setStatus(event, false);
@@ -110,13 +110,13 @@ public class CreateAPluginAction extends DumbAwareAction {
             return;
         }
         if (element instanceof Method && element.getParent()
-                == phpClass && isPluginAllowed.check((Method) element)) {
+                == phpClass && IsPluginAllowedForMethodUtil.check((Method) element)) {
             this.targetMethod = (Method) element;
             return;
         }
         final PsiElement parent = element.getParent();
         if (parent instanceof Method && parent.getParent()
-                == phpClass && isPluginAllowed.check((Method) parent)) {
+                == phpClass && IsPluginAllowedForMethodUtil.check((Method) parent)) {
             this.targetMethod = (Method) parent;
         }
     }
