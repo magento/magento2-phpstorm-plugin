@@ -28,19 +28,19 @@ public class CopyMagentoPath extends CopyPathProvider {
     };
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
-        final VirtualFile virtualFile = e.getData(PlatformDataKeys.VIRTUAL_FILE);
+    public void update(@NotNull final AnActionEvent event) {
+        final VirtualFile virtualFile = event.getData(PlatformDataKeys.VIRTUAL_FILE);
         if (virtualFile != null && virtualFile.isDirectory()) {
-            e.getPresentation().setVisible(false);
+            event.getPresentation().setVisible(false);
         }
     }
 
     @Nullable
     @Override
     public String getPathToElement(
-            @NotNull Project project,
-            @Nullable VirtualFile virtualFile,
-            @Nullable Editor editor
+            @NotNull final Project project,
+            @Nullable final VirtualFile virtualFile,
+            @Nullable final Editor editor
     ) {
         final PsiDirectory directory
                 = PsiManager.getInstance(project).findFile(virtualFile).getContainingDirectory();
@@ -63,9 +63,9 @@ public class CopyMagentoPath extends CopyPathProvider {
         return path;
     }
 
-    private int getIndexOf(StringBuilder fullPath, String path) {
-        return fullPath.lastIndexOf(path) != -1
-                ? fullPath.lastIndexOf(path)
-                : getIndexOf(fullPath, templatePaths[++index]);
+    private int getIndexOf(final StringBuilder fullPath, final String path) {
+        return fullPath.lastIndexOf(path) == -1
+                ? getIndexOf(fullPath, templatePaths[++index])
+                : fullPath.lastIndexOf(path);
     }
 }
