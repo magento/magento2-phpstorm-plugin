@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin.inspections.php;
 
 import com.jetbrains.php.PhpBundle;
+import com.magento.idea.magento2plugin.bundles.InspectionBundle;
 
 public class PluginInspectionTest extends InspectionPhpFixtureTestCase {
 
@@ -48,5 +49,16 @@ public class PluginInspectionTest extends InspectionPhpFixtureTestCase {
         );
 
         assertHasHighlighting(wrongParameterError);
+    }
+
+    /**
+     * Inspection highlights error in callable parameter type.
+     */
+    public void testWithNoninterceptableTargetClass() {
+        myFixture.configureByFile(getFixturePath("Plugin.php"));
+
+        assertHasHighlighting(new InspectionBundle().message(
+                "inspection.plugin.error.noninterceptableInterface"
+        ));
     }
 }

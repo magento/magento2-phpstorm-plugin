@@ -6,6 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 3.1.0
 
+## 3.0.4
+
+### Fixed
+
+- Overriding the interface that generates invalid php code
+- Overriding a template from the base area
+- Disabled the ability to create a plugin for a class that implements `\Magento\Framework\ObjectManager\NoninterceptableInterface`
+
+### Added
+
+- `NoninterceptableInterface` case warning to the plugin inspection
+
+## 3.0.3
+
+### Fixed
+
+- Fixed model generation with same names
+- Fixed NPTR exception in theme directory view model action
+- Fixed observer name validator
+- Fixed plugin name validator
+
 ## 3.0.2
 
 ### Fixed

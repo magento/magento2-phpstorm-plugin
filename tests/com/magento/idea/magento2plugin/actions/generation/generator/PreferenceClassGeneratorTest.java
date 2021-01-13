@@ -26,6 +26,7 @@ public class PreferenceClassGeneratorTest extends BaseGeneratorTestCase {
                 "SimpleModelOneOverride",
                 "Foo\\Bar\\Model\\Override\\SimpleModelOneOverride",
                 "Foo\\Bar\\Model\\Override",
+                false,
                 false
         );
         final String filePath = this.getFixturePath("SimpleModelOneOverride.php");
@@ -34,6 +35,29 @@ public class PreferenceClassGeneratorTest extends BaseGeneratorTestCase {
         assertGeneratedFileIsCorrect(
                 expectedFile,
                 "src/app/code/Foo/Bar/Model/Override",
+                preferenceClassFile
+        );
+    }
+
+    /**
+     * Test preference class file generation.
+     */
+    public void testGeneratePreferenceInterfaceFile() {
+        final PsiFile preferenceClassFile = createPreferenceClassFile(
+                TARGET_MODEL_ONE_CLASS_FQN,
+                "Model",
+                "InterfaceOverride",
+                "Foo\\Bar\\Model\\InterfaceOverride",
+                "Foo\\Bar\\Model",
+                false,
+                true
+        );
+        final String filePath = this.getFixturePath("InterfaceOverride.php");
+        final PsiFile expectedFile = myFixture.configureByFile(filePath);
+
+        assertGeneratedFileIsCorrect(
+                expectedFile,
+                "src/app/code/Foo/Bar/Model",
                 preferenceClassFile
         );
     }
@@ -48,7 +72,8 @@ public class PreferenceClassGeneratorTest extends BaseGeneratorTestCase {
                 "SimpleModelTwoOverride",
                 "Foo\\Bar\\Model\\Override\\SimpleModelTwoOverride",
                 "Foo\\Bar\\Model\\Override",
-                true
+                true,
+                false
         );
         final String filePath = this.getFixturePath("SimpleModelTwoOverride.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -77,7 +102,8 @@ public class PreferenceClassGeneratorTest extends BaseGeneratorTestCase {
             final String preferenceClassName,
             final String preferenceFqn,
             final String namespace,
-            final Boolean inheritClass
+            final Boolean inheritClass,
+            final Boolean isInterface
     ) {
         final Project project = myFixture.getProject();
         final PhpClass targetClass = GetPhpClassByFQN.getInstance(project).execute(targetClassFnq);
@@ -88,7 +114,8 @@ public class PreferenceClassGeneratorTest extends BaseGeneratorTestCase {
                 targetClass,
                 preferenceFqn,
                 namespace,
-                inheritClass
+                inheritClass,
+                isInterface
         );
         final PreferenceClassGenerator preferenceClassGenerator = new PreferenceClassGenerator(
                 preferenceFileData,
