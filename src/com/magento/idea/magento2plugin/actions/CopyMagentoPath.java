@@ -37,10 +37,16 @@ public class CopyMagentoPath extends CopyPathProvider {
 
     @Nullable
     @Override
-    public String getPathToElement(@NotNull Project project, @Nullable VirtualFile virtualFile, @Nullable Editor editor) {
-        final PsiDirectory directory = PsiManager.getInstance(project).findFile(virtualFile).getContainingDirectory();
+    public String getPathToElement(
+        @NotNull Project project,
+        @Nullable VirtualFile virtualFile,
+        @Nullable Editor editor
+    ) {
+        final PsiDirectory directory
+            = PsiManager.getInstance(project).findFile(virtualFile).getContainingDirectory();
         final StringBuilder fullPath = new StringBuilder(virtualFile.getPath());
-        final StringBuilder magentoPath = new StringBuilder(GetModuleNameByDirectoryUtil.execute(directory, project));
+        final StringBuilder magentoPath
+            = new StringBuilder(GetModuleNameByDirectoryUtil.execute(directory, project));
         String path = fullPath.toString();
 
         if (PHTML.equals(virtualFile.getExtension())) {
