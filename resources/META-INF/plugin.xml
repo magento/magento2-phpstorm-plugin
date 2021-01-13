@@ -94,6 +94,12 @@
             <add-to-group group-id="ProjectViewPopupMenu"/>
         </action>
 
+        <action id="CopyMagentoPath"
+                class="com.magento.idea.magento2plugin.actions.CopyMagentoPath"
+                text="Magento Path"
+                description="Copies Magento's path of file depending on file type">
+            <add-to-group group-id="CopyFileReference" anchor="last"/>
+        </action>
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
