@@ -11,9 +11,16 @@ import com.magento.idea.magento2plugin.actions.generation.NewDbSchemaAction;
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlSourceData;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericWithUnderscoreRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.Lowercase;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.TableNameLength;
+import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaXmlGenerator;
+import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaXml;
+import com.magento.idea.magento2plugin.ui.table.TableGroupWrapper;
+import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -22,7 +29,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import javax.swing.AbstractCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -32,40 +38,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.DefaultCellEditor;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableColumn;
-
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericWithUnderscoreRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.Lowercase;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.TableNameLength;
-import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaXmlGenerator;
-import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaXml;
-import com.magento.idea.magento2plugin.ui.table.ComboBoxCellEditor;
-import com.magento.idea.magento2plugin.ui.table.TableGroupWrapper;
-import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class NewDbSchemaDialog extends AbstractDialog {
     private static final String TABLE_NAME = "Table Name";
-
-    // Table Columns
-    private static final String COLUMN_TYPE = "Type";
-    private static final String COLUMN_NAME = "Name";
-    private static final String COLUMN_PADDING = "Padding";
-    private static final String COLUMN_UNSIGNED = "Unsigned";
-    private static final String COLUMN_NULLABLE = "Nullable";
-    private static final String COLUMN_IDENTITY = "Identity";
-    private static final String COLUMN_COMMENT = "Comment";
-    private static final String COLUMN_LENGTH = "Length";
-    private static final String COLUMN_PRECISION = "Precision";
-    private static final String COLUMN_SCALE = "Scale";
-    private static final String COLUMN_DEFAULT = "Default";
-    private static final String COLUMN_ON_CREATE = "On Create";
-    private static final String COLUMN_ON_UPDATE = "On Update";
 
     private final Project project;
     private final String moduleName;
@@ -94,14 +70,10 @@ public class NewDbSchemaDialog extends AbstractDialog {
     private JComboBox<ComboBoxItemData> tableResource;
 
     // Table Columns UI components group
+    private TableGroupWrapper columnsTableGroupWrapper;
     private JTable columnsTable;
     private JButton addColumnButton;
     private JScrollPane columnsScrollPanel;//NOPMD
-
-    // Table Constraints UI components group
-    private JTable constraintsTable;
-    private JButton addConstraintButton;
-    private JScrollPane constraintsScrollPanel;//NOPMD
 
     // Labels
     private JLabel tableNameLabel;//NOPMD
@@ -109,7 +81,6 @@ public class NewDbSchemaDialog extends AbstractDialog {
     private JLabel tableResourceLabel;//NOPMD
     private JLabel tableCommentLabel;//NOPMD
     private JLabel tableColumnsLabel;//NOPMD
-    private JLabel tableConstraintsLabel;//NOPMD
 
     /**
      * Constructor.
@@ -186,7 +157,8 @@ public class NewDbSchemaDialog extends AbstractDialog {
                         getTableName(),
                         getTableResource(),
                         getTableEngine(),
-                        getTableComment()
+                        getTableComment(),
+                        getColumns()
                 ),
                 project,
                 moduleName
@@ -195,79 +167,40 @@ public class NewDbSchemaDialog extends AbstractDialog {
 
     private void initializeColumnsUiComponentGroup() {
         final List<String> columns = new LinkedList<>(Arrays.asList(
-                COLUMN_TYPE,
-                COLUMN_NAME,
-                COLUMN_PADDING,
-                COLUMN_UNSIGNED,
-                COLUMN_NULLABLE,
-                COLUMN_IDENTITY,
-                COLUMN_LENGTH,
-                COLUMN_PRECISION,
-                COLUMN_SCALE,
-                COLUMN_DEFAULT,
-                COLUMN_ON_CREATE,
-                COLUMN_ON_UPDATE,
-                COLUMN_COMMENT
+                ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
+                ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME,
+                ModuleDbSchemaXml.XML_ATTR_COLUMN_PADDING,
+                ModuleDbSchemaXml.XML_ATTR_COLUMN_UNSIGNED,
+                ModuleDbSchemaXml.XML_ATTR_COLUMN_NULLABLE,
+                ModuleDbSchemaXml.XML_ATTR_COLUMN_IDENTITY,
+                ModuleDbSchemaXml.XML_ATTR_COLUMN_LENGTH,
+                ModuleDbSchemaXml.XML_ATTR_COLUMN_PRECISION,
+                ModuleDbSchemaXml.XML_ATTR_COLUMN_SCALE,
+                ModuleDbSchemaXml.XML_ATTR_COLUMN_ON_UPDATE,
+                ModuleDbSchemaXml.XML_ATTR_COLUMN_DEFAULT,
+                ModuleDbSchemaXml.XML_ATTR_COLUMN_COMMENT
         ));
         // Set default values for columns
         final Map<String, String> defaultValues = new HashMap<>();
-        defaultValues.put(COLUMN_NULLABLE, "false");
+        defaultValues.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NULLABLE, "false");
+        defaultValues.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_IDENTITY, "false");
         // Set sources for columns
         final Map<String, List<String>> sources = new HashMap<>();
         final List<String> booleanSource = Arrays.asList("true", "false");
-        sources.put(COLUMN_TYPE, DbSchemaXmlSourceData.getColumnTypes());
-        sources.put(COLUMN_UNSIGNED, booleanSource);
-        sources.put(COLUMN_NULLABLE, booleanSource);
-        sources.put(COLUMN_IDENTITY, booleanSource);
-        sources.put(COLUMN_ON_CREATE, booleanSource);
-        sources.put(COLUMN_ON_UPDATE, booleanSource);
-        // Set action listeners for columns
-        final Map<String, ActionListener> actionListeners = new HashMap<>();
-        actionListeners.put(COLUMN_TYPE, event -> {
-            if (event.getActionCommand().equals("comboBoxChanged")) {
-                if (event.getSource() instanceof JComboBox) {
-                    final JComboBox source = (JComboBox) event.getSource();
-                    final JTable table = (JTable) source.getParent();
-                    final String value = source.getSelectedItem().toString();
-
-                    if (!value.isEmpty()) {
-                        final int editingRow = ((JTable) source.getParent()).getEditingRow();
-                        // Index should starts from the `1` to not consider xsi:type attribute
-                        for (int index = 1; index < columns.size(); index++) {
-                            TableCellEditor cellEditor = table.getCellEditor(editingRow, index);
-                            JComponent component = null;
-
-                            if (cellEditor instanceof DefaultCellEditor) {
-                                component = (JComponent) ((DefaultCellEditor) cellEditor)
-                                        .getComponent();
-                            } else if (cellEditor instanceof ComboBoxCellEditor) {
-                                component = (JComponent) ((ComboBoxCellEditor) cellEditor)
-                                        .getComponent();
-                            }
-
-                            if (component instanceof JComboBox) {
-                                component.setEnabled(ModuleDbSchemaXml.getAllowedAttributes(value)
-                                        .contains(columns.get(index).toLowerCase()));
-                            } else if (component instanceof JTextField) {
-                                ((JTextField) component).setEditable(
-                                        ModuleDbSchemaXml.getAllowedAttributes(value)
-                                        .contains(columns.get(index).toLowerCase())
-                                );
-                            }
-                        }
-                    }
-                }
-            }
-        });
+        sources.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE, DbSchemaXmlSourceData.getColumnTypes());
+        sources.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_UNSIGNED, booleanSource);
+        sources.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NULLABLE, booleanSource);
+        sources.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_IDENTITY, booleanSource);
+        sources.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_ON_UPDATE, booleanSource);
         // Initialize new Table Group
-        TableGroupWrapper tableGroupWrapper = new TableGroupWrapper(
+        columnsTableGroupWrapper = new TableGroupWrapper(
                 columnsTable,
                 addColumnButton,
                 columns,
                 defaultValues,
-                sources,
-                actionListeners
+                sources
         );
+        columnsTableGroupWrapper.initTableGroup();
     }
 
     /**
@@ -318,5 +251,14 @@ public class NewDbSchemaDialog extends AbstractDialog {
      */
     private String getTableComment() {
         return tableComment.getText().trim();
+    }
+
+    /**
+     * Get columnsTable values.
+     *
+     * @return List
+     */
+    private List<Map<String, String>> getColumns() {
+        return columnsTableGroupWrapper.getColumnsData();
     }
 }

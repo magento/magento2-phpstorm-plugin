@@ -16,13 +16,13 @@ import com.intellij.psi.xml.XmlTag;
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateDbSchemaXmlUtil;
 import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaXml;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import org.jetbrains.annotations.NotNull;
 
 public class DbSchemaXmlGenerator extends FileGenerator {
     private final Project project;
@@ -56,6 +56,7 @@ public class DbSchemaXmlGenerator extends FileGenerator {
     }
 
     @Override
+    @SuppressWarnings({"PMD.NPathComplexity", "PMD.CyclomaticComplexity"})
     public PsiFile generate(final String actionName) {
         final XmlFile dbSchemaXmlFile = (XmlFile) findOrCreateDbSchemaXmlUtil.execute(
                 actionName,
@@ -66,17 +67,132 @@ public class DbSchemaXmlGenerator extends FileGenerator {
         }
 
         final XmlTag rootTag = dbSchemaXmlFile.getRootTag();
+
         if (rootTag == null) {
             return null;
         }
-        XmlTag tableTag = findOrCreateTag(
+        final XmlTag tableTag = findOrCreateTag(
                 ModuleDbSchemaXml.XML_TAG_TABLE,
                 ModuleDbSchemaXml.XML_ATTR_TABLE_NAME,
                 rootTag,
                 dbSchemaXmlData.getTableName(),
                 dbSchemaXmlData.getTableAttributesMap()
         );
+
+        boolean hasPrimaryKey = false;
+        final Map<String, String> primaryKeyData = new HashMap<>();//NOPMD
+
+        for (final Map<String, String> columnData : dbSchemaXmlData.getColumns()) {
+            final String columnIdentityValue =
+                    columnData.get(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME);
+            final String identityAttrValue =
+                    columnData.get(ModuleDbSchemaXml.XML_ATTR_COLUMN_IDENTITY);
+            final Map<String, String> attributes = new LinkedHashMap<>();//NOPMD
+
+            if (!hasPrimaryKey && Boolean.parseBoolean(identityAttrValue)) {
+                hasPrimaryKey = true;
+                primaryKeyData.putAll(columnData);
+            }
+
+            final String columnTypeValue = columnData.get(ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE);
+            final List<String> allowedColumns =
+                    ModuleDbSchemaXml.getAllowedAttributes(columnTypeValue);
+
+            for (final Map.Entry<String, String> columnDataEntry : columnData.entrySet()) {
+                if (allowedColumns.contains(columnDataEntry.getKey())
+                        && !columnDataEntry.getValue().isEmpty()) {
+                    attributes.put(columnDataEntry.getKey(), columnDataEntry.getValue());
+                }
+            }
+
+            findOrCreateTag(
+                    ModuleDbSchemaXml.XML_TAG_COLUMN,
+                    ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME,
+                    tableTag,
+                    columnIdentityValue,
+                    attributes
+            );
+        }
+
+        if (hasPrimaryKey && !primaryKeyData.isEmpty()) {
+            generatePrimaryKey(primaryKeyData, tableTag);
+        }
+
         return commitDbSchemaXmlFile(dbSchemaXmlFile);
+    }
+
+    /**
+     * Generate PK constraint and its index.
+     *
+     * @param primaryKeyData Map
+     * @param tableTag XmlTag
+     */
+    private void generatePrimaryKey(
+            @NotNull final Map<String, String> primaryKeyData,
+            final XmlTag tableTag
+    ) {
+        final String columnIdentityValue = primaryKeyData.get(
+                ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME
+        );
+        final Map<String, String> attributes = new LinkedHashMap<>();//NOPMD
+        attributes.put(
+                ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
+                ModuleDbSchemaXml.XML_ATTR_TYPE_PK
+        );
+        attributes.put(
+                ModuleDbSchemaXml.XML_ATTR_CONSTRAINT_REFERENCE_ID_NAME,
+                ModuleDbSchemaXml.XML_ATTR_REFERENCE_ID_PK
+        );
+
+        final XmlTag pkTag = findOrCreateTag(
+                ModuleDbSchemaXml.XML_TAG_CONSTRAINT,
+                ModuleDbSchemaXml.XML_ATTR_CONSTRAINT_REFERENCE_ID_NAME,
+                tableTag,
+                ModuleDbSchemaXml.XML_ATTR_REFERENCE_ID_PK,
+                attributes
+        );
+        final Map<String, String> pkColumnAttributes = new HashMap<>();//NOPMD
+        pkColumnAttributes.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME, columnIdentityValue);
+
+        findOrCreateTag(
+                ModuleDbSchemaXml.XML_TAG_COLUMN,
+                ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME,
+                pkTag,
+                columnIdentityValue,
+                pkColumnAttributes
+        );
+
+        final Map<String, String> pkIndexAttributes = new LinkedHashMap<>();//NOPMD
+        final List<String> indexColumnsNames = new LinkedList<>();
+        indexColumnsNames.add(columnIdentityValue);
+
+        pkIndexAttributes.put(
+                ModuleDbSchemaXml.XML_ATTR_CONSTRAINT_REFERENCE_ID_NAME,
+                ModuleDbSchemaXml.generateIndexReferenceId(
+                        dbSchemaXmlData.getTableName(),
+                        indexColumnsNames
+                )
+        );
+        pkIndexAttributes.put(
+                ModuleDbSchemaXml.XML_ATTR_INDEX_TYPE_NAME,
+                ModuleDbSchemaXml.XML_ATTR_INDEX_TYPE_BTREE
+        );
+
+        final XmlTag pkIndexTag = findOrCreateTag(
+                ModuleDbSchemaXml.XML_TAG_INDEX,
+                ModuleDbSchemaXml.XML_ATTR_CONSTRAINT_REFERENCE_ID_NAME,
+                tableTag,
+                ModuleDbSchemaXml.XML_ATTR_REFERENCE_ID_PK,
+                pkIndexAttributes
+        );
+
+        findOrCreateTag(
+                ModuleDbSchemaXml.XML_TAG_COLUMN,
+                ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME,
+                pkIndexTag,
+                columnIdentityValue,
+                pkColumnAttributes
+        );
     }
 
     /**
@@ -91,7 +207,7 @@ public class DbSchemaXmlGenerator extends FileGenerator {
             for (final XmlTag tag : Lists.reverse(newTagsQueue)) {
                 if (newTagsChildParentRelationMap.containsKey(tag)) {
                     final XmlTag parent = newTagsChildParentRelationMap.get(tag);
-                    parent.addSubTag(tag, false);
+                    parent.addSubTag(tag, true);
                 }
             }
         });
@@ -132,16 +248,16 @@ public class DbSchemaXmlGenerator extends FileGenerator {
                 return childTag;
             }
         }
-        final XmlTag newTag = parent.createChildTag(targetTagName, null, "", false);
+        final XmlTag newTag = parent.createChildTag(targetTagName, null, null, false);
 
-        if (attributes != null) {
-            for (Map.Entry<String, String> attrEntry : attributes.entrySet()) {
+        if (attributes == null) {
+            newTag.setAttribute(identityAttrName, targetIdentityAttrValue);
+        } else {
+            for (final Map.Entry<String, String> attrEntry : attributes.entrySet()) {
                 if (attrEntry.getValue() != null) {
                     newTag.setAttribute(attrEntry.getKey(), attrEntry.getValue());
                 }
             }
-        } else {
-            newTag.setAttribute(identityAttrName, targetIdentityAttrValue);
         }
         newTagsQueue.add(newTag);
         newTagsChildParentRelationMap.put(newTag, parent);

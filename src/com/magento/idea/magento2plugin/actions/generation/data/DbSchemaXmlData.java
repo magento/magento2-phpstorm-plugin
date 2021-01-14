@@ -7,6 +7,8 @@ package com.magento.idea.magento2plugin.actions.generation.data;
 
 import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaXml;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public class DbSchemaXmlData {
@@ -14,6 +16,7 @@ public class DbSchemaXmlData {
     private String tableResource;
     private String tableEngine;
     private String tableComment;
+    private List<Map<String, String>> columns;
 
     /**
      * Constructor.
@@ -22,17 +25,20 @@ public class DbSchemaXmlData {
      * @param tableResource String
      * @param tableEngine String
      * @param tableComment String
+     * @param columns List
      */
     public DbSchemaXmlData(
-        final String tableName,
-        final String tableResource,
-        final String tableEngine,
-        final String tableComment
+            final String tableName,
+            final String tableResource,
+            final String tableEngine,
+            final String tableComment,
+            final List<Map<String, String>> columns
     ) {
         this.tableName = tableName;
         this.tableResource = tableResource;
         this.tableEngine = tableEngine;
         this.tableComment = tableComment;
+        this.columns = columns;
     }
 
     public String getTableName() {
@@ -65,6 +71,14 @@ public class DbSchemaXmlData {
 
     public void setTableComment(final String tableComment) {
         this.tableComment = tableComment;
+    }
+
+    public List<Map<String, String>> getColumns() {
+        return new LinkedList<>(columns);
+    }
+
+    public void setColumns(List<Map<String, String>> columns) {
+        this.columns = columns;
     }
 
     /**

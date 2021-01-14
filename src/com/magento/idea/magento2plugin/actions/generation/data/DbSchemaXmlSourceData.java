@@ -39,6 +39,10 @@ public final class DbSchemaXmlSourceData {
     public static final String COLUMN_TYPE_LONGTEXT = "longtext";
     // boolean
     public static final String COLUMN_TYPE_BOOLEAN = "boolean";
+    // date
+    public static final String COLUMN_TYPE_DATETIME = "datetime";
+    public static final String COLUMN_TYPE_DATE = "date";
+    public static final String COLUMN_TYPE_TIMESTAMP = "timestamp";
 
     /**
      * Denying the possibility to initialize this class.
@@ -93,7 +97,10 @@ public final class DbSchemaXmlSourceData {
                 COLUMN_TYPE_TEXT,
                 COLUMN_TYPE_MEDIUMTEXT,
                 COLUMN_TYPE_LONGTEXT,
-                COLUMN_TYPE_BOOLEAN
+                COLUMN_TYPE_BOOLEAN,
+                COLUMN_TYPE_DATETIME,
+                COLUMN_TYPE_DATE,
+                COLUMN_TYPE_TIMESTAMP
         ));
     }
 }

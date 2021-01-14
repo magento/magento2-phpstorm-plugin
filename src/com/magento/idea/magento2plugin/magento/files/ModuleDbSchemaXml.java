@@ -8,7 +8,6 @@ package com.magento.idea.magento2plugin.magento.files;
 import com.intellij.lang.Language;
 import com.intellij.lang.xml.XMLLanguage;
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlSourceData;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +25,8 @@ public class ModuleDbSchemaXml implements ModuleFileInterface {
     public static final String XML_ATTR_CONSTRAINT_REFERENCE_TABLE_NAME = "referenceTable";
     public static final String XML_ATTR_CONSTRAINT_COLUMN_NAME = "column";
     public static final String XML_ATTR_CONSTRAINT_REFERENCE_COLUMN_NAME = "referenceColumn";
+    public static final String XML_ATTR_CONSTRAINT_REFERENCE_ID_NAME = "referenceId";
+    public static final String XML_ATTR_INDEX_TYPE_NAME = "indexType";
     public static final String XML_ATTR_COLUMN_NAME = "name";
     public static final String XML_ATTR_COLUMN_TYPE = "xsi:type";
     public static final String XML_ATTR_COLUMN_PADDING = "padding";
@@ -39,12 +40,27 @@ public class ModuleDbSchemaXml implements ModuleFileInterface {
     public static final String XML_ATTR_COLUMN_PRECISION = "precision";
     public static final String XML_ATTR_COLUMN_ON_UPDATE = "on_update";
 
+    //constant attributes values
+    public static final String XML_ATTR_TYPE_PK = "primary";
+    public static final String XML_ATTR_REFERENCE_ID_PK = "PRIMARY";
+    public static final String XML_ATTR_INDEX_TYPE_BTREE = "btree";
+    public static final String XML_ATTR_INDEX_TYPE_FULLTEXT = "fulltext";
+    public static final String XML_ATTR_INDEX_TYPE_HASH = "hash";
+
     //tags
     public static final String XML_TAG_SCHEMA = "schema";
     public static final String XML_TAG_TABLE = "table";
     public static final String XML_TAG_COLUMN = "column";
     public static final String XML_TAG_CONSTRAINT = "constraint";
+    public static final String XML_TAG_INDEX = "index";
 
+    /**
+     * Get allowed attributes for column by its type.
+     *
+     * @param columnType String
+     *
+     * @return List
+     */
     public static List<String> getAllowedAttributes(final String columnType) {
         List<String> allowedAttributes = new ArrayList<>();
 
@@ -52,6 +68,7 @@ public class ModuleDbSchemaXml implements ModuleFileInterface {
             case DbSchemaXmlSourceData.COLUMN_TYPE_BLOB:
             case DbSchemaXmlSourceData.COLUMN_TYPE_MEDIUMBLOB:
             case DbSchemaXmlSourceData.COLUMN_TYPE_LONGBLOB:
+            case DbSchemaXmlSourceData.COLUMN_TYPE_DATE:
                 allowedAttributes.add(XML_ATTR_COLUMN_NAME);
                 allowedAttributes.add(XML_ATTR_COLUMN_NULLABLE);
                 allowedAttributes.add(XML_ATTR_COLUMN_COMMENT);
@@ -102,11 +119,42 @@ public class ModuleDbSchemaXml implements ModuleFileInterface {
                 allowedAttributes.add(XML_ATTR_COLUMN_NULLABLE);
                 allowedAttributes.add(XML_ATTR_COLUMN_COMMENT);
                 break;
+            case DbSchemaXmlSourceData.COLUMN_TYPE_DATETIME:
+            case DbSchemaXmlSourceData.COLUMN_TYPE_TIMESTAMP:
+                allowedAttributes.add(XML_ATTR_COLUMN_NAME);
+                allowedAttributes.add(XML_ATTR_COLUMN_ON_UPDATE);
+                allowedAttributes.add(XML_ATTR_COLUMN_NULLABLE);
+                allowedAttributes.add(XML_ATTR_COLUMN_DEFAULT);
+                allowedAttributes.add(XML_ATTR_COLUMN_COMMENT);
+                break;
             default:
                 break;
         }
+        allowedAttributes.add(XML_ATTR_COLUMN_TYPE);
         return allowedAttributes;
     }
+
+    /**
+     * Generate index key reference id.
+     *
+     * @param tableName String
+     * @param indexColumnsNames List
+     *
+     * @return String
+     */
+    public static String generateIndexReferenceId(
+            final String tableName,
+            final List<String> indexColumnsNames
+    ) {
+        StringBuilder stringBuilder = new StringBuilder(tableName.toUpperCase());
+
+        for (String indexName : indexColumnsNames) {
+            stringBuilder.append("_").append(indexName.toUpperCase());
+        }
+
+        return stringBuilder.toString();
+    }
+
 
     public static ModuleDbSchemaXml getInstance() {
         return INSTANCE;
