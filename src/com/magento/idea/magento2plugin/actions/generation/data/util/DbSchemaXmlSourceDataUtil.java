@@ -3,13 +3,13 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2plugin.actions.generation.data;
+package com.magento.idea.magento2plugin.actions.generation.data.util;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public final class DbSchemaXmlSourceData {
+public final class DbSchemaXmlSourceDataUtil {
     // currently available engines
     public static final String TABLE_ENGINE_INNODB = "innodb";
     public static final String TABLE_ENGINE_MEMORY = "memory";
@@ -47,7 +47,7 @@ public final class DbSchemaXmlSourceData {
     /**
      * Denying the possibility to initialize this class.
      */
-    private DbSchemaXmlSourceData() {}
+    private DbSchemaXmlSourceDataUtil() {}
 
     /**
      * Get source list for available table engines.
@@ -56,8 +56,8 @@ public final class DbSchemaXmlSourceData {
      */
     public static List<String> getTableEngineSource() {
         return new LinkedList<>(Arrays.asList(
-                DbSchemaXmlSourceData.TABLE_ENGINE_INNODB,
-                DbSchemaXmlSourceData.TABLE_ENGINE_MEMORY)
+                DbSchemaXmlSourceDataUtil.TABLE_ENGINE_INNODB,
+                DbSchemaXmlSourceDataUtil.TABLE_ENGINE_MEMORY)
         );
     }
 

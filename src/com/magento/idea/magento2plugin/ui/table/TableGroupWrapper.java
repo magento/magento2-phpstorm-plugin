@@ -73,11 +73,11 @@ public class TableGroupWrapper {
      * @return List
      */
     public List<Map<String, String>> getColumnsData() {
-        List<Map<String, String>> data = new LinkedList<>();
-        DefaultTableModel tableModel = getTableModel();
+        final List<Map<String, String>> data = new LinkedList<>();
+        final DefaultTableModel tableModel = getTableModel();
 
         for (int row = 0; row < tableModel.getRowCount(); row++) {
-            Map<String, String> columnValues = new LinkedHashMap<>();
+            final Map<String, String> columnValues = new LinkedHashMap<>();//NOPMD
 
             for (int columnIndex = 0; columnIndex < columns.size(); columnIndex++) {
                 columnValues.put(
@@ -121,10 +121,10 @@ public class TableGroupWrapper {
         String title = column.replace("_", " ");
 
         if (title.contains(":")) {
-            title = title.substring(title.indexOf(":") + 1);
+            title = title.substring(title.indexOf(':') + 1);
         }
 
-        return title.substring(0, 1).toUpperCase() + title.substring(1);
+        return title.substring(0, 1).toUpperCase() + title.substring(1);//NOPMD
     }
 
     /**
@@ -159,16 +159,16 @@ public class TableGroupWrapper {
             }
             if (sources != null && sources.containsKey(columns.get(index))) {
                 final String column = columns.get(index);
-                final List<String> source = new LinkedList<>(sources.get(column));
-                final String[] sourceArray = new String[source.size()];
+                final List<String> source = new LinkedList<>(sources.get(column));//NOPMD
+                final String[] sourceArray = new String[source.size()];//NOPMD
 
                 for (int sourceIndex = 0; sourceIndex < source.size(); sourceIndex++) {
                     sourceArray[sourceIndex] = source.get(sourceIndex);
                 }
                 final TableColumn currentColumn = table.getColumn(getTitleForColumn(column));
-                currentColumn.setCellRenderer(new ComboBoxRenderer(sourceArray));
+                currentColumn.setCellRenderer(new ComboBoxRenderer(sourceArray));//NOPMD
                 currentColumn.setCellEditor(
-                        new ComboBoxCellEditor<String>(Arrays.asList(sourceArray))
+                        new ComboBoxCellEditor<String>(Arrays.asList(sourceArray))//NOPMD
                 );
 
                 if (columnValuesObjectArray[index].toString().isEmpty()
