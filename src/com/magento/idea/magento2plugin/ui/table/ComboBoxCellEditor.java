@@ -5,40 +5,44 @@
 
 package com.magento.idea.magento2plugin.ui.table;
 
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
 import javax.swing.AbstractCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Vector;
 
 public class ComboBoxCellEditor<T> extends AbstractCellEditor
         implements TableCellEditor, ActionListener {
     private T value;
-    private List<T> options;
-    private JComboBox<T> editorComponent;
+    private final List<T> options;//NOPMD
+    private final JComboBox<T> editorComponent;
     private ActionListener actionListener;
 
-    public ComboBoxCellEditor(List<T> options) {
+    /**
+     * Constructor.
+     *
+     * @param options List
+     */
+    public ComboBoxCellEditor(final List<T> options) {
+        super();
         this.options = options;
         editorComponent = new JComboBox();
 
-        for (T option : options) {
+        for (final T option : this.options) {
             editorComponent.addItem(option);
         }
     }
 
     @Override
     public Component getTableCellEditorComponent(
-            JTable table,
-            Object value,
-            boolean isSelected,
-            int row,
-            int column
+            final JTable table,
+            final Object value,
+            final boolean isSelected,
+            final int row,
+            final int column
     ) {
         this.value = (T) value;
 
@@ -60,8 +64,8 @@ public class ComboBoxCellEditor<T> extends AbstractCellEditor
     }
 
     @Override
-    public void actionPerformed(ActionEvent event) {
-        JComboBox<T> comboBox = (JComboBox<T>) event.getSource();
+    public void actionPerformed(final ActionEvent event) {
+        final JComboBox<T> comboBox = (JComboBox<T>) event.getSource();
         this.value = (T) comboBox.getSelectedItem();
 
         if (actionListener != null) {
@@ -70,11 +74,21 @@ public class ComboBoxCellEditor<T> extends AbstractCellEditor
         editorComponent.setPopupVisible(false);
     }
 
+    /**
+     * Get component.
+     *
+     * @return Component
+     */
     public Component getComponent() {
         return editorComponent;
     }
 
-    public void addAdditionalActionListener(ActionListener actionListener) {
+    /**
+     * Add additional action listener.
+     *
+     * @param actionListener ActionListener
+     */
+    public void addAdditionalActionListener(final ActionListener actionListener) {
         this.actionListener = actionListener;
     }
 }

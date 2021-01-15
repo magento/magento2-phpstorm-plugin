@@ -56,7 +56,7 @@ public class DbSchemaXmlGenerator extends FileGenerator {
     }
 
     @Override
-    @SuppressWarnings({"PMD.NPathComplexity", "PMD.CyclomaticComplexity"})
+    @SuppressWarnings({"PMD.NPathComplexity", "PMD.CyclomaticComplexity", "PMD.ExcessiveImports"})
     public PsiFile generate(final String actionName) {
         final XmlFile dbSchemaXmlFile = (XmlFile) findOrCreateDbSchemaXmlUtil.execute(
                 actionName,

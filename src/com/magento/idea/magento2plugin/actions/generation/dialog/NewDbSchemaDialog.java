@@ -9,8 +9,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.actions.generation.NewDbSchemaAction;
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
-import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlSourceData;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
+import com.magento.idea.magento2plugin.actions.generation.data.util.DbSchemaXmlSourceDataUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericWithUnderscoreRule;
@@ -40,12 +40,12 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings({"PMD.TooManyFields", "PMD.LoosePackageCoupling"})
 public class NewDbSchemaDialog extends AbstractDialog {
     private static final String TABLE_NAME = "Table Name";
 
     private final Project project;
     private final String moduleName;
-    private final PsiDirectory directory;
     private JPanel contentPanel;
 
     // Buttons
@@ -94,7 +94,6 @@ public class NewDbSchemaDialog extends AbstractDialog {
     ) {
         super();
         this.project = project;
-        this.directory = directory;
         moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
         setTitle(NewDbSchemaAction.ACTION_DESCRIPTION);
@@ -181,13 +180,16 @@ public class NewDbSchemaDialog extends AbstractDialog {
                 ModuleDbSchemaXml.XML_ATTR_COLUMN_COMMENT
         ));
         // Set default values for columns
-        final Map<String, String> defaultValues = new HashMap<>();
+        final Map<String, String> defaultValues = new HashMap<>();//NOPMD
         defaultValues.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NULLABLE, "false");
         defaultValues.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_IDENTITY, "false");
         // Set sources for columns
-        final Map<String, List<String>> sources = new HashMap<>();
+        final Map<String, List<String>> sources = new HashMap<>();//NOPMD
         final List<String> booleanSource = Arrays.asList("true", "false");
-        sources.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE, DbSchemaXmlSourceData.getColumnTypes());
+        sources.put(
+                ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
+                DbSchemaXmlSourceDataUtil.getColumnTypes()
+        );
         sources.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_UNSIGNED, booleanSource);
         sources.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NULLABLE, booleanSource);
         sources.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_IDENTITY, booleanSource);
@@ -208,12 +210,12 @@ public class NewDbSchemaDialog extends AbstractDialog {
      */
     private void fillComboBoxes() {
         // Table Engine ComboBox defaults.
-        for (final String engine : DbSchemaXmlSourceData.getTableEngineSource()) {
-            tableEngine.addItem(new ComboBoxItemData(engine, engine));
+        for (final String engine : DbSchemaXmlSourceDataUtil.getTableEngineSource()) {
+            tableEngine.addItem(new ComboBoxItemData(engine, engine));//NOPMD
         }
         // Table Resource ComboBox defaults.
-        for (final String resource : DbSchemaXmlSourceData.getTableResourceSource()) {
-            tableResource.addItem(new ComboBoxItemData(resource, resource));
+        for (final String resource : DbSchemaXmlSourceDataUtil.getTableResourceSource()) {
+            tableResource.addItem(new ComboBoxItemData(resource, resource));//NOPMD
         }
     }
 
