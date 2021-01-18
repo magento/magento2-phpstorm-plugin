@@ -40,7 +40,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings({"PMD.TooManyFields", "PMD.LoosePackageCoupling"})
+@SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveImports"})
 public class NewDbSchemaDialog extends AbstractDialog {
     private static final String TABLE_NAME = "Table Name";
 
