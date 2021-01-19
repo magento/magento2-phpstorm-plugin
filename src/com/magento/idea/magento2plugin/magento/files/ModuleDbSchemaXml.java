@@ -7,7 +7,7 @@ package com.magento.idea.magento2plugin.magento.files;
 
 import com.intellij.lang.Language;
 import com.intellij.lang.xml.XMLLanguage;
-import com.magento.idea.magento2plugin.actions.generation.data.util.DbSchemaXmlSourceDataUtil;
+import com.magento.idea.magento2plugin.magento.packages.database.TableColumnTypes;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,30 +61,30 @@ public class ModuleDbSchemaXml implements ModuleFileInterface {
      *
      * @return List
      */
-    @SuppressWarnings("PMD")
-    public static List<String> getAllowedAttributes(final String columnType) {
+    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NcssCount"})
+    public static List<String> getAllowedAttributes(final TableColumnTypes columnType) {
         final List<String> allowedAttributes = new ArrayList<>();
 
         switch (columnType) {
-            case DbSchemaXmlSourceDataUtil.COLUMN_TYPE_BLOB:
-            case DbSchemaXmlSourceDataUtil.COLUMN_TYPE_MEDIUMBLOB:
-            case DbSchemaXmlSourceDataUtil.COLUMN_TYPE_LONGBLOB:
-            case DbSchemaXmlSourceDataUtil.COLUMN_TYPE_DATE:
+            case BLOB:
+            case MEDIUMBLOB:
+            case LONGBLOB:
+            case DATE:
                 allowedAttributes.add(XML_ATTR_COLUMN_NAME);
                 allowedAttributes.add(XML_ATTR_COLUMN_NULLABLE);
                 allowedAttributes.add(XML_ATTR_COLUMN_COMMENT);
                 break;
-            case DbSchemaXmlSourceDataUtil.COLUMN_TYPE_VARBINARY:
+            case VARBINARY:
                 allowedAttributes.add(XML_ATTR_COLUMN_NAME);
                 allowedAttributes.add(XML_ATTR_COLUMN_DEFAULT);
                 allowedAttributes.add(XML_ATTR_COLUMN_NULLABLE);
                 allowedAttributes.add(XML_ATTR_COLUMN_LENGTH);
                 allowedAttributes.add(XML_ATTR_COLUMN_COMMENT);
                 break;
-            case DbSchemaXmlSourceDataUtil.COLUMN_TYPE_TINYINT:
-            case DbSchemaXmlSourceDataUtil.COLUMN_TYPE_SMALLINT:
-            case DbSchemaXmlSourceDataUtil.COLUMN_TYPE_INT:
-            case DbSchemaXmlSourceDataUtil.COLUMN_TYPE_BIGINT:
+            case TINYINT:
+            case SMALLINT:
+            case INT:
+            case BIGINT:
                 allowedAttributes.add(XML_ATTR_COLUMN_NAME);
                 allowedAttributes.add(XML_ATTR_COLUMN_PADDING);
                 allowedAttributes.add(XML_ATTR_COLUMN_UNSIGNED);
@@ -93,9 +93,9 @@ public class ModuleDbSchemaXml implements ModuleFileInterface {
                 allowedAttributes.add(XML_ATTR_COLUMN_DEFAULT);
                 allowedAttributes.add(XML_ATTR_COLUMN_COMMENT);
                 break;
-            case DbSchemaXmlSourceDataUtil.COLUMN_TYPE_DECIMAL:
-            case DbSchemaXmlSourceDataUtil.COLUMN_TYPE_DOUBLE:
-            case DbSchemaXmlSourceDataUtil.COLUMN_TYPE_FLOAT:
+            case DECIMAL:
+            case DOUBLE:
+            case FLOAT:
                 allowedAttributes.add(XML_ATTR_COLUMN_NAME);
                 allowedAttributes.add(XML_ATTR_COLUMN_DEFAULT);
                 allowedAttributes.add(XML_ATTR_COLUMN_SCALE);
@@ -104,24 +104,24 @@ public class ModuleDbSchemaXml implements ModuleFileInterface {
                 allowedAttributes.add(XML_ATTR_COLUMN_NULLABLE);
                 allowedAttributes.add(XML_ATTR_COLUMN_COMMENT);
                 break;
-            case DbSchemaXmlSourceDataUtil.COLUMN_TYPE_VARCHAR:
-            case DbSchemaXmlSourceDataUtil.COLUMN_TYPE_TEXT:
-            case DbSchemaXmlSourceDataUtil.COLUMN_TYPE_MEDIUMTEXT:
-            case DbSchemaXmlSourceDataUtil.COLUMN_TYPE_LONGTEXT:
+            case VARCHAR:
+            case TEXT:
+            case MEDIUMTEXT:
+            case LONGTEXT:
                 allowedAttributes.add(XML_ATTR_COLUMN_NAME);
                 allowedAttributes.add(XML_ATTR_COLUMN_NULLABLE);
                 allowedAttributes.add(XML_ATTR_COLUMN_LENGTH);
                 allowedAttributes.add(XML_ATTR_COLUMN_DEFAULT);
                 allowedAttributes.add(XML_ATTR_COLUMN_COMMENT);
                 break;
-            case DbSchemaXmlSourceDataUtil.COLUMN_TYPE_BOOLEAN:
+            case BOOLEAN:
                 allowedAttributes.add(XML_ATTR_COLUMN_NAME);
                 allowedAttributes.add(XML_ATTR_COLUMN_DEFAULT);
                 allowedAttributes.add(XML_ATTR_COLUMN_NULLABLE);
                 allowedAttributes.add(XML_ATTR_COLUMN_COMMENT);
                 break;
-            case DbSchemaXmlSourceDataUtil.COLUMN_TYPE_DATETIME:
-            case DbSchemaXmlSourceDataUtil.COLUMN_TYPE_TIMESTAMP:
+            case DATETIME:
+            case TIMESTAMP:
                 allowedAttributes.add(XML_ATTR_COLUMN_NAME);
                 allowedAttributes.add(XML_ATTR_COLUMN_ON_UPDATE);
                 allowedAttributes.add(XML_ATTR_COLUMN_NULLABLE);
@@ -132,6 +132,7 @@ public class ModuleDbSchemaXml implements ModuleFileInterface {
                 break;
         }
         allowedAttributes.add(XML_ATTR_COLUMN_TYPE);
+
         return allowedAttributes;
     }
 
@@ -143,19 +144,19 @@ public class ModuleDbSchemaXml implements ModuleFileInterface {
      *
      * @return String
      */
+    @SuppressWarnings("PMD.UseLocaleWithCaseConversions")
     public static String generateIndexReferenceId(
             final String tableName,
             final List<String> indexColumnsNames
     ) {
-        final StringBuilder stringBuilder = new StringBuilder(tableName.toUpperCase());//NOPMD
+        final StringBuilder stringBuilder = new StringBuilder(tableName.toUpperCase());
 
         for (final String indexName : indexColumnsNames) {
-            stringBuilder.append("_").append(indexName.toUpperCase());//NOPMD
+            stringBuilder.append('_').append(indexName.toUpperCase());
         }
 
         return stringBuilder.toString();
     }
-
 
     public static ModuleDbSchemaXml getInstance() {
         return INSTANCE;

@@ -16,7 +16,9 @@ import com.intellij.psi.xml.XmlTag;
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateDbSchemaXmlUtil;
 import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaXml;
+import com.magento.idea.magento2plugin.magento.packages.database.TableColumnTypes;
 import java.util.HashMap;
+import java.util.InputMismatchException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,7 +58,12 @@ public class DbSchemaXmlGenerator extends FileGenerator {
     }
 
     @Override
-    @SuppressWarnings({"PMD.NPathComplexity", "PMD.CyclomaticComplexity"})
+    @SuppressWarnings({
+            "PMD.NPathComplexity",
+            "PMD.CyclomaticComplexity",
+            "PMD.ExcessiveImports",
+            "PMD.AvoidInstantiatingObjectsInLoops"
+    })
     public PsiFile generate(final String actionName) {
         final XmlFile dbSchemaXmlFile = (XmlFile) findOrCreateDbSchemaXmlUtil.execute(
                 actionName,
@@ -80,14 +87,11 @@ public class DbSchemaXmlGenerator extends FileGenerator {
         );
 
         boolean hasPrimaryKey = false;
-        final Map<String, String> primaryKeyData = new HashMap<>();//NOPMD
+        final Map<String, String> primaryKeyData = new HashMap<>();
 
         for (final Map<String, String> columnData : dbSchemaXmlData.getColumns()) {
-            final String columnIdentityValue =
-                    columnData.get(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME);
             final String identityAttrValue =
                     columnData.get(ModuleDbSchemaXml.XML_ATTR_COLUMN_IDENTITY);
-            final Map<String, String> attributes = new LinkedHashMap<>();//NOPMD
 
             if (!hasPrimaryKey && Boolean.parseBoolean(identityAttrValue)) {
                 hasPrimaryKey = true;
@@ -95,15 +99,25 @@ public class DbSchemaXmlGenerator extends FileGenerator {
             }
 
             final String columnTypeValue = columnData.get(ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE);
-            final List<String> allowedColumns =
-                    ModuleDbSchemaXml.getAllowedAttributes(columnTypeValue);
+            final TableColumnTypes columnType = TableColumnTypes.getByValue(columnTypeValue);
 
+            if (columnType == null) {
+                throw new InputMismatchException(
+                        "Invalid column types provided. Should be compatible with "
+                                + TableColumnTypes.class
+                );
+            }
+
+            final Map<String, String> attributes = new LinkedHashMap<>();
+            final List<String> allowedColumns = ModuleDbSchemaXml.getAllowedAttributes(columnType);
             for (final Map.Entry<String, String> columnDataEntry : columnData.entrySet()) {
                 if (allowedColumns.contains(columnDataEntry.getKey())
                         && !columnDataEntry.getValue().isEmpty()) {
                     attributes.put(columnDataEntry.getKey(), columnDataEntry.getValue());
                 }
             }
+            final String columnIdentityValue =
+                    columnData.get(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME);
 
             findOrCreateTag(
                     ModuleDbSchemaXml.XML_TAG_COLUMN,
@@ -131,10 +145,7 @@ public class DbSchemaXmlGenerator extends FileGenerator {
             @NotNull final Map<String, String> primaryKeyData,
             final XmlTag tableTag
     ) {
-        final String columnIdentityValue = primaryKeyData.get(
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME
-        );
-        final Map<String, String> attributes = new LinkedHashMap<>();//NOPMD
+        final Map<String, String> attributes = new LinkedHashMap<>();
         attributes.put(
                 ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
                 ModuleDbSchemaXml.XML_ATTR_TYPE_PK
@@ -151,7 +162,10 @@ public class DbSchemaXmlGenerator extends FileGenerator {
                 ModuleDbSchemaXml.XML_ATTR_REFERENCE_ID_PK,
                 attributes
         );
-        final Map<String, String> pkColumnAttributes = new HashMap<>();//NOPMD
+        final Map<String, String> pkColumnAttributes = new HashMap<>();
+        final String columnIdentityValue = primaryKeyData.get(
+                ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME
+        );
         pkColumnAttributes.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME, columnIdentityValue);
 
         findOrCreateTag(
@@ -162,7 +176,7 @@ public class DbSchemaXmlGenerator extends FileGenerator {
                 pkColumnAttributes
         );
 
-        final Map<String, String> pkIndexAttributes = new LinkedHashMap<>();//NOPMD
+        final Map<String, String> pkIndexAttributes = new LinkedHashMap<>();
         final List<String> indexColumnsNames = new LinkedList<>();
         indexColumnsNames.add(columnIdentityValue);
 
@@ -277,5 +291,6 @@ public class DbSchemaXmlGenerator extends FileGenerator {
     }
 
     @Override
-    protected void fillAttributes(Properties attributes) {}//NOPMD
+    @SuppressWarnings("PMD.UncommentedEmptyMethodBody")
+    protected void fillAttributes(final Properties attributes) {}
 }
