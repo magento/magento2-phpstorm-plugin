@@ -10,6 +10,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBoxTableRenderer;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
+import com.magento.idea.magento2plugin.actions.generation.NewDbSchemaAction;
 import com.magento.idea.magento2plugin.actions.generation.NewUiComponentGridAction;
 import com.magento.idea.magento2plugin.actions.generation.NewViewModelAction;
 import java.awt.event.ActionEvent;
@@ -18,6 +19,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
@@ -27,6 +29,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.CollectionData;
 import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelInterfaceData;
+import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.LayoutXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.MenuXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.ModelData;
@@ -43,6 +46,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.code.ClassPropert
 import com.magento.idea.magento2plugin.actions.generation.generator.AclXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DataModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DataModelInterfaceGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.LayoutXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.MenuXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleCollectionGenerator;
@@ -68,6 +72,7 @@ import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.ui.table.ComboBoxEditor;
 import com.magento.idea.magento2plugin.ui.table.DeleteRowButton;
 import com.magento.idea.magento2plugin.ui.table.TableButton;
+import com.magento.idea.magento2plugin.ui.table.TableGroupWrapper;
 import com.magento.idea.magento2plugin.util.FirstLetterToLowercaseUtil;
 import com.magento.idea.magento2plugin.util.magento.GetAclResourcesListUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
@@ -128,7 +133,13 @@ public class NewEntityDialog extends AbstractDialog {
     private JCheckBox addFullTextSearchCheckBox;
     private JCheckBox addListingFiltersCheckBox;
     private JCheckBox addListingPagingCheckBox;
+    private JComboBox tableEngine;
+    private JLabel tableEngineLabel;
+    private JComboBox tableResource;
+    private JLabel tableResourceLabel;
     private final List<String> properties;
+    // Table Columns UI components group
+    private TableGroupWrapper columnsTableGroupWrapper;
 
     private static final String ACTION_NAME = "Create Entity";
     private static final String PROPERTY_NAME = "Name";
@@ -252,6 +263,8 @@ public class NewEntityDialog extends AbstractDialog {
         generateGridLayoutFile();
         generateMenuFile();
         generateUiComponentGridFile();
+
+        generateDbSchemaXmlFile();
     }
 
     private PsiFile generateModelFile() {
@@ -811,7 +824,7 @@ public class NewEntityDialog extends AbstractDialog {
             getUiComponentGridData(),
             project
         );
-        gridXmlGenerator.generate(NewUiComponentGridAction.ACTION_NAME, true);
+        gridXmlGenerator.generate(ACTION_NAME, true);
     }
 
     /**
@@ -869,5 +882,49 @@ public class NewEntityDialog extends AbstractDialog {
 
     private Boolean getAddBookmarksCheckBox() {
         return addBookmarksCheckBox.isSelected();
+    }
+
+    /**
+     * Run db_schema.xml file generator.
+     */
+    private void generateDbSchemaXmlFile() {
+        new DbSchemaXmlGenerator(
+            new DbSchemaXmlData(
+                getDbTableName(),
+                getTableResource(),
+                getTableEngine(),
+                getEntityName(),
+                getColumns()
+            ),
+            project,
+            moduleName
+        ).generate(ACTION_NAME, false);
+    }
+
+    /**
+     * Get tableResource field value.
+     *
+     * @return String
+     */
+    private String getTableResource() {
+        return tableResource.getSelectedItem().toString().trim();
+    }
+
+    /**
+     * Get tableEngine field value.
+     *
+     * @return String
+     */
+    private String getTableEngine() {
+        return tableEngine.getSelectedItem().toString().trim();
+    }
+
+    /**
+     * Get columnsTable values.
+     *
+     * @return List
+     */
+    private List<Map<String, String>> getColumns() {
+        return columnsTableGroupWrapper.getColumnsData();
     }
 }
