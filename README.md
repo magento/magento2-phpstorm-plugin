@@ -1,10 +1,10 @@
-# PhpStorm Magento 2 Plugin
-
 <p align="center">
     <a href="https://magento.com">
         <img src="https://static.magento.com/sites/all/themes/magento/logo.svg" width="300px" alt="Magento Commerce" />
     </a>
 </p>
+
+# PhpStorm Magento 2 Plugin
 
 [![Version](http://phpstorm.espend.de/badge/8024/version)](https://plugins.jetbrains.com/plugin/8024)
 [![Downloads](http://phpstorm.espend.de/badge/8024/downloads)](https://plugins.jetbrains.com/plugin/8024)
