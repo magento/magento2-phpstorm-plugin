@@ -26,6 +26,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpNamespaceNameRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.RouteIdRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.StartWithNumberOrCapitalLetterRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.TableNameLength;
 
 public enum RuleRegistry {
     NOT_EMPTY(NotEmptyRule.class),
@@ -48,7 +49,8 @@ public enum RuleRegistry {
     CRON_SCHEDULE(CronScheduleRule.class),
     CONFIG_PATH(ConfigPathRule.class),
     CLI_COMMAND(CliCommandRule.class),
-    NUMERIC(NumericRule.class);
+    NUMERIC(NumericRule.class),
+    TABLE_NAME_LENGTH(TableNameLength.class);
 
     private Class<?> rule;
 
