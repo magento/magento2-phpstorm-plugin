@@ -9,7 +9,6 @@
 [![Version](http://phpstorm.espend.de/badge/8024/version)](https://plugins.jetbrains.com/plugin/8024)
 [![Downloads](http://phpstorm.espend.de/badge/8024/downloads)](https://plugins.jetbrains.com/plugin/8024)
 ![merge-chance-badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fmerge-chance.info%2Fbadge%3Frepo%3Dmagento/magento2-phpstorm-plugin)
-[merge-chance-link](https://merge-chance.info/target?repo=magento/magento2-phpstorm-plugin)This is a PhpStorm IDE plugin for a better Magento 2 development workflow. It is available via the [JetBrains Plugin Repository](https://plugins.jetbrains.com/plugin/8024)
 
 ## Installation
 
