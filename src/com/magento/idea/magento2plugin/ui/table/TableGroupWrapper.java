@@ -72,12 +72,13 @@ public class TableGroupWrapper {
      *
      * @return List
      */
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     public List<Map<String, String>> getColumnsData() {
         final List<Map<String, String>> data = new LinkedList<>();
         final DefaultTableModel tableModel = getTableModel();
 
         for (int row = 0; row < tableModel.getRowCount(); row++) {
-            final Map<String, String> columnValues = new LinkedHashMap<>();//NOPMD
+            final Map<String, String> columnValues = new LinkedHashMap<>();
 
             for (int columnIndex = 0; columnIndex < columns.size(); columnIndex++) {
                 columnValues.put(
@@ -114,6 +115,7 @@ public class TableGroupWrapper {
      *
      * @return String
      */
+    @SuppressWarnings("PMD.UseLocaleWithCaseConversions")
     private String getTitleForColumn(final String column) {
         if (Character.isUpperCase(column.charAt(0))) {
             return column;
@@ -124,7 +126,7 @@ public class TableGroupWrapper {
             title = title.substring(title.indexOf(':') + 1);
         }
 
-        return title.substring(0, 1).toUpperCase() + title.substring(1);//NOPMD
+        return title.substring(0, 1).toUpperCase() + title.substring(1);
     }
 
     /**
@@ -143,6 +145,7 @@ public class TableGroupWrapper {
      * @param defaultValues Map
      * @param sources Map
      */
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     private void addNewRowRoutine(
             final List<String> columns,
             final Map<String, String> defaultValues,
@@ -159,16 +162,16 @@ public class TableGroupWrapper {
             }
             if (sources != null && sources.containsKey(columns.get(index))) {
                 final String column = columns.get(index);
-                final List<String> source = new LinkedList<>(sources.get(column));//NOPMD
-                final String[] sourceArray = new String[source.size()];//NOPMD
+                final List<String> source = new LinkedList<>(sources.get(column));
+                final String[] sourceArray = new String[source.size()];
 
                 for (int sourceIndex = 0; sourceIndex < source.size(); sourceIndex++) {
                     sourceArray[sourceIndex] = source.get(sourceIndex);
                 }
                 final TableColumn currentColumn = table.getColumn(getTitleForColumn(column));
-                currentColumn.setCellRenderer(new ComboBoxRenderer(sourceArray));//NOPMD
+                currentColumn.setCellRenderer(new ComboBoxRenderer(sourceArray));
                 currentColumn.setCellEditor(
-                        new ComboBoxCellEditor<String>(Arrays.asList(sourceArray))//NOPMD
+                        new ComboBoxCellEditor<String>(Arrays.asList(sourceArray))
                 );
 
                 if (columnValuesObjectArray[index].toString().isEmpty()

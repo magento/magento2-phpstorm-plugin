@@ -10,7 +10,6 @@ import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.actions.generation.NewDbSchemaAction;
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
-import com.magento.idea.magento2plugin.actions.generation.data.util.DbSchemaXmlSourceDataUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericWithUnderscoreRule;
@@ -19,6 +18,9 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.TableNameLength;
 import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaXmlGenerator;
 import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaXml;
+import com.magento.idea.magento2plugin.magento.packages.database.TableColumnTypes;
+import com.magento.idea.magento2plugin.magento.packages.database.TableEngines;
+import com.magento.idea.magento2plugin.magento.packages.database.TableResources;
 import com.magento.idea.magento2plugin.ui.table.TableGroupWrapper;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.KeyEvent;
@@ -150,6 +152,9 @@ public class NewDbSchemaDialog extends AbstractDialog {
         dialog.setVisible(true);
     }
 
+    /**
+     * Run db_schema.xml file generator.
+     */
     private void generateDbSchemaXmlFile() {
         new DbSchemaXmlGenerator(
                 new DbSchemaXmlData(
@@ -164,6 +169,9 @@ public class NewDbSchemaDialog extends AbstractDialog {
         ).generate(NewDbSchemaAction.ACTION_NAME, false);
     }
 
+    /**
+     * Initialize columns ui component.
+     */
     private void initializeColumnsUiComponentGroup() {
         final List<String> columns = new LinkedList<>(Arrays.asList(
                 ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
@@ -180,15 +188,17 @@ public class NewDbSchemaDialog extends AbstractDialog {
                 ModuleDbSchemaXml.XML_ATTR_COLUMN_COMMENT
         ));
         // Set default values for columns
-        final Map<String, String> defaultValues = new HashMap<>();//NOPMD
+        final Map<String, String> defaultValues = new HashMap<>();
         defaultValues.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NULLABLE, "false");
         defaultValues.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_IDENTITY, "false");
         // Set sources for columns
-        final Map<String, List<String>> sources = new HashMap<>();//NOPMD
+        final Map<String, List<String>> sources = new HashMap<>();
         final List<String> booleanSource = Arrays.asList("true", "false");
+        final List<String> columnTypes = TableColumnTypes.getTableColumnTypesList();
+        columnTypes.add(0, "");
         sources.put(
                 ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
-                DbSchemaXmlSourceDataUtil.getColumnTypes()
+                columnTypes
         );
         sources.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_UNSIGNED, booleanSource);
         sources.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NULLABLE, booleanSource);
@@ -208,14 +218,15 @@ public class NewDbSchemaDialog extends AbstractDialog {
     /**
      * Fill ComboBoxes ui components with predefined constant values.
      */
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     private void fillComboBoxes() {
         // Table Engine ComboBox defaults.
-        for (final String engine : DbSchemaXmlSourceDataUtil.getTableEngineSource()) {
-            tableEngine.addItem(new ComboBoxItemData(engine, engine));//NOPMD
+        for (final String engine : TableEngines.getTableEnginesList()) {
+            tableEngine.addItem(new ComboBoxItemData(engine, engine));
         }
         // Table Resource ComboBox defaults.
-        for (final String resource : DbSchemaXmlSourceDataUtil.getTableResourceSource()) {
-            tableResource.addItem(new ComboBoxItemData(resource, resource));//NOPMD
+        for (final String resource : TableResources.getTableResourcesList()) {
+            tableResource.addItem(new ComboBoxItemData(resource, resource));
         }
     }
 

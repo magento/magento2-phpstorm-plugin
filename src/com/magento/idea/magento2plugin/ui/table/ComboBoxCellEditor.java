@@ -8,6 +8,7 @@ package com.magento.idea.magento2plugin.ui.table;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.LinkedList;
 import java.util.List;
 import javax.swing.AbstractCellEditor;
 import javax.swing.JComboBox;
@@ -17,7 +18,7 @@ import javax.swing.table.TableCellEditor;
 public class ComboBoxCellEditor<T> extends AbstractCellEditor
         implements TableCellEditor, ActionListener {
     private T value;
-    private final List<T> options;//NOPMD
+    private final List<T> options;
     private final JComboBox<T> editorComponent;
     private ActionListener actionListener;
 
@@ -72,6 +73,15 @@ public class ComboBoxCellEditor<T> extends AbstractCellEditor
             actionListener.actionPerformed(event);
         }
         editorComponent.setPopupVisible(false);
+    }
+
+    /**
+     * Get combobox options.
+     *
+     * @return List of combobox options.
+     */
+    public List<T> getOptions() {
+        return new LinkedList<>(options);
     }
 
     /**

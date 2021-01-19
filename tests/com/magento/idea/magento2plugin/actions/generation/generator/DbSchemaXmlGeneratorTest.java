@@ -6,8 +6,10 @@
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
-import com.magento.idea.magento2plugin.actions.generation.data.util.DbSchemaXmlSourceDataUtil;
 import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaXml;
+import com.magento.idea.magento2plugin.magento.packages.database.TableColumnTypes;
+import com.magento.idea.magento2plugin.magento.packages.database.TableEngines;
+import com.magento.idea.magento2plugin.magento.packages.database.TableResources;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,8 +23,8 @@ public class DbSchemaXmlGeneratorTest extends BaseGeneratorTestCase {
     private static final String BOOLEAN_VALUE_TRUE = "true";
     private static final String BOOLEAN_VALUE_FALSE = "false";
     private static final String CURRENT_TIMESTAMP_DEFAULT_VALUE = "CURRENT_TIMESTAMP";
-    private static final String TABLE_RESOURCE = DbSchemaXmlSourceDataUtil.TABLE_RESOURCE_DEFAULT;
-    private static final String TABLE_ENGINE = DbSchemaXmlSourceDataUtil.TABLE_ENGINE_INNODB;
+    private static final String TABLE_RESOURCE = TableResources.DEFAULT.getResource();
+    private static final String TABLE_ENGINE = TableEngines.INNODB.getEngine();
 
     /**
      * Test whether db_schema.xml file generated correctly.
@@ -61,7 +63,7 @@ public class DbSchemaXmlGeneratorTest extends BaseGeneratorTestCase {
         final Map<String, String> entityIdColumnData = new LinkedHashMap<>();
         entityIdColumnData.put(
                 ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
-                DbSchemaXmlSourceDataUtil.COLUMN_TYPE_INT
+                TableColumnTypes.INT.getColumnType()
         );
         entityIdColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME, "entity_id");
         entityIdColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_PADDING, "11");
@@ -73,7 +75,7 @@ public class DbSchemaXmlGeneratorTest extends BaseGeneratorTestCase {
         final Map<String, String> nameColumnData = new LinkedHashMap<>();
         nameColumnData.put(
                 ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
-                DbSchemaXmlSourceDataUtil.COLUMN_TYPE_VARCHAR
+                TableColumnTypes.VARCHAR.getColumnType()
         );
         nameColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME, "name");
         nameColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NULLABLE, BOOLEAN_VALUE_FALSE);
@@ -84,7 +86,7 @@ public class DbSchemaXmlGeneratorTest extends BaseGeneratorTestCase {
         final Map<String, String> ageColumnData = new LinkedHashMap<>();
         ageColumnData.put(
                 ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
-                DbSchemaXmlSourceDataUtil.COLUMN_TYPE_INT
+                TableColumnTypes.INT.getColumnType()
         );
         ageColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME, "age");
         ageColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_PADDING, "5");
@@ -96,7 +98,7 @@ public class DbSchemaXmlGeneratorTest extends BaseGeneratorTestCase {
         final Map<String, String> salaryColumnData = new LinkedHashMap<>();
         salaryColumnData.put(
                 ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
-                DbSchemaXmlSourceDataUtil.COLUMN_TYPE_DECIMAL
+                TableColumnTypes.DECIMAL.getColumnType()
         );
         salaryColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME, "salary");
         salaryColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_PADDING, "5");
@@ -110,7 +112,7 @@ public class DbSchemaXmlGeneratorTest extends BaseGeneratorTestCase {
         final Map<String, String> dobColumnData = new LinkedHashMap<>();
         dobColumnData.put(
                 ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
-                DbSchemaXmlSourceDataUtil.COLUMN_TYPE_DATE
+                TableColumnTypes.DATE.getColumnType()
         );
         dobColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME, "dob");
         dobColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NULLABLE, BOOLEAN_VALUE_TRUE);
@@ -119,7 +121,7 @@ public class DbSchemaXmlGeneratorTest extends BaseGeneratorTestCase {
         final Map<String, String> createdAtColumnData = new LinkedHashMap<>();
         createdAtColumnData.put(
                 ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
-                DbSchemaXmlSourceDataUtil.COLUMN_TYPE_TIMESTAMP
+                TableColumnTypes.TIMESTAMP.getColumnType()
         );
         createdAtColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME, "created_at");
         createdAtColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NULLABLE, BOOLEAN_VALUE_FALSE);
@@ -133,7 +135,7 @@ public class DbSchemaXmlGeneratorTest extends BaseGeneratorTestCase {
         final Map<String, String> updatedAtColumnData = new LinkedHashMap<>();
         updatedAtColumnData.put(
                 ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
-                DbSchemaXmlSourceDataUtil.COLUMN_TYPE_TIMESTAMP
+                TableColumnTypes.TIMESTAMP.getColumnType()
         );
         updatedAtColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME, "updated_at");
         updatedAtColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NULLABLE, BOOLEAN_VALUE_FALSE);
