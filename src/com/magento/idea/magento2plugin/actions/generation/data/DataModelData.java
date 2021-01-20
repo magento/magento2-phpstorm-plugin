@@ -12,7 +12,7 @@ public class DataModelData {
     private final String fqn;
     private final String interfaceFQN;
     private final String properties;
-    private final boolean hasInterface;
+    private final boolean withInterface;
 
     /**
      * Constructor.
@@ -40,7 +40,7 @@ public class DataModelData {
         this.fqn = fqn;
         this.interfaceFQN = interfaceFQN;
         this.properties = properties;
-        this.hasInterface = hasInterface;
+        this.withInterface = hasInterface;
     }
 
     /**
@@ -103,6 +103,6 @@ public class DataModelData {
      * @return boolean
      */
     public boolean hasInterface() {
-        return hasInterface;
+        return withInterface;
     }
 }
