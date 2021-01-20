@@ -5,8 +5,8 @@
 
 package com.magento.idea.magento2plugin.magento.files;
 
-import com.intellij.lang.Language;
 import com.intellij.json.JsonLanguage;
+import com.intellij.lang.Language;
 
 public class ModuleDbSchemaWhitelistJson implements ModuleFileInterface {
     private static final ModuleDbSchemaWhitelistJson INSTANCE = new ModuleDbSchemaWhitelistJson();
