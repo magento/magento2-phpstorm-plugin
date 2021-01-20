@@ -87,7 +87,7 @@ public class DbSchemaXmlData {
      * @return Map
      */
     public Map<String, String> getTableAttributesMap() {
-        final Map<String, String> tableAttributesData = new LinkedHashMap<>();
+        final Map<String, String> tableAttributesData = new LinkedHashMap<>();//NOPMD
         tableAttributesData.put(ModuleDbSchemaXml.XML_ATTR_TABLE_NAME, getTableName());
         tableAttributesData.put(ModuleDbSchemaXml.XML_ATTR_TABLE_RESOURCE, getTableResource());
         tableAttributesData.put(ModuleDbSchemaXml.XML_ATTR_TABLE_ENGINE, getTableEngine());
