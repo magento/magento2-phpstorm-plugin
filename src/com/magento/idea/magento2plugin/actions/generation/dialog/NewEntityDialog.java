@@ -10,6 +10,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBoxTableRenderer;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
+import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.actions.generation.NewDbSchemaAction;
 import com.magento.idea.magento2plugin.actions.generation.NewUiComponentGridAction;
 import com.magento.idea.magento2plugin.actions.generation.NewViewModelAction;
@@ -18,6 +19,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import javax.swing.*;
@@ -68,6 +71,7 @@ import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.PropertiesTypes;
+import com.magento.idea.magento2plugin.stubs.indexes.xml.MenuIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.ui.table.ComboBoxEditor;
 import com.magento.idea.magento2plugin.ui.table.DeleteRowButton;
@@ -740,6 +744,7 @@ public class NewEntityDialog extends AbstractDialog {
     @SuppressWarnings({"PMD.UnusedPrivateMethod"})
     private void createUIComponents() {
         this.parentAcl = new FilteredComboBox(getAclResourcesList());
+        this.parentMenu = new FilteredComboBox(getMenuReferences());
 
         if (getAclResourcesList().contains(ModuleMenuXml.defaultAcl)) {
             parentAcl.setSelectedItem(ModuleMenuXml.defaultAcl);
@@ -926,5 +931,14 @@ public class NewEntityDialog extends AbstractDialog {
      */
     private List<Map<String, String>> getColumns() {
         return columnsTableGroupWrapper.getColumnsData();
+    }
+
+    @NotNull
+    private List<String> getMenuReferences() {
+        final Collection<String> menuReferences
+            = FileBasedIndex.getInstance().getAllKeys(MenuIndex.KEY, project);
+        final ArrayList<String> menuReferencesList = new ArrayList<>(menuReferences);
+        Collections.sort(menuReferencesList);
+        return menuReferencesList;
     }
 }
