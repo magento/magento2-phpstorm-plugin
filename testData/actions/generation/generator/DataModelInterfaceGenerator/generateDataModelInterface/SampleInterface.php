@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Foo\Bar\Api\Data;
 
@@ -10,13 +11,18 @@ interface SampleInterface
     const SAMPLE_PROPERTY = "sample_property";
 
     /**
-     * @return string
+     * Getter for SampleProperty.
+     *
+     * @return string|null
      */
-    public function getSampleProperty();
+    public function getSampleProperty(): ?string;
 
     /**
-     * @param string $sampleProperty
-     * @return $this
+     * Setter for SampleProperty.
+     *
+     * @param string|null $sampleProperty
+     *
+     * @return void
      */
-    public function setSampleProperty($sampleProperty);
+    public function setSampleProperty(?string $sampleProperty): void;
 }

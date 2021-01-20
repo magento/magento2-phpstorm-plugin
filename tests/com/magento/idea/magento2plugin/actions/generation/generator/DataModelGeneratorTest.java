@@ -22,7 +22,36 @@ public class DataModelGeneratorTest extends BaseGeneratorTestCase {
                 "Foo_Bar",
                 "Foo\\Bar\\Model\\Data\\Sample",
                 "Foo\\Bar\\Api\\Data\\SampleInterface",
-                "SAMPLE_PROPERTY;sample_property;string;SampleProperty;sampleProperty"
+                "SAMPLE_PROPERTY;sample_property;string;SampleProperty;sampleProperty",
+                true
+        );
+        final DataModelGenerator generator = new DataModelGenerator(
+                project, modelData
+        );
+        final PsiFile modelFile = generator.generate(NewDataModelAction.ACTION_NAME);
+        final PsiFile expectedFile
+                = myFixture.configureByFile(this.getFixturePath("Sample.php"));
+
+        assertGeneratedFileIsCorrect(
+                expectedFile,
+                "src/app/code/Foo/Bar/Model/Data",
+                modelFile
+        );
+    }
+
+    /**
+     * Tests for generation of a Magento 2 Data Model without interface.
+     */
+    public void testGenerateDataModelWithoutInterface() {
+        final Project project = myFixture.getProject();
+        final DataModelData modelData = new DataModelData(
+                "Foo\\Bar\\Model\\Data",
+                "Sample",
+                "Foo_Bar",
+                "Foo\\Bar\\Model\\Data\\Sample",
+                "Foo\\Bar\\Api\\Data\\SampleInterface",
+                "SAMPLE_PROPERTY;sample_property;string;SampleProperty;sampleProperty",
+                false
         );
         final DataModelGenerator generator = new DataModelGenerator(
                 project, modelData
