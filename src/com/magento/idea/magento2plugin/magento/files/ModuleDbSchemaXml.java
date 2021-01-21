@@ -30,19 +30,6 @@ public class ModuleDbSchemaXml implements ModuleFileInterface {
     public static final String XML_ATTR_CONSTRAINT_REFERENCE_ID_NAME = "referenceId";
     public static final String XML_ATTR_INDEX_TYPE_NAME = "indexType";
 
-    public static final String XML_ATTR_COLUMN_NAME = "name";
-    public static final String XML_ATTR_COLUMN_TYPE = "xsi:type";
-    public static final String XML_ATTR_COLUMN_PADDING = "padding";
-    public static final String XML_ATTR_COLUMN_UNSIGNED = "unsigned";
-    public static final String XML_ATTR_COLUMN_NULLABLE = "nullable";
-    public static final String XML_ATTR_COLUMN_IDENTITY = "identity";
-    public static final String XML_ATTR_COLUMN_COMMENT = "comment";
-    public static final String XML_ATTR_COLUMN_DEFAULT = "default";
-    public static final String XML_ATTR_COLUMN_LENGTH = "length";
-    public static final String XML_ATTR_COLUMN_SCALE = "scale";
-    public static final String XML_ATTR_COLUMN_PRECISION = "precision";
-    public static final String XML_ATTR_COLUMN_ON_UPDATE = "on_update";
-
     //constant attributes values
     public static final String XML_ATTR_TYPE_PK = "primary";
     public static final String XML_ATTR_REFERENCE_ID_PK = "PRIMARY";
@@ -128,7 +115,7 @@ public class ModuleDbSchemaXml implements ModuleFileInterface {
             default:
                 break;
         }
-        allowedAttributes.add(XML_ATTR_COLUMN_TYPE);
+        allowedAttributes.add(ColumnAttributes.TYPE.getName());
 
         return allowedAttributes;
     }

@@ -7,7 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
 import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaWhitelistJson;
-import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaXml;
+import com.magento.idea.magento2plugin.magento.packages.database.ColumnAttributes;
 import com.magento.idea.magento2plugin.magento.packages.database.TableColumnTypes;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -55,53 +55,53 @@ public class DbSchemaWhitelistGeneratorTest extends BaseGeneratorTestCase {
         final List<Map<String, String>> columns = new LinkedList<>();
         final Map<String, String> entityIdColumnData = new LinkedHashMap<>();
         entityIdColumnData.put(
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
+                ColumnAttributes.TYPE.getName(),
                 TableColumnTypes.INT.getColumnType()
         );
-        entityIdColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME, "entity_id");
-        entityIdColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_IDENTITY, "true");
+        entityIdColumnData.put(ColumnAttributes.NAME.getName(), "entity_id");
+        entityIdColumnData.put(ColumnAttributes.IDENTITY.getName(), "true");
         columns.add(entityIdColumnData);
         final Map<String, String> nameColumnData = new LinkedHashMap<>();
         nameColumnData.put(
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
+                ColumnAttributes.TYPE.getName(),
                 TableColumnTypes.VARCHAR.getColumnType()
         );
-        nameColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME, "name");
+        nameColumnData.put(ColumnAttributes.NAME.getName(), "name");
         columns.add(nameColumnData);
         final Map<String, String> ageColumnData = new LinkedHashMap<>();
         ageColumnData.put(
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
+                ColumnAttributes.TYPE.getName(),
                 TableColumnTypes.INT.getColumnType()
         );
-        ageColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME, "age");
+        ageColumnData.put(ColumnAttributes.NAME.getName(), "age");
         columns.add(ageColumnData);
         final Map<String, String> salaryColumnData = new LinkedHashMap<>();
         salaryColumnData.put(
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
+                ColumnAttributes.TYPE.getName(),
                 TableColumnTypes.DECIMAL.getColumnType()
         );
-        salaryColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME, "salary");
+        salaryColumnData.put(ColumnAttributes.NAME.getName(), "salary");
         columns.add(salaryColumnData);
         final Map<String, String> dobColumnData = new LinkedHashMap<>();
         dobColumnData.put(
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
+                ColumnAttributes.TYPE.getName(),
                 TableColumnTypes.DATE.getColumnType()
         );
-        dobColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME, "dob");
+        dobColumnData.put(ColumnAttributes.NAME.getName(), "dob");
         columns.add(dobColumnData);
         final Map<String, String> createdAtColumnData = new LinkedHashMap<>();
         createdAtColumnData.put(
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
+                ColumnAttributes.TYPE.getName(),
                 TableColumnTypes.TIMESTAMP.getColumnType()
         );
-        createdAtColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME, "created_at");
+        createdAtColumnData.put(ColumnAttributes.NAME.getName(), "created_at");
         columns.add(createdAtColumnData);
         final Map<String, String> updatedAtColumnData = new LinkedHashMap<>();
         updatedAtColumnData.put(
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
+                ColumnAttributes.TYPE.getName(),
                 TableColumnTypes.TIMESTAMP.getColumnType()
         );
-        updatedAtColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME, "updated_at");
+        updatedAtColumnData.put(ColumnAttributes.NAME.getName(), "updated_at");
         columns.add(updatedAtColumnData);
 
         return columns;

@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
 import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaXml;
+import com.magento.idea.magento2plugin.magento.packages.database.ColumnAttributes;
 import com.magento.idea.magento2plugin.magento.packages.database.TableColumnTypes;
 import com.magento.idea.magento2plugin.magento.packages.database.TableEngines;
 import com.magento.idea.magento2plugin.magento.packages.database.TableResources;
@@ -62,89 +63,89 @@ public class DbSchemaXmlGeneratorTest extends BaseGeneratorTestCase {
         final List<Map<String, String>> columns = new LinkedList<>();
         final Map<String, String> entityIdColumnData = new LinkedHashMap<>();
         entityIdColumnData.put(
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
+                ColumnAttributes.TYPE.getName(),
                 TableColumnTypes.INT.getColumnType()
         );
-        entityIdColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME, "entity_id");
-        entityIdColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_PADDING, "11");
-        entityIdColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_UNSIGNED, BOOLEAN_VALUE_TRUE);
-        entityIdColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NULLABLE, BOOLEAN_VALUE_FALSE);
-        entityIdColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_IDENTITY, BOOLEAN_VALUE_TRUE);
-        entityIdColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_COMMENT, "Entity Id Column");
+        entityIdColumnData.put(ColumnAttributes.NAME.getName(), "entity_id");
+        entityIdColumnData.put(ColumnAttributes.PADDING.getName(), "11");
+        entityIdColumnData.put(ColumnAttributes.UNSIGNED.getName(), BOOLEAN_VALUE_TRUE);
+        entityIdColumnData.put(ColumnAttributes.NULLABLE.getName(), BOOLEAN_VALUE_FALSE);
+        entityIdColumnData.put(ColumnAttributes.IDENTITY.getName(), BOOLEAN_VALUE_TRUE);
+        entityIdColumnData.put(ColumnAttributes.COMMENT.getName(), "Entity Id Column");
         columns.add(entityIdColumnData);
         final Map<String, String> nameColumnData = new LinkedHashMap<>();
         nameColumnData.put(
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
+                ColumnAttributes.TYPE.getName(),
                 TableColumnTypes.VARCHAR.getColumnType()
         );
-        nameColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME, "name");
-        nameColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NULLABLE, BOOLEAN_VALUE_FALSE);
-        nameColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_LENGTH, "255");
-        nameColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_DEFAULT, "John Smith");
-        nameColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_COMMENT, "Name Column");
+        nameColumnData.put(ColumnAttributes.NAME.getName(), "name");
+        nameColumnData.put(ColumnAttributes.NULLABLE.getName(), BOOLEAN_VALUE_FALSE);
+        nameColumnData.put(ColumnAttributes.LENGTH.getName(), "255");
+        nameColumnData.put(ColumnAttributes.DEFAULT.getName(), "John Smith");
+        nameColumnData.put(ColumnAttributes.COMMENT.getName(), "Name Column");
         columns.add(nameColumnData);
         final Map<String, String> ageColumnData = new LinkedHashMap<>();
         ageColumnData.put(
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
+                ColumnAttributes.TYPE.getName(),
                 TableColumnTypes.INT.getColumnType()
         );
-        ageColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME, "age");
-        ageColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_PADDING, "5");
-        ageColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_UNSIGNED, BOOLEAN_VALUE_TRUE);
-        ageColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NULLABLE, BOOLEAN_VALUE_TRUE);
-        ageColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_IDENTITY, BOOLEAN_VALUE_FALSE);
-        ageColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_COMMENT, "Age Column");
+        ageColumnData.put(ColumnAttributes.NAME.getName(), "age");
+        ageColumnData.put(ColumnAttributes.PADDING.getName(), "5");
+        ageColumnData.put(ColumnAttributes.UNSIGNED.getName(), BOOLEAN_VALUE_TRUE);
+        ageColumnData.put(ColumnAttributes.NULLABLE.getName(), BOOLEAN_VALUE_TRUE);
+        ageColumnData.put(ColumnAttributes.IDENTITY.getName(), BOOLEAN_VALUE_FALSE);
+        ageColumnData.put(ColumnAttributes.COMMENT.getName(), "Age Column");
         columns.add(ageColumnData);
         final Map<String, String> salaryColumnData = new LinkedHashMap<>();
         salaryColumnData.put(
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
+                ColumnAttributes.TYPE.getName(),
                 TableColumnTypes.DECIMAL.getColumnType()
         );
-        salaryColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME, "salary");
-        salaryColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_PADDING, "5");
-        salaryColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_UNSIGNED, BOOLEAN_VALUE_TRUE);
-        salaryColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NULLABLE, BOOLEAN_VALUE_FALSE);
-        salaryColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_PRECISION, "10");
-        salaryColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_SCALE, "2");
-        salaryColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_DEFAULT, "0.0");
-        salaryColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_COMMENT, "Salary Column");
+        salaryColumnData.put(ColumnAttributes.NAME.getName(), "salary");
+        salaryColumnData.put(ColumnAttributes.PADDING.getName(), "5");
+        salaryColumnData.put(ColumnAttributes.UNSIGNED.getName(), BOOLEAN_VALUE_TRUE);
+        salaryColumnData.put(ColumnAttributes.NULLABLE.getName(), BOOLEAN_VALUE_FALSE);
+        salaryColumnData.put(ColumnAttributes.PRECISION.getName(), "10");
+        salaryColumnData.put(ColumnAttributes.SCALE.getName(), "2");
+        salaryColumnData.put(ColumnAttributes.DEFAULT.getName(), "0.0");
+        salaryColumnData.put(ColumnAttributes.COMMENT.getName(), "Salary Column");
         columns.add(salaryColumnData);
         final Map<String, String> dobColumnData = new LinkedHashMap<>();
         dobColumnData.put(
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
+                ColumnAttributes.TYPE.getName(),
                 TableColumnTypes.DATE.getColumnType()
         );
-        dobColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME, "dob");
-        dobColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NULLABLE, BOOLEAN_VALUE_TRUE);
-        dobColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_COMMENT, "Date Of The Birth Column");
+        dobColumnData.put(ColumnAttributes.NAME.getName(), "dob");
+        dobColumnData.put(ColumnAttributes.NULLABLE.getName(), BOOLEAN_VALUE_TRUE);
+        dobColumnData.put(ColumnAttributes.COMMENT.getName(), "Date Of The Birth Column");
         columns.add(dobColumnData);
         final Map<String, String> createdAtColumnData = new LinkedHashMap<>();
         createdAtColumnData.put(
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
+                ColumnAttributes.TYPE.getName(),
                 TableColumnTypes.TIMESTAMP.getColumnType()
         );
-        createdAtColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME, "created_at");
-        createdAtColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NULLABLE, BOOLEAN_VALUE_FALSE);
-        createdAtColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_ON_UPDATE, BOOLEAN_VALUE_FALSE);
+        createdAtColumnData.put(ColumnAttributes.NAME.getName(), "created_at");
+        createdAtColumnData.put(ColumnAttributes.NULLABLE.getName(), BOOLEAN_VALUE_FALSE);
+        createdAtColumnData.put(ColumnAttributes.ON_UPDATE.getName(), BOOLEAN_VALUE_FALSE);
         createdAtColumnData.put(
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_DEFAULT,
+                ColumnAttributes.DEFAULT.getName(),
                 CURRENT_TIMESTAMP_DEFAULT_VALUE
         );
-        createdAtColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_COMMENT, "Created At Column");
+        createdAtColumnData.put(ColumnAttributes.COMMENT.getName(), "Created At Column");
         columns.add(createdAtColumnData);
         final Map<String, String> updatedAtColumnData = new LinkedHashMap<>();
         updatedAtColumnData.put(
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
+                ColumnAttributes.TYPE.getName(),
                 TableColumnTypes.TIMESTAMP.getColumnType()
         );
-        updatedAtColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME, "updated_at");
-        updatedAtColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NULLABLE, BOOLEAN_VALUE_FALSE);
-        updatedAtColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_ON_UPDATE, BOOLEAN_VALUE_TRUE);
+        updatedAtColumnData.put(ColumnAttributes.NAME.getName(), "updated_at");
+        updatedAtColumnData.put(ColumnAttributes.NULLABLE.getName(), BOOLEAN_VALUE_FALSE);
+        updatedAtColumnData.put(ColumnAttributes.ON_UPDATE.getName(), BOOLEAN_VALUE_TRUE);
         updatedAtColumnData.put(
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_DEFAULT,
+                ColumnAttributes.DEFAULT.getName(),
                 CURRENT_TIMESTAMP_DEFAULT_VALUE
         );
-        updatedAtColumnData.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_COMMENT, "Updated At Column");
+        updatedAtColumnData.put(ColumnAttributes.COMMENT.getName(), "Updated At Column");
         columns.add(updatedAtColumnData);
 
         return columns;
