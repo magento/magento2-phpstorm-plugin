@@ -27,6 +27,7 @@ import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.magento.files.DataModel;
 import com.magento.idea.magento2plugin.magento.files.DataModelInterface;
+import com.magento.idea.magento2plugin.magento.packages.PropertiesTypes;
 import com.magento.idea.magento2plugin.ui.table.ComboBoxEditor;
 import com.magento.idea.magento2plugin.ui.table.DeleteRowButton;
 import com.magento.idea.magento2plugin.ui.table.TableButton;
@@ -69,8 +70,6 @@ public class NewDataModelDialog extends AbstractDialog {
     private static final String PROPERTY_TYPE = "Type";
     private static final String PROPERTY_ACTION = "Action";
     private static final String PROPERTY_DELETE = "Delete";
-
-    private static final String[] PROPERTY_TYPES = {"int", "float", "string", "bool"};
 
     private JPanel contentPanel;
     private JButton buttonOK;
@@ -304,9 +303,10 @@ public class NewDataModelDialog extends AbstractDialog {
 
         addProperty.addActionListener(e -> {
             propertiesTable.addRow(new Object[]{
-                    "",
-                    PROPERTY_TYPES[0],
-                    PROPERTY_DELETE
+                "",
+                PropertiesTypes.valueOf(PropertiesTypes.INT.toString())
+                    .getPropertyType(),
+                PROPERTY_DELETE
             });
         });
 
@@ -315,8 +315,8 @@ public class NewDataModelDialog extends AbstractDialog {
 
     private void initPropertyTypeColumn() {
         final TableColumn formElementTypeColumn = propertyTable.getColumn(PROPERTY_TYPE);
-        formElementTypeColumn.setCellEditor(new ComboBoxEditor(PROPERTY_TYPES));
-        formElementTypeColumn.setCellRenderer(new ComboBoxTableRenderer<>(PROPERTY_TYPES));
+        formElementTypeColumn.setCellEditor(new ComboBoxEditor(PropertiesTypes.getPropertyTypes()));
+        formElementTypeColumn.setCellRenderer(new ComboBoxTableRenderer<>(PropertiesTypes.getPropertyTypes()));
     }
 
     private DefaultTableModel getPropertiesTable() {
