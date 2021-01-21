@@ -227,6 +227,7 @@
         <internalFileTemplate name="Magento Data Model"/>
         <internalFileTemplate name="Magento Data Model Interface"/>
         <internalFileTemplate name="Magento Module Declarative Schema XML"/>
+        <internalFileTemplate name="Magento Module Declarative Schema Whitelist JSON"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 
