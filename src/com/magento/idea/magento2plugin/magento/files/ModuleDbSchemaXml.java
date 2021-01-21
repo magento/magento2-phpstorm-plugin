@@ -7,9 +7,11 @@ package com.magento.idea.magento2plugin.magento.files;
 
 import com.intellij.lang.Language;
 import com.intellij.lang.xml.XMLLanguage;
+import com.magento.idea.magento2plugin.magento.packages.database.ColumnAttributes;
 import com.magento.idea.magento2plugin.magento.packages.database.TableColumnTypes;
 import java.util.ArrayList;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 public class ModuleDbSchemaXml implements ModuleFileInterface {
     private static final ModuleDbSchemaXml INSTANCE = new ModuleDbSchemaXml();
@@ -27,6 +29,7 @@ public class ModuleDbSchemaXml implements ModuleFileInterface {
     public static final String XML_ATTR_CONSTRAINT_REFERENCE_COLUMN_NAME = "referenceColumn";
     public static final String XML_ATTR_CONSTRAINT_REFERENCE_ID_NAME = "referenceId";
     public static final String XML_ATTR_INDEX_TYPE_NAME = "indexType";
+
     public static final String XML_ATTR_COLUMN_NAME = "name";
     public static final String XML_ATTR_COLUMN_TYPE = "xsi:type";
     public static final String XML_ATTR_COLUMN_PADDING = "padding";
@@ -62,7 +65,7 @@ public class ModuleDbSchemaXml implements ModuleFileInterface {
      * @return List
      */
     @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NcssCount"})
-    public static List<String> getAllowedAttributes(final TableColumnTypes columnType) {
+    public static List<String> getAllowedAttributes(final @NotNull TableColumnTypes columnType) {
         final List<String> allowedAttributes = new ArrayList<>();
 
         switch (columnType) {
@@ -70,63 +73,57 @@ public class ModuleDbSchemaXml implements ModuleFileInterface {
             case MEDIUMBLOB:
             case LONGBLOB:
             case DATE:
-                allowedAttributes.add(XML_ATTR_COLUMN_NAME);
-                allowedAttributes.add(XML_ATTR_COLUMN_NULLABLE);
-                allowedAttributes.add(XML_ATTR_COLUMN_COMMENT);
-                break;
-            case VARBINARY:
-                allowedAttributes.add(XML_ATTR_COLUMN_NAME);
-                allowedAttributes.add(XML_ATTR_COLUMN_DEFAULT);
-                allowedAttributes.add(XML_ATTR_COLUMN_NULLABLE);
-                allowedAttributes.add(XML_ATTR_COLUMN_LENGTH);
-                allowedAttributes.add(XML_ATTR_COLUMN_COMMENT);
+                allowedAttributes.add(ColumnAttributes.NAME.getName());
+                allowedAttributes.add(ColumnAttributes.NULLABLE.getName());
+                allowedAttributes.add(ColumnAttributes.COMMENT.getName());
                 break;
             case TINYINT:
             case SMALLINT:
             case INT:
             case BIGINT:
-                allowedAttributes.add(XML_ATTR_COLUMN_NAME);
-                allowedAttributes.add(XML_ATTR_COLUMN_PADDING);
-                allowedAttributes.add(XML_ATTR_COLUMN_UNSIGNED);
-                allowedAttributes.add(XML_ATTR_COLUMN_NULLABLE);
-                allowedAttributes.add(XML_ATTR_COLUMN_IDENTITY);
-                allowedAttributes.add(XML_ATTR_COLUMN_DEFAULT);
-                allowedAttributes.add(XML_ATTR_COLUMN_COMMENT);
+                allowedAttributes.add(ColumnAttributes.NAME.getName());
+                allowedAttributes.add(ColumnAttributes.PADDING.getName());
+                allowedAttributes.add(ColumnAttributes.UNSIGNED.getName());
+                allowedAttributes.add(ColumnAttributes.NULLABLE.getName());
+                allowedAttributes.add(ColumnAttributes.IDENTITY.getName());
+                allowedAttributes.add(ColumnAttributes.DEFAULT.getName());
+                allowedAttributes.add(ColumnAttributes.COMMENT.getName());
                 break;
             case DECIMAL:
             case DOUBLE:
             case FLOAT:
-                allowedAttributes.add(XML_ATTR_COLUMN_NAME);
-                allowedAttributes.add(XML_ATTR_COLUMN_DEFAULT);
-                allowedAttributes.add(XML_ATTR_COLUMN_SCALE);
-                allowedAttributes.add(XML_ATTR_COLUMN_PRECISION);
-                allowedAttributes.add(XML_ATTR_COLUMN_UNSIGNED);
-                allowedAttributes.add(XML_ATTR_COLUMN_NULLABLE);
-                allowedAttributes.add(XML_ATTR_COLUMN_COMMENT);
+                allowedAttributes.add(ColumnAttributes.NAME.getName());
+                allowedAttributes.add(ColumnAttributes.PRECISION.getName());
+                allowedAttributes.add(ColumnAttributes.SCALE.getName());
+                allowedAttributes.add(ColumnAttributes.UNSIGNED.getName());
+                allowedAttributes.add(ColumnAttributes.NULLABLE.getName());
+                allowedAttributes.add(ColumnAttributes.DEFAULT.getName());
+                allowedAttributes.add(ColumnAttributes.COMMENT.getName());
                 break;
+            case VARBINARY:
             case VARCHAR:
             case TEXT:
             case MEDIUMTEXT:
             case LONGTEXT:
-                allowedAttributes.add(XML_ATTR_COLUMN_NAME);
-                allowedAttributes.add(XML_ATTR_COLUMN_NULLABLE);
-                allowedAttributes.add(XML_ATTR_COLUMN_LENGTH);
-                allowedAttributes.add(XML_ATTR_COLUMN_DEFAULT);
-                allowedAttributes.add(XML_ATTR_COLUMN_COMMENT);
+                allowedAttributes.add(ColumnAttributes.NAME.getName());
+                allowedAttributes.add(ColumnAttributes.NULLABLE.getName());
+                allowedAttributes.add(ColumnAttributes.LENGTH.getName());
+                allowedAttributes.add(ColumnAttributes.DEFAULT.getName());
+                allowedAttributes.add(ColumnAttributes.COMMENT.getName());
                 break;
             case BOOLEAN:
-                allowedAttributes.add(XML_ATTR_COLUMN_NAME);
-                allowedAttributes.add(XML_ATTR_COLUMN_DEFAULT);
-                allowedAttributes.add(XML_ATTR_COLUMN_NULLABLE);
-                allowedAttributes.add(XML_ATTR_COLUMN_COMMENT);
+                allowedAttributes.add(ColumnAttributes.NAME.getName());
+                allowedAttributes.add(ColumnAttributes.NULLABLE.getName());
+                allowedAttributes.add(ColumnAttributes.DEFAULT.getName());
+                allowedAttributes.add(ColumnAttributes.COMMENT.getName());
                 break;
             case DATETIME:
             case TIMESTAMP:
-                allowedAttributes.add(XML_ATTR_COLUMN_NAME);
-                allowedAttributes.add(XML_ATTR_COLUMN_ON_UPDATE);
-                allowedAttributes.add(XML_ATTR_COLUMN_NULLABLE);
-                allowedAttributes.add(XML_ATTR_COLUMN_DEFAULT);
-                allowedAttributes.add(XML_ATTR_COLUMN_COMMENT);
+                allowedAttributes.add(ColumnAttributes.NAME.getName());
+                allowedAttributes.add(ColumnAttributes.ON_UPDATE.getName());
+                allowedAttributes.add(ColumnAttributes.NULLABLE.getName());
+                allowedAttributes.add(ColumnAttributes.DEFAULT.getName());
+                allowedAttributes.add(ColumnAttributes.COMMENT.getName());
                 break;
             default:
                 break;
