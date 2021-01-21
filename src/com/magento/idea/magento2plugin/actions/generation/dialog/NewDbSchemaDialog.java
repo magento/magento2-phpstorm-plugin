@@ -16,6 +16,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.Lowercase;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.TableNameLength;
+import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaWhitelistJsonGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaXmlGenerator;
 import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaXml;
 import com.magento.idea.magento2plugin.magento.packages.database.TableColumnTypes;
@@ -131,7 +132,15 @@ public class NewDbSchemaDialog extends AbstractDialog {
         if (!validateFormFields()) {
             return;
         }
-        generateDbSchemaXmlFile();
+        final DbSchemaXmlData dbSchemaXmlData = new DbSchemaXmlData(
+                getTableName(),
+                getTableResource(),
+                getTableEngine(),
+                getTableComment(),
+                getColumns()
+        );
+        generateDbSchemaXmlFile(dbSchemaXmlData);
+        generateWhitelistJsonFile(dbSchemaXmlData);
 
         this.setVisible(false);
     }
@@ -154,17 +163,26 @@ public class NewDbSchemaDialog extends AbstractDialog {
 
     /**
      * Run db_schema.xml file generator.
+     *
+     * @param dbSchemaXmlData DbSchemaXmlData
      */
-    private void generateDbSchemaXmlFile() {
+    private void generateDbSchemaXmlFile(final @NotNull DbSchemaXmlData dbSchemaXmlData) {
         new DbSchemaXmlGenerator(
-                new DbSchemaXmlData(
-                        getTableName(),
-                        getTableResource(),
-                        getTableEngine(),
-                        getTableComment(),
-                        getColumns()
-                ),
+                dbSchemaXmlData,
                 project,
+                moduleName
+        ).generate(NewDbSchemaAction.ACTION_NAME, false);
+    }
+
+    /**
+     * Run db_schema_whitelist.json file generator.
+     *
+     * @param dbSchemaXmlData DbSchemaXmlData
+     */
+    private void generateWhitelistJsonFile(final @NotNull DbSchemaXmlData dbSchemaXmlData) {
+        new DbSchemaWhitelistJsonGenerator(
+                project,
+                dbSchemaXmlData,
                 moduleName
         ).generate(NewDbSchemaAction.ACTION_NAME, false);
     }
