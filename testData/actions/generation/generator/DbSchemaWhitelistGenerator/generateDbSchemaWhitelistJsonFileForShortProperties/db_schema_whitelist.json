@@ -1,0 +1,17 @@
+{
+  "test_table": {
+    "column": {
+      "entity_id": true,
+      "name": true,
+      "age": true,
+      "salary": true,
+      "is_single": true
+    },
+    "index": {
+      "TEST_TABLE_ENTITY_ID": true
+    },
+    "constraint": {
+      "PRIMARY": true
+    }
+  }
+}
