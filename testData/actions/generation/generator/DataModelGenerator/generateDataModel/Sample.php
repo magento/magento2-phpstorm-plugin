@@ -30,8 +30,7 @@ class Sample extends DataObject implements SampleInterface
      */
     public function getSampleProperty(): ?string
     {
-        return $this->getData(self::SAMPLE_PROPERTY) === null ? null
-            : $this->getData(self::SAMPLE_PROPERTY);
+        return $this->getData(self::SAMPLE_PROPERTY);
     }
 
     /**
