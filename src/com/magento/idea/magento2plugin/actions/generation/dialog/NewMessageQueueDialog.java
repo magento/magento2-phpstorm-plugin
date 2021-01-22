@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.ui.DocumentAdapter;
 import com.magento.idea.magento2plugin.actions.generation.NewMessageQueueAction;
 import com.magento.idea.magento2plugin.actions.generation.data.QueueCommunicationData;
 import com.magento.idea.magento2plugin.actions.generation.data.QueueConsumerData;
@@ -25,16 +26,19 @@ import com.magento.idea.magento2plugin.actions.generation.generator.QueueCommuni
 import com.magento.idea.magento2plugin.actions.generation.generator.QueueConsumerGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.QueuePublisherGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.QueueTopologyGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
+import com.magento.idea.magento2plugin.magento.files.ModelPhp;
+import com.magento.idea.magento2plugin.ui.FilteredComboBox;
+import com.magento.idea.magento2plugin.magento.packages.MessageQueueConnections;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+import org.jetbrains.annotations.NotNull;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
@@ -48,10 +52,11 @@ public class NewMessageQueueDialog extends AbstractDialog {
     private static final String QUEUE_NAME = "Queue Name";
     private static final String CONSUMER_TYPE = "Consumer Type";
     private static final String MAX_MESSAGES = "Maximum Messages";
-    private static final String CONNECTION_NAME = "Connection Name";
     private static final String EXCHANGE_NAME = "Exchange Name";
     private static final String BINDING_ID = "Binding ID";
     private static final String BINDING_TOPIC = "Binding Topic";
+
+    private FilteredComboBox connectionName;
 
     /* TODO: Improve validation */
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
@@ -64,15 +69,15 @@ public class NewMessageQueueDialog extends AbstractDialog {
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, HANDLER_NAME})
-    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC_WITH_UNDERSCORE,
+    @FieldValidation(rule = RuleRegistry.ALPHA_WITH_PERIOD,
             message = {AlphanumericWithUnderscoreRule.MESSAGE, HANDLER_NAME})
     private JTextField handlerName;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, HANDLER_TYPE})
-    @FieldValidation(rule = RuleRegistry.PHP_CLASS_FQN,
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
             message = {PhpClassFqnRule.MESSAGE, HANDLER_TYPE})
-    private JTextField handlerType;
+    private JTextField handlerClass;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, CONSUMER_NAME})
@@ -92,20 +97,15 @@ public class NewMessageQueueDialog extends AbstractDialog {
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, CONSUMER_TYPE})
-    @FieldValidation(rule = RuleRegistry.PHP_CLASS_FQN,
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
             message = {PhpClassFqnRule.MESSAGE, CONSUMER_TYPE})
-    private JTextField consumerType;
+    private JTextField consumerClass;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, MAX_MESSAGES})
     @FieldValidation(rule = RuleRegistry.NUMERIC,
             message = {NumericRule.MESSAGE, MAX_MESSAGES})
     private JTextField maxMessages;
-
-    // TODO: Can this be made a dropdown?
-    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, CONNECTION_NAME})
-    private JTextField connectionName;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, EXCHANGE_NAME})
@@ -119,14 +119,19 @@ public class NewMessageQueueDialog extends AbstractDialog {
             message = {AlphaWithDashRule.MESSAGE, BINDING_ID})
     private JTextField bindingId;
 
-    // TODO: New validation rule
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, BINDING_TOPIC})
     private JTextField bindingTopic;
 
+    private JTextField consumerDirectory;
+    private JTextField handlerDirectory;
+
     private JPanel contentPanel;
     private JButton buttonOK;
     private JButton buttonCancel;
+    private JLabel handlerDirectoryLabel;
+    private JLabel handlerClassLabel;
+    private JLabel consumerDirectoryLabel;
 
     private final Project project;
     private final String moduleName;
@@ -163,6 +168,19 @@ public class NewMessageQueueDialog extends AbstractDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
+
+        this.topicName.getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
+            protected void textChanged(final @NotNull DocumentEvent event) {
+                updateIndefiersTextes();
+            }
+        });
+        this.handlerClass.getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
+            protected void textChanged(final @NotNull DocumentEvent event) {
+                updateBindingText();
+            }
+        });
     }
 
     /**
@@ -194,7 +212,7 @@ public class NewMessageQueueDialog extends AbstractDialog {
         new QueueCommunicationGenerator(project, new QueueCommunicationData(
                 getTopicName(),
                 getHandlerName(),
-                getHandlerType(),
+                getHandlerClass(),
                 getHandlerMethod(),
                 getModuleName()
         )).generate(NewMessageQueueAction.ACTION_NAME, true);
@@ -204,7 +222,7 @@ public class NewMessageQueueDialog extends AbstractDialog {
         new QueueConsumerGenerator(project, new QueueConsumerData(
                 getConsumerName(),
                 getQueueName(),
-                getConsumerType(),
+                getConsumerClass(),
                 getMaxMessages(),
                 getConnectionName(),
                 getModuleName()
@@ -239,8 +257,12 @@ public class NewMessageQueueDialog extends AbstractDialog {
         return handlerName.getText().trim();
     }
 
-    public String getHandlerType() {
-        return handlerType.getText().trim();
+    public String getHandlerClass() {
+        return new NamespaceBuilder(
+            getModuleName(),
+            handlerClass.getText().trim(),
+            handlerDirectory.getText().trim()
+        ).getClassFqn();
     }
 
     public String getHandlerMethod() {
@@ -255,8 +277,12 @@ public class NewMessageQueueDialog extends AbstractDialog {
         return queueName.getText().trim();
     }
 
-    public String getConsumerType() {
-        return consumerType.getText().trim();
+    public String getConsumerClass() {
+        return new NamespaceBuilder(
+            getModuleName(),
+            consumerClass.getText().trim(),
+            consumerDirectory.getText().trim()
+        ).getClassFqn();
     }
 
     public String getMaxMessages() {
@@ -264,7 +290,7 @@ public class NewMessageQueueDialog extends AbstractDialog {
     }
 
     public String getConnectionName() {
-        return connectionName.getText().trim();
+        return connectionName.getSelectedItem().toString();
     }
 
     public String getExchangeName() {
@@ -281,5 +307,31 @@ public class NewMessageQueueDialog extends AbstractDialog {
 
     public String getModuleName() {
         return moduleName;
+    }
+
+    /**
+     * Update identifier texts.
+     */
+    public void updateIndefiersTextes() {
+        final String topicNameText = this.topicName.getText();
+        this.handlerName.setText(topicNameText.concat(".handler"));
+        this.consumerName.setText(topicNameText);
+        this.queueName.setText(topicNameText);
+    }
+
+    /**
+     * Update identifier texts.
+     */
+    public void updateBindingText() {
+        final String handlerTypeText = this.handlerClass.getText();
+        this.consumerClass.setText(handlerTypeText.replace("Handler", "").concat("Consumer"));
+        this.bindingId.setText(handlerTypeText.replace("Handler", "").concat("Binding"));
+    }
+
+    @SuppressWarnings({"PMD.UnusedPrivateMethod"})
+    private void createUIComponents() {
+            this.connectionName = new FilteredComboBox(
+                    MessageQueueConnections.getList()
+            );
     }
 }
