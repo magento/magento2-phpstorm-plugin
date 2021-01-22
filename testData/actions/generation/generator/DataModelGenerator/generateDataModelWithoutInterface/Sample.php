@@ -10,7 +10,31 @@ class Sample extends DataObject
     /**
      * String constants for property names
      */
+    const ID_PROPERTY = "id_property";
     const SAMPLE_PROPERTY = "sample_property";
+
+    /**
+     * Getter for IdProperty.
+     *
+     * @return int|null
+     */
+    public function getIdProperty(): ?int
+    {
+        return $this->getData(self::ID_PROPERTY) === null ? null
+            : (int)$this->getData(self::ID_PROPERTY);
+    }
+
+    /**
+     * Setter for IdProperty.
+     *
+     * @param int|null $idProperty
+     *
+     * @return void
+     */
+    public function setIdProperty(?int $idProperty): void
+    {
+        $this->setData(self::ID_PROPERTY, $idProperty);
+    }
 
     /**
      * Getter for SampleProperty.
@@ -20,7 +44,7 @@ class Sample extends DataObject
     public function getSampleProperty(): ?string
     {
         return $this->getData(self::SAMPLE_PROPERTY) === null ? null
-            : (string)$this->getData(self::SAMPLE_PROPERTY);
+            : $this->getData(self::SAMPLE_PROPERTY);
     }
 
     /**

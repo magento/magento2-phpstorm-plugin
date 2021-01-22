@@ -21,7 +21,8 @@ public class DataModelInterfaceGeneratorTest extends BaseGeneratorTestCase {
                 "SampleInterface",
                 "Foo_Bar",
                 "Foo\\Bar\\Api\\Data\\SampleInterface",
-                "SAMPLE_PROPERTY;sample_property;string;SampleProperty;sampleProperty"
+                "ID_PROPERTY;id_property;int;IdProperty;idProperty," +
+                        "SAMPLE_PROPERTY;sample_property;string;SampleProperty;sampleProperty"
         );
         final DataModelInterfaceGenerator generator = new DataModelInterfaceGenerator(
                 project, interfaceData
