@@ -22,8 +22,8 @@ public class DataModelGeneratorTest extends BaseGeneratorTestCase {
                 "Foo_Bar",
                 "Foo\\Bar\\Model\\Data\\Sample",
                 "Foo\\Bar\\Api\\Data\\SampleInterface",
-                "ID_PROPERTY;id_property;int;IdProperty;idProperty," +
-                        "SAMPLE_PROPERTY;sample_property;string;SampleProperty;sampleProperty",
+                "ID_PROPERTY;id_property;int;IdProperty;idProperty,"
+                        + "SAMPLE_PROPERTY;sample_property;string;SampleProperty;sampleProperty",
                 true
         );
         final DataModelGenerator generator = new DataModelGenerator(
@@ -51,8 +51,8 @@ public class DataModelGeneratorTest extends BaseGeneratorTestCase {
                 "Foo_Bar",
                 "Foo\\Bar\\Model\\Data\\Sample",
                 "Foo\\Bar\\Api\\Data\\SampleInterface",
-                "ID_PROPERTY;id_property;int;IdProperty;idProperty," +
-                        "SAMPLE_PROPERTY;sample_property;string;SampleProperty;sampleProperty",
+                "ID_PROPERTY;id_property;int;IdProperty;idProperty,"
+                        + "SAMPLE_PROPERTY;sample_property;string;SampleProperty;sampleProperty",
                 false
         );
         final DataModelGenerator generator = new DataModelGenerator(
