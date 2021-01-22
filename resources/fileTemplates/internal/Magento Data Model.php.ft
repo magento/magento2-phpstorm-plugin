@@ -55,9 +55,12 @@ class ${NAME} #if (${EXTENDS})extends ${EXTENDS} #end #if (${IMPLEMENTS} && $has
             #end
             public function get$propertyUpperCamel(): ?$propertyType
             {
-                #set($propertyCast = "#if($propertyType != 'string')($propertyType)#{else}#end")
+                #if($propertyType == 'string')
+                return $this->getData(self::$propertyUpperSnake);
+                #{else}
                 return $this->getData(self::$propertyUpperSnake) === null ? null
-                    : $propertyCast $this->getData(self::$propertyUpperSnake);
+                    : ($propertyType) $this->getData(self::$propertyUpperSnake);
+                #end
             }
 
             #if ($hasInterface)
