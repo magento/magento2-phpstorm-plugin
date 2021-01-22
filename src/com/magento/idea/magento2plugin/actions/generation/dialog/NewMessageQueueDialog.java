@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import com.magento.idea.magento2plugin.actions.generation.NewDataModelAction;
 import com.magento.idea.magento2plugin.actions.generation.NewMessageQueueAction;
 import com.magento.idea.magento2plugin.actions.generation.data.QueueCommunicationData;
 import com.magento.idea.magento2plugin.actions.generation.data.QueueConsumerData;
@@ -143,7 +142,7 @@ public class NewMessageQueueDialog extends AbstractDialog {
 
         setContentPane(contentPanel);
         setModal(true);
-        setTitle(NewDataModelAction.ACTION_DESCRIPTION);
+        setTitle(NewMessageQueueAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
 
         buttonOK.addActionListener((final ActionEvent event) -> onOK());

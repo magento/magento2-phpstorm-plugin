@@ -2,11 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0). 
-
-## 3.1.1
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 3.1.0
+
+### Added
+
+- Code generation for message queue in [#411](https://github.com/magento/magento2-phpstorm-plugin/pull/411)
+- Code generation for declarative schema [#453](https://github.com/magento/magento2-phpstorm-plugin/pull/453)
+- Inspection warning for disabled observer [#432](https://github.com/magento/magento2-phpstorm-plugin/pull/432)
+- The action item to the context menu to copy file path in the Magento format [#451](https://github.com/magento/magento2-phpstorm-plugin/pull/451)
 
 ## 3.0.4
 
