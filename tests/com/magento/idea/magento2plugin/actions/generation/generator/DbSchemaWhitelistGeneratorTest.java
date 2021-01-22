@@ -6,6 +6,8 @@
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.DbSchemaGeneratorDataProviderUtil;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.DbSchemaGeneratorUtil;
 import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaWhitelistJson;
 import com.magento.idea.magento2plugin.magento.packages.database.ColumnAttributes;
 import com.magento.idea.magento2plugin.magento.packages.database.TableColumnTypes;
@@ -29,6 +31,41 @@ public class DbSchemaWhitelistGeneratorTest extends BaseGeneratorTestCase {
                 "",
                 "",
                 createColumnsForTest()
+        );
+        final DbSchemaWhitelistJsonGenerator dbSchemaWhitelistJsonGenerator =
+                new DbSchemaWhitelistJsonGenerator(
+                        myFixture.getProject(),
+                        dbSchemaXmlData,
+                        MODULE_NAME
+                );
+
+        final String filePath = this.getFixturePath(ModuleDbSchemaWhitelistJson.FILE_NAME);
+
+        assertGeneratedFileIsCorrect(
+                myFixture.configureByFile(filePath),
+                EXPECTED_DIRECTORY,
+                dbSchemaWhitelistJsonGenerator.generate("test")
+        );
+    }
+
+    /**
+     * Test whether db_schema_whitelist.json file generated correctly
+     * when columns provided as short entity properties.
+     */
+    public void testGenerateDbSchemaWhitelistJsonFileForShortProperties() {
+        final List<Map<String, String>> properties =
+                DbSchemaGeneratorDataProviderUtil.generateEntityPropertiesForTest();
+
+        final List<Map<String, String>> columnsData =
+                DbSchemaGeneratorUtil.complementShortPropertiesByDefaults(properties);
+        columnsData.add(0, DbSchemaGeneratorUtil.getTableIdentityColumnData("entity_id"));
+
+        final DbSchemaXmlData dbSchemaXmlData = new DbSchemaXmlData(
+                TABLE_NAME,
+                "",
+                "",
+                "",
+                columnsData
         );
         final DbSchemaWhitelistJsonGenerator dbSchemaWhitelistJsonGenerator =
                 new DbSchemaWhitelistJsonGenerator(

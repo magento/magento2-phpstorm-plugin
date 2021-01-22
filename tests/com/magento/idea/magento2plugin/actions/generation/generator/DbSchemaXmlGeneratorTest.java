@@ -6,6 +6,8 @@
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.DbSchemaGeneratorDataProviderUtil;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.DbSchemaGeneratorUtil;
 import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaXml;
 import com.magento.idea.magento2plugin.magento.packages.database.ColumnAttributes;
 import com.magento.idea.magento2plugin.magento.packages.database.TableColumnTypes;
@@ -37,6 +39,39 @@ public class DbSchemaXmlGeneratorTest extends BaseGeneratorTestCase {
                 TABLE_ENGINE,
                 TABLE_COMMENT,
                 createColumnsForTest()
+        );
+        final DbSchemaXmlGenerator dbSchemaXmlGenerator = new DbSchemaXmlGenerator(
+                dbSchemaXmlData,
+                myFixture.getProject(),
+                MODULE_NAME
+        );
+
+        final String filePath = this.getFixturePath(ModuleDbSchemaXml.FILE_NAME);
+
+        assertGeneratedFileIsCorrect(
+                myFixture.configureByFile(filePath),
+                EXPECTED_DIRECTORY,
+                dbSchemaXmlGenerator.generate("test")
+        );
+    }
+
+    /**
+     * Test db_schema.xml file generation when columns provided as short entity properties.
+     */
+    public void testGenerateDbSchemaXmlFileForShortProperties() {
+        final List<Map<String, String>> properties =
+                DbSchemaGeneratorDataProviderUtil.generateEntityPropertiesForTest();
+
+        final List<Map<String, String>> columnsData =
+                DbSchemaGeneratorUtil.complementShortPropertiesByDefaults(properties);
+        columnsData.add(0, DbSchemaGeneratorUtil.getTableIdentityColumnData("entity_id"));
+
+        final DbSchemaXmlData dbSchemaXmlData = new DbSchemaXmlData(
+                TABLE_NAME,
+                TABLE_RESOURCE,
+                TABLE_ENGINE,
+                TABLE_COMMENT,
+                columnsData
         );
         final DbSchemaXmlGenerator dbSchemaXmlGenerator = new DbSchemaXmlGenerator(
                 dbSchemaXmlData,
