@@ -1,5 +1,6 @@
 <?php
 #parse("PHP File Header.php")
+declare(strict_types=1);
 
 #if (${NAMESPACE})
     namespace ${NAMESPACE};
@@ -28,15 +29,20 @@ interface ${NAME}
             #set ($propertyLowerCamel = $propertyData.get(4))
 
             /**
-             * @return $propertyType
+             * Getter for $propertyUpperCamel.
+             *
+             * @return $propertyType|null
              */
-            public function get$propertyUpperCamel();
+            public function get$propertyUpperCamel(): ?$propertyType;
 
             /**
-             * @param $propertyType $$propertyLowerCamel
-             * @return $this
+             * Setter for $propertyUpperCamel.
+             *
+             * @param $propertyType|null $$propertyLowerCamel
+             *
+             * @return void
              */
-            public function set$propertyUpperCamel($$propertyLowerCamel);
+            public function set$propertyUpperCamel(?$propertyType $$propertyLowerCamel): void;
         #end
     #end
 }
