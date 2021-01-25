@@ -11,6 +11,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.actions.generation.NewViewModelAction;
+import com.magento.idea.magento2plugin.actions.generation.OverrideClassByAPreferenceAction;
 import com.magento.idea.magento2plugin.actions.generation.data.AclXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.CollectionData;
 import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
@@ -20,6 +21,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.LayoutXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.MenuXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.ModelData;
+import com.magento.idea.magento2plugin.actions.generation.data.PreferenceDiXmFileData;
 import com.magento.idea.magento2plugin.actions.generation.data.ResourceModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.RoutesXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataProviderData;
@@ -42,6 +44,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.ModuleCollec
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleControllerClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleResourceModelGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.PreferenceDiXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.RoutesXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentDataProviderGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentFormGenerator;
@@ -64,6 +67,7 @@ import com.magento.idea.magento2plugin.stubs.indexes.xml.MenuIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.ui.table.TableGroupWrapper;
 import com.magento.idea.magento2plugin.util.FirstLetterToLowercaseUtil;
+import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.magento.GetAclResourcesListUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.ActionEvent;
@@ -115,7 +119,6 @@ public class NewEntityDialog extends AbstractDialog {
     private JButton buttonCancel;
     private JPanel generalTable;
     private JCheckBox createUiComponent;
-    private JLabel createUiComponentsLabel;
     private JTextField entityName;
     private JLabel entityNameLabel;
     private JLabel dbTableNameLabel;
@@ -153,6 +156,7 @@ public class NewEntityDialog extends AbstractDialog {
     private JLabel tableEngineLabel;
     private JComboBox tableResource;
     private JLabel tableResourceLabel;
+    private JCheckBox createInterface;
     private final List<String> properties;
     private TableGroupWrapper entityPropertiesTableGroupWrapper;
 
@@ -262,10 +266,13 @@ public class NewEntityDialog extends AbstractDialog {
         generateModelFile();
         generateResourceModelFile();
         generateCollectionFile();
-
         formatProperties();
         generateDataModelFile();
-        generateDataModelInterfaceFile();
+
+        if (createInterface.isSelected()) {
+            generateDataModelInterfaceFile();
+            generateDataModelPreference();
+        }
 
         generateRoutesXmlFile();
         generateViewControllerFile();
@@ -274,7 +281,6 @@ public class NewEntityDialog extends AbstractDialog {
         generateLayoutFile();
         generateFormFile();
         generateAclXmlFile();
-
         generateGridViewControllerFile();
         generateGridLayoutFile();
         generateMenuFile();
@@ -290,6 +296,7 @@ public class NewEntityDialog extends AbstractDialog {
 
         generateDbSchemaXmlFile(dbSchemaXmlData);
         generateWhitelistJsonFile(dbSchemaXmlData);
+        this.setVisible(false);
     }
 
     private PsiFile generateModelFile() {
@@ -331,6 +338,23 @@ public class NewEntityDialog extends AbstractDialog {
             getResourceModelName(),
             ResourceModelPhp.RESOURCE_MODEL_DIRECTORY
         );
+    }
+
+    /**
+     * Generate preference for data model.
+     */
+    private void generateDataModelPreference() {
+        final NamespaceBuilder modelNamespace = getModelNamespace();
+        final NamespaceBuilder modelInterfaceNamespace = getDataModelInterfaceNamespace();
+        new PreferenceDiXmlGenerator(new PreferenceDiXmFileData(
+                getModuleName(),
+                GetPhpClassByFQN.getInstance(project).execute(
+                        modelInterfaceNamespace.getClassFqn()
+                ),
+                modelNamespace.getClassFqn(),
+                getModelName(),
+                Areas.base.toString()
+        ), project).generate(OverrideClassByAPreferenceAction.ACTION_NAME);
     }
 
     private String getModuleName() {
@@ -410,6 +434,9 @@ public class NewEntityDialog extends AbstractDialog {
         ), project).generate(ACTION_NAME, true);
     }
 
+    /**
+     * Generate Data Model File.
+     */
     private void generateDataModelFile() {
         final NamespaceBuilder nameSpaceBuilder = getDataModelNamespace();
         new DataModelGenerator(project, new DataModelData(
@@ -418,7 +445,8 @@ public class NewEntityDialog extends AbstractDialog {
             getModuleName(),
             nameSpaceBuilder.getClassFqn(),
             getDataModelInterfaceNamespace().getClassFqn(),
-            getProperties()
+            getProperties(),
+            createInterface.isSelected()
         )).generate(ACTION_NAME, true);
     }
 
