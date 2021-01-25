@@ -22,6 +22,8 @@ public class UiComponentDataProviderPhp implements ModuleFileInterface {
     private String className;
     public static final String DEFAULT_DATA_PROVIDER =
             "Magento\\Framework\\View\\Element\\UiComponent\\DataProvider\\DataProvider";
+    public static final String SEARCH_RESULT_FACTORY =
+            "Magento\\Ui\\DataProvider\\SearchResultFactory";
 
     /**
      * Returns a new instance of the class.

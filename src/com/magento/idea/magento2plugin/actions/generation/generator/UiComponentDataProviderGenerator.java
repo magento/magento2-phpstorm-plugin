@@ -14,16 +14,22 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataProviderData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
+import com.magento.idea.magento2plugin.magento.files.queries.GetListQuery;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryType;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 import javax.swing.JOptionPane;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({"PMD.OnlyOneReturn", "PMD.DataflowAnomalyAnalysis"})
 public class UiComponentDataProviderGenerator extends FileGenerator {
@@ -44,12 +50,11 @@ public class UiComponentDataProviderGenerator extends FileGenerator {
      * @param project Project
      */
     public UiComponentDataProviderGenerator(
-            final UiComponentDataProviderData uiComponentGridDataProviderData,
-            final String moduleName,
-            final Project project
+            final @NotNull UiComponentDataProviderData uiComponentGridDataProviderData,
+            final @NotNull String moduleName,
+            final @NotNull Project project
     ) {
         super(project);
-
         this.uiComponentGridDataProviderData = uiComponentGridDataProviderData;
         this.directoryGenerator = DirectoryGenerator.getInstance();
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
@@ -60,8 +65,15 @@ public class UiComponentDataProviderGenerator extends FileGenerator {
         this.moduleName = moduleName;
     }
 
+    /**
+     * Generate UiComponent data provider class.
+     *
+     * @param actionName String
+     *
+     * @return PsiFile
+     */
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile generate(final @NotNull String actionName) {
         final PsiFile[] dataProviderFiles = new PsiFile[1];
 
         WriteCommandAction.runWriteCommandAction(project, () -> {
@@ -107,13 +119,82 @@ public class UiComponentDataProviderGenerator extends FileGenerator {
         return dataProviderFiles[0];
     }
 
+    /**
+     * Fill file property attributes.
+     *
+     * @param attributes Properties
+     */
     @Override
-    protected void fillAttributes(final Properties attributes) {
+    protected void fillAttributes(final @NotNull Properties attributes) {
         attributes.setProperty("NAMESPACE", uiComponentGridDataProviderData.getNamespace());
         attributes.setProperty("CLASS_NAME", uiComponentGridDataProviderData.getName());
+
+        if (uiComponentGridDataProviderData.getEntityIdFieldName() != null) {
+            attributes.setProperty(
+                    "ENTITY_ID",
+                    uiComponentGridDataProviderData.getEntityIdFieldName()
+            );
+        }
+        attributes.setProperty("HAS_GET_LIST_QUERY", "false");
+
+        final List<String> uses = new LinkedList<>();
+
+        uses.add(UiComponentDataProviderPhp.DEFAULT_DATA_PROVIDER);
+        attributes.setProperty(
+                "EXTENDS",
+                PhpClassGeneratorUtil.getNameFromFqn(
+                        UiComponentDataProviderPhp.DEFAULT_DATA_PROVIDER
+                )
+        );
+
+        final PhpClass getListQueryFile = GetPhpClassByFQN.getInstance(project).execute(
+                GetListQuery.getClassFqn(moduleName)
+        );
+
+        if (getListQueryFile == null) {
+            attributes.setProperty("USES", PhpClassGeneratorUtil.formatUses(uses));
+            return;
+        }
+        attributes.setProperty("HAS_GET_LIST_QUERY", "true");
+
+        uses.add(FrameworkLibraryType.REPORTING.getType());
+        attributes.setProperty("REPORTING_TYPE", FrameworkLibraryType.REPORTING.getTypeName());
+
+        uses.add(FrameworkLibraryType.API_SEARCH_CRITERIA_BUILDER.getType());
+        attributes.setProperty("SEARCH_CRITERIA_BUILDER",
+                FrameworkLibraryType.API_SEARCH_CRITERIA_BUILDER.getTypeName());
+
+        uses.add(FrameworkLibraryType.REQUEST.getType());
+        attributes.setProperty("REQUEST_TYPE", FrameworkLibraryType.REQUEST.getTypeName());
+
+        uses.add(FrameworkLibraryType.FILTER_BUILDER.getType());
+        attributes.setProperty("FILTER_BUILDER", FrameworkLibraryType.FILTER_BUILDER.getTypeName());
+
+        uses.add(UiComponentDataProviderPhp.SEARCH_RESULT_FACTORY);
+        attributes.setProperty("SEARCH_RESULT_FACTORY",
+                PhpClassGeneratorUtil.getNameFromFqn(
+                        UiComponentDataProviderPhp.SEARCH_RESULT_FACTORY
+                )
+        );
+
+        final @NotNull String getListQueryFqn = getListQueryFile.getPresentableFQN();
+
+        uses.add(getListQueryFqn);
+        attributes.setProperty("GET_LIST_QUERY_TYPE", PhpClassGeneratorUtil.getNameFromFqn(
+                getListQueryFqn
+        ));
+
+        attributes.setProperty("USES", PhpClassGeneratorUtil.formatUses(uses));
     }
 
-    private PhpClass createDataProviderClass(final String actionName) {
+    /**
+     * Generate data provider class.
+     *
+     * @param actionName String
+     *
+     * @return PhpClass
+     */
+    private PhpClass createDataProviderClass(final @NotNull String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(this.moduleName);
         final PsiFile dataProviderFile;
@@ -144,6 +225,11 @@ public class UiComponentDataProviderGenerator extends FileGenerator {
         return getFirstClassOfFile.execute((PhpFile) dataProviderFile);
     }
 
+    /**
+     * Get data provider class FQN.
+     *
+     * @return String
+     */
     private String getDataProviderFqn() {
         return String.format(
                 "%s%s%s",
