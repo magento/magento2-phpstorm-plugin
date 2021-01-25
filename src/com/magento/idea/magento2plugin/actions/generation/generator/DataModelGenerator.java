@@ -21,7 +21,7 @@ import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.DataModel;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import javax.swing.JOptionPane;
@@ -108,13 +108,17 @@ public class DataModelGenerator extends FileGenerator {
                 PhpClassGeneratorUtil.getNameFromFqn(modelData.getInterfaceFQN())
         );
         attributes.setProperty("PROPERTIES", modelData.getProperties());
+        attributes.setProperty("HASINTERFACE", Boolean.toString(modelData.hasInterface()));
     }
 
     private List<String> getUses() {
-        return Arrays.asList(
-                DataModel.DATA_OBJECT,
-                modelData.getInterfaceFQN()
-        );
+        final List<String> usesList = new LinkedList<>();
+        usesList.add(DataModel.DATA_OBJECT);
+
+        if (modelData.hasInterface()) {
+            usesList.add(modelData.getInterfaceFQN());
+        }
+        return usesList;
     }
 
     private PhpClass createModel(final String actionName) {
