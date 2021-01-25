@@ -7,26 +7,11 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.google.common.base.CaseFormat;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.ComboBoxTableRenderer;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.indexing.FileBasedIndex;
-import com.magento.idea.magento2plugin.actions.generation.NewDbSchemaAction;
-import com.magento.idea.magento2plugin.actions.generation.NewUiComponentGridAction;
 import com.magento.idea.magento2plugin.actions.generation.NewViewModelAction;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-
+import com.magento.idea.magento2plugin.actions.generation.OverrideClassByAPreferenceAction;
 import com.magento.idea.magento2plugin.actions.generation.data.AclXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.CollectionData;
 import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
@@ -36,6 +21,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.LayoutXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.MenuXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.ModelData;
+import com.magento.idea.magento2plugin.actions.generation.data.PreferenceDiXmFileData;
 import com.magento.idea.magento2plugin.actions.generation.data.ResourceModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.RoutesXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataProviderData;
@@ -46,9 +32,11 @@ import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFi
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridToolbarData;
 import com.magento.idea.magento2plugin.actions.generation.data.code.ClassPropertyData;
+import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
 import com.magento.idea.magento2plugin.actions.generation.generator.AclXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DataModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DataModelInterfaceGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaWhitelistJsonGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.LayoutXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.MenuXmlGenerator;
@@ -56,10 +44,12 @@ import com.magento.idea.magento2plugin.actions.generation.generator.ModuleCollec
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleControllerClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleResourceModelGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.PreferenceDiXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.RoutesXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentDataProviderGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentFormGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentGridXmlGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.DbSchemaGeneratorUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.files.DataModel;
@@ -71,15 +61,38 @@ import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.PropertiesTypes;
+import com.magento.idea.magento2plugin.magento.packages.database.TableEngines;
+import com.magento.idea.magento2plugin.magento.packages.database.TableResources;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.MenuIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
-import com.magento.idea.magento2plugin.ui.table.ComboBoxEditor;
-import com.magento.idea.magento2plugin.ui.table.DeleteRowButton;
-import com.magento.idea.magento2plugin.ui.table.TableButton;
 import com.magento.idea.magento2plugin.ui.table.TableGroupWrapper;
 import com.magento.idea.magento2plugin.util.FirstLetterToLowercaseUtil;
+import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.magento.GetAclResourcesListUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import javax.swing.table.DefaultTableModel;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -89,6 +102,9 @@ import org.jetbrains.annotations.NotNull;
         "PMD.DataClass",
         "PMD.UnusedPrivateField",
         "PMD.ExcessiveImports",
+        "PMD.GodClass",
+        "PMD.TooManyMethods",
+        "PMD.CyclomaticComplexity"
 })
 public class NewEntityDialog extends AbstractDialog {
     @NotNull
@@ -103,7 +119,6 @@ public class NewEntityDialog extends AbstractDialog {
     private JButton buttonCancel;
     private JPanel generalTable;
     private JCheckBox createUiComponent;
-    private JLabel createUiComponentsLabel;
     private JTextField entityName;
     private JLabel entityNameLabel;
     private JLabel dbTableNameLabel;
@@ -141,15 +156,13 @@ public class NewEntityDialog extends AbstractDialog {
     private JLabel tableEngineLabel;
     private JComboBox tableResource;
     private JLabel tableResourceLabel;
+    private JCheckBox createInterface;
     private final List<String> properties;
-    // Table Columns UI components group
-    private TableGroupWrapper columnsTableGroupWrapper;
+    private TableGroupWrapper entityPropertiesTableGroupWrapper;
 
     private static final String ACTION_NAME = "Create Entity";
     private static final String PROPERTY_NAME = "Name";
     private static final String PROPERTY_TYPE = "Type";
-    private static final String PROPERTY_ACTION = "Action";
-    private static final String PROPERTY_DELETE = "Delete";
 
     private JTextField observerName;
 
@@ -183,13 +196,14 @@ public class NewEntityDialog extends AbstractDialog {
             }
         });
 
+        initializeComboboxSources();
         initPropertiesTable();
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
-            (final ActionEvent event) -> onCancel(),
-            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-            JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+                (final ActionEvent event) -> onCancel(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
     }
 
@@ -206,37 +220,39 @@ public class NewEntityDialog extends AbstractDialog {
         dialog.setVisible(true);
     }
 
-    private void initPropertiesTable() {
-        final DefaultTableModel propertiesTable = getPropertiesTable();
-        propertiesTable.setDataVector(
-            new Object[][]{},
-            new Object[]{
-                PROPERTY_NAME,
-                PROPERTY_TYPE,
-                PROPERTY_ACTION
-            }
-        );
-
-        final TableColumn column = propertyTable.getColumn(PROPERTY_ACTION);
-        column.setCellRenderer(new TableButton(PROPERTY_DELETE));
-        column.setCellEditor(new DeleteRowButton(new JCheckBox()));
-
-        addProperty.addActionListener(e -> {
-            propertiesTable.addRow(new Object[]{
-                "",
-                PropertiesTypes.valueOf(PropertiesTypes.INT.toString())
-                        .getPropertyType(),
-                PROPERTY_DELETE
-            });
-        });
-
-        initPropertyTypeColumn();
+    /**
+     * Initialize combobox sources.
+     */
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
+    private void initializeComboboxSources() {
+        for (final String engine : TableEngines.getTableEnginesList()) {
+            tableEngine.addItem(new ComboBoxItemData(engine, engine));
+        }
+        for (final String resource : TableResources.getTableResourcesList()) {
+            tableResource.addItem(new ComboBoxItemData(resource, resource));
+        }
     }
 
-    private void initPropertyTypeColumn() {
-        final TableColumn formElementTypeColumn = propertyTable.getColumn(PROPERTY_TYPE);
-        formElementTypeColumn.setCellEditor(new ComboBoxEditor(PropertiesTypes.getPropertyTypes()));
-        formElementTypeColumn.setCellRenderer(new ComboBoxTableRenderer<>(PropertiesTypes.getPropertyTypes()));
+    /**
+     * Initialize properties table.
+     */
+    private void initPropertiesTable() {
+        final List<String> columns = new LinkedList<>(Arrays.asList(
+                PROPERTY_NAME,
+                PROPERTY_TYPE
+        ));
+        final Map<String, List<String>> sources = new HashMap<>();
+        sources.put(PROPERTY_TYPE, PropertiesTypes.getPropertyTypesList());
+
+        // Initialize entity properties Table Group
+        entityPropertiesTableGroupWrapper = new TableGroupWrapper(
+                propertyTable,
+                addProperty,
+                columns,
+                new HashMap<>(),
+                sources
+        );
+        entityPropertiesTableGroupWrapper.initTableGroup();
     }
 
     private DefaultTableModel getPropertiesTable() {
@@ -250,10 +266,13 @@ public class NewEntityDialog extends AbstractDialog {
         generateModelFile();
         generateResourceModelFile();
         generateCollectionFile();
-
         formatProperties();
         generateDataModelFile();
-        generateDataModelInterfaceFile();
+
+        if (createInterface.isSelected()) {
+            generateDataModelInterfaceFile();
+            generateDataModelPreference();
+        }
 
         generateRoutesXmlFile();
         generateViewControllerFile();
@@ -262,19 +281,28 @@ public class NewEntityDialog extends AbstractDialog {
         generateLayoutFile();
         generateFormFile();
         generateAclXmlFile();
-
         generateGridViewControllerFile();
         generateGridLayoutFile();
         generateMenuFile();
         generateUiComponentGridFile();
 
-        generateDbSchemaXmlFile();
+        final DbSchemaXmlData dbSchemaXmlData = new DbSchemaXmlData(
+                getDbTableName(),
+                getTableResource(),
+                getTableEngine(),
+                getEntityName(),
+                getEntityProperties()
+        );
+
+        generateDbSchemaXmlFile(dbSchemaXmlData);
+        generateWhitelistJsonFile(dbSchemaXmlData);
+        this.setVisible(false);
     }
 
     private PsiFile generateModelFile() {
         final NamespaceBuilder modelNamespace = getModelNamespace();
         final NamespaceBuilder resourceModelNamespace = getResourceModelNamespace();
-        String resourceModelName = getResourceModelName();
+        final String resourceModelName = getResourceModelName();
 
 
         return new ModuleModelGenerator(new ModelData(
@@ -297,7 +325,11 @@ public class NewEntityDialog extends AbstractDialog {
     }
 
     private NamespaceBuilder getDataModelInterfaceNamespace() {
-        return new NamespaceBuilder(getModuleName(), getDataModelInterfaceName(), DataModelInterface.DIRECTORY);
+        return new NamespaceBuilder(
+                getModuleName(),
+                getDataModelInterfaceName(),
+                DataModelInterface.DIRECTORY
+        );
     }
 
     private NamespaceBuilder getResourceModelNamespace() {
@@ -306,6 +338,23 @@ public class NewEntityDialog extends AbstractDialog {
             getResourceModelName(),
             ResourceModelPhp.RESOURCE_MODEL_DIRECTORY
         );
+    }
+
+    /**
+     * Generate preference for data model.
+     */
+    private void generateDataModelPreference() {
+        final NamespaceBuilder modelNamespace = getModelNamespace();
+        final NamespaceBuilder modelInterfaceNamespace = getDataModelInterfaceNamespace();
+        new PreferenceDiXmlGenerator(new PreferenceDiXmFileData(
+                getModuleName(),
+                GetPhpClassByFQN.getInstance(project).execute(
+                        modelInterfaceNamespace.getClassFqn()
+                ),
+                modelNamespace.getClassFqn(),
+                getModelName(),
+                Areas.base.toString()
+        ), project).generate(OverrideClassByAPreferenceAction.ACTION_NAME);
     }
 
     private String getModuleName() {
@@ -365,10 +414,10 @@ public class NewEntityDialog extends AbstractDialog {
         final NamespaceBuilder modelNamespace = getModelNamespace();
         final NamespaceBuilder collectionNamespace = getCollectionNamespace();
         final StringBuilder modelFqn = new StringBuilder(modelNamespace.getClassFqn());
-        String modelName = getModelName();
+        final String modelName = getModelName();
         final StringBuilder resourceModelFqn
                 = new StringBuilder(resourceModelNamespace.getClassFqn());
-        String resourceModelName = getResourceModelName();
+        final String resourceModelName = getResourceModelName();
 
 
         return new ModuleCollectionGenerator(new CollectionData(
@@ -385,20 +434,24 @@ public class NewEntityDialog extends AbstractDialog {
         ), project).generate(ACTION_NAME, true);
     }
 
+    /**
+     * Generate Data Model File.
+     */
     private void generateDataModelFile() {
-        NamespaceBuilder nameSpaceBuilder = getDataModelNamespace();
+        final NamespaceBuilder nameSpaceBuilder = getDataModelNamespace();
         new DataModelGenerator(project, new DataModelData(
             getDataModelNamespace().getNamespace(),
             getDataModelName(),
             getModuleName(),
             nameSpaceBuilder.getClassFqn(),
             getDataModelInterfaceNamespace().getClassFqn(),
-            getProperties()
+            getProperties(),
+            createInterface.isSelected()
         )).generate(ACTION_NAME, true);
     }
 
     private void generateDataModelInterfaceFile() {
-        NamespaceBuilder nameSpaceBuilder = getDataModelInterfaceNamespace();
+        final NamespaceBuilder nameSpaceBuilder = getDataModelInterfaceNamespace();
         new DataModelInterfaceGenerator(project, new DataModelInterfaceData(
             nameSpaceBuilder.getNamespace(),
             getDataModelInterfaceName(),
@@ -428,22 +481,22 @@ public class NewEntityDialog extends AbstractDialog {
         name = getEntityIdColumn();
         type = "int";
         properties.add(new ClassPropertyData(// NOPMD
-            type,
-            CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name),
-            CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name),
-            name,
-            CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_UNDERSCORE, name)
+                type,
+                CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name),
+                CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name),
+                name,
+                CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_UNDERSCORE, name)
         ).string());
 
         for (int index = 0; index < rowCount; index++) {
             name = propertiesTable.getValueAt(index, 0).toString();
             type = propertiesTable.getValueAt(index, 1).toString();
             properties.add(new ClassPropertyData(// NOPMD
-                type,
-                CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name),
-                CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name),
-                name,
-                CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_UNDERSCORE, name)
+                    type,
+                    CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name),
+                    CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name),
+                    name,
+                    CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_UNDERSCORE, name)
             ).string());
         }
     }
@@ -475,19 +528,19 @@ public class NewEntityDialog extends AbstractDialog {
 
     private PsiFile generateViewControllerFile() {
         final NamespaceBuilder namespace = new NamespaceBuilder(
-            getModuleName(),
-            getViewActionName(),
-            getViewControllerDirectory()
+                getModuleName(),
+                getViewActionName(),
+                getViewControllerDirectory()
         );
         return new ModuleControllerClassGenerator(new ControllerFileData(
-            getViewControllerDirectory(),
-            getViewActionName(),
-            getModuleName(),
-            Areas.adminhtml.toString(),
-            HttpMethod.GET.toString(),
-            getAcl(),
-            true,
-            namespace.getNamespace()
+                getViewControllerDirectory(),
+                getViewActionName(),
+                getModuleName(),
+                Areas.adminhtml.toString(),
+                HttpMethod.GET.toString(),
+                getAcl(),
+                true,
+                namespace.getNamespace()
         ), project).generate(ACTION_NAME, false);
     }
 
@@ -496,7 +549,7 @@ public class NewEntityDialog extends AbstractDialog {
     }
 
     private String getSubmitActionName() {
-        return "Save";
+        return "Save";//NOPMD
     }
 
     private String getViewControllerDirectory() {
@@ -509,19 +562,19 @@ public class NewEntityDialog extends AbstractDialog {
 
     private PsiFile generateSubmitControllerFile() {
         final NamespaceBuilder namespace = new NamespaceBuilder(
-            getModuleName(),
-            getSubmitActionName(),
-            getViewControllerDirectory()
+                getModuleName(),
+                getSubmitActionName(),
+                getViewControllerDirectory()
         );
         return new ModuleControllerClassGenerator(new ControllerFileData(
-            getViewControllerDirectory(),
-            getSubmitActionName(),
-            getModuleName(),
-            Areas.adminhtml.toString(),
-            HttpMethod.POST.toString(),
-            getAcl(),
-            true,
-            namespace.getNamespace()
+                getViewControllerDirectory(),
+                getSubmitActionName(),
+                getModuleName(),
+                Areas.adminhtml.toString(),
+                HttpMethod.POST.toString(),
+                getAcl(),
+                true,
+                namespace.getNamespace()
         ), project).generate(ACTION_NAME, false);
     }
 
@@ -638,41 +691,41 @@ public class NewEntityDialog extends AbstractDialog {
         final List buttons = new ArrayList();
         final String directory = "Block/Form";
 
-        NamespaceBuilder namespaceBuilderSave = new NamespaceBuilder(
-            getModuleName(),
-            "Save",
-            directory
+        final NamespaceBuilder namespaceBuilderSave = new NamespaceBuilder(
+                getModuleName(),
+                "Save",
+                directory
         );
         buttons.add(new UiComponentFormButtonData(
-            directory,
-            "SaveEntity",
-            getModuleName(),
-            "Save",
-            namespaceBuilderSave.getNamespace(),
-            "Save Entity",
-            "10",
-            getFormName(),
-            namespaceBuilderSave.getClassFqn()
+                directory,
+                "SaveEntity",
+                getModuleName(),
+                "Save",
+                namespaceBuilderSave.getNamespace(),
+                "Save Entity",
+                "10",
+                getFormName(),
+                namespaceBuilderSave.getClassFqn()
         ));
 
-        NamespaceBuilder namespaceBuilderBack = new NamespaceBuilder(
-            getModuleName(),
-            "Back",
-            directory
+        final NamespaceBuilder namespaceBuilderBack = new NamespaceBuilder(
+                getModuleName(),
+                "Back",
+                directory
         );
         buttons.add(new UiComponentFormButtonData(
-            directory,
-            "Back",
-            getModuleName(),
-            "Back",
-            namespaceBuilderBack.getNamespace(),
-            "Back To Grid",
-            "20",
-            getFormName(),
-            namespaceBuilderBack.getClassFqn()
+                directory,
+                "Back",
+                getModuleName(),
+                "Back",
+                namespaceBuilderBack.getNamespace(),
+                "Back To Grid",
+                "20",
+                getFormName(),
+                namespaceBuilderBack.getClassFqn()
         ));
 
-        NamespaceBuilder namespaceBuilderDelete = new NamespaceBuilder(
+        final NamespaceBuilder namespaceBuilderDelete = new NamespaceBuilder(
                 getModuleName(),
                 "Delete",
                 directory
@@ -701,15 +754,15 @@ public class NewEntityDialog extends AbstractDialog {
         final ArrayList<UiComponentFormFieldData> fieldsets = new ArrayList<>();
 
         fieldsets.add(
-            new UiComponentFormFieldData(
-                "entity_id",
-                "int",
-                "Entity ID",
-                "0",
-                "general",
-                "hidden",
-                "entity_id"
-            )
+                new UiComponentFormFieldData(
+                        "entity_id",
+                        "int",
+                        "Entity ID",
+                        "0",
+                        "general",
+                        "hidden",
+                        "entity_id"
+                )
         );
 
         for (int count = 0; count < model.getRowCount(); count++) {
@@ -724,17 +777,17 @@ public class NewEntityDialog extends AbstractDialog {
             final String source = model.getValueAt(count, 0).toString(); //todo: convert
 
             final UiComponentFormFieldData fieldsetData = new UiComponentFormFieldData(//NOPMD
-                name,
-                label,
-                sortOrder,
-                fieldset,
-                formElementType,
-                dataType,
-                source
+                    name,
+                    label,
+                    sortOrder,
+                    fieldset,
+                    formElementType,
+                    dataType,
+                    source
             );
 
             fieldsets.add(
-                fieldsetData
+                    fieldsetData
             );
         }
 
@@ -757,30 +810,30 @@ public class NewEntityDialog extends AbstractDialog {
 
     private PsiFile generateGridViewControllerFile() {
         final NamespaceBuilder namespace = new NamespaceBuilder(
-            getModuleName(),
-            "Listing",
-            getControllerDirectory()
+                getModuleName(),
+                "Listing",
+                getControllerDirectory()
         );
         return new ModuleControllerClassGenerator(new ControllerFileData(
-            getControllerDirectory(),
-            "Listing",
-            getModuleName(),
-            Areas.adminhtml.toString(),
-            HttpMethod.GET.toString(),
-            getAcl(),
-            true,
-            namespace.getNamespace()
+                getControllerDirectory(),
+                "Listing",
+                getModuleName(),
+                Areas.adminhtml.toString(),
+                HttpMethod.GET.toString(),
+                getAcl(),
+                true,
+                namespace.getNamespace()
         ), project).generate(ACTION_NAME, false);
     }
 
     private PsiFile generateGridLayoutFile() {
         return new LayoutXmlGenerator(new LayoutXmlData(
-            Areas.adminhtml.toString(),
-            getRoute(),
-            getModuleName(),
-            getEntityName(),
-            "Listing",
-            getGridName()
+                Areas.adminhtml.toString(),
+                getRoute(),
+                getModuleName(),
+                getEntityName(),
+                "Listing",
+                getGridName()
         ), project).generate(ACTION_NAME, false);
     }
 
@@ -826,8 +879,8 @@ public class NewEntityDialog extends AbstractDialog {
 
     private void generateUiComponentGridFile() {
         final UiComponentGridXmlGenerator gridXmlGenerator = new UiComponentGridXmlGenerator(
-            getUiComponentGridData(),
-            project
+                getUiComponentGridData(),
+                project
         );
         gridXmlGenerator.generate(ACTION_NAME, true);
     }
@@ -891,18 +944,27 @@ public class NewEntityDialog extends AbstractDialog {
 
     /**
      * Run db_schema.xml file generator.
+     *
+     * @param dbSchemaXmlData DbSchemaXmlData
      */
-    private void generateDbSchemaXmlFile() {
+    private void generateDbSchemaXmlFile(final @NotNull DbSchemaXmlData dbSchemaXmlData) {
         new DbSchemaXmlGenerator(
-            new DbSchemaXmlData(
-                getDbTableName(),
-                getTableResource(),
-                getTableEngine(),
-                getEntityName(),
-                getColumns()
-            ),
-            project,
-            moduleName
+                dbSchemaXmlData,
+                project,
+                moduleName
+        ).generate(ACTION_NAME, false);
+    }
+
+    /**
+     * Run db_schema_whitelist.json generator.
+     *
+     * @param dbSchemaXmlData DbSchemaXmlData
+     */
+    private void generateWhitelistJsonFile(final @NotNull DbSchemaXmlData dbSchemaXmlData) {
+        new DbSchemaWhitelistJsonGenerator(
+                project,
+                dbSchemaXmlData,
+                moduleName
         ).generate(ACTION_NAME, false);
     }
 
@@ -925,20 +987,28 @@ public class NewEntityDialog extends AbstractDialog {
     }
 
     /**
-     * Get columnsTable values.
+     * Get entity properties table columns data and format to suitable for generator.
      *
-     * @return List
+     * @return List of entity properties stored in HashMap.
      */
-    private List<Map<String, String>> getColumns() {
-        return columnsTableGroupWrapper.getColumnsData();
+    private List<Map<String, String>> getEntityProperties() {
+        final List<Map<String, String>> shortColumnsData =
+                entityPropertiesTableGroupWrapper.getColumnsData();
+
+        final List<Map<String, String>> columnsData =
+                DbSchemaGeneratorUtil.complementShortPropertiesByDefaults(shortColumnsData);
+        columnsData.add(0, DbSchemaGeneratorUtil.getTableIdentityColumnData(getEntityIdColumn()));
+
+        return columnsData;
     }
 
     @NotNull
     private List<String> getMenuReferences() {
         final Collection<String> menuReferences
-            = FileBasedIndex.getInstance().getAllKeys(MenuIndex.KEY, project);
+                = FileBasedIndex.getInstance().getAllKeys(MenuIndex.KEY, project);
         final ArrayList<String> menuReferencesList = new ArrayList<>(menuReferences);
         Collections.sort(menuReferencesList);
+
         return menuReferencesList;
     }
 }

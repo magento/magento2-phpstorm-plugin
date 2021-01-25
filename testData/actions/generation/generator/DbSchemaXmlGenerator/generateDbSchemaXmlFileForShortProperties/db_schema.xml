@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="test_table" resource="default" engine="innodb" comment="Test Table">
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="true"
+                comment="Entity Id Column"/>
+        <column xsi:type="varchar" name="name" nullable="false" length="255" comment="Name Column"/>
+        <column xsi:type="int" name="age" padding="10" unsigned="true" nullable="false" identity="false"
+                comment="Age Column"/>
+        <column xsi:type="decimal" name="salary" precision="20" scale="2" unsigned="true" nullable="false"
+                comment="Salary Column"/>
+        <column xsi:type="boolean" name="is_single" nullable="false" comment="Is Single Column"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <index referenceId="TEST_TABLE_ENTITY_ID" indexType="btree">
+            <column name="entity_id"/>
+        </index>
+    </table>
+</schema>
