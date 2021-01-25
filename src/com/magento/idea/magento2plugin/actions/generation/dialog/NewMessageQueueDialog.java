@@ -132,6 +132,7 @@ public class NewMessageQueueDialog extends AbstractDialog {
     private JLabel handlerDirectoryLabel;
     private JLabel handlerClassLabel;
     private JLabel consumerDirectoryLabel;
+    private JLabel bindingTopicLabel;
 
     private final Project project;
     private final String moduleName;
