@@ -119,7 +119,6 @@ public class NewEntityDialog extends AbstractDialog {
     private JButton buttonCancel;
     private JPanel generalTable;
     private JCheckBox createUiComponent;
-    private JLabel createUiComponentsLabel;
     private JTextField entityName;
     private JLabel entityNameLabel;
     private JLabel dbTableNameLabel;
