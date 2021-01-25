@@ -10,7 +10,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.indexing.FileBasedIndex;
-import com.magento.idea.magento2plugin.actions.generation.NewViewModelAction;
+import com.magento.idea.magento2plugin.actions.generation.NewEntityAction;
 import com.magento.idea.magento2plugin.actions.generation.OverrideClassByAPreferenceAction;
 import com.magento.idea.magento2plugin.actions.generation.data.AclXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.CollectionData;
@@ -184,7 +184,7 @@ public class NewEntityDialog extends AbstractDialog {
 
         setContentPane(contentPane);
         setModal(true);
-        setTitle(NewViewModelAction.ACTION_DESCRIPTION);
+        setTitle(NewEntityAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
 
         buttonOK.addActionListener((final ActionEvent event) -> onOK());
