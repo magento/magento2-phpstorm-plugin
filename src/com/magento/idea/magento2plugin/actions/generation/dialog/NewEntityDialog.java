@@ -25,6 +25,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.GetListQueryModel
 import com.magento.idea.magento2plugin.actions.generation.data.PreferenceDiXmFileData;
 import com.magento.idea.magento2plugin.actions.generation.data.ResourceModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.RoutesXmlData;
+import com.magento.idea.magento2plugin.actions.generation.data.SaveEntityCommandData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataProviderData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormButtonData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldData;
@@ -48,6 +49,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.ModuleResour
 import com.magento.idea.magento2plugin.actions.generation.generator.GetListQueryModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.PreferenceDiXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.RoutesXmlGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.SaveEntityCommandGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentDataProviderGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentFormGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentGridXmlGenerator;
@@ -60,6 +62,7 @@ import com.magento.idea.magento2plugin.magento.files.ModelPhp;
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 import com.magento.idea.magento2plugin.magento.files.ResourceModelPhp;
 import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
+import com.magento.idea.magento2plugin.magento.files.commands.SaveEntityCommandFile;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
@@ -281,6 +284,7 @@ public class NewEntityDialog extends AbstractDialog {
         generateViewControllerFile();
         generateSubmitControllerFile();
         generateModelGetListQueryFile();
+        generateSaveEntityCommandFile();
         generateDataProviderFile();
         generateLayoutFile();
         generateFormFile();
@@ -320,14 +324,29 @@ public class NewEntityDialog extends AbstractDialog {
         ), project).generate(ACTION_NAME, true);
     }
 
+    /**
+     * Get Magento 2 model namespace builder for the entity.
+     *
+     * @return NamespaceBuilder
+     */
     private NamespaceBuilder getModelNamespace() {
         return new NamespaceBuilder(getModuleName(), getModelName(), ModelPhp.MODEL_DIRECTORY);
     }
 
+    /**
+     * Get DTO model namespace builder for the entity.
+     *
+     * @return NamespaceBuilder
+     */
     private NamespaceBuilder getDataModelNamespace() {
         return new NamespaceBuilder(getModuleName(), getDataModelName(), DataModel.DIRECTORY);
     }
 
+    /**
+     * Get DTO model interface namespace builder for the entity.
+     *
+     * @return NamespaceBuilder
+     */
     private NamespaceBuilder getDataModelInterfaceNamespace() {
         return new NamespaceBuilder(
                 getModuleName(),
@@ -336,6 +355,11 @@ public class NewEntityDialog extends AbstractDialog {
         );
     }
 
+    /**
+     * Get Magento 2 Resource model namespace builder for the entity.
+     *
+     * @return NamespaceBuilder
+     */
     private NamespaceBuilder getResourceModelNamespace() {
         return new NamespaceBuilder(
             getModuleName(),
@@ -1034,6 +1058,45 @@ public class NewEntityDialog extends AbstractDialog {
     private String getEntityDataMapperType() {
         // TODO: implement with entity data mapper generation.
         return "Test\\Test\\Mapper\\" + getEntityName() + "DataMapper";
+    }
+
+    /**
+     * Run SaveCommand.php file generator for an entity.
+     */
+    private void generateSaveEntityCommandFile() {
+        final String classFqn = SaveEntityCommandFile.getClassFqn(
+                getModuleName(),
+                getEntityName()
+        );
+        final String namespace = SaveEntityCommandFile.getNamespace(
+                getModuleName(),
+                getEntityName()
+        );
+        final NamespaceBuilder modelNamespace = getModelNamespace();
+        final NamespaceBuilder resourceModelNamespace = getResourceModelNamespace();
+        final NamespaceBuilder dtoModelNamespace = getDataModelNamespace();
+        final NamespaceBuilder dtoInterfaceModelNamespace = getDataModelInterfaceNamespace();
+
+        final String dtoType;
+
+        if (createInterface.isSelected()) {
+            dtoType = dtoInterfaceModelNamespace.getClassFqn();
+        } else {
+            dtoType = dtoModelNamespace.getClassFqn();
+        }
+
+        new SaveEntityCommandGenerator(
+                new SaveEntityCommandData(
+                        getModuleName(),
+                        getEntityName(),
+                        namespace,
+                        classFqn,
+                        modelNamespace.getClassFqn(),
+                        resourceModelNamespace.getClassFqn(),
+                        dtoType
+                ),
+                project
+        ).generate(ACTION_NAME, true);
     }
 
     /**
