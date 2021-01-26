@@ -10,7 +10,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.indexing.FileBasedIndex;
-import com.magento.idea.magento2plugin.actions.generation.NewViewModelAction;
+import com.magento.idea.magento2plugin.actions.generation.NewEntityAction;
 import com.magento.idea.magento2plugin.actions.generation.OverrideClassByAPreferenceAction;
 import com.magento.idea.magento2plugin.actions.generation.data.AclXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.CollectionData;
@@ -21,6 +21,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.LayoutXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.MenuXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.ModelData;
+import com.magento.idea.magento2plugin.actions.generation.data.GetListQueryModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.PreferenceDiXmFileData;
 import com.magento.idea.magento2plugin.actions.generation.data.ResourceModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.RoutesXmlData;
@@ -44,6 +45,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.ModuleCollec
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleControllerClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleResourceModelGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.GetListQueryModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.PreferenceDiXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.RoutesXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentDataProviderGenerator;
@@ -57,6 +59,7 @@ import com.magento.idea.magento2plugin.magento.files.DataModelInterface;
 import com.magento.idea.magento2plugin.magento.files.ModelPhp;
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 import com.magento.idea.magento2plugin.magento.files.ResourceModelPhp;
+import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
@@ -181,7 +184,7 @@ public class NewEntityDialog extends AbstractDialog {
 
         setContentPane(contentPane);
         setModal(true);
-        setTitle(NewViewModelAction.ACTION_DESCRIPTION);
+        setTitle(NewEntityAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
 
         buttonOK.addActionListener((final ActionEvent event) -> onOK());
@@ -277,6 +280,7 @@ public class NewEntityDialog extends AbstractDialog {
         generateRoutesXmlFile();
         generateViewControllerFile();
         generateSubmitControllerFile();
+        generateModelGetListQueryFile();
         generateDataProviderFile();
         generateLayoutFile();
         generateFormFile();
@@ -373,6 +377,11 @@ public class NewEntityDialog extends AbstractDialog {
         return getEntityName().concat("Data");
     }
 
+    /**
+     * Get data provider class name.
+     *
+     * @return String
+     */
     private String getDataProviderClassName() {
         return getEntityName().concat("DataProvider");
     }
@@ -405,6 +414,11 @@ public class NewEntityDialog extends AbstractDialog {
         ), project).generate(ACTION_NAME, true);
     }
 
+    /**
+     * Get entity id column name.
+     *
+     * @return String
+     */
     private String getEntityIdColumn() {
         return entityId.getText().trim();
     }
@@ -582,15 +596,26 @@ public class NewEntityDialog extends AbstractDialog {
         return acl.getText().trim();
     }
 
-    private PsiFile generateDataProviderFile() {
-        final NamespaceBuilder namespace = getDataProviderNamespace();
-        return new UiComponentDataProviderGenerator(new UiComponentDataProviderData(
-            getDataProviderClassName(),
-            namespace.getNamespace(),
-            getDataProviderDirectory()
-        ), getModuleName(), project).generate(ACTION_NAME, false);
+    /**
+     * Generate data provider file.
+     */
+    private void generateDataProviderFile() {
+        if (getDataProviderType().equals(UiComponentDataProviderPhp.CUSTOM_TYPE)) {
+            final NamespaceBuilder namespaceBuilder = getDataProviderNamespace();
+            new UiComponentDataProviderGenerator(new UiComponentDataProviderData(
+                    getDataProviderClassName(),
+                    namespaceBuilder.getNamespace(),
+                    getDataProviderDirectory(),
+                    getEntityIdColumn()
+            ), getModuleName(), project).generate(ACTION_NAME, false);
+        }
     }
 
+    /**
+     * Get data provider namespace builder.
+     *
+     * @return NamespaceBuilder
+     */
     @NotNull
     private NamespaceBuilder getDataProviderNamespace() {
         return new NamespaceBuilder(
@@ -600,8 +625,24 @@ public class NewEntityDialog extends AbstractDialog {
         );
     }
 
+    /**
+     * Get data provider directory.
+     *
+     * @return String
+     */
     public String getDataProviderDirectory() {
+        // TODO: add ui part with dynamic implementation.
         return "UI/DataProvider";
+    }
+
+    /**
+     * Get data provider type.
+     *
+     * @return String
+     */
+    public String getDataProviderType() {
+        // TODO: add ui part with dynamic implementation.
+        return UiComponentDataProviderPhp.CUSTOM_TYPE;
     }
 
     private PsiFile generateLayoutFile() {
@@ -966,6 +1007,33 @@ public class NewEntityDialog extends AbstractDialog {
                 dbSchemaXmlData,
                 moduleName
         ).generate(ACTION_NAME, false);
+    }
+
+    /**
+     * Run GetListQuery.php file generator.
+     */
+    private void generateModelGetListQueryFile() {
+        final String entityCollectionType = getCollectionNamespace().getClassFqn();
+
+        new GetListQueryModelGenerator(
+                new GetListQueryModelData(
+                        getModuleName(),
+                        getEntityName(),
+                        entityCollectionType,
+                        getEntityDataMapperType()
+                ),
+                project
+        ).generate(ACTION_NAME, true);
+    }
+
+    /**
+     * Get entity data mapper type.
+     *
+     * @return String
+     */
+    private String getEntityDataMapperType() {
+        // TODO: implement with entity data mapper generation.
+        return "Test\\Test\\Mapper\\" + getEntityName() + "DataMapper";
     }
 
     /**

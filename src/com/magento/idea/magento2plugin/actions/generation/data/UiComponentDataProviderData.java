@@ -10,6 +10,7 @@ public class UiComponentDataProviderData {
     private final String name;
     private final String namespace;
     private final String path;
+    private final String entityIdFieldName;
 
     /**
      * UiComponentGridDataProviderData constructor.
@@ -23,9 +24,27 @@ public class UiComponentDataProviderData {
             final String namespace,
             final String path
     ) {
+        this(name, namespace, path, null);
+    }
+
+    /**
+     * UiComponentGridDataProviderData constructor.
+     *
+     * @param name String
+     * @param namespace String
+     * @param path String
+     * @param entityIdFieldName String
+     */
+    public UiComponentDataProviderData(
+            final String name,
+            final String namespace,
+            final String path,
+            final String entityIdFieldName
+    ) {
         this.name = name;
         this.namespace = namespace;
         this.path = path;
+        this.entityIdFieldName = entityIdFieldName;
     }
 
     /**
@@ -53,5 +72,14 @@ public class UiComponentDataProviderData {
      */
     public String getPath() {
         return path;
+    }
+
+    /**
+     * Get entity id field name.
+     *
+     * @return String
+     */
+    public String getEntityIdFieldName() {
+        return entityIdFieldName;
     }
 }
