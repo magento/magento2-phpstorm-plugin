@@ -18,13 +18,14 @@ import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileDat
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelInterfaceData;
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
+import com.magento.idea.magento2plugin.actions.generation.data.GetListQueryModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.LayoutXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.MenuXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.ModelData;
-import com.magento.idea.magento2plugin.actions.generation.data.GetListQueryModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.PreferenceDiXmFileData;
 import com.magento.idea.magento2plugin.actions.generation.data.ResourceModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.RoutesXmlData;
+import com.magento.idea.magento2plugin.actions.generation.data.SaveEntityControllerFileData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataProviderData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormButtonData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldData;
@@ -39,15 +40,16 @@ import com.magento.idea.magento2plugin.actions.generation.generator.DataModelGen
 import com.magento.idea.magento2plugin.actions.generation.generator.DataModelInterfaceGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaWhitelistJsonGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaXmlGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.GetListQueryModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.LayoutXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.MenuXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleCollectionGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleControllerClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleResourceModelGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.GetListQueryModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.PreferenceDiXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.RoutesXmlGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.SaveEntityControllerFileGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentDataProviderGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentFormGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentGridXmlGenerator;
@@ -60,6 +62,7 @@ import com.magento.idea.magento2plugin.magento.files.ModelPhp;
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 import com.magento.idea.magento2plugin.magento.files.ResourceModelPhp;
 import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
+import com.magento.idea.magento2plugin.magento.files.actions.SaveActionFile;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
@@ -107,7 +110,8 @@ import org.jetbrains.annotations.NotNull;
         "PMD.ExcessiveImports",
         "PMD.GodClass",
         "PMD.TooManyMethods",
-        "PMD.CyclomaticComplexity"
+        "PMD.CyclomaticComplexity",
+        "PMD.ExcessiveClassLength"
 })
 public class NewEntityDialog extends AbstractDialog {
     @NotNull
@@ -279,7 +283,7 @@ public class NewEntityDialog extends AbstractDialog {
 
         generateRoutesXmlFile();
         generateViewControllerFile();
-        generateSubmitControllerFile();
+        generateSaveControllerFile();
         generateModelGetListQueryFile();
         generateDataProviderFile();
         generateLayoutFile();
@@ -301,6 +305,49 @@ public class NewEntityDialog extends AbstractDialog {
         generateDbSchemaXmlFile(dbSchemaXmlData);
         generateWhitelistJsonFile(dbSchemaXmlData);
         this.setVisible(false);
+    }
+
+    /**
+     * Generate Save Controller file.
+     */
+    private void generateSaveControllerFile() {
+        final NamespaceBuilder dtoModelNamespace = getDataModelNamespace();
+        final NamespaceBuilder dtoInterfaceModelNamespace = getDataModelInterfaceNamespace();
+        final NamespaceBuilder namespace = new NamespaceBuilder(
+                getModuleName(),
+                SaveActionFile.CLASS_NAME,
+                SaveActionFile.getDirectory(getEntityName())
+        );
+        final String dtoType;
+
+        if (createInterface.isSelected()) {
+            dtoType = dtoInterfaceModelNamespace.getClassFqn();
+        } else {
+            dtoType = dtoModelNamespace.getClassFqn();
+        }
+
+        new SaveEntityControllerFileGenerator(new SaveEntityControllerFileData(
+                getEntityName(),
+                getModuleName(),
+                namespace.getNamespace(),
+                getSaveEntityCommandClassFqn(),
+                dtoType,
+                getAcl(),
+                getEntityIdColumn()
+        ), project).generate(ACTION_NAME, false);
+    }
+
+    /**
+     * Get save entity command class Fqn.
+     *
+     * @return String
+     */
+    private String getSaveEntityCommandClassFqn() {
+        //TODO: change this stub after the save command generated will be implemented.
+        final NamespaceBuilder namespaceBuilder =
+                new NamespaceBuilder(getModuleName(), "SaveCommand", "Command/" + getEntityName());
+
+        return namespaceBuilder.getClassFqn();
     }
 
     private PsiFile generateModelFile() {
@@ -574,24 +621,11 @@ public class NewEntityDialog extends AbstractDialog {
         return ControllerBackendPhp.DEFAULT_DIR  + File.separator;
     }
 
-    private PsiFile generateSubmitControllerFile() {
-        final NamespaceBuilder namespace = new NamespaceBuilder(
-                getModuleName(),
-                getSubmitActionName(),
-                getViewControllerDirectory()
-        );
-        return new ModuleControllerClassGenerator(new ControllerFileData(
-                getViewControllerDirectory(),
-                getSubmitActionName(),
-                getModuleName(),
-                Areas.adminhtml.toString(),
-                HttpMethod.POST.toString(),
-                getAcl(),
-                true,
-                namespace.getNamespace()
-        ), project).generate(ACTION_NAME, false);
-    }
-
+    /**
+     * Get Acl id.
+     *
+     * @return String
+     */
     public String getAcl() {
         return acl.getText().trim();
     }
