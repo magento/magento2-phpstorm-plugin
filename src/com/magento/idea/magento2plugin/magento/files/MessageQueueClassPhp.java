@@ -13,7 +13,7 @@ public class MessageQueueClassPhp implements ModuleFileInterface {
     public static final String CONSUMER_TEMPLATE = "Magento Message Queue Consumer Class";
     public static final String FILE_EXTENSION = "php";
     private String className;
-    private Type type;
+    private final Type type;
 
     /**
      * Constructor.
@@ -23,7 +23,7 @@ public class MessageQueueClassPhp implements ModuleFileInterface {
      */
     public MessageQueueClassPhp(
             final String className,
-            Type type
+            final Type type
     ) {
         this.className = className;
         this.type = type;
