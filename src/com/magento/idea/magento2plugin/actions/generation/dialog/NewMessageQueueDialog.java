@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.ui.DocumentAdapter;
 import com.magento.idea.magento2plugin.actions.generation.NewMessageQueueAction;
+import com.magento.idea.magento2plugin.actions.generation.data.MessageQueueClassData;
 import com.magento.idea.magento2plugin.actions.generation.data.QueueCommunicationData;
 import com.magento.idea.magento2plugin.actions.generation.data.QueueConsumerData;
 import com.magento.idea.magento2plugin.actions.generation.data.QueuePublisherData;
@@ -22,26 +23,32 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NumericRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassFqnRule;
+import com.magento.idea.magento2plugin.actions.generation.generator.MessageQueueClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.QueueCommunicationGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.QueueConsumerGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.QueuePublisherGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.QueueTopologyGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
-import com.magento.idea.magento2plugin.magento.files.ModelPhp;
-import com.magento.idea.magento2plugin.ui.FilteredComboBox;
+import com.magento.idea.magento2plugin.magento.files.MessageQueueClassPhp;
 import com.magento.idea.magento2plugin.magento.packages.MessageQueueConnections;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-import org.jetbrains.annotations.NotNull;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
+        "PMD.TooManyMethods",
         "PMD.ExcessiveImports",
 })
 public class NewMessageQueueDialog extends AbstractDialog {
@@ -56,7 +63,7 @@ public class NewMessageQueueDialog extends AbstractDialog {
     private static final String BINDING_ID = "Binding ID";
     private static final String BINDING_TOPIC = "Binding Topic";
 
-    private FilteredComboBox connectionName;
+    private JComboBox connectionName;
 
     /* TODO: Improve validation */
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
@@ -121,6 +128,8 @@ public class NewMessageQueueDialog extends AbstractDialog {
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, BINDING_TOPIC})
+    @FieldValidation(rule = RuleRegistry.ALPHA_WITH_PERIOD,
+            message = {AlphanumericWithUnderscoreRule.MESSAGE, BINDING_TOPIC})
     private JTextField bindingTopic;
 
     private JTextField consumerDirectory;
@@ -129,10 +138,13 @@ public class NewMessageQueueDialog extends AbstractDialog {
     private JPanel contentPanel;
     private JButton buttonOK;
     private JButton buttonCancel;
-    private JLabel handlerDirectoryLabel;
-    private JLabel handlerClassLabel;
     private JLabel consumerDirectoryLabel;
-    private JLabel bindingTopicLabel;
+    private JLabel consumerClassLabel;
+    private JLabel maxMessagesLabel;
+    private JLabel bindingTopicLabel;//NOPMD
+    private JLabel handlerClassLabel;//NOPMD
+    private JLabel consumerNameLabel;//NOPMD
+    private JLabel handlerDirectoryLabel;//NOPMD
 
     private final Project project;
     private final String moduleName;
@@ -150,6 +162,10 @@ public class NewMessageQueueDialog extends AbstractDialog {
         setModal(true);
         setTitle(NewMessageQueueAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
+
+        for (final String connection : MessageQueueConnections.getList()) {
+            connectionName.addItem(connection);
+        }
 
         buttonOK.addActionListener((final ActionEvent event) -> onOK());
         buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
@@ -182,6 +198,26 @@ public class NewMessageQueueDialog extends AbstractDialog {
                 updateBindingText();
             }
         });
+
+        connectionName.addActionListener(e -> toggleConsumer());
+    }
+
+    private void toggleConsumer() {
+        if (getConnectionName().equals(MessageQueueConnections.AMPQ.getType())) {
+            consumerDirectoryLabel.setVisible(false);
+            consumerDirectory.setVisible(false);
+            consumerClass.setVisible(false);
+            consumerClassLabel.setVisible(false);
+            maxMessages.setVisible(false);
+            maxMessagesLabel.setVisible(false);
+            return;
+        }
+        consumerDirectoryLabel.setVisible(true);
+        consumerDirectory.setVisible(true);
+        consumerClass.setVisible(true);
+        consumerClassLabel.setVisible(true);
+        maxMessages.setVisible(true);
+        maxMessagesLabel.setVisible(true);
     }
 
     /**
@@ -205,6 +241,10 @@ public class NewMessageQueueDialog extends AbstractDialog {
             generateConsumer();
             generateTopology();
             generatePublisher();
+            generateHandlerClass();
+            if (getConnectionName().equals(MessageQueueConnections.DB.getType())) {
+                generateConsumerClass();
+            }
             this.setVisible(false);
         }
     }
@@ -226,8 +266,9 @@ public class NewMessageQueueDialog extends AbstractDialog {
                 getConsumerClass(),
                 getMaxMessages(),
                 getConnectionName(),
-                getModuleName()
-        )).generate(NewMessageQueueAction.ACTION_NAME, true);
+                getModuleName(),
+                getHandlerClass().concat("::").concat(getHandlerMethod())
+        )).generate(NewMessageQueueAction.ACTION_NAME, false);
     }
 
     private void generateTopology() {
@@ -238,7 +279,7 @@ public class NewMessageQueueDialog extends AbstractDialog {
                 getBindingTopic(),
                 getQueueName(),
                 getModuleName()
-        )).generate(NewMessageQueueAction.ACTION_NAME, true);
+        )).generate(NewMessageQueueAction.ACTION_NAME, false);
     }
 
     private void generatePublisher() {
@@ -247,7 +288,29 @@ public class NewMessageQueueDialog extends AbstractDialog {
                 getConnectionName(),
                 getExchangeName(),
                 getModuleName()
-        )).generate(NewMessageQueueAction.ACTION_NAME, true);
+        )).generate(NewMessageQueueAction.ACTION_NAME, false);
+    }
+
+    private void generateHandlerClass() {
+        @NotNull final NamespaceBuilder handlerNamespaceBuilder = getHandlerNamespaceBuilder();
+        new MessageQueueClassGenerator(new MessageQueueClassData(
+            handlerClass.getText().trim(),
+            handlerNamespaceBuilder.getNamespace(),
+            handlerDirectory.getText().trim(),
+            handlerNamespaceBuilder.getClassFqn(),
+            MessageQueueClassPhp.Type.HANDLER
+        ), getModuleName(), project).generate(NewMessageQueueAction.ACTION_NAME, false);
+    }
+
+    private void generateConsumerClass() {
+        @NotNull final NamespaceBuilder consumerNamespaceBuilder = getConsumerNamespaceBuilder();
+        new MessageQueueClassGenerator(new MessageQueueClassData(
+            consumerClass.getText().trim(),
+            consumerNamespaceBuilder.getNamespace(),
+            consumerDirectory.getText().trim(),
+            consumerNamespaceBuilder.getClassFqn(),
+            MessageQueueClassPhp.Type.CONSUMER
+        ), getModuleName(), project).generate(NewMessageQueueAction.ACTION_NAME, false);
     }
 
     public String getTopicName() {
@@ -258,12 +321,30 @@ public class NewMessageQueueDialog extends AbstractDialog {
         return handlerName.getText().trim();
     }
 
-    public String getHandlerClass() {
+    @NotNull
+    private NamespaceBuilder getHandlerNamespaceBuilder() {
         return new NamespaceBuilder(
             getModuleName(),
             handlerClass.getText().trim(),
             handlerDirectory.getText().trim()
-        ).getClassFqn();
+        );
+    }
+
+    @NotNull
+    private NamespaceBuilder getConsumerNamespaceBuilder() {
+        return new NamespaceBuilder(
+            getModuleName(),
+            consumerClass.getText().trim(),
+            consumerDirectory.getText().trim()
+        );
+    }
+
+    public String getHandlerClass() {
+        return getHandlerNamespaceBuilder().getClassFqn();
+    }
+
+    public String getConsumerClass() {
+        return getConsumerNamespaceBuilder().getClassFqn();
     }
 
     public String getHandlerMethod() {
@@ -276,14 +357,6 @@ public class NewMessageQueueDialog extends AbstractDialog {
 
     public String getQueueName() {
         return queueName.getText().trim();
-    }
-
-    public String getConsumerClass() {
-        return new NamespaceBuilder(
-            getModuleName(),
-            consumerClass.getText().trim(),
-            consumerDirectory.getText().trim()
-        ).getClassFqn();
     }
 
     public String getMaxMessages() {
@@ -318,6 +391,7 @@ public class NewMessageQueueDialog extends AbstractDialog {
         this.handlerName.setText(topicNameText.concat(".handler"));
         this.consumerName.setText(topicNameText);
         this.queueName.setText(topicNameText);
+        this.bindingTopic.setText(topicNameText);
     }
 
     /**
@@ -327,12 +401,5 @@ public class NewMessageQueueDialog extends AbstractDialog {
         final String handlerTypeText = this.handlerClass.getText();
         this.consumerClass.setText(handlerTypeText.replace("Handler", "").concat("Consumer"));
         this.bindingId.setText(handlerTypeText.replace("Handler", "").concat("Binding"));
-    }
-
-    @SuppressWarnings({"PMD.UnusedPrivateMethod"})
-    private void createUIComponents() {
-            this.connectionName = new FilteredComboBox(
-                    MessageQueueConnections.getList()
-            );
     }
 }
