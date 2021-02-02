@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Added
 
+- Extended `.phpstorm.meta.php` for more convenient autocomplete [#467](https://github.com/magento/magento2-phpstorm-plugin/pull/467)
 - Code generation for message queue in [#411](https://github.com/magento/magento2-phpstorm-plugin/pull/411)
 - Code generation for declarative schema [#453](https://github.com/magento/magento2-phpstorm-plugin/pull/453)
 - Inspection warning for disabled observer [#432](https://github.com/magento/magento2-phpstorm-plugin/pull/432)
