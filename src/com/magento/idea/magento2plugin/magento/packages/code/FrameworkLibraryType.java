@@ -9,7 +9,11 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClas
 import org.jetbrains.annotations.NotNull;
 
 public enum FrameworkLibraryType {
+    ABSTRACT_COLLECTION(
+            "Magento\\Framework\\Model\\ResourceModel\\Db\\Collection\\AbstractCollection"
+    ),
     COLLECTION_PROCESSOR("Magento\\Framework\\Api\\SearchCriteria\\CollectionProcessorInterface"),
+    DATA_OBJECT("Magento\\Framework\\DataObject"),
     FILTER_BUILDER("Magento\\Framework\\Api\\FilterBuilder"),
     REPORTING("Magento\\Framework\\Api\\Search\\ReportingInterface"),
     REQUEST("Magento\\Framework\\App\\RequestInterface"),
