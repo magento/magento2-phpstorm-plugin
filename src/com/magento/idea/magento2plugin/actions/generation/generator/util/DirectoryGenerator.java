@@ -9,6 +9,8 @@ import com.intellij.openapi.application.WriteAction;
 import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.actions.generation.generator.data.ModuleDirectoriesData;
 import com.magento.idea.magento2plugin.magento.packages.Package;
+import java.io.File;
+import java.util.Arrays;
 import org.jetbrains.annotations.NotNull;
 
 public class DirectoryGenerator {
@@ -61,5 +63,45 @@ public class DirectoryGenerator {
     ) {
         final PsiDirectory sub = parent.findSubdirectory(subdirName);
         return sub == null ? WriteAction.compute(() -> parent.createSubdirectory(subdirName)) : sub;
+    }
+
+    /**
+     * Find or create subdirectories.
+     *
+     * @param parent PsiDirectory
+     * @param subdirPath String
+     *
+     * @return PsiDirectory
+     */
+    public PsiDirectory findOrCreateSubdirectories(
+            final @NotNull PsiDirectory parent,
+            final @NotNull String subdirPath
+    ) {
+        PsiDirectory lastDirectory = null;
+        final String[] directories = subdirPath.split(File.separator);
+
+        for (final String directory : Arrays.asList(directories)) {
+            if (lastDirectory == null) {
+                final PsiDirectory subDir = parent.findSubdirectory(directory);
+
+                if (subDir == null) {
+                    lastDirectory = WriteAction.compute(() -> parent.createSubdirectory(directory));
+                } else {
+                    lastDirectory = subDir;
+                }
+            } else {
+                final PsiDirectory subDir = lastDirectory.findSubdirectory(directory);
+
+                if (subDir == null) {
+                    final PsiDirectory finalLastDirectory = lastDirectory;
+                    lastDirectory = WriteAction.compute(() ->
+                            finalLastDirectory.createSubdirectory(directory));
+                } else {
+                    lastDirectory = subDir;
+                }
+            }
+        }
+
+        return lastDirectory;
     }
 }
