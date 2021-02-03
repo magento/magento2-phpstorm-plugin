@@ -9,7 +9,7 @@ use $use;
 #end
 
  /**
- * ${ENTITY_NAME} magento model collection to entity data transfer object array mapper.
+ * Converts a collection of ${ENTITY_NAME} entities to an array of data transfer objects.
  */
 class ${CLASS_NAME}
 {

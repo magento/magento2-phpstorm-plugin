@@ -11,35 +11,23 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Namespa
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import org.jetbrains.annotations.NotNull;
 
-public final class EntityDataMapperFile implements ModuleFileInterface {
+public class EntityDataMapperFile implements ModuleFileInterface {
 
     public static final String CLASS_NAME_SUFFIX = "DataMapper";
     public static final String FILE_EXTENSION = "php";
     public static final String TEMPLATE = "Magento Entity Data Mapper";
     private static final String DIRECTORY = "Mapper";
-    private static EntityDataMapperFile instance;
-    private String className;
+    private final String className;
     private String namespaceFqn;
     private String classFqn;
 
-    private EntityDataMapperFile() {}
-
     /**
-     * Get singleton object of entity data mapper file.
+     * Entity data mapper file constructor.
      *
      * @param entityName String
-     *
-     * @return EntityDataMapperFile
      */
-    public static EntityDataMapperFile getInstance(final @NotNull String entityName) {
-        synchronized (EntityDataMapperFile.class) {
-            if (instance == null) {
-                instance = new EntityDataMapperFile();
-                instance.className = entityName.concat(CLASS_NAME_SUFFIX);
-            }
-        }
-
-        return instance;
+    public EntityDataMapperFile(final @NotNull String entityName) {
+        this.className = entityName.concat(CLASS_NAME_SUFFIX);
     }
 
     /**

@@ -36,8 +36,7 @@ public class EntityDataMapperClassGeneratorTest extends BaseGeneratorTestCase {
                         myFixture.getProject(),
                         false
                 );
-        final EntityDataMapperFile entityDataMapperFile =
-                EntityDataMapperFile.getInstance(ENTITY_NAME);
+        final EntityDataMapperFile entityDataMapperFile = new EntityDataMapperFile(ENTITY_NAME);
         final String filePath = this.getFixturePath(entityDataMapperFile.getFileName());
 
         assertGeneratedFileIsCorrect(

@@ -9,7 +9,7 @@ use Magento\Framework\DataObject;
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 
 /**
- * Unicorn magento model collection to entity data transfer object array mapper.
+ * Converts a collection of Unicorn entities to an array of data transfer objects.
  */
 class UnicornDataMapper
 {

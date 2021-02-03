@@ -1019,7 +1019,7 @@ public class NewEntityDialog extends AbstractDialog {
      */
     private void generateEntityDataMapperFile() {
         final EntityDataMapperFile entityDataMapperFile =
-                EntityDataMapperFile.getInstance(getEntityName());
+                new EntityDataMapperFile(getEntityName());
 
         final String namespace = entityDataMapperFile.getNamespace(getModuleName());
         final String classFqn = entityDataMapperFile.getClassFqn(getModuleName());
@@ -1073,7 +1073,7 @@ public class NewEntityDialog extends AbstractDialog {
      */
     private String getEntityDataMapperType() {
         final EntityDataMapperFile entityDataMapperFile =
-                EntityDataMapperFile.getInstance(getEntityName());
+                new EntityDataMapperFile(getEntityName());
 
         return entityDataMapperFile.getClassFqn(getModuleName());
     }
