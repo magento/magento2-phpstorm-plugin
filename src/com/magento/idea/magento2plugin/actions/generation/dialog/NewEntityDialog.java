@@ -278,17 +278,20 @@ public class NewEntityDialog extends AbstractDialog {
         }
 
         generateRoutesXmlFile();
-        generateViewControllerFile();
-        generateSubmitControllerFile();
-        generateModelGetListQueryFile();
-        generateDataProviderFile();
-        generateLayoutFile();
-        generateFormFile();
         generateAclXmlFile();
-        generateGridViewControllerFile();
-        generateGridLayoutFile();
         generateMenuFile();
-        generateUiComponentGridFile();
+
+        if (createUiComponent.isSelected()) {
+            generateGridViewControllerFile();
+            generateGridLayoutFile();
+            generateModelGetListQueryFile();
+            generateDataProviderFile();
+            generateUiComponentGridFile();
+            generateFormLayoutFile();
+            generateFormViewControllerFile();
+            generateFormSubmitControllerFile();
+            generateUiComponentFormFile();
+        }
 
         final DbSchemaXmlData dbSchemaXmlData = new DbSchemaXmlData(
                 getDbTableName(),
@@ -348,14 +351,14 @@ public class NewEntityDialog extends AbstractDialog {
      * Generate preference for data model.
      */
     private void generateDataModelPreference() {
-        final NamespaceBuilder modelNamespace = getModelNamespace();
+        final NamespaceBuilder dataModelNamespace = getDataModelNamespace();
         final NamespaceBuilder modelInterfaceNamespace = getDataModelInterfaceNamespace();
         new PreferenceDiXmlGenerator(new PreferenceDiXmFileData(
                 getModuleName(),
                 GetPhpClassByFQN.getInstance(project).execute(
                         modelInterfaceNamespace.getClassFqn()
                 ),
-                modelNamespace.getClassFqn(),
+                dataModelNamespace.getClassFqn(),
                 getModelName(),
                 Areas.base.toString()
         ), project).generate(OverrideClassByAPreferenceAction.ACTION_NAME);
@@ -540,60 +543,24 @@ public class NewEntityDialog extends AbstractDialog {
         return route.getText().trim();
     }
 
-    private PsiFile generateViewControllerFile() {
-        final NamespaceBuilder namespace = new NamespaceBuilder(
-                getModuleName(),
-                getViewActionName(),
-                getViewControllerDirectory()
-        );
-        return new ModuleControllerClassGenerator(new ControllerFileData(
-                getViewControllerDirectory(),
-                getViewActionName(),
-                getModuleName(),
-                Areas.adminhtml.toString(),
-                HttpMethod.GET.toString(),
-                getAcl(),
-                true,
-                namespace.getNamespace()
-        ), project).generate(ACTION_NAME, false);
-    }
-
-    private String getViewActionName() {
-        return "Edit";
-    }
-
-    private String getSubmitActionName() {
-        return "Save";//NOPMD
-    }
-
-    private String getViewControllerDirectory() {
-        return getControllerDirectory() + getModelName();
-    }
-
-    private String getControllerDirectory() {
-        return ControllerBackendPhp.DEFAULT_DIR  + File.separator;
-    }
-
-    private PsiFile generateSubmitControllerFile() {
-        final NamespaceBuilder namespace = new NamespaceBuilder(
-                getModuleName(),
-                getSubmitActionName(),
-                getViewControllerDirectory()
-        );
-        return new ModuleControllerClassGenerator(new ControllerFileData(
-                getViewControllerDirectory(),
-                getSubmitActionName(),
-                getModuleName(),
-                Areas.adminhtml.toString(),
-                HttpMethod.POST.toString(),
-                getAcl(),
-                true,
-                namespace.getNamespace()
-        ), project).generate(ACTION_NAME, false);
-    }
-
     public String getAcl() {
         return acl.getText().trim();
+    }
+
+    private PsiFile generateAclXmlFile() {
+        return new AclXmlGenerator(new AclXmlData(
+            getParentAcl(),
+            getAcl(),
+            getAclTitle()
+        ), getModuleName(), project).generate(ACTION_NAME, false);
+    }
+
+    public String getParentAcl() {
+        return parentAcl.getSelectedItem().toString().trim();
+    }
+
+    public String getAclTitle() {
+        return aclTitle.getText().trim();
     }
 
     /**
@@ -619,9 +586,9 @@ public class NewEntityDialog extends AbstractDialog {
     @NotNull
     private NamespaceBuilder getDataProviderNamespace() {
         return new NamespaceBuilder(
-            getModuleName(),
-            getDataProviderClassName(),
-            getDataProviderDirectory()
+                getModuleName(),
+                getDataProviderClassName(),
+                getDataProviderDirectory()
         );
     }
 
@@ -645,14 +612,17 @@ public class NewEntityDialog extends AbstractDialog {
         return UiComponentDataProviderPhp.CUSTOM_TYPE;
     }
 
-    private PsiFile generateLayoutFile() {
-        return new LayoutXmlGenerator(new LayoutXmlData(
-            Areas.adminhtml.toString(),
-            getRoute(),
-            getModuleName(),
-            getEntityName(),
-            getViewActionName(),
-            getFormName()
+    /**
+     * Generate Form UI Component layout file.
+     */
+    private void generateFormLayoutFile() {
+        new LayoutXmlGenerator(new LayoutXmlData(
+                Areas.adminhtml.toString(),
+                getRoute(),
+                getModuleName(),
+                getEntityName(),
+                getViewActionName(),
+                getFormName()
         ), project).generate(ACTION_NAME, false);
     }
 
@@ -665,24 +635,32 @@ public class NewEntityDialog extends AbstractDialog {
         return formName.getText().trim();
     }
 
-    private PsiFile generateAclXmlFile() {
-        return new AclXmlGenerator(new AclXmlData(
-            getParentAcl(),
-            getAcl(),
-            getAclTitle()
-        ), getModuleName(), project).generate(ACTION_NAME, false);
+    /**
+     * Generate Form UI Component post controller file.
+     */
+    private void generateFormSubmitControllerFile() {
+        final NamespaceBuilder namespace = new NamespaceBuilder(
+                getModuleName(),
+                getSubmitActionName(),
+                getViewControllerDirectory()
+        );
+        new ModuleControllerClassGenerator(new ControllerFileData(
+                getViewControllerDirectory(),
+                getSubmitActionName(),
+                getModuleName(),
+                Areas.adminhtml.toString(),
+                HttpMethod.POST.toString(),
+                getAcl(),
+                true,
+                namespace.getNamespace()
+        ), project).generate(ACTION_NAME, false);
     }
 
-    public String getParentAcl() {
-        return parentAcl.getSelectedItem().toString().trim();
-    }
-
-    public String getAclTitle() {
-        return aclTitle.getText().trim();
-    }
-
-    private PsiFile generateFormFile() {
-        return new UiComponentFormGenerator(new UiComponentFormFileData(
+    /**
+     * Generate UI component form file.
+     */
+    private void generateUiComponentFormFile() {
+        new UiComponentFormGenerator(new UiComponentFormFileData(
             getFormName(),
             Areas.adminhtml.toString(),
             getModuleName(),
@@ -697,6 +675,11 @@ public class NewEntityDialog extends AbstractDialog {
         ), project).generate(ACTION_NAME, true);
     }
 
+    /**
+     * Get UI Component form label.
+     *
+     * @return String
+     */
     public String getFormLabel() {
         return formLabel.getText().trim();
     }
@@ -835,6 +818,151 @@ public class NewEntityDialog extends AbstractDialog {
         return fieldsets;
     }
 
+    /**
+     * Generate UI Component grid file.
+     */
+    private void generateUiComponentGridFile() {
+        final UiComponentGridXmlGenerator gridXmlGenerator = new UiComponentGridXmlGenerator(
+                getUiComponentGridData(),
+                project
+        );
+        gridXmlGenerator.generate(ACTION_NAME, true);
+    }
+
+    /**
+     * Get grid UI component data.
+     *
+     * @return UiComponentGridData
+     */
+    public UiComponentGridData getUiComponentGridData() {
+        return new UiComponentGridData(
+                getModuleName(),
+                Areas.adminhtml.toString(),
+                getGridName(),
+                getDataProviderNamespace().getClassFqn(),
+                getEntityIdColumn(),
+                getAcl(),
+                getUiComponentGridToolbarData()
+        );
+    }
+
+    /**
+     * Get grid toolbar data.
+     *
+     * @return UiComponentGridToolbarData
+     */
+    public UiComponentGridToolbarData getUiComponentGridToolbarData() {
+        return new UiComponentGridToolbarData(
+                getAddToolBar(),
+                getAddBookmarksCheckBox(),
+                getAddColumnsControlCheckBox(),
+                getAddFullTextSearchCheckBox(),
+                getAddListingFiltersCheckBox(),
+                getAddListingPagingCheckBox()
+        );
+    }
+
+    /**
+     * Generate Grid UI Component View Controller file.
+     */
+    private void generateGridViewControllerFile() {
+        final NamespaceBuilder namespace = new NamespaceBuilder(
+                getModuleName(),
+                "Listing",
+                getControllerDirectory()
+        );
+        new ModuleControllerClassGenerator(new ControllerFileData(
+                getControllerDirectory(),
+                "Listing",
+                getModuleName(),
+                Areas.adminhtml.toString(),
+                HttpMethod.GET.toString(),
+                getAcl(),
+                true,
+                namespace.getNamespace()
+        ), project).generate(ACTION_NAME, false);
+    }
+
+    /**
+     * Generate Grid UI Component layout file.
+     */
+    private void generateGridLayoutFile() {
+        new LayoutXmlGenerator(new LayoutXmlData(
+                Areas.adminhtml.toString(),
+                getRoute(),
+                getModuleName(),
+                getEntityName(),
+                "Listing",
+                getGridName()
+        ), project).generate(ACTION_NAME, false);
+    }
+
+    /**
+     * Get Grid Name.
+     *
+     * @return String
+     */
+    private String getGridName() {
+        return gridName.getText();
+    }
+
+    /**
+     * Generate Form UI Component View Controller file.
+     */
+    private void generateFormViewControllerFile() {
+        final NamespaceBuilder namespace = new NamespaceBuilder(
+                getModuleName(),
+                getViewActionName(),
+                getViewControllerDirectory()
+        );
+        new ModuleControllerClassGenerator(new ControllerFileData(
+                getViewControllerDirectory(),
+                getViewActionName(),
+                getModuleName(),
+                Areas.adminhtml.toString(),
+                HttpMethod.GET.toString(),
+                getAcl(),
+                true,
+                namespace.getNamespace()
+        ), project).generate(ACTION_NAME, false);
+    }
+
+    /**
+     * Get view action name.
+     *
+     * @return String
+     */
+    private String getViewActionName() {
+        return "Edit";
+    }
+
+    /**
+     * Get submit action name.
+     *
+     * @return String
+     */
+    private String getSubmitActionName() {
+        return "Save";//NOPMD
+    }
+
+    /**
+     * Get view controller directory.
+     *
+     * @return String
+     */
+    private String getViewControllerDirectory() {
+        return getControllerDirectory() + getModelName();
+    }
+
+    /**
+     * Get Adminhtml controller directory.
+     *
+     * @return String
+     */
+    private String getControllerDirectory() {
+        return ControllerBackendPhp.DEFAULT_DIR  + File.separator;
+    }
+
     @SuppressWarnings({"PMD.UnusedPrivateMethod"})
     private void createUIComponents() {
         this.parentAcl = new FilteredComboBox(getAclResourcesList());
@@ -847,39 +975,6 @@ public class NewEntityDialog extends AbstractDialog {
 
     private List<String> getAclResourcesList() {
         return GetAclResourcesListUtil.execute(project);
-    }
-
-    private PsiFile generateGridViewControllerFile() {
-        final NamespaceBuilder namespace = new NamespaceBuilder(
-                getModuleName(),
-                "Listing",
-                getControllerDirectory()
-        );
-        return new ModuleControllerClassGenerator(new ControllerFileData(
-                getControllerDirectory(),
-                "Listing",
-                getModuleName(),
-                Areas.adminhtml.toString(),
-                HttpMethod.GET.toString(),
-                getAcl(),
-                true,
-                namespace.getNamespace()
-        ), project).generate(ACTION_NAME, false);
-    }
-
-    private PsiFile generateGridLayoutFile() {
-        return new LayoutXmlGenerator(new LayoutXmlData(
-                Areas.adminhtml.toString(),
-                getRoute(),
-                getModuleName(),
-                getEntityName(),
-                "Listing",
-                getGridName()
-        ), project).generate(ACTION_NAME, false);
-    }
-
-    private String getGridName() {
-        return gridName.getText().toString();
     }
 
     private PsiFile generateMenuFile() {
@@ -916,47 +1011,6 @@ public class NewEntityDialog extends AbstractDialog {
 
     public String getMenuTitle() {
         return menuTitle.getText().trim();
-    }
-
-    private void generateUiComponentGridFile() {
-        final UiComponentGridXmlGenerator gridXmlGenerator = new UiComponentGridXmlGenerator(
-                getUiComponentGridData(),
-                project
-        );
-        gridXmlGenerator.generate(ACTION_NAME, true);
-    }
-
-    /**
-     * Get grid UI component data.
-     *
-     * @return UiComponentGridData
-     */
-    public UiComponentGridData getUiComponentGridData() {
-        return new UiComponentGridData(
-            getModuleName(),
-            Areas.adminhtml.toString(),
-            getGridName(),
-            getDataProviderNamespace().getClassFqn(),
-            getEntityIdColumn(),
-            getAcl(),
-            getUiComponentGridToolbarData()
-        );
-    }
-
-    /**
-     * Get grid toolbar data.
-     *
-     * @return UiComponentGridToolbarData
-     */
-    public UiComponentGridToolbarData getUiComponentGridToolbarData() {
-        return new UiComponentGridToolbarData(
-            getAddToolBar(),
-            getAddBookmarksCheckBox(),
-            getAddColumnsControlCheckBox(),
-            getAddFullTextSearchCheckBox(),
-            getAddListingFiltersCheckBox(),
-            getAddListingPagingCheckBox()
-        );
     }
 
     private Boolean getAddToolBar() {

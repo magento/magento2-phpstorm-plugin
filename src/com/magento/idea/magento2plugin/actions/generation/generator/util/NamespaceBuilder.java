@@ -25,11 +25,11 @@ public class NamespaceBuilder {
     public NamespaceBuilder(
             final String moduleName,
             final String className,
-            final String classDirectory
+            String classDirectory
     ) {
         this.moduleName = moduleName;
         this.className = className;
-        this.classDirectory = classDirectory;
+        this.classDirectory = classDirectory.replaceAll(File.separator + "$", "");
     }
 
     /**
