@@ -50,8 +50,8 @@ import com.magento.idea.magento2plugin.actions.generation.generator.ModuleModelG
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleResourceModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.PreferenceDiXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.RoutesXmlGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.SaveEntityControllerFileGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.SaveEntityCommandGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.SaveEntityControllerFileGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentDataProviderGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentFormGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentGridXmlGenerator;
