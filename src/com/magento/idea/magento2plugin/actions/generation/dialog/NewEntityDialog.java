@@ -351,9 +351,12 @@ public class NewEntityDialog extends AbstractDialog {
      * @return String
      */
     private String getSaveEntityCommandClassFqn() {
-        //TODO: change this stub after the save command generated will be implemented.
         final NamespaceBuilder namespaceBuilder =
-                new NamespaceBuilder(getModuleName(), "SaveCommand", "Command/" + getEntityName());
+                new NamespaceBuilder(
+                        getModuleName(),
+                        SaveEntityCommandFile.CLASS_NAME,
+                        SaveEntityCommandFile.getDirectory(getEntityName())
+                );
 
         return namespaceBuilder.getClassFqn();
     }
