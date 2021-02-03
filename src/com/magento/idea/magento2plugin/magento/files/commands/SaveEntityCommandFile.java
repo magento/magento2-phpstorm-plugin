@@ -17,16 +17,6 @@ public class SaveEntityCommandFile implements ModuleFileInterface {
     public static final String FILE_EXTENSION = "php";
     public static final String TEMPLATE = "Magento Save Entity Command Model";
     private static final String DIRECTORY = "Command";
-    private static final SaveEntityCommandFile INSTANCE = new SaveEntityCommandFile();
-
-    /**
-     * Get singleton object of save command file.
-     *
-     * @return SaveEntityCommandFile
-     */
-    public static SaveEntityCommandFile getInstance() {
-        return INSTANCE;
-    }
 
     /**
      * Get namespace.

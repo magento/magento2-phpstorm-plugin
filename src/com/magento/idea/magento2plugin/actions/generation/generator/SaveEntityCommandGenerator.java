@@ -18,8 +18,8 @@ import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.commands.SaveEntityCommandFile;
 import com.magento.idea.magento2plugin.magento.packages.code.ExceptionType;
 import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryType;
-import com.magento.idea.magento2plugin.magento.packages.code.PhpCoreType;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -33,6 +33,7 @@ public class SaveEntityCommandGenerator extends FileGenerator {
     private final DirectoryGenerator directoryGenerator;
     private final ModuleIndex moduleIndex;
     private final boolean checkFileAlreadyExists;
+    private final List<String> uses;
 
     /**
      * Save entity command generator constructor.
@@ -66,6 +67,7 @@ public class SaveEntityCommandGenerator extends FileGenerator {
         fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         directoryGenerator = DirectoryGenerator.getInstance();
         moduleIndex = ModuleIndex.getInstance(project);
+        uses = new ArrayList<>();
     }
 
     /**
@@ -94,7 +96,7 @@ public class SaveEntityCommandGenerator extends FileGenerator {
         );
 
         return fileFromTemplateGenerator.generate(
-                SaveEntityCommandFile.getInstance(),
+                new SaveEntityCommandFile(),
                 getAttributes(),
                 saveCommandFileBaseDir,
                 actionName
@@ -108,15 +110,17 @@ public class SaveEntityCommandGenerator extends FileGenerator {
      */
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        final List<String> uses = new LinkedList<>();
-        uses.add(PhpCoreType.EXCEPTION.getType());
-        uses.add(FrameworkLibraryType.DATA_OBJECT.getType());
-        uses.add(ExceptionType.COULD_NOT_SAVE.getType());
-        uses.add(FrameworkLibraryType.LOGGER.getType());
+        attributes.setProperty("ENTITY_NAME", saveEntityCommandData.getEntityName());
+        attributes.setProperty("NAMESPACE", saveEntityCommandData.getNamespace());
+        attributes.setProperty("CLASS_NAME", SaveEntityCommandFile.CLASS_NAME);
+        attributes.setProperty("EXCEPTION", "Exception");
+        uses.add("Exception");
+        addProperty(attributes, "DATA_OBJECT", FrameworkLibraryType.DATA_OBJECT.getType());
+        addProperty(attributes, "COULD_NOT_SAVE", ExceptionType.COULD_NOT_SAVE.getType());
+        addProperty(attributes, "LOGGER", FrameworkLibraryType.LOGGER.getType());
 
         final String dtoType = saveEntityCommandData.getDataModelClassFqn();
-        uses.add(dtoType);
-        attributes.setProperty("DTO", PhpClassGeneratorUtil.getNameFromFqn(dtoType));
+        addProperty(attributes, "DTO", dtoType);
 
         final String dtoProperty = CaseFormat.UPPER_CAMEL.to(
                 CaseFormat.LOWER_CAMEL, saveEntityCommandData.getEntityName()
@@ -124,28 +128,30 @@ public class SaveEntityCommandGenerator extends FileGenerator {
         attributes.setProperty("DTO_PROPERTY", dtoProperty);
 
         final String modelType = saveEntityCommandData.getModelClassFqn();
-        uses.add(modelType);
-        attributes.setProperty("MODEL", PhpClassGeneratorUtil.getNameFromFqn(modelType));
+        addProperty(attributes, "MODEL", modelType);
 
         final String modelFactoryType = modelType.concat("Factory");
-        uses.add(modelFactoryType);
-        attributes.setProperty("MODEL_FACTORY",
-                PhpClassGeneratorUtil.getNameFromFqn(modelFactoryType)
-        );
+        addProperty(attributes, "MODEL_FACTORY", modelFactoryType);
 
         final String resourceType = saveEntityCommandData.getResourceModelClassFqn();
-        uses.add(resourceType);
-        attributes.setProperty("RESOURCE", PhpClassGeneratorUtil.getNameFromFqn(resourceType));
-
-        attributes.setProperty("ENTITY_NAME", saveEntityCommandData.getEntityName());
-        attributes.setProperty("NAMESPACE", saveEntityCommandData.getNamespace());
-        attributes.setProperty("CLASS_NAME", SaveEntityCommandFile.CLASS_NAME);
-
-        attributes.setProperty("EXCEPTION", PhpCoreType.EXCEPTION.getType());
-        attributes.setProperty("DATA_OBJECT", FrameworkLibraryType.DATA_OBJECT.getTypeName());
-        attributes.setProperty("COULD_NOT_SAVE", ExceptionType.COULD_NOT_SAVE.getTypeName());
-        attributes.setProperty("LOGGER", FrameworkLibraryType.LOGGER.getTypeName());
+        addProperty(attributes, "RESOURCE", resourceType);
 
         attributes.setProperty("USES", PhpClassGeneratorUtil.formatUses(uses));
+    }
+
+    /**
+     * Add type to property list.
+     *
+     * @param properties Properties
+     * @param propertyName String
+     * @param type String
+     */
+    protected void addProperty(
+            final @NotNull Properties properties,
+            final String propertyName,
+            final String type
+    ) {
+        uses.add(type);
+        properties.setProperty(propertyName, PhpClassGeneratorUtil.getNameFromFqn(type));
     }
 }

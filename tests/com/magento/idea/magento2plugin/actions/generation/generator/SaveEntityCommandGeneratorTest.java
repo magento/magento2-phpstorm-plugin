@@ -39,7 +39,7 @@ public class SaveEntityCommandGeneratorTest extends BaseGeneratorTestCase {
                         false
                 );
         final String filePath = this.getFixturePath(
-                SaveEntityCommandFile.getInstance().getFileName()
+                new SaveEntityCommandFile().getFileName()
         );
 
         assertGeneratedFileIsCorrect(
