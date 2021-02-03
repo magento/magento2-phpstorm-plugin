@@ -14,6 +14,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Inspection warning for disabled observer [#432](https://github.com/magento/magento2-phpstorm-plugin/pull/432)
 - The action item to the context menu to copy file path in the Magento format [#451](https://github.com/magento/magento2-phpstorm-plugin/pull/451)
 
+### Fixed
+
+- The null pointer exception on the Create Module Dialog
+
 ## 3.0.4
 
 ### Fixed
