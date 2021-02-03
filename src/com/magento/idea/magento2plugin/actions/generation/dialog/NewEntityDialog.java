@@ -869,7 +869,7 @@ public class NewEntityDialog extends AbstractDialog {
         final NamespaceBuilder namespace = new NamespaceBuilder(
                 getModuleName(),
                 "Listing",
-                getControllerDirectory()
+                ControllerBackendPhp.DEFAULT_DIR
         );
         new ModuleControllerClassGenerator(new ControllerFileData(
                 getControllerDirectory(),
