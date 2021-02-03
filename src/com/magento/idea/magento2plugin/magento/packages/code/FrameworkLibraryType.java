@@ -9,13 +9,17 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClas
 import org.jetbrains.annotations.NotNull;
 
 public enum FrameworkLibraryType {
+    API_SEARCH_CRITERIA_BUILDER("Magento\\Framework\\Api\\Search\\SearchCriteriaBuilder"),
     COLLECTION_PROCESSOR("Magento\\Framework\\Api\\SearchCriteria\\CollectionProcessorInterface"),
+    DATA_PERSISTOR("Magento\\Framework\\App\\Request\\DataPersistorInterface"),
+    DATA_OBJECT("Magento\\Framework\\DataObject"),
     FILTER_BUILDER("Magento\\Framework\\Api\\FilterBuilder"),
+    RESULT_INTERFACE("Magento\\Framework\\Controller\\ResultInterface"),
+    RESPONSE_INTERFACE("Magento\\Framework\\App\\ResponseInterface"),
     REPORTING("Magento\\Framework\\Api\\Search\\ReportingInterface"),
     REQUEST("Magento\\Framework\\App\\RequestInterface"),
     SEARCH_CRITERIA("Magento\\Framework\\Api\\SearchCriteriaInterface"),
     SEARCH_CRITERIA_BUILDER("Magento\\Framework\\Api\\SearchCriteriaBuilder"),
-    API_SEARCH_CRITERIA_BUILDER("Magento\\Framework\\Api\\Search\\SearchCriteriaBuilder"),
     SEARCH_RESULT("Magento\\Framework\\Api\\SearchResultsInterface");
 
     /**
