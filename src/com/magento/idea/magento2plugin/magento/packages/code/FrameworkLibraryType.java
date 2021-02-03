@@ -10,6 +10,9 @@ import org.jetbrains.annotations.NotNull;
 
 public enum FrameworkLibraryType {
     API_SEARCH_CRITERIA_BUILDER("Magento\\Framework\\Api\\Search\\SearchCriteriaBuilder"),
+    ABSTRACT_COLLECTION(
+            "Magento\\Framework\\Model\\ResourceModel\\Db\\Collection\\AbstractCollection"
+    ),
     COLLECTION_PROCESSOR("Magento\\Framework\\Api\\SearchCriteria\\CollectionProcessorInterface"),
     DATA_PERSISTOR("Magento\\Framework\\App\\Request\\DataPersistorInterface"),
     DATA_OBJECT("Magento\\Framework\\DataObject"),
