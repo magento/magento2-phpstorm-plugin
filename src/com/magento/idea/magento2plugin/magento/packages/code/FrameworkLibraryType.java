@@ -19,6 +19,7 @@ public enum FrameworkLibraryType {
     FILTER_BUILDER("Magento\\Framework\\Api\\FilterBuilder"),
     RESULT_INTERFACE("Magento\\Framework\\Controller\\ResultInterface"),
     RESPONSE_INTERFACE("Magento\\Framework\\App\\ResponseInterface"),
+    LOGGER("Psr\\Log\\LoggerInterface"),
     REPORTING("Magento\\Framework\\Api\\Search\\ReportingInterface"),
     REQUEST("Magento\\Framework\\App\\RequestInterface"),
     SEARCH_CRITERIA("Magento\\Framework\\Api\\SearchCriteriaInterface"),

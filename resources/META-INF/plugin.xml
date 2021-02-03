@@ -231,6 +231,7 @@
         <internalFileTemplate name="Magento Get List Query Model"/>
         <internalFileTemplate name="Magento Entity Save Controller Class"/>
         <internalFileTemplate name="Magento Entity Data Mapper"/>
+        <internalFileTemplate name="Magento Save Entity Command Model"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 
