@@ -230,6 +230,7 @@
         <internalFileTemplate name="Magento Module Declarative Schema Whitelist JSON"/>
         <internalFileTemplate name="Magento Get List Query Model"/>
         <internalFileTemplate name="Magento Entity Save Controller Class"/>
+        <internalFileTemplate name="Magento Entity Data Mapper"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 

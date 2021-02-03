@@ -18,6 +18,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileDat
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelInterfaceData;
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
+import com.magento.idea.magento2plugin.actions.generation.data.EntityDataMapperData;
 import com.magento.idea.magento2plugin.actions.generation.data.GetListQueryModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.LayoutXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.MenuXmlData;
@@ -40,6 +41,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.DataModelGen
 import com.magento.idea.magento2plugin.actions.generation.generator.DataModelInterfaceGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaWhitelistJsonGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaXmlGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.EntityDataMapperGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.GetListQueryModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.LayoutXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.MenuXmlGenerator;
@@ -58,6 +60,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Namespa
 import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.files.DataModel;
 import com.magento.idea.magento2plugin.magento.files.DataModelInterface;
+import com.magento.idea.magento2plugin.magento.files.EntityDataMapperFile;
 import com.magento.idea.magento2plugin.magento.files.ModelPhp;
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 import com.magento.idea.magento2plugin.magento.files.ResourceModelPhp;
@@ -284,6 +287,7 @@ public class NewEntityDialog extends AbstractDialog {
         generateRoutesXmlFile();
         generateViewControllerFile();
         generateSaveControllerFile();
+        generateEntityDataMapperFile();
         generateModelGetListQueryFile();
         generateDataProviderFile();
         generateLayoutFile();
@@ -1044,6 +1048,41 @@ public class NewEntityDialog extends AbstractDialog {
     }
 
     /**
+     * Generate entity data mapper type.
+     */
+    private void generateEntityDataMapperFile() {
+        final EntityDataMapperFile entityDataMapperFile =
+                new EntityDataMapperFile(getEntityName());
+
+        final String namespace = entityDataMapperFile.getNamespace(getModuleName());
+        final String classFqn = entityDataMapperFile.getClassFqn(getModuleName());
+
+        final NamespaceBuilder modelNamespace = getModelNamespace();
+        final NamespaceBuilder dtoModelNamespace = getDataModelNamespace();
+        final NamespaceBuilder dtoInterfaceModelNamespace = getDataModelInterfaceNamespace();
+
+        final String dtoType;
+
+        if (createInterface.isSelected()) {
+            dtoType = dtoInterfaceModelNamespace.getClassFqn();
+        } else {
+            dtoType = dtoModelNamespace.getClassFqn();
+        }
+
+        new EntityDataMapperGenerator(
+                new EntityDataMapperData(
+                        getModuleName(),
+                        getEntityName(),
+                        namespace,
+                        classFqn,
+                        modelNamespace.getClassFqn(),
+                        dtoType
+                ),
+                project
+        ).generate(ACTION_NAME, false);
+    }
+
+    /**
      * Run GetListQuery.php file generator.
      */
     private void generateModelGetListQueryFile() {
@@ -1066,8 +1105,10 @@ public class NewEntityDialog extends AbstractDialog {
      * @return String
      */
     private String getEntityDataMapperType() {
-        // TODO: implement with entity data mapper generation.
-        return "Test\\Test\\Mapper\\" + getEntityName() + "DataMapper";
+        final EntityDataMapperFile entityDataMapperFile =
+                new EntityDataMapperFile(getEntityName());
+
+        return entityDataMapperFile.getClassFqn(getModuleName());
     }
 
     /**
