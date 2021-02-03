@@ -288,19 +288,22 @@ public class NewEntityDialog extends AbstractDialog {
         }
 
         generateRoutesXmlFile();
-        generateViewControllerFile();
-        generateSaveControllerFile();
-        generateEntityDataMapperFile();
-        generateModelGetListQueryFile();
-        generateSaveEntityCommandFile();
-        generateDataProviderFile();
-        generateLayoutFile();
-        generateFormFile();
         generateAclXmlFile();
-        generateGridViewControllerFile();
-        generateGridLayoutFile();
         generateMenuFile();
-        generateUiComponentGridFile();
+
+        if (createUiComponent.isSelected()) {
+            generateGridViewControllerFile();
+            generateGridLayoutFile();
+            generateEntityDataMapperFile();
+            generateModelGetListQueryFile();
+            generateDataProviderFile();
+            generateUiComponentGridFile();
+            generateFormViewControllerFile();
+            generateFormLayoutFile();
+            generateSaveEntityCommandFile();
+            generateFormSaveControllerFile();
+            generateUiComponentFormFile();
+        }
 
         final DbSchemaXmlData dbSchemaXmlData = new DbSchemaXmlData(
                 getDbTableName(),
@@ -313,52 +316,6 @@ public class NewEntityDialog extends AbstractDialog {
         generateDbSchemaXmlFile(dbSchemaXmlData);
         generateWhitelistJsonFile(dbSchemaXmlData);
         this.setVisible(false);
-    }
-
-    /**
-     * Generate Save Controller file.
-     */
-    private void generateSaveControllerFile() {
-        final NamespaceBuilder dtoModelNamespace = getDataModelNamespace();
-        final NamespaceBuilder dtoInterfaceModelNamespace = getDataModelInterfaceNamespace();
-        final NamespaceBuilder namespace = new NamespaceBuilder(
-                getModuleName(),
-                SaveActionFile.CLASS_NAME,
-                SaveActionFile.getDirectory(getEntityName())
-        );
-        final String dtoType;
-
-        if (createInterface.isSelected()) {
-            dtoType = dtoInterfaceModelNamespace.getClassFqn();
-        } else {
-            dtoType = dtoModelNamespace.getClassFqn();
-        }
-
-        new SaveEntityControllerFileGenerator(new SaveEntityControllerFileData(
-                getEntityName(),
-                getModuleName(),
-                namespace.getNamespace(),
-                getSaveEntityCommandClassFqn(),
-                dtoType,
-                getAcl(),
-                getEntityIdColumn()
-        ), project).generate(ACTION_NAME, false);
-    }
-
-    /**
-     * Get save entity command class Fqn.
-     *
-     * @return String
-     */
-    private String getSaveEntityCommandClassFqn() {
-        final NamespaceBuilder namespaceBuilder =
-                new NamespaceBuilder(
-                        getModuleName(),
-                        SaveEntityCommandFile.CLASS_NAME,
-                        SaveEntityCommandFile.getDirectory(getEntityName())
-                );
-
-        return namespaceBuilder.getClassFqn();
     }
 
     private PsiFile generateModelFile() {
@@ -426,14 +383,14 @@ public class NewEntityDialog extends AbstractDialog {
      * Generate preference for data model.
      */
     private void generateDataModelPreference() {
-        final NamespaceBuilder modelNamespace = getModelNamespace();
+        final NamespaceBuilder dataModelNamespace = getDataModelNamespace();
         final NamespaceBuilder modelInterfaceNamespace = getDataModelInterfaceNamespace();
         new PreferenceDiXmlGenerator(new PreferenceDiXmFileData(
                 getModuleName(),
                 GetPhpClassByFQN.getInstance(project).execute(
                         modelInterfaceNamespace.getClassFqn()
                 ),
-                modelNamespace.getClassFqn(),
+                dataModelNamespace.getClassFqn(),
                 getModelName(),
                 Areas.base.toString()
         ), project).generate(OverrideClassByAPreferenceAction.ACTION_NAME);
@@ -618,24 +575,6 @@ public class NewEntityDialog extends AbstractDialog {
         return route.getText().trim();
     }
 
-    private PsiFile generateViewControllerFile() {
-        final NamespaceBuilder namespace = new NamespaceBuilder(
-                getModuleName(),
-                getViewActionName(),
-                getViewControllerDirectory()
-        );
-        return new ModuleControllerClassGenerator(new ControllerFileData(
-                getViewControllerDirectory(),
-                getViewActionName(),
-                getModuleName(),
-                Areas.adminhtml.toString(),
-                HttpMethod.GET.toString(),
-                getAcl(),
-                true,
-                namespace.getNamespace()
-        ), project).generate(ACTION_NAME, false);
-    }
-
     private String getViewActionName() {
         return "Edit";
     }
@@ -662,66 +601,6 @@ public class NewEntityDialog extends AbstractDialog {
     }
 
     /**
-     * Generate data provider file.
-     */
-    private void generateDataProviderFile() {
-        if (getDataProviderType().equals(UiComponentDataProviderPhp.CUSTOM_TYPE)) {
-            final NamespaceBuilder namespaceBuilder = getDataProviderNamespace();
-            new UiComponentDataProviderGenerator(new UiComponentDataProviderData(
-                    getDataProviderClassName(),
-                    namespaceBuilder.getNamespace(),
-                    getDataProviderDirectory(),
-                    getEntityIdColumn()
-            ), getModuleName(), project).generate(ACTION_NAME, false);
-        }
-    }
-
-    /**
-     * Get data provider namespace builder.
-     *
-     * @return NamespaceBuilder
-     */
-    @NotNull
-    private NamespaceBuilder getDataProviderNamespace() {
-        return new NamespaceBuilder(
-            getModuleName(),
-            getDataProviderClassName(),
-            getDataProviderDirectory()
-        );
-    }
-
-    /**
-     * Get data provider directory.
-     *
-     * @return String
-     */
-    public String getDataProviderDirectory() {
-        // TODO: add ui part with dynamic implementation.
-        return "UI/DataProvider";
-    }
-
-    /**
-     * Get data provider type.
-     *
-     * @return String
-     */
-    public String getDataProviderType() {
-        // TODO: add ui part with dynamic implementation.
-        return UiComponentDataProviderPhp.CUSTOM_TYPE;
-    }
-
-    private PsiFile generateLayoutFile() {
-        return new LayoutXmlGenerator(new LayoutXmlData(
-            Areas.adminhtml.toString(),
-            getRoute(),
-            getModuleName(),
-            getEntityName(),
-            getViewActionName(),
-            getFormName()
-        ), project).generate(ACTION_NAME, false);
-    }
-
-    /**
      * Get controller name.
      *
      * @return String
@@ -744,22 +623,6 @@ public class NewEntityDialog extends AbstractDialog {
 
     public String getAclTitle() {
         return aclTitle.getText().trim();
-    }
-
-    private PsiFile generateFormFile() {
-        return new UiComponentFormGenerator(new UiComponentFormFileData(
-            getFormName(),
-            Areas.adminhtml.toString(),
-            getModuleName(),
-            getFormLabel(),
-            getButtons(),
-            getFieldsets(),
-            getFields(),
-            getRoute(),
-            getEntityName(),
-            getSubmitActionName(),
-            getDataProviderNamespace().getClassFqn()
-        ), project).generate(ACTION_NAME, true);
     }
 
     public String getFormLabel() {
@@ -914,13 +777,16 @@ public class NewEntityDialog extends AbstractDialog {
         return GetAclResourcesListUtil.execute(project);
     }
 
-    private PsiFile generateGridViewControllerFile() {
+    /**
+     * Generate Grid view controller file.
+     */
+    private void generateGridViewControllerFile() {
         final NamespaceBuilder namespace = new NamespaceBuilder(
                 getModuleName(),
                 "Listing",
-                getControllerDirectory()
+                ControllerBackendPhp.DEFAULT_DIR
         );
-        return new ModuleControllerClassGenerator(new ControllerFileData(
+        new ModuleControllerClassGenerator(new ControllerFileData(
                 getControllerDirectory(),
                 "Listing",
                 getModuleName(),
@@ -932,8 +798,11 @@ public class NewEntityDialog extends AbstractDialog {
         ), project).generate(ACTION_NAME, false);
     }
 
-    private PsiFile generateGridLayoutFile() {
-        return new LayoutXmlGenerator(new LayoutXmlData(
+    /**
+     * Generate grid layout file.
+     */
+    private void generateGridLayoutFile() {
+        new LayoutXmlGenerator(new LayoutXmlData(
                 Areas.adminhtml.toString(),
                 getRoute(),
                 getModuleName(),
@@ -943,135 +812,13 @@ public class NewEntityDialog extends AbstractDialog {
         ), project).generate(ACTION_NAME, false);
     }
 
+    /**
+     * Get grid name.
+     *
+     * @return String
+     */
     private String getGridName() {
-        return gridName.getText().toString();
-    }
-
-    private PsiFile generateMenuFile() {
-        return new MenuXmlGenerator(new MenuXmlData(
-            getParentMenuItem(),
-            getSortOrder(),
-            getModuleName(),
-            getMenuIdentifier(),
-            getMenuTitle(),
-            getAcl(),
-            getMenuAction()
-        ), project).generate(ACTION_NAME, false);
-    }
-
-    private String getParentMenuItem() {
-        return parentMenu.getSelectedItem().toString();
-    }
-
-    public String getSortOrder() {
-        return sortOrder.getText().trim();
-    }
-
-    public String getMenuIdentifier() {
-        return menuIdentifier.getText().trim();
-    }
-
-    private String getMenuAction() {
-        return getRoute()
-            + File.separator
-            + FirstLetterToLowercaseUtil.convert(getEntityName())
-            + File.separator
-            + "listing";
-    }
-
-    public String getMenuTitle() {
-        return menuTitle.getText().trim();
-    }
-
-    private void generateUiComponentGridFile() {
-        final UiComponentGridXmlGenerator gridXmlGenerator = new UiComponentGridXmlGenerator(
-                getUiComponentGridData(),
-                project
-        );
-        gridXmlGenerator.generate(ACTION_NAME, true);
-    }
-
-    /**
-     * Get grid UI component data.
-     *
-     * @return UiComponentGridData
-     */
-    public UiComponentGridData getUiComponentGridData() {
-        return new UiComponentGridData(
-            getModuleName(),
-            Areas.adminhtml.toString(),
-            getGridName(),
-            getDataProviderNamespace().getClassFqn(),
-            getEntityIdColumn(),
-            getAcl(),
-            getUiComponentGridToolbarData()
-        );
-    }
-
-    /**
-     * Get grid toolbar data.
-     *
-     * @return UiComponentGridToolbarData
-     */
-    public UiComponentGridToolbarData getUiComponentGridToolbarData() {
-        return new UiComponentGridToolbarData(
-            getAddToolBar(),
-            getAddBookmarksCheckBox(),
-            getAddColumnsControlCheckBox(),
-            getAddFullTextSearchCheckBox(),
-            getAddListingFiltersCheckBox(),
-            getAddListingPagingCheckBox()
-        );
-    }
-
-    private Boolean getAddToolBar() {
-        return addToolBar.isSelected();
-    }
-
-    private Boolean getAddColumnsControlCheckBox() {
-        return addColumnsControlCheckBox.isSelected();
-    }
-
-    private Boolean getAddFullTextSearchCheckBox() {
-        return addFullTextSearchCheckBox.isSelected();
-    }
-
-    private Boolean getAddListingFiltersCheckBox() {
-        return addListingFiltersCheckBox.isSelected();
-    }
-
-    private Boolean getAddListingPagingCheckBox() {
-        return addListingPagingCheckBox.isSelected();
-    }
-
-    private Boolean getAddBookmarksCheckBox() {
-        return addBookmarksCheckBox.isSelected();
-    }
-
-    /**
-     * Run db_schema.xml file generator.
-     *
-     * @param dbSchemaXmlData DbSchemaXmlData
-     */
-    private void generateDbSchemaXmlFile(final @NotNull DbSchemaXmlData dbSchemaXmlData) {
-        new DbSchemaXmlGenerator(
-                dbSchemaXmlData,
-                project,
-                moduleName
-        ).generate(ACTION_NAME, false);
-    }
-
-    /**
-     * Run db_schema_whitelist.json generator.
-     *
-     * @param dbSchemaXmlData DbSchemaXmlData
-     */
-    private void generateWhitelistJsonFile(final @NotNull DbSchemaXmlData dbSchemaXmlData) {
-        new DbSchemaWhitelistJsonGenerator(
-                project,
-                dbSchemaXmlData,
-                moduleName
-        ).generate(ACTION_NAME, false);
+        return gridName.getText();
     }
 
     /**
@@ -1139,6 +886,134 @@ public class NewEntityDialog extends AbstractDialog {
     }
 
     /**
+     * Generate data provider file.
+     */
+    private void generateDataProviderFile() {
+        if (getDataProviderType().equals(UiComponentDataProviderPhp.CUSTOM_TYPE)) {
+            final NamespaceBuilder namespaceBuilder = getDataProviderNamespace();
+            new UiComponentDataProviderGenerator(new UiComponentDataProviderData(
+                    getDataProviderClassName(),
+                    namespaceBuilder.getNamespace(),
+                    getDataProviderDirectory(),
+                    getEntityIdColumn()
+            ), getModuleName(), project).generate(ACTION_NAME, false);
+        }
+    }
+
+    /**
+     * Get data provider namespace builder.
+     *
+     * @return NamespaceBuilder
+     */
+    @NotNull
+    private NamespaceBuilder getDataProviderNamespace() {
+        return new NamespaceBuilder(
+                getModuleName(),
+                getDataProviderClassName(),
+                getDataProviderDirectory()
+        );
+    }
+
+    /**
+     * Get data provider directory.
+     *
+     * @return String
+     */
+    public String getDataProviderDirectory() {
+        // TODO: add ui part with dynamic implementation.
+        return "UI/DataProvider";
+    }
+
+    /**
+     * Get data provider type.
+     *
+     * @return String
+     */
+    public String getDataProviderType() {
+        // TODO: add ui part with dynamic implementation.
+        return UiComponentDataProviderPhp.CUSTOM_TYPE;
+    }
+
+    /**
+     * Generate UI Component grid file.
+     */
+    private void generateUiComponentGridFile() {
+        final UiComponentGridXmlGenerator gridXmlGenerator = new UiComponentGridXmlGenerator(
+                getUiComponentGridData(),
+                project
+        );
+        gridXmlGenerator.generate(ACTION_NAME, true);
+    }
+
+    /**
+     * Get grid UI component data.
+     *
+     * @return UiComponentGridData
+     */
+    public UiComponentGridData getUiComponentGridData() {
+        return new UiComponentGridData(
+                getModuleName(),
+                Areas.adminhtml.toString(),
+                getGridName(),
+                getDataProviderNamespace().getClassFqn(),
+                getEntityIdColumn(),
+                getAcl(),
+                getUiComponentGridToolbarData()
+        );
+    }
+
+    /**
+     * Get grid toolbar data.
+     *
+     * @return UiComponentGridToolbarData
+     */
+    public UiComponentGridToolbarData getUiComponentGridToolbarData() {
+        return new UiComponentGridToolbarData(
+                getAddToolBar(),
+                getAddBookmarksCheckBox(),
+                getAddColumnsControlCheckBox(),
+                getAddFullTextSearchCheckBox(),
+                getAddListingFiltersCheckBox(),
+                getAddListingPagingCheckBox()
+        );
+    }
+
+    /**
+     * Generate form view controller file.
+     */
+    private void generateFormViewControllerFile() {
+        final NamespaceBuilder namespace = new NamespaceBuilder(
+                getModuleName(),
+                getViewActionName(),
+                getViewControllerDirectory()
+        );
+        new ModuleControllerClassGenerator(new ControllerFileData(
+                getViewControllerDirectory(),
+                getViewActionName(),
+                getModuleName(),
+                Areas.adminhtml.toString(),
+                HttpMethod.GET.toString(),
+                getAcl(),
+                true,
+                namespace.getNamespace()
+        ), project).generate(ACTION_NAME, false);
+    }
+
+    /**
+     * Generate UI Component form layout file.
+     */
+    private void generateFormLayoutFile() {
+        new LayoutXmlGenerator(new LayoutXmlData(
+                Areas.adminhtml.toString(),
+                getRoute(),
+                getModuleName(),
+                getEntityName(),
+                getViewActionName(),
+                getFormName()
+        ), project).generate(ACTION_NAME, false);
+    }
+
+    /**
      * Run SaveCommand.php file generator for an entity.
      */
     private void generateSaveEntityCommandFile() {
@@ -1175,6 +1050,157 @@ public class NewEntityDialog extends AbstractDialog {
                 ),
                 project
         ).generate(ACTION_NAME, true);
+    }
+
+    /**
+     * Generate Save Controller file.
+     */
+    private void generateFormSaveControllerFile() {
+        final NamespaceBuilder dtoModelNamespace = getDataModelNamespace();
+        final NamespaceBuilder dtoInterfaceModelNamespace = getDataModelInterfaceNamespace();
+        final NamespaceBuilder namespace = new NamespaceBuilder(
+                getModuleName(),
+                SaveActionFile.CLASS_NAME,
+                SaveActionFile.getDirectory(getEntityName())
+        );
+        final String dtoType;
+
+        if (createInterface.isSelected()) {
+            dtoType = dtoInterfaceModelNamespace.getClassFqn();
+        } else {
+            dtoType = dtoModelNamespace.getClassFqn();
+        }
+
+        new SaveEntityControllerFileGenerator(new SaveEntityControllerFileData(
+                getEntityName(),
+                getModuleName(),
+                namespace.getNamespace(),
+                getSaveEntityCommandClassFqn(),
+                dtoType,
+                getAcl(),
+                getEntityIdColumn()
+        ), project).generate(ACTION_NAME, false);
+    }
+
+    /**
+     * Get save entity command class Fqn.
+     *
+     * @return String
+     */
+    private String getSaveEntityCommandClassFqn() {
+        final NamespaceBuilder namespaceBuilder =
+                new NamespaceBuilder(
+                        getModuleName(),
+                        SaveEntityCommandFile.CLASS_NAME,
+                        SaveEntityCommandFile.getDirectory(getEntityName())
+                );
+
+        return namespaceBuilder.getClassFqn();
+    }
+
+    /**
+     * Generate UI Component form file.
+     */
+    private void generateUiComponentFormFile() {
+        new UiComponentFormGenerator(new UiComponentFormFileData(
+                getFormName(),
+                Areas.adminhtml.toString(),
+                getModuleName(),
+                getFormLabel(),
+                getButtons(),
+                getFieldsets(),
+                getFields(),
+                getRoute(),
+                getEntityName(),
+                getSubmitActionName(),
+                getDataProviderNamespace().getClassFqn()
+        ), project).generate(ACTION_NAME, true);
+    }
+
+    private PsiFile generateMenuFile() {
+        return new MenuXmlGenerator(new MenuXmlData(
+            getParentMenuItem(),
+            getSortOrder(),
+            getModuleName(),
+            getMenuIdentifier(),
+            getMenuTitle(),
+            getAcl(),
+            getMenuAction()
+        ), project).generate(ACTION_NAME, false);
+    }
+
+    private String getParentMenuItem() {
+        return parentMenu.getSelectedItem().toString();
+    }
+
+    public String getSortOrder() {
+        return sortOrder.getText().trim();
+    }
+
+    public String getMenuIdentifier() {
+        return menuIdentifier.getText().trim();
+    }
+
+    private String getMenuAction() {
+        return getRoute()
+            + File.separator
+            + FirstLetterToLowercaseUtil.convert(getEntityName())
+            + File.separator
+            + "listing";
+    }
+
+    public String getMenuTitle() {
+        return menuTitle.getText().trim();
+    }
+
+    private Boolean getAddToolBar() {
+        return addToolBar.isSelected();
+    }
+
+    private Boolean getAddColumnsControlCheckBox() {
+        return addColumnsControlCheckBox.isSelected();
+    }
+
+    private Boolean getAddFullTextSearchCheckBox() {
+        return addFullTextSearchCheckBox.isSelected();
+    }
+
+    private Boolean getAddListingFiltersCheckBox() {
+        return addListingFiltersCheckBox.isSelected();
+    }
+
+    private Boolean getAddListingPagingCheckBox() {
+        return addListingPagingCheckBox.isSelected();
+    }
+
+    private Boolean getAddBookmarksCheckBox() {
+        return addBookmarksCheckBox.isSelected();
+    }
+
+    /**
+     * Run db_schema.xml file generator.
+     *
+     * @param dbSchemaXmlData DbSchemaXmlData
+     */
+    private void generateDbSchemaXmlFile(final @NotNull DbSchemaXmlData dbSchemaXmlData) {
+        new DbSchemaXmlGenerator(
+                dbSchemaXmlData,
+                project,
+                moduleName
+        ).generate(ACTION_NAME, false);
+    }
+
+    /**
+     * Run db_schema_whitelist.json generator.
+     *
+     * @param dbSchemaXmlData DbSchemaXmlData
+     */
+    private void generateWhitelistJsonFile(final @NotNull DbSchemaXmlData dbSchemaXmlData) {
+        new DbSchemaWhitelistJsonGenerator(
+                project,
+                dbSchemaXmlData,
+                moduleName
+        ).generate(ACTION_NAME, false);
     }
 
     /**
