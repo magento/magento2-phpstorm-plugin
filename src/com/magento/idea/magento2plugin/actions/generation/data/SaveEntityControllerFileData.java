@@ -36,14 +36,14 @@ public class SaveEntityControllerFileData {
             final @NotNull String dtoType,
             final @NotNull String acl,
             final @NotNull String entityId
-            ) {
-       this.entityName = entityName;
-       this.moduleName = moduleName;
-       this.namespace = namespace;
-       this.saveCommandFqn = saveCommandFqn;
-       this.dtoType = dtoType;
-       this.acl = acl;
-       this.entityId = entityId;
+    ) {
+        this.entityName = entityName;
+        this.moduleName = moduleName;
+        this.namespace = namespace;
+        this.saveCommandFqn = saveCommandFqn;
+        this.dtoType = dtoType;
+        this.acl = acl;
+        this.entityId = entityId;
     }
 
     /**

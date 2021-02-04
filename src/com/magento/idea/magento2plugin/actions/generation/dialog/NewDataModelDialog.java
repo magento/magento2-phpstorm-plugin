@@ -312,10 +312,10 @@ public class NewDataModelDialog extends AbstractDialog {
 
         addProperty.addActionListener(e -> {
             propertiesTable.addRow(new Object[]{
-                "",
-                PropertiesTypes.valueOf(PropertiesTypes.INT.toString())
-                    .getPropertyType(),
-                PROPERTY_DELETE
+                    "",
+                    PropertiesTypes.valueOf(PropertiesTypes.INT.toString())
+                            .getPropertyType(),
+                    PROPERTY_DELETE
             });
         });
 
@@ -324,8 +324,12 @@ public class NewDataModelDialog extends AbstractDialog {
 
     private void initPropertyTypeColumn() {
         final TableColumn formElementTypeColumn = propertyTable.getColumn(PROPERTY_TYPE);
-        formElementTypeColumn.setCellEditor(new ComboBoxEditor(PropertiesTypes.getPropertyTypes()));
-        formElementTypeColumn.setCellRenderer(new ComboBoxTableRenderer<>(PropertiesTypes.getPropertyTypes()));
+        formElementTypeColumn.setCellEditor(
+                new ComboBoxEditor(PropertiesTypes.getPropertyTypes())
+        );
+        formElementTypeColumn.setCellRenderer(
+                new ComboBoxTableRenderer<>(PropertiesTypes.getPropertyTypes())
+        );
     }
 
     private DefaultTableModel getPropertiesTable() {

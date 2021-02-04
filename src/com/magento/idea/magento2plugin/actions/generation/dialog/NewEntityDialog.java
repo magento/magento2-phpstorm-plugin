@@ -37,6 +37,13 @@ import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridDa
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridToolbarData;
 import com.magento.idea.magento2plugin.actions.generation.data.code.ClassPropertyData;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AclResourceIdRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.MenuIdentifierRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NumericRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.AclXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DataModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DataModelInterfaceGenerator;
@@ -103,6 +110,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 import org.apache.commons.lang.StringUtils;
@@ -140,25 +148,18 @@ public class NewEntityDialog extends AbstractDialog {
     private JLabel entityIdColumnNameLabel;
     private JTextField route;
     private JLabel routeLabel;
-    private JTextField acl;
     private JLabel aclLabel;
     private JTextField aclTitle;
     private FilteredComboBox parentAcl;
-    private JLabel formNameLabel;
-    private JTextField formName;
     private JTextField formLabel;
     private JLabel formLabelLabel;
-    private JTextField gridName;
     private JLabel gridNameLabel;
     private JLabel parentMenuItemLabel;
     private JLabel sortOrderLabel;
     private JLabel menuIdentifierLabel;
-    private JTextField sortOrder;
-    private JTextField menuIdentifier;
     private JLabel menuTitleLabel;
     private JTextField menuTitle;
     private FilteredComboBox parentMenu;
-    private JLabel formMenuLabel;
     private JCheckBox addToolBar;
     private JCheckBox addBookmarksCheckBox;
     private JCheckBox addColumnsControlCheckBox;
@@ -176,7 +177,36 @@ public class NewEntityDialog extends AbstractDialog {
     private static final String ACTION_NAME = "Create Entity";
     private static final String PROPERTY_NAME = "Name";
     private static final String PROPERTY_TYPE = "Type";
+    private static final String ACL_ID = "ACL ID";
+    private static final String FORM_NAME = "Form Name";
+    private static final String GRID_NAME = "Grit Name";
+    private static final String IDENTIFIER = "Identifier";
+    private static final String SORT_ORDER = "Sort Order";
 
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, FORM_NAME})
+    @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE})
+    private JTextField formName;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, GRID_NAME})
+    @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE})
+    private JTextField gridName;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, ACL_ID})
+    @FieldValidation(rule = RuleRegistry.ACL_RESOURCE_ID, message = {AclResourceIdRule.MESSAGE})
+    private JTextField acl;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, SORT_ORDER})
+    @FieldValidation(rule = RuleRegistry.NUMERIC, message = {NumericRule.MESSAGE})
+    private JTextField sortOrder;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, IDENTIFIER})
+    @FieldValidation(rule = RuleRegistry.MENU_IDENTIFIER, message = {MenuIdentifierRule.MESSAGE})
+    private JTextField menuIdentifier;
+    private JLabel formNameLabel;
+    private JTextPane exampleIdentifier;
+    private JTextPane exampleAclId;
+    private JTextPane exampleFormName;
+    private JTextPane exampleGridName;
     private JTextField observerName;
 
     /**
@@ -276,6 +306,10 @@ public class NewEntityDialog extends AbstractDialog {
      * Perform code generation using input data.
      */
     private void onOK() {
+        if (!validateFormFields()) {
+            return;
+        }
+
         generateModelFile();
         generateResourceModelFile();
         generateCollectionFile();
