@@ -68,6 +68,9 @@ public class RegExUtil {
 
         public static final String ACL_RESOURCE_ID
                 = "^([A-Z]+[a-zA-Z0-9]{1,}){1,}_[A-Z]+[A-Z0-9a-z]{1,}::[A-Za-z_0-9]{1,}$";
+
+        public static final String MENU_IDENTIFIER =
+                "^([A-Z]+[a-zA-Z0-9]{1,}){1,}_[A-Z]+[A-Z0-9a-z]{1,}::[A-Za-z_0-9]{1,}$";
     }
 
     public class PhpRegex {
