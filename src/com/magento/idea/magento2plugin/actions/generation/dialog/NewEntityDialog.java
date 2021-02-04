@@ -809,7 +809,7 @@ public class NewEntityDialog extends AbstractDialog {
                 getRoute(),
                 getModuleName(),
                 getEntityName(),
-                "Listing",
+                AdminListViewActionFile.CLASS_NAME,
                 getGridName()
         ), project).generate(ACTION_NAME, false);
     }
