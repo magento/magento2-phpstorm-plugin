@@ -22,9 +22,8 @@ import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-
-import javax.swing.*;
 import java.util.Properties;
+import javax.swing.JOptionPane;
 
 public class QueryGenerator extends FileGenerator {
     private final UiComponentDataProviderData uiComponentGridDataProviderData;
