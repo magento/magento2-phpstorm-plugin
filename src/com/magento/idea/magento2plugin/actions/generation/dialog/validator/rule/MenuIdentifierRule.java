@@ -8,7 +8,7 @@ public class MenuIdentifierRule implements ValidationRule {
 
     @Override
     public boolean check(final String value) {
-        return value.matches(RegExUtil.Magento.MENU_IDENTIFIER);
+        return value.matches(RegExUtil.Magento.XML_IDENTIFIER);
     }
 
     public static ValidationRule getInstance() {
