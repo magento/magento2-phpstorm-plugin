@@ -5,7 +5,10 @@
 
 package com.magento.idea.magento2plugin.actions.generation.data;
 
-@SuppressWarnings({"PMD.DataClass"})
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 public class UiComponentGridData {
     private final String moduleName;
     private final String area;
@@ -14,6 +17,7 @@ public class UiComponentGridData {
     private final String idFieldName;
     private final String acl;
     private final UiComponentGridToolbarData gridToolbarData;
+    private final List<Map<String, String>> columns;
 
     /**
      * Ui component grid data constructor.
@@ -33,6 +37,38 @@ public class UiComponentGridData {
             final String acl,
             final UiComponentGridToolbarData gridToolbarData
     ) {
+        this(
+                moduleName,
+                area,
+                name,
+                providerClassName,
+                idFieldName,
+                acl,
+                gridToolbarData,
+                new ArrayList<>()
+        );
+    }
+
+    /**
+     * Ui component grid data constructor.
+     *
+     * @param area Area
+     * @param name Name
+     * @param idFieldName Id field name
+     * @param acl ACL
+     * @param gridToolbarData Toolbar data
+     * @param columns List
+     */
+    public UiComponentGridData(
+            final String moduleName,
+            final String area,
+            final String name,
+            final String providerClassName,
+            final String idFieldName,
+            final String acl,
+            final UiComponentGridToolbarData gridToolbarData,
+            final List<Map<String, String>> columns
+    ) {
         this.moduleName = moduleName;
         this.area = area;
         this.name = name;
@@ -40,6 +76,7 @@ public class UiComponentGridData {
         this.idFieldName = idFieldName;
         this.acl = acl;
         this.gridToolbarData = gridToolbarData;
+        this.columns = columns;
     }
 
     /**
@@ -103,5 +140,14 @@ public class UiComponentGridData {
      */
     public String getProviderClassName() {
         return providerClassName;
+    }
+
+    /**
+     * Get entity columns data.
+     *
+     * @return List of columns properties.
+     */
+    public List<Map<String, String>> getColumns() {
+        return columns;
     }
 }

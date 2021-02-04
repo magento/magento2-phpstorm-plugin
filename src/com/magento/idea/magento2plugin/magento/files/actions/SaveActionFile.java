@@ -10,7 +10,6 @@ import com.jetbrains.php.lang.PhpLanguage;
 import com.magento.idea.magento2plugin.magento.files.ModuleFileInterface;
 import org.jetbrains.annotations.NotNull;
 
-
 public final class SaveActionFile implements ModuleFileInterface {
     public static final String CLASS_NAME = "Save";
     public static final String FILE_EXTENSION = "php";
@@ -37,7 +36,7 @@ public final class SaveActionFile implements ModuleFileInterface {
      * @return String
      */
     public static String getDirectory(final @NotNull String entityName) {
-        return DIRECTORY.concat("/" + entityName.concat("Model"));
+        return DIRECTORY.concat("/" + entityName);
     }
 
     /**
