@@ -201,7 +201,7 @@ public class NewEntityDialog extends AbstractDialog {
     private JTextField acl;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, SORT_ORDER})
-    @FieldValidation(rule = RuleRegistry.NUMERIC, message = {NumericRule.MESSAGE})
+    @FieldValidation(rule = RuleRegistry.NUMERIC, message = {NumericRule.MESSAGE, SORT_ORDER})
     private JTextField sortOrder;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, IDENTIFIER})
