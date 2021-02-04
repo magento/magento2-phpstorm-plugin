@@ -31,4 +31,12 @@ public class ObserverDeclarationInspectionTest extends InspectionXmlFixtureTestC
         myFixture.configureByFile(getFixturePath(ModuleEventsXml.FILE_NAME));
         myFixture.testHighlighting(true, false, false);
     }
+
+    /**
+     * Tests warning for disabling of non-existing observer.
+     */
+    public void testDisablingNonExistingObserver() {
+        myFixture.configureByFile(getFixturePath(ModuleEventsXml.FILE_NAME));
+        myFixture.testHighlighting(true, false, false);
+    }
 }

@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation;
 
 import com.intellij.codeInsight.hint.HintManager;
@@ -39,22 +40,38 @@ import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.magento.plugin.GetTargetClassNamesByPluginClassName;
-import com.magento.idea.magento2plugin.util.magento.plugin.IsPluginAllowedForMethod;
+import com.magento.idea.magento2plugin.util.magento.plugin.IsPluginAllowedForMethodUtil;
 import gnu.trove.THashSet;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.TreeMap;
+import javax.swing.JOptionPane;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import java.util.*;
-
+@SuppressWarnings({
+        "PMD.GodClass",
+        "PMD.ExcessiveImports",
+        "PMD.CyclomaticComplexity"
+})
 public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeInsightActionHandler {
-    private CollectInsertedMethods collectInsertedMethods;
-    private ValidatorBundle validatorBundle;
-    private CommonBundle commonBundle;
+    private final CollectInsertedMethods collectInsertedMethods;
+    private final ValidatorBundle validatorBundle;
+    private final CommonBundle commonBundle;
     public String type;
     public FillTextBufferWithPluginMethods fillTextBuffer;
 
-    public PluginGenerateMethodHandlerBase(Plugin.PluginType type) {
+    /**
+     * Constructor.
+     *
+     * @param type Plugin.PluginType
+     */
+    public PluginGenerateMethodHandlerBase(final Plugin.PluginType type) {
         this.type = type.toString();
         this.fillTextBuffer = FillTextBufferWithPluginMethods.getInstance();
         this.collectInsertedMethods = CollectInsertedMethods.getInstance();
@@ -62,28 +79,35 @@ public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeIns
         this.commonBundle = new CommonBundle();
     }
 
-    public boolean isValidFor(Editor editor, PsiFile file) {
+    @Override
+    public boolean isValidFor(final Editor editor, final PsiFile file) {
         if (!(file instanceof PhpFile)) {
             return false;
         }
-        PhpClass phpClass = PhpCodeEditUtil.findClassAtCaret(editor, file);
+        final PhpClass phpClass = PhpCodeEditUtil.findClassAtCaret(editor, file);
         if (phpClass == null) {
             return false;
         }
-        GetTargetClassNamesByPluginClassName targetClassesService = GetTargetClassNamesByPluginClassName.getInstance(editor.getProject());
-        String currentClass = phpClass.getFQN().substring(1);
-        ArrayList<String> targetClassNames = targetClassesService.execute(currentClass);
+        final GetTargetClassNamesByPluginClassName targetClassesService
+                = GetTargetClassNamesByPluginClassName.getInstance(editor.getProject());
+        final String currentClass = phpClass.getFQN().substring(1);
+        final ArrayList<String> targetClassNames = targetClassesService.execute(currentClass);
         return !targetClassNames.isEmpty();
     }
 
-    public void invoke(@NotNull Project project, @NotNull Editor editor, @NotNull PsiFile pluginFile) {
-        PhpFile pluginPhpFile = (PhpFile)pluginFile;
-        PhpClass pluginClass = PhpCodeEditUtil.findClassAtCaret(editor, pluginPhpFile);
-        Key<Object> targetClassKey = Key.create(PluginMethodsGenerator.originalTargetKey);
+    @Override
+    public void invoke(
+            final @NotNull Project project,
+            final @NotNull Editor editor,
+            final @NotNull PsiFile pluginFile
+    ) {
+        final PhpFile pluginPhpFile = (PhpFile)pluginFile;
+        final PhpClass pluginClass = PhpCodeEditUtil.findClassAtCaret(editor, pluginPhpFile);
         if (pluginClass == null) {
             return;
         }
-        PhpNamedElementNode[] fieldsToShow = this.targetMethods(pluginClass, targetClassKey);
+        final Key<Object> targetClassKey = Key.create(PluginMethodsGenerator.originalTargetKey);
+        final PhpNamedElementNode[] fieldsToShow = this.targetMethods(pluginClass, targetClassKey);
         if (fieldsToShow.length == 0) {
             if (ApplicationManager.getApplication().isHeadlessEnvironment()) {
                 return;
@@ -91,65 +115,119 @@ public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeIns
             HintManager.getInstance().showErrorHint(editor, this.getErrorMessage());
             return;
         }
-        PhpNamedElementNode[] members = this.chooseMembers(fieldsToShow, true, pluginFile.getProject());
+        final PhpNamedElementNode[] members = this.chooseMembers(
+                fieldsToShow,
+                true,
+                pluginFile.getProject()
+        );
         if (members == null || members.length == 0) {
             return;
         }
-        int insertPos = getSuitableEditorPosition(editor, pluginPhpFile);
+        final int insertPos = getSuitableEditorPosition(editor, pluginPhpFile);
 
-        CodeStyleSettings codeStyleSettings = new CodeStyleSettings(pluginPhpFile);
+        final CodeStyleSettings codeStyleSettings = new CodeStyleSettings(pluginPhpFile);
         codeStyleSettings.adjustBeforeWrite();
         ApplicationManager.getApplication().runWriteAction(() -> {
-            Set<CharSequence> insertedMethodsNames = new THashSet();
-            PhpClassReferenceResolver resolver = new PhpClassReferenceResolver();
-            StringBuffer textBuf = new StringBuffer();
-            PhpPsiElement scope = PhpCodeInsightUtil.findScopeForUseOperator(pluginClass);
+            final Set<CharSequence> insertedMethodsNames = new THashSet();
+            final PhpClassReferenceResolver resolver = new PhpClassReferenceResolver();
+            final StringBuffer textBuf = new StringBuffer();
+            final PhpPsiElement scope = PhpCodeInsightUtil.findScopeForUseOperator(pluginClass);
 
-            for (PhpNamedElementNode member : members) {
-                PsiElement method = member.getPsiElement();
-                PluginMethodData[] pluginMethods = this.createPluginMethods(pluginClass, (Method) method, targetClassKey);
-                fillTextBuffer.execute(targetClassKey, insertedMethodsNames, resolver, textBuf, pluginMethods);
+            for (final PhpNamedElementNode member : members) {
+                final PsiElement method = member.getPsiElement();
+                final PluginMethodData[] pluginMethods = this.createPluginMethods(
+                        pluginClass,
+                        (Method) method,
+                        targetClassKey
+                );
+                fillTextBuffer.execute(
+                        targetClassKey,
+                        insertedMethodsNames,
+                        resolver,
+                        textBuf,
+                        pluginMethods
+                );
             }
 
-            insertPluginMethodsToFile(project, editor, pluginFile, pluginClass, insertPos, insertedMethodsNames, resolver, textBuf, scope);
+            insertPluginMethodsToFile(
+                    project,
+                    editor,
+                    pluginFile,
+                    pluginClass,
+                    insertPos,
+                    insertedMethodsNames,
+                    resolver,
+                    textBuf,
+                    scope
+            );
         });
         codeStyleSettings.restore();
     }
 
-    private void insertPluginMethodsToFile(@NotNull Project project, @NotNull Editor editor, @NotNull PsiFile pluginFile, PhpClass pluginClass, int insertPos, Set<CharSequence> insertedMethodsNames, PhpClassReferenceResolver resolver, StringBuffer textBuf, PhpPsiElement scope) {
+    private void insertPluginMethodsToFile(
+            final @NotNull Project project,
+            final @NotNull Editor editor,
+            final @NotNull PsiFile pluginFile,
+            final PhpClass pluginClass,
+            final int insertPos,
+            final Set<CharSequence> insertedMethodsNames,
+            final PhpClassReferenceResolver resolver,
+            final StringBuffer textBuf,
+            final PhpPsiElement scope
+    ) {
         if (textBuf.length() > 0 && insertPos >= 0) {
             editor.getDocument().insertString(insertPos, textBuf);
-            int endPos = insertPos + textBuf.length();
+            final int endPos = insertPos + textBuf.length();
             CodeStyleManager.getInstance(project).reformatText(pluginFile, insertPos, endPos);
             PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument());
         }
         if (!insertedMethodsNames.isEmpty()) {
-            List<PsiElement> insertedMethods = collectInsertedMethods.execute(pluginFile, pluginClass.getNameCS(), insertedMethodsNames);
+            final List<PsiElement> insertedMethods = collectInsertedMethods.execute(
+                    pluginFile,
+                    pluginClass.getNameCS(),
+                    insertedMethodsNames
+            );
             if (scope != null && insertedMethods != null) {
                 resolver.importReferences(scope, insertedMethods);
             }
         }
     }
 
-    protected abstract PluginMethodData[] createPluginMethods(PhpClass currentClass, Method method, Key<Object> targetClassKey);
+    protected abstract PluginMethodData[] createPluginMethods(
+            PhpClass currentClass,
+            Method method,
+            Key<Object> targetClassKey
+    );
 
     protected String getErrorMessage() {
         return "No methods to generate";
     }
 
+    @Override
     public boolean startInWriteAction() {
         return false;
     }
 
     @Nullable
-    protected PhpNamedElementNode[] chooseMembers(PhpNamedElementNode[] members, boolean allowEmptySelection, Project project) {
-        PhpNamedElementNode[] nodes = fixOrderToBeAsOriginalFiles(members).toArray(new PhpNamedElementNode[members.length]);
+    protected PhpNamedElementNode[] chooseMembers(
+            final PhpNamedElementNode[] members,
+            final boolean allowEmptySelection,
+            final Project project
+    ) {
+        final PhpNamedElementNode[] nodes = fixOrderToBeAsOriginalFiles(members).toArray(
+                new PhpNamedElementNode[members.length]
+        );
         if (!ApplicationManager.getApplication().isHeadlessEnvironment()) {
-            PluginGenerateMethodHandlerBase.MyMemberChooser chooser = new PluginGenerateMethodHandlerBase.MyMemberChooser(nodes, allowEmptySelection, project);
+            final PluginGenerateMethodHandlerBase.MyMemberChooser chooser
+                    = new PluginGenerateMethodHandlerBase.MyMemberChooser(
+                            nodes,
+                            allowEmptySelection,
+                            project
+                        );
             chooser.setTitle("Choose Methods");
             chooser.setCopyJavadocVisible(false);
             chooser.show();
-            List<PhpNamedElementNode> list = chooser.getSelectedElements();
+            final List<PhpNamedElementNode> list = chooser.getSelectedElements();
             return list == null ? null : list.toArray(new PhpNamedElementNode[0]);
         }
 
@@ -157,18 +235,31 @@ public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeIns
     }
 
     @NotNull
-    protected PhpNamedElementNode[] targetMethods(@NotNull PhpClass phpClass, Key<Object> targetClassKey) {
-        TreeMap<String, PhpNamedElementNode> nodes = new TreeMap();
+    protected PhpNamedElementNode[] targetMethods(
+            final @NotNull PhpClass phpClass,
+            final Key<Object> targetClassKey
+    ) {
+        final TreeMap<String, PhpNamedElementNode> nodes = new TreeMap();
 
-        GetTargetClassNamesByPluginClassName targetClassesService = GetTargetClassNamesByPluginClassName.getInstance(phpClass.getProject());
-        String currentClass = phpClass.getFQN().substring(1);
-        ArrayList<String> targetClassNames = targetClassesService.execute(currentClass);
-        for (String targetClassName : targetClassNames) {
-            PhpClass targetClass = GetPhpClassByFQN.getInstance(phpClass.getProject()).execute(targetClassName);
+        final GetTargetClassNamesByPluginClassName targetClassesService =
+                GetTargetClassNamesByPluginClassName.getInstance(phpClass.getProject());
+        final String currentClass = phpClass.getFQN().substring(1);
+        final ArrayList<String> targetClassNames = targetClassesService.execute(currentClass);
+        for (final String targetClassName : targetClassNames) {
+            final PhpClass targetClass = GetPhpClassByFQN.getInstance(
+                    phpClass.getProject()
+            ).execute(targetClassName);
 
             if (targetClass == null) {
-                String errorMessage = validatorBundle.message("validator.class.targetClassNotFound");
-                JOptionPane.showMessageDialog(null, errorMessage, commonBundle.message("common.error"), JOptionPane.ERROR_MESSAGE);
+                final String errorMessage = validatorBundle.message(
+                        "validator.class.targetClassNotFound"
+                );
+                JOptionPane.showMessageDialog(
+                        null,
+                        errorMessage,
+                        commonBundle.message("common.error"),
+                        JOptionPane.ERROR_MESSAGE
+                );
                 continue;
             }
 
@@ -176,97 +267,125 @@ public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeIns
                 continue;
             }
 
-            Collection<Method> methods = targetClass.getMethods();
-            Iterator methodIterator = methods.iterator();
+            final Collection<Method> methods = targetClass.getMethods();
+            final Iterator methodIterator = methods.iterator();
 
-            while(methodIterator.hasNext()) {
-                Method method = (Method) methodIterator.next();
-                if (IsPluginAllowedForMethod.getInstance().check(method) && !pluginAlreadyHasMethod(phpClass, method)) {
+            while (methodIterator.hasNext()) {
+                final Method method = (Method) methodIterator.next();
+                if (IsPluginAllowedForMethodUtil.check(method)
+                        && !pluginAlreadyHasMethod(phpClass, method)) {
                     method.putUserData(targetClassKey, targetClass);
-                    nodes.put(method.getName(), new PhpNamedElementNode(method));
+                    nodes.put(method.getName(), new PhpNamedElementNode(method));//NOPMD
                 }
             }
         }
-        PhpNamedElementNode[] targetMethods = nodes.values().toArray(new PhpNamedElementNode[0]);
 
-        return targetMethods;
+        return nodes.values().toArray(new PhpNamedElementNode[0]);
     }
 
-    protected boolean pluginAlreadyHasMethod(@NotNull PhpClass currentClass, @NotNull Method method) {
-        Collection<Method> currentMethods = currentClass.getMethods();
-        String methodName = method.getName();
-        String methodPrefix = type;
-        String methodSuffix = methodName.substring(0, 1).toUpperCase() + methodName.substring(1);
-        String pluginMethodName = methodPrefix.concat(methodSuffix);
-        for (Method currentMethod: currentMethods) {
-            if(!currentMethod.getName().equals(pluginMethodName)) {
-                continue;
+    /**
+     * Plugin has a method check.
+     *
+     * @param currentClass PhpClass
+     * @param method Method
+     * @return boolean
+     */
+    protected boolean pluginAlreadyHasMethod(
+            final @NotNull PhpClass currentClass,
+            final @NotNull Method method
+    ) {
+        final Collection<Method> currentMethods = currentClass.getMethods();
+        final String methodName = method.getName();
+        final String methodPrefix = type;
+        final String methodSuffix = methodName.substring(0, 1).toUpperCase(Locale.getDefault())
+                + methodName.substring(1);
+        final String pluginMethodName = methodPrefix.concat(methodSuffix);
+        for (final Method currentMethod: currentMethods) {
+            if (currentMethod.getName().equals(pluginMethodName)) {
+                return true;
             }
-            return true;
         }
         return false;
     }
 
-    public static Collection<PhpNamedElementNode> fixOrderToBeAsOriginalFiles(PhpNamedElementNode[] selected) {
-        List<PhpNamedElementNode> newSelected = ContainerUtil.newArrayList(selected);
+    /**
+     * Sort Order fix.
+     *
+     * @param selected PhpNamedElementNode
+     * @return Collection
+     */
+    public static Collection<PhpNamedElementNode> fixOrderToBeAsOriginalFiles(
+            final PhpNamedElementNode... selected
+    ) {
+        final List<PhpNamedElementNode> newSelected = ContainerUtil.newArrayList(selected);
         Collections.sort(newSelected, (o1, o2) -> {
-            PsiElement psiElement = o1.getPsiElement();
-            PsiElement psiElement2 = o2.getPsiElement();
-            PsiFile containingFile = psiElement.getContainingFile();
-            PsiFile containingFile2 = psiElement2.getContainingFile();
-            return containingFile == containingFile2 ? psiElement.getTextOffset() - psiElement2.getTextOffset() : containingFile.getName().compareTo(containingFile2.getName());
+            final PsiElement psiElement = o1.getPsiElement();
+            final PsiElement psiElement2 = o2.getPsiElement();
+            final PsiFile containingFile = psiElement.getContainingFile();
+            final PsiFile containingFile2 = psiElement2.getContainingFile();
+            return containingFile.equals(containingFile2)
+                    ? psiElement.getTextOffset() - psiElement2.getTextOffset()
+                    : containingFile.getName().compareTo(containingFile2.getName());
         });
         return newSelected;
     }
 
-    private static int getSuitableEditorPosition(Editor editor, PhpFile phpFile) {
-        PsiElement currElement = phpFile.findElementAt(editor.getCaretModel().getOffset());
+    private static int getSuitableEditorPosition(final Editor editor, final PhpFile phpFile) {
+        final PsiElement currElement = phpFile.findElementAt(editor.getCaretModel().getOffset());
         if (currElement != null) {
             PsiElement parent = currElement.getParent();
 
-            for(PsiElement prevParent = currElement; parent != null && !(parent instanceof PhpFile); parent = parent.getParent()) {
+            for (PsiElement prevParent = currElement;
+                    parent != null && !(parent instanceof PhpFile); parent = parent.getParent()) {
                 if (isClassMember(parent)) {
                     return getNextPos(parent);
                 }
 
                 if (parent instanceof PhpClass) {
-                    while(prevParent != null) {
-                        if (isClassMember(prevParent) || PhpPsiUtil.isOfType(prevParent, PhpTokenTypes.chLBRACE)) {
+                    while (prevParent != null) {
+                        if (isClassMember(prevParent) || PhpPsiUtil.isOfType(//NOPMD
+                                prevParent, PhpTokenTypes.chLBRACE)) {
                             return getNextPos(prevParent);
                         }
 
-                        prevParent = prevParent.getPrevSibling();
+                        prevParent = prevParent.getPrevSibling();//NOPMD
                     }
 
-                    for(PsiElement classChild = parent.getFirstChild(); classChild != null; classChild = classChild.getNextSibling()) {
-                        if (PhpPsiUtil.isOfType(classChild, PhpTokenTypes.chLBRACE)) {
+                    for (PsiElement classChild = parent.getFirstChild();
+                                classChild != null; classChild = classChild.getNextSibling()) {
+                        if (PhpPsiUtil.isOfType(classChild, PhpTokenTypes.chLBRACE)) { //NOPMD
                             return getNextPos(classChild);
                         }
                     }
                 }
 
-                prevParent = parent;
+                prevParent = parent;//NOPMD
             }
         }
 
         return -1;
     }
 
-    private static boolean isClassMember(PsiElement element) {
+    private static boolean isClassMember(final PsiElement element) {
         if (element == null) {
             return false;
         }
-        IElementType elementType = element.getNode().getElementType();
-        return elementType == PhpElementTypes.CLASS_FIELDS || elementType == PhpElementTypes.CLASS_CONSTANTS || elementType == PhpStubElementTypes.CLASS_METHOD;
+        final IElementType elementType = element.getNode().getElementType();
+        return elementType == PhpElementTypes.CLASS_FIELDS
+                    || elementType == PhpElementTypes.CLASS_CONSTANTS
+                    || elementType == PhpStubElementTypes.CLASS_METHOD;
     }
 
-    private static int getNextPos(PsiElement element) {
-        PsiElement next = element.getNextSibling();
-        return next != null ? next.getTextOffset() : -1;
+    private static int getNextPos(final PsiElement element) {
+        final PsiElement next = element.getNextSibling();
+        return next != null ? next.getTextOffset() : -1;//NOPMD
     }
 
     private static class MyMemberChooser extends MemberChooser<PhpNamedElementNode> {
-        protected MyMemberChooser(@NotNull PhpNamedElementNode[] nodes, boolean allowEmptySelection, @NotNull Project project) {
+        protected MyMemberChooser(
+                final @NotNull PhpNamedElementNode[] nodes,
+                final boolean allowEmptySelection,
+                final @NotNull Project project) {
             super(nodes, allowEmptySelection, true, project, false);
         }
     }

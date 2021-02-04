@@ -2,27 +2,33 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.data;
 
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 
 public class PreferenceFileData {
-    private String preferenceDirectory;
-    private String preferenceClassName;
-    private String preferenceModule;
-    private PhpClass targetClass;
-    private String preferenceFqn;
-    private String namespace;
-    private boolean inheritClass;
+    private final String preferenceDirectory;
+    private final String preferenceClassName;
+    private final String preferenceModule;
+    private final PhpClass targetClass;
+    private final String preferenceFqn;
+    private final String namespace;
+    private final boolean inheritClass;
+    private final boolean isAnInterface;
 
+    /**
+     * Constructor.
+     */
     public PreferenceFileData(
-            String preferenceDirectory,
-            String preferenceClassName,
-            String preferenceModule,
-            PhpClass targetClass,
-            String preferenceFqn,
-            String namespace,
-            boolean inheritClass
+            final String preferenceDirectory,
+            final String preferenceClassName,
+            final String preferenceModule,
+            final PhpClass targetClass,
+            final String preferenceFqn,
+            final String namespace,
+            final boolean inheritClass,
+            final boolean isAnInterface
     ) {
         this.preferenceDirectory = preferenceDirectory;
         this.preferenceClassName = preferenceClassName;
@@ -31,6 +37,7 @@ public class PreferenceFileData {
         this.preferenceFqn = preferenceFqn;
         this.namespace = namespace;
         this.inheritClass = inheritClass;
+        this.isAnInterface = isAnInterface;
     }
 
     public String getPreferenceClassName() {
@@ -59,5 +66,9 @@ public class PreferenceFileData {
 
     public boolean isInheritClass() {
         return inheritClass;
+    }
+
+    public boolean isInterface() {
+        return isAnInterface;
     }
 }

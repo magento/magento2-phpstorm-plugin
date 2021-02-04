@@ -7,7 +7,7 @@
 <idea-plugin>
     <id>com.magento.idea.magento2plugin</id>
     <name>Magento PhpStorm</name>
-    <version>3.1.0</version>
+    <version>3.2.0</version>
     <vendor url="https://github.com/magento/magento2-phpstorm-plugin">Magento Inc.</vendor>
 
     <description><![CDATA[
@@ -70,6 +70,7 @@
             <action id="NewModelsAction" class="com.magento.idea.magento2plugin.actions.generation.NewModelsAction" />
             <action id="MagentoCreateADataModel" class="com.magento.idea.magento2plugin.actions.generation.NewDataModelAction" />
             <action id="MagentoMessageQueue" class="com.magento.idea.magento2plugin.actions.generation.NewMessageQueueAction" />
+            <action id="NewDbSchema" class="com.magento.idea.magento2plugin.actions.generation.NewDbSchemaAction" />
             <add-to-group group-id="NewGroup" anchor="last"/>
         </group>
 
@@ -94,6 +95,12 @@
             <add-to-group group-id="ProjectViewPopupMenu"/>
         </action>
 
+        <action id="CopyMagentoPath"
+                class="com.magento.idea.magento2plugin.actions.CopyMagentoPath"
+                text="Magento Path"
+                description="Copies Magento's path of file depending on file type">
+            <add-to-group group-id="CopyFileReference" anchor="last"/>
+        </action>
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -218,6 +225,8 @@
         <internalFileTemplate name="Magento Resource Model Class"/>
         <internalFileTemplate name="Magento Data Model"/>
         <internalFileTemplate name="Magento Data Model Interface"/>
+        <internalFileTemplate name="Magento Module Declarative Schema XML"/>
+        <internalFileTemplate name="Magento Module Declarative Schema Whitelist JSON"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 
@@ -227,7 +236,7 @@
     <extensions defaultExtensionNs="com.jetbrains.php">
         <frameworkProjectConfigurableProvider implementation="com.magento.idea.magento2plugin.project.ConfigurableProvider"/>
         <frameworkUsageProvider implementation="com.magento.idea.magento2plugin.project.UsagesProvider"/>
-        <libraryRoot id="phpstorm.meta.php" path="/phpstorm.meta.php/" runtime="false"/>
+        <libraryRoot id="phpstorm.meta.php" path="/.phpstorm.meta.php/" runtime="false"/>
     </extensions>
 
 </idea-plugin>

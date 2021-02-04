@@ -94,10 +94,7 @@ public class ObserverDeclarationInspection extends PhpInspection {
                         final XmlAttribute observerDisabledAttribute =
                                 observerXmlTag.getAttribute("disabled");
 
-                        if (observerNameAttribute == null || (
-                                observerDisabledAttribute != null//NOPMD
-                                && observerDisabledAttribute.getValue().equals("true"))
-                        ) {
+                        if (observerNameAttribute == null) {
                             continue;
                         }
 
@@ -122,6 +119,21 @@ public class ObserverDeclarationInspection extends PhpInspection {
                                         eventIndex,
                                         file
                                 );
+
+                        if (observerDisabledAttribute != null
+                                && observerDisabledAttribute.getValue() != null
+                                && observerDisabledAttribute.getValue().equals("true")
+                                && modulesWithSameObserverName.isEmpty()
+                        ) {
+                            problemsHolder.registerProblem(
+                                    observerNameAttribute.getValueElement(),
+                                    inspectionBundle.message(
+                                            "inspection.observer.disabledObserverDoesNotExist"
+                                    ),
+                                    errorSeverity
+                            );
+                        }
+
                         for (final HashMap<String, String> moduleEntry:
                                 modulesWithSameObserverName) {
                             final Map.Entry<String, String> module = moduleEntry
