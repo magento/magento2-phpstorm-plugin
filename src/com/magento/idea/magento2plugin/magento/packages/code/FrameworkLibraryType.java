@@ -18,13 +18,15 @@ public enum FrameworkLibraryType {
     DATA_OBJECT("Magento\\Framework\\DataObject"),
     FILTER_BUILDER("Magento\\Framework\\Api\\FilterBuilder"),
     RESULT_INTERFACE("Magento\\Framework\\Controller\\ResultInterface"),
+    RESULT_FACTORY("Magento\\Framework\\Controller\\ResultFactory"),
     RESPONSE_INTERFACE("Magento\\Framework\\App\\ResponseInterface"),
     LOGGER("Psr\\Log\\LoggerInterface"),
     REPORTING("Magento\\Framework\\Api\\Search\\ReportingInterface"),
     REQUEST("Magento\\Framework\\App\\RequestInterface"),
     SEARCH_CRITERIA("Magento\\Framework\\Api\\SearchCriteriaInterface"),
     SEARCH_CRITERIA_BUILDER("Magento\\Framework\\Api\\SearchCriteriaBuilder"),
-    SEARCH_RESULT("Magento\\Framework\\Api\\SearchResultsInterface");
+    SEARCH_RESULT("Magento\\Framework\\Api\\SearchResultsInterface"),
+    URL("Magento\\Framework\\UrlInterface");
 
     /**
      * Factory type suffix.

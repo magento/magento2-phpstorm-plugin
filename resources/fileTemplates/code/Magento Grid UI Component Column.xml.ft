@@ -1,0 +1,8 @@
+<column name="${COLUMN_NAME}">
+<settings>
+#if (${COLUMN_FILTER})
+    <filter>${COLUMN_FILTER}</filter>
+#end
+    <label translate="true">${COLUMN_LABEL}</label>
+</settings>
+</column>

@@ -1,6 +1,6 @@
 <?php
 
-namespace Foo\Bar\Controller\Adminhtml\CompanyModel;
+namespace Foo\Bar\Controller\Adminhtml\Company;
 
 use Foo\Bar\Command\Company\SaveCommand;
 use Foo\Bar\Model\CompanyModel\CompanyModel;

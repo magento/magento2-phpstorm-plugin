@@ -56,5 +56,16 @@
                 <sorting>desc</sorting>
             </settings>
         </column>
+        #if (${COLUMNS})
+            #set($columns = ${COLUMNS})
+            #foreach ($column in $columns.split("\n"))
+                $column
+            #end
+        #end
+        <actionsColumn name="actions" class="${ACTION_COLUMN}">
+            <settings>
+                <indexField>${ID_FIELD_NAME}</indexField>
+            </settings>
+        </actionsColumn>
     </columns>
 </listing>

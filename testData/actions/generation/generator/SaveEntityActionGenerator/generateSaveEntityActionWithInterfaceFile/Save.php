@@ -1,6 +1,6 @@
 <?php
 
-namespace Foo\Bar\Controller\Adminhtml\CompanyModel;
+namespace Foo\Bar\Controller\Adminhtml\Company;
 
 use Foo\Bar\Api\Data\CompanyInterface;
 use Foo\Bar\Api\Data\CompanyInterfaceFactory;
