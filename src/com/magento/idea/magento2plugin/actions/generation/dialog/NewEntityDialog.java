@@ -82,6 +82,7 @@ import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.PropertiesTypes;
 import com.magento.idea.magento2plugin.magento.packages.database.TableEngines;
 import com.magento.idea.magento2plugin.magento.packages.database.TableResources;
+import com.magento.idea.magento2plugin.magento.packages.uiComponent.FormElementType;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.MenuIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.ui.table.TableGroupWrapper;
@@ -690,8 +691,8 @@ public class NewEntityDialog extends AbstractDialog {
      *
      * @return List[UiComponentFormButtonData]
      */
-    protected List getButtons() {
-        final List buttons = new ArrayList();
+    protected List<UiComponentFormButtonData> getButtons() {
+        final List<UiComponentFormButtonData> buttons = new ArrayList<>();
         final String directory = "Block/Form";
 
         final NamespaceBuilder namespaceBuilderSave = new NamespaceBuilder(
@@ -701,7 +702,7 @@ public class NewEntityDialog extends AbstractDialog {
         );
         buttons.add(new UiComponentFormButtonData(
                 directory,
-                "SaveEntity",
+                "Save",
                 getModuleName(),
                 "Save",
                 namespaceBuilderSave.getNamespace(),
@@ -758,13 +759,13 @@ public class NewEntityDialog extends AbstractDialog {
 
         fieldsets.add(
                 new UiComponentFormFieldData(
-                        "entity_id",
-                        "int",
+                        getEntityIdColumn(),
                         "Entity ID",
                         "0",
                         "general",
-                        "hidden",
-                        "entity_id"
+                        FormElementType.HIDDEN.getType(),
+                        "text",
+                        getEntityIdColumn()
                 )
         );
 
@@ -776,7 +777,12 @@ public class NewEntityDialog extends AbstractDialog {
             final String label = model.getValueAt(count, 0).toString(); //todo: convert
             final String sortOrder = String.valueOf(count).concat("0");
             final String fieldset = "general";
-            final String formElementType = model.getValueAt(count, 1).toString();
+
+            final PropertiesTypes property =
+                    PropertiesTypes.getByValue(model.getValueAt(count, 1).toString());
+            final String formElementType =
+                    FormElementType.getDefaultForProperty(property).getType();
+
             final String source = model.getValueAt(count, 0).toString(); //todo: convert
 
             final UiComponentFormFieldData fieldsetData = new UiComponentFormFieldData(//NOPMD
