@@ -232,6 +232,8 @@
         <internalFileTemplate name="Magento Entity Save Controller Class"/>
         <internalFileTemplate name="Magento Entity Data Mapper"/>
         <internalFileTemplate name="Magento Save Entity Command Model"/>
+        <internalFileTemplate name="Magento Entity Index Adminhtml Controller Class"/>
+        <internalFileTemplate name="Magento Grid Ui Component Action Column Class"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 

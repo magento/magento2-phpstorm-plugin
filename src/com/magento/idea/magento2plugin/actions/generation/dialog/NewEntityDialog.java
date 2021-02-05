@@ -19,7 +19,9 @@ import com.magento.idea.magento2plugin.actions.generation.data.DataModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelInterfaceData;
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.EntityDataMapperData;
+import com.magento.idea.magento2plugin.actions.generation.data.AdminListViewEntityActionData;
 import com.magento.idea.magento2plugin.actions.generation.data.GetListQueryModelData;
+import com.magento.idea.magento2plugin.actions.generation.data.GridActionColumnData;
 import com.magento.idea.magento2plugin.actions.generation.data.LayoutXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.MenuXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.ModelData;
@@ -50,7 +52,9 @@ import com.magento.idea.magento2plugin.actions.generation.generator.DataModelInt
 import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaWhitelistJsonGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.EntityDataMapperGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.AdminListViewEntityActionGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.GetListQueryModelGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.GridActionColumnFileGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.LayoutXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.MenuXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleCollectionGenerator;
@@ -74,6 +78,7 @@ import com.magento.idea.magento2plugin.magento.files.ModelPhp;
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 import com.magento.idea.magento2plugin.magento.files.ResourceModelPhp;
 import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
+import com.magento.idea.magento2plugin.magento.files.actions.AdminListViewActionFile;
 import com.magento.idea.magento2plugin.magento.files.actions.SaveActionFile;
 import com.magento.idea.magento2plugin.magento.files.commands.SaveEntityCommandFile;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
@@ -196,7 +201,7 @@ public class NewEntityDialog extends AbstractDialog {
     private JTextField acl;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, SORT_ORDER})
-    @FieldValidation(rule = RuleRegistry.NUMERIC, message = {NumericRule.MESSAGE})
+    @FieldValidation(rule = RuleRegistry.NUMERIC, message = {NumericRule.MESSAGE, SORT_ORDER})
     private JTextField sortOrder;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, IDENTIFIER})
@@ -331,6 +336,7 @@ public class NewEntityDialog extends AbstractDialog {
             generateEntityDataMapperFile();
             generateModelGetListQueryFile();
             generateDataProviderFile();
+            generateUiComponentGridActionColumnFile();
             generateUiComponentGridFile();
             generateFormViewControllerFile();
             generateFormLayoutFile();
@@ -617,10 +623,6 @@ public class NewEntityDialog extends AbstractDialog {
         return "Save";//NOPMD
     }
 
-    private String getViewControllerDirectory() {
-        return getControllerDirectory() + getModelName();
-    }
-
     private String getControllerDirectory() {
         return ControllerBackendPhp.DEFAULT_DIR  + File.separator;
     }
@@ -815,21 +817,21 @@ public class NewEntityDialog extends AbstractDialog {
      * Generate Grid view controller file.
      */
     private void generateGridViewControllerFile() {
+        final AdminListViewActionFile indexFile = new AdminListViewActionFile(getEntityName());
         final NamespaceBuilder namespace = new NamespaceBuilder(
                 getModuleName(),
-                "Listing",
-                ControllerBackendPhp.DEFAULT_DIR
+                AdminListViewActionFile.CLASS_NAME,
+                indexFile.getDirectory()
         );
-        new ModuleControllerClassGenerator(new ControllerFileData(
-                getControllerDirectory(),
-                "Listing",
+        final AdminListViewEntityActionData data = new AdminListViewEntityActionData(
                 getModuleName(),
-                Areas.adminhtml.toString(),
-                HttpMethod.GET.toString(),
+                getEntityName(),
+                namespace.getNamespace(),
+                namespace.getClassFqn(),
                 getAcl(),
-                true,
-                namespace.getNamespace()
-        ), project).generate(ACTION_NAME, false);
+                getMenuIdentifier()
+        );
+        new AdminListViewEntityActionGenerator(data, project).generate(ACTION_NAME, false);
     }
 
     /**
@@ -841,7 +843,7 @@ public class NewEntityDialog extends AbstractDialog {
                 getRoute(),
                 getModuleName(),
                 getEntityName(),
-                "Listing",
+                AdminListViewActionFile.CLASS_NAME,
                 getGridName()
         ), project).generate(ACTION_NAME, false);
     }
@@ -969,6 +971,20 @@ public class NewEntityDialog extends AbstractDialog {
     }
 
     /**
+     * Generate Grid UI Component action column file.
+     */
+    private void generateUiComponentGridActionColumnFile() {
+        final GridActionColumnData data = new GridActionColumnData(
+                getModuleName(),
+                getEntityName(),
+                getEntityIdColumn(),
+                getEditViewAction(),
+                getDeleteAction()
+        );
+        new GridActionColumnFileGenerator(data, project).generate(ACTION_NAME, true);
+    }
+
+    /**
      * Generate UI Component grid file.
      */
     private void generateUiComponentGridFile() {
@@ -992,7 +1008,8 @@ public class NewEntityDialog extends AbstractDialog {
                 getDataProviderNamespace().getClassFqn(),
                 getEntityIdColumn(),
                 getAcl(),
-                getUiComponentGridToolbarData()
+                getUiComponentGridToolbarData(),
+                getEntityProperties()
         );
     }
 
@@ -1013,16 +1030,55 @@ public class NewEntityDialog extends AbstractDialog {
     }
 
     /**
+     * Get index view action path.
+     *
+     * @return String
+     */
+    private String getIndexViewAction() {
+        return getRoute()
+                + File.separator
+                + FirstLetterToLowercaseUtil.convert(getEntityName())
+                + File.separator
+                + "index";
+    }
+
+    /**
+     * Get edit view action path.
+     *
+     * @return String
+     */
+    private String getEditViewAction() {
+        return getRoute()
+                + File.separator
+                + FirstLetterToLowercaseUtil.convert(getEntityName())
+                + File.separator
+                + "edit";
+    }
+
+    /**
+     * Get delete action path.
+     *
+     * @return String
+     */
+    private String getDeleteAction() {
+        return getRoute()
+                + File.separator
+                + FirstLetterToLowercaseUtil.convert(getEntityName())
+                + File.separator
+                + "delete";
+    }
+
+    /**
      * Generate form view controller file.
      */
     private void generateFormViewControllerFile() {
         final NamespaceBuilder namespace = new NamespaceBuilder(
                 getModuleName(),
                 getViewActionName(),
-                getViewControllerDirectory()
+                getControllerDirectory().concat(getEntityName())
         );
         new ModuleControllerClassGenerator(new ControllerFileData(
-                getViewControllerDirectory(),
+                getControllerDirectory().concat(getEntityName()),
                 getViewActionName(),
                 getModuleName(),
                 Areas.adminhtml.toString(),
@@ -1151,15 +1207,18 @@ public class NewEntityDialog extends AbstractDialog {
         ), project).generate(ACTION_NAME, true);
     }
 
-    private PsiFile generateMenuFile() {
-        return new MenuXmlGenerator(new MenuXmlData(
-            getParentMenuItem(),
-            getSortOrder(),
-            getModuleName(),
-            getMenuIdentifier(),
-            getMenuTitle(),
-            getAcl(),
-            getMenuAction()
+    /**
+     * Generate menu file.
+     */
+    private void generateMenuFile() {
+        new MenuXmlGenerator(new MenuXmlData(
+                getParentMenuItem(),
+                getSortOrder(),
+                getModuleName(),
+                getMenuIdentifier(),
+                getMenuTitle(),
+                getAcl(),
+                getIndexViewAction()
         ), project).generate(ACTION_NAME, false);
     }
 
@@ -1173,14 +1232,6 @@ public class NewEntityDialog extends AbstractDialog {
 
     public String getMenuIdentifier() {
         return menuIdentifier.getText().trim();
-    }
-
-    private String getMenuAction() {
-        return getRoute()
-            + File.separator
-            + FirstLetterToLowercaseUtil.convert(getEntityName())
-            + File.separator
-            + "listing";
     }
 
     public String getMenuTitle() {

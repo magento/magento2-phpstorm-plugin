@@ -13,9 +13,9 @@ public class SaveEntityActionGeneratorTest extends BaseGeneratorTestCase {
     private static final String MODULE_NAME = "Foo_Bar";
     private static final String ENTITY_NAME = "Company";
     private static final String EXPECTED_DIRECTORY =
-            "/src/app/code/Foo/Bar/Controller/Adminhtml/" + ENTITY_NAME + "Model";
+            "/src/app/code/Foo/Bar/Controller/Adminhtml/" + ENTITY_NAME;
     private static final String NAMESPACE =
-            "Foo\\Bar\\Controller\\Adminhtml\\" + ENTITY_NAME + "Model";
+            "Foo\\Bar\\Controller\\Adminhtml\\" + ENTITY_NAME;
     private static final String SAVE_COMMAND =
             "Foo\\Bar\\Command\\" + ENTITY_NAME + "\\SaveCommand";
     private static final String DTO_TYPE =

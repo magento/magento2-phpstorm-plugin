@@ -1,0 +1,37 @@
+<?php
+#parse("PHP File Header.php")
+
+namespace ${NAMESPACE};
+
+#set($uses = ${USES})
+#foreach ($use in $uses.split(","))
+use $use;
+#end
+
+/**
+ * ${ENTITY_NAME} backend index (list) controller.
+ */
+class ${CLASS_NAME} extends ${PARENT_CLASS_NAME} implements ${HTTP_GET_METHOD}
+{
+    /**
+     * Authorization level of a basic admin session.
+     */
+    const ADMIN_RESOURCE = '${ACL}';
+
+    /**
+     * Execute action based on request and return result.
+     *
+     * @return ${RESULT}|${RESPONSE}
+     */
+    public function execute()
+    {
+        $resultPage = $this->resultFactory->create(${RESULT_FACTORY}::TYPE_PAGE);
+
+        $resultPage->setActiveMenu('${MENU}');
+        $resultPage->addBreadcrumb(__('${ENTITY_NAME}'), __('${ENTITY_NAME}'));
+        $resultPage->addBreadcrumb(__('Manage ${ENTITY_NAME}s'), __('Manage ${ENTITY_NAME}s'));
+        $resultPage->getConfig()->getTitle()->prepend(__('${ENTITY_NAME} List'));
+
+        return $resultPage;
+    }
+}
