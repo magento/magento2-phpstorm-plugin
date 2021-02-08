@@ -7,7 +7,7 @@
 <idea-plugin>
     <id>com.magento.idea.magento2plugin</id>
     <name>Magento PhpStorm</name>
-    <version>3.1.0</version>
+    <version>3.2.0</version>
     <vendor url="https://github.com/magento/magento2-phpstorm-plugin">Magento Inc.</vendor>
 
     <description><![CDATA[
@@ -236,7 +236,7 @@
     <extensions defaultExtensionNs="com.jetbrains.php">
         <frameworkProjectConfigurableProvider implementation="com.magento.idea.magento2plugin.project.ConfigurableProvider"/>
         <frameworkUsageProvider implementation="com.magento.idea.magento2plugin.project.UsagesProvider"/>
-        <libraryRoot id="phpstorm.meta.php" path="/phpstorm.meta.php/" runtime="false"/>
+        <libraryRoot id="phpstorm.meta.php" path="/.phpstorm.meta.php/" runtime="false"/>
     </extensions>
 
 </idea-plugin>
