@@ -5,6 +5,9 @@
 
 package com.magento.idea.magento2plugin.magento.files;
 
+@SuppressWarnings({
+        "PMD.ClassNamingConventions"
+})
 public class TestFixture {
     public static final String PHP_DOC_TAG_NAME = "@magentoDataFixture";
     public static final String PHP_DOC_TAG_NAME_API = "@magentoApiDataFixture";
