@@ -1,0 +1,36 @@
+<?php
+#parse("PHP File Header.php")
+
+namespace ${NAMESPACE};
+
+#set($uses = ${USES})
+#foreach ($use in $uses.split(","))
+use $use;
+#end
+
+/**
+ * New action ${ENTITY_NAME} controller.
+ */
+class ${CLASS_NAME} extends ${EXTENDS} implements ${IMPLEMENTS}
+{
+     /**
+     * Authorization level of a basic admin session.
+     *
+     * @see _isAllowed()
+     */
+    const ADMIN_RESOURCE = '${ADMIN_RESOURCE}';
+
+    /**
+     * Create new ${ENTITY_NAME} action.
+     *
+     * @return ${RESULT_INTERFACE}|${FORWARD}
+     */
+    public function execute()
+    {
+        /** @var ${FORWARD} $resultForward */
+        $resultForward = $this->resultFactory->create(${RESULT_FACTORY}::TYPE_FORWARD);
+        $resultForward->forward('edit');
+
+        return $resultForward;
+    }
+}

@@ -13,18 +13,19 @@ import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.actions.generation.NewEntityAction;
 import com.magento.idea.magento2plugin.actions.generation.OverrideClassByAPreferenceAction;
 import com.magento.idea.magento2plugin.actions.generation.data.AclXmlData;
+import com.magento.idea.magento2plugin.actions.generation.data.AdminListViewEntityActionData;
 import com.magento.idea.magento2plugin.actions.generation.data.CollectionData;
 import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelInterfaceData;
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.EntityDataMapperData;
-import com.magento.idea.magento2plugin.actions.generation.data.AdminListViewEntityActionData;
 import com.magento.idea.magento2plugin.actions.generation.data.GetListQueryModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.GridActionColumnData;
 import com.magento.idea.magento2plugin.actions.generation.data.LayoutXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.MenuXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.ModelData;
+import com.magento.idea.magento2plugin.actions.generation.data.NewActionEntityControllerFileData;
 import com.magento.idea.magento2plugin.actions.generation.data.PreferenceDiXmFileData;
 import com.magento.idea.magento2plugin.actions.generation.data.ResourceModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.RoutesXmlData;
@@ -47,12 +48,12 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NumericRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.AclXmlGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.AdminListViewEntityActionGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DataModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DataModelInterfaceGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaWhitelistJsonGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.EntityDataMapperGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.AdminListViewEntityActionGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.GetListQueryModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.GridActionColumnFileGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.LayoutXmlGenerator;
@@ -61,6 +62,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.ModuleCollec
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleControllerClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleResourceModelGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.NewActionEntityControllerFileGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.PreferenceDiXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.RoutesXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.SaveEntityCommandGenerator;
@@ -79,6 +81,7 @@ import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 import com.magento.idea.magento2plugin.magento.files.ResourceModelPhp;
 import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
 import com.magento.idea.magento2plugin.magento.files.actions.AdminListViewActionFile;
+import com.magento.idea.magento2plugin.magento.files.actions.NewActionFile;
 import com.magento.idea.magento2plugin.magento.files.actions.SaveActionFile;
 import com.magento.idea.magento2plugin.magento.files.commands.SaveEntityCommandFile;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
@@ -342,6 +345,7 @@ public class NewEntityDialog extends AbstractDialog {
             generateFormLayoutFile();
             generateSaveEntityCommandFile();
             generateFormSaveControllerFile();
+            generateFormNewActionControllerFile();
             generateUiComponentFormFile();
         }
 
@@ -1169,6 +1173,24 @@ public class NewEntityDialog extends AbstractDialog {
                 dtoType,
                 getAcl(),
                 getEntityIdColumn()
+        ), project).generate(ACTION_NAME, false);
+    }
+
+    /**
+     * Generate NewAction Controller file.
+     */
+    private void generateFormNewActionControllerFile() {
+        final NamespaceBuilder namespace = new NamespaceBuilder(
+                getModuleName(),
+                NewActionFile.CLASS_NAME,
+                NewActionFile.getDirectory(getEntityName())
+        );
+
+        new NewActionEntityControllerFileGenerator(new NewActionEntityControllerFileData(
+                getEntityName(),
+                getModuleName(),
+                namespace.getNamespace(),
+                getAcl()
         ), project).generate(ACTION_NAME, false);
     }
 

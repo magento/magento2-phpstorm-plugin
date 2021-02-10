@@ -10,7 +10,8 @@ import org.jetbrains.annotations.NotNull;
 
 public enum BackendModuleType {
     CONTEXT("Magento\\Backend\\App\\Action\\Context"),
-    EXTENDS("Magento\\Backend\\App\\Action");
+    EXTENDS("Magento\\Backend\\App\\Action"),
+    FORWARD("Magento\\Backend\\Model\\View\\Result\\Forward");
 
     /**
      * Backend module type.
