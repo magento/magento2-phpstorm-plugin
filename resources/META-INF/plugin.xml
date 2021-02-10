@@ -234,6 +234,7 @@
         <internalFileTemplate name="Magento Save Entity Command Model"/>
         <internalFileTemplate name="Magento Entity Index Adminhtml Controller Class"/>
         <internalFileTemplate name="Magento Grid Ui Component Action Column Class"/>
+        <internalFileTemplate name="Magento PHP Form Generic Button Block Class"/>
         <internalFileTemplate name="Magento Entity New Action Controller Class"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>

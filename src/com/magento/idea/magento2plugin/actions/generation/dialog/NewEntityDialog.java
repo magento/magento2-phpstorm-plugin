@@ -20,6 +20,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.DataModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelInterfaceData;
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.EntityDataMapperData;
+import com.magento.idea.magento2plugin.actions.generation.data.FormGenericButtonBlockData;
 import com.magento.idea.magento2plugin.actions.generation.data.GetListQueryModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.GridActionColumnData;
 import com.magento.idea.magento2plugin.actions.generation.data.LayoutXmlData;
@@ -54,6 +55,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.DataModelInt
 import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaWhitelistJsonGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.EntityDataMapperGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.FormGenericButtonBlockGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.GetListQueryModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.GridActionColumnFileGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.LayoutXmlGenerator;
@@ -76,6 +78,7 @@ import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.files.DataModel;
 import com.magento.idea.magento2plugin.magento.files.DataModelInterface;
 import com.magento.idea.magento2plugin.magento.files.EntityDataMapperFile;
+import com.magento.idea.magento2plugin.magento.files.FormGenericButtonBlockFile;
 import com.magento.idea.magento2plugin.magento.files.ModelPhp;
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 import com.magento.idea.magento2plugin.magento.files.ResourceModelPhp;
@@ -90,6 +93,7 @@ import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.PropertiesTypes;
 import com.magento.idea.magento2plugin.magento.packages.database.TableEngines;
 import com.magento.idea.magento2plugin.magento.packages.database.TableResources;
+import com.magento.idea.magento2plugin.magento.packages.uiComponent.FormElementType;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.MenuIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.ui.table.TableGroupWrapper;
@@ -345,6 +349,7 @@ public class NewEntityDialog extends AbstractDialog {
             generateFormLayoutFile();
             generateSaveEntityCommandFile();
             generateFormSaveControllerFile();
+            generateFormUiComponentGenericButtonFile();
             generateFormNewActionControllerFile();
             generateUiComponentFormFile();
         }
@@ -696,8 +701,8 @@ public class NewEntityDialog extends AbstractDialog {
      *
      * @return List[UiComponentFormButtonData]
      */
-    protected List getButtons() {
-        final List buttons = new ArrayList();
+    protected List<UiComponentFormButtonData> getButtons() {
+        final List<UiComponentFormButtonData> buttons = new ArrayList<>();
         final String directory = "Block/Form";
 
         final NamespaceBuilder namespaceBuilderSave = new NamespaceBuilder(
@@ -707,7 +712,7 @@ public class NewEntityDialog extends AbstractDialog {
         );
         buttons.add(new UiComponentFormButtonData(
                 directory,
-                "SaveEntity",
+                "Save",
                 getModuleName(),
                 "Save",
                 namespaceBuilderSave.getNamespace(),
@@ -764,13 +769,13 @@ public class NewEntityDialog extends AbstractDialog {
 
         fieldsets.add(
                 new UiComponentFormFieldData(
-                        "entity_id",
-                        "int",
+                        getEntityIdColumn(),
                         "Entity ID",
                         "0",
                         "general",
-                        "hidden",
-                        "entity_id"
+                        FormElementType.HIDDEN.getType(),
+                        "text",
+                        getEntityIdColumn()
                 )
         );
 
@@ -782,7 +787,12 @@ public class NewEntityDialog extends AbstractDialog {
             final String label = model.getValueAt(count, 0).toString(); //todo: convert
             final String sortOrder = String.valueOf(count).concat("0");
             final String fieldset = "general";
-            final String formElementType = model.getValueAt(count, 1).toString();
+
+            final PropertiesTypes property =
+                    PropertiesTypes.getByValue(model.getValueAt(count, 1).toString());
+            final String formElementType =
+                    FormElementType.getDefaultForProperty(property).getType();
+
             final String source = model.getValueAt(count, 0).toString(); //todo: convert
 
             final UiComponentFormFieldData fieldsetData = new UiComponentFormFieldData(//NOPMD
@@ -1208,6 +1218,27 @@ public class NewEntityDialog extends AbstractDialog {
                 );
 
         return namespaceBuilder.getClassFqn();
+    }
+
+    /**
+     * Generate Form UI Component generic button block file.
+     */
+    private void generateFormUiComponentGenericButtonFile() {
+        final NamespaceBuilder genericButtonBlockNamespace = new NamespaceBuilder(
+                getModuleName(),
+                FormGenericButtonBlockFile.CLASS_NAME,
+                FormGenericButtonBlockFile.DIRECTORY
+        );
+        new FormGenericButtonBlockGenerator(
+                new FormGenericButtonBlockData(
+                        getModuleName(),
+                        getEntityName(),
+                        getEntityIdColumn(),
+                        genericButtonBlockNamespace.getClassFqn(),
+                        genericButtonBlockNamespace.getNamespace()
+                ),
+                project
+        ).generate(ACTION_NAME, true);
     }
 
     /**

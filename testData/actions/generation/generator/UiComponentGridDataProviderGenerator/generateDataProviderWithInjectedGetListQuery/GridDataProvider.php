@@ -26,6 +26,11 @@ class GridDataProvider extends DataProvider
     private $searchResultFactory;
 
     /**
+     * @var array
+     */
+    private $loadedData = [];
+
+    /**
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
@@ -81,5 +86,24 @@ class GridDataProvider extends DataProvider
             $searchCriteria,
             'entity_id'
         );
+    }
+
+    /**
+     * Get data.
+     *
+     * @return array
+     */
+    public function getData(): array
+    {
+        if ($this->loadedData) {
+            return $this->loadedData;
+        }
+        $this->loadedData = parent::getData();
+
+        foreach ($this->loadedData['items'] as $item) {
+            $this->loadedData['items'][$item['entity_id']] = $item;
+        }
+
+        return $this->loadedData;
     }
 }
