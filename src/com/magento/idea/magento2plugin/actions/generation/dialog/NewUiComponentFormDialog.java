@@ -47,6 +47,7 @@ import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
+import com.magento.idea.magento2plugin.magento.packages.uiComponent.FormElementType;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.ui.table.ComboBoxEditor;
 import com.magento.idea.magento2plugin.ui.table.DeleteRowButton;
@@ -346,25 +347,9 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     }
 
     private void initFormElementTypeColumn() {
-        final String[] formElementTypes = {
-            "hidden",
-            "file",
-            "input",
-            "date",
-            "boolean",
-            "checkbox",
-            "checkboxset",
-            "email",
-            "select",
-            "multiselect",
-            "text",
-            "textarea",
-            "price",
-            "radioset",
-            "wysiwyg"
-        };
-
+        final String[] formElementTypes = FormElementType.getTypeList().toArray(new String[0]);
         final TableColumn formElementTypeColumn = fields.getColumn(FORM_ELEMENT_TYPE_COLUMN);
+
         formElementTypeColumn.setCellEditor(new ComboBoxEditor(formElementTypes));
         formElementTypeColumn.setCellRenderer(new ComboBoxTableRenderer<>(formElementTypes));
     }
