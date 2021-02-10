@@ -9,6 +9,7 @@
 [![Version](http://phpstorm.espend.de/badge/8024/version)](https://plugins.jetbrains.com/plugin/8024)
 [![Downloads](http://phpstorm.espend.de/badge/8024/downloads)](https://plugins.jetbrains.com/plugin/8024)
 ![merge-chance-badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fmerge-chance.info%2Fbadge%3Frepo%3Dmagento/magento2-phpstorm-plugin)
+[![Made With Love](https://img.shields.io/badge/Made%20With-Love-orange.svg)](https://magento.com)
 
 ## Installation
 

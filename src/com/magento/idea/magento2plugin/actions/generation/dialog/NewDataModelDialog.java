@@ -77,6 +77,7 @@ public class NewDataModelDialog extends AbstractDialog {
     private JButton buttonCancel;
     private JTable propertyTable;
     private JButton addProperty;
+    private JCheckBox createInterface;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, MODEL_NAME})
@@ -137,9 +138,12 @@ public class NewDataModelDialog extends AbstractDialog {
         if (validateFormFields()) {
             buildNamespaces();
             formatProperties();
-            generateModelInterfaceFile();
             generateModelFile();
-            generatePreference();
+
+            if (isInterfaceShouldBeCreated()) {
+                generateModelInterfaceFile();
+                generatePreference();
+            }
             this.setVisible(false);
         }
     }
@@ -206,7 +210,8 @@ public class NewDataModelDialog extends AbstractDialog {
                 getModuleName(),
                 getModelFQN(),
                 getInterfaceFQN(),
-                getProperties()
+                getProperties(),
+                isInterfaceShouldBeCreated()
         )).generate(NewDataModelAction.ACTION_NAME, true);
     }
 
@@ -249,6 +254,10 @@ public class NewDataModelDialog extends AbstractDialog {
                     CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_UNDERSCORE, name)
             ).string());
         }
+    }
+
+    private boolean isInterfaceShouldBeCreated() {
+        return createInterface.isSelected();
     }
 
     private String getModuleName() {

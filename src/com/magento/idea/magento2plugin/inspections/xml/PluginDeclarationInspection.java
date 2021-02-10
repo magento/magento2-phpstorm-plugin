@@ -71,6 +71,9 @@ public class PluginDeclarationInspection extends PhpInspection {
 
                     final XmlAttribute pluginNameAttribute =
                             pluginXmlTag.getAttribute(ModuleDiXml.NAME_ATTR);
+                    if (pluginNameAttribute == null) {
+                        continue;
+                    }
 
                     final String pluginNameAttributeValue = pluginNameAttribute.getValue();
                     if (pluginNameAttributeValue == null) {
