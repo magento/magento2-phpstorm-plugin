@@ -30,6 +30,11 @@ class ${CLASS_NAME} extends ${EXTENDS}
     private $searchResultFactory;
 
     /**
+     * @var array
+     */
+    private $loadedData = [];
+
+    /**
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
@@ -84,6 +89,26 @@ class ${CLASS_NAME} extends ${EXTENDS}
             $searchCriteria,
             '#if(${ENTITY_ID})${ENTITY_ID}#{else}entity_id#end'
         );
+    }
+
+    /**
+     * Get data.
+     *
+     * @return array
+     */
+    public function getData(): array
+    {
+        if ($this->loadedData) {
+            return $this->loadedData;
+        }
+        $this->loadedData = parent::getData();
+
+        foreach ($this->loadedData['items'] as $item) {
+        #set($idAccessor = '[' + "#if(${ENTITY_ID})'${ENTITY_ID}'#{else}'entity_id'#end" + ']')
+            $this->loadedData['items'][$item$idAccessor] = $item;
+        }
+
+        return $this->loadedData;
     }
 #else
     /**
