@@ -1,0 +1,14 @@
+<?php
+#parse("PHP File Header.php")
+#if (${NAMESPACE})
+
+namespace ${NAMESPACE};
+#end
+
+class ${CLASS_NAME}
+{
+    public function execute()
+    {
+        //TODO: implement method
+    }
+}

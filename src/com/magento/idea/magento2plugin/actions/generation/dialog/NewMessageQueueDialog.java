@@ -7,8 +7,9 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import com.magento.idea.magento2plugin.actions.generation.NewDataModelAction;
+import com.intellij.ui.DocumentAdapter;
 import com.magento.idea.magento2plugin.actions.generation.NewMessageQueueAction;
+import com.magento.idea.magento2plugin.actions.generation.data.MessageQueueClassData;
 import com.magento.idea.magento2plugin.actions.generation.data.QueueCommunicationData;
 import com.magento.idea.magento2plugin.actions.generation.data.QueueConsumerData;
 import com.magento.idea.magento2plugin.actions.generation.data.QueuePublisherData;
@@ -22,23 +23,32 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NumericRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassFqnRule;
+import com.magento.idea.magento2plugin.actions.generation.generator.MessageQueueClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.QueueCommunicationGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.QueueConsumerGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.QueuePublisherGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.QueueTopologyGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
+import com.magento.idea.magento2plugin.magento.files.MessageQueueClassPhp;
+import com.magento.idea.magento2plugin.magento.packages.MessageQueueConnections;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.event.DocumentEvent;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
+        "PMD.TooManyMethods",
         "PMD.ExcessiveImports",
 })
 public class NewMessageQueueDialog extends AbstractDialog {
@@ -49,10 +59,11 @@ public class NewMessageQueueDialog extends AbstractDialog {
     private static final String QUEUE_NAME = "Queue Name";
     private static final String CONSUMER_TYPE = "Consumer Type";
     private static final String MAX_MESSAGES = "Maximum Messages";
-    private static final String CONNECTION_NAME = "Connection Name";
     private static final String EXCHANGE_NAME = "Exchange Name";
     private static final String BINDING_ID = "Binding ID";
     private static final String BINDING_TOPIC = "Binding Topic";
+
+    private JComboBox connectionName;
 
     /* TODO: Improve validation */
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
@@ -65,15 +76,15 @@ public class NewMessageQueueDialog extends AbstractDialog {
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, HANDLER_NAME})
-    @FieldValidation(rule = RuleRegistry.ALPHANUMERIC_WITH_UNDERSCORE,
+    @FieldValidation(rule = RuleRegistry.ALPHA_WITH_PERIOD,
             message = {AlphanumericWithUnderscoreRule.MESSAGE, HANDLER_NAME})
     private JTextField handlerName;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, HANDLER_TYPE})
-    @FieldValidation(rule = RuleRegistry.PHP_CLASS_FQN,
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
             message = {PhpClassFqnRule.MESSAGE, HANDLER_TYPE})
-    private JTextField handlerType;
+    private JTextField handlerClass;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, CONSUMER_NAME})
@@ -93,20 +104,15 @@ public class NewMessageQueueDialog extends AbstractDialog {
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, CONSUMER_TYPE})
-    @FieldValidation(rule = RuleRegistry.PHP_CLASS_FQN,
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
             message = {PhpClassFqnRule.MESSAGE, CONSUMER_TYPE})
-    private JTextField consumerType;
+    private JTextField consumerClass;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, MAX_MESSAGES})
     @FieldValidation(rule = RuleRegistry.NUMERIC,
             message = {NumericRule.MESSAGE, MAX_MESSAGES})
     private JTextField maxMessages;
-
-    // TODO: Can this be made a dropdown?
-    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, CONNECTION_NAME})
-    private JTextField connectionName;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, EXCHANGE_NAME})
@@ -120,14 +126,25 @@ public class NewMessageQueueDialog extends AbstractDialog {
             message = {AlphaWithDashRule.MESSAGE, BINDING_ID})
     private JTextField bindingId;
 
-    // TODO: New validation rule
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, BINDING_TOPIC})
+    @FieldValidation(rule = RuleRegistry.ALPHA_WITH_PERIOD,
+            message = {AlphanumericWithUnderscoreRule.MESSAGE, BINDING_TOPIC})
     private JTextField bindingTopic;
+
+    private JTextField consumerDirectory;
+    private JTextField handlerDirectory;
 
     private JPanel contentPanel;
     private JButton buttonOK;
     private JButton buttonCancel;
+    private JLabel consumerDirectoryLabel;
+    private JLabel consumerClassLabel;
+    private JLabel maxMessagesLabel;
+    private JLabel bindingTopicLabel;//NOPMD
+    private JLabel handlerClassLabel;//NOPMD
+    private JLabel consumerNameLabel;//NOPMD
+    private JLabel handlerDirectoryLabel;//NOPMD
 
     private final Project project;
     private final String moduleName;
@@ -143,8 +160,12 @@ public class NewMessageQueueDialog extends AbstractDialog {
 
         setContentPane(contentPanel);
         setModal(true);
-        setTitle(NewDataModelAction.ACTION_DESCRIPTION);
+        setTitle(NewMessageQueueAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
+
+        for (final String connection : MessageQueueConnections.getList()) {
+            connectionName.addItem(connection);
+        }
 
         buttonOK.addActionListener((final ActionEvent event) -> onOK());
         buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
@@ -164,6 +185,39 @@ public class NewMessageQueueDialog extends AbstractDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
+
+        this.topicName.getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
+            protected void textChanged(final @NotNull DocumentEvent event) {
+                updateIndefiersTextes();
+            }
+        });
+        this.handlerClass.getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
+            protected void textChanged(final @NotNull DocumentEvent event) {
+                updateBindingText();
+            }
+        });
+
+        connectionName.addActionListener(e -> toggleConsumer());
+    }
+
+    private void toggleConsumer() {
+        if (getConnectionName().equals(MessageQueueConnections.AMPQ.getType())) {
+            consumerDirectoryLabel.setVisible(false);
+            consumerDirectory.setVisible(false);
+            consumerClass.setVisible(false);
+            consumerClassLabel.setVisible(false);
+            maxMessages.setVisible(false);
+            maxMessagesLabel.setVisible(false);
+            return;
+        }
+        consumerDirectoryLabel.setVisible(true);
+        consumerDirectory.setVisible(true);
+        consumerClass.setVisible(true);
+        consumerClassLabel.setVisible(true);
+        maxMessages.setVisible(true);
+        maxMessagesLabel.setVisible(true);
     }
 
     /**
@@ -187,6 +241,10 @@ public class NewMessageQueueDialog extends AbstractDialog {
             generateConsumer();
             generateTopology();
             generatePublisher();
+            generateHandlerClass();
+            if (getConnectionName().equals(MessageQueueConnections.DB.getType())) {
+                generateConsumerClass();
+            }
             this.setVisible(false);
         }
     }
@@ -195,7 +253,7 @@ public class NewMessageQueueDialog extends AbstractDialog {
         new QueueCommunicationGenerator(project, new QueueCommunicationData(
                 getTopicName(),
                 getHandlerName(),
-                getHandlerType(),
+                getHandlerClass(),
                 getHandlerMethod(),
                 getModuleName()
         )).generate(NewMessageQueueAction.ACTION_NAME, true);
@@ -205,11 +263,12 @@ public class NewMessageQueueDialog extends AbstractDialog {
         new QueueConsumerGenerator(project, new QueueConsumerData(
                 getConsumerName(),
                 getQueueName(),
-                getConsumerType(),
+                getConsumerClass(),
                 getMaxMessages(),
                 getConnectionName(),
-                getModuleName()
-        )).generate(NewMessageQueueAction.ACTION_NAME, true);
+                getModuleName(),
+                getHandlerClass().concat("::").concat(getHandlerMethod())
+        )).generate(NewMessageQueueAction.ACTION_NAME, false);
     }
 
     private void generateTopology() {
@@ -220,7 +279,7 @@ public class NewMessageQueueDialog extends AbstractDialog {
                 getBindingTopic(),
                 getQueueName(),
                 getModuleName()
-        )).generate(NewMessageQueueAction.ACTION_NAME, true);
+        )).generate(NewMessageQueueAction.ACTION_NAME, false);
     }
 
     private void generatePublisher() {
@@ -229,7 +288,29 @@ public class NewMessageQueueDialog extends AbstractDialog {
                 getConnectionName(),
                 getExchangeName(),
                 getModuleName()
-        )).generate(NewMessageQueueAction.ACTION_NAME, true);
+        )).generate(NewMessageQueueAction.ACTION_NAME, false);
+    }
+
+    private void generateHandlerClass() {
+        @NotNull final NamespaceBuilder handlerNamespaceBuilder = getHandlerNamespaceBuilder();
+        new MessageQueueClassGenerator(new MessageQueueClassData(
+            handlerClass.getText().trim(),
+            handlerNamespaceBuilder.getNamespace(),
+            handlerDirectory.getText().trim(),
+            handlerNamespaceBuilder.getClassFqn(),
+            MessageQueueClassPhp.Type.HANDLER
+        ), getModuleName(), project).generate(NewMessageQueueAction.ACTION_NAME, false);
+    }
+
+    private void generateConsumerClass() {
+        @NotNull final NamespaceBuilder consumerNamespaceBuilder = getConsumerNamespaceBuilder();
+        new MessageQueueClassGenerator(new MessageQueueClassData(
+            consumerClass.getText().trim(),
+            consumerNamespaceBuilder.getNamespace(),
+            consumerDirectory.getText().trim(),
+            consumerNamespaceBuilder.getClassFqn(),
+            MessageQueueClassPhp.Type.CONSUMER
+        ), getModuleName(), project).generate(NewMessageQueueAction.ACTION_NAME, false);
     }
 
     public String getTopicName() {
@@ -240,8 +321,30 @@ public class NewMessageQueueDialog extends AbstractDialog {
         return handlerName.getText().trim();
     }
 
-    public String getHandlerType() {
-        return handlerType.getText().trim();
+    @NotNull
+    private NamespaceBuilder getHandlerNamespaceBuilder() {
+        return new NamespaceBuilder(
+            getModuleName(),
+            handlerClass.getText().trim(),
+            handlerDirectory.getText().trim()
+        );
+    }
+
+    @NotNull
+    private NamespaceBuilder getConsumerNamespaceBuilder() {
+        return new NamespaceBuilder(
+            getModuleName(),
+            consumerClass.getText().trim(),
+            consumerDirectory.getText().trim()
+        );
+    }
+
+    public String getHandlerClass() {
+        return getHandlerNamespaceBuilder().getClassFqn();
+    }
+
+    public String getConsumerClass() {
+        return getConsumerNamespaceBuilder().getClassFqn();
     }
 
     public String getHandlerMethod() {
@@ -256,16 +359,12 @@ public class NewMessageQueueDialog extends AbstractDialog {
         return queueName.getText().trim();
     }
 
-    public String getConsumerType() {
-        return consumerType.getText().trim();
-    }
-
     public String getMaxMessages() {
         return maxMessages.getText().trim();
     }
 
     public String getConnectionName() {
-        return connectionName.getText().trim();
+        return connectionName.getSelectedItem().toString();
     }
 
     public String getExchangeName() {
@@ -282,5 +381,25 @@ public class NewMessageQueueDialog extends AbstractDialog {
 
     public String getModuleName() {
         return moduleName;
+    }
+
+    /**
+     * Update identifier texts.
+     */
+    public void updateIndefiersTextes() {
+        final String topicNameText = this.topicName.getText();
+        this.handlerName.setText(topicNameText.concat(".handler"));
+        this.consumerName.setText(topicNameText);
+        this.queueName.setText(topicNameText);
+        this.bindingTopic.setText(topicNameText);
+    }
+
+    /**
+     * Update identifier texts.
+     */
+    public void updateBindingText() {
+        final String handlerTypeText = this.handlerClass.getText();
+        this.consumerClass.setText(handlerTypeText.replace("Handler", "").concat("Consumer"));
+        this.bindingId.setText(handlerTypeText.replace("Handler", "").concat("Binding"));
     }
 }

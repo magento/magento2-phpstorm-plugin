@@ -239,5 +239,4 @@
         <frameworkUsageProvider implementation="com.magento.idea.magento2plugin.project.UsagesProvider"/>
         <libraryRoot id="phpstorm.meta.php" path="/.phpstorm.meta.php/" runtime="false"/>
     </extensions>
-
 </idea-plugin>
