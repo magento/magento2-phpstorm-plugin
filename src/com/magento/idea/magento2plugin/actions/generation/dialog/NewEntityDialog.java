@@ -20,6 +20,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.DataModelInterfac
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.EntityDataMapperData;
 import com.magento.idea.magento2plugin.actions.generation.data.AdminListViewEntityActionData;
+import com.magento.idea.magento2plugin.actions.generation.data.FormGenericButtonBlockData;
 import com.magento.idea.magento2plugin.actions.generation.data.GetListQueryModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.GridActionColumnData;
 import com.magento.idea.magento2plugin.actions.generation.data.LayoutXmlData;
@@ -53,6 +54,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaWhit
 import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.EntityDataMapperGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.AdminListViewEntityActionGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.FormGenericButtonBlockGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.GetListQueryModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.GridActionColumnFileGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.LayoutXmlGenerator;
@@ -74,6 +76,7 @@ import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.files.DataModel;
 import com.magento.idea.magento2plugin.magento.files.DataModelInterface;
 import com.magento.idea.magento2plugin.magento.files.EntityDataMapperFile;
+import com.magento.idea.magento2plugin.magento.files.FormGenericButtonBlockFile;
 import com.magento.idea.magento2plugin.magento.files.ModelPhp;
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 import com.magento.idea.magento2plugin.magento.files.ResourceModelPhp;
@@ -343,6 +346,7 @@ public class NewEntityDialog extends AbstractDialog {
             generateFormLayoutFile();
             generateSaveEntityCommandFile();
             generateFormSaveControllerFile();
+            generateFormUiComponentGenericButtonFile();
             generateUiComponentFormFile();
         }
 
@@ -1192,6 +1196,27 @@ public class NewEntityDialog extends AbstractDialog {
                 );
 
         return namespaceBuilder.getClassFqn();
+    }
+
+    /**
+     * Generate Form UI Component generic button block file.
+     */
+    private void generateFormUiComponentGenericButtonFile() {
+        final NamespaceBuilder genericButtonBlockNamespace = new NamespaceBuilder(
+                getModuleName(),
+                FormGenericButtonBlockFile.CLASS_NAME,
+                FormGenericButtonBlockFile.DIRECTORY
+        );
+        new FormGenericButtonBlockGenerator(
+                new FormGenericButtonBlockData(
+                        getModuleName(),
+                        getEntityName(),
+                        getEntityIdColumn(),
+                        genericButtonBlockNamespace.getClassFqn(),
+                        genericButtonBlockNamespace.getNamespace()
+                ),
+                project
+        ).generate(ACTION_NAME, true);
     }
 
     /**
