@@ -25,11 +25,14 @@ import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
 public class UiComponentFormGenerator extends FileGenerator {
+
     private final UiComponentFormFileData uiFormFileData;
     private final Project project;
+    private final String entityName;
+    private final String entityIdField;
 
     /**
-     * Constructor.
+     * Ui Component form generator constructor.
      *
      * @param uiFormFileData UiFormFileData
      * @param project Project
@@ -38,15 +41,35 @@ public class UiComponentFormGenerator extends FileGenerator {
             final @NotNull UiComponentFormFileData uiFormFileData,
             final Project project
     ) {
+        this(uiFormFileData, project, "Entity", "entity_id");
+    }
+
+    /**
+     * Ui Component form generator constructor.
+     *
+     * @param uiFormFileData UiFormFileData
+     * @param project Project
+     * @param entityName String
+     * @param entityIdField String
+     */
+    public UiComponentFormGenerator(
+            final @NotNull UiComponentFormFileData uiFormFileData,
+            final Project project,
+            final @NotNull String entityName,
+            final @NotNull String entityIdField
+    ) {
         super(project);
         this.uiFormFileData = uiFormFileData;
         this.project = project;
+        this.entityName = entityName;
+        this.entityIdField = entityIdField;
     }
 
     /**
      * Creates a module UI form file.
      *
      * @param actionName String
+     *
      * @return PsiFile
      */
     @Override
@@ -54,17 +77,24 @@ public class UiComponentFormGenerator extends FileGenerator {
         final PsiFile formFile = createForm(
                 actionName
         );
-
-        createButtonClasses(actionName);
+        generateButtonClasses(actionName);
 
         return formFile;
     }
 
-    protected void createButtonClasses(final String actionName) {
-        for (final UiComponentFormButtonData buttonData: uiFormFileData.getButtons()) {
-            new UiComponentFormButtonPhpClassGenerator(//NOPMD
-                buttonData,
-                project
+    /**
+     * Generate buttons classes.
+     *
+     * @param actionName String
+     */
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
+    protected void generateButtonClasses(final @NotNull String actionName) {
+        for (final UiComponentFormButtonData buttonData : uiFormFileData.getButtons()) {
+            new UiComponentFormButtonBlockGenerator(
+                    buttonData,
+                    project,
+                    entityName,
+                    entityIdField
             ).generate(actionName);
         }
     }
@@ -73,6 +103,7 @@ public class UiComponentFormGenerator extends FileGenerator {
      * Finds or creates form.
      *
      * @param actionName String
+     *
      * @return PsiFile
      */
     protected PsiFile createForm(

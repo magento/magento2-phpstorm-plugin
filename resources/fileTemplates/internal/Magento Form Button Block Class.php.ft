@@ -1,22 +1,31 @@
 <?php
 #parse("PHP File Header.php")
 
-#if (${NAMESPACE})
-
 namespace ${NAMESPACE};
 
+#set($uses = ${USES})
+#foreach ($use in $uses.split(","))
+use $use;
 #end
-use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 
 /**
- * @inheritdoc
+ * ${CLASS_ANNOTATION}
  */
-class ${NAME} implements ButtonProviderInterface
+class ${NAME} extends ${GENERIC_BUTTON} implements ${DATA_PROVIDER_TYPE}
 {
     /**
-     * @inheritDoc
+     * Retrieve ${TYPE} button settings.
+     *
+     * @return array
      */
-    public function getButtonData()
+    public function getButtonData(): array
     {
+        return $this->wrapButtonSettings(
+            '${LABEL}',
+            '${CLASS}',
+            ${ON_CLICK},
+            ${DATA_ATTRS},
+            ${SORT_ORDER}
+        );
     }
 }

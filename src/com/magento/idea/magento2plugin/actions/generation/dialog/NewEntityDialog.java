@@ -744,7 +744,7 @@ public class NewEntityDialog extends AbstractDialog {
                 directory,
                 "Delete",
                 getModuleName(),
-                "Save",
+                "Delete",
                 namespaceBuilderDelete.getNamespace(),
                 "Delete Entity",
                 "30",
@@ -1235,7 +1235,7 @@ public class NewEntityDialog extends AbstractDialog {
                 getEntityName(),
                 getSubmitActionName(),
                 getDataProviderNamespace().getClassFqn()
-        ), project).generate(ACTION_NAME, true);
+        ), project, getEntityName(), getEntityIdColumn()).generate(ACTION_NAME, true);
     }
 
     /**

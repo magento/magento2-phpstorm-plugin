@@ -1,6 +1,0 @@
-        return [
-            'label' => __('${BUTTON_LABEL}'),
-            'on_click' => sprintf("location.href = '%s';", $this->getUrl('*/*/')),
-            'class' => 'back',
-            'sort_order' => ${BUTTON_SORT_ORDER}
-        ];
