@@ -126,10 +126,8 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import org.apache.commons.lang.StringUtils;
-import org.bouncycastle.util.Strings;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({
