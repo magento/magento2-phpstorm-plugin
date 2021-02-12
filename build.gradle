@@ -4,7 +4,7 @@
  */
 
 plugins {
-    id 'org.jetbrains.intellij' version '0.4.22'
+    id 'org.jetbrains.intellij' version '0.6.5'
     id 'checkstyle'
     id 'pmd'
     id 'org.jetbrains.changelog' version '0.6.2'
@@ -15,16 +15,17 @@ repositories {
 }
 
 group 'com.magento.idea'
-version '2.1.0'
+version '3.2.0'
 
 apply plugin: 'org.jetbrains.intellij'
 apply plugin: 'java'
+apply plugin: 'idea'
 apply plugin: 'groovy'
 apply plugin: 'org.jetbrains.changelog'
 
-def phpPluginVersion = System.getProperty("phpPluginVersion", "201.7223.91")
-def ideaVersion = System.getProperty("ideaVersion", "2020.1.1")
-def javaVersion = 1.8
+def phpPluginVersion = System.getProperty("phpPluginVersion", "203.5981.175")
+def ideaVersion = System.getProperty("ideaVersion", "2020.3")
+def javaVersion = 11
 
 sourceCompatibility = javaVersion
 targetCompatibility = javaVersion
@@ -40,7 +41,7 @@ intellij {
             'properties',
             'CSS',
             'JavaScriptLanguage',
-            'com.intellij.lang.jsgraphql:2.3.0',
+            'com.intellij.lang.jsgraphql:2.7.0',
             'platform-images',
             'copyright'
     ]
@@ -90,4 +91,25 @@ changelog {
     keepUnreleasedSection = true
     unreleasedTerm = "[Unreleased]"
     groups = ["Added", "Changed", "Deprecated", "Removed", "Fixed", "Security"]
+}
+
+idea {
+    project {
+        jdkName         = javaVersion
+        languageLevel   = javaVersion
+    }
+
+    module {
+        generatedSourceDirs += file('gen')
+    }
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.13'
+}
+
+test {
+    useJUnit()
+
+    maxHeapSize = '1G'
 }

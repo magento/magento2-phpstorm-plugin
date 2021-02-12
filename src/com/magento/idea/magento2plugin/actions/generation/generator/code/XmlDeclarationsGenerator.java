@@ -10,7 +10,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormBu
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldsetData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFileData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplate;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplateUtil;
 import com.magento.idea.magento2plugin.magento.files.UiComponentFormXml;
 import com.magento.idea.magento2plugin.util.FirstLetterToLowercaseUtil;
 import java.io.IOException;
@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 public class XmlDeclarationsGenerator {
     private final UiComponentFormFileData uiFormFileData;
     private final Project project;
-    private final GetCodeTemplate getCodeTemplate;
+    private final GetCodeTemplateUtil getCodeTemplateUtil;
 
     /**
      * Constructor.
@@ -34,7 +34,7 @@ public class XmlDeclarationsGenerator {
     ) {
         this.uiFormFileData = uiFormFileData;
         this.project = project;
-        this.getCodeTemplate = GetCodeTemplate.getInstance(project);
+        this.getCodeTemplateUtil = new GetCodeTemplateUtil(project);
     }
 
     /**
@@ -94,7 +94,7 @@ public class XmlDeclarationsGenerator {
                     continue;
                 }
                 try {
-                    fieldsStringBuffer.append(getCodeTemplate.execute(
+                    fieldsStringBuffer.append(getCodeTemplateUtil.execute(
                             UiComponentFormXml.FIELD_TEMPLATE,
                             fillAttributes(formFieldData)
                         )

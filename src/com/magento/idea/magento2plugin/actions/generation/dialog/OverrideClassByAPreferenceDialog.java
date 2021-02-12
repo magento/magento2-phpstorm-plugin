@@ -48,6 +48,7 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
     @NotNull
     private final Project project;
     private final PhpClass targetClass;
+    private boolean isInterface;
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -98,14 +99,19 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
         this.targetClass = targetClass;
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
+        this.isInterface = false;
 
         setContentPane(contentPane);
         setModal(true);
+        setTitle(OverrideClassByAPreferenceAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
         fillTargetAreaOptions();
         if (targetClass.isFinal()) {
             inheritClass.setVisible(false);
             inheritClassLabel.setVisible(false);
+        }
+        if (targetClass.isInterface()) {
+            this.isInterface = true;
         }
         suggestPreferenceClassName(targetClass);
         suggestPreferenceDirectory(targetClass);
@@ -187,7 +193,8 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
                 targetClass,
                 getPreferenceClassFqn(),
                 getNamespace(),
-                isInheritClass()
+                isInheritClass(),
+                isInterface
         ), project).generate(OverrideClassByAPreferenceAction.ACTION_NAME, true);
 
         this.setVisible(false);

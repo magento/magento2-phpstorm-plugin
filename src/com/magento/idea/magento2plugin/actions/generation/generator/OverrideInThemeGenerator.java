@@ -41,8 +41,9 @@ public class OverrideInThemeGenerator {
      *
      * @param baseFile PsiFile
      * @param themeName String
+     * @param isOverride boolean
      */
-    public void execute(final PsiFile baseFile, final String themeName) {
+    public void execute(final PsiFile baseFile, final String themeName, final boolean isOverride) {
         final String componentType = GetComponentTypeByNameUtil.execute(
                 GetComponentNameByDirectoryUtil
                     .execute(baseFile.getContainingDirectory(), project));
@@ -56,6 +57,10 @@ public class OverrideInThemeGenerator {
                             project
                     )
             );
+            if (isOverride) {
+                pathComponents.add("override");
+                pathComponents.add("base");
+            }
         } else if (componentType.equals(ComponentType.theme.toString())) {
             pathComponents = getThemePathComponents(baseFile);
         } else {
@@ -98,7 +103,9 @@ public class OverrideInThemeGenerator {
         final List<String> pathComponents = new ArrayList<>();
         PsiDirectory parent = file.getParent();
         while (!parent.getName().equals(Areas.frontend.toString())
-                && !parent.getName().equals(Areas.adminhtml.toString())) {
+                && !parent.getName().equals(Areas.adminhtml.toString())
+                && !parent.getName().equals(Areas.base.toString())
+        ) {
             pathComponents.add(parent.getName());
             parent = parent.getParent();
         }

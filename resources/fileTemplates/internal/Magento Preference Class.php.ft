@@ -1,0 +1,14 @@
+<?php
+#parse("PHP File Header.php")
+#if (${NAMESPACE})
+
+namespace ${NAMESPACE};
+#end
+#if (${USE})
+
+use ${USE};
+#end
+
+#if (${INTERFACE})interface#else class#end ${NAME} #if (${EXTENDS})extends ${EXTENDS}#end {
+
+}

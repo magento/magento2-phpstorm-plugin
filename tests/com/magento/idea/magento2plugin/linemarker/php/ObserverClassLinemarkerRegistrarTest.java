@@ -2,21 +2,28 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.linemarker.php;
 
-public class ObserverClassLinemarkerRegistrarTest extends LinemarkerPhpFixtureTestCase {
+import com.magento.idea.magento2plugin.linemarker.LinemarkerFixtureTestCase;
 
+public class ObserverClassLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
+
+    /**
+     * Tests linemarkers in the Observer class.
+     */
     public void testObserverClassShouldHaveLinemarker() {
-        String filePath = this.getFixturePath("TestObserver.php");
-        myFixture.configureByFile(filePath);
+        myFixture.configureByFile(this.getFixturePath("TestObserver.php", "php"));
 
-        assertHasLinemarkerWithTooltipAndIcon("Navigate to configuration", "/fileTypes/xml.svg");
+        assertHasLinemarkerWithTooltipAndIcon("Navigate to configuration", "fileTypes/xml.svg");
     }
 
+    /**
+     * Tests linemarkers in the regular class.
+     */
     public void testRegularPhpClassShouldNotHaveLinemarker() {
-        String filePath = this.getFixturePath("TestNotObserver.php");
-        myFixture.configureByFile(filePath);
+        myFixture.configureByFile(this.getFixturePath("TestNotObserver.php", "php"));
 
-        assertHasNoLinemarkerWithTooltipAndIcon("Navigate to configuration", "/fileTypes/xml.svg");
+        assertHasNoLinemarkerWithTooltipAndIcon("Navigate to configuration", "fileTypes/xml.svg");
     }
 }

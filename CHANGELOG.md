@@ -2,7 +2,99 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0). 
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
+
+## 3.2.0
+
+## 3.1.0
+
+### Added
+
+- Extended `.phpstorm.meta.php` for more convenient autocomplete [#467](https://github.com/magento/magento2-phpstorm-plugin/pull/467)
+- Code generation for message queue in [#411](https://github.com/magento/magento2-phpstorm-plugin/pull/411)
+- Code generation for declarative schema [#453](https://github.com/magento/magento2-phpstorm-plugin/pull/453)
+- Inspection warning for disabled observer [#432](https://github.com/magento/magento2-phpstorm-plugin/pull/432)
+- The action item to the context menu to copy file path in the Magento format [#451](https://github.com/magento/magento2-phpstorm-plugin/pull/451)
+
+### Fixed
+
+- The null pointer exception on the Create Module Dialog
+
+## 3.0.4
+
+### Fixed
+
+- Overriding the interface that generates invalid php code
+- Overriding a template from the base area
+- Disabled the ability to create a plugin for a class that implements `\Magento\Framework\ObjectManager\NoninterceptableInterface`
+
+### Added
+
+- `NoninterceptableInterface` case warning to the plugin inspection
+
+## 3.0.3
+
+### Fixed
+
+- Fixed model generation with same names
+- Fixed NPTR exception in theme directory view model action
+- Fixed observer name validator
+- Fixed plugin name validator
+
+## 3.0.2
+
+### Fixed
+
+- Fixed the Inject a View Model dialog
+
+## 3.0.1
+
+### Fixed
+
+- Skipped IDEA include tag causing error
+- Fixed StringIndexOutOfBoundsException on PluginInspection
+
+## 3.0.0
+
+### Added
+
+- Description for "Magento Routes XML" code template in [#349](https://github.com/magento/magento2-phpstorm-plugin/pull/349)
+- Code completion and reference navigation for table names and column names in `db_schema.xml` file in [#351](https://github.com/magento/magento2-phpstorm-plugin/pull/351)
+- Code completion and reference navigation for UI Component names in layout XMLs in [#354](https://github.com/magento/magento2-phpstorm-plugin/pull/354)
+- Description for "Magento Layout XML" code template in [#365](https://github.com/magento/magento2-phpstorm-plugin/pull/365)
+- Reference navigation for disabled plugins in `di.xml` in [#373](https://github.com/magento/magento2-phpstorm-plugin/pull/373)
+- Code completion and reference navigation for Magento module names in `config.php` in [#374](https://github.com/magento/magento2-phpstorm-plugin/pull/374)
+- Inspection warning when disabling a nonexistent plugin in `di.xml` in [#382](https://github.com/magento/magento2-phpstorm-plugin/pull/382)
+- Description for "Magento Form Button Block Class" code template in [#383](https://github.com/magento/magento2-phpstorm-plugin/pull/383)
+- Code generation for database models (model, resource model, and collection) in [#392](https://github.com/magento/magento2-phpstorm-plugin/pull/392)
+- Code generation for data models (data interface and its implementation) in [#399](https://github.com/magento/magento2-phpstorm-plugin/pull/399)
+- QuickFix for a missing GraphQL resolver defined in the the `schema.graphqls` file in [#399](https://github.com/magento/magento2-phpstorm-plugin/pull/399)
+
+### Fixed
+
+- Inability to save PhpStorm plugin settings after disabling the plugin with invalid field content in [#317](https://github.com/magento/magento2-phpstorm-plugin/pull/317)
+- Field statuses in PhpStorm plugin settings not disabling if plugin is disabled in [#320](https://github.com/magento/magento2-phpstorm-plugin/pull/320)
+- Missing linemarker for plugins to interface methods in [#328](https://github.com/magento/magento2-phpstorm-plugin/pull/328)
+- Incorrect code completion for MFTF tags (stories, title, and description) in [#364](https://github.com/magento/magento2-phpstorm-plugin/pull/364)
+- Argument name for types in `di.xml` not allowing underscores in [#370](https://github.com/magento/magento2-phpstorm-plugin/pull/370)
+- Incorrect sort order validation in 'Create a New Plugin' code generation dialog in [#389](https://github.com/magento/magento2-phpstorm-plugin/pull/389)
+
+### Changed
+
+- Code generation dialog titles in [#363](https://github.com/magento/magento2-phpstorm-plugin/pull/363)
+
+## 2.0.2
+
+### Added
+
+- PWA pure function Live Template 
+
+### Fixed
+
+- Library root for object manager autocomplete
+- Line marker for interface plugin target
+- Allowed theme override of non-magento composer themes
+- Issue with `Magento Module Ui Grid Collection Data Provider Php`
 
 ## 2.0.1
 

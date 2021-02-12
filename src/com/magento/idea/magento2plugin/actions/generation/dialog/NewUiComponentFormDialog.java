@@ -211,6 +211,7 @@ public class NewUiComponentFormDialog extends AbstractDialog {
 
         setContentPane(contentPane);
         setModal(true);
+        setTitle(NewUiComponentFormAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
 
         buttonOK.addActionListener(e -> onOK());

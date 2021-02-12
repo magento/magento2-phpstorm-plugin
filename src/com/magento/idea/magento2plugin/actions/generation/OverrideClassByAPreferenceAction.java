@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -19,8 +20,9 @@ import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import org.jetbrains.annotations.NotNull;
 
 public class OverrideClassByAPreferenceAction extends DumbAwareAction {
-    public static String ACTION_NAME = "Override Class By a Preference...";
-    public static String ACTION_DESCRIPTION = "Create a new Magento 2 preference for the class";
+    public static final String ACTION_NAME = "Override this class by a new Preference";
+    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Preference";
+    public static final String INTERFACE_ACTION = "Override this interface by a new Preference";
     private final GetFirstClassOfFile getFirstClassOfFile;
     private PhpClass targetClass;
 
@@ -29,16 +31,23 @@ public class OverrideClassByAPreferenceAction extends DumbAwareAction {
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
     }
 
-    public void update(AnActionEvent event) {
-        targetClass = null;
-        Project project = event.getData(PlatformDataKeys.PROJECT);
+    /**
+     * Updates the state of action.
+     */
+    @Override
+    public void update(final AnActionEvent event) {
+        targetClass = null;// NOPMD
+        final Project project = event.getData(PlatformDataKeys.PROJECT);
         if (Settings.isEnabled(project)) {
-            Pair<PsiFile, PhpClass> pair = this.findPhpClass(event);
-            PsiFile psiFile = pair.getFirst();
-            PhpClass phpClass = pair.getSecond();
+            final Pair<PsiFile, PhpClass> pair = this.findPhpClass(event);
+            final PsiFile psiFile = pair.getFirst();
+            final PhpClass phpClass = pair.getSecond();
             targetClass = phpClass;
             if (psiFile instanceof PhpFile && phpClass != null) {
                 this.setStatus(event, true);
+                if (phpClass.isInterface()) {
+                    event.getPresentation().setText(INTERFACE_ACTION);
+                }
             } else  {
                 this.setStatus(event, false);
             }
@@ -47,14 +56,14 @@ public class OverrideClassByAPreferenceAction extends DumbAwareAction {
         }
     }
 
-    private void setStatus(AnActionEvent event, boolean status) {
+    private void setStatus(final AnActionEvent event, final boolean status) {
         event.getPresentation().setVisible(status);
         event.getPresentation().setEnabled(status);
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        OverrideClassByAPreferenceDialog.open(e.getProject(), this.targetClass);
+    public void actionPerformed(@NotNull final AnActionEvent event) {
+        OverrideClassByAPreferenceDialog.open(event.getProject(), this.targetClass);
     }
 
     @Override
@@ -62,8 +71,8 @@ public class OverrideClassByAPreferenceAction extends DumbAwareAction {
         return false;
     }
 
-    private Pair<PsiFile, PhpClass> findPhpClass(@NotNull AnActionEvent event) {
-        PsiFile psiFile = event.getData(PlatformDataKeys.PSI_FILE);
+    private Pair<PsiFile, PhpClass> findPhpClass(@NotNull final AnActionEvent event) {
+        final PsiFile psiFile = event.getData(PlatformDataKeys.PSI_FILE);
 
         PhpClass phpClass = null;
         if (psiFile instanceof PhpFile) {

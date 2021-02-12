@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -17,37 +18,44 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.CreateAPluginDialog;
-import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
-import com.magento.idea.magento2plugin.util.magento.plugin.IsPluginAllowedForMethod;
-import org.jetbrains.annotations.NotNull;
+import com.magento.idea.magento2plugin.inspections.php.util.PhpClassImplementsNoninterceptableInterfaceUtil;
 import com.magento.idea.magento2plugin.project.Settings;
+import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
+import com.magento.idea.magento2plugin.util.magento.plugin.IsPluginAllowedForMethodUtil;
+import org.jetbrains.annotations.NotNull;
 
 public class CreateAPluginAction extends DumbAwareAction {
-    public static String ACTION_NAME = "Create a Plugin...";
-    public static String ACTION_DESCRIPTION = "Create a new Magento 2 plugin for the class";
-    private final IsPluginAllowedForMethod isPluginAllowed;
+    public static final String ACTION_NAME = "Create a new Plugin for this method";
+    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Plugin";
     private final GetFirstClassOfFile getFirstClassOfFile;
     private Method targetMethod;
     private PhpClass targetClass;
 
+    /**
+     * Constructor.
+     */
     public CreateAPluginAction() {
         super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
-        this.isPluginAllowed = IsPluginAllowedForMethod.getInstance();
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
     }
 
-    public void update(AnActionEvent event) {
-        targetClass = null;
-        targetMethod = null;
-        Project project = event.getData(PlatformDataKeys.PROJECT);
+    /**
+     * Updates the state of action.
+     */
+    @Override
+    public void update(final AnActionEvent event) {
+        targetClass = null;// NOPMD
+        targetMethod = null;// NOPMD
+        final Project project = event.getData(PlatformDataKeys.PROJECT);
         if (Settings.isEnabled(project)) {
-            Pair<PsiFile, PhpClass> pair = this.findPhpClass(event);
-            PsiFile psiFile = pair.getFirst();
-            PhpClass phpClass = pair.getSecond();
-         if ((phpClass == null || psiFile == null)
-            || !(psiFile instanceof PhpFile) 
-            || phpClass.isFinal() 
-            || this.targetMethod == null
+            final Pair<PsiFile, PhpClass> pair = this.findPhpClass(event);
+            final PsiFile psiFile = pair.getFirst();
+            final PhpClass phpClass = pair.getSecond();
+            if (phpClass == null
+                    || !(psiFile instanceof PhpFile)
+                    || phpClass.isFinal()
+                    || PhpClassImplementsNoninterceptableInterfaceUtil.execute(phpClass)
+                    || this.targetMethod == null
             ) {
                 this.setStatus(event, false);
                 return;
@@ -60,14 +68,14 @@ public class CreateAPluginAction extends DumbAwareAction {
         this.setStatus(event, false);
     }
 
-    private void setStatus(AnActionEvent event, boolean status) {
+    private void setStatus(final AnActionEvent event, final boolean status) {
         event.getPresentation().setVisible(status);
         event.getPresentation().setEnabled(status);
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        CreateAPluginDialog.open(e.getProject(), this.targetMethod, this.targetClass);
+    public void actionPerformed(@NotNull final AnActionEvent event) {
+        CreateAPluginDialog.open(event.getProject(), this.targetMethod, this.targetClass);
     }
 
     @Override
@@ -75,8 +83,8 @@ public class CreateAPluginAction extends DumbAwareAction {
         return false;
     }
 
-    private Pair<PsiFile, PhpClass> findPhpClass(@NotNull AnActionEvent event) {
-        PsiFile psiFile = event.getData(PlatformDataKeys.PSI_FILE);
+    private Pair<PsiFile, PhpClass> findPhpClass(@NotNull final AnActionEvent event) {
+        final PsiFile psiFile = event.getData(PlatformDataKeys.PSI_FILE);
 
         PhpClass phpClass = null;
         if (psiFile instanceof PhpFile) {
@@ -87,23 +95,29 @@ public class CreateAPluginAction extends DumbAwareAction {
         return Pair.create(psiFile, phpClass);
     }
 
-    private void fetchTargetMethod(@NotNull AnActionEvent event, PsiFile psiFile, PhpClass phpClass) {
-        Caret caret = event.getData(PlatformDataKeys.CARET);
+    private void fetchTargetMethod(
+            @NotNull final AnActionEvent event,
+            final PsiFile psiFile,
+            final PhpClass phpClass
+    ) {
+        final Caret caret = event.getData(PlatformDataKeys.CARET);
         if (caret == null) {
             return;
         }
-        int offset = caret.getOffset();
-        PsiElement element = psiFile.findElementAt(offset);
+        final int offset = caret.getOffset();
+        final PsiElement element = psiFile.findElementAt(offset);
         if (element == null) {
             return;
         }
-        if (element instanceof Method && element.getParent() == phpClass && isPluginAllowed.check((Method)element)) {
-            this.targetMethod = (Method)element;
+        if (element instanceof Method && element.getParent()
+                == phpClass && IsPluginAllowedForMethodUtil.check((Method) element)) {
+            this.targetMethod = (Method) element;
             return;
         }
-        PsiElement parent = element.getParent();
-        if (parent instanceof Method && parent.getParent() == phpClass && isPluginAllowed.check((Method)parent)) {
-            this.targetMethod = (Method)parent;
+        final PsiElement parent = element.getParent();
+        if (parent instanceof Method && parent.getParent()
+                == phpClass && IsPluginAllowedForMethodUtil.check((Method) parent)) {
+            this.targetMethod = (Method) parent;
         }
     }
 }

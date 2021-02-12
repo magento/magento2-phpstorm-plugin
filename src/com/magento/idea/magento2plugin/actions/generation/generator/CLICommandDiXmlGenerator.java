@@ -17,7 +17,7 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.magento.idea.magento2plugin.actions.generation.data.CLICommandXmlData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateDiXml;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplate;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplateUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.XmlFilePositionUtil;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
         "PMD.UselessParentheses"
 })
 public class CLICommandDiXmlGenerator extends FileGenerator {
-    private final GetCodeTemplate getCodeTemplate;
+    private final GetCodeTemplateUtil getCodeTemplateUtil;
     private final FindOrCreateDiXml findOrCreateDiXml;
     private final XmlFilePositionUtil positionUtil;
     private final CLICommandXmlData cliCommandXmlData;
@@ -50,7 +50,7 @@ public class CLICommandDiXmlGenerator extends FileGenerator {
         super(project);
         this.cliCommandXmlData = cliCommandXmlData;
         this.project = project;
-        this.getCodeTemplate = GetCodeTemplate.getInstance(project);
+        this.getCodeTemplateUtil = new GetCodeTemplateUtil(project);
         this.findOrCreateDiXml = new FindOrCreateDiXml(project);
         this.positionUtil = XmlFilePositionUtil.getInstance();
     }
@@ -69,7 +69,7 @@ public class CLICommandDiXmlGenerator extends FileGenerator {
         WriteCommandAction.runWriteCommandAction(project, () -> {
             final StringBuffer textBuf = new StringBuffer();
             try {
-                final String template = getCodeTemplate.execute(
+                final String template = getCodeTemplateUtil.execute(
                         ModuleDiXml.TEMPLATE_CLI_COMMAND,
                         getAttributes()
                 );

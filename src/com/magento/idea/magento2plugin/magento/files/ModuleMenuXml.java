@@ -22,7 +22,7 @@ public class ModuleMenuXml implements ModuleFileInterface {
     public static String actionTagAttribute = "action";
     public static String defaultAcl = "Magento_Backend::admin";
 
-    public static String template = "Magento Menu Xml";
+    public static String template = "Magento Menu XML";
 
     @Override
     public String getFileName() {

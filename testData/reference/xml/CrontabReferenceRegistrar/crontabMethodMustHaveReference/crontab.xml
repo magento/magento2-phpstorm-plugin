@@ -8,8 +8,10 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
     <group id="default">
-        <job name="test_catalog_index_refresh_price" instance="Magento\Catalog\Cron\RefreshSpecialPrices" method="execute<caret>">
-            <schedule>0 * * * *</schedule>
+        <job name="catalog_index_refresh_price"
+             instance="Magento\Catalog\Cron\RefreshSpecialPrices"
+             method="execute<caret>">
+            <schedule>* * * * *</schedule>
         </job>
     </group>
 </config>

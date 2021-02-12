@@ -19,7 +19,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.NewControllerDi
 @SuppressWarnings({"PMD.OnlyOneReturn", "PMD.FieldNamingConventions"})
 public class NewControllerAction extends AnAction {
     public static final String ACTION_NAME = "Magento 2 Controller";
-    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 controller";
+    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Controller";
 
     /**
      * New controller action constructor.

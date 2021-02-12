@@ -89,7 +89,7 @@ public class NewCLICommandDialog extends AbstractDialog {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
-        setTitle(this.bundle.message("common.cli.create.new.cli.command.title"));
+        setTitle(NewCLICommandAction.ACTION_DESCRIPTION);
 
         buttonOK.addActionListener(e -> onOK());
         buttonCancel.addActionListener(e -> onCancel());

@@ -19,7 +19,7 @@ import com.intellij.psi.xml.XmlTag;
 import com.jetbrains.php.lang.PhpLangUtil;
 import com.magento.idea.magento2plugin.actions.generation.data.PluginDiXmlData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateDiXml;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplate;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplateUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.XmlFilePositionUtil;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
@@ -29,7 +29,7 @@ import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
 public class PluginDiXmlGenerator extends FileGenerator {
-    private final GetCodeTemplate getCodeTemplate;
+    private final GetCodeTemplateUtil getCodeTemplateUtil;
     private final FindOrCreateDiXml findOrCreateDiXml;
     private final XmlFilePositionUtil positionUtil;
     private final PluginDiXmlData pluginFileData;
@@ -49,7 +49,7 @@ public class PluginDiXmlGenerator extends FileGenerator {
         super(project);
         this.pluginFileData = pluginFileData;
         this.project = project;
-        this.getCodeTemplate = GetCodeTemplate.getInstance(project);
+        this.getCodeTemplateUtil = new GetCodeTemplateUtil(project);
         this.findOrCreateDiXml = new FindOrCreateDiXml(project);
         this.positionUtil = XmlFilePositionUtil.getInstance();
     }
@@ -80,7 +80,7 @@ public class PluginDiXmlGenerator extends FileGenerator {
         WriteCommandAction.runWriteCommandAction(project, () -> {
             final StringBuffer textBuf = new StringBuffer();
             try {
-                textBuf.append(getCodeTemplate.execute(
+                textBuf.append(getCodeTemplateUtil.execute(
                         ModuleDiXml.TEMPLATE_PLUGIN,
                         getAttributes())
                 );
@@ -161,6 +161,9 @@ public class PluginDiXmlGenerator extends FileGenerator {
         attributes.setProperty("NAME", pluginFileData.getPluginName());
         attributes.setProperty("PLUGIN_TYPE", pluginFileData.getPluginFqn());
         attributes.setProperty("PLUGIN_NAME", pluginFileData.getPluginName());
-        attributes.setProperty("SORT_ORDER", pluginFileData.getSortOrder());
+        final String sortOrder = pluginFileData.getSortOrder();
+        if (!sortOrder.isEmpty()) {
+            attributes.setProperty("SORT_ORDER", sortOrder);
+        }
     }
 }

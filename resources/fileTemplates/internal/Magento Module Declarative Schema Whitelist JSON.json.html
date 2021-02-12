@@ -1,0 +1,40 @@
+<html lang="en">
+<body>
+<p face="verdana" size="-1">
+    The db_schema_whitelist.json file provides a history of all tables, columns, and keys added with declarative schema. It is required to allow drop operations.<br>
+</p>
+<p>
+    Read more about <a href="https://devdocs.magento.com/guides/v2.4/extension-dev-guide/declarative-schema/migration-commands.html#create-whitelist">Create a schema whitelist</a>.
+</p>
+<p>
+    The magento 2 whitelist generation command gets INDEX and CONSTRAINTS referenceId from the real database, db_schema.xml data used only as recommendations.
+    Please, pay attention, in the PHP Storm file generation referenceId used from the db_schema.xml file and should be checked from the real database.
+</p>
+
+<table width="100%" border="0" cellpadding="5" cellspacing="0" style="border-collapse: collapse">
+    <tr>
+        <td colspan="3"><font face="verdana" size="-1">Template's predefined variables:</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${TABLE_NAME}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">Database table name.</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${COLUMNS}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">Database table columns names.</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${INDEXES}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">Database table indexes names.</font></td>
+    </tr>
+    <tr>
+        <td valign="top"><nobr><font face="verdana" size="-2"><b>${CONSTRAINTS}</b></font></nobr></td>
+        <td width="10">&nbsp;</td>
+        <td width="100%" valign="top"><font face="verdana" size="-1">Database table constraints names.</font></td>
+    </tr>
+</table>
+</body>
+</html>

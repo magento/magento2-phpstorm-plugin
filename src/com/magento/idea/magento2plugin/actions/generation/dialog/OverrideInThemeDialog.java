@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
+import com.magento.idea.magento2plugin.actions.generation.OverrideInThemeAction;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
@@ -22,6 +23,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,6 +40,8 @@ public class OverrideInThemeDialog extends AbstractDialog {
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, THEME_NAME})
     private JComboBox theme;
+    private JRadioButton radioButtonOverride;
+    private JRadioButton radioButtonExtend;
 
     /**
      * Constructor.
@@ -53,14 +57,19 @@ public class OverrideInThemeDialog extends AbstractDialog {
 
         setContentPane(contentPane);
         setModal(true);
+        setTitle(OverrideInThemeAction.actionDescription);
         getRootPane().setDefaultButton(buttonOK);
         fillThemeOptions();
 
         buttonOK.addActionListener((final ActionEvent event) -> onOK());
         buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
 
+        radioButtonOverride.addActionListener((final ActionEvent event) -> onOverride());
+        radioButtonExtend.addActionListener((final ActionEvent event) -> onExtend());
+
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(final WindowEvent event) {
                 onCancel();
             }
@@ -73,6 +82,16 @@ public class OverrideInThemeDialog extends AbstractDialog {
         );
     }
 
+    private void onOverride() {
+        this.radioButtonOverride.setSelected(true);
+        this.radioButtonExtend.setSelected(false);
+    }
+
+    private void onExtend() {
+        this.radioButtonOverride.setSelected(false);
+        this.radioButtonExtend.setSelected(true);
+    }
+
     private void onOK() {
         if (!validateFormFields()) {
             return;
@@ -80,13 +99,22 @@ public class OverrideInThemeDialog extends AbstractDialog {
 
         final OverrideInThemeGenerator overrideInThemeGenerator =
                 new OverrideInThemeGenerator(project);
-        overrideInThemeGenerator.execute(psiFile, this.getTheme());
+        overrideInThemeGenerator.execute(psiFile, this.getTheme(), this.isOverride());
 
         this.setVisible(false);
     }
 
     public String getTheme() {
         return this.theme.getSelectedItem().toString();
+    }
+
+    /**
+     * Is Override.
+     *
+     * @return boolean
+     */
+    public boolean isOverride() {
+        return this.radioButtonOverride.isSelected();
     }
 
     /**

@@ -15,7 +15,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annot
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.BoxNotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierWithColonRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NumericRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
@@ -82,16 +82,14 @@ public class CreateAPluginDialog extends AbstractDialog {
             message = {DirectoryRule.MESSAGE, DIRECTORY})
     private JTextField pluginDirectory;
 
-    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, SORT_ORDER})
     @FieldValidation(rule = RuleRegistry.NUMERIC,
             message = {NumericRule.MESSAGE, SORT_ORDER})
     private JTextField pluginSortOrder;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, PLUGIN_NAME})
-    @FieldValidation(rule = RuleRegistry.IDENTIFIER,
-            message = {IdentifierRule.MESSAGE, PLUGIN_NAME})
+    @FieldValidation(rule = RuleRegistry.IDENTIFIER_WITH_COLON,
+            message = {IdentifierWithColonRule.MESSAGE, PLUGIN_NAME})
     private JTextField pluginName;
 
     private JLabel pluginDirectoryName;//NOPMD
@@ -121,6 +119,7 @@ public class CreateAPluginDialog extends AbstractDialog {
 
         setContentPane(contentPane);
         setModal(true);
+        setTitle(CreateAPluginAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
         fillPluginTypeOptions();
         fillTargetAreaOptions();
@@ -130,6 +129,7 @@ public class CreateAPluginDialog extends AbstractDialog {
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(final WindowEvent event) {
                 onCancel();
             }

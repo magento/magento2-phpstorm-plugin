@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
@@ -12,22 +13,26 @@ import com.magento.idea.magento2plugin.magento.files.RegistrationPhp;
 
 public class ModuleRegistrationPhpGeneratorTest extends BaseGeneratorTestCase {
 
+    /**
+     * Test for generation of registration.php file.
+     */
     public void testGenerateRegistrationPhpFile() {
-        String filePath = this.getFixturePath(RegistrationPhp.FILE_NAME);
-        PsiFile expectedFile = myFixture.configureByFile(filePath);
-        Project project = myFixture.getProject();
-        PsiDirectory projectDir = getProjectDirectory();
-        ModuleRegistrationPhpData moduleRegistrationPhpData = new ModuleRegistrationPhpData(
+        final String filePath = this.getFixturePath(RegistrationPhp.FILE_NAME);
+        final PsiFile expectedFile = myFixture.configureByFile(filePath);
+        final Project project = myFixture.getProject();
+        final PsiDirectory projectDir = getProjectDirectory();
+        final ModuleRegistrationPhpData moduleRegistrationPhpData = new ModuleRegistrationPhpData(
                 "Foo",
                 "Bar",
                 projectDir,
                 true
         );
-        ModuleRegistrationPhpGenerator moduleRegistrationPhpGenerator = new ModuleRegistrationPhpGenerator(
-                moduleRegistrationPhpData,
-                project
+        final ModuleRegistrationPhpGenerator moduleRegistrationPhpGenerator
+                = new ModuleRegistrationPhpGenerator(
+                    moduleRegistrationPhpData,
+                    project
         );
-        PsiFile registrationPhp = moduleRegistrationPhpGenerator.generate("test");
+        final PsiFile registrationPhp = moduleRegistrationPhpGenerator.generate("test");
         assertGeneratedFileIsCorrect(
                 expectedFile,
                 projectDir.getVirtualFile().getPath() + "/Foo/Bar",
@@ -35,23 +40,26 @@ public class ModuleRegistrationPhpGeneratorTest extends BaseGeneratorTestCase {
         );
     }
 
-    public void testGenerateRegistrationPhpFileInRoot()
-    {
-        String filePath = this.getFixturePath(RegistrationPhp.FILE_NAME);
-        PsiFile expectedFile = myFixture.configureByFile(filePath);
-        Project project = myFixture.getProject();
-        PsiDirectory projectDir = getProjectDirectory();
-        ModuleRegistrationPhpData moduleRegistrationPhpData = new ModuleRegistrationPhpData(
+    /**
+     * Test for generation of registration.php file for a module project.
+     */
+    public void testGenerateRegistrationPhpFileInRoot() {
+        final String filePath = this.getFixturePath(RegistrationPhp.FILE_NAME);
+        final PsiFile expectedFile = myFixture.configureByFile(filePath);
+        final Project project = myFixture.getProject();
+        final PsiDirectory projectDir = getProjectDirectory();
+        final ModuleRegistrationPhpData moduleRegistrationPhpData = new ModuleRegistrationPhpData(
                 "Foo",
                 "Bar",
                 projectDir,
                 false
         );
-        ModuleRegistrationPhpGenerator moduleRegistrationPhpGenerator = new ModuleRegistrationPhpGenerator(
-                moduleRegistrationPhpData,
-                project
+        final ModuleRegistrationPhpGenerator moduleRegistrationPhpGenerator
+                = new ModuleRegistrationPhpGenerator(
+                    moduleRegistrationPhpData,
+                    project
         );
-        PsiFile registrationPhp = moduleRegistrationPhpGenerator.generate("test");
+        final PsiFile registrationPhp = moduleRegistrationPhpGenerator.generate("test");
         assertGeneratedFileIsCorrect(
                 expectedFile,
                 projectDir.getVirtualFile().getPath(),

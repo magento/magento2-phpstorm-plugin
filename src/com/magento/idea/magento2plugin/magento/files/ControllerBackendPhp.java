@@ -14,7 +14,7 @@ import com.jetbrains.php.lang.PhpLanguage;
         "PMD.RedundantFieldInitializer"
 })
 public class ControllerBackendPhp implements ModuleFileInterface {
-    public static final String TEMPLATE = "Magento Module Controller Backend Class";
+    public static final String TEMPLATE = "Magento Backend Controller Class";
     public static final String DEFAULT_DIR = "Controller/Adminhtml";
     private static ControllerBackendPhp INSTANCE = null;
     private String fileName;

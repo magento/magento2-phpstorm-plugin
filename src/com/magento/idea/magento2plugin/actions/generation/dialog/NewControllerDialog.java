@@ -84,6 +84,7 @@ public class NewControllerDialog extends AbstractDialog {
 
         setContentPane(contentPane);
         setModal(true);
+        setTitle(NewControllerAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
         suggestControllerDirectory();
         controllerAreaSelect.addActionListener(e -> suggestControllerDirectory());
@@ -95,6 +96,7 @@ public class NewControllerDialog extends AbstractDialog {
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(final WindowEvent event) {
                 onCancel();
             }
