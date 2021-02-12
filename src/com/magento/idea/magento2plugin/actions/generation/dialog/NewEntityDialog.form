@@ -137,13 +137,16 @@
               </vspacer>
             </children>
           </grid>
-          <grid id="e3309" layout-manager="GridLayoutManager" row-count="8" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+          <grid id="e3309" binding="uiComponentsPanel" layout-manager="GridLayoutManager" row-count="8" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="10" left="10" bottom="0" right="10"/>
             <constraints>
               <tabbedpane title="Admin UI Components"/>
             </constraints>
-            <properties/>
-            <border type="none" title=""/>
+            <properties>
+              <preferredSize width="483" height="230"/>
+              <requestFocusEnabled value="false"/>
+            </properties>
+            <border type="none"/>
             <children>
               <component id="3c721" class="javax.swing.JTextField" binding="route">
                 <constraints>

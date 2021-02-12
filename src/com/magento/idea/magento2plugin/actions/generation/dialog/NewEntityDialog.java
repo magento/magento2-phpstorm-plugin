@@ -196,6 +196,7 @@ public class NewEntityDialog extends AbstractDialog {
     private static final String GRID_NAME = "Grit Name";
     private static final String IDENTIFIER = "Identifier";
     private static final String SORT_ORDER = "Sort Order";
+    private static final String UI_COMPONENTS_TAB_NAME = "Admin UI Components";
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, FORM_NAME})
     @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE})
@@ -221,6 +222,7 @@ public class NewEntityDialog extends AbstractDialog {
     private JTextPane exampleAclId;
     private JTextPane exampleFormName;
     private JTextPane exampleGridName;
+    private JPanel uiComponentsPanel;
     private JTextField observerName;
 
     /**
@@ -269,6 +271,10 @@ public class NewEntityDialog extends AbstractDialog {
                 autoCompleteIdentifiers();
             }
         });
+
+        toggleUiComponentsPanel();
+
+        createUiComponent.addItemListener(event -> toggleUiComponentsPanel());
     }
 
     /**
@@ -1398,5 +1404,17 @@ public class NewEntityDialog extends AbstractDialog {
         aclTitle.setText(entityNameLabel.concat(" Management"));
         menuIdentifier.setText(getModuleName().concat("::management"));
         menuTitle.setText(entityNameLabel.concat(" Management"));
+    }
+
+    /**
+     * Resolve ui components panel state.
+     */
+    private void toggleUiComponentsPanel() {
+        if (createUiComponent.isSelected()) {
+            tabbedPane1.add(uiComponentsPanel, 1);
+            tabbedPane1.setTitleAt(1, UI_COMPONENTS_TAB_NAME);
+        } else {
+            tabbedPane1.remove(1);
+        }
     }
 }
