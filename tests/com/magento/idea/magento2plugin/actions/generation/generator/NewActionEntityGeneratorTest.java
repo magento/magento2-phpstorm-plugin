@@ -17,6 +17,7 @@ public class NewActionEntityGeneratorTest extends BaseGeneratorTestCase {
     private static final String NAMESPACE =
             "Foo\\Bar\\Controller\\Adminhtml\\" + ENTITY_NAME;
     private static final String ACL = "Foo_Bar::company_id";
+    private static final String MENU = "Foo_Bar::menu_id";
 
 
     /**
@@ -28,7 +29,8 @@ public class NewActionEntityGeneratorTest extends BaseGeneratorTestCase {
                         ENTITY_NAME,
                         MODULE_NAME,
                         NAMESPACE,
-                        ACL
+                        ACL,
+                        MENU
                 );
         final NewActionEntityControllerFileGenerator newActionEntityControllerFileGenerator =
                 new NewActionEntityControllerFileGenerator(

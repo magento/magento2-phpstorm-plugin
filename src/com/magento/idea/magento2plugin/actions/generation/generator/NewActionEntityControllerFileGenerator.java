@@ -76,9 +76,10 @@ public class NewActionEntityControllerFileGenerator extends FileGenerator {
         addProperty(attributes, "EXTENDS", BackendModuleType.EXTENDS.getType());
         addProperty(attributes, "IMPLEMENTS", HttpMethod.GET.getInterfaceFqn());
         attributes.setProperty("ADMIN_RESOURCE", fileData.getAcl());
+        attributes.setProperty("MENU_IDENTIFIER", fileData.getMenu());
         addProperty(attributes, "RESULT_INTERFACE", FrameworkLibraryType.RESULT_INTERFACE.getType());
         addProperty(attributes, "RESULT_FACTORY", FrameworkLibraryType.RESULT_FACTORY.getType());
-        addProperty(attributes, "FORWARD", BackendModuleType.FORWARD.getType());
+        addProperty(attributes, "RESULT_PAGE", BackendModuleType.RESULT_PAGE.getType());
 
         attributes.setProperty("USES", PhpClassGeneratorUtil.formatUses(uses));
     }

@@ -23,14 +23,15 @@ class ${CLASS_NAME} extends ${EXTENDS} implements ${IMPLEMENTS}
     /**
      * Create new ${ENTITY_NAME} action.
      *
-     * @return ${RESULT_INTERFACE}|${FORWARD}
+     * @return ${RESULT_PAGE}|${RESULT_INTERFACE}
      */
     public function execute()
     {
-        /** @var ${FORWARD} $resultForward */
-        $resultForward = $this->resultFactory->create(${RESULT_FACTORY}::TYPE_FORWARD);
-        $resultForward->forward('edit');
+        /** @var ${RESULT_PAGE} $resultPage */
+        $resultPage = $this->resultFactory->create(${RESULT_FACTORY}::TYPE_FORWARD);
+        $resultPage->setActiveMenu('${MENU_IDENTIFIER}');
+        $resultPage->getConfig()->getTitle()->prepend(__('New ${ENTITY_NAME}'));
 
-        return $resultForward;
+        return $resultPage;
     }
 }

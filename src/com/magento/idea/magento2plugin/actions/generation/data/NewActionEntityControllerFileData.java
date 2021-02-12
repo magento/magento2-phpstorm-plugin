@@ -13,6 +13,7 @@ public class NewActionEntityControllerFileData {
     private final String moduleName;
     private final String namespace;
     private final String acl;
+    private final String menuIdentifier;
 
     /**
      * Controller NewAction file constructor.
@@ -25,12 +26,14 @@ public class NewActionEntityControllerFileData {
             final @NotNull String entityName,
             final @NotNull String moduleName,
             final @NotNull String namespace,
-            final @NotNull String acl
+            final @NotNull String acl,
+            final @NotNull String menuIdentifier
     ) {
         this.entityName = entityName;
         this.moduleName = moduleName;
         this.namespace = namespace;
         this.acl = acl;
+        this.menuIdentifier = menuIdentifier;
     }
 
     /**
@@ -67,5 +70,14 @@ public class NewActionEntityControllerFileData {
      */
     public String getAcl() {
         return acl;
+    }
+
+    /**
+     * Get menu.
+     *
+     * @return String
+     */
+    public String getMenu() {
+        return menuIdentifier;
     }
 }

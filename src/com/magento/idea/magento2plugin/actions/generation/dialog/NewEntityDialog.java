@@ -1212,7 +1212,8 @@ public class NewEntityDialog extends AbstractDialog {
                 getEntityName(),
                 getModuleName(),
                 namespace.getNamespace(),
-                getAcl()
+                getAcl(),
+                getMenuIdentifier()
         ), project).generate(ACTION_NAME, false);
     }
 
