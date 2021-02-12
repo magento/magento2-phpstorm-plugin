@@ -14,7 +14,7 @@ import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.xml.XmlFile;
 import com.magento.idea.magento2plugin.actions.generation.data.EmailTemplatesXmlData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateEmailTemplatesXml;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplate;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplateUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.XmlFilePositionUtil;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
@@ -28,7 +28,7 @@ public class ModuleEmailTemplatesXmlGenerator extends FileGenerator {
     private final EmailTemplatesXmlData emailTemplatesData;
     private final Project project;
     private final FindOrCreateEmailTemplatesXml findOrCreateEmailTemplatesXml;
-    private final GetCodeTemplate getCodeTemplate;
+    private final GetCodeTemplateUtil getCodeTemplateUtil;
     private final XmlFilePositionUtil positionUtil;
     private final PsiDocumentManager psiDocumentManager;
     private final CodeStyleManager codeStyleManager;
@@ -48,7 +48,7 @@ public class ModuleEmailTemplatesXmlGenerator extends FileGenerator {
         super(project);
         this.project = project;
         this.emailTemplatesData = emailTemplatesData;
-        this.getCodeTemplate = GetCodeTemplate.getInstance(project);
+        this.getCodeTemplateUtil = new GetCodeTemplateUtil(project);
         this.findOrCreateEmailTemplatesXml = new FindOrCreateEmailTemplatesXml(project);
         this.positionUtil = XmlFilePositionUtil.getInstance();
         this.psiDocumentManager = PsiDocumentManager.getInstance(project);
@@ -75,7 +75,7 @@ public class ModuleEmailTemplatesXmlGenerator extends FileGenerator {
             final StringBuffer textBuf = new StringBuffer();
 
             try {
-                final String emailTemplateRegistrationTemplate = this.getCodeTemplate.execute(
+                final String emailTemplateRegistrationTemplate = this.getCodeTemplateUtil.execute(
                         EmailTemplatesXml.EMAIL_TEMPLATE_REGISTRATION,
                         getAttributes()
                 );
