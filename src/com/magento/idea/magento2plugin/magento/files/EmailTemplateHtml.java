@@ -13,7 +13,7 @@ public class EmailTemplateHtml implements ModuleFileInterface {
     public static final String HTML_TYPE = "html";
     public static final String TEXT_TYPE = "text";
     public static final String HTML_FILE_EXTENSION = "html";
-    private static EmailTemplateHtml INSTANCE = null;
+    private static EmailTemplateHtml instance = null;
     private String fileName;
 
     /**
@@ -22,13 +22,13 @@ public class EmailTemplateHtml implements ModuleFileInterface {
      * @return EmailTemplatesXml
      */
     public static EmailTemplateHtml getInstance(final String fileName) {
-        if (null == INSTANCE) {
-            INSTANCE = new EmailTemplateHtml();
+        if (null == instance) { //NOPMD
+            instance = new EmailTemplateHtml();
         }
 
-        INSTANCE.setFileName(fileName);
+        instance.setFileName(fileName);
 
-        return INSTANCE;
+        return instance;
     }
 
     @Override

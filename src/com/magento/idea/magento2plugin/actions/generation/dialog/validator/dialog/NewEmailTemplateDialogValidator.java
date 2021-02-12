@@ -132,7 +132,7 @@ public class NewEmailTemplateDialogValidator {
     private boolean isTemplateFileAlreadyExists(
             final EmailTemplateHtmlData emailTemplateData
     ) {
-        PsiFile templateFile = FileBasedIndexUtil.findModuleViewFile(
+        final PsiFile templateFile = FileBasedIndexUtil.findModuleViewFile(
                 emailTemplateData.getFileName(),
                 getArea(emailTemplateData.getArea()),
                 emailTemplateData.getModule(),

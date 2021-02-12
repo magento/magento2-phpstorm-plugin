@@ -51,8 +51,8 @@ public class ModuleEmailTemplateHtmlGenerator extends FileGenerator {
      * @param actionName Action name
      * @return PsiFile
      */
-    public PsiFile generate(String actionName) {
-        PsiFile templateFile = FileBasedIndexUtil.findModuleViewFile(
+    public PsiFile generate(final String actionName) {
+        final PsiFile templateFile = FileBasedIndexUtil.findModuleViewFile(
                 this.emailTemplateData.getFileName(),
                 getArea(this.emailTemplateData.getArea()),
                 this.emailTemplateData.getModule(),
@@ -92,7 +92,7 @@ public class ModuleEmailTemplateHtmlGenerator extends FileGenerator {
     }
 
     @Override
-    protected void fillAttributes(Properties attributes) {
+    protected void fillAttributes(final Properties attributes) {
         attributes.setProperty("SUBJECT", emailTemplateData.getSubject());
         attributes.setProperty("TYPE", emailTemplateData.getType());
 

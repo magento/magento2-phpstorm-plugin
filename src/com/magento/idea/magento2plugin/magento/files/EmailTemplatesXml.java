@@ -19,7 +19,7 @@ public class EmailTemplatesXml implements ModuleFileInterface {
     public static final String TEMPLATE_TAG = "template";
     public static final String TEMPLATE_ID_ATTRIBUTE = "id";
 
-    private static EmailTemplatesXml INSTANCE = null;
+    private static EmailTemplatesXml instance = null;
 
     /**
      * Returns a new instance of the class.
@@ -27,11 +27,11 @@ public class EmailTemplatesXml implements ModuleFileInterface {
      * @return EmailTemplatesXml
      */
     public static EmailTemplatesXml getInstance() {
-        if (null == INSTANCE) {
-            INSTANCE = new EmailTemplatesXml();
+        if (null == instance) { //NOPMD
+            instance = new EmailTemplatesXml();
         }
 
-        return INSTANCE;
+        return instance;
     }
 
     @Override

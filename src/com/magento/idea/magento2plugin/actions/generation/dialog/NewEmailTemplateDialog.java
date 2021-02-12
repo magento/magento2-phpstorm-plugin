@@ -39,16 +39,16 @@ public class NewEmailTemplateDialog extends AbstractDialog {
     private final String moduleName;
     private final Project project;
     private final NewEmailTemplateDialogValidator validator;
-    private static final String ID = "id";
+    private static final String EMAIL_TEMPLATE_ID = "id";
     private static final String LABEL = "label";
     private static final String FILENAME = "file name";
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, ID})
+            message = {NotEmptyRule.MESSAGE, EMAIL_TEMPLATE_ID})
     @FieldValidation(rule = RuleRegistry.IDENTIFIER,
-            message = {IdentifierRule.MESSAGE, ID})
+            message = {IdentifierRule.MESSAGE, EMAIL_TEMPLATE_ID})
     private JTextField identifier;
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, LABEL})
@@ -69,6 +69,7 @@ public class NewEmailTemplateDialog extends AbstractDialog {
      * @param directory Directory
      */
     public NewEmailTemplateDialog(final Project project, final PsiDirectory directory) {
+        super();
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
@@ -82,7 +83,7 @@ public class NewEmailTemplateDialog extends AbstractDialog {
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
-            public void windowClosing(final WindowEvent e) {
+            public void windowClosing(final WindowEvent windowEvent) {
                 onCancel();
             }
         });
@@ -90,7 +91,7 @@ public class NewEmailTemplateDialog extends AbstractDialog {
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
                 new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
+                    public void actionPerformed(ActionEvent actionEvent) {
                         onCancel();
                     }
                 },
@@ -230,6 +231,7 @@ public class NewEmailTemplateDialog extends AbstractDialog {
         dispose();
     }
 
+    @SuppressWarnings({"PMD.UnusedPrivateMethod"})
     private void createUIComponents() {
         this.area = new FilteredComboBox(getAreaList());
         this.templateType = new FilteredComboBox(getTypeList());

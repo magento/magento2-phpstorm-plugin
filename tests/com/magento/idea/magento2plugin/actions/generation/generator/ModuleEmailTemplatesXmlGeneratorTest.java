@@ -83,7 +83,7 @@ public class ModuleEmailTemplatesXmlGeneratorTest extends BaseGeneratorTestCase 
     /**
      * Add email template XML.
      *
-     * @param id Email Template ID
+     * @param emailTemplateId Email Template ID
      * @param label Email Template Label
      * @param filename Email Template Filename
      * @param type Email Type
@@ -91,7 +91,7 @@ public class ModuleEmailTemplatesXmlGeneratorTest extends BaseGeneratorTestCase 
      * @return PsiFile
      */
     private PsiFile addEmailTemplateXml(
-            final String id,
+            final String emailTemplateId,
             final String label,
             final String filename,
             final String type,
@@ -100,7 +100,7 @@ public class ModuleEmailTemplatesXmlGeneratorTest extends BaseGeneratorTestCase 
         final Project project = myFixture.getProject();
         final EmailTemplatesXmlData emailTemplatesData = new EmailTemplatesXmlData(
                 MODULE_NAME,
-                id,
+                emailTemplateId,
                 label,
                 filename,
                 type,

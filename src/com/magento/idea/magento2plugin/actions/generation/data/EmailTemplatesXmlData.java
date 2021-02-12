@@ -8,7 +8,7 @@ package com.magento.idea.magento2plugin.actions.generation.data;
 @SuppressWarnings({"PMD.DataClass"})
 public class EmailTemplatesXmlData {
     private final String module;
-    private final String id;
+    private final String emailTemplateId;
     private final String label;
     private final String templateFileName;
     private final String type;
@@ -18,7 +18,7 @@ public class EmailTemplatesXmlData {
      * Email templates data constructor.
      *
      * @param module String
-     * @param id String
+     * @param emailTemplateId String
      * @param label String
      * @param templateFileName String
      * @param type String
@@ -26,14 +26,14 @@ public class EmailTemplatesXmlData {
      */
     public EmailTemplatesXmlData(
             final String module,
-            final String id,
+            final String emailTemplateId,
             final String label,
             final String templateFileName,
             final String type,
             final String area
     ) {
         this.module = module;
-        this.id = id;
+        this.emailTemplateId = emailTemplateId;
         this.label = label;
         this.templateFileName = templateFileName;
         this.type = type;
@@ -55,7 +55,7 @@ public class EmailTemplatesXmlData {
      * @return String
      */
     public String getId() {
-        return id;
+        return emailTemplateId;
     }
 
     /**
