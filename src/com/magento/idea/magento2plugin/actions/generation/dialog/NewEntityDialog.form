@@ -142,8 +142,11 @@
             <constraints>
               <tabbedpane title="Admin UI Components"/>
             </constraints>
-            <properties/>
-            <border type="none" title=""/>
+            <properties>
+              <preferredSize width="483" height="230"/>
+              <requestFocusEnabled value="false"/>
+            </properties>
+            <border type="none"/>
             <children>
               <component id="3c721" class="javax.swing.JTextField" binding="route">
                 <constraints>
