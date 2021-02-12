@@ -11,10 +11,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlFile;
-import com.intellij.psi.xml.XmlTag;
 import com.magento.idea.magento2plugin.actions.generation.data.EmailTemplatesXmlData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateEmailTemplatesXml;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplate;
@@ -22,9 +19,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.XmlFile
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.magento.files.EmailTemplatesXml;
-import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Properties;
 import javax.swing.JOptionPane;
 
@@ -75,22 +70,6 @@ public class ModuleEmailTemplatesXmlGenerator extends FileGenerator {
                 actionName,
                 moduleName
         );
-        final String groupName = this.emailTemplatesData.getId();
-        final XmlTag emailTemplateTag = this.getTemplateTag(emailTemplateXmlFile, groupName);
-
-        if (emailTemplateTag != null) {
-            final String errorMessage = this.validatorBundle.message(
-                    "validator.alreadyDeclared",
-                    String.format("%s Email Template", groupName),
-                    moduleName
-            );
-            JOptionPane.showMessageDialog(
-                    null,
-                    errorMessage,
-                    commonBundle.message("common.error"),
-                    JOptionPane.ERROR_MESSAGE
-            );
-        }
 
         WriteCommandAction.runWriteCommandAction(project, () -> {
             final StringBuffer textBuf = new StringBuffer();
@@ -167,28 +146,5 @@ public class ModuleEmailTemplatesXmlGenerator extends FileGenerator {
         attributes.setProperty("TYPE", emailTemplatesData.getType());
         attributes.setProperty("MODULE", emailTemplatesData.getModule());
         attributes.setProperty("AREA", emailTemplatesData.getArea());
-    }
-
-    /**
-     * Retrieve template tag with email template id if it registered in email_templates.xml file.
-     *
-     * @param emailTemplatesXmlFile email templates XML file
-     * @param id Email template ID
-     * @return XmlTag
-     */
-    private XmlTag getTemplateTag(final XmlFile emailTemplatesXmlFile, final String id) {
-        final Collection<XmlAttributeValue> attributes = XmlPsiTreeUtil.findAttributeValueElements(
-                emailTemplatesXmlFile,
-                EmailTemplatesXml.TEMPLATE_TAG,
-                EmailTemplatesXml.TEMPLATE_ID_ATTRIBUTE
-        );
-
-        for (final XmlAttributeValue emailTemplateAttribute: attributes) {
-            if (emailTemplateAttribute.getValue().equals(id)) {
-                return PsiTreeUtil.getParentOfType(emailTemplateAttribute, XmlTag.class);
-            }
-        }
-
-        return null;
     }
 }

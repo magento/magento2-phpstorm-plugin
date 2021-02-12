@@ -13,8 +13,8 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import com.magento.idea.magento2plugin.actions.generation.dialog.NewEmailTemplateDialog;
 import com.magento.idea.magento2plugin.MagentoIcons;
+import com.magento.idea.magento2plugin.actions.generation.dialog.NewEmailTemplateDialog;
 
 @SuppressWarnings({"PMD.OnlyOneReturn", "PMD.FieldNamingConventions"})
 public class NewEmailTemplateAction extends AnAction {

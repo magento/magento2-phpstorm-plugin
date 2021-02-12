@@ -16,7 +16,7 @@ public class EmailTemplatesXml implements ModuleFileInterface {
     public static final String EMAIL_TEMPLATE_REGISTRATION = "Magento Module Email Template Xml";
 
     // XML definitions
-    public static final String TEMPLATE_TAG = "templates";
+    public static final String TEMPLATE_TAG = "template";
     public static final String TEMPLATE_ID_ATTRIBUTE = "id";
 
     private static EmailTemplatesXml INSTANCE = null;

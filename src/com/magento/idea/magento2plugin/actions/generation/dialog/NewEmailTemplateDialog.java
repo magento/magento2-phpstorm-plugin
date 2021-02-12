@@ -10,12 +10,13 @@ import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.actions.generation.NewEmailTemplateAction;
 import com.magento.idea.magento2plugin.actions.generation.data.EmailTemplateHtmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.EmailTemplatesXmlData;
-import com.magento.idea.magento2plugin.actions.generation.generator.ModuleEmailTemplateHtmlGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.ModuleEmailTemplatesXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.dialog.NewEmailTemplateDialogValidator;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
+import com.magento.idea.magento2plugin.actions.generation.generator.ModuleEmailTemplateHtmlGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.ModuleEmailTemplatesXmlGenerator;
 import com.magento.idea.magento2plugin.magento.files.EmailTemplateHtml;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
@@ -37,6 +38,7 @@ import javax.swing.KeyStroke;
 public class NewEmailTemplateDialog extends AbstractDialog {
     private final String moduleName;
     private final Project project;
+    private final NewEmailTemplateDialogValidator validator;
     private static final String ID = "id";
     private static final String LABEL = "label";
     private static final String FILENAME = "file name";
@@ -71,6 +73,7 @@ public class NewEmailTemplateDialog extends AbstractDialog {
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
         this.project = project;
+        this.validator = new NewEmailTemplateDialogValidator(project);
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
         buttonOK.addActionListener(e -> onOK());
@@ -199,7 +202,8 @@ public class NewEmailTemplateDialog extends AbstractDialog {
     }
 
     private void onOK() {
-        if (!validateFormFields()) {
+        final boolean emailTemplateCanBeDeclared = !this.validator.validate(this);
+        if (!validateFormFields() || emailTemplateCanBeDeclared) {
             return;
         }
 

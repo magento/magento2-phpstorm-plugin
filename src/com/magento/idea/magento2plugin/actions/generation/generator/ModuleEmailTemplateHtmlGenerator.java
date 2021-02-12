@@ -13,7 +13,9 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Directo
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.EmailTemplateHtml;
+import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.util.magento.FileBasedIndexUtil;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -22,6 +24,7 @@ public class ModuleEmailTemplateHtmlGenerator extends FileGenerator {
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final ModuleIndex moduleIndex;
     private final DirectoryGenerator directoryGenerator;
+    private final Project project;
 
     /**
      * Constructor.
@@ -36,6 +39,7 @@ public class ModuleEmailTemplateHtmlGenerator extends FileGenerator {
         super(project);
 
         this.emailTemplateData = emailTemplateData;
+        this.project = project;
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         this.directoryGenerator = DirectoryGenerator.getInstance();
         this.moduleIndex = ModuleIndex.getInstance(project);
@@ -48,6 +52,18 @@ public class ModuleEmailTemplateHtmlGenerator extends FileGenerator {
      * @return PsiFile
      */
     public PsiFile generate(String actionName) {
+        PsiFile templateFile = FileBasedIndexUtil.findModuleViewFile(
+                this.emailTemplateData.getFileName(),
+                getArea(this.emailTemplateData.getArea()),
+                this.emailTemplateData.getModule(),
+                this.project,
+                Package.moduleViewEmailDir
+        );
+
+        if (templateFile != null) {
+            return null;
+        }
+
         PsiDirectory parentDirectory = this.moduleIndex.getModuleDirectoryByModuleName(
                 this.emailTemplateData.getModule()
         );
@@ -83,5 +99,9 @@ public class ModuleEmailTemplateHtmlGenerator extends FileGenerator {
         if (emailTemplateData.getType().equals(EmailTemplateHtml.HTML_TYPE)) {
             attributes.setProperty("HTML_TYPE", "true");
         }
+    }
+
+    private Areas getArea(final String area) {
+        return Areas.getAreaByString(area);
     }
 }
