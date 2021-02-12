@@ -28,7 +28,7 @@ class ${CLASS_NAME} extends ${EXTENDS} implements ${IMPLEMENTS}
     public function execute()
     {
         /** @var ${RESULT_PAGE} $resultPage */
-        $resultPage = $this->resultFactory->create(${RESULT_FACTORY}::TYPE_FORWARD);
+        $resultPage = $this->resultFactory->create(${RESULT_FACTORY}::TYPE_PAGE);
         $resultPage->setActiveMenu('${MENU_IDENTIFIER}');
         $resultPage->getConfig()->getTitle()->prepend(__('New ${ENTITY_NAME}'));
 
