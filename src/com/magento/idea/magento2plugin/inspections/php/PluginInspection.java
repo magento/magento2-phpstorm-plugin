@@ -20,6 +20,7 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import com.magento.idea.magento2plugin.bundles.InspectionBundle;
 import com.magento.idea.magento2plugin.inspections.php.util.PhpClassImplementsInterfaceUtil;
+import com.magento.idea.magento2plugin.inspections.php.util.PhpClassImplementsNoninterceptableInterfaceUtil;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
 import com.magento.idea.magento2plugin.magento.packages.Package;
@@ -126,6 +127,17 @@ public class PluginInspection extends PhpInspection {
                         );
                     }
                 }
+
+
+                if (PhpClassImplementsNoninterceptableInterfaceUtil.execute(target)) {
+                    problemsHolder.registerProblem(
+                            currentClassNameIdentifier,
+                            inspectionBundle.message(
+                                    "inspection.plugin.error.noninterceptableInterface"
+                            ),
+                            ProblemHighlightType.ERROR
+                    );
+                }
             }
 
             private void checkTargetMethod(
@@ -133,7 +145,7 @@ public class PluginInspection extends PhpInspection {
                     final String targetClassMethodName,
                     final Method targetMethod
             ) {
-                if (targetClassMethodName.equals(Plugin.constructMethodName)) {
+                if (targetClassMethodName.equals(Plugin.CONSTRUCT_METHOD_NAME)) {
                     problemsHolder.registerProblem(
                             pluginMethod.getNameIdentifier(),
                             inspectionBundle.message("inspection.plugin.error.constructMethod"),
@@ -154,7 +166,7 @@ public class PluginInspection extends PhpInspection {
                             ProblemHighlightType.ERROR
                     );
                 }
-                if (!targetMethod.getAccess().toString().equals(Plugin.publicAccess)) {
+                if (!targetMethod.getAccess().toString().equals(Plugin.PUBLIC_ACCESS)) {
                     problemsHolder.registerProblem(
                             pluginMethod.getNameIdentifier(),
                             inspectionBundle.message("inspection.plugin.error.nonPublicMethod"),
@@ -175,7 +187,11 @@ public class PluginInspection extends PhpInspection {
                 int index = 0;
                 for (final Parameter pluginMethodParameter : pluginMethodParameters) {
                     index++;
-                    final String declaredType = pluginMethodParameter.getDeclaredType().toString();
+                    String declaredType = pluginMethodParameter.getDeclaredType().toString();
+
+                    if (declaredType.isEmpty()) {
+                        declaredType = pluginMethodParameter.getDocType().toString();
+                    }
 
                     if (index == 1) { //NOPMD
                         final String targetClassFqn = Package.fqnSeparator.concat(targetClassName);
@@ -283,9 +299,8 @@ public class PluginInspection extends PhpInspection {
                     final String targetMethodParameterDeclaredType =
                             targetMethodParameter.getDeclaredType().toString();
 
-                    if (!checkTypeIncompatibility(
-                            targetMethodParameterDeclaredType,
-                            declaredType)
+                    if (!checkTypeIncompatibility(targetMethodParameterDeclaredType, declaredType)
+                            && !pluginMethodParameter.getText().contains("...$")
                     ) {
                         problemsHolder.registerProblem(
                                 pluginMethodParameter,
@@ -311,8 +326,6 @@ public class PluginInspection extends PhpInspection {
                 }
             }
 
-
-
             private String getTargetMethodName(
                     final Method pluginMethod,
                     final String pluginPrefix
@@ -320,6 +333,9 @@ public class PluginInspection extends PhpInspection {
                 final String pluginMethodName = pluginMethod.getName();
                 final String targetClassMethodName = pluginMethodName
                         .replace(pluginPrefix, "");
+                if (targetClassMethodName.isEmpty()) {
+                    return null;
+                }
                 final char firstCharOfTargetName = targetClassMethodName.charAt(0);
                 final int charType = Character.getType(firstCharOfTargetName);
                 if (charType == Character.LOWERCASE_LETTER) {

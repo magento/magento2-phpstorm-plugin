@@ -108,7 +108,7 @@
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text resource-bundle="magento2/common" key="common.name"/>
+              <text resource-bundle="magento2/common" key="common.pluginName"/>
             </properties>
           </component>
           <component id="9431c" class="javax.swing.JTextField" binding="pluginName">
@@ -131,7 +131,6 @@
               </grid>
             </constraints>
             <properties>
-              <text value="10"/>
               <toolTipText value="Plugin sort order in di.xml"/>
             </properties>
             <clientProperties>

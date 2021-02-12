@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class NewModuleAction extends com.intellij.openapi.actionSystem.AnAction {
     public static String actionName = "Magento 2 Module";
-    public static String actionDescription = "Create a new Magento 2 module";
+    public static String actionDescription = "Create a new Magento 2 Module";
 
     /**
      * Constructor.

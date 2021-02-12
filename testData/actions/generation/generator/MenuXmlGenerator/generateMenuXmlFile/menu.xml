@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Foo_Bar::menu" sortOrder="10" title="My Title" module="Foo_Bar" parent="Magento_Customer::customer"
+             resource="Foo_Bar::acl" translate="title" action="test"/>
+    </menu>
+</config>

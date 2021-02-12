@@ -10,14 +10,17 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.NewGraphQlResolverAction;
 import com.magento.idea.magento2plugin.actions.generation.data.GraphQlResolverFileData;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewGraphQlResolverValidator;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpDirectoryRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleGraphQlResolverClassGenerator;
 import com.magento.idea.magento2plugin.magento.files.GraphQlResolverPhp;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -28,15 +31,26 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
 public class NewGraphQlResolverDialog extends AbstractDialog {
-    private final NewGraphQlResolverValidator validator;
     private final PsiDirectory baseDir;
     private final String moduleName;
     private JPanel contentPanel;
     private JButton buttonOK;
     private JButton buttonCancel;
-    private JTextField graphQlResolverClassName;
-    private JTextField graphQlResolverParentDir;
     private final Project project;
+    private static final String CLASS_NAME = "class name";
+    private static final String PARENT_DIRECTORY = "directory";
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, CLASS_NAME})
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
+            message = {PhpClassRule.MESSAGE, CLASS_NAME})
+    private JTextField graphQlResolverClassName;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, PARENT_DIRECTORY})
+    @FieldValidation(rule = RuleRegistry.PHP_DIRECTORY,
+            message = {PhpDirectoryRule.MESSAGE, PARENT_DIRECTORY})
+    private JTextField graphQlResolverParentDir;
 
     /**
      * Constructor.
@@ -50,41 +64,31 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
         this.project = project;
         this.baseDir = directory;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
-        this.validator = NewGraphQlResolverValidator.getInstance(this);
 
         setContentPane(contentPanel);
         setModal(true);
-        setTitle("Create a new Magento 2 GraphQL Resolver.");
+        setTitle(NewGraphQlResolverAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
         suggestGraphQlResolverDirectory();
 
-        buttonOK.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent event) {
-                onOK();
-            }
-        });
-
-        buttonCancel.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent event) {
-                onCancel();
-            }
-        });
+        buttonOK.addActionListener((final ActionEvent event) -> onOK());
+        buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
 
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(final WindowEvent event) {
                 onCancel();
             }
         });
 
         // call onCancel() on ESCAPE
-        contentPanel.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(final ActionEvent event) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPanel.registerKeyboardAction(
+                (final ActionEvent event) -> onCancel(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+        );
     }
 
     /**
@@ -101,7 +105,7 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
     }
 
     protected void onOK() {
-        if (!validator.validate()) {
+        if (!validateFormFields()) {
             return;
         }
         generateFile();
@@ -176,6 +180,7 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
         return getNamespace().concat(Package.fqnSeparator).concat(getGraphQlResolverClassName());
     }
 
+    @Override
     public void onCancel() {
         // add your code here if necessary
         dispose();

@@ -1,0 +1,12 @@
+<field name="${NAME}" sortOrder="${SORT_ORDER}" formElement="${FORM_ELEMENT}">
+    <argument name="data" xsi:type="array">
+        <item name="config" xsi:type="array">
+            <item name="source" xsi:type="string">${SOURCE}</item>
+        </item>
+    </argument>
+    <settings>
+        <dataType>${DATA_TYPE}</dataType>
+        <label translate="true">${LABEL}</label>
+        <dataScope>${NAME}</dataScope>
+    </settings>
+</field>

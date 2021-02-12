@@ -1,0 +1,16 @@
+<?php
+#parse("PHP File Header.php")
+#if (${NAMESPACE})
+
+namespace ${NAMESPACE};
+#end
+
+use Magento\Framework\MessageQueue\ConsumerInterface;
+
+class ${CLASS_NAME} implements ConsumerInterface
+{
+   public function process($maxNumberOfMessages = null)
+   {
+       // TODO: Implement process() method.
+   }
+}

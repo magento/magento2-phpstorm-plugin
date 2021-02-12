@@ -18,7 +18,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.NewCronGroupDia
 @SuppressWarnings({"PMD.OnlyOneReturn"})
 public class NewCronGroupAction extends com.intellij.openapi.actionSystem.AnAction {
     public static final String ACTION_NAME = "Magento 2 Cron Group";
-    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 cron group";
+    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Cron Group";
 
     /**
      * New CRON group action constructor.

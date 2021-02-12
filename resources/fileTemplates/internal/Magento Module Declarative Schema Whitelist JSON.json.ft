@@ -1,0 +1,30 @@
+{
+#if (${TABLE_NAME})
+  "${TABLE_NAME}": {
+    #if (${COLUMNS})
+      "column": {
+        #set ($columns = ${COLUMNS})
+        #foreach ($column in $columns)
+          "$column": true,
+        #end
+      },
+    #end
+    #if (${INDEXES})
+      "index": {
+        #set ($indexes = ${INDEXES})
+        #foreach ($index in $indexes)
+          "$index": true,
+        #end
+      },
+    #end
+    #if (${CONSTRAINTS})
+      "constraint": {
+        #set ($constraints = ${CONSTRAINTS})
+        #foreach ($constraint in $constraints)
+          "$constraint": true,
+        #end
+      }
+    #end
+  }
+#end
+}

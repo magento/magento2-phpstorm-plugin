@@ -11,7 +11,14 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.CreateAPluginAction;
 import com.magento.idea.magento2plugin.actions.generation.data.PluginDiXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.PluginFileData;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.CreateAPluginDialogValidator;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.BoxNotEmptyRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierWithColonRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NumericRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.PluginClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.PluginDiXmlGenerator;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
@@ -21,7 +28,6 @@ import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -35,24 +41,57 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings({"PMD.TooManyFields", "PMD.DataClass", "PMD.UnusedPrivateMethod"})
+@SuppressWarnings({
+        "PMD.TooManyFields",
+        "PMD.DataClass",
+        "PMD.UnusedPrivateMethod",
+        "PMD.ExcessiveImports"
+})
 public class CreateAPluginDialog extends AbstractDialog {
     @NotNull
     private final Project project;
     private final Method targetMethod;
     private final PhpClass targetClass;
-    @NotNull
-    private final CreateAPluginDialogValidator validator;
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
-    private JTextField pluginClassName;
-    private JTextField pluginDirectory;
     private JComboBox pluginType;
-    private FilteredComboBox pluginModule;
     private JComboBox pluginArea;
+
+    private static final String CLASS_NAME = "class name";
+    private static final String DIRECTORY = "directory path";
+    private static final String SORT_ORDER = "sort order";
+    private static final String PLUGIN_NAME = "plugin name";
+    private static final String TARGET_MODULE = "target module";
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, TARGET_MODULE})
+    @FieldValidation(rule = RuleRegistry.BOX_NOT_EMPTY,
+            message = {BoxNotEmptyRule.MESSAGE, TARGET_MODULE})
+    private FilteredComboBox pluginModule;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, CLASS_NAME})
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
+            message = {PhpClassRule.MESSAGE, CLASS_NAME})
+    private JTextField pluginClassName;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, DIRECTORY})
+    @FieldValidation(rule = RuleRegistry.DIRECTORY,
+            message = {DirectoryRule.MESSAGE, DIRECTORY})
+    private JTextField pluginDirectory;
+
+    @FieldValidation(rule = RuleRegistry.NUMERIC,
+            message = {NumericRule.MESSAGE, SORT_ORDER})
     private JTextField pluginSortOrder;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, PLUGIN_NAME})
+    @FieldValidation(rule = RuleRegistry.IDENTIFIER_WITH_COLON,
+            message = {IdentifierWithColonRule.MESSAGE, PLUGIN_NAME})
     private JTextField pluginName;
+
     private JLabel pluginDirectoryName;//NOPMD
     private JLabel selectPluginModule;//NOPMD
     private JLabel pluginTypeLabel;//NOPMD
@@ -77,38 +116,28 @@ public class CreateAPluginDialog extends AbstractDialog {
         this.project = project;
         this.targetMethod = targetMethod;
         this.targetClass = targetClass;
-        this.validator = CreateAPluginDialogValidator.getInstance(this);
 
         setContentPane(contentPane);
         setModal(true);
+        setTitle(CreateAPluginAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
         fillPluginTypeOptions();
         fillTargetAreaOptions();
 
-        buttonOK.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent event) {
-                onOK();
-            }
-        });
-
-        buttonCancel.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent event) {
-                onCancel();
-            }
-        });
+        buttonOK.addActionListener((final ActionEvent event) -> onOK());
+        buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(final WindowEvent event) {
                 onCancel();
             }
         });
 
-        contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(final ActionEvent event) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+        contentPane.registerKeyboardAction(
+                (final ActionEvent event) -> onCancel(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
     }
@@ -126,7 +155,7 @@ public class CreateAPluginDialog extends AbstractDialog {
     }
 
     protected void onOK() {
-        if (!validator.validate(project)) {
+        if (!validateFormFields()) {
             return;
         }
         new PluginClassGenerator(new PluginFileData(

@@ -10,7 +10,7 @@ import com.intellij.lang.xml.XMLLanguage;
 
 public class CronGroupXmlTemplate implements ModuleFileInterface {
     public static final String FILE_NAME = "cron_groups.xml";
-    public static final String TEMPLATE = "Magento Module Cron Groups Xml";
+    public static final String TEMPLATE = "Magento Cron Groups XML";
 
     // code templates
     public static final String TEMPLATE_CRON_GROUP_REGISTRATION = "Magento Module Cron Group Xml";

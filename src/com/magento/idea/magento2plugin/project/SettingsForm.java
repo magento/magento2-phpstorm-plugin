@@ -18,7 +18,7 @@ import com.magento.idea.magento2plugin.indexes.IndexManager;
 import com.magento.idea.magento2plugin.init.ConfigurationManager;
 import com.magento.idea.magento2plugin.magento.packages.MagentoComponentManager;
 import com.magento.idea.magento2plugin.project.validator.SettingsFormValidator;
-import com.magento.idea.magento2plugin.util.magento.MagentoVersion;
+import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JButton;
@@ -33,8 +33,11 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings({
+        "PMD.TooManyFields",
+        "PMD.TooManyMethods"
+})
 public class SettingsForm implements PhpFrameworkConfigurable {
-
     private final Project project;
     private JCheckBox pluginEnabled;
     private JButton buttonReindex;
@@ -44,7 +47,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     private JTextField moduleDefaultLicenseName;
     private JCheckBox mftfSupportEnabled;
     private TextFieldWithBrowseButton magentoPath;
-    private final SettingsFormValidator validator = SettingsFormValidator.getInstance(this);
+    private final SettingsFormValidator validator = new SettingsFormValidator(this);
     private JLabel magentoVersionLabel;//NOPMD
     private JLabel magentoPathLabel;//NOPMD
 
@@ -77,12 +80,12 @@ public class SettingsForm implements PhpFrameworkConfigurable {
                 }
         );
 
-        buttonReindex.setEnabled(getSettings().pluginEnabled);
-        regenerateUrnMapButton.setEnabled(getSettings().pluginEnabled);
-
         regenerateUrnMapButton.addMouseListener(
                 new RegenerateUrnMapListener(project)
         );
+
+        refreshFormStatus(getSettings().pluginEnabled);
+        pluginEnabled.addActionListener(e -> refreshFormStatus(pluginEnabled.isSelected()));
 
         moduleDefaultLicenseName.setText(getSettings().defaultLicense);
         mftfSupportEnabled.setSelected(getSettings().mftfSupportEnabled);
@@ -95,6 +98,15 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         return (JComponent) panel;
     }
 
+    private void refreshFormStatus(final boolean isEnabled) {
+        buttonReindex.setEnabled(isEnabled);
+        regenerateUrnMapButton.setEnabled(isEnabled);
+        magentoVersion.setEnabled(isEnabled);
+        mftfSupportEnabled.setEnabled(isEnabled);
+        magentoPath.setEnabled(isEnabled);
+        moduleDefaultLicenseName.setEnabled(isEnabled);
+    }
+
     protected void reindex() {
         IndexManager.manualReindex();
         MagentoComponentManager.getInstance(project).flushModules();
@@ -105,12 +117,16 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         final boolean licenseChanged = !moduleDefaultLicenseName.getText().equals(
                 Settings.defaultLicense
         );
+        final boolean versionChanged = !magentoVersion.getText().equals(
+                getSettings().magentoVersion
+        );
         final boolean statusChanged = !pluginEnabled.isSelected() == getSettings().pluginEnabled;
         final boolean mftfSupportChanged = mftfSupportEnabled.isSelected()
                 != getSettings().mftfSupportEnabled;
         final boolean magentoPathChanged = isMagentoPathChanged();
 
-        return statusChanged || licenseChanged || mftfSupportChanged || magentoPathChanged;
+        return statusChanged || licenseChanged || mftfSupportChanged
+                || magentoPathChanged || versionChanged;
     }
 
     private void resolveMagentoVersion() {
@@ -217,7 +233,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
      */
     public void updateMagentoVersion() {
         final String magentoPathValue = this.magentoPath.getTextField().getText();
-        final String resolvedVersion = MagentoVersion.get(project, magentoPathValue);
+        final String resolvedVersion = MagentoVersionUtil.get(project, magentoPathValue);
         magentoVersion.setText(resolvedVersion);
     }
 

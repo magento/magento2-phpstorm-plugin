@@ -1,0 +1,51 @@
+<!--
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<html>
+    <body>
+        <table width="100%" border="0" cellpadding="5" cellspacing="0" style="border-collapse: collapse">
+            <tr>
+                <td><font face="verdana" size="-1">
+                    The object manager uses the preference mappings to determine what the default implementation is for that class for a particular scope.
+                    <a href="https://devdocs.magento.com/guides/v2.3/extension-dev-guide/build/di-xml-file.html#override-a-method-using-preference-nodes">
+                    For example</a>, a preference is used to override a public or protected method from a core class.
+                </font><br>
+                </td>
+            </tr>
+            <tr>
+                <td><font face="verdana" size="-1">
+                    Read more About the preferences in the <a href="https://devdocs.magento.com/guides/v2.3/extension-dev-guide/build/di-xml-file.html#abstraction-implementation-mappings">DevDocs</a>.
+                </font><br>
+                </td>
+            </tr>
+        </table>
+        <table width="100%" border="0" cellpadding="5" cellspacing="0" style="border-collapse: collapse">
+            <tr>
+                <td colspan="3"><font face="verdana" size="-1">Predefined variables explanation:</font></td>
+            </tr>
+            <tr>
+                <td valign="top"><nobr><font face="verdana" size="-2"><b>${NAMESPACE}</b></font></nobr></td>
+                <td width="10">&nbsp;</td>
+                <td width="100%" valign="top"><font face="verdana" size="-1">Preference's namespace.</font></td>
+            </tr>
+            <tr>
+                <td valign="top"><nobr><font face="verdana" size="-2"><b>${USE}</b></font></nobr></td>
+                <td width="10">&nbsp;</td>
+                <td width="100%" valign="top"><font face="verdana" size="-1">The namespace of the PHP class to extend from.</font></td>
+            </tr>
+            <tr>
+                <td valign="top"><nobr><font face="verdana" size="-2"><b>${NAME}</b></font></nobr></td>
+                <td width="10">&nbsp;</td>
+                <td width="100%" valign="top"><font face="verdana" size="-1">The name of PHP class.</font></td>
+            </tr>
+            <tr>
+                <td valign="top"><nobr><font face="verdana" size="-2"><b>${EXTENDS}</b></font></nobr></td>
+                <td width="10">&nbsp;</td>
+                <td width="100%" valign="top"><font face="verdana" size="-1">The name of the PHP class to extend from.</font></td>
+            </tr>
+        </table>
+    </body>
+</html>

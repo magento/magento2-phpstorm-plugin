@@ -12,7 +12,12 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.OverrideClassByAPreferenceAction;
 import com.magento.idea.magento2plugin.actions.generation.data.PreferenceDiXmFileData;
 import com.magento.idea.magento2plugin.actions.generation.data.PreferenceFileData;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.OverrideClassByAPreferenceDialogValidator;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.BoxNotEmptyRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.PreferenceClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.PreferenceDiXmlGenerator;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
@@ -23,7 +28,6 @@ import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -44,16 +48,12 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
     @NotNull
     private final Project project;
     private final PhpClass targetClass;
-    @NotNull
-    private final OverrideClassByAPreferenceDialogValidator validator;
+    private boolean isInterface;
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
-    private JTextField preferenceClassName;
-    private JTextField preferenceDirectory;
     private final CommonBundle commonBundle;
     private final ValidatorBundle validatorBundle;
-    private FilteredComboBox preferenceModule;
     private JLabel inheritClassLabel;
     private JComboBox preferenceArea;
     private JCheckBox inheritClass;
@@ -61,6 +61,27 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
     private JLabel selectPreferenceModule;//NOPMD
     private JLabel preferenceDirectoryLabel;//NOPMD
     private JLabel preferenceClassNameLabel;//NOPMD
+    private static final String MODULE = "target module";
+    private static final String CLASS = "class name";
+    private static final String DIRECTORY = "directory";
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, MODULE})
+    @FieldValidation(rule = RuleRegistry.BOX_NOT_EMPTY,
+            message = {BoxNotEmptyRule.MESSAGE, MODULE})
+    private FilteredComboBox preferenceModule;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, CLASS})
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
+            message = {PhpClassRule.MESSAGE, CLASS})
+    private JTextField preferenceClassName;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, DIRECTORY})
+    @FieldValidation(rule = RuleRegistry.DIRECTORY,
+            message = {DirectoryRule.MESSAGE, DIRECTORY})
+    private JTextField preferenceDirectory;
 
     /**
      * Constructor.
@@ -76,34 +97,27 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
 
         this.project = project;
         this.targetClass = targetClass;
-        this.validator = OverrideClassByAPreferenceDialogValidator.getInstance(this);
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
+        this.isInterface = false;
 
         setContentPane(contentPane);
         setModal(true);
+        setTitle(OverrideClassByAPreferenceAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
         fillTargetAreaOptions();
         if (targetClass.isFinal()) {
             inheritClass.setVisible(false);
             inheritClassLabel.setVisible(false);
         }
+        if (targetClass.isInterface()) {
+            this.isInterface = true;
+        }
         suggestPreferenceClassName(targetClass);
         suggestPreferenceDirectory(targetClass);
 
-        buttonOK.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                onOK();
-            }
-        });
-
-        buttonCancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                onCancel();
-            }
-        });
+        buttonOK.addActionListener((final ActionEvent event) -> onOK());
+        buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
@@ -113,13 +127,11 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
             }
         });
 
-        contentPane.registerKeyboardAction(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPane.registerKeyboardAction(
+                (final ActionEvent event) -> onCancel(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+        );
     }
 
     private void suggestPreferenceDirectory(final PhpClass targetClass) {
@@ -148,7 +160,7 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
     }
 
     protected void onOK() {
-        if (!validator.validate(project)) {
+        if (!validateFormFields()) {
             return;
         }
         final PsiFile diXml = new PreferenceDiXmlGenerator(new PreferenceDiXmFileData(
@@ -181,9 +193,9 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
                 targetClass,
                 getPreferenceClassFqn(),
                 getNamespace(),
-                isInheritClass()
+                isInheritClass(),
+                isInterface
         ), project).generate(OverrideClassByAPreferenceAction.ACTION_NAME, true);
-
 
         this.setVisible(false);
     }

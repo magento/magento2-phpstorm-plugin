@@ -7,11 +7,11 @@
 <idea-plugin>
     <id>com.magento.idea.magento2plugin</id>
     <name>Magento PhpStorm</name>
-    <version>2.0.0</version>
+    <version>3.2.0</version>
     <vendor url="https://github.com/magento/magento2-phpstorm-plugin">Magento Inc.</vendor>
 
     <description><![CDATA[
-        Magento PhpStorm plugin, created to improve life-work balance while working with Magento 2
+        This is a PhpStorm IDE plugin for a better Magento 2 development workflow.
     ]]></description>
 
     <change-notes><![CDATA[
@@ -24,7 +24,7 @@
     </change-notes>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="201.7223.91"/>
+    <idea-version since-build="203.5981.155"/>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
@@ -35,6 +35,7 @@
     <depends>JavaScript</depends>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.platform.images</depends>
+    <depends>com.intellij.copyright</depends>
     <depends optional="true" config-file="withJsGraphQl.xml">com.intellij.lang.jsgraphql</depends>
 
     <actions>
@@ -65,6 +66,11 @@
             <action id="MagentoCreateAGraphQlResolver" class="com.magento.idea.magento2plugin.actions.generation.NewGraphQlResolverAction" />
             <action id="MagentoCreateCLICommand" class="com.magento.idea.magento2plugin.actions.generation.NewCLICommandAction" />
             <action id="MagentoCreateUiComponentGrid" class="com.magento.idea.magento2plugin.actions.generation.NewUiComponentGridAction" />
+            <action id="MagentoCreateUiComponentForm" class="com.magento.idea.magento2plugin.actions.generation.NewUiComponentFormAction" />
+            <action id="NewModelsAction" class="com.magento.idea.magento2plugin.actions.generation.NewModelsAction" />
+            <action id="MagentoCreateADataModel" class="com.magento.idea.magento2plugin.actions.generation.NewDataModelAction" />
+            <action id="MagentoMessageQueue" class="com.magento.idea.magento2plugin.actions.generation.NewMessageQueueAction" />
+            <action id="NewDbSchema" class="com.magento.idea.magento2plugin.actions.generation.NewDbSchemaAction" />
             <add-to-group group-id="NewGroup" anchor="last"/>
         </group>
 
@@ -85,7 +91,16 @@
         <action id="InjectAViewModelAction.Menu" class="com.magento.idea.magento2plugin.actions.generation.InjectAViewModelAction">
             <add-to-group group-id="EditorPopupMenu"/>
         </action>
+        <action id="OverrideInTheme.Menu" class="com.magento.idea.magento2plugin.actions.generation.OverrideInThemeAction">
+            <add-to-group group-id="ProjectViewPopupMenu"/>
+        </action>
 
+        <action id="CopyMagentoPath"
+                class="com.magento.idea.magento2plugin.actions.CopyMagentoPath"
+                text="Magento Path"
+                description="Copies Magento's path of file depending on file type">
+            <add-to-group group-id="CopyFileReference" anchor="last"/>
+        </action>
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -95,6 +110,7 @@
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.Settings"/>
 
         <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.completion.xml.XmlCompletionContributor" id="xml" />
+        <completion.contributor language="PHP" implementationClass="com.magento.idea.magento2plugin.completion.php.PhpCompletionContributor" id="php" />
 
         <psi.referenceContributor language="XML" implementation="com.magento.idea.magento2plugin.reference.xml.XmlReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.magento.idea.magento2plugin.reference.php.PhpReferenceContributor"/>
@@ -119,11 +135,15 @@
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.AclResourceIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.MenuIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.DeclarativeSchemaElementsIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.UIComponentIndex" />
 
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.PluginLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.PluginTargetLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.ClassConfigurationLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.WebApiLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.TestFixtureLineMarkerProvider"/>
 
         <directoryProjectConfigurator implementation="com.magento.idea.magento2plugin.project.ProjectDetector"/>
 
@@ -179,26 +199,37 @@
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.AclResourceXmlInspection"/>
 
-        <libraryRoot id=".phpstorm.meta.php" path=".phpstorm.meta.php/" runtime="false"/>
-
-        <internalFileTemplate name="Magento Module Composer"/>
-        <internalFileTemplate name="Magento Module Registration Php"/>
-        <internalFileTemplate name="Magento Module Xml"/>
-        <internalFileTemplate name="Magento Module DI Xml"/>
-        <internalFileTemplate name="Magento Php Preference Class"/>
-        <internalFileTemplate name="Magento Module Common Php Class"/>
+        <internalFileTemplate name="Magento Composer JSON"/>
+        <internalFileTemplate name="Magento Registration PHP"/>
+        <internalFileTemplate name="Magento Module XML"/>
+        <internalFileTemplate name="Magento DI XML"/>
+        <internalFileTemplate name="Magento Preference Class"/>
+        <internalFileTemplate name="Magento Regular Class"/>
         <internalFileTemplate name="Magento Observer Class"/>
-        <internalFileTemplate name="Magento Module Events Xml"/>
+        <internalFileTemplate name="Magento Events XML"/>
         <internalFileTemplate name="Magento GraphQL Resolver Class"/>
-        <internalFileTemplate name="Magento Cronjob Class"/>
-        <internalFileTemplate name="Magento Crontab Xml"/>
+        <internalFileTemplate name="Magento Cron Job Class"/>
+        <internalFileTemplate name="Magento Cron Tab XML"/>
         <internalFileTemplate name="Magento CLI Command Class"/>
-        <internalFileTemplate name="Magento Module Controller Backend Class"/>
-        <internalFileTemplate name="Magento Module Controller Frontend Class"/>
-        <internalFileTemplate name="Magento Module Cron Groups Xml"/>
-        <internalFileTemplate name="Magento Module UI Component Grid Xml"/>
-        <internalFileTemplate name="Magento Module Ui Grid Collection Data Provider Php"/>
-        <internalFileTemplate name="Magento Module Ui Grid Custom Data Provider Php"/>
+        <internalFileTemplate name="Magento Backend Controller Class"/>
+        <internalFileTemplate name="Magento Frontend Controller Class"/>
+        <internalFileTemplate name="Magento Cron Groups XML"/>
+        <internalFileTemplate name="Magento UI Component Grid XML"/>
+        <internalFileTemplate name="Magento UI Component Custom Data Provider Class"/>
+        <internalFileTemplate name="Magento UI Component Form XML"/>
+        <internalFileTemplate name="Magento Form Button Block Class"/>
+        <internalFileTemplate name="Magento Routes XML"/>
+        <internalFileTemplate name="Magento Layout XML"/>
+        <internalFileTemplate name="Magento ACL XML"/>
+        <internalFileTemplate name="Magento Collection Class"/>
+        <internalFileTemplate name="Magento Model Class"/>
+        <internalFileTemplate name="Magento Resource Model Class"/>
+        <internalFileTemplate name="Magento Data Model"/>
+        <internalFileTemplate name="Magento Data Model Interface"/>
+        <internalFileTemplate name="Magento Module Declarative Schema XML"/>
+        <internalFileTemplate name="Magento Module Declarative Schema Whitelist JSON"/>
+
+        <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 
         <postStartupActivity implementation="com.magento.idea.magento2plugin.project.startup.CheckIfMagentoPathIsValidActivity"/>
     </extensions>
@@ -206,6 +237,6 @@
     <extensions defaultExtensionNs="com.jetbrains.php">
         <frameworkProjectConfigurableProvider implementation="com.magento.idea.magento2plugin.project.ConfigurableProvider"/>
         <frameworkUsageProvider implementation="com.magento.idea.magento2plugin.project.UsagesProvider"/>
+        <libraryRoot id="phpstorm.meta.php" path="/.phpstorm.meta.php/" runtime="false"/>
     </extensions>
-
 </idea-plugin>

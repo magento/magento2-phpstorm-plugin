@@ -10,7 +10,11 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.NewControllerAction;
 import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.NewControllerValidator;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpDirectoryRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleControllerClassGenerator;
 import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.files.ControllerFrontendPhp;
@@ -21,7 +25,6 @@ import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -37,10 +40,10 @@ import javax.swing.KeyStroke;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
-        "PMD.ConstructorCallsOverridableMethod"
+        "PMD.ConstructorCallsOverridableMethod",
+        "PMD.ExcessiveImports"
 })
 public class NewControllerDialog extends AbstractDialog {
-    private final NewControllerValidator validator;
     private final String moduleName;
     private final Project project;
     private JPanel contentPane;
@@ -48,11 +51,24 @@ public class NewControllerDialog extends AbstractDialog {
     private JButton buttonCancel;
     private FilteredComboBox controllerAreaSelect;
     private FilteredComboBox httpMethodSelect;
-    private JTextField controllerName;
     private JTextField controllerParentDir;
     private JCheckBox inheritClass;
     private JPanel adminPanel;
     private JTextField acl;
+
+    private static final String CONTROLLER_NAME = "controller name";
+    private static final String ACTION_NAME = "action name";
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, CONTROLLER_NAME})
+    @FieldValidation(rule = RuleRegistry.PHP_DIRECTORY,
+            message = {PhpDirectoryRule.MESSAGE, CONTROLLER_NAME})
+    private JTextField controllerName;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, ACTION_NAME})
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
+            message = {PhpClassRule.MESSAGE, ACTION_NAME})
     private JTextField actionName;
 
     /**
@@ -65,10 +81,10 @@ public class NewControllerDialog extends AbstractDialog {
         super();
         this.project = project;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
-        this.validator = NewControllerValidator.getInstance(this);
 
         setContentPane(contentPane);
         setModal(true);
+        setTitle(NewControllerAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
         suggestControllerDirectory();
         controllerAreaSelect.addActionListener(e -> suggestControllerDirectory());
@@ -80,6 +96,7 @@ public class NewControllerDialog extends AbstractDialog {
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(final WindowEvent event) {
                 onCancel();
             }
@@ -87,11 +104,7 @@ public class NewControllerDialog extends AbstractDialog {
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
-                new ActionListener() {
-                    public void actionPerformed(final ActionEvent event) {
-                        onCancel();
-                    }
-                },
+                (final ActionEvent event) -> onCancel(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
@@ -178,7 +191,7 @@ public class NewControllerDialog extends AbstractDialog {
     }
 
     private void onOK() {
-        if (!validator.validate()) {
+        if (!validateFormFields()) {
             return;
         }
 
@@ -243,6 +256,7 @@ public class NewControllerDialog extends AbstractDialog {
         return inheritClass.isSelected();
     }
 
+    @Override
     protected void onCancel() {
         dispose();
     }

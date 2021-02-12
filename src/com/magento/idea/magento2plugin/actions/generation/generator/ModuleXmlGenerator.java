@@ -15,7 +15,6 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFro
 import com.magento.idea.magento2plugin.magento.files.ModuleXml;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 import java.util.Properties;
 
@@ -43,7 +42,7 @@ public class ModuleXmlGenerator extends FileGenerator {
 
     @Override
     public PsiFile generate(final String actionName) {
-        if (moduleXmlData.getCreateModuleDirs()) {
+        if (moduleXmlData.isCreateModuleDirs()) {
             final ModuleDirectoriesData moduleDirectoriesData = directoryGenerator
                     .createOrFindModuleDirectories(
                             moduleXmlData.getPackageName(),
@@ -69,9 +68,13 @@ public class ModuleXmlGenerator extends FileGenerator {
         );
     }
 
+    @Override
     protected void fillAttributes(final Properties attributes) {
         attributes.setProperty("PACKAGE", moduleXmlData.getPackageName());
         attributes.setProperty("MODULE_NAME", moduleXmlData.getModuleName());
+        if (moduleXmlData.getSetupVersion() != null) {
+            attributes.setProperty("SETUP_VERSION", moduleXmlData.getSetupVersion());
+        }
         attributes.setProperty("SEQUENCES", this.getDependenciesString(moduleXmlData.getModuleDependencies()));
     }
 
