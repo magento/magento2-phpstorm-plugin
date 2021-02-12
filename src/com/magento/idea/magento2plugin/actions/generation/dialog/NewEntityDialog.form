@@ -18,10 +18,7 @@
             <preferred-size width="200" height="200"/>
           </grid>
         </constraints>
-        <properties>
-          <enabled value="true"/>
-          <visible value="true"/>
-        </properties>
+        <properties/>
         <border type="none"/>
         <children>
           <grid id="6be8b" binding="generalTable" layout-manager="GridLayoutManager" row-count="7" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -29,10 +26,7 @@
             <constraints>
               <tabbedpane title="General"/>
             </constraints>
-            <properties>
-              <enabled value="true"/>
-              <visible value="false"/>
-            </properties>
+            <properties/>
             <border type="none"/>
             <children>
               <component id="210a4" class="javax.swing.JLabel" binding="entityNameLabel">
@@ -148,14 +142,7 @@
             <constraints>
               <tabbedpane title="Admin UI Components"/>
             </constraints>
-            <properties>
-              <background color="-12828863"/>
-              <enabled value="true"/>
-              <visible value="true"/>
-            </properties>
-            <clientProperties>
-              <html.disable class="java.lang.Boolean" value="false"/>
-            </clientProperties>
+            <properties/>
             <border type="none" title=""/>
             <children>
               <component id="3c721" class="javax.swing.JTextField" binding="route">
