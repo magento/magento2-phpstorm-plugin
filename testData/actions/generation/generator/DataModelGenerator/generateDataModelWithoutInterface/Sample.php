@@ -2,13 +2,20 @@
 
 namespace Foo\Bar\Model\Data;
 
-use Foo\Bar\Api\Data\SampleInterface;
 use Magento\Framework\DataObject;
 
-class Sample extends DataObject implements SampleInterface
+class Sample extends DataObject
 {
     /**
-     * @inheritDoc
+     * String constants for property names
+     */
+    const ID_PROPERTY = "id_property";
+    const SAMPLE_PROPERTY = "sample_property";
+
+    /**
+     * Getter for IdProperty.
+     *
+     * @return int|null
      */
     public function getIdProperty(): ?int
     {
@@ -17,7 +24,11 @@ class Sample extends DataObject implements SampleInterface
     }
 
     /**
-     * @inheritDoc
+     * Setter for IdProperty.
+     *
+     * @param int|null $idProperty
+     *
+     * @return void
      */
     public function setIdProperty(?int $idProperty): void
     {
@@ -25,7 +36,9 @@ class Sample extends DataObject implements SampleInterface
     }
 
     /**
-     * @inheritDoc
+     * Getter for SampleProperty.
+     *
+     * @return string|null
      */
     public function getSampleProperty(): ?string
     {
@@ -33,7 +46,11 @@ class Sample extends DataObject implements SampleInterface
     }
 
     /**
-     * @inheritDoc
+     * Setter for SampleProperty.
+     *
+     * @param string|null $sampleProperty
+     *
+     * @return void
      */
     public function setSampleProperty(?string $sampleProperty): void
     {
