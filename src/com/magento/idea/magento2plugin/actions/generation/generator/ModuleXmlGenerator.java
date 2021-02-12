@@ -75,7 +75,14 @@ public class ModuleXmlGenerator extends FileGenerator {
         if (moduleXmlData.getSetupVersion() != null) {
             attributes.setProperty("SETUP_VERSION", moduleXmlData.getSetupVersion());
         }
-        attributes.setProperty("SEQUENCES", this.getSequencesString(moduleXmlData.getModuleSequences()));
+
+        String sequences = this.getSequencesString(moduleXmlData.getModuleSequences());
+        if (!sequences.isEmpty()) {
+            attributes.setProperty(
+                    "SEQUENCES",
+                    sequences
+            );
+        }
     }
 
     private String getSequencesString(final List sequences) {
@@ -90,7 +97,8 @@ public class ModuleXmlGenerator extends FileGenerator {
 
         for (Object o : dependencies) {
             String dependency = o.toString();
-            result = result.concat("<module name=\"" + dependency + "\"/>");
+            String moduleSequence = "<module name=\"%s\"/>";
+            result = result.concat(String.format(moduleSequence, dependency));
         }
 
         return result;
