@@ -91,7 +91,7 @@ public class NewEmailTemplateDialog extends AbstractDialog {
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
                 new ActionListener() {
-                    public void actionPerformed(ActionEvent actionEvent) {
+                    public void actionPerformed(final ActionEvent actionEvent) {
                         onCancel();
                     }
                 },

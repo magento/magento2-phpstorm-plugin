@@ -19,7 +19,7 @@ public class EmailTemplatesXml implements ModuleFileInterface {
     public static final String TEMPLATE_TAG = "template";
     public static final String TEMPLATE_ID_ATTRIBUTE = "id";
 
-    private static EmailTemplatesXml instance = null;
+    private static EmailTemplatesXml instance;
 
     /**
      * Returns a new instance of the class.

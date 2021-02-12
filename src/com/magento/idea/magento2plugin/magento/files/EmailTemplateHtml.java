@@ -13,7 +13,7 @@ public class EmailTemplateHtml implements ModuleFileInterface {
     public static final String HTML_TYPE = "html";
     public static final String TEXT_TYPE = "text";
     public static final String HTML_FILE_EXTENSION = "html";
-    private static EmailTemplateHtml instance = null;
+    private static EmailTemplateHtml instance;
     private String fileName;
 
     /**
