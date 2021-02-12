@@ -67,9 +67,10 @@ public class NewEmailTemplateDialogValidator {
         final EmailTemplateHtmlData emailTemplateHtmlData = dialog.getEmailTemplateHtmlData();
 
         if (isTemplateFileAlreadyExists(emailTemplateHtmlData)) {
+            final String templateFileName = emailTemplatesXmlData.getTemplateFileName();
             final String errorMessage = this.validatorBundle.message(
                     "validator.alreadyDeclared",
-                    String.format("%s Email Template File", emailTemplatesXmlData.getTemplateFileName()),
+                    String.format("%s Email Template File", templateFileName),
                     emailTemplatesXmlData.getModule()
             );
             JOptionPane.showMessageDialog(
