@@ -20,7 +20,6 @@ import com.magento.idea.magento2plugin.magento.packages.code.ExceptionType;
 import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryType;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;

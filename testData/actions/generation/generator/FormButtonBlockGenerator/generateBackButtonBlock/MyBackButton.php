@@ -1,20 +1,27 @@
 <?php
 
-
 namespace Foo\Bar\Block\Form;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 
 /**
- * @inheritdoc
+ * Back to list button.
  */
-class MyBackButton implements ButtonProviderInterface
+class MyBackButton extends GenericButton implements ButtonProviderInterface
 {
     /**
-     * @inheritDoc
+     * Retrieve Back To Grid button settings.
+     *
+     * @return array
      */
-    public function getButtonData()
+    public function getButtonData(): array
     {
-        return ['label' => __('Back Button'), 'on_click' => sprintf("location.href = '%s';", $this->getUrl('*/*/')), 'class' => 'back', 'sort_order' => 20];
+        return $this->wrapButtonSettings(
+            'Back To Grid',
+            'back',
+            sprintf("location.href = '%s';", $this->getUrl('*/*/')),
+            [],
+            30
+        );
     }
 }

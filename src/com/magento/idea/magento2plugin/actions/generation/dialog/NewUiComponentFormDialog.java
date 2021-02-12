@@ -42,7 +42,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentF
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.files.ControllerFrontendPhp;
-import com.magento.idea.magento2plugin.magento.files.FormButtonBlockPhp;
+import com.magento.idea.magento2plugin.magento.files.FormButtonBlockFile;
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
@@ -274,10 +274,10 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         });
 
         final String[] buttonTypes = {
-            FormButtonBlockPhp.TYPE_SAVE,
-            FormButtonBlockPhp.TYPE_BACK,
-            FormButtonBlockPhp.TYPE_DELETE,
-            FormButtonBlockPhp.TYPE_CUSTOM
+            FormButtonBlockFile.TYPE_SAVE,
+            FormButtonBlockFile.TYPE_BACK,
+            FormButtonBlockFile.TYPE_DELETE,
+            FormButtonBlockFile.TYPE_CUSTOM
         };
 
         final TableColumn typeColumnObject = formButtons.getColumn(TYPE_COLUMN);
