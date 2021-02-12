@@ -53,11 +53,11 @@ public class CopyMagentoPath extends CopyPathProvider {
             return null;
         }
         final PsiDirectory directory = file.getContainingDirectory();
-        final StringBuilder fullPath = new StringBuilder(virtualFile.getPath());
-        String moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
+        final String moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
         if (moduleName == null) {
             return null;
         }
+        final StringBuilder fullPath = new StringBuilder(virtualFile.getPath());
         final StringBuilder magentoPath
                 = new StringBuilder(moduleName);
         String path = fullPath.toString();
