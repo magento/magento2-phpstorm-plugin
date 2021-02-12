@@ -14,7 +14,7 @@ public class ModuleXmlData {
     private final String moduleName;
     private final String setupVersion;
     private final PsiDirectory baseDir;
-    private final List<String> moduleDependencies;
+    private final List<String> moduleSequences;
     private final boolean createModuleDirs;
 
     /**
@@ -31,14 +31,14 @@ public class ModuleXmlData {
             final String moduleName,
             final String setupVersion,
             final PsiDirectory baseDir,
-            final List<String> moduleDependencies,
+            final List<String> moduleSequences,
             final boolean createModuleDirs
     ) {
         this.packageName = packageName;
         this.moduleName = moduleName;
         this.setupVersion = setupVersion;
         this.baseDir = baseDir;
-        this.moduleDependencies = moduleDependencies;
+        this.moduleSequences = moduleSequences;
         this.createModuleDirs = createModuleDirs;
     }
 
@@ -58,8 +58,8 @@ public class ModuleXmlData {
         return this.setupVersion;
     }
 
-    public List<String> getModuleDependencies() {
-        return moduleDependencies;
+    public List<String> getModuleSequences() {
+        return moduleSequences;
     }
 
     public boolean isCreateModuleDirs() {

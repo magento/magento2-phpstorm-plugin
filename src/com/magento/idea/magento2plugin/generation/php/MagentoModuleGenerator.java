@@ -5,14 +5,11 @@
 
 package com.magento.idea.magento2plugin.generation.php;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.intellij.ide.util.projectWizard.WebProjectTemplate;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupManager;
-import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.platform.ProjectGeneratorPeer;
 import com.intellij.psi.PsiDirectory;
@@ -27,19 +24,12 @@ import com.magento.idea.magento2plugin.actions.generation.generator.ModuleCompos
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleRegistrationPhpGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleXmlGenerator;
 import com.magento.idea.magento2plugin.init.ConfigurationManager;
-import com.magento.idea.magento2plugin.magento.files.ComposerJson;
 import com.magento.idea.magento2plugin.project.Settings;
 import java.util.ArrayList;
 import javax.swing.Icon;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MagentoModuleGenerator extends WebProjectTemplate<MagentoProjectGeneratorSettings> {
     public static String actionName = "Magento 2 Module";
@@ -142,7 +132,7 @@ public class MagentoModuleGenerator extends WebProjectTemplate<MagentoProjectGen
      * @param project Project
      * @param baseDir Base directory
      * @param settings Settings
-     * @return
+     * @return void
      */
     private PsiFile generateRegistrationPhp(
             @NotNull final Project project,

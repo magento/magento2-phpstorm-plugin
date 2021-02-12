@@ -14,9 +14,9 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Directo
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.magento.files.ModuleXml;
 import com.magento.idea.magento2plugin.magento.packages.Package;
-import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Properties;
+import org.jetbrains.annotations.NotNull;
 
 public class ModuleXmlGenerator extends FileGenerator {
 
@@ -75,20 +75,21 @@ public class ModuleXmlGenerator extends FileGenerator {
         if (moduleXmlData.getSetupVersion() != null) {
             attributes.setProperty("SETUP_VERSION", moduleXmlData.getSetupVersion());
         }
-        attributes.setProperty("SEQUENCES", this.getDependenciesString(moduleXmlData.getModuleDependencies()));
+        attributes.setProperty("SEQUENCES", this.getSequencesString(moduleXmlData.getModuleSequences()));
     }
 
-    private String getDependenciesString(List dependenciesList) {
+    private String getSequencesString(final List sequences) {
         String result = "";
-        Object[] dependencies = dependenciesList.toArray();
-        boolean noDependency = dependencies.length == 1 && dependencies[0].equals(ModuleXml.NO_DEPENDENCY_LABEL);
+        Object[] dependencies = sequences.toArray();
+        boolean noDependency = dependencies.length == 1 && dependencies[0]
+                .equals(ModuleXml.NO_SEQUENCES_LABEL);
 
         if (noDependency) {
             return result;
         }
 
-        for (int i = 0; i < dependencies.length; i++) {
-            String dependency = dependencies[i].toString();
+        for (Object o : dependencies) {
+            String dependency = o.toString();
             result = result.concat("<module name=\"" + dependency + "\"/>");
         }
 

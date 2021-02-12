@@ -7,6 +7,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.ModuleXmlData;
 import com.magento.idea.magento2plugin.magento.files.ModuleXml;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
+import java.util.Arrays;
 
 public class ModuleXmlGeneratorHaveSetupVersionTest extends BaseGeneratorTestCase {
 
@@ -24,6 +25,7 @@ public class ModuleXmlGeneratorHaveSetupVersionTest extends BaseGeneratorTestCas
                 "Module1",
                 "1.0.0",
                 projectDir,
+                Arrays.asList("Magento_Catalog", "Magento_InventoryApi"),
                 true
         );
         final ModuleXmlGenerator moduleXmlGenerator = new ModuleXmlGenerator(
