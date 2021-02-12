@@ -87,6 +87,10 @@ public final class MagentoVersionUtil {
             return true;
         }
 
+        if (version1.isEmpty()) {
+            return false;
+        }
+
         final String[] version1s = version1.split("\\.");
         final String[] version2s = version2.split("\\.");
         for (int i = 0; i < 2; i++) {

@@ -18,7 +18,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.NewDbSchemaDial
 import org.jetbrains.annotations.NotNull;
 
 public class NewDbSchemaAction extends AnAction {
-    public static final String ACTION_NAME = "Declarative Schema XML";
+    public static final String ACTION_NAME = "Magento 2 Declarative Schema XML";
     public static final String ACTION_DESCRIPTION = "Create a new declarative schema XML";
 
     /**

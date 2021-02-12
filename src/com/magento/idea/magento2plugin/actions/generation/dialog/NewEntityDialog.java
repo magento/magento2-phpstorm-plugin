@@ -9,6 +9,7 @@ import com.google.common.base.CaseFormat;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
+import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.actions.generation.NewEntityAction;
 import com.magento.idea.magento2plugin.actions.generation.OverrideClassByAPreferenceAction;
@@ -97,6 +98,7 @@ import com.magento.idea.magento2plugin.magento.packages.uiComponent.FormElementT
 import com.magento.idea.magento2plugin.stubs.indexes.xml.MenuIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.ui.table.TableGroupWrapper;
+import com.magento.idea.magento2plugin.util.CamelCaseToSnakeCase;
 import com.magento.idea.magento2plugin.util.FirstLetterToLowercaseUtil;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.magento.GetAclResourcesListUtil;
@@ -112,7 +114,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -124,6 +128,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
+import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -260,6 +265,13 @@ public class NewEntityDialog extends AbstractDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
+
+        entityName.getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
+            protected void textChanged(final @NotNull DocumentEvent event) {
+                autoCompleteIdentifiers();
+            }
+        });
     }
 
     /**
@@ -1383,5 +1395,30 @@ public class NewEntityDialog extends AbstractDialog {
         Collections.sort(menuReferencesList);
 
         return menuReferencesList;
+    }
+
+    /**
+     * Autocomplete entity name dependent fields.
+     */
+    private void autoCompleteIdentifiers() {
+        if (getEntityName().isEmpty()) {
+            return;
+        }
+        final String entityName = CamelCaseToSnakeCase.getInstance().convert(getEntityName());
+        final String entityNameLabel = Arrays.stream(entityName.split("_")).map(
+                string -> string.substring(0, 1).toUpperCase(Locale.getDefault())
+                        + string.substring(1)
+        ).collect(Collectors.joining(" "));
+
+        dbTableName.setText(entityName);
+        entityId.setText(entityName.concat("_id"));
+        route.setText(entityName);
+        formLabel.setText(entityNameLabel.concat(" Form"));
+        formName.setText(entityName.concat("_form"));
+        gridName.setText(entityName.concat("_listing"));
+        acl.setText(getModuleName().concat("::management"));
+        aclTitle.setText(entityNameLabel.concat(" Management"));
+        menuIdentifier.setText(getModuleName().concat("::management"));
+        menuTitle.setText(entityNameLabel.concat(" Management"));
     }
 }
