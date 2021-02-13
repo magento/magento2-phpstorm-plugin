@@ -7,7 +7,7 @@
 <idea-plugin>
     <id>com.magento.idea.magento2plugin</id>
     <name>Magento PhpStorm</name>
-    <version>3.1.1</version>
+    <version>3.2.0</version>
     <vendor url="https://github.com/magento/magento2-phpstorm-plugin">Magento Inc.</vendor>
 
     <description><![CDATA[
@@ -143,6 +143,7 @@
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.PluginTargetLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.ClassConfigurationLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.WebApiLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.TestFixtureLineMarkerProvider"/>
 
         <directoryProjectConfigurator implementation="com.magento.idea.magento2plugin.project.ProjectDetector"/>
 
