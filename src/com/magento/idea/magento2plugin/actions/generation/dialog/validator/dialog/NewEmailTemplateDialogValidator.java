@@ -47,11 +47,13 @@ public class NewEmailTemplateDialogValidator {
     public boolean validate(final NewEmailTemplateDialog dialog) {
         final EmailTemplatesXmlData emailTemplatesXmlData = dialog.getEmailTemplateData();
         final String errorTitle = commonBundle.message("common.error");
+        final EmailTemplateHtmlData emailTemplateHtmlData = dialog.getEmailTemplateHtmlData();
 
-        if (isTemplateTagAlreadyExists(emailTemplatesXmlData)) {
+        if (isTemplateFileAlreadyExists(emailTemplateHtmlData)) {
+            final String templateFileName = emailTemplatesXmlData.getTemplateFileName();
             final String errorMessage = this.validatorBundle.message(
                     "validator.alreadyDeclared",
-                    String.format("%s Email Template", emailTemplatesXmlData.getId()),
+                    String.format("%s Email Template File", templateFileName),
                     emailTemplatesXmlData.getModule()
             );
             JOptionPane.showMessageDialog(
@@ -64,13 +66,10 @@ public class NewEmailTemplateDialogValidator {
             return false;
         }
 
-        final EmailTemplateHtmlData emailTemplateHtmlData = dialog.getEmailTemplateHtmlData();
-
-        if (isTemplateFileAlreadyExists(emailTemplateHtmlData)) {
-            final String templateFileName = emailTemplatesXmlData.getTemplateFileName();
+        if (isTemplateTagAlreadyExists(emailTemplatesXmlData)) {
             final String errorMessage = this.validatorBundle.message(
                     "validator.alreadyDeclared",
-                    String.format("%s Email Template File", templateFileName),
+                    String.format("%s Email Template", emailTemplatesXmlData.getId()),
                     emailTemplatesXmlData.getModule()
             );
             JOptionPane.showMessageDialog(
@@ -101,6 +100,11 @@ public class NewEmailTemplateDialogValidator {
                 emailTemplatesXmlData.getModule(),
                 project
         );
+
+        if (emailTemplatesFile == null) {
+            return false;
+        }
+
         final Collection<XmlAttributeValue> attributes = XmlPsiTreeUtil.findAttributeValueElements(
                 emailTemplatesFile,
                 EmailTemplatesXml.TEMPLATE_TAG,
