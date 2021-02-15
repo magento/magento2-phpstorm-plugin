@@ -22,7 +22,7 @@ public class SaveEntityActionGeneratorTest extends BaseGeneratorTestCase {
             "Foo\\Bar\\Model\\" + ENTITY_NAME + "Model" + "\\CompanyModel";
     private static final String DTO_TYPE_INTERFACE =
             "Foo\\Bar\\Api\\Data\\" + ENTITY_NAME + "Interface";
-    private static final String ACL = "company_id";
+    private static final String ACL = "Foo_Bar::company_id";
     private static final String ENTITY_ID = "entity_id";
 
     /**
