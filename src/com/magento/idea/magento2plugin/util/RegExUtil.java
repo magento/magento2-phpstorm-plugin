@@ -75,8 +75,11 @@ public class RegExUtil {
         public static final String CLASS_NAME
                 = "[A-Z][a-zA-Z0-9_\\x7f-\\xff]*";
 
+        public static final String DIR_NAME
+                = "[a-zA-Z0-9_\\x7f-\\xff]*";
+
         public static final String FQN
-                = CLASS_NAME + "(\\\\" + CLASS_NAME + ")*";
+                = CLASS_NAME + "(\\\\" + DIR_NAME + ")*" + CLASS_NAME;
     }
 
     public static class XmlRegex {
