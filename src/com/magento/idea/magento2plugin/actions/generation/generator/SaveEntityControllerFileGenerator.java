@@ -111,11 +111,7 @@ public class SaveEntityControllerFileGenerator extends FileGenerator {
         attributes.setProperty("ENTITY_NAME", fileData.getEntityName());
         attributes.setProperty("CLASS_NAME", SaveActionFile.CLASS_NAME);
         attributes.setProperty("ENTITY_ID", fileData.getEntityId());
-        attributes.setProperty("ADMIN_RESOURCE", SaveActionFile.getAdminResource(
-                        fileData.getModuleName(),
-                        fileData.getAcl()
-                )
-        );
+        attributes.setProperty("ADMIN_RESOURCE", fileData.getAcl());
         addProperty(attributes, "IMPLEMENTS", HttpMethod.POST.getInterfaceFqn());
         addProperty(attributes, "DATA_PERSISTOR", FrameworkLibraryType.DATA_PERSISTOR.getType());
         addProperty(attributes, "ENTITY_DTO", fileData.getDtoType());
