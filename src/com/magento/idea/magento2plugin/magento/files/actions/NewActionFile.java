@@ -10,21 +10,19 @@ import com.jetbrains.php.lang.PhpLanguage;
 import com.magento.idea.magento2plugin.magento.files.ModuleFileInterface;
 import org.jetbrains.annotations.NotNull;
 
-public final class SaveActionFile implements ModuleFileInterface {
-    public static final String CLASS_NAME = "Save";
+public final class NewActionFile implements ModuleFileInterface {
+    public static final String CLASS_NAME = "NewAction";
     public static final String FILE_EXTENSION = "php";
-    public static final String TEMPLATE = "Magento Entity Save Controller Class";
+    public static final String TEMPLATE = "Magento Entity New Action Controller Class";
     private static final String DIRECTORY = "Controller/Adminhtml";
-    private static final SaveActionFile INSTANCE = new SaveActionFile();
-    public static final String COULD_NOT_SAVE =
-            "Magento\\Framework\\Exception\\CouldNotSaveException";
+    private static final NewActionFile INSTANCE = new NewActionFile();
 
     /**
      * Get singleton instance of the class.
      *
-     * @return SaveAction
+     * @return NewAction
      */
-    public static SaveActionFile getInstance() {
+    public static NewActionFile getInstance() {
         return INSTANCE;
     }
 
