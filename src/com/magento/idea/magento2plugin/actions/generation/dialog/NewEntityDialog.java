@@ -28,6 +28,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.LayoutXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.MenuXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.ModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.NewActionEntityControllerFileData;
+import com.magento.idea.magento2plugin.actions.generation.data.NewEntityLayoutData;
 import com.magento.idea.magento2plugin.actions.generation.data.PreferenceDiXmFileData;
 import com.magento.idea.magento2plugin.actions.generation.data.ResourceModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.RoutesXmlData;
@@ -66,6 +67,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.ModuleContro
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleResourceModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.NewActionEntityControllerFileGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.NewEntityLayoutGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.PreferenceDiXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.RoutesXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.SaveEntityCommandGenerator;
@@ -365,6 +367,7 @@ public class NewEntityDialog extends AbstractDialog {
             generateUiComponentGridFile();
             generateFormViewControllerFile();
             generateFormLayoutFile();
+            generateNewEntityLayoutFile();
             generateSaveEntityCommandFile();
             generateFormSaveControllerFile();
             generateFormUiComponentGenericButtonFile();
@@ -1088,6 +1091,19 @@ public class NewEntityDialog extends AbstractDialog {
     }
 
     /**
+     * Get new entity action path.
+     *
+     * @return String
+     */
+    private String getNewEntityAction() {
+        return getRoute()
+                + File.separator
+                + FirstLetterToLowercaseUtil.convert(getEntityName())
+                + File.separator
+                + "new";
+    }
+
+    /**
      * Get delete action path.
      *
      * @return String
@@ -1132,6 +1148,14 @@ public class NewEntityDialog extends AbstractDialog {
                 getEntityName(),
                 getViewActionName(),
                 getFormName()
+        ), project).generate(ACTION_NAME, false);
+    }
+
+    private void generateNewEntityLayoutFile() {
+        new NewEntityLayoutGenerator(new NewEntityLayoutData(
+                getModuleName(),
+                getNewEntityAction(),
+                getEditViewAction()
         ), project).generate(ACTION_NAME, false);
     }
 
