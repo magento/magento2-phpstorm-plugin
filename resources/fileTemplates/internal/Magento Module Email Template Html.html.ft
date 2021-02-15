@@ -1,0 +1,7 @@
+<!--@subject {{trans "${SUBJECT}"}} @-->
+<!--@vars {} @-->
+
+#if (${HTML_TYPE}){{template config_path="design/email/header_template"}}#end
+
+<!-- @todo: implement ${TYPE} template -->
+#if (${HTML_TYPE}){{template config_path="design/email/footer_template"}}#end
