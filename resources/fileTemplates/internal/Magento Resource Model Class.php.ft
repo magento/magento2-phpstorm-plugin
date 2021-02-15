@@ -22,5 +22,6 @@ class ${NAME}#if (${EXTENDS}) extends ${EXTENDS}#end#if (${IMPLEMENTS}) implemen
     protected function _construct()
     {
         $this->_init('${DB_NAME}', '${ENTITY_ID_COLUMN}');
+        $this->_useIsObjectNew = true;
     }
 }
