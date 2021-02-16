@@ -78,7 +78,7 @@ public enum FormElementType {
             case STRING:
                 return FormElementType.INPUT;
             case BOOL:
-                return FormElementType.BOOLEAN;
+                return FormElementType.CHECKBOX;
             case FLOAT:
                 return FormElementType.PRICE;
             default:
