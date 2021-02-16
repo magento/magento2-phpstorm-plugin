@@ -102,10 +102,17 @@ class ${CLASS_NAME} extends ${EXTENDS}
             return $this->loadedData;
         }
         $this->loadedData = parent::getData();
+        $itemsById = [];
 
+#set($entityId = "#if(${ENTITY_ID})${ENTITY_ID}#{else}entity_id#end")
+#set($entityIdAccessor = '[(int) $item[' + "'$entityId'" + ']]')
+#set($getIdFromParamsAccessor = "[(int) $this->request->getParam('$entityId')]")
         foreach ($this->loadedData['items'] as $item) {
-        #set($idAccessor = '[' + "#if(${ENTITY_ID})'${ENTITY_ID}'#{else}'entity_id'#end" + ']')
-            $this->loadedData['items'][$item$idAccessor] = $item;
+            $itemsById$entityIdAccessor = $item;
+        }
+
+        if ($this->request->getParam('$entityId')) {
+            $this->loadedData['entity'] = $itemsById$getIdFromParamsAccessor;
         }
 
         return $this->loadedData;

@@ -99,9 +99,14 @@ class GridDataProvider extends DataProvider
             return $this->loadedData;
         }
         $this->loadedData = parent::getData();
+        $itemsById = [];
 
         foreach ($this->loadedData['items'] as $item) {
-            $this->loadedData['items'][$item['entity_id']] = $item;
+            $itemsById[(int)$item['entity_id']] = $item;
+        }
+
+        if ($this->request->getParam('entity_id')) {
+            $this->loadedData['entity'] = $itemsById[(int)$this->request->getParam('entity_id')];
         }
 
         return $this->loadedData;

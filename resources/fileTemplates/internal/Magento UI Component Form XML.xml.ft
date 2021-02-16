@@ -9,6 +9,7 @@
     </argument>
     <settings>
         <namespace>${NAME}</namespace>
+        <dataScope>data.general</dataScope>
         <deps>
             <dep>${NAME}.${NAME}_data_source</dep>
         </deps>
