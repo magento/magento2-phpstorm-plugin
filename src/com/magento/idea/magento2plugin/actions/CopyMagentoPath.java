@@ -12,6 +12,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +31,8 @@ public class CopyMagentoPath extends CopyPathProvider {
     @Override
     public void update(@NotNull final AnActionEvent event) {
         final VirtualFile virtualFile = event.getData(PlatformDataKeys.VIRTUAL_FILE);
-        if (virtualFile != null && virtualFile.isDirectory()) {
+        if (virtualFile != null && virtualFile.isDirectory()
+                || virtualFile != null && !PHTML.equals(virtualFile.getExtension())) {
             event.getPresentation().setVisible(false);
         }
     }
@@ -42,11 +44,22 @@ public class CopyMagentoPath extends CopyPathProvider {
             @Nullable final VirtualFile virtualFile,
             @Nullable final Editor editor
     ) {
-        final PsiDirectory directory
-                = PsiManager.getInstance(project).findFile(virtualFile).getContainingDirectory();
+        if (virtualFile == null) {
+            return null;
+        }
+        final PsiFile file
+                = PsiManager.getInstance(project).findFile(virtualFile);
+        if (file == null) {
+            return null;
+        }
+        final PsiDirectory directory = file.getContainingDirectory();
+        final String moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
+        if (moduleName == null) {
+            return null;
+        }
         final StringBuilder fullPath = new StringBuilder(virtualFile.getPath());
         final StringBuilder magentoPath
-                = new StringBuilder(GetModuleNameByDirectoryUtil.execute(directory, project));
+                = new StringBuilder(moduleName);
         String path = fullPath.toString();
 
         if (PHTML.equals(virtualFile.getExtension())) {
