@@ -79,7 +79,7 @@ public class RegExUtil {
                 = "[a-zA-Z0-9_\\x7f-\\xff]*";
 
         public static final String FQN
-                = "(\\\\" + DIR_NAME + ")*" + CLASS_NAME;
+                = CLASS_NAME + "(\\\\" + DIR_NAME + ")*" + CLASS_NAME;
     }
 
     public static class XmlRegex {
