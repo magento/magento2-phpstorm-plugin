@@ -52,8 +52,8 @@ public class PhpClassReferenceProvider extends PsiReferenceProvider {
         for (int i = 0; i < fqnParts.length - 1; i++) {
             namespacePart = fqnParts[i];
 
-            namespace.append("\\");
-            namespace.append(namespacePart);
+            namespace.append("\\");//NOPMD
+            namespace.append(namespacePart);//NOPMD
             final Collection<PhpNamespace> references =
                     phpIndex.getNamespacesByName(namespace.toString().toLowerCase(
                             new Locale("en","EN"))
