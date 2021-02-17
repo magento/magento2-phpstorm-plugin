@@ -271,6 +271,7 @@ public class NewEntityDialog extends AbstractDialog {
         );
 
         entityName.getDocument().addDocumentListener(new DocumentAdapter() {
+            @SuppressWarnings("PMD.AccessorMethodGeneration")
             @Override
             protected void textChanged(final @NotNull DocumentEvent event) {
                 autoCompleteIdentifiers();
@@ -805,7 +806,10 @@ public class NewEntityDialog extends AbstractDialog {
             final String name = model.getValueAt(count, 0).toString();
             final String dataType = model.getValueAt(count, 1).toString();
 
-            final String label = model.getValueAt(count, 0).toString(); //todo: convert
+            final String label = Arrays.stream(name.split("_")).map(
+                            string -> string.substring(0, 1).toUpperCase(Locale.getDefault())
+                                    + string.substring(1)).collect(Collectors.joining(" ")
+                    );
             final String sortOrder = String.valueOf(count).concat("0");
             final String fieldset = "general";
 
