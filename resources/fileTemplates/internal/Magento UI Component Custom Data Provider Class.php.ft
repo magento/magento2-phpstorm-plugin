@@ -106,13 +106,13 @@ class ${CLASS_NAME} extends ${EXTENDS}
 
 #set($entityId = "#if(${ENTITY_ID})${ENTITY_ID}#{else}entity_id#end")
 #set($entityIdAccessor = '[(int) $item[' + "'$entityId'" + ']]')
-#set($getIdFromParamsAccessor = "[(int) $this->request->getParam('$entityId')]")
+#set($getIdAccessor = "[(int) $id]")
         foreach ($this->loadedData['items'] as $item) {
             $itemsById$entityIdAccessor = $item;
         }
 
-        if ($this->request->getParam('$entityId')) {
-            $this->loadedData['entity'] = $itemsById$getIdFromParamsAccessor;
+        if ($id = $this->request->getParam('$entityId', null)) {
+            $this->loadedData['entity'] = $itemsById$getIdAccessor;
         }
 
         return $this->loadedData;

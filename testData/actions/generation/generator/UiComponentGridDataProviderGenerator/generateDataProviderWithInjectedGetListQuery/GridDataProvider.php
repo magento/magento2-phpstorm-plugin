@@ -105,8 +105,8 @@ class GridDataProvider extends DataProvider
             $itemsById[(int)$item['entity_id']] = $item;
         }
 
-        if ($this->request->getParam('entity_id')) {
-            $this->loadedData['entity'] = $itemsById[(int)$this->request->getParam('entity_id')];
+        if ($id = $this->request->getParam('entity_id', null)) {
+            $this->loadedData['entity'] = $itemsById[(int)$id];
         }
 
         return $this->loadedData;
