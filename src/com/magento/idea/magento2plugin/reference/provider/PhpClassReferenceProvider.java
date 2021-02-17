@@ -36,7 +36,7 @@ public class PhpClassReferenceProvider extends PsiReferenceProvider {
             return PsiReference.EMPTY_ARRAY;
         }
 
-        String classFQN = matcher.group();
+        String classFQN = origValue.replaceAll("^\"|\"$", "");;
         String[] fqnParts = classFQN.split("\\\\");
 
         PhpIndex phpIndex = PhpIndex.getInstance(element.getProject());
