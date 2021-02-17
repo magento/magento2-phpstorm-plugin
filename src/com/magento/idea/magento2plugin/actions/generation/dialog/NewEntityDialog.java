@@ -20,6 +20,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileDat
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelInterfaceData;
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
+import com.magento.idea.magento2plugin.actions.generation.data.DeleteEntityControllerFileData;
 import com.magento.idea.magento2plugin.actions.generation.data.EntityDataMapperData;
 import com.magento.idea.magento2plugin.actions.generation.data.FormGenericButtonBlockData;
 import com.magento.idea.magento2plugin.actions.generation.data.GetListQueryModelData;
@@ -56,6 +57,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.DataModelGen
 import com.magento.idea.magento2plugin.actions.generation.generator.DataModelInterfaceGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaWhitelistJsonGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaXmlGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.DeleteEntityControllerFileGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.EntityDataMapperGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.FormGenericButtonBlockGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.GetListQueryModelGenerator;
@@ -373,6 +375,7 @@ public class NewEntityDialog extends AbstractDialog {
             generateFormSaveControllerFile();
             generateFormUiComponentGenericButtonFile();
             generateFormNewActionControllerFile();
+            generateFormDeleteControllerFile();
             generateUiComponentFormFile();
         }
 
@@ -1250,6 +1253,43 @@ public class NewEntityDialog extends AbstractDialog {
                 getMenuIdentifier()
         ), project).generate(ACTION_NAME, false);
     }
+
+    /**
+     * Generate Delete Controller file.
+     */
+    private void generateFormDeleteControllerFile() {
+        final NamespaceBuilder namespace = new NamespaceBuilder(
+                getModuleName(),
+                NewActionFile.CLASS_NAME,
+                NewActionFile.getDirectory(getEntityName())
+        );
+
+        new DeleteEntityControllerFileGenerator(new DeleteEntityControllerFileData(
+                getEntityName(),
+                getModuleName(),
+                namespace.getNamespace(),
+                getDeleteEntityCommandClassFqn(),
+                getAcl(),
+                getEntityIdColumn()
+        ), project).generate(ACTION_NAME, false);
+    }
+
+    /**
+     * Get delete entity command class Fqn.
+     *
+     * @return String
+     */
+    private String getDeleteEntityCommandClassFqn() {
+        final NamespaceBuilder namespaceBuilder =
+                new NamespaceBuilder(
+                        getModuleName(),
+                        "DeleteByIdCommand", //TODO after command added:  DeleteEntityCommandFile.CLASS_NAME,
+                        "Command".concat("/" + getEntityName()) //TODO after command added: DeleteEntityCommandFile.getDirectory(getEntityName())
+                );
+
+        return namespaceBuilder.getClassFqn();
+    }
+
 
     /**
      * Get save entity command class Fqn.
