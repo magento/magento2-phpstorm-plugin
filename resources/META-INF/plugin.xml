@@ -238,6 +238,7 @@
         <internalFileTemplate name="Magento PHP Form Generic Button Block Class"/>
         <internalFileTemplate name="Magento Entity New Action Controller Class"/>
         <internalFileTemplate name="Magento New Entity Layout XML"/>
+        <internalFileTemplate name="Magento Delete Entity By Id Command"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 

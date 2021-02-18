@@ -20,6 +20,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileDat
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelInterfaceData;
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
+import com.magento.idea.magento2plugin.actions.generation.data.DeleteEntityByIdCommandData;
 import com.magento.idea.magento2plugin.actions.generation.data.EntityDataMapperData;
 import com.magento.idea.magento2plugin.actions.generation.data.FormGenericButtonBlockData;
 import com.magento.idea.magento2plugin.actions.generation.data.GetListQueryModelData;
@@ -56,6 +57,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.DataModelGen
 import com.magento.idea.magento2plugin.actions.generation.generator.DataModelInterfaceGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaWhitelistJsonGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaXmlGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.DeleteEntityByIdCommandGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.EntityDataMapperGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.FormGenericButtonBlockGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.GetListQueryModelGenerator;
@@ -89,6 +91,7 @@ import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
 import com.magento.idea.magento2plugin.magento.files.actions.AdminListViewActionFile;
 import com.magento.idea.magento2plugin.magento.files.actions.NewActionFile;
 import com.magento.idea.magento2plugin.magento.files.actions.SaveActionFile;
+import com.magento.idea.magento2plugin.magento.files.commands.DeleteEntityByIdCommandFile;
 import com.magento.idea.magento2plugin.magento.files.commands.SaveEntityCommandFile;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
@@ -370,6 +373,7 @@ public class NewEntityDialog extends AbstractDialog {
             generateFormLayoutFile();
             generateNewEntityLayoutFile();
             generateSaveEntityCommandFile();
+            generateDeleteEntityByIdCommandFile();
             generateFormSaveControllerFile();
             generateFormUiComponentGenericButtonFile();
             generateFormNewActionControllerFile();
@@ -1197,6 +1201,33 @@ public class NewEntityDialog extends AbstractDialog {
                         modelNamespace.getClassFqn(),
                         resourceModelNamespace.getClassFqn(),
                         dtoType
+                ), project).generate(ACTION_NAME, true);
+    }
+
+    /**
+     * Run DeleteEntityById.php file generator for an entity.
+     */
+    private void generateDeleteEntityByIdCommandFile() {
+        final String classFqn = DeleteEntityByIdCommandFile.getClassFqn(
+                getModuleName(),
+                getEntityName()
+        );
+        final String namespace = DeleteEntityByIdCommandFile.getNamespace(
+                getModuleName(),
+                getEntityName()
+        );
+        final NamespaceBuilder modelNamespace = getModelNamespace();
+        final NamespaceBuilder resourceModelNamespace = getResourceModelNamespace();
+
+        new DeleteEntityByIdCommandGenerator(
+                new DeleteEntityByIdCommandData(
+                        getModuleName(),
+                        getEntityName(),
+                        namespace,
+                        classFqn,
+                        modelNamespace.getClassFqn(),
+                        resourceModelNamespace.getClassFqn(),
+                        getEntityIdColumn()
                 ),
                 project
         ).generate(ACTION_NAME, true);
