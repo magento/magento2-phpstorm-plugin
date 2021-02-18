@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 public class DeleteEntityByIdCommandFile implements ModuleFileInterface {
     public static final String CLASS_NAME = "DeleteByIdCommand";
     public static final String FILE_EXTENSION = "php";
-    public static final String TEMPLATE = "Magento Delete Entity By Id Command Model";
+    public static final String TEMPLATE = "Magento Delete Entity By Id Command";
     private static final String DIRECTORY = "Command";
 
     /**
