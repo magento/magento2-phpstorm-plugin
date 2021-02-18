@@ -10,6 +10,7 @@
     </argument>
     <settings>
         <namespace>my_form</namespace>
+        <dataScope>data.general</dataScope>
         <deps>
             <dep>my_form.my_form_data_source</dep>
         </deps>
