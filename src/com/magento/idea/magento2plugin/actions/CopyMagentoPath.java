@@ -25,7 +25,8 @@ public class CopyMagentoPath extends CopyPathProvider {
     private final String[] templatePaths = {
         "view/frontend/templates/",
         "view/adminhtml/templates/",
-        "view/base/templates/"
+        "view/base/templates/",
+        "templates/"
     };
 
     @Override

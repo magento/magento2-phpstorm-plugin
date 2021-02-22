@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 3.2.0
 
+## 3.1.2
+
+### Fixed
+
+- Reference navigation for classes under directories with underscores
+- Fixed the array access exception when using copy path action
+
 ## 3.1.1
 
 ### Fixed
