@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 3.1.3
 
+### Changed
+
+- Require restart on plugin update due to using native libraries
+
 ## 3.1.2
 
 ### Fixed
