@@ -57,6 +57,11 @@ class ${CLASS_NAME}
             /** @var ${MODEL} $model */
             $model = $this->modelFactory->create();
             $model->addData($${DTO_PROPERTY}->getData());
+            $model->setHasDataChanges(true);
+
+            if (!$model->getId()) {
+                $model->isObjectNew(true);
+            }
             $this->resource->save($model);
         } catch (${EXCEPTION} $exception) {
             $this->logger->error(
