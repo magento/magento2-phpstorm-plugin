@@ -8,40 +8,63 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
-import com.magento.idea.magento2plugin.actions.generation.data.NewActionEntityControllerFileData;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.magento.idea.magento2plugin.actions.generation.data.EditEntityActionData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.magento.files.actions.NewActionFile;
+import com.magento.idea.magento2plugin.magento.files.actions.EditEntityActionFile;
 import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.code.BackendModuleType;
 import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryType;
-import org.jetbrains.annotations.NotNull;
-
+import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import org.jetbrains.annotations.NotNull;
 
-public class NewActionEntityControllerFileGenerator extends FileGenerator {
+public class EditEntityActionGenerator extends FileGenerator {
 
-    private final NewActionEntityControllerFileData fileData;
+    private final Project project;
+    private final EditEntityActionFile file;
+    private final EditEntityActionData data;
+    private final boolean checkFileAlreadyExists;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final DirectoryGenerator directoryGenerator;
     private final ModuleIndex moduleIndex;
     private final List<String> uses;
 
     /**
-     * NewAction Entity Controller File Generator.
-     * @param fileData NewActionEntityControllerFileData
+     * Edit entity action/controller file generator constructor.
+     *
+     * @param data EditEntityActionData
      * @param project Project
      */
-    public NewActionEntityControllerFileGenerator(
-            final NewActionEntityControllerFileData fileData,
+    public EditEntityActionGenerator(
+            final @NotNull EditEntityActionData data,
             final @NotNull Project project
     ) {
+        this(data, project, true);
+    }
+
+    /**
+     * Edit entity action/controller file generator constructor.
+     *
+     * @param data EditEntityActionData
+     * @param project Project
+     * @param checkFileAlreadyExists boolean
+     */
+    public EditEntityActionGenerator(
+            final @NotNull EditEntityActionData data,
+            final @NotNull Project project,
+            final boolean checkFileAlreadyExists
+    ) {
         super(project);
-        this.fileData = fileData;
+        this.data = data;
+        this.project = project;
+        this.checkFileAlreadyExists = checkFileAlreadyExists;
+        file = new EditEntityActionFile(data.getEntityName());
         fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         moduleIndex = ModuleIndex.getInstance(project);
         directoryGenerator = DirectoryGenerator.getInstance();
@@ -49,7 +72,7 @@ public class NewActionEntityControllerFileGenerator extends FileGenerator {
     }
 
     /**
-     * Generate NewAction controller for entity.
+     * Generate edit action controller for entity.
      *
      * @param actionName String
      *
@@ -57,31 +80,44 @@ public class NewActionEntityControllerFileGenerator extends FileGenerator {
      */
     @Override
     public PsiFile generate(final @NotNull String actionName) {
-        final PsiDirectory moduleBaseDir = moduleIndex.getModuleDirectoryByModuleName(
-                fileData.getModuleName()
+        final PhpClass editActionClass = GetPhpClassByFQN.getInstance(project).execute(
+                data.getClassFqn()
         );
-        final PsiDirectory baseDirectory = directoryGenerator.findOrCreateSubdirectories(
-                moduleBaseDir,
-                NewActionFile.getDirectory(fileData.getEntityName())
+
+        if (this.checkFileAlreadyExists && editActionClass != null) {
+            return editActionClass.getContainingFile();
+        }
+
+        final PsiDirectory editActionBaseDir = directoryGenerator.findOrCreateSubdirectories(
+                moduleIndex.getModuleDirectoryByModuleName(
+                        data.getModuleName()
+                ),
+                file.getDirectory()
         );
 
         return fileFromTemplateGenerator.generate(
-                NewActionFile.getInstance(),
+                file,
                 getAttributes(),
-                baseDirectory,
+                editActionBaseDir,
                 actionName
         );
     }
 
+    /**
+     * Fill edit action file attributes.
+     *
+     * @param attributes Properties
+     */
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        attributes.setProperty("NAMESPACE", fileData.getNamespace());
-        attributes.setProperty("ENTITY_NAME", fileData.getEntityName());
-        attributes.setProperty("CLASS_NAME", NewActionFile.CLASS_NAME);
+        attributes.setProperty("NAMESPACE", data.getNamespace());
+        attributes.setProperty("ENTITY_NAME", data.getEntityName());
+        attributes.setProperty("CLASS_NAME", file.getClassName());
+        attributes.setProperty("ADMIN_RESOURCE", data.getAcl());
+        attributes.setProperty("MENU_IDENTIFIER", data.getMenu());
+
         addProperty(attributes, "EXTENDS", BackendModuleType.EXTENDS.getType());
         addProperty(attributes, "IMPLEMENTS", HttpMethod.GET.getInterfaceFqn());
-        attributes.setProperty("ADMIN_RESOURCE", fileData.getAcl());
-        attributes.setProperty("MENU_IDENTIFIER", fileData.getMenu());
         addProperty(attributes, "RESULT_INTERFACE",
                 FrameworkLibraryType.RESULT_INTERFACE.getType()
         );

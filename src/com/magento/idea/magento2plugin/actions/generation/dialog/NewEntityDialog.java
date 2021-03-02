@@ -16,10 +16,10 @@ import com.magento.idea.magento2plugin.actions.generation.OverrideClassByAPrefer
 import com.magento.idea.magento2plugin.actions.generation.data.AclXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.AdminListViewEntityActionData;
 import com.magento.idea.magento2plugin.actions.generation.data.CollectionData;
-import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelInterfaceData;
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
+import com.magento.idea.magento2plugin.actions.generation.data.EditEntityActionData;
 import com.magento.idea.magento2plugin.actions.generation.data.DeleteEntityByIdCommandData;
 import com.magento.idea.magento2plugin.actions.generation.data.EntityDataMapperData;
 import com.magento.idea.magento2plugin.actions.generation.data.FormGenericButtonBlockData;
@@ -57,6 +57,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.DataModelGen
 import com.magento.idea.magento2plugin.actions.generation.generator.DataModelInterfaceGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaWhitelistJsonGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaXmlGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.EditEntityActionGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DeleteEntityByIdCommandGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.EntityDataMapperGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.FormGenericButtonBlockGenerator;
@@ -65,7 +66,6 @@ import com.magento.idea.magento2plugin.actions.generation.generator.GridActionCo
 import com.magento.idea.magento2plugin.actions.generation.generator.LayoutXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.MenuXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleCollectionGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.ModuleControllerClassGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleResourceModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.NewActionEntityControllerFileGenerator;
@@ -89,13 +89,13 @@ import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 import com.magento.idea.magento2plugin.magento.files.ResourceModelPhp;
 import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
 import com.magento.idea.magento2plugin.magento.files.actions.AdminListViewActionFile;
+import com.magento.idea.magento2plugin.magento.files.actions.EditEntityActionFile;
 import com.magento.idea.magento2plugin.magento.files.actions.NewActionFile;
 import com.magento.idea.magento2plugin.magento.files.actions.SaveActionFile;
 import com.magento.idea.magento2plugin.magento.files.commands.DeleteEntityByIdCommandFile;
 import com.magento.idea.magento2plugin.magento.files.commands.SaveEntityCommandFile;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
-import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.PropertiesTypes;
 import com.magento.idea.magento2plugin.magento.packages.database.TableEngines;
 import com.magento.idea.magento2plugin.magento.packages.database.TableResources;
@@ -369,13 +369,14 @@ public class NewEntityDialog extends AbstractDialog {
             generateDataProviderFile();
             generateUiComponentGridActionColumnFile();
             generateUiComponentGridFile();
-            generateFormViewControllerFile();
             generateFormLayoutFile();
             generateNewEntityLayoutFile();
             generateSaveEntityCommandFile();
             generateDeleteEntityByIdCommandFile();
             generateFormSaveControllerFile();
             generateFormUiComponentGenericButtonFile();
+            generateFormEditControllerFile();
+            generateFormSaveControllerFile();
             generateFormNewActionControllerFile();
             generateUiComponentFormFile();
         }
@@ -650,12 +651,22 @@ public class NewEntityDialog extends AbstractDialog {
         return route.getText().trim();
     }
 
-    private String getViewActionName() {
+    /**
+     * Get edit action name.
+     *
+     * @return String
+     */
+    private String getEditActionName() {
         return "Edit";
     }
 
+    /**
+     * Get submit action name.
+     *
+     * @return String
+     */
     private String getSubmitActionName() {
-        return "Save";//NOPMD
+        return "Save";
     }
 
     private String getControllerDirectory() {
@@ -1125,24 +1136,24 @@ public class NewEntityDialog extends AbstractDialog {
     }
 
     /**
-     * Generate form view controller file.
+     * Generate form edit controller file.
      */
-    private void generateFormViewControllerFile() {
-        final NamespaceBuilder namespace = new NamespaceBuilder(
+    private void generateFormEditControllerFile() {
+        final EditEntityActionFile file = new EditEntityActionFile(getEntityName());
+        final NamespaceBuilder editActionNamespaceBuilder = new NamespaceBuilder(
                 getModuleName(),
-                getViewActionName(),
-                getControllerDirectory().concat(getEntityName())
+                file.getClassName(),
+                file.getDirectory()
         );
-        new ModuleControllerClassGenerator(new ControllerFileData(
-                getControllerDirectory().concat(getEntityName()),
-                getViewActionName(),
+        final EditEntityActionData data = new EditEntityActionData(
+                getEntityName(),
                 getModuleName(),
-                Areas.adminhtml.toString(),
-                HttpMethod.GET.toString(),
+                editActionNamespaceBuilder.getClassFqn(),
+                editActionNamespaceBuilder.getNamespace(),
                 getAcl(),
-                true,
-                namespace.getNamespace()
-        ), project).generate(ACTION_NAME, false);
+                getMenuIdentifier()
+        );
+        new EditEntityActionGenerator(data, project).generate(ACTION_NAME, false);
     }
 
     /**
@@ -1154,7 +1165,7 @@ public class NewEntityDialog extends AbstractDialog {
                 getRoute(),
                 getModuleName(),
                 getEntityName(),
-                getViewActionName(),
+                getEditActionName(),
                 getFormName()
         ), project).generate(ACTION_NAME, false);
     }

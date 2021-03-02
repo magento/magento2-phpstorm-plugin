@@ -61,6 +61,11 @@ class SaveCommand
             /** @var BookModel $model */
             $model = $this->modelFactory->create();
             $model->addData($book->getData());
+            $model->setHasDataChanges(true);
+
+            if (!$model->getId()) {
+                $model->isObjectNew(true);
+            }
             $this->resource->save($model);
         } catch (Exception $exception) {
             $this->logger->error(

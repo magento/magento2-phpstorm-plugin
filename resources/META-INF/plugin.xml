@@ -239,6 +239,7 @@
         <internalFileTemplate name="Magento Entity New Action Controller Class"/>
         <internalFileTemplate name="Magento New Entity Layout XML"/>
         <internalFileTemplate name="Magento Delete Entity By Id Command"/>
+        <internalFileTemplate name="Magento Entity Edit Action Controller Class"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 
