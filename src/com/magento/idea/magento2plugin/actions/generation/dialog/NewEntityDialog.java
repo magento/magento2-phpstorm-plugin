@@ -20,6 +20,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.DataModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelInterfaceData;
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.EditEntityActionData;
+import com.magento.idea.magento2plugin.actions.generation.data.DeleteEntityByIdCommandData;
 import com.magento.idea.magento2plugin.actions.generation.data.EntityDataMapperData;
 import com.magento.idea.magento2plugin.actions.generation.data.FormGenericButtonBlockData;
 import com.magento.idea.magento2plugin.actions.generation.data.GetListQueryModelData;
@@ -57,6 +58,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.DataModelInt
 import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaWhitelistJsonGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.EditEntityActionGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.DeleteEntityByIdCommandGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.EntityDataMapperGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.FormGenericButtonBlockGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.GetListQueryModelGenerator;
@@ -90,6 +92,7 @@ import com.magento.idea.magento2plugin.magento.files.actions.AdminListViewAction
 import com.magento.idea.magento2plugin.magento.files.actions.EditEntityActionFile;
 import com.magento.idea.magento2plugin.magento.files.actions.NewActionFile;
 import com.magento.idea.magento2plugin.magento.files.actions.SaveActionFile;
+import com.magento.idea.magento2plugin.magento.files.commands.DeleteEntityByIdCommandFile;
 import com.magento.idea.magento2plugin.magento.files.commands.SaveEntityCommandFile;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
@@ -271,6 +274,7 @@ public class NewEntityDialog extends AbstractDialog {
         );
 
         entityName.getDocument().addDocumentListener(new DocumentAdapter() {
+            @SuppressWarnings("PMD.AccessorMethodGeneration")
             @Override
             protected void textChanged(final @NotNull DocumentEvent event) {
                 autoCompleteIdentifiers();
@@ -368,6 +372,8 @@ public class NewEntityDialog extends AbstractDialog {
             generateFormLayoutFile();
             generateNewEntityLayoutFile();
             generateSaveEntityCommandFile();
+            generateDeleteEntityByIdCommandFile();
+            generateFormSaveControllerFile();
             generateFormUiComponentGenericButtonFile();
             generateFormEditControllerFile();
             generateFormSaveControllerFile();
@@ -815,7 +821,10 @@ public class NewEntityDialog extends AbstractDialog {
             final String name = model.getValueAt(count, 0).toString();
             final String dataType = model.getValueAt(count, 1).toString();
 
-            final String label = model.getValueAt(count, 0).toString(); //todo: convert
+            final String label = Arrays.stream(name.split("_")).map(
+                            string -> string.substring(0, 1).toUpperCase(Locale.getDefault())
+                                    + string.substring(1)).collect(Collectors.joining(" ")
+                    );
             final String sortOrder = String.valueOf(count).concat("0");
             final String fieldset = "general";
 
@@ -1203,6 +1212,33 @@ public class NewEntityDialog extends AbstractDialog {
                         modelNamespace.getClassFqn(),
                         resourceModelNamespace.getClassFqn(),
                         dtoType
+                ), project).generate(ACTION_NAME, true);
+    }
+
+    /**
+     * Run DeleteEntityById.php file generator for an entity.
+     */
+    private void generateDeleteEntityByIdCommandFile() {
+        final String classFqn = DeleteEntityByIdCommandFile.getClassFqn(
+                getModuleName(),
+                getEntityName()
+        );
+        final String namespace = DeleteEntityByIdCommandFile.getNamespace(
+                getModuleName(),
+                getEntityName()
+        );
+        final NamespaceBuilder modelNamespace = getModelNamespace();
+        final NamespaceBuilder resourceModelNamespace = getResourceModelNamespace();
+
+        new DeleteEntityByIdCommandGenerator(
+                new DeleteEntityByIdCommandData(
+                        getModuleName(),
+                        getEntityName(),
+                        namespace,
+                        classFqn,
+                        modelNamespace.getClassFqn(),
+                        resourceModelNamespace.getClassFqn(),
+                        getEntityIdColumn()
                 ),
                 project
         ).generate(ACTION_NAME, true);
