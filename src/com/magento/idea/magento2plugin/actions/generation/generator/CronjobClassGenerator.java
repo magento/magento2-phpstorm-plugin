@@ -34,7 +34,7 @@ public class CronjobClassGenerator extends FileGenerator {
         this.cronjobClassData = cronjobClassData;
 
         this.directoryGenerator = DirectoryGenerator.getInstance();
-        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         this.validatorBundle = new ValidatorBundle();
     }
 
@@ -82,7 +82,7 @@ public class CronjobClassGenerator extends FileGenerator {
         String cronjobClassName = this.cronjobClassData.getClassName();
         String moduleName = this.cronjobClassData.getModuleName();
         String[] cronjobSubDirectories = this.cronjobClassData.getDirectory().split("/");
-        PsiDirectory parentDirectory = ModuleIndex.getInstance(project).getModuleDirectoryByModuleName(moduleName);
+        PsiDirectory parentDirectory = new ModuleIndex(project).getModuleDirectoryByModuleName(moduleName);
 
         for (String cronjobSubDirectory: cronjobSubDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, cronjobSubDirectory);

@@ -26,26 +26,15 @@ import java.util.regex.Pattern;
 
 public final class ModuleIndex {
 
-    private static ModuleIndex instance;
-
-    private Project project;
-
-    private ModuleIndex() {
-    }
+    private final Project project;
 
     /**
      * Constructor.
      *
      * @param project Project
-     * @return ModuleIndex
      */
-    public static ModuleIndex getInstance(final Project project) {
-        if (null == instance) { //NOPMD
-            instance = new ModuleIndex();
-        }
-        instance.project = project;
-
-        return instance;
+    public ModuleIndex(final Project project) {
+        this.project = project;
     }
 
     public List<String> getEditableModuleNames() {

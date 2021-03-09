@@ -23,7 +23,7 @@ public class ModuleRegistrationPhpGenerator extends FileGenerator {
     public ModuleRegistrationPhpGenerator(@NotNull ModuleRegistrationPhpData moduleRegistrationPhpData, Project project) {
         super(project);
         this.moduleRegistrationPhpData = moduleRegistrationPhpData;
-        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         this.directoryGenerator = DirectoryGenerator.getInstance();
     }
 

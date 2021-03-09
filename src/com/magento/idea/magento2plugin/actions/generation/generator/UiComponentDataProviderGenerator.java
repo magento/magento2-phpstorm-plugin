@@ -52,7 +52,7 @@ public class UiComponentDataProviderGenerator extends FileGenerator {
 
         this.uiComponentGridDataProviderData = uiComponentGridDataProviderData;
         this.directoryGenerator = DirectoryGenerator.getInstance();
-        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
@@ -114,7 +114,7 @@ public class UiComponentDataProviderGenerator extends FileGenerator {
     }
 
     private PhpClass createDataProviderClass(final String actionName) {
-        PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+        PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(this.moduleName);
         final PsiFile dataProviderFile;
         final String[] dataProviderDirectories = uiComponentGridDataProviderData.getPath().split(

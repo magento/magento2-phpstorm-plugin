@@ -39,8 +39,8 @@ public class UiComponentGridXmlGenerator extends FileGenerator {
 
         this.uiComponentGridData = uiComponentGridData;
         this.directoryGenerator = DirectoryGenerator.getInstance();
-        this.moduleIndex = ModuleIndex.getInstance(project);
-        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        this.moduleIndex = new ModuleIndex(project);
+        this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
     }
 
     @Override

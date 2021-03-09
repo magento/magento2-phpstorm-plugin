@@ -44,7 +44,7 @@ public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
     public ModuleGraphQlResolverClassGenerator(@NotNull GraphQlResolverFileData graphQlResolverFileData, Project project) {
         super(project);
         this.directoryGenerator = DirectoryGenerator.getInstance();
-        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
         this.graphQlResolverFileData = graphQlResolverFileData;
         this.project = project;
@@ -107,7 +107,7 @@ public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
     }
 
     private PhpClass createGraphQlResolverClass(String actionName) {
-        PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+        PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(graphQlResolverFileData.getGraphQlResolverModule());
         String[] graphQlResolverDirectories = graphQlResolverFileData.getGraphQlResolverDirectory().split(File.separator);
         for (String graphQlResolverDirectory: graphQlResolverDirectories) {

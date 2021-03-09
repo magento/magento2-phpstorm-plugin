@@ -45,7 +45,7 @@ public class ModuleBlockClassGenerator extends FileGenerator {
     ) {
         super(project);
         this.directoryGenerator = DirectoryGenerator.getInstance();
-        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         this.blockFileData = blockFileData;
         this.project = project;
         this.validatorBundle = new ValidatorBundle();
@@ -104,7 +104,7 @@ public class ModuleBlockClassGenerator extends FileGenerator {
     }
 
     private PhpFile createBlockClass(final String actionName) {
-        PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+        PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(getBlockModule());
         final String[] blockDirectories = blockFileData.getBlockDirectory().split(File.separator);
         for (final String blockDirectory: blockDirectories) {

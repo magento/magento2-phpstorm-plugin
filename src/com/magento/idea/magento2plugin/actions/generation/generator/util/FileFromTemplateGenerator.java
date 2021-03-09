@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator.util;
 
 import com.intellij.ide.fileTemplates.DefaultTemplatePropertiesProvider;
@@ -21,24 +22,19 @@ import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.util.IncorrectOperationException;
 import com.magento.idea.magento2plugin.magento.files.ModuleFileInterface;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class FileFromTemplateGenerator {
-    private static FileFromTemplateGenerator INSTANCE = null;
-    private Project project;
+    private final Project project;
 
-    public static FileFromTemplateGenerator getInstance(Project project) {
-        if (null == INSTANCE) {
-            INSTANCE = new FileFromTemplateGenerator();
-        }
-        INSTANCE.project = project;
-        return INSTANCE;
+    public FileFromTemplateGenerator(Project project) {
+        this.project = project;
     }
 
     @Nullable
@@ -46,8 +42,8 @@ public class FileFromTemplateGenerator {
             @NotNull ModuleFileInterface moduleFile,
             @NotNull Properties attributes,
             @NotNull PsiDirectory baseDir,
-            @NotNull String actionName)
-    {
+            @NotNull String actionName
+    ) {
         Ref<PsiFile> fileRef = new Ref<>(null);
         Ref<String> exceptionRef = new Ref<>(null);
         String filePath = baseDir.getText().concat("/").concat(moduleFile.getFileName());
