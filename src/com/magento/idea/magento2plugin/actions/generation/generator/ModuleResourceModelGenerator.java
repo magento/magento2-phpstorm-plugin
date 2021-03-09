@@ -51,7 +51,7 @@ public class ModuleResourceModelGenerator extends FileGenerator {
         this.project = project;
         this.resourceModelData = resourceModelData;
         this.directoryGenerator = DirectoryGenerator.getInstance();
-        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
@@ -123,7 +123,7 @@ public class ModuleResourceModelGenerator extends FileGenerator {
     }
 
     private PhpClass createClass(final String actionName) {
-        PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+        PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(getModuleName());
         final PsiFile modelFile;
 

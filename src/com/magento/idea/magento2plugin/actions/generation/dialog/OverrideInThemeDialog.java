@@ -131,7 +131,7 @@ public class OverrideInThemeDialog extends AbstractDialog {
     }
 
     private void fillThemeOptions() {
-        final List<String> themeNames = ModuleIndex.getInstance(project).getEditableThemeNames();
+        final List<String> themeNames = new ModuleIndex(project).getEditableThemeNames();
         for (final String themeName: themeNames) {
             theme.addItem(themeName);
         }

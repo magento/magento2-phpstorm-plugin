@@ -69,10 +69,10 @@ public class UiComponentFormButtonPhpClassGenerator extends FileGenerator {
     ) {
         final DirectoryGenerator directoryGenerator = DirectoryGenerator.getInstance();
         final FileFromTemplateGenerator fileFromTemplateGenerator =
-                FileFromTemplateGenerator.getInstance(project);
+                new FileFromTemplateGenerator(project);
 
         final String moduleName = buttonData.getButtonModule();
-        PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+        PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(moduleName);
         final String[] directories = buttonData.getButtonDirectory().split(File.separator);
         for (final String pluginDirectory: directories) {
