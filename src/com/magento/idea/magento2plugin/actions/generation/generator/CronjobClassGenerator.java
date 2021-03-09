@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
@@ -14,21 +15,26 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFro
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.CronjobTemplate;
-import org.jetbrains.annotations.NotNull;
 import java.util.Properties;
+import org.jetbrains.annotations.NotNull;
 
 public class CronjobClassGenerator extends FileGenerator {
-    private CronjobClassData cronjobClassData;
-    private Project project;
-    private ValidatorBundle validatorBundle;
+    private final CronjobClassData cronjobClassData;
+    private final Project project;
+    private final ValidatorBundle validatorBundle;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
 
     /**
-     * @param project
-     * @param cronjobClassData
+     * Construct generator.
+     *
+     * @param project Project
+     * @param cronjobClassData CronjobClassData
      */
-    public CronjobClassGenerator(Project project, @NotNull CronjobClassData cronjobClassData) {
+    public CronjobClassGenerator(
+            final Project project,
+            final @NotNull CronjobClassData cronjobClassData
+    ) {
         super(project);
         this.project = project;
         this.cronjobClassData = cronjobClassData;
@@ -39,62 +45,68 @@ public class CronjobClassGenerator extends FileGenerator {
     }
 
     /**
+     * Generate file from code template.
      *
-     * @param actionName
+     * @param actionName String
      *
      * @return void
      */
-    public PsiFile generate(String actionName) {
-        PhpFile cronjobFile = createCronjobClass(actionName);
+    @Override
+    public PsiFile generate(final String actionName) {
+        final PhpFile cronjobFile = createCronjobClass(actionName);
 
         if (cronjobFile == null) {
-            String errorMessage = validatorBundle.message(
-            "validator.file.cantBeCreated",
-            "Cronjob Class"
+            final String errorMessage = validatorBundle.message(
+                    "validator.file.cantBeCreated",
+                    "Cronjob Class"
             );
 
-            throw new RuntimeException(errorMessage);
+            throw new RuntimeException(errorMessage);//NOPMD
         }
 
         return cronjobFile;
     }
 
     /**
+     * Fill template attributes.
      *
-     * @param attributes
+     * @param attributes Properties
      */
-    protected void fillAttributes(Properties attributes) {
-        String cronjobClassName = this.cronjobClassData.getClassName();
-        String cronjobNamespace = this.cronjobClassData.getNamespace();
+    @Override
+    protected void fillAttributes(final Properties attributes) {
+        final String cronjobClassName = this.cronjobClassData.getClassName();
+        final String cronjobNamespace = this.cronjobClassData.getNamespace();
 
         attributes.setProperty("NAME", cronjobClassName);
         attributes.setProperty("NAMESPACE", cronjobNamespace);
     }
 
     /**
-     * Generate Cronjob Class according to data model
+     * Generate Cronjob Class according to data model.
      *
-     * @param actionName
+     * @param actionName String
      *
      * @return PhpFile
      */
-    private PhpFile createCronjobClass(String actionName) {
-        String cronjobClassName = this.cronjobClassData.getClassName();
-        String moduleName = this.cronjobClassData.getModuleName();
-        String[] cronjobSubDirectories = this.cronjobClassData.getDirectory().split("/");
-        PsiDirectory parentDirectory = new ModuleIndex(project).getModuleDirectoryByModuleName(moduleName);
+    private PhpFile createCronjobClass(final String actionName) {
+        final String cronjobClassName = this.cronjobClassData.getClassName();
+        final String moduleName = this.cronjobClassData.getModuleName();
+        final String[] cronjobSubDirectories = this.cronjobClassData.getDirectory().split("/");
+        PsiDirectory parentDirectory = new ModuleIndex(project)
+                .getModuleDirectoryByModuleName(moduleName);
 
-        for (String cronjobSubDirectory: cronjobSubDirectories) {
-            parentDirectory = directoryGenerator.findOrCreateSubdirectory(parentDirectory, cronjobSubDirectory);
+        for (final String cronjobSubDirectory: cronjobSubDirectories) {
+            parentDirectory = directoryGenerator
+                    .findOrCreateSubdirectory(parentDirectory, cronjobSubDirectory);
         }
 
-        Properties attributes = getAttributes();
+        final Properties attributes = getAttributes();
 
-        PsiFile blockFile = fileFromTemplateGenerator.generate(
-            new CronjobTemplate(cronjobClassName),
-            attributes,
-            parentDirectory,
-            actionName
+        final PsiFile blockFile = fileFromTemplateGenerator.generate(
+                new CronjobTemplate(cronjobClassName),
+                attributes,
+                parentDirectory,
+                actionName
         );
 
         if (blockFile == null) {
