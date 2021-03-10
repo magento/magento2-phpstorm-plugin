@@ -8,6 +8,7 @@ package com.magento.idea.magento2plugin.inspections.xml;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.codeInspection.XmlSuppressableInspectionTool;
+import com.intellij.patterns.XmlAttributeValuePattern;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
@@ -26,6 +27,8 @@ import com.magento.idea.magento2plugin.util.magento.IsFileInEditableModuleUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class ModuleDeclarationInModuleXmlInspection extends XmlSuppressableInspectionTool {
+
+    private static final String MODULE_NAME = "name";
 
     @NotNull
     @Override
@@ -54,24 +57,26 @@ public class ModuleDeclarationInModuleXmlInspection extends XmlSuppressableInspe
                     return;
                 }
 
-                final String expectedName
-                        = GetEditableModuleNameByRootFileUtil.execute(etcDirectory);
-                final String actualName = value.getValue();
-                if (actualName.equals(expectedName)) {
-                    return;
+                final String attributeName = XmlAttributeValuePattern.getLocalName(value);
+                if (attributeName != null && attributeName.equals(MODULE_NAME)) {
+                    final String expectedName
+                            = GetEditableModuleNameByRootFileUtil.execute(etcDirectory);
+                    final String actualName = value.getValue();
+                    if (actualName.equals(expectedName)) {
+                        return;
+                    }
+                    final InspectionBundle inspectionBundle = new InspectionBundle();
+                    problemsHolder.registerProblem(
+                            value,
+                            inspectionBundle.message(
+                                    "inspection.moduleDeclaration.warning.wrongModuleName",
+                                    actualName,
+                                    expectedName
+                            ),
+                            ProblemHighlightType.ERROR,
+                            new XmlModuleNameQuickFix(expectedName)
+                    );
                 }
-
-                final InspectionBundle inspectionBundle = new InspectionBundle();
-                problemsHolder.registerProblem(
-                        value,
-                        inspectionBundle.message(
-                                "inspection.moduleDeclaration.warning.wrongModuleName",
-                                actualName,
-                                expectedName
-                        ),
-                        ProblemHighlightType.ERROR,
-                        new XmlModuleNameQuickFix(expectedName)
-                );
             }
         };
     }
