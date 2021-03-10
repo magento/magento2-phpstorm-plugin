@@ -56,7 +56,7 @@ public class ObserverClassGenerator extends FileGenerator {
         this.project = project;
 
         this.directoryGenerator = DirectoryGenerator.getInstance();
-        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
@@ -131,7 +131,7 @@ public class ObserverClassGenerator extends FileGenerator {
     }
 
     private PhpClass createObserverClass(final String actionName) {
-        PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+        PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(observerFileData.getObserverModule());
         final String[] observerDirectories = observerFileData.getObserverDirectory()
                 .split(File.separator);

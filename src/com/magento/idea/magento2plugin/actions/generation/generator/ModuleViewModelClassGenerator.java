@@ -45,7 +45,7 @@ public class ModuleViewModelClassGenerator extends FileGenerator {
         super(project);
 
         this.directoryGenerator = DirectoryGenerator.getInstance();
-        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         this.viewModelFileData = viewModelFileData;
         this.project = project;
         this.validatorBundle = new ValidatorBundle();
@@ -104,7 +104,7 @@ public class ModuleViewModelClassGenerator extends FileGenerator {
     }
 
     private PhpFile createViewModelClass(final String actionName) {
-        PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+        PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(getViewModelModule());
         final String[] viewModelDirectories = viewModelFileData.getViewModelDirectory()
                 .split(File.separator);

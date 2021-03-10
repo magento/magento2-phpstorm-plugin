@@ -192,7 +192,7 @@ public class CreateAnObserverDialog extends AbstractDialog {
     }
 
     private void createUIComponents() { //NOPMD
-        final List<String> allModulesList = ModuleIndex.getInstance(project)
+        final List<String> allModulesList = new ModuleIndex(project)
                 .getEditableModuleNames();
 
         this.observerModule = new FilteredComboBox(allModulesList);
