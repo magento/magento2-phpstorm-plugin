@@ -111,6 +111,7 @@ import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.magento.GetAclResourcesListUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -274,6 +275,13 @@ public class NewEntityDialog extends AbstractDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
+
+        entityName.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                entityName.setText(StringUtils.capitalize(entityName.getText()));
+            }
+        });
 
         entityName.getDocument().addDocumentListener(new DocumentAdapter() {
             @SuppressWarnings("PMD.AccessorMethodGeneration")
