@@ -28,8 +28,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class ModuleDeclarationInModuleXmlInspection extends XmlSuppressableInspectionTool {
 
-    private static final String MODULE_NAME = "name";
-
     @NotNull
     @Override
     public PsiElementVisitor buildVisitor(
@@ -58,7 +56,7 @@ public class ModuleDeclarationInModuleXmlInspection extends XmlSuppressableInspe
                 }
 
                 final String attributeName = XmlAttributeValuePattern.getLocalName(value);
-                if (attributeName != null && attributeName.equals(MODULE_NAME)) {
+                if (attributeName != null && attributeName.equals(ModuleXml.MODULE_ATTR_NAME)) {
                     final String expectedName
                             = GetEditableModuleNameByRootFileUtil.execute(etcDirectory);
                     final String actualName = value.getValue();
