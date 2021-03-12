@@ -18,7 +18,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClas
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.magento.files.CollectionPhp;
+import com.magento.idea.magento2plugin.magento.files.CollectionModelFile;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
@@ -138,7 +138,7 @@ public class ModuleCollectionGenerator extends FileGenerator {
 
         final Properties attributes = getAttributes();
         modelFile = fileFromTemplateGenerator.generate(
-                new CollectionPhp(collectionData.getCollectionName()),
+                new CollectionModelFile(collectionData.getCollectionName()),
                 attributes,
                 parentDirectory,
                 actionName
@@ -168,7 +168,7 @@ public class ModuleCollectionGenerator extends FileGenerator {
 
         attributes.setProperty(
                 "EXTENDS",
-                PhpClassGeneratorUtil.getNameFromFqn(CollectionPhp.ABSTRACT_COLLECTION)
+                PhpClassGeneratorUtil.getNameFromFqn(CollectionModelFile.ABSTRACT_COLLECTION)
         );
 
         attributes.setProperty("USES", PhpClassGeneratorUtil.formatUses(uses));
@@ -176,7 +176,7 @@ public class ModuleCollectionGenerator extends FileGenerator {
 
     private List<String> getUses() {
         return new ArrayList<>(Arrays.asList(
-                CollectionPhp.ABSTRACT_COLLECTION
+                CollectionModelFile.ABSTRACT_COLLECTION
         ));
     }
 }

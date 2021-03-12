@@ -6,7 +6,7 @@
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.magento.idea.magento2plugin.actions.generation.data.AdminListViewEntityActionData;
-import com.magento.idea.magento2plugin.magento.files.actions.AdminListViewActionFile;
+import com.magento.idea.magento2plugin.magento.files.actions.IndexActionFile;
 
 public class AdminListViewEntityControllerGeneratorTest extends BaseGeneratorTestCase {
     private static final String MODULE_NAME = "Foo_Bar";
@@ -14,13 +14,13 @@ public class AdminListViewEntityControllerGeneratorTest extends BaseGeneratorTes
     private static final String NAMESPACE = "Foo\\Bar\\Controller\\Adminhtml\\" + ENTITY_NAME;
     private static final String ACL = "Foo_Bar::book_management";
     private static final String MENU = "Foo_Bar::book_management_menu";
-    private static final String CLASS_FQN = NAMESPACE + "\\" + AdminListViewActionFile.CLASS_NAME;
+    private static final String CLASS_FQN = NAMESPACE + "\\" + IndexActionFile.CLASS_NAME;
 
     /**
      * Test generation of list view entity controller (adminhtml).
      */
     public void testGenerateListViewControllerFile() {
-        final AdminListViewActionFile file = new AdminListViewActionFile(ENTITY_NAME);
+        final IndexActionFile file = new IndexActionFile(ENTITY_NAME);
         final AdminListViewEntityActionData data = new AdminListViewEntityActionData(
                 MODULE_NAME,
                 ENTITY_NAME,

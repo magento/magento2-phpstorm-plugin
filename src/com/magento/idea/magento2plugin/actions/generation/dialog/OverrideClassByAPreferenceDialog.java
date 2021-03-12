@@ -165,7 +165,7 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
         }
         final PsiFile diXml = new PreferenceDiXmlGenerator(new PreferenceDiXmFileData(
                 getPreferenceModule(),
-                targetClass,
+                targetClass.getPresentableFQN(),
                 getPreferenceClassFqn(),
                 getNamespace(),
                 getPreferenceArea()

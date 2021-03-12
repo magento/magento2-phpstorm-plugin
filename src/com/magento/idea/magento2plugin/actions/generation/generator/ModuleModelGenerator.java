@@ -18,7 +18,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClas
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.magento.files.ModelPhp;
+import com.magento.idea.magento2plugin.magento.files.ModelFile;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import java.util.ArrayList;
@@ -127,12 +127,12 @@ public class ModuleModelGenerator extends FileGenerator {
         final PsiFile modelFile;
 
         parentDirectory = directoryGenerator.findOrCreateSubdirectory(
-                parentDirectory, ModelPhp.MODEL_DIRECTORY
+                parentDirectory, ModelFile.MODEL_DIRECTORY
         );
 
         final Properties attributes = getAttributes();
         modelFile = fileFromTemplateGenerator.generate(
-                new ModelPhp(modelData.getModelName()),
+                new ModelFile(modelData.getModelName()),
                 attributes,
                 parentDirectory,
                 actionName
@@ -155,7 +155,7 @@ public class ModuleModelGenerator extends FileGenerator {
 
         attributes.setProperty(
                 "EXTENDS",
-                PhpClassGeneratorUtil.getNameFromFqn(ModelPhp.ABSTRACT_MODEL)
+                PhpClassGeneratorUtil.getNameFromFqn(ModelFile.ABSTRACT_MODEL)
         );
 
         attributes.setProperty("USES", PhpClassGeneratorUtil.formatUses(uses));
@@ -163,7 +163,7 @@ public class ModuleModelGenerator extends FileGenerator {
 
     private List<String> getUses() {
         return new ArrayList<>(Arrays.asList(
-                ModelPhp.ABSTRACT_MODEL,
+                ModelFile.ABSTRACT_MODEL,
                 modelData.getResourceModelFqn()
         ));
     }

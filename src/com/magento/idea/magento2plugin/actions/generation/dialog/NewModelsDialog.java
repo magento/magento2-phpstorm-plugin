@@ -21,8 +21,8 @@ import com.magento.idea.magento2plugin.actions.generation.generator.ModuleCollec
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleResourceModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
-import com.magento.idea.magento2plugin.magento.files.ModelPhp;
-import com.magento.idea.magento2plugin.magento.files.ResourceModelPhp;
+import com.magento.idea.magento2plugin.magento.files.ModelFile;
+import com.magento.idea.magento2plugin.magento.files.ResourceModelFile;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.ActionEvent;
@@ -175,19 +175,19 @@ public class NewModelsDialog extends AbstractDialog {
     }
 
     private String getCollectionDirectory() {
-        return ResourceModelPhp.RESOURCE_MODEL_DIRECTORY + File.separator
+        return ResourceModelFile.RESOURCE_MODEL_DIRECTORY + File.separator
             + collectionDirectory.getText().trim();
     }
 
     private NamespaceBuilder getModelNamespace() {
-        return new NamespaceBuilder(getModuleName(), getModelName(), ModelPhp.MODEL_DIRECTORY);
+        return new NamespaceBuilder(getModuleName(), getModelName(), ModelFile.MODEL_DIRECTORY);
     }
 
     private NamespaceBuilder getResourceModelNamespace() {
         return new NamespaceBuilder(
                 getModuleName(),
                 getResourceModelName(),
-                ResourceModelPhp.RESOURCE_MODEL_DIRECTORY
+                ResourceModelFile.RESOURCE_MODEL_DIRECTORY
         );
     }
 

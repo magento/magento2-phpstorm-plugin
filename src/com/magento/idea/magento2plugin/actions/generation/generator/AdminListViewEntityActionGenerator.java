@@ -14,7 +14,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Directo
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.magento.files.actions.AdminListViewActionFile;
+import com.magento.idea.magento2plugin.magento.files.actions.IndexActionFile;
 import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.code.BackendModuleType;
 import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryType;
@@ -28,7 +28,7 @@ public class AdminListViewEntityActionGenerator extends FileGenerator {
 
     private final Project project;
     private final AdminListViewEntityActionData data;
-    private final AdminListViewActionFile file;
+    private final IndexActionFile file;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final DirectoryGenerator directoryGenerator;
     private final ModuleIndex moduleIndex;
@@ -64,7 +64,7 @@ public class AdminListViewEntityActionGenerator extends FileGenerator {
         this.data = data;
         this.project = project;
         this.checkFileAlreadyExists = checkFileAlreadyExists;
-        file = new AdminListViewActionFile(data.getEntityName());
+        file = new IndexActionFile(data.getEntityName());
         fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         directoryGenerator = DirectoryGenerator.getInstance();
         moduleIndex = ModuleIndex.getInstance(project);
@@ -113,7 +113,7 @@ public class AdminListViewEntityActionGenerator extends FileGenerator {
     protected void fillAttributes(final @NotNull Properties attributes) {
         attributes.setProperty("ENTITY_NAME", data.getEntityName());
         attributes.setProperty("NAMESPACE", data.getNamespace());
-        attributes.setProperty("CLASS_NAME", AdminListViewActionFile.CLASS_NAME);
+        attributes.setProperty("CLASS_NAME", IndexActionFile.CLASS_NAME);
         attributes.setProperty("ACL", data.getAcl());
         attributes.setProperty("MENU", data.getMenu());
 

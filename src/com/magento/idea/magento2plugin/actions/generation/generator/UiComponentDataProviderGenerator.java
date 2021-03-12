@@ -18,7 +18,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClas
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
+import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderFile;
 import com.magento.idea.magento2plugin.magento.files.queries.GetListQuery;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
@@ -139,11 +139,11 @@ public class UiComponentDataProviderGenerator extends FileGenerator {
 
         final List<String> uses = new LinkedList<>();
 
-        uses.add(UiComponentDataProviderPhp.DEFAULT_DATA_PROVIDER);
+        uses.add(UiComponentDataProviderFile.DEFAULT_DATA_PROVIDER);
         attributes.setProperty(
                 "EXTENDS",
                 PhpClassGeneratorUtil.getNameFromFqn(
-                        UiComponentDataProviderPhp.DEFAULT_DATA_PROVIDER
+                        UiComponentDataProviderFile.DEFAULT_DATA_PROVIDER
                 )
         );
 
@@ -170,10 +170,10 @@ public class UiComponentDataProviderGenerator extends FileGenerator {
         uses.add(FrameworkLibraryType.FILTER_BUILDER.getType());
         attributes.setProperty("FILTER_BUILDER", FrameworkLibraryType.FILTER_BUILDER.getTypeName());
 
-        uses.add(UiComponentDataProviderPhp.SEARCH_RESULT_FACTORY);
+        uses.add(UiComponentDataProviderFile.SEARCH_RESULT_FACTORY);
         attributes.setProperty("SEARCH_RESULT_FACTORY",
                 PhpClassGeneratorUtil.getNameFromFqn(
-                        UiComponentDataProviderPhp.SEARCH_RESULT_FACTORY
+                        UiComponentDataProviderFile.SEARCH_RESULT_FACTORY
                 )
         );
 
@@ -210,7 +210,7 @@ public class UiComponentDataProviderGenerator extends FileGenerator {
         final Properties attributes = getAttributes();
 
         dataProviderFile = fileFromTemplateGenerator.generate(
-                UiComponentDataProviderPhp.getInstance(
+                UiComponentDataProviderFile.getInstance(
                         uiComponentGridDataProviderData.getName()
                 ),
                 attributes,

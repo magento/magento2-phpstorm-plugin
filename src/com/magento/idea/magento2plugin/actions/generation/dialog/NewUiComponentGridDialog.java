@@ -44,7 +44,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentG
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
-import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
+import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderFile;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
@@ -342,7 +342,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     }
 
     private void generateDataProviderClass() {
-        if (getDataProviderType().equals(UiComponentDataProviderPhp.CUSTOM_TYPE)) {
+        if (getDataProviderType().equals(UiComponentDataProviderFile.CUSTOM_TYPE)) {
             final UiComponentDataProviderGenerator dataProviderGenerator;
             dataProviderGenerator = new UiComponentDataProviderGenerator(
                 getGridDataProviderData(),
@@ -354,7 +354,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     }
 
     private void generateDataProviderDeclaration() {
-        if (getDataProviderType().equals(UiComponentDataProviderPhp.COLLECTION_TYPE)) {
+        if (getDataProviderType().equals(UiComponentDataProviderFile.COLLECTION_TYPE)) {
             final DataProviderDeclarationGenerator dataProviderGenerator;
             dataProviderGenerator = new DataProviderDeclarationGenerator(
                 new DataProviderDeclarationData(
@@ -439,7 +439,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
 
     private void onDataProviderTypeChange() {
         final boolean visible = getDataProviderType().equals(
-                UiComponentDataProviderPhp.COLLECTION_TYPE
+                UiComponentDataProviderFile.COLLECTION_TYPE
         );
 
         collection.setVisible(visible);
@@ -492,8 +492,8 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     private List<String> getProviderTypeOptions() {
         return new ArrayList<>(
                 Arrays.asList(
-                        UiComponentDataProviderPhp.COLLECTION_TYPE,
-                        UiComponentDataProviderPhp.CUSTOM_TYPE
+                        UiComponentDataProviderFile.COLLECTION_TYPE,
+                        UiComponentDataProviderFile.CUSTOM_TYPE
                 )
         );
     }
@@ -529,8 +529,8 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     }
 
     private String getDataProviderClassFqn() {
-        if (!getDataProviderType().equals(UiComponentDataProviderPhp.CUSTOM_TYPE)) {
-            return UiComponentDataProviderPhp.DEFAULT_DATA_PROVIDER;
+        if (!getDataProviderType().equals(UiComponentDataProviderFile.CUSTOM_TYPE)) {
+            return UiComponentDataProviderFile.DEFAULT_DATA_PROVIDER;
         }
         return String.format(
                 "%s%s%s",

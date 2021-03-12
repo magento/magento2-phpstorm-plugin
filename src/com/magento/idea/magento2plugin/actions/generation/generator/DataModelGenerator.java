@@ -18,7 +18,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClas
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.magento.files.DataModel;
+import com.magento.idea.magento2plugin.magento.files.DataModelFile;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import java.util.LinkedList;
@@ -101,7 +101,7 @@ public class DataModelGenerator extends FileGenerator {
         attributes.setProperty("NAME", modelData.getName());
         attributes.setProperty(
                 "EXTENDS",
-                PhpClassGeneratorUtil.getNameFromFqn(DataModel.DATA_OBJECT)
+                PhpClassGeneratorUtil.getNameFromFqn(DataModelFile.DATA_OBJECT)
         );
         attributes.setProperty(
                 "IMPLEMENTS",
@@ -113,7 +113,7 @@ public class DataModelGenerator extends FileGenerator {
 
     private List<String> getUses() {
         final List<String> usesList = new LinkedList<>();
-        usesList.add(DataModel.DATA_OBJECT);
+        usesList.add(DataModelFile.DATA_OBJECT);
 
         if (modelData.hasInterface()) {
             usesList.add(modelData.getInterfaceFQN());
@@ -127,14 +127,14 @@ public class DataModelGenerator extends FileGenerator {
         final PsiFile interfaceFile;
         final Properties attributes = getAttributes();
 
-        for (final String directory: DataModel.DIRECTORY.split("/")) {
+        for (final String directory: DataModelFile.DIRECTORY.split("/")) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(
                     parentDirectory, directory
             );
         }
 
         interfaceFile = fileFromTemplateGenerator.generate(
-                new DataModel(modelData.getName()),
+                new DataModelFile(modelData.getName()),
                 attributes,
                 parentDirectory,
                 actionName

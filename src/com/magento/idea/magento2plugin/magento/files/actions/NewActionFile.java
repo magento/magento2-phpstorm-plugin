@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.magento.files.actions;
 
 import com.intellij.lang.Language;
 import com.jetbrains.php.lang.PhpLanguage;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.magento.files.ModuleFileInterface;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,6 +25,25 @@ public final class NewActionFile implements ModuleFileInterface {
      */
     public static NewActionFile getInstance() {
         return INSTANCE;
+    }
+
+    /**
+     * Get namespace builder for file.
+     *
+     * @param moduleName String
+     * @param entityName String
+     *
+     * @return String
+     */
+    public static @NotNull NamespaceBuilder getNamespaceBuilder(
+            final @NotNull String moduleName,
+            final @NotNull String entityName
+    ) {
+        return new NamespaceBuilder(
+                moduleName,
+                CLASS_NAME,
+                getDirectory(entityName)
+        );
     }
 
     /**

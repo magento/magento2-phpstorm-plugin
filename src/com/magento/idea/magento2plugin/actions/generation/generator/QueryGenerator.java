@@ -17,7 +17,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFro
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
+import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderFile;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
@@ -128,7 +128,7 @@ public class QueryGenerator extends FileGenerator {
         final Properties attributes = getAttributes();
 
         dataProviderFile = fileFromTemplateGenerator.generate(
-                UiComponentDataProviderPhp.getInstance(
+                UiComponentDataProviderFile.getInstance(
                         uiComponentGridDataProviderData.getName()
                 ),
                 attributes,

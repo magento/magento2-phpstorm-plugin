@@ -96,7 +96,7 @@ public class PreferenceDiXmlGenerator extends FileGenerator {
                         ModuleDiXml.PREFERENCE_TAG_NAME,
                         ModuleDiXml.PREFERENCE_ATTR_FOR
                 );
-        final String fqn = preferenceDiXmFileData.getTargetClass().getPresentableFQN();
+        final String fqn = preferenceDiXmFileData.getTargetClass();
         for (final XmlAttributeValue preference: preferences) {
             if (PhpLangUtil.toPresentableFQN(preference.getValue()).equals(fqn)) {
                 return true;
@@ -108,8 +108,7 @@ public class PreferenceDiXmlGenerator extends FileGenerator {
 
     @Override
     protected void fillAttributes(final Properties attributes) {
-        attributes.setProperty("FOR", preferenceDiXmFileData.getTargetClass()
-                .getPresentableFQN());
+        attributes.setProperty("FOR", preferenceDiXmFileData.getTargetClass());
         attributes.setProperty("TYPE", preferenceDiXmFileData.getPreferenceFqn());
     }
 }
