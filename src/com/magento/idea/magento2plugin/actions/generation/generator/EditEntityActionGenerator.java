@@ -14,7 +14,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Directo
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.magento.files.actions.EditEntityActionFile;
+import com.magento.idea.magento2plugin.magento.files.actions.EditActionFile;
 import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.code.BackendModuleType;
 import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryType;
@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 public class EditEntityActionGenerator extends FileGenerator {
 
     private final Project project;
-    private final EditEntityActionFile file;
+    private final EditActionFile file;
     private final EditEntityActionData data;
     private final boolean checkFileAlreadyExists;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
@@ -64,7 +64,7 @@ public class EditEntityActionGenerator extends FileGenerator {
         this.data = data;
         this.project = project;
         this.checkFileAlreadyExists = checkFileAlreadyExists;
-        file = new EditEntityActionFile(data.getEntityName());
+        file = new EditActionFile(data.getEntityName());
         fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         moduleIndex = ModuleIndex.getInstance(project);
         directoryGenerator = DirectoryGenerator.getInstance();

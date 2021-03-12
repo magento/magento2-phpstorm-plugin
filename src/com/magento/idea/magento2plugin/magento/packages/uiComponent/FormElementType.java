@@ -76,11 +76,10 @@ public enum FormElementType {
         switch (property) {
             case INT:
             case STRING:
+            case FLOAT:
                 return FormElementType.INPUT;
             case BOOL:
                 return FormElementType.CHECKBOX;
-            case FLOAT:
-                return FormElementType.PRICE;
             default:
                 throw new NotSupportedException(
                         "ENUMs " + FormElementType.class + " property is not supported."

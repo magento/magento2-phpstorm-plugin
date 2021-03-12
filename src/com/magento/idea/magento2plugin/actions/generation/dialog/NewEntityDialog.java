@@ -10,14 +10,20 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.actions.generation.NewEntityAction;
+import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormButtonData;
+import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldData;
+import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldsetData;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.AclXmlDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.CollectionModelDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.DataModelDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.DataModelInterfaceDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.DataProviderDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.DbSchemaXmlDtoConverter;
+import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.DeleteEntityByIdCommandDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.EntityDataMapperDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.EntityListActionDtoConverter;
+import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.FormDeleteControllerDtoConverter;
+import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.FormEditControllerDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.FormGenericButtonBlockDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.FormLayoutDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.FormSaveControllerDtoConverter;
@@ -32,14 +38,11 @@ import com.magento.idea.magento2plugin.actions.generation.data.converter.newenti
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.PreferenceDiXmlFileDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.ResourceModelDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.RoutesXmlDtoConverter;
+import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.SaveEntityCommandDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.UiComponentFormLayoutDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.UiComponentGridDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityManagerContextData;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.NewEntityDialogData;
-import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormButtonData;
-import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldData;
-import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldsetData;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.SaveEntityCommandDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.util.ClassPropertyFormatterUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
@@ -58,8 +61,11 @@ import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.DataProviderGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.DbSchemaWhitelistGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.DbSchemaXmlGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.DeleteByIdCommandGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.EntityDataMapperGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.EntityListActionGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormDeleteControllerGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormEditControllerGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormGenericButtonBlockGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormLayoutGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormSaveControllerGeneratorHandler;
@@ -88,9 +94,12 @@ import com.magento.idea.magento2plugin.magento.files.ModelFile;
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 import com.magento.idea.magento2plugin.magento.files.ResourceModelFile;
 import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderFile;
+import com.magento.idea.magento2plugin.magento.files.actions.DeleteActionFile;
+import com.magento.idea.magento2plugin.magento.files.actions.EditActionFile;
 import com.magento.idea.magento2plugin.magento.files.actions.IndexActionFile;
 import com.magento.idea.magento2plugin.magento.files.actions.NewActionFile;
 import com.magento.idea.magento2plugin.magento.files.actions.SaveActionFile;
+import com.magento.idea.magento2plugin.magento.files.commands.DeleteEntityByIdCommandFile;
 import com.magento.idea.magento2plugin.magento.files.commands.SaveEntityCommandFile;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.PropertiesTypes;
@@ -272,8 +281,9 @@ public class NewEntityDialog extends AbstractDialog {
         );
 
         entityName.addKeyListener(new KeyAdapter() {
+            @SuppressWarnings("PMD.AccessorMethodGeneration")
             @Override
-            public void keyReleased(KeyEvent e) {
+            public void keyReleased(final KeyEvent event) {
                 entityName.setText(StringUtils.capitalize(entityName.getText()));
             }
         });
@@ -449,8 +459,23 @@ public class NewEntityDialog extends AbstractDialog {
                         dialogData::hasAdminUiComponents
                 )
                 .addNext(
+                        DeleteByIdCommandGeneratorHandler.class,
+                        new DeleteEntityByIdCommandDtoConverter(context, dialogData),
+                        dialogData::hasAdminUiComponents
+                )
+                .addNext(
                         FormSaveControllerGeneratorHandler.class,
                         new FormSaveControllerDtoConverter(context, dialogData),
+                        dialogData::hasAdminUiComponents
+                )
+                .addNext(
+                        FormDeleteControllerGeneratorHandler.class,
+                        new FormDeleteControllerDtoConverter(context, dialogData),
+                        dialogData::hasAdminUiComponents
+                )
+                .addNext(
+                        FormEditControllerGeneratorHandler.class,
+                        new FormEditControllerDtoConverter(context, dialogData),
                         dialogData::hasAdminUiComponents
                 )
                 .addNext(
@@ -478,11 +503,6 @@ public class NewEntityDialog extends AbstractDialog {
                 );
 
         generatorPoolHandler.run();
-
-        generateDeleteEntityByIdCommandFile();
-        generateFormEditControllerFile();
-        generateFormSaveControllerFile();
-        generateFormDeleteControllerFile();
 
         this.setVisible(false);
     }
@@ -539,9 +559,12 @@ public class NewEntityDialog extends AbstractDialog {
                 new IndexActionFile(entityName).getNamespaceBuilder(moduleName),
                 new EntityDataMapperFile(entityName).getNamespaceBuilder(moduleName),
                 SaveEntityCommandFile.getNamespaceBuilder(moduleName, entityName),
+                DeleteEntityByIdCommandFile.getNamespaceBuilder(moduleName, entityName),
                 formViewNamespaceBuilder,
                 NewActionFile.getNamespaceBuilder(moduleName, entityName),
                 SaveActionFile.getNamespaceBuilder(moduleName, entityName),
+                DeleteActionFile.getNamespaceBuilder(moduleName, entityName),
+                new EditActionFile(entityName).getNamespaceBuilder(moduleName),
                 FormGenericButtonBlockFile.getNamespaceBuilder(moduleName),
                 getEntityProperties(),
                 getButtons(),

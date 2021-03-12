@@ -7,7 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.EditEntityActionData;
-import com.magento.idea.magento2plugin.magento.files.actions.EditEntityActionFile;
+import com.magento.idea.magento2plugin.magento.files.actions.EditActionFile;
 
 public class EditEntityActionGeneratorTest extends BaseGeneratorTestCase {
     private static final String MODULE_NAME = "Foo_Bar";
@@ -23,7 +23,7 @@ public class EditEntityActionGeneratorTest extends BaseGeneratorTestCase {
      * Test generation of edit entity controller file.
      */
     public void testGenerateEditEntityActionFile() {
-        final EditEntityActionFile file = new EditEntityActionFile(ENTITY_NAME);
+        final EditActionFile file = new EditActionFile(ENTITY_NAME);
         final EditEntityActionGenerator generator =
                 new EditEntityActionGenerator(
                         new EditEntityActionData(
