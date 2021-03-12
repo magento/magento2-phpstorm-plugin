@@ -66,7 +66,7 @@ class ${CLASS_NAME} extends ${EXTENDS} implements ${IMPLEMENTS}
         try {
                 /** @var ${ENTITY_DTO}|${DATA_OBJECT} $entityModel */
                 $entityModel = $this->entityDataFactory->create();
-                $entityModel->addData($params);
+                $entityModel->addData($params['general']);
                 $this->saveCommand->execute($entityModel);
                 $this->messageManager->addSuccessMessage(
                 __('The ${ENTITY_NAME} data was saved successfully')

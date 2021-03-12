@@ -17,5 +17,6 @@ class TestResourceModel extends AbstractDb
     protected function _construct()
     {
         $this->_init('my_table', 'entity_id');
+        $this->_useIsObjectNew = true;
     }
 }

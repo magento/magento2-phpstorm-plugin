@@ -3,18 +3,17 @@
 namespace Foo\Bar\Command\Book;
 
 use Exception;
-use Foo\Bar\Data\BookData;
 use Foo\Bar\Model\BookModel;
 use Foo\Bar\Model\BookModelFactory;
 use Foo\Bar\Model\ResourceModel\BookResource;
-use Magento\Framework\DataObject;
-use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\CouldNotDeleteException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Psr\Log\LoggerInterface;
 
 /**
- * Save Book Command.
+ * Delete Book by id Command.
  */
-class SaveCommand
+class DeleteByIdCommand
 {
     /**
      * @var LoggerInterface
@@ -48,36 +47,40 @@ class SaveCommand
     }
 
     /**
-     * Save Book.
+     * Delete Book.
      *
-     * @param BookData|DataObject $book
+     * @param int $entityId
      *
-     * @return int
-     * @throws CouldNotSaveException
+     * @return void
+     * @throws CouldNotDeleteException|NoSuchEntityException
      */
-    public function execute(BookData $book): int
+    public function execute(int $entityId)
     {
         try {
             /** @var BookModel $model */
             $model = $this->modelFactory->create();
-            $model->addData($book->getData());
-            $model->setHasDataChanges(true);
+            $this->resource->load($model, $entityId, 'book_id');
 
-            if (!$model->getId()) {
-                $model->isObjectNew(true);
+            if (!$model->getData('book_id')) {
+                throw new NoSuchEntityException(
+                    __('Could not find Book with id: `%id`',
+                        [
+                            'id' => $entityId
+                        ]
+                    )
+                );
             }
-            $this->resource->save($model);
+
+            $this->resource->delete($model);
         } catch (Exception $exception) {
             $this->logger->error(
-                __('Could not save Book. Original message: {message}'),
+                __('Could not delete Book. Original message: {message}'),
                 [
                     'message' => $exception->getMessage(),
                     'exception' => $exception
                 ]
             );
-            throw new CouldNotSaveException(__('Could not save Book.'));
+            throw new CouldNotDeleteException(__('Could not delete Book.'));
         }
-
-        return (int)$model->getEntityId();
     }
 }

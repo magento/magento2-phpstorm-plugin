@@ -9,7 +9,7 @@ use $use;
 #end
 
 /**
- * Save ${ENTITY_NAME} Command.
+ * Delete ${ENTITY_NAME} by id Command.
  */
 class ${CLASS_NAME}
 {
@@ -44,36 +44,40 @@ class ${CLASS_NAME}
     }
 
     /**
-     * Save ${ENTITY_NAME}.
+     * Delete ${ENTITY_NAME}.
      *
-     * @param ${DTO}|${DATA_OBJECT} $${DTO_PROPERTY}
+     * @param int $entityId
      *
-     * @return int
-     * @throws ${COULD_NOT_SAVE}
+     * @return void
+     * @throws ${COULD_NOT_DELETE}|${NO_SUCH_ENTITY_EXCEPTION}
      */
-    public function execute(${DTO} $${DTO_PROPERTY}): int
+    public function execute(int $entityId)
     {
         try {
             /** @var ${MODEL} $model */
             $model = $this->modelFactory->create();
-            $model->addData($${DTO_PROPERTY}->getData());
-            $model->setHasDataChanges(true);
+            $this->resource->load($model, $entityId, '${ENTITY_ID}');
 
-            if (!$model->getId()) {
-                $model->isObjectNew(true);
+            if (!$model->getData('${ENTITY_ID}')) {
+                throw new ${NO_SUCH_ENTITY_EXCEPTION}(
+                    __('Could not find ${ENTITY_NAME} with id: `%id`',
+                        [
+                            'id' => $entityId
+                        ]
+                    )
+                );
             }
-            $this->resource->save($model);
-        } catch (${EXCEPTION} $exception) {
+
+            $this->resource->delete($model);
+        } catch (Exception $exception) {
             $this->logger->error(
-                __('Could not save ${ENTITY_NAME}. Original message: {message}'),
+                __('Could not delete ${ENTITY_NAME}. Original message: {message}'),
                 [
                     'message' => $exception->getMessage(),
                     'exception' => $exception
                 ]
             );
-            throw new ${COULD_NOT_SAVE}(__('Could not save ${ENTITY_NAME}.'));
+            throw new ${COULD_NOT_DELETE}(__('Could not delete ${ENTITY_NAME}.'));
         }
-
-        return (int) $model->getEntityId();
     }
 }

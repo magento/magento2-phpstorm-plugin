@@ -105,6 +105,7 @@ import com.magento.idea.magento2plugin.util.FirstLetterToLowercaseUtil;
 import com.magento.idea.magento2plugin.util.magento.GetAclResourcesListUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -131,6 +132,7 @@ import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({
@@ -221,7 +223,6 @@ public class NewEntityDialog extends AbstractDialog {
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, IDENTIFIER})
     @FieldValidation(rule = RuleRegistry.MENU_IDENTIFIER, message = {MenuIdentifierRule.MESSAGE})
     private JTextField menuIdentifier;
-
     private JLabel formNameLabel;
     private JTextPane exampleIdentifier;
     private JTextPane exampleAclId;
@@ -269,6 +270,13 @@ public class NewEntityDialog extends AbstractDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
+
+        entityName.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                entityName.setText(StringUtils.capitalize(entityName.getText()));
+            }
+        });
 
         entityName.getDocument().addDocumentListener(new DocumentAdapter() {
             @SuppressWarnings("PMD.AccessorMethodGeneration")
@@ -470,6 +478,11 @@ public class NewEntityDialog extends AbstractDialog {
                 );
 
         generatorPoolHandler.run();
+
+        generateDeleteEntityByIdCommandFile();
+        generateFormEditControllerFile();
+        generateFormSaveControllerFile();
+        generateFormDeleteControllerFile();
 
         this.setVisible(false);
     }
