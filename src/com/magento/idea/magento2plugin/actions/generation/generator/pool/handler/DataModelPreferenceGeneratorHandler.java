@@ -44,7 +44,7 @@ public class DataModelPreferenceGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    protected void generate() {
+    public void generate() {
         new PreferenceDiXmlGenerator(
                 (PreferenceDiXmFileData) getDataObjectConverter(),
                 getProject()

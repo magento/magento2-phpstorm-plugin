@@ -44,7 +44,7 @@ public class SaveCommandGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    protected void generate() {
+    public void generate() {
         new SaveEntityCommandGenerator(
                 (SaveEntityCommandData) getDataObjectConverter(),
                 getProject()

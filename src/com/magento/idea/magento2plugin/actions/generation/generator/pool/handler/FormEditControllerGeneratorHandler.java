@@ -44,7 +44,7 @@ public class FormEditControllerGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    protected void generate() {
+    public void generate() {
         new EditEntityActionGenerator(
                 (EditEntityActionData) getDataObjectConverter(),
                 getProject()

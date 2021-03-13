@@ -44,7 +44,7 @@ public class DbSchemaWhitelistGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    protected void generate() {
+    public void generate() {
         new DbSchemaWhitelistJsonGenerator(
                 getProject(),
                 (DbSchemaXmlData) getDataObjectConverter(),

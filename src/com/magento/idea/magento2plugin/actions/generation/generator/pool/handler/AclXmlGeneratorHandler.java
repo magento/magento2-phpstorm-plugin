@@ -44,7 +44,7 @@ public class AclXmlGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    protected void generate() {
+    public void generate() {
         new AclXmlGenerator(
                 (AclXmlData) getDataObjectConverter(),
                 getContextData().getModuleName(),

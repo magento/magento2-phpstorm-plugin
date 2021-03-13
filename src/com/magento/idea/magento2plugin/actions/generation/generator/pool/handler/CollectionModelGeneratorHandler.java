@@ -44,7 +44,7 @@ public class CollectionModelGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    protected void generate() {
+    public void generate() {
         new ModuleCollectionGenerator(
                 (CollectionData) getDataObjectConverter(),
                 getProject()

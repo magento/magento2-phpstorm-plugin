@@ -44,7 +44,7 @@ public class DbSchemaXmlGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    protected void generate() {
+    public void generate() {
         new DbSchemaXmlGenerator(
                 (DbSchemaXmlData) getDataObjectConverter(),
                 getProject(),

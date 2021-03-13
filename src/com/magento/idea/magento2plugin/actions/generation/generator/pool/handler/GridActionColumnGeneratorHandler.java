@@ -44,7 +44,7 @@ public class GridActionColumnGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    protected void generate() {
+    public void generate() {
         new GridActionColumnFileGenerator(
                 (GridActionColumnDtoConverter) getDataObjectConverter(),
                 getProject()

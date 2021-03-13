@@ -44,7 +44,7 @@ public class NewEntityLayoutGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    protected void generate() {
+    public void generate() {
         new NewEntityLayoutGenerator(
                 (NewEntityLayoutData) getDataObjectConverter(),
                 getProject()

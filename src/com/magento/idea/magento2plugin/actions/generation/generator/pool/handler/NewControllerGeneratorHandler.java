@@ -44,7 +44,7 @@ public class NewControllerGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    protected void generate() {
+    public void generate() {
         new NewActionEntityControllerFileGenerator(
                 (NewActionEntityControllerFileData) getDataObjectConverter(),
                 getProject()

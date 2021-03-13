@@ -44,7 +44,7 @@ public class EntityDataMapperGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    protected void generate() {
+    public void generate() {
         new EntityDataMapperGenerator(
                 (EntityDataMapperData) getDataObjectConverter(),
                 getProject()

@@ -44,7 +44,7 @@ public class FormViewControllerGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    protected void generate() {
+    public void generate() {
         new ModuleControllerClassGenerator(
                 (FormViewControllerDtoConverter) getDataObjectConverter(),
                 getProject()

@@ -44,7 +44,7 @@ public class FormLayoutGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    protected void generate() {
+    public void generate() {
         new LayoutXmlGenerator(
                 (LayoutXmlData) getDataObjectConverter(),
                 getProject()

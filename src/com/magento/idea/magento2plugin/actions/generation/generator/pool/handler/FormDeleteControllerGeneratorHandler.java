@@ -44,7 +44,7 @@ public class FormDeleteControllerGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    protected void generate() {
+    public void generate() {
         new DeleteEntityControllerFileGenerator(
                 (DeleteEntityControllerFileData) getDataObjectConverter(),
                 getProject()

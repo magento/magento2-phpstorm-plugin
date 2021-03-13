@@ -44,7 +44,7 @@ public class FormSaveControllerGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    protected void generate() {
+    public void generate() {
         new SaveEntityControllerFileGenerator(
                 (SaveEntityControllerFileData) getDataObjectConverter(),
                 getProject()

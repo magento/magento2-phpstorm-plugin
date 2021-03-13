@@ -44,7 +44,7 @@ public class DataModelInterfaceGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    protected void generate() {
+    public void generate() {
         new DataModelInterfaceGenerator(
                 getProject(),
                 (DataModelInterfaceData) getDataObjectConverter()

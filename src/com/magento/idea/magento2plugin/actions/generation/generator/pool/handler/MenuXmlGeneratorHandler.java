@@ -44,7 +44,7 @@ public class MenuXmlGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    protected void generate() {
+    public void generate() {
         new MenuXmlGenerator(
                 (MenuXmlData) getDataObjectConverter(),
                 getProject()

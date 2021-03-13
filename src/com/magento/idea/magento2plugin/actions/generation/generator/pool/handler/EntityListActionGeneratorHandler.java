@@ -44,7 +44,7 @@ public class EntityListActionGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    protected void generate() {
+    public void generate() {
         new AdminListViewEntityActionGenerator(
                 (AdminListViewEntityActionData) getDataObjectConverter(),
                 getProject()

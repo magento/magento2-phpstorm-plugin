@@ -44,7 +44,7 @@ public class UiComponentGridGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    protected void generate() {
+    public void generate() {
         new UiComponentGridXmlGenerator(
                 (UiComponentGridData) getDataObjectConverter(),
                 getProject()

@@ -44,7 +44,7 @@ public class UiComponentFormLayoutGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    protected void generate() {
+    public void generate() {
         final UiComponentFormFileData data = (UiComponentFormFileData) getDataObjectConverter();
 
         new UiComponentFormGenerator(

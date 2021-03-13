@@ -44,7 +44,7 @@ public class RoutesXmlGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    protected void generate() {
+    public void generate() {
         new RoutesXmlGenerator(
                 (RoutesXmlData) getDataObjectConverter(),
                 getProject()

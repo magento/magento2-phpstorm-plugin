@@ -44,7 +44,7 @@ public class GetListQueryGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    protected void generate() {
+    public void generate() {
         new GetListQueryModelGenerator(
                 (GetListQueryModelData) getDataObjectConverter(),
                 getProject()

@@ -52,7 +52,7 @@ public abstract class GeneratorHandler {
      *
      * @return boolean
      */
-    protected boolean validate() {
+    public boolean validate() {
         if (runnerValidator != null) {
             return runnerValidator.validate();
         }
@@ -62,7 +62,7 @@ public abstract class GeneratorHandler {
     /**
      * Run chain of generators.
      */
-    protected abstract void generate();
+    public abstract void generate();
 
     /**
      * Get project.

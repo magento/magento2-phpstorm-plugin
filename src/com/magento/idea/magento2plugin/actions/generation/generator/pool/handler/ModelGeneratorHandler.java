@@ -44,7 +44,7 @@ public class ModelGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    protected void generate() {
+    public void generate() {
         new ModuleModelGenerator(
                 (ModelData) getDataObjectConverter(),
                 getProject()

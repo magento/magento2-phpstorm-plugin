@@ -44,7 +44,7 @@ public class DataProviderGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    protected void generate() {
+    public void generate() {
         new UiComponentDataProviderGenerator(
                 (UiComponentDataProviderData) getDataObjectConverter(),
                 getContextData().getModuleName(),
