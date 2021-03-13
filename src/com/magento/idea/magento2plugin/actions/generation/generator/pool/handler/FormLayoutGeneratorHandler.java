@@ -25,7 +25,7 @@ public class FormLayoutGeneratorHandler extends GeneratorHandler {
             final @NotNull GenerationContextData contextData,
             final @NotNull DataObjectConverter dataObjectConverter
     ) {
-        this(contextData, dataObjectConverter, null);
+        super(contextData, dataObjectConverter, null);
     }
 
     /**
@@ -44,10 +44,10 @@ public class FormLayoutGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new LayoutXmlGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new LayoutXmlGenerator(
                 (LayoutXmlData) getDataObjectConverter(),
                 getProject()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

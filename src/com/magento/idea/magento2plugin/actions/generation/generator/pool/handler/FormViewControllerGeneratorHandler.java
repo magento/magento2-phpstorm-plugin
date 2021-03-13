@@ -44,10 +44,10 @@ public class FormViewControllerGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new ModuleControllerClassGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new ModuleControllerClassGenerator(
                 (FormViewControllerDtoConverter) getDataObjectConverter(),
                 getProject()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

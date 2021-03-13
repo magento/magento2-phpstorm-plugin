@@ -44,10 +44,10 @@ public class FormGenericButtonBlockGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new FormGenericButtonBlockGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new FormGenericButtonBlockGenerator(
                 (FormGenericButtonBlockData) getDataObjectConverter(),
                 getProject()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

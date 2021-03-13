@@ -44,10 +44,10 @@ public class DataModelPreferenceGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new PreferenceDiXmlGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new PreferenceDiXmlGenerator(
                 (PreferenceDiXmFileData) getDataObjectConverter(),
                 getProject()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

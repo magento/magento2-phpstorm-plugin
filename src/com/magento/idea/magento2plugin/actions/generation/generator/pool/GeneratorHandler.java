@@ -8,7 +8,7 @@ package com.magento.idea.magento2plugin.actions.generation.generator.pool;
 import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.DataObjectConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.GenerationContextData;
-
+import com.magento.idea.magento2plugin.actions.generation.generator.FileGenerator;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class GeneratorHandler {
@@ -16,6 +16,7 @@ public abstract class GeneratorHandler {
     private final GenerationContextData contextData;
     private final DataObjectConverter dataObjectConverter;
     private final GeneratorRunnerValidator runnerValidator;
+    private FileGenerator generator;
 
     /**
      * Generator handler constructor.
@@ -60,9 +61,26 @@ public abstract class GeneratorHandler {
     }
 
     /**
-     * Run chain of generators.
+     * Instantiate and retrieve generator.
+     * Must be separated from generate method to test converter type casting.
      */
-    public abstract void generate();
+    public abstract void instantiateGenerator();
+
+    /**
+     * Set generator.
+     *
+     * @param generator FileGenerator
+     */
+    public void setGenerator(final FileGenerator generator) {
+        this.generator = generator;
+    }
+
+    /**
+     * Run generator.
+     */
+    public final void generate() {
+        generator.generate(getContextData().getActionName(), getContextData().hasOpenFileFlag());
+    }
 
     /**
      * Get project.

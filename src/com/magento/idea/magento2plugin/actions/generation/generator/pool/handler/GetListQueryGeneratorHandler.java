@@ -44,10 +44,10 @@ public class GetListQueryGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new GetListQueryModelGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new GetListQueryModelGenerator(
                 (GetListQueryModelData) getDataObjectConverter(),
                 getProject()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

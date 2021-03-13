@@ -44,10 +44,10 @@ public class SaveCommandGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new SaveEntityCommandGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new SaveEntityCommandGenerator(
                 (SaveEntityCommandData) getDataObjectConverter(),
                 getProject()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

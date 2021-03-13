@@ -44,11 +44,11 @@ public class DataProviderGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new UiComponentDataProviderGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new UiComponentDataProviderGenerator(
                 (UiComponentDataProviderData) getDataObjectConverter(),
                 getContextData().getModuleName(),
                 getProject()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

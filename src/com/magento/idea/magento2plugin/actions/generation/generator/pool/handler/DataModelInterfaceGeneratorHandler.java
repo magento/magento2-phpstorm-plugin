@@ -44,10 +44,10 @@ public class DataModelInterfaceGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new DataModelInterfaceGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new DataModelInterfaceGenerator(
                 getProject(),
                 (DataModelInterfaceData) getDataObjectConverter()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

@@ -20,6 +20,7 @@ public class EntityManagerContextData implements GenerationContextData {
     private final Project project;
     private final String moduleName;
     private final String actionName;
+    private final boolean hasOpenFileFlag;
     private final String indexViewAction;
     private final String editViewAction;
     private final String newViewAction;
@@ -52,6 +53,7 @@ public class EntityManagerContextData implements GenerationContextData {
      * @param project Project
      * @param moduleName String
      * @param actionName String
+     * @param hasOpenFileFlag boolean
      * @param indexViewAction String
      * @param editViewAction String
      * @param newViewAction String
@@ -83,6 +85,7 @@ public class EntityManagerContextData implements GenerationContextData {
             final @NotNull Project project,
             final @NotNull String moduleName,
             final @NotNull String actionName,
+            final boolean hasOpenFileFlag,
             final @NotNull String indexViewAction,
             final @NotNull String editViewAction,
             final @NotNull String newViewAction,
@@ -112,6 +115,7 @@ public class EntityManagerContextData implements GenerationContextData {
         this.project = project;
         this.moduleName = moduleName;
         this.actionName = actionName;
+        this.hasOpenFileFlag = hasOpenFileFlag;
         this.indexViewAction = indexViewAction;
         this.editViewAction = editViewAction;
         this.newViewAction = newViewAction;
@@ -152,6 +156,11 @@ public class EntityManagerContextData implements GenerationContextData {
     @Override
     public String getActionName() {
         return actionName;
+    }
+
+    @Override
+    public boolean hasOpenFileFlag() {
+        return hasOpenFileFlag;
     }
 
     /**

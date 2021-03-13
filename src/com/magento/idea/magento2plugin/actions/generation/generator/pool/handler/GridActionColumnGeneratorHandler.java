@@ -44,10 +44,10 @@ public class GridActionColumnGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new GridActionColumnFileGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new GridActionColumnFileGenerator(
                 (GridActionColumnDtoConverter) getDataObjectConverter(),
                 getProject()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

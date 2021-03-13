@@ -44,10 +44,10 @@ public class DeleteByIdCommandGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new DeleteEntityByIdCommandGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new DeleteEntityByIdCommandGenerator(
                 (DeleteEntityByIdCommandData) getDataObjectConverter(),
                 getProject()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

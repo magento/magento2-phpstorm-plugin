@@ -44,10 +44,10 @@ public class ModelGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new ModuleModelGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new ModuleModelGenerator(
                 (ModelData) getDataObjectConverter(),
                 getProject()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

@@ -44,10 +44,10 @@ public class ResourceModelGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new ModuleResourceModelGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new ModuleResourceModelGenerator(
                 (ResourceModelData) getDataObjectConverter(),
                 getProject()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

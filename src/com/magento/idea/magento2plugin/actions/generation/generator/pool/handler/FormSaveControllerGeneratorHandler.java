@@ -44,10 +44,10 @@ public class FormSaveControllerGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new SaveEntityControllerFileGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new SaveEntityControllerFileGenerator(
                 (SaveEntityControllerFileData) getDataObjectConverter(),
                 getProject()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

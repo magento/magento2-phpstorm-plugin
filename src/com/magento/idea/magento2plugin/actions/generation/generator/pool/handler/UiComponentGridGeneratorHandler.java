@@ -44,10 +44,10 @@ public class UiComponentGridGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new UiComponentGridXmlGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new UiComponentGridXmlGenerator(
                 (UiComponentGridData) getDataObjectConverter(),
                 getProject()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

@@ -44,11 +44,11 @@ public class AclXmlGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new AclXmlGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new AclXmlGenerator(
                 (AclXmlData) getDataObjectConverter(),
                 getContextData().getModuleName(),
                 getProject()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

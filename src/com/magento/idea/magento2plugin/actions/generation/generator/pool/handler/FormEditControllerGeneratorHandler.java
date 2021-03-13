@@ -44,10 +44,10 @@ public class FormEditControllerGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new EditEntityActionGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new EditEntityActionGenerator(
                 (EditEntityActionData) getDataObjectConverter(),
                 getProject()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }
