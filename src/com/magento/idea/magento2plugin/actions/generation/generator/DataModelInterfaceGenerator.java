@@ -17,7 +17,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFro
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.magento.files.DataModelInterface;
+import com.magento.idea.magento2plugin.magento.files.DataModelInterfaceFile;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import java.util.Properties;
@@ -106,14 +106,14 @@ public class DataModelInterfaceGenerator extends FileGenerator {
         final PsiFile interfaceFile;
         final Properties attributes = getAttributes();
 
-        for (final String directory: DataModelInterface.DIRECTORY.split("/")) {
+        for (final String directory: DataModelInterfaceFile.DIRECTORY.split("/")) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(
                     parentDirectory, directory
             );
         }
 
         interfaceFile = fileFromTemplateGenerator.generate(
-                new DataModelInterface(interfaceData.getName()),
+                new DataModelInterfaceFile(interfaceData.getName()),
                 attributes,
                 parentDirectory,
                 actionName

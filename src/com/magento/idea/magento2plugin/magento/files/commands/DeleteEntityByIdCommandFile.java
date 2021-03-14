@@ -9,7 +9,6 @@ import com.intellij.lang.Language;
 import com.jetbrains.php.lang.PhpLanguage;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.magento.files.ModuleFileInterface;
-import com.magento.idea.magento2plugin.magento.packages.Package;
 import org.jetbrains.annotations.NotNull;
 
 public class DeleteEntityByIdCommandFile implements ModuleFileInterface {
@@ -30,13 +29,7 @@ public class DeleteEntityByIdCommandFile implements ModuleFileInterface {
             final @NotNull String moduleName,
             final @NotNull String entityName
     ) {
-        final NamespaceBuilder namespaceBuilder = new NamespaceBuilder(
-                moduleName,
-                DeleteEntityByIdCommandFile.CLASS_NAME,
-                DeleteEntityByIdCommandFile.getDirectory(entityName)
-        );
-
-        return namespaceBuilder.getNamespace();
+        return getNamespaceBuilder(moduleName, entityName).getNamespace();
     }
 
     /**
@@ -51,9 +44,26 @@ public class DeleteEntityByIdCommandFile implements ModuleFileInterface {
             final @NotNull String moduleName,
             final @NotNull String entityName
     ) {
-        return getNamespace(moduleName, entityName)
-                .concat(Package.fqnSeparator)
-                .concat(CLASS_NAME);
+        return getNamespaceBuilder(moduleName, entityName).getClassFqn();
+    }
+
+    /**
+     * Get namespace builder for file.
+     *
+     * @param moduleName String
+     * @param entityName String
+     *
+     * @return String
+     */
+    public static @NotNull NamespaceBuilder getNamespaceBuilder(
+            final @NotNull String moduleName,
+            final @NotNull String entityName
+    ) {
+        return new NamespaceBuilder(
+                moduleName,
+                CLASS_NAME,
+                getDirectory(entityName)
+        );
     }
 
     /**

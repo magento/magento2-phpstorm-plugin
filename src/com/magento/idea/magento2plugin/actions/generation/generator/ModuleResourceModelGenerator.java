@@ -18,7 +18,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClas
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.magento.files.ResourceModelPhp;
+import com.magento.idea.magento2plugin.magento.files.ResourceModelFile;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
@@ -127,7 +127,7 @@ public class ModuleResourceModelGenerator extends FileGenerator {
                 .getModuleDirectoryByModuleName(getModuleName());
         final PsiFile modelFile;
 
-        final String[] resourceModelDirectories = ResourceModelPhp.RESOURCE_MODEL_DIRECTORY.split(
+        final String[] resourceModelDirectories = ResourceModelFile.RESOURCE_MODEL_DIRECTORY.split(
             File.separator
         );
         for (final String directory: resourceModelDirectories) {
@@ -138,7 +138,7 @@ public class ModuleResourceModelGenerator extends FileGenerator {
 
         final Properties attributes = getAttributes();
         modelFile = fileFromTemplateGenerator.generate(
-                new ResourceModelPhp(resourceModelData.getResourceModelName()),
+                new ResourceModelFile(resourceModelData.getResourceModelName()),
                 attributes,
                 parentDirectory,
                 actionName
@@ -163,7 +163,7 @@ public class ModuleResourceModelGenerator extends FileGenerator {
 
         attributes.setProperty(
                 "EXTENDS",
-                PhpClassGeneratorUtil.getNameFromFqn(ResourceModelPhp.ABSTRACT_DB)
+                PhpClassGeneratorUtil.getNameFromFqn(ResourceModelFile.ABSTRACT_DB)
         );
 
         attributes.setProperty("USES", PhpClassGeneratorUtil.formatUses(uses));
@@ -171,7 +171,7 @@ public class ModuleResourceModelGenerator extends FileGenerator {
 
     private List<String> getUses() {
         return new ArrayList<>(Arrays.asList(
-                ResourceModelPhp.ABSTRACT_DB
+                ResourceModelFile.ABSTRACT_DB
         ));
     }
 }

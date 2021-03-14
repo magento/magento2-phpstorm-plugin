@@ -1,6 +1,6 @@
 <?php
 
-namespace Foo\Bar\UI\Component\Listing\Column;
+namespace Foo\Bar\Ui\Component\Listing\Column;
 
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\UiComponentFactory;

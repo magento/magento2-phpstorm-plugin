@@ -19,6 +19,8 @@ public class UiComponentFormFileData {
     private final String submitControllerName;
     private final String submitActionName;
     private final String dataProviderFqn;
+    private final String entityName;
+    private final String entityId;
 
     /**
      * UI Form data file constructor.
@@ -48,6 +50,55 @@ public class UiComponentFormFileData {
             final String submitActionName,
             final String dataProviderFqn
     ) {
+        this(
+                formName,
+                formArea,
+                moduleName,
+                label,
+                buttons,
+                fieldsets,
+                fields,
+                route,
+                submitControllerName,
+                submitActionName,
+                dataProviderFqn,
+                "Entity",
+                "entity_id"
+        );
+    }
+
+    /**
+     * UI Form data file constructor.
+     *
+     * @param formName String
+     * @param formArea String
+     * @param moduleName String
+     * @param buttons List[UiComponentFormButtonData]
+     * @param fieldsets List[UiComponentFormFieldsetData]
+     * @param fields List[UiComponentFormFieldData]
+     * @param route String
+     * @param submitControllerName String
+     * @param submitActionName String
+     * @param dataProviderFqn String
+     * @param entityName String
+     * @param entityId String
+     */
+    @SuppressWarnings({"PMD.ExcessiveParameterList"})
+    public UiComponentFormFileData(
+            final String formName,
+            final String formArea,
+            final String moduleName,
+            final String label,
+            final List<UiComponentFormButtonData> buttons,
+            final List<UiComponentFormFieldsetData> fieldsets,
+            final List<UiComponentFormFieldData> fields,
+            final String route,
+            final String submitControllerName,
+            final String submitActionName,
+            final String dataProviderFqn,
+            final String entityName,
+            final String entityId
+    ) {
         this.formName = formName;
         this.formArea = formArea;
         this.moduleName = moduleName;
@@ -59,6 +110,8 @@ public class UiComponentFormFileData {
         this.submitControllerName = submitControllerName;
         this.submitActionName = submitActionName;
         this.dataProviderFqn = dataProviderFqn;
+        this.entityName = entityName;
+        this.entityId = entityId;
     }
 
     /**
@@ -158,5 +211,23 @@ public class UiComponentFormFileData {
      */
     public String getDataProviderFqn() {
         return dataProviderFqn;
+    }
+
+    /**
+     * Get entity name.
+     *
+     * @return String
+     */
+    public String getEntityName() {
+        return entityName;
+    }
+
+    /**
+     * Get entity id.
+     *
+     * @return String
+     */
+    public String getEntityId() {
+        return entityId;
     }
 }

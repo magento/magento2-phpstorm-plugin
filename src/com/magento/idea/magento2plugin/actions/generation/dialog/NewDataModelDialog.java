@@ -5,7 +5,6 @@
 
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
-import com.google.common.base.CaseFormat;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBoxTableRenderer;
 import com.intellij.psi.PsiDirectory;
@@ -14,7 +13,7 @@ import com.magento.idea.magento2plugin.actions.generation.OverrideClassByAPrefer
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelInterfaceData;
 import com.magento.idea.magento2plugin.actions.generation.data.PreferenceDiXmFileData;
-import com.magento.idea.magento2plugin.actions.generation.data.code.ClassPropertyData;
+import com.magento.idea.magento2plugin.actions.generation.dialog.util.ClassPropertyFormatterUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
@@ -25,8 +24,8 @@ import com.magento.idea.magento2plugin.actions.generation.generator.PreferenceDi
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
-import com.magento.idea.magento2plugin.magento.files.DataModel;
-import com.magento.idea.magento2plugin.magento.files.DataModelInterface;
+import com.magento.idea.magento2plugin.magento.files.DataModelFile;
+import com.magento.idea.magento2plugin.magento.files.DataModelInterfaceFile;
 import com.magento.idea.magento2plugin.magento.packages.PropertiesTypes;
 import com.magento.idea.magento2plugin.ui.table.ComboBoxEditor;
 import com.magento.idea.magento2plugin.ui.table.DeleteRowButton;
@@ -50,7 +49,6 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
-import org.apache.commons.lang.StringUtils;
 
 @SuppressWarnings({
         "PMD.ExcessiveImports",
@@ -198,7 +196,7 @@ public class NewDataModelDialog extends AbstractDialog {
                 getInterfaceName(),
                 getModuleName(),
                 getInterfaceFQN(),
-                getProperties()
+                ClassPropertyFormatterUtil.joinProperties(properties)
         )).generate(NewDataModelAction.ACTION_NAME, true);
     }
 
@@ -209,7 +207,7 @@ public class NewDataModelDialog extends AbstractDialog {
                 getModuleName(),
                 getModelFQN(),
                 getInterfaceFQN(),
-                getProperties(),
+                ClassPropertyFormatterUtil.joinProperties(properties),
                 isInterfaceShouldBeCreated()
         )).generate(NewDataModelAction.ACTION_NAME, true);
     }
@@ -217,7 +215,7 @@ public class NewDataModelDialog extends AbstractDialog {
     private void generatePreference() {
         new PreferenceDiXmlGenerator(new PreferenceDiXmFileData(
                 getModuleName(),
-                GetPhpClassByFQN.getInstance(project).execute(getInterfaceFQN()),
+                getInterfaceFQN(),
                 getModelFQN(),
                 getModelNamespace(),
                 "base"
@@ -226,10 +224,10 @@ public class NewDataModelDialog extends AbstractDialog {
 
     private void buildNamespaces() {
         interfaceNamespace = new NamespaceBuilder(
-                getModuleName(), getInterfaceName(), DataModelInterface.DIRECTORY
+                getModuleName(), getInterfaceName(), DataModelInterfaceFile.DIRECTORY
         );
         modelNamespace = new NamespaceBuilder(
-                getModuleName(), getModelName(), DataModel.DIRECTORY
+                getModuleName(), getModelName(), DataModelFile.DIRECTORY
         );
     }
 
@@ -237,22 +235,7 @@ public class NewDataModelDialog extends AbstractDialog {
      * Formats properties into an array of ClassPropertyData objects.
      */
     private void formatProperties() {
-        final DefaultTableModel propertiesTable = getPropertiesTable();
-        final int rowCount = propertiesTable.getRowCount();
-        String name;
-        String type;
-
-        for (int index = 0; index < rowCount; index++) {
-            name = propertiesTable.getValueAt(index, 0).toString();
-            type = propertiesTable.getValueAt(index, 1).toString();
-            properties.add(new ClassPropertyData(// NOPMD
-                    type,
-                    CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name),
-                    CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name),
-                    name,
-                    CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_UNDERSCORE, name)
-            ).string());
-        }
+        properties.addAll(ClassPropertyFormatterUtil.formatProperties(getPropertiesTable()));
     }
 
     private boolean isInterfaceShouldBeCreated() {
@@ -285,14 +268,6 @@ public class NewDataModelDialog extends AbstractDialog {
 
     private String getModelFQN() {
         return modelNamespace.getClassFqn();
-    }
-
-    /**
-     * Gets properties as a string, ready for templating.
-     * "UPPER_SNAKE;lower_snake;type;UpperCamel;lowerCamel".
-     */
-    private String getProperties() {
-        return StringUtils.join(properties, ",");
     }
 
     private void initPropertiesTable() {

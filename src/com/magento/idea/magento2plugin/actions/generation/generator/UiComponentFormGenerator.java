@@ -28,8 +28,6 @@ public class UiComponentFormGenerator extends FileGenerator {
 
     private final UiComponentFormFileData uiFormFileData;
     private final Project project;
-    private final String entityName;
-    private final String entityIdField;
 
     /**
      * Ui Component form generator constructor.
@@ -41,28 +39,9 @@ public class UiComponentFormGenerator extends FileGenerator {
             final @NotNull UiComponentFormFileData uiFormFileData,
             final Project project
     ) {
-        this(uiFormFileData, project, "Entity", "entity_id");
-    }
-
-    /**
-     * Ui Component form generator constructor.
-     *
-     * @param uiFormFileData UiFormFileData
-     * @param project Project
-     * @param entityName String
-     * @param entityIdField String
-     */
-    public UiComponentFormGenerator(
-            final @NotNull UiComponentFormFileData uiFormFileData,
-            final Project project,
-            final @NotNull String entityName,
-            final @NotNull String entityIdField
-    ) {
         super(project);
         this.uiFormFileData = uiFormFileData;
         this.project = project;
-        this.entityName = entityName;
-        this.entityIdField = entityIdField;
     }
 
     /**
@@ -93,8 +72,8 @@ public class UiComponentFormGenerator extends FileGenerator {
             new UiComponentFormButtonBlockGenerator(
                     buttonData,
                     project,
-                    entityName,
-                    entityIdField
+                    uiFormFileData.getEntityName(),
+                    uiFormFileData.getEntityId()
             ).generate(actionName);
         }
     }

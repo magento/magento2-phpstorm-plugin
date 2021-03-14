@@ -31,6 +31,23 @@ public class EntityDataMapperFile implements ModuleFileInterface {
     }
 
     /**
+     * Get namespace builder.
+     *
+     * @param moduleName String
+     *
+     * @return String
+     */
+    public @NotNull NamespaceBuilder getNamespaceBuilder(
+            final @NotNull String moduleName
+    ) {
+        return new NamespaceBuilder(
+                moduleName,
+                className,
+                DIRECTORY
+        );
+    }
+
+    /**
      * Get namespace.
      *
      * @param moduleName String

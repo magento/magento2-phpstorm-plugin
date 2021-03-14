@@ -4,21 +4,30 @@
  */
 package com.magento.idea.magento2plugin.actions.generation.data;
 
-import com.jetbrains.php.lang.psi.elements.PhpClass;
+import org.jetbrains.annotations.NotNull;
 
 public class PreferenceDiXmFileData {
-    private String preferenceModule;
-    private PhpClass targetClass;
-    private String preferenceFqn;
-    private String namespace;
-    private String area;
+    private final String preferenceModule;
+    private final String targetClass;
+    private final String preferenceFqn;
+    private final String namespace;
+    private final String area;
 
+    /**
+     * Preference DI XML file data.
+     *
+     * @param preferenceModule String
+     * @param targetClass String
+     * @param preferenceFqn String
+     * @param namespace String
+     * @param area String
+     */
     public PreferenceDiXmFileData(
-            String preferenceModule,
-            PhpClass targetClass,
-            String preferenceFqn,
-            String namespace,
-            String area
+            final @NotNull String preferenceModule,
+            final @NotNull String targetClass,
+            final @NotNull String preferenceFqn,
+            final @NotNull String namespace,
+            final @NotNull String area
     ) {
         this.preferenceModule = preferenceModule;
         this.targetClass = targetClass;
@@ -27,22 +36,47 @@ public class PreferenceDiXmFileData {
         this.area = area;
     }
 
+    /**
+     * Get preference module.
+     *
+     * @return String
+     */
     public String getPreferenceModule() {
         return preferenceModule;
     }
 
-    public PhpClass getTargetClass() {
+    /**
+     * Get target class.
+     *
+     * @return String
+     */
+    public String getTargetClass() {
         return targetClass;
     }
 
+    /**
+     * Get preference FQN.
+     *
+     * @return String
+     */
     public String getPreferenceFqn() {
         return preferenceFqn;
     }
 
+    /**
+     * Get namespace.
+     *
+     * @return String
+     */
     public String getNamespace() {
         return namespace;
     }
 
+    /**
+     * Get area.
+     *
+     * @return String
+     */
     public String getArea() {
         return area;
     }

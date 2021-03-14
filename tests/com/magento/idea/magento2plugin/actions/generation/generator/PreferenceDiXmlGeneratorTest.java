@@ -7,13 +7,11 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.PreferenceDiXmFileData;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
-import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 
 public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
     private static final String MODULE = "Foo_Bar";
@@ -104,10 +102,9 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
             final String area
     ) {
         final Project project = myFixture.getProject();
-        final PhpClass targetClass = GetPhpClassByFQN.getInstance(project).execute(targetClassFnq);
         final PreferenceDiXmFileData preferenceDiXmlFileData = new PreferenceDiXmFileData(
                 MODULE,
-                targetClass,
+                targetClassFnq,
                 preferenceFqn,
                 NAMESPACE,
                 area
