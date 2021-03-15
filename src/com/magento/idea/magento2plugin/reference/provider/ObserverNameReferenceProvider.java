@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
-public class ObserverNameReferenceProvider extends @NotNull PsiReferenceProvider {
+public class ObserverNameReferenceProvider extends PsiReferenceProvider {
     @Override
     public PsiReference @NotNull [] getReferencesByElement(
             @NotNull final PsiElement element,
