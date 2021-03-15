@@ -30,7 +30,7 @@ public class ObserverNameReferenceProvider extends PsiReferenceProvider {
 
         final String observerName = ((XmlAttributeValueImpl) element).getValue();
         final Collection<PsiElement> observers
-                = EventIndex.getInstance(element.getProject()).getObservers(
+                = new EventIndex(element.getProject()).getObservers(
                         eventName, observerName, GlobalSearchScope.allScope(element.getProject())
                 );
 

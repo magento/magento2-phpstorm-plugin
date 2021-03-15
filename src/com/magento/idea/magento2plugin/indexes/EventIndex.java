@@ -21,19 +21,13 @@ import java.util.Collection;
 
 public class EventIndex {
 
-    private static EventIndex INSTANCE; //NOPMD
-    private Project project;
+    private final Project project;
 
     /**
      * Gets singleton instance.
      */
-    public static EventIndex getInstance(final Project project) {
-        if (null == INSTANCE) { //NOPMD
-            INSTANCE = new EventIndex();
-        }
-        INSTANCE.project = project;
-
-        return INSTANCE;
+    public EventIndex(final Project project) {
+        this.project = project;
     }
 
     /**

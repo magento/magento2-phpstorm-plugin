@@ -44,6 +44,7 @@ public class ObserverDeclarationInspection extends PhpInspection {
 
     @NotNull
     @Override
+    @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
     public PsiElementVisitor buildVisitor(
             final @NotNull ProblemsHolder problemsHolder,
             final boolean isOnTheFly
@@ -66,12 +67,12 @@ public class ObserverDeclarationInspection extends PhpInspection {
                     return;
                 }
 
-                final EventIndex eventIndex = EventIndex.getInstance(file.getProject());
+                final EventIndex eventIndex = new EventIndex(file.getProject());
                 final HashMap<String, XmlTag> targetObserversHash = new HashMap<>();
 
                 for (final XmlTag eventXmlTag: xmlTags) {
                     final HashMap<String, XmlTag> eventProblems = new HashMap<>();
-                    if (!eventXmlTag.getName().equals("event")) {
+                    if (!eventXmlTag.getName().equals(ModuleEventsXml.EVENT_TAG)) {
                         continue;
                     }
 
@@ -236,7 +237,7 @@ public class ObserverDeclarationInspection extends PhpInspection {
                 }
 
                 for (final XmlTag observerXmlTag: observerXmlTags) {
-                    if (!observerXmlTag.getName().equals("observer")) {
+                    if (!observerXmlTag.getName().equals(ModuleEventsXml.OBSERVER_TAG)) {
                         continue;
                     }
 
@@ -257,10 +258,11 @@ public class ObserverDeclarationInspection extends PhpInspection {
                     return;
                 }
 
-                if (!moduleDeclarationTag.getName().equals("module")) {
+                if (!moduleDeclarationTag.getName().equals(ModuleEventsXml.MODULE_TAG)) {
                     return;
                 }
-                final XmlAttribute moduleNameAttribute = moduleDeclarationTag.getAttribute("name");
+                final XmlAttribute moduleNameAttribute
+                        = moduleDeclarationTag.getAttribute(ModuleEventsXml.NAME_ATTRIBUTE);
                 if (moduleNameAttribute == null) {
                     return;
                 }
