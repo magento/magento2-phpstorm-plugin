@@ -153,6 +153,16 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
             new EventNameReferenceProvider()
         );
 
+        // <observer name="reference" />
+        registrar.registerReferenceProvider(
+                XmlPatterns.xmlAttributeValue().withParent(
+                        XmlPatterns.xmlAttribute().withName("name").withParent(
+                                XmlPatterns.xmlTag().withName("observer")
+                        )
+                ),
+                new ObserverNameReferenceProvider()
+        );
+
         // <someXmlTag someAttribute="Module_Name[.*]" />
         registrar.registerReferenceProvider(
             XmlPatterns.xmlAttributeValue().withValue(string().matches(".*[A-Z][a-zA-Z0-9]+_[A-Z][a-zA-Z0-9]+.*")),

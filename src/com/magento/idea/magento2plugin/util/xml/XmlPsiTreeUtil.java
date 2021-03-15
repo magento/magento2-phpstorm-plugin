@@ -29,6 +29,10 @@ import org.jetbrains.annotations.Nullable;
         "PMD.UseObjectForClearerAPI"
 })
 public class XmlPsiTreeUtil {
+    public static final String EVENT_TAG_NAME = "event";
+    public static final String OBSERVER_TAG_NAME = "observer";
+    public static final String NAME_ATTRIBUTE = "name";
+
     /**
      * Get type tag of an argument.
      *
@@ -45,6 +49,52 @@ public class XmlPsiTreeUtil {
         final XmlTag argumentsTag = PsiTreeUtil.getParentOfType(argumentTag, XmlTag.class);
 
         return PsiTreeUtil.getParentOfType(argumentsTag, XmlTag.class);
+    }
+
+    /**
+     * Finds observer tags by event-observer name combination.
+     */
+    @SuppressWarnings({
+            "PMD.CyclomaticComplexity"
+    })
+    public static Collection<XmlAttributeValue> findObserverTags(
+            final XmlFile xmlFile,
+            final String eventName,
+            final String observerName
+    ) {
+        Collection<XmlAttributeValue> psiElements = new THashSet<>();
+        final XmlTag configTag = xmlFile.getRootTag();
+
+        if (configTag == null) {
+            return psiElements;
+        }
+
+        /* Loop through event tags */
+        for (XmlTag eventTag: configTag.getSubTags()) {
+            XmlAttribute eventNameAttribute = eventTag.getAttribute(NAME_ATTRIBUTE);
+
+            /* Check if event tag and name matches */
+            if (EVENT_TAG_NAME.equals(eventTag.getName())
+                    && eventNameAttribute != null
+                    && eventName.equals(eventNameAttribute.getValue())
+            ) {
+                /* Loop through observer tags under matched event tag */
+                for (XmlTag observerTag: eventTag.getSubTags()) {
+                    XmlAttribute observerNameAttribute = observerTag.getAttribute(NAME_ATTRIBUTE);
+
+                    /* Check if observer tag and name matches */
+                    if (OBSERVER_TAG_NAME.equals(observerTag.getName())
+                            && observerNameAttribute != null
+                            && observerNameAttribute.getValueElement() != null
+                            && observerName.equals(observerNameAttribute.getValue())
+                    ) {
+                        psiElements.add(observerNameAttribute.getValueElement());
+                    }
+                }
+            }
+        }
+
+        return psiElements;
     }
 
     /**
