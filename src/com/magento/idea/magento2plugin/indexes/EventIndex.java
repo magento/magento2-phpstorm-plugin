@@ -24,7 +24,7 @@ public class EventIndex {
     private final Project project;
 
     /**
-     * Gets singleton instance.
+     * Constructor.
      */
     public EventIndex(final Project project) {
         this.project = project;

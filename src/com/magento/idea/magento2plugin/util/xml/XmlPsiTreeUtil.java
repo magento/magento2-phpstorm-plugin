@@ -54,6 +54,9 @@ public class XmlPsiTreeUtil {
     /**
      * Finds observer tags by event-observer name combination.
      */
+    @SuppressWarnings({
+            "PMD.CyclomaticComplexity"
+    })
     public static Collection<XmlAttributeValue> findObserverTags(
             final XmlFile xmlFile,
             final String eventName,
