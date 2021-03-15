@@ -13,7 +13,7 @@ import com.magento.idea.magento2plugin.actions.generation.NewEntityAction;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormButtonData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldsetData;
-import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityManagerContextData;
+import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityCreatorContextData;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.NewEntityDialogData;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.util.ClassPropertyFormatterUtil;
@@ -57,6 +57,7 @@ import com.magento.idea.magento2plugin.util.CamelCaseToSnakeCase;
 import com.magento.idea.magento2plugin.util.FirstLetterToLowercaseUtil;
 import com.magento.idea.magento2plugin.util.magento.GetAclResourcesListUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -304,7 +305,7 @@ public class NewEntityDialog extends AbstractDialog {
         formatProperties();
 
         final NewEntityDialogData dialogData = getNewEntityDialogData();
-        final EntityManagerContextData context = getEntityManagerContextData(dialogData);
+        final EntityCreatorContextData context = getEntityCreatorContextData(dialogData);
 
         final GeneratorPoolHandler generatorPoolHandler = new GeneratorPoolHandler(context);
 
@@ -320,13 +321,13 @@ public class NewEntityDialog extends AbstractDialog {
     }
 
     /**
-     * Get entity manager context data.
+     * Get entity creator context data.
      *
      * @param dialogData NewEntityDialogData
      *
-     * @return EntityManagerContextData
+     * @return EntityCreatorContextData
      */
-    private EntityManagerContextData getEntityManagerContextData(
+    private EntityCreatorContextData getEntityCreatorContextData(
             final @NotNull NewEntityDialogData dialogData
     ) {
         final String entityName = dialogData.getEntityName();
@@ -351,7 +352,7 @@ public class NewEntityDialog extends AbstractDialog {
                         ControllerBackendPhp.DEFAULT_DIR + File.separator + entityName
                 );
 
-        return new EntityManagerContextData(
+        return new EntityCreatorContextData(
                 project,
                 moduleName,
                 ACTION_NAME,
@@ -402,7 +403,7 @@ public class NewEntityDialog extends AbstractDialog {
      *
      * @return String
      */
-    public String getFormName() {
+    private String getFormName() {
         return formName.getText().trim();
     }
 
@@ -411,7 +412,7 @@ public class NewEntityDialog extends AbstractDialog {
      *
      * @return List[UiComponentFormFieldsetData]
      */
-    public List<UiComponentFormFieldsetData> getFieldSets() {
+    private List<UiComponentFormFieldsetData> getFieldSets() {
         final ArrayList<UiComponentFormFieldsetData> fieldSets = new ArrayList<>();
         final UiComponentFormFieldsetData fieldsetData = new UiComponentFormFieldsetData(
                 "general",
@@ -428,7 +429,7 @@ public class NewEntityDialog extends AbstractDialog {
      *
      * @return List[UiComponentFormButtonData]
      */
-    protected List<UiComponentFormButtonData> getButtons() {
+    private List<UiComponentFormButtonData> getButtons() {
         final List<UiComponentFormButtonData> buttons = new ArrayList<>();
         final String directory = "Block/Form";
 
@@ -490,7 +491,7 @@ public class NewEntityDialog extends AbstractDialog {
      *
      * @return List[UiComponentFormFieldData]
      */
-    public List<UiComponentFormFieldData> getFields() {
+    private List<UiComponentFormFieldData> getFields() {
         final DefaultTableModel model = getPropertiesTable();
         final ArrayList<UiComponentFormFieldData> fieldsets = new ArrayList<>();
 

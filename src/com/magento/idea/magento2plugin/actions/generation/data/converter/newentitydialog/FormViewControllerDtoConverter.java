@@ -7,7 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.data.converter.newent
 
 import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.DataObjectConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityManagerContextData;
+import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityCreatorContextData;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.NewEntityDialogData;
 import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
@@ -23,11 +23,11 @@ public class FormViewControllerDtoConverter extends ControllerFileData
     /**
      * Form view controller converter.
      *
-     * @param generationContextData EntityManagerContextData
+     * @param generationContextData EntityCreatorContextData
      * @param newEntityDialogData NewEntityDialogData
      */
     public FormViewControllerDtoConverter(
-            final @NotNull EntityManagerContextData generationContextData,
+            final @NotNull EntityCreatorContextData generationContextData,
             final @NotNull NewEntityDialogData newEntityDialogData
     ) {
         super(

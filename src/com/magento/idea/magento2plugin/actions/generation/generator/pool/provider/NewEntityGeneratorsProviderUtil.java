@@ -33,7 +33,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.converter.newenti
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.SaveEntityCommandDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.UiComponentFormLayoutDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.UiComponentGridDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityManagerContextData;
+import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityCreatorContextData;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.NewEntityDialogData;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.GeneratorPoolHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.AclXmlGeneratorHandler;
@@ -79,13 +79,13 @@ public final class NewEntityGeneratorsProviderUtil {
      * Generators initializing excluded from dialog to better test coverage.
      *
      * @param generatorPoolHandler GeneratorPoolHandler
-     * @param context EntityManagerContextData
+     * @param context EntityCreatorContextData
      * @param dialogData NewEntityDialogData
      */
     @SuppressWarnings("PMD.ExcessiveMethodLength")
     public static void initializeGenerators(
             final @NotNull GeneratorPoolHandler generatorPoolHandler,
-            final @NotNull EntityManagerContextData context,
+            final @NotNull EntityCreatorContextData context,
             final @NotNull NewEntityDialogData dialogData
     ) {
         generatorPoolHandler

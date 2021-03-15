@@ -7,7 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.data.converter.newent
 
 import com.magento.idea.magento2plugin.actions.generation.data.CollectionData;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.DataObjectConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityManagerContextData;
+import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityCreatorContextData;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.NewEntityDialogData;
 import com.magento.idea.magento2plugin.magento.files.ResourceModelFile;
 import com.magento.idea.magento2plugin.magento.packages.File;
@@ -18,11 +18,11 @@ public class CollectionModelDtoConverter extends CollectionData implements DataO
     /**
      * Collection model DTO converter.
      *
-     * @param generationContextData EntityManagerContextData
+     * @param generationContextData EntityCreatorContextData
      * @param newEntityDialogData NewEntityDialogData
      */
     public CollectionModelDtoConverter(
-            final @NotNull EntityManagerContextData generationContextData,
+            final @NotNull EntityCreatorContextData generationContextData,
             final @NotNull NewEntityDialogData newEntityDialogData
     ) {
         super(

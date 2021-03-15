@@ -7,7 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.data.converter.newent
 
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFileData;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.DataObjectConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityManagerContextData;
+import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityCreatorContextData;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.NewEntityDialogData;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +18,7 @@ public class UiComponentFormLayoutDtoConverter extends UiComponentFormFileData
     private final static String SUBMIT_ACTION_NAME = "Save";
 
     public UiComponentFormLayoutDtoConverter(
-            final @NotNull EntityManagerContextData generationContextData,
+            final @NotNull EntityCreatorContextData generationContextData,
             final @NotNull NewEntityDialogData newEntityDialogData
     ) {
         super(

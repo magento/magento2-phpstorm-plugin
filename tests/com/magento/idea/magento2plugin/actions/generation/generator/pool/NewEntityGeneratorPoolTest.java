@@ -5,7 +5,7 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator.pool;
 
-import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityManagerContextData;
+import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityCreatorContextData;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.NewEntityDialogData;
 import com.magento.idea.magento2plugin.actions.generation.generator.BaseGeneratorTestCase;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.provider.NewEntityGeneratorsProviderUtil;
@@ -26,7 +26,7 @@ public class NewEntityGeneratorPoolTest extends BaseGeneratorTestCase {
      */
     public void testGeneratorsInPoolInstantiating() {
         final NewEntityDialogData dialogData = getMockNewEntityDialogData();
-        final EntityManagerContextData contextData = getMockContext();
+        final EntityCreatorContextData contextData = getMockContext();
         final GeneratorPoolHandler generatorPoolHandler = new GeneratorPoolHandler(contextData);
 
         NewEntityGeneratorsProviderUtil.initializeGenerators(
@@ -46,7 +46,7 @@ public class NewEntityGeneratorPoolTest extends BaseGeneratorTestCase {
      */
     public void testGeneratorsInPoolOnCorrectDtoConverterTypes() {
         final NewEntityDialogData dialogData = getMockNewEntityDialogData();
-        final EntityManagerContextData contextData = getMockContext();
+        final EntityCreatorContextData contextData = getMockContext();
         final GeneratorPoolHandler generatorPoolHandler = new GeneratorPoolHandler(contextData);
 
         NewEntityGeneratorsProviderUtil.initializeGenerators(
@@ -99,18 +99,18 @@ public class NewEntityGeneratorPoolTest extends BaseGeneratorTestCase {
     }
 
     /**
-     * Get mocked entity manager context data.
+     * Get mocked entity creator context data.
      *
-     * @return EntityManagerContextData
+     * @return EntityCreatorContextData
      */
-    private EntityManagerContextData getMockContext() {
+    private EntityCreatorContextData getMockContext() {
         final NamespaceBuilder mockNamespace = new NamespaceBuilder(
                 MODULE_NAME,
                 "MockClass",
                 "Mock/Directory"
         );
 
-        return new EntityManagerContextData(
+        return new EntityCreatorContextData(
                 this.myFixture.getProject(),
                 MODULE_NAME,
                 ACTION_NAME,

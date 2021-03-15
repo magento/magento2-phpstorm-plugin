@@ -15,7 +15,7 @@ import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("PMD.TooManyFields")
-public class EntityManagerContextData implements GenerationContextData {
+public class EntityCreatorContextData implements GenerationContextData {
 
     private final Project project;
     private final String moduleName;
@@ -48,7 +48,7 @@ public class EntityManagerContextData implements GenerationContextData {
     private final List<UiComponentFormFieldData> fieldsData;
 
     /**
-     * Entity manager context data.
+     * Entity creator context data.
      *
      * @param project Project
      * @param moduleName String
@@ -81,7 +81,7 @@ public class EntityManagerContextData implements GenerationContextData {
      * @param fieldsData List
      */
     @SuppressWarnings("PMD.ExcessiveParameterList")
-    public EntityManagerContextData(
+    public EntityCreatorContextData(
             final @NotNull Project project,
             final @NotNull String moduleName,
             final @NotNull String actionName,

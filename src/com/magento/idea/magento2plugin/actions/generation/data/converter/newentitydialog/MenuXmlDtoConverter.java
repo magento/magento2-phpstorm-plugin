@@ -7,7 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.data.converter.newent
 
 import com.magento.idea.magento2plugin.actions.generation.data.MenuXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.DataObjectConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityManagerContextData;
+import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityCreatorContextData;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.NewEntityDialogData;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,11 +16,11 @@ public class MenuXmlDtoConverter extends MenuXmlData implements DataObjectConver
     /**
      * Menu XML DTO converter.
      *
-     * @param generationContextData EntityManagerContextData
+     * @param generationContextData EntityCreatorContextData
      * @param newEntityDialogData NewEntityDialogData
      */
     public MenuXmlDtoConverter(
-            final @NotNull EntityManagerContextData generationContextData,
+            final @NotNull EntityCreatorContextData generationContextData,
             final @NotNull NewEntityDialogData newEntityDialogData
     ) {
         super(
