@@ -163,18 +163,15 @@ public final class GeneratorPoolHandler {
 
     /**
      * Show error messages for the user.
-     * Those errors are system and must be processed by the dev during the testing.
-     * They cannot go to live.
      */
     private void showErrorMessages() {
         if (!errors.isEmpty()) {
             final String title = this.exceptionBundle.message(
-                    "exception.common.checkLogg"
+                    "exception.common.title"
             );
-            final AtomicInteger messageNum = new AtomicInteger(1);
-            final String errorMessage = errors.stream()
-                    .map(message -> messageNum.getAndIncrement() + ". " + message)
-                    .collect(Collectors.joining("\n"));
+            final String errorMessage = this.exceptionBundle.message(
+                    "exception.common.informUs"
+            );
 
             JOptionPane.showMessageDialog(
                     null,
