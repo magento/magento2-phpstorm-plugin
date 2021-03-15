@@ -19,6 +19,15 @@ public class ObserverReferenceRegistrarTest extends ReferenceXmlFixtureTestCase 
     }
 
     /**
+     * Tests for observer instance with snake case reference in events.xml.
+     */
+    public void testObserverInstanceDirectorySnakeCaseMustHaveReference() {
+        myFixture.configureByFile(this.getFixturePath(ModuleEventsXml.FILE_NAME));
+
+        assertHasReferencePhpClass("Magento\\Catalog\\test_event\\TestObserver");
+    }
+
+    /**
      * Tests for observer name reference in events.xml.
      */
     public void testObserverNameMustHaveReference() {

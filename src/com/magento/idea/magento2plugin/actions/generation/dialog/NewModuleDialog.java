@@ -213,6 +213,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
                 getModuleName(),
                 getSetupVersion(),
                 getBaseDir(),
+                getModuleDependencies(),
                 true
         ), project).generate(NewModuleAction.actionName, true);
     }
