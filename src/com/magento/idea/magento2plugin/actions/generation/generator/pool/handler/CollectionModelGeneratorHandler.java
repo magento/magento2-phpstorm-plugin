@@ -44,10 +44,10 @@ public class CollectionModelGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new ModuleCollectionGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new ModuleCollectionGenerator(
                 (CollectionData) getDataObjectConverter(),
                 getProject()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

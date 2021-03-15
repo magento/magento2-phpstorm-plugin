@@ -32,4 +32,11 @@ public interface GenerationContextData {
      * @return String
      */
     String getActionName();
+
+    /**
+     * Check if files should be opened after generation.
+     *
+     * @return boolean
+     */
+    boolean hasOpenFileFlag();
 }

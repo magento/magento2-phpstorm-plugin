@@ -13,35 +13,7 @@ import com.magento.idea.magento2plugin.actions.generation.NewEntityAction;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormButtonData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldsetData;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.AclXmlDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.CollectionModelDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.DataModelDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.DataModelInterfaceDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.DataProviderDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.DbSchemaXmlDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.DeleteEntityByIdCommandDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.EntityDataMapperDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.EntityListActionDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.FormDeleteControllerDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.FormEditControllerDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.FormGenericButtonBlockDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.FormLayoutDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.FormSaveControllerDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.FormViewControllerDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.GetListQueryDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.GridActionColumnDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.GridLayoutXmlDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.MenuXmlDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.ModelDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.NewControllerDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.NewEntityLayoutDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.PreferenceDiXmlFileDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.ResourceModelDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.RoutesXmlDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.SaveEntityCommandDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.UiComponentFormLayoutDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.UiComponentGridDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityManagerContextData;
+import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityCreatorContextData;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.NewEntityDialogData;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.util.ClassPropertyFormatterUtil;
@@ -53,35 +25,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NumericRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.GeneratorPoolHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.AclXmlGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.CollectionModelGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.DataModelGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.DataModelInterfaceGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.DataModelPreferenceGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.DataProviderGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.DbSchemaWhitelistGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.DbSchemaXmlGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.DeleteByIdCommandGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.EntityDataMapperGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.EntityListActionGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormDeleteControllerGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormEditControllerGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormGenericButtonBlockGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormLayoutGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormSaveControllerGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormViewControllerGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.GetListQueryGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.GridActionColumnGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.GridLayoutXmlGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.MenuXmlGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.ModelGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.NewControllerGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.NewEntityLayoutGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.ResourceModelGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.RoutesXmlGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.SaveCommandGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.UiComponentFormLayoutGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.UiComponentGridGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.provider.NewEntityGeneratorsProviderUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DbSchemaGeneratorUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.magento.files.CollectionModelFile;
@@ -147,7 +91,6 @@ import org.jetbrains.annotations.NotNull;
 @SuppressWarnings({
         "PMD.TooManyFields",
         "PMD.UnusedPrivateField",
-        "PMD.CouplingBetweenObjects",
         "PMD.ExcessiveImports"
 })
 public class NewEntityDialog extends AbstractDialog {
@@ -212,6 +155,8 @@ public class NewEntityDialog extends AbstractDialog {
     private static final String DTO_MODEL_SUFFIX = "Data";
     private static final String DTO_INTERFACE_SUFFIX = "Interface";
     private static final String DATA_PROVIDER_SUFFIX = "DataProvider";
+
+    private static final boolean OPEN_FILES_FLAG = false;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, FORM_NAME})
     @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE})
@@ -352,7 +297,6 @@ public class NewEntityDialog extends AbstractDialog {
     /**
      * Perform code generation using input data.
      */
-    @SuppressWarnings("PMD.ExcessiveMethodLength")
     private void onOK() {
         if (!validateFormFields()) {
             return;
@@ -360,147 +304,15 @@ public class NewEntityDialog extends AbstractDialog {
         formatProperties();
 
         final NewEntityDialogData dialogData = getNewEntityDialogData();
-        final EntityManagerContextData context = getEntityManagerContextData(dialogData);
+        final EntityCreatorContextData context = getEntityCreatorContextData(dialogData);
 
         final GeneratorPoolHandler generatorPoolHandler = new GeneratorPoolHandler(context);
 
-        generatorPoolHandler
-                .addNext(
-                        ModelGeneratorHandler.class,
-                        new ModelDtoConverter(context, dialogData)
-                )
-                .addNext(
-                        ResourceModelGeneratorHandler.class,
-                        new ResourceModelDtoConverter(context, dialogData)
-                )
-                .addNext(
-                        CollectionModelGeneratorHandler.class,
-                        new CollectionModelDtoConverter(context, dialogData)
-                )
-                .addNext(
-                        DataModelGeneratorHandler.class,
-                        new DataModelDtoConverter(context, dialogData)
-                )
-                .addNext(
-                        DataModelInterfaceGeneratorHandler.class,
-                        new DataModelInterfaceDtoConverter(context, dialogData),
-                        dialogData::hasDtoInterface
-                )
-                .addNext(
-                        DataModelPreferenceGeneratorHandler.class,
-                        new PreferenceDiXmlFileDtoConverter(context, dialogData),
-                        dialogData::hasDtoInterface
-                )
-                .addNext(
-                        RoutesXmlGeneratorHandler.class,
-                        new RoutesXmlDtoConverter(context, dialogData)
-                )
-                .addNext(
-                        AclXmlGeneratorHandler.class,
-                        new AclXmlDtoConverter(context, dialogData)
-                )
-                .addNext(
-                        MenuXmlGeneratorHandler.class,
-                        new MenuXmlDtoConverter(context, dialogData)
-                )
-                .addNext(
-                        EntityListActionGeneratorHandler.class,
-                        new EntityListActionDtoConverter(context, dialogData),
-                        dialogData::hasAdminUiComponents
-                )
-                .addNext(
-                        GridLayoutXmlGeneratorHandler.class,
-                        new GridLayoutXmlDtoConverter(context, dialogData),
-                        dialogData::hasAdminUiComponents
-                )
-                .addNext(
-                        EntityDataMapperGeneratorHandler.class,
-                        new EntityDataMapperDtoConverter(context, dialogData),
-                        dialogData::hasAdminUiComponents
-                )
-                .addNext(
-                        GetListQueryGeneratorHandler.class,
-                        new GetListQueryDtoConverter(context, dialogData),
-                        dialogData::hasAdminUiComponents
-                )
-                .addNext(
-                        DataProviderGeneratorHandler.class,
-                        new DataProviderDtoConverter(context, dialogData),
-                        dialogData::hasAdminUiComponents
-                )
-                .addNext(
-                        GridActionColumnGeneratorHandler.class,
-                        new GridActionColumnDtoConverter(context, dialogData),
-                        dialogData::hasAdminUiComponents
-                )
-                .addNext(
-                        UiComponentGridGeneratorHandler.class,
-                        new UiComponentGridDtoConverter(context, dialogData),
-                        dialogData::hasAdminUiComponents
-                )
-                .addNext(
-                        FormViewControllerGeneratorHandler.class,
-                        new FormViewControllerDtoConverter(context, dialogData),
-                        dialogData::hasAdminUiComponents
-                )
-                .addNext(
-                        FormLayoutGeneratorHandler.class,
-                        new FormLayoutDtoConverter(context, dialogData),
-                        dialogData::hasAdminUiComponents
-                )
-                .addNext(
-                        NewEntityLayoutGeneratorHandler.class,
-                        new NewEntityLayoutDtoConverter(context, dialogData),
-                        dialogData::hasAdminUiComponents
-                )
-                .addNext(
-                        SaveCommandGeneratorHandler.class,
-                        new SaveEntityCommandDtoConverter(context, dialogData),
-                        dialogData::hasAdminUiComponents
-                )
-                .addNext(
-                        DeleteByIdCommandGeneratorHandler.class,
-                        new DeleteEntityByIdCommandDtoConverter(context, dialogData),
-                        dialogData::hasAdminUiComponents
-                )
-                .addNext(
-                        FormSaveControllerGeneratorHandler.class,
-                        new FormSaveControllerDtoConverter(context, dialogData),
-                        dialogData::hasAdminUiComponents
-                )
-                .addNext(
-                        FormDeleteControllerGeneratorHandler.class,
-                        new FormDeleteControllerDtoConverter(context, dialogData),
-                        dialogData::hasAdminUiComponents
-                )
-                .addNext(
-                        FormEditControllerGeneratorHandler.class,
-                        new FormEditControllerDtoConverter(context, dialogData),
-                        dialogData::hasAdminUiComponents
-                )
-                .addNext(
-                        FormGenericButtonBlockGeneratorHandler.class,
-                        new FormGenericButtonBlockDtoConverter(context, dialogData),
-                        dialogData::hasAdminUiComponents
-                )
-                .addNext(
-                        NewControllerGeneratorHandler.class,
-                        new NewControllerDtoConverter(context, dialogData),
-                        dialogData::hasAdminUiComponents
-                )
-                .addNext(
-                        UiComponentFormLayoutGeneratorHandler.class,
-                        new UiComponentFormLayoutDtoConverter(context, dialogData),
-                        dialogData::hasAdminUiComponents
-                )
-                .addNext(
-                        DbSchemaXmlGeneratorHandler.class,
-                        new DbSchemaXmlDtoConverter(context, dialogData)
-                )
-                .addNext(
-                        DbSchemaWhitelistGeneratorHandler.class,
-                        new DbSchemaXmlDtoConverter(context, dialogData)
-                );
+        NewEntityGeneratorsProviderUtil.initializeGenerators(
+                generatorPoolHandler,
+                context,
+                dialogData
+        );
 
         generatorPoolHandler.run();
 
@@ -508,13 +320,13 @@ public class NewEntityDialog extends AbstractDialog {
     }
 
     /**
-     * Get entity manager context data.
+     * Get entity creator context data.
      *
      * @param dialogData NewEntityDialogData
      *
-     * @return EntityManagerContextData
+     * @return EntityCreatorContextData
      */
-    private EntityManagerContextData getEntityManagerContextData(
+    private EntityCreatorContextData getEntityCreatorContextData(
             final @NotNull NewEntityDialogData dialogData
     ) {
         final String entityName = dialogData.getEntityName();
@@ -539,10 +351,11 @@ public class NewEntityDialog extends AbstractDialog {
                         ControllerBackendPhp.DEFAULT_DIR + File.separator + entityName
                 );
 
-        return new EntityManagerContextData(
+        return new EntityCreatorContextData(
                 project,
                 moduleName,
                 ACTION_NAME,
+                OPEN_FILES_FLAG,
                 actionsPathPrefix.concat("index"),
                 actionsPathPrefix.concat("edit"),
                 actionsPathPrefix.concat("new"),
@@ -589,7 +402,7 @@ public class NewEntityDialog extends AbstractDialog {
      *
      * @return String
      */
-    public String getFormName() {
+    private String getFormName() {
         return formName.getText().trim();
     }
 
@@ -598,7 +411,7 @@ public class NewEntityDialog extends AbstractDialog {
      *
      * @return List[UiComponentFormFieldsetData]
      */
-    public List<UiComponentFormFieldsetData> getFieldSets() {
+    private List<UiComponentFormFieldsetData> getFieldSets() {
         final ArrayList<UiComponentFormFieldsetData> fieldSets = new ArrayList<>();
         final UiComponentFormFieldsetData fieldsetData = new UiComponentFormFieldsetData(
                 "general",
@@ -615,7 +428,7 @@ public class NewEntityDialog extends AbstractDialog {
      *
      * @return List[UiComponentFormButtonData]
      */
-    protected List<UiComponentFormButtonData> getButtons() {
+    private List<UiComponentFormButtonData> getButtons() {
         final List<UiComponentFormButtonData> buttons = new ArrayList<>();
         final String directory = "Block/Form";
 
@@ -677,7 +490,7 @@ public class NewEntityDialog extends AbstractDialog {
      *
      * @return List[UiComponentFormFieldData]
      */
-    public List<UiComponentFormFieldData> getFields() {
+    private List<UiComponentFormFieldData> getFields() {
         final DefaultTableModel model = getPropertiesTable();
         final ArrayList<UiComponentFormFieldData> fieldsets = new ArrayList<>();
 

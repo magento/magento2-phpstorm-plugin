@@ -44,10 +44,10 @@ public class NewEntityLayoutGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new NewEntityLayoutGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new NewEntityLayoutGenerator(
                 (NewEntityLayoutData) getDataObjectConverter(),
                 getProject()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

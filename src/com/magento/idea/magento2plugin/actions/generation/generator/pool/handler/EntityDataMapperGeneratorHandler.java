@@ -44,10 +44,10 @@ public class EntityDataMapperGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new EntityDataMapperGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new EntityDataMapperGenerator(
                 (EntityDataMapperData) getDataObjectConverter(),
                 getProject()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

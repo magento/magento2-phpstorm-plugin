@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
@@ -13,24 +14,32 @@ public abstract class FileGenerator {
     private final Project project;
     private final NavigateToCreatedFile navigateToCreatedFile;
 
-    public FileGenerator(Project project)
-    {
+    public FileGenerator(final Project project) {
         this.project = project;
         this.navigateToCreatedFile = NavigateToCreatedFile.getInstance();
     }
 
-    public abstract PsiFile generate(String actionName);
+    public abstract PsiFile generate(final String actionName);
 
-    public PsiFile generate(String actionName, boolean openFile) {
-        PsiFile file = this.generate(actionName);
-        if (file != null) {
+    /**
+     * Generate file.
+     *
+     * @param actionName String
+     * @param openFile boolean
+     *
+     * @return PsiFile
+     */
+    public PsiFile generate(final String actionName, final boolean openFile) {
+        final PsiFile file = this.generate(actionName);
+
+        if (file != null && openFile) {
             navigateToCreatedFile.navigate(project, file);
         }
         return file;
     }
 
     protected Properties getAttributes() {
-        Properties attributes = new Properties();
+        final Properties attributes = new Properties();
         this.fillAttributes(attributes);
         return attributes;
     }

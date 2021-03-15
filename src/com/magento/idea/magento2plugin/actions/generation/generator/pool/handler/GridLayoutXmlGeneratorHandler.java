@@ -44,10 +44,10 @@ public class GridLayoutXmlGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new LayoutXmlGenerator(
-                (LayoutXmlData) getDataObjectConverter(),
-                getProject()
-        ).generate(getContextData().getActionName(), true);
+    public void instantiateGenerator() {
+       setGenerator(new LayoutXmlGenerator(
+               (LayoutXmlData) getDataObjectConverter(),
+               getProject()
+       ));
     }
 }

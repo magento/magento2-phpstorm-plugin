@@ -7,7 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.data.converter.newent
 
 import com.magento.idea.magento2plugin.actions.generation.data.FormGenericButtonBlockData;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.DataObjectConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityManagerContextData;
+import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityCreatorContextData;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.NewEntityDialogData;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,11 +17,11 @@ public class FormGenericButtonBlockDtoConverter extends FormGenericButtonBlockDa
     /**
      * Form generic button block converter.
      *
-     * @param generationContextData EntityManagerContextData
+     * @param generationContextData EntityCreatorContextData
      * @param newEntityDialogData NewEntityDialogData
      */
     public FormGenericButtonBlockDtoConverter(
-            final @NotNull EntityManagerContextData generationContextData,
+            final @NotNull EntityCreatorContextData generationContextData,
             final @NotNull NewEntityDialogData newEntityDialogData
     ) {
         super(

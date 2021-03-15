@@ -44,10 +44,10 @@ public class EntityListActionGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new AdminListViewEntityActionGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new AdminListViewEntityActionGenerator(
                 (AdminListViewEntityActionData) getDataObjectConverter(),
                 getProject()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

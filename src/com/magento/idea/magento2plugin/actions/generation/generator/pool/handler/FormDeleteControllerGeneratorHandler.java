@@ -44,10 +44,10 @@ public class FormDeleteControllerGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new DeleteEntityControllerFileGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new DeleteEntityControllerFileGenerator(
                 (DeleteEntityControllerFileData) getDataObjectConverter(),
                 getProject()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

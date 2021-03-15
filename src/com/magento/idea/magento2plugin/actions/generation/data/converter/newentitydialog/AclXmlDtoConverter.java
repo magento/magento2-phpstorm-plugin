@@ -7,7 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.data.converter.newent
 
 import com.magento.idea.magento2plugin.actions.generation.data.AclXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.DataObjectConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityManagerContextData;
+import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityCreatorContextData;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.NewEntityDialogData;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,12 +16,12 @@ public class AclXmlDtoConverter extends AclXmlData implements DataObjectConverte
     /**
      * Acl XML DTO converter.
      *
-     * @param generationContextData EntityManagerContextData
+     * @param generationContextData EntityCreatorContextData
      * @param newEntityDialogData NewEntityDialogData
      */
     @SuppressWarnings("PMD.UnusedFormalParameter")
     public AclXmlDtoConverter(
-            final @NotNull EntityManagerContextData generationContextData,
+            final @NotNull EntityCreatorContextData generationContextData,
             final @NotNull NewEntityDialogData newEntityDialogData
     ) {
         super(

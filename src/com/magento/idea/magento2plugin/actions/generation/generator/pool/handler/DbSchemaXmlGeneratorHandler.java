@@ -44,11 +44,11 @@ public class DbSchemaXmlGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new DbSchemaXmlGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new DbSchemaXmlGenerator(
                 (DbSchemaXmlData) getDataObjectConverter(),
                 getProject(),
                 getContextData().getModuleName()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

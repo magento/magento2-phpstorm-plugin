@@ -44,12 +44,10 @@ public class UiComponentFormLayoutGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        final UiComponentFormFileData data = (UiComponentFormFileData) getDataObjectConverter();
-
-        new UiComponentFormGenerator(
-                data,
+    public void instantiateGenerator() {
+        setGenerator(new UiComponentFormGenerator(
+                (UiComponentFormFileData) getDataObjectConverter(),
                 getProject()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

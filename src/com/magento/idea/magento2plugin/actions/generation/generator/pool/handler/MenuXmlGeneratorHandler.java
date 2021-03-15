@@ -44,10 +44,10 @@ public class MenuXmlGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new MenuXmlGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new MenuXmlGenerator(
                 (MenuXmlData) getDataObjectConverter(),
                 getProject()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

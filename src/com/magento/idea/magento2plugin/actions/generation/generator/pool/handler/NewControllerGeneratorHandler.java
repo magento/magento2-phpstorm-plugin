@@ -44,10 +44,10 @@ public class NewControllerGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new NewActionEntityControllerFileGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new NewActionEntityControllerFileGenerator(
                 (NewActionEntityControllerFileData) getDataObjectConverter(),
                 getProject()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

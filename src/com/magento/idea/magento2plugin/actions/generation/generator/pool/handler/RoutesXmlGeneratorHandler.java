@@ -44,10 +44,10 @@ public class RoutesXmlGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new RoutesXmlGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new RoutesXmlGenerator(
                 (RoutesXmlData) getDataObjectConverter(),
                 getProject()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }

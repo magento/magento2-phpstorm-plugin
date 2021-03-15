@@ -44,11 +44,11 @@ public class DbSchemaWhitelistGeneratorHandler extends GeneratorHandler {
     }
 
     @Override
-    public void generate() {
-        new DbSchemaWhitelistJsonGenerator(
+    public void instantiateGenerator() {
+        setGenerator(new DbSchemaWhitelistJsonGenerator(
                 getProject(),
                 (DbSchemaXmlData) getDataObjectConverter(),
                 getContextData().getModuleName()
-        ).generate(getContextData().getActionName(), true);
+        ));
     }
 }
