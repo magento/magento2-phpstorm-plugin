@@ -17,6 +17,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityCrea
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.NewEntityDialogData;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.util.ClassPropertyFormatterUtil;
+import com.magento.idea.magento2plugin.actions.generation.dialog.util.ProcessWorker;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AclResourceIdRule;
@@ -57,6 +58,7 @@ import com.magento.idea.magento2plugin.util.CamelCaseToSnakeCase;
 import com.magento.idea.magento2plugin.util.FirstLetterToLowercaseUtil;
 import com.magento.idea.magento2plugin.util.magento.GetAclResourcesListUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -184,6 +186,7 @@ public class NewEntityDialog extends AbstractDialog {
     private JTextPane exampleGridName;
     private JPanel uiComponentsPanel;
     private JTextField observerName;
+    private final ProcessWorker.InProgressFlag onOkActionFired;
 
     /**
      * Constructor.
@@ -203,7 +206,8 @@ public class NewEntityDialog extends AbstractDialog {
         setTitle(NewEntityAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
 
-        buttonOK.addActionListener((final ActionEvent event) -> onOK());
+        onOkActionFired = new ProcessWorker.InProgressFlag(false);
+        buttonOK.addActionListener(this::generateNewEntityFiles);
         buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
 
         // call onCancel() when cross is clicked
@@ -295,12 +299,34 @@ public class NewEntityDialog extends AbstractDialog {
     }
 
     /**
+     * Generate new entity files.
+     *
+     * @param event ActionEvent
+     */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
+    private void generateNewEntityFiles(final @NotNull ActionEvent event) {
+        if (!onOkActionFired.isInProgress()) {
+            buttonOK.setEnabled(false);
+            buttonCancel.setEnabled(false);
+
+            new ProcessWorker(
+                    this::onOK,
+                    this::releaseDialogAfterGeneration,
+                    onOkActionFired
+            ).execute();
+        }
+    }
+
+    /**
      * Perform code generation using input data.
      */
     private void onOK() {
         if (!validateFormFields()) {
+            onOkActionFired.setInProgress(false);
             return;
         }
+        setCursor(new Cursor(Cursor.WAIT_CURSOR));
+
         formatProperties();
 
         final NewEntityDialogData dialogData = getNewEntityDialogData();
@@ -315,8 +341,20 @@ public class NewEntityDialog extends AbstractDialog {
         );
 
         generatorPoolHandler.run();
+        onOkActionFired.setFinished(true);
+    }
 
-        this.setVisible(false);
+    /**
+     * Release dialog buttons and hide.
+     */
+    private void releaseDialogAfterGeneration() {
+        setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        buttonCancel.setEnabled(true);
+        buttonOK.setEnabled(true);
+
+        if (onOkActionFired.isFinished()) {
+            this.setVisible(false);
+        }
     }
 
     /**
