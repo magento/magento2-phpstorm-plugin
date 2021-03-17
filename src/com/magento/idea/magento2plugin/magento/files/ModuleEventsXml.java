@@ -19,6 +19,10 @@ public class ModuleEventsXml implements ModuleFileInterface {
     public static final String OBSERVER_TAG = "observer";
     public static final String INSTANCE_ATTRIBUTE = "instance";
     public static final String EVENT_TAG = "event";
+    public static final String MODULE_TAG = "module";
+
+    //attributes
+    public static final String NAME_ATTRIBUTE = "name";
 
     private static final ModuleEventsXml INSTANCE = new ModuleEventsXml();
 
