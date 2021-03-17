@@ -40,9 +40,9 @@ public class ModuleEmailTemplateHtmlGenerator extends FileGenerator {
 
         this.emailTemplateData = emailTemplateData;
         this.project = project;
-        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         this.directoryGenerator = DirectoryGenerator.getInstance();
-        this.moduleIndex = ModuleIndex.getInstance(project);
+        this.moduleIndex = new ModuleIndex(project);
     }
 
     /**

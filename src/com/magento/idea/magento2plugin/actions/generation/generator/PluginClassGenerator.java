@@ -72,7 +72,7 @@ public class PluginClassGenerator extends FileGenerator {
     ) {
         super(project);
         this.directoryGenerator = DirectoryGenerator.getInstance();
-        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
         this.fillTextBuffer = FillTextBufferWithPluginMethods.getInstance();
         this.collectInsertedMethods = CollectInsertedMethods.getInstance();
@@ -203,7 +203,7 @@ public class PluginClassGenerator extends FileGenerator {
     }
 
     private PhpClass createPluginClass(final String actionName) {
-        PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+        PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(getPluginModule());
         final String[] pluginDirectories = pluginFileData.getPluginDirectory()
                 .split(File.separator);

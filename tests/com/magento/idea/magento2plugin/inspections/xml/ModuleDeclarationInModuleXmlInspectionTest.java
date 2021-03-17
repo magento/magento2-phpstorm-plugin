@@ -13,6 +13,7 @@ public class ModuleDeclarationInModuleXmlInspectionTest
     private static final String MESSAGE_ID =
             "inspection.moduleDeclaration.warning.wrongModuleName";
     private static final String WRONG_MODULE_NAME = "Wrong_ModuleName";
+    private static final String SETUP_VERSION_ATTRIBUTE_VALUE = "1.0.0";
 
     @Override
     public void setUp() throws Exception {
@@ -44,6 +45,27 @@ public class ModuleDeclarationInModuleXmlInspectionTest
         );
 
         assertHasHighlighting(errorMessage);
+    }
+
+    /**
+     * Inspection do not highlight wrong module name warning for setup version attribute.
+     */
+    public void testSetupVersionNotErrorMessageInEditableModule() {
+        final Settings settings = Settings.getInstance(myFixture.getProject());
+        settings.magentoPath =
+                "/src/xml/ModuleDeclarationInModuleXmlInspection/"
+                        + "setupVersionNotErrorMessageInEditableModule";
+        myFixture.configureByFile(
+                getFixturePath("app/code/Test/TestModule/etc/" + ModuleXml.FILE_NAME)
+        );
+
+        final String errorMessage =  inspectionBundle.message(
+                MESSAGE_ID,
+                SETUP_VERSION_ATTRIBUTE_VALUE,
+                "Test_TestModule"
+        );
+
+        assertHasNoHighlighting(errorMessage);
     }
 
     /**

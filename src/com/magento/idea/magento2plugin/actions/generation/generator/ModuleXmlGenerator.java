@@ -36,7 +36,7 @@ public class ModuleXmlGenerator extends FileGenerator {
     ) {
         super(project);
         this.moduleXmlData = moduleXmlData;
-        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         this.directoryGenerator = DirectoryGenerator.getInstance();
     }
 
