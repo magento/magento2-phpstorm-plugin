@@ -27,9 +27,7 @@ public class ResourceModelDtoConverter extends ResourceModelData implements Data
                 generationContextData.getModuleName(),
                 newEntityDialogData.getTableName(),
                 newEntityDialogData.getEntityName().concat("Resource"),
-                newEntityDialogData.getIdFieldName(),
-                generationContextData.getResourceModelNamespaceBuilder().getNamespace(),
-                generationContextData.getResourceModelNamespaceBuilder().getClassFqn()
+                newEntityDialogData.getIdFieldName()
         );
     }
 }

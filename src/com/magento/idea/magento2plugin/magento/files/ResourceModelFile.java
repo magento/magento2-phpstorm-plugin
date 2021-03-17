@@ -13,6 +13,8 @@ public class ResourceModelFile extends AbstractPhpClass {
     public static final String TEMPLATE = "Magento Resource Model Class";
     public static final String ABSTRACT_DB
             = "Magento\\Framework\\Model\\ResourceModel\\Db\\AbstractDb";
+    public static final String ALIAS = "ResourceModel";
+    private NamespaceBuilder namespaceBuilder;
 
     public ResourceModelFile(final @NotNull String className) {
         super(className);
@@ -28,11 +30,15 @@ public class ResourceModelFile extends AbstractPhpClass {
     public @NotNull NamespaceBuilder getNamespaceBuilder(
             final @NotNull String moduleName
     ) {
-        return new NamespaceBuilder(
-                moduleName,
-                getClassName(),
-                RESOURCE_MODEL_DIRECTORY
-        );
+        if (namespaceBuilder == null) {
+            namespaceBuilder = new NamespaceBuilder(
+                    moduleName,
+                    getClassName(),
+                    RESOURCE_MODEL_DIRECTORY
+            );
+        }
+
+        return namespaceBuilder;
     }
 
     @Override
