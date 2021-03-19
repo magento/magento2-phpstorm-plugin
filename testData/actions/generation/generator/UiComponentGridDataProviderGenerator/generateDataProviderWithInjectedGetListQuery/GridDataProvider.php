@@ -1,8 +1,8 @@
 <?php
 
-namespace Foo\Bar\Ui\Listing;
+namespace Foo\Bar\Ui\Component\Listing;
 
-use Foo\Bar\Query\GetListQuery;
+use Foo\Bar\Query\Book\GetListQuery;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\Search\ReportingInterface;
 use Magento\Framework\Api\Search\SearchCriteriaBuilder;

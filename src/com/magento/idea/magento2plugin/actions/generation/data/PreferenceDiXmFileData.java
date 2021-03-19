@@ -2,37 +2,35 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.data;
 
 import org.jetbrains.annotations.NotNull;
 
 public class PreferenceDiXmFileData {
+
     private final String preferenceModule;
-    private final String targetClass;
-    private final String preferenceFqn;
-    private final String namespace;
+    private final String preferenceFor;
+    private final String preferenceType;
     private final String area;
 
     /**
      * Preference DI XML file data.
      *
      * @param preferenceModule String
-     * @param targetClass String
-     * @param preferenceFqn String
-     * @param namespace String
+     * @param preferenceFor String
+     * @param preferenceType String
      * @param area String
      */
     public PreferenceDiXmFileData(
             final @NotNull String preferenceModule,
-            final @NotNull String targetClass,
-            final @NotNull String preferenceFqn,
-            final @NotNull String namespace,
+            final @NotNull String preferenceFor,
+            final @NotNull String preferenceType,
             final @NotNull String area
     ) {
         this.preferenceModule = preferenceModule;
-        this.targetClass = targetClass;
-        this.preferenceFqn = preferenceFqn;
-        this.namespace = namespace;
+        this.preferenceFor = preferenceFor;
+        this.preferenceType = preferenceType;
         this.area = area;
     }
 
@@ -50,8 +48,8 @@ public class PreferenceDiXmFileData {
      *
      * @return String
      */
-    public String getTargetClass() {
-        return targetClass;
+    public String getPreferenceFor() {
+        return preferenceFor;
     }
 
     /**
@@ -59,17 +57,8 @@ public class PreferenceDiXmFileData {
      *
      * @return String
      */
-    public String getPreferenceFqn() {
-        return preferenceFqn;
-    }
-
-    /**
-     * Get namespace.
-     *
-     * @return String
-     */
-    public String getNamespace() {
-        return namespace;
+    public String getPreferenceType() {
+        return preferenceType;
     }
 
     /**

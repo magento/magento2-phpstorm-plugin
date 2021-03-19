@@ -13,10 +13,10 @@ public class EntityDataMapperClassGeneratorTest extends BaseGeneratorTestCase {
     private static final String MODULE_NAME = "Foo_Bar";
     private static final String EXPECTED_DIRECTORY = "src/app/code/Foo/Bar/Mapper";
     private static final String ENTITY_NAME = "Unicorn";
-    private static final String NAMESPACE = "Foo\\Bar\\Mapper";
-    private static final String CLASS_FQN = NAMESPACE + "\\UnicornDataMapper";
-    private static final String MODEL_CLASS_FQN = "Foo\\Bar\\Model\\UnicornModel";
-    private static final String DATA_MODEL_CLASS_FQN = "Foo\\Bar\\Api\\Data\\UnicornDataInterface";
+    private static final String MODEL_NAME = "UnicornModel";
+    private static final String DTO_NAME = "UnicornData";
+    private static final String DTO_INTERFACE_NAME = "UnicornDataInterface";
+    private static final boolean DTO_HAS_INTERFACE = true;
 
     /**
      * Test generation of entity data mapper class.
@@ -25,10 +25,10 @@ public class EntityDataMapperClassGeneratorTest extends BaseGeneratorTestCase {
         final EntityDataMapperData entityDataMapperData = new EntityDataMapperData(
                 MODULE_NAME,
                 ENTITY_NAME,
-                NAMESPACE,
-                CLASS_FQN,
-                MODEL_CLASS_FQN,
-                DATA_MODEL_CLASS_FQN
+                MODEL_NAME,
+                DTO_NAME,
+                DTO_INTERFACE_NAME,
+                DTO_HAS_INTERFACE
         );
         final EntityDataMapperGenerator entityDataMapperGenerator =
                 new EntityDataMapperGenerator(

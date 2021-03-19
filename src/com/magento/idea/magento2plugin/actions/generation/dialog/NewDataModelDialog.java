@@ -21,7 +21,6 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.generator.DataModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DataModelInterfaceGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.PreferenceDiXmlGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.magento.files.DataModelFile;
@@ -30,7 +29,6 @@ import com.magento.idea.magento2plugin.magento.packages.PropertiesTypes;
 import com.magento.idea.magento2plugin.ui.table.ComboBoxEditor;
 import com.magento.idea.magento2plugin.ui.table.DeleteRowButton;
 import com.magento.idea.magento2plugin.ui.table.TableButton;
-import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.ActionEvent;
@@ -51,17 +49,15 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
 @SuppressWarnings({
-        "PMD.ExcessiveImports",
-        "PMD.TooManyMethods",
+        "PMD.ExcessiveImports"
 })
 public class NewDataModelDialog extends AbstractDialog {
+
     private final Project project;
     private final String moduleName;
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
     private final List<String> properties;
-    private NamespaceBuilder interfaceNamespace;
-    private NamespaceBuilder modelNamespace;
 
     private static final String MODEL_NAME = "Model Name";
     private static final String PROPERTY_NAME = "Name";
@@ -131,15 +127,17 @@ public class NewDataModelDialog extends AbstractDialog {
         dialog.setVisible(true);
     }
 
+    /**
+     * Proceed with generation.
+     */
     private void onOK() {
         if (validateFormFields()) {
-            buildNamespaces();
             formatProperties();
-            generateModelFile();
+            generateDataModelFile();
 
-            if (isInterfaceShouldBeCreated()) {
-                generateModelInterfaceFile();
-                generatePreference();
+            if (createInterface.isSelected()) {
+                generateDataModelInterfaceFile();
+                generatePreferenceForInterface();
             }
             this.setVisible(false);
         }
@@ -148,6 +146,7 @@ public class NewDataModelDialog extends AbstractDialog {
     @Override
     protected boolean validateFormFields() {
         boolean valid = false;
+
         if (super.validateFormFields()) {
             valid = true;
             final String errorTitle = commonBundle.message("common.error");
@@ -190,45 +189,71 @@ public class NewDataModelDialog extends AbstractDialog {
         dispose();
     }
 
-    private void generateModelInterfaceFile() {
-        new DataModelInterfaceGenerator(project, new DataModelInterfaceData(
-                getInterfaceNamespace(),
-                getInterfaceName(),
+    /**
+     * Generate DTO interface file.
+     */
+    private void generateDataModelInterfaceFile() {
+        new DataModelInterfaceGenerator(new DataModelInterfaceData(
+                getDtoInterfaceName(),
                 getModuleName(),
-                getInterfaceFQN(),
                 ClassPropertyFormatterUtil.joinProperties(properties)
-        )).generate(NewDataModelAction.ACTION_NAME, true);
+        ), project).generate(NewDataModelAction.ACTION_NAME, true);
     }
 
-    private void generateModelFile() {
+    /**
+     * Generate DTO model file.
+     */
+    private void generateDataModelFile() {
         new DataModelGenerator(project, new DataModelData(
-                getModelNamespace(),
-                getModelName(),
+                getDtoModelName(),
+                getDtoInterfaceName(),
                 getModuleName(),
-                getModelFQN(),
-                getInterfaceFQN(),
                 ClassPropertyFormatterUtil.joinProperties(properties),
-                isInterfaceShouldBeCreated()
+                createInterface.isSelected()
         )).generate(NewDataModelAction.ACTION_NAME, true);
     }
 
-    private void generatePreference() {
+    /**
+     * Generate preference for interface DTO.
+     */
+    private void generatePreferenceForInterface() {
         new PreferenceDiXmlGenerator(new PreferenceDiXmFileData(
                 getModuleName(),
-                getInterfaceFQN(),
-                getModelFQN(),
-                getModelNamespace(),
+                new DataModelInterfaceFile(
+                        getDtoInterfaceName()
+                ).getNamespaceBuilder(getModuleName()).getClassFqn(),
+                new DataModelFile(
+                        getDtoModelName()
+                ).getNamespaceBuilder(getModuleName()).getClassFqn(),
                 "base"
         ), project).generate(OverrideClassByAPreferenceAction.ACTION_NAME);
     }
 
-    private void buildNamespaces() {
-        interfaceNamespace = new NamespaceBuilder(
-                getModuleName(), getInterfaceName(), DataModelInterfaceFile.DIRECTORY
-        );
-        modelNamespace = new NamespaceBuilder(
-                getModuleName(), getModelName(), DataModelFile.DIRECTORY
-        );
+    /**
+     * Get module name.
+     *
+     * @return String
+     */
+    private String getModuleName() {
+        return moduleName;
+    }
+
+    /**
+     * Get DTO model name.
+     *
+     * @return String
+     */
+    private String getDtoModelName() {
+        return modelName.getText().trim();
+    }
+
+    /**
+     * Get DTO interface name.
+     *
+     * @return String
+     */
+    private String getDtoInterfaceName() {
+        return modelName.getText().trim().concat("Interface");
     }
 
     /**
@@ -238,40 +263,12 @@ public class NewDataModelDialog extends AbstractDialog {
         properties.addAll(ClassPropertyFormatterUtil.formatProperties(getPropertiesTable()));
     }
 
-    private boolean isInterfaceShouldBeCreated() {
-        return createInterface.isSelected();
-    }
-
-    private String getModuleName() {
-        return moduleName;
-    }
-
-    private String getInterfaceNamespace() {
-        return interfaceNamespace.getNamespace();
-    }
-
-    private String getInterfaceName() {
-        return modelName.getText().trim().concat("Interface");
-    }
-
-    private String getInterfaceFQN() {
-        return interfaceNamespace.getClassFqn();
-    }
-
-    private String getModelNamespace() {
-        return modelNamespace.getNamespace();
-    }
-
-    private String getModelName() {
-        return modelName.getText().trim();
-    }
-
-    private String getModelFQN() {
-        return modelNamespace.getClassFqn();
-    }
-
+    /**
+     * Initialize properties table.
+     */
     private void initPropertiesTable() {
         final DefaultTableModel propertiesTable = getPropertiesTable();
+
         propertiesTable.setDataVector(
                 new Object[][]{},
                 new Object[]{
@@ -297,6 +294,9 @@ public class NewDataModelDialog extends AbstractDialog {
         initPropertyTypeColumn();
     }
 
+    /**
+     * Initialize property type column.
+     */
     private void initPropertyTypeColumn() {
         final TableColumn formElementTypeColumn = propertyTable.getColumn(PROPERTY_TYPE);
         formElementTypeColumn.setCellEditor(
@@ -307,6 +307,11 @@ public class NewDataModelDialog extends AbstractDialog {
         );
     }
 
+    /**
+     * Get properties table.
+     *
+     * @return DefaultTableModel
+     */
     private DefaultTableModel getPropertiesTable() {
         return (DefaultTableModel) propertyTable.getModel();
     }

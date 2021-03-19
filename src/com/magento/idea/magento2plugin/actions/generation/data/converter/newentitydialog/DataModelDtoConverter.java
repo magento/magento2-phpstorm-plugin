@@ -24,11 +24,9 @@ public class DataModelDtoConverter extends DataModelData implements DataObjectCo
             final @NotNull NewEntityDialogData newEntityDialogData
     ) {
         super(
-                generationContextData.getDtoModelNamespaceBuilder().getNamespace(),
                 newEntityDialogData.getEntityName().concat("Data"),
+                newEntityDialogData.getEntityName().concat("Interface"),
                 generationContextData.getModuleName(),
-                generationContextData.getDtoModelNamespaceBuilder().getClassFqn(),
-                generationContextData.getDtoInterfaceNamespaceBuilder().getClassFqn(),
                 newEntityDialogData.getProperties(),
                 newEntityDialogData.hasDtoInterface()
         );

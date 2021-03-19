@@ -9,31 +9,29 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.magento.idea.magento2plugin.actions.generation.data.AdminListViewEntityActionData;
+import com.magento.idea.magento2plugin.actions.generation.data.IndexActionData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.actions.IndexActionFile;
 import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.code.BackendModuleType;
 import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryType;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
-public class AdminListViewEntityActionGenerator extends FileGenerator {
+public class IndexActionGenerator extends FileGenerator {
 
     private final Project project;
-    private final AdminListViewEntityActionData data;
+    private final IndexActionData data;
     private final IndexActionFile file;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final DirectoryGenerator directoryGenerator;
     private final ModuleIndex moduleIndex;
     private final boolean checkFileAlreadyExists;
-    private final List<String> uses;
 
     /**
      * Constructor for adminhtml index (list) controller generator.
@@ -41,8 +39,8 @@ public class AdminListViewEntityActionGenerator extends FileGenerator {
      * @param data EntityIndexAdminhtmlActionData
      * @param project Project
      */
-    public AdminListViewEntityActionGenerator(
-            final @NotNull AdminListViewEntityActionData data,
+    public IndexActionGenerator(
+            final @NotNull IndexActionData data,
             final @NotNull Project project
     ) {
         this(data, project, true);
@@ -55,8 +53,8 @@ public class AdminListViewEntityActionGenerator extends FileGenerator {
      * @param project Project
      * @param checkFileAlreadyExists boolean
      */
-    public AdminListViewEntityActionGenerator(
-            final @NotNull AdminListViewEntityActionData data,
+    public IndexActionGenerator(
+            final @NotNull IndexActionData data,
             final @NotNull Project project,
             final boolean checkFileAlreadyExists
     ) {
@@ -68,7 +66,6 @@ public class AdminListViewEntityActionGenerator extends FileGenerator {
         fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         directoryGenerator = DirectoryGenerator.getInstance();
         moduleIndex = ModuleIndex.getInstance(project);
-        uses = new ArrayList<>();
     }
 
     /**
@@ -81,7 +78,7 @@ public class AdminListViewEntityActionGenerator extends FileGenerator {
     @Override
     public PsiFile generate(final @NotNull String actionName) {
         final PhpClass indexActionClass = GetPhpClassByFQN.getInstance(project).execute(
-                data.getClassFqn()
+                file.getNamespaceBuilder(data.getModuleName()).getClassFqn()
         );
 
         if (this.checkFileAlreadyExists && indexActionClass != null) {
@@ -111,34 +108,27 @@ public class AdminListViewEntityActionGenerator extends FileGenerator {
      */
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        attributes.setProperty("ENTITY_NAME", data.getEntityName());
-        attributes.setProperty("NAMESPACE", data.getNamespace());
-        attributes.setProperty("CLASS_NAME", IndexActionFile.CLASS_NAME);
-        attributes.setProperty("ACL", data.getAcl());
-        attributes.setProperty("MENU", data.getMenu());
+        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
 
-        addProperty(attributes, "PARENT_CLASS_NAME", BackendModuleType.EXTENDS.getType());
-        addProperty(attributes, "HTTP_GET_METHOD", HttpMethod.GET.getInterfaceFqn());
-        addProperty(attributes, "RESULT", FrameworkLibraryType.RESULT_INTERFACE.getType());
-        addProperty(attributes, "RESPONSE", FrameworkLibraryType.RESPONSE_INTERFACE.getType());
-        addProperty(attributes, "RESULT_FACTORY", FrameworkLibraryType.RESULT_FACTORY.getType());
+        phpClassTypesBuilder
+                .appendProperty("ENTITY_NAME", data.getEntityName())
+                .appendProperty("CLASS_NAME", IndexActionFile.CLASS_NAME)
+                .appendProperty("ACL", data.getAcl())
+                .appendProperty("MENU", data.getMenu())
+                .appendProperty(
+                        "NAMESPACE",
+                        file.getNamespaceBuilder(data.getModuleName()).getNamespace()
+                )
+                .append("PARENT_CLASS_NAME", BackendModuleType.EXTENDS.getType())
+                .append("HTTP_GET_METHOD", HttpMethod.GET.getInterfaceFqn())
+                .append("RESULT", FrameworkLibraryType.RESULT_INTERFACE.getType())
+                .append("RESPONSE", FrameworkLibraryType.RESPONSE_INTERFACE.getType())
+                .append("RESULT_FACTORY", FrameworkLibraryType.RESULT_FACTORY.getType())
+                .mergeProperties(attributes);
 
-        attributes.setProperty("USES", PhpClassGeneratorUtil.formatUses(uses));
-    }
-
-    /**
-     * Add type to property list.
-     *
-     * @param properties Properties
-     * @param propertyName String
-     * @param type String
-     */
-    private void addProperty(
-            final @NotNull Properties properties,
-            final String propertyName,
-            final String type
-    ) {
-        uses.add(type);
-        properties.setProperty(propertyName, PhpClassGeneratorUtil.getNameFromFqn(type));
+        attributes.setProperty(
+                "USES",
+                PhpClassGeneratorUtil.formatUses(phpClassTypesBuilder.getUses())
+        );
     }
 }

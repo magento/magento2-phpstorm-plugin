@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.NewUiComponentFormAction;
@@ -256,7 +255,6 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     public UiComponentDataProviderData getGridDataProviderData() {
         return new UiComponentDataProviderData(
                 getDataProviderClass(),
-                getDataProviderNamespace(),
                 getDataProviderDirectory()
         );
     }
@@ -325,14 +323,20 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         dataProviderType.addActionListener(event -> onDataProviderTypeChange());
     }
 
-    private PsiFile generateRoutesXmlFile() {
-        return new RoutesXmlGenerator(new RoutesXmlData(
+    /**
+     * Generate routes file.
+     */
+    private void generateRoutesXmlFile() {
+        new RoutesXmlGenerator(new RoutesXmlData(
             getArea(),
             getRoute(),
             getModuleName()
         ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
     }
 
+    /**
+     * Generate Ui Component class.
+     */
     private void generateUiComponentFile() {
         final UiComponentGridXmlGenerator gridXmlGenerator = new UiComponentGridXmlGenerator(
                 getUiComponentGridData(),
@@ -341,6 +345,9 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         gridXmlGenerator.generate(NewUiComponentGridAction.ACTION_NAME, true);
     }
 
+    /**
+     * Generate data provider class.
+     */
     private void generateDataProviderClass() {
         if (getDataProviderType().equals(UiComponentDataProviderFile.CUSTOM_TYPE)) {
             final UiComponentDataProviderGenerator dataProviderGenerator;
@@ -353,6 +360,9 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         }
     }
 
+    /**
+     * Generate data provider declaration.
+     */
     private void generateDataProviderDeclaration() {
         if (getDataProviderType().equals(UiComponentDataProviderFile.COLLECTION_TYPE)) {
             final DataProviderDeclarationGenerator dataProviderGenerator;
@@ -368,13 +378,16 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         }
     }
 
-    private PsiFile generateViewControllerFile() {
+    /**
+     * Generate view controller file.
+     */
+    private void generateViewControllerFile() {
         final NamespaceBuilder namespace = new NamespaceBuilder(
                 getModuleName(),
                 getActionName(),
                 getControllerDirectory()
         );
-        return new ModuleControllerClassGenerator(new ControllerFileData(
+        new ModuleControllerClassGenerator(new ControllerFileData(
                 getControllerDirectory(),
                 getActionName(),
                 getModuleName(),
@@ -386,8 +399,11 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
     }
 
-    private PsiFile generateLayoutFile() {
-        return new LayoutXmlGenerator(new LayoutXmlData(
+    /**
+     * Generate layout file.
+     */
+    private void generateLayoutFile() {
+        new LayoutXmlGenerator(new LayoutXmlData(
             getArea(),
             getRoute(),
             getModuleName(),
@@ -397,8 +413,11 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
     }
 
-    private PsiFile generateMenuFile() {
-        return new MenuXmlGenerator(new MenuXmlData(
+    /**
+     * Generate menu xml file.
+     */
+    private void generateMenuFile() {
+        new MenuXmlGenerator(new MenuXmlData(
             getParentMenuItem(),
             getSortOrder(),
             getModuleName(),
@@ -409,8 +428,11 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
     }
 
-    private PsiFile generateAclXmlFile() {
-        return new AclXmlGenerator(new AclXmlData(
+    /**
+     * Generate ACL XML file.
+     */
+    private void generateAclXmlFile() {
+        new AclXmlGenerator(new AclXmlData(
             getParentAcl(),
             getAcl(),
             getAclTitle()

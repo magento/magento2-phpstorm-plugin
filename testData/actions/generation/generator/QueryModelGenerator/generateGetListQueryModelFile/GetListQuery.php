@@ -1,6 +1,6 @@
 <?php
 
-namespace Foo\Bar\Query;
+namespace Foo\Bar\Query\Book;
 
 use Foo\Bar\Mapper\BookDataMapper;
 use Foo\Bar\Model\ResourceModel\Book\Collection;

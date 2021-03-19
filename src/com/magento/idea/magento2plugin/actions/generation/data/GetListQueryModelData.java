@@ -8,31 +8,30 @@ package com.magento.idea.magento2plugin.actions.generation.data;
 import org.jetbrains.annotations.NotNull;
 
 public class GetListQueryModelData {
+
     private final String moduleName;
     private final String entityName;
-    private final String collectionType;
-    private final String collectionTypeFactory;
-    private final String entityDataMapperType;
+    private final String modelName;
+    private final String collectionName;
 
     /**
      * Query Model DTO Constructor.
      *
      * @param moduleName String
      * @param entityName String
-     * @param collectionType String
-     * @param entityDataMapperType String
+     * @param modelName String
+     * @param collectionName String
      */
     public GetListQueryModelData(
             final @NotNull String moduleName,
             final @NotNull String entityName,
-            final @NotNull String collectionType,
-            final @NotNull String entityDataMapperType
+            final @NotNull String modelName,
+            final @NotNull String collectionName
     ) {
         this.moduleName = moduleName;
         this.entityName = entityName;
-        this.collectionType = collectionType;
-        this.collectionTypeFactory = collectionType.concat("Factory");
-        this.entityDataMapperType = entityDataMapperType;
+        this.modelName = modelName;
+        this.collectionName = collectionName;
     }
 
     /**
@@ -54,29 +53,20 @@ public class GetListQueryModelData {
     }
 
     /**
-     * Get entity collection type.
+     * Get model name.
      *
      * @return String
      */
-    public String getCollectionType() {
-        return collectionType;
+    public String getModelName() {
+        return modelName;
     }
 
     /**
-     * Get entity collection type factory.
+     * Get entity collection name.
      *
      * @return String
      */
-    public String getCollectionTypeFactory() {
-        return collectionTypeFactory;
-    }
-
-    /**
-     * Get entity data mapper type.
-     *
-     * @return String
-     */
-    public String getEntityDataMapperType() {
-        return entityDataMapperType;
+    public String getCollectionName() {
+        return collectionName;
     }
 }
