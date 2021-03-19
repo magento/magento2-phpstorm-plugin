@@ -13,6 +13,8 @@ public class ModelFile extends AbstractPhpClass {
             "Magento\\Framework\\Model\\AbstractModel";
     public static final String MODEL_DIRECTORY = "Model";
     public static final String TEMPLATE = "Magento Model Class";
+    public static final String ALIAS = "Model";
+    private NamespaceBuilder namespaceBuilder;
 
     public ModelFile(final String className) {
         super(className);
@@ -28,11 +30,15 @@ public class ModelFile extends AbstractPhpClass {
     public @NotNull NamespaceBuilder getNamespaceBuilder(
             final @NotNull String moduleName
     ) {
-        return new NamespaceBuilder(
-                moduleName,
-                getClassName(),
-                MODEL_DIRECTORY
-        );
+        if (namespaceBuilder == null) {
+            namespaceBuilder = new NamespaceBuilder(
+                    moduleName,
+                    getClassName(),
+                    MODEL_DIRECTORY
+            );
+        }
+
+        return namespaceBuilder;
     }
 
     @Override

@@ -1,12 +1,12 @@
 <?php
 
-namespace Foo\Bar\Model\ResourceModel\TestModel;
+namespace Foo\Bar\Model\ResourceModel\Test;
 
-use Foo\Bar\Model\ResourceModel\TestResource;
-use Foo\Bar\Model\TestModel;
+use Foo\Bar\Model\ResourceModel\Test as ResourceModel;
+use Foo\Bar\Model\Test as Model;
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 
-class TestCollection extends AbstractCollection
+class Collection extends AbstractCollection
 {
     /**
      * @var string
@@ -18,6 +18,6 @@ class TestCollection extends AbstractCollection
      */
     protected function _construct()
     {
-        $this->_init(TestModel::class, TestResource::class);
+        $this->_init(Model::class, ResourceModel::class);
     }
 }

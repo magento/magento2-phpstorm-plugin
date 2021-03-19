@@ -15,6 +15,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.ResourceModelData
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
@@ -22,13 +23,13 @@ import com.magento.idea.magento2plugin.magento.files.ResourceModelFile;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import javax.swing.JOptionPane;
+import org.jetbrains.annotations.NotNull;
 
 public class ModuleResourceModelGenerator extends FileGenerator {
+
     private final ResourceModelData resourceModelData;
     private final Project project;
     private final ValidatorBundle validatorBundle;
@@ -36,6 +37,7 @@ public class ModuleResourceModelGenerator extends FileGenerator {
     private final GetFirstClassOfFile getFirstClassOfFile;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
+    private final ResourceModelFile file;
 
     /**
      * Generates new Resource Model PHP Class based on provided data.
@@ -55,20 +57,24 @@ public class ModuleResourceModelGenerator extends FileGenerator {
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
+        file = new ResourceModelFile(resourceModelData.getResourceModelName());
+
     }
 
     /**
      * Generates resource model class.
      *
      * @param actionName Action name
+     *
      * @return PsiFile
      */
-    public PsiFile generate(final String actionName) {
+    @Override
+    public PsiFile generate(final @NotNull String actionName) {
         final PsiFile[] resourceModelFiles = new PsiFile[1];
 
         WriteCommandAction.runWriteCommandAction(project, () -> {
             PhpClass resourceModel = GetPhpClassByFQN.getInstance(project).execute(
-                    getResourceModelFqn()
+                    file.getNamespaceBuilder(resourceModelData.getModuleName()).getClassFqn()
             );
 
             if (resourceModel != null) {
@@ -110,21 +116,15 @@ public class ModuleResourceModelGenerator extends FileGenerator {
     }
 
     /**
-     * Get module.
+     * Create resource model class.
      *
-     * @return String
+     * @param actionName String
+     *
+     * @return PhpClass
      */
-    public String getModuleName() {
-        return resourceModelData.getModuleName();
-    }
-
-    private String getResourceModelFqn() {
-        return resourceModelData.getFqn();
-    }
-
-    private PhpClass createClass(final String actionName) {
+    private PhpClass createClass(final @NotNull String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
-                .getModuleDirectoryByModuleName(getModuleName());
+                .getModuleDirectoryByModuleName(resourceModelData.getModuleName());
         final PsiFile modelFile;
 
         final String[] resourceModelDirectories = ResourceModelFile.RESOURCE_MODEL_DIRECTORY.split(
@@ -138,7 +138,7 @@ public class ModuleResourceModelGenerator extends FileGenerator {
 
         final Properties attributes = getAttributes();
         modelFile = fileFromTemplateGenerator.generate(
-                new ResourceModelFile(resourceModelData.getResourceModelName()),
+                file,
                 attributes,
                 parentDirectory,
                 actionName
@@ -151,27 +151,27 @@ public class ModuleResourceModelGenerator extends FileGenerator {
         return getFirstClassOfFile.execute((PhpFile) modelFile);
     }
 
-    protected void fillAttributes(final Properties attributes) {
-        attributes.setProperty("NAME", resourceModelData.getResourceModelName());
-        attributes.setProperty("NAMESPACE", resourceModelData.getNamespace());
+    /**
+     * Fill resource model file attributes.
+     *
+     * @param attributes Properties
+     */
+    @Override
+    protected void fillAttributes(final @NotNull Properties attributes) {
+        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
 
-        attributes.setProperty("DB_NAME", resourceModelData.getDbTableName());
-        attributes.setProperty("ENTITY_ID_COLUMN", PhpClassGeneratorUtil.getNameFromFqn(
-                resourceModelData.getEntityIdColumn())
-        );
-        final List<String> uses = getUses();
+        phpClassTypesBuilder
+                .appendProperty("NAME", resourceModelData.getResourceModelName())
+                .appendProperty(
+                        "NAMESPACE",
+                        file.getNamespaceBuilder(resourceModelData.getModuleName()).getNamespace()
+                )
+                .appendProperty("DB_NAME", resourceModelData.getDbTableName())
+                .appendProperty("ENTITY_ID_COLUMN", resourceModelData.getEntityIdColumn())
+                .append("EXTENDS", ResourceModelFile.ABSTRACT_DB)
+                .mergeProperties(attributes);
 
-        attributes.setProperty(
-                "EXTENDS",
-                PhpClassGeneratorUtil.getNameFromFqn(ResourceModelFile.ABSTRACT_DB)
-        );
-
+        final List<String> uses = phpClassTypesBuilder.getUses();
         attributes.setProperty("USES", PhpClassGeneratorUtil.formatUses(uses));
-    }
-
-    private List<String> getUses() {
-        return new ArrayList<>(Arrays.asList(
-                ResourceModelFile.ABSTRACT_DB
-        ));
     }
 }

@@ -27,10 +27,7 @@ public class ModelDtoConverter extends ModelData implements DataObjectConverter 
                 generationContextData.getModuleName(),
                 newEntityDialogData.getTableName(),
                 newEntityDialogData.getEntityName().concat("Model"),
-                newEntityDialogData.getEntityName().concat("Resource"),
-                generationContextData.getModelNamespaceBuilder().getClassFqn(),
-                generationContextData.getModelNamespaceBuilder().getNamespace(),
-                generationContextData.getResourceModelNamespaceBuilder().getClassFqn()
+                newEntityDialogData.getEntityName().concat("Resource")
         );
     }
 }
