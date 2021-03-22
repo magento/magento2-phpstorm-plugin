@@ -218,6 +218,11 @@ public class NewEntityDialog extends AbstractDialog {
             public void windowClosing(final WindowEvent event) {
                 onCancel();
             }
+
+            @Override
+            public void windowOpened(WindowEvent e) {
+                entityName.requestFocus();
+            }
         });
 
         initializeComboboxSources();
