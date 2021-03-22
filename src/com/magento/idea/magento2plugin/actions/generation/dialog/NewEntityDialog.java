@@ -96,6 +96,7 @@ import org.jetbrains.annotations.NotNull;
         "PMD.ExcessiveImports"
 })
 public class NewEntityDialog extends AbstractDialog {
+
     private final @NotNull Project project;
     private final String moduleName;
     private JPanel contentPane;
@@ -405,8 +406,8 @@ public class NewEntityDialog extends AbstractDialog {
                 dtoModelNamespace,
                 dtoInterfaceNamespace,
                 createInterface.isSelected() ? dtoInterfaceNamespace : dtoModelNamespace,
-                UiComponentDataProviderFile
-                        .getInstance(dataProviderClassName).getNamespaceBuilder(moduleName),
+                new UiComponentDataProviderFile(dataProviderClassName)
+                        .getNamespaceBuilder(moduleName, null),
                 new IndexActionFile(entityName).getNamespaceBuilder(moduleName),
                 new EntityDataMapperFile(entityName).getNamespaceBuilder(moduleName),
                 SaveEntityCommandFile.getNamespaceBuilder(moduleName, entityName),

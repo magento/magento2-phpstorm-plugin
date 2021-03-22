@@ -8,36 +8,38 @@ package com.magento.idea.magento2plugin.actions.generation.data;
 import org.jetbrains.annotations.NotNull;
 
 public class EntityDataMapperData {
+
     private final String moduleName;
     private final String entityName;
-    private final String namespace;
-    private final String classFqn;
-    private final String modelClassFqn;
-    private final String dataModelClassFqn;
+    private final String modelName;
+    private final String dtoName;
+    private final String dtoInterfaceName;
+    private final boolean isDtoWithInterface;
 
     /**
      * Magento entity data mapper data constructor.
      *
      * @param moduleName String
      * @param entityName String
-     * @param namespace String
-     * @param modelClassFqn String
-     * @param dataModelClassFqn String
+     * @param modelName String
+     * @param dtoName String
+     * @param dtoInterfaceName String
+     * @param isDtoWithInterface boolean
      */
     public EntityDataMapperData(
             final @NotNull String moduleName,
             final @NotNull String entityName,
-            final @NotNull String namespace,
-            final @NotNull String classFqn,
-            final @NotNull String modelClassFqn,
-            final @NotNull String dataModelClassFqn
+            final @NotNull String modelName,
+            final @NotNull String dtoName,
+            final @NotNull String dtoInterfaceName,
+            final boolean isDtoWithInterface
     ) {
         this.moduleName = moduleName;
         this.entityName = entityName;
-        this.namespace = namespace;
-        this.classFqn = classFqn;
-        this.modelClassFqn = modelClassFqn;
-        this.dataModelClassFqn = dataModelClassFqn;
+        this.modelName = modelName;
+        this.dtoName = dtoName;
+        this.dtoInterfaceName = dtoInterfaceName;
+        this.isDtoWithInterface = isDtoWithInterface;
     }
 
     /**
@@ -59,38 +61,38 @@ public class EntityDataMapperData {
     }
 
     /**
-     * Get namespace.
+     * Get model name.
      *
      * @return String
      */
-    public String getNamespace() {
-        return namespace;
+    public String getModelName() {
+        return modelName;
     }
 
     /**
-     * Get class fqn.
+     * Get DTO name.
      *
      * @return String
      */
-    public String getClassFqn() {
-        return classFqn;
+    public String getDtoName() {
+        return dtoName;
     }
 
     /**
-     * Get model class fqn.
+     * Get DTO interface name.
      *
      * @return String
      */
-    public String getModelClassFqn() {
-        return modelClassFqn;
+    public String getDtoInterfaceName() {
+        return dtoInterfaceName;
     }
 
     /**
-     * Get data model class fqn.
+     * Check if DTO has interface.
      *
-     * @return String
+     * @return boolean
      */
-    public String getDataModelClassFqn() {
-        return dataModelClassFqn;
+    public boolean isDtoWithInterface() {
+        return isDtoWithInterface;
     }
 }

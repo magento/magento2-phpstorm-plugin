@@ -27,8 +27,8 @@ public class GetListQueryDtoConverter extends GetListQueryModelData
         super(
                 generationContextData.getModuleName(),
                 newEntityDialogData.getEntityName(),
-                generationContextData.getCollectionModelNamespaceBuilder().getClassFqn(),
-                generationContextData.getEntityDataMapperNamespaceBuilder().getClassFqn()
+                newEntityDialogData.getEntityName().concat("Model"),
+                newEntityDialogData.getEntityName().concat("Collection")
         );
     }
 }

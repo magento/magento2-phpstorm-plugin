@@ -5,14 +5,13 @@
 
 package com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog;
 
-import com.magento.idea.magento2plugin.actions.generation.data.AdminListViewEntityActionData;
+import com.magento.idea.magento2plugin.actions.generation.data.IndexActionData;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.DataObjectConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityCreatorContextData;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.NewEntityDialogData;
 import org.jetbrains.annotations.NotNull;
 
-public class EntityListActionDtoConverter extends AdminListViewEntityActionData
-        implements DataObjectConverter {
+public class IndexActionDtoConverter extends IndexActionData implements DataObjectConverter {
 
     /**
      * Entity list action converter.
@@ -20,15 +19,13 @@ public class EntityListActionDtoConverter extends AdminListViewEntityActionData
      * @param generationContextData EntityCreatorContextData
      * @param newEntityDialogData NewEntityDialogData
      */
-    public EntityListActionDtoConverter(
+    public IndexActionDtoConverter(
             final @NotNull EntityCreatorContextData generationContextData,
             final @NotNull NewEntityDialogData newEntityDialogData
     ) {
         super(
                 generationContextData.getModuleName(),
                 newEntityDialogData.getEntityName(),
-                generationContextData.getEntityListActionNamespaceBuilder().getNamespace(),
-                generationContextData.getEntityListActionNamespaceBuilder().getClassFqn(),
                 newEntityDialogData.getAclId(),
                 newEntityDialogData.getMenuId()
         );

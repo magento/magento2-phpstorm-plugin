@@ -16,6 +16,7 @@ public class DataModelFile implements ModuleFileInterface {
     public static final String DATA_OBJECT = "Magento\\Framework\\DataObject";
     private final String className;
     private final String fileName;
+    private NamespaceBuilder namespaceBuilder;
 
     public DataModelFile(final @NotNull String className) {
         this.className = className;
@@ -32,11 +33,15 @@ public class DataModelFile implements ModuleFileInterface {
     public @NotNull NamespaceBuilder getNamespaceBuilder(
             final @NotNull String moduleName
     ) {
-        return new NamespaceBuilder(
-                moduleName,
-                className,
-                DIRECTORY
-        );
+        if (namespaceBuilder == null) {
+            namespaceBuilder = new NamespaceBuilder(
+                    moduleName,
+                    className,
+                    DIRECTORY
+            );
+        }
+
+        return namespaceBuilder;
     }
 
     @Override

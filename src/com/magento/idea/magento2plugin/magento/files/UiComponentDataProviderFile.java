@@ -10,67 +10,50 @@ import com.jetbrains.php.lang.PhpLanguage;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings({
-        "PMD.FieldNamingConventions",
-        "PMD.NonThreadSafeSingleton",
-        "PMD.RedundantFieldInitializer"
-})
 public class UiComponentDataProviderFile implements ModuleFileInterface {
+
     public static final String TEMPLATE = "Magento UI Component Custom Data Provider Class";
     public static final String DIRECTORY = "Ui/DataProvider";
     public static final String FILE_EXTENSION = "php";
     public static final String CUSTOM_TYPE = "custom";
     public static final String COLLECTION_TYPE = "collection";
-    private static UiComponentDataProviderFile INSTANCE = null;
-    private String className;
     public static final String DEFAULT_DATA_PROVIDER =
             "Magento\\Framework\\View\\Element\\UiComponent\\DataProvider\\DataProvider";
     public static final String SEARCH_RESULT_FACTORY =
             "Magento\\Ui\\DataProvider\\SearchResultFactory";
+    private final String className;
+    private NamespaceBuilder namespaceBuilder;
 
     /**
-     * Returns a new instance of the class.
+     * Ui Component data provider file constructor.
      *
-     * @param className DataProvider class name
-     *
-     * @return UiComponentDataProviderFile
+     * @param className String
      */
-    public static UiComponentDataProviderFile getInstance(
-            final @NotNull String className
-    ) {
-        if (null == INSTANCE) {
-            INSTANCE = new UiComponentDataProviderFile();
-        }
-
-        INSTANCE.setClassName(className);
-
-        return INSTANCE;
+    public UiComponentDataProviderFile(final @NotNull String className) {
+        this.className = className;
     }
 
     /**
      * Get namespace builder for file.
      *
      * @param moduleName String
+     * @param directory String
      *
      * @return String
      */
     public @NotNull NamespaceBuilder getNamespaceBuilder(
-            final @NotNull String moduleName
+            final @NotNull String moduleName,
+            final String directory
     ) {
-        return new NamespaceBuilder(
-                moduleName,
-                className,
-                DIRECTORY
-        );
-    }
+        if (namespaceBuilder == null) {
+            namespaceBuilder = new NamespaceBuilder(
+                    moduleName,
+                    className,
+                    directory == null ? DIRECTORY : directory
+            );
+        }
 
-    /**
-     * Set class name.
-     *
-     * @param className String
-     */
-    public void setClassName(final String className) {
-        this.className = className;
+        return namespaceBuilder;
     }
 
     @Override

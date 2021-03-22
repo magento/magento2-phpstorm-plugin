@@ -27,10 +27,10 @@ public class EntityDataMapperDtoConverter extends EntityDataMapperData
         super(
                 generationContextData.getModuleName(),
                 newEntityDialogData.getEntityName(),
-                generationContextData.getEntityDataMapperNamespaceBuilder().getNamespace(),
-                generationContextData.getEntityDataMapperNamespaceBuilder().getClassFqn(),
-                generationContextData.getModelNamespaceBuilder().getClassFqn(),
-                generationContextData.getFinalDtoTypeNamespaceBuilder().getClassFqn()
+                newEntityDialogData.getEntityName().concat("Model"),
+                newEntityDialogData.getEntityName().concat("Data"),
+                newEntityDialogData.getEntityName().concat("Interface"),
+                newEntityDialogData.hasDtoInterface()
         );
     }
 }

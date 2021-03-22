@@ -7,11 +7,10 @@ package com.magento.idea.magento2plugin.actions.generation.data;
 
 import org.jetbrains.annotations.NotNull;
 
-public class AdminListViewEntityActionData {
+public class IndexActionData {
+
     private final String moduleName;
     private final String entityName;
-    private final String namespace;
-    private final String classFqn;
     private final String acl;
     private final String menu;
 
@@ -20,22 +19,17 @@ public class AdminListViewEntityActionData {
      *
      * @param moduleName String
      * @param entityName String
-     * @param namespace String
      * @param acl String
      * @param menu String
      */
-    public AdminListViewEntityActionData(
+    public IndexActionData(
             final @NotNull String moduleName,
             final @NotNull String entityName,
-            final @NotNull String namespace,
-            final @NotNull String classFqn,
             final @NotNull String acl,
             final @NotNull String menu
     ) {
         this.moduleName = moduleName;
         this.entityName = entityName;
-        this.namespace = namespace;
-        this.classFqn = classFqn;
         this.acl = acl;
         this.menu = menu;
     }
@@ -56,24 +50,6 @@ public class AdminListViewEntityActionData {
      */
     public String getEntityName() {
         return entityName;
-    }
-
-    /**
-     * Get namespace.
-     *
-     * @return String
-     */
-    public String getNamespace() {
-        return namespace;
-    }
-
-    /**
-     * Get class fqn.
-     *
-     * @return String
-     */
-    public String getClassFqn() {
-        return classFqn;
     }
 
     /**

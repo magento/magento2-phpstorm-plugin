@@ -21,14 +21,15 @@ public class DataProviderDtoConverter extends UiComponentDataProviderData
      * @param generationContextData EntityCreatorContextData
      * @param newEntityDialogData NewEntityDialogData
      */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public DataProviderDtoConverter(
             final @NotNull EntityCreatorContextData generationContextData,
             final @NotNull NewEntityDialogData newEntityDialogData
     ) {
         super(
                 newEntityDialogData.getEntityName().concat("DataProvider"),
-                generationContextData.getDataProviderNamespaceBuilder().getNamespace(),
                 UiComponentDataProviderFile.DIRECTORY,
+                newEntityDialogData.getEntityName(),
                 newEntityDialogData.getIdFieldName()
         );
     }

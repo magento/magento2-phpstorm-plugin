@@ -5,15 +5,15 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator.pool.handler;
 
-import com.magento.idea.magento2plugin.actions.generation.data.AdminListViewEntityActionData;
+import com.magento.idea.magento2plugin.actions.generation.data.IndexActionData;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.DataObjectConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.GenerationContextData;
-import com.magento.idea.magento2plugin.actions.generation.generator.AdminListViewEntityActionGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.IndexActionGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.GeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.GeneratorRunnerValidator;
 import org.jetbrains.annotations.NotNull;
 
-public class EntityListActionGeneratorHandler extends GeneratorHandler {
+public class IndexActionGeneratorHandler extends GeneratorHandler {
 
     /**
      * Entity index action generator handler.
@@ -21,7 +21,7 @@ public class EntityListActionGeneratorHandler extends GeneratorHandler {
      * @param contextData GenerationContextData
      * @param dataObjectConverter DataObjectConverter
      */
-    public EntityListActionGeneratorHandler(
+    public IndexActionGeneratorHandler(
             final @NotNull GenerationContextData contextData,
             final @NotNull DataObjectConverter dataObjectConverter
     ) {
@@ -35,7 +35,7 @@ public class EntityListActionGeneratorHandler extends GeneratorHandler {
      * @param dataObjectConverter DataObjectConverter
      * @param runnerValidator GeneratorRunnerValidator
      */
-    public EntityListActionGeneratorHandler(
+    public IndexActionGeneratorHandler(
             final @NotNull GenerationContextData contextData,
             final @NotNull DataObjectConverter dataObjectConverter,
             final GeneratorRunnerValidator runnerValidator
@@ -45,8 +45,8 @@ public class EntityListActionGeneratorHandler extends GeneratorHandler {
 
     @Override
     public void instantiateGenerator() {
-        setGenerator(new AdminListViewEntityActionGenerator(
-                (AdminListViewEntityActionData) getDataObjectConverter(),
+        setGenerator(new IndexActionGenerator(
+                (IndexActionData) getDataObjectConverter(),
                 getProject()
         ));
     }

@@ -13,7 +13,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.converter.newenti
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.DbSchemaXmlDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.DeleteEntityByIdCommandDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.EntityDataMapperDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.EntityListActionDtoConverter;
+import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.IndexActionDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.FormDeleteControllerDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.FormEditControllerDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.FormGenericButtonBlockDtoConverter;
@@ -46,7 +46,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.DbSchemaXmlGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.DeleteByIdCommandGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.EntityDataMapperGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.EntityListActionGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.IndexActionGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormDeleteControllerGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormEditControllerGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormGenericButtonBlockGeneratorHandler;
@@ -128,8 +128,8 @@ public final class NewEntityGeneratorsProviderUtil {
                         new MenuXmlDtoConverter(context, dialogData)
                 )
                 .addNext(
-                        EntityListActionGeneratorHandler.class,
-                        new EntityListActionDtoConverter(context, dialogData),
+                        IndexActionGeneratorHandler.class,
+                        new IndexActionDtoConverter(context, dialogData),
                         dialogData::hasAdminUiComponents
                 )
                 .addNext(

@@ -9,45 +9,53 @@ import com.intellij.lang.Language;
 import com.jetbrains.php.lang.PhpLanguage;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.magento.files.ModuleFileInterface;
-import com.magento.idea.magento2plugin.magento.packages.Package;
+import java.io.File;
 import org.jetbrains.annotations.NotNull;
 
-public final class GetListQuery implements ModuleFileInterface {
-    public static final String DIRECTORY = "Query";
+public final class GetListQueryFile implements ModuleFileInterface {
+
     public static final String CLASS_NAME = "GetListQuery";
     public static final String FILE_EXTENSION = "php";
     public static final String TEMPLATE = "Magento Get List Query Model";
-    private static final GetListQuery INSTANCE = new GetListQuery();
+    private static final String DIRECTORY = "Query";
+    private final String entityName;
+    private NamespaceBuilder namespaceBuilder;
 
     /**
-     * Get singleton instance of the class.
+     * Get list query file constructor.
      *
-     * @return GetListQuery
+     * @param entityName String
      */
-    public static GetListQuery getInstance() {
-        return INSTANCE;
+    public GetListQueryFile(final @NotNull String entityName) {
+        this.entityName = entityName;
     }
 
     /**
-     * Get class FQN.
+     * Get namespace builder for file.
      *
      * @param moduleName String
      *
+     * @return NamespaceBuilder
+     */
+    public NamespaceBuilder getNamespaceBuilder(final @NotNull String moduleName) {
+        if (namespaceBuilder == null) {
+            namespaceBuilder = new NamespaceBuilder(
+                    moduleName,
+                    GetListQueryFile.CLASS_NAME,
+                    getDirectory()
+            );
+        }
+
+        return namespaceBuilder;
+    }
+
+    /**
+     * Get get list query file directory.
+     *
      * @return String
      */
-    public static String getClassFqn(final @NotNull String moduleName) {
-        final NamespaceBuilder namespaceBuilder = new NamespaceBuilder(
-                moduleName,
-                GetListQuery.CLASS_NAME,
-                GetListQuery.DIRECTORY
-        );
-
-        return String.format(
-                "%s%s%s",
-                namespaceBuilder.getNamespace(),
-                Package.fqnSeparator,
-                CLASS_NAME
-        );
+    public String getDirectory() {
+        return DIRECTORY.concat(File.separator).concat(entityName);
     }
 
     @Override

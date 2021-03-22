@@ -15,54 +15,63 @@ import com.magento.idea.magento2plugin.actions.generation.data.DataModelData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.DataModelFile;
+import com.magento.idea.magento2plugin.magento.files.DataModelInterfaceFile;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Properties;
 import javax.swing.JOptionPane;
+import org.jetbrains.annotations.NotNull;
 
 public class DataModelGenerator extends FileGenerator {
+
     private final Project project;
-    private final DataModelData modelData;
+    private final DataModelData data;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final GetFirstClassOfFile getFirstClassOfFile;
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
+    private final DataModelFile file;
 
     /**
-     * Constructor.
+     * Data model generator constructor.
+     *
+     * @param project Project
+     * @param data DataModelData
      */
-    public DataModelGenerator(final Project project, final DataModelData modelData) {
+    public DataModelGenerator(
+            final @NotNull Project project,
+            final @NotNull DataModelData data
+    ) {
         super(project);
-
         this.project = project;
-        this.modelData = modelData;
+        this.data = data;
         this.directoryGenerator = DirectoryGenerator.getInstance();
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
+        file = new DataModelFile(data.getName());
     }
 
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile generate(final @NotNull String actionName) {
         final PsiFile[] files = new PsiFile[1];
 
         WriteCommandAction.runWriteCommandAction(project, () -> {
-            PhpClass model = GetPhpClassByFQN.getInstance(project).execute(
-                    modelData.getFQN()
+            PhpClass dataModel = GetPhpClassByFQN.getInstance(project).execute(
+                    file.getNamespaceBuilder(data.getModuleName()).getClassFqn()
             );
 
-            if (model == null) {
-                model = createModel(actionName);
+            if (dataModel == null) {
+                dataModel = createModel(actionName);
 
-                if (model == null) {
+                if (dataModel == null) {
                     final String errorMessage = this.validatorBundle.message(
                             "validator.file.cantBeCreated",
                             "Data Model"
@@ -74,7 +83,7 @@ public class DataModelGenerator extends FileGenerator {
                             JOptionPane.ERROR_MESSAGE
                     );
                 } else {
-                    files[0] = model.getContainingFile();
+                    files[0] = dataModel.getContainingFile();
                 }
             } else {
                 final String errorMessage = this.validatorBundle.message(
@@ -93,53 +102,63 @@ public class DataModelGenerator extends FileGenerator {
         return files[0];
     }
 
-    @Override
-    protected void fillAttributes(final Properties attributes) {
-        final List<String> uses = getUses();
-        attributes.setProperty("NAMESPACE", modelData.getNamespace());
-        attributes.setProperty("USES", PhpClassGeneratorUtil.formatUses(uses));
-        attributes.setProperty("NAME", modelData.getName());
-        attributes.setProperty(
-                "EXTENDS",
-                PhpClassGeneratorUtil.getNameFromFqn(DataModelFile.DATA_OBJECT)
-        );
-        attributes.setProperty(
-                "IMPLEMENTS",
-                PhpClassGeneratorUtil.getNameFromFqn(modelData.getInterfaceFQN())
-        );
-        attributes.setProperty("PROPERTIES", modelData.getProperties());
-        attributes.setProperty("HASINTERFACE", Boolean.toString(modelData.hasInterface()));
-    }
-
-    private List<String> getUses() {
-        final List<String> usesList = new LinkedList<>();
-        usesList.add(DataModelFile.DATA_OBJECT);
-
-        if (modelData.hasInterface()) {
-            usesList.add(modelData.getInterfaceFQN());
-        }
-        return usesList;
-    }
-
-    private PhpClass createModel(final String actionName) {
-        PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
-                .getModuleDirectoryByModuleName(modelData.getModuleName());
-        final PsiFile interfaceFile;
-        final Properties attributes = getAttributes();
-
-        for (final String directory: DataModelFile.DIRECTORY.split("/")) {
-            parentDirectory = directoryGenerator.findOrCreateSubdirectory(
-                    parentDirectory, directory
-            );
-        }
-
-        interfaceFile = fileFromTemplateGenerator.generate(
-                new DataModelFile(modelData.getName()),
-                attributes,
+    /**
+     * Create model class.
+     *
+     * @param actionName String
+     *
+     * @return PhpClass
+     */
+    private PhpClass createModel(final @NotNull String actionName) {
+        final PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+                .getModuleDirectoryByModuleName(data.getModuleName());
+        final PsiDirectory dataModelDirectory = directoryGenerator.findOrCreateSubdirectories(
                 parentDirectory,
+                DataModelFile.DIRECTORY
+        );
+
+        final PsiFile dataModelFile = fileFromTemplateGenerator.generate(
+                file,
+                getAttributes(),
+                dataModelDirectory,
                 actionName
         );
 
-        return interfaceFile == null ? null : getFirstClassOfFile.execute((PhpFile) interfaceFile);
+        return dataModelFile == null ? null : getFirstClassOfFile.execute((PhpFile) dataModelFile);
+    }
+
+    /**
+     * Fill data model file attributes.
+     *
+     * @param attributes Properties
+     */
+    @Override
+    protected void fillAttributes(final @NotNull Properties attributes) {
+        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
+
+        phpClassTypesBuilder
+                .appendProperty(
+                        "NAMESPACE",
+                        file.getNamespaceBuilder(data.getModuleName()).getNamespace()
+                )
+                .appendProperty("NAME", data.getName())
+                .appendProperty("PROPERTIES", data.getProperties())
+                .appendProperty("HASINTERFACE", Boolean.toString(data.hasInterface()))
+                .append("EXTENDS", DataModelFile.DATA_OBJECT);
+
+        if (data.hasInterface()) {
+            phpClassTypesBuilder.append(
+                    "IMPLEMENTS",
+                    new DataModelInterfaceFile(
+                            data.getInterfaceName()
+                    ).getNamespaceBuilder(data.getModuleName()).getClassFqn());
+        }
+
+        phpClassTypesBuilder.mergeProperties(attributes);
+
+        attributes.setProperty(
+                "USES",
+                PhpClassGeneratorUtil.formatUses(phpClassTypesBuilder.getUses())
+        );
     }
 }

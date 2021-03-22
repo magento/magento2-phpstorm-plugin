@@ -6,27 +6,25 @@
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.magento.idea.magento2plugin.actions.generation.data.GetListQueryModelData;
-import com.magento.idea.magento2plugin.magento.files.queries.GetListQuery;
+import com.magento.idea.magento2plugin.magento.files.queries.GetListQueryFile;
 
 public class QueryModelGeneratorTest extends BaseGeneratorTestCase {
+
     private static final String MODULE_NAME = "Foo_Bar";
-    private static final String EXPECTED_DIRECTORY = "src/app/code/Foo/Bar/"
-            + GetListQuery.DIRECTORY;
     private static final String ENTITY_NAME = "Book";
-    private static final String COLLECTION_TYPE = "Foo\\Bar\\Model\\ResourceModel\\"
-            + ENTITY_NAME + "\\Collection";
-    private static final String ENTITY_DATA_MAPPER_TYPE = "Foo\\Bar\\Mapper\\"
-            + ENTITY_NAME + "DataMapper";
+    private static final String MODEL_NAME = "Book";
+    private static final String COLLECTION_NAME = "Collection";
 
     /**
      * Test generation of GetListQuery model for entity.
      */
     public void testGenerateGetListQueryModelFile() {
+        final GetListQueryFile file = new GetListQueryFile(ENTITY_NAME);
         final GetListQueryModelData getListQueryModelData = new GetListQueryModelData(
                 MODULE_NAME,
                 ENTITY_NAME,
-                COLLECTION_TYPE,
-                ENTITY_DATA_MAPPER_TYPE
+                MODEL_NAME,
+                COLLECTION_NAME
         );
         final GetListQueryModelGenerator getListQueryModelGenerator =
                 new GetListQueryModelGenerator(
@@ -34,11 +32,11 @@ public class QueryModelGeneratorTest extends BaseGeneratorTestCase {
                         myFixture.getProject(),
                         false
                 );
-        final String filePath = this.getFixturePath(GetListQuery.getInstance().getFileName());
+        final String filePath = this.getFixturePath(file.getFileName());
 
         assertGeneratedFileIsCorrect(
                 myFixture.configureByFile(filePath),
-                EXPECTED_DIRECTORY,
+                file.getDirectory(),
                 getListQueryModelGenerator.generate("test")
         );
     }

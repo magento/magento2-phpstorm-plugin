@@ -16,6 +16,7 @@ public class DataModelInterfaceDtoConverter extends DataModelInterfaceData
 
     /**
      * DTO interface converter.
+     *
      * @param generationContextData EntityCreatorContextData
      * @param newEntityDialogData NewEntityDialogData
      */
@@ -24,10 +25,8 @@ public class DataModelInterfaceDtoConverter extends DataModelInterfaceData
             final @NotNull NewEntityDialogData newEntityDialogData
     ) {
         super(
-                generationContextData.getDtoInterfaceNamespaceBuilder().getNamespace(),
                 newEntityDialogData.getEntityName().concat("Interface"),
                 generationContextData.getModuleName(),
-                generationContextData.getDtoInterfaceNamespaceBuilder().getClassFqn(),
                 newEntityDialogData.getProperties()
         );
     }

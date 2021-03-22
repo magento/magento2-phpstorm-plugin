@@ -21,6 +21,7 @@ public class PreferenceDiXmlFileDtoConverter extends PreferenceDiXmFileData
      * @param generationContextData EntityCreatorContextData
      * @param newEntityDialogData NewEntityDialogData
      */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public PreferenceDiXmlFileDtoConverter(
             final @NotNull EntityCreatorContextData generationContextData,
             final @NotNull NewEntityDialogData newEntityDialogData
@@ -29,7 +30,6 @@ public class PreferenceDiXmlFileDtoConverter extends PreferenceDiXmFileData
                 generationContextData.getModuleName(),
                 generationContextData.getDtoInterfaceNamespaceBuilder().getClassFqn(),
                 generationContextData.getDtoModelNamespaceBuilder().getClassFqn(),
-                newEntityDialogData.getEntityName().concat("Model"),
                 Areas.base.toString()
         );
     }

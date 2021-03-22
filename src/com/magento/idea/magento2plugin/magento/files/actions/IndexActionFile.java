@@ -12,11 +12,13 @@ import com.magento.idea.magento2plugin.magento.files.ModuleFileInterface;
 import org.jetbrains.annotations.NotNull;
 
 public final class IndexActionFile implements ModuleFileInterface {
+
     public static final String CLASS_NAME = "Index";
     public static final String FILE_EXTENSION = "php";
     public static final String TEMPLATE = "Magento Entity Index Adminhtml Controller Class";
     private static final String DIRECTORY = "Controller/Adminhtml";
     private final String entityName;
+    private NamespaceBuilder namespaceBuilder;
 
     /**
      * Index adminhtml controller for an entity.
@@ -39,11 +41,15 @@ public final class IndexActionFile implements ModuleFileInterface {
     public @NotNull NamespaceBuilder getNamespaceBuilder(
             final @NotNull String moduleName
     ) {
-        return new NamespaceBuilder(
-                moduleName,
-                CLASS_NAME,
-                getDirectory()
-        );
+        if (namespaceBuilder == null) {
+            namespaceBuilder = new NamespaceBuilder(
+                    moduleName,
+                    CLASS_NAME,
+                    getDirectory()
+            );
+        }
+
+        return namespaceBuilder;
     }
 
     /**
