@@ -5,7 +5,7 @@
 
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
-import com.magento.idea.magento2plugin.actions.generation.dialog.util.HighlightDialogFieldOnErrorUtil;
+import com.magento.idea.magento2plugin.actions.generation.dialog.util.DialogFieldErrorUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidations;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.ValidationRule;
@@ -28,17 +28,21 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * All code generate dialog should extend this class.
  */
 @SuppressWarnings({"PMD.ShortVariable", "PMD.MissingSerialVersionUID"})
 public abstract class AbstractDialog extends JDialog {
+
     protected CommonBundle bundle;
     protected final ValidatorBundle validatorBundle = new ValidatorBundle();
     private final String errorTitle;
-    private final Map<Object, List<ValidationRule>> textFieldValidationRuleMap;
-    private final Map<Object, Map<ValidationRule, String>> errorMessageFieldValidationRuleMap;
+    private final Map<Field, List<ValidationRule>> textFieldValidationRuleMap;
+    private final Map<Field, Map<ValidationRule, String>> errorMessageFieldValidationRuleMap;
+    private boolean isValidationErrorShown;
+    private boolean dialogHasErrors;
 
     /**
      * Abstract Dialog Constructor.
@@ -62,11 +66,18 @@ public abstract class AbstractDialog extends JDialog {
         this.setVisible(false);
     }
 
+    /**
+     * Validate all form fields.
+     *
+     * @return boolean
+     */
     protected boolean validateFormFields() {
         addValidationRulesFromAnnotations();
-        for (final Map.Entry<Object, List<ValidationRule>> entry
+        isValidationErrorShown = dialogHasErrors = false;
+
+        for (final Map.Entry<Field, List<ValidationRule>> entry
                 : textFieldValidationRuleMap.entrySet()) {
-            final Object field = entry.getKey();
+            final Field field = entry.getKey();
             final List<ValidationRule> rules = entry.getValue();
 
             for (final ValidationRule rule : rules) {
@@ -75,25 +86,66 @@ public abstract class AbstractDialog extends JDialog {
                 if (value != null && !rule.check(value)) {
                     if (errorMessageFieldValidationRuleMap.containsKey(field)
                             && errorMessageFieldValidationRuleMap.get(field).containsKey(rule)) {
-                        showErrorMessage(errorMessageFieldValidationRuleMap.get(field).get(rule));
-                        highlightFieldWithErrorStyle(field);
+                        dialogHasErrors = true;
+                        showErrorMessage(
+                                field,
+                                errorMessageFieldValidationRuleMap.get(field).get(rule)
+                        );
                     }
-                    return false;
+                    break;
                 }
             }
         }
-        return true;
+
+        if (dialogHasErrors && !isValidationErrorShown) {
+            showErrorMessage(
+                    validatorBundle.message("validator.someFieldsHaveErrors")
+            );
+        }
+
+        return !dialogHasErrors;
     }
 
+    /**
+     * Show error message for field.
+     *
+     * @param field Field
+     * @param errorMessage String
+     */
+    protected void showErrorMessage(
+            final @NotNull Field field,
+            final @NotNull String errorMessage
+    ) {
+        final boolean isMessageShown =
+                DialogFieldErrorUtil.showErrorMessageForField(this, field, errorMessage);
+
+        if (!isMessageShown) {
+            showErrorMessage(errorMessage);
+            DialogFieldErrorUtil.highlightField(this, field);
+        }
+    }
+
+    /**
+     * Show error message in dialog.
+     *
+     * @param errorMessage String
+     */
     protected void showErrorMessage(final String errorMessage) {
+        if (isValidationErrorShown) {
+            return;
+        }
         JOptionPane.showMessageDialog(
                 null,
                 errorMessage,
                 errorTitle,
                 JOptionPane.ERROR_MESSAGE
         );
+        isValidationErrorShown = true;
     }
 
+    /**
+     * Process validation rules from annotations.
+     */
     private void addValidationRulesFromAnnotations() {
         final Class<?> type = this.getClass();
         final List<FieldValidation> validations = new LinkedList<>();
@@ -114,18 +166,28 @@ public abstract class AbstractDialog extends JDialog {
             for (final FieldValidation validation : validations) {
                 try {
                     addValidationRuleToField(
-                            field.get(this),
+                            field,
                             getRuleFromAnnotation(validation),
                             getMessageFromAnnotation(validation)
                     );
-                } catch (Exception exception) { // NOPMD
-                    // We don't need to cover this case.
+                } catch (NoSuchMethodException | IllegalAccessException
+                        | InvocationTargetException | InstantiationException exception) {
+                    return;
+                } finally {
+                    field.setAccessible(false);
                 }
             }
             field.setAccessible(false);
         }
     }
 
+    /**
+     * Get error message from annotation.
+     *
+     * @param validation FieldValidation
+     *
+     * @return String
+     */
     private String getMessageFromAnnotation(final FieldValidation validation) {
         String[] params;
         final int minMessageArrayLength = 1;
@@ -138,22 +200,38 @@ public abstract class AbstractDialog extends JDialog {
         return validatorBundle.message(validation.message()[0], (Object[]) params);
     }
 
+    /**
+     * Get validation rule from annotation.
+     *
+     * @param validation FieldValidation
+     *
+     * @return ValidationRule
+     */
     private ValidationRule getRuleFromAnnotation(final FieldValidation validation)
-            throws NoSuchMethodException,
-            IllegalAccessException, InvocationTargetException, InstantiationException {
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException,
+            InstantiationException {
         final Class<?> ruleType = validation.rule().getRule();
 
         return (ValidationRule) ruleType.getConstructor().newInstance();
     }
 
+    /**
+     * Add validation rule for field.
+     *
+     * @param field Field
+     * @param rule ValidationRule
+     * @param message String
+     */
     protected void addValidationRuleToField(
-            final Object field,
+            final Field field,
             final ValidationRule rule,
-            final String message) {
-        if (!(field instanceof JComponent)) {
+            final String message
+    ) {
+        if (getComponentForField(field) == null) {
             return;
         }
         List<ValidationRule> rules;
+
         if (textFieldValidationRuleMap.containsKey(field)) {
             rules = textFieldValidationRuleMap.get(field);
         } else {
@@ -167,10 +245,18 @@ public abstract class AbstractDialog extends JDialog {
         }
     }
 
+    /**
+     * Associate validation rule with field.
+     *
+     * @param field Field
+     * @param rule ValidationRule
+     * @param message String
+     */
     private void addFieldValidationRuleMessageAssociation(
-            final Object field,
+            final Field field,
             final ValidationRule rule,
-            final String message) {
+            final String message
+    ) {
         Map<ValidationRule, String> validationRuleErrorMessageMap;
         if (errorMessageFieldValidationRuleMap.containsKey(field)) {
             validationRuleErrorMessageMap = errorMessageFieldValidationRuleMap.get(field);
@@ -181,31 +267,53 @@ public abstract class AbstractDialog extends JDialog {
         errorMessageFieldValidationRuleMap.put(field, validationRuleErrorMessageMap);
     }
 
-    private String resolveFieldValueByComponentType(final Object field) {
-        if (field instanceof JTextField) {
-            return ((JTextField) field).isEditable() ? ((JTextField) field).getText() : null;
-        } else if (field instanceof JComboBox) {
-            if (((JComboBox<?>) field).getSelectedIndex() == -1) {
+    /**
+     * Resolve value of stored component by field.
+     *
+     * @param field Field
+     *
+     * @return String
+     */
+    private String resolveFieldValueByComponentType(final Field field) {
+        final JComponent component = getComponentForField(field);
+
+        if (component instanceof JTextField) {
+            return ((JTextField) component).isEditable()
+                    ? ((JTextField) component).getText() : null;
+        } else if (component instanceof JComboBox) {
+            if (((JComboBox<?>) component).getSelectedIndex() == -1) {
                 return "";
             } else {
-                return ((JComboBox) field).getSelectedItem().toString();
+                return ((JComboBox) component).getSelectedItem().toString();
             }
-        } else if (field instanceof JTextArea) {
-            return ((JTextArea) field).getText();
+        } else if (component instanceof JTextArea) {
+            return ((JTextArea) component).getText();
         }
+
         return null;
     }
 
     /**
-     * Highlight field with error style.
+     * Get JComponent for field.
      *
-     * @param field Object
+     * @param field Field
+     *
+     * @return JComponent
      */
-    private void highlightFieldWithErrorStyle(final Object field) {
-        if (field instanceof JTextField) {
-            HighlightDialogFieldOnErrorUtil.execute((JTextField) field);
-        } else if (field instanceof JComboBox) {
-            HighlightDialogFieldOnErrorUtil.execute((JComboBox) field);
+    private JComponent getComponentForField(final @NotNull Field field) {
+        try {
+            field.setAccessible(true);
+            final Object component = field.get(this);
+
+            if (component instanceof JComponent) {
+                return (JComponent) component;
+            }
+        } catch (IllegalAccessException exception) {
+            return null;
+        } finally {
+            field.setAccessible(false);
         }
+
+        return null;
     }
 }
