@@ -162,11 +162,11 @@ public class NewEntityDialog extends AbstractDialog {
     private static final boolean OPEN_FILES_FLAG = false;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, FORM_NAME})
-    @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE})
+    @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE, FORM_NAME})
     private JTextField formName;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, GRID_NAME})
-    @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE})
+    @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE, FORM_NAME})
     private JTextField gridName;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, ACL_ID})
@@ -186,6 +186,15 @@ public class NewEntityDialog extends AbstractDialog {
     private JTextPane exampleFormName;
     private JTextPane exampleGridName;
     private JPanel uiComponentsPanel;
+    private JPanel formNamePanel;
+    private JPanel gridNamePanel;
+    private JPanel aclIdPanel;
+    private JPanel menuIdPanel;
+    private JLabel formNameErrorMessage;
+    private JLabel gridNameErrorMessage;
+    private JLabel aclErrorMessage;
+    private JLabel menuIdentifierErrorMessage;
+    private JLabel sortOrderErrorMessage;
     private JTextField observerName;
     private final ProcessWorker.InProgressFlag onOkActionFired;
 
