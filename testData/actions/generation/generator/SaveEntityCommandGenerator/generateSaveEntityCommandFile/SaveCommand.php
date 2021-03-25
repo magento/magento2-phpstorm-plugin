@@ -3,9 +3,9 @@
 namespace Foo\Bar\Command\Book;
 
 use Exception;
-use Foo\Bar\Data\BookData;
 use Foo\Bar\Model\BookModel;
 use Foo\Bar\Model\BookModelFactory;
+use Foo\Bar\Model\Data\BookData;
 use Foo\Bar\Model\ResourceModel\BookResource;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\CouldNotSaveException;

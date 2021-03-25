@@ -254,7 +254,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
      */
     public UiComponentDataProviderData getGridDataProviderData() {
         return new UiComponentDataProviderData(
-                getDataProviderClass(),
+                getDataProviderClassName(),
                 getDataProviderDirectory()
         );
     }
@@ -285,9 +285,10 @@ public class NewUiComponentGridDialog extends AbstractDialog {
                 getModuleName(),
                 getArea(),
                 getUiComponentName(),
-                getDataProviderClassFqn(),
                 getEntityIdFieldName(),
                 getAcl(),
+                getDataProviderClassName(),
+                getDataProviderDirectory(),
                 getUiComponentGridToolbarData()
         );
     }
@@ -369,7 +370,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
             dataProviderGenerator = new DataProviderDeclarationGenerator(
                 new DataProviderDeclarationData(
                     getModuleName(),
-                    getDataProviderClass(),
+                    getDataProviderClassName(),
                     getCollection(),
                     getUiComponentName() + "_data_source",
                     getTableName()
@@ -558,7 +559,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
                 "%s%s%s",
                 getDataProviderNamespace(),
                 Package.fqnSeparator,
-                getDataProviderClass()
+                getDataProviderClassName()
         );
     }
 
@@ -616,7 +617,12 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         return collectionFqn.substring(1);
     }
 
-    private String getDataProviderClass() {
+    /**
+     * Get data provider class name.
+     *
+     * @return String
+     */
+    private String getDataProviderClassName() {
         return providerClassName.getText().trim();
     }
 

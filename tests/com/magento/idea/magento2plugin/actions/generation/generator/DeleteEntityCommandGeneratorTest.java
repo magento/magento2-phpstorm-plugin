@@ -10,15 +10,12 @@ import com.magento.idea.magento2plugin.actions.generation.data.DeleteEntityByIdC
 import com.magento.idea.magento2plugin.magento.files.commands.DeleteEntityByIdCommandFile;
 
 public class DeleteEntityCommandGeneratorTest extends BaseGeneratorTestCase {
+
     private static final String MODULE_NAME = "Foo_Bar";
     private static final String ENTITY_NAME = "Book";
+    private static final String MODEL_NAME = ENTITY_NAME + "Model";
+    private static final String RESOURCE_MODEL_NAME = ENTITY_NAME + "Resource";
     private static final String EXPECTED_DIRECTORY = "src/app/code/Foo/Bar/Command/" + ENTITY_NAME;
-    private static final String NAMESPACE = "Foo\\Bar\\Command\\" + ENTITY_NAME;
-    private static final String CLASS_FQN = NAMESPACE + "\\"
-            + DeleteEntityByIdCommandFile.CLASS_NAME;
-    private static final String MODEL_CLASS_FQN = "Foo\\Bar\\Model\\" + ENTITY_NAME + "Model";
-    private static final String RESOURCE_CLASS_FQN = "Foo\\Bar\\Model\\ResourceModel\\"
-            + ENTITY_NAME + "Resource";
     private static final String ENTITY_ID = "book_id";
 
     /**
@@ -27,13 +24,11 @@ public class DeleteEntityCommandGeneratorTest extends BaseGeneratorTestCase {
     public void testGenerateDeleteEntityByIdCommandFile() {
         final DeleteEntityByIdCommandData deleteEntityByIdCommandData =
                 new DeleteEntityByIdCommandData(
-                    MODULE_NAME,
-                    ENTITY_NAME,
-                    NAMESPACE,
-                    CLASS_FQN,
-                    MODEL_CLASS_FQN,
-                    RESOURCE_CLASS_FQN,
-                    ENTITY_ID
+                        MODULE_NAME,
+                        ENTITY_NAME,
+                        ENTITY_ID,
+                        MODEL_NAME,
+                        RESOURCE_MODEL_NAME
                 );
         final DeleteEntityByIdCommandGenerator deleteEntityByIdCommandGenerator =
                 new DeleteEntityByIdCommandGenerator(
@@ -42,7 +37,7 @@ public class DeleteEntityCommandGeneratorTest extends BaseGeneratorTestCase {
                         false
                 );
         final String filePath = this.getFixturePath(
-                new DeleteEntityByIdCommandFile().getFileName()
+                new DeleteEntityByIdCommandFile(ENTITY_NAME).getFileName()
         );
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
         final PsiFile deleteEntityCommandFile = deleteEntityByIdCommandGenerator.generate("test");

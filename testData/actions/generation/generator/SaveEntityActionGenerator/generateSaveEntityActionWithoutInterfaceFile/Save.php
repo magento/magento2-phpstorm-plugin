@@ -3,8 +3,8 @@
 namespace Foo\Bar\Controller\Adminhtml\Company;
 
 use Foo\Bar\Command\Company\SaveCommand;
-use Foo\Bar\Model\CompanyModel\CompanyModel;
-use Foo\Bar\Model\CompanyModel\CompanyModelFactory;
+use Foo\Bar\Model\Data\CompanyData;
+use Foo\Bar\Model\Data\CompanyDataFactory;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
@@ -37,7 +37,7 @@ class Save extends Action implements HttpPostActionInterface
     private $saveCommand;
 
     /**
-     * @var CompanyModelFactory
+     * @var CompanyDataFactory
      */
     private $entityDataFactory;
 
@@ -45,13 +45,13 @@ class Save extends Action implements HttpPostActionInterface
      * @param Context $context
      * @param DataPersistorInterface $dataPersistor
      * @param SaveCommand $saveCommand
-     * @param CompanyModelFactory $entityDataFactory
+     * @param CompanyDataFactory $entityDataFactory
      */
     public function __construct(
         Context $context,
         DataPersistorInterface $dataPersistor,
         SaveCommand $saveCommand,
-        CompanyModelFactory $entityDataFactory
+        CompanyDataFactory $entityDataFactory
     )
     {
         parent::__construct($context);
@@ -71,7 +71,7 @@ class Save extends Action implements HttpPostActionInterface
         $params = $this->getRequest()->getParams();
 
         try {
-            /** @var CompanyModel|DataObject $entityModel */
+            /** @var CompanyData|DataObject $entityModel */
             $entityModel = $this->entityDataFactory->create();
             $entityModel->addData($params['general']);
             $this->saveCommand->execute($entityModel);

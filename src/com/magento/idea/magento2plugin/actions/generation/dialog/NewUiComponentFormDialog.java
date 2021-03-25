@@ -428,15 +428,6 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         ), getModuleName(), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
     }
 
-    @NotNull
-    private NamespaceBuilder getDataProviderNamespace() {
-        return new NamespaceBuilder(
-                getModuleName(),
-                getDataProviderClassName(),
-                getDataProviderDirectory()
-        );
-    }
-
     /**
      * Generate form file.
      */
@@ -452,7 +443,8 @@ public class NewUiComponentFormDialog extends AbstractDialog {
                 getRoute(),
                 getSubmitControllerName(),
                 getSubmitActionName(),
-                getDataProviderNamespace().getClassFqn()
+                getDataProviderClassName(),
+                getDataProviderDirectory()
         ), project).generate(NewUiComponentFormAction.ACTION_NAME, true);
     }
 

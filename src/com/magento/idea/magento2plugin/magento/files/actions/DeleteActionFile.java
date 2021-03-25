@@ -12,48 +12,50 @@ import com.magento.idea.magento2plugin.magento.files.ModuleFileInterface;
 import org.jetbrains.annotations.NotNull;
 
 public final class DeleteActionFile implements ModuleFileInterface {
+
     public static final String CLASS_NAME = "Delete";
     public static final String FILE_EXTENSION = "php";
     public static final String TEMPLATE = "Magento Entity Delete Controller Class";
     private static final String DIRECTORY = "Controller/Adminhtml";
-    private static final DeleteActionFile INSTANCE = new DeleteActionFile();
+    private final String entityName;
+    private NamespaceBuilder namespaceBuilder;
 
     /**
-     * Get singleton instance of the class.
+     * Delete action file constructor.
      *
-     * @return Delete
+     * @param entityName String
      */
-    public static DeleteActionFile getInstance() {
-        return INSTANCE;
+    public DeleteActionFile(final @NotNull String entityName) {
+        this.entityName = entityName;
     }
 
     /**
      * Get namespace builder for file.
      *
      * @param moduleName String
-     * @param entityName String
      *
      * @return String
      */
-    public static @NotNull NamespaceBuilder getNamespaceBuilder(
-            final @NotNull String moduleName,
-            final @NotNull String entityName
+    public @NotNull NamespaceBuilder getNamespaceBuilder(
+            final @NotNull String moduleName
     ) {
-        return new NamespaceBuilder(
-                moduleName,
-                CLASS_NAME,
-                getDirectory(entityName)
-        );
+        if (namespaceBuilder == null) {
+            namespaceBuilder = new NamespaceBuilder(
+                    moduleName,
+                    CLASS_NAME,
+                    getDirectory()
+            );
+        }
+
+        return namespaceBuilder;
     }
 
     /**
      * Get Directory path from the module root.
      *
-     * @param entityName String
-     *
      * @return String
      */
-    public static String getDirectory(final @NotNull String entityName) {
+    public String getDirectory() {
         return DIRECTORY.concat("/" + entityName);
     }
 

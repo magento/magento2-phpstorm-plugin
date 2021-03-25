@@ -79,7 +79,10 @@ public abstract class GeneratorHandler {
      * Run generator.
      */
     public final void generate() {
-        generator.generate(getContextData().getActionName(), getContextData().hasOpenFileFlag());
+        generator.generate(
+                getContextData().getActionName(),
+                getContextData().checkIfHasOpenFileFlag()
+        );
     }
 
     /**

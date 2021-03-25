@@ -9,6 +9,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridDa
 import com.magento.idea.magento2plugin.actions.generation.data.converter.DataObjectConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityCreatorContextData;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.NewEntityDialogData;
+import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderFile;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,9 +30,10 @@ public class UiComponentGridDtoConverter extends UiComponentGridData
                 generationContextData.getModuleName(),
                 Areas.adminhtml.toString(),
                 newEntityDialogData.getGridName(),
-                generationContextData.getDataProviderNamespaceBuilder().getClassFqn(),
                 newEntityDialogData.getIdFieldName(),
                 newEntityDialogData.getAclId(),
+                newEntityDialogData.getEntityName().concat("DataProvider"),
+                UiComponentDataProviderFile.DIRECTORY,
                 new UiComponentGridToolbarDtoConverter(generationContextData, newEntityDialogData),
                 generationContextData.getEntityProps()
         );

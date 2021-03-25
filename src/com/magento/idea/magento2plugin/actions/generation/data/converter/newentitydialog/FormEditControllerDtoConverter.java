@@ -27,8 +27,6 @@ public class FormEditControllerDtoConverter extends EditEntityActionData
         super(
                 newEntityDialogData.getEntityName(),
                 generationContextData.getModuleName(),
-                generationContextData.getEditControllerNamespaceBuilder().getClassFqn(),
-                generationContextData.getEditControllerNamespaceBuilder().getNamespace(),
                 newEntityDialogData.getAclId(),
                 newEntityDialogData.getMenuId()
         );

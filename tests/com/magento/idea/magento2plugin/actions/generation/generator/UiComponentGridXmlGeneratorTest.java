@@ -14,12 +14,14 @@ import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 
 public class UiComponentGridXmlGeneratorTest extends BaseGeneratorTestCase {
+
     private static final String MODULE_DIRECTORY = "src/app/code/Foo/Bar/";
     private static final String MODULE_NAME = "Foo_Bar";
     private static final String COMPONENT_NAME = "custom_entity_grid";
     private static final String ID_FIELD_NAME = "entity_id";
     private static final String ACL = "Foo_Bar::custom_entity";
-    private static final String PROVIDER_CLASS_NAME = "Foo\\Bar\\Ui\\Listing\\DataProvider";
+    private static final String DATA_PROVIDER_NAME = "DataProvider";
+    private static final String DATA_PROVIDER_PATH = "Ui/Listing";
 
     /**
      * Test UI component listing file generation for specific area.
@@ -51,6 +53,14 @@ public class UiComponentGridXmlGeneratorTest extends BaseGeneratorTestCase {
         assertGeneratedFileIsCorrect(expectedFile, getExpectedDirectory(area), cronGroupsXmlFile);
     }
 
+    /**
+     * Generate UI Component Grid Xml file.
+     *
+     * @param area String
+     * @param addToolbar boolean
+     *
+     * @return PsiFile
+     */
     private PsiFile generateComponentGridXml(
             final String area,
             final boolean addToolbar
@@ -68,9 +78,10 @@ public class UiComponentGridXmlGeneratorTest extends BaseGeneratorTestCase {
                 MODULE_NAME,
                 area,
                 COMPONENT_NAME,
-                PROVIDER_CLASS_NAME,
                 ID_FIELD_NAME,
                 ACL,
+                DATA_PROVIDER_NAME,
+                DATA_PROVIDER_PATH,
                 uiGridToolbarData
         );
         final UiComponentGridXmlGenerator uiGridXmlGenerator = new UiComponentGridXmlGenerator(
