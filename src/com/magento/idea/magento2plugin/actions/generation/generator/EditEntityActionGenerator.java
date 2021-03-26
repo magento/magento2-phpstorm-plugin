@@ -13,27 +13,25 @@ import com.magento.idea.magento2plugin.actions.generation.data.EditEntityActionD
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.actions.EditActionFile;
 import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.code.BackendModuleType;
 import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryType;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
 public class EditEntityActionGenerator extends FileGenerator {
 
     private final Project project;
-    private final EditActionFile file;
     private final EditEntityActionData data;
     private final boolean checkFileAlreadyExists;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final DirectoryGenerator directoryGenerator;
     private final ModuleIndex moduleIndex;
-    private final List<String> uses;
+    private final EditActionFile file;
 
     /**
      * Edit entity action/controller file generator constructor.
@@ -64,11 +62,10 @@ public class EditEntityActionGenerator extends FileGenerator {
         this.data = data;
         this.project = project;
         this.checkFileAlreadyExists = checkFileAlreadyExists;
-        file = new EditActionFile(data.getEntityName());
         fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         moduleIndex = ModuleIndex.getInstance(project);
         directoryGenerator = DirectoryGenerator.getInstance();
-        uses = new ArrayList<>();
+        file = new EditActionFile(data.getEntityName());
     }
 
     /**
@@ -81,7 +78,7 @@ public class EditEntityActionGenerator extends FileGenerator {
     @Override
     public PsiFile generate(final @NotNull String actionName) {
         final PhpClass editActionClass = GetPhpClassByFQN.getInstance(project).execute(
-                data.getClassFqn()
+                file.getNamespaceBuilder(data.getModuleName()).getClassFqn()
         );
 
         if (this.checkFileAlreadyExists && editActionClass != null) {
@@ -110,36 +107,23 @@ public class EditEntityActionGenerator extends FileGenerator {
      */
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        attributes.setProperty("NAMESPACE", data.getNamespace());
-        attributes.setProperty("ENTITY_NAME", data.getEntityName());
-        attributes.setProperty("CLASS_NAME", file.getClassName());
-        attributes.setProperty("ADMIN_RESOURCE", data.getAcl());
-        attributes.setProperty("MENU_IDENTIFIER", data.getMenu());
+        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
 
-        addProperty(attributes, "EXTENDS", BackendModuleType.EXTENDS.getType());
-        addProperty(attributes, "IMPLEMENTS", HttpMethod.GET.getInterfaceFqn());
-        addProperty(attributes, "RESULT_INTERFACE",
-                FrameworkLibraryType.RESULT_INTERFACE.getType()
-        );
-        addProperty(attributes, "RESULT_FACTORY", FrameworkLibraryType.RESULT_FACTORY.getType());
-        addProperty(attributes, "RESULT_PAGE", BackendModuleType.RESULT_PAGE.getType());
+        phpClassTypesBuilder
+                .appendProperty("NAMESPACE",
+                        file.getNamespaceBuilder(data.getModuleName()).getNamespace())
+                .appendProperty("ENTITY_NAME", data.getEntityName())
+                .appendProperty("CLASS_NAME", file.getClassName())
+                .appendProperty("ADMIN_RESOURCE", data.getAcl())
+                .appendProperty("MENU_IDENTIFIER", data.getMenu())
+                .append("EXTENDS", BackendModuleType.EXTENDS.getType())
+                .append("IMPLEMENTS", HttpMethod.GET.getInterfaceFqn())
+                .append("RESULT_INTERFACE", FrameworkLibraryType.RESULT_INTERFACE.getType())
+                .append("RESULT_FACTORY", FrameworkLibraryType.RESULT_FACTORY.getType())
+                .append("RESULT_PAGE", BackendModuleType.RESULT_PAGE.getType())
+                .mergeProperties(attributes);
 
-        attributes.setProperty("USES", PhpClassGeneratorUtil.formatUses(uses));
-    }
-
-    /**
-     * Add type to properties.
-     *
-     * @param properties Properties
-     * @param propertyName String
-     * @param type String
-     */
-    protected void addProperty(
-            final @NotNull Properties properties,
-            final String propertyName,
-            final String type
-    ) {
-        uses.add(type);
-        properties.setProperty(propertyName, PhpClassGeneratorUtil.getNameFromFqn(type));
+        attributes.setProperty("USES",
+                PhpClassGeneratorUtil.formatUses(phpClassTypesBuilder.getUses()));
     }
 }

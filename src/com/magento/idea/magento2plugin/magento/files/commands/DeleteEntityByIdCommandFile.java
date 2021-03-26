@@ -12,58 +12,68 @@ import com.magento.idea.magento2plugin.magento.files.ModuleFileInterface;
 import org.jetbrains.annotations.NotNull;
 
 public class DeleteEntityByIdCommandFile implements ModuleFileInterface {
+
     public static final String CLASS_NAME = "DeleteByIdCommand";
     public static final String FILE_EXTENSION = "php";
     public static final String TEMPLATE = "Magento Delete Entity By Id Command";
     private static final String DIRECTORY = "Command";
+    private final String entityName;
+    private NamespaceBuilder namespaceBuilder;
+
+    /**
+     * Delete entity by id command file constructor.
+     *
+     * @param entityName String
+     */
+    public DeleteEntityByIdCommandFile(final @NotNull String entityName) {
+        this.entityName = entityName;
+    }
 
     /**
      * Get namespace.
      *
      * @param moduleName String
-     * @param entityName String
      *
      * @return String
      */
-    public static @NotNull String getNamespace(
-            final @NotNull String moduleName,
-            final @NotNull String entityName
+    public @NotNull String getNamespace(
+            final @NotNull String moduleName
     ) {
-        return getNamespaceBuilder(moduleName, entityName).getNamespace();
+        return getNamespaceBuilder(moduleName).getNamespace();
     }
 
     /**
      * Get class FQN.
      *
      * @param moduleName String
-     * @param entityName String
      *
      * @return String
      */
-    public static String getClassFqn(
-            final @NotNull String moduleName,
-            final @NotNull String entityName
+    public String getClassFqn(
+            final @NotNull String moduleName
     ) {
-        return getNamespaceBuilder(moduleName, entityName).getClassFqn();
+        return getNamespaceBuilder(moduleName).getClassFqn();
     }
 
     /**
      * Get namespace builder for file.
      *
      * @param moduleName String
-     * @param entityName String
      *
      * @return String
      */
-    public static @NotNull NamespaceBuilder getNamespaceBuilder(
-            final @NotNull String moduleName,
-            final @NotNull String entityName
+    public @NotNull NamespaceBuilder getNamespaceBuilder(
+            final @NotNull String moduleName
     ) {
-        return new NamespaceBuilder(
-                moduleName,
-                CLASS_NAME,
-                getDirectory(entityName)
-        );
+        if (namespaceBuilder == null) {
+            namespaceBuilder = new NamespaceBuilder(
+                    moduleName,
+                    CLASS_NAME,
+                    getDirectory(entityName)
+            );
+        }
+
+        return namespaceBuilder;
     }
 
     /**

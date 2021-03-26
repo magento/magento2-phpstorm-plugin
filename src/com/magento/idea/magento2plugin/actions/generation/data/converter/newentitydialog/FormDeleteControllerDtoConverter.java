@@ -27,8 +27,6 @@ public class FormDeleteControllerDtoConverter extends DeleteEntityControllerFile
         super(
                 newEntityDialogData.getEntityName(),
                 generationContextData.getModuleName(),
-                generationContextData.getDeleteControllerNamespaceBuilder().getNamespace(),
-                generationContextData.getDeleteEntityByIdCommandNamespaceBuilder().getClassFqn(),
                 newEntityDialogData.getAclId(),
                 newEntityDialogData.getIdFieldName()
         );

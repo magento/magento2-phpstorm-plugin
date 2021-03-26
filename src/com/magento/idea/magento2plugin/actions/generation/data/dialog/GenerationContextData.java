@@ -38,5 +38,5 @@ public interface GenerationContextData {
      *
      * @return boolean
      */
-    boolean hasOpenFileFlag();
+    boolean checkIfHasOpenFileFlag();
 }

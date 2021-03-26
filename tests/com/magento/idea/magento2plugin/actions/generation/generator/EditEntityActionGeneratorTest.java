@@ -10,12 +10,11 @@ import com.magento.idea.magento2plugin.actions.generation.data.EditEntityActionD
 import com.magento.idea.magento2plugin.magento.files.actions.EditActionFile;
 
 public class EditEntityActionGeneratorTest extends BaseGeneratorTestCase {
+
     private static final String MODULE_NAME = "Foo_Bar";
     private static final String ENTITY_NAME = "Book";
     private static final String EXPECTED_DIRECTORY =
             "/src/app/code/Foo/Bar/Controller/Adminhtml/" + ENTITY_NAME;
-    private static final String NAMESPACE =
-            "Foo\\Bar\\Controller\\Adminhtml\\" + ENTITY_NAME;
     private static final String ACL = "Foo_Bar::management";
     private static final String MENU = "Foo_Bar::management";
 
@@ -29,8 +28,6 @@ public class EditEntityActionGeneratorTest extends BaseGeneratorTestCase {
                         new EditEntityActionData(
                                 ENTITY_NAME,
                                 MODULE_NAME,
-                                NAMESPACE.concat("\\" + file.getClassName()),
-                                NAMESPACE,
                                 ACL,
                                 MENU
                         ),
