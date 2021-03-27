@@ -89,6 +89,7 @@ public class RegExUtil {
     }
 
     public static class CustomTheme {
-        public static final String MODULE_NAME = "app\\/design\\/(adminhtml|frontend)\\/\\w*\\/\\w*\\/\\w*";
+        public static final String MODULE_NAME =
+                "app\\/design\\/(adminhtml|frontend)\\/\\w*\\/\\w*\\/\\w*";
     }
 }
