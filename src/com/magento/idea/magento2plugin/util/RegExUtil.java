@@ -87,4 +87,8 @@ public class RegExUtil {
         public static final String CLASS_ELEMENT =
                 "\\\\?" + PhpRegex.FQN + "(" + CLASS_MEMBER_NAME + ")?.*";
     }
+
+    public static class CustomTheme {
+        public static final String MODULE_NAME = "app\\/design\\/(adminhtml|frontend)\\/\\w*\\/\\w*\\/\\w*";
+    }
 }
