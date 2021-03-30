@@ -11,6 +11,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annot
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.ValidationRule;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.lang.reflect.Field;
@@ -26,6 +27,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import org.jetbrains.annotations.NotNull;
@@ -41,6 +43,7 @@ public abstract class AbstractDialog extends JDialog {
     private final String errorTitle;
     private final Map<Field, List<ValidationRule>> textFieldValidationRuleMap;
     private final Map<Field, Map<ValidationRule, String>> errorMessageFieldValidationRuleMap;
+    private JTabbedPane tabbedPane;
     private boolean isValidationErrorShown;
     private boolean dialogHasErrors;
 
@@ -86,6 +89,13 @@ public abstract class AbstractDialog extends JDialog {
                 if (value != null && !rule.check(value)) {
                     if (errorMessageFieldValidationRuleMap.containsKey(field)
                             && errorMessageFieldValidationRuleMap.get(field).containsKey(rule)) {
+                        if (!dialogHasErrors) {
+                            final JComponent component = getComponentForField(field);
+
+                            if (component != null && tabbedPane != null) {
+                                navigateToTabWithComponent(component);
+                            }
+                        }
                         dialogHasErrors = true;
                         showErrorMessage(
                                 field,
@@ -104,6 +114,15 @@ public abstract class AbstractDialog extends JDialog {
         }
 
         return !dialogHasErrors;
+    }
+
+    /**
+     * Tabbed pane should be registered to be possible navigate to the tab in which error occurred.
+     *
+     * @param tabbedPane JTabbedPane
+     */
+    protected void registerTabbedPane(final @NotNull JTabbedPane tabbedPane) {
+        this.tabbedPane = tabbedPane;
     }
 
     /**
@@ -315,5 +334,47 @@ public abstract class AbstractDialog extends JDialog {
         }
 
         return null;
+    }
+
+    /**
+     * Navigate to tab with specified component.
+     *
+     * @param component JComponent
+     */
+    private void navigateToTabWithComponent(final @NotNull JComponent component) {
+        if (tabbedPane == null) {
+            return;
+        }
+
+        final int index = getParentTabPaneForComponent(component);
+
+        if (index != -1) {
+            tabbedPane.setSelectedIndex(index);
+        }
+    }
+
+    /**
+     * Get parent tab index for component.
+     *
+     * @param component Container
+     *
+     * @return int
+     */
+    private int getParentTabPaneForComponent(final @NotNull Container component) {
+        if (tabbedPane == null) {
+            return -1;
+        }
+        final int parentTabIndex = tabbedPane.indexOfComponent(component);
+
+        if (parentTabIndex != -1) {
+            return parentTabIndex;
+        }
+        final Container parent = component.getParent();
+
+        if (parent == null) {
+            return -1;
+        }
+
+        return getParentTabPaneForComponent(parent);
     }
 }

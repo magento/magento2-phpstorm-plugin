@@ -251,6 +251,7 @@ public class NewEntityDialog extends AbstractDialog {
         toggleUiComponentsPanel();
 
         createUiComponent.addItemListener(event -> toggleUiComponentsPanel());
+        registerTabbedPane(tabbedPane1);
     }
 
     /**
