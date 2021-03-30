@@ -15,25 +15,22 @@ import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataPr
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
-import com.magento.idea.magento2plugin.magento.files.queries.GetListQuery;
-import com.magento.idea.magento2plugin.magento.packages.File;
-import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderFile;
+import com.magento.idea.magento2plugin.magento.files.queries.GetListQueryFile;
 import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryType;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Properties;
 import javax.swing.JOptionPane;
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings({"PMD.OnlyOneReturn", "PMD.DataflowAnomalyAnalysis"})
 public class UiComponentDataProviderGenerator extends FileGenerator {
-    private final UiComponentDataProviderData uiComponentGridDataProviderData;
+
+    private final UiComponentDataProviderData data;
     private final Project project;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
@@ -41,21 +38,22 @@ public class UiComponentDataProviderGenerator extends FileGenerator {
     private final CommonBundle commonBundle;
     private final String moduleName;
     private final GetFirstClassOfFile getFirstClassOfFile;
+    private final UiComponentDataProviderFile file;
 
     /**
      * Ui component grid data provider constructor.
      *
-     * @param uiComponentGridDataProviderData UiComponentGridDataProviderData
+     * @param data UiComponentGridDataProviderData
      * @param moduleName String
      * @param project Project
      */
     public UiComponentDataProviderGenerator(
-            final @NotNull UiComponentDataProviderData uiComponentGridDataProviderData,
+            final @NotNull UiComponentDataProviderData data,
             final @NotNull String moduleName,
             final @NotNull Project project
     ) {
         super(project);
-        this.uiComponentGridDataProviderData = uiComponentGridDataProviderData;
+        this.data = data;
         this.directoryGenerator = DirectoryGenerator.getInstance();
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         this.validatorBundle = new ValidatorBundle();
@@ -63,6 +61,7 @@ public class UiComponentDataProviderGenerator extends FileGenerator {
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
         this.project = project;
         this.moduleName = moduleName;
+        file = new UiComponentDataProviderFile(data.getName());
     }
 
     /**
@@ -78,7 +77,7 @@ public class UiComponentDataProviderGenerator extends FileGenerator {
 
         WriteCommandAction.runWriteCommandAction(project, () -> {
             PhpClass dataProvider = GetPhpClassByFQN.getInstance(project).execute(
-                    getDataProviderFqn()
+                    file.getNamespaceBuilder(moduleName, data.getPath()).getClassFqn()
             );
 
             if (dataProvider != null) {
@@ -120,74 +119,6 @@ public class UiComponentDataProviderGenerator extends FileGenerator {
     }
 
     /**
-     * Fill file property attributes.
-     *
-     * @param attributes Properties
-     */
-    @Override
-    protected void fillAttributes(final @NotNull Properties attributes) {
-        attributes.setProperty("NAMESPACE", uiComponentGridDataProviderData.getNamespace());
-        attributes.setProperty("CLASS_NAME", uiComponentGridDataProviderData.getName());
-
-        if (uiComponentGridDataProviderData.getEntityIdFieldName() != null) {
-            attributes.setProperty(
-                    "ENTITY_ID",
-                    uiComponentGridDataProviderData.getEntityIdFieldName()
-            );
-        }
-        attributes.setProperty("HAS_GET_LIST_QUERY", "false");
-
-        final List<String> uses = new LinkedList<>();
-
-        uses.add(UiComponentDataProviderPhp.DEFAULT_DATA_PROVIDER);
-        attributes.setProperty(
-                "EXTENDS",
-                PhpClassGeneratorUtil.getNameFromFqn(
-                        UiComponentDataProviderPhp.DEFAULT_DATA_PROVIDER
-                )
-        );
-
-        final PhpClass getListQueryFile = GetPhpClassByFQN.getInstance(project).execute(
-                GetListQuery.getClassFqn(moduleName)
-        );
-
-        if (getListQueryFile == null) {
-            attributes.setProperty("USES", PhpClassGeneratorUtil.formatUses(uses));
-            return;
-        }
-        attributes.setProperty("HAS_GET_LIST_QUERY", "true");
-
-        uses.add(FrameworkLibraryType.REPORTING.getType());
-        attributes.setProperty("REPORTING_TYPE", FrameworkLibraryType.REPORTING.getTypeName());
-
-        uses.add(FrameworkLibraryType.API_SEARCH_CRITERIA_BUILDER.getType());
-        attributes.setProperty("SEARCH_CRITERIA_BUILDER",
-                FrameworkLibraryType.API_SEARCH_CRITERIA_BUILDER.getTypeName());
-
-        uses.add(FrameworkLibraryType.REQUEST.getType());
-        attributes.setProperty("REQUEST_TYPE", FrameworkLibraryType.REQUEST.getTypeName());
-
-        uses.add(FrameworkLibraryType.FILTER_BUILDER.getType());
-        attributes.setProperty("FILTER_BUILDER", FrameworkLibraryType.FILTER_BUILDER.getTypeName());
-
-        uses.add(UiComponentDataProviderPhp.SEARCH_RESULT_FACTORY);
-        attributes.setProperty("SEARCH_RESULT_FACTORY",
-                PhpClassGeneratorUtil.getNameFromFqn(
-                        UiComponentDataProviderPhp.SEARCH_RESULT_FACTORY
-                )
-        );
-
-        final @NotNull String getListQueryFqn = getListQueryFile.getPresentableFQN();
-
-        uses.add(getListQueryFqn);
-        attributes.setProperty("GET_LIST_QUERY_TYPE", PhpClassGeneratorUtil.getNameFromFqn(
-                getListQueryFqn
-        ));
-
-        attributes.setProperty("USES", PhpClassGeneratorUtil.formatUses(uses));
-    }
-
-    /**
      * Generate data provider class.
      *
      * @param actionName String
@@ -195,26 +126,15 @@ public class UiComponentDataProviderGenerator extends FileGenerator {
      * @return PhpClass
      */
     private PhpClass createDataProviderClass(final @NotNull String actionName) {
-        PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+        final PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(this.moduleName);
-        final PsiFile dataProviderFile;
-        final String[] dataProviderDirectories = uiComponentGridDataProviderData.getPath().split(
-                File.separator
-        );
-        for (final String dataProviderDirectory: dataProviderDirectories) {
-            parentDirectory = directoryGenerator.findOrCreateSubdirectory(
-                    parentDirectory, dataProviderDirectory
-            );
-        }
+        final PsiDirectory fileDirectory =
+                directoryGenerator.findOrCreateSubdirectories(parentDirectory, data.getPath());
 
-        final Properties attributes = getAttributes();
-
-        dataProviderFile = fileFromTemplateGenerator.generate(
-                UiComponentDataProviderPhp.getInstance(
-                        uiComponentGridDataProviderData.getName()
-                ),
-                attributes,
-                parentDirectory,
+        final PsiFile dataProviderFile = fileFromTemplateGenerator.generate(
+                file,
+                getAttributes(),
+                fileDirectory,
                 actionName
         );
 
@@ -226,16 +146,43 @@ public class UiComponentDataProviderGenerator extends FileGenerator {
     }
 
     /**
-     * Get data provider class FQN.
+     * Fill file property attributes.
      *
-     * @return String
+     * @param attributes Properties
      */
-    private String getDataProviderFqn() {
-        return String.format(
-                "%s%s%s",
-                uiComponentGridDataProviderData.getNamespace(),
-                Package.fqnSeparator,
-                uiComponentGridDataProviderData.getName()
-        );
+    @Override
+    protected void fillAttributes(final @NotNull Properties attributes) {
+        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
+
+        phpClassTypesBuilder
+                .appendProperty("NAMESPACE",
+                        file.getNamespaceBuilder(moduleName, data.getPath()).getNamespace())
+                .appendProperty("CLASS_NAME", data.getName())
+                .appendProperty("HAS_GET_LIST_QUERY", "false")
+                .append("EXTENDS", UiComponentDataProviderFile.DEFAULT_DATA_PROVIDER);
+
+        if (data.getEntityIdFieldName() != null && data.getEntityName() != null) {
+            phpClassTypesBuilder.appendProperty("ENTITY_ID", data.getEntityIdFieldName());
+
+            phpClassTypesBuilder
+                    .appendProperty("HAS_GET_LIST_QUERY", "true")
+                    .append(
+                            "GET_LIST_QUERY_TYPE",
+                            new GetListQueryFile(
+                                    data.getEntityName()
+                            ).getNamespaceBuilder(moduleName).getClassFqn()
+                    )
+                    .append("REPORTING_TYPE", FrameworkLibraryType.REPORTING.getType())
+                    .append("SEARCH_CRITERIA_BUILDER",
+                            FrameworkLibraryType.API_SEARCH_CRITERIA_BUILDER.getType())
+                    .append("REQUEST_TYPE", FrameworkLibraryType.REQUEST.getType())
+                    .append("FILTER_BUILDER", FrameworkLibraryType.FILTER_BUILDER.getType())
+                    .append("SEARCH_RESULT_FACTORY",
+                            UiComponentDataProviderFile.SEARCH_RESULT_FACTORY);
+        }
+        phpClassTypesBuilder.mergeProperties(attributes);
+
+        attributes.setProperty("USES",
+                PhpClassGeneratorUtil.formatUses(phpClassTypesBuilder.getUses()));
     }
 }

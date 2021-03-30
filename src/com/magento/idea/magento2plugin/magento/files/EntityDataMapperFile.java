@@ -8,7 +8,6 @@ package com.magento.idea.magento2plugin.magento.files;
 import com.intellij.lang.Language;
 import com.jetbrains.php.lang.PhpLanguage;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
-import com.magento.idea.magento2plugin.magento.packages.Package;
 import org.jetbrains.annotations.NotNull;
 
 public class EntityDataMapperFile implements ModuleFileInterface {
@@ -18,8 +17,7 @@ public class EntityDataMapperFile implements ModuleFileInterface {
     public static final String TEMPLATE = "Magento Entity Data Mapper";
     private static final String DIRECTORY = "Mapper";
     private final String className;
-    private String namespaceFqn;
-    private String classFqn;
+    private NamespaceBuilder namespaceBuilder;
 
     /**
      * Entity data mapper file constructor.
@@ -28,6 +26,27 @@ public class EntityDataMapperFile implements ModuleFileInterface {
      */
     public EntityDataMapperFile(final @NotNull String entityName) {
         this.className = entityName.concat(CLASS_NAME_SUFFIX);
+    }
+
+    /**
+     * Get namespace builder.
+     *
+     * @param moduleName String
+     *
+     * @return String
+     */
+    public @NotNull NamespaceBuilder getNamespaceBuilder(
+            final @NotNull String moduleName
+    ) {
+        if (namespaceBuilder == null) {
+            namespaceBuilder = new NamespaceBuilder(
+                    moduleName,
+                    className,
+                    DIRECTORY
+            );
+        }
+
+        return namespaceBuilder;
     }
 
     /**
@@ -40,16 +59,7 @@ public class EntityDataMapperFile implements ModuleFileInterface {
     public @NotNull String getNamespace(
             final @NotNull String moduleName
     ) {
-        if (namespaceFqn == null) {
-            final NamespaceBuilder namespaceBuilder = new NamespaceBuilder(
-                    moduleName,
-                    className,
-                    DIRECTORY
-            );
-            namespaceFqn = namespaceBuilder.getNamespace();
-        }
-
-        return namespaceFqn;
+        return getNamespaceBuilder(moduleName).getNamespace();
     }
 
     /**
@@ -62,13 +72,7 @@ public class EntityDataMapperFile implements ModuleFileInterface {
     public @NotNull String getClassFqn(
             final @NotNull String moduleName
     ) {
-        if (classFqn == null) {
-            classFqn = getNamespace(moduleName)
-                    .concat(Package.fqnSeparator)
-                    .concat(className);
-        }
-
-        return classFqn;
+        return getNamespaceBuilder(moduleName).getClassFqn();
     }
 
     /**

@@ -13,13 +13,12 @@ import com.magento.idea.magento2plugin.actions.generation.data.FormGenericButton
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.FormGenericButtonBlockFile;
 import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryType;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -33,7 +32,7 @@ public class FormGenericButtonBlockGenerator extends FileGenerator {
     private final DirectoryGenerator directoryGenerator;
     private final ModuleIndex moduleIndex;
     private final boolean checkFileAlreadyExists;
-    private final List<String> uses;
+    private final FormGenericButtonBlockFile file;
 
     /**
      * Generic Button Block generator constructor.
@@ -67,7 +66,7 @@ public class FormGenericButtonBlockGenerator extends FileGenerator {
         fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         directoryGenerator = DirectoryGenerator.getInstance();
         moduleIndex = ModuleIndex.getInstance(project);
-        uses = new ArrayList<>();
+        file = new FormGenericButtonBlockFile();
     }
 
     /**
@@ -80,7 +79,7 @@ public class FormGenericButtonBlockGenerator extends FileGenerator {
     @Override
     public PsiFile generate(final @NotNull String actionName) {
         final PhpClass genericButtonClass = GetPhpClassByFQN.getInstance(project).execute(
-                data.getClassFqn()
+                file.getNamespaceBuilder(data.getModuleName()).getClassFqn()
         );
 
         if (this.checkFileAlreadyExists && genericButtonClass != null) {
@@ -110,34 +109,23 @@ public class FormGenericButtonBlockGenerator extends FileGenerator {
      */
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        attributes.setProperty("NAMESPACE", data.getNamespace());
-        attributes.setProperty("ENTITY_NAME", data.getEntityName());
-        attributes.setProperty("CLASS_NAME", FormGenericButtonBlockFile.CLASS_NAME);
-        attributes.setProperty("ENTITY_ID", data.getEntityId());
-
+        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
         final String entityIdGetter = "get" + Arrays.stream(data.getEntityId().split("_"))
                 .map(s -> s.substring(0, 1).toUpperCase(Locale.getDefault()) + s.substring(1))
                 .collect(Collectors.joining());
 
-        attributes.setProperty("ENTITY_ID_GETTER", entityIdGetter);
-        addProperty(attributes, "CONTEXT", FormGenericButtonBlockFile.CONTEXT);
-        addProperty(attributes, "URL", FrameworkLibraryType.URL.getType());
-        attributes.setProperty("USES", PhpClassGeneratorUtil.formatUses(uses));
-    }
+        phpClassTypesBuilder
+                .appendProperty("NAMESPACE",
+                        file.getNamespaceBuilder(data.getModuleName()).getNamespace())
+                .appendProperty("ENTITY_NAME", data.getEntityName())
+                .appendProperty("CLASS_NAME", FormGenericButtonBlockFile.CLASS_NAME)
+                .appendProperty("ENTITY_ID", data.getEntityId())
+                .appendProperty("ENTITY_ID_GETTER", entityIdGetter)
+                .append("CONTEXT", FormGenericButtonBlockFile.CONTEXT)
+                .append("URL", FrameworkLibraryType.URL.getType())
+                .mergeProperties(attributes);
 
-    /**
-     * Add type to property list.
-     *
-     * @param properties Properties
-     * @param propertyName String
-     * @param type String
-     */
-    protected void addProperty(
-            final @NotNull Properties properties,
-            final String propertyName,
-            final String type
-    ) {
-        uses.add(type);
-        properties.setProperty(propertyName, PhpClassGeneratorUtil.getNameFromFqn(type));
+        attributes.setProperty("USES",
+                PhpClassGeneratorUtil.formatUses(phpClassTypesBuilder.getUses()));
     }
 }

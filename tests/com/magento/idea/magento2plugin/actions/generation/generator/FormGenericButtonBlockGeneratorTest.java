@@ -9,13 +9,11 @@ import com.magento.idea.magento2plugin.actions.generation.data.FormGenericButton
 import com.magento.idea.magento2plugin.magento.files.FormGenericButtonBlockFile;
 
 public class FormGenericButtonBlockGeneratorTest extends BaseGeneratorTestCase {
+
     private static final String MODULE_NAME = "Foo_Bar";
     private static final String ENTITY_NAME = "Book";
     private static final String ENTITY_ID = "book_id";
     private static final String EXPECTED_DIRECTORY = "src/app/code/Foo/Bar/Block/Form";
-    private static final String NAMESPACE = "Foo\\Bar\\Block\\Form";
-    private static final String CLASS_FQN = NAMESPACE + "\\"
-            + FormGenericButtonBlockFile.CLASS_NAME;
 
     /**
      * Test generation of form ui component generic button block.
@@ -24,9 +22,7 @@ public class FormGenericButtonBlockGeneratorTest extends BaseGeneratorTestCase {
         final FormGenericButtonBlockData data = new FormGenericButtonBlockData(
                 MODULE_NAME,
                 ENTITY_NAME,
-                ENTITY_ID,
-                CLASS_FQN,
-                NAMESPACE
+                ENTITY_ID
         );
         final FormGenericButtonBlockGenerator generator =
                 new FormGenericButtonBlockGenerator(

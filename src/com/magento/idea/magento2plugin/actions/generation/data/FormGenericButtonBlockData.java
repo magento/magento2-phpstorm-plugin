@@ -12,8 +12,6 @@ public class FormGenericButtonBlockData {
     private final String moduleName;
     private final String entityName;
     private final String entityId;
-    private final String classFqn;
-    private final String namespace;
 
     /**
      * Generic button DTO constructor.
@@ -21,21 +19,15 @@ public class FormGenericButtonBlockData {
      * @param moduleName String
      * @param entityName String
      * @param entityId String
-     * @param classFqn String
-     * @param namespace String
      */
     public FormGenericButtonBlockData(
             final @NotNull String moduleName,
             final @NotNull String entityName,
-            final @NotNull String entityId,
-            final @NotNull String classFqn,
-            final @NotNull String namespace
+            final @NotNull String entityId
     ) {
         this.moduleName = moduleName;
         this.entityName = entityName;
         this.entityId = entityId;
-        this.classFqn = classFqn;
-        this.namespace = namespace;
     }
 
     /**
@@ -63,23 +55,5 @@ public class FormGenericButtonBlockData {
      */
     public String getEntityId() {
         return entityId;
-    }
-
-    /**
-     * Get class FQN.
-     *
-     * @return String
-     */
-    public String getClassFqn() {
-        return classFqn;
-    }
-
-    /**
-     * Get namespace.
-     *
-     * @return String
-     */
-    public String getNamespace() {
-        return namespace;
     }
 }

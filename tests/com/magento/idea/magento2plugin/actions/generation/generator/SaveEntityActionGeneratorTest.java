@@ -10,19 +10,14 @@ import com.magento.idea.magento2plugin.actions.generation.data.SaveEntityControl
 import com.magento.idea.magento2plugin.magento.files.actions.SaveActionFile;
 
 public class SaveEntityActionGeneratorTest extends BaseGeneratorTestCase {
+
     private static final String MODULE_NAME = "Foo_Bar";
     private static final String ENTITY_NAME = "Company";
+    private static final String DTO_NAME = "CompanyData";
+    private static final String DTO_TYPE_INTERFACE = "CompanyInterface";
     private static final String EXPECTED_DIRECTORY =
             "/src/app/code/Foo/Bar/Controller/Adminhtml/" + ENTITY_NAME;
-    private static final String NAMESPACE =
-            "Foo\\Bar\\Controller\\Adminhtml\\" + ENTITY_NAME;
-    private static final String SAVE_COMMAND =
-            "Foo\\Bar\\Command\\" + ENTITY_NAME + "\\SaveCommand";
-    private static final String DTO_TYPE =
-            "Foo\\Bar\\Model\\" + ENTITY_NAME + "Model" + "\\CompanyModel";
-    private static final String DTO_TYPE_INTERFACE =
-            "Foo\\Bar\\Api\\Data\\" + ENTITY_NAME + "Interface";
-    private static final String ACL = "company_id";
+    private static final String ACL = "Foo_Bar::company_id";
     private static final String ENTITY_ID = "entity_id";
 
     /**
@@ -33,11 +28,11 @@ public class SaveEntityActionGeneratorTest extends BaseGeneratorTestCase {
                 new SaveEntityControllerFileData(
                         ENTITY_NAME,
                         MODULE_NAME,
-                        NAMESPACE,
-                        SAVE_COMMAND,
-                        DTO_TYPE,
                         ACL,
-                        ENTITY_ID
+                        ENTITY_ID,
+                        DTO_NAME,
+                        "",
+                        false
                 );
         final SaveEntityControllerFileGenerator saveEntityControllerFileGenerator =
                 new SaveEntityControllerFileGenerator(
@@ -46,7 +41,7 @@ public class SaveEntityActionGeneratorTest extends BaseGeneratorTestCase {
                         false
                 );
         final PsiFile saveEntityActionFile = saveEntityControllerFileGenerator.generate("test");
-        final String filePath = this.getFixturePath(SaveActionFile.getInstance().getFileName());
+        final String filePath = this.getFixturePath(new SaveActionFile(ENTITY_NAME).getFileName());
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
 
         assertGeneratedFileIsCorrect(
@@ -64,11 +59,11 @@ public class SaveEntityActionGeneratorTest extends BaseGeneratorTestCase {
                 new SaveEntityControllerFileData(
                         ENTITY_NAME,
                         MODULE_NAME,
-                        NAMESPACE,
-                        SAVE_COMMAND,
-                        DTO_TYPE_INTERFACE,
                         ACL,
-                        ENTITY_ID
+                        ENTITY_ID,
+                        DTO_NAME,
+                        DTO_TYPE_INTERFACE,
+                        true
                 );
         final SaveEntityControllerFileGenerator saveEntityControllerFileGenerator =
                 new SaveEntityControllerFileGenerator(
@@ -77,7 +72,7 @@ public class SaveEntityActionGeneratorTest extends BaseGeneratorTestCase {
                         true
                 );
         final PsiFile saveEntityActionFile = saveEntityControllerFileGenerator.generate("test");
-        final String filePath = this.getFixturePath(SaveActionFile.getInstance().getFileName());
+        final String filePath = this.getFixturePath(new SaveActionFile(ENTITY_NAME).getFileName());
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
 
         assertGeneratedFileIsCorrect(

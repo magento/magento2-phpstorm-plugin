@@ -8,6 +8,13 @@
         </item>
     </argument>
     <settings>
+        <buttons>
+            <button name="add">
+                <url path="*/*/new"/>
+                <class>primary</class>
+                <label translate="true">Add New</label>
+            </button>
+        </buttons>
         <spinner>custom_entity_grid_columns</spinner>
         <deps>
             <dep>custom_entity_grid.custom_entity_grid_data_source</dep>
@@ -36,5 +43,10 @@
                 <sorting>desc</sorting>
             </settings>
         </column>
+        <actionsColumn name="actions" class="Foo\Bar\Ui\Component\Listing\Column\BlockActions">
+            <settings>
+                <indexField>entity_id</indexField>
+            </settings>
+        </actionsColumn>
     </columns>
 </listing>

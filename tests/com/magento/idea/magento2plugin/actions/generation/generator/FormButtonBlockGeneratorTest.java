@@ -15,6 +15,8 @@ public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
     private static final String FORM_NAME = "my_form";
     private static final String BLOCK_DIRECTORY = "Block/Form";
     private static final String ACTION_NAME = "test";
+    private static final String ENTITY_NAME = "Book";
+    private static final String ENTITY_ID = "book_id";
     public static final String EXPECTED_DIRECTORY = "src/app/code/Foo/Bar/Block/Form";
 
     /**
@@ -42,11 +44,14 @@ public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
                 FORM_NAME,
                 namespace.getClassFqn()
         );
-        final UiComponentFormButtonPhpClassGenerator formButtonPhpClassGenerator =
-                new UiComponentFormButtonPhpClassGenerator(
-                    uiComponentFormButtonData,
-                    project
-            );
+        final UiComponentFormButtonBlockGenerator formButtonPhpClassGenerator =
+                new UiComponentFormButtonBlockGenerator(
+                        uiComponentFormButtonData,
+                        project,
+                        ENTITY_NAME,
+                        ENTITY_ID,
+                        false
+                );
 
         final PsiFile file = formButtonPhpClassGenerator.generate(ACTION_NAME);
         assertGeneratedFileIsCorrect(expectedFile, EXPECTED_DIRECTORY, file);
@@ -77,10 +82,13 @@ public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
                 FORM_NAME,
                 namespace.getClassFqn()
         );
-        final UiComponentFormButtonPhpClassGenerator formButtonPhpClassGenerator =
-                new UiComponentFormButtonPhpClassGenerator(
+        final UiComponentFormButtonBlockGenerator formButtonPhpClassGenerator =
+                new UiComponentFormButtonBlockGenerator(
                         uiComponentFormButtonData,
-                        project
+                        project,
+                        ENTITY_NAME,
+                        ENTITY_ID,
+                        false
                 );
 
         final PsiFile file = formButtonPhpClassGenerator.generate(ACTION_NAME);
@@ -112,13 +120,16 @@ public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
                 FORM_NAME,
                 namespace.getClassFqn()
         );
-        final UiComponentFormButtonPhpClassGenerator formButtonPhpClassGenerator =
-                new UiComponentFormButtonPhpClassGenerator(
-                    uiComponentFormButtonData,
-                    project
+        final UiComponentFormButtonBlockGenerator generator =
+                new UiComponentFormButtonBlockGenerator(
+                        uiComponentFormButtonData,
+                        project,
+                        ENTITY_NAME,
+                        ENTITY_ID,
+                        false
                 );
 
-        final PsiFile file = formButtonPhpClassGenerator.generate(ACTION_NAME);
+        final PsiFile file = generator.generate(ACTION_NAME);
         assertGeneratedFileIsCorrect(expectedFile, EXPECTED_DIRECTORY, file);
     }
 
@@ -147,10 +158,13 @@ public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
                 FORM_NAME,
                 namespace.getClassFqn()
         );
-        final UiComponentFormButtonPhpClassGenerator formButtonPhpClassGenerator =
-                new UiComponentFormButtonPhpClassGenerator(
-                    uiComponentFormButtonData,
-                    project
+        final UiComponentFormButtonBlockGenerator formButtonPhpClassGenerator =
+                new UiComponentFormButtonBlockGenerator(
+                        uiComponentFormButtonData,
+                        project,
+                        ENTITY_NAME,
+                        ENTITY_ID,
+                        false
                 );
 
         final PsiFile file = formButtonPhpClassGenerator.generate(ACTION_NAME);

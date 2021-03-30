@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2plugin.actions.generation.dialog;//NOPMD
+package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
@@ -43,7 +43,10 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings({"PMD.TooManyFields", "PMD.DataClass", "PMD.UnusedPrivateMethod"})
+@SuppressWarnings({
+        "PMD.UnusedPrivateMethod",
+        "PMD.ExcessiveImports"
+})
 public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
     @NotNull
     private final Project project;
@@ -165,9 +168,8 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
         }
         final PsiFile diXml = new PreferenceDiXmlGenerator(new PreferenceDiXmFileData(
                 getPreferenceModule(),
-                targetClass,
+                targetClass.getPresentableFQN(),
                 getPreferenceClassFqn(),
-                getNamespace(),
                 getPreferenceArea()
         ), project).generate(OverrideClassByAPreferenceAction.ACTION_NAME);
         if (diXml == null) {

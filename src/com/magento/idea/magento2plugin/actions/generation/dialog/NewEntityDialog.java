@@ -5,41 +5,19 @@
 
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
-import com.google.common.base.CaseFormat;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
+import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.actions.generation.NewEntityAction;
-import com.magento.idea.magento2plugin.actions.generation.OverrideClassByAPreferenceAction;
-import com.magento.idea.magento2plugin.actions.generation.data.AclXmlData;
-import com.magento.idea.magento2plugin.actions.generation.data.CollectionData;
-import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
-import com.magento.idea.magento2plugin.actions.generation.data.DataModelData;
-import com.magento.idea.magento2plugin.actions.generation.data.DataModelInterfaceData;
-import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
-import com.magento.idea.magento2plugin.actions.generation.data.EntityDataMapperData;
-import com.magento.idea.magento2plugin.actions.generation.data.AdminListViewEntityActionData;
-import com.magento.idea.magento2plugin.actions.generation.data.FormGenericButtonBlockData;
-import com.magento.idea.magento2plugin.actions.generation.data.GetListQueryModelData;
-import com.magento.idea.magento2plugin.actions.generation.data.GridActionColumnData;
-import com.magento.idea.magento2plugin.actions.generation.data.LayoutXmlData;
-import com.magento.idea.magento2plugin.actions.generation.data.MenuXmlData;
-import com.magento.idea.magento2plugin.actions.generation.data.ModelData;
-import com.magento.idea.magento2plugin.actions.generation.data.PreferenceDiXmFileData;
-import com.magento.idea.magento2plugin.actions.generation.data.ResourceModelData;
-import com.magento.idea.magento2plugin.actions.generation.data.RoutesXmlData;
-import com.magento.idea.magento2plugin.actions.generation.data.SaveEntityCommandData;
-import com.magento.idea.magento2plugin.actions.generation.data.SaveEntityControllerFileData;
-import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataProviderData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormButtonData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldsetData;
-import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFileData;
-import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridData;
-import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridToolbarData;
-import com.magento.idea.magento2plugin.actions.generation.data.code.ClassPropertyData;
+import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityCreatorContextData;
+import com.magento.idea.magento2plugin.actions.generation.data.dialog.NewEntityDialogData;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
+import com.magento.idea.magento2plugin.actions.generation.dialog.util.ClassPropertyFormatterUtil;
+import com.magento.idea.magento2plugin.actions.generation.dialog.util.ProcessWorker;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AclResourceIdRule;
@@ -47,46 +25,16 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.MenuIdentifierRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NumericRule;
-import com.magento.idea.magento2plugin.actions.generation.generator.AclXmlGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.DataModelGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.DataModelInterfaceGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaWhitelistJsonGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaXmlGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.EntityDataMapperGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.AdminListViewEntityActionGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.FormGenericButtonBlockGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.GetListQueryModelGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.GridActionColumnFileGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.LayoutXmlGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.MenuXmlGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.ModuleCollectionGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.ModuleControllerClassGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.ModuleModelGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.ModuleResourceModelGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.PreferenceDiXmlGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.RoutesXmlGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.SaveEntityCommandGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.SaveEntityControllerFileGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentDataProviderGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentFormGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentGridXmlGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.GeneratorPoolHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.provider.NewEntityGeneratorsProviderUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DbSchemaGeneratorUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
-import com.magento.idea.magento2plugin.magento.files.DataModel;
-import com.magento.idea.magento2plugin.magento.files.DataModelInterface;
-import com.magento.idea.magento2plugin.magento.files.EntityDataMapperFile;
-import com.magento.idea.magento2plugin.magento.files.FormGenericButtonBlockFile;
-import com.magento.idea.magento2plugin.magento.files.ModelPhp;
+import com.magento.idea.magento2plugin.magento.files.DataModelFile;
+import com.magento.idea.magento2plugin.magento.files.DataModelInterfaceFile;
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
-import com.magento.idea.magento2plugin.magento.files.ResourceModelPhp;
-import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
-import com.magento.idea.magento2plugin.magento.files.actions.AdminListViewActionFile;
-import com.magento.idea.magento2plugin.magento.files.actions.SaveActionFile;
-import com.magento.idea.magento2plugin.magento.files.commands.SaveEntityCommandFile;
-import com.magento.idea.magento2plugin.magento.packages.Areas;
+import com.magento.idea.magento2plugin.magento.files.actions.NewActionFile;
 import com.magento.idea.magento2plugin.magento.packages.File;
-import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.PropertiesTypes;
 import com.magento.idea.magento2plugin.magento.packages.database.TableEngines;
 import com.magento.idea.magento2plugin.magento.packages.database.TableResources;
@@ -94,11 +42,13 @@ import com.magento.idea.magento2plugin.magento.packages.uiComponent.FormElementT
 import com.magento.idea.magento2plugin.stubs.indexes.xml.MenuIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.ui.table.TableGroupWrapper;
+import com.magento.idea.magento2plugin.util.CamelCaseToSnakeCase;
 import com.magento.idea.magento2plugin.util.FirstLetterToLowercaseUtil;
-import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.magento.GetAclResourcesListUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -109,7 +59,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -121,24 +73,19 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
+import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
-        "PMD.MissingSerialVersionUID",
-        "PMD.DataClass",
         "PMD.UnusedPrivateField",
-        "PMD.ExcessiveImports",
-        "PMD.GodClass",
-        "PMD.TooManyMethods",
-        "PMD.CyclomaticComplexity",
-        "PMD.ExcessiveClassLength"
+        "PMD.ExcessiveImports"
 })
 public class NewEntityDialog extends AbstractDialog {
-    @NotNull
-    private final Project project;
+
+    private final @NotNull Project project;
     private final String moduleName;
     private JPanel contentPane;
     private JTabbedPane tabbedPane1;
@@ -175,9 +122,9 @@ public class NewEntityDialog extends AbstractDialog {
     private JCheckBox addFullTextSearchCheckBox;
     private JCheckBox addListingFiltersCheckBox;
     private JCheckBox addListingPagingCheckBox;
-    private JComboBox tableEngine;
+    private JComboBox<ComboBoxItemData> tableEngine;
     private JLabel tableEngineLabel;
-    private JComboBox tableResource;
+    private JComboBox<ComboBoxItemData> tableResource;
     private JLabel tableResourceLabel;
     private JCheckBox createInterface;
     private final List<String> properties;
@@ -191,13 +138,23 @@ public class NewEntityDialog extends AbstractDialog {
     private static final String GRID_NAME = "Grit Name";
     private static final String IDENTIFIER = "Identifier";
     private static final String SORT_ORDER = "Sort Order";
+    private static final String UI_COMPONENTS_TAB_NAME = "Admin UI Components";
+
+    private static final String MODEL_SUFFIX = "Model";
+    private static final String RESOURCE_MODEL_SUFFIX = "Resource";
+    private static final String COLLECTION_MODEL_SUFFIX = "Collection";
+    private static final String DTO_MODEL_SUFFIX = "Data";
+    private static final String DTO_INTERFACE_SUFFIX = "Interface";
+    private static final String DATA_PROVIDER_SUFFIX = "DataProvider";
+
+    private static final boolean OPEN_FILES_FLAG = false;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, FORM_NAME})
-    @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE})
+    @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE, FORM_NAME})
     private JTextField formName;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, GRID_NAME})
-    @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE})
+    @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE, FORM_NAME})
     private JTextField gridName;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, ACL_ID})
@@ -216,7 +173,18 @@ public class NewEntityDialog extends AbstractDialog {
     private JTextPane exampleAclId;
     private JTextPane exampleFormName;
     private JTextPane exampleGridName;
+    private JPanel uiComponentsPanel;
+    private JPanel formNamePanel;
+    private JPanel gridNamePanel;
+    private JPanel aclIdPanel;
+    private JPanel menuIdPanel;
+    private JLabel formNameErrorMessage;
+    private JLabel gridNameErrorMessage;
+    private JLabel aclErrorMessage;
+    private JLabel menuIdentifierErrorMessage;
+    private JLabel sortOrderErrorMessage;
     private JTextField observerName;
+    private final ProcessWorker.InProgressFlag onOkActionFired;
 
     /**
      * Constructor.
@@ -224,7 +192,7 @@ public class NewEntityDialog extends AbstractDialog {
      * @param project Project
      * @param directory PsiDirectory
      */
-    public NewEntityDialog(final Project project, final PsiDirectory directory) {
+    public NewEntityDialog(final @NotNull Project project, final PsiDirectory directory) {
         super();
 
         this.project = project;
@@ -236,7 +204,8 @@ public class NewEntityDialog extends AbstractDialog {
         setTitle(NewEntityAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
 
-        buttonOK.addActionListener((final ActionEvent event) -> onOK());
+        onOkActionFired = new ProcessWorker.InProgressFlag(false);
+        buttonOK.addActionListener(this::generateNewEntityFiles);
         buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
 
         // call onCancel() when cross is clicked
@@ -245,6 +214,11 @@ public class NewEntityDialog extends AbstractDialog {
             @Override
             public void windowClosing(final WindowEvent event) {
                 onCancel();
+            }
+
+            @Override
+            public void windowOpened(WindowEvent e) {
+                entityName.requestFocus();
             }
         });
 
@@ -257,6 +231,26 @@ public class NewEntityDialog extends AbstractDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
+
+        entityName.addKeyListener(new KeyAdapter() {
+            @SuppressWarnings("PMD.AccessorMethodGeneration")
+            @Override
+            public void keyReleased(final KeyEvent event) {
+                entityName.setText(StringUtils.capitalize(entityName.getText()));
+            }
+        });
+
+        entityName.getDocument().addDocumentListener(new DocumentAdapter() {
+            @SuppressWarnings("PMD.AccessorMethodGeneration")
+            @Override
+            protected void textChanged(final @NotNull DocumentEvent event) {
+                autoCompleteIdentifiers();
+            }
+        });
+
+        toggleUiComponentsPanel();
+
+        createUiComponent.addItemListener(event -> toggleUiComponentsPanel());
     }
 
     /**
@@ -307,8 +301,23 @@ public class NewEntityDialog extends AbstractDialog {
         entityPropertiesTableGroupWrapper.initTableGroup();
     }
 
-    private DefaultTableModel getPropertiesTable() {
-        return (DefaultTableModel) propertyTable.getModel();
+    /**
+     * Generate new entity files.
+     *
+     * @param event ActionEvent
+     */
+    @SuppressWarnings("PMD.UnusedFormalParameter")
+    private void generateNewEntityFiles(final @NotNull ActionEvent event) {
+        if (!onOkActionFired.isInProgress()) {
+            buttonOK.setEnabled(false);
+            buttonCancel.setEnabled(false);
+
+            new ProcessWorker(
+                    this::onOK,
+                    this::releaseDialogAfterGeneration,
+                    onOkActionFired
+            ).execute();
+        }
     }
 
     /**
@@ -316,329 +325,98 @@ public class NewEntityDialog extends AbstractDialog {
      */
     private void onOK() {
         if (!validateFormFields()) {
+            onOkActionFired.setInProgress(false);
             return;
         }
+        setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
-        generateModelFile();
-        generateResourceModelFile();
-        generateCollectionFile();
         formatProperties();
-        generateDataModelFile();
 
-        if (createInterface.isSelected()) {
-            generateDataModelInterfaceFile();
-            generateDataModelPreference();
+        final NewEntityDialogData dialogData = getNewEntityDialogData();
+        final EntityCreatorContextData context = getEntityCreatorContextData(dialogData);
+
+        final GeneratorPoolHandler generatorPoolHandler = new GeneratorPoolHandler(context);
+
+        NewEntityGeneratorsProviderUtil.initializeGenerators(
+                generatorPoolHandler,
+                context,
+                dialogData
+        );
+
+        generatorPoolHandler.run();
+        onOkActionFired.setFinished(true);
+    }
+
+    /**
+     * Release dialog buttons and hide.
+     */
+    private void releaseDialogAfterGeneration() {
+        setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        buttonCancel.setEnabled(true);
+        buttonOK.setEnabled(true);
+
+        if (onOkActionFired.isFinished()) {
+            this.setVisible(false);
         }
+    }
 
-        generateRoutesXmlFile();
-        generateAclXmlFile();
-        generateMenuFile();
+    /**
+     * Get entity creator context data.
+     *
+     * @param dialogData NewEntityDialogData
+     *
+     * @return EntityCreatorContextData
+     */
+    private EntityCreatorContextData getEntityCreatorContextData(
+            final @NotNull NewEntityDialogData dialogData
+    ) {
+        final String entityName = dialogData.getEntityName();
+        final String dtoClassName = entityName.concat(DTO_MODEL_SUFFIX);
+        final String dtoInterfaceClassName = entityName.concat(DTO_INTERFACE_SUFFIX);
 
-        if (createUiComponent.isSelected()) {
-            generateGridViewControllerFile();
-            generateGridLayoutFile();
-            generateEntityDataMapperFile();
-            generateModelGetListQueryFile();
-            generateDataProviderFile();
-            generateUiComponentGridActionColumnFile();
-            generateUiComponentGridFile();
-            generateFormViewControllerFile();
-            generateFormLayoutFile();
-            generateSaveEntityCommandFile();
-            generateFormSaveControllerFile();
-            generateFormUiComponentGenericButtonFile();
-            generateUiComponentFormFile();
-        }
+        final String actionsPathPrefix = dialogData.getRoute() + File.separator
+                + FirstLetterToLowercaseUtil.convert(entityName) + File.separator;
+        final NamespaceBuilder dtoModelNamespace =
+                new DataModelFile(dtoClassName).getNamespaceBuilder(moduleName);
+        final NamespaceBuilder dtoInterfaceNamespace =
+                new DataModelInterfaceFile(dtoInterfaceClassName).getNamespaceBuilder(moduleName);
 
-        final DbSchemaXmlData dbSchemaXmlData = new DbSchemaXmlData(
-                getDbTableName(),
-                getTableResource(),
-                getTableEngine(),
-                getEntityName(),
-                getEntityProperties()
+        final NamespaceBuilder formViewNamespaceBuilder =
+                new NamespaceBuilder(
+                        moduleName,
+                        "Edit",
+                        ControllerBackendPhp.DEFAULT_DIR + File.separator + entityName
+                );
+
+        return new EntityCreatorContextData(
+                project,
+                moduleName,
+                ACTION_NAME,
+                OPEN_FILES_FLAG,
+                actionsPathPrefix.concat("index"),
+                actionsPathPrefix.concat("edit"),
+                actionsPathPrefix.concat("new"),
+                actionsPathPrefix.concat("delete"),
+                dtoModelNamespace,
+                dtoInterfaceNamespace,
+                formViewNamespaceBuilder,
+                NewActionFile.getNamespaceBuilder(moduleName, entityName),
+                getEntityProperties(),
+                getButtons(),
+                getFieldSets(),
+                getFields()
         );
-
-        generateDbSchemaXmlFile(dbSchemaXmlData);
-        generateWhitelistJsonFile(dbSchemaXmlData);
-        this.setVisible(false);
-    }
-
-    private PsiFile generateModelFile() {
-        final NamespaceBuilder modelNamespace = getModelNamespace();
-        final NamespaceBuilder resourceModelNamespace = getResourceModelNamespace();
-        final String resourceModelName = getResourceModelName();
-
-
-        return new ModuleModelGenerator(new ModelData(
-            getModuleName(),
-            getDbTableName(),
-            getModelName(),
-            resourceModelName,
-            modelNamespace.getClassFqn(),
-            modelNamespace.getNamespace(),
-            resourceModelNamespace.getClassFqn()
-        ), project).generate(ACTION_NAME, true);
-    }
-
-    /**
-     * Get Magento 2 model namespace builder for the entity.
-     *
-     * @return NamespaceBuilder
-     */
-    private NamespaceBuilder getModelNamespace() {
-        return new NamespaceBuilder(getModuleName(), getModelName(), ModelPhp.MODEL_DIRECTORY);
-    }
-
-    /**
-     * Get DTO model namespace builder for the entity.
-     *
-     * @return NamespaceBuilder
-     */
-    private NamespaceBuilder getDataModelNamespace() {
-        return new NamespaceBuilder(getModuleName(), getDataModelName(), DataModel.DIRECTORY);
-    }
-
-    /**
-     * Get DTO model interface namespace builder for the entity.
-     *
-     * @return NamespaceBuilder
-     */
-    private NamespaceBuilder getDataModelInterfaceNamespace() {
-        return new NamespaceBuilder(
-                getModuleName(),
-                getDataModelInterfaceName(),
-                DataModelInterface.DIRECTORY
-        );
-    }
-
-    /**
-     * Get Magento 2 Resource model namespace builder for the entity.
-     *
-     * @return NamespaceBuilder
-     */
-    private NamespaceBuilder getResourceModelNamespace() {
-        return new NamespaceBuilder(
-            getModuleName(),
-            getResourceModelName(),
-            ResourceModelPhp.RESOURCE_MODEL_DIRECTORY
-        );
-    }
-
-    /**
-     * Generate preference for data model.
-     */
-    private void generateDataModelPreference() {
-        final NamespaceBuilder dataModelNamespace = getDataModelNamespace();
-        final NamespaceBuilder modelInterfaceNamespace = getDataModelInterfaceNamespace();
-        new PreferenceDiXmlGenerator(new PreferenceDiXmFileData(
-                getModuleName(),
-                GetPhpClassByFQN.getInstance(project).execute(
-                        modelInterfaceNamespace.getClassFqn()
-                ),
-                dataModelNamespace.getClassFqn(),
-                getModelName(),
-                Areas.base.toString()
-        ), project).generate(OverrideClassByAPreferenceAction.ACTION_NAME);
-    }
-
-    private String getModuleName() {
-        return moduleName;
-    }
-
-    private String getEntityName() {
-        return entityName.getText().trim();
-    }
-
-    private String getModelName() {
-        return getEntityName().concat("Model");
-    }
-
-    private String getDataModelName() {
-        return getEntityName().concat("Data");
-    }
-
-    /**
-     * Get data provider class name.
-     *
-     * @return String
-     */
-    private String getDataProviderClassName() {
-        return getEntityName().concat("DataProvider");
-    }
-
-    private String getDataModelInterfaceName() {
-        return getEntityName().concat("Interface");
-    }
-
-    private String getResourceModelName() {
-        return getEntityName().concat("Resource");
-    }
-
-    private String getCollectionName() {
-        return getEntityName().concat("Collection");
-    }
-
-    private String getDbTableName() {
-        return dbTableName.getText().trim();
-    }
-
-    private PsiFile generateResourceModelFile() {
-        final NamespaceBuilder resourceModelNamespace = getResourceModelNamespace();
-        return new ModuleResourceModelGenerator(new ResourceModelData(
-            getModuleName(),
-            getDbTableName(),
-            getResourceModelName(),
-            getEntityIdColumn(),
-            resourceModelNamespace.getNamespace(),
-            resourceModelNamespace.getClassFqn()
-        ), project).generate(ACTION_NAME, true);
-    }
-
-    /**
-     * Get entity id column name.
-     *
-     * @return String
-     */
-    private String getEntityIdColumn() {
-        return entityId.getText().trim();
-    }
-
-    private PsiFile generateCollectionFile() {
-        final NamespaceBuilder resourceModelNamespace = getResourceModelNamespace();
-        final NamespaceBuilder modelNamespace = getModelNamespace();
-        final NamespaceBuilder collectionNamespace = getCollectionNamespace();
-        final StringBuilder modelFqn = new StringBuilder(modelNamespace.getClassFqn());
-        final String modelName = getModelName();
-        final StringBuilder resourceModelFqn
-                = new StringBuilder(resourceModelNamespace.getClassFqn());
-        final String resourceModelName = getResourceModelName();
-
-
-        return new ModuleCollectionGenerator(new CollectionData(
-            getModuleName(),
-            getDbTableName(),
-            modelName,
-            getCollectionName(),
-            collectionNamespace.getClassFqn(),
-            getCollectionDirectory(),
-            collectionNamespace.getNamespace(),
-            resourceModelName,
-            resourceModelFqn.toString(),
-            modelFqn.toString()
-        ), project).generate(ACTION_NAME, true);
-    }
-
-    /**
-     * Generate Data Model File.
-     */
-    private void generateDataModelFile() {
-        final NamespaceBuilder nameSpaceBuilder = getDataModelNamespace();
-        new DataModelGenerator(project, new DataModelData(
-            getDataModelNamespace().getNamespace(),
-            getDataModelName(),
-            getModuleName(),
-            nameSpaceBuilder.getClassFqn(),
-            getDataModelInterfaceNamespace().getClassFqn(),
-            getProperties(),
-            createInterface.isSelected()
-        )).generate(ACTION_NAME, true);
-    }
-
-    private void generateDataModelInterfaceFile() {
-        final NamespaceBuilder nameSpaceBuilder = getDataModelInterfaceNamespace();
-        new DataModelInterfaceGenerator(project, new DataModelInterfaceData(
-            nameSpaceBuilder.getNamespace(),
-            getDataModelInterfaceName(),
-            getModuleName(),
-            nameSpaceBuilder.getClassFqn(),
-            getProperties()
-        )).generate(ACTION_NAME, true);
-    }
-
-    /**
-     * Gets properties as a string, ready for templating.
-     * "UPPER_SNAKE;lower_snake;type;UpperCamel;lowerCamel".
-     */
-    private String getProperties() {
-        return StringUtils.join(properties, ",");
     }
 
     /**
      * Formats properties into an array of ClassPropertyData objects.
      */
     private void formatProperties() {
-        final DefaultTableModel propertiesTable = getPropertiesTable();
-        final int rowCount = propertiesTable.getRowCount();
-        String name;
-        String type;
+        final String name = getEntityIdColumn();
+        final String type = "int";
 
-        name = getEntityIdColumn();
-        type = "int";
-        properties.add(new ClassPropertyData(// NOPMD
-                type,
-                CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name),
-                CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name),
-                name,
-                CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_UNDERSCORE, name)
-        ).string());
-
-        for (int index = 0; index < rowCount; index++) {
-            name = propertiesTable.getValueAt(index, 0).toString();
-            type = propertiesTable.getValueAt(index, 1).toString();
-            properties.add(new ClassPropertyData(// NOPMD
-                    type,
-                    CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name),
-                    CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name),
-                    name,
-                    CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_UNDERSCORE, name)
-            ).string());
-        }
-    }
-
-    private NamespaceBuilder getCollectionNamespace() {
-        return new NamespaceBuilder(
-            getModuleName(),
-            getCollectionName(),
-            getCollectionDirectory()
-        );
-    }
-
-    private String getCollectionDirectory() {
-        return ResourceModelPhp.RESOURCE_MODEL_DIRECTORY + File.separator
-            + getEntityName();
-    }
-
-    private PsiFile generateRoutesXmlFile() {
-        return new RoutesXmlGenerator(new RoutesXmlData(
-            Areas.adminhtml.toString(),
-            getRoute(),
-            getModuleName()
-        ), project).generate(ACTION_NAME, false);
-    }
-
-    public String getRoute() {
-        return route.getText().trim();
-    }
-
-    private String getViewActionName() {
-        return "Edit";
-    }
-
-    private String getSubmitActionName() {
-        return "Save";//NOPMD
-    }
-
-    private String getControllerDirectory() {
-        return ControllerBackendPhp.DEFAULT_DIR  + File.separator;
-    }
-
-    /**
-     * Get Acl id.
-     *
-     * @return String
-     */
-    public String getAcl() {
-        return acl.getText().trim();
+        properties.add(ClassPropertyFormatterUtil.formatSingleProperty(name, type));
+        properties.addAll(ClassPropertyFormatterUtil.formatProperties(getPropertiesTable()));
     }
 
     /**
@@ -646,50 +424,25 @@ public class NewEntityDialog extends AbstractDialog {
      *
      * @return String
      */
-    public String getFormName() {
+    private String getFormName() {
         return formName.getText().trim();
     }
 
-    private PsiFile generateAclXmlFile() {
-        return new AclXmlGenerator(new AclXmlData(
-            getParentAcl(),
-            getAcl(),
-            getAclTitle()
-        ), getModuleName(), project).generate(ACTION_NAME, false);
-    }
-
-    public String getParentAcl() {
-        return parentAcl.getSelectedItem().toString().trim();
-    }
-
-    public String getAclTitle() {
-        return aclTitle.getText().trim();
-    }
-
-    public String getFormLabel() {
-        return formLabel.getText().trim();
-    }
-
     /**
-     * Returns form fieldsets.
+     * Returns form fieldSets.
      *
      * @return List[UiComponentFormFieldsetData]
      */
-    public List<UiComponentFormFieldsetData> getFieldsets() {
-
-        final ArrayList<UiComponentFormFieldsetData> fieldsets =
-                new ArrayList<>();
+    private List<UiComponentFormFieldsetData> getFieldSets() {
+        final ArrayList<UiComponentFormFieldsetData> fieldSets = new ArrayList<>();
         final UiComponentFormFieldsetData fieldsetData = new UiComponentFormFieldsetData(
                 "general",
                 "General",
                 "10"
         );
+        fieldSets.add(fieldsetData);
 
-        fieldsets.add(
-                fieldsetData
-        );
-
-        return fieldsets;
+        return fieldSets;
     }
 
     /**
@@ -697,19 +450,19 @@ public class NewEntityDialog extends AbstractDialog {
      *
      * @return List[UiComponentFormButtonData]
      */
-    protected List<UiComponentFormButtonData> getButtons() {
+    private List<UiComponentFormButtonData> getButtons() {
         final List<UiComponentFormButtonData> buttons = new ArrayList<>();
         final String directory = "Block/Form";
 
         final NamespaceBuilder namespaceBuilderSave = new NamespaceBuilder(
-                getModuleName(),
+                moduleName,
                 "Save",
                 directory
         );
         buttons.add(new UiComponentFormButtonData(
                 directory,
                 "Save",
-                getModuleName(),
+                moduleName,
                 "Save",
                 namespaceBuilderSave.getNamespace(),
                 "Save Entity",
@@ -719,14 +472,14 @@ public class NewEntityDialog extends AbstractDialog {
         ));
 
         final NamespaceBuilder namespaceBuilderBack = new NamespaceBuilder(
-                getModuleName(),
+                moduleName,
                 "Back",
                 directory
         );
         buttons.add(new UiComponentFormButtonData(
                 directory,
                 "Back",
-                getModuleName(),
+                moduleName,
                 "Back",
                 namespaceBuilderBack.getNamespace(),
                 "Back To Grid",
@@ -736,15 +489,15 @@ public class NewEntityDialog extends AbstractDialog {
         ));
 
         final NamespaceBuilder namespaceBuilderDelete = new NamespaceBuilder(
-                getModuleName(),
+                moduleName,
                 "Delete",
                 directory
         );
         buttons.add(new UiComponentFormButtonData(
                 directory,
                 "Delete",
-                getModuleName(),
-                "Save",
+                moduleName,
+                "Delete",
                 namespaceBuilderDelete.getNamespace(),
                 "Delete Entity",
                 "30",
@@ -759,7 +512,7 @@ public class NewEntityDialog extends AbstractDialog {
      *
      * @return List[UiComponentFormFieldData]
      */
-    public List<UiComponentFormFieldData> getFields() {
+    private List<UiComponentFormFieldData> getFields() {
         final DefaultTableModel model = getPropertiesTable();
         final ArrayList<UiComponentFormFieldData> fieldsets = new ArrayList<>();
 
@@ -780,7 +533,10 @@ public class NewEntityDialog extends AbstractDialog {
             final String name = model.getValueAt(count, 0).toString();
             final String dataType = model.getValueAt(count, 1).toString();
 
-            final String label = model.getValueAt(count, 0).toString(); //todo: convert
+            final String label = Arrays.stream(name.split("_")).map(
+                            string -> string.substring(0, 1).toUpperCase(Locale.getDefault())
+                                    + string.substring(1)).collect(Collectors.joining(" ")
+                    );
             final String sortOrder = String.valueOf(count).concat("0");
             final String fieldset = "general";
 
@@ -811,530 +567,18 @@ public class NewEntityDialog extends AbstractDialog {
 
     @SuppressWarnings({"PMD.UnusedPrivateMethod"})
     private void createUIComponents() {
-        this.parentAcl = new FilteredComboBox(getAclResourcesList());
-        this.parentMenu = new FilteredComboBox(getMenuReferences());
+        final List<String> aclResourcesList = GetAclResourcesListUtil.execute(project);
+        final Collection<String> menuReferences = FileBasedIndex
+                .getInstance().getAllKeys(MenuIndex.KEY, project);
+        final ArrayList<String> menuReferencesList = new ArrayList<>(menuReferences);
+        Collections.sort(menuReferencesList);
 
-        if (getAclResourcesList().contains(ModuleMenuXml.defaultAcl)) {
+        this.parentAcl = new FilteredComboBox(aclResourcesList);
+        this.parentMenu = new FilteredComboBox(menuReferencesList);
+
+        if (aclResourcesList.contains(ModuleMenuXml.defaultAcl)) {
             parentAcl.setSelectedItem(ModuleMenuXml.defaultAcl);
         }
-    }
-
-    private List<String> getAclResourcesList() {
-        return GetAclResourcesListUtil.execute(project);
-    }
-
-    /**
-     * Generate Grid view controller file.
-     */
-    private void generateGridViewControllerFile() {
-        final AdminListViewActionFile indexFile = new AdminListViewActionFile(getEntityName());
-        final NamespaceBuilder namespace = new NamespaceBuilder(
-                getModuleName(),
-                AdminListViewActionFile.CLASS_NAME,
-                indexFile.getDirectory()
-        );
-        final AdminListViewEntityActionData data = new AdminListViewEntityActionData(
-                getModuleName(),
-                getEntityName(),
-                namespace.getNamespace(),
-                namespace.getClassFqn(),
-                getAcl(),
-                getMenuIdentifier()
-        );
-        new AdminListViewEntityActionGenerator(data, project).generate(ACTION_NAME, false);
-    }
-
-    /**
-     * Generate grid layout file.
-     */
-    private void generateGridLayoutFile() {
-        new LayoutXmlGenerator(new LayoutXmlData(
-                Areas.adminhtml.toString(),
-                getRoute(),
-                getModuleName(),
-                getEntityName(),
-                AdminListViewActionFile.CLASS_NAME,
-                getGridName()
-        ), project).generate(ACTION_NAME, false);
-    }
-
-    /**
-     * Get grid name.
-     *
-     * @return String
-     */
-    private String getGridName() {
-        return gridName.getText();
-    }
-
-    /**
-     * Generate entity data mapper type.
-     */
-    private void generateEntityDataMapperFile() {
-        final EntityDataMapperFile entityDataMapperFile =
-                new EntityDataMapperFile(getEntityName());
-
-        final String namespace = entityDataMapperFile.getNamespace(getModuleName());
-        final String classFqn = entityDataMapperFile.getClassFqn(getModuleName());
-
-        final NamespaceBuilder modelNamespace = getModelNamespace();
-        final NamespaceBuilder dtoModelNamespace = getDataModelNamespace();
-        final NamespaceBuilder dtoInterfaceModelNamespace = getDataModelInterfaceNamespace();
-
-        final String dtoType;
-
-        if (createInterface.isSelected()) {
-            dtoType = dtoInterfaceModelNamespace.getClassFqn();
-        } else {
-            dtoType = dtoModelNamespace.getClassFqn();
-        }
-
-        new EntityDataMapperGenerator(
-                new EntityDataMapperData(
-                        getModuleName(),
-                        getEntityName(),
-                        namespace,
-                        classFqn,
-                        modelNamespace.getClassFqn(),
-                        dtoType
-                ),
-                project
-        ).generate(ACTION_NAME, false);
-    }
-
-    /**
-     * Run GetListQuery.php file generator.
-     */
-    private void generateModelGetListQueryFile() {
-        final String entityCollectionType = getCollectionNamespace().getClassFqn();
-
-        new GetListQueryModelGenerator(
-                new GetListQueryModelData(
-                        getModuleName(),
-                        getEntityName(),
-                        entityCollectionType,
-                        getEntityDataMapperType()
-                ),
-                project
-        ).generate(ACTION_NAME, true);
-    }
-
-    /**
-     * Get entity data mapper type.
-     *
-     * @return String
-     */
-    private String getEntityDataMapperType() {
-        final EntityDataMapperFile entityDataMapperFile =
-                new EntityDataMapperFile(getEntityName());
-
-        return entityDataMapperFile.getClassFqn(getModuleName());
-    }
-
-    /**
-     * Generate data provider file.
-     */
-    private void generateDataProviderFile() {
-        if (getDataProviderType().equals(UiComponentDataProviderPhp.CUSTOM_TYPE)) {
-            final NamespaceBuilder namespaceBuilder = getDataProviderNamespace();
-            new UiComponentDataProviderGenerator(new UiComponentDataProviderData(
-                    getDataProviderClassName(),
-                    namespaceBuilder.getNamespace(),
-                    getDataProviderDirectory(),
-                    getEntityIdColumn()
-            ), getModuleName(), project).generate(ACTION_NAME, false);
-        }
-    }
-
-    /**
-     * Get data provider namespace builder.
-     *
-     * @return NamespaceBuilder
-     */
-    @NotNull
-    private NamespaceBuilder getDataProviderNamespace() {
-        return new NamespaceBuilder(
-                getModuleName(),
-                getDataProviderClassName(),
-                getDataProviderDirectory()
-        );
-    }
-
-    /**
-     * Get data provider directory.
-     *
-     * @return String
-     */
-    public String getDataProviderDirectory() {
-        // TODO: add ui part with dynamic implementation.
-        return "UI/DataProvider";
-    }
-
-    /**
-     * Get data provider type.
-     *
-     * @return String
-     */
-    public String getDataProviderType() {
-        // TODO: add ui part with dynamic implementation.
-        return UiComponentDataProviderPhp.CUSTOM_TYPE;
-    }
-
-    /**
-     * Generate Grid UI Component action column file.
-     */
-    private void generateUiComponentGridActionColumnFile() {
-        final GridActionColumnData data = new GridActionColumnData(
-                getModuleName(),
-                getEntityName(),
-                getEntityIdColumn(),
-                getEditViewAction(),
-                getDeleteAction()
-        );
-        new GridActionColumnFileGenerator(data, project).generate(ACTION_NAME, true);
-    }
-
-    /**
-     * Generate UI Component grid file.
-     */
-    private void generateUiComponentGridFile() {
-        final UiComponentGridXmlGenerator gridXmlGenerator = new UiComponentGridXmlGenerator(
-                getUiComponentGridData(),
-                project
-        );
-        gridXmlGenerator.generate(ACTION_NAME, true);
-    }
-
-    /**
-     * Get grid UI component data.
-     *
-     * @return UiComponentGridData
-     */
-    public UiComponentGridData getUiComponentGridData() {
-        return new UiComponentGridData(
-                getModuleName(),
-                Areas.adminhtml.toString(),
-                getGridName(),
-                getDataProviderNamespace().getClassFqn(),
-                getEntityIdColumn(),
-                getAcl(),
-                getUiComponentGridToolbarData(),
-                getEntityProperties()
-        );
-    }
-
-    /**
-     * Get grid toolbar data.
-     *
-     * @return UiComponentGridToolbarData
-     */
-    public UiComponentGridToolbarData getUiComponentGridToolbarData() {
-        return new UiComponentGridToolbarData(
-                getAddToolBar(),
-                getAddBookmarksCheckBox(),
-                getAddColumnsControlCheckBox(),
-                getAddFullTextSearchCheckBox(),
-                getAddListingFiltersCheckBox(),
-                getAddListingPagingCheckBox()
-        );
-    }
-
-    /**
-     * Get index view action path.
-     *
-     * @return String
-     */
-    private String getIndexViewAction() {
-        return getRoute()
-                + File.separator
-                + FirstLetterToLowercaseUtil.convert(getEntityName())
-                + File.separator
-                + "index";
-    }
-
-    /**
-     * Get edit view action path.
-     *
-     * @return String
-     */
-    private String getEditViewAction() {
-        return getRoute()
-                + File.separator
-                + FirstLetterToLowercaseUtil.convert(getEntityName())
-                + File.separator
-                + "edit";
-    }
-
-    /**
-     * Get delete action path.
-     *
-     * @return String
-     */
-    private String getDeleteAction() {
-        return getRoute()
-                + File.separator
-                + FirstLetterToLowercaseUtil.convert(getEntityName())
-                + File.separator
-                + "delete";
-    }
-
-    /**
-     * Generate form view controller file.
-     */
-    private void generateFormViewControllerFile() {
-        final NamespaceBuilder namespace = new NamespaceBuilder(
-                getModuleName(),
-                getViewActionName(),
-                getControllerDirectory().concat(getEntityName())
-        );
-        new ModuleControllerClassGenerator(new ControllerFileData(
-                getControllerDirectory().concat(getEntityName()),
-                getViewActionName(),
-                getModuleName(),
-                Areas.adminhtml.toString(),
-                HttpMethod.GET.toString(),
-                getAcl(),
-                true,
-                namespace.getNamespace()
-        ), project).generate(ACTION_NAME, false);
-    }
-
-    /**
-     * Generate UI Component form layout file.
-     */
-    private void generateFormLayoutFile() {
-        new LayoutXmlGenerator(new LayoutXmlData(
-                Areas.adminhtml.toString(),
-                getRoute(),
-                getModuleName(),
-                getEntityName(),
-                getViewActionName(),
-                getFormName()
-        ), project).generate(ACTION_NAME, false);
-    }
-
-    /**
-     * Run SaveCommand.php file generator for an entity.
-     */
-    private void generateSaveEntityCommandFile() {
-        final String classFqn = SaveEntityCommandFile.getClassFqn(
-                getModuleName(),
-                getEntityName()
-        );
-        final String namespace = SaveEntityCommandFile.getNamespace(
-                getModuleName(),
-                getEntityName()
-        );
-        final NamespaceBuilder modelNamespace = getModelNamespace();
-        final NamespaceBuilder resourceModelNamespace = getResourceModelNamespace();
-        final NamespaceBuilder dtoModelNamespace = getDataModelNamespace();
-        final NamespaceBuilder dtoInterfaceModelNamespace = getDataModelInterfaceNamespace();
-
-        final String dtoType;
-
-        if (createInterface.isSelected()) {
-            dtoType = dtoInterfaceModelNamespace.getClassFqn();
-        } else {
-            dtoType = dtoModelNamespace.getClassFqn();
-        }
-
-        new SaveEntityCommandGenerator(
-                new SaveEntityCommandData(
-                        getModuleName(),
-                        getEntityName(),
-                        namespace,
-                        classFqn,
-                        modelNamespace.getClassFqn(),
-                        resourceModelNamespace.getClassFqn(),
-                        dtoType
-                ),
-                project
-        ).generate(ACTION_NAME, true);
-    }
-
-    /**
-     * Generate Save Controller file.
-     */
-    private void generateFormSaveControllerFile() {
-        final NamespaceBuilder dtoModelNamespace = getDataModelNamespace();
-        final NamespaceBuilder dtoInterfaceModelNamespace = getDataModelInterfaceNamespace();
-        final NamespaceBuilder namespace = new NamespaceBuilder(
-                getModuleName(),
-                SaveActionFile.CLASS_NAME,
-                SaveActionFile.getDirectory(getEntityName())
-        );
-        final String dtoType;
-
-        if (createInterface.isSelected()) {
-            dtoType = dtoInterfaceModelNamespace.getClassFqn();
-        } else {
-            dtoType = dtoModelNamespace.getClassFqn();
-        }
-
-        new SaveEntityControllerFileGenerator(new SaveEntityControllerFileData(
-                getEntityName(),
-                getModuleName(),
-                namespace.getNamespace(),
-                getSaveEntityCommandClassFqn(),
-                dtoType,
-                getAcl(),
-                getEntityIdColumn()
-        ), project).generate(ACTION_NAME, false);
-    }
-
-    /**
-     * Get save entity command class Fqn.
-     *
-     * @return String
-     */
-    private String getSaveEntityCommandClassFqn() {
-        final NamespaceBuilder namespaceBuilder =
-                new NamespaceBuilder(
-                        getModuleName(),
-                        SaveEntityCommandFile.CLASS_NAME,
-                        SaveEntityCommandFile.getDirectory(getEntityName())
-                );
-
-        return namespaceBuilder.getClassFqn();
-    }
-
-    /**
-     * Generate Form UI Component generic button block file.
-     */
-    private void generateFormUiComponentGenericButtonFile() {
-        final NamespaceBuilder genericButtonBlockNamespace = new NamespaceBuilder(
-                getModuleName(),
-                FormGenericButtonBlockFile.CLASS_NAME,
-                FormGenericButtonBlockFile.DIRECTORY
-        );
-        new FormGenericButtonBlockGenerator(
-                new FormGenericButtonBlockData(
-                        getModuleName(),
-                        getEntityName(),
-                        getEntityIdColumn(),
-                        genericButtonBlockNamespace.getClassFqn(),
-                        genericButtonBlockNamespace.getNamespace()
-                ),
-                project
-        ).generate(ACTION_NAME, true);
-    }
-
-    /**
-     * Generate UI Component form file.
-     */
-    private void generateUiComponentFormFile() {
-        new UiComponentFormGenerator(new UiComponentFormFileData(
-                getFormName(),
-                Areas.adminhtml.toString(),
-                getModuleName(),
-                getFormLabel(),
-                getButtons(),
-                getFieldsets(),
-                getFields(),
-                getRoute(),
-                getEntityName(),
-                getSubmitActionName(),
-                getDataProviderNamespace().getClassFqn()
-        ), project).generate(ACTION_NAME, true);
-    }
-
-    /**
-     * Generate menu file.
-     */
-    private void generateMenuFile() {
-        new MenuXmlGenerator(new MenuXmlData(
-                getParentMenuItem(),
-                getSortOrder(),
-                getModuleName(),
-                getMenuIdentifier(),
-                getMenuTitle(),
-                getAcl(),
-                getIndexViewAction()
-        ), project).generate(ACTION_NAME, false);
-    }
-
-    private String getParentMenuItem() {
-        return parentMenu.getSelectedItem().toString();
-    }
-
-    public String getSortOrder() {
-        return sortOrder.getText().trim();
-    }
-
-    public String getMenuIdentifier() {
-        return menuIdentifier.getText().trim();
-    }
-
-    public String getMenuTitle() {
-        return menuTitle.getText().trim();
-    }
-
-    private Boolean getAddToolBar() {
-        return addToolBar.isSelected();
-    }
-
-    private Boolean getAddColumnsControlCheckBox() {
-        return addColumnsControlCheckBox.isSelected();
-    }
-
-    private Boolean getAddFullTextSearchCheckBox() {
-        return addFullTextSearchCheckBox.isSelected();
-    }
-
-    private Boolean getAddListingFiltersCheckBox() {
-        return addListingFiltersCheckBox.isSelected();
-    }
-
-    private Boolean getAddListingPagingCheckBox() {
-        return addListingPagingCheckBox.isSelected();
-    }
-
-    private Boolean getAddBookmarksCheckBox() {
-        return addBookmarksCheckBox.isSelected();
-    }
-
-    /**
-     * Run db_schema.xml file generator.
-     *
-     * @param dbSchemaXmlData DbSchemaXmlData
-     */
-    private void generateDbSchemaXmlFile(final @NotNull DbSchemaXmlData dbSchemaXmlData) {
-        new DbSchemaXmlGenerator(
-                dbSchemaXmlData,
-                project,
-                moduleName
-        ).generate(ACTION_NAME, false);
-    }
-
-    /**
-     * Run db_schema_whitelist.json generator.
-     *
-     * @param dbSchemaXmlData DbSchemaXmlData
-     */
-    private void generateWhitelistJsonFile(final @NotNull DbSchemaXmlData dbSchemaXmlData) {
-        new DbSchemaWhitelistJsonGenerator(
-                project,
-                dbSchemaXmlData,
-                moduleName
-        ).generate(ACTION_NAME, false);
-    }
-
-    /**
-     * Get tableResource field value.
-     *
-     * @return String
-     */
-    private String getTableResource() {
-        return tableResource.getSelectedItem().toString().trim();
-    }
-
-    /**
-     * Get tableEngine field value.
-     *
-     * @return String
-     */
-    private String getTableEngine() {
-        return tableEngine.getSelectedItem().toString().trim();
     }
 
     /**
@@ -1353,13 +597,134 @@ public class NewEntityDialog extends AbstractDialog {
         return columnsData;
     }
 
-    @NotNull
-    private List<String> getMenuReferences() {
-        final Collection<String> menuReferences
-                = FileBasedIndex.getInstance().getAllKeys(MenuIndex.KEY, project);
-        final ArrayList<String> menuReferencesList = new ArrayList<>(menuReferences);
-        Collections.sort(menuReferencesList);
+    /**
+     * Autocomplete entity name dependent fields.
+     */
+    private void autoCompleteIdentifiers() {
+        final String entityNameValue = entityName.getText().trim();
+        if (entityNameValue.isEmpty()) {
+            return;
+        }
+        final String entityName = CamelCaseToSnakeCase.getInstance().convert(entityNameValue);
+        final String entityNameLabel = Arrays.stream(entityName.split("_")).map(
+                string -> string.substring(0, 1).toUpperCase(Locale.getDefault())
+                        + string.substring(1)
+        ).collect(Collectors.joining(" "));
 
-        return menuReferencesList;
+        dbTableName.setText(entityName);
+        entityId.setText(entityName.concat("_id"));
+        route.setText(entityName);
+        formLabel.setText(entityNameLabel.concat(" Form"));
+        formName.setText(entityName.concat("_form"));
+        gridName.setText(entityName.concat("_listing"));
+        acl.setText(moduleName.concat("::management"));
+        aclTitle.setText(entityNameLabel.concat(" Management"));
+        menuIdentifier.setText(moduleName.concat("::management"));
+        menuTitle.setText(entityNameLabel.concat(" Management"));
+    }
+
+    /**
+     * Resolve ui components panel state.
+     */
+    private void toggleUiComponentsPanel() {
+        if (createUiComponent.isSelected()) {
+            tabbedPane1.add(uiComponentsPanel, 1);
+            tabbedPane1.setTitleAt(1, UI_COMPONENTS_TAB_NAME);
+        } else {
+            tabbedPane1.remove(1);
+        }
+    }
+
+    /**
+     * Get new entity dialog data object.
+     *
+     * @return NewEntityDialogData
+     */
+    private NewEntityDialogData getNewEntityDialogData() {
+        return new NewEntityDialogData(
+                entityName.getText().trim(),
+                dbTableName.getText().trim(),
+                entityId.getText().trim(),
+                getTableEngine(),
+                getTableResource(),
+                createUiComponent.isSelected(),
+                createInterface.isSelected(),
+                route.getText().trim(),
+                formLabel.getText().trim(),
+                formName.getText().trim(),
+                gridName.getText().trim(),
+                addToolBar.isSelected(),
+                addBookmarksCheckBox.isSelected(),
+                addColumnsControlCheckBox.isSelected(),
+                addListingFiltersCheckBox.isSelected(),
+                addListingPagingCheckBox.isSelected(),
+                addFullTextSearchCheckBox.isSelected(),
+                getParentAcl(),
+                acl.getText().trim(),
+                aclTitle.getText().trim(),
+                getParentMenu(),
+                Integer.parseInt(sortOrder.getText().trim()),
+                menuIdentifier.getText().trim(),
+                menuTitle.getText().trim(),
+                ClassPropertyFormatterUtil.joinProperties(properties)
+        );
+    }
+
+    /**
+     * Get properties table.
+     *
+     * @return DefaultTableModel
+     */
+    private DefaultTableModel getPropertiesTable() {
+        return (DefaultTableModel) propertyTable.getModel();
+    }
+
+    /**
+     * Get entity id column name.
+     *
+     * @return String
+     */
+    private String getEntityIdColumn() {
+        return entityId.getText().trim();
+    }
+
+    /**
+     * Get table engine.
+     *
+     * @return String
+     */
+    private String getTableEngine() {
+        return tableEngine.getSelectedItem() == null ? ""
+                : tableEngine.getSelectedItem().toString().trim();
+    }
+
+    /**
+     * Get table resource.
+     *
+     * @return String
+     */
+    private String getTableResource() {
+        return tableResource.getSelectedItem() == null ? ""
+                : tableResource.getSelectedItem().toString().trim();
+    }
+
+    /**
+     * Get parent acl resource id.
+     *
+     * @return String
+     */
+    private String getParentAcl() {
+        return parentAcl.getSelectedItem() == null ? ""
+                : parentAcl.getSelectedItem().toString().trim();
+    }
+
+    /**
+     * Get parent menu id.
+     *
+     * @return String
+     */
+    private String getParentMenu() {
+        return parentMenu.getSelectedItem() == null ? ""
+                : parentMenu.getSelectedItem().toString().trim();
     }
 }

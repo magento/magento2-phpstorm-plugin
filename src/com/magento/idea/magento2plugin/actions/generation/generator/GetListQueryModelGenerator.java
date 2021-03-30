@@ -14,62 +14,59 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Directo
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.magento.files.queries.GetListQuery;
+import com.magento.idea.magento2plugin.magento.files.CollectionModelFile;
+import com.magento.idea.magento2plugin.magento.files.EntityDataMapperFile;
+import com.magento.idea.magento2plugin.magento.files.queries.GetListQueryFile;
 import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryType;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
 public class GetListQueryModelGenerator extends FileGenerator {
 
     private final Project project;
-    private final GetListQueryModelData queryModelData;
+    private final GetListQueryModelData data;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final DirectoryGenerator directoryGenerator;
     private final ModuleIndex moduleIndex;
-    private final NamespaceBuilder queryModelNamespaceBuilder;
     private final boolean checkFileAlreadyExists;
+    private final GetListQueryFile file;
 
     /**
      * Query model generator Constructor.
      *
-     * @param queryModelData QueryModelData
+     * @param data QueryModelData
      * @param project Project
      */
     public GetListQueryModelGenerator(
-            final @NotNull GetListQueryModelData queryModelData,
+            final @NotNull GetListQueryModelData data,
             final @NotNull Project project
     ) {
-        this(queryModelData, project, true);
+        this(data, project, true);
     }
 
     /**
      * Query model generator Constructor.
      *
-     * @param queryModelData QueryModelData
+     * @param data QueryModelData
      * @param project Project
      * @param checkFileAlreadyExists boolean
      */
     public GetListQueryModelGenerator(
-            final @NotNull GetListQueryModelData queryModelData,
+            final @NotNull GetListQueryModelData data,
             final @NotNull Project project,
             final boolean checkFileAlreadyExists
     ) {
         super(project);
         this.project = project;
-        this.queryModelData = queryModelData;
+        this.data = data;
         this.checkFileAlreadyExists = checkFileAlreadyExists;
         fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         directoryGenerator = DirectoryGenerator.getInstance();
         moduleIndex = ModuleIndex.getInstance(project);
-        queryModelNamespaceBuilder = new NamespaceBuilder(
-                queryModelData.getModuleName(),
-                GetListQuery.CLASS_NAME,
-                GetListQuery.DIRECTORY
-        );
+        file = new GetListQueryFile(data.getEntityName());
     }
 
     /**
@@ -82,7 +79,7 @@ public class GetListQueryModelGenerator extends FileGenerator {
     @Override
     public PsiFile generate(final @NotNull String actionName) {
         final PhpClass getListQueryClass = GetPhpClassByFQN.getInstance(project).execute(
-                GetListQuery.getClassFqn(queryModelData.getModuleName())
+                file.getNamespaceBuilder(data.getModuleName()).getClassFqn()
         );
 
         if (this.checkFileAlreadyExists && getListQueryClass != null) {
@@ -90,15 +87,15 @@ public class GetListQueryModelGenerator extends FileGenerator {
         }
 
         final PsiDirectory moduleBaseDir = moduleIndex.getModuleDirectoryByModuleName(
-                queryModelData.getModuleName()
+                data.getModuleName()
         );
-        final PsiDirectory queryModelBaseDir = directoryGenerator.findOrCreateSubdirectory(
+        final PsiDirectory queryModelBaseDir = directoryGenerator.findOrCreateSubdirectories(
                 moduleBaseDir,
-                GetListQuery.DIRECTORY
+                file.getDirectory()
         );
 
         return fileFromTemplateGenerator.generate(
-                GetListQuery.getInstance(),
+                file,
                 getAttributes(),
                 queryModelBaseDir,
                 actionName
@@ -112,48 +109,58 @@ public class GetListQueryModelGenerator extends FileGenerator {
      */
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        final List<String> uses = new LinkedList<>();
+        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
+        final CollectionModelFile collectionModelFile =
+                new CollectionModelFile(data.getCollectionName());
+        final NamespaceBuilder collectionNamespace =
+                collectionModelFile.getNamespaceBuilder(data.getModuleName(), data.getModelName());
 
-        uses.add(queryModelData.getCollectionTypeFactory());
-        uses.add(queryModelData.getCollectionType());
-        uses.add(queryModelData.getEntityDataMapperType());
-        uses.add(FrameworkLibraryType.COLLECTION_PROCESSOR.getType());
-        uses.add(FrameworkLibraryType.SEARCH_CRITERIA_BUILDER.getType());
-        uses.add(FrameworkLibraryType.SEARCH_CRITERIA.getType());
-        uses.add(FrameworkLibraryType.SEARCH_RESULT.getFactory());
-        uses.add(FrameworkLibraryType.SEARCH_RESULT.getType());
+        phpClassTypesBuilder
+                .appendProperty("ENTITY_NAME", data.getEntityName())
+                .appendProperty(
+                        "NAMESPACE",
+                        file.getNamespaceBuilder(data.getModuleName()).getNamespace()
+                )
+                .appendProperty("CLASS_NAME", GetListQueryFile.CLASS_NAME)
+                .append(
+                        "ENTITY_COLLECTION_TYPE",
+                        collectionNamespace.getClassFqn()
+                )
+                .append(
+                        "ENTITY_COLLECTION_FACTORY_TYPE",
+                        collectionNamespace.getClassFqn().concat("Factory")
+                )
+                .append(
+                        "ENTITY_DATA_MAPPER_TYPE",
+                        new EntityDataMapperFile(
+                                data.getEntityName()
+                        ).getClassFqn(data.getModuleName())
+                )
+                .append(
+                        "COLLECTION_PROCESSOR_TYPE",
+                        FrameworkLibraryType.COLLECTION_PROCESSOR.getType()
+                )
+                .append(
+                        "SEARCH_CRITERIA_BUILDER_TYPE",
+                        FrameworkLibraryType.SEARCH_CRITERIA_BUILDER.getType()
+                )
+                .append(
+                        "SEARCH_CRITERIA_TYPE",
+                        FrameworkLibraryType.SEARCH_CRITERIA.getType()
+                )
+                .append(
+                        "SEARCH_RESULT_TYPE",
+                        FrameworkLibraryType.SEARCH_RESULT.getType()
+                )
+                .append(
+                        "SEARCH_RESULT_FACTORY_TYPE",
+                        FrameworkLibraryType.SEARCH_RESULT.getFactory()
+                )
+                .mergeProperties(attributes);
 
-        attributes.setProperty("USES", PhpClassGeneratorUtil.formatUses(uses));
-        attributes.setProperty("ENTITY_NAME", queryModelData.getEntityName());
-        attributes.setProperty("NAMESPACE", queryModelNamespaceBuilder.getNamespace());
-        attributes.setProperty("CLASS_NAME", GetListQuery.CLASS_NAME);
         attributes.setProperty(
-                "ENTITY_COLLECTION_FACTORY_TYPE",
-                PhpClassGeneratorUtil.getNameFromFqn(
-                        queryModelData.getCollectionTypeFactory()
-                )
+                "USES",
+                PhpClassGeneratorUtil.formatUses(phpClassTypesBuilder.getUses())
         );
-        attributes.setProperty(
-                "ENTITY_COLLECTION_TYPE",
-                PhpClassGeneratorUtil.getNameFromFqn(
-                        queryModelData.getCollectionType()
-                )
-        );
-        attributes.setProperty(
-                "ENTITY_DATA_MAPPER_TYPE",
-                PhpClassGeneratorUtil.getNameFromFqn(
-                        queryModelData.getEntityDataMapperType()
-                )
-        );
-        attributes.setProperty("COLLECTION_PROCESSOR_TYPE",
-                FrameworkLibraryType.COLLECTION_PROCESSOR.getTypeName());
-        attributes.setProperty("SEARCH_CRITERIA_BUILDER_TYPE",
-                FrameworkLibraryType.SEARCH_CRITERIA_BUILDER.getTypeName());
-        attributes.setProperty("SEARCH_CRITERIA_TYPE",
-                FrameworkLibraryType.SEARCH_CRITERIA.getTypeName());
-        attributes.setProperty("SEARCH_RESULT_FACTORY_TYPE",
-                FrameworkLibraryType.SEARCH_RESULT.getFactoryName());
-        attributes.setProperty("SEARCH_RESULT_TYPE",
-                FrameworkLibraryType.SEARCH_RESULT.getTypeName());
     }
 }

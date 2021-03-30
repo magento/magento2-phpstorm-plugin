@@ -13,60 +13,60 @@ import com.magento.idea.magento2plugin.actions.generation.data.EntityDataMapperD
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
+import com.magento.idea.magento2plugin.magento.files.DataModelFile;
+import com.magento.idea.magento2plugin.magento.files.DataModelInterfaceFile;
 import com.magento.idea.magento2plugin.magento.files.EntityDataMapperFile;
+import com.magento.idea.magento2plugin.magento.files.ModelFile;
 import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryType;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
 public class EntityDataMapperGenerator extends FileGenerator {
 
-    private final EntityDataMapperData entityDataMapperData;
+    private final EntityDataMapperData data;
     private final Project project;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final DirectoryGenerator directoryGenerator;
     private final ModuleIndex moduleIndex;
-    private final EntityDataMapperFile entityDataMapperFile;
+    private final EntityDataMapperFile file;
     private final boolean checkFileAlreadyExists;
-    private final List<String> uses;
 
     /**
      * Entity data mapper generator constructor.
      *
-     * @param entityDataMapperData EntityDataMapperData
+     * @param data EntityDataMapperData
      * @param project Project
      */
     public EntityDataMapperGenerator(
-            final @NotNull EntityDataMapperData entityDataMapperData,
+            final @NotNull EntityDataMapperData data,
             final @NotNull Project project
     ) {
-        this(entityDataMapperData, project, true);
+        this(data, project, true);
     }
 
     /**
      * Entity data mapper generator constructor.
      *
-     * @param entityDataMapperData EntityDataMapperData
+     * @param data EntityDataMapperData
      * @param project Project
      * @param checkFileAlreadyExists boolean
      */
     public EntityDataMapperGenerator(
-            final @NotNull EntityDataMapperData entityDataMapperData,
+            final @NotNull EntityDataMapperData data,
             final @NotNull Project project,
             final boolean checkFileAlreadyExists
     ) {
         super(project);
-        this.entityDataMapperData = entityDataMapperData;
+        this.data = data;
         this.project = project;
         this.checkFileAlreadyExists = checkFileAlreadyExists;
-        entityDataMapperFile = new EntityDataMapperFile(entityDataMapperData.getEntityName());
+        file = new EntityDataMapperFile(data.getEntityName());
         fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         directoryGenerator = DirectoryGenerator.getInstance();
         moduleIndex = ModuleIndex.getInstance(project);
-        uses = new ArrayList<>();
     }
 
     /**
@@ -79,22 +79,22 @@ public class EntityDataMapperGenerator extends FileGenerator {
     @Override
     public PsiFile generate(final @NotNull String actionName) {
         final PhpClass entityDataMapperClass = GetPhpClassByFQN.getInstance(project).execute(
-                entityDataMapperData.getClassFqn()
+                file.getClassFqn(data.getModuleName())
         );
         if (this.checkFileAlreadyExists && entityDataMapperClass != null) {
             return entityDataMapperClass.getContainingFile();
         }
 
         final PsiDirectory moduleBaseDir = moduleIndex.getModuleDirectoryByModuleName(
-                entityDataMapperData.getModuleName()
+                data.getModuleName()
         );
         final PsiDirectory entityDataMapperDir = directoryGenerator.findOrCreateSubdirectory(
                 moduleBaseDir,
-                entityDataMapperFile.getDirectory()
+                file.getDirectory()
         );
 
         return fileFromTemplateGenerator.generate(
-                entityDataMapperFile,
+                file,
                 getAttributes(),
                 entityDataMapperDir,
                 actionName
@@ -108,40 +108,38 @@ public class EntityDataMapperGenerator extends FileGenerator {
      */
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        attributes.setProperty("NAMESPACE", entityDataMapperData.getNamespace());
-        attributes.setProperty("ENTITY_NAME", entityDataMapperData.getEntityName());
-        attributes.setProperty("CLASS_NAME", entityDataMapperFile.getClassName());
+        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
 
-        addProperty(attributes, "DATA_OBJECT", FrameworkLibraryType.DATA_OBJECT.getType());
-        addProperty(attributes, "DTO_TYPE", entityDataMapperData.getDataModelClassFqn());
-        addProperty(attributes, "MAGENTO_MODEL_TYPE", entityDataMapperData.getModelClassFqn());
-        addProperty(
-                attributes,
-                "DTO_FACTORY",
-                entityDataMapperData.getDataModelClassFqn().concat("Factory")
+        final ModelFile modelFile = new ModelFile(data.getModelName());
+        final DataModelFile dtoFile = new DataModelFile(data.getDtoName());
+        final DataModelInterfaceFile dtoInterfaceFile =
+                new DataModelInterfaceFile(data.getDtoInterfaceName());
+        String dtoType;
+
+        if (data.isDtoWithInterface()) {
+            dtoType = dtoInterfaceFile.getNamespaceBuilder(data.getModuleName()).getClassFqn();
+        } else {
+            dtoType = dtoFile.getNamespaceBuilder(data.getModuleName()).getClassFqn();
+        }
+
+        phpClassTypesBuilder
+                .appendProperty("NAMESPACE", file.getNamespace(data.getModuleName()))
+                .appendProperty("ENTITY_NAME", data.getEntityName())
+                .appendProperty("CLASS_NAME", file.getClassName())
+                .append("DATA_OBJECT", FrameworkLibraryType.DATA_OBJECT.getType())
+                .append("DTO_TYPE", dtoType)
+                .append(
+                        "MAGENTO_MODEL_TYPE",
+                        modelFile.getNamespaceBuilder(data.getModuleName()).getClassFqn()
+                )
+                .append("DTO_FACTORY", dtoType.concat("Factory"))
+                .append("ABSTRACT_COLLECTION", FrameworkLibraryType.ABSTRACT_COLLECTION.getType())
+                .mergeProperties(attributes);
+
+
+        attributes.setProperty(
+                "USES",
+                PhpClassGeneratorUtil.formatUses(phpClassTypesBuilder.getUses())
         );
-        addProperty(
-                attributes,
-                "ABSTRACT_COLLECTION",
-                FrameworkLibraryType.ABSTRACT_COLLECTION.getType()
-        );
-
-        attributes.setProperty("USES", PhpClassGeneratorUtil.formatUses(uses));
-    }
-
-    /**
-     * Add type to property list.
-     *
-     * @param properties Properties
-     * @param propertyName String
-     * @param type String
-     */
-    protected void addProperty(
-            final @NotNull Properties properties,
-            final String propertyName,
-            final String type
-    ) {
-        uses.add(type);
-        properties.setProperty(propertyName, PhpClassGeneratorUtil.getNameFromFqn(type));
     }
 }

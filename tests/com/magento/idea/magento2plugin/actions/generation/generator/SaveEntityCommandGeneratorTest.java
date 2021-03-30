@@ -9,15 +9,14 @@ import com.magento.idea.magento2plugin.actions.generation.data.SaveEntityCommand
 import com.magento.idea.magento2plugin.magento.files.commands.SaveEntityCommandFile;
 
 public class SaveEntityCommandGeneratorTest extends BaseGeneratorTestCase {
+
     private static final String MODULE_NAME = "Foo_Bar";
     private static final String ENTITY_NAME = "Book";
+    private static final String MODEL_NAME = ENTITY_NAME + "Model";
+    private static final String RESOURCE_MODEL_NAME = ENTITY_NAME + "Resource";
+    private static final String DTO_NAME = ENTITY_NAME + "Data";
+    private static final boolean IS_DTO_HAS_INTERFACE = false;
     private static final String EXPECTED_DIRECTORY = "src/app/code/Foo/Bar/Command/" + ENTITY_NAME;
-    private static final String NAMESPACE = "Foo\\Bar\\Command\\" + ENTITY_NAME;
-    private static final String CLASS_FQN = NAMESPACE + "\\" + SaveEntityCommandFile.CLASS_NAME;
-    private static final String DTO_CLASS_FQN = "Foo\\Bar\\Data\\" + ENTITY_NAME + "Data";
-    private static final String MODEL_CLASS_FQN = "Foo\\Bar\\Model\\" + ENTITY_NAME + "Model";
-    private static final String RESOURCE_CLASS_FQN = "Foo\\Bar\\Model\\ResourceModel\\"
-            + ENTITY_NAME + "Resource";
 
     /**
      * Test generation of SaveCommand model for entity.
@@ -26,11 +25,11 @@ public class SaveEntityCommandGeneratorTest extends BaseGeneratorTestCase {
         final SaveEntityCommandData saveEntityCommandData = new SaveEntityCommandData(
                 MODULE_NAME,
                 ENTITY_NAME,
-                NAMESPACE,
-                CLASS_FQN,
-                MODEL_CLASS_FQN,
-                RESOURCE_CLASS_FQN,
-                DTO_CLASS_FQN
+                MODEL_NAME,
+                RESOURCE_MODEL_NAME,
+                DTO_NAME,
+                "",
+                IS_DTO_HAS_INTERFACE
         );
         final SaveEntityCommandGenerator saveEntityCommandGenerator =
                 new SaveEntityCommandGenerator(
@@ -39,7 +38,7 @@ public class SaveEntityCommandGeneratorTest extends BaseGeneratorTestCase {
                         false
                 );
         final String filePath = this.getFixturePath(
-                new SaveEntityCommandFile().getFileName()
+                new SaveEntityCommandFile(ENTITY_NAME).getFileName()
         );
 
         assertGeneratedFileIsCorrect(

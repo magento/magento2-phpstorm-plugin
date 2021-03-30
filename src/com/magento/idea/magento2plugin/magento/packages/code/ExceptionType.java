@@ -9,7 +9,9 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClas
 import org.jetbrains.annotations.NotNull;
 
 public enum ExceptionType {
-    COULD_NOT_SAVE("Magento\\Framework\\Exception\\CouldNotSaveException");
+    COULD_NOT_SAVE("Magento\\Framework\\Exception\\CouldNotSaveException"),
+    COULD_NOT_DELETE("Magento\\Framework\\Exception\\CouldNotDeleteException"),
+    NO_SUCH_ENTITY_EXCEPTION("Magento\\Framework\\Exception\\NoSuchEntityException");
 
     /**
      * Magento Exception type.

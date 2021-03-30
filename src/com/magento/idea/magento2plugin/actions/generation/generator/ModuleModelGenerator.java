@@ -15,59 +15,63 @@ import com.magento.idea.magento2plugin.actions.generation.data.ModelData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.magento.files.ModelPhp;
+import com.magento.idea.magento2plugin.magento.files.ModelFile;
+import com.magento.idea.magento2plugin.magento.files.ResourceModelFile;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
 import javax.swing.JOptionPane;
+import org.jetbrains.annotations.NotNull;
 
 public class ModuleModelGenerator extends FileGenerator {
-    private final ModelData modelData;
+    private final ModelData data;
     private final Project project;
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
     private final GetFirstClassOfFile getFirstClassOfFile;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
+    private final ModelFile file;
 
     /**
      * Generates new Model PHP Class based on provided data.
      *
-     * @param modelData ModelData
+     * @param data ModelData
      * @param project Project
      */
     public ModuleModelGenerator(
-            final ModelData modelData,
-            final Project project
+            final @NotNull ModelData data,
+            final @NotNull Project project
     ) {
         super(project);
         this.project = project;
-        this.modelData = modelData;
+        this.data = data;
         this.directoryGenerator = DirectoryGenerator.getInstance();
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
+        file = new ModelFile(data.getModelName());
     }
 
     /**
      * Generates model class.
      *
      * @param actionName Action name
+     *
      * @return PsiFile
      */
-    public PsiFile generate(final String actionName) {
+    @Override
+    public PsiFile generate(final @NotNull String actionName) {
         final PsiFile[] modelFiles = new PsiFile[1];
 
         WriteCommandAction.runWriteCommandAction(project, () -> {
             PhpClass model = GetPhpClassByFQN.getInstance(project).execute(
-                    getModelFqn()
+                    file.getNamespaceBuilder(data.getModuleName()).getClassFqn()
             );
 
             if (model != null) {
@@ -109,30 +113,24 @@ public class ModuleModelGenerator extends FileGenerator {
     }
 
     /**
-     * Get module.
+     * Create model class.
      *
-     * @return String
+     * @param actionName String
+     *
+     * @return PhpClass
      */
-    public String getModuleName() {
-        return modelData.getModuleName();
-    }
-
-    private String getModelFqn() {
-        return modelData.getFqn();
-    }
-
-    private PhpClass createModelClass(final String actionName) {
+    private PhpClass createModelClass(final @NotNull String actionName) {
         PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
-                .getModuleDirectoryByModuleName(getModuleName());
+                .getModuleDirectoryByModuleName(data.getModuleName());
         final PsiFile modelFile;
 
         parentDirectory = directoryGenerator.findOrCreateSubdirectory(
-                parentDirectory, ModelPhp.MODEL_DIRECTORY
+                parentDirectory, ModelFile.MODEL_DIRECTORY
         );
 
         final Properties attributes = getAttributes();
         modelFile = fileFromTemplateGenerator.generate(
-                new ModelPhp(modelData.getModelName()),
+                file,
                 attributes,
                 parentDirectory,
                 actionName
@@ -145,26 +143,36 @@ public class ModuleModelGenerator extends FileGenerator {
         return getFirstClassOfFile.execute((PhpFile) modelFile);
     }
 
-    protected void fillAttributes(final Properties attributes) {
-        attributes.setProperty("NAME", modelData.getModelName());
-        attributes.setProperty("NAMESPACE", modelData.getNamespace());
+    /**
+     * Fill model file attributes.
+     *
+     * @param attributes Properties
+     */
+    @Override
+    protected void fillAttributes(final @NotNull Properties attributes) {
+        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
+        final ResourceModelFile resourceModelFile = new ResourceModelFile(data.getResourceName());
 
-        attributes.setProperty("DB_NAME", modelData.getDbTableName());
-        attributes.setProperty("RESOURCE_MODEL", modelData.getResourceName());
-        final List<String> uses = getUses();
+        phpClassTypesBuilder
+                .appendProperty("NAME", data.getModelName())
+                .appendProperty(
+                        "NAMESPACE",
+                        file.getNamespaceBuilder(data.getModuleName()).getNamespace()
+                )
+                .appendProperty("DB_NAME", data.getDbTableName())
+                .append(
+                        "RESOURCE_MODEL",
+                        resourceModelFile.getNamespaceBuilder(data.getModuleName()).getClassFqn(),
+                        ResourceModelFile.ALIAS
+                )
+                .appendProperty(
+                        "EXTENDS",
+                        PhpClassGeneratorUtil.getNameFromFqn(ModelFile.ABSTRACT_MODEL)
+                )
+                .append("ABSTRACT_MODEL", ModelFile.ABSTRACT_MODEL)
+                .mergeProperties(attributes);
 
-        attributes.setProperty(
-                "EXTENDS",
-                PhpClassGeneratorUtil.getNameFromFqn(ModelPhp.ABSTRACT_MODEL)
-        );
-
-        attributes.setProperty("USES", PhpClassGeneratorUtil.formatUses(uses));
-    }
-
-    private List<String> getUses() {
-        return new ArrayList<>(Arrays.asList(
-                ModelPhp.ABSTRACT_MODEL,
-                modelData.getResourceModelFqn()
-        ));
+        attributes.setProperty("USES",
+                PhpClassGeneratorUtil.formatUses(phpClassTypesBuilder.getUses()));
     }
 }

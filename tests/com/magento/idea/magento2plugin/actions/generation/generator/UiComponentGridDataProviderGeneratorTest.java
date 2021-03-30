@@ -11,22 +11,24 @@ import com.magento.idea.magento2plugin.actions.generation.data.GetListQueryModel
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataProviderData;
 
 public class UiComponentGridDataProviderGeneratorTest extends BaseGeneratorTestCase {
+
     private static final String EXPECTED_DIRECTORY = "src/app/code/Foo/Bar/Ui/Component/Listing";
     private static final String MODULE_NAME = "Foo_Bar";
     private static final String ENTITY_NAME = "Book";
+    private static final String ENTITY_ID_FIELD_NAME = "entity_id";
+    private static final String MODEL_NAME = "Book";
     private static final String PROVIDER_CLASS_NAME = "GridDataProvider";
-    private static final String PROVIDER_NAMESPACE = "Foo\\Bar\\Ui\\Listing";
     private static final String PROVIDER_PATH = "Ui/Component/Listing";
-    private static final String COLLECTION_TYPE = "Foo\\Bar\\Model\\ResourceModel\\"
-            + ENTITY_NAME + "\\Collection";
-    private static final String ENTITY_DATA_MAPPER_TYPE = "Foo\\Bar\\Mapper\\"
-            + ENTITY_NAME + "DataMapper";
+    private static final String COLLECTION_NAME = "Collection";
 
     /**
      * Test data provider class file generation with custom type.
      */
     public void testGenerateCustomDataProvider() {
-        final PsiFile dataProviderFile = generateDataProvider();
+        final PsiFile dataProviderFile = generateDataProvider( new UiComponentDataProviderData(
+                PROVIDER_CLASS_NAME,
+                PROVIDER_PATH
+        ));
         final String filePath = this.getFixturePath("GridDataProvider.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
 
@@ -42,7 +44,12 @@ public class UiComponentGridDataProviderGeneratorTest extends BaseGeneratorTestC
      */
     public void testGenerateDataProviderWithInjectedGetListQuery() {
         generateGetListQuery();
-        final PsiFile dataProviderFile = generateDataProvider();
+        final PsiFile dataProviderFile = generateDataProvider(new UiComponentDataProviderData(
+                PROVIDER_CLASS_NAME,
+                PROVIDER_PATH,
+                ENTITY_NAME,
+                ENTITY_ID_FIELD_NAME
+        ));
         final String filePath = this.getFixturePath("GridDataProvider.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
 
@@ -58,21 +65,14 @@ public class UiComponentGridDataProviderGeneratorTest extends BaseGeneratorTestC
      *
      * @return PsiFile
      */
-    private PsiFile generateDataProvider() {
+    private PsiFile generateDataProvider(final UiComponentDataProviderData data) {
         final Project project = myFixture.getProject();
-        final UiComponentDataProviderData providerData = new UiComponentDataProviderData(
-                PROVIDER_CLASS_NAME,
-                PROVIDER_NAMESPACE,
-                PROVIDER_PATH
-        );
-        final UiComponentDataProviderGenerator generator;
-        generator = new UiComponentDataProviderGenerator(
-                providerData,
+
+        return new UiComponentDataProviderGenerator(
+                data,
                 MODULE_NAME,
                 project
-        );
-
-        return generator.generate("test");
+        ).generate("test");
     }
 
     /**
@@ -83,8 +83,8 @@ public class UiComponentGridDataProviderGeneratorTest extends BaseGeneratorTestC
         final GetListQueryModelData getListData = new GetListQueryModelData(
                 MODULE_NAME,
                 ENTITY_NAME,
-                COLLECTION_TYPE,
-                ENTITY_DATA_MAPPER_TYPE
+                MODEL_NAME,
+                COLLECTION_NAME
         );
         new GetListQueryModelGenerator(getListData, project, false).generate("test");
     }

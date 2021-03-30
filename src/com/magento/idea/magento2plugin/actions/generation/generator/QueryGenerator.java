@@ -17,16 +17,16 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFro
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
-import com.magento.idea.magento2plugin.magento.packages.File;
-import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderFile;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import java.util.Properties;
 import javax.swing.JOptionPane;
+import org.jetbrains.annotations.NotNull;
 
 public class QueryGenerator extends FileGenerator {
-    private final UiComponentDataProviderData uiComponentGridDataProviderData;
+
+    private final UiComponentDataProviderData data;
     private final Project project;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
@@ -34,22 +34,22 @@ public class QueryGenerator extends FileGenerator {
     private final CommonBundle commonBundle;
     private final String moduleName;
     private final GetFirstClassOfFile getFirstClassOfFile;
+    private final UiComponentDataProviderFile file;
 
     /**
      * Ui component grid data provider constructor.
      *
-     * @param uiComponentGridDataProviderData UiComponentGridDataProviderData
+     * @param data UiComponentGridDataProviderData
      * @param moduleName String
      * @param project Project
      */
     public QueryGenerator(
-            final UiComponentDataProviderData uiComponentGridDataProviderData,
+            final UiComponentDataProviderData data,
             final String moduleName,
             final Project project
     ) {
         super(project);
-
-        this.uiComponentGridDataProviderData = uiComponentGridDataProviderData;
+        this.data = data;
         this.directoryGenerator = DirectoryGenerator.getInstance();
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         this.validatorBundle = new ValidatorBundle();
@@ -57,15 +57,16 @@ public class QueryGenerator extends FileGenerator {
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
         this.project = project;
         this.moduleName = moduleName;
+        file = new UiComponentDataProviderFile(data.getName());
     }
 
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile generate(final @NotNull String actionName) {
         final PsiFile[] dataProviderFiles = new PsiFile[1];
 
         WriteCommandAction.runWriteCommandAction(project, () -> {
             PhpClass dataProvider = GetPhpClassByFQN.getInstance(project).execute(
-                    getDataProviderFqn()
+                    file.getNamespaceBuilder(moduleName, data.getPath()).getClassFqn()
             );
 
             if (dataProvider != null) {
@@ -106,33 +107,23 @@ public class QueryGenerator extends FileGenerator {
         return dataProviderFiles[0];
     }
 
-    @Override
-    protected void fillAttributes(final Properties attributes) {
-        attributes.setProperty("NAMESPACE", uiComponentGridDataProviderData.getNamespace());
-        attributes.setProperty("CLASS_NAME", uiComponentGridDataProviderData.getName());
-    }
-
-    private PhpClass createDataProviderClass(final String actionName) {
-        PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+    /**
+     * Create data provider file.
+     *
+     * @param actionName String
+     *
+     * @return PhpClass
+     */
+    private PhpClass createDataProviderClass(final @NotNull String actionName) {
+        final PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(this.moduleName);
-        final PsiFile dataProviderFile;
-        final String[] dataProviderDirectories = uiComponentGridDataProviderData.getPath().split(
-                File.separator
-        );
-        for (final String dataProviderDirectory: dataProviderDirectories) {
-            parentDirectory = directoryGenerator.findOrCreateSubdirectory(
-                    parentDirectory, dataProviderDirectory
-            );
-        }
+        final PsiDirectory dataProviderDirectory =
+                directoryGenerator.findOrCreateSubdirectories(parentDirectory, data.getPath());
 
-        final Properties attributes = getAttributes();
-
-        dataProviderFile = fileFromTemplateGenerator.generate(
-                UiComponentDataProviderPhp.getInstance(
-                        uiComponentGridDataProviderData.getName()
-                ),
-                attributes,
-                parentDirectory,
+        final PsiFile dataProviderFile = fileFromTemplateGenerator.generate(
+                new UiComponentDataProviderFile(data.getName()),
+                getAttributes(),
+                dataProviderDirectory,
                 actionName
         );
 
@@ -143,12 +134,15 @@ public class QueryGenerator extends FileGenerator {
         return getFirstClassOfFile.execute((PhpFile) dataProviderFile);
     }
 
-    private String getDataProviderFqn() {
-        return String.format(
-                "%s%s%s",
-                uiComponentGridDataProviderData.getNamespace(),
-                Package.fqnSeparator,
-                uiComponentGridDataProviderData.getName()
-        );
+    /**
+     * Fill file property attributes.
+     *
+     * @param attributes Properties
+     */
+    @Override
+    protected void fillAttributes(final @NotNull Properties attributes) {
+        attributes.setProperty("NAMESPACE",
+                file.getNamespaceBuilder(moduleName, data.getPath()).getNamespace());
+        attributes.setProperty("CLASS_NAME", data.getName());
     }
 }

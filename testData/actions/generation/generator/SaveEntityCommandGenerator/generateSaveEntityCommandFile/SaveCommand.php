@@ -3,9 +3,9 @@
 namespace Foo\Bar\Command\Book;
 
 use Exception;
-use Foo\Bar\Data\BookData;
 use Foo\Bar\Model\BookModel;
 use Foo\Bar\Model\BookModelFactory;
+use Foo\Bar\Model\Data\BookData;
 use Foo\Bar\Model\ResourceModel\BookResource;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\CouldNotSaveException;
@@ -61,6 +61,11 @@ class SaveCommand
             /** @var BookModel $model */
             $model = $this->modelFactory->create();
             $model->addData($book->getData());
+            $model->setHasDataChanges(true);
+
+            if (!$model->getId()) {
+                $model->isObjectNew(true);
+            }
             $this->resource->save($model);
         } catch (Exception $exception) {
             $this->logger->error(

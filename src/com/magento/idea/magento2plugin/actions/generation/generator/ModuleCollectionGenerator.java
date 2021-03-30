@@ -15,60 +15,68 @@ import com.magento.idea.magento2plugin.actions.generation.data.CollectionData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.magento.files.CollectionPhp;
-import com.magento.idea.magento2plugin.magento.packages.File;
+import com.magento.idea.magento2plugin.magento.files.CollectionModelFile;
+import com.magento.idea.magento2plugin.magento.files.ModelFile;
+import com.magento.idea.magento2plugin.magento.files.ResourceModelFile;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
 import javax.swing.JOptionPane;
+import org.jetbrains.annotations.NotNull;
 
 public class ModuleCollectionGenerator extends FileGenerator {
-    private final CollectionData collectionData;
+
+    private final CollectionData data;
     private final Project project;
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
     private final GetFirstClassOfFile getFirstClassOfFile;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
+    private final CollectionModelFile file;
 
     /**
      * Generates new Collection PHP Class based on provided data.
      *
-     * @param collectionData CollectionData
+     * @param data CollectionData
      * @param project Project
      */
     public ModuleCollectionGenerator(
-            final CollectionData collectionData,
-            final Project project
+            final @NotNull CollectionData data,
+            final @NotNull Project project
     ) {
         super(project);
         this.project = project;
-        this.collectionData = collectionData;
+        this.data = data;
         this.directoryGenerator = DirectoryGenerator.getInstance();
         this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
+        file = new CollectionModelFile(data.getCollectionName());
     }
 
     /**
      * Generates collection model class.
      *
      * @param actionName Action name
+     *
      * @return PsiFile
      */
-    public PsiFile generate(final String actionName) {
+    @Override
+    public PsiFile generate(final @NotNull String actionName) {
         final PsiFile[] collectionFiles = new PsiFile[1];
 
         WriteCommandAction.runWriteCommandAction(project, () -> {
             PhpClass collection = GetPhpClassByFQN.getInstance(project).execute(
-                    getCollectionModelFqn()
+                    file.getNamespaceBuilder(
+                            data.getModuleName(),
+                            data.getCollectionDirectory()
+                    ).getClassFqn()
             );
 
             if (collection != null) {
@@ -110,37 +118,27 @@ public class ModuleCollectionGenerator extends FileGenerator {
     }
 
     /**
-     * Get controller module.
+     * Create collection class.
      *
-     * @return String
+     * @param actionName String
+     *
+     * @return PhpClass
      */
-    public String getModuleName() {
-        return collectionData.getModuleName();
-    }
-
-    private String getCollectionModelFqn() {
-        return collectionData.getCollectionFqn();
-    }
-
-    private PhpClass createClass(final String actionName) {
-        PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
-                .getModuleDirectoryByModuleName(getModuleName());
+    private PhpClass createClass(final @NotNull String actionName) {
+        final PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+                .getModuleDirectoryByModuleName(data.getModuleName());
         final PsiFile modelFile;
 
-        final String[] collectionDirectories = collectionData.getCollectionDirectory().split(
-            File.separator
-        );
-        for (final String directory: collectionDirectories) {
-            parentDirectory = directoryGenerator.findOrCreateSubdirectory(
-                parentDirectory, directory
-            );
-        }
-
-        final Properties attributes = getAttributes();
-        modelFile = fileFromTemplateGenerator.generate(
-                new CollectionPhp(collectionData.getCollectionName()),
-                attributes,
+        final PsiDirectory collectionDirectory = directoryGenerator.findOrCreateSubdirectories(
                 parentDirectory,
+                file.getDirectory(data.getCollectionDirectory())
+        );
+        final Properties attributes = getAttributes();
+
+        modelFile = fileFromTemplateGenerator.generate(
+                file,
+                attributes,
+                collectionDirectory,
                 actionName
         );
 
@@ -151,32 +149,52 @@ public class ModuleCollectionGenerator extends FileGenerator {
         return getFirstClassOfFile.execute((PhpFile) modelFile);
     }
 
-    protected void fillAttributes(final Properties attributes) {
-        attributes.setProperty("NAME", collectionData.getCollectionName());
-        attributes.setProperty("NAMESPACE", collectionData.getCollectionNamespace());
+    /**
+     * Fill collection model file attributes.
+     *
+     * @param attributes Properties
+     */
+    @Override
+    protected void fillAttributes(final @NotNull Properties attributes) {
+        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
 
-        attributes.setProperty("DB_NAME", collectionData.getDbTableName());
-        attributes.setProperty("MODEL", PhpClassGeneratorUtil.getNameFromFqn(
-                collectionData.getModelName())
-        );
-        attributes.setProperty("RESOURCE_MODEL", PhpClassGeneratorUtil.getNameFromFqn(
-                collectionData.getResourceModelName())
-        );
-        final List<String> uses = getUses();
-        uses.add(collectionData.getResourceModelFqn());
-        uses.add(collectionData.getModelFqn());
+        final ResourceModelFile resourceModelFile =
+                new ResourceModelFile(data.getResourceModelName());
+        final ModelFile modelFile = new ModelFile(data.getModelName());
+
+        phpClassTypesBuilder.appendProperty("NAME", data.getCollectionName())
+                .appendProperty(
+                        "NAMESPACE",
+                        file.getNamespaceBuilder(
+                                data.getModuleName(),
+                                data.getCollectionDirectory()
+                        ).getNamespace()
+                )
+                .appendProperty("DB_NAME", data.getDbTableName())
+                .appendProperty("MODEL", data.getModelName())
+                .appendProperty("RESOURCE_MODEL", data.getResourceModelName())
+                .append("EXTENDS", CollectionModelFile.ABSTRACT_COLLECTION)
+                .append(
+                        "RESOURCE_MODEL",
+                        resourceModelFile.getNamespaceBuilder(
+                                data.getModuleName()
+                        ).getClassFqn(),
+                        ResourceModelFile.ALIAS
+                )
+                .append(
+                        "MODEL",
+                        modelFile.getNamespaceBuilder(
+                                data.getModuleName()
+                        ).getClassFqn(),
+                        ModelFile.ALIAS
+                )
+                .mergeProperties(attributes);
 
         attributes.setProperty(
-                "EXTENDS",
-                PhpClassGeneratorUtil.getNameFromFqn(CollectionPhp.ABSTRACT_COLLECTION)
+                "USES",
+                PhpClassGeneratorUtil.formatUses(
+                        phpClassTypesBuilder.getUses()
+                )
         );
-
-        attributes.setProperty("USES", PhpClassGeneratorUtil.formatUses(uses));
-    }
-
-    private List<String> getUses() {
-        return new ArrayList<>(Arrays.asList(
-                CollectionPhp.ABSTRACT_COLLECTION
-        ));
     }
 }

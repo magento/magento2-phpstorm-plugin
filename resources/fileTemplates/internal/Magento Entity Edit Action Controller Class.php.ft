@@ -1,0 +1,37 @@
+<?php
+#parse("PHP File Header.php")
+
+namespace ${NAMESPACE};
+
+#set($uses = ${USES})
+#foreach ($use in $uses.split(","))
+use $use;
+#end
+
+/**
+ * Edit ${ENTITY_NAME} entity backend controller.
+ */
+class ${CLASS_NAME} extends ${EXTENDS} implements ${IMPLEMENTS}
+{
+     /**
+     * Authorization level of a basic admin session.
+     *
+     * @see _isAllowed()
+     */
+    const ADMIN_RESOURCE = '${ADMIN_RESOURCE}';
+
+    /**
+     * Edit ${ENTITY_NAME} action.
+     *
+     * @return ${RESULT_PAGE}|${RESULT_INTERFACE}
+     */
+    public function execute()
+    {
+        /** @var ${RESULT_PAGE} $resultPage */
+        $resultPage = $this->resultFactory->create(${RESULT_FACTORY}::TYPE_PAGE);
+        $resultPage->setActiveMenu('${MENU_IDENTIFIER}');
+        $resultPage->getConfig()->getTitle()->prepend(__('Edit ${ENTITY_NAME}'));
+
+        return $resultPage;
+    }
+}

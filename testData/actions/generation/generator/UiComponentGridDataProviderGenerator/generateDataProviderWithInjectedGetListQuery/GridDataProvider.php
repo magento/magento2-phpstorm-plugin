@@ -1,8 +1,8 @@
 <?php
 
-namespace Foo\Bar\Ui\Listing;
+namespace Foo\Bar\Ui\Component\Listing;
 
-use Foo\Bar\Query\GetListQuery;
+use Foo\Bar\Query\Book\GetListQuery;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\Search\ReportingInterface;
 use Magento\Framework\Api\Search\SearchCriteriaBuilder;
@@ -99,9 +99,14 @@ class GridDataProvider extends DataProvider
             return $this->loadedData;
         }
         $this->loadedData = parent::getData();
+        $itemsById = [];
 
         foreach ($this->loadedData['items'] as $item) {
-            $this->loadedData['items'][$item['entity_id']] = $item;
+            $itemsById[(int)$item['entity_id']] = $item;
+        }
+
+        if ($id = $this->request->getParam('entity_id', null)) {
+            $this->loadedData['entity'] = $itemsById[(int)$id];
         }
 
         return $this->loadedData;
