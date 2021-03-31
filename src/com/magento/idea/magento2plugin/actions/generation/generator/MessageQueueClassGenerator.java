@@ -50,7 +50,7 @@ public class MessageQueueClassGenerator extends FileGenerator {
 
         this.messageQueueClassDataName = messageQueueClassData;
         this.directoryGenerator = DirectoryGenerator.getInstance();
-        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
@@ -112,7 +112,7 @@ public class MessageQueueClassGenerator extends FileGenerator {
     }
 
     private PhpClass createHandlerClass(final String actionName) {
-        PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+        PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(this.moduleName);
         final PsiFile handlerFile;
         final String[] handlerDirectories = messageQueueClassDataName.getPath().split(

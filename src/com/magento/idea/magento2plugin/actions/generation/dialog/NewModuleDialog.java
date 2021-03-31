@@ -123,7 +123,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         this.project = project;
         this.initialBaseDir = initialBaseDir;
         this.camelCaseToHyphen = CamelCaseToHyphen.getInstance();
-        this.moduleIndex = ModuleIndex.getInstance(project);
+        this.moduleIndex = new ModuleIndex(project);
         detectPackageName(initialBaseDir);
         setContentPane(contentPane);
         setModal(true);
@@ -213,6 +213,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
                 getModuleName(),
                 getSetupVersion(),
                 getBaseDir(),
+                getModuleDependencies(),
                 true
         ), project).generate(NewModuleAction.actionName, true);
     }

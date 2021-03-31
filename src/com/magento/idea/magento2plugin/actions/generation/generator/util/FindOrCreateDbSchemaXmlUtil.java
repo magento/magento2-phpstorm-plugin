@@ -33,9 +33,9 @@ public final class FindOrCreateDbSchemaXmlUtil {
     public PsiFile execute(final String actionName, final String moduleName) {
         final DirectoryGenerator directoryGenerator = DirectoryGenerator.getInstance();
         final FileFromTemplateGenerator fileFromTemplateGenerator =
-                FileFromTemplateGenerator.getInstance(project);
+                new FileFromTemplateGenerator(project);
 
-        PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+        PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(moduleName);
         parentDirectory = directoryGenerator
                 .findOrCreateSubdirectory(parentDirectory, Package.moduleBaseAreaDir);

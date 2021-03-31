@@ -49,7 +49,7 @@ public class DataModelInterfaceGenerator extends FileGenerator {
         this.project = project;
         this.data = data;
         this.directoryGenerator = DirectoryGenerator.getInstance();
-        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();

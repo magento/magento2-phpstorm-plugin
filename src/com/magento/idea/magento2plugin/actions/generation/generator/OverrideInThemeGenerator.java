@@ -67,7 +67,7 @@ public class OverrideInThemeGenerator {
             return;
         }
 
-        final ModuleIndex moduleIndex = ModuleIndex.getInstance(project);
+        final ModuleIndex moduleIndex = new ModuleIndex(project);
         PsiDirectory directory = moduleIndex.getModuleDirectoryByModuleName(themeName);
         directory = getTargetDirectory(directory, pathComponents);
 

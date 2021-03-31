@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin.actions.generation.data;
 
 import com.intellij.psi.PsiDirectory;
+import java.util.List;
 
 @SuppressWarnings({"PMD.DataClass"})
 public class ModuleXmlData {
@@ -13,6 +14,7 @@ public class ModuleXmlData {
     private final String moduleName;
     private final String setupVersion;
     private final PsiDirectory baseDir;
+    private final List<String> moduleSequences;
     private final boolean createModuleDirs;
 
     /**
@@ -29,12 +31,14 @@ public class ModuleXmlData {
             final String moduleName,
             final String setupVersion,
             final PsiDirectory baseDir,
+            final List<String> moduleSequences,
             final boolean createModuleDirs
     ) {
         this.packageName = packageName;
         this.moduleName = moduleName;
         this.setupVersion = setupVersion;
         this.baseDir = baseDir;
+        this.moduleSequences = moduleSequences;
         this.createModuleDirs = createModuleDirs;
     }
 
@@ -52,6 +56,10 @@ public class ModuleXmlData {
 
     public String getSetupVersion() {
         return this.setupVersion;
+    }
+
+    public List<String> getModuleSequences() {
+        return moduleSequences;
     }
 
     public boolean isCreateModuleDirs() {
