@@ -136,7 +136,7 @@ public class NewEntityDialog extends AbstractDialog {
     private static final String PROPERTY_TYPE = "Type";
     private static final String ACL_ID = "ACL ID";
     private static final String FORM_NAME = "Form Name";
-    private static final String GRID_NAME = "Grit Name";
+    private static final String GRID_NAME = "Grid Name";
     private static final String IDENTIFIER = "Identifier";
     private static final String SORT_ORDER = "Sort Order";
     private static final String UI_COMPONENTS_TAB_NAME = "Admin UI Components";
