@@ -37,7 +37,7 @@ public class DeleteEntityGeneratorTest extends BaseGeneratorTestCase {
         final PsiFile DeleteEntityActionFile =
                 deleteEntityControllerFileGenerator.generate("test");
         final String filePath =
-                this.getFixturePath(new DeleteActionFile(ENTITY_NAME).getFileName());
+                this.getFixturePath(new DeleteActionFile(MODULE_NAME, ENTITY_NAME).getFileName());
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
 
         assertGeneratedFileIsCorrect(

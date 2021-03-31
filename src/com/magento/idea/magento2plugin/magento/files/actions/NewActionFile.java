@@ -7,54 +7,40 @@ package com.magento.idea.magento2plugin.magento.files.actions;
 
 import com.intellij.lang.Language;
 import com.jetbrains.php.lang.PhpLanguage;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
-import com.magento.idea.magento2plugin.magento.files.ModuleFileInterface;
+import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import org.jetbrains.annotations.NotNull;
 
-public final class NewActionFile implements ModuleFileInterface {
+public final class NewActionFile extends AbstractPhpFile {
+
     public static final String CLASS_NAME = "NewAction";
+    public static final String HUMAN_READABLE_NAME = "New entity controller class";
     public static final String FILE_EXTENSION = "php";
     public static final String TEMPLATE = "Magento Entity New Action Controller Class";
     private static final String DIRECTORY = "Controller/Adminhtml";
-    private static final NewActionFile INSTANCE = new NewActionFile();
+    private final String entityName;
 
     /**
-     * Get singleton instance of the class.
-     *
-     * @return NewAction
-     */
-    public static NewActionFile getInstance() {
-        return INSTANCE;
-    }
-
-    /**
-     * Get namespace builder for file.
+     * New action file constructor.
      *
      * @param moduleName String
      * @param entityName String
-     *
-     * @return String
      */
-    public static @NotNull NamespaceBuilder getNamespaceBuilder(
+    public NewActionFile(
             final @NotNull String moduleName,
             final @NotNull String entityName
     ) {
-        return new NamespaceBuilder(
-                moduleName,
-                CLASS_NAME,
-                getDirectory(entityName)
-        );
+        super(moduleName, CLASS_NAME);
+        this.entityName = entityName;
     }
 
-    /**
-     * Get Directory path from the module root.
-     *
-     * @param entityName String
-     *
-     * @return String
-     */
-    public static String getDirectory(final @NotNull String entityName) {
+    @Override
+    public String getDirectory() {
         return DIRECTORY.concat("/" + entityName);
+    }
+
+    @Override
+    public String getHumanReadableName() {
+        return HUMAN_READABLE_NAME;
     }
 
     @Override

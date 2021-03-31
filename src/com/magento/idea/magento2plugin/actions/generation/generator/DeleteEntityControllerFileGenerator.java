@@ -1,14 +1,15 @@
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.DeleteEntityControllerFileData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
-import com.magento.idea.magento2plugin.indexes.ModuleIndex;
+import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.actions.DeleteActionFile;
 import com.magento.idea.magento2plugin.magento.files.commands.DeleteEntityByIdCommandFile;
 import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
@@ -18,54 +19,42 @@ import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryTyp
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
-public class DeleteEntityControllerFileGenerator extends FileGenerator {
+public class DeleteEntityControllerFileGenerator extends PhpFileGenerator {
 
     private final DeleteEntityControllerFileData data;
-    private final FileFromTemplateGenerator fileFromTemplateGenerator;
-    private final DirectoryGenerator directoryGenerator;
-    private final ModuleIndex moduleIndex;
-    private final DeleteActionFile file;
 
     /**
      * Delete Entity Controller File Generator.
+     *
      * @param data DeleteEntityControllerFileData
      * @param project Project
      */
     public DeleteEntityControllerFileGenerator(
-            final DeleteEntityControllerFileData data,
+            final @NotNull DeleteEntityControllerFileData data,
             final @NotNull Project project
     ) {
-        super(project);
-        this.data = data;
-        fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
-        moduleIndex = new ModuleIndex(project);
-        directoryGenerator = DirectoryGenerator.getInstance();
-        file = new DeleteActionFile(data.getEntityName());
+        this(data, project, true);
     }
 
     /**
-     * Generate Delete controller.
+     * Delete Entity Controller File Generator.
      *
-     * @param actionName String
-     *
-     * @return PsiFile
+     * @param data DeleteEntityControllerFileData
+     * @param project Project
+     * @param checkFileAlreadyExists boolean
      */
-    @Override
-    public PsiFile generate(final @NotNull String actionName) {
-        final PsiDirectory moduleBaseDir = moduleIndex.getModuleDirectoryByModuleName(
-                data.getModuleName()
-        );
-        final PsiDirectory baseDirectory = directoryGenerator.findOrCreateSubdirectories(
-                moduleBaseDir,
-                file.getDirectory()
-        );
+    public DeleteEntityControllerFileGenerator(
+            final @NotNull DeleteEntityControllerFileData data,
+            final @NotNull Project project,
+            final boolean checkFileAlreadyExists
+    ) {
+        super(project, checkFileAlreadyExists);
+        this.data = data;
+    }
 
-        return fileFromTemplateGenerator.generate(
-                file,
-                getAttributes(),
-                baseDirectory,
-                actionName
-        );
+    @Override
+    protected AbstractPhpFile initFile() {
+        return new DeleteActionFile(data.getModuleName(), data.getEntityName());
     }
 
     /**
@@ -78,8 +67,7 @@ public class DeleteEntityControllerFileGenerator extends FileGenerator {
         final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
 
         phpClassTypesBuilder
-                .appendProperty("NAMESPACE",
-                        file.getNamespaceBuilder(data.getModuleName()).getNamespace())
+                .appendProperty("NAMESPACE", file.getNamespace())
                 .appendProperty("ENTITY_NAME", data.getEntityName())
                 .appendProperty("CLASS_NAME", DeleteActionFile.CLASS_NAME)
                 .appendProperty("ADMIN_RESOURCE", data.getAcl())

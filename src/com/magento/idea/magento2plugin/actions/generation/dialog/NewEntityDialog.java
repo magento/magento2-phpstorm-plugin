@@ -434,7 +434,7 @@ public class NewEntityDialog extends AbstractDialog {
                 dtoModelNamespace,
                 dtoInterfaceNamespace,
                 formViewNamespaceBuilder,
-                NewActionFile.getNamespaceBuilder(moduleName, entityName),
+                new NewActionFile(moduleName, entityName).getNamespaceBuilder(),
                 getEntityProperties(),
                 getButtons(),
                 getFieldSets(),
