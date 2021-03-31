@@ -27,11 +27,11 @@ public class SaveEntityCommandDtoConverter extends SaveEntityCommandData
         super(
                 generationContextData.getModuleName(),
                 newEntityDialogData.getEntityName(),
-                generationContextData.getSaveEntityCommandNamespaceBuilder().getNamespace(),
-                generationContextData.getSaveEntityCommandNamespaceBuilder().getClassFqn(),
-                generationContextData.getModelNamespaceBuilder().getClassFqn(),
-                generationContextData.getResourceModelNamespaceBuilder().getClassFqn(),
-                generationContextData.getFinalDtoTypeNamespaceBuilder().getClassFqn()
+                newEntityDialogData.getEntityName().concat("Model"),
+                newEntityDialogData.getEntityName().concat("Resource"),
+                newEntityDialogData.getEntityName().concat("Data"),
+                newEntityDialogData.getEntityName().concat("Interface"),
+                newEntityDialogData.hasDtoInterface()
         );
     }
 }

@@ -27,9 +27,7 @@ public class FormGenericButtonBlockDtoConverter extends FormGenericButtonBlockDa
         super(
                 generationContextData.getModuleName(),
                 newEntityDialogData.getEntityName(),
-                newEntityDialogData.getIdFieldName(),
-                generationContextData.getGenericButtonBlockNamespaceBuilder().getClassFqn(),
-                generationContextData.getGenericButtonBlockNamespaceBuilder().getNamespace()
+                newEntityDialogData.getIdFieldName()
         );
     }
 }

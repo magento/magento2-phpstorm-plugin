@@ -11,8 +11,6 @@ public class EditEntityActionData {
 
     private final String entityName;
     private final String moduleName;
-    private final String classFqn;
-    private final String namespace;
     private final String acl;
     private final String menuIdentifier;
 
@@ -21,23 +19,17 @@ public class EditEntityActionData {
      *
      * @param entityName String
      * @param moduleName String
-     * @param classFqn String
-     * @param namespace String
      * @param acl String
      * @param menuIdentifier String
      */
     public EditEntityActionData(
             final @NotNull String entityName,
             final @NotNull String moduleName,
-            final @NotNull String classFqn,
-            final @NotNull String namespace,
             final @NotNull String acl,
             final @NotNull String menuIdentifier
     ) {
         this.entityName = entityName;
         this.moduleName = moduleName;
-        this.classFqn = classFqn;
-        this.namespace = namespace;
         this.acl = acl;
         this.menuIdentifier = menuIdentifier;
     }
@@ -58,24 +50,6 @@ public class EditEntityActionData {
      */
     public String getModuleName() {
         return moduleName;
-    }
-
-    /**
-     * Get class FQN.
-     *
-     * @return String
-     */
-    public String getClassFqn() {
-        return classFqn;
-    }
-
-    /**
-     * Get namespace.
-     *
-     * @return String
-     */
-    public String getNamespace() {
-        return namespace;
     }
 
     /**

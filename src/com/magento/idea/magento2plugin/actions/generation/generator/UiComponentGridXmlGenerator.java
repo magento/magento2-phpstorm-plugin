@@ -14,10 +14,11 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Directo
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplateUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.GridActionColumnFile;
-import com.magento.idea.magento2plugin.magento.files.UiComponentGridXml;
-import com.magento.idea.magento2plugin.magento.packages.File;
+import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderFile;
+import com.magento.idea.magento2plugin.magento.files.UiComponentGridXmlFile;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.magento.packages.database.ColumnAttributes;
 import com.magento.idea.magento2plugin.magento.packages.database.TableColumnTypes;
@@ -32,8 +33,9 @@ import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 
 public class UiComponentGridXmlGenerator extends FileGenerator {
+
     public static final String TRUE = "true";
-    private final UiComponentGridData uiComponentGridData;
+    private final UiComponentGridData data;
     private final DirectoryGenerator directoryGenerator;
     private final ModuleIndex moduleIndex;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
@@ -42,16 +44,16 @@ public class UiComponentGridXmlGenerator extends FileGenerator {
     /**
      * UI component grid XML generator constructor.
      *
-     * @param uiComponentGridData UiComponentGridData
+     * @param data UiComponentGridData
      * @param project Project
      */
     public UiComponentGridXmlGenerator(
-            final UiComponentGridData uiComponentGridData,
+            final UiComponentGridData data,
             final Project project
     ) {
         super(project);
 
-        this.uiComponentGridData = uiComponentGridData;
+        this.data = data;
         directoryGenerator = DirectoryGenerator.getInstance();
         moduleIndex = ModuleIndex.getInstance(project);
         fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
@@ -60,28 +62,21 @@ public class UiComponentGridXmlGenerator extends FileGenerator {
 
     @Override
     public PsiFile generate(final String actionName) {
-        final String moduleName = this.uiComponentGridData.getModuleName();
-        PsiDirectory uiComponentDirectory = this.moduleIndex.getModuleDirectoryByModuleName(
+        final String moduleName = this.data.getModuleName();
+        final PsiDirectory parentDirectory = this.moduleIndex.getModuleDirectoryByModuleName(
                 moduleName
         );
         final String subdirectory = String.format(
                 "%s/%s/%s",
                 Package.moduleViewDir,
-                this.uiComponentGridData.getArea(),
+                this.data.getArea(),
                 Package.moduleViewUiComponentDir
         );
-
-        for (final String directory: subdirectory.split(File.separator)) {
-            uiComponentDirectory = directoryGenerator.findOrCreateSubdirectory(
-                    uiComponentDirectory,
-                    directory
-            );
-        }
-
-        final UiComponentGridXml uiGridXml = new UiComponentGridXml(uiComponentGridData.getName());
+        final PsiDirectory uiComponentDirectory =
+                directoryGenerator.findOrCreateSubdirectories(parentDirectory, subdirectory);
 
         return this.fileFromTemplateGenerator.generate(
-                uiGridXml,
+                new UiComponentGridXmlFile(data.getName()),
                 getAttributes(),
                 uiComponentDirectory,
                 actionName
@@ -95,36 +90,47 @@ public class UiComponentGridXmlGenerator extends FileGenerator {
      */
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        attributes.setProperty("NAME", uiComponentGridData.getName());
-        attributes.setProperty("ID_FIELD_NAME", uiComponentGridData.getIdFieldName());
-        attributes.setProperty("ID_FIELD_NAME", uiComponentGridData.getIdFieldName());
-        attributes.setProperty("PROVIDER_CLASS", uiComponentGridData.getProviderClassName());
-        attributes.setProperty("ACL", uiComponentGridData.getAcl());
-        final UiComponentGridToolbarData toolbarData = uiComponentGridData.getGridToolbarData();
+        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
+        final String dataProviderClassName =
+                new UiComponentDataProviderFile(
+                        data.getDataProviderName()
+                ).getNamespaceBuilder(
+                        data.getModuleName(),
+                        data.getDataProviderPath()
+                ).getClassFqn();
+
+        phpClassTypesBuilder
+                .appendProperty("NAME", data.getName())
+                .appendProperty("ID_FIELD_NAME", data.getIdFieldName())
+                .appendProperty("PROVIDER_CLASS", dataProviderClassName)
+                .appendProperty("ACL", data.getAcl());
+
+        final UiComponentGridToolbarData toolbarData = data.getGridToolbarData();
 
         if (toolbarData.isAddToolbar()) {
-            attributes.setProperty("TOOLBAR", TRUE);
+            phpClassTypesBuilder.appendProperty("TOOLBAR", TRUE);
 
             if (toolbarData.isAddBookmarks()) {
-                attributes.setProperty("BOOKMARKS", TRUE);
+                phpClassTypesBuilder.appendProperty("BOOKMARKS", TRUE);
             }
 
             if (toolbarData.isAddColumnsControls()) {
-                attributes.setProperty("COLUMNS_CONTROLS", TRUE);
+                phpClassTypesBuilder.appendProperty("COLUMNS_CONTROLS", TRUE);
             }
 
             if (toolbarData.isAddFulltextSearch()) {
-                attributes.setProperty("FULLTEXT_SEARCH", TRUE);
+                phpClassTypesBuilder.appendProperty("FULLTEXT_SEARCH", TRUE);
             }
 
             if (toolbarData.isAddListingFilters()) {
-                attributes.setProperty("LISTING_FILTERS", TRUE);
+                phpClassTypesBuilder.appendProperty("LISTING_FILTERS", TRUE);
             }
 
             if (toolbarData.isAddListingPaging()) {
-                attributes.setProperty("LISTING_PAGING", TRUE);
+                phpClassTypesBuilder.appendProperty("LISTING_PAGING", TRUE);
             }
         }
+        phpClassTypesBuilder.mergeProperties(attributes);
 
         prepareColumnsProperties(attributes);
     }
@@ -135,13 +141,13 @@ public class UiComponentGridXmlGenerator extends FileGenerator {
      * @param attributes Properties
      */
     private void prepareColumnsProperties(final @NotNull Properties attributes) {
-        final List<Map<String, String>> columnsProperties = uiComponentGridData.getColumns();
+        final List<Map<String, String>> columnsProperties = data.getColumns();
         final List<String> columnsTextList = new LinkedList<>();
 
         for (final Map<String, String> columnProperties : columnsProperties) {
             final String columnName = columnProperties.get(ColumnAttributes.NAME.getName());
 
-            if (columnName.equals(uiComponentGridData.getIdFieldName())) {
+            if (columnName.equals(data.getIdFieldName())) {
                 continue;
             }
 
@@ -167,7 +173,7 @@ public class UiComponentGridXmlGenerator extends FileGenerator {
             try {
                 columnsTextList.add(
                         getCodeTemplateUtil.execute(
-                                UiComponentGridXml.COLUMN_TEMPLATE,
+                                UiComponentGridXmlFile.COLUMN_TEMPLATE,
                                 fillColumnCodeTemplateAttributes(
                                         columnName,
                                         columnLabel,
@@ -185,7 +191,7 @@ public class UiComponentGridXmlGenerator extends FileGenerator {
         }
 
         final NamespaceBuilder actionColumnNamespace = new NamespaceBuilder(
-                uiComponentGridData.getModuleName(),
+                data.getModuleName(),
                 GridActionColumnFile.CLASS_NAME,
                 GridActionColumnFile.DIRECTORY
         );

@@ -8,18 +8,19 @@ package com.magento.idea.magento2plugin.magento.files;
 import com.intellij.lang.Language;
 import com.intellij.lang.xml.XMLLanguage;
 
-public class UiComponentGridXml implements ModuleFileInterface {
+public class UiComponentFormXmlFile implements ModuleFileInterface {
+
     public static final String FILE_EXTENSION = "xml";
-    public static final String TEMPLATE = "Magento UI Component Grid XML";
-    public static final String COLUMN_TEMPLATE = "Magento Grid UI Component Column";
+    public static final String TEMPLATE = "Magento UI Component Form XML";
+    public static final String FIELD_TEMPLATE = "Magento Module UI Component Form Field Xml";
     private final String componentName;
 
     /**
-     * UI component grid XML template constructor.
+     * UI component Form XML template constructor.
      *
      * @param componentName component name
      */
-    public UiComponentGridXml(final String componentName) {
+    public UiComponentFormXmlFile(final String componentName) {
         this.componentName = componentName;
     }
 

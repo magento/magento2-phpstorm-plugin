@@ -9,6 +9,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFi
 import com.magento.idea.magento2plugin.actions.generation.data.converter.DataObjectConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityCreatorContextData;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.NewEntityDialogData;
+import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderFile;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,7 +33,8 @@ public class UiComponentFormLayoutDtoConverter extends UiComponentFormFileData
                 newEntityDialogData.getRoute(),
                 newEntityDialogData.getEntityName(),
                 SUBMIT_ACTION_NAME,
-                generationContextData.getDataProviderNamespaceBuilder().getClassFqn(),
+                newEntityDialogData.getEntityName().concat("DataProvider"),
+                UiComponentDataProviderFile.DIRECTORY,
                 newEntityDialogData.getEntityName(),
                 newEntityDialogData.getIdFieldName()
         );

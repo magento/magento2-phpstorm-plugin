@@ -34,23 +34,11 @@ import com.magento.idea.magento2plugin.actions.generation.generator.pool.Generat
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.provider.NewEntityGeneratorsProviderUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DbSchemaGeneratorUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
-import com.magento.idea.magento2plugin.magento.files.CollectionModelFile;
 import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.files.DataModelFile;
 import com.magento.idea.magento2plugin.magento.files.DataModelInterfaceFile;
-import com.magento.idea.magento2plugin.magento.files.EntityDataMapperFile;
-import com.magento.idea.magento2plugin.magento.files.FormGenericButtonBlockFile;
-import com.magento.idea.magento2plugin.magento.files.ModelFile;
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
-import com.magento.idea.magento2plugin.magento.files.ResourceModelFile;
-import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderFile;
-import com.magento.idea.magento2plugin.magento.files.actions.DeleteActionFile;
-import com.magento.idea.magento2plugin.magento.files.actions.EditActionFile;
-import com.magento.idea.magento2plugin.magento.files.actions.IndexActionFile;
 import com.magento.idea.magento2plugin.magento.files.actions.NewActionFile;
-import com.magento.idea.magento2plugin.magento.files.actions.SaveActionFile;
-import com.magento.idea.magento2plugin.magento.files.commands.DeleteEntityByIdCommandFile;
-import com.magento.idea.magento2plugin.magento.files.commands.SaveEntityCommandFile;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.PropertiesTypes;
 import com.magento.idea.magento2plugin.magento.packages.database.TableEngines;
@@ -296,6 +284,7 @@ public class NewEntityDialog extends AbstractDialog {
         toggleUiComponentsPanel();
 
         createUiComponent.addItemListener(event -> toggleUiComponentsPanel());
+        registerTabbedPane(tabbedPane1);
     }
 
     /**
@@ -416,10 +405,6 @@ public class NewEntityDialog extends AbstractDialog {
             final @NotNull NewEntityDialogData dialogData
     ) {
         final String entityName = dialogData.getEntityName();
-        final String modelClassName = entityName.concat(MODEL_SUFFIX);
-        final String resourceClassName = entityName.concat(RESOURCE_MODEL_SUFFIX);
-        final String collectionClassName = entityName.concat(COLLECTION_MODEL_SUFFIX);
-        final String dataProviderClassName = entityName.concat(DATA_PROVIDER_SUFFIX);
         final String dtoClassName = entityName.concat(DTO_MODEL_SUFFIX);
         final String dtoInterfaceClassName = entityName.concat(DTO_INTERFACE_SUFFIX);
 
@@ -446,25 +431,10 @@ public class NewEntityDialog extends AbstractDialog {
                 actionsPathPrefix.concat("edit"),
                 actionsPathPrefix.concat("new"),
                 actionsPathPrefix.concat("delete"),
-                new ModelFile(modelClassName).getNamespaceBuilder(moduleName),
-                new ResourceModelFile(resourceClassName).getNamespaceBuilder(moduleName),
-                new CollectionModelFile(collectionClassName)
-                        .getNamespaceBuilder(moduleName, entityName),
                 dtoModelNamespace,
                 dtoInterfaceNamespace,
-                createInterface.isSelected() ? dtoInterfaceNamespace : dtoModelNamespace,
-                new UiComponentDataProviderFile(dataProviderClassName)
-                        .getNamespaceBuilder(moduleName, null),
-                new IndexActionFile(entityName).getNamespaceBuilder(moduleName),
-                new EntityDataMapperFile(entityName).getNamespaceBuilder(moduleName),
-                SaveEntityCommandFile.getNamespaceBuilder(moduleName, entityName),
-                DeleteEntityByIdCommandFile.getNamespaceBuilder(moduleName, entityName),
                 formViewNamespaceBuilder,
                 NewActionFile.getNamespaceBuilder(moduleName, entityName),
-                SaveActionFile.getNamespaceBuilder(moduleName, entityName),
-                DeleteActionFile.getNamespaceBuilder(moduleName, entityName),
-                new EditActionFile(entityName).getNamespaceBuilder(moduleName),
-                FormGenericButtonBlockFile.getNamespaceBuilder(moduleName),
                 getEntityProperties(),
                 getButtons(),
                 getFieldSets(),

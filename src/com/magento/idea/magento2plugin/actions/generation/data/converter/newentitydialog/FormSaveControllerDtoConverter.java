@@ -27,11 +27,11 @@ public class FormSaveControllerDtoConverter extends SaveEntityControllerFileData
         super(
                 newEntityDialogData.getEntityName(),
                 generationContextData.getModuleName(),
-                generationContextData.getSaveControllerNamespaceBuilder().getNamespace(),
-                generationContextData.getSaveEntityCommandNamespaceBuilder().getClassFqn(),
-                generationContextData.getFinalDtoTypeNamespaceBuilder().getClassFqn(),
                 newEntityDialogData.getAclId(),
-                newEntityDialogData.getIdFieldName()
+                newEntityDialogData.getIdFieldName(),
+                newEntityDialogData.getEntityName().concat("Data"),
+                newEntityDialogData.getEntityName().concat("Interface"),
+                newEntityDialogData.hasDtoInterface()
         );
     }
 }

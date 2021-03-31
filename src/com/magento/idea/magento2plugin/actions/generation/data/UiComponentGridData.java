@@ -10,40 +10,47 @@ import java.util.List;
 import java.util.Map;
 
 public class UiComponentGridData {
+
     private final String moduleName;
     private final String area;
     private final String name;
-    private final String providerClassName;
     private final String idFieldName;
     private final String acl;
+    private final String dataProviderName;
+    private final String dataProviderPath;
     private final UiComponentGridToolbarData gridToolbarData;
     private final List<Map<String, String>> columns;
 
     /**
      * Ui component grid data constructor.
      *
-     * @param area Area
-     * @param name Name
-     * @param idFieldName Id field name
-     * @param acl ACL
-     * @param gridToolbarData Toolbar data
+     * @param moduleName String
+     * @param area String
+     * @param name String
+     * @param idFieldName String
+     * @param acl String
+     * @param dataProviderName String
+     * @param dataProviderPath String
+     * @param gridToolbarData UiComponentGridToolbarData
      */
     public UiComponentGridData(
             final String moduleName,
             final String area,
             final String name,
-            final String providerClassName,
             final String idFieldName,
             final String acl,
+            final String dataProviderName,
+            final String dataProviderPath,
             final UiComponentGridToolbarData gridToolbarData
     ) {
         this(
                 moduleName,
                 area,
                 name,
-                providerClassName,
                 idFieldName,
                 acl,
+                dataProviderName,
+                dataProviderPath,
                 gridToolbarData,
                 new ArrayList<>()
         );
@@ -52,29 +59,34 @@ public class UiComponentGridData {
     /**
      * Ui component grid data constructor.
      *
-     * @param area Area
-     * @param name Name
-     * @param idFieldName Id field name
-     * @param acl ACL
-     * @param gridToolbarData Toolbar data
+     * @param moduleName String
+     * @param area String
+     * @param name String
+     * @param idFieldName String
+     * @param acl String
+     * @param dataProviderName String
+     * @param dataProviderPath String
+     * @param gridToolbarData UiComponentGridToolbarData
      * @param columns List
      */
     public UiComponentGridData(
             final String moduleName,
             final String area,
             final String name,
-            final String providerClassName,
             final String idFieldName,
             final String acl,
+            final String dataProviderName,
+            final String dataProviderPath,
             final UiComponentGridToolbarData gridToolbarData,
             final List<Map<String, String>> columns
     ) {
         this.moduleName = moduleName;
         this.area = area;
         this.name = name;
-        this.providerClassName = providerClassName;
         this.idFieldName = idFieldName;
         this.acl = acl;
+        this.dataProviderName = dataProviderName;
+        this.dataProviderPath = dataProviderPath;
         this.gridToolbarData = gridToolbarData;
         this.columns = columns;
     }
@@ -125,21 +137,30 @@ public class UiComponentGridData {
     }
 
     /**
+     * Get data provider name.
+     *
+     * @return String
+     */
+    public String getDataProviderName() {
+        return dataProviderName;
+    }
+
+    /**
+     * Get data provider path.
+     *
+     * @return String
+     */
+    public String getDataProviderPath() {
+        return dataProviderPath;
+    }
+
+    /**
      * Get ID field name.
      *
      * @return String
      */
     public String getIdFieldName() {
         return idFieldName;
-    }
-
-    /**
-     * Get data provider class name.
-     *
-     * @return String
-     */
-    public String getProviderClassName() {
-        return providerClassName;
     }
 
     /**

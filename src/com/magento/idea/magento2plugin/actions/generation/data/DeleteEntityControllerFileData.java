@@ -11,8 +11,6 @@ public class DeleteEntityControllerFileData {
 
     private final String entityName;
     private final String moduleName;
-    private final String namespace;
-    private final String deleteCommandFqn;
     private final String acl;
     private final String entityId;
 
@@ -21,22 +19,17 @@ public class DeleteEntityControllerFileData {
      *
      * @param entityName String
      * @param moduleName String
-     * @param namespace String
      * @param acl String
      * @param entityId String
      */
     public DeleteEntityControllerFileData(
             final @NotNull String entityName,
             final @NotNull String moduleName,
-            final @NotNull String namespace,
-            final @NotNull String deleteCommandFqn,
             final @NotNull String acl,
             final @NotNull String entityId
     ) {
         this.entityName = entityName;
         this.moduleName = moduleName;
-        this.namespace = namespace;
-        this.deleteCommandFqn = deleteCommandFqn;
         this.acl = acl;
         this.entityId = entityId;
     }
@@ -57,24 +50,6 @@ public class DeleteEntityControllerFileData {
      */
     public String getModuleName() {
         return moduleName;
-    }
-
-    /**
-     * Get namespace.
-     *
-     * @return String
-     */
-    public String getNamespace() {
-        return namespace;
-    }
-
-    /**
-     * Get delete command Fqn.
-     *
-     * @return String
-     */
-    public String getDeleteCommandFqn() {
-        return deleteCommandFqn;
     }
 
     /**

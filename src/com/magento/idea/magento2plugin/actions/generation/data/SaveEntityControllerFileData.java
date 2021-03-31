@@ -11,39 +11,39 @@ public class SaveEntityControllerFileData {
 
     private final String entityName;
     private final String moduleName;
-    private final String namespace;
-    private final String saveCommandFqn;
-    private final String dtoType;
     private final String acl;
     private final String entityId;
+    private final String dtoName;
+    private final String dtoInterfaceName;
+    private final boolean isDtoWithInterface;
 
     /**
      * Controller save file constructor.
      *
      * @param entityName String
      * @param moduleName String
-     * @param namespace String
-     * @param saveCommandFqn String
      * @param acl String
-     * @param dtoType String
      * @param entityId String
+     * @param dtoName String
+     * @param dtoInterfaceName String
+     * @param isDtoWithInterface boolean
      */
     public SaveEntityControllerFileData(
             final @NotNull String entityName,
             final @NotNull String moduleName,
-            final @NotNull String namespace,
-            final @NotNull String saveCommandFqn,
-            final @NotNull String dtoType,
             final @NotNull String acl,
-            final @NotNull String entityId
+            final @NotNull String entityId,
+            final @NotNull String dtoName,
+            final @NotNull String dtoInterfaceName,
+            final boolean isDtoWithInterface
     ) {
         this.entityName = entityName;
         this.moduleName = moduleName;
-        this.namespace = namespace;
-        this.saveCommandFqn = saveCommandFqn;
-        this.dtoType = dtoType;
         this.acl = acl;
         this.entityId = entityId;
+        this.dtoName = dtoName;
+        this.dtoInterfaceName = dtoInterfaceName;
+        this.isDtoWithInterface = isDtoWithInterface;
     }
 
     /**
@@ -65,24 +65,6 @@ public class SaveEntityControllerFileData {
     }
 
     /**
-     * Get dto type.
-     *
-     * @return String
-     */
-    public  String getDtoType() {
-        return dtoType;
-    }
-
-    /**
-     * Get save command Fqn.
-     *
-     * @return String
-     */
-    public String getSaveCommandFqn() {
-        return saveCommandFqn;
-    }
-
-    /**
      * Get entity name.
      *
      * @return String
@@ -101,11 +83,29 @@ public class SaveEntityControllerFileData {
     }
 
     /**
-     * Get namespace.
+     * Get DTO name.
      *
      * @return String
      */
-    public String getNamespace() {
-        return namespace;
+    public String getDtoName() {
+        return dtoName;
+    }
+
+    /**
+     * Get DTO interface name.
+     *
+     * @return String
+     */
+    public String getDtoInterfaceName() {
+        return dtoInterfaceName;
+    }
+
+    /**
+     * Check if DTO has interface.
+     *
+     * @return boolean
+     */
+    public boolean isDtoWithInterface() {
+        return isDtoWithInterface;
     }
 }

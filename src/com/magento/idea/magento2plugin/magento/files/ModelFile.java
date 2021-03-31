@@ -9,6 +9,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Namespa
 import org.jetbrains.annotations.NotNull;
 
 public class ModelFile extends AbstractPhpClass {
+
     public static final String ABSTRACT_MODEL =
             "Magento\\Framework\\Model\\AbstractModel";
     public static final String MODEL_DIRECTORY = "Model";
