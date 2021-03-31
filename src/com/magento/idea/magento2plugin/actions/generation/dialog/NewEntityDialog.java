@@ -21,10 +21,15 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.util.ProcessWor
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AclResourceIdRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericWithUnderscoreRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.Lowercase;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.MenuIdentifierRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NumericRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.RouteIdRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.TableNameLength;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.GeneratorPoolHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.provider.NewEntityGeneratorsProviderUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DbSchemaGeneratorUtil;
@@ -96,13 +101,9 @@ public class NewEntityDialog extends AbstractDialog {
     private JButton buttonCancel;
     private JPanel generalTable;
     private JCheckBox createUiComponent;
-    private JTextField entityName;
     private JLabel entityNameLabel;
     private JLabel dbTableNameLabel;
-    private JTextField dbTableName;
-    private JTextField entityId;
     private JLabel entityIdColumnNameLabel;
-    private JTextField route;
     private JLabel routeLabel;
     private JLabel aclLabel;
     private JTextField aclTitle;
@@ -135,10 +136,14 @@ public class NewEntityDialog extends AbstractDialog {
     private static final String PROPERTY_TYPE = "Type";
     private static final String ACL_ID = "ACL ID";
     private static final String FORM_NAME = "Form Name";
-    private static final String GRID_NAME = "Grit Name";
+    private static final String GRID_NAME = "Grid Name";
     private static final String IDENTIFIER = "Identifier";
     private static final String SORT_ORDER = "Sort Order";
     private static final String UI_COMPONENTS_TAB_NAME = "Admin UI Components";
+    private static final String TABLE_NAME = "DB Table Name";
+    private static final String ENTITY_NAME = "Entity Name";
+    private static final String ROUTER = "Route";
+    private static final String ENTITY_ID = "Entity ID Field Name";
 
     private static final String MODEL_SUFFIX = "Model";
     private static final String RESOURCE_MODEL_SUFFIX = "Resource";
@@ -148,6 +153,30 @@ public class NewEntityDialog extends AbstractDialog {
     private static final String DATA_PROVIDER_SUFFIX = "DataProvider";
 
     private static final boolean OPEN_FILES_FLAG = false;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, ENTITY_ID})
+    @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE, ENTITY_ID})
+    private JTextField entityId;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, ENTITY_NAME})
+    @FieldValidation(
+            rule = RuleRegistry.ALPHANUMERIC,
+            message = {AlphanumericRule.MESSAGE, ENTITY_NAME}
+            )
+    private JTextField entityName;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, TABLE_NAME})
+    @FieldValidation(rule = RuleRegistry.LOWERCASE, message = {Lowercase.MESSAGE, TABLE_NAME})
+    @FieldValidation(
+            rule = RuleRegistry.ALPHANUMERIC_WITH_UNDERSCORE,
+            message = {AlphanumericWithUnderscoreRule.MESSAGE, TABLE_NAME}
+    )
+    @FieldValidation(rule = RuleRegistry.TABLE_NAME_LENGTH, message = {TableNameLength.MESSAGE})
+    private JTextField dbTableName;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, ROUTER})
+    @FieldValidation(rule = RuleRegistry.ROUTE_ID, message = {RouteIdRule.MESSAGE})
+    private JTextField route;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, FORM_NAME})
     @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE, FORM_NAME})
@@ -183,6 +212,10 @@ public class NewEntityDialog extends AbstractDialog {
     private JLabel aclErrorMessage;
     private JLabel menuIdentifierErrorMessage;
     private JLabel sortOrderErrorMessage;
+    private JLabel entityNameErrorMessage;
+    private JLabel dbTableNameErrorMessage;
+    private JLabel entityIdErrorMessage;
+    private JLabel routeErrorMessage;
     private JTextField observerName;
     private final ProcessWorker.InProgressFlag onOkActionFired;
 
