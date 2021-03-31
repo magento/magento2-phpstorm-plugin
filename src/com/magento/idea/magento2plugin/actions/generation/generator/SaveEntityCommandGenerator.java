@@ -7,15 +7,10 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.google.common.base.CaseFormat;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.SaveEntityCommandData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
-import com.magento.idea.magento2plugin.indexes.ModuleIndex;
+import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.DataModelFile;
 import com.magento.idea.magento2plugin.magento.files.DataModelInterfaceFile;
 import com.magento.idea.magento2plugin.magento.files.ModelFile;
@@ -23,19 +18,12 @@ import com.magento.idea.magento2plugin.magento.files.ResourceModelFile;
 import com.magento.idea.magento2plugin.magento.files.commands.SaveEntityCommandFile;
 import com.magento.idea.magento2plugin.magento.packages.code.ExceptionType;
 import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryType;
-import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
-public class SaveEntityCommandGenerator extends FileGenerator {
+public class SaveEntityCommandGenerator extends PhpFileGenerator {
 
-    private final Project project;
     private final SaveEntityCommandData data;
-    private final FileFromTemplateGenerator fileFromTemplateGenerator;
-    private final DirectoryGenerator directoryGenerator;
-    private final ModuleIndex moduleIndex;
-    private final boolean checkFileAlreadyExists;
-    private final SaveEntityCommandFile file;
 
     /**
      * Save entity command generator constructor.
@@ -62,47 +50,13 @@ public class SaveEntityCommandGenerator extends FileGenerator {
             final @NotNull Project project,
             final boolean checkFileAlreadyExists
     ) {
-        super(project);
+        super(project, checkFileAlreadyExists);
         this.data = data;
-        this.project = project;
-        this.checkFileAlreadyExists = checkFileAlreadyExists;
-        fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
-        directoryGenerator = DirectoryGenerator.getInstance();
-        moduleIndex = ModuleIndex.getInstance(project);
-        file = new SaveEntityCommandFile(data.getEntityName());
     }
 
-    /**
-     * Generate save command for entity.
-     *
-     * @param actionName String
-     *
-     * @return PsiFile
-     */
     @Override
-    public PsiFile generate(final @NotNull String actionName) {
-        final PhpClass saveEntityCommandClass = GetPhpClassByFQN.getInstance(project).execute(
-                file.getClassFqn(data.getModuleName())
-        );
-
-        if (this.checkFileAlreadyExists && saveEntityCommandClass != null) {
-            return saveEntityCommandClass.getContainingFile();
-        }
-
-        final PsiDirectory moduleBaseDir = moduleIndex.getModuleDirectoryByModuleName(
-                data.getModuleName()
-        );
-        final PsiDirectory saveCommandFileBaseDir = directoryGenerator.findOrCreateSubdirectories(
-                moduleBaseDir,
-                file.getDirectory()
-        );
-
-        return fileFromTemplateGenerator.generate(
-                file,
-                getAttributes(),
-                saveCommandFileBaseDir,
-                actionName
-        );
+    protected AbstractPhpFile initFile() {
+        return new SaveEntityCommandFile(data.getModuleName(), data.getEntityName());
     }
 
     /**
@@ -115,7 +69,7 @@ public class SaveEntityCommandGenerator extends FileGenerator {
         final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
 
         phpClassTypesBuilder
-                .appendProperty("NAMESPACE", file.getNamespace(data.getModuleName()))
+                .appendProperty("NAMESPACE", file.getNamespace())
                 .appendProperty("ENTITY_NAME", data.getEntityName())
                 .appendProperty("CLASS_NAME", SaveEntityCommandFile.CLASS_NAME)
                 .append("EXCEPTION", "Exception")
@@ -123,14 +77,13 @@ public class SaveEntityCommandGenerator extends FileGenerator {
                 .append("COULD_NOT_SAVE", ExceptionType.COULD_NOT_SAVE.getType())
                 .append("LOGGER", FrameworkLibraryType.LOGGER.getType());
 
-        final ModelFile modelFile = new ModelFile(data.getModelName());
+        final ModelFile modelFile = new ModelFile(data.getModuleName(), data.getModelName());
         final ResourceModelFile resourceModelFile =
-                new ResourceModelFile(data.getResourceModelName());
+                new ResourceModelFile(data.getModuleName(), data.getResourceModelName());
 
-        final String modelType = modelFile.getNamespaceBuilder(data.getModuleName()).getClassFqn();
+        final String modelType = modelFile.getClassFqn();
         final String modelFactoryType = modelType.concat("Factory");
-        final String resourceType = resourceModelFile
-                .getNamespaceBuilder(data.getModuleName()).getClassFqn();
+        final String resourceType = resourceModelFile.getClassFqn();
 
         if (data.isDtoWithInterface()) {
             final DataModelInterfaceFile dataModelInterfaceFile =

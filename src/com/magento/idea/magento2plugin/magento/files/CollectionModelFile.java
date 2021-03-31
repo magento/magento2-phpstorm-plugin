@@ -5,52 +5,41 @@
 
 package com.magento.idea.magento2plugin.magento.files;
 
-import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import org.jetbrains.annotations.NotNull;
 
-public class CollectionModelFile extends AbstractPhpClass {
+public class CollectionModelFile extends AbstractPhpFile {
+
     public static final String TEMPLATE = "Magento Collection Class";
+    public static final String HUMAN_READABLE_NAME = "Collection class";
     public static final String ABSTRACT_COLLECTION
             = "Magento\\Framework\\Model\\ResourceModel\\Db\\Collection\\AbstractCollection";
-    private NamespaceBuilder namespaceBuilder;
-
-    public CollectionModelFile(final @NotNull String className) {
-        super(className);
-    }
+    private final String directoryName;
 
     /**
-     * Get namespace builder for file.
+     * Collection model file constructor.
      *
      * @param moduleName String
+     * @param className String
      * @param directoryName String
-     *
-     * @return String
      */
-    public @NotNull NamespaceBuilder getNamespaceBuilder(
+    public CollectionModelFile(
             final @NotNull String moduleName,
+            final @NotNull String className,
             final @NotNull String directoryName
     ) {
-        if (namespaceBuilder == null) {
-            namespaceBuilder = new NamespaceBuilder(
-                    moduleName,
-                    getClassName(),
-                    getDirectory(directoryName)
-            );
-        }
-
-        return namespaceBuilder;
+        super(moduleName, className);
+        this.directoryName = directoryName;
     }
 
-    /**
-     * Get collection file directory.
-     *
-     * @param directoryName String
-     *
-     * @return String
-     */
-    public @NotNull String getDirectory(final @NotNull String directoryName) {
+    @Override
+    public @NotNull String getDirectory() {
         return ResourceModelFile.RESOURCE_MODEL_DIRECTORY + File.separator + directoryName;
+    }
+
+    @Override
+    public String getHumanReadableName() {
+        return HUMAN_READABLE_NAME;
     }
 
     @Override

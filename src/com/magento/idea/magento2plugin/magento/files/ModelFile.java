@@ -5,41 +5,38 @@
 
 package com.magento.idea.magento2plugin.magento.files;
 
-import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import org.jetbrains.annotations.NotNull;
 
-public class ModelFile extends AbstractPhpClass {
+public class ModelFile extends AbstractPhpFile {
 
     public static final String ABSTRACT_MODEL =
             "Magento\\Framework\\Model\\AbstractModel";
     public static final String MODEL_DIRECTORY = "Model";
     public static final String TEMPLATE = "Magento Model Class";
+    public static final String HUMAN_READABLE_NAME = "Model class";
     public static final String ALIAS = "Model";
-    private NamespaceBuilder namespaceBuilder;
-
-    public ModelFile(final String className) {
-        super(className);
-    }
 
     /**
-     * Get namespace builder for file.
+     * Model file constructor.
      *
      * @param moduleName String
-     *
-     * @return String
+     * @param className String
      */
-    public @NotNull NamespaceBuilder getNamespaceBuilder(
-            final @NotNull String moduleName
+    public ModelFile(
+            final @NotNull String moduleName,
+            final @NotNull String className
     ) {
-        if (namespaceBuilder == null) {
-            namespaceBuilder = new NamespaceBuilder(
-                    moduleName,
-                    getClassName(),
-                    MODEL_DIRECTORY
-            );
-        }
+        super(moduleName, className);
+    }
 
-        return namespaceBuilder;
+    @Override
+    public String getDirectory() {
+        return MODEL_DIRECTORY;
+    }
+
+    @Override
+    public String getHumanReadableName() {
+        return HUMAN_READABLE_NAME;
     }
 
     @Override

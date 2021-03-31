@@ -110,7 +110,7 @@ public class EntityDataMapperGenerator extends FileGenerator {
     protected void fillAttributes(final @NotNull Properties attributes) {
         final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
 
-        final ModelFile modelFile = new ModelFile(data.getModelName());
+        final ModelFile modelFile = new ModelFile(data.getModuleName(), data.getModelName());
         final DataModelFile dtoFile = new DataModelFile(data.getDtoName());
         final DataModelInterfaceFile dtoInterfaceFile =
                 new DataModelInterfaceFile(data.getDtoInterfaceName());
@@ -128,10 +128,7 @@ public class EntityDataMapperGenerator extends FileGenerator {
                 .appendProperty("CLASS_NAME", file.getClassName())
                 .append("DATA_OBJECT", FrameworkLibraryType.DATA_OBJECT.getType())
                 .append("DTO_TYPE", dtoType)
-                .append(
-                        "MAGENTO_MODEL_TYPE",
-                        modelFile.getNamespaceBuilder(data.getModuleName()).getClassFqn()
-                )
+                .append("MAGENTO_MODEL_TYPE", modelFile.getClassFqn())
                 .append("DTO_FACTORY", dtoType.concat("Factory"))
                 .append("ABSTRACT_COLLECTION", FrameworkLibraryType.ABSTRACT_COLLECTION.getType())
                 .mergeProperties(attributes);

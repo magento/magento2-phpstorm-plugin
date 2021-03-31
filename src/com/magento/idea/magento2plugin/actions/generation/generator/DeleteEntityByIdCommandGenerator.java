@@ -110,10 +110,11 @@ public class DeleteEntityByIdCommandGenerator extends FileGenerator {
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
         final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
-        final ModelFile modelFile = new ModelFile(data.getModelName());
-        final String modelType = modelFile.getNamespaceBuilder(data.getModuleName()).getClassFqn();
+        final ModelFile modelFile = new ModelFile(data.getModuleName(), data.getModelName());
+        final String modelType = modelFile.getClassFqn();
         final String modelFactoryType = modelType.concat("Factory");
-        final ResourceModelFile resourceFile = new ResourceModelFile(data.getResourceModelName());
+        final ResourceModelFile resourceFile =
+                new ResourceModelFile(data.getModuleName(), data.getResourceModelName());
 
         phpClassTypesBuilder
                 .appendProperty("ENTITY_NAME", data.getEntityName())
@@ -127,8 +128,7 @@ public class DeleteEntityByIdCommandGenerator extends FileGenerator {
                 .append("LOGGER", FrameworkLibraryType.LOGGER.getType())
                 .append("MODEL", modelType)
                 .append("MODEL_FACTORY", modelFactoryType)
-                .append("RESOURCE",
-                        resourceFile.getNamespaceBuilder(data.getModuleName()).getClassFqn())
+                .append("RESOURCE", resourceFile.getClassFqn())
                 .mergeProperties(attributes);
 
         attributes.setProperty("USES",

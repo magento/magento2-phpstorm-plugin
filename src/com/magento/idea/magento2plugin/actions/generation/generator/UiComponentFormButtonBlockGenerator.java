@@ -124,7 +124,11 @@ public class UiComponentFormButtonBlockGenerator extends FileGenerator {
         );
 
         return fileFromTemplateGenerator.generate(
-                new FormButtonBlockFile(buttonData.getButtonClassName()),
+                new FormButtonBlockFile(
+                        buttonData.getButtonModule(),
+                        buttonData.getButtonClassName(),
+                        buttonData.getButtonDirectory()
+                ),
                 getAttributes(),
                 baseDirectory,
                 actionName
