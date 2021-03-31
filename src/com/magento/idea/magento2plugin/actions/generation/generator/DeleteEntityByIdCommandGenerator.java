@@ -63,9 +63,9 @@ public class DeleteEntityByIdCommandGenerator extends FileGenerator {
         this.data = data;
         this.project = project;
         this.checkFileAlreadyExists = checkFileAlreadyExists;
-        fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         directoryGenerator = DirectoryGenerator.getInstance();
-        moduleIndex = ModuleIndex.getInstance(project);
+        moduleIndex = new ModuleIndex(project);
         file = new DeleteEntityByIdCommandFile(data.getEntityName());
     }
 

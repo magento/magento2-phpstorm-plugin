@@ -94,10 +94,10 @@ public class UiComponentFormGenerator extends FileGenerator {
     ) {
         final DirectoryGenerator directoryGenerator = DirectoryGenerator.getInstance();
         final FileFromTemplateGenerator fileFromTemplateGenerator =
-                FileFromTemplateGenerator.getInstance(project);
+                new FileFromTemplateGenerator(project);
 
         final String moduleName = data.getModuleName();
-        final PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+        final PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(moduleName);
 
         final ArrayList<String> fileDirectories = new ArrayList<>();

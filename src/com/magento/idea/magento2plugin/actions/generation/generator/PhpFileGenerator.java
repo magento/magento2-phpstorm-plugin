@@ -43,9 +43,9 @@ public abstract class PhpFileGenerator extends FileGenerator {
         this.checkFileAlreadyExists = checkFileAlreadyExists;
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
-        fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         directoryGenerator = DirectoryGenerator.getInstance();
-        moduleIndex = ModuleIndex.getInstance(project);
+        moduleIndex = new ModuleIndex(project);
     }
 
     /**

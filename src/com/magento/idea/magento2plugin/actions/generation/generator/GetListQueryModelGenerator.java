@@ -63,9 +63,9 @@ public class GetListQueryModelGenerator extends FileGenerator {
         this.project = project;
         this.data = data;
         this.checkFileAlreadyExists = checkFileAlreadyExists;
-        fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         directoryGenerator = DirectoryGenerator.getInstance();
-        moduleIndex = ModuleIndex.getInstance(project);
+        moduleIndex = new ModuleIndex(project);
         file = new GetListQueryFile(data.getEntityName());
     }
 

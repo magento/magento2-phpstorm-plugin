@@ -107,7 +107,7 @@ public class DataModelInterfaceGenerator extends FileGenerator {
      * @return PhpClass
      */
     private PhpClass createInterface(final @NotNull String actionName) {
-        final PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+        final PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(data.getModuleName());
         final PsiDirectory dtoInterfaceDirectory = directoryGenerator
                 .findOrCreateSubdirectories(parentDirectory, DataModelInterfaceFile.DIRECTORY);

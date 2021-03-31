@@ -62,8 +62,8 @@ public class EditEntityActionGenerator extends FileGenerator {
         this.data = data;
         this.project = project;
         this.checkFileAlreadyExists = checkFileAlreadyExists;
-        fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
-        moduleIndex = ModuleIndex.getInstance(project);
+        fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
+        moduleIndex = new ModuleIndex(project);
         directoryGenerator = DirectoryGenerator.getInstance();
         file = new EditActionFile(data.getEntityName());
     }

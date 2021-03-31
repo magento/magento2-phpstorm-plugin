@@ -63,9 +63,9 @@ public class IndexActionGenerator extends FileGenerator {
         this.project = project;
         this.checkFileAlreadyExists = checkFileAlreadyExists;
         file = new IndexActionFile(data.getEntityName());
-        fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         directoryGenerator = DirectoryGenerator.getInstance();
-        moduleIndex = ModuleIndex.getInstance(project);
+        moduleIndex = new ModuleIndex(project);
     }
 
     /**

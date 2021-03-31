@@ -55,8 +55,8 @@ public class UiComponentGridXmlGenerator extends FileGenerator {
 
         this.data = data;
         directoryGenerator = DirectoryGenerator.getInstance();
-        moduleIndex = ModuleIndex.getInstance(project);
-        fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        moduleIndex = new ModuleIndex(project);
+        fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         getCodeTemplateUtil = new GetCodeTemplateUtil(project);
     }
 

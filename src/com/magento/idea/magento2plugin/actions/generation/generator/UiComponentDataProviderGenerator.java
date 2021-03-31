@@ -55,7 +55,7 @@ public class UiComponentDataProviderGenerator extends FileGenerator {
         super(project);
         this.data = data;
         this.directoryGenerator = DirectoryGenerator.getInstance();
-        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
@@ -126,7 +126,7 @@ public class UiComponentDataProviderGenerator extends FileGenerator {
      * @return PhpClass
      */
     private PhpClass createDataProviderClass(final @NotNull String actionName) {
-        final PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+        final PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(this.moduleName);
         final PsiDirectory fileDirectory =
                 directoryGenerator.findOrCreateSubdirectories(parentDirectory, data.getPath());

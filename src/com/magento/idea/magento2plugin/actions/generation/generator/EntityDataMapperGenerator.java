@@ -64,9 +64,9 @@ public class EntityDataMapperGenerator extends FileGenerator {
         this.project = project;
         this.checkFileAlreadyExists = checkFileAlreadyExists;
         file = new EntityDataMapperFile(data.getEntityName());
-        fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         directoryGenerator = DirectoryGenerator.getInstance();
-        moduleIndex = ModuleIndex.getInstance(project);
+        moduleIndex = new ModuleIndex(project);
     }
 
     /**

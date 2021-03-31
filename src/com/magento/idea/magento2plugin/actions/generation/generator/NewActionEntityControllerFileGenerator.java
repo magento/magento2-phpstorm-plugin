@@ -42,8 +42,8 @@ public class NewActionEntityControllerFileGenerator extends FileGenerator {
     ) {
         super(project);
         this.fileData = fileData;
-        fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
-        moduleIndex = ModuleIndex.getInstance(project);
+        fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
+        moduleIndex = new ModuleIndex(project);
         directoryGenerator = DirectoryGenerator.getInstance();
         uses = new ArrayList<>();
     }

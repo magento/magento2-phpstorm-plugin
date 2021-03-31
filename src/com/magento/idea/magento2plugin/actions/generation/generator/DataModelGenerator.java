@@ -110,7 +110,7 @@ public class DataModelGenerator extends FileGenerator {
      * @return PhpClass
      */
     private PhpClass createModel(final @NotNull String actionName) {
-        final PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+        final PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(data.getModuleName());
         final PsiDirectory dataModelDirectory = directoryGenerator.findOrCreateSubdirectories(
                 parentDirectory,

@@ -59,9 +59,9 @@ public class NewEntityLayoutGenerator extends FileGenerator {
         this.project = project;
         this.checkFileAlreadyExists = checkFileAlreadyExists;
         file = new NewEntityLayoutFile(data.getNewActionPath().replace(File.separator, "_"));
-        fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         directoryGenerator = DirectoryGenerator.getInstance();
-        moduleIndex = ModuleIndex.getInstance(project);
+        moduleIndex = new ModuleIndex(project);
     }
 
     /**
