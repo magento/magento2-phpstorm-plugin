@@ -29,8 +29,8 @@ public abstract class FindOrCreateQueueXml {
         this.project = project;
 
         this.directoryGenerator = DirectoryGenerator.getInstance();
-        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
-        this.moduleIndex = ModuleIndex.getInstance(project);
+        this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
+        this.moduleIndex = new ModuleIndex(project);
     }
 
     /**

@@ -42,7 +42,7 @@ public class XmlDeclarationsGenerator {
      *
      * @param formFile XmlFile
      */
-    public void generate(final XmlFile formFile) {
+    public void generate(final @NotNull XmlFile formFile) {
         final PsiDocumentManager psiDocumentManager =
                 PsiDocumentManager.getInstance(project);
         final Document document = psiDocumentManager.getDocument(formFile);

@@ -51,13 +51,13 @@ public class QueryGenerator extends FileGenerator {
         super(project);
         this.data = data;
         this.directoryGenerator = DirectoryGenerator.getInstance();
-        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
         this.project = project;
         this.moduleName = moduleName;
-        file = new UiComponentDataProviderFile(data.getName());
+        file = new UiComponentDataProviderFile(moduleName, data.getName(), data.getPath());
     }
 
     @Override
@@ -66,7 +66,7 @@ public class QueryGenerator extends FileGenerator {
 
         WriteCommandAction.runWriteCommandAction(project, () -> {
             PhpClass dataProvider = GetPhpClassByFQN.getInstance(project).execute(
-                    file.getNamespaceBuilder(moduleName, data.getPath()).getClassFqn()
+                    file.getClassFqn()
             );
 
             if (dataProvider != null) {
@@ -115,13 +115,13 @@ public class QueryGenerator extends FileGenerator {
      * @return PhpClass
      */
     private PhpClass createDataProviderClass(final @NotNull String actionName) {
-        final PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+        final PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(this.moduleName);
         final PsiDirectory dataProviderDirectory =
                 directoryGenerator.findOrCreateSubdirectories(parentDirectory, data.getPath());
 
         final PsiFile dataProviderFile = fileFromTemplateGenerator.generate(
-                new UiComponentDataProviderFile(data.getName()),
+                new UiComponentDataProviderFile(moduleName, data.getName(), data.getPath()),
                 getAttributes(),
                 dataProviderDirectory,
                 actionName
@@ -141,8 +141,7 @@ public class QueryGenerator extends FileGenerator {
      */
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        attributes.setProperty("NAMESPACE",
-                file.getNamespaceBuilder(moduleName, data.getPath()).getNamespace());
+        attributes.setProperty("NAMESPACE", file.getNamespace());
         attributes.setProperty("CLASS_NAME", data.getName());
     }
 }

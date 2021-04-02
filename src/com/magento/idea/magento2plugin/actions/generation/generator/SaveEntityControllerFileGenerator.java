@@ -65,8 +65,8 @@ public class SaveEntityControllerFileGenerator extends FileGenerator {
         this.data = data;
         this.project = project;
         this.checkFileAlreadyExists = checkFileAlreadyExists;
-        fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
-        moduleIndex = ModuleIndex.getInstance(project);
+        fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
+        moduleIndex = new ModuleIndex(project);
         directoryGenerator = DirectoryGenerator.getInstance();
         file = new SaveActionFile(data.getEntityName());
     }
@@ -138,8 +138,9 @@ public class SaveEntityControllerFileGenerator extends FileGenerator {
                 .append("ENTITY_DTO_FACTORY", dtoType.concat("Factory"))
                 .append("SAVE_COMMAND",
                         new SaveEntityCommandFile(
+                                data.getModuleName(),
                                 data.getEntityName()
-                        ).getClassFqn(data.getModuleName())
+                        ).getClassFqn()
                 )
                 .append("DATA_OBJECT", FrameworkLibraryType.DATA_OBJECT.getType())
                 .append("COULD_NOT_SAVE", SaveActionFile.COULD_NOT_SAVE)

@@ -39,7 +39,9 @@ public class NewActionEntityGeneratorTest extends BaseGeneratorTestCase {
                 );
         final PsiFile newActionEntityActionFile =
                 newActionEntityControllerFileGenerator.generate("test");
-        final String filePath = this.getFixturePath(NewActionFile.getInstance().getFileName());
+        final String filePath = this.getFixturePath(
+                new NewActionFile(MODULE_NAME, ENTITY_NAME).getFileName()
+        );
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
 
         assertGeneratedFileIsCorrect(

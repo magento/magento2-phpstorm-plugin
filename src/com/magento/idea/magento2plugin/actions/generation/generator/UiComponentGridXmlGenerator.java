@@ -8,6 +8,7 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.xml.XmlFile;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridToolbarData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
@@ -19,6 +20,7 @@ import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.GridActionColumnFile;
 import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderFile;
 import com.magento.idea.magento2plugin.magento.files.UiComponentGridXmlFile;
+import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.magento.packages.database.ColumnAttributes;
 import com.magento.idea.magento2plugin.magento.packages.database.TableColumnTypes;
@@ -30,6 +32,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
+import com.magento.idea.magento2plugin.util.magento.FileBasedIndexUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class UiComponentGridXmlGenerator extends FileGenerator {
@@ -52,18 +55,17 @@ public class UiComponentGridXmlGenerator extends FileGenerator {
             final Project project
     ) {
         super(project);
-
         this.data = data;
         directoryGenerator = DirectoryGenerator.getInstance();
-        moduleIndex = ModuleIndex.getInstance(project);
-        fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        moduleIndex = new ModuleIndex(project);
+        fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         getCodeTemplateUtil = new GetCodeTemplateUtil(project);
     }
 
     @Override
     public PsiFile generate(final String actionName) {
-        final String moduleName = this.data.getModuleName();
-        final PsiDirectory parentDirectory = this.moduleIndex.getModuleDirectoryByModuleName(
+        final String moduleName = data.getModuleName();
+        final PsiDirectory parentDirectory = moduleIndex.getModuleDirectoryByModuleName(
                 moduleName
         );
         final String subdirectory = String.format(
@@ -75,12 +77,26 @@ public class UiComponentGridXmlGenerator extends FileGenerator {
         final PsiDirectory uiComponentDirectory =
                 directoryGenerator.findOrCreateSubdirectories(parentDirectory, subdirectory);
 
-        return this.fileFromTemplateGenerator.generate(
-                new UiComponentGridXmlFile(data.getName()),
-                getAttributes(),
-                uiComponentDirectory,
-                actionName
+        final UiComponentGridXmlFile file = new UiComponentGridXmlFile(data.getName());
+
+        XmlFile gridXmlFile = (XmlFile) FileBasedIndexUtil.findModuleViewFile(
+                file.getFileName(),
+                Areas.getAreaByString(data.getArea()),
+                moduleName,
+                project,
+                Package.moduleViewUiComponentDir
         );
+
+        if (gridXmlFile == null) {
+            gridXmlFile = (XmlFile) fileFromTemplateGenerator.generate(
+                    new UiComponentGridXmlFile(data.getName()),
+                    getAttributes(),
+                    uiComponentDirectory,
+                    actionName
+            );
+        }
+
+        return gridXmlFile;
     }
 
     /**
@@ -93,9 +109,8 @@ public class UiComponentGridXmlGenerator extends FileGenerator {
         final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
         final String dataProviderClassName =
                 new UiComponentDataProviderFile(
-                        data.getDataProviderName()
-                ).getNamespaceBuilder(
                         data.getModuleName(),
+                        data.getDataProviderName(),
                         data.getDataProviderPath()
                 ).getClassFqn();
 

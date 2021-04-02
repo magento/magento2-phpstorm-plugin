@@ -232,7 +232,7 @@ public class CreateAPluginDialog extends AbstractDialog {
     }
 
     private void createUIComponents() {
-        final List<String> allModulesList = ModuleIndex.getInstance(project)
+        final List<String> allModulesList = new ModuleIndex(project)
                 .getEditableModuleNames();
 
         this.pluginModule = new FilteredComboBox(allModulesList);

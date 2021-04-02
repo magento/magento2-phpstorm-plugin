@@ -5,40 +5,38 @@
 
 package com.magento.idea.magento2plugin.magento.files;
 
-import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import org.jetbrains.annotations.NotNull;
 
-public class ResourceModelFile extends AbstractPhpClass {
+public class ResourceModelFile extends AbstractPhpFile {
+
     public static final String RESOURCE_MODEL_DIRECTORY = "Model/ResourceModel";
     public static final String TEMPLATE = "Magento Resource Model Class";
+    public static final String HUMAN_READABLE_NAME = "Resource model class";
     public static final String ABSTRACT_DB
             = "Magento\\Framework\\Model\\ResourceModel\\Db\\AbstractDb";
     public static final String ALIAS = "ResourceModel";
-    private NamespaceBuilder namespaceBuilder;
-
-    public ResourceModelFile(final @NotNull String className) {
-        super(className);
-    }
 
     /**
-     * Get namespace builder for file.
+     * Resource model file constructor.
      *
      * @param moduleName String
-     *
-     * @return String
+     * @param className String
      */
-    public @NotNull NamespaceBuilder getNamespaceBuilder(
-            final @NotNull String moduleName
+    public ResourceModelFile(
+            final @NotNull String moduleName,
+            final @NotNull String className
     ) {
-        if (namespaceBuilder == null) {
-            namespaceBuilder = new NamespaceBuilder(
-                    moduleName,
-                    getClassName(),
-                    RESOURCE_MODEL_DIRECTORY
-            );
-        }
+        super(moduleName, className);
+    }
 
-        return namespaceBuilder;
+    @Override
+    public String getDirectory() {
+        return RESOURCE_MODEL_DIRECTORY;
+    }
+
+    @Override
+    public String getHumanReadableName() {
+        return HUMAN_READABLE_NAME;
     }
 
     @Override

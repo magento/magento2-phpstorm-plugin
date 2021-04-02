@@ -63,9 +63,9 @@ public class GetListQueryModelGenerator extends FileGenerator {
         this.project = project;
         this.data = data;
         this.checkFileAlreadyExists = checkFileAlreadyExists;
-        fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         directoryGenerator = DirectoryGenerator.getInstance();
-        moduleIndex = ModuleIndex.getInstance(project);
+        moduleIndex = new ModuleIndex(project);
         file = new GetListQueryFile(data.getEntityName());
     }
 
@@ -111,9 +111,13 @@ public class GetListQueryModelGenerator extends FileGenerator {
     protected void fillAttributes(final @NotNull Properties attributes) {
         final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
         final CollectionModelFile collectionModelFile =
-                new CollectionModelFile(data.getCollectionName());
+                new CollectionModelFile(
+                        data.getModuleName(),
+                        data.getCollectionName(),
+                        data.getModelName()
+                );
         final NamespaceBuilder collectionNamespace =
-                collectionModelFile.getNamespaceBuilder(data.getModuleName(), data.getModelName());
+                collectionModelFile.getNamespaceBuilder();
 
         phpClassTypesBuilder
                 .appendProperty("ENTITY_NAME", data.getEntityName())

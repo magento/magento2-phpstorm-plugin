@@ -237,7 +237,7 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
     }
 
     private void createUIComponents() {
-        final List<String> allModulesList = ModuleIndex.getInstance(project)
+        final List<String> allModulesList = new ModuleIndex(project)
                 .getEditableModuleNames();
 
         this.preferenceModule = new FilteredComboBox(allModulesList);

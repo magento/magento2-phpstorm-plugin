@@ -7,12 +7,12 @@ package com.magento.idea.magento2plugin.magento.files;
 
 import com.intellij.lang.Language;
 import com.jetbrains.php.lang.PhpLanguage;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import org.jetbrains.annotations.NotNull;
 
-public class UiComponentDataProviderFile implements ModuleFileInterface {
+public class UiComponentDataProviderFile extends AbstractPhpFile {
 
     public static final String TEMPLATE = "Magento UI Component Custom Data Provider Class";
+    public static final String HUMAN_READABLE_NAME = "Data Provider Class";
     public static final String DIRECTORY = "Ui/DataProvider";
     public static final String FILE_EXTENSION = "php";
     public static final String CUSTOM_TYPE = "custom";
@@ -21,44 +21,37 @@ public class UiComponentDataProviderFile implements ModuleFileInterface {
             "Magento\\Framework\\View\\Element\\UiComponent\\DataProvider\\DataProvider";
     public static final String SEARCH_RESULT_FACTORY =
             "Magento\\Ui\\DataProvider\\SearchResultFactory";
-    private final String className;
-    private NamespaceBuilder namespaceBuilder;
+    private final String directory;
 
     /**
      * Ui Component data provider file constructor.
      *
-     * @param className String
-     */
-    public UiComponentDataProviderFile(final @NotNull String className) {
-        this.className = className;
-    }
-
-    /**
-     * Get namespace builder for file.
-     *
      * @param moduleName String
+     * @param className String
      * @param directory String
-     *
-     * @return String
      */
-    public @NotNull NamespaceBuilder getNamespaceBuilder(
+    public UiComponentDataProviderFile(
             final @NotNull String moduleName,
+            final @NotNull String className,
             final String directory
     ) {
-        if (namespaceBuilder == null) {
-            namespaceBuilder = new NamespaceBuilder(
-                    moduleName,
-                    className,
-                    directory == null ? DIRECTORY : directory
-            );
-        }
+        super(moduleName, className);
+        this.directory = directory;
+    }
 
-        return namespaceBuilder;
+    @Override
+    public String getHumanReadableName() {
+        return HUMAN_READABLE_NAME;
+    }
+
+    @Override
+    public String getDirectory() {
+        return directory == null ? DIRECTORY : directory;
     }
 
     @Override
     public String getFileName() {
-        return String.format("%s.%s", className, FILE_EXTENSION);
+        return String.format("%s.%s", getClassName(), FILE_EXTENSION);
     }
 
     @Override

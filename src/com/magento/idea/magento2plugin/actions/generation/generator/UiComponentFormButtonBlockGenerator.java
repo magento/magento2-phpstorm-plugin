@@ -93,9 +93,9 @@ public class UiComponentFormButtonBlockGenerator extends FileGenerator {
         this.checkFileAlreadyExists = checkFileAlreadyExists;
         this.entityName = entityName;
         this.entityIdField = entityIdField;
-        fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         directoryGenerator = DirectoryGenerator.getInstance();
-        moduleIndex = ModuleIndex.getInstance(project);
+        moduleIndex = new ModuleIndex(project);
         uses = new ArrayList<>();
     }
 
@@ -124,7 +124,11 @@ public class UiComponentFormButtonBlockGenerator extends FileGenerator {
         );
 
         return fileFromTemplateGenerator.generate(
-                new FormButtonBlockFile(buttonData.getButtonClassName()),
+                new FormButtonBlockFile(
+                        buttonData.getButtonModule(),
+                        buttonData.getButtonClassName(),
+                        buttonData.getButtonDirectory()
+                ),
                 getAttributes(),
                 baseDirectory,
                 actionName

@@ -7,47 +7,30 @@ package com.magento.idea.magento2plugin.magento.files.actions;
 
 import com.intellij.lang.Language;
 import com.jetbrains.php.lang.PhpLanguage;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
-import com.magento.idea.magento2plugin.magento.files.ModuleFileInterface;
+import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import org.jetbrains.annotations.NotNull;
 
-public final class DeleteActionFile implements ModuleFileInterface {
+public final class DeleteActionFile extends AbstractPhpFile {
 
     public static final String CLASS_NAME = "Delete";
+    public static final String HUMAN_READABLE_NAME = "Delete controller class";
     public static final String FILE_EXTENSION = "php";
     public static final String TEMPLATE = "Magento Entity Delete Controller Class";
     private static final String DIRECTORY = "Controller/Adminhtml";
     private final String entityName;
-    private NamespaceBuilder namespaceBuilder;
 
     /**
      * Delete action file constructor.
      *
+     * @param moduleName String
      * @param entityName String
      */
-    public DeleteActionFile(final @NotNull String entityName) {
-        this.entityName = entityName;
-    }
-
-    /**
-     * Get namespace builder for file.
-     *
-     * @param moduleName String
-     *
-     * @return String
-     */
-    public @NotNull NamespaceBuilder getNamespaceBuilder(
-            final @NotNull String moduleName
+    public DeleteActionFile(
+            final @NotNull String moduleName,
+            final @NotNull String entityName
     ) {
-        if (namespaceBuilder == null) {
-            namespaceBuilder = new NamespaceBuilder(
-                    moduleName,
-                    CLASS_NAME,
-                    getDirectory()
-            );
-        }
-
-        return namespaceBuilder;
+        super(moduleName, CLASS_NAME);
+        this.entityName = entityName;
     }
 
     /**
@@ -55,8 +38,14 @@ public final class DeleteActionFile implements ModuleFileInterface {
      *
      * @return String
      */
+    @Override
     public String getDirectory() {
         return DIRECTORY.concat("/" + entityName);
+    }
+
+    @Override
+    public String getHumanReadableName() {
+        return HUMAN_READABLE_NAME;
     }
 
     @Override

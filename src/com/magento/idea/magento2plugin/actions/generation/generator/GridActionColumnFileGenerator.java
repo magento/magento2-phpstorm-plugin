@@ -65,9 +65,9 @@ public class GridActionColumnFileGenerator extends FileGenerator {
         this.project = project;
         this.checkFileAlreadyExists = checkFileAlreadyExists;
         file = new GridActionColumnFile();
-        fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         directoryGenerator = DirectoryGenerator.getInstance();
-        moduleIndex = ModuleIndex.getInstance(project);
+        moduleIndex = new ModuleIndex(project);
         uses = new ArrayList<>();
         classNamespaceBuilder = new NamespaceBuilder(
                 data.getModuleName(),

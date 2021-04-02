@@ -94,10 +94,10 @@ public class UiComponentFormGenerator extends FileGenerator {
     ) {
         final DirectoryGenerator directoryGenerator = DirectoryGenerator.getInstance();
         final FileFromTemplateGenerator fileFromTemplateGenerator =
-                FileFromTemplateGenerator.getInstance(project);
+                new FileFromTemplateGenerator(project);
 
         final String moduleName = data.getModuleName();
-        final PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+        final PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(moduleName);
 
         final ArrayList<String> fileDirectories = new ArrayList<>();
@@ -114,11 +114,12 @@ public class UiComponentFormGenerator extends FileGenerator {
 
         final String formName = data.getFormName();
         final UiComponentFormXmlFile uiComponentFormXml = new UiComponentFormXmlFile(formName);
-        XmlFile formFile = (XmlFile) FileBasedIndexUtil.findModuleConfigFile(
+        XmlFile formFile = (XmlFile) FileBasedIndexUtil.findModuleViewFile(
                 uiComponentFormXml.getFileName(),
                 getArea(area),
-                formName,
-                project
+                moduleName,
+                project,
+                Package.moduleViewUiComponentDir
         );
 
         if (formFile == null) {
@@ -129,7 +130,10 @@ public class UiComponentFormGenerator extends FileGenerator {
                     actionName
             );
         }
-        new XmlDeclarationsGenerator(data, project).generate(formFile);
+
+        if (formFile != null) {
+            new XmlDeclarationsGenerator(data, project).generate(formFile);
+        }
 
         return formFile;
     }
@@ -154,9 +158,8 @@ public class UiComponentFormGenerator extends FileGenerator {
                         data.getSubmitActionName().toLowerCase(new Locale("en","EN")))
                 .appendProperty("DATA_PROVIDER",
                         new UiComponentDataProviderFile(
-                                data.getDataProviderName()
-                        ).getNamespaceBuilder(
                                 data.getModuleName(),
+                                data.getDataProviderName(),
                                 data.getDataProviderPath()
                         ).getClassFqn()
                 )

@@ -49,7 +49,7 @@ public class DataModelInterfaceGenerator extends FileGenerator {
         this.project = project;
         this.data = data;
         this.directoryGenerator = DirectoryGenerator.getInstance();
-        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
@@ -107,7 +107,7 @@ public class DataModelInterfaceGenerator extends FileGenerator {
      * @return PhpClass
      */
     private PhpClass createInterface(final @NotNull String actionName) {
-        final PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+        final PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(data.getModuleName());
         final PsiDirectory dtoInterfaceDirectory = directoryGenerator
                 .findOrCreateSubdirectories(parentDirectory, DataModelInterfaceFile.DIRECTORY);
