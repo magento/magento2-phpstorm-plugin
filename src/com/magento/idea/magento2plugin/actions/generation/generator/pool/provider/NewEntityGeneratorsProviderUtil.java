@@ -117,7 +117,8 @@ public final class NewEntityGeneratorsProviderUtil {
                 )
                 .addNext(
                         RoutesXmlGeneratorHandler.class,
-                        new RoutesXmlDtoConverter(context, dialogData)
+                        new RoutesXmlDtoConverter(context, dialogData),
+                        dialogData::hasAdminUiComponents
                 )
                 .addNext(
                         AclXmlGeneratorHandler.class,

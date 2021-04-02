@@ -16,10 +16,12 @@ import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFi
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityCreatorContextData;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.NewEntityDialogData;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
+import com.magento.idea.magento2plugin.actions.generation.dialog.reflection.GetReflectionFieldUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.util.ClassPropertyFormatterUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.util.ProcessWorker;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.data.FieldValidationData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AclResourceIdRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericWithUnderscoreRule;
@@ -57,6 +59,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -249,8 +252,9 @@ public class NewEntityDialog extends AbstractDialog {
                 onCancel();
             }
 
+            @SuppressWarnings("PMD.AccessorMethodGeneration")
             @Override
-            public void windowOpened(WindowEvent e) {
+            public void windowOpened(final WindowEvent event) {
                 entityName.requestFocus();
             }
         });
@@ -298,6 +302,34 @@ public class NewEntityDialog extends AbstractDialog {
         dialog.pack();
         dialog.centerDialog(dialog);
         dialog.setVisible(true);
+    }
+
+    /**
+     * Filter fields to validate if createUiComponent checkbox isn't selected.
+     *
+     * @return List[FieldValidationData]
+     */
+    @Override
+    protected List<FieldValidationData> getFieldsToValidate() {
+        final List<FieldValidationData> filteredFields = new LinkedList<>();
+
+        if (createUiComponent.isSelected()) {
+            filteredFields.addAll(super.getFieldsToValidate());
+        } else {
+            final List<Field> fieldsToIgnore = new ArrayList<>();
+            fieldsToIgnore.add(GetReflectionFieldUtil.getByName("route", this.getClass()));
+            fieldsToIgnore.add(GetReflectionFieldUtil.getByName("formName", this.getClass()));
+            fieldsToIgnore.add(GetReflectionFieldUtil.getByName("gridName", this.getClass()));
+
+            for (final FieldValidationData fieldData : super.getFieldsToValidate()) {
+                if (fieldsToIgnore.contains(fieldData.getField())) {
+                    continue;
+                }
+                filteredFields.add(fieldData);
+            }
+        }
+
+        return filteredFields;
     }
 
     /**

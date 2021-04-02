@@ -14,6 +14,8 @@ import java.lang.reflect.Field;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+
+import com.magento.idea.magento2plugin.actions.generation.dialog.reflection.ExtractComponentFromFieldUtil;
 import org.jetbrains.annotations.NotNull;
 
 public final class DialogFieldErrorUtil {
@@ -34,7 +36,7 @@ public final class DialogFieldErrorUtil {
             final @NotNull AbstractDialog dialog,
             final @NotNull Field field
     ) {
-        final JComponent fieldComponent = getComponentForField(dialog, field);
+        final JComponent fieldComponent = ExtractComponentFromFieldUtil.extract(field, dialog);
 
         if (fieldComponent != null) {
             highlightField(fieldComponent);
@@ -82,7 +84,7 @@ public final class DialogFieldErrorUtil {
             final @NotNull String message
     ) {
         final JLabel messageHolder = getMessageHolderForField(dialog, field);
-        final JComponent fieldComponent = getComponentForField(dialog, field);
+        final JComponent fieldComponent = ExtractComponentFromFieldUtil.extract(field, dialog);
 
         if (messageHolder == null || fieldComponent == null) {
             return false;
@@ -135,33 +137,6 @@ public final class DialogFieldErrorUtil {
             }
         } catch (NoSuchFieldException | IllegalAccessException exception) {
             return null;
-        }
-
-        return null;
-    }
-
-    /**
-     * Get JComponent for field.
-     *
-     * @param field Field
-     *
-     * @return JComponent
-     */
-    private static JComponent getComponentForField(
-            final @NotNull AbstractDialog dialog,
-            final @NotNull Field field
-    ) {
-        try {
-            field.setAccessible(true);
-            final Object component = field.get(dialog);
-
-            if (component instanceof JComponent) {
-                return (JComponent) component;
-            }
-        } catch (IllegalAccessException exception) {
-            return null;
-        } finally {
-            field.setAccessible(false);
         }
 
         return null;
