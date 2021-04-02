@@ -7,15 +7,18 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.util;
 
 import com.intellij.util.ui.UIUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.AbstractDialog;
+import com.magento.idea.magento2plugin.actions.generation.dialog.reflection.ExtractComponentFromFieldUtil;
 import java.awt.Color;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.lang.reflect.Field;
 import javax.swing.BorderFactory;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-
-import com.magento.idea.magento2plugin.actions.generation.dialog.reflection.ExtractComponentFromFieldUtil;
+import javax.swing.JTextField;
+import javax.swing.UIManager;
+import javax.swing.border.Border;
 import org.jetbrains.annotations.NotNull;
 
 public final class DialogFieldErrorUtil {
@@ -49,24 +52,73 @@ public final class DialogFieldErrorUtil {
      * @param fieldComponent JComponent
      */
     public static void highlightField(final @NotNull JComponent fieldComponent) {
-        final Color defaultBackgroundColor = fieldComponent.getBackground();
-
         fieldComponent.setBorder(BorderFactory.createLineBorder(ERROR_COLOR));
         fieldComponent.setBackground(ERROR_BACKGROUND_COLOR);
 
         fieldComponent.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(final FocusEvent event) {
-                fieldComponent.setBorder(null);
-                fieldComponent.setBackground(defaultBackgroundColor);
+                resetComponentHighlighting(fieldComponent);
             }
 
             @Override
             public void focusLost(final FocusEvent event) {
-                fieldComponent.setBorder(null);
-                fieldComponent.setBackground(defaultBackgroundColor);
+                resetComponentHighlighting(fieldComponent);
             }
         });
+    }
+
+    /**
+     * Reset field highlighting.
+     *
+     * @param field Field
+     * @param dialog AbstractDialog
+     */
+    public static void resetFieldHighlighting(
+            final @NotNull Field field,
+            final @NotNull AbstractDialog dialog
+    ) {
+        final JComponent fieldComponent = ExtractComponentFromFieldUtil.extract(field, dialog);
+
+        if (fieldComponent == null) {
+            return;
+        }
+
+        resetComponentHighlighting(fieldComponent);
+        final JLabel messageHolder = getMessageHolderForField(dialog, field);
+
+        if (messageHolder == null) {
+            return;
+        }
+
+        messageHolder.setVisible(false);
+        messageHolder.setText("");
+    }
+
+    /**
+     * Reset component highlighting.
+     *
+     * @param fieldComponent JComponent
+     */
+    public static void resetComponentHighlighting(
+            final @NotNull JComponent fieldComponent
+    ) {
+        Color defaultBackgroundColor;
+        Border defaultBorder;
+
+        if (fieldComponent instanceof JTextField) {
+            defaultBackgroundColor = UIManager.getColor("TextField.background");
+            defaultBorder = UIManager.getBorder("TextField.border");
+        } else if (fieldComponent instanceof JComboBox) {
+            defaultBackgroundColor = UIManager.getColor("ComboBox.background");
+            defaultBorder = UIManager.getBorder("ComboBox.border");
+        } else {
+            defaultBackgroundColor = UIManager.getColor("TextField.background");
+            defaultBorder = UIManager.getBorder("TextField.border");
+        }
+
+        fieldComponent.setBackground(defaultBackgroundColor);
+        fieldComponent.setBorder(defaultBorder);
     }
 
     /**

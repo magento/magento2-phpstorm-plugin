@@ -52,9 +52,9 @@ public abstract class AbstractDialog extends JDialog {
 
     protected void centerDialog(final AbstractDialog dialog) {
         final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        final int cordX = screenSize.width / 2  - dialog.getSize().width / 2;
-        final int cordY = screenSize.height / 2 - dialog.getSize().height / 2;
-        dialog.setLocation(cordX, cordY);
+        final int coordinateX = screenSize.width / 2  - dialog.getSize().width / 2;
+        final int coordinateY = screenSize.height / 2 - dialog.getSize().height / 2;
+        dialog.setLocation(coordinateX, coordinateY);
     }
 
     protected void onCancel() {
@@ -70,6 +70,7 @@ public abstract class AbstractDialog extends JDialog {
     protected boolean validateFormFields() {
         boolean dialogHasErrors;
         isValidationErrorShown = dialogHasErrors = false;
+        clearValidationHighlighting();
 
         for (final FieldValidationData fieldValidationData : getFieldsToValidate()) {
             final Field field = fieldValidationData.getField();
@@ -101,6 +102,15 @@ public abstract class AbstractDialog extends JDialog {
         }
 
         return !dialogHasErrors;
+    }
+
+    /**
+     * Reset highlighting for fields.
+     */
+    protected void clearValidationHighlighting() {
+        for (final FieldValidationData fieldValidationData : fieldsValidationsList) {
+            DialogFieldErrorUtil.resetFieldHighlighting(fieldValidationData.getField(), this);
+        }
     }
 
     /**
