@@ -41,7 +41,9 @@ public class SaveEntityActionGeneratorTest extends BaseGeneratorTestCase {
                         false
                 );
         final PsiFile saveEntityActionFile = saveEntityControllerFileGenerator.generate("test");
-        final String filePath = this.getFixturePath(new SaveActionFile(ENTITY_NAME).getFileName());
+        final String filePath = this.getFixturePath(
+                new SaveActionFile(MODULE_NAME, ENTITY_NAME).getFileName()
+        );
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
 
         assertGeneratedFileIsCorrect(
@@ -69,10 +71,12 @@ public class SaveEntityActionGeneratorTest extends BaseGeneratorTestCase {
                 new SaveEntityControllerFileGenerator(
                         saveEntityControllerFileData,
                         myFixture.getProject(),
-                        true
+                        false
                 );
         final PsiFile saveEntityActionFile = saveEntityControllerFileGenerator.generate("test");
-        final String filePath = this.getFixturePath(new SaveActionFile(ENTITY_NAME).getFileName());
+        final String filePath = this.getFixturePath(
+                new SaveActionFile(MODULE_NAME, ENTITY_NAME).getFileName()
+        );
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
 
         assertGeneratedFileIsCorrect(

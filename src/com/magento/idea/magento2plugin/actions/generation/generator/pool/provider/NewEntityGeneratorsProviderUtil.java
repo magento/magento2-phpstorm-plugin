@@ -13,16 +13,15 @@ import com.magento.idea.magento2plugin.actions.generation.data.converter.newenti
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.DbSchemaXmlDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.DeleteEntityByIdCommandDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.EntityDataMapperDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.IndexActionDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.FormDeleteControllerDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.FormEditControllerDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.FormGenericButtonBlockDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.FormLayoutDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.FormSaveControllerDtoConverter;
-import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.FormViewControllerDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.GetListQueryDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.GridActionColumnDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.GridLayoutXmlDtoConverter;
+import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.IndexActionDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.MenuXmlDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.ModelDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.NewControllerDtoConverter;
@@ -46,16 +45,15 @@ import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.DbSchemaXmlGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.DeleteByIdCommandGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.EntityDataMapperGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.IndexActionGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormDeleteControllerGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormEditControllerGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormGenericButtonBlockGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormLayoutGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormSaveControllerGeneratorHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormViewControllerGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.GetListQueryGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.GridActionColumnGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.GridLayoutXmlGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.IndexActionGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.MenuXmlGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.ModelGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.NewControllerGeneratorHandler;
@@ -161,11 +159,6 @@ public final class NewEntityGeneratorsProviderUtil {
                 .addNext(
                         UiComponentGridGeneratorHandler.class,
                         new UiComponentGridDtoConverter(context, dialogData),
-                        dialogData::hasAdminUiComponents
-                )
-                .addNext(
-                        FormViewControllerGeneratorHandler.class,
-                        new FormViewControllerDtoConverter(context, dialogData),
                         dialogData::hasAdminUiComponents
                 )
                 .addNext(

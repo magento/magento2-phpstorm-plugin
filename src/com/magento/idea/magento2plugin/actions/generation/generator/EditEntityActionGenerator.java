@@ -6,32 +6,20 @@
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.EditEntityActionData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
-import com.magento.idea.magento2plugin.indexes.ModuleIndex;
+import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.actions.EditActionFile;
 import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.code.BackendModuleType;
 import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryType;
-import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
-public class EditEntityActionGenerator extends FileGenerator {
+public class EditEntityActionGenerator extends PhpFileGenerator {
 
-    private final Project project;
     private final EditEntityActionData data;
-    private final boolean checkFileAlreadyExists;
-    private final FileFromTemplateGenerator fileFromTemplateGenerator;
-    private final DirectoryGenerator directoryGenerator;
-    private final ModuleIndex moduleIndex;
-    private final EditActionFile file;
 
     /**
      * Edit entity action/controller file generator constructor.
@@ -58,46 +46,13 @@ public class EditEntityActionGenerator extends FileGenerator {
             final @NotNull Project project,
             final boolean checkFileAlreadyExists
     ) {
-        super(project);
+        super(project, checkFileAlreadyExists);
         this.data = data;
-        this.project = project;
-        this.checkFileAlreadyExists = checkFileAlreadyExists;
-        fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
-        moduleIndex = new ModuleIndex(project);
-        directoryGenerator = DirectoryGenerator.getInstance();
-        file = new EditActionFile(data.getEntityName());
     }
 
-    /**
-     * Generate edit action controller for entity.
-     *
-     * @param actionName String
-     *
-     * @return PsiFile
-     */
     @Override
-    public PsiFile generate(final @NotNull String actionName) {
-        final PhpClass editActionClass = GetPhpClassByFQN.getInstance(project).execute(
-                file.getNamespaceBuilder(data.getModuleName()).getClassFqn()
-        );
-
-        if (this.checkFileAlreadyExists && editActionClass != null) {
-            return editActionClass.getContainingFile();
-        }
-
-        final PsiDirectory editActionBaseDir = directoryGenerator.findOrCreateSubdirectories(
-                moduleIndex.getModuleDirectoryByModuleName(
-                        data.getModuleName()
-                ),
-                file.getDirectory()
-        );
-
-        return fileFromTemplateGenerator.generate(
-                file,
-                getAttributes(),
-                editActionBaseDir,
-                actionName
-        );
+    protected AbstractPhpFile initFile() {
+        return new EditActionFile(data.getModuleName(), data.getEntityName());
     }
 
     /**
@@ -110,8 +65,7 @@ public class EditEntityActionGenerator extends FileGenerator {
         final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
 
         phpClassTypesBuilder
-                .appendProperty("NAMESPACE",
-                        file.getNamespaceBuilder(data.getModuleName()).getNamespace())
+                .appendProperty("NAMESPACE", file.getNamespace())
                 .appendProperty("ENTITY_NAME", data.getEntityName())
                 .appendProperty("CLASS_NAME", file.getClassName())
                 .appendProperty("ADMIN_RESOURCE", data.getAcl())

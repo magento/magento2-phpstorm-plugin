@@ -6,33 +6,21 @@
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.DeleteEntityByIdCommandData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
-import com.magento.idea.magento2plugin.indexes.ModuleIndex;
+import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.ModelFile;
 import com.magento.idea.magento2plugin.magento.files.ResourceModelFile;
 import com.magento.idea.magento2plugin.magento.files.commands.DeleteEntityByIdCommandFile;
 import com.magento.idea.magento2plugin.magento.packages.code.ExceptionType;
 import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryType;
-import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
-public class DeleteEntityByIdCommandGenerator extends FileGenerator {
+public class DeleteEntityByIdCommandGenerator extends PhpFileGenerator {
 
-    private final Project project;
     private final DeleteEntityByIdCommandData data;
-    private final FileFromTemplateGenerator fileFromTemplateGenerator;
-    private final DirectoryGenerator directoryGenerator;
-    private final ModuleIndex moduleIndex;
-    private final boolean checkFileAlreadyExists;
-    private final DeleteEntityByIdCommandFile file;
 
     /**
      * Delete entity command generator constructor.
@@ -59,47 +47,13 @@ public class DeleteEntityByIdCommandGenerator extends FileGenerator {
             final @NotNull Project project,
             final boolean checkFileAlreadyExists
     ) {
-        super(project);
+        super(project, checkFileAlreadyExists);
         this.data = data;
-        this.project = project;
-        this.checkFileAlreadyExists = checkFileAlreadyExists;
-        fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
-        directoryGenerator = DirectoryGenerator.getInstance();
-        moduleIndex = new ModuleIndex(project);
-        file = new DeleteEntityByIdCommandFile(data.getEntityName());
     }
 
-    /**
-     * Generate delete command for entity.
-     *
-     * @param actionName String
-     *
-     * @return PsiFile
-     */
     @Override
-    public PsiFile generate(final @NotNull String actionName) {
-        final PhpClass deleteEntityCommandClass = GetPhpClassByFQN.getInstance(project).execute(
-                file.getClassFqn(data.getModuleName())
-        );
-
-        if (this.checkFileAlreadyExists && deleteEntityCommandClass != null) {
-            return deleteEntityCommandClass.getContainingFile();
-        }
-
-        final PsiDirectory moduleBaseDir = moduleIndex.getModuleDirectoryByModuleName(
-                data.getModuleName()
-        );
-        final PsiDirectory deleteCommandFileBaseDir = directoryGenerator.findOrCreateSubdirectories(
-                moduleBaseDir,
-                DeleteEntityByIdCommandFile.getDirectory(data.getEntityName())
-        );
-
-        return fileFromTemplateGenerator.generate(
-                file,
-                getAttributes(),
-                deleteCommandFileBaseDir,
-                actionName
-        );
+    protected AbstractPhpFile initFile() {
+        return new DeleteEntityByIdCommandFile(data.getModuleName(), data.getEntityName());
     }
 
     /**
@@ -118,7 +72,7 @@ public class DeleteEntityByIdCommandGenerator extends FileGenerator {
 
         phpClassTypesBuilder
                 .appendProperty("ENTITY_NAME", data.getEntityName())
-                .appendProperty("NAMESPACE", file.getNamespace(data.getModuleName()))
+                .appendProperty("NAMESPACE", file.getNamespace())
                 .appendProperty("CLASS_NAME", DeleteEntityByIdCommandFile.CLASS_NAME)
                 .appendProperty("ENTITY_ID", data.getEntityId())
                 .append("Exception", "Exception")

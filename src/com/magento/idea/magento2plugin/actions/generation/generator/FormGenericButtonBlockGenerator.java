@@ -6,33 +6,21 @@
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.FormGenericButtonBlockData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
-import com.magento.idea.magento2plugin.indexes.ModuleIndex;
+import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.FormGenericButtonBlockFile;
 import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryType;
-import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 
-public class FormGenericButtonBlockGenerator extends FileGenerator {
+public class FormGenericButtonBlockGenerator extends PhpFileGenerator {
 
     private final FormGenericButtonBlockData data;
-    private final Project project;
-    private final FileFromTemplateGenerator fileFromTemplateGenerator;
-    private final DirectoryGenerator directoryGenerator;
-    private final ModuleIndex moduleIndex;
-    private final boolean checkFileAlreadyExists;
-    private final FormGenericButtonBlockFile file;
 
     /**
      * Generic Button Block generator constructor.
@@ -59,47 +47,13 @@ public class FormGenericButtonBlockGenerator extends FileGenerator {
             final @NotNull Project project,
             final boolean checkFileAlreadyExists
     ) {
-        super(project);
+        super(project, checkFileAlreadyExists);
         this.data = data;
-        this.project = project;
-        this.checkFileAlreadyExists = checkFileAlreadyExists;
-        fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
-        directoryGenerator = DirectoryGenerator.getInstance();
-        moduleIndex = new ModuleIndex(project);
-        file = new FormGenericButtonBlockFile();
     }
 
-    /**
-     * Generate ui component form generic block.
-     *
-     * @param actionName String
-     *
-     * @return PsiFile
-     */
     @Override
-    public PsiFile generate(final @NotNull String actionName) {
-        final PhpClass genericButtonClass = GetPhpClassByFQN.getInstance(project).execute(
-                file.getNamespaceBuilder(data.getModuleName()).getClassFqn()
-        );
-
-        if (this.checkFileAlreadyExists && genericButtonClass != null) {
-            return genericButtonClass.getContainingFile();
-        }
-
-        final PsiDirectory moduleBaseDir = moduleIndex.getModuleDirectoryByModuleName(
-                data.getModuleName()
-        );
-        final PsiDirectory genericButtonBaseDir = directoryGenerator.findOrCreateSubdirectories(
-                moduleBaseDir,
-                FormGenericButtonBlockFile.DIRECTORY
-        );
-
-        return fileFromTemplateGenerator.generate(
-                new FormGenericButtonBlockFile(),
-                getAttributes(),
-                genericButtonBaseDir,
-                actionName
-        );
+    protected AbstractPhpFile initFile() {
+        return new FormGenericButtonBlockFile(data.getModuleName());
     }
 
     /**
@@ -115,8 +69,7 @@ public class FormGenericButtonBlockGenerator extends FileGenerator {
                 .collect(Collectors.joining());
 
         phpClassTypesBuilder
-                .appendProperty("NAMESPACE",
-                        file.getNamespaceBuilder(data.getModuleName()).getNamespace())
+                .appendProperty("NAMESPACE", file.getNamespace())
                 .appendProperty("ENTITY_NAME", data.getEntityName())
                 .appendProperty("CLASS_NAME", FormGenericButtonBlockFile.CLASS_NAME)
                 .appendProperty("ENTITY_ID", data.getEntityId())

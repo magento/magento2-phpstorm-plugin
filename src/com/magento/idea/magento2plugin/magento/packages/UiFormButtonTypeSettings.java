@@ -7,18 +7,18 @@ package com.magento.idea.magento2plugin.magento.packages;
 
 import java.util.InputMismatchException;
 import java.util.Map;
-
 import org.jetbrains.annotations.NotNull;
 
 public enum UiFormButtonTypeSettings {
-    SAVE("Save", "save primary", "''", "[\n" +
-            "                'mage-init' => ['button' => ['event' => 'save']],\n" +
-            "                'form-role' => 'save'\n" +
-            "            ]", 10, "Save entity button."),
-    DELETE("Delete", "delete", "'deleteConfirm(\\''\n" +
-            "            . __('Are you sure you want to delete this $varName?')\n" +
-            "            . '\\', \\'' . $this->getUrl('*/*/delete', ['$varId' => " +
-            "$this->$varEntityIdAccessor]) . '\\')'", "[]", 20, "Delete entity button."),
+
+    SAVE("Save", "save primary", "''", "[\n"
+            + "                'mage-init' => ['button' => ['event' => 'save']],\n"
+            + "                'form-role' => 'save'\n"
+            + "            ]", 10, "Save entity button."),
+    DELETE("Delete", "delete", "'deleteConfirm(\\''\n"
+            + "            . __('Are you sure you want to delete this $varName?')\n"
+            + "            . '\\', \\'' . $this->getUrl('*/*/delete', ['$varId' => "
+            + "$this->$varEntityIdAccessor]) . '\\')'", "[]", 20, "Delete entity button."),
     BACK("Back To Grid", "back",
             "sprintf(\"location.href = '%s';\", $this->getUrl('*/*/'))",
             "[]", 30, "Back to list button."),

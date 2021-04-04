@@ -31,7 +31,7 @@ public class FormGenericButtonBlockGeneratorTest extends BaseGeneratorTestCase {
                         false
                 );
         final String filePath = this.getFixturePath(
-                new FormGenericButtonBlockFile().getFileName()
+                new FormGenericButtonBlockFile(MODULE_NAME).getFileName()
         );
 
         assertGeneratedFileIsCorrect(

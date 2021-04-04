@@ -5,53 +5,37 @@
 
 package com.magento.idea.magento2plugin.magento.files;
 
-import com.intellij.lang.Language;
-import com.jetbrains.php.lang.PhpLanguage;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import org.jetbrains.annotations.NotNull;
 
-public final class FormGenericButtonBlockFile implements ModuleFileInterface {
+public final class FormGenericButtonBlockFile extends AbstractPhpFile {
 
     public static final String CLASS_NAME = "GenericButton";
-    public static final String FILE_EXTENSION = "php";
+    public static final String HUMAN_READABLE_NAME = "Generic button block class";
     public static final String TEMPLATE = "Magento PHP Form Generic Button Block Class";
     public static final String DIRECTORY = "Block/Form";
     public static final String CONTEXT = "Magento\\Backend\\Block\\Widget\\Context";
-    private NamespaceBuilder namespaceBuilder;
 
     /**
-     * Get namespace builder for file.
+     * Form generic button block file constructor.
      *
      * @param moduleName String
-     *
-     * @return String
      */
-    public @NotNull NamespaceBuilder getNamespaceBuilder(
-            final @NotNull String moduleName
-    ) {
-        if (namespaceBuilder == null) {
-            namespaceBuilder = new NamespaceBuilder(
-                    moduleName,
-                    CLASS_NAME,
-                    DIRECTORY
-            );
-        }
-
-        return namespaceBuilder;
+    public FormGenericButtonBlockFile(final @NotNull String moduleName) {
+        super(moduleName, CLASS_NAME);
     }
 
     @Override
-    public String getFileName() {
-        return CLASS_NAME.concat("." + FILE_EXTENSION);
+    public String getHumanReadableName() {
+        return HUMAN_READABLE_NAME;
+    }
+
+    @Override
+    public String getDirectory() {
+        return DIRECTORY;
     }
 
     @Override
     public String getTemplate() {
         return TEMPLATE;
-    }
-
-    @Override
-    public Language getLanguage() {
-        return PhpLanguage.INSTANCE;
     }
 }

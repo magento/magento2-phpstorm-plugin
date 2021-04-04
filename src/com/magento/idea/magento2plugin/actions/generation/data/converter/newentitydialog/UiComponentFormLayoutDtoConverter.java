@@ -16,8 +16,14 @@ import org.jetbrains.annotations.NotNull;
 public class UiComponentFormLayoutDtoConverter extends UiComponentFormFileData
         implements DataObjectConverter {
 
-    private final static String SUBMIT_ACTION_NAME = "Save";
+    private static final String SUBMIT_ACTION_NAME = "Save";
 
+    /**
+     * Ui Component form layout DTO converter.
+     *
+     * @param generationContextData EntityCreatorContextData
+     * @param newEntityDialogData NewEntityDialogData
+     */
     public UiComponentFormLayoutDtoConverter(
             final @NotNull EntityCreatorContextData generationContextData,
             final @NotNull NewEntityDialogData newEntityDialogData

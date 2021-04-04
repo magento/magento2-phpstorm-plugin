@@ -8,7 +8,6 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBoxTableRenderer;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.NewUiComponentFormAction;
 import com.magento.idea.magento2plugin.actions.generation.data.AclXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
@@ -47,7 +46,7 @@ import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
-import com.magento.idea.magento2plugin.magento.packages.uiComponent.FormElementType;
+import com.magento.idea.magento2plugin.magento.packages.uicomponent.FormElementType;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.ui.table.ComboBoxEditor;
 import com.magento.idea.magento2plugin.ui.table.DeleteRowButton;
@@ -72,7 +71,6 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
-import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({
         "PMD.TooManyFields",

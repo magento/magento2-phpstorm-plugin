@@ -219,12 +219,8 @@ public class NewDataModelDialog extends AbstractDialog {
     private void generatePreferenceForInterface() {
         new PreferenceDiXmlGenerator(new PreferenceDiXmFileData(
                 getModuleName(),
-                new DataModelInterfaceFile(
-                        getDtoInterfaceName()
-                ).getNamespaceBuilder(getModuleName()).getClassFqn(),
-                new DataModelFile(
-                        getDtoModelName()
-                ).getNamespaceBuilder(getModuleName()).getClassFqn(),
+                new DataModelInterfaceFile(getModuleName(), getDtoInterfaceName()).getClassFqn(),
+                new DataModelFile(getModuleName(), getDtoModelName()).getClassFqn(),
                 "base"
         ), project).generate(OverrideClassByAPreferenceAction.ACTION_NAME);
     }

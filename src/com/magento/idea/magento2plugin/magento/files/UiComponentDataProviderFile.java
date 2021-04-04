@@ -5,8 +5,6 @@
 
 package com.magento.idea.magento2plugin.magento.files;
 
-import com.intellij.lang.Language;
-import com.jetbrains.php.lang.PhpLanguage;
 import org.jetbrains.annotations.NotNull;
 
 public class UiComponentDataProviderFile extends AbstractPhpFile {
@@ -14,7 +12,6 @@ public class UiComponentDataProviderFile extends AbstractPhpFile {
     public static final String TEMPLATE = "Magento UI Component Custom Data Provider Class";
     public static final String HUMAN_READABLE_NAME = "Data Provider Class";
     public static final String DIRECTORY = "Ui/DataProvider";
-    public static final String FILE_EXTENSION = "php";
     public static final String CUSTOM_TYPE = "custom";
     public static final String COLLECTION_TYPE = "collection";
     public static final String DEFAULT_DATA_PROVIDER =
@@ -50,17 +47,7 @@ public class UiComponentDataProviderFile extends AbstractPhpFile {
     }
 
     @Override
-    public String getFileName() {
-        return String.format("%s.%s", getClassName(), FILE_EXTENSION);
-    }
-
-    @Override
     public String getTemplate() {
         return TEMPLATE;
-    }
-
-    @Override
-    public Language getLanguage() {
-        return PhpLanguage.INSTANCE;
     }
 }

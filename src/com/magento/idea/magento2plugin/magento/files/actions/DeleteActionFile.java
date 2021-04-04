@@ -5,8 +5,6 @@
 
 package com.magento.idea.magento2plugin.magento.files.actions;
 
-import com.intellij.lang.Language;
-import com.jetbrains.php.lang.PhpLanguage;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,7 +12,6 @@ public final class DeleteActionFile extends AbstractPhpFile {
 
     public static final String CLASS_NAME = "Delete";
     public static final String HUMAN_READABLE_NAME = "Delete controller class";
-    public static final String FILE_EXTENSION = "php";
     public static final String TEMPLATE = "Magento Entity Delete Controller Class";
     private static final String DIRECTORY = "Controller/Adminhtml";
     private final String entityName;
@@ -49,17 +46,7 @@ public final class DeleteActionFile extends AbstractPhpFile {
     }
 
     @Override
-    public String getFileName() {
-        return CLASS_NAME.concat("." + FILE_EXTENSION);
-    }
-
-    @Override
     public String getTemplate() {
         return TEMPLATE;
-    }
-
-    @Override
-    public Language getLanguage() {
-        return PhpLanguage.INSTANCE;
     }
 }

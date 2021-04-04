@@ -6,33 +6,21 @@
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.GetListQueryModelData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
-import com.magento.idea.magento2plugin.indexes.ModuleIndex;
+import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.CollectionModelFile;
 import com.magento.idea.magento2plugin.magento.files.EntityDataMapperFile;
 import com.magento.idea.magento2plugin.magento.files.queries.GetListQueryFile;
 import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryType;
-import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
-public class GetListQueryModelGenerator extends FileGenerator {
+public class GetListQueryModelGenerator extends PhpFileGenerator {
 
-    private final Project project;
     private final GetListQueryModelData data;
-    private final FileFromTemplateGenerator fileFromTemplateGenerator;
-    private final DirectoryGenerator directoryGenerator;
-    private final ModuleIndex moduleIndex;
-    private final boolean checkFileAlreadyExists;
-    private final GetListQueryFile file;
 
     /**
      * Query model generator Constructor.
@@ -59,47 +47,13 @@ public class GetListQueryModelGenerator extends FileGenerator {
             final @NotNull Project project,
             final boolean checkFileAlreadyExists
     ) {
-        super(project);
-        this.project = project;
+        super(project, checkFileAlreadyExists);
         this.data = data;
-        this.checkFileAlreadyExists = checkFileAlreadyExists;
-        fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
-        directoryGenerator = DirectoryGenerator.getInstance();
-        moduleIndex = new ModuleIndex(project);
-        file = new GetListQueryFile(data.getEntityName());
     }
 
-    /**
-     * Generate Get List Query model.
-     *
-     * @param actionName String
-     *
-     * @return PsiFile
-     */
     @Override
-    public PsiFile generate(final @NotNull String actionName) {
-        final PhpClass getListQueryClass = GetPhpClassByFQN.getInstance(project).execute(
-                file.getNamespaceBuilder(data.getModuleName()).getClassFqn()
-        );
-
-        if (this.checkFileAlreadyExists && getListQueryClass != null) {
-            return getListQueryClass.getContainingFile();
-        }
-
-        final PsiDirectory moduleBaseDir = moduleIndex.getModuleDirectoryByModuleName(
-                data.getModuleName()
-        );
-        final PsiDirectory queryModelBaseDir = directoryGenerator.findOrCreateSubdirectories(
-                moduleBaseDir,
-                file.getDirectory()
-        );
-
-        return fileFromTemplateGenerator.generate(
-                file,
-                getAttributes(),
-                queryModelBaseDir,
-                actionName
-        );
+    protected AbstractPhpFile initFile() {
+        return new GetListQueryFile(data.getModuleName(), data.getEntityName());
     }
 
     /**
@@ -121,10 +75,7 @@ public class GetListQueryModelGenerator extends FileGenerator {
 
         phpClassTypesBuilder
                 .appendProperty("ENTITY_NAME", data.getEntityName())
-                .appendProperty(
-                        "NAMESPACE",
-                        file.getNamespaceBuilder(data.getModuleName()).getNamespace()
-                )
+                .appendProperty("NAMESPACE", file.getNamespace())
                 .appendProperty("CLASS_NAME", GetListQueryFile.CLASS_NAME)
                 .append(
                         "ENTITY_COLLECTION_TYPE",
@@ -137,8 +88,9 @@ public class GetListQueryModelGenerator extends FileGenerator {
                 .append(
                         "ENTITY_DATA_MAPPER_TYPE",
                         new EntityDataMapperFile(
+                                data.getModuleName(),
                                 data.getEntityName()
-                        ).getClassFqn(data.getModuleName())
+                        ).getClassFqn()
                 )
                 .append(
                         "COLLECTION_PROCESSOR_TYPE",
