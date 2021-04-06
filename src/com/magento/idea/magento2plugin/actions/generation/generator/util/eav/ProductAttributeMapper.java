@@ -16,7 +16,9 @@ import java.util.Map;
 
 public class ProductAttributeMapper implements AttributeMapperInterface {
     @Override
-    public List<String> mapAttributesByEntityData(@NotNull final EavEntityDataInterface entityData) {
+    public List<String> mapAttributesByEntityData(
+            @NotNull final EavEntityDataInterface entityData
+    ) {
         final ProductEntityData productEntityData = (ProductEntityData) entityData;
 
         final List<String> attributesWithValues = new ArrayList<>();

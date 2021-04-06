@@ -43,7 +43,7 @@ public class EavAttributeSetupPatchGenerator extends FileGenerator {
      * Constructor.
      *
      * @param eavEntityData EavEntityDataInterface
-     * @param project Project
+     * @param project       Project
      */
     public EavAttributeSetupPatchGenerator(
             final @NotNull EavEntityDataInterface eavEntityData,
@@ -84,7 +84,10 @@ public class EavAttributeSetupPatchGenerator extends FileGenerator {
                 + eavEntityData.getDataPatchName();
     }
 
-    private boolean validateIfFileAlreadyExist(final PhpClass dataPatchClass, final String errorTitle) {
+    private boolean validateIfFileAlreadyExist(
+            final PhpClass dataPatchClass,
+            final String errorTitle
+    ) {
         if (dataPatchClass != null) {
             final String errorMessage = validatorBundle.message(
                     "validator.file.alreadyExists",
@@ -136,7 +139,10 @@ public class EavAttributeSetupPatchGenerator extends FileGenerator {
         return parentDirectory;
     }
 
-    private boolean validateIfFileCanBeCreated(final String errorTitle, final PhpFile dataPathFile) {
+    private boolean validateIfFileCanBeCreated(
+            final String errorTitle,
+            final PhpFile dataPathFile
+    ) {
         if (dataPathFile == null) {
             final String errorMessage = validatorBundle.message(
                     "validator.file.cantBeCreated",

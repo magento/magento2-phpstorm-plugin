@@ -30,6 +30,9 @@ public class ProductEntityData implements EavEntityDataInterface {
     private String directory;
     private String moduleName;
 
+    /**
+     * Constructor.
+     */
     public ProductEntityData() {
         this.required = false;
         this.usedInGrid = false;

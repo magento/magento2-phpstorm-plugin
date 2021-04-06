@@ -40,7 +40,6 @@ import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveImports"})
 public class NewEavAttributeDialog extends AbstractDialog {
-    private final static Boolean IS_MODAL = true;
     private final String moduleName;
     private JPanel contentPanel;
     private JButton buttonOK;
@@ -99,7 +98,7 @@ public class NewEavAttributeDialog extends AbstractDialog {
 
     private void setPanelConfiguration() {
         setContentPane(contentPanel);
-        setModal(IS_MODAL);
+        setModal(true);
         getRootPane().setDefaultButton(buttonOK);
     }
 
@@ -195,7 +194,7 @@ public class NewEavAttributeDialog extends AbstractDialog {
         final NewEavAttributeDialog dialog = new NewEavAttributeDialog(project, directory);
         dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(IS_MODAL);
+        dialog.setVisible(true);
     }
 
     private void onOk() {
