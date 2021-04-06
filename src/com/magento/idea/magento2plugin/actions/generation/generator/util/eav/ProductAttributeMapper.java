@@ -39,7 +39,7 @@ public class ProductAttributeMapper implements AttributeMapperInterface {
         mappedAttributes.put(EavAttributes.label.name(), wrapStringValueForTemplate(eavEntityData.getLabel()));
         mappedAttributes.put(EavAttributes.input.name(), wrapStringValueForTemplate(eavEntityData.getInput()));
 
-        mappedAttributes.put(EavAttributes.source.name(), wrapStringValueForTemplate(eavEntityData.getSource()));
+        mappedAttributes.put(EavAttributes.source.name(), eavEntityData.getSource());
         mappedAttributes.put(EavAttributes.required.name(), Boolean.toString(eavEntityData.isRequired()));
         mappedAttributes.put(EavAttributes.sort_order.name(), Integer.toString(eavEntityData.getSortOrder()));
         mappedAttributes.put(EavAttributes.global.name(), eavEntityData.getScope());

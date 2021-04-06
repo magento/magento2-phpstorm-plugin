@@ -8,7 +8,7 @@ public class ProductEntityData implements EavEntityDataInterface {
     private String type;
     private String label;
     private String input;
-    private String source;
+    private String source = null;
     private String scope;
     private boolean isRequired = false;
     private boolean isUsedInGrid = false;
