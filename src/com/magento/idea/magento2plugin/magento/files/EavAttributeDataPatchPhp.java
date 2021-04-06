@@ -13,6 +13,11 @@ public class EavAttributeDataPatchPhp implements ModuleFileInterface {
         this.fileName = fileName;
     }
 
+    /**
+     * Create instance by class name
+     *
+     * @param className String
+     */
     public static EavAttributeDataPatchPhp getInstance(final String className) {
         if (null == INSTANCE) {
             INSTANCE = new EavAttributeDataPatchPhp();

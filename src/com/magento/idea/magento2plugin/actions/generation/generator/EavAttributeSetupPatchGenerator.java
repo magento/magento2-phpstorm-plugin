@@ -20,10 +20,11 @@ import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.magento.packages.eav.DataPatchDependency;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.sun.istack.NotNull;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import javax.swing.JOptionPane;
 import org.jetbrains.annotations.Nullable;
-
-import javax.swing.*;
-import java.util.*;
 
 public class EavAttributeSetupPatchGenerator extends FileGenerator {
     private final EavEntityDataInterface eavEntityData;
@@ -33,6 +34,12 @@ public class EavAttributeSetupPatchGenerator extends FileGenerator {
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
 
+    /**
+     * Constructor.
+     *
+     * @param eavEntityData EavEntityDataInterface
+     * @param project Project
+     */
     public EavAttributeSetupPatchGenerator(
             final @NotNull EavEntityDataInterface eavEntityData,
             Project project
@@ -53,11 +60,15 @@ public class EavAttributeSetupPatchGenerator extends FileGenerator {
         final PhpClass dataPatchClass = GetPhpClassByFQN.getInstance(project)
                 .execute(getDataPatchFqn());
 
-        if (validateIfFileAlreadyExist(dataPatchClass, errorTitle)) return null;
+        if (validateIfFileAlreadyExist(dataPatchClass, errorTitle)) {
+            return null;
+        }
 
         final PhpFile dataPathFile = createDataPathClass(actionName);
 
-        if (validateIfFileCanBeCreated(errorTitle, dataPathFile)) return null;
+        if (validateIfFileCanBeCreated(errorTitle, dataPathFile)) {
+            return null;
+        }
 
         return dataPathFile;
     }
@@ -151,7 +162,8 @@ public class EavAttributeSetupPatchGenerator extends FileGenerator {
 
         final String eavSetup = DataPatchDependency.ENV_SETUP.getClassPatch();
         final String eavSetupFactory = DataPatchDependency.EAV_SETUP_FACTORY.getClassPatch();
-        final String moduleDataSetupInterface = DataPatchDependency.MODULE_DATA_SETUP_INTERFACE.getClassPatch();
+        final String moduleDataSetupInterface =
+                DataPatchDependency.MODULE_DATA_SETUP_INTERFACE.getClassPatch();
         final String entityClass = eavEntityData.getEntityClass();
 
         attributes.setProperty(
@@ -183,13 +195,13 @@ public class EavAttributeSetupPatchGenerator extends FileGenerator {
 
         List<String> entityAttributes = getAttributesList(eavEntityData);
         attributes.setProperty("ATTRIBUTE_SET", String.join(",", entityAttributes));
-
-
     }
 
     private List<String> getAttributesList(EavEntityDataInterface eavEntityData) {
         AttributeMapperFactory attributeMapperFactory = new AttributeMapperFactory();
-        AttributeMapperInterface attributeMapper = attributeMapperFactory.createByEntityClass(eavEntityData.getEntityClass());
+        AttributeMapperInterface attributeMapper = attributeMapperFactory.createByEntityClass(
+                eavEntityData.getEntityClass()
+        );
 
         return attributeMapper.mapAttributesByEntityData(eavEntityData);
     }

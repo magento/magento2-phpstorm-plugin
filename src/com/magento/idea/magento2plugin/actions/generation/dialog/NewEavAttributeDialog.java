@@ -13,16 +13,26 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annot
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.Lowercase;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.EavAttributeSetupPatchGenerator;
-import com.magento.idea.magento2plugin.magento.packages.eav.*;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.magento.packages.eav.AttributeInputs;
+import com.magento.idea.magento2plugin.magento.packages.eav.AttributeScopes;
+import com.magento.idea.magento2plugin.magento.packages.eav.AttributeTypes;
+import com.magento.idea.magento2plugin.magento.packages.eav.EavEntities;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import javax.swing.event.DocumentEvent;
 import org.codehaus.plexus.util.StringUtils;
 import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import java.awt.event.*;
 
 public class NewEavAttributeDialog extends AbstractDialog {
     private static Boolean IS_MODAL = true;
@@ -63,6 +73,12 @@ public class NewEavAttributeDialog extends AbstractDialog {
     private final Project project;
     private final PsiDirectory directory;
 
+    /**
+     * Constructor.
+     *
+     * @param project Project
+     * @param directory PsiDirectory
+     */
     public NewEavAttributeDialog(Project project, PsiDirectory directory) {
         super();
 
@@ -118,19 +134,27 @@ public class NewEavAttributeDialog extends AbstractDialog {
 
     private void fillEntityTypeComboBox() {
         for (final EavEntities entity : EavEntities.values()) {
-            entityType.addItem(new ComboBoxItemData(entity.name(), entity.name()));
+            entityType.addItem(
+                    new ComboBoxItemData(entity.name(), entity.name())
+            );
         }
 
         for (final AttributeTypes typeValue : AttributeTypes.values()) {
-            typeComboBox.addItem(new ComboBoxItemData(typeValue.getType(), typeValue.getType()));
+            typeComboBox.addItem(
+                    new ComboBoxItemData(typeValue.getType(), typeValue.getType())
+            );
         }
 
         for (final AttributeInputs inputValue : AttributeInputs.values()) {
-            inputComboBox.addItem(new ComboBoxItemData(inputValue.getInput(), inputValue.getInput()));
+            inputComboBox.addItem(
+                    new ComboBoxItemData(inputValue.getInput(), inputValue.getInput())
+            );
         }
 
         for (final AttributeScopes globalValue : AttributeScopes.values()) {
-            scopeComboBox.addItem(new ComboBoxItemData(globalValue.getScope(), globalValue.name()));
+            scopeComboBox.addItem(
+                    new ComboBoxItemData(globalValue.getScope(), globalValue.name())
+            );
         }
     }
 
