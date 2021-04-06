@@ -1,139 +1,169 @@
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 package com.magento.idea.magento2plugin.actions.generation.data;
 
 import com.magento.idea.magento2plugin.magento.packages.eav.EavEntities;
 
+@SuppressWarnings({"PMD.TooManyFields"})
 public class ProductEntityData implements EavEntityDataInterface {
     private String group;
     private String code;
     private String type;
     private String label;
     private String input;
-    private String source = null;
+    private String source;
     private String scope;
-    private boolean isRequired = false;
-    private boolean isUsedInGrid = false;
-    private boolean isVisibleInGrid = false;
-    private boolean isFilterableInGrid = false;
-    private boolean isVisible = true;
-    private boolean isHtmlAllowedOnFront = false;
-    private boolean isVisibleOnFront = false;
-    private int sortOrder = 0;
+    private boolean required;
+    private boolean usedInGrid;
+    private boolean visibleInGrid;
+    private boolean filterableInGrid;
+    private boolean visible;
+    private boolean htmlAllowedOnFront;
+    private boolean visibleOnFront;
+    private int sortOrder;
 
     private String dataPatchName;
     private String namespace;
     private String directory;
     private String moduleName;
 
-    public void setGroup(String group) {
+    public ProductEntityData() {
+        this.required = false;
+        this.usedInGrid = false;
+        this.visibleInGrid = false;
+        this.filterableInGrid = false;
+        this.visible = true;
+        this.htmlAllowedOnFront = false;
+        this.visibleOnFront = false;
+        this.sortOrder = 0;
+    }
+
+    public void setGroup(final String group) {
         this.group = group;
     }
 
-    public void setCode(String code) {
+    public void setCode(final String code) {
         this.code = code;
     }
 
-    public void setType(String type) {
+    public void setType(final String type) {
         this.type = type;
     }
 
-    public void setLabel(String label) {
+    public void setLabel(final String label) {
         this.label = label;
     }
 
-    public void setInput(String input) {
+    public void setInput(final String input) {
         this.input = input;
     }
 
-    public void setSource(String source) {
+    public void setSource(final String source) {
         this.source = source;
     }
 
-    public void setScope(String scope) {
+    public void setScope(final String scope) {
         this.scope = scope;
     }
 
-    public void setRequired(boolean required) {
-        isRequired = required;
+    public void setRequired(final boolean required) {
+        this.required = required;
     }
 
-    public void setUsedInGrid(boolean usedInGrid) {
-        isUsedInGrid = usedInGrid;
+    public void setUsedInGrid(final boolean usedInGrid) {
+        this.usedInGrid = usedInGrid;
     }
 
-    public void setVisibleInGrid(boolean visibleInGrid) {
-        isVisibleInGrid = visibleInGrid;
+    public void setVisibleInGrid(final boolean visibleInGrid) {
+        this.visibleInGrid = visibleInGrid;
     }
 
-    public void setFilterableInGrid(boolean filterableInGrid) {
-        isFilterableInGrid = filterableInGrid;
+    public void setFilterableInGrid(final boolean filterableInGrid) {
+        this.filterableInGrid = filterableInGrid;
     }
 
-    public void setVisible(boolean visible) {
-        isVisible = visible;
+    public void setVisible(final boolean visible) {
+        this.visible = visible;
     }
 
-    public void setHtmlAllowedOnFront(boolean htmlAllowedOnFront) {
-        isHtmlAllowedOnFront = htmlAllowedOnFront;
+    public void setHtmlAllowedOnFront(final boolean htmlAllowedOnFront) {
+        this.htmlAllowedOnFront = htmlAllowedOnFront;
     }
 
-    public void setVisibleOnFront(boolean visibleOnFront) {
-        isVisibleOnFront = visibleOnFront;
+    public void setVisibleOnFront(final boolean visibleOnFront) {
+        this.visibleOnFront = visibleOnFront;
     }
 
-    public void setSortOrder(int sortOrder) {
+    public void setSortOrder(final int sortOrder) {
         this.sortOrder = sortOrder;
     }
 
-    public void setDataPatchName(String dataPatchName) {
+    public void setDataPatchName(final String dataPatchName) {
         this.dataPatchName = dataPatchName;
     }
 
-    public void setNamespace(String namespace) {
+    public void setNamespace(final String namespace) {
         this.namespace = namespace;
     }
 
-    public void setDirectory(String directory) {
+    public void setDirectory(final String directory) {
         this.directory = directory;
     }
 
-    public void setModuleName(String moduleName) {
+    public void setModuleName(final String moduleName) {
         this.moduleName = moduleName;
     }
 
+    @Override
     public String getCode() {
         return code;
     }
 
+    @Override
     public String getType() {
         return type;
     }
 
+    @Override
     public String getLabel() {
         return label;
     }
 
+    @Override
     public String getInput() {
         return input;
     }
 
-    public String getGroup() {
-        return group;
-    }
-
+    @Override
     public String getNamespace() {
         return namespace;
     }
 
+    @Override
     public String getModuleName() {
         return moduleName;
     }
 
+    @Override
     public String getDirectory() {
         return directory;
     }
 
+    @Override
     public String getDataPatchName() {
         return dataPatchName;
+    }
+
+    @Override
+    public String getEntityClass() {
+        return EavEntities.PRODUCT.getEntityClass();
+    }
+
+    public String getGroup() {
+        return group;
     }
 
     public String getSource() {
@@ -145,39 +175,34 @@ public class ProductEntityData implements EavEntityDataInterface {
     }
 
     public boolean isRequired() {
-        return isRequired;
+        return required;
     }
 
     public boolean isUsedInGrid() {
-        return isUsedInGrid;
+        return usedInGrid;
     }
 
     public boolean isVisibleInGrid() {
-        return isVisibleInGrid;
+        return visibleInGrid;
     }
 
     public boolean isFilterableInGrid() {
-        return isFilterableInGrid;
+        return filterableInGrid;
     }
 
     public boolean isVisible() {
-        return isVisible;
+        return visible;
     }
 
     public boolean isHtmlAllowedOnFront() {
-        return isHtmlAllowedOnFront;
+        return htmlAllowedOnFront;
     }
 
     public boolean isVisibleOnFront() {
-        return isVisibleOnFront;
+        return visibleOnFront;
     }
 
     public int getSortOrder() {
         return sortOrder;
-    }
-
-    @Override
-    public String getEntityClass() {
-        return EavEntities.PRODUCT.getEntityClass();
     }
 }

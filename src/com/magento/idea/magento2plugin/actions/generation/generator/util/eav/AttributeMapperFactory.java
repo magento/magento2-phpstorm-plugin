@@ -1,3 +1,8 @@
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 package com.magento.idea.magento2plugin.actions.generation.generator.util.eav;
 
 import com.magento.idea.magento2plugin.magento.packages.eav.EavEntities;
@@ -9,7 +14,7 @@ public class AttributeMapperFactory {
      *
      * @param entityClass String
      */
-    public AttributeMapperInterface createByEntityClass(@NotNull String entityClass) {
+    public AttributeMapperInterface createByEntityClass(@NotNull final String entityClass) {
         if (entityClass.equals(EavEntities.PRODUCT.getEntityClass())) {
             return new ProductAttributeMapper();
         }

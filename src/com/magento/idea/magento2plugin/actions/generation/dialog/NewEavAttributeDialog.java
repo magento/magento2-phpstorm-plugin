@@ -1,8 +1,12 @@
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
 import com.intellij.ui.DocumentAdapter;
 import com.magento.idea.magento2plugin.actions.generation.NewEavAttributeAction;
 import com.magento.idea.magento2plugin.actions.generation.data.EavEntityDataInterface;
@@ -34,8 +38,9 @@ import javax.swing.event.DocumentEvent;
 import org.codehaus.plexus.util.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveImports"})
 public class NewEavAttributeDialog extends AbstractDialog {
-    private static Boolean IS_MODAL = true;
+    private final static Boolean IS_MODAL = true;
     private final String moduleName;
     private JPanel contentPanel;
     private JButton buttonOK;
@@ -63,15 +68,14 @@ public class NewEavAttributeDialog extends AbstractDialog {
     private JComboBox<ComboBoxItemData> inputComboBox;
     private JComboBox<ComboBoxItemData> typeComboBox;
     private JComboBox<ComboBoxItemData> scopeComboBox;
-    private JCheckBox isRequiredCheckBox;
-    private JCheckBox isUsedInGridGridCheckBox;
-    private JCheckBox isVisibleInGridCheckBox;
-    private JCheckBox isFilterableInGridCheckBox;
+    private JCheckBox requiredCheckBox;
+    private JCheckBox usedInGridGridCheckBox;
+    private JCheckBox visibleInGridCheckBox;
+    private JCheckBox filterableInGridCheckBox;
     private JCheckBox visibleCheckBox;
-    private JCheckBox isHtmlAllowedOnCheckBox;
+    private JCheckBox htmlAllowedOnCheckBox;
     private JCheckBox visibleOnFrontCheckBox;
     private final Project project;
-    private final PsiDirectory directory;
 
     /**
      * Constructor.
@@ -79,11 +83,10 @@ public class NewEavAttributeDialog extends AbstractDialog {
      * @param project Project
      * @param directory PsiDirectory
      */
-    public NewEavAttributeDialog(Project project, PsiDirectory directory) {
+    public NewEavAttributeDialog(final Project project, final PsiDirectory directory) {
         super();
 
         this.project = project;
-        this.directory = directory;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
         setPanelConfiguration();
@@ -123,6 +126,7 @@ public class NewEavAttributeDialog extends AbstractDialog {
         );
     }
 
+    @SuppressWarnings("PMD.AccessorMethodGeneration")
     private void setAutocompleteListenerForAttributeCodeField() {
         this.codeTextField.getDocument().addDocumentListener(new DocumentAdapter() {
             @Override
@@ -132,6 +136,7 @@ public class NewEavAttributeDialog extends AbstractDialog {
         });
     }
 
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     private void fillEntityTypeComboBox() {
         for (final EavEntities entity : EavEntities.values()) {
             entityType.addItem(
@@ -159,7 +164,7 @@ public class NewEavAttributeDialog extends AbstractDialog {
     }
 
     private void updateDataPatchFileName() {
-        String attributeCode = this.codeTextField.getText();
+        final String attributeCode = this.codeTextField.getText();
 
         if (attributeCode.isEmpty()) {
             dataPatchNameTextField.setText("");
@@ -167,14 +172,14 @@ public class NewEavAttributeDialog extends AbstractDialog {
             return;
         }
 
-        String dataPatchSuffix = "Add";
-        String dataPatchPrefix = "Attribute";
+        final String dataPatchSuffix = "Add";
+        final String dataPatchPrefix = "Attribute";
 
-        String[] attributeCodeParts = attributeCode.split("_");
+        final String[] attributeCodeParts = attributeCode.split("_");
         String fileName = "";
 
-        for (String fileNamePart : attributeCodeParts) {
-            fileName += StringUtils.capitalise(fileNamePart);
+        for (final String fileNamePart : attributeCodeParts) {
+            fileName = String.join("", fileName, StringUtils.capitalise(fileNamePart));
         }
 
         dataPatchNameTextField.setText(dataPatchSuffix + fileName + dataPatchPrefix);
@@ -202,8 +207,8 @@ public class NewEavAttributeDialog extends AbstractDialog {
         setVisible(false);
     }
 
-    private PsiFile generateFile() {
-        return new EavAttributeSetupPatchGenerator(
+    private void generateFile() {
+        new EavAttributeSetupPatchGenerator(
                 getEntityData(),
                 project
         ).generate(NewEavAttributeAction.ACTION_NAME, true);
@@ -218,7 +223,7 @@ public class NewEavAttributeDialog extends AbstractDialog {
         return entityData;
     }
 
-    private ProductEntityData populateProductEntityData(ProductEntityData productEntityData) {
+    private ProductEntityData populateProductEntityData(final ProductEntityData productEntityData) {
         productEntityData.setNamespace(getDataPathNamespace());
         productEntityData.setDirectory(getDataPathDirectory());
         productEntityData.setModuleName(getModuleName());
@@ -247,7 +252,7 @@ public class NewEavAttributeDialog extends AbstractDialog {
     }
 
     private boolean isAttributeHtmlAllowedOnFront() {
-        return isHtmlAllowedOnCheckBox.isSelected();
+        return htmlAllowedOnCheckBox.isSelected();
     }
 
     private boolean isAttributeVisible() {
@@ -255,19 +260,19 @@ public class NewEavAttributeDialog extends AbstractDialog {
     }
 
     private boolean isAttributeFilterableInGrid() {
-        return isFilterableInGridCheckBox.isSelected();
+        return filterableInGridCheckBox.isSelected();
     }
 
     private boolean isAttributeVisibleOnGrid() {
-        return isVisibleInGridCheckBox.isSelected();
+        return visibleInGridCheckBox.isSelected();
     }
 
     private boolean isAttributeUsedInGrid() {
-        return isUsedInGridGridCheckBox.isSelected();
+        return usedInGridGridCheckBox.isSelected();
     }
 
     private boolean isAttributeRequired() {
-        return isRequiredCheckBox.isSelected();
+        return requiredCheckBox.isSelected();
     }
 
     private int getAttributeSortOrder() {
@@ -275,13 +280,13 @@ public class NewEavAttributeDialog extends AbstractDialog {
     }
 
     private String getAttributeScope() {
-        ComboBoxItemData selectedScope = (ComboBoxItemData) scopeComboBox.getSelectedItem();
+        final ComboBoxItemData selectedScope = (ComboBoxItemData) scopeComboBox.getSelectedItem();
 
-        return selectedScope.getKey().toString().trim();
+        return selectedScope.getKey().trim();
     }
 
     private String getAttributeCode() {
-        return codeTextField.getText().toString().trim();
+        return codeTextField.getText().trim();
     }
 
     private String getSelectedEntityType() {
@@ -289,7 +294,7 @@ public class NewEavAttributeDialog extends AbstractDialog {
     }
 
     private String getAttributeLabel() {
-        return labelTextField.getText().toString().trim();
+        return labelTextField.getText().trim();
     }
 
     private String getAttributeInput() {
@@ -297,11 +302,11 @@ public class NewEavAttributeDialog extends AbstractDialog {
     }
 
     private String getAttributeGroup() {
-        return groupTextField.getText().toString().trim();
+        return groupTextField.getText().trim();
     }
 
     private String getDataPatchName() {
-        return dataPatchNameTextField.getText().toString().trim();
+        return dataPatchNameTextField.getText().trim();
     }
 
     private String getDataPathNamespace() {

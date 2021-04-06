@@ -1,3 +1,8 @@
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
@@ -42,7 +47,7 @@ public class EavAttributeSetupPatchGenerator extends FileGenerator {
      */
     public EavAttributeSetupPatchGenerator(
             final @NotNull EavEntityDataInterface eavEntityData,
-            Project project
+            final Project project
     ) {
         super(project);
 
@@ -55,7 +60,7 @@ public class EavAttributeSetupPatchGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(String actionName) {
+    public PsiFile generate(final String actionName) {
         final String errorTitle = commonBundle.message("common.error");
         final PhpClass dataPatchClass = GetPhpClassByFQN.getInstance(project)
                 .execute(getDataPatchFqn());
@@ -79,7 +84,7 @@ public class EavAttributeSetupPatchGenerator extends FileGenerator {
                 + eavEntityData.getDataPatchName();
     }
 
-    private boolean validateIfFileAlreadyExist(PhpClass dataPatchClass, String errorTitle) {
+    private boolean validateIfFileAlreadyExist(final PhpClass dataPatchClass, final String errorTitle) {
         if (dataPatchClass != null) {
             final String errorMessage = validatorBundle.message(
                     "validator.file.alreadyExists",
@@ -100,7 +105,7 @@ public class EavAttributeSetupPatchGenerator extends FileGenerator {
 
     @Nullable
     private PhpFile createDataPathClass(final String actionName) {
-        PsiDirectory parentDirectory = getDataPatchDirectory();
+        final PsiDirectory parentDirectory = getDataPatchDirectory();
         final Properties attributes = getAttributes();
         final PsiFile dataPatchFile = fileFromTemplateGenerator.generate(
                 EavAttributeDataPatchPhp.getInstance(eavEntityData.getDataPatchName()),
@@ -131,7 +136,7 @@ public class EavAttributeSetupPatchGenerator extends FileGenerator {
         return parentDirectory;
     }
 
-    private boolean validateIfFileCanBeCreated(String errorTitle, PhpFile dataPathFile) {
+    private boolean validateIfFileCanBeCreated(final String errorTitle, final PhpFile dataPathFile) {
         if (dataPathFile == null) {
             final String errorMessage = validatorBundle.message(
                     "validator.file.cantBeCreated",
@@ -150,7 +155,7 @@ public class EavAttributeSetupPatchGenerator extends FileGenerator {
     }
 
     @Override
-    protected void fillAttributes(Properties attributes) {
+    protected void fillAttributes(final Properties attributes) {
         attributes.setProperty("NAME", eavEntityData.getDataPatchName());
         attributes.setProperty("NAMESPACE", eavEntityData.getNamespace());
 
@@ -193,13 +198,13 @@ public class EavAttributeSetupPatchGenerator extends FileGenerator {
 
         attributes.setProperty("ATTRIBUTE_CODE", eavEntityData.getCode());
 
-        List<String> entityAttributes = getAttributesList(eavEntityData);
+        final List<String> entityAttributes = getAttributesList(eavEntityData);
         attributes.setProperty("ATTRIBUTE_SET", String.join(",", entityAttributes));
     }
 
-    private List<String> getAttributesList(EavEntityDataInterface eavEntityData) {
-        AttributeMapperFactory attributeMapperFactory = new AttributeMapperFactory();
-        AttributeMapperInterface attributeMapper = attributeMapperFactory.createByEntityClass(
+    private List<String> getAttributesList(final EavEntityDataInterface eavEntityData) {
+        final AttributeMapperFactory attributeMapperFactory = new AttributeMapperFactory();
+        final AttributeMapperInterface attributeMapper = attributeMapperFactory.createByEntityClass(
                 eavEntityData.getEntityClass()
         );
 

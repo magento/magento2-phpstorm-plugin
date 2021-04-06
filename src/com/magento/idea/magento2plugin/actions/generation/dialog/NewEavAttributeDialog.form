@@ -118,7 +118,7 @@
             </constraints>
             <properties/>
           </component>
-          <component id="40617" class="javax.swing.JCheckBox" binding="isRequiredCheckBox" default-binding="true">
+          <component id="40617" class="javax.swing.JCheckBox" binding="requiredCheckBox" default-binding="true">
             <constraints>
               <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -144,7 +144,7 @@
               <text value="10"/>
             </properties>
           </component>
-          <component id="aff93" class="javax.swing.JCheckBox" binding="isVisibleInGridCheckBox" default-binding="true">
+          <component id="aff93" class="javax.swing.JCheckBox" binding="visibleInGridCheckBox" default-binding="true">
             <constraints>
               <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -153,7 +153,7 @@
               <text value="Is visible in grid"/>
             </properties>
           </component>
-          <component id="fb245" class="javax.swing.JCheckBox" binding="isFilterableInGridCheckBox" default-binding="true">
+          <component id="fb245" class="javax.swing.JCheckBox" binding="filterableInGridCheckBox" default-binding="true">
             <constraints>
               <grid row="3" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -161,7 +161,7 @@
               <text value="Is filterable in grid"/>
             </properties>
           </component>
-          <component id="d83ba" class="javax.swing.JCheckBox" binding="isUsedInGridGridCheckBox">
+          <component id="d83ba" class="javax.swing.JCheckBox" binding="usedInGridGridCheckBox">
             <constraints>
               <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -181,7 +181,7 @@
               <text value="Visible"/>
             </properties>
           </component>
-          <component id="51e87" class="javax.swing.JCheckBox" binding="isHtmlAllowedOnCheckBox" default-binding="true">
+          <component id="51e87" class="javax.swing.JCheckBox" binding="htmlAllowedOnCheckBox" default-binding="true">
             <constraints>
               <grid row="4" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>

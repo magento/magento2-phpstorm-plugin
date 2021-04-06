@@ -1,3 +1,8 @@
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 package com.magento.idea.magento2plugin.magento.packages.eav;
 
 public enum EavEntities {
@@ -5,7 +10,7 @@ public enum EavEntities {
 
     private String entityClass;
 
-    EavEntities(String entityClass) {
+    EavEntities(final String entityClass) {
         this.entityClass = entityClass;
     }
 

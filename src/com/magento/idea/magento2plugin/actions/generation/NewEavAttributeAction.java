@@ -1,3 +1,8 @@
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 package com.magento.idea.magento2plugin.actions.generation;
 
 import com.intellij.ide.IdeView;
@@ -21,8 +26,8 @@ public class NewEavAttributeAction extends AnAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        final DataContext dataContext = e.getDataContext();
+    public void actionPerformed(final @NotNull AnActionEvent event) {
+        final DataContext dataContext = event.getDataContext();
         final IdeView view = LangDataKeys.IDE_VIEW.getData(dataContext);
         if (view == null) {
             return;

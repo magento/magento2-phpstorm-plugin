@@ -1,5 +1,6 @@
 package com.magento.idea.magento2plugin.actions.generation.data;
 
+@SuppressWarnings({"PMD.UnnecessaryModifier"})
 public interface EavEntityDataInterface {
     public String getCode();
 
