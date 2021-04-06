@@ -72,6 +72,7 @@
             <action id="MagentoCreateADataModel" class="com.magento.idea.magento2plugin.actions.generation.NewDataModelAction" />
             <action id="MagentoMessageQueue" class="com.magento.idea.magento2plugin.actions.generation.NewMessageQueueAction" />
             <action id="NewDbSchema" class="com.magento.idea.magento2plugin.actions.generation.NewDbSchemaAction" />
+            <action id="NewEavAttribute" class="com.magento.idea.magento2plugin.actions.generation.NewEavAttributeAction" />
             <add-to-group group-id="NewGroup" anchor="last"/>
         </group>
 
