@@ -11,27 +11,19 @@ import com.jetbrains.php.lang.PhpLanguage;
 public class EavAttributeDataPatchPhp implements ModuleFileInterface {
     public static final String TEMPLATE = "Magento Eav Attribute Data Patch Class";
     public static final String DEFAULT_DIR = "Setup/Patch/Data";
-    private static EavAttributeDataPatchPhp instance;
     private String fileName;
+
+    /**
+     * Constructor.
+     *
+     * @param className String
+     */
+    public EavAttributeDataPatchPhp(final String className) {
+        fileName = className.concat(".php");
+    }
 
     public void setFileName(final String fileName) {
         this.fileName = fileName;
-    }
-
-    /**
-     * Create instance by class name.
-     *
-     * @param className String
-     * @return EavAttributeDataPatchPhp
-     */
-    public static EavAttributeDataPatchPhp getInstance(final String className) {
-        if (null == instance) {
-            instance = new EavAttributeDataPatchPhp();
-        }
-
-        instance.setFileName(className.concat(".php"));
-
-        return instance;
     }
 
     @Override

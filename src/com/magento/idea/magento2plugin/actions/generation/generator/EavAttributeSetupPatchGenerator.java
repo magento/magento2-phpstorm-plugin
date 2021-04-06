@@ -111,7 +111,7 @@ public class EavAttributeSetupPatchGenerator extends FileGenerator {
         final PsiDirectory parentDirectory = getDataPatchDirectory();
         final Properties attributes = getAttributes();
         final PsiFile dataPatchFile = fileFromTemplateGenerator.generate(
-                EavAttributeDataPatchPhp.getInstance(eavEntityData.getDataPatchName()),
+                new EavAttributeDataPatchPhp(eavEntityData.getDataPatchName()),
                 attributes,
                 parentDirectory,
                 actionName
