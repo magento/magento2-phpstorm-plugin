@@ -5,7 +5,7 @@ import com.sun.istack.NotNull;
 
 public class AttributeMapperFactory {
     /**
-     * Create entity mapper by entity class
+     * Create entity mapper by entity class.
      *
      * @param entityClass String
      */

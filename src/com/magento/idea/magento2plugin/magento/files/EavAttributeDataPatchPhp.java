@@ -14,7 +14,7 @@ public class EavAttributeDataPatchPhp implements ModuleFileInterface {
     }
 
     /**
-     * Create instance by class name
+     * Create instance by class name.
      *
      * @param className String
      */
