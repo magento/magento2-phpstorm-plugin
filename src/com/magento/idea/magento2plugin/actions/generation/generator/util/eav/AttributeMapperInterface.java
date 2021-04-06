@@ -5,5 +5,5 @@ import com.sun.istack.NotNull;
 import java.util.List;
 
 public interface AttributeMapperInterface {
-    public List<String> mapAttributesByEntityData(@NotNull EavEntityDataInterface entityData);
+    List<String> mapAttributesByEntityData(@NotNull EavEntityDataInterface entityData);
 }
