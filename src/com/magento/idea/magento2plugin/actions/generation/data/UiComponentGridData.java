@@ -18,6 +18,7 @@ public class UiComponentGridData {
     private final String acl;
     private final String dataProviderName;
     private final String dataProviderPath;
+    private final String entityName;
     private final UiComponentGridToolbarData gridToolbarData;
     private final List<Map<String, String>> columns;
 
@@ -51,6 +52,7 @@ public class UiComponentGridData {
                 acl,
                 dataProviderName,
                 dataProviderPath,
+                null,
                 gridToolbarData,
                 new ArrayList<>()
         );
@@ -66,6 +68,7 @@ public class UiComponentGridData {
      * @param acl String
      * @param dataProviderName String
      * @param dataProviderPath String
+     * @param entityName String
      * @param gridToolbarData UiComponentGridToolbarData
      * @param columns List
      */
@@ -77,6 +80,7 @@ public class UiComponentGridData {
             final String acl,
             final String dataProviderName,
             final String dataProviderPath,
+            final String entityName,
             final UiComponentGridToolbarData gridToolbarData,
             final List<Map<String, String>> columns
     ) {
@@ -87,6 +91,7 @@ public class UiComponentGridData {
         this.acl = acl;
         this.dataProviderName = dataProviderName;
         this.dataProviderPath = dataProviderPath;
+        this.entityName = entityName;
         this.gridToolbarData = gridToolbarData;
         this.columns = columns;
     }
@@ -152,6 +157,15 @@ public class UiComponentGridData {
      */
     public String getDataProviderPath() {
         return dataProviderPath;
+    }
+
+    /**
+     * Get entity name.
+     *
+     * @return String
+     */
+    public String getEntityName() {
+        return entityName;
     }
 
     /**

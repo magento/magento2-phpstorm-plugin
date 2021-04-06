@@ -205,12 +205,11 @@ public class UiComponentGridXmlGenerator extends FileGenerator {
             attributes.setProperty("COLUMNS", String.join("\n", columnsTextList));
         }
 
-        final NamespaceBuilder actionColumnNamespace = new NamespaceBuilder(
-                data.getModuleName(),
-                GridActionColumnFile.CLASS_NAME,
-                GridActionColumnFile.DIRECTORY
-        );
-        attributes.setProperty("ACTION_COLUMN", actionColumnNamespace.getClassFqn());
+        if (data.getEntityName() != null) {
+            final GridActionColumnFile gridActionColumnFile =
+                    new GridActionColumnFile(data.getModuleName(), data.getEntityName());
+            attributes.setProperty("ACTION_COLUMN", gridActionColumnFile.getClassFqn());
+        }
     }
 
     /**

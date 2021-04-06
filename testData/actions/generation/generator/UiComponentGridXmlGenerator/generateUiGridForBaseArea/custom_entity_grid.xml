@@ -43,10 +43,5 @@
                 <sorting>desc</sorting>
             </settings>
         </column>
-        <actionsColumn name="actions" class="Foo\Bar\Ui\Component\Listing\Column\BlockActions">
-            <settings>
-                <indexField>entity_id</indexField>
-            </settings>
-        </actionsColumn>
     </columns>
 </listing>

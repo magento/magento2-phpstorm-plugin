@@ -13,7 +13,8 @@ public class FormGenericButtonBlockGeneratorTest extends BaseGeneratorTestCase {
     private static final String MODULE_NAME = "Foo_Bar";
     private static final String ENTITY_NAME = "Book";
     private static final String ENTITY_ID = "book_id";
-    private static final String EXPECTED_DIRECTORY = "src/app/code/Foo/Bar/Block/Form";
+    private static final String EXPECTED_DIRECTORY
+            = "src/app/code/Foo/Bar/Block/Form/" + ENTITY_NAME;
 
     /**
      * Test generation of form ui component generic button block.
@@ -31,7 +32,7 @@ public class FormGenericButtonBlockGeneratorTest extends BaseGeneratorTestCase {
                         false
                 );
         final String filePath = this.getFixturePath(
-                new FormGenericButtonBlockFile(MODULE_NAME).getFileName()
+                new FormGenericButtonBlockFile(MODULE_NAME, ENTITY_NAME).getFileName()
         );
 
         assertGeneratedFileIsCorrect(

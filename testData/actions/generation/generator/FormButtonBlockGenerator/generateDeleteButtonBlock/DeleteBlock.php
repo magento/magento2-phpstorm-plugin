@@ -1,6 +1,6 @@
 <?php
 
-namespace Foo\Bar\Block\Form;
+namespace Foo\Bar\Block\Form\Book;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 

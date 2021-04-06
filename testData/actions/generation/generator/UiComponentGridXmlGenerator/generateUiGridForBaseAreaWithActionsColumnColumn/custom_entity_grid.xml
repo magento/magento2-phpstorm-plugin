@@ -35,13 +35,6 @@
             </settings>
         </dataProvider>
     </dataSource>
-    <listingToolbar name="listing_top">
-        <bookmark name="bookmarks"/>
-        <columnsControls name="columns_controls"/>
-        <filterSearch name="fulltext"/>
-        <filters name="listing_filters"/>
-        <paging name="listing_paging"/>
-    </listingToolbar>
     <columns name="custom_entity_grid_columns">
         <column name="entity_id">
             <settings>
@@ -50,5 +43,10 @@
                 <sorting>desc</sorting>
             </settings>
         </column>
+        <actionsColumn name="actions" class="Foo\Bar\Ui\Component\Listing\Column\BookBlockActions">
+            <settings>
+                <indexField>entity_id</indexField>
+            </settings>
+        </actionsColumn>
     </columns>
 </listing>

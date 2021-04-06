@@ -34,6 +34,7 @@ public class UiComponentGridDtoConverter extends UiComponentGridData
                 newEntityDialogData.getAclId(),
                 newEntityDialogData.getEntityName().concat("DataProvider"),
                 UiComponentDataProviderFile.DIRECTORY,
+                newEntityDialogData.getEntityName(),
                 new UiComponentGridToolbarDtoConverter(generationContextData, newEntityDialogData),
                 generationContextData.getEntityProps()
         );

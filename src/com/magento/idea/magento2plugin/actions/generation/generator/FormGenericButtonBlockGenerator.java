@@ -53,7 +53,7 @@ public class FormGenericButtonBlockGenerator extends PhpFileGenerator {
 
     @Override
     protected AbstractPhpFile initFile() {
-        return new FormGenericButtonBlockFile(data.getModuleName());
+        return new FormGenericButtonBlockFile(data.getModuleName(), data.getEntityName());
     }
 
     /**

@@ -378,6 +378,10 @@ public class NewEntityDialog extends AbstractDialog {
             buttonOK.setEnabled(false);
             buttonCancel.setEnabled(false);
 
+            if (propertyTable.isEditing()) {
+                propertyTable.getCellEditor().stopCellEditing();
+            }
+
             new ProcessWorker(
                     this::onOK,
                     this::releaseDialogAfterGeneration,
@@ -518,7 +522,7 @@ public class NewEntityDialog extends AbstractDialog {
      */
     private List<UiComponentFormButtonData> getButtons() {
         final List<UiComponentFormButtonData> buttons = new ArrayList<>();
-        final String directory = "Block/Form";
+        final String directory = "Block/Form/" + entityName.getText().trim();
 
         final NamespaceBuilder namespaceBuilderSave = new NamespaceBuilder(
                 moduleName,

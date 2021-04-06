@@ -1,6 +1,6 @@
 <?php
 
-namespace Foo\Bar\Block\Form;
+namespace Foo\Bar\Block\Form\Book;
 
 use Magento\Backend\Block\Widget\Context;
 use Magento\Framework\UrlInterface;

@@ -50,7 +50,7 @@ public class GridActionColumnFileGenerator extends PhpFileGenerator {
 
     @Override
     protected AbstractPhpFile initFile() {
-        return new GridActionColumnFile(data.getModuleName());
+        return new GridActionColumnFile(data.getModuleName(), data.getEntityName());
     }
 
     /**

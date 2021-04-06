@@ -10,7 +10,7 @@ use Magento\Ui\Component\Listing\Columns\Column;
 /**
  * Class to build edit and delete link for each item.
  */
-class BlockActions extends Column
+class BookBlockActions extends Column
 {
     /**
      * Entity name.
