@@ -15,20 +15,20 @@ public class NewEntityDialogData implements DialogData {
     private final String idFieldName;
     private final String tableEngine;
     private final String tableResource;
-    private final boolean hasAdminUiComponents;
-    private final boolean hasDtoInterface;
+    private final boolean adminUiComponents;
+    private final boolean dtoInterface;
 
     // Admin UI Components tab data.
     private final String route;
     private final String formLabel;
     private final String formName;
     private final String gridName;
-    private final boolean hasToolbar;
-    private final boolean hasToolbarBookmarks;
-    private final boolean hasToolbarColumnsControl;
-    private final boolean hasToolbarListingFilters;
-    private final boolean hasToolbarListingPaging;
-    private final boolean hasToolbarFullTextSearch;
+    private final boolean toolbar;
+    private final boolean toolbarBookmarks;
+    private final boolean toolbarColumnsControl;
+    private final boolean toolbarListingFilters;
+    private final boolean toolbarListingPaging;
+    private final boolean toolbarFullTextSearch;
 
     // Acl tab data.
     private final String parentAclId;
@@ -105,18 +105,18 @@ public class NewEntityDialogData implements DialogData {
         this.idFieldName = idFieldName;
         this.tableEngine = tableEngine;
         this.tableResource = tableResource;
-        this.hasAdminUiComponents = hasAdminUiComponents;
-        this.hasDtoInterface = hasDtoInterface;
+        this.adminUiComponents = hasAdminUiComponents;
+        this.dtoInterface = hasDtoInterface;
         this.route = route;
         this.formLabel = formLabel;
         this.formName = formName;
         this.gridName = gridName;
-        this.hasToolbar = hasToolbar;
-        this.hasToolbarBookmarks = hasToolbarBookmarks;
-        this.hasToolbarColumnsControl = hasToolbarColumnsControl;
-        this.hasToolbarListingFilters = hasToolbarListingFilters;
-        this.hasToolbarListingPaging = hasToolbarListingPaging;
-        this.hasToolbarFullTextSearch = hasToolbarFullTextSearch;
+        this.toolbar = hasToolbar;
+        this.toolbarBookmarks = hasToolbarBookmarks;
+        this.toolbarColumnsControl = hasToolbarColumnsControl;
+        this.toolbarListingFilters = hasToolbarListingFilters;
+        this.toolbarListingPaging = hasToolbarListingPaging;
+        this.toolbarFullTextSearch = hasToolbarFullTextSearch;
         this.parentAclId = parentAclId;
         this.aclId = aclId;
         this.aclTitle = aclTitle;
@@ -178,7 +178,7 @@ public class NewEntityDialogData implements DialogData {
      * @return boolean
      */
     public boolean hasAdminUiComponents() {
-        return hasAdminUiComponents;
+        return adminUiComponents;
     }
 
     /**
@@ -187,7 +187,7 @@ public class NewEntityDialogData implements DialogData {
      * @return boolean
      */
     public boolean hasDtoInterface() {
-        return hasDtoInterface;
+        return dtoInterface;
     }
 
     /**
@@ -232,7 +232,7 @@ public class NewEntityDialogData implements DialogData {
      * @return boolean
      */
     public boolean hasToolbar() {
-        return hasToolbar;
+        return toolbar;
     }
 
     /**
@@ -241,7 +241,7 @@ public class NewEntityDialogData implements DialogData {
      * @return boolean
      */
     public boolean hasToolbarBookmarks() {
-        return hasToolbarBookmarks;
+        return toolbarBookmarks;
     }
 
     /**
@@ -250,7 +250,7 @@ public class NewEntityDialogData implements DialogData {
      * @return boolean
      */
     public boolean hasToolbarColumnsControl() {
-        return hasToolbarColumnsControl;
+        return toolbarColumnsControl;
     }
 
     /**
@@ -259,7 +259,7 @@ public class NewEntityDialogData implements DialogData {
      * @return boolean
      */
     public boolean hasToolbarListingFilters() {
-        return hasToolbarListingFilters;
+        return toolbarListingFilters;
     }
 
     /**
@@ -268,7 +268,7 @@ public class NewEntityDialogData implements DialogData {
      * @return boolean
      */
     public boolean hasToolbarListingPaging() {
-        return hasToolbarListingPaging;
+        return toolbarListingPaging;
     }
 
     /**
@@ -277,7 +277,7 @@ public class NewEntityDialogData implements DialogData {
      * @return boolean
      */
     public boolean hasToolbarFullTextSearch() {
-        return hasToolbarFullTextSearch;
+        return toolbarFullTextSearch;
     }
 
     /**

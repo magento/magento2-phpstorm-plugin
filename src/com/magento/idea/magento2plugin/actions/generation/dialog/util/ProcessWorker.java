@@ -69,7 +69,7 @@ public final class ProcessWorker extends SwingWorker<Boolean, String> {
         /**
          * Is action finished flag.
          */
-        private boolean isFinished;
+        private boolean finished;
 
         /**
          * In progress flag constructor.
@@ -78,7 +78,7 @@ public final class ProcessWorker extends SwingWorker<Boolean, String> {
          */
         public InProgressFlag(final boolean inProgress) {
             this.inProgress = inProgress;
-            isFinished = false;
+            finished = false;
         }
 
         /**
@@ -103,7 +103,7 @@ public final class ProcessWorker extends SwingWorker<Boolean, String> {
          * Get is progress finished flag value.
          */
         public boolean isFinished() {
-            return isFinished;
+            return finished;
         }
 
         /**
@@ -111,8 +111,8 @@ public final class ProcessWorker extends SwingWorker<Boolean, String> {
          *
          * @param finished boolean
          */
-        public void setFinished(boolean finished) {
-            isFinished = finished;
+        public void setFinished(final boolean finished) {
+            this.finished = finished;
         }
     }
 }

@@ -96,9 +96,7 @@ public abstract class AbstractPhpFile implements ModuleFileInterface {
      *
      * @return String
      */
-    public String getHumanReadableName() {
-        return null;
-    }
+    public abstract String getHumanReadableName();
 
     @Override
     public String getFileName() {

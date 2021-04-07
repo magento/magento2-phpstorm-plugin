@@ -15,7 +15,7 @@ public class SaveEntityCommandData {
     private final String resourceModelName;
     private final String dtoName;
     private final String dtoInterfaceName;
-    private final boolean isDtoWithInterface;
+    private final boolean dtoWithInterface;
 
     /**
      * Save Command DTO Constructor.
@@ -43,7 +43,7 @@ public class SaveEntityCommandData {
         this.resourceModelName = resourceModelName;
         this.dtoName = dtoName;
         this.dtoInterfaceName = dtoInterfaceName;
-        this.isDtoWithInterface = isDtoWithInterface;
+        this.dtoWithInterface = isDtoWithInterface;
     }
 
     /**
@@ -106,6 +106,6 @@ public class SaveEntityCommandData {
      * @return boolean
      */
     public boolean isDtoWithInterface() {
-        return isDtoWithInterface;
+        return dtoWithInterface;
     }
 }

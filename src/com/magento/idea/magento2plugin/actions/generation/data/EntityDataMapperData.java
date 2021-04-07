@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.data;
 
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings({"PMD.ExcessiveParameterList", "PMD.TooManyFields"})
 public class EntityDataMapperData {
 
     private final String moduleName;
@@ -14,7 +15,7 @@ public class EntityDataMapperData {
     private final String modelName;
     private final String dtoName;
     private final String dtoInterfaceName;
-    private final boolean isDtoWithInterface;
+    private final boolean dtoWithInterface;
 
     /**
      * Magento entity data mapper data constructor.
@@ -39,7 +40,7 @@ public class EntityDataMapperData {
         this.modelName = modelName;
         this.dtoName = dtoName;
         this.dtoInterfaceName = dtoInterfaceName;
-        this.isDtoWithInterface = isDtoWithInterface;
+        this.dtoWithInterface = isDtoWithInterface;
     }
 
     /**
@@ -93,6 +94,6 @@ public class EntityDataMapperData {
      * @return boolean
      */
     public boolean isDtoWithInterface() {
-        return isDtoWithInterface;
+        return dtoWithInterface;
     }
 }

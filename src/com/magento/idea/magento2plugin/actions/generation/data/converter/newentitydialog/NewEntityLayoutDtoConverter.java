@@ -22,7 +22,7 @@ public class NewEntityLayoutDtoConverter extends NewEntityLayoutData
      */
     public NewEntityLayoutDtoConverter(
             final @NotNull EntityCreatorContextData generationContextData,
-            final @NotNull NewEntityDialogData newEntityDialogData
+            final @NotNull NewEntityDialogData newEntityDialogData //NOPMD
     ) {
         super(
                 generationContextData.getModuleName(),

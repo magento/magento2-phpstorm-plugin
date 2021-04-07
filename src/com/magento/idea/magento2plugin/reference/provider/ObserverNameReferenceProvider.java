@@ -33,6 +33,7 @@ public class ObserverNameReferenceProvider extends PsiReferenceProvider {
                 = new EventIndex(element.getProject()).getObservers(
                         eventName, observerName, GlobalSearchScope.allScope(element.getProject())
                 );
+        observers.removeIf(observer -> observer == element);
 
         if (!observers.isEmpty()) {
             psiReferences.add(new PolyVariantReferenceBase(element, observers));

@@ -135,6 +135,13 @@ public class ObserverDeclarationInspection extends PhpInspection {
                             );
                         }
 
+                        if (observerDisabledAttribute != null
+                                && observerDisabledAttribute.getValue() != null
+                                && observerDisabledAttribute.getValue().equals("true")
+                        ) {
+                                continue;
+                        }
+
                         for (final HashMap<String, String> moduleEntry:
                                 modulesWithSameObserverName) {
                             final Map.Entry<String, String> module = moduleEntry
