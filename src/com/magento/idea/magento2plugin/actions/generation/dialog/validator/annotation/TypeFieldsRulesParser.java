@@ -60,12 +60,12 @@ public final class TypeFieldsRulesParser {
                     final String message = ValidationMessageExtractorUtil.extract(annotation);
 
                     if (rule != null) {
-                        rulePairList.add(new Pair<>(rule, message));
+                        rulePairList.add(new Pair<>(rule, message)); //NOPMD
                     }
                 }
 
                 if (!rulePairList.isEmpty()) {
-                    fieldValidationList.add(new FieldValidationData(field, rulePairList));
+                    fieldValidationList.add(new FieldValidationData(field, rulePairList)); //NOPMD
                 }
             }
         }

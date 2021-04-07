@@ -24,6 +24,11 @@ public class ControllerBackendPhp extends AbstractPhpFile {
         return DEFAULT_DIR;
     }
 
+    @Override
+    public String getHumanReadableName() {
+        return null;
+    }
+
     /**
      * Get name of backend controller template.
      *

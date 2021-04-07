@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.data.dialog;
 
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings({"PMD.ExcessiveParameterList", "PMD.TooManyFields"})
 public class NewEntityDialogData implements DialogData {
 
     // General tab data.
