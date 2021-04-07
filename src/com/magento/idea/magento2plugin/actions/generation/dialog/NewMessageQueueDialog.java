@@ -189,7 +189,7 @@ public class NewMessageQueueDialog extends AbstractDialog {
         this.topicName.getDocument().addDocumentListener(new DocumentAdapter() {
             @Override
             protected void textChanged(final @NotNull DocumentEvent event) {
-                updateIndefiersTextes();
+                updateIdentifiersTexts();
             }
         });
         this.handlerClass.getDocument().addDocumentListener(new DocumentAdapter() {
@@ -386,7 +386,7 @@ public class NewMessageQueueDialog extends AbstractDialog {
     /**
      * Update identifier texts.
      */
-    public void updateIndefiersTextes() {
+    public void updateIdentifiersTexts() {
         final String topicNameText = this.topicName.getText();
         this.handlerName.setText(topicNameText.concat(".handler"));
         this.consumerName.setText(topicNameText);

@@ -15,8 +15,9 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 public class ObserverNameReferenceProvider extends PsiReferenceProvider {
+    @NotNull
     @Override
-    public PsiReference @NotNull [] getReferencesByElement(
+    public PsiReference [] getReferencesByElement(
             @NotNull final PsiElement element,
             @NotNull final ProcessingContext context
     ) {
@@ -33,6 +34,7 @@ public class ObserverNameReferenceProvider extends PsiReferenceProvider {
                 = new EventIndex(element.getProject()).getObservers(
                         eventName, observerName, GlobalSearchScope.allScope(element.getProject())
                 );
+        observers.removeIf(observer -> observer == element);
 
         if (!observers.isEmpty()) {
             psiReferences.add(new PolyVariantReferenceBase(element, observers));

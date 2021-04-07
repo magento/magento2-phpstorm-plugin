@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.generator.util;
 
 import java.util.Collections;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 public final class PhpClassGeneratorUtil {
 
@@ -16,9 +17,10 @@ public final class PhpClassGeneratorUtil {
      * Formats PHP class uses.
      *
      * @param uses List
+     *
      * @return String
      */
-    public static String formatUses(final List<String> uses) {
+    public static String formatUses(final @NotNull List<String> uses) {
         Collections.sort(uses);
 
         return String.join(",", uses);
@@ -28,9 +30,10 @@ public final class PhpClassGeneratorUtil {
      * Fetches the class name from a fully qualified name.
      *
      * @param fqn FQN
+     *
      * @return String
      */
-    public static String getNameFromFqn(final String fqn) {
+    public static String getNameFromFqn(final @NotNull String fqn) {
         final String[] fqnArray = fqn.split("\\\\");
 
         return fqnArray[fqnArray.length - 1];

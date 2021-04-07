@@ -10,6 +10,9 @@ import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.ResourceModelData;
 
 public class ModuleResourceModelGeneratorTest extends BaseGeneratorTestCase {
+
+    private static final String EXPECTED_DIR = "src/app/code/Foo/Bar/Model/ResourceModel";
+
     /**
      * Test generation of resource model file.
      */
@@ -19,22 +22,20 @@ public class ModuleResourceModelGeneratorTest extends BaseGeneratorTestCase {
                 "Foo_Bar",
                 "my_table",
                 "TestResourceModel",
-                "entity_id",
-                "Foo\\Bar\\Model\\ResourceModel",
-                "Foo\\Bar\\Model\\ResourceModel\\TestModel"
+                "entity_id"
         );
         final ModuleResourceModelGenerator generator = new ModuleResourceModelGenerator(
                 resourceModelData,
                 project
         );
-        final PsiFile controllerFile = generator.generate("test");
+        final PsiFile resourceModelFile = generator.generate("test");
         final String filePath = this.getFixturePath("TestResourceModel.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
 
         assertGeneratedFileIsCorrect(
                 expectedFile,
-                "src/app/code/Foo/Bar/Model/ResourceModel",
-                controllerFile
+                EXPECTED_DIR,
+                resourceModelFile
         );
     }
 }

@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
 import com.intellij.ui.DocumentAdapter;
 import com.magento.idea.magento2plugin.actions.generation.data.CollectionData;
 import com.magento.idea.magento2plugin.actions.generation.data.ModelData;
@@ -20,10 +19,6 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleCollectionGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleResourceModelGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
-import com.magento.idea.magento2plugin.magento.files.ModelPhp;
-import com.magento.idea.magento2plugin.magento.files.ResourceModelPhp;
-import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -38,7 +33,7 @@ import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveImports"})
+@SuppressWarnings("PMD.TooManyFields")
 public class NewModelsDialog extends AbstractDialog {
     private final String moduleName;
     private final Project project;
@@ -53,9 +48,6 @@ public class NewModelsDialog extends AbstractDialog {
     private static final String ENTITY_ID_COLUMN_NAME = "Entity ID Column Name";
     private static final String COLLECTION_NAME = "Collection Name";
     private static final String COLLECTION_DIRECTORY = "Collection Directory";
-    public static final String RESOURCE_MODEL = "ResourceModel";
-    public static final String MODEL = "Model";
-    public static final String FQN_ALIAS_KEYWORD = " as ";
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, MODEL_NAME})
@@ -150,68 +142,30 @@ public class NewModelsDialog extends AbstractDialog {
         this.collectionDirectory.setText(modelName);
     }
 
-    private String getModuleName() {
-        return moduleName;
-    }
-
-    private String getModelName() {
-        return modelName.getText().trim();
-    }
-
-    private String getCollectionName() {
-        return collectionName.getText().trim();
-    }
-
-    private String getResourceModelName() {
-        return resourceModelName.getText().trim();
-    }
-
-    private String getDbTableName() {
-        return dbTableName.getText().trim();
-    }
-
-    private String getEntityIdColumn() {
-        return entityIdColumn.getText().trim();
-    }
-
-    private String getCollectionDirectory() {
-        return ResourceModelPhp.RESOURCE_MODEL_DIRECTORY + File.separator
-            + collectionDirectory.getText().trim();
-    }
-
-    private NamespaceBuilder getModelNamespace() {
-        return new NamespaceBuilder(getModuleName(), getModelName(), ModelPhp.MODEL_DIRECTORY);
-    }
-
-    private NamespaceBuilder getResourceModelNamespace() {
-        return new NamespaceBuilder(
-                getModuleName(),
-                getResourceModelName(),
-                ResourceModelPhp.RESOURCE_MODEL_DIRECTORY
-        );
-    }
-
-    private NamespaceBuilder getCollectionNamespace() {
-        return new NamespaceBuilder(
-            getModuleName(),
-            getCollectionName(),
-            getCollectionDirectory()
-        );
-    }
-
     /**
      * Open new controller dialog.
      *
      * @param project Project
      * @param directory PsiDirectory
      */
-    public static void open(final Project project, final PsiDirectory directory) {
+    public static void open(
+            final @NotNull Project project,
+            final @NotNull PsiDirectory directory
+    ) {
         final NewModelsDialog dialog = new NewModelsDialog(project, directory);
         dialog.pack();
         dialog.centerDialog(dialog);
         dialog.setVisible(true);
     }
 
+    @Override
+    protected void onCancel() {
+        dispose();
+    }
+
+    /**
+     * Process generation.
+     */
     private void onOK() {
         if (!validateFormFields()) {
             return;
@@ -220,81 +174,108 @@ public class NewModelsDialog extends AbstractDialog {
         generateModelFile();
         generateResourceModelFile();
         generateCollectionFile();
+
         this.setVisible(false);
     }
 
-    private PsiFile generateModelFile() {
-        final NamespaceBuilder modelNamespace = getModelNamespace();
-        final NamespaceBuilder resourceModelNamespace = getResourceModelNamespace();
-        final StringBuilder resourceModelFqn
-                = new StringBuilder(resourceModelNamespace.getClassFqn());
-        String resourceModelName = getResourceModelName();
-
-        if (getModelName().equals(getResourceModelName())) {
-            resourceModelFqn.append(FQN_ALIAS_KEYWORD);
-            resourceModelFqn.append(RESOURCE_MODEL);
-            resourceModelName = RESOURCE_MODEL;
-        }
-
-        return new ModuleModelGenerator(new ModelData(
+    /**
+     * Generate model file.
+     */
+    private void generateModelFile() {
+        new ModuleModelGenerator(new ModelData(
                 getModuleName(),
                 getDbTableName(),
                 getModelName(),
-                resourceModelName,
-                modelNamespace.getClassFqn(),
-                modelNamespace.getNamespace(),
-                resourceModelFqn.toString()
+                getResourceModelName()
         ), project).generate(NewModelsDialog.ACTION_NAME, true);
     }
 
-    private PsiFile generateResourceModelFile() {
-        final NamespaceBuilder resourceModelNamespace = getResourceModelNamespace();
-        return new ModuleResourceModelGenerator(new ResourceModelData(
-            getModuleName(),
-            getDbTableName(),
-            getResourceModelName(),
-            getEntityIdColumn(),
-            resourceModelNamespace.getNamespace(),
-            resourceModelNamespace.getClassFqn()
+    /**
+     * Generate resource model file.
+     */
+    private void generateResourceModelFile() {
+        new ModuleResourceModelGenerator(new ResourceModelData(
+                getModuleName(),
+                getDbTableName(),
+                getResourceModelName(),
+                getEntityIdColumn()
         ), project).generate(NewModelsDialog.ACTION_NAME, true);
     }
 
-    private PsiFile generateCollectionFile() {
-        final NamespaceBuilder resourceModelNamespace = getResourceModelNamespace();
-        final NamespaceBuilder modelNamespace = getModelNamespace();
-        final NamespaceBuilder collectionNamespace = getCollectionNamespace();
-        final StringBuilder modelFqn = new StringBuilder(modelNamespace.getClassFqn());
-        String modelName = getModelName();
-        final StringBuilder resourceModelFqn
-                = new StringBuilder(resourceModelNamespace.getClassFqn());
-        String resourceModelName = getResourceModelName();
-
-
-        if (getModelName().equals(getResourceModelName())) {
-            modelFqn.append(FQN_ALIAS_KEYWORD);
-            modelFqn.append(MODEL);
-            modelName = MODEL;
-            resourceModelFqn.append(FQN_ALIAS_KEYWORD);
-            resourceModelFqn.append(RESOURCE_MODEL);
-            resourceModelName = RESOURCE_MODEL;
-        }
-
-        return new ModuleCollectionGenerator(new CollectionData(
-            getModuleName(),
-            getDbTableName(),
-            modelName,
-            getCollectionName(),
-            collectionNamespace.getClassFqn(),
-            getCollectionDirectory(),
-            collectionNamespace.getNamespace(),
-            resourceModelName,
-            resourceModelFqn.toString(),
-            modelFqn.toString()
+    /**
+     * Generate collection file.
+     */
+    private void generateCollectionFile() {
+        new ModuleCollectionGenerator(new CollectionData(
+                getModuleName(),
+                getDbTableName(),
+                getModelName(),
+                getResourceModelName(),
+                getCollectionName(),
+                getCollectionDirectory()
         ), project).generate(NewModelsDialog.ACTION_NAME, true);
     }
 
-    @Override
-    protected void onCancel() {
-        dispose();
+    /**
+     * Get module name.
+     *
+     * @return String
+     */
+    private String getModuleName() {
+        return moduleName;
+    }
+
+    /**
+     * Get model name.
+     *
+     * @return String
+     */
+    private String getModelName() {
+        return modelName.getText().trim();
+    }
+
+    /**
+     * Get resource model name.
+     *
+     * @return String
+     */
+    private String getResourceModelName() {
+        return resourceModelName.getText().trim();
+    }
+
+    /**
+     * Get collection name.
+     *
+     * @return String
+     */
+    private String getCollectionName() {
+        return collectionName.getText().trim();
+    }
+
+    /**
+     * Get db table name.
+     *
+     * @return String
+     */
+    private String getDbTableName() {
+        return dbTableName.getText().trim();
+    }
+
+    /**
+     * Get entity id column name.
+     *
+     * @return String
+     */
+    private String getEntityIdColumn() {
+        return entityIdColumn.getText().trim();
+    }
+
+    /**
+     * Get collection directory.
+     *
+     * @return String
+     */
+    private String getCollectionDirectory() {
+        return collectionDirectory.getText().trim();
     }
 }

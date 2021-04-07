@@ -4,7 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
+## 4.0.0
+
 ## 3.2.0
+
+### Added
+
+- Code generation for a Magento Entity in [#521](https://github.com/magento/magento2-phpstorm-plugin/pull/521)
+- Code generation for email templates in [#350](https://github.com/magento/magento2-phpstorm-plugin/pull/350)
+- Reference navigation for disabled observers in `events.xml` in [#439](https://github.com/magento/magento2-phpstorm-plugin/pull/439)
+- Line markers for test fixtures in [#477](https://github.com/magento/magento2-phpstorm-plugin/pull/477)
+
+### Changed
+
+- Added ability to set the module sequence at generating new module [#266](https://github.com/magento/magento2-phpstorm-plugin/pull/266)
+
+### Fixed
+
+- ArrayIndexOutOfBoundsException in the New Module Action in [#519](https://github.com/magento/magento2-phpstorm-plugin/pull/519)
 
 ## 3.1.3
 

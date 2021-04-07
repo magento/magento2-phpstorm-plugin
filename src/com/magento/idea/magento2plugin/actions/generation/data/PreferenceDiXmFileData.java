@@ -2,47 +2,70 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.data;
 
-import com.jetbrains.php.lang.psi.elements.PhpClass;
+import org.jetbrains.annotations.NotNull;
 
 public class PreferenceDiXmFileData {
-    private String preferenceModule;
-    private PhpClass targetClass;
-    private String preferenceFqn;
-    private String namespace;
-    private String area;
 
+    private final String preferenceModule;
+    private final String preferenceFor;
+    private final String preferenceType;
+    private final String area;
+
+    /**
+     * Preference DI XML file data.
+     *
+     * @param preferenceModule String
+     * @param preferenceFor String
+     * @param preferenceType String
+     * @param area String
+     */
     public PreferenceDiXmFileData(
-            String preferenceModule,
-            PhpClass targetClass,
-            String preferenceFqn,
-            String namespace,
-            String area
+            final @NotNull String preferenceModule,
+            final @NotNull String preferenceFor,
+            final @NotNull String preferenceType,
+            final @NotNull String area
     ) {
         this.preferenceModule = preferenceModule;
-        this.targetClass = targetClass;
-        this.preferenceFqn = preferenceFqn;
-        this.namespace = namespace;
+        this.preferenceFor = preferenceFor;
+        this.preferenceType = preferenceType;
         this.area = area;
     }
 
+    /**
+     * Get preference module.
+     *
+     * @return String
+     */
     public String getPreferenceModule() {
         return preferenceModule;
     }
 
-    public PhpClass getTargetClass() {
-        return targetClass;
+    /**
+     * Get target class.
+     *
+     * @return String
+     */
+    public String getPreferenceFor() {
+        return preferenceFor;
     }
 
-    public String getPreferenceFqn() {
-        return preferenceFqn;
+    /**
+     * Get preference FQN.
+     *
+     * @return String
+     */
+    public String getPreferenceType() {
+        return preferenceType;
     }
 
-    public String getNamespace() {
-        return namespace;
-    }
-
+    /**
+     * Get area.
+     *
+     * @return String
+     */
     public String getArea() {
         return area;
     }

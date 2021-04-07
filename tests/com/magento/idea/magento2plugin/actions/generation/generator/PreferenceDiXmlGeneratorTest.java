@@ -7,20 +7,18 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.PreferenceDiXmFileData;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
-import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 
 public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
+
     private static final String MODULE = "Foo_Bar";
     private static final String MODULE_DIR = "src/app/code/Foo/Bar/";
     private static final String TARGET_MODEL_ONE_CLASS_FQN = "Foo\\Bar\\Model\\SimpleModelOne";
     private static final String TARGET_MODEL_TWO_CLASS_FQN = "Foo\\Bar\\Model\\SimpleModelTwo";
-    private static final String NAMESPACE = "Foo\\Bar\\Model\\Override";
 
     /**
      * Test preference DI XML file generation.
@@ -96,6 +94,7 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
      * @param targetClassFnq Target class FQN
      * @param preferenceFqn Preference FQN
      * @param area Area
+     *
      * @return PsiFile
      */
     private PsiFile addPreferenceDiXml(
@@ -104,12 +103,10 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
             final String area
     ) {
         final Project project = myFixture.getProject();
-        final PhpClass targetClass = GetPhpClassByFQN.getInstance(project).execute(targetClassFnq);
         final PreferenceDiXmFileData preferenceDiXmlFileData = new PreferenceDiXmFileData(
                 MODULE,
-                targetClass,
+                targetClassFnq,
                 preferenceFqn,
-                NAMESPACE,
                 area
         );
         final PreferenceDiXmlGenerator moduleXmlGenerator = new PreferenceDiXmlGenerator(
@@ -124,6 +121,7 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
      * Get expected directory based on provided area.
      *
      * @param area Area name
+     *
      * @return String
      */
     private String getExpectedDirectory(final String area) {

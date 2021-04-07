@@ -7,7 +7,7 @@
 <idea-plugin require-restart="true">
     <id>com.magento.idea.magento2plugin</id>
     <name>Magento PhpStorm</name>
-    <version>3.2.0</version>
+    <version>4.0.0</version>
     <vendor url="https://github.com/magento/magento2-phpstorm-plugin">Magento Inc.</vendor>
 
     <description><![CDATA[
@@ -24,7 +24,7 @@
     </change-notes>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="203.5981.155"/>
+    <idea-version since-build="211.6693.111"/>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
@@ -58,6 +58,7 @@
 
         <!-- Module file generators -->
         <group id="MagentoNewModuleFileGroup" class="com.magento.idea.magento2plugin.actions.groups.NewModuleFileGroup" text="Module File" popup="true">
+            <action id="MagentoCreateEntity" class="com.magento.idea.magento2plugin.actions.generation.NewEntityAction" />
             <action id="MagentoCreateABlock" class="com.magento.idea.magento2plugin.actions.generation.NewBlockAction" />
             <action id="MagentoCreateAController" class="com.magento.idea.magento2plugin.actions.generation.NewControllerAction" />
             <action id="MagentoCreateACronjob" class="com.magento.idea.magento2plugin.actions.generation.NewCronjobAction" />
@@ -230,6 +231,18 @@
         <internalFileTemplate name="Magento Data Model Interface"/>
         <internalFileTemplate name="Magento Module Declarative Schema XML"/>
         <internalFileTemplate name="Magento Module Declarative Schema Whitelist JSON"/>
+        <internalFileTemplate name="Magento Get List Query Model"/>
+        <internalFileTemplate name="Magento Entity Save Controller Class"/>
+        <internalFileTemplate name="Magento Entity Data Mapper"/>
+        <internalFileTemplate name="Magento Save Entity Command Model"/>
+        <internalFileTemplate name="Magento Entity Index Adminhtml Controller Class"/>
+        <internalFileTemplate name="Magento Grid Ui Component Action Column Class"/>
+        <internalFileTemplate name="Magento PHP Form Generic Button Block Class"/>
+        <internalFileTemplate name="Magento Entity New Action Controller Class"/>
+        <internalFileTemplate name="Magento New Entity Layout XML"/>
+        <internalFileTemplate name="Magento Delete Entity By Id Command"/>
+        <internalFileTemplate name="Magento Entity Edit Action Controller Class"/>
+        <internalFileTemplate name="Magento Entity Delete Controller Class"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 
