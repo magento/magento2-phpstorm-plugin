@@ -17,8 +17,6 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annot
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.Lowercase;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.EavAttributeSetupPatchGenerator;
-import com.magento.idea.magento2plugin.magento.packages.File;
-import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeInputs;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeScopes;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeTypes;
@@ -223,8 +221,6 @@ public class NewEavAttributeDialog extends AbstractDialog {
     }
 
     private ProductEntityData populateProductEntityData(final ProductEntityData productEntityData) {
-        productEntityData.setNamespace(getDataPathNamespace());
-        productEntityData.setDirectory(getDataPathDirectory());
         productEntityData.setModuleName(getModuleName());
 
         productEntityData.setDataPatchName(getDataPatchName());
@@ -308,24 +304,8 @@ public class NewEavAttributeDialog extends AbstractDialog {
         return dataPatchNameTextField.getText().trim();
     }
 
-    private String getDataPathNamespace() {
-        final String[] parts = moduleName.split(Package.vendorModuleNameSeparator);
-        if (parts[0] == null || parts[1] == null || parts.length > 2) {
-            return null;
-        }
-        final String directoryPart = getDataPathDirectory().replace(
-                File.separator,
-                Package.fqnSeparator
-        );
-        return parts[0] + Package.fqnSeparator + parts[1] + Package.fqnSeparator + directoryPart;
-    }
-
     private String getAttributeType() {
         return typeComboBox.getSelectedItem().toString().trim();
-    }
-
-    private String getDataPathDirectory() {
-        return "Setup/Patch/Data";
     }
 
     private String getModuleName() {

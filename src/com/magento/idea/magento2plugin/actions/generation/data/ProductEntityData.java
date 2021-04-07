@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.data;
 
+import com.magento.idea.magento2plugin.magento.packages.File;
+import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.magento.packages.eav.EavEntities;
 
 @SuppressWarnings({"PMD.TooManyFields"})
@@ -142,7 +144,23 @@ public class ProductEntityData implements EavEntityDataInterface {
 
     @Override
     public String getNamespace() {
+        if (namespace == null) {
+            namespace = getDataPathNamespace();
+        }
+
         return namespace;
+    }
+
+    private String getDataPathNamespace() {
+        final String[] parts = moduleName.split(Package.vendorModuleNameSeparator);
+        if (parts[0] == null || parts[1] == null || parts.length > 2) {
+            return null;
+        }
+        final String directoryPart = getDirectory().replace(
+                File.separator,
+                Package.fqnSeparator
+        );
+        return parts[0] + Package.fqnSeparator + parts[1] + Package.fqnSeparator + directoryPart;
     }
 
     @Override
@@ -152,6 +170,10 @@ public class ProductEntityData implements EavEntityDataInterface {
 
     @Override
     public String getDirectory() {
+        if (directory == null) {
+            directory = "Setup/Patch/Data";
+        }
+
         return directory;
     }
 
