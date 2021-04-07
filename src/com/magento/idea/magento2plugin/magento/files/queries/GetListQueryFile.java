@@ -6,7 +6,7 @@
 package com.magento.idea.magento2plugin.magento.files.queries;
 
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
-import java.io.File;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import org.jetbrains.annotations.NotNull;
 
 public final class GetListQueryFile extends AbstractPhpFile {
