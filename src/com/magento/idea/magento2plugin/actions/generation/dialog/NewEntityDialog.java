@@ -45,7 +45,7 @@ import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.PropertiesTypes;
 import com.magento.idea.magento2plugin.magento.packages.database.TableEngines;
 import com.magento.idea.magento2plugin.magento.packages.database.TableResources;
-import com.magento.idea.magento2plugin.magento.packages.uiComponent.FormElementType;
+import com.magento.idea.magento2plugin.magento.packages.uicomponent.FormElementType;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.MenuIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.ui.table.TableGroupWrapper;
@@ -378,6 +378,10 @@ public class NewEntityDialog extends AbstractDialog {
             buttonOK.setEnabled(false);
             buttonCancel.setEnabled(false);
 
+            if (propertyTable.isEditing()) {
+                propertyTable.getCellEditor().stopCellEditing();
+            }
+
             new ProcessWorker(
                     this::onOK,
                     this::releaseDialogAfterGeneration,
@@ -443,9 +447,9 @@ public class NewEntityDialog extends AbstractDialog {
         final String actionsPathPrefix = dialogData.getRoute() + File.separator
                 + FirstLetterToLowercaseUtil.convert(entityName) + File.separator;
         final NamespaceBuilder dtoModelNamespace =
-                new DataModelFile(dtoClassName).getNamespaceBuilder(moduleName);
+                new DataModelFile(moduleName, dtoClassName).getNamespaceBuilder();
         final NamespaceBuilder dtoInterfaceNamespace =
-                new DataModelInterfaceFile(dtoInterfaceClassName).getNamespaceBuilder(moduleName);
+                new DataModelInterfaceFile(moduleName, dtoInterfaceClassName).getNamespaceBuilder();
 
         final NamespaceBuilder formViewNamespaceBuilder =
                 new NamespaceBuilder(
@@ -518,7 +522,7 @@ public class NewEntityDialog extends AbstractDialog {
      */
     private List<UiComponentFormButtonData> getButtons() {
         final List<UiComponentFormButtonData> buttons = new ArrayList<>();
-        final String directory = "Block/Form";
+        final String directory = "Block/Form/" + entityName.getText().trim();
 
         final NamespaceBuilder namespaceBuilderSave = new NamespaceBuilder(
                 moduleName,
@@ -600,9 +604,9 @@ public class NewEntityDialog extends AbstractDialog {
             final String dataType = model.getValueAt(count, 1).toString();
 
             final String label = Arrays.stream(name.split("_")).map(
-                            string -> string.substring(0, 1).toUpperCase(Locale.getDefault())
-                                    + string.substring(1)).collect(Collectors.joining(" ")
-                    );
+                    string -> string.substring(0, 1).toUpperCase(Locale.getDefault())
+                            + string.substring(1)).collect(Collectors.joining(" ")
+            );
             final String sortOrder = String.valueOf(count).concat("0");
             final String fieldset = "general";
 

@@ -163,14 +163,17 @@ public class ModuleControllerClassGenerator extends FileGenerator {
 
         if (data.getControllerArea().equals(adminhtmlArea)) {
             controllerFile = fileFromTemplateGenerator.generate(
-                    ControllerBackendPhp.getInstance(data.getActionClassName()),
+                    new ControllerBackendPhp(data.getControllerModule(), data.getActionClassName()),
                     attributes,
                     parentDirectory,
                     actionName
             );
         } else {
             controllerFile = fileFromTemplateGenerator.generate(
-                    ControllerFrontendPhp.getInstance(data.getActionClassName()),
+                    new ControllerFrontendPhp(
+                            data.getControllerModule(),
+                            data.getActionClassName()
+                    ),
                     attributes,
                     parentDirectory,
                     actionName

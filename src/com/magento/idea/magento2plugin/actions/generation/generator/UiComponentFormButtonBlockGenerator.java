@@ -31,6 +31,7 @@ import org.bouncycastle.util.Strings;
 import org.jetbrains.annotations.NotNull;
 
 public class UiComponentFormButtonBlockGenerator extends FileGenerator {
+
     private final UiComponentFormButtonData buttonData;
     private final Project project;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
@@ -148,15 +149,18 @@ public class UiComponentFormButtonBlockGenerator extends FileGenerator {
                 PhpClassGeneratorUtil.getNameFromFqn(FormButtonBlockFile.DATA_PROVIDER_TYPE));
         uses.add(FormButtonBlockFile.DATA_PROVIDER_TYPE);
 
+        final FormGenericButtonBlockFile genericButtonBlockFile =
+                new FormGenericButtonBlockFile(buttonData.getButtonModule(), entityName);
+
         final NamespaceBuilder genericBtnNamespace = new NamespaceBuilder(
                 buttonData.getButtonModule(),
                 FormGenericButtonBlockFile.CLASS_NAME,
-                FormGenericButtonBlockFile.DIRECTORY
+                genericButtonBlockFile.getDirectory()
         );
         attributes.setProperty("GENERIC_BUTTON",
                 PhpClassGeneratorUtil.getNameFromFqn(genericBtnNamespace.getClassFqn()));
 
-        if (!FormGenericButtonBlockFile.DIRECTORY.equals(buttonData.getButtonDirectory())) {
+        if (!genericButtonBlockFile.getDirectory().equals(buttonData.getButtonDirectory())) {
             uses.add(genericBtnNamespace.getClassFqn());
         }
 

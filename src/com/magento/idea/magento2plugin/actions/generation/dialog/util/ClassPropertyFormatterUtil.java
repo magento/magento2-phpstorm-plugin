@@ -7,10 +7,10 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.util;
 
 import com.google.common.base.CaseFormat;
 import com.magento.idea.magento2plugin.actions.generation.data.code.ClassPropertyData;
-import org.apache.commons.lang.StringUtils;
-import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.table.DefaultTableModel;
+import org.apache.commons.lang.StringUtils;
 
 public final class ClassPropertyFormatterUtil {
 
@@ -27,8 +27,8 @@ public final class ClassPropertyFormatterUtil {
         final List<String> properties = new ArrayList<>();
 
         for (int index = 0; index < table.getRowCount(); index++) {
-            String name = table.getValueAt(index, 0).toString();
-            String type = table.getValueAt(index, 1).toString();
+            final String name = table.getValueAt(index, 0).toString();
+            final String type = table.getValueAt(index, 1).toString();
 
             properties.add(ClassPropertyFormatterUtil.formatSingleProperty(name, type));
         }

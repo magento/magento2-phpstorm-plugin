@@ -9,6 +9,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.GridActionColumnD
 import com.magento.idea.magento2plugin.magento.files.GridActionColumnFile;
 
 public class GridActionColumnFileGeneratorTest extends BaseGeneratorTestCase {
+
     private static final String MODULE_NAME = "Foo_Bar";
     private static final String ENTITY_NAME = "Book";
     private static final String ENTITY_ID_COLUMN = "book_id";
@@ -19,7 +20,7 @@ public class GridActionColumnFileGeneratorTest extends BaseGeneratorTestCase {
      * Test generation of grid actions column file.
      */
     public void testGenerateGridActionColumnFile() {
-        final GridActionColumnFile file = new GridActionColumnFile();
+        final GridActionColumnFile file = new GridActionColumnFile(MODULE_NAME, ENTITY_NAME);
         final GridActionColumnData data = new GridActionColumnData(
                 MODULE_NAME,
                 ENTITY_NAME,

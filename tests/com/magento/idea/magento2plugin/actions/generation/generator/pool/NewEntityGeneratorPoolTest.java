@@ -14,12 +14,12 @@ import java.util.ArrayList;
 
 public class NewEntityGeneratorPoolTest extends BaseGeneratorTestCase {
 
-    private final static String MODULE_NAME = "Foo_Bar";
-    private final static String ACTION_NAME = "Test";
-    private final static String INDEX_PATH = "index";
-    private final static String EDIT_PATH = "edit";
-    private final static String NEW_PATH = "new";
-    private final static String DELETE_PATH = "delete";
+    private static final String MODULE_NAME = "Foo_Bar";
+    private static final String ACTION_NAME = "Test";
+    private static final String INDEX_PATH = "index";
+    private static final String EDIT_PATH = "edit";
+    private static final String NEW_PATH = "new";
+    private static final String DELETE_PATH = "delete";
 
     /**
      * Test if generator pool handler instantiated without any error.

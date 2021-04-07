@@ -3,7 +3,8 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2plugin.magento.packages.uiComponent;
+package com.magento.idea.magento2plugin.magento.packages.uicomponent;
+
 import com.intellij.openapi.externalSystem.service.execution.NotSupportedException;
 import com.magento.idea.magento2plugin.magento.packages.PropertiesTypes;
 import java.util.LinkedList;
@@ -11,6 +12,7 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 public enum FormElementType {
+
     HIDDEN("hidden"),
     FILE("file"),
     INPUT("input"),

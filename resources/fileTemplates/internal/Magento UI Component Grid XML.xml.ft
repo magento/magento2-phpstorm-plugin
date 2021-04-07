@@ -69,10 +69,12 @@
                 $column
             #end
         #end
+#if (${ACTION_COLUMN})
         <actionsColumn name="actions" class="${ACTION_COLUMN}">
             <settings>
                 <indexField>${ID_FIELD_NAME}</indexField>
             </settings>
         </actionsColumn>
+#end
     </columns>
 </listing>

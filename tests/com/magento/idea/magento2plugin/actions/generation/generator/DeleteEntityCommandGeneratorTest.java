@@ -37,7 +37,7 @@ public class DeleteEntityCommandGeneratorTest extends BaseGeneratorTestCase {
                         false
                 );
         final String filePath = this.getFixturePath(
-                new DeleteEntityByIdCommandFile(ENTITY_NAME).getFileName()
+                new DeleteEntityByIdCommandFile(MODULE_NAME, ENTITY_NAME).getFileName()
         );
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
         final PsiFile deleteEntityCommandFile = deleteEntityByIdCommandGenerator.generate("test");

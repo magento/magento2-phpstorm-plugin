@@ -25,7 +25,7 @@ public class UiComponentGridDataProviderGeneratorTest extends BaseGeneratorTestC
      * Test data provider class file generation with custom type.
      */
     public void testGenerateCustomDataProvider() {
-        final PsiFile dataProviderFile = generateDataProvider( new UiComponentDataProviderData(
+        final PsiFile dataProviderFile = generateDataProvider(new UiComponentDataProviderData(
                 PROVIDER_CLASS_NAME,
                 PROVIDER_PATH
         ));

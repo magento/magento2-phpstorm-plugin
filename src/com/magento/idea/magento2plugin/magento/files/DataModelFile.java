@@ -5,57 +5,40 @@
 
 package com.magento.idea.magento2plugin.magento.files;
 
-import com.intellij.lang.Language;
-import com.jetbrains.php.lang.PhpLanguage;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import org.jetbrains.annotations.NotNull;
 
-public class DataModelFile implements ModuleFileInterface {
+public class DataModelFile extends AbstractPhpFile {
+
     public static final String TEMPLATE = "Magento Data Model";
+    public static final String HUMAN_READABLE_NAME = "Data transfer object model";
     public static final String DIRECTORY = "Model/Data";
     public static final String DATA_OBJECT = "Magento\\Framework\\DataObject";
-    private final String className;
-    private final String fileName;
-    private NamespaceBuilder namespaceBuilder;
-
-    public DataModelFile(final @NotNull String className) {
-        this.className = className;
-        fileName = className.concat(".php");
-    }
 
     /**
-     * Get namespace builder for file.
+     * Data model generator file constructor.
      *
      * @param moduleName String
-     *
-     * @return String
+     * @param className String
      */
-    public @NotNull NamespaceBuilder getNamespaceBuilder(
-            final @NotNull String moduleName
+    public DataModelFile(
+            final @NotNull String moduleName,
+            final @NotNull String className
     ) {
-        if (namespaceBuilder == null) {
-            namespaceBuilder = new NamespaceBuilder(
-                    moduleName,
-                    className,
-                    DIRECTORY
-            );
-        }
-
-        return namespaceBuilder;
+        super(moduleName, className);
     }
 
     @Override
-    public String getFileName() {
-        return fileName;
+    public String getHumanReadableName() {
+        return HUMAN_READABLE_NAME;
+    }
+
+    @Override
+    public String getDirectory() {
+        return DIRECTORY;
     }
 
     @Override
     public String getTemplate() {
         return TEMPLATE;
-    }
-
-    @Override
-    public Language getLanguage() {
-        return PhpLanguage.INSTANCE;
     }
 }

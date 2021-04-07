@@ -24,6 +24,7 @@ import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.magento.packages.database.ColumnAttributes;
 import com.magento.idea.magento2plugin.magento.packages.database.TableColumnTypes;
+import com.magento.idea.magento2plugin.util.magento.FileBasedIndexUtil;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -32,7 +33,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
-import com.magento.idea.magento2plugin.util.magento.FileBasedIndexUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class UiComponentGridXmlGenerator extends FileGenerator {
@@ -205,12 +205,11 @@ public class UiComponentGridXmlGenerator extends FileGenerator {
             attributes.setProperty("COLUMNS", String.join("\n", columnsTextList));
         }
 
-        final NamespaceBuilder actionColumnNamespace = new NamespaceBuilder(
-                data.getModuleName(),
-                GridActionColumnFile.CLASS_NAME,
-                GridActionColumnFile.DIRECTORY
-        );
-        attributes.setProperty("ACTION_COLUMN", actionColumnNamespace.getClassFqn());
+        if (data.getEntityName() != null) {
+            final GridActionColumnFile gridActionColumnFile =
+                    new GridActionColumnFile(data.getModuleName(), data.getEntityName());
+            attributes.setProperty("ACTION_COLUMN", gridActionColumnFile.getClassFqn());
+        }
     }
 
     /**

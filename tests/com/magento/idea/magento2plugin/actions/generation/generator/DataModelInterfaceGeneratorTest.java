@@ -22,8 +22,8 @@ public class DataModelInterfaceGeneratorTest extends BaseGeneratorTestCase {
                         "SampleInterface",
                         "Foo_Bar",
                         "ID_PROPERTY;id_property;int;IdProperty;idProperty,"
-                                + "SAMPLE_PROPERTY;sample_property;string;" +
-                                "SampleProperty;sampleProperty"
+                                + "SAMPLE_PROPERTY;sample_property;string;"
+                                + "SampleProperty;sampleProperty"
                 ),
                 myFixture.getProject()
         );

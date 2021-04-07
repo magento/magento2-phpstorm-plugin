@@ -87,14 +87,13 @@ public class SaveEntityCommandGenerator extends PhpFileGenerator {
 
         if (data.isDtoWithInterface()) {
             final DataModelInterfaceFile dataModelInterfaceFile =
-                    new DataModelInterfaceFile(data.getDtoInterfaceName());
-            final String dtoType = dataModelInterfaceFile
-                    .getNamespaceBuilder(data.getModuleName()).getClassFqn();
+                    new DataModelInterfaceFile(data.getModuleName(), data.getDtoInterfaceName());
+            final String dtoType = dataModelInterfaceFile.getClassFqn();
             phpClassTypesBuilder.append("DTO", dtoType);
         } else {
-            final DataModelFile dataModelFile = new DataModelFile(data.getDtoName());
-            final String dtoType = dataModelFile
-                    .getNamespaceBuilder(data.getModuleName()).getClassFqn();
+            final DataModelFile dataModelFile =
+                    new DataModelFile(data.getModuleName(), data.getDtoName());
+            final String dtoType = dataModelFile.getClassFqn();
             phpClassTypesBuilder.append("DTO", dtoType);
         }
 

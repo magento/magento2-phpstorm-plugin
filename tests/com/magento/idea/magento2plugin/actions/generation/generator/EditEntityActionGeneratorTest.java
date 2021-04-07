@@ -22,7 +22,7 @@ public class EditEntityActionGeneratorTest extends BaseGeneratorTestCase {
      * Test generation of edit entity controller file.
      */
     public void testGenerateEditEntityActionFile() {
-        final EditActionFile file = new EditActionFile(ENTITY_NAME);
+        final EditActionFile file = new EditActionFile(MODULE_NAME, ENTITY_NAME);
         final EditEntityActionGenerator generator =
                 new EditEntityActionGenerator(
                         new EditEntityActionData(

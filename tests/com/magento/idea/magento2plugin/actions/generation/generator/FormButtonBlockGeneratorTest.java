@@ -11,13 +11,15 @@ import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormBu
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 
 public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
+
     private static final String MODULE_NAME = "Foo_Bar";
     private static final String FORM_NAME = "my_form";
-    private static final String BLOCK_DIRECTORY = "Block/Form";
-    private static final String ACTION_NAME = "test";
     private static final String ENTITY_NAME = "Book";
+    private static final String BLOCK_DIRECTORY = "Block/Form/" + ENTITY_NAME;
+    private static final String ACTION_NAME = "test";
     private static final String ENTITY_ID = "book_id";
-    public static final String EXPECTED_DIRECTORY = "src/app/code/Foo/Bar/Block/Form";
+    public static final String EXPECTED_DIRECTORY
+            = "src/app/code/Foo/Bar/Block/Form/" + ENTITY_NAME;
 
     /**
      * Test creation Block type Save.
