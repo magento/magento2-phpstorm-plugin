@@ -8,8 +8,8 @@ package com.magento.idea.magento2plugin.actions.generation.generator.util;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.actions.generation.generator.data.ModuleDirectoriesData;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
-import java.io.File;
 import java.util.Arrays;
 import org.jetbrains.annotations.NotNull;
 
