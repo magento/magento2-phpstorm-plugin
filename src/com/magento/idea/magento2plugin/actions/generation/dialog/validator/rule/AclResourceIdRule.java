@@ -13,7 +13,7 @@ public class AclResourceIdRule implements ValidationRule {
 
     @Override
     public boolean check(final String value) {
-        return value.matches(RegExUtil.Magento.ACL_RESOURCE_ID);
+        return value.matches(RegExUtil.Magento.XML_IDENTIFIER);
     }
 
     public static ValidationRule getInstance() {

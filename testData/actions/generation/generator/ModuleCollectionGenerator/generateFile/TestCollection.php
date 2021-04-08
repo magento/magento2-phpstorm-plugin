@@ -2,7 +2,7 @@
 
 namespace Foo\Bar\Model\ResourceModel\TestModel;
 
-use Foo\Bar\Model\ResourceModel\TestModel\TestResource;
+use Foo\Bar\Model\ResourceModel\TestResource;
 use Foo\Bar\Model\TestModel;
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 

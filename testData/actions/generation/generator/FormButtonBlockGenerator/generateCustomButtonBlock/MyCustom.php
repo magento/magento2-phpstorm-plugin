@@ -1,19 +1,27 @@
 <?php
 
-
-namespace Foo\Bar\Block\Form;
+namespace Foo\Bar\Block\Form\Book;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 
 /**
- * @inheritdoc
+ * Custom button.
  */
-class MyCustom implements ButtonProviderInterface
+class MyCustom extends GenericButton implements ButtonProviderInterface
 {
     /**
-     * @inheritDoc
+     * Retrieve Custom Button button settings.
+     *
+     * @return array
      */
-    public function getButtonData()
+    public function getButtonData(): array
     {
+        return $this->wrapButtonSettings(
+            'Custom Button',
+            'custom',
+            '',
+            [],
+            0
+        );
     }
 }

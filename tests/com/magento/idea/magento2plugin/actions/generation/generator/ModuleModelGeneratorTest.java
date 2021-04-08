@@ -10,6 +10,9 @@ import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.ModelData;
 
 public class ModuleModelGeneratorTest extends BaseGeneratorTestCase {
+
+    private static final String EXPECTED_DIR = "src/app/code/Foo/Bar/Model";
+
     /**
      * Test generation of model file.
      */
@@ -19,23 +22,41 @@ public class ModuleModelGeneratorTest extends BaseGeneratorTestCase {
                 "Foo_Bar",
                 "my_table",
                 "TestModel",
-                "TestResource",
-                "Foo\\Bar\\Model\\TestModel",
-                "Foo\\Bar\\Model",
-                "Foo\\Bar\\Model\\ResourceModel\\TestResource"
+                "TestResource"
         );
         final ModuleModelGenerator generator = new ModuleModelGenerator(
                 modelData,
                 project
         );
-        final PsiFile controllerFile = generator.generate("test");
+        final PsiFile modelFile = generator.generate("test");
         final String filePath = this.getFixturePath("TestModel.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
 
         assertGeneratedFileIsCorrect(
                 expectedFile,
-                "src/app/code/Foo/Bar/Model",
-                controllerFile
+                EXPECTED_DIR,
+                modelFile
+        );
+    }
+
+    /**
+     * Test generation of model file where resource model name equal to the model name.
+     */
+    public void testGenerateWithTheSameNameForResourceModel() {
+        final PsiFile modelFile = new ModuleModelGenerator(
+                new ModelData(
+                        "Foo_Bar",
+                        "my_table",
+                        "Test",
+                        "Test"
+                ),
+                myFixture.getProject()
+        ).generate("test");
+
+        assertGeneratedFileIsCorrect(
+                myFixture.configureByFile(this.getFixturePath("Test.php")),
+                EXPECTED_DIR,
+                modelFile
         );
     }
 }
