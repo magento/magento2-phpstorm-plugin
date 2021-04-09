@@ -5,7 +5,7 @@
 
 package com.magento.idea.magento2plugin.magento.packages.eav;
 
-public enum EavAttributes {
+public enum EavAttribute {
     GROUP("group"),
     TYPE("type"),
     LABEL("label"),
@@ -23,7 +23,7 @@ public enum EavAttributes {
 
     private String attribute;
 
-    EavAttributes(final String attribute) {
+    EavAttribute(final String attribute) {
         this.attribute = attribute;
     }
 

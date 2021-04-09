@@ -5,15 +5,17 @@
 
 package com.magento.idea.magento2plugin.magento.packages.eav;
 
-public enum AttributeSourceModels {
+public enum AttributeSourceModel {
     BOOLEAN("\\Magento\\Eav\\Model\\Entity\\Attribute\\Source\\Boolean"),
     TABLE("\\Magento\\Eav\\Model\\Entity\\Attribute\\Source\\Table"),
     CONFIG("\\Magento\\Eav\\Model\\Entity\\Attribute\\Source\\Config"),
-    STORE("\\Magento\\Eav\\Model\\Entity\\Attribute\\Source\\Store");
+    STORE("\\Magento\\Eav\\Model\\Entity\\Attribute\\Source\\Store"),
+    GENERATE_SOURCE("Custom Source"),
+    NULLABLE_SOURCE("Set Source Model as null");
 
     private String source;
 
-    AttributeSourceModels(final String source) {
+    AttributeSourceModel(final String source) {
         this.source = source;
     }
 

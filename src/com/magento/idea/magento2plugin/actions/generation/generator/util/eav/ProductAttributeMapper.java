@@ -7,7 +7,8 @@ package com.magento.idea.magento2plugin.actions.generation.generator.util.eav;
 
 import com.magento.idea.magento2plugin.actions.generation.data.EavEntityDataInterface;
 import com.magento.idea.magento2plugin.actions.generation.data.ProductEntityData;
-import com.magento.idea.magento2plugin.magento.packages.eav.EavAttributes;
+import com.magento.idea.magento2plugin.magento.packages.eav.AttributeSourceModel;
+import com.magento.idea.magento2plugin.magento.packages.eav.EavAttribute;
 import com.sun.istack.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,37 +38,41 @@ public class ProductAttributeMapper implements AttributeMapperInterface {
         return attributesWithValues;
     }
 
+    @SuppressWarnings({"PMD.NullAssignment"})
     private Map<String, String> getMappedAttributes(final ProductEntityData eavEntityData) {
         final Map<String, String> mappedAttributes = new HashMap<>();
 
-        mappedAttributes.put(EavAttributes.GROUP.getAttribute(),
+        mappedAttributes.put(EavAttribute.GROUP.getAttribute(),
                 wrapStringValueForTemplate(eavEntityData.getGroup()));
-        mappedAttributes.put(EavAttributes.TYPE.getAttribute(),
+        mappedAttributes.put(EavAttribute.TYPE.getAttribute(),
                 wrapStringValueForTemplate(eavEntityData.getType()));
-        mappedAttributes.put(EavAttributes.LABEL.getAttribute(),
+        mappedAttributes.put(EavAttribute.LABEL.getAttribute(),
                 wrapStringValueForTemplate(eavEntityData.getLabel()));
-        mappedAttributes.put(EavAttributes.INPUT.getAttribute(),
+        mappedAttributes.put(EavAttribute.INPUT.getAttribute(),
                 wrapStringValueForTemplate(eavEntityData.getInput()));
 
-        mappedAttributes.put(EavAttributes.SOURCE.getAttribute(),
-                eavEntityData.getSource());
-        mappedAttributes.put(EavAttributes.REQUIRED.getAttribute(),
+        final String eavSource = eavEntityData.getSource();
+        mappedAttributes.put(EavAttribute.SOURCE.getAttribute(),
+                eavSource == null || eavSource.equals(AttributeSourceModel.NULLABLE_SOURCE.getSource())
+                        ? null : eavSource + "::class");
+
+        mappedAttributes.put(EavAttribute.REQUIRED.getAttribute(),
                 Boolean.toString(eavEntityData.isRequired()));
-        mappedAttributes.put(EavAttributes.SORT_ORDER.getAttribute(),
+        mappedAttributes.put(EavAttribute.SORT_ORDER.getAttribute(),
                 Integer.toString(eavEntityData.getSortOrder()));
-        mappedAttributes.put(EavAttributes.GLOBAL.getAttribute(),
+        mappedAttributes.put(EavAttribute.GLOBAL.getAttribute(),
                 eavEntityData.getScope());
-        mappedAttributes.put(EavAttributes.IS_USED_IN_GRID.getAttribute(),
+        mappedAttributes.put(EavAttribute.IS_USED_IN_GRID.getAttribute(),
                 Boolean.toString(eavEntityData.isUsedInGrid()));
-        mappedAttributes.put(EavAttributes.IS_VISIBLE_IN_GRID.getAttribute(),
+        mappedAttributes.put(EavAttribute.IS_VISIBLE_IN_GRID.getAttribute(),
                 Boolean.toString(eavEntityData.isVisibleInGrid()));
-        mappedAttributes.put(EavAttributes.IS_FILTERABLE_IN_GRID.getAttribute(),
+        mappedAttributes.put(EavAttribute.IS_FILTERABLE_IN_GRID.getAttribute(),
                 Boolean.toString(eavEntityData.isFilterableInGrid()));
-        mappedAttributes.put(EavAttributes.VISIBLE.getAttribute(),
+        mappedAttributes.put(EavAttribute.VISIBLE.getAttribute(),
                 Boolean.toString(eavEntityData.isVisible()));
-        mappedAttributes.put(EavAttributes.IS_HTML_ALLOWED_ON_FRONT.getAttribute(),
+        mappedAttributes.put(EavAttribute.IS_HTML_ALLOWED_ON_FRONT.getAttribute(),
                 Boolean.toString(eavEntityData.isHtmlAllowedOnFront()));
-        mappedAttributes.put(EavAttributes.VISIBLE_ON_FRONT.getAttribute(),
+        mappedAttributes.put(EavAttribute.VISIBLE_ON_FRONT.getAttribute(),
                 Boolean.toString(eavEntityData.isVisibleOnFront()));
 
         return mappedAttributes;
