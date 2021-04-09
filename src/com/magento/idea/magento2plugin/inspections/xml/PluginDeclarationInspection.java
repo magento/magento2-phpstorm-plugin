@@ -120,7 +120,7 @@ public class PluginDeclarationInspection extends PhpInspection {
                                 && pluginTypeDisabledAttribute.getValue().equals("true")
                                 && !pluginTypeName.isEmpty()
                         ) {
-                            @Nullable XmlAttributeValue valueElement
+                            @Nullable final XmlAttributeValue valueElement
                                     = pluginTypeNameAttribute.getValueElement();
                             if (modulesWithSamePluginName.isEmpty() && valueElement != null) {
                                 problemsHolder.registerProblem(
