@@ -129,6 +129,13 @@ public class PluginDeclarationInspection extends PhpInspection {
                             );
                         }
 
+                        if (pluginTypeDisabledAttribute != null
+                                 && pluginTypeDisabledAttribute.getValue() != null
+                                 && pluginTypeDisabledAttribute.getValue().equals("true")
+                        ) {
+                            continue;
+                        }
+
                         for (final Pair<String, String> moduleEntry: modulesWithSamePluginName) {
                             final String scope = moduleEntry.getFirst();
                             final String moduleName = moduleEntry.getSecond();
