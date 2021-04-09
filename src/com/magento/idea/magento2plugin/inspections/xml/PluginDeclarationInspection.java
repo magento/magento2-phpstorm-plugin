@@ -118,22 +118,18 @@ public class PluginDeclarationInspection extends PhpInspection {
                         if (pluginTypeDisabledAttribute != null
                                 && pluginTypeDisabledAttribute.getValue() != null
                                 && pluginTypeDisabledAttribute.getValue().equals("true")
-                                && modulesWithSamePluginName.isEmpty()
                         ) {
-                            problemsHolder.registerProblem(
-                                    pluginTypeNameAttribute.getValueElement(),
-                                    inspectionBundle.message(
+                            if (modulesWithSamePluginName.isEmpty()) {
+                                problemsHolder.registerProblem(
+                                        pluginTypeNameAttribute.getValueElement(),
+                                        inspectionBundle.message(
                                             "inspection.plugin.disabledPluginDoesNotExist"
-                                    ),
-                                    errorSeverity
-                            );
-                        }
-
-                        if (pluginTypeDisabledAttribute != null
-                                 && pluginTypeDisabledAttribute.getValue() != null
-                                 && pluginTypeDisabledAttribute.getValue().equals("true")
-                        ) {
-                            continue;
+                                        ),
+                                        errorSeverity
+                                );
+                            } else {
+                                continue;
+                            }
                         }
 
                         for (final Pair<String, String> moduleEntry: modulesWithSamePluginName) {
