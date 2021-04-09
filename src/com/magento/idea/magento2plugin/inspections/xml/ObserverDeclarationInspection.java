@@ -100,6 +100,10 @@ public class ObserverDeclarationInspection extends PhpInspection {
                         }
 
                         final String observerName = observerNameAttribute.getValue();
+                        if (observerName == null) {
+                            continue;
+                        }
+
                         final String observerKey = eventNameAttributeValue.concat("_")
                                 .concat(observerName);
                         if (targetObserversHash.containsKey(observerKey)) {
@@ -124,10 +128,13 @@ public class ObserverDeclarationInspection extends PhpInspection {
                         if (observerDisabledAttribute != null
                                 && observerDisabledAttribute.getValue() != null
                                 && observerDisabledAttribute.getValue().equals("true")
+                                && !observerName.isEmpty()
                         ) {
-                            if (modulesWithSameObserverName.isEmpty()) {
+                            @Nullable final XmlAttributeValue valueElement
+                                    = observerNameAttribute.getValueElement();
+                            if (modulesWithSameObserverName.isEmpty() && valueElement != null) {
                                     problemsHolder.registerProblem(
-                                            observerNameAttribute.getValueElement(),
+                                            valueElement,
                                             inspectionBundle.message(
                                                 "inspection.observer.disabledObserverDoesNotExist"
                                             ),
