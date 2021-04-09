@@ -124,22 +124,18 @@ public class ObserverDeclarationInspection extends PhpInspection {
                         if (observerDisabledAttribute != null
                                 && observerDisabledAttribute.getValue() != null
                                 && observerDisabledAttribute.getValue().equals("true")
-                                && modulesWithSameObserverName.isEmpty()
                         ) {
-                            problemsHolder.registerProblem(
-                                    observerNameAttribute.getValueElement(),
-                                    inspectionBundle.message(
-                                            "inspection.observer.disabledObserverDoesNotExist"
-                                    ),
-                                    errorSeverity
-                            );
-                        }
-
-                        if (observerDisabledAttribute != null
-                                && observerDisabledAttribute.getValue() != null
-                                && observerDisabledAttribute.getValue().equals("true")
-                        ) {
+                            if (modulesWithSameObserverName.isEmpty()) {
+                                    problemsHolder.registerProblem(
+                                            observerNameAttribute.getValueElement(),
+                                            inspectionBundle.message(
+                                                "inspection.observer.disabledObserverDoesNotExist"
+                                            ),
+                                            errorSeverity
+                                    );
+                            } else {
                                 continue;
+                            }
                         }
 
                         for (final HashMap<String, String> moduleEntry:
