@@ -118,14 +118,16 @@ public class PluginDeclarationInspection extends PhpInspection {
                         if (pluginTypeDisabledAttribute != null
                                 && pluginTypeDisabledAttribute.getValue() != null
                                 && pluginTypeDisabledAttribute.getValue().equals("true")
+                                && !pluginTypeName.isEmpty()
                         ) {
-                            if (modulesWithSamePluginName.isEmpty()) {
+                            @Nullable XmlAttributeValue valueElement = pluginTypeNameAttribute.getValueElement();
+                            if (modulesWithSamePluginName.isEmpty() && valueElement != null) {
                                 problemsHolder.registerProblem(
-                                        pluginTypeNameAttribute.getValueElement(),
-                                        inspectionBundle.message(
-                                            "inspection.plugin.disabledPluginDoesNotExist"
-                                        ),
-                                        errorSeverity
+                                            valueElement,
+                                            inspectionBundle.message(
+                                                "inspection.plugin.disabledPluginDoesNotExist"
+                                            ),
+                                            errorSeverity
                                 );
                             } else {
                                 continue;
