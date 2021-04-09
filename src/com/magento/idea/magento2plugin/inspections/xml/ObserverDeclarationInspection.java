@@ -126,7 +126,8 @@ public class ObserverDeclarationInspection extends PhpInspection {
                                 && observerDisabledAttribute.getValue().equals("true")
                                 && !observerName.isEmpty()
                         ) {
-                            @Nullable XmlAttributeValue valueElement = observerNameAttribute.getValueElement();
+                            @Nullable XmlAttributeValue valueElement
+                                    = observerNameAttribute.getValueElement();
                             if (modulesWithSameObserverName.isEmpty() && valueElement != null) {
                                     problemsHolder.registerProblem(
                                             valueElement,
