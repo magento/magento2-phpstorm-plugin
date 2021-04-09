@@ -100,6 +100,10 @@ public class ObserverDeclarationInspection extends PhpInspection {
                         }
 
                         final String observerName = observerNameAttribute.getValue();
+                        if (observerName == null) {
+                            continue;
+                        }
+
                         final String observerKey = eventNameAttributeValue.concat("_")
                                 .concat(observerName);
                         if (targetObserversHash.containsKey(observerKey)) {

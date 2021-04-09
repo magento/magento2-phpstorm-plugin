@@ -93,6 +93,10 @@ public class PluginDeclarationInspection extends PhpInspection {
                         }
 
                         final String pluginTypeName = pluginTypeNameAttribute.getValue();
+                        if (pluginTypeName == null) {
+                            continue;
+                        }
+
                         final String pluginTypeKey = pluginNameAttributeValue.concat(
                                 Package.vendorModuleNameSeparator
                         ).concat(pluginTypeName);
