@@ -5,7 +5,7 @@
 
 package com.magento.idea.magento2plugin.magento.packages.eav;
 
-public enum AttributeTypes {
+public enum AttributeType {
     STATIC("static"),
     VARCHAR("varchar"),
     INT("int"),
@@ -15,7 +15,7 @@ public enum AttributeTypes {
 
     private String type;
 
-    AttributeTypes(final String type) {
+    AttributeType(final String type) {
         this.type = type;
     }
 

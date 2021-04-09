@@ -5,7 +5,7 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator.util.eav;
 
-import com.magento.idea.magento2plugin.magento.packages.eav.EavEntities;
+import com.magento.idea.magento2plugin.magento.packages.eav.EavEntity;
 import com.sun.istack.NotNull;
 
 public class AttributeMapperFactory {
@@ -15,7 +15,7 @@ public class AttributeMapperFactory {
      * @param entityClass String
      */
     public AttributeMapperInterface createByEntityClass(@NotNull final String entityClass) {
-        if (entityClass.equals(EavEntities.PRODUCT.getEntityClass())) {
+        if (entityClass.equals(EavEntity.PRODUCT.getEntityClass())) {
             return new ProductAttributeMapper();
         }
 

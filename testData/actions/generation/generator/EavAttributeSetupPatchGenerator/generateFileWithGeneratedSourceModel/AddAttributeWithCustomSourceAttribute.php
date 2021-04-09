@@ -7,7 +7,7 @@ use Magento\Eav\Setup\EavSetupFactory;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 
-class AddTestAttribute implements DataPatchInterface
+class AddAttributeWithCustomSourceAttribute implements DataPatchInterface
 {
 
     /**
@@ -78,7 +78,7 @@ class AddTestAttribute implements DataPatchInterface
 
         $eavSetup->addAttribute(
             \Magento\Catalog\Model\Product::ENTITY,
-            'test',
+            'attribute_with_custom_source',
             [
                 'is_visible_in_grid' => false,
                 'is_html_allowed_on_front' => false,
@@ -86,7 +86,7 @@ class AddTestAttribute implements DataPatchInterface
                 'visible' => true,
                 'global' => \Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface::SCOPE_GLOBAL,
                 'label' => 'Test Label',
-                'source' => null,
+                'source' => \Foo\Bar\Model\Source\AttributeWithCustomSource::class,
                 'type' => 'static',
                 'is_used_in_grid' => false,
                 'required' => false,

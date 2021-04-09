@@ -9,19 +9,21 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.ui.DocumentAdapter;
 import com.magento.idea.magento2plugin.actions.generation.NewEavAttributeAction;
-import com.magento.idea.magento2plugin.actions.generation.data.EavEntityDataInterface;
 import com.magento.idea.magento2plugin.actions.generation.data.ProductEntityData;
+import com.magento.idea.magento2plugin.actions.generation.data.SourceModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
+import com.magento.idea.magento2plugin.actions.generation.dialog.event.EavAttributeInputItemListener;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.Lowercase;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.EavAttributeSetupPatchGenerator;
-import com.magento.idea.magento2plugin.magento.packages.eav.AttributeInputs;
-import com.magento.idea.magento2plugin.magento.packages.eav.AttributeScopes;
-import com.magento.idea.magento2plugin.magento.packages.eav.AttributeTypes;
-import com.magento.idea.magento2plugin.magento.packages.eav.EavEntities;
+import com.magento.idea.magento2plugin.actions.generation.generator.SourceModelGenerator;
+import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.magento.packages.eav.*;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -36,7 +38,7 @@ import javax.swing.event.DocumentEvent;
 import org.codehaus.plexus.util.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveImports"})
+@SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.UnusedPrivateField"})
 public class NewEavAttributeDialog extends AbstractDialog {
     private final String moduleName;
     private JPanel contentPanel;
@@ -65,6 +67,7 @@ public class NewEavAttributeDialog extends AbstractDialog {
     private JComboBox<ComboBoxItemData> inputComboBox;
     private JComboBox<ComboBoxItemData> typeComboBox;
     private JComboBox<ComboBoxItemData> scopeComboBox;
+    private JComboBox<ComboBoxItemData> sourceComboBox;
     private JCheckBox requiredCheckBox;
     private JCheckBox usedInGridGridCheckBox;
     private JCheckBox visibleInGridCheckBox;
@@ -72,12 +75,21 @@ public class NewEavAttributeDialog extends AbstractDialog {
     private JCheckBox visibleCheckBox;
     private JCheckBox htmlAllowedOnCheckBox;
     private JCheckBox visibleOnFrontCheckBox;
+    private JPanel sourcePanel;
+    private JPanel customSourceModelPanel;
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, "Source Model Directory"})
+    private JTextField sourceModelDirectoryTexField;
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, "Source Model Name"})
+    private JTextField sourceModelNameTexField;
     private final Project project;
+    private final SourceModelData sourceModelData;
 
     /**
      * Constructor.
      *
-     * @param project Project
+     * @param project   Project
      * @param directory PsiDirectory
      */
     public NewEavAttributeDialog(final Project project, final PsiDirectory directory) {
@@ -85,13 +97,58 @@ public class NewEavAttributeDialog extends AbstractDialog {
 
         this.project = project;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
+        this.sourceModelData = new SourceModelData();
 
         setPanelConfiguration();
         addActionListenersForButtons();
         addCancelActionForWindow();
         addCancelActionForEsc();
         setAutocompleteListenerForAttributeCodeField();
-        fillEntityTypeComboBox();
+        fillEntityComboBoxes();
+        addDependBetweenInputAndSourceModel();
+        setDefaultSources();
+    }
+
+    @SuppressWarnings("PMD.AccessorMethodGeneration")
+    private void addDependBetweenInputAndSourceModel() {
+        inputComboBox.addItemListener(
+                new EavAttributeInputItemListener(sourceComboBox)
+        );
+
+        sourceComboBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(final ItemEvent itemEvent) {
+                final String selectedSource = itemEvent.getItem().toString();
+
+                if (selectedSource.equals(AttributeSourceModel.GENERATE_SOURCE.getSource())) {
+                    customSourceModelPanel.setVisible(true);
+                    sourceModelData.setModuleName(moduleName);
+
+                    if (sourceModelDirectoryTexField.getText().trim().isEmpty()) {
+                        sourceModelDirectoryTexField.setText(sourceModelData.getDirectory());
+                    }
+                } else {
+                    customSourceModelPanel.setVisible(false);
+                }
+            }
+        });
+
+        sourceModelDirectoryTexField.setText(sourceModelData.getDirectory());
+    }
+
+    private void setDefaultSources() {
+        final ComboBoxItemData generateSourceItem = new ComboBoxItemData(
+                AttributeSourceModel.GENERATE_SOURCE.getSource(),
+                AttributeSourceModel.GENERATE_SOURCE.getSource()
+        );
+        final ComboBoxItemData defaultSourceItem = new ComboBoxItemData(
+                AttributeSourceModel.NULLABLE_SOURCE.name(),
+                AttributeSourceModel.NULLABLE_SOURCE.getSource()
+        );
+        sourceComboBox.addItem(defaultSourceItem);
+        sourceComboBox.addItem(generateSourceItem);
+
+        sourceComboBox.setSelectedItem(defaultSourceItem);
     }
 
     private void setPanelConfiguration() {
@@ -128,41 +185,41 @@ public class NewEavAttributeDialog extends AbstractDialog {
         this.codeTextField.getDocument().addDocumentListener(new DocumentAdapter() {
             @Override
             protected void textChanged(final @NotNull DocumentEvent event) {
-                updateDataPatchFileName();
+                final String attributeCode = codeTextField.getText();
+                updateDataPatchFileName(attributeCode);
+                updateSourceModelName(attributeCode);
             }
         });
     }
 
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
-    private void fillEntityTypeComboBox() {
-        for (final EavEntities entity : EavEntities.values()) {
+    private void fillEntityComboBoxes() {
+        for (final EavEntity entity : EavEntity.values()) {
             entityType.addItem(
                     new ComboBoxItemData(entity.name(), entity.name())
             );
         }
 
-        for (final AttributeTypes typeValue : AttributeTypes.values()) {
+        for (final AttributeType typeValue : AttributeType.values()) {
             typeComboBox.addItem(
                     new ComboBoxItemData(typeValue.getType(), typeValue.getType())
             );
         }
 
-        for (final AttributeInputs inputValue : AttributeInputs.values()) {
+        for (final AttributeInput inputValue : AttributeInput.values()) {
             inputComboBox.addItem(
                     new ComboBoxItemData(inputValue.getInput(), inputValue.getInput())
             );
         }
 
-        for (final AttributeScopes globalValue : AttributeScopes.values()) {
+        for (final AttributeScope globalValue : AttributeScope.values()) {
             scopeComboBox.addItem(
                     new ComboBoxItemData(globalValue.getScope(), globalValue.name())
             );
         }
     }
 
-    private void updateDataPatchFileName() {
-        final String attributeCode = this.codeTextField.getText();
-
+    private void updateDataPatchFileName(final String attributeCode) {
         if (attributeCode.isEmpty()) {
             dataPatchNameTextField.setText("");
 
@@ -180,6 +237,24 @@ public class NewEavAttributeDialog extends AbstractDialog {
         }
 
         dataPatchNameTextField.setText(dataPatchSuffix + fileName + dataPatchPrefix);
+    }
+
+    private void updateSourceModelName(final String attributeCode) {
+
+        if (attributeCode.isEmpty()) {
+            sourceModelNameTexField.setText("");
+
+            return;
+        }
+
+        final String[] attributeCodeParts = attributeCode.split("_");
+        final StringBuilder sourceModelClassName = new StringBuilder();
+
+        for (final String codePart : attributeCodeParts) {
+            sourceModelClassName.append(StringUtils.capitalise(codePart));
+        }
+
+        sourceModelNameTexField.setText(sourceModelClassName.toString());
     }
 
     /**
@@ -200,115 +275,107 @@ public class NewEavAttributeDialog extends AbstractDialog {
             return;
         }
 
-        generateFile();
+        generateSourceModelFile();
+        generateDataPatchFile();
+
         setVisible(false);
     }
 
-    private void generateFile() {
+    private void generateSourceModelFile() {
+        final ComboBoxItemData selectedSource = (ComboBoxItemData) sourceComboBox.getSelectedItem();
+
+        if (selectedSource == null
+                || !selectedSource.getText().equals(AttributeSourceModel.GENERATE_SOURCE.getSource())) {
+            return;
+        }
+
+        sourceModelData.setModuleName(moduleName);
+        sourceModelData.setClassName(sourceModelNameTexField.getText().trim());
+        sourceModelData.setDirectory(sourceModelDirectoryTexField.getText().trim());
+
+        new SourceModelGenerator(project, sourceModelData)
+                .generate(NewEavAttributeAction.ACTION_NAME, false);
+    }
+
+    private void generateDataPatchFile() {
         new EavAttributeSetupPatchGenerator(
-                getEntityData(),
+                populateProductEntityData(new ProductEntityData()),
                 project
         ).generate(NewEavAttributeAction.ACTION_NAME, true);
     }
 
-    private EavEntityDataInterface getEntityData() {
-        EavEntityDataInterface entityData = null;
-        if (getSelectedEntityType().equals(EavEntities.PRODUCT.name())) {
-            entityData = populateProductEntityData(new ProductEntityData());
-        }
-
-        return entityData;
-    }
-
     private ProductEntityData populateProductEntityData(final ProductEntityData productEntityData) {
-        productEntityData.setModuleName(getModuleName());
+        productEntityData.setModuleName(moduleName);
 
-        productEntityData.setDataPatchName(getDataPatchName());
-        productEntityData.setGroup(getAttributeGroup());
-        productEntityData.setCode(getAttributeCode());
+        productEntityData.setDataPatchName(dataPatchNameTextField.getText().trim());
+        productEntityData.setGroup(groupTextField.getText().trim());
+        productEntityData.setCode(codeTextField.getText().trim());
+        productEntityData.setLabel(labelTextField.getText().trim());
+        productEntityData.setSortOrder(Integer.parseInt(sortOrderTextField.getText().trim()));
+        productEntityData.setRequired(requiredCheckBox.isSelected());
+        productEntityData.setUsedInGrid(usedInGridGridCheckBox.isSelected());
+        productEntityData.setVisibleInGrid(visibleInGridCheckBox.isSelected());
+        productEntityData.setFilterableInGrid(filterableInGridCheckBox.isSelected());
+        productEntityData.setVisible(visibleCheckBox.isSelected());
+        productEntityData.setHtmlAllowedOnFront(htmlAllowedOnCheckBox.isSelected());
+        productEntityData.setVisibleOnFront(visibleOnFrontCheckBox.isSelected());
         productEntityData.setType(getAttributeType());
-        productEntityData.setLabel(getAttributeLabel());
         productEntityData.setInput(getAttributeInput());
         productEntityData.setScope(getAttributeScope());
-        productEntityData.setSortOrder(getAttributeSortOrder());
-        productEntityData.setRequired(isAttributeRequired());
-        productEntityData.setUsedInGrid(isAttributeUsedInGrid());
-        productEntityData.setVisibleInGrid(isAttributeVisibleOnGrid());
-        productEntityData.setFilterableInGrid(isAttributeFilterableInGrid());
-        productEntityData.setVisible(isAttributeVisible());
-        productEntityData.setHtmlAllowedOnFront(isAttributeHtmlAllowedOnFront());
-        productEntityData.setVisibleOnFront(isAttributeVisibleOnFront());
+        productEntityData.setSource(getAttributeSource());
 
         return productEntityData;
     }
 
-    private boolean isAttributeVisibleOnFront() {
-        return visibleOnFrontCheckBox.isSelected();
-    }
+    private String getAttributeSource() {
+        final ComboBoxItemData selectedItem = (ComboBoxItemData) sourceComboBox.getSelectedItem();
 
-    private boolean isAttributeHtmlAllowedOnFront() {
-        return htmlAllowedOnCheckBox.isSelected();
-    }
+        if (selectedItem == null
+                || selectedItem.getText().equals(AttributeSourceModel.NULLABLE_SOURCE.getSource())) {
+            return null;
+        }
 
-    private boolean isAttributeVisible() {
-        return visibleCheckBox.isSelected();
-    }
+        if (selectedItem.getText().equals(AttributeSourceModel.GENERATE_SOURCE.getSource())
+                && sourceModelData != null) {
 
-    private boolean isAttributeFilterableInGrid() {
-        return filterableInGridCheckBox.isSelected();
-    }
+            return String.join(
+                    Package.fqnSeparator,
+                    "",
+                    sourceModelData.getNamespace(),
+                    sourceModelData.getClassName()
+            );
+        }
 
-    private boolean isAttributeVisibleOnGrid() {
-        return visibleInGridCheckBox.isSelected();
-    }
-
-    private boolean isAttributeUsedInGrid() {
-        return usedInGridGridCheckBox.isSelected();
-    }
-
-    private boolean isAttributeRequired() {
-        return requiredCheckBox.isSelected();
-    }
-
-    private int getAttributeSortOrder() {
-        return Integer.parseInt(sortOrderTextField.getText().trim());
+        return sourceComboBox.getSelectedItem().toString();
     }
 
     private String getAttributeScope() {
         final ComboBoxItemData selectedScope = (ComboBoxItemData) scopeComboBox.getSelectedItem();
 
-        return selectedScope.getKey().trim();
-    }
+        if (selectedScope != null) {
+            selectedScope.getKey().trim();
+        }
 
-    private String getAttributeCode() {
-        return codeTextField.getText().trim();
-    }
-
-    private String getSelectedEntityType() {
-        return entityType.getSelectedItem().toString().trim();
-    }
-
-    private String getAttributeLabel() {
-        return labelTextField.getText().trim();
+        return AttributeScope.GLOBAL.getScope();
     }
 
     private String getAttributeInput() {
-        return inputComboBox.getSelectedItem().toString().trim();
-    }
+        final ComboBoxItemData selectedAttributeInput = (ComboBoxItemData) inputComboBox.getSelectedItem();
 
-    private String getAttributeGroup() {
-        return groupTextField.getText().trim();
-    }
+        if (selectedAttributeInput != null) {
+            return selectedAttributeInput.getText().trim();
+        }
 
-    private String getDataPatchName() {
-        return dataPatchNameTextField.getText().trim();
+        return "";
     }
 
     private String getAttributeType() {
-        return typeComboBox.getSelectedItem().toString().trim();
-    }
+        final ComboBoxItemData selectedItem = (ComboBoxItemData) typeComboBox.getSelectedItem();
 
-    private String getModuleName() {
-        return moduleName;
+        if (selectedItem != null) {
+            return selectedItem.getText();
+        }
+
+        return "";
     }
 }

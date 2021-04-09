@@ -5,12 +5,12 @@
 
 package com.magento.idea.magento2plugin.magento.packages.eav;
 
-public enum EavEntities {
+public enum EavEntity {
     PRODUCT("\\Magento\\Catalog\\Model\\Product");
 
     private String entityClass;
 
-    EavEntities(final String entityClass) {
+    EavEntity(final String entityClass) {
         this.entityClass = entityClass;
     }
 

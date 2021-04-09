@@ -7,7 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.data;
 
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
-import com.magento.idea.magento2plugin.magento.packages.eav.EavEntities;
+import com.magento.idea.magento2plugin.magento.packages.eav.EavEntity;
 
 @SuppressWarnings({"PMD.TooManyFields"})
 public class ProductEntityData implements EavEntityDataInterface {
@@ -184,7 +184,7 @@ public class ProductEntityData implements EavEntityDataInterface {
 
     @Override
     public String getEntityClass() {
-        return EavEntities.PRODUCT.getEntityClass();
+        return EavEntity.PRODUCT.getEntityClass();
     }
 
     public String getGroup() {
