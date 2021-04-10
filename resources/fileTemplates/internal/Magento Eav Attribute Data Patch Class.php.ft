@@ -10,7 +10,7 @@ namespace ${NAMESPACE};
 use $use;
 #end
 
-class ${NAME} implements ${IMPLEMENTS} {
+class ${CLASS_NAME} implements ${IMPLEMENTS} {
 
      /**
      * @var ${MODULE_DATA_SETUP_INTERFACE}

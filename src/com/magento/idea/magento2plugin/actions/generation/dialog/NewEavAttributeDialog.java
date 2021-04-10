@@ -300,7 +300,8 @@ public class NewEavAttributeDialog extends AbstractDialog {
     private void generateDataPatchFile() {
         new EavAttributeSetupPatchGenerator(
                 populateProductEntityData(new ProductEntityData()),
-                project
+                project,
+                true
         ).generate(NewEavAttributeAction.ACTION_NAME, true);
     }
 
