@@ -293,7 +293,7 @@ public class NewEavAttributeDialog extends AbstractDialog {
         sourceModelData.setClassName(sourceModelNameTexField.getText().trim());
         sourceModelData.setDirectory(sourceModelDirectoryTexField.getText().trim());
 
-        new SourceModelGenerator(project, sourceModelData)
+        new SourceModelGenerator(sourceModelData, project, true)
                 .generate(NewEavAttributeAction.ACTION_NAME, false);
     }
 

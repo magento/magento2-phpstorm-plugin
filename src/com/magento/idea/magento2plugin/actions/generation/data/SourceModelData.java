@@ -5,7 +5,7 @@
 
 package com.magento.idea.magento2plugin.actions.generation.data;
 
-import com.magento.idea.magento2plugin.magento.files.SourceModelPhp;
+import com.magento.idea.magento2plugin.magento.files.SourceModelFile;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 
@@ -63,7 +63,7 @@ public class SourceModelData {
      */
     public String getDirectory() {
         if (this.directory == null) {
-            return SourceModelPhp.DEFAULT_DIR;
+            return SourceModelFile.DEFAULT_DIR;
         }
 
         return this.directory;

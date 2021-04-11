@@ -25,7 +25,7 @@ public class SourceModelGeneratorTest extends BaseGeneratorTestCase {
         sourceModelData.setNamespace(SOURCE_MODEL_NAMESPACE);
 
         final SourceModelGenerator sourceModelGeneratorGenerator =
-                new SourceModelGenerator(project, sourceModelData);
+                new SourceModelGenerator(sourceModelData, project);
         final PsiFile dataPatchFile = sourceModelGeneratorGenerator.generate("test");
         final String filePatch = this.getFixturePath("CustomSourceModel.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePatch);
