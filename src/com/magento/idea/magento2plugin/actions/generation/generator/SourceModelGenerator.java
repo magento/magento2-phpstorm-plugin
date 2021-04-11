@@ -49,7 +49,11 @@ public class SourceModelGenerator extends PhpFileGenerator {
 
     @Override
     protected AbstractPhpFile initFile() {
-        return new SourceModelFile(data.getModuleName(), data.getClassName());
+        return new SourceModelFile(
+                data.getModuleName(),
+                data.getClassName(),
+                data.getDirectory()
+        );
     }
 
     @Override
