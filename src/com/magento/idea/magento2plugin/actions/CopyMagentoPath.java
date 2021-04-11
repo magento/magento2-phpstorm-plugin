@@ -15,17 +15,17 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+import java.util.Arrays;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class CopyMagentoPath extends CopyPathProvider {
-    public static final String PHTML = "phtml";
-    public static final String JS = "js";
-    public static final String CSS = "css";
-    private final List<String> acceptedTypes = Arrays.asList(PHTML, JS, CSS);
+    public static final String PHTML_EXTENSION = "phtml";
+    public static final String JS_EXTENSION = "js";
+    public static final String CSS_EXTENSION = "css";
+    private final List<String> acceptedTypes
+            = Arrays.asList(PHTML_EXTENSION, JS_EXTENSION, CSS_EXTENSION);
     public static final String SEPARATOR = "::";
     private int index;
 
@@ -51,7 +51,7 @@ public class CopyMagentoPath extends CopyPathProvider {
         }
     }
 
-    private boolean isNotValidFile(VirtualFile virtualFile) {
+    private boolean isNotValidFile(final VirtualFile virtualFile) {
         return virtualFile != null && virtualFile.isDirectory()
                 || virtualFile != null && !acceptedTypes.contains(virtualFile.getExtension());
     }
@@ -77,31 +77,30 @@ public class CopyMagentoPath extends CopyPathProvider {
             return null;
         }
         final StringBuilder fullPath = new StringBuilder(virtualFile.getPath());
-        final StringBuilder magentoPath
-                = new StringBuilder(moduleName);
 
         index = -1;
         String[] paths;
 
-        if (PHTML.equals(virtualFile.getExtension())) {
+        if (PHTML_EXTENSION.equals(virtualFile.getExtension())) {
             paths = templatePaths;
-        } else if (JS.equals(virtualFile.getExtension()) || CSS.equals(virtualFile.getExtension())) {
+        } else if (JS_EXTENSION.equals(virtualFile.getExtension())
+                || CSS_EXTENSION.equals(virtualFile.getExtension())) {
             paths = webPaths;
         } else {
             return fullPath.toString();
         }
 
-        final int endIndex = getIndexOf(fullPath, paths[++index], paths);
+        final int endIndex = getIndexOf(paths, fullPath, paths[++index]);
         final int offset = paths[index].length();
 
         fullPath.replace(0, endIndex + offset, "");
 
-        return magentoPath.append(SEPARATOR).append(fullPath).toString();
+        return moduleName + SEPARATOR + fullPath;
     }
 
-    private int getIndexOf(final StringBuilder fullPath, final String path, final String[] paths) {
+    private int getIndexOf(final String[] paths, final StringBuilder fullPath, final String path) {
         return fullPath.lastIndexOf(path) == -1
-                ? getIndexOf(fullPath, paths[++index], paths)
+                ? getIndexOf(paths, fullPath, paths[++index])
                 : fullPath.lastIndexOf(path);
     }
 }
