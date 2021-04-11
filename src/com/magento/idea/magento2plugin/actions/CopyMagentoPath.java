@@ -24,7 +24,8 @@ import java.util.List;
 public class CopyMagentoPath extends CopyPathProvider {
     public static final String PHTML = "phtml";
     public static final String JS = "js";
-    private final List<String> acceptedTypes = Arrays.asList(PHTML, JS);
+    public static final String CSS = "css";
+    private final List<String> acceptedTypes = Arrays.asList(PHTML, JS, CSS);
     public static final String SEPARATOR = "::";
     private int index;
 
@@ -35,10 +36,11 @@ public class CopyMagentoPath extends CopyPathProvider {
         "templates/"
     };
 
-    private final String[] jsPaths = {
+    private final String[] webPaths = {
         "view/frontend/web/",
         "view/adminhtml/web/",
-        "view/base/web/"
+        "view/base/web/",
+        "web/"
     };
 
     @Override
@@ -77,29 +79,24 @@ public class CopyMagentoPath extends CopyPathProvider {
         final StringBuilder fullPath = new StringBuilder(virtualFile.getPath());
         final StringBuilder magentoPath
                 = new StringBuilder(moduleName);
-        String path = fullPath.toString();
+
+        index = -1;
+        String[] paths;
 
         if (PHTML.equals(virtualFile.getExtension())) {
-            index = -1;
-            final int endIndex = getIndexOf(fullPath, templatePaths[++index], templatePaths);
-            final int offset = templatePaths[index].length();
-
-            fullPath.replace(0, endIndex + offset, "");
-            magentoPath.append(SEPARATOR);
-            magentoPath.append(fullPath);
-            path = magentoPath.toString();
-        } else if (JS.equals(virtualFile.getExtension())) {
-            index = -1;
-            final int endIndex = getIndexOf(fullPath, jsPaths[++index], jsPaths);
-            final int offset = jsPaths[index].length();
-
-            fullPath.replace(0, endIndex + offset, "");
-            magentoPath.append(SEPARATOR);
-            magentoPath.append(fullPath);
-            path = magentoPath.toString();
+            paths = templatePaths;
+        } else if (JS.equals(virtualFile.getExtension()) || CSS.equals(virtualFile.getExtension())) {
+            paths = webPaths;
+        } else {
+            return fullPath.toString();
         }
 
-        return path;
+        final int endIndex = getIndexOf(fullPath, paths[++index], paths);
+        final int offset = paths[index].length();
+
+        fullPath.replace(0, endIndex + offset, "");
+
+        return magentoPath.append(SEPARATOR).append(fullPath).toString();
     }
 
     private int getIndexOf(final StringBuilder fullPath, final String path, final String[] paths) {
