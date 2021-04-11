@@ -18,10 +18,16 @@ import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class CopyMagentoPath extends CopyPathProvider {
     public static final String PHTML = "phtml";
-    public static final String PHTML_SEPARATOR = "::";
+    public static final String JS = "js";
+    private final List<String> acceptedTypes = Arrays.asList(PHTML, JS);
+    public static final String SEPARATOR = "::";
     private int index;
+
     private final String[] templatePaths = {
         "view/frontend/templates/",
         "view/adminhtml/templates/",
@@ -29,13 +35,23 @@ public class CopyMagentoPath extends CopyPathProvider {
         "templates/"
     };
 
+    private final String[] jsPaths = {
+        "view/frontend/web/",
+        "view/adminhtml/web/",
+        "view/base/web/"
+    };
+
     @Override
     public void update(@NotNull final AnActionEvent event) {
         final VirtualFile virtualFile = event.getData(PlatformDataKeys.VIRTUAL_FILE);
-        if (virtualFile != null && virtualFile.isDirectory()
-                || virtualFile != null && !PHTML.equals(virtualFile.getExtension())) {
+        if (isNotValidFile(virtualFile)) {
             event.getPresentation().setVisible(false);
         }
+    }
+
+    private boolean isNotValidFile(VirtualFile virtualFile) {
+        return virtualFile != null && virtualFile.isDirectory()
+                || virtualFile != null && !acceptedTypes.contains(virtualFile.getExtension());
     }
 
     @Nullable
@@ -65,11 +81,20 @@ public class CopyMagentoPath extends CopyPathProvider {
 
         if (PHTML.equals(virtualFile.getExtension())) {
             index = -1;
-            final int endIndex = getIndexOf(fullPath, templatePaths[++index]);
+            final int endIndex = getIndexOf(fullPath, templatePaths[++index], templatePaths);
             final int offset = templatePaths[index].length();
 
             fullPath.replace(0, endIndex + offset, "");
-            magentoPath.append(PHTML_SEPARATOR);
+            magentoPath.append(SEPARATOR);
+            magentoPath.append(fullPath);
+            path = magentoPath.toString();
+        } else if (JS.equals(virtualFile.getExtension())) {
+            index = -1;
+            final int endIndex = getIndexOf(fullPath, jsPaths[++index], jsPaths);
+            final int offset = jsPaths[index].length();
+
+            fullPath.replace(0, endIndex + offset, "");
+            magentoPath.append(SEPARATOR);
             magentoPath.append(fullPath);
             path = magentoPath.toString();
         }
@@ -77,9 +102,9 @@ public class CopyMagentoPath extends CopyPathProvider {
         return path;
     }
 
-    private int getIndexOf(final StringBuilder fullPath, final String path) {
+    private int getIndexOf(final StringBuilder fullPath, final String path, final String[] paths) {
         return fullPath.lastIndexOf(path) == -1
-                ? getIndexOf(fullPath, templatePaths[++index])
+                ? getIndexOf(fullPath, paths[++index], paths)
                 : fullPath.lastIndexOf(path);
     }
 }
