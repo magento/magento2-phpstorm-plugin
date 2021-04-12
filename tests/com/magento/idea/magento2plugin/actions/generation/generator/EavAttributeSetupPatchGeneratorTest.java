@@ -113,4 +113,37 @@ public class EavAttributeSetupPatchGeneratorTest extends BaseGeneratorTestCase {
 
         assertGeneratedFileIsCorrect(expectedFile, "src/app/code/Foo/Bar/Setup/Patch/Data", dataPatchFile);
     }
+
+    public void testGenerateFileWithApplyToAttribute() {
+        final Project project = myFixture.getProject();
+
+        final ProductEntityData productEntityData = new ProductEntityData();
+        productEntityData.setCode("applied_to_attribute");
+        productEntityData.setVisibleInGrid(false);
+        productEntityData.setHtmlAllowedOnFront(false);
+        productEntityData.setVisibleOnFront(false);
+        productEntityData.setVisible(true);
+        productEntityData.setScope(AttributeScope.GLOBAL.getScope());
+        productEntityData.setLabel("Test Label");
+        productEntityData.setType("static");
+        productEntityData.setUsedInGrid(false);
+        productEntityData.setRequired(false);
+        productEntityData.setInput("text");
+        productEntityData.setFilterableInGrid(false);
+        productEntityData.setSortOrder(10);
+        productEntityData.setGroup("General");
+        productEntityData.setApplyTo("configurable,simple");
+
+        productEntityData.setDataPatchName("AddAppliedToAttribute");
+        productEntityData.setModuleName(MODULE_NAME);
+
+        final EavAttributeSetupPatchGenerator setupPatchGenerator =
+                new EavAttributeSetupPatchGenerator(productEntityData, project);
+        final PsiFile dataPatchFile = setupPatchGenerator.generate("testGenerateFileWithApplyToAttribute");
+
+        final String filePatch = this.getFixturePath("AddAppliedToAttribute.php");
+        final PsiFile expectedFile = myFixture.configureByFile(filePatch);
+
+        assertGeneratedFileIsCorrect(expectedFile, "src/app/code/Foo/Bar/Setup/Patch/Data", dataPatchFile);
+    }
 }
