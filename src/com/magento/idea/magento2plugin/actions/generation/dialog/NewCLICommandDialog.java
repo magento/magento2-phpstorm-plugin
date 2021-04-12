@@ -85,6 +85,7 @@ public class NewCLICommandDialog extends AbstractDialog {
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
         this.toSnakeCase = CamelCaseToSnakeCase.getInstance();
         this.commonBundle = new CommonBundle();
+        this.cliCommandDescriptionField.setBorder(new JTextField().getBorder());
 
         setContentPane(contentPane);
         setModal(true);

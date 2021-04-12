@@ -134,6 +134,7 @@
             </constraints>
             <properties>
               <lineWrap value="true"/>
+              <text value="N/A"/>
               <wrapStyleWord value="false"/>
             </properties>
           </component>
