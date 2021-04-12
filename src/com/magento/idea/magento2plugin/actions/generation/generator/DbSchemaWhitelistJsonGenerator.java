@@ -21,6 +21,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateDbSchemaWhitelistJson;
 import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaWhitelistJson;
 import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaXml;
+import com.magento.idea.magento2plugin.magento.packages.database.ColumnAttributes;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
@@ -84,10 +85,10 @@ public class DbSchemaWhitelistJsonGenerator extends FileGenerator {
             final JsonObject indexObject = jsonElementGenerator.createObject("");
 
             for (final Map<String, String> columnData : dbSchemaXmlData.getColumns()) {
-                final String columnName = columnData.get(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME);
+                final String columnName = columnData.get(ColumnAttributes.NAME.getName());
                 final boolean isIdentity =
                         Boolean.parseBoolean(
-                                columnData.get(ModuleDbSchemaXml.XML_ATTR_COLUMN_IDENTITY)
+                                columnData.get(ColumnAttributes.IDENTITY.getName())
                         );
 
                 if (isIdentity) {

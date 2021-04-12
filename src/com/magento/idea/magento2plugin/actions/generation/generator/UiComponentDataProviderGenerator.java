@@ -5,151 +5,96 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
-import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
-import com.jetbrains.php.lang.psi.PhpFile;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataProviderData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
-import com.magento.idea.magento2plugin.bundles.CommonBundle;
-import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
-import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
-import com.magento.idea.magento2plugin.magento.packages.File;
-import com.magento.idea.magento2plugin.magento.packages.Package;
-import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
-import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
+import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
+import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderFile;
+import com.magento.idea.magento2plugin.magento.files.queries.GetListQueryFile;
+import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryType;
 import java.util.Properties;
-import javax.swing.JOptionPane;
+import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings({"PMD.OnlyOneReturn", "PMD.DataflowAnomalyAnalysis"})
-public class UiComponentDataProviderGenerator extends FileGenerator {
-    private final UiComponentDataProviderData uiComponentGridDataProviderData;
-    private final Project project;
-    private final DirectoryGenerator directoryGenerator;
-    private final FileFromTemplateGenerator fileFromTemplateGenerator;
-    private final ValidatorBundle validatorBundle;
-    private final CommonBundle commonBundle;
+public class UiComponentDataProviderGenerator extends PhpFileGenerator {
+
+    private final UiComponentDataProviderData data;
     private final String moduleName;
-    private final GetFirstClassOfFile getFirstClassOfFile;
 
     /**
      * Ui component grid data provider constructor.
      *
-     * @param uiComponentGridDataProviderData UiComponentGridDataProviderData
+     * @param data UiComponentGridDataProviderData
      * @param moduleName String
      * @param project Project
      */
     public UiComponentDataProviderGenerator(
-            final UiComponentDataProviderData uiComponentGridDataProviderData,
-            final String moduleName,
-            final Project project
+            final @NotNull UiComponentDataProviderData data,
+            final @NotNull String moduleName,
+            final @NotNull Project project
     ) {
-        super(project);
+        this(data, moduleName, project, true);
+    }
 
-        this.uiComponentGridDataProviderData = uiComponentGridDataProviderData;
-        this.directoryGenerator = DirectoryGenerator.getInstance();
-        this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
-        this.validatorBundle = new ValidatorBundle();
-        this.commonBundle = new CommonBundle();
-        this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
-        this.project = project;
+    /**
+     * Ui component grid data provider constructor.
+     *
+     * @param data UiComponentGridDataProviderData
+     * @param moduleName String
+     * @param project Project
+     * @param checkFileAlreadyExists boolean
+     */
+    public UiComponentDataProviderGenerator(
+            final @NotNull UiComponentDataProviderData data,
+            final @NotNull String moduleName,
+            final @NotNull Project project,
+            final boolean checkFileAlreadyExists
+    ) {
+        super(project, checkFileAlreadyExists);
+        this.data = data;
         this.moduleName = moduleName;
     }
 
     @Override
-    public PsiFile generate(final String actionName) {
-        final PsiFile[] dataProviderFiles = new PsiFile[1];
-
-        WriteCommandAction.runWriteCommandAction(project, () -> {
-            PhpClass dataProvider = GetPhpClassByFQN.getInstance(project).execute(
-                    getDataProviderFqn()
-            );
-
-            if (dataProvider != null) {
-                final String errorMessage = this.validatorBundle.message(
-                        "validator.file.alreadyExists",
-                        "DataProvider Class"
-                );
-                JOptionPane.showMessageDialog(
-                        null,
-                        errorMessage,
-                        commonBundle.message("common.error"),
-                        JOptionPane.ERROR_MESSAGE
-                );
-
-                return;
-            }
-
-            dataProvider = createDataProviderClass(actionName);
-
-            if (dataProvider == null) {
-                final String errorMessage = this.validatorBundle.message(
-                        "validator.file.cantBeCreated",
-                        "DataProvider Class"
-                );
-                JOptionPane.showMessageDialog(
-                        null,
-                        errorMessage,
-                        commonBundle.message("common.error"),
-                        JOptionPane.ERROR_MESSAGE
-                );
-
-                return;
-            }
-
-            dataProviderFiles[0] = dataProvider.getContainingFile();
-        });
-
-        return dataProviderFiles[0];
+    protected AbstractPhpFile initFile() {
+        return new UiComponentDataProviderFile(moduleName, data.getName(), data.getPath());
     }
 
+    /**
+     * Fill file property attributes.
+     *
+     * @param attributes Properties
+     */
     @Override
-    protected void fillAttributes(final Properties attributes) {
-        attributes.setProperty("NAMESPACE", uiComponentGridDataProviderData.getNamespace());
-        attributes.setProperty("CLASS_NAME", uiComponentGridDataProviderData.getName());
-    }
+    protected void fillAttributes(final @NotNull Properties attributes) {
+        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
 
-    private PhpClass createDataProviderClass(final String actionName) {
-        PsiDirectory parentDirectory = new ModuleIndex(project)
-                .getModuleDirectoryByModuleName(this.moduleName);
-        final PsiFile dataProviderFile;
-        final String[] dataProviderDirectories = uiComponentGridDataProviderData.getPath().split(
-                File.separator
-        );
-        for (final String dataProviderDirectory: dataProviderDirectories) {
-            parentDirectory = directoryGenerator.findOrCreateSubdirectory(
-                    parentDirectory, dataProviderDirectory
-            );
+        phpClassTypesBuilder
+                .appendProperty("NAMESPACE", file.getNamespace())
+                .appendProperty("CLASS_NAME", data.getName())
+                .appendProperty("HAS_GET_LIST_QUERY", "false")
+                .append("EXTENDS", UiComponentDataProviderFile.DEFAULT_DATA_PROVIDER);
+
+        if (data.getEntityIdFieldName() != null && data.getEntityName() != null) {
+            phpClassTypesBuilder.appendProperty("ENTITY_ID", data.getEntityIdFieldName());
+
+            phpClassTypesBuilder
+                    .appendProperty("HAS_GET_LIST_QUERY", "true")
+                    .append(
+                            "GET_LIST_QUERY_TYPE",
+                            new GetListQueryFile(moduleName, data.getEntityName()).getClassFqn()
+                    )
+                    .append("REPORTING_TYPE", FrameworkLibraryType.REPORTING.getType())
+                    .append("SEARCH_CRITERIA_BUILDER",
+                            FrameworkLibraryType.API_SEARCH_CRITERIA_BUILDER.getType())
+                    .append("REQUEST_TYPE", FrameworkLibraryType.REQUEST.getType())
+                    .append("FILTER_BUILDER", FrameworkLibraryType.FILTER_BUILDER.getType())
+                    .append("SEARCH_RESULT_FACTORY",
+                            UiComponentDataProviderFile.SEARCH_RESULT_FACTORY);
         }
+        phpClassTypesBuilder.mergeProperties(attributes);
 
-        final Properties attributes = getAttributes();
-
-        dataProviderFile = fileFromTemplateGenerator.generate(
-                UiComponentDataProviderPhp.getInstance(
-                        uiComponentGridDataProviderData.getName()
-                ),
-                attributes,
-                parentDirectory,
-                actionName
-        );
-
-        if (dataProviderFile == null) {
-            return null;
-        }
-
-        return getFirstClassOfFile.execute((PhpFile) dataProviderFile);
-    }
-
-    private String getDataProviderFqn() {
-        return String.format(
-                "%s%s%s",
-                uiComponentGridDataProviderData.getNamespace(),
-                Package.fqnSeparator,
-                uiComponentGridDataProviderData.getName()
-        );
+        attributes.setProperty("USES",
+                PhpClassGeneratorUtil.formatUses(phpClassTypesBuilder.getUses()));
     }
 }

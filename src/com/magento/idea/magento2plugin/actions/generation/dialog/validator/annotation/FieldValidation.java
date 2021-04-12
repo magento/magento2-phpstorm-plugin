@@ -26,7 +26,7 @@ public @interface FieldValidation {
     /**
      * Get specified in the annotation message array.
      * The first element of array is a bundle message identifier,
-     * туче elements are the arguments for the bundle message.
+     * next elements are the arguments for the bundle message.
      *
      * @return String[]
      */

@@ -5,46 +5,54 @@
 
 package com.magento.idea.magento2plugin.actions.generation.data;
 
+import org.jetbrains.annotations.NotNull;
+
 public class DataModelInterfaceData {
-    private final String namespace;
+
     private final String name;
     private final String moduleName;
-    private final String fqn;
     private final String properties;
 
     /**
-     * Constructor.
+     * Data model interface constructor.
+     *
+     * @param name String
+     * @param moduleName String
+     * @param properties String
      */
     public DataModelInterfaceData(
-            final String namespace,
-            final String name,
-            final String moduleName,
-            final String fqn,
-            final String properties
+            final @NotNull String name,
+            final @NotNull String moduleName,
+            final @NotNull String properties
     ) {
-        this.namespace = namespace;
         this.name = name;
         this.moduleName = moduleName;
-        this.fqn = fqn;
         this.properties = properties;
     }
 
-    public String getNamespace() {
-        return namespace;
-    }
-
+    /**
+     * Get data model interface name.
+     *
+     * @return String
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Get module name.
+     *
+     * @return String
+     */
     public String getModuleName() {
         return moduleName;
     }
 
-    public String getFQN() {
-        return fqn;
-    }
-
+    /**
+     * Get properties.
+     *
+     * @return String
+     */
     public String getProperties() {
         return properties;
     }

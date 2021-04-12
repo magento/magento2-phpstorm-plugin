@@ -22,7 +22,7 @@
 
 ## Works with
 
-* PhpStorm >= 2020.3
+* PhpStorm >= 2021.1
 * JRE >= 11
 
 ## Features

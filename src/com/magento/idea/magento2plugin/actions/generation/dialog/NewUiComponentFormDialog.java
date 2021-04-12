@@ -8,7 +8,6 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBoxTableRenderer;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.NewUiComponentFormAction;
 import com.magento.idea.magento2plugin.actions.generation.data.AclXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
@@ -42,11 +41,12 @@ import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentF
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.files.ControllerFrontendPhp;
-import com.magento.idea.magento2plugin.magento.files.FormButtonBlockPhp;
+import com.magento.idea.magento2plugin.magento.files.FormButtonBlockFile;
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
+import com.magento.idea.magento2plugin.magento.packages.uicomponent.FormElementType;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.ui.table.ComboBoxEditor;
 import com.magento.idea.magento2plugin.ui.table.DeleteRowButton;
@@ -71,7 +71,6 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
-import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
@@ -273,10 +272,10 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         });
 
         final String[] buttonTypes = {
-            FormButtonBlockPhp.TYPE_SAVE,
-            FormButtonBlockPhp.TYPE_BACK,
-            FormButtonBlockPhp.TYPE_DELETE,
-            FormButtonBlockPhp.TYPE_CUSTOM
+            FormButtonBlockFile.TYPE_SAVE,
+            FormButtonBlockFile.TYPE_BACK,
+            FormButtonBlockFile.TYPE_DELETE,
+            FormButtonBlockFile.TYPE_CUSTOM
         };
 
         final TableColumn typeColumnObject = formButtons.getColumn(TYPE_COLUMN);
@@ -346,25 +345,9 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     }
 
     private void initFormElementTypeColumn() {
-        final String[] formElementTypes = {
-            "hidden",
-            "file",
-            "input",
-            "date",
-            "boolean",
-            "checkbox",
-            "checkboxset",
-            "email",
-            "select",
-            "multiselect",
-            "text",
-            "textarea",
-            "price",
-            "radioset",
-            "wysiwyg"
-        };
-
+        final String[] formElementTypes = FormElementType.getTypeList().toArray(new String[0]);
         final TableColumn formElementTypeColumn = fields.getColumn(FORM_ELEMENT_TYPE_COLUMN);
+
         formElementTypeColumn.setCellEditor(new ComboBoxEditor(formElementTypes));
         formElementTypeColumn.setCellRenderer(new ComboBoxTableRenderer<>(formElementTypes));
     }
@@ -433,26 +416,21 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         this.setVisible(false);
     }
 
-    private PsiFile generateDataProviderFile() {
-        final NamespaceBuilder namespace = getDataProviderNamespace();
-        return new UiComponentDataProviderGenerator(new UiComponentDataProviderData(
+    /**
+     * Generate data provider file.
+     */
+    private void generateDataProviderFile() {
+        new UiComponentDataProviderGenerator(new UiComponentDataProviderData(
             getDataProviderClassName(),
-            namespace.getNamespace(),
             getDataProviderDirectory()
         ), getModuleName(), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
     }
 
-    @NotNull
-    private NamespaceBuilder getDataProviderNamespace() {
-        return new NamespaceBuilder(
-                getModuleName(),
-                getDataProviderClassName(),
-                getDataProviderDirectory()
-        );
-    }
-
-    private PsiFile generateFormFile() {
-        return new UiComponentFormGenerator(new UiComponentFormFileData(
+    /**
+     * Generate form file.
+     */
+    private void generateFormFile() {
+        new UiComponentFormGenerator(new UiComponentFormFileData(
                 getFormName(),
                 getArea(),
                 getModuleName(),
@@ -463,25 +441,32 @@ public class NewUiComponentFormDialog extends AbstractDialog {
                 getRoute(),
                 getSubmitControllerName(),
                 getSubmitActionName(),
-                getDataProviderNamespace().getClassFqn()
+                getDataProviderClassName(),
+                getDataProviderDirectory()
         ), project).generate(NewUiComponentFormAction.ACTION_NAME, true);
     }
 
-    private PsiFile generateRoutesXmlFile() {
-        return new RoutesXmlGenerator(new RoutesXmlData(
+    /**
+     * Generate route xml file.
+     */
+    private void generateRoutesXmlFile() {
+        new RoutesXmlGenerator(new RoutesXmlData(
             getArea(),
             getRoute(),
             getModuleName()
         ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
     }
 
-    private PsiFile generateViewControllerFile() {
+    /**
+     * Generate view controller file.
+     */
+    private void generateViewControllerFile() {
         final NamespaceBuilder namespace = new NamespaceBuilder(
                 getModuleName(),
                 getViewActionName(),
                 getViewControllerDirectory()
         );
-        return new ModuleControllerClassGenerator(new ControllerFileData(
+        new ModuleControllerClassGenerator(new ControllerFileData(
             getViewControllerDirectory(),
             getViewActionName(),
             getModuleName(),
@@ -493,13 +478,16 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
     }
 
-    private PsiFile generateSubmitControllerFile() {
+    /**
+     * Generate submit controller file.
+     */
+    private void generateSubmitControllerFile() {
         final NamespaceBuilder namespace = new NamespaceBuilder(
                 getModuleName(),
                 getViewActionName(),
                 getSubmitControllerDirectory()
         );
-        return new ModuleControllerClassGenerator(new ControllerFileData(
+        new ModuleControllerClassGenerator(new ControllerFileData(
             getSubmitControllerDirectory(),
             getSubmitActionName(),
             getModuleName(),
@@ -511,8 +499,11 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
     }
 
-    private PsiFile generateLayoutFile() {
-        return new LayoutXmlGenerator(new LayoutXmlData(
+    /**
+     * Generate layout file.
+     */
+    private void generateLayoutFile() {
+        new LayoutXmlGenerator(new LayoutXmlData(
             getArea(),
             getRoute(),
             getModuleName(),
@@ -522,8 +513,11 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
     }
 
-    private PsiFile generateAclXmlFile() {
-        return new AclXmlGenerator(new AclXmlData(
+    /**
+     * Generate ACL XML file.
+     */
+    private void generateAclXmlFile() {
+        new AclXmlGenerator(new AclXmlData(
             getParentAcl(),
             getAcl(),
             getAclTitle()

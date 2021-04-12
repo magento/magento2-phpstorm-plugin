@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.NewControllerAction;
 import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
@@ -199,8 +198,11 @@ public class NewControllerDialog extends AbstractDialog {
         this.setVisible(false);
     }
 
-    private PsiFile generateFile() {
-        return new ModuleControllerClassGenerator(new ControllerFileData(
+    /**
+     * Generate controller class file.
+     */
+    private void generateFile() {
+        new ModuleControllerClassGenerator(new ControllerFileData(
                 getActionDirectory(),
                 getActionName(),
                 getModuleName(),

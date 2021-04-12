@@ -8,6 +8,7 @@ package com.magento.idea.magento2plugin.actions.generation.data;
 import java.util.List;
 
 public class UiComponentFormFileData {
+
     private final String formName;
     private final String formArea;
     private final String moduleName;
@@ -18,7 +19,10 @@ public class UiComponentFormFileData {
     private final String route;
     private final String submitControllerName;
     private final String submitActionName;
-    private final String dataProviderFqn;
+    private final String dataProviderName;
+    private final String dataProviderPath;
+    private final String entityName;
+    private final String entityId;
 
     /**
      * UI Form data file constructor.
@@ -32,7 +36,8 @@ public class UiComponentFormFileData {
      * @param route String
      * @param submitControllerName String
      * @param submitActionName String
-     * @param dataProviderFqn String
+     * @param dataProviderName String
+     * @param dataProviderPath String
      */
     @SuppressWarnings({"PMD.ExcessiveParameterList"})
     public UiComponentFormFileData(
@@ -46,7 +51,60 @@ public class UiComponentFormFileData {
             final String route,
             final String submitControllerName,
             final String submitActionName,
-            final String dataProviderFqn
+            final String dataProviderName,
+            final String dataProviderPath
+    ) {
+        this(
+                formName,
+                formArea,
+                moduleName,
+                label,
+                buttons,
+                fieldsets,
+                fields,
+                route,
+                submitControllerName,
+                submitActionName,
+                dataProviderName,
+                dataProviderPath,
+                "Entity",
+                "entity_id"
+        );
+    }
+
+    /**
+     * UI Form data file constructor.
+     *
+     * @param formName String
+     * @param formArea String
+     * @param moduleName String
+     * @param buttons List[UiComponentFormButtonData]
+     * @param fieldsets List[UiComponentFormFieldsetData]
+     * @param fields List[UiComponentFormFieldData]
+     * @param route String
+     * @param submitControllerName String
+     * @param submitActionName String
+     * @param dataProviderName String
+     * @param dataProviderPath String
+     * @param entityName String
+     * @param entityId String
+     */
+    @SuppressWarnings({"PMD.ExcessiveParameterList"})
+    public UiComponentFormFileData(
+            final String formName,
+            final String formArea,
+            final String moduleName,
+            final String label,
+            final List<UiComponentFormButtonData> buttons,
+            final List<UiComponentFormFieldsetData> fieldsets,
+            final List<UiComponentFormFieldData> fields,
+            final String route,
+            final String submitControllerName,
+            final String submitActionName,
+            final String dataProviderName,
+            final String dataProviderPath,
+            final String entityName,
+            final String entityId
     ) {
         this.formName = formName;
         this.formArea = formArea;
@@ -58,7 +116,10 @@ public class UiComponentFormFileData {
         this.route = route;
         this.submitControllerName = submitControllerName;
         this.submitActionName = submitActionName;
-        this.dataProviderFqn = dataProviderFqn;
+        this.dataProviderName = dataProviderName;
+        this.dataProviderPath = dataProviderPath;
+        this.entityName = entityName;
+        this.entityId = entityId;
     }
 
     /**
@@ -152,11 +213,38 @@ public class UiComponentFormFileData {
     }
 
     /**
-     * Get data provider FQN.
+     * Get data provider name.
      *
      * @return String
      */
-    public String getDataProviderFqn() {
-        return dataProviderFqn;
+    public String getDataProviderName() {
+        return dataProviderName;
+    }
+
+    /**
+     * Get data provider path.
+     *
+     * @return String
+     */
+    public String getDataProviderPath() {
+        return dataProviderPath;
+    }
+
+    /**
+     * Get entity name.
+     *
+     * @return String
+     */
+    public String getEntityName() {
+        return entityName;
+    }
+
+    /**
+     * Get entity id.
+     *
+     * @return String
+     */
+    public String getEntityId() {
+        return entityId;
     }
 }
