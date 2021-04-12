@@ -64,7 +64,7 @@ public class SourceModelGenerator extends PhpFileGenerator {
         uses.add(abstractSourceClass);
 
         attributes.setProperty("NAME", data.getClassName());
-        attributes.setProperty("NAMESPACE", data.getNamespace());
+        attributes.setProperty("NAMESPACE", this.getFile().getNamespace());
         attributes.setProperty(
                 "EXTENDS",
                 PhpClassGeneratorUtil.getNameFromFqn(abstractSourceClass)

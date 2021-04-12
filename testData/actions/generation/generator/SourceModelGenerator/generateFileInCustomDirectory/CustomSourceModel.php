@@ -1,6 +1,6 @@
 <?php
 
-namespace Foo\Bar\Model\Source;
+namespace Foo\Bar\Custom\Source\Directory;
 
 use Magento\Eav\Model\Entity\Attribute\Source\AbstractSource;
 

@@ -11,10 +11,9 @@ import com.magento.idea.magento2plugin.actions.generation.data.SourceModelData;
 
 public class SourceModelGeneratorTest extends BaseGeneratorTestCase {
     private final static String MODULE_NAME = "Foo_Bar";
-    private final static String SOURCE_MODEL_NAMESPACE = "Foo\\Bar\\Setup\\Patch\\Data";
 
     /**
-     * Test Data patch for product's eav attribute generator.
+     * Test source model generation
      */
     public void testGenerateFile() {
         final Project project = myFixture.getProject();
@@ -22,7 +21,6 @@ public class SourceModelGeneratorTest extends BaseGeneratorTestCase {
         final SourceModelData sourceModelData = new SourceModelData();
         sourceModelData.setClassName("CustomSourceModel");
         sourceModelData.setModuleName(MODULE_NAME);
-        sourceModelData.setNamespace(SOURCE_MODEL_NAMESPACE);
 
         final SourceModelGenerator sourceModelGeneratorGenerator =
                 new SourceModelGenerator(sourceModelData, project);
@@ -33,6 +31,30 @@ public class SourceModelGeneratorTest extends BaseGeneratorTestCase {
         assertGeneratedFileIsCorrect(
                 expectedFile,
                 "src/app/code/Foo/Bar/Model/Source",
+                dataPatchFile
+        );
+    }
+
+    /**
+     * Test source model in custom directory generation
+     */
+    public void testGenerateFileInCustomDirectory() {
+        final Project project = myFixture.getProject();
+
+        final SourceModelData sourceModelData = new SourceModelData();
+        sourceModelData.setClassName("CustomSourceModel");
+        sourceModelData.setModuleName(MODULE_NAME);
+        sourceModelData.setDirectory("Custom/Source/Directory");
+
+        final SourceModelGenerator sourceModelGeneratorGenerator =
+                new SourceModelGenerator(sourceModelData, project);
+        final PsiFile dataPatchFile = sourceModelGeneratorGenerator.generate("test custom dir");
+        final String filePatch = this.getFixturePath("CustomSourceModel.php");
+        final PsiFile expectedFile = myFixture.configureByFile(filePatch);
+
+        assertGeneratedFileIsCorrect(
+                expectedFile,
+                "src/app/code/Foo/Bar/Custom/Source/Directory",
                 dataPatchFile
         );
     }

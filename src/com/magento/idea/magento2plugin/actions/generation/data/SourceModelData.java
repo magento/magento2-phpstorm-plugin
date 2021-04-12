@@ -6,45 +6,14 @@
 package com.magento.idea.magento2plugin.actions.generation.data;
 
 import com.magento.idea.magento2plugin.magento.files.SourceModelFile;
-import com.magento.idea.magento2plugin.magento.packages.File;
-import com.magento.idea.magento2plugin.magento.packages.Package;
 
 public class SourceModelData {
     private String className;
-    private String namespace;
     private String moduleName;
     private String directory;
 
     public String getClassName() {
         return className;
-    }
-
-    /**
-     * Constructor.
-     */
-    public String getNamespace() {
-        if (namespace == null) {
-            namespace = getDefaultSourceModelNamespace();
-        }
-
-        return namespace;
-    }
-
-    /**
-     * Provides default namespace.
-     *
-     * @return String
-     */
-    public String getDefaultSourceModelNamespace() {
-        final String[] parts = moduleName.split(Package.vendorModuleNameSeparator);
-        if (parts[0] == null || parts[1] == null || parts.length > 2) {
-            return null;
-        }
-        final String directoryPart = getDirectory().replace(
-                File.separator,
-                Package.fqnSeparator
-        );
-        return parts[0] + Package.fqnSeparator + parts[1] + Package.fqnSeparator + directoryPart;
     }
 
     /**
@@ -71,10 +40,6 @@ public class SourceModelData {
 
     public void setClassName(final String className) {
         this.className = className;
-    }
-
-    public void setNamespace(final String namespace) {
-        this.namespace = namespace;
     }
 
     public void setModuleName(final String moduleName) {
