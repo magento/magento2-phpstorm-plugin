@@ -93,6 +93,10 @@ public class PluginDeclarationInspection extends PhpInspection {
                         }
 
                         final String pluginTypeName = pluginTypeNameAttribute.getValue();
+                        if (pluginTypeName == null) {
+                            continue;
+                        }
+
                         final String pluginTypeKey = pluginNameAttributeValue.concat(
                                 Package.vendorModuleNameSeparator
                         ).concat(pluginTypeName);
@@ -118,14 +122,17 @@ public class PluginDeclarationInspection extends PhpInspection {
                         if (pluginTypeDisabledAttribute != null
                                 && pluginTypeDisabledAttribute.getValue() != null
                                 && pluginTypeDisabledAttribute.getValue().equals("true")
+                                && !pluginTypeName.isEmpty()
                         ) {
-                            if (modulesWithSamePluginName.isEmpty()) {
+                            @Nullable final XmlAttributeValue valueElement
+                                    = pluginTypeNameAttribute.getValueElement();
+                            if (modulesWithSamePluginName.isEmpty() && valueElement != null) {
                                 problemsHolder.registerProblem(
-                                        pluginTypeNameAttribute.getValueElement(),
-                                        inspectionBundle.message(
-                                            "inspection.plugin.disabledPluginDoesNotExist"
-                                        ),
-                                        errorSeverity
+                                            valueElement,
+                                            inspectionBundle.message(
+                                                "inspection.plugin.disabledPluginDoesNotExist"
+                                            ),
+                                            errorSeverity
                                 );
                             } else {
                                 continue;
