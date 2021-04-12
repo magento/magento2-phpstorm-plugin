@@ -17,6 +17,6 @@ class ${NAME} extends ${EXTENDS}
      */
     public function getAllOptions(): array
     {
-        // TODO: Implement getAllOptions() method.
+        return [];
     }
 }

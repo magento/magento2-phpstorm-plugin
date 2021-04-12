@@ -19,8 +19,12 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.EavAttributeSetupPatchGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.SourceModelGenerator;
-import com.magento.idea.magento2plugin.magento.packages.Package;
-import com.magento.idea.magento2plugin.magento.packages.eav.*;
+import com.magento.idea.magento2plugin.magento.files.SourceModelFile;
+import com.magento.idea.magento2plugin.magento.packages.eav.AttributeInput;
+import com.magento.idea.magento2plugin.magento.packages.eav.AttributeScope;
+import com.magento.idea.magento2plugin.magento.packages.eav.AttributeSourceModel;
+import com.magento.idea.magento2plugin.magento.packages.eav.AttributeType;
+import com.magento.idea.magento2plugin.magento.packages.eav.EavEntity;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -38,7 +42,12 @@ import javax.swing.event.DocumentEvent;
 import org.codehaus.plexus.util.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.UnusedPrivateField"})
+@SuppressWarnings({
+        "PMD.TooManyFields",
+        "PMD.ExcessiveImports",
+        "PMD.TooManyMethods",
+        "PMD.UnusedPrivateField"
+})
 public class NewEavAttributeDialog extends AbstractDialog {
     private final String moduleName;
     private JPanel contentPanel;
@@ -285,7 +294,9 @@ public class NewEavAttributeDialog extends AbstractDialog {
         final ComboBoxItemData selectedSource = (ComboBoxItemData) sourceComboBox.getSelectedItem();
 
         if (selectedSource == null
-                || !selectedSource.getText().equals(AttributeSourceModel.GENERATE_SOURCE.getSource())) {
+                || !selectedSource.getText().equals(
+                        AttributeSourceModel.GENERATE_SOURCE.getSource()
+        )) {
             return;
         }
 
@@ -293,14 +304,15 @@ public class NewEavAttributeDialog extends AbstractDialog {
         sourceModelData.setClassName(sourceModelNameTexField.getText().trim());
         sourceModelData.setDirectory(sourceModelDirectoryTexField.getText().trim());
 
-        new SourceModelGenerator(project, sourceModelData)
+        new SourceModelGenerator(sourceModelData, project, true)
                 .generate(NewEavAttributeAction.ACTION_NAME, false);
     }
 
     private void generateDataPatchFile() {
         new EavAttributeSetupPatchGenerator(
                 populateProductEntityData(new ProductEntityData()),
-                project
+                project,
+                true
         ).generate(NewEavAttributeAction.ACTION_NAME, true);
     }
 
@@ -331,19 +343,20 @@ public class NewEavAttributeDialog extends AbstractDialog {
         final ComboBoxItemData selectedItem = (ComboBoxItemData) sourceComboBox.getSelectedItem();
 
         if (selectedItem == null
-                || selectedItem.getText().equals(AttributeSourceModel.NULLABLE_SOURCE.getSource())) {
+                || selectedItem.getText().equals(
+                        AttributeSourceModel.NULLABLE_SOURCE.getSource()
+        )) {
             return null;
         }
 
         if (selectedItem.getText().equals(AttributeSourceModel.GENERATE_SOURCE.getSource())
                 && sourceModelData != null) {
 
-            return String.join(
-                    Package.fqnSeparator,
-                    "",
-                    sourceModelData.getNamespace(),
-                    sourceModelData.getClassName()
-            );
+            return "\\" + new SourceModelFile(
+                    sourceModelData.getModuleName(),
+                    sourceModelData.getClassName(),
+                    sourceModelData.getDirectory()
+            ).getClassFqn();
         }
 
         return sourceComboBox.getSelectedItem().toString();
@@ -360,7 +373,8 @@ public class NewEavAttributeDialog extends AbstractDialog {
     }
 
     private String getAttributeInput() {
-        final ComboBoxItemData selectedAttributeInput = (ComboBoxItemData) inputComboBox.getSelectedItem();
+        final ComboBoxItemData selectedAttributeInput =
+                (ComboBoxItemData) inputComboBox.getSelectedItem();
 
         if (selectedAttributeInput != null) {
             return selectedAttributeInput.getText().trim();

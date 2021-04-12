@@ -50,12 +50,8 @@ public class ProductAttributeMapper implements AttributeMapperInterface {
                 wrapStringValueForTemplate(eavEntityData.getLabel()));
         mappedAttributes.put(EavAttribute.INPUT.getAttribute(),
                 wrapStringValueForTemplate(eavEntityData.getInput()));
-
-        final String eavSource = eavEntityData.getSource();
         mappedAttributes.put(EavAttribute.SOURCE.getAttribute(),
-                eavSource == null || eavSource.equals(AttributeSourceModel.NULLABLE_SOURCE.getSource())
-                        ? null : eavSource + "::class");
-
+                getEntitySource(eavEntityData));
         mappedAttributes.put(EavAttribute.REQUIRED.getAttribute(),
                 Boolean.toString(eavEntityData.isRequired()));
         mappedAttributes.put(EavAttribute.SORT_ORDER.getAttribute(),
@@ -80,5 +76,14 @@ public class ProductAttributeMapper implements AttributeMapperInterface {
 
     private String wrapStringValueForTemplate(final String value) {
         return "'" + value + "'";
+    }
+
+
+    private String getEntitySource(final ProductEntityData eavEntityData) {
+        final String eavSource = eavEntityData.getSource();
+
+        return eavSource == null
+                || eavSource.equals(AttributeSourceModel.NULLABLE_SOURCE.getSource())
+                ? null : eavSource + "::class";
     }
 }

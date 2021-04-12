@@ -12,7 +12,6 @@ import com.magento.idea.magento2plugin.magento.packages.eav.AttributeSourceModel
 
 public class EavAttributeSetupPatchGeneratorTest extends BaseGeneratorTestCase {
     private final static String MODULE_NAME = "Foo_Bar";
-    private final static String DATA_PATCH_NAMESPACE = "Foo\\Bar\\Setup\\Patch\\Data";
 
     /**
      * Test Data patch for product's eav attribute generator.
@@ -37,7 +36,6 @@ public class EavAttributeSetupPatchGeneratorTest extends BaseGeneratorTestCase {
         productEntityData.setGroup("General");
 
         productEntityData.setDataPatchName("AddTestAttribute");
-        productEntityData.setNamespace(DATA_PATCH_NAMESPACE);
         productEntityData.setModuleName(MODULE_NAME);
 
         final EavAttributeSetupPatchGenerator setupPatchGenerator =
@@ -71,7 +69,6 @@ public class EavAttributeSetupPatchGeneratorTest extends BaseGeneratorTestCase {
         productEntityData.setGroup("General");
 
         productEntityData.setDataPatchName("AddBooleanInputAttributeAttribute");
-        productEntityData.setNamespace(DATA_PATCH_NAMESPACE);
         productEntityData.setModuleName(MODULE_NAME);
 
         final EavAttributeSetupPatchGenerator setupPatchGenerator =
@@ -105,7 +102,6 @@ public class EavAttributeSetupPatchGeneratorTest extends BaseGeneratorTestCase {
         productEntityData.setGroup("General");
 
         productEntityData.setDataPatchName("AddAttributeWithCustomSourceAttribute");
-        productEntityData.setNamespace(DATA_PATCH_NAMESPACE);
         productEntityData.setModuleName(MODULE_NAME);
 
         final EavAttributeSetupPatchGenerator setupPatchGenerator =
