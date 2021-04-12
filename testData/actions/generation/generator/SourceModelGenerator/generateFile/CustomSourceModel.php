@@ -13,6 +13,6 @@ class CustomSourceModel extends AbstractSource
      */
     public function getAllOptions(): array
     {
-        // TODO: Implement getAllOptions() method.
+        return [];
     }
 }
