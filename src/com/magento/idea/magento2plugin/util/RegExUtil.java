@@ -68,6 +68,9 @@ public class RegExUtil {
 
         public static final String XML_IDENTIFIER =
                 "^([A-Z]+[a-zA-Z0-9]{1,}){1,}_[A-Z]+[A-Z0-9a-z]{1,}::[A-Za-z_0-9]{1,}$";
+
+        public static final String COMMA_SEPARATED_STRING =
+                "^[^\\s,]+(?:,\\s*[^\\s,]+)*$";
     }
 
     public class PhpRegex {

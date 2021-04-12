@@ -12,9 +12,11 @@ import com.magento.idea.magento2plugin.actions.generation.NewEavAttributeAction;
 import com.magento.idea.magento2plugin.actions.generation.data.ProductEntityData;
 import com.magento.idea.magento2plugin.actions.generation.data.SourceModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
+import com.magento.idea.magento2plugin.actions.generation.dialog.event.ApplyToVisibleListener;
 import com.magento.idea.magento2plugin.actions.generation.dialog.event.EavAttributeInputItemListener;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.CommaSeparatedStringRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.Lowercase;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.EavAttributeSetupPatchGenerator;
@@ -37,6 +39,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import org.codehaus.plexus.util.StringUtils;
@@ -92,6 +95,12 @@ public class NewEavAttributeDialog extends AbstractDialog {
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, "Source Model Name"})
     private JTextField sourceModelNameTexField;
+    @FieldValidation(rule = RuleRegistry.COMMA_SEPARATED_STRING,
+            message = {CommaSeparatedStringRule.MESSAGE, "Apply To"})
+    private JTextField applyToTextField;
+    private JCheckBox applyToAllProductsCheckBox;
+    private JPanel applyToPanel;
+    private JTextPane applyToRecommendationTextPanel;
     private final Project project;
     private final SourceModelData sourceModelData;
 
@@ -112,10 +121,15 @@ public class NewEavAttributeDialog extends AbstractDialog {
         addActionListenersForButtons();
         addCancelActionForWindow();
         addCancelActionForEsc();
+        addApplyToVisibilityAction();
         setAutocompleteListenerForAttributeCodeField();
         fillEntityComboBoxes();
         addDependBetweenInputAndSourceModel();
         setDefaultSources();
+    }
+
+    private void addApplyToVisibilityAction() {
+        applyToAllProductsCheckBox.addChangeListener(new ApplyToVisibleListener(applyToPanel));
     }
 
     @SuppressWarnings("PMD.AccessorMethodGeneration")
@@ -295,7 +309,7 @@ public class NewEavAttributeDialog extends AbstractDialog {
 
         if (selectedSource == null
                 || !selectedSource.getText().equals(
-                        AttributeSourceModel.GENERATE_SOURCE.getSource()
+                AttributeSourceModel.GENERATE_SOURCE.getSource()
         )) {
             return;
         }
@@ -336,6 +350,10 @@ public class NewEavAttributeDialog extends AbstractDialog {
         productEntityData.setScope(getAttributeScope());
         productEntityData.setSource(getAttributeSource());
 
+        if (!applyToAllProductsCheckBox.isSelected()) {
+            productEntityData.setApplyTo(applyToTextField.getText().trim());
+        }
+
         return productEntityData;
     }
 
@@ -344,7 +362,7 @@ public class NewEavAttributeDialog extends AbstractDialog {
 
         if (selectedItem == null
                 || selectedItem.getText().equals(
-                        AttributeSourceModel.NULLABLE_SOURCE.getSource()
+                AttributeSourceModel.NULLABLE_SOURCE.getSource()
         )) {
             return null;
         }

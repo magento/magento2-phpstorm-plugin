@@ -71,6 +71,11 @@ public class ProductAttributeMapper implements AttributeMapperInterface {
         mappedAttributes.put(EavAttribute.VISIBLE_ON_FRONT.getAttribute(),
                 Boolean.toString(eavEntityData.isVisibleOnFront()));
 
+        if (eavEntityData.getApplyTo() != null && !eavEntityData.getApplyTo().isEmpty()) {
+            mappedAttributes.put(EavAttribute.APPLY_TO.getAttribute(),
+                    wrapStringValueForTemplate(eavEntityData.getApplyTo()));
+        }
+
         return mappedAttributes;
     }
 

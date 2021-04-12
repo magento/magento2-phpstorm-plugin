@@ -19,4 +19,6 @@ public interface EavEntityDataInterface {
     public String getDataPatchName();
 
     public String getEntityClass();
+
+    public String getSource();
 }
