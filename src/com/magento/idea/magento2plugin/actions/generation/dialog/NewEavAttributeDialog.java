@@ -28,18 +28,21 @@ import com.magento.idea.magento2plugin.magento.packages.eav.AttributeSourceModel
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeType;
 import com.magento.idea.magento2plugin.magento.packages.eav.EavEntity;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+import com.magento.idea.magento2plugin.util.magento.GetProductTypesListUtil;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.List;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import org.codehaus.plexus.util.StringUtils;
@@ -100,7 +103,7 @@ public class NewEavAttributeDialog extends AbstractDialog {
     private JTextField applyToTextField;
     private JCheckBox applyToAllProductsCheckBox;
     private JPanel applyToPanel;
-    private JTextPane applyToRecommendationTextPanel;
+    private JList productsTypesList;
     private final Project project;
     private final SourceModelData sourceModelData;
 
@@ -124,8 +127,18 @@ public class NewEavAttributeDialog extends AbstractDialog {
         addApplyToVisibilityAction();
         setAutocompleteListenerForAttributeCodeField();
         fillEntityComboBoxes();
+        fillProductsTypesList();
         addDependBetweenInputAndSourceModel();
         setDefaultSources();
+    }
+
+    private void fillProductsTypesList() {
+        final List<String> productTypes = GetProductTypesListUtil.execute(project);
+
+        final DefaultListModel<String> listModel = new DefaultListModel<>();
+        listModel.addAll(productTypes);
+        productsTypesList.setModel(listModel);
+        productsTypesList.setSelectedIndex(0);
     }
 
     private void addApplyToVisibilityAction() {
@@ -351,7 +364,9 @@ public class NewEavAttributeDialog extends AbstractDialog {
         productEntityData.setSource(getAttributeSource());
 
         if (!applyToAllProductsCheckBox.isSelected()) {
-            productEntityData.setApplyTo(applyToTextField.getText().trim());
+            productEntityData.setApplyTo(
+                    String.join(",", productsTypesList.getSelectedValuesList())
+            );
         }
 
         return productEntityData;
