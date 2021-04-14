@@ -82,8 +82,8 @@ class ${CLASS_NAME} implements ${IMPLEMENTS} {
         '${ATTRIBUTE_CODE}',
             [
             #set ($attributeSet = ${ATTRIBUTE_SET})
-            #foreach ($attribute in $attributeSet.split(","))
-                $attribute,
+            #foreach ($attribute in $attributeSet.split("->"))
+                $attribute
             #end
 ]
         );

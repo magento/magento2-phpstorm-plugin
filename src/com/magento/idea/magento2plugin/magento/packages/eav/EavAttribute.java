@@ -19,7 +19,8 @@ public enum EavAttribute {
     IS_FILTERABLE_IN_GRID("is_filterable_in_grid"),
     VISIBLE("visible"),
     IS_HTML_ALLOWED_ON_FRONT("is_html_allowed_on_front"),
-    VISIBLE_ON_FRONT("visible_on_front");
+    VISIBLE_ON_FRONT("visible_on_front"),
+    OPTION("option");
 
     private String attribute;
 
