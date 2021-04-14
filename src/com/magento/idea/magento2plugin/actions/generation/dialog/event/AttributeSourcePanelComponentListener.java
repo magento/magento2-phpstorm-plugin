@@ -31,15 +31,19 @@ public class AttributeSourcePanelComponentListener implements ComponentListener 
 
     @Override
     public void componentShown(final ComponentEvent componentEvent) {
+        initSetDirectoryFieldValue();
+    }
+
+    @Override
+    public void componentHidden(final ComponentEvent componentEvent) {
+        initSetDirectoryFieldValue();
+    }
+
+    private void initSetDirectoryFieldValue() {
         final String sourceDirectoryValue = sourceModelDirectoryTexField.getText().trim();
 
         if (sourceDirectoryValue.isEmpty()) {
             sourceModelDirectoryTexField.setText(SourceModelFile.DEFAULT_DIR);
         }
-    }
-
-    @Override
-    public void componentHidden(final ComponentEvent componentEvent) {
-        //
     }
 }
