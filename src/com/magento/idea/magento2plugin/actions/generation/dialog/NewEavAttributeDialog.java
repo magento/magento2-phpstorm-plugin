@@ -12,9 +12,11 @@ import com.magento.idea.magento2plugin.actions.generation.NewEavAttributeAction;
 import com.magento.idea.magento2plugin.actions.generation.data.ProductEntityData;
 import com.magento.idea.magento2plugin.actions.generation.data.SourceModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
+import com.magento.idea.magento2plugin.actions.generation.dialog.event.ApplyToVisibleListener;
 import com.magento.idea.magento2plugin.actions.generation.dialog.event.EavAttributeInputItemListener;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.CommaSeparatedStringRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.Lowercase;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.EavAttributeSetupPatchGenerator;
@@ -26,15 +28,19 @@ import com.magento.idea.magento2plugin.magento.packages.eav.AttributeSourceModel
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeType;
 import com.magento.idea.magento2plugin.magento.packages.eav.EavEntity;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+import com.magento.idea.magento2plugin.util.magento.GetProductTypesListUtil;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.List;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -92,6 +98,12 @@ public class NewEavAttributeDialog extends AbstractDialog {
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, "Source Model Name"})
     private JTextField sourceModelNameTexField;
+    @FieldValidation(rule = RuleRegistry.COMMA_SEPARATED_STRING,
+            message = {CommaSeparatedStringRule.MESSAGE, "Apply To"})
+    private JTextField applyToTextField;
+    private JCheckBox applyToAllProductsCheckBox;
+    private JPanel applyToPanel;
+    private JList productsTypesList;
     private final Project project;
     private final SourceModelData sourceModelData;
 
@@ -112,10 +124,25 @@ public class NewEavAttributeDialog extends AbstractDialog {
         addActionListenersForButtons();
         addCancelActionForWindow();
         addCancelActionForEsc();
+        addApplyToVisibilityAction();
         setAutocompleteListenerForAttributeCodeField();
         fillEntityComboBoxes();
+        fillProductsTypesList();
         addDependBetweenInputAndSourceModel();
         setDefaultSources();
+    }
+
+    private void fillProductsTypesList() {
+        final List<String> productTypes = GetProductTypesListUtil.execute(project);
+
+        final DefaultListModel<String> listModel = new DefaultListModel<>();
+        listModel.addAll(productTypes);
+        productsTypesList.setModel(listModel);
+        productsTypesList.setSelectedIndex(0);
+    }
+
+    private void addApplyToVisibilityAction() {
+        applyToAllProductsCheckBox.addChangeListener(new ApplyToVisibleListener(applyToPanel));
     }
 
     @SuppressWarnings("PMD.AccessorMethodGeneration")
@@ -295,7 +322,7 @@ public class NewEavAttributeDialog extends AbstractDialog {
 
         if (selectedSource == null
                 || !selectedSource.getText().equals(
-                        AttributeSourceModel.GENERATE_SOURCE.getSource()
+                AttributeSourceModel.GENERATE_SOURCE.getSource()
         )) {
             return;
         }
@@ -336,6 +363,12 @@ public class NewEavAttributeDialog extends AbstractDialog {
         productEntityData.setScope(getAttributeScope());
         productEntityData.setSource(getAttributeSource());
 
+        if (!applyToAllProductsCheckBox.isSelected()) {
+            productEntityData.setApplyTo(
+                    String.join(",", productsTypesList.getSelectedValuesList())
+            );
+        }
+
         return productEntityData;
     }
 
@@ -344,7 +377,7 @@ public class NewEavAttributeDialog extends AbstractDialog {
 
         if (selectedItem == null
                 || selectedItem.getText().equals(
-                        AttributeSourceModel.NULLABLE_SOURCE.getSource()
+                AttributeSourceModel.NULLABLE_SOURCE.getSource()
         )) {
             return null;
         }

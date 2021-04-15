@@ -63,7 +63,7 @@ public class EavAttributeSetupPatchGenerator extends PhpFileGenerator {
                 .appendProperty("NAMESPACE", this.getFile().getNamespace())
                 .appendProperty("ENTITY_CLASS", data.getEntityClass())
                 .appendProperty("ATTRIBUTE_CODE", data.getCode())
-                .appendProperty("ATTRIBUTE_SET", String.join(",", getAttributesList(data)))
+                .appendProperty("ATTRIBUTE_SET", String.join("->", getAttributesList(data)))
                 .append(
                         "IMPLEMENTS",
                         DataPatchDependency.DATA_PATCH_INTERFACE.getClassPatch()
