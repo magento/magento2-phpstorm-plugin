@@ -18,6 +18,7 @@ public class ProductEntityData implements EavEntityDataInterface {
     private String input;
     private String source;
     private String scope;
+    private String applyTo;
     private boolean required;
     private boolean usedInGrid;
     private boolean visibleInGrid;
@@ -74,6 +75,10 @@ public class ProductEntityData implements EavEntityDataInterface {
 
     public void setScope(final String scope) {
         this.scope = scope;
+    }
+
+    public void setApplyTo(final String applyTo) {
+        this.applyTo = applyTo;
     }
 
     public void setRequired(final boolean required) {
@@ -193,12 +198,17 @@ public class ProductEntityData implements EavEntityDataInterface {
         return group;
     }
 
+    @Override
     public String getSource() {
         return source;
     }
 
     public String getScope() {
         return scope;
+    }
+
+    public String getApplyTo() {
+        return applyTo;
     }
 
     public boolean isRequired() {

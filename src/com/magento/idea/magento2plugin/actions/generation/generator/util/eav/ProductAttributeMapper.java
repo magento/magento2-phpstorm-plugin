@@ -80,6 +80,11 @@ public class ProductAttributeMapper implements AttributeMapperInterface {
                     getMappedOptions(eavEntityData.getOptions(), eavEntityData.getOptionsSortOrder()));
         }
 
+        if (eavEntityData.getApplyTo() != null && !eavEntityData.getApplyTo().isEmpty()) {
+            mappedAttributes.put(EavAttribute.APPLY_TO.getAttribute(),
+                    wrapStringValueForTemplate(eavEntityData.getApplyTo()));
+        }
+
         return mappedAttributes;
     }
 
