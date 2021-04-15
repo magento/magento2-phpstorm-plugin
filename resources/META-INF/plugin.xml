@@ -246,6 +246,8 @@
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 
         <postStartupActivity implementation="com.magento.idea.magento2plugin.project.startup.CheckIfMagentoPathIsValidActivity"/>
+
+        <errorHandler implementation="com.magento.idea.magento2plugin.project.diagnostic.DefaultErrorReportSubmitter"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.php">
