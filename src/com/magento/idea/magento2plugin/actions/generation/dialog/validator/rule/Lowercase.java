@@ -6,7 +6,6 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule;
 
 import org.jetbrains.annotations.NotNull;
-
 import java.util.Locale;
 
 public class Lowercase implements ValidationRule {
