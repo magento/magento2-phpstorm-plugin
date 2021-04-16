@@ -20,7 +20,8 @@ public enum EavAttribute {
     VISIBLE("visible"),
     IS_HTML_ALLOWED_ON_FRONT("is_html_allowed_on_front"),
     VISIBLE_ON_FRONT("visible_on_front"),
-    APPLY_TO("apply_to");
+    APPLY_TO("apply_to"),
+    OPTION("option");
 
     private String attribute;
 

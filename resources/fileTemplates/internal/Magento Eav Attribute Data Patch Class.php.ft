@@ -83,7 +83,7 @@ class ${CLASS_NAME} implements ${IMPLEMENTS} {
             [
             #set ($attributeSet = ${ATTRIBUTE_SET})
             #foreach ($attribute in $attributeSet.split("->"))
-                $attribute,
+                $attribute
             #end
 ]
         );

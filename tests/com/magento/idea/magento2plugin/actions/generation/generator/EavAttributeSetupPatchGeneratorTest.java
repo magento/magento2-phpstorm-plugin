@@ -9,6 +9,8 @@ import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.ProductEntityData;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeScope;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeSourceModel;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EavAttributeSetupPatchGeneratorTest extends BaseGeneratorTestCase {
     private final static String MODULE_NAME = "Foo_Bar";
@@ -142,6 +144,46 @@ public class EavAttributeSetupPatchGeneratorTest extends BaseGeneratorTestCase {
         final PsiFile dataPatchFile = setupPatchGenerator.generate("testGenerateFileWithApplyToAttribute");
 
         final String filePatch = this.getFixturePath("AddAppliedToAttribute.php");
+        final PsiFile expectedFile = myFixture.configureByFile(filePatch);
+
+        assertGeneratedFileIsCorrect(expectedFile, "src/app/code/Foo/Bar/Setup/Patch/Data", dataPatchFile);
+    }
+
+    public void testGenerateFileWithOptions() {
+        final Project project = myFixture.getProject();
+
+        final ProductEntityData productEntityData = new ProductEntityData();
+        productEntityData.setVisibleInGrid(false);
+        productEntityData.setHtmlAllowedOnFront(false);
+        productEntityData.setVisibleOnFront(false);
+        productEntityData.setVisible(true);
+        productEntityData.setScope(AttributeScope.GLOBAL.getScope());
+        productEntityData.setCode("attribute_with_options");
+        productEntityData.setLabel("Attribute With Options");
+        productEntityData.setType("varchar");
+        productEntityData.setUsedInGrid(false);
+        productEntityData.setRequired(false);
+        productEntityData.setInput("multiselect");
+        productEntityData.setSource(AttributeSourceModel.NULLABLE_SOURCE.getSource());
+        productEntityData.setFilterableInGrid(false);
+        productEntityData.setSortOrder(10);
+        productEntityData.setGroup("General");
+
+        final Map<Integer, String> options = new HashMap<>();
+        options.put(0, "option1");
+        options.put(1, "option2");
+        options.put(2, "option3");
+
+        productEntityData.setOptions(options);
+
+        productEntityData.setDataPatchName("AddAttributeWithOptionsAttribute");
+        productEntityData.setModuleName(MODULE_NAME);
+
+        final EavAttributeSetupPatchGenerator setupPatchGenerator =
+                new EavAttributeSetupPatchGenerator(productEntityData, project);
+        final PsiFile dataPatchFile = setupPatchGenerator.generate("testGenerateFileWithOptions");
+
+        final String filePatch = this.getFixturePath("AddAttributeWithOptionsAttribute.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePatch);
 
         assertGeneratedFileIsCorrect(expectedFile, "src/app/code/Foo/Bar/Setup/Patch/Data", dataPatchFile);

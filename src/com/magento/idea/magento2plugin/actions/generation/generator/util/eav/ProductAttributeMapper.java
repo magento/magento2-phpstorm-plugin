@@ -31,7 +31,7 @@ public class ProductAttributeMapper implements AttributeMapperInterface {
             final String attributeValue = attributePair.getValue();
 
             attributesWithValues.add(
-                    String.join("=>", attributeKey, attributeValue)
+                    String.join("=>", attributeKey, attributeValue + ",")
             );
         }
 
@@ -41,7 +41,6 @@ public class ProductAttributeMapper implements AttributeMapperInterface {
     @SuppressWarnings({"PMD.NullAssignment"})
     private Map<String, String> getMappedAttributes(final ProductEntityData eavEntityData) {
         final Map<String, String> mappedAttributes = new HashMap<>();
-
         mappedAttributes.put(EavAttribute.GROUP.getAttribute(),
                 wrapStringValueForTemplate(eavEntityData.getGroup()));
         mappedAttributes.put(EavAttribute.TYPE.getAttribute(),
@@ -71,6 +70,16 @@ public class ProductAttributeMapper implements AttributeMapperInterface {
         mappedAttributes.put(EavAttribute.VISIBLE_ON_FRONT.getAttribute(),
                 Boolean.toString(eavEntityData.isVisibleOnFront()));
 
+        final String attributeOptions = getMappedOptions(
+                eavEntityData.getOptions(),
+                eavEntityData.getOptionsSortOrder()
+        );
+
+        if (!attributeOptions.isEmpty()) {
+            mappedAttributes.put(EavAttribute.OPTION.getAttribute(),
+                    getMappedOptions(eavEntityData.getOptions(), eavEntityData.getOptionsSortOrder()));
+        }
+
         if (eavEntityData.getApplyTo() != null && !eavEntityData.getApplyTo().isEmpty()) {
             mappedAttributes.put(EavAttribute.APPLY_TO.getAttribute(),
                     wrapStringValueForTemplate(eavEntityData.getApplyTo()));
@@ -90,5 +99,63 @@ public class ProductAttributeMapper implements AttributeMapperInterface {
         return eavSource == null
                 || eavSource.equals(AttributeSourceModel.NULLABLE_SOURCE.getSource())
                 ? null : eavSource + "::class";
+    }
+
+    private String getMappedOptions(
+            final Map<Integer, String> optionValues,
+            final Map<Integer, String> optionSortOrders
+    ) {
+        if (optionValues == null || optionValues.isEmpty()) {
+            return "";
+        }
+
+        return "[" + getParsedOptions(optionValues)
+                + (optionSortOrders == null || optionSortOrders.isEmpty()
+                ? "->" : "," + getParsedOptionSortOrders(optionSortOrders)) + "]";
+    }
+
+    private String getParsedOptions(final Map<Integer, String> optionValues) {
+        final String valueNode = "->" + wrapStringValueForTemplate("value") + " => ";
+        final StringBuilder optionsContent = new StringBuilder();
+
+        for (final Integer optionKey : optionValues.keySet()) {
+            final String optionValue = optionValues.get(optionKey);
+
+            if (optionValue.isEmpty()) {
+                continue;
+            }
+
+            optionsContent
+                    .append("->")
+                    .append(wrapStringValueForTemplate("option_" + optionKey))
+                    .append(" => ")
+                    .append("[")
+                    .append(wrapStringValueForTemplate(optionValue))
+                    .append("], ");
+        }
+
+        return valueNode + "[" + optionsContent + "->]";
+    }
+
+    private String getParsedOptionSortOrders(final Map<Integer, String> optionSortOrders) {
+        final String orderNode = "->" + wrapStringValueForTemplate("order") + " => ";
+        final StringBuilder ordersContent = new StringBuilder();
+
+        for (final Integer optionKey : optionSortOrders.keySet()) {
+            final String orderValue = optionSortOrders.get(optionKey);
+
+            if (orderValue.isEmpty()) {
+                continue;
+            }
+
+            ordersContent
+                    .append("->")
+                    .append(wrapStringValueForTemplate("option_" + optionKey))
+                    .append(" => ")
+                    .append(orderValue)
+                    .append(",");
+        }
+
+        return orderNode + "[" + ordersContent + "->]->";
     }
 }

@@ -11,7 +11,7 @@ public enum AttributeSourceModel {
     CONFIG("\\Magento\\Eav\\Model\\Entity\\Attribute\\Source\\Config"),
     STORE("\\Magento\\Eav\\Model\\Entity\\Attribute\\Source\\Store"),
     GENERATE_SOURCE("Custom Source"),
-    NULLABLE_SOURCE("Set Source Model as null");
+    NULLABLE_SOURCE("Without Source Model");
 
     private String source;
 

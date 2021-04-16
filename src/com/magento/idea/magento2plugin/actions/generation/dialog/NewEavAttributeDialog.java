@@ -13,7 +13,10 @@ import com.magento.idea.magento2plugin.actions.generation.data.ProductEntityData
 import com.magento.idea.magento2plugin.actions.generation.data.SourceModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.event.ApplyToVisibleListener;
+import com.magento.idea.magento2plugin.actions.generation.dialog.event.AttributeSourcePanelComponentListener;
+import com.magento.idea.magento2plugin.actions.generation.dialog.event.AttributeSourceRelationsItemListener;
 import com.magento.idea.magento2plugin.actions.generation.dialog.event.EavAttributeInputItemListener;
+import com.magento.idea.magento2plugin.actions.generation.dialog.event.OptionsPanelVisibilityChangeListener;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.CommaSeparatedStringRule;
@@ -21,19 +24,22 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.EavAttributeSetupPatchGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.SourceModelGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.GetAttributeOptionPropertiesUtil;
 import com.magento.idea.magento2plugin.magento.files.SourceModelFile;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeInput;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeScope;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeSourceModel;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeType;
 import com.magento.idea.magento2plugin.magento.packages.eav.EavEntity;
+import com.magento.idea.magento2plugin.ui.table.TableGroupWrapper;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import com.magento.idea.magento2plugin.util.magento.GetProductTypesListUtil;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -42,6 +48,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
@@ -98,14 +105,17 @@ public class NewEavAttributeDialog extends AbstractDialog {
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, "Source Model Name"})
     private JTextField sourceModelNameTexField;
+    private JTable optionTable;
+    private JButton addOptionButton;
+    private JPanel optionsPanel;
     @FieldValidation(rule = RuleRegistry.COMMA_SEPARATED_STRING,
             message = {CommaSeparatedStringRule.MESSAGE, "Apply To"})
-    private JTextField applyToTextField;
     private JCheckBox applyToAllProductsCheckBox;
     private JPanel applyToPanel;
     private JList productsTypesList;
     private final Project project;
     private final SourceModelData sourceModelData;
+    private TableGroupWrapper entityPropertiesTableGroupWrapper;
 
     /**
      * Constructor.
@@ -120,16 +130,35 @@ public class NewEavAttributeDialog extends AbstractDialog {
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
         this.sourceModelData = new SourceModelData();
 
+        fillEntityComboBoxes();
+        initPropertiesTable();
         setPanelConfiguration();
         addActionListenersForButtons();
         addCancelActionForWindow();
         addCancelActionForEsc();
         addApplyToVisibilityAction();
-        setAutocompleteListenerForAttributeCodeField();
         fillEntityComboBoxes();
         fillProductsTypesList();
         addDependBetweenInputAndSourceModel();
+        addOptionPanelListener();
+        setAutocompleteListenerForAttributeCodeField();
         setDefaultSources();
+    }
+
+    private void initPropertiesTable() {
+        final List<String> columns = new LinkedList<>(Arrays.asList(
+                "Value",
+                "Sort Order"
+        ));
+        // Initialize entity properties Table Group
+        entityPropertiesTableGroupWrapper = new TableGroupWrapper(
+                optionTable,
+                addOptionButton,
+                columns,
+                new HashMap<>(),
+                new HashMap<>()
+        );
+        entityPropertiesTableGroupWrapper.initTableGroup();
     }
 
     private void fillProductsTypesList() {
@@ -151,25 +180,23 @@ public class NewEavAttributeDialog extends AbstractDialog {
                 new EavAttributeInputItemListener(sourceComboBox)
         );
 
-        sourceComboBox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(final ItemEvent itemEvent) {
-                final String selectedSource = itemEvent.getItem().toString();
+        sourceComboBox.addItemListener(
+                new AttributeSourceRelationsItemListener(customSourceModelPanel)
+        );
 
-                if (selectedSource.equals(AttributeSourceModel.GENERATE_SOURCE.getSource())) {
-                    customSourceModelPanel.setVisible(true);
-                    sourceModelData.setModuleName(moduleName);
+        customSourceModelPanel.addComponentListener(
+                new AttributeSourcePanelComponentListener(sourceModelDirectoryTexField)
+        );
+    }
 
-                    if (sourceModelDirectoryTexField.getText().trim().isEmpty()) {
-                        sourceModelDirectoryTexField.setText(sourceModelData.getDirectory());
-                    }
-                } else {
-                    customSourceModelPanel.setVisible(false);
-                }
-            }
-        });
-
-        sourceModelDirectoryTexField.setText(sourceModelData.getDirectory());
+    @SuppressWarnings("PMD.AccessorMethodGeneration")
+    private void addOptionPanelListener() {
+        sourceComboBox.addItemListener(
+                new OptionsPanelVisibilityChangeListener(
+                        optionsPanel,
+                        inputComboBox
+                )
+        );
     }
 
     private void setDefaultSources() {
@@ -362,6 +389,10 @@ public class NewEavAttributeDialog extends AbstractDialog {
         productEntityData.setInput(getAttributeInput());
         productEntityData.setScope(getAttributeScope());
         productEntityData.setSource(getAttributeSource());
+        productEntityData.setOptions(GetAttributeOptionPropertiesUtil.getValues(
+                entityPropertiesTableGroupWrapper.getColumnsData()));
+        productEntityData.setOptionsSortOrder(GetAttributeOptionPropertiesUtil.getSortOrders(
+                entityPropertiesTableGroupWrapper.getColumnsData()));
 
         if (!applyToAllProductsCheckBox.isSelected()) {
             productEntityData.setApplyTo(

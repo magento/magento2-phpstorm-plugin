@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.data;
 
 import com.magento.idea.magento2plugin.magento.files.EavAttributeDataPatchFile;
 import com.magento.idea.magento2plugin.magento.packages.eav.EavEntity;
+import java.util.Map;
 
 @SuppressWarnings({"PMD.TooManyFields"})
 public class ProductEntityData implements EavEntityDataInterface {
@@ -26,6 +27,8 @@ public class ProductEntityData implements EavEntityDataInterface {
     private boolean htmlAllowedOnFront;
     private boolean visibleOnFront;
     private int sortOrder;
+    private Map<Integer, String> options;
+    private Map<Integer, String> optionsSortOrder;
 
     private String dataPatchName;
     private String namespace;
@@ -124,6 +127,22 @@ public class ProductEntityData implements EavEntityDataInterface {
 
     public void setModuleName(final String moduleName) {
         this.moduleName = moduleName;
+    }
+
+    public void setOptions(final Map<Integer, String> options) {
+        this.options = options;
+    }
+
+    public void setOptionsSortOrder(final Map<Integer, String> optionsSortOrder) {
+        this.optionsSortOrder = optionsSortOrder;
+    }
+
+    public Map<Integer, String> getOptions() {
+        return options;
+    }
+
+    public Map<Integer, String> getOptionsSortOrder() {
+        return optionsSortOrder;
     }
 
     @Override
