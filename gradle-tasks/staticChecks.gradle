@@ -19,7 +19,6 @@ checkstyle {
 pmd {
     toolVersion = "6.21.0"
     consoleOutput = true
-    rulesMinimumPriority = 5
     ruleSets = [
             rootProject.file("gradle-tasks/pmd/ruleset.xml")
     ]
