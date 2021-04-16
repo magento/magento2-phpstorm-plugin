@@ -16,6 +16,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 public class FormFieldsetsValidator {
+
     private final ValidatorBundle validatorBundle;
     private final NewUiComponentFormDialog dialog;
     private final String errorTitle;

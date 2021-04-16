@@ -5,14 +5,17 @@
 
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Locale;
 
 public class Lowercase implements ValidationRule {
+
     public static final String MESSAGE = "validator.lowercaseCharacters";
     private static final ValidationRule INSTANCE = new Lowercase();
 
     @Override
-    public boolean check(final String value) {
+    public boolean check(final @NotNull String value) {
         return value.equals(value.toLowerCase(Locale.getDefault()));
     }
 
