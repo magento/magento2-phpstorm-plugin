@@ -44,7 +44,10 @@
 1. Check out this repository
 1. Open a folder with the project in the IntelliJ Ultimate using the `open` action button.
 1. Make sure that you on the latest develop branch (e.g `4.0.0-develop`)
-1. Right-click on the `build.gradle` file, choose "Import Gradle project" (you need to have Gradle plugin installed)
+1. Right-click on the `build.gradle` file, choose "Import Gradle project" (if this is not exist look for "Build module '<root folder name>'") (you need to have Gradle plugin installed)
+1. Check if the right SDK version is used for the project.
+   - Current Java version for the project is **java 11**, so you should additionally download **SDK 11** and choose it in the module settings: `Right click by the project root > Open Module Settings > Project Settings > Project > Project SDK`
+   - Check if right SDK version is used for the Gradle plugin: `Intellij IDEA > Preferences... > Build, Execution, Deployment > Build Tools > Gradle > Gradle JVM` and choose your JDK.
 1. When the Gradle sections appeared in the right bar, navigate there and right-click `magento-2-php-storm-plugin > Tasks -> Intellij -> runIde`
 1. Click `Run "magento-2-php-storm-plugin"` to run the plugin. You should see a new instance of IntelliJ launched with the plugin installed. Make sure the plugin is enabled in IntelliJ settings and indexing is finished. Plugin features should be accessible at this point.
 
