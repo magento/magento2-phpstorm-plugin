@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2plugin.actions.generation.dialog.event;
+package com.magento.idea.magento2plugin.actions.generation.dialog.event.eavdialog;
 
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeInput;
@@ -16,11 +16,11 @@ import org.jetbrains.annotations.NotNull;
 
 public class OptionsPanelVisibilityChangeListener implements ItemListener {
     private final JPanel optionsPanel;
-    private final JComboBox inputComboBox;
+    private final JComboBox<ComboBoxItemData> inputComboBox;
 
     public OptionsPanelVisibilityChangeListener(
             @NotNull final JPanel optionsPanel,
-            @NotNull final JComboBox inputComboBox
+            @NotNull final JComboBox<ComboBoxItemData> inputComboBox
     ) {
         this.optionsPanel = optionsPanel;
         this.inputComboBox = inputComboBox;
@@ -39,10 +39,6 @@ public class OptionsPanelVisibilityChangeListener implements ItemListener {
                 AttributeInput.SELECT.getInput().equals(selectedInput)
                         || AttributeInput.MULTISELECT.getInput().equals(selectedInput);
 
-        if (isAllowedInput && isAttributeWithoutSource) {
-            optionsPanel.setVisible(true);
-        } else {
-            optionsPanel.setVisible(false);
-        }
+        optionsPanel.setVisible(isAllowedInput && isAttributeWithoutSource);
     }
 }

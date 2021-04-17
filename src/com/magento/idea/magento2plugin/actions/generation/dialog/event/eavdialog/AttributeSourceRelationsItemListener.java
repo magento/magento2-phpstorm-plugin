@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2plugin.actions.generation.dialog.event;
+package com.magento.idea.magento2plugin.actions.generation.dialog.event.eavdialog;
 
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeSourceModel;
 import java.awt.event.ItemEvent;
@@ -21,10 +21,8 @@ public class AttributeSourceRelationsItemListener implements ItemListener {
     public void itemStateChanged(final ItemEvent itemEvent) {
         final String selectedSource = itemEvent.getItem().toString();
 
-        if (selectedSource.equals(AttributeSourceModel.GENERATE_SOURCE.getSource())) {
-            customSourcePanel.setVisible(true);
-        } else {
-            customSourcePanel.setVisible(false);
-        }
+        customSourcePanel.setVisible(
+                selectedSource.equals(AttributeSourceModel.GENERATE_SOURCE.getSource())
+        );
     }
 }

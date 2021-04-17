@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2plugin.actions.generation.dialog.event;
+package com.magento.idea.magento2plugin.actions.generation.dialog.event.eavdialog;
 
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -23,10 +23,6 @@ public class ApplyToVisibleListener implements ChangeListener {
     public void stateChanged(final ChangeEvent changeEvent) {
         final JCheckBox checkBox = (JCheckBox) changeEvent.getSource();
 
-        if (checkBox.isSelected()) {
-            applyToPanel.setVisible(false);
-        } else {
-            applyToPanel.setVisible(true);
-        }
+        applyToPanel.setVisible(!checkBox.isSelected());
     }
 }
