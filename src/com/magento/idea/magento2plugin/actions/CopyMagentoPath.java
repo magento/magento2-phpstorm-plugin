@@ -52,7 +52,7 @@ public class CopyMagentoPath extends CopyPathProvider {
     private boolean isNotValidFile(final VirtualFile virtualFile) {
         return virtualFile != null && virtualFile.isDirectory()
                 || virtualFile != null && !WEB_EXTENSIONS.contains(virtualFile.getExtension())
-                || virtualFile != null && !PHTML_EXTENSION.equals(virtualFile.getExtension());
+                    && !PHTML_EXTENSION.equals(virtualFile.getExtension());
     }
 
     @Nullable
@@ -88,12 +88,16 @@ public class CopyMagentoPath extends CopyPathProvider {
             return fullPath.toString();
         }
 
-        final int endIndex = getIndexOf(paths, fullPath, paths[++index]);
-        final int offset = paths[index].length();
+        try {
+            final int endIndex = getIndexOf(paths, fullPath, paths[++index]);
+            final int offset = paths[index].length();
 
-        fullPath.replace(0, endIndex + offset, "");
+            fullPath.replace(0, endIndex + offset, "");
 
-        return moduleName + SEPARATOR + fullPath;
+            return moduleName + SEPARATOR + fullPath;
+        } catch (ArrayIndexOutOfBoundsException exception) {
+            return fullPath.toString();
+        }
     }
 
     private int getIndexOf(final String[] paths, final StringBuilder fullPath, final String path) {
