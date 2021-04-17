@@ -22,10 +22,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class CopyMagentoPath extends CopyPathProvider {
     public static final String PHTML_EXTENSION = "phtml";
-    public static final String JS_EXTENSION = "js";
-    public static final String CSS_EXTENSION = "css";
-    private final List<String> acceptedTypes
-            = Arrays.asList(PHTML_EXTENSION, JS_EXTENSION, CSS_EXTENSION);
+    public static final List<String> WEB_EXTENSIONS
+            = Arrays.asList("js", "css", "png", "jpg", "jpeg", "gif");
     public static final String SEPARATOR = "::";
     private int index;
 
@@ -53,7 +51,8 @@ public class CopyMagentoPath extends CopyPathProvider {
 
     private boolean isNotValidFile(final VirtualFile virtualFile) {
         return virtualFile != null && virtualFile.isDirectory()
-                || virtualFile != null && !acceptedTypes.contains(virtualFile.getExtension());
+                || virtualFile != null && !WEB_EXTENSIONS.contains(virtualFile.getExtension())
+                || virtualFile != null && !PHTML_EXTENSION.equals(virtualFile.getExtension());
     }
 
     @Nullable
@@ -83,8 +82,7 @@ public class CopyMagentoPath extends CopyPathProvider {
 
         if (PHTML_EXTENSION.equals(virtualFile.getExtension())) {
             paths = templatePaths;
-        } else if (JS_EXTENSION.equals(virtualFile.getExtension())
-                || CSS_EXTENSION.equals(virtualFile.getExtension())) {
+        } else if (WEB_EXTENSIONS.contains(virtualFile.getExtension())) {
             paths = webPaths;
         } else {
             return fullPath.toString();
