@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewProductEavAttributeDialog;
+import com.magento.idea.magento2plugin.actions.generation.dialog.eavattribute.EavAttributeDialog;
 
 public class NewProductEavAttributeAction extends NewEavAttributeAction {
 
@@ -20,7 +21,7 @@ public class NewProductEavAttributeAction extends NewEavAttributeAction {
     }
 
     @Override
-    protected NewProductEavAttributeDialog getDialogWindow(
+    protected EavAttributeDialog getDialogWindow(
             final Project project,
             final PsiDirectory directory
     ) {

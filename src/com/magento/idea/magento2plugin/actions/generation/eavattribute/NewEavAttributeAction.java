@@ -13,7 +13,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import com.magento.idea.magento2plugin.actions.generation.dialog.NewProductEavAttributeDialog;
+import com.magento.idea.magento2plugin.actions.generation.dialog.eavattribute.EavAttributeDialog;
 import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 
@@ -44,9 +44,8 @@ public abstract class NewEavAttributeAction extends AnAction {
             return;
         }
 
-        final NewProductEavAttributeDialog newProductEavAttributeDialog =
-                getDialogWindow(project, directory);
-        newProductEavAttributeDialog.open();
+        final EavAttributeDialog eavAttributeDialog = getDialogWindow(project, directory);
+        eavAttributeDialog.open();
     }
 
     @Override
@@ -54,7 +53,7 @@ public abstract class NewEavAttributeAction extends AnAction {
         return false;
     }
 
-    protected abstract NewProductEavAttributeDialog getDialogWindow(
+    protected abstract EavAttributeDialog getDialogWindow(
             Project project,
             PsiDirectory directory
     );
