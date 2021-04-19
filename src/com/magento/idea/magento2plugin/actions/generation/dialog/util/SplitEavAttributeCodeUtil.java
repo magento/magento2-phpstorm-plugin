@@ -8,11 +8,11 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.util;
 
 import org.jetbrains.annotations.NotNull;
 
-public final class EavAttributeCodeSeparatorUtil {
+public final class SplitEavAttributeCodeUtil {
 
     public static final String ATTRIBUTE_SEPARATOR = "_";
 
-    private EavAttributeCodeSeparatorUtil(){}
+    private SplitEavAttributeCodeUtil(){}
 
     /**
      * Return separated attribute code.

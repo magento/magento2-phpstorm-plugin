@@ -6,7 +6,7 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog.event.eavdialog;
 
 import com.intellij.ui.DocumentAdapter;
-import com.magento.idea.magento2plugin.actions.generation.dialog.util.EavAttributeCodeSeparatorUtil;
+import com.magento.idea.magento2plugin.actions.generation.dialog.util.SplitEavAttributeCodeUtil;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.BadLocationException;
@@ -72,7 +72,7 @@ public class DataPatchNameAdapter extends DocumentAdapter {
 
         String fileName = "";
 
-        for (final String fileNamePart : EavAttributeCodeSeparatorUtil.execute(attributeCode)) {
+        for (final String fileNamePart : SplitEavAttributeCodeUtil.execute(attributeCode)) {
             fileName = String.join("", fileName, StringUtils.capitalise(fileNamePart));
         }
 
