@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2plugin.actions.generation;
+package com.magento.idea.magento2plugin.actions.generation.eavattribute;
 
 import com.intellij.ide.IdeView;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -13,16 +13,17 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import com.magento.idea.magento2plugin.MagentoIcons;
-import com.magento.idea.magento2plugin.actions.generation.dialog.NewEavAttributeDialog;
+import com.magento.idea.magento2plugin.actions.generation.dialog.eavattribute.EavAttributeDialog;
+import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 
-public class NewEavAttributeAction extends AnAction {
-    public static final String ACTION_NAME = "Magento 2 EAV Attribute";
-    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 EAV Attribute";
-
-    public NewEavAttributeAction() {
-        super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
+public abstract class NewEavAttributeAction extends AnAction {
+    public NewEavAttributeAction(
+            final String actionName,
+            final String actionDescription,
+            final Icon icon
+    ) {
+        super(actionName, actionDescription, icon);
     }
 
     @Override
@@ -43,11 +44,17 @@ public class NewEavAttributeAction extends AnAction {
             return;
         }
 
-        NewEavAttributeDialog.open(project, directory);
+        final EavAttributeDialog eavAttributeDialog = getDialogWindow(project, directory);
+        eavAttributeDialog.open();
     }
 
     @Override
     public boolean isDumbAware() {
         return false;
     }
+
+    protected abstract EavAttributeDialog getDialogWindow(
+            Project project,
+            PsiDirectory directory
+    );
 }

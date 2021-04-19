@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2plugin.actions.generation.dialog.event;
+package com.magento.idea.magento2plugin.actions.generation.dialog.event.eavdialog;
 
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeSourceModel;
