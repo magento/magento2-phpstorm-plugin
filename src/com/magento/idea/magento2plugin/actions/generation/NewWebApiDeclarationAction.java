@@ -47,12 +47,8 @@ public class NewWebApiDeclarationAction extends AnAction {
             return;
         }
 
-        final PhpDocComment classDocComment = method.getContainingClass().getDocComment();
-
         if (!method.getAccess().isPublic()
-                || method.getName().equals(MagentoPhpClass.CONSTRUCT_METHOD_NAME)
-                || classDocComment == null
-                || !classDocComment.getText().contains("@api")) {
+                || method.getName().equals(MagentoPhpClass.CONSTRUCT_METHOD_NAME)) {
             return;
         }
 
