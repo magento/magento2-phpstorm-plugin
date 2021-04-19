@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 public class NewEavAttributeGroup extends NonTrivialActionGroup {
 
     /**
-     * Group for eav attribute generation actions.
+     * Group for Eav attribute generation actions.
      */
     public NewEavAttributeGroup() {
         super();

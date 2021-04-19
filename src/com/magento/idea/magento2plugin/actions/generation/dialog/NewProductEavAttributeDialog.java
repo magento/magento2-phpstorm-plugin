@@ -93,7 +93,7 @@ public class NewProductEavAttributeDialog extends EavAttributeDialog {
     /**
      * Constructor.
      *
-     * @param project   Project
+     * @param project Project
      * @param directory PsiDirectory
      */
     public NewProductEavAttributeDialog(

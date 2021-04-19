@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog.event.eavdialog;
 
 import com.intellij.ui.DocumentAdapter;
+import com.magento.idea.magento2plugin.actions.generation.dialog.util.EavAttributeCodeSeparatorUtil;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.BadLocationException;
@@ -42,10 +43,9 @@ public class SourceModelNameAdapter extends DocumentAdapter {
             return;
         }
 
-        final String[] attributeCodeParts = attributeCode.split("_");
         final StringBuilder sourceModelClassName = new StringBuilder();
 
-        for (final String codePart : attributeCodeParts) {
+        for (final String codePart : EavAttributeCodeSeparatorUtil.execute(attributeCode)) {
             sourceModelClassName.append(StringUtils.capitalise(codePart));
         }
 
