@@ -78,7 +78,8 @@
 
         <!-- Eav Attribute generators -->
         <group id="NewEavAttributeGroup" class="com.magento.idea.magento2plugin.actions.groups.NewEavAttributeGroup" text="Magento 2 EAV Attribute" popup="true">
-            <action id="NewEavAttribute" class="com.magento.idea.magento2plugin.actions.generation.eavattribute.NewProductEavAttributeAction" />
+            <action id="NewProductEavAttribute" class="com.magento.idea.magento2plugin.actions.generation.eavattribute.NewProductEavAttributeAction" />
+            <action id="NewCatalogEavAttribute" class="com.magento.idea.magento2plugin.actions.generation.eavattribute.NewCategoryEavAttributeAction" />
             <add-to-group group-id="MagentoNewModuleFileGroup" anchor="last"/>
         </group>
 
