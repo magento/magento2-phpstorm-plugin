@@ -65,7 +65,7 @@ public final class WebApiDeclarationGenerator extends FileGenerator {
     }
 
     /**
-     * Generate WEB API xml declaration.
+     * Generate Web API XML declaration.
      *
      * @param actionName String
      *

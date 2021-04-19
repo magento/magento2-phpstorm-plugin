@@ -17,7 +17,7 @@ public class WebApiXmlRouteData {
     private final String aclResource;
 
     /**
-     * Web Api xml declaration DTO constructor.
+     * Web API XML declaration DTO constructor.
      *
      * @param moduleName String
      * @param url String

@@ -14,14 +14,16 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewWebApiDeclarationDialog;
+import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.php.PhpPsiElementsUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class NewWebApiDeclarationAction extends AnAction {
 
-    public static final String ACTION_NAME = "Create a new WebApi declaration for this method";
-    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 WebApi XML declaration";
+    public static final String ACTION_NAME = "Create a new Web API declaration for this method";
+    public static final String ACTION_DESCRIPTION =
+            "Create a new Magento 2 Web API XML declaration";
     private Method currentPhpMethod;
 
     /**
@@ -48,7 +50,7 @@ public class NewWebApiDeclarationAction extends AnAction {
         final PhpDocComment classDocComment = method.getContainingClass().getDocComment();
 
         if (!method.getAccess().isPublic()
-                || method.getName().equals("__construct")
+                || method.getName().equals(MagentoPhpClass.CONSTRUCT_METHOD_NAME)
                 || classDocComment == null
                 || !classDocComment.getText().contains("@api")) {
             return;
