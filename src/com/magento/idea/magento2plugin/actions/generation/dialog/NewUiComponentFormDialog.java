@@ -402,6 +402,18 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     }
 
     private void onOK() {
+        if (formButtons.isEditing()) {
+            formButtons.getCellEditor().stopCellEditing();
+        }
+
+        if (fieldsets.isEditing()) {
+            fieldsets.getCellEditor().stopCellEditing();
+        }
+
+        if (fields.isEditing()) {
+            fields.getCellEditor().stopCellEditing();
+        }
+
         if (!validateFormFields()) {
             return;
         }

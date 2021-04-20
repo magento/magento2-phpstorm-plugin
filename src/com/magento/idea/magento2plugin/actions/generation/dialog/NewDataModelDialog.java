@@ -131,6 +131,10 @@ public class NewDataModelDialog extends AbstractDialog {
      * Proceed with generation.
      */
     private void onOK() {
+        if (propertyTable.isEditing()) {
+            propertyTable.getCellEditor().stopCellEditing();
+        }
+
         if (validateFormFields()) {
             formatProperties();
             generateDataModelFile();
