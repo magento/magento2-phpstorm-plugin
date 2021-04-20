@@ -31,6 +31,9 @@ public class RegExUtil {
     public static final String IDENTIFIER_WITH_COLON
             = "[a-zA-Z0-9:_\\-]*";
 
+    public static final String IDENTIFIER_WITH_SLASH
+            = "[a-zA-Z0-9_\\-\\/]*";
+
     public static final String LOWER_SNAKE_CASE
             = "[a-z][a-z0-9_]*";
 
