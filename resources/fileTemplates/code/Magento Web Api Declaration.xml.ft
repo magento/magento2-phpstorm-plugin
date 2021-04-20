@@ -1,0 +1,6 @@
+<route url="/V1/${ROUTE}" method="${METHOD}">
+    <service class="${SERVICE}" method="${SERVICE_METHOD}"/>
+    <resources>
+        <resource ref="${RESOURCE}"/>
+    </resources>
+</route>
