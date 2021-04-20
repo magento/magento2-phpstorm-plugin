@@ -96,6 +96,9 @@
         <action id="OverrideInTheme.Menu" class="com.magento.idea.magento2plugin.actions.generation.OverrideInThemeAction">
             <add-to-group group-id="ProjectViewPopupMenu"/>
         </action>
+        <action id="MagentoCreateAWebApiDeclaration.Menu" class="com.magento.idea.magento2plugin.actions.generation.NewWebApiDeclarationAction">
+            <add-to-group group-id="EditorPopupMenu"/>
+        </action>
 
         <action id="CopyMagentoPath"
                 class="com.magento.idea.magento2plugin.actions.CopyMagentoPath"
@@ -246,6 +249,8 @@
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 
         <postStartupActivity implementation="com.magento.idea.magento2plugin.project.startup.CheckIfMagentoPathIsValidActivity"/>
+
+        <errorHandler implementation="com.magento.idea.magento2plugin.project.diagnostic.DefaultErrorReportSubmitter"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.php">
