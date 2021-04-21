@@ -247,7 +247,7 @@ public class NewCategoryEavAttributeDialog extends EavAttributeDialog {
 
     private void generateCategoryAdminForm(final CategoryEntityData categoryEntityData) {
         final CategoryFormXmlData categoryFormXmlData = new CategoryFormXmlData(
-                convertGroupNameToFieldSet(categoryEntityData.getGroup()),
+                categoryEntityData.getGroup(),
                 categoryEntityData.getCode(),
                 categoryEntityData.getInput(),
                 categoryEntityData.getSortOrder()
@@ -258,11 +258,5 @@ public class NewCategoryEavAttributeDialog extends EavAttributeDialog {
                 project,
                 moduleName
         ).generate(actionName, false);
-    }
-
-    private String convertGroupNameToFieldSet(final String groupName) {
-        final String[] nameParts = groupName.toLowerCase().split(" ");//NOPMD
-
-        return String.join("_", nameParts);
     }
 }

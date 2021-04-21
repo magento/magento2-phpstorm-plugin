@@ -20,10 +20,16 @@ public class CategoryFormXmlData {
             @NotNull final String attributeInput,
             @NotNull final int sortOrder
     ) {
-        this.fieldSetName = fieldSetName;
+        this.fieldSetName = convertGroupNameToFieldSet(fieldSetName);
         this.fieldName = fieldName;
         this.attributeInput = attributeInput;
         this.sortOrder = sortOrder;
+    }
+
+    private String convertGroupNameToFieldSet(final String groupName) {
+        final String[] nameParts = groupName.toLowerCase().split(" ");//NOPMD
+
+        return String.join("_", nameParts);
     }
 
     public String getFieldSetName() {
