@@ -15,7 +15,7 @@ public class PhpDirectoryRule implements ValidationRule {
 
     @Override
     public boolean check(final @NotNull String value) {
-        return value.matches(RegExUtil.Magento.PHP_CLASS);
+        return value.matches(RegExUtil.DIRECTORY);
     }
 
     public static ValidationRule getInstance() {
