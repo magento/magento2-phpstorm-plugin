@@ -44,7 +44,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
-public abstract class EavAttributeDialog extends AbstractDialog {
+public abstract class  EavAttributeDialog extends AbstractDialog {
 
     protected String moduleName;
     protected Project project;
@@ -245,8 +245,11 @@ public abstract class EavAttributeDialog extends AbstractDialog {
             return;
         }
 
-        generateSourceModelFile();
-        generateDataPatchFile();
+        generateExtraFilesBeforeDataPatchGeneration();
+
+        final EavEntityDataInterface eavEntityDataInterface = getEavEntityData();
+        generateDataPatchFile(eavEntityDataInterface);
+        generateExtraFilesAfterDataPatchGeneration(eavEntityDataInterface);
 
         setVisible(false);
     }
@@ -270,13 +273,21 @@ public abstract class EavAttributeDialog extends AbstractDialog {
                 .generate(actionName, false);
     }
 
-    protected void generateDataPatchFile() {
+    protected void generateDataPatchFile(final EavEntityDataInterface eavEntityDataInterface) {
         new EavAttributeSetupPatchGenerator(
-                getEavEntityData(),
+                eavEntityDataInterface,
                 project,
                 true
         ).generate(actionName, true);
     }
+
+    protected void generateExtraFilesBeforeDataPatchGeneration() {
+        generateSourceModelFile();
+    }
+
+    protected void generateExtraFilesAfterDataPatchGeneration(
+            final EavEntityDataInterface eavEntityDataInterface
+    ) {}
 
     protected void addCancelActionForWindow() {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -443,7 +454,7 @@ public abstract class EavAttributeDialog extends AbstractDialog {
     }
 
     protected String getAttributeBackendType() {
-        final JComboBox typeComboBox = getAttributeTypeCompoBox();
+        final JComboBox<ComboBoxItemData> typeComboBox = getAttributeTypeCompoBox();
 
         return AttributeUtil.getBackendTypeBySelectedItem(
                 (ComboBoxItemData) typeComboBox.getSelectedItem()
@@ -451,7 +462,7 @@ public abstract class EavAttributeDialog extends AbstractDialog {
     }
 
     protected String getAttributeInput() {
-        final JComboBox inputComboBox = getAttributeInputComboBox();
+        final JComboBox<ComboBoxItemData> inputComboBox = getAttributeInputComboBox();
 
         return AttributeUtil.getInputTypeBySelectedItem(
                 (ComboBoxItemData) inputComboBox.getSelectedItem()
@@ -459,7 +470,7 @@ public abstract class EavAttributeDialog extends AbstractDialog {
     }
 
     protected String getAttributeSource(final SourceModelData sourceModelData) {
-        final JComboBox sourceComboBox = getAttributeSourceComboBox();
+        final JComboBox<ComboBoxItemData> sourceComboBox = getAttributeSourceComboBox();
 
         return AttributeUtil.getSourceClassBySelectedItem(
                 (ComboBoxItemData) sourceComboBox.getSelectedItem(),

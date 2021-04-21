@@ -3,6 +3,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.actions.generation.data.CategoryEntityData;
+import com.magento.idea.magento2plugin.actions.generation.data.CategoryFormXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.EavEntityDataInterface;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.eavattribute.EavAttributeDialog;
@@ -11,6 +12,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annot
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.Lowercase;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
+import com.magento.idea.magento2plugin.actions.generation.generator.CategoryFormXmlGenerator;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeScope;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -27,7 +29,7 @@ import javax.swing.JTextField;
 })
 public class NewCategoryEavAttributeDialog extends EavAttributeDialog {
 
-    private final static String ENTITY_NAME = "Category";
+    private static final String ENTITY_NAME = "Category";
     private JPanel contentPanel;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -204,7 +206,9 @@ public class NewCategoryEavAttributeDialog extends EavAttributeDialog {
         return populateCategoryEntityData(new CategoryEntityData());
     }
 
-    private CategoryEntityData populateCategoryEntityData(final CategoryEntityData categoryEntityData) {
+    private CategoryEntityData populateCategoryEntityData(
+            final CategoryEntityData categoryEntityData
+    ) {
         categoryEntityData.setModuleName(moduleName);
 
         categoryEntityData.setDataPatchName(getDataPatchName());
@@ -231,5 +235,34 @@ public class NewCategoryEavAttributeDialog extends EavAttributeDialog {
         categoryEntityData.setGroup(groupTextField.getText().trim());
 
         return categoryEntityData;
+    }
+
+    @Override
+    protected void generateExtraFilesAfterDataPatchGeneration(
+            final EavEntityDataInterface eavEntityDataInterface
+    ) {
+        super.generateExtraFilesAfterDataPatchGeneration(eavEntityDataInterface);
+        generateCategoryAdminForm((CategoryEntityData) eavEntityDataInterface);
+    }
+
+    private void generateCategoryAdminForm(final CategoryEntityData categoryEntityData) {
+        final CategoryFormXmlData categoryFormXmlData = new CategoryFormXmlData(
+                convertGroupNameToFieldSet(categoryEntityData.getGroup()),
+                categoryEntityData.getCode(),
+                categoryEntityData.getInput(),
+                categoryEntityData.getSortOrder()
+        );
+
+        new CategoryFormXmlGenerator(
+                categoryFormXmlData,
+                project,
+                moduleName
+        ).generate(actionName, false);
+    }
+
+    private String convertGroupNameToFieldSet(final String groupName) {
+        final String[] nameParts = groupName.toLowerCase().split(" ");//NOPMD
+
+        return String.join("_", nameParts);
     }
 }
