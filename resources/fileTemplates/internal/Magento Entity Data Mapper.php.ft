@@ -44,7 +44,7 @@ class ${CLASS_NAME}
             $entityDto->addData($item->getData());
 
             #set($brackets = "[]")
-$results$brackets = $entityDto;
+            $results$brackets = $entityDto;
         }
 
         return $results;
