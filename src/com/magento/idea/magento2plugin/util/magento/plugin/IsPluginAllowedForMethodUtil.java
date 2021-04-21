@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.util.magento.plugin;
 
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
+import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
 
 public final class IsPluginAllowedForMethodUtil {
 
@@ -20,7 +21,7 @@ public final class IsPluginAllowedForMethodUtil {
      */
     public static boolean check(final Method targetMethod) {
         final String targetMethodName = targetMethod.getName();
-        if (targetMethodName.equals(Plugin.CONSTRUCT_METHOD_NAME)) {
+        if (targetMethodName.equals(MagentoPhpClass.CONSTRUCT_METHOD_NAME)) {
             return false;
         }
         if (targetMethod.isFinal()) {
