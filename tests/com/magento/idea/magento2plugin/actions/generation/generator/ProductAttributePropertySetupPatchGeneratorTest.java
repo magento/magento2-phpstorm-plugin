@@ -12,7 +12,7 @@ import com.magento.idea.magento2plugin.magento.packages.eav.AttributeSourceModel
 import java.util.HashMap;
 import java.util.Map;
 
-public class AttributePropertySetupPatchGeneratorTest extends BaseGeneratorTestCase {
+public class ProductAttributePropertySetupPatchGeneratorTest extends BaseGeneratorTestCase {
     private final static String MODULE_NAME = "Foo_Bar";
 
     /**

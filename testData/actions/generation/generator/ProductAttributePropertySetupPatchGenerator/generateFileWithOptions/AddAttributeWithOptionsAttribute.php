@@ -92,8 +92,8 @@ class AddAttributeWithOptionsAttribute implements DataPatchInterface
                 'required' => false,
                 'input' => 'multiselect',
                 'is_filterable_in_grid' => false,
+                'backend' => \Magento\Eav\Model\Entity\Attribute\Backend\ArrayBackend::class,
                 'sort_order' => 10,
-                'group' => 'General',
                 'option' => [
                     'value' => [
                         'option_0' => ['option1'],
@@ -101,6 +101,7 @@ class AddAttributeWithOptionsAttribute implements DataPatchInterface
                         'option_2' => ['option3'],
                     ]
                 ],
+                'group' => 'General',
             ]
         );
     }
