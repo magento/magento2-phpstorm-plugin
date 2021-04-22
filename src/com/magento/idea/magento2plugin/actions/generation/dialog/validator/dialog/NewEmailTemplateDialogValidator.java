@@ -23,8 +23,10 @@ import com.magento.idea.magento2plugin.util.magento.FileBasedIndexUtil;
 import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
 import java.util.Collection;
 import javax.swing.JOptionPane;
+import org.jetbrains.annotations.NotNull;
 
 public class NewEmailTemplateDialogValidator {
+
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
     private final Project project;
@@ -44,7 +46,7 @@ public class NewEmailTemplateDialogValidator {
      * @param dialog NewEmailTemplateDialog
      * @return boolean
      */
-    public boolean validate(final NewEmailTemplateDialog dialog) {
+    public boolean validate(final @NotNull NewEmailTemplateDialog dialog) {
         final EmailTemplatesXmlData emailTemplatesXmlData = dialog.getEmailTemplateData();
         final String errorTitle = commonBundle.message("common.error");
         final EmailTemplateHtmlData emailTemplateHtmlData = dialog.getEmailTemplateHtmlData();
@@ -92,7 +94,9 @@ public class NewEmailTemplateDialogValidator {
      *
      * @return bool
      */
-    private boolean isTemplateTagAlreadyExists(final EmailTemplatesXmlData emailTemplatesXmlData) {
+    private boolean isTemplateTagAlreadyExists(
+            final @NotNull EmailTemplatesXmlData emailTemplatesXmlData
+    ) {
         final EmailTemplatesXml emailTemplatesXml = new EmailTemplatesXml();
         final XmlFile emailTemplatesFile = (XmlFile) FileBasedIndexUtil.findModuleConfigFile(
                 emailTemplatesXml.getFileName(),
@@ -134,7 +138,7 @@ public class NewEmailTemplateDialogValidator {
      * @return boolean
      */
     private boolean isTemplateFileAlreadyExists(
-            final EmailTemplateHtmlData emailTemplateData
+            final @NotNull EmailTemplateHtmlData emailTemplateData
     ) {
         final PsiFile templateFile = FileBasedIndexUtil.findModuleViewFile(
                 emailTemplateData.getFileName(),
