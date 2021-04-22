@@ -1,31 +1,22 @@
-/*
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
-
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
+import com.magento.idea.magento2plugin.actions.generation.data.CategoryEntityData;
+import com.magento.idea.magento2plugin.actions.generation.data.CategoryFormXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.EavEntityDataInterface;
-import com.magento.idea.magento2plugin.actions.generation.data.ProductEntityData;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.eavattribute.EavAttributeDialog;
-import com.magento.idea.magento2plugin.actions.generation.dialog.event.eavdialog.ApplyToVisibleListener;
 import com.magento.idea.magento2plugin.actions.generation.dialog.util.eavdialog.AttributeUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.CommaSeparatedStringRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.Lowercase;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
+import com.magento.idea.magento2plugin.actions.generation.generator.CategoryFormXmlGenerator;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeScope;
-import com.magento.idea.magento2plugin.util.magento.GetProductTypesListUtil;
-import java.util.List;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -36,9 +27,9 @@ import javax.swing.JTextField;
         "PMD.TooManyMethods",
         "PMD.UnusedPrivateField"
 })
-public class NewProductEavAttributeDialog extends EavAttributeDialog {
+public class NewCategoryEavAttributeDialog extends EavAttributeDialog {
 
-    private static final String ENTITY_NAME = "Product";
+    private static final String ENTITY_NAME = "Category";
     private JPanel contentPanel;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -66,12 +57,7 @@ public class NewProductEavAttributeDialog extends EavAttributeDialog {
     private JComboBox<ComboBoxItemData> scopeComboBox;
     private JComboBox<ComboBoxItemData> sourceComboBox;
     private JCheckBox requiredCheckBox;
-    private JCheckBox usedInGridGridCheckBox;
-    private JCheckBox visibleInGridCheckBox;
-    private JCheckBox filterableInGridCheckBox;
     private JCheckBox visibleCheckBox;
-    private JCheckBox htmlAllowedOnCheckBox;
-    private JCheckBox visibleOnFrontCheckBox;
     private JPanel sourcePanel;
     private JPanel customSourceModelPanel;
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
@@ -83,32 +69,27 @@ public class NewProductEavAttributeDialog extends EavAttributeDialog {
     private JTable optionsTable;
     private JButton addNewOptionButton;
     private JPanel optionsPanel;
-    @FieldValidation(rule = RuleRegistry.COMMA_SEPARATED_STRING,
-            message = {CommaSeparatedStringRule.MESSAGE, "Apply To"})
-    private JCheckBox applyToAllProductsCheckBox;
-    private JPanel applyToPanel;
-    private JList productsTypesList;
 
     /**
      * Constructor.
      *
-     * @param project Project
-     * @param directory PsiDirectory
+     * @param project    Project
+     * @param directory  PsiDirectory
+     * @param actionName String
      */
-    public NewProductEavAttributeDialog(
+    public NewCategoryEavAttributeDialog(
             final Project project,
             final PsiDirectory directory,
             final String actionName
     ) {
         super(project, directory, actionName);
+
     }
 
     @Override
     protected void initBaseDialogState() {
         super.initBaseDialogState();
         fillAttributeScopeComboBoxes();
-        addApplyToVisibilityAction();
-        fillProductsTypesList();
     }
 
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
@@ -222,58 +203,60 @@ public class NewProductEavAttributeDialog extends EavAttributeDialog {
 
     @Override
     protected EavEntityDataInterface getEavEntityData() {
-        return populateProductEntityData(new ProductEntityData());
+        return populateCategoryEntityData(new CategoryEntityData());
     }
 
-    private ProductEntityData populateProductEntityData(final ProductEntityData productEntityData) {
-        productEntityData.setModuleName(moduleName);
+    private CategoryEntityData populateCategoryEntityData(
+            final CategoryEntityData categoryEntityData
+    ) {
+        categoryEntityData.setModuleName(moduleName);
 
-        productEntityData.setDataPatchName(getDataPatchName());
-        productEntityData.setCode(getAttributeCode());
-        productEntityData.setLabel(getAttributeLabel());
-        productEntityData.setSortOrder(getAttributeSortOrder());
-        productEntityData.setRequired(isRequiredAttribute());
-        productEntityData.setVisible(isVisibleAttribute());
-        productEntityData.setGroup(groupTextField.getText().trim());
-        productEntityData.setUsedInGrid(usedInGridGridCheckBox.isSelected());
-        productEntityData.setVisibleInGrid(visibleInGridCheckBox.isSelected());
-        productEntityData.setFilterableInGrid(filterableInGridCheckBox.isSelected());
-        productEntityData.setHtmlAllowedOnFront(htmlAllowedOnCheckBox.isSelected());
-        productEntityData.setVisibleOnFront(visibleOnFrontCheckBox.isSelected());
-        productEntityData.setType(getAttributeBackendType());
-        productEntityData.setInput(getAttributeInput());
-        productEntityData.setScope(
+        categoryEntityData.setDataPatchName(getDataPatchName());
+        categoryEntityData.setCode(getAttributeCode());
+        categoryEntityData.setLabel(getAttributeLabel());
+        categoryEntityData.setSortOrder(getAttributeSortOrder());
+        categoryEntityData.setRequired(isRequiredAttribute());
+        categoryEntityData.setVisible(isVisibleAttribute());
+        categoryEntityData.setType(getAttributeBackendType());
+        categoryEntityData.setInput(getAttributeInput());
+        categoryEntityData.setScope(
                 AttributeUtil.getScopeClassBySelectedItem(
                         (ComboBoxItemData) scopeComboBox.getSelectedItem()
                 )
         );
-        productEntityData.setSource(getAttributeSource(sourceModelData));
-        productEntityData.setOptions(
+        categoryEntityData.setSource(getAttributeSource(sourceModelData));
+        categoryEntityData.setOptions(
                 getAttributeOptions(entityPropertiesTableGroupWrapper)
         );
-        productEntityData.setOptionsSortOrder(
+        categoryEntityData.setOptionsSortOrder(
                 getAttributeOptionsSortOrders(entityPropertiesTableGroupWrapper)
         );
 
-        if (!applyToAllProductsCheckBox.isSelected()) {
-            productEntityData.setApplyTo(
-                    String.join(",", productsTypesList.getSelectedValuesList())
-            );
-        }
+        categoryEntityData.setGroup(groupTextField.getText().trim());
 
-        return productEntityData;
+        return categoryEntityData;
     }
 
-    protected void addApplyToVisibilityAction() {
-        applyToAllProductsCheckBox.addChangeListener(new ApplyToVisibleListener(applyToPanel));
+    @Override
+    protected void generateExtraFilesAfterDataPatchGeneration(
+            final EavEntityDataInterface eavEntityDataInterface
+    ) {
+        super.generateExtraFilesAfterDataPatchGeneration(eavEntityDataInterface);
+        generateCategoryAdminForm((CategoryEntityData) eavEntityDataInterface);
     }
 
-    private void fillProductsTypesList() {
-        final List<String> productTypes = GetProductTypesListUtil.execute(project);
+    private void generateCategoryAdminForm(final CategoryEntityData categoryEntityData) {
+        final CategoryFormXmlData categoryFormXmlData = new CategoryFormXmlData(
+                categoryEntityData.getGroup(),
+                categoryEntityData.getCode(),
+                categoryEntityData.getInput(),
+                categoryEntityData.getSortOrder()
+        );
 
-        final DefaultListModel<String> listModel = new DefaultListModel<>();
-        listModel.addAll(productTypes);
-        productsTypesList.setModel(listModel);
-        productsTypesList.setSelectedIndex(0);
+        new CategoryFormXmlGenerator(
+                categoryFormXmlData,
+                project,
+                moduleName
+        ).generate(actionName, false);
     }
 }

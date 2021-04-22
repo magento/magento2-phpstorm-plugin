@@ -17,6 +17,8 @@ public class AttributeMapperFactory {
     public AttributeMapperInterface createByEntityClass(@NotNull final String entityClass) {
         if (entityClass.equals(EavEntity.PRODUCT.getEntityClass())) {
             return new ProductAttributeMapper();
+        } else if (entityClass.equals(EavEntity.CATEGORY.getEntityClass())) {
+            return new CategoryAttributeMapper();
         }
 
         return null;

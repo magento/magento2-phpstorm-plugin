@@ -9,7 +9,7 @@ import com.magento.idea.magento2plugin.magento.files.EavAttributeDataPatchFile;
 import com.magento.idea.magento2plugin.magento.packages.eav.EavEntity;
 import java.util.Map;
 
-@SuppressWarnings({"PMD.TooManyFields"})
+@SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessivePublicCount"})
 public class ProductEntityData implements EavEntityDataInterface {
     private String group;
     private String code;
@@ -19,6 +19,7 @@ public class ProductEntityData implements EavEntityDataInterface {
     private String source;
     private String scope;
     private String applyTo;
+    private String backendModel;
     private boolean required;
     private boolean usedInGrid;
     private boolean visibleInGrid;
@@ -53,22 +54,27 @@ public class ProductEntityData implements EavEntityDataInterface {
         this.group = group;
     }
 
+    @Override
     public void setCode(final String code) {
         this.code = code;
     }
 
+    @Override
     public void setType(final String type) {
         this.type = type;
     }
 
+    @Override
     public void setLabel(final String label) {
         this.label = label;
     }
 
+    @Override
     public void setInput(final String input) {
         this.input = input;
     }
 
+    @Override
     public void setSource(final String source) {
         this.source = source;
     }
@@ -81,6 +87,7 @@ public class ProductEntityData implements EavEntityDataInterface {
         this.applyTo = applyTo;
     }
 
+    @Override
     public void setRequired(final boolean required) {
         this.required = required;
     }
@@ -97,8 +104,14 @@ public class ProductEntityData implements EavEntityDataInterface {
         this.filterableInGrid = filterableInGrid;
     }
 
+    @Override
     public void setVisible(final boolean visible) {
         this.visible = visible;
+    }
+
+    @Override
+    public void setBackendModel(final String model) {
+        this.backendModel = model;
     }
 
     public void setHtmlAllowedOnFront(final boolean htmlAllowedOnFront) {
@@ -109,38 +122,47 @@ public class ProductEntityData implements EavEntityDataInterface {
         this.visibleOnFront = visibleOnFront;
     }
 
+    @Override
     public void setSortOrder(final int sortOrder) {
         this.sortOrder = sortOrder;
     }
 
+    @Override
     public void setDataPatchName(final String dataPatchName) {
         this.dataPatchName = dataPatchName;
     }
 
+    @Override
     public void setNamespace(final String namespace) {
         this.namespace = namespace;
     }
 
+    @Override
     public void setDirectory(final String directory) {
         this.directory = directory;
     }
 
+    @Override
     public void setModuleName(final String moduleName) {
         this.moduleName = moduleName;
     }
 
+    @Override
     public void setOptions(final Map<Integer, String> options) {
         this.options = options;
     }
 
+    @Override
     public void setOptionsSortOrder(final Map<Integer, String> optionsSortOrder) {
         this.optionsSortOrder = optionsSortOrder;
     }
 
+    @Override
     public Map<Integer, String> getOptions() {
         return options;
     }
 
+    @Override
     public Map<Integer, String> getOptionsSortOrder() {
         return optionsSortOrder;
     }
@@ -203,6 +225,11 @@ public class ProductEntityData implements EavEntityDataInterface {
         return source;
     }
 
+    @Override
+    public String getBackendModel() {
+        return backendModel;
+    }
+
     public String getScope() {
         return scope;
     }
@@ -211,6 +238,7 @@ public class ProductEntityData implements EavEntityDataInterface {
         return applyTo;
     }
 
+    @Override
     public boolean isRequired() {
         return required;
     }
@@ -227,6 +255,7 @@ public class ProductEntityData implements EavEntityDataInterface {
         return filterableInGrid;
     }
 
+    @Override
     public boolean isVisible() {
         return visible;
     }
@@ -239,6 +268,7 @@ public class ProductEntityData implements EavEntityDataInterface {
         return visibleOnFront;
     }
 
+    @Override
     public int getSortOrder() {
         return sortOrder;
     }

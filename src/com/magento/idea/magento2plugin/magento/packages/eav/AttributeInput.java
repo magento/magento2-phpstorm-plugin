@@ -7,18 +7,13 @@ package com.magento.idea.magento2plugin.magento.packages.eav;
 
 public enum AttributeInput {
     TEXT("text"),
-    BOOLEAN("boolean"),
-    MULTISELECT("multiselect"),
-    SELECT("select"),
     TEXTAREA("textarea"),
-    PRICE("price"),
+    BOOLEAN("boolean"),
+    SELECT("select"),
+    MULTISELECT("multiselect"),
     DATE("date"),
-    GALLERY("gallery"),
-    HIDDEN("hidden"),
-    IMAGE("image"),
-    MEDIA_IMAGE("media_image"),
-    MULTILINE("multiline"),
-    WEIGHT("weight");
+    PRICE("price"),
+    HIDDEN("hidden");
 
     private String input;
 
@@ -26,7 +21,28 @@ public enum AttributeInput {
         this.input = input;
     }
 
+    /**
+     * Return attribute input.
+     *
+     * @return String
+     */
     public String getInput() {
         return this.input;
+    }
+
+    /**
+     * Return attribute input item by input code.
+     *
+     * @param code String
+     * @return AttributeInput
+     */
+    public static AttributeInput getAttributeInputByCode(final String code) {
+        for (final AttributeInput attributeInput: values()) {
+            if (attributeInput.getInput().equals(code)) {
+                return attributeInput;
+            }
+        }
+
+        return null;
     }
 }

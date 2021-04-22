@@ -6,7 +6,8 @@
 package com.magento.idea.magento2plugin.magento.packages.eav;
 
 public enum EavEntity {
-    PRODUCT("\\Magento\\Catalog\\Model\\Product");
+    PRODUCT("\\Magento\\Catalog\\Model\\Product"),
+    CATEGORY("\\Magento\\Catalog\\Model\\Category");
 
     private String entityClass;
 

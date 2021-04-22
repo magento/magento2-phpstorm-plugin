@@ -17,8 +17,10 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.event.eavdialog
 import com.magento.idea.magento2plugin.actions.generation.dialog.event.eavdialog.EavAttributeInputItemListener;
 import com.magento.idea.magento2plugin.actions.generation.dialog.event.eavdialog.OptionsPanelVisibilityChangeListener;
 import com.magento.idea.magento2plugin.actions.generation.dialog.event.eavdialog.SourceModelNameAdapter;
+import com.magento.idea.magento2plugin.actions.generation.dialog.util.eavdialog.AttributeUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.EavAttributeSetupPatchGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.SourceModelGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.GetAttributeOptionPropertiesUtil;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeInput;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeSourceModel;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeType;
@@ -33,6 +35,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -40,8 +43,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
-@SuppressWarnings({"PMD.TooManyMethods"})
-public abstract class EavAttributeDialog extends AbstractDialog {
+@SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
+public abstract class  EavAttributeDialog extends AbstractDialog {
 
     protected String moduleName;
     protected Project project;
@@ -80,6 +83,14 @@ public abstract class EavAttributeDialog extends AbstractDialog {
     protected abstract JTextField getDataPatchNameTextField();
 
     protected abstract JTextField getSourceModelNameTexField();
+
+    protected abstract JTextField getAttributeLabelTexField();
+
+    protected abstract JTextField getAttributeSortOrderTextField();
+
+    protected abstract JCheckBox getAttributeRequiredCheckBox();
+
+    protected abstract JCheckBox getAttributeVisibleBox();
 
     protected abstract String getEntityName();
 
@@ -234,8 +245,11 @@ public abstract class EavAttributeDialog extends AbstractDialog {
             return;
         }
 
-        generateSourceModelFile();
-        generateDataPatchFile();
+        generateExtraFilesBeforeDataPatchGeneration();
+
+        final EavEntityDataInterface eavEntityDataInterface = getEavEntityData();
+        generateDataPatchFile(eavEntityDataInterface);
+        generateExtraFilesAfterDataPatchGeneration(eavEntityDataInterface);
 
         setVisible(false);
     }
@@ -259,13 +273,21 @@ public abstract class EavAttributeDialog extends AbstractDialog {
                 .generate(actionName, false);
     }
 
-    protected void generateDataPatchFile() {
+    protected void generateDataPatchFile(final EavEntityDataInterface eavEntityDataInterface) {
         new EavAttributeSetupPatchGenerator(
-                getEavEntityData(),
+                eavEntityDataInterface,
                 project,
                 true
         ).generate(actionName, true);
     }
+
+    protected void generateExtraFilesBeforeDataPatchGeneration() {
+        generateSourceModelFile();
+    }
+
+    protected void generateExtraFilesAfterDataPatchGeneration(
+            final EavEntityDataInterface eavEntityDataInterface
+    ) {}
 
     protected void addCancelActionForWindow() {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -389,5 +411,86 @@ public abstract class EavAttributeDialog extends AbstractDialog {
 
         mainTextField.getDocument()
                 .addDocumentListener(new SourceModelNameAdapter(dependentTextField));
+    }
+
+    protected String getDataPatchName() {
+        final JTextField dataPatchNameTextField = getDataPatchNameTextField();
+
+        return dataPatchNameTextField == null
+                ? "" : dataPatchNameTextField.getText().trim();
+    }
+
+    protected String getAttributeCode() {
+        final JTextField codeTextField = getAttributeCodeTextField();
+
+        return codeTextField == null
+                ? "" : codeTextField.getText().trim();
+    }
+
+    protected String getAttributeLabel() {
+        final JTextField labelTextField = getAttributeLabelTexField();
+
+        return labelTextField == null
+                ? "" : labelTextField.getText().trim();
+    }
+
+    protected int getAttributeSortOrder() {
+        final JTextField sortOrderTextField = getAttributeSortOrderTextField();
+
+        return sortOrderTextField == null
+                ? 0 : Integer.parseInt(sortOrderTextField.getText().trim());
+    }
+
+    protected boolean isRequiredAttribute() {
+        final JCheckBox requiredCheckBox = getAttributeRequiredCheckBox();
+
+        return requiredCheckBox != null && requiredCheckBox.isSelected();
+    }
+
+    protected boolean isVisibleAttribute() {
+        final JCheckBox visibleCheckBox = getAttributeVisibleBox();
+
+        return visibleCheckBox != null && visibleCheckBox.isSelected();
+    }
+
+    protected String getAttributeBackendType() {
+        final JComboBox<ComboBoxItemData> typeComboBox = getAttributeTypeCompoBox();
+
+        return AttributeUtil.getBackendTypeBySelectedItem(
+                (ComboBoxItemData) typeComboBox.getSelectedItem()
+        );
+    }
+
+    protected String getAttributeInput() {
+        final JComboBox<ComboBoxItemData> inputComboBox = getAttributeInputComboBox();
+
+        return AttributeUtil.getInputTypeBySelectedItem(
+                (ComboBoxItemData) inputComboBox.getSelectedItem()
+        );
+    }
+
+    protected String getAttributeSource(final SourceModelData sourceModelData) {
+        final JComboBox<ComboBoxItemData> sourceComboBox = getAttributeSourceComboBox();
+
+        return AttributeUtil.getSourceClassBySelectedItem(
+                (ComboBoxItemData) sourceComboBox.getSelectedItem(),
+                sourceModelData
+        );
+    }
+
+    protected Map<Integer, String> getAttributeOptions(
+            final TableGroupWrapper entityPropertiesTableGroupWrapper
+    ) {
+        return GetAttributeOptionPropertiesUtil.getValues(
+                entityPropertiesTableGroupWrapper.getColumnsData()
+        );
+    }
+
+    protected Map<Integer, String> getAttributeOptionsSortOrders(
+            final TableGroupWrapper entityPropertiesTableGroupWrapper
+    ) {
+        return GetAttributeOptionPropertiesUtil.getSortOrders(
+                entityPropertiesTableGroupWrapper.getColumnsData()
+        );
     }
 }

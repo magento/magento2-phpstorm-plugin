@@ -5,7 +5,7 @@
 
 package com.magento.idea.magento2plugin.magento.packages.eav;
 
-public enum EavAttribute {
+public enum AttributeProperty {
     GROUP("group"),
     TYPE("type"),
     LABEL("label"),
@@ -21,15 +21,16 @@ public enum EavAttribute {
     IS_HTML_ALLOWED_ON_FRONT("is_html_allowed_on_front"),
     VISIBLE_ON_FRONT("visible_on_front"),
     APPLY_TO("apply_to"),
-    OPTION("option");
+    OPTION("option"),
+    BACKEND_MODEL("backend");
 
     private String attribute;
 
-    EavAttribute(final String attribute) {
+    AttributeProperty(final String attribute) {
         this.attribute = attribute;
     }
 
-    public String getAttribute() {
+    public String getProperty() {
         return attribute;
     }
 }

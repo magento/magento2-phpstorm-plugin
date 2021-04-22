@@ -1,24 +1,69 @@
 package com.magento.idea.magento2plugin.actions.generation.data;
 
+import java.util.Map;
+
 @SuppressWarnings({"PMD.UnnecessaryModifier"})
 public interface EavEntityDataInterface {
-    public String getCode();
 
-    public String getType();
+    void setCode(final String code);
 
-    public String getLabel();
+    void setType(final String type);
 
-    public String getInput();
+    void setLabel(final String label);
 
-    public String getNamespace();
+    void setInput(final String input);
 
-    public String getModuleName();
+    void setNamespace(final String namespace);
 
-    public String getDirectory();
+    void setModuleName(final String moduleName);
 
-    public String getDataPatchName();
+    void setDirectory(final String directory);
 
-    public String getEntityClass();
+    void setDataPatchName(final String dataPatchName);
 
-    public String getSource();
+    void setSource(final String source);
+
+    void setSortOrder(final int sortOrder);
+
+    void setOptions(final Map<Integer, String> options);
+
+    void setOptionsSortOrder(final Map<Integer, String> optionsSortOrder);
+
+    void setRequired(final boolean required);
+
+    void setVisible(final boolean visible);
+
+    void setBackendModel(final String model);
+
+    String getCode();
+
+    String getType();
+
+    String getLabel();
+
+    String getInput();
+
+    String getNamespace();
+
+    String getModuleName();
+
+    String getDirectory();
+
+    String getDataPatchName();
+
+    String getEntityClass();
+
+    String getSource();
+
+    String getBackendModel();
+
+    int getSortOrder();
+
+    Map<Integer, String> getOptions();
+
+    Map<Integer, String> getOptionsSortOrder();
+
+    boolean isRequired();
+
+    boolean isVisible();
 }
