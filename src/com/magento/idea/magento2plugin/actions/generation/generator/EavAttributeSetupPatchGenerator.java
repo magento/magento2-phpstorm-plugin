@@ -69,8 +69,13 @@ public class EavAttributeSetupPatchGenerator extends PhpFileGenerator {
                         DataPatchDependency.DATA_PATCH_INTERFACE.getClassPatch()
                 )
                 .append(
+                        "ENTITY_CLASS",
+                        data.getEntityClass()
+                )
+                .append(
                         "MODULE_DATA_SETUP_INTERFACE",
-                        DataPatchDependency.MODULE_DATA_SETUP_INTERFACE.getClassPatch())
+                        DataPatchDependency.MODULE_DATA_SETUP_INTERFACE.getClassPatch()
+                )
                 .append(
                         "EAV_SETUP_FACTORY",
                         DataPatchDependency.EAV_SETUP_FACTORY.getClassPatch()

@@ -23,8 +23,6 @@ class ${CLASS_NAME} implements ${IMPLEMENTS} {
     private $eavSetupFactory;
 
     /**
-     * AddRecommendedAttribute constructor.
-     *
      * @param ${MODULE_DATA_SETUP_INTERFACE} $moduleDataSetup
      * @param ${EAV_SETUP_FACTORY} $eavSetupFactory
      */
@@ -34,33 +32,6 @@ class ${CLASS_NAME} implements ${IMPLEMENTS} {
     ) {
           $this->moduleDataSetup = $moduleDataSetup;
           $this->eavSetupFactory = $eavSetupFactory;
-    }
-
-    /**
-     * Get array of patches that have to be executed prior to this.
-     *
-     * Example of implementation:
-     *
-     * [
-     *      \Vendor_Name\Module_Name\Setup\Patch\Patch1::class,
-     *      \Vendor_Name\Module_Name\Setup\Patch\Patch2::class
-     * ]
-     *
-     * @return string[]
-     */
-    public static function getDependencies()
-    {
-        return [];
-    }
-
-    /**
-     * Get aliases (previous names) for the patch.
-     *
-     * @return string[]
-     */
-    public function getAliases()
-    {
-        return [];
     }
 
     /**
@@ -88,4 +59,31 @@ class ${CLASS_NAME} implements ${IMPLEMENTS} {
 ]
         );
      }
+
+    /**
+     * Get array of patches that have to be executed prior to this.
+     *
+     * Example of implementation:
+     *
+     * [
+     *      \Vendor_Name\Module_Name\Setup\Patch\Patch1::class,
+     *      \Vendor_Name\Module_Name\Setup\Patch\Patch2::class
+     * ]
+     *
+     * @return string[]
+     */
+    public static function getDependencies()
+    {
+        return [];
+    }
+
+    /**
+     * Get aliases (previous names) for the patch.
+     *
+     * @return string[]
+     */
+    public function getAliases()
+    {
+        return [];
+    }
 }
