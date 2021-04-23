@@ -17,13 +17,13 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.bundles.InspectionBundle;
-import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
+import com.magento.idea.magento2plugin.inspections.xml.fix.MethodNotPublicAccessQuickFix;
 import com.magento.idea.magento2plugin.magento.files.ModuleWebApiXmlFile;
-
 import java.util.Collection;
-
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.NPathComplexity"})
 public class WebApiServiceInspection extends XmlSuppressableInspectionTool {
 
     @NotNull
@@ -48,7 +48,9 @@ public class WebApiServiceInspection extends XmlSuppressableInspectionTool {
                 }
 
                 //Check whether the class attribute is not empty
-                final XmlAttribute classAttribute = xmlTag.getAttribute(ModuleWebApiXmlFile.CLASS_ATTR);
+                final XmlAttribute classAttribute = xmlTag.getAttribute(
+                        ModuleWebApiXmlFile.CLASS_ATTR
+                );
                 if (classAttribute == null) {
                     return;
                 }
@@ -70,8 +72,9 @@ public class WebApiServiceInspection extends XmlSuppressableInspectionTool {
                 final PhpIndex phpIndex = PhpIndex.getInstance(
                         problemsHolder.getProject()
                 );
-                @NotNull Collection<PhpClass> classes = phpIndex.getClassesByFQN(classFqn);
-                if (classes.isEmpty()) {
+                @NotNull final Collection<PhpClass> classes = phpIndex.getClassesByFQN(classFqn);
+                @NotNull final Collection<PhpClass> interfaces = phpIndex.getInterfacesByFQN(classFqn);
+                if (classes.isEmpty() && interfaces.isEmpty()) {
                         problemsHolder.registerProblem(
                                 classAttribute,
                                 inspectionBundle.message(
@@ -80,10 +83,13 @@ public class WebApiServiceInspection extends XmlSuppressableInspectionTool {
                                 ),
                                 ProblemHighlightType.WARNING
                         );
+                        return;
                 }
 
                 //Check whether the method attribute is not empty
-                final XmlAttribute methodAttribute = xmlTag.getAttribute(ModuleWebApiXmlFile.METHOD_ATTR);
+                final XmlAttribute methodAttribute = xmlTag.getAttribute(
+                        ModuleWebApiXmlFile.METHOD_ATTR
+                );
                 if (methodAttribute == null) {
                     return;
                 }
@@ -102,39 +108,47 @@ public class WebApiServiceInspection extends XmlSuppressableInspectionTool {
                 }
 
                 //Check whether method exists
-                Method targetMethod = null;
-                for (PhpClass phpClass: classes) {
-                        for (Method method: phpClass.getMethods()) {
-                            if (method.getName().equals(methodName)) {
-                                targetMethod = method;
-                            }
-                            break;
-                        }
-                }
+                Method targetMethod = findTargetMethod(classes, methodName);
                 if (targetMethod == null) {
+                    targetMethod = findTargetMethod(interfaces, methodName);
+                }
+                if (targetMethod == null && methodAttribute.getValueElement() != null) {
                     problemsHolder.registerProblem(
-                            methodAttribute,
+                            methodAttribute.getValueElement(),
                             inspectionBundle.message(
                                 "inspection.warning.method.does.not.exist",
                                 methodName
                             ),
                             ProblemHighlightType.WARNING
                     );
+
                     return;
                 }
 
                 //API method should have public access
-                if (targetMethod.getAccess() != null && !targetMethod.getAccess().toString()
-                        .equals(AbstractPhpFile.PUBLIC_ACCESS)) {
+                if (targetMethod.getAccess() != null && !targetMethod.getAccess().isPublic()) {
                     problemsHolder.registerProblem(
                             methodAttribute,
                             inspectionBundle.message(
                                 "inspection.warning.method.should.have.public.access",
                                 methodName
                             ),
-                            ProblemHighlightType.WARNING
+                            ProblemHighlightType.WARNING,
+                            new MethodNotPublicAccessQuickFix(targetMethod)
                     );
                 }
+            }
+
+            @Nullable
+            private Method findTargetMethod(final Collection<PhpClass> classes, final String methodName) {
+                for (final PhpClass phpClass : classes) {
+                    for (final Method method : phpClass.getMethods()) {
+                        if (method.getName().equals(methodName)) {
+                            return method;
+                        }
+                    }
+                }
+                return null;
             }
         };
     }
