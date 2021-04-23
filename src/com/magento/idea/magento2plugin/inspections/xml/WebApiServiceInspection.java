@@ -73,7 +73,8 @@ public class WebApiServiceInspection extends XmlSuppressableInspectionTool {
                         problemsHolder.getProject()
                 );
                 @NotNull final Collection<PhpClass> classes = phpIndex.getClassesByFQN(classFqn);
-                @NotNull final Collection<PhpClass> interfaces = phpIndex.getInterfacesByFQN(classFqn);
+                @NotNull final Collection<PhpClass> interfaces = phpIndex
+                        .getInterfacesByFQN(classFqn);
                 if (classes.isEmpty() && interfaces.isEmpty()) {
                         problemsHolder.registerProblem(
                                 classAttribute,
@@ -140,7 +141,10 @@ public class WebApiServiceInspection extends XmlSuppressableInspectionTool {
             }
 
             @Nullable
-            private Method findTargetMethod(final Collection<PhpClass> classes, final String methodName) {
+            private Method findTargetMethod(
+                    final Collection<PhpClass> classes,
+                    final String methodName
+            ) {
                 for (final PhpClass phpClass : classes) {
                     for (final Method method : phpClass.getMethods()) {
                         if (method.getName().equals(methodName)) {
