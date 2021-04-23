@@ -241,7 +241,10 @@ public class NewControllerDialog extends AbstractDialog {
                 File.separator,
                 Package.fqnSeparator
         );
-        final String controllerPart = Package.fqnSeparator + getControllerName();
+        final String controllerPart = getControllerName().replace(
+                File.separator,
+                Package.fqnSeparator
+        );
 
         return String.format(
                 "%s%s%s%s%s%s",
