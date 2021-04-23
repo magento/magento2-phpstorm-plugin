@@ -14,12 +14,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.CategoryFormXmlGenerator;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeScope;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.JTable;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
@@ -62,13 +57,20 @@ public class NewCategoryEavAttributeDialog extends EavAttributeDialog {
     private JPanel customSourceModelPanel;
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, "Source Model Directory"})
-    private JTextField sourceModelDirectoryTexField;
+    private JTextField sourceModelDirectoryTextField;
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, "Source Model Name"})
-    private JTextField sourceModelNameTexField;
+    private JTextField sourceModelNameTextField;
     private JTable optionsTable;
     private JButton addNewOptionButton;
     private JPanel optionsPanel;
+    private JLabel codeTextFieldErrorMessage;
+    private JLabel labelTextFieldErrorMessage;
+    private JLabel dataPatchNameTextFieldErrorMessage;
+    private JLabel groupTextFieldErrorMessage;
+    private JLabel sourceModelDirectoryTextFieldErrorMessage;
+    private JLabel sourceModelNameTextFieldErrorMessage;
+    private JLabel sortOrderTextFieldErrorMessage;
 
     /**
      * Constructor.
@@ -83,7 +85,6 @@ public class NewCategoryEavAttributeDialog extends EavAttributeDialog {
             final String actionName
     ) {
         super(project, directory, actionName);
-
     }
 
     @Override
@@ -143,12 +144,12 @@ public class NewCategoryEavAttributeDialog extends EavAttributeDialog {
 
     @Override
     protected JTextField getAttributeSourceModelNameTexField() {
-        return sourceModelNameTexField;
+        return sourceModelNameTextField;
     }
 
     @Override
-    protected JTextField getSourceModelDirectoryTexField() {
-        return sourceModelDirectoryTexField;
+    protected JTextField getSourceModelDirectoryTextField() {
+        return sourceModelDirectoryTextField;
     }
 
     @Override
@@ -172,8 +173,8 @@ public class NewCategoryEavAttributeDialog extends EavAttributeDialog {
     }
 
     @Override
-    protected JTextField getSourceModelNameTexField() {
-        return sourceModelNameTexField;
+    protected JTextField getSourceModelNameTextField() {
+        return sourceModelNameTextField;
     }
 
     @Override
