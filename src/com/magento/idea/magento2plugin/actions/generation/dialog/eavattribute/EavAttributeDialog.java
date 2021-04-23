@@ -11,7 +11,13 @@ import com.magento.idea.magento2plugin.actions.generation.data.EavEntityDataInte
 import com.magento.idea.magento2plugin.actions.generation.data.SourceModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.AbstractDialog;
-import com.magento.idea.magento2plugin.actions.generation.dialog.event.eavdialog.*;
+import com.magento.idea.magento2plugin.actions.generation.dialog.event.eavdialog.AttributeCodeAdapter;
+import com.magento.idea.magento2plugin.actions.generation.dialog.event.eavdialog.AttributeSourcePanelComponentListener;
+import com.magento.idea.magento2plugin.actions.generation.dialog.event.eavdialog.AttributeSourceRelationsItemListener;
+import com.magento.idea.magento2plugin.actions.generation.dialog.event.eavdialog.DataPatchNameAdapter;
+import com.magento.idea.magento2plugin.actions.generation.dialog.event.eavdialog.EavAttributeInputItemListener;
+import com.magento.idea.magento2plugin.actions.generation.dialog.event.eavdialog.OptionsPanelVisibilityChangeListener;
+import com.magento.idea.magento2plugin.actions.generation.dialog.event.eavdialog.SourceModelNameAdapter;
 import com.magento.idea.magento2plugin.actions.generation.dialog.util.eavdialog.AttributeUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.EavAttributeSetupPatchGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.SourceModelGenerator;
