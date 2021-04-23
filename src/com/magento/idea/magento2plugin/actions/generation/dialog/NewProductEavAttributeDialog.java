@@ -21,7 +21,15 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeScope;
 import com.magento.idea.magento2plugin.util.magento.GetProductTypesListUtil;
 import java.util.List;
-import javax.swing.*;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
