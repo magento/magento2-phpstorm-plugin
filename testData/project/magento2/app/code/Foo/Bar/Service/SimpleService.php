@@ -7,4 +7,9 @@ class SimpleService
     {
 
     }
+
+    protected function myProtected(int $param1, string $param2)
+    {
+
+    }
 }

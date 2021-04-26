@@ -153,7 +153,7 @@
         <directoryProjectConfigurator implementation="com.magento.idea.magento2plugin.project.ProjectDetector"/>
 
         <localInspection language="PHP" groupPath="PHP"
-                         shortName="PluginInspection" 
+                         shortName="PluginInspection"
                          bundle="magento2.inspection" key="inspection.displayName.PluginInspection"
                          groupBundle="magento2.inspection" groupKey="inspection.group.name"
                          enabledByDefault="true"
@@ -204,6 +204,13 @@
                          groupBundle="magento2.inspection" groupKey="inspection.group.name"
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.AclResourceXmlInspection"/>
+
+        <localInspection language="XML" groupPath="XML"
+                         shortName="WebApiServiceInspection"
+                         displayName="Inspection for the Web API XML service declaration"
+                         groupName="Magento 2"
+                         enabledByDefault="true" level="WARNING"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.WebApiServiceInspection"/>
 
         <localInspection language="XML" groupPath="XML"
                          shortName="InvalidDiTypeInspection"
