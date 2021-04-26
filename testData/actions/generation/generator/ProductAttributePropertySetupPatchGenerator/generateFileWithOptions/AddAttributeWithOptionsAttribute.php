@@ -2,6 +2,7 @@
 
 namespace Foo\Bar\Setup\Patch\Data;
 
+use Magento\Catalog\Model\Product;
 use Magento\Eav\Setup\EavSetup;
 use Magento\Eav\Setup\EavSetupFactory;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
@@ -21,8 +22,6 @@ class AddAttributeWithOptionsAttribute implements DataPatchInterface
     private $eavSetupFactory;
 
     /**
-     * AddRecommendedAttribute constructor.
-     *
      * @param ModuleDataSetupInterface $moduleDataSetup
      * @param EavSetupFactory $eavSetupFactory
      */
@@ -33,6 +32,50 @@ class AddAttributeWithOptionsAttribute implements DataPatchInterface
     {
         $this->moduleDataSetup = $moduleDataSetup;
         $this->eavSetupFactory = $eavSetupFactory;
+    }
+
+    /**
+     * Run code inside patch
+     * If code fails, patch must be reverted, in case when we are speaking about schema - then under revert
+     * means run PatchInterface::revert()
+     *
+     * If we speak about data, under revert means: $transaction->rollback()
+     *
+     * @return $this
+     */
+    public function apply()
+    {
+        /** @var EavSetup $eavSetup */
+        $eavSetup = $this->eavSetupFactory->create(['setup' => $this->moduleDataSetup]);
+
+        $eavSetup->addAttribute(
+            Product::ENTITY,
+            'attribute_with_options',
+            [
+                'is_visible_in_grid' => false,
+                'is_html_allowed_on_front' => false,
+                'visible_on_front' => false,
+                'visible' => true,
+                'global' => \Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface::SCOPE_GLOBAL,
+                'label' => 'Attribute With Options',
+                'source' => null,
+                'type' => 'varchar',
+                'is_used_in_grid' => false,
+                'required' => false,
+                'input' => 'multiselect',
+                'is_filterable_in_grid' => false,
+                'backend' => \Magento\Eav\Model\Entity\Attribute\Backend\ArrayBackend::class,
+                'sort_order' => 10,
+                'option' => [
+                    'value' => [
+                        'option_0' => ['option1'],
+                        'option_1' => ['option2'],
+                        'option_2' => ['option3'],
+                    ]
+                ],
+                'group' => 'General',
+            ]
+        );
     }
 
     /**
@@ -60,49 +103,5 @@ class AddAttributeWithOptionsAttribute implements DataPatchInterface
     public function getAliases()
     {
         return [];
-    }
-
-    /**
-     * Run code inside patch
-     * If code fails, patch must be reverted, in case when we are speaking about schema - then under revert
-     * means run PatchInterface::revert()
-     *
-     * If we speak about data, under revert means: $transaction->rollback()
-     *
-     * @return $this
-     */
-    public function apply()
-    {
-        /** @var EavSetup $eavSetup */
-        $eavSetup = $this->eavSetupFactory->create(['setup' => $this->moduleDataSetup]);
-
-        $eavSetup->addAttribute(
-            \Magento\Catalog\Model\Product::ENTITY,
-            'attribute_with_options',
-            [
-                'is_visible_in_grid' => false,
-                'is_html_allowed_on_front' => false,
-                'visible_on_front' => false,
-                'visible' => true,
-                'global' => \Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface::SCOPE_GLOBAL,
-                'label' => 'Attribute With Options',
-                'source' => null,
-                'type' => 'varchar',
-                'is_used_in_grid' => false,
-                'required' => false,
-                'input' => 'multiselect',
-                'is_filterable_in_grid' => false,
-                'backend' => \Magento\Eav\Model\Entity\Attribute\Backend\ArrayBackend::class,
-                'sort_order' => 10,
-                'option' => [
-                    'value' => [
-                        'option_0' => ['option1'],
-                        'option_1' => ['option2'],
-                        'option_2' => ['option3'],
-                    ]
-                ],
-                'group' => 'General',
-            ]
-        );
     }
 }

@@ -21,8 +21,6 @@ class AddTestAttributeCategoryAttribute implements DataPatchInterface
     private $eavSetupFactory;
 
     /**
-     * AddRecommendedAttribute constructor.
-     *
      * @param ModuleDataSetupInterface $moduleDataSetup
      * @param EavSetupFactory $eavSetupFactory
      */
@@ -33,33 +31,6 @@ class AddTestAttributeCategoryAttribute implements DataPatchInterface
     {
         $this->moduleDataSetup = $moduleDataSetup;
         $this->eavSetupFactory = $eavSetupFactory;
-    }
-
-    /**
-     * Get array of patches that have to be executed prior to this.
-     *
-     * Example of implementation:
-     *
-     * [
-     *      \Vendor_Name\Module_Name\Setup\Patch\Patch1::class,
-     *      \Vendor_Name\Module_Name\Setup\Patch\Patch2::class
-     * ]
-     *
-     * @return string[]
-     */
-    public static function getDependencies()
-    {
-        return [];
-    }
-
-    /**
-     * Get aliases (previous names) for the patch.
-     *
-     * @return string[]
-     */
-    public function getAliases()
-    {
-        return [];
     }
 
     /**
@@ -91,5 +62,32 @@ class AddTestAttributeCategoryAttribute implements DataPatchInterface
                 'group' => 'Content',
             ]
         );
+    }
+
+    /**
+     * Get array of patches that have to be executed prior to this.
+     *
+     * Example of implementation:
+     *
+     * [
+     *      \Vendor_Name\Module_Name\Setup\Patch\Patch1::class,
+     *      \Vendor_Name\Module_Name\Setup\Patch\Patch2::class
+     * ]
+     *
+     * @return string[]
+     */
+    public static function getDependencies()
+    {
+        return [];
+    }
+
+    /**
+     * Get aliases (previous names) for the patch.
+     *
+     * @return string[]
+     */
+    public function getAliases()
+    {
+        return [];
     }
 }
