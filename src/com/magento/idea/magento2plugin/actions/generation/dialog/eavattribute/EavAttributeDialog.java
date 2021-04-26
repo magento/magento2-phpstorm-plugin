@@ -11,6 +11,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.EavEntityDataInte
 import com.magento.idea.magento2plugin.actions.generation.data.SourceModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.AbstractDialog;
+import com.magento.idea.magento2plugin.actions.generation.dialog.event.eavdialog.AttributeCodeAdapter;
 import com.magento.idea.magento2plugin.actions.generation.dialog.event.eavdialog.AttributeSourcePanelComponentListener;
 import com.magento.idea.magento2plugin.actions.generation.dialog.event.eavdialog.AttributeSourceRelationsItemListener;
 import com.magento.idea.magento2plugin.actions.generation.dialog.event.eavdialog.DataPatchNameAdapter;
@@ -42,6 +43,7 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
 public abstract class  EavAttributeDialog extends AbstractDialog {
@@ -72,7 +74,7 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
 
     protected abstract JTextField getAttributeSourceModelNameTexField();
 
-    protected abstract JTextField getSourceModelDirectoryTexField();
+    protected abstract JTextField getSourceModelDirectoryTextField();
 
     protected abstract JPanel getAttributeCustomSourceModelPanel();
 
@@ -82,7 +84,7 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
 
     protected abstract JTextField getDataPatchNameTextField();
 
-    protected abstract JTextField getSourceModelNameTexField();
+    protected abstract JTextField getSourceModelNameTextField();
 
     protected abstract JTextField getAttributeLabelTexField();
 
@@ -121,6 +123,7 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
         this.initBaseDialogState();
         pack();
         centerDialog(this);
+        setTitle(actionName);
         setVisible(true);
     }
 
@@ -151,7 +154,7 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
 
         this.setSourceModelPanelAction(
                 getAttributeCustomSourceModelPanel(),
-                getSourceModelDirectoryTexField()
+                getSourceModelDirectoryTextField()
         );
         this.addOptionPanelListener(
                 getAttributeSourceComboBox(),
@@ -159,13 +162,17 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
                 getAttributeOptionsPanel()
         );
         this.setDefaultSources(getAttributeSourceComboBox());
+        this.setAutocompleteListenerForAttributeCodeField(
+                getAttributeLabelTexField(),
+                getAttributeCodeTextField()
+        );
         this.setAutocompleteListenerForDataPathNameField(
                 getAttributeCodeTextField(),
                 getDataPatchNameTextField()
         );
         this.setAutocompleteListenerForSourceModelNameField(
                 getAttributeCodeTextField(),
-                getSourceModelNameTexField()
+                getSourceModelNameTextField()
         );
     }
 
@@ -241,6 +248,8 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
     }
 
     protected void onOk() {
+        stopOptionsTableEditing(getOptionsTable());
+
         if (!validateFormFields()) {
             return;
         }
@@ -267,7 +276,7 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
 
         sourceModelData.setModuleName(moduleName);
         sourceModelData.setClassName(getAttributeSourceModelNameTexField().getText().trim());
-        sourceModelData.setDirectory(getSourceModelDirectoryTexField().getText().trim());
+        sourceModelData.setDirectory(getSourceModelDirectoryTextField().getText().trim());
 
         new SourceModelGenerator(sourceModelData, project, true)
                 .generate(actionName, false);
@@ -386,6 +395,14 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
         sourceComboBox.setSelectedItem(defaultSourceItem);
     }
 
+    protected void setAutocompleteListenerForAttributeCodeField(
+            @NotNull final JTextField attributeLabelTextField,
+            @NotNull final JTextField attributeCodeTextField
+    ) {
+        attributeLabelTextField.getDocument()
+                .addDocumentListener(new AttributeCodeAdapter(attributeCodeTextField));
+    }
+
     @SuppressWarnings("PMD.AccessorMethodGeneration")
     protected void setAutocompleteListenerForDataPathNameField(
             final JTextField mainTextField,
@@ -492,5 +509,11 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
         return GetAttributeOptionPropertiesUtil.getSortOrders(
                 entityPropertiesTableGroupWrapper.getColumnsData()
         );
+    }
+
+    private void stopOptionsTableEditing(final JTable optionsTable) {
+        if (optionsTable != null && optionsTable.isEditing()) {
+            optionsTable.getCellEditor().stopCellEditing();
+        }
     }
 }

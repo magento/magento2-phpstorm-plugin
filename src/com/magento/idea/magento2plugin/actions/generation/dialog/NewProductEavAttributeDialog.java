@@ -25,6 +25,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -76,10 +77,10 @@ public class NewProductEavAttributeDialog extends EavAttributeDialog {
     private JPanel customSourceModelPanel;
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, "Source Model Directory"})
-    private JTextField sourceModelDirectoryTexField;
+    private JTextField sourceModelDirectoryTextField;
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, "Source Model Name"})
-    private JTextField sourceModelNameTexField;
+    private JTextField sourceModelNameTextField;
     private JTable optionsTable;
     private JButton addNewOptionButton;
     private JPanel optionsPanel;
@@ -88,6 +89,13 @@ public class NewProductEavAttributeDialog extends EavAttributeDialog {
     private JCheckBox applyToAllProductsCheckBox;
     private JPanel applyToPanel;
     private JList productsTypesList;
+    private JLabel labelTextFieldErrorMessage;
+    private JLabel codeTextFieldErrorMessage;
+    private JLabel dataPatchNameTextFieldErrorMessage;
+    private JLabel groupTextFieldErrorMessage;
+    private JLabel sourceModelDirectoryTextFieldErrorMessage;
+    private JLabel sourceModelNameTextFieldErrorMessage;
+    private JLabel sortOrderTextFieldErrorMessage;
 
     /**
      * Constructor.
@@ -162,12 +170,12 @@ public class NewProductEavAttributeDialog extends EavAttributeDialog {
 
     @Override
     protected JTextField getAttributeSourceModelNameTexField() {
-        return sourceModelNameTexField;
+        return sourceModelNameTextField;
     }
 
     @Override
-    protected JTextField getSourceModelDirectoryTexField() {
-        return sourceModelDirectoryTexField;
+    protected JTextField getSourceModelDirectoryTextField() {
+        return sourceModelDirectoryTextField;
     }
 
     @Override
@@ -191,8 +199,8 @@ public class NewProductEavAttributeDialog extends EavAttributeDialog {
     }
 
     @Override
-    protected JTextField getSourceModelNameTexField() {
-        return sourceModelNameTexField;
+    protected JTextField getSourceModelNameTextField() {
+        return sourceModelNameTextField;
     }
 
     @Override
