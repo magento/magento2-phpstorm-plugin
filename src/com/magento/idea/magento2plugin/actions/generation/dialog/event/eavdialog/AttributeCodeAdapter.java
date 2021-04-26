@@ -1,7 +1,6 @@
 /*
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
- *
  */
 
 package com.magento.idea.magento2plugin.actions.generation.dialog.event.eavdialog;
@@ -42,7 +41,6 @@ public class AttributeCodeAdapter extends DocumentAdapter {
     private String convertLabelToAttributeCode(final String attributeLabel) {
         final String formattedAttributeLabel = attributeLabel.trim().toLowerCase(Locale.ROOT);
 
-        //replace 2 or more spaces with underscore
         return formattedAttributeLabel.replaceAll("^ +| +$|( )+", "_");
     }
 }
