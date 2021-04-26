@@ -207,8 +207,8 @@
 
         <localInspection language="XML" groupPath="XML"
                          shortName="WebApiServiceInspection"
-                         displayName="Inspection for the Web API XML service declaration"
-                         groupName="Magento 2"
+                         bundle="magento2.inspection" key="inspection.displayName.WebApiServiceInspection"
+                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
                          enabledByDefault="true" level="WARNING"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.WebApiServiceInspection"/>
 
