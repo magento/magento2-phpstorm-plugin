@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 3.2.2
 
+### Fixed
+
+- `Java.lang.IllegalArgumentException` During adding a new method into an existing plugin
+
 ## 3.2.1
 
 ### Fixed
