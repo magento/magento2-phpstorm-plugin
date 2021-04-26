@@ -24,9 +24,6 @@ public class Plugin implements ModuleFileInterface {
         around//NOPMD
     }
 
-    //allowed methods access type
-    public static final String PUBLIC_ACCESS = "public";
-
     private String fileName;
 
     /**

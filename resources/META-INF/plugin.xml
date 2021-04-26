@@ -204,6 +204,13 @@
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.AclResourceXmlInspection"/>
 
+        <localInspection language="XML" groupPath="XML"
+                         shortName="WebApiServiceInspection"
+                         displayName="Inspection for the Web API XML service declaration"
+                         groupName="Magento 2"
+                         enabledByDefault="true" level="WARNING"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.WebApiServiceInspection"/>
+
         <internalFileTemplate name="Magento Composer JSON"/>
         <internalFileTemplate name="Magento Registration PHP"/>
         <internalFileTemplate name="Magento Module XML"/>

@@ -13,6 +13,9 @@ public final class ModuleWebApiXmlFile implements ModuleFileInterface {
     public static final String FILE_NAME = "webapi.xml";
     public static final String TEMPLATE = "Magento Web Api XML";
     public static final String DECLARATION_TEMPLATE = "Magento Web Api Declaration";
+    public static final String SERVICE_TAG_NAME = "service";
+    public static final String CLASS_ATTR = "class";
+    public static final String METHOD_ATTR = "method";
 
     @Override
     public String getFileName() {
