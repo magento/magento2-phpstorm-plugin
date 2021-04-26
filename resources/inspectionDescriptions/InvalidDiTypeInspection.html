@@ -1,0 +1,22 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<html>
+<body>
+<p>
+  Validates if all types inside the &lt;type/&gt; tag of di.xml files contains valid classes,
+  interfaces, factories, proxies or virtual type names.
+</p>
+<p>This inspection checks name attribute of the &lt;type/&gt; tag and all arguments recursively which has xsi:type attribute value as object.</p>
+<p>This inspection supports next types:</p>
+<ul>
+  <li>PHP classes</li>
+  <li>PHP interfaces</li>
+  <li>PHP classes or interfaces with added Factory or \Proxy suffixes</li>
+  <li>Magento 2 Virtual Types names</li>
+</ul>
+</body>
+</html>

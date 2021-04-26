@@ -54,6 +54,7 @@ public class ModuleDiXml implements ModuleFileInterface {
     public static String XSI_TYPE_ATTR = "xsi:type";
 
     // attribute values
+    public static String XSI_TYPE_OBJECT = "object";
     public static String XSI_TYPE_STRING = "string";
     public static String XSI_TYPE_ARRAY = "array";
     public static String COLLECTIONS_ATTR_VALUE = "collections";

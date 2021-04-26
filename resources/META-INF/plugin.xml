@@ -153,56 +153,64 @@
         <directoryProjectConfigurator implementation="com.magento.idea.magento2plugin.project.ProjectDetector"/>
 
         <localInspection language="PHP" groupPath="PHP"
-                         shortName="PluginInspection" displayName="Inspection for the Plugin declaration"
-                         groupName="Magento 2"
+                         shortName="PluginInspection" 
+                         bundle="magento2.inspection" key="inspection.displayName.PluginInspection"
+                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.php.PluginInspection"/>
 
         <localInspection language="PHP" groupPath="PHP"
                          shortName="ModuleDeclarationInRegistrationPhpInspection"
-                         displayName="Inspection for the Module declaration in the `registration.php` file"
-                         groupName="Magento 2"
+                         bundle="magento2.inspection" key="inspection.displayName.ModuleDeclarationInRegistrationPhpInspection"
+                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.php.ModuleDeclarationInRegistrationPhpInspection"/>
 
         <localInspection language="XML" groupPath="XML"
                          shortName="ObserverDeclarationInspection"
-                         displayName="Duplicated Observer Usage in events XML"
-                         groupName="Magento 2"
+                         bundle="magento2.inspection" key="inspection.displayName.ObserverDeclarationInspection"
+                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.ObserverDeclarationInspection"/>
 
         <localInspection language="XML" groupPath="XML"
                          shortName="PluginDeclarationInspection"
-                         displayName="Duplicated Plugin Usage in di XML"
-                         groupName="Magento 2"
+                         bundle="magento2.inspection" key="inspection.displayName.PluginDeclarationInspection"
+                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
                          enabledByDefault="true"
                          level="WARNING"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.PluginDeclarationInspection"/>
 
         <localInspection language="XML" groupPath="XML"
                          shortName="CacheableFalseInDefaultLayoutInspection"
-                         displayName="Inspection for disabled cache site-wide"
-                         groupName="Magento 2"
+                         bundle="magento2.inspection" key="inspection.displayName.CacheableFalseInDefaultLayoutInspection"
+                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
                          enabledByDefault="true" level="WARNING"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.CacheableFalseInDefaultLayoutInspection"/>
 
         <localInspection language="XML" groupPath="XML"
                          shortName="ModuleDeclarationInModuleXmlInspection"
-                         displayName="Inspection for the Module declaration in the `etc/module.xml` file"
-                         groupName="Magento 2"
+                         bundle="magento2.inspection" key="inspection.displayName.ModuleDeclarationInModuleXmlInspection"
+                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.ModuleDeclarationInModuleXmlInspection"/>
 
         <localInspection language="XML" groupPath="XML"
                          shortName="AclResourceXmlInspection"
-                         displayName="Inspection for the Title XML required attribute in the `etc/acl.xml` file"
-                         groupName="Magento 2"
+                         bundle="magento2.inspection" key="inspection.displayName.AclResourceXmlInspection"
+                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
                          enabledByDefault="true" level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.AclResourceXmlInspection"/>
+
+        <localInspection language="XML" groupPath="XML"
+                         shortName="InvalidDiTypeInspection"
+                         bundle="magento2.inspection" key="inspection.displayName.InvalidDiTypeInspection"
+                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
+                         enabledByDefault="true" level="WARNING"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.InvalidDependencyInjectionTypeInspection"/>
 
         <internalFileTemplate name="Magento Composer JSON"/>
         <internalFileTemplate name="Magento Registration PHP"/>

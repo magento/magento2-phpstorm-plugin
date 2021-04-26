@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <type name="Magento\Catalog\Api\ProductRepositoryInterface">
+        <arguments>
+            <argument name="test_parameter" xsi:type="array">
+                <item name="element1" xsi:type="array">
+                    <item name="element2" xsi:type="object">Magento\Catalog\Api\ProductRepositoryInterface\Proxy</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+</routes>
