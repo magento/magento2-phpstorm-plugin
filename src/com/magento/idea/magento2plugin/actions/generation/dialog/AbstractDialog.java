@@ -119,7 +119,20 @@ public abstract class AbstractDialog extends JDialog {
      * @return List[FieldValidationData]
      */
     protected List<FieldValidationData> getFieldsToValidate() {
-        return getAvailableForFiltering(fieldsValidationsList);
+        final List<FieldValidationData> result = new LinkedList<>();
+
+        for (final FieldValidationData fieldValidationData : fieldsValidationsList) {
+            final JComponent component = ExtractComponentFromFieldUtil.extract(
+                    fieldValidationData.getField(),
+                    this
+            );
+
+            if (component != null && component.isVisible() && component.getParent().isVisible()) {
+                result.add(fieldValidationData);
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -234,31 +247,5 @@ public abstract class AbstractDialog extends JDialog {
         }
 
         return getParentTabPaneForComponent(parent);
-    }
-
-    /**
-     * Returns only available for validation field.
-     *
-     * @param allFields List
-     *
-     * @return List
-     */
-    private List<FieldValidationData> getAvailableForFiltering(
-            final @NotNull List<FieldValidationData> allFields
-    ) {
-        final List<FieldValidationData> result = new LinkedList<>();
-
-        for (final FieldValidationData fieldValidationData : allFields) {
-            final JComponent component = ExtractComponentFromFieldUtil.extract(
-                    fieldValidationData.getField(),
-                    this
-            );
-
-            if (component != null && component.isVisible() && component.getParent().isVisible()) {
-                result.add(fieldValidationData);
-            }
-        }
-
-        return result;
     }
 }
