@@ -21,6 +21,7 @@ import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import com.magento.idea.magento2plugin.bundles.InspectionBundle;
 import com.magento.idea.magento2plugin.inspections.php.util.PhpClassImplementsInterfaceUtil;
 import com.magento.idea.magento2plugin.inspections.php.util.PhpClassImplementsNoninterceptableInterfaceUtil;
+import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
 import com.magento.idea.magento2plugin.magento.packages.Package;
@@ -166,7 +167,7 @@ public class PluginInspection extends PhpInspection {
                             ProblemHighlightType.ERROR
                     );
                 }
-                if (!targetMethod.getAccess().toString().equals(Plugin.PUBLIC_ACCESS)) {
+                if (!targetMethod.getAccess().toString().equals(AbstractPhpFile.PUBLIC_ACCESS)) {
                     problemsHolder.registerProblem(
                             pluginMethod.getNameIdentifier(),
                             inspectionBundle.message("inspection.plugin.error.nonPublicMethod"),
