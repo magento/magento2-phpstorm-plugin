@@ -82,7 +82,7 @@ public class NewCustomerEavAttributeDialog extends EavAttributeDialog {
     private JCheckBox useInGridCheckBox;
     private JCheckBox filterableInGridCheckBox;
     private JCheckBox visibleInGridCheckBox;
-    private JCheckBox systemAttributecheckBox;
+    private JCheckBox systemAttributeCheckBox;
 
     /**
      * Constructor.
@@ -243,9 +243,9 @@ public class NewCustomerEavAttributeDialog extends EavAttributeDialog {
                 useInCustomerAccountEditCheckBox.isSelected()
         );
         customerEntityData.setVisibleInGrid(visibleInGridCheckBox.isSelected());
-        customerEntityData.setUsedInGrid(useInGridCheckBox.isVisible());
+        customerEntityData.setUsedInGrid(useInGridCheckBox.isSelected());
         customerEntityData.setFilterableInGrid(filterableInGridCheckBox.isSelected());
-        customerEntityData.setSystem(systemAttributecheckBox.isSelected());
+        customerEntityData.setSystem(systemAttributeCheckBox.isSelected());
 
         return customerEntityData;
     }
