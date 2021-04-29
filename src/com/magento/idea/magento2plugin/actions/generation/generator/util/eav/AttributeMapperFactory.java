@@ -19,6 +19,8 @@ public class AttributeMapperFactory {
             return new ProductAttributeMapper();
         } else if (entityClass.equals(EavEntity.CATEGORY.getEntityClass())) {
             return new CategoryAttributeMapper();
+        } else if (entityClass.equals(EavEntity.CUSTOMER.getEntityClass())) {
+            return new CustomerAttributeMapper();
         }
 
         return null;

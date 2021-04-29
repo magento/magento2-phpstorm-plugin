@@ -1,0 +1,113 @@
+<?php
+#parse("PHP File Header.php")
+#if (${NAMESPACE})
+namespace ${NAMESPACE};
+#end
+
+#set ($uses = ${USES})
+#foreach ($use in $uses.split(","))
+use $use;
+#end
+
+class ${CLASS_NAME} implements ${IMPLEMENTS}
+{
+    /**
+     * @var ${MODULE_DATA_SETUP_INTERFACE}
+     */
+     private $moduleDataSetup;
+
+     /**
+     * @var ${EAV_SETUP_FACTORY}
+     */
+    private $eavSetupFactory;
+
+    /**
+     * @var ${EAV_CONFIG_CLASS}
+     */
+    private $eavConfig;
+
+     /**
+     * @param ${MODULE_DATA_SETUP_INTERFACE} $moduleDataSetup
+     * @param ${EAV_SETUP_FACTORY} $eavSetupFactory
+     */
+    public function __construct(
+        ${MODULE_DATA_SETUP_INTERFACE} $moduleDataSetup,
+        ${EAV_SETUP_FACTORY} $eavSetupFactory,
+        ${EAV_CONFIG_CLASS} $eavConfig
+    ) {
+        $this->moduleDataSetup = $moduleDataSetup;
+        $this->eavSetupFactory = $eavSetupFactory;
+        $this->eavConfig = $eavConfig;
+    }
+
+    /**
+    * Run code inside patch
+    * If code fails, patch must be reverted, in case when we are speaking about schema - then under revert
+    * means run PatchInterface::revert()
+    *
+    * If we speak about data, under revert means: $transaction->rollback()
+    *
+   * @return $this
+   */
+   public function apply()
+   {
+/** @var ${EAV_SETUP} $eavSetup */
+        $eavSetup = $this->eavSetupFactory->create(['setup' => $this->moduleDataSetup]);
+
+        $eavSetup->addAttribute(
+        ${ENTITY_CLASS}::ENTITY,
+        '${ATTRIBUTE_CODE}',
+                [
+                #set ($attributeSet = ${ATTRIBUTE_SET})
+                #foreach ($attribute in $attributeSet.split("->"))
+                        $attribute
+                #end
+]
+        );
+
+        $eavSetup->addAttributeToSet(
+                ${CUSTOMER_METADATA_INTERFACE}::ENTITY_TYPE_CUSTOMER,
+                ${CUSTOMER_METADATA_INTERFACE}::ATTRIBUTE_SET_ID_CUSTOMER,
+                null,
+                '${ATTRIBUTE_CODE}'
+        );
+
+        #if (${CUSTOMER_FORMS})
+            $attribute = $this->eavConfig->getAttribute(${ENTITY_CLASS}::ENTITY, '${ATTRIBUTE_CODE}');
+            $attribute->setData(
+                'used_in_forms',
+                [${CUSTOMER_FORMS}]
+            );
+            $attribute->save();
+        #end
+
+        return $this;
+   }
+
+   /**
+   * Get array of patches that have to be executed prior to this.
+   *
+   * Example of implementation:
+   *
+   * [
+   *      \Vendor_Name\Module_Name\Setup\Patch\Patch1::class,
+   *      \Vendor_Name\Module_Name\Setup\Patch\Patch2::class
+   * ]
+   *
+   * @return string[]
+   */
+   public static function getDependencies()
+   {
+        return [];
+   }
+
+   /**
+   * Get aliases (previous names) for the patch.
+   *
+   * @return string[]
+   */
+   public function getAliases()
+   {
+        return [];
+   }
+}

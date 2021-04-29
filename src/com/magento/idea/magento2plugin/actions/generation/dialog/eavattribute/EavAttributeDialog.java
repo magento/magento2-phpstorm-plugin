@@ -149,7 +149,10 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
         this.addCancelActionForWindow();
         this.addCancelActionForEsc();
 
-        this.setAttributeInputComboBoxAction(getAttributeSourceComboBox());
+        this.setAttributeInputComboBoxAction(
+                getAttributeSourceComboBox(),
+                getAttributeInputComboBox()
+        );
         this.setSourceComboBoxAction(getAttributeSourceComboBox());
 
         this.setSourceModelPanelAction(
@@ -318,13 +321,14 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
 
     @SuppressWarnings("PMD.AccessorMethodGeneration")
     protected void setAttributeInputComboBoxAction(
-            final JComboBox<ComboBoxItemData> sourceComboBox
+            final JComboBox<ComboBoxItemData> sourceComboBox,
+            final JComboBox<ComboBoxItemData> inputComboBox
     ) {
-        if (sourceComboBox == null) {
+        if (sourceComboBox == null || inputComboBox == null) {
             return;
         }
 
-        getAttributeInputComboBox().addItemListener(
+        inputComboBox.addItemListener(
                 new EavAttributeInputItemListener(sourceComboBox)
         );
     }

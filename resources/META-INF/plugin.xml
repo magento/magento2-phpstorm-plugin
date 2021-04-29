@@ -80,6 +80,7 @@
         <group id="NewEavAttributeGroup" class="com.magento.idea.magento2plugin.actions.groups.NewEavAttributeGroup" text="Magento 2 EAV Attribute" popup="true">
             <action id="NewProductEavAttribute" class="com.magento.idea.magento2plugin.actions.generation.eavattribute.NewProductEavAttributeAction" />
             <action id="NewCatalogEavAttribute" class="com.magento.idea.magento2plugin.actions.generation.eavattribute.NewCategoryEavAttributeAction" />
+            <action id="NewCustomerAttribute" class="com.magento.idea.magento2plugin.actions.generation.NewCustomerEavAttributeAction" />
             <add-to-group group-id="MagentoNewModuleFileGroup" anchor="last"/>
         </group>
 
