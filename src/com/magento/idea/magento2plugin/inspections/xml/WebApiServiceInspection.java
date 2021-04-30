@@ -17,6 +17,9 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.bundles.InspectionBundle;
+import com.magento.idea.magento2plugin.inspections.validator.InspectionValidator;
+import com.magento.idea.magento2plugin.inspections.validator.NotEmptyValidator;
+import com.magento.idea.magento2plugin.inspections.validator.PhpClassExistenceValidator;
 import com.magento.idea.magento2plugin.inspections.xml.fix.MethodNotPublicAccessQuickFix;
 import com.magento.idea.magento2plugin.magento.files.ModuleWebApiXmlFile;
 import java.util.Collection;
@@ -33,7 +36,12 @@ public class WebApiServiceInspection extends XmlSuppressableInspectionTool {
             final boolean isOnTheFly
     ) {
         return new XmlElementVisitor() {
+
             private final InspectionBundle inspectionBundle = new InspectionBundle();
+            // Inspection validators
+            private final InspectionValidator notEmptyValidator = new NotEmptyValidator();
+            private final InspectionValidator phpClassExistenceValidator =
+                    new PhpClassExistenceValidator(problemsHolder.getProject());
 
             @Override
             public void visitXmlTag(final XmlTag xmlTag) {
@@ -55,7 +63,8 @@ public class WebApiServiceInspection extends XmlSuppressableInspectionTool {
                     return;
                 }
                 final String classFqn = classAttribute.getValue();
-                if (classFqn == null || classFqn.isEmpty()) {
+
+                if (!notEmptyValidator.validate(classFqn)) {
                     problemsHolder.registerProblem(
                             classAttribute,
                             inspectionBundle.message(
@@ -68,14 +77,7 @@ public class WebApiServiceInspection extends XmlSuppressableInspectionTool {
                     return;
                 }
 
-                //Check whether the class exists
-                final PhpIndex phpIndex = PhpIndex.getInstance(
-                        problemsHolder.getProject()
-                );
-                @NotNull final Collection<PhpClass> classes = phpIndex.getClassesByFQN(classFqn);
-                @NotNull final Collection<PhpClass> interfaces = phpIndex
-                        .getInterfacesByFQN(classFqn);
-                if (classes.isEmpty() && interfaces.isEmpty()) {
+                if (!phpClassExistenceValidator.validate(classFqn)) {
                         problemsHolder.registerProblem(
                                 classAttribute,
                                 inspectionBundle.message(
@@ -95,7 +97,8 @@ public class WebApiServiceInspection extends XmlSuppressableInspectionTool {
                     return;
                 }
                 final String methodName = methodAttribute.getValue();
-                if (methodName == null || methodName.isEmpty()) {
+
+                if (!notEmptyValidator.validate(methodName)) {
                     problemsHolder.registerProblem(
                             classAttribute,
                             inspectionBundle.message(
@@ -109,10 +112,16 @@ public class WebApiServiceInspection extends XmlSuppressableInspectionTool {
                 }
 
                 //Check whether method exists
+                final PhpIndex phpIndex = PhpIndex.getInstance(problemsHolder.getProject());
+                final @NotNull Collection<PhpClass> classes = phpIndex.getClassesByFQN(classFqn);
+                final @NotNull Collection<PhpClass> interfaces = phpIndex
+                        .getInterfacesByFQN(classFqn);
+
                 Method targetMethod = findTargetMethod(classes, methodName);
                 if (targetMethod == null) {
                     targetMethod = findTargetMethod(interfaces, methodName);
                 }
+
                 if (targetMethod == null && methodAttribute.getValueElement() != null) {
                     problemsHolder.registerProblem(
                             methodAttribute.getValueElement(),
@@ -127,7 +136,9 @@ public class WebApiServiceInspection extends XmlSuppressableInspectionTool {
                 }
 
                 //API method should have public access
-                if (targetMethod.getAccess() != null && !targetMethod.getAccess().isPublic()) {
+                if (targetMethod != null
+                        && targetMethod.getAccess() != null
+                        && !targetMethod.getAccess().isPublic()) {
                     problemsHolder.registerProblem(
                             methodAttribute,
                             inspectionBundle.message(
@@ -140,8 +151,7 @@ public class WebApiServiceInspection extends XmlSuppressableInspectionTool {
                 }
             }
 
-            @Nullable
-            private Method findTargetMethod(
+            private @Nullable Method findTargetMethod(
                     final Collection<PhpClass> classes,
                     final String methodName
             ) {
