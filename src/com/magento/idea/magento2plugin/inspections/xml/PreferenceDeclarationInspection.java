@@ -30,8 +30,8 @@ public class PreferenceDeclarationInspection extends XmlSuppressableInspectionTo
             final boolean isOnTheFly
     ) {
         return new XmlElementVisitor() {
-            private final InspectionBundle inspectionBundle = new InspectionBundle();
 
+            private final InspectionBundle inspectionBundle = new InspectionBundle();
             private final InspectionValidator phpClassExistenceValidator =
                     new PhpClassExistenceValidator(problemsHolder.getProject());
             private final InspectionValidator notEmptyValidator = new NotEmptyValidator();
