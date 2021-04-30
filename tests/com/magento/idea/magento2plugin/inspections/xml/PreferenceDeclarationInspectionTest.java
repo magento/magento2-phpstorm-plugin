@@ -32,8 +32,7 @@ public class PreferenceDeclarationInspectionTest extends InspectionXmlFixtureTes
 
     /**
      * Test for the absence of an error in the presence of
-     * classes or interfaces specified for preferences
-     * <preference for="Magento\Catalog\Api\ProductRepositoryInterface" type="Foo\Bar\Model\Logger"/>
+     * classes or interfaces specified for preferences.
      */
     public void testClassAttrForAndTypeAreExist() {
         configureFixture();
@@ -54,7 +53,7 @@ public class PreferenceDeclarationInspectionTest extends InspectionXmlFixtureTes
     }
 
     /**
-     * Test for throwing an error for a class that does not exist for the "for" attribute
+     * Test for throwing an error for a class that does not exist for the "for" attribute.
      */
     public void testClassAttrForDoesNotExists() {
         configureFixture();
@@ -68,7 +67,7 @@ public class PreferenceDeclarationInspectionTest extends InspectionXmlFixtureTes
     }
 
     /**
-     * Test for throwing an error for a class that does not exist for the "type" attribute
+     * Test for throwing an error for a class that does not exist for the "type" attribute.
      */
     public void testClassAttrTypeDoesNotExists() {
         configureFixture();
@@ -83,7 +82,7 @@ public class PreferenceDeclarationInspectionTest extends InspectionXmlFixtureTes
 
     /**
      * Test for an error for the "type" attribute because it is empty and
-     * there is no error "for" the for attribute because this class exists
+     * there is no error "for" the for attribute because this class exists.
      * <preference for="Foo\Bar\Model\Logger" type=""/>
      */
     public void testForAttrArgsValuesIsEmpty() {
@@ -106,7 +105,7 @@ public class PreferenceDeclarationInspectionTest extends InspectionXmlFixtureTes
 
     /**
      * Test for an error for the "for" attribute because it is empty and
-     * there is no error "type" the for attribute because this class exists
+     * there is no error "type" the for attribute because this class exists.
      * <preference for="" type="Foo\Bar\Model\Logger"/>
      */
     public void testTypeAttrArgsValuesIsEmpty() {
