@@ -31,25 +31,63 @@ public class PreferenceDeclarationInspectionTest extends InspectionXmlFixtureTes
     }
 
     /**
-     * Test for the absence of an error in the presence of
-     * classes or interfaces specified for preferences.
+     * Test for an error for the "type" attribute because it is empty.
+     * <preference for="" type="Foo\Bar\Model\Logger"/>
      */
-    public void testClassAttrForAndTypeAreExist() {
+    public void testAttrArgForValuesIsEmpty() {
         configureFixture();
 
-        final String classOneExists =  inspectionBundle.message(
-                CLASS_DOES_NOT_EXIST,
-                EXISTENT_CLASS_ONE
+        final String forAttrIsEmptyMessage =  inspectionBundle.message(
+                ARGUMENT_VALUE_IS_EMPTY,
+                ModuleDiXml.TYPE_ATTR
         );
 
-        assertHasNoHighlighting(classOneExists);
+        assertHasHighlighting(forAttrIsEmptyMessage);
+    }
 
-        final String classTwoExists =  inspectionBundle.message(
-                CLASS_DOES_NOT_EXIST,
-                EXISTENT_CLASS_TWO
+    /**
+     * Test for an error for the "for" attribute because it is empty.
+     * <preference for="Foo\Bar\Model\Logger" type=""/>
+     */
+    public void testAttrArgTypeValueIsEmpty() {
+        configureFixture();
+
+        final String forAttrIsEmptyMessage =  inspectionBundle.message(
+                ARGUMENT_VALUE_IS_EMPTY,
+                ModuleDiXml.PREFERENCE_ATTR_FOR
         );
 
-        assertHasNoHighlighting(classTwoExists);
+        assertHasHighlighting(forAttrIsEmptyMessage);
+    }
+
+    /**
+     * Test for an no error for the "for" attribute because this class exists.
+     * <preference for="Foo\Bar\Model\Logger" type=""/>
+     */
+    public void testAttrForClassExists() {
+        configureFixture();
+
+        final String typeAttrIsEmptyMessage =  inspectionBundle.message(
+                ARGUMENT_VALUE_IS_EMPTY,
+                ModuleDiXml.TYPE_ATTR
+        );
+
+        assertHasNoHighlighting(typeAttrIsEmptyMessage);
+    }
+
+    /**
+     * Test for an no error for the "type" attribute because this class exists.
+     * <preference for="" type="Foo\Bar\Model\Logger"/>
+     */
+    public void testAttrTypeClassExists() {
+        configureFixture();
+
+        final String typeAttrIsEmptyMessage =  inspectionBundle.message(
+                ARGUMENT_VALUE_IS_EMPTY,
+                ModuleDiXml.PREFERENCE_ATTR_FOR
+        );
+
+        assertHasNoHighlighting(typeAttrIsEmptyMessage);
     }
 
     /**
@@ -67,6 +105,21 @@ public class PreferenceDeclarationInspectionTest extends InspectionXmlFixtureTes
     }
 
     /**
+     * Test for the absence of an error in the presence of
+     * classes or interfaces specified for preferences.
+     */
+    public void testClassAttrForIsExist() {
+        configureFixture();
+
+        final String classOneExists =  inspectionBundle.message(
+                CLASS_DOES_NOT_EXIST,
+                EXISTENT_CLASS_ONE
+        );
+
+        assertHasNoHighlighting(classOneExists);
+    }
+
+    /**
      * Test for throwing an error for a class that does not exist for the "type" attribute.
      */
     public void testClassAttrTypeDoesNotExists() {
@@ -81,49 +134,18 @@ public class PreferenceDeclarationInspectionTest extends InspectionXmlFixtureTes
     }
 
     /**
-     * Test for an error for the "type" attribute because it is empty and
-     * there is no error "for" the for attribute because this class exists.
-     * <preference for="Foo\Bar\Model\Logger" type=""/>
+     * Test for the absence of an error in the presence of
+     * classes or interfaces specified for preferences.
      */
-    public void testForAttrArgsValuesIsEmpty() {
+    public void testClassAttrTypeIsExist() {
         configureFixture();
 
-        final String forAttrIsEmptyMessage =  inspectionBundle.message(
-                ARGUMENT_VALUE_IS_EMPTY,
-                ModuleDiXml.PREFERENCE_ATTR_FOR
+        final String classOneExists =  inspectionBundle.message(
+                CLASS_DOES_NOT_EXIST,
+                EXISTENT_CLASS_TWO
         );
 
-        assertHasHighlighting(forAttrIsEmptyMessage);
-
-        final String typeAttrIsEmptyMessage =  inspectionBundle.message(
-                ARGUMENT_VALUE_IS_EMPTY,
-                ModuleDiXml.TYPE_ATTR
-        );
-
-        assertHasNoHighlighting(typeAttrIsEmptyMessage);
-    }
-
-    /**
-     * Test for an error for the "for" attribute because it is empty and
-     * there is no error "type" the for attribute because this class exists.
-     * <preference for="" type="Foo\Bar\Model\Logger"/>
-     */
-    public void testTypeAttrArgsValuesIsEmpty() {
-        configureFixture();
-
-        final String forAttrIsEmptyMessage =  inspectionBundle.message(
-                ARGUMENT_VALUE_IS_EMPTY,
-                ModuleDiXml.TYPE_ATTR
-        );
-
-        assertHasHighlighting(forAttrIsEmptyMessage);
-
-        final String typeAttrIsEmptyMessage =  inspectionBundle.message(
-                ARGUMENT_VALUE_IS_EMPTY,
-                ModuleDiXml.PREFERENCE_ATTR_FOR
-        );
-
-        assertHasNoHighlighting(typeAttrIsEmptyMessage);
+        assertHasNoHighlighting(classOneExists);
     }
 
     private void configureFixture() {
