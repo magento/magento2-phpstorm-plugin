@@ -21,6 +21,7 @@ import com.magento.idea.magento2plugin.inspections.validator.PhpClassExistenceVa
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.NPathComplexity"})
 public class PreferenceDeclarationInspection extends XmlSuppressableInspectionTool {
 
     @Override
@@ -46,8 +47,6 @@ public class PreferenceDeclarationInspection extends XmlSuppressableInspectionTo
 
                 final XmlAttribute preferenceForAttribute =
                         xmlTag.getAttribute(ModuleDiXml.PREFERENCE_ATTR_FOR);
-                final XmlAttribute preferenceTypeAttribute =
-                        xmlTag.getAttribute(ModuleDiXml.TYPE_ATTR);
 
                 if (preferenceForAttribute == null
                         || preferenceForAttribute.getValue() == null
@@ -61,6 +60,9 @@ public class PreferenceDeclarationInspection extends XmlSuppressableInspectionTo
                             preferenceForAttribute.getName()
                     );
                 }
+
+                final XmlAttribute preferenceTypeAttribute =
+                        xmlTag.getAttribute(ModuleDiXml.TYPE_ATTR);
 
                 if (preferenceTypeAttribute == null
                         || preferenceTypeAttribute.getValue() == null
