@@ -1,41 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="45px" height="54px"
-     viewBox="0 0 45 54" version="1.1">
-    <title>Magento-color</title>
-    <style type="text/css">
-        .st0{fill:#27140D;}
-        .st1{fill:#F26724;}
-        .st2{fill:#FDDFDD;}
-    </style>
-    <g>
-        <circle id="XMLID_27_" class="st0" cx="18" cy="18" r="18"/>
-        <g>
-            <g id="XMLID_22_">
-                <path id="XMLID_26_" class="st1" d="M18.2,1.8c2.2,0,4.3,0.5,6.3,1.3s3.7,1.9,5.1,3.5c1.4,1.4,2.7,3.2,3.5,5.1
-				c0.8,1.9,1.3,4.2,1.3,6.3s-0.5,4.3-1.3,6.3c-0.8,1.9-1.9,3.7-3.5,5.1c-1.4,1.4-3.2,2.7-5.1,3.5c-1.9,0.8-4.2,1.3-6.3,1.3
-				s-4.3-0.5-6.3-1.3C10,32.1,8.2,31,6.8,29.4C5.3,28,4,26.2,3.2,24.3S1.9,20.1,1.9,18s0.5-4.3,1.3-6.3S5.1,8,6.8,6.6
-				c1.4-1.4,3.2-2.7,5.1-3.5S15.9,1.8,18.2,1.8 M18.2,0C8.2,0,0,8,0,18s8,18,18,18s18-8,18-18S28.1,0,18.2,0L18.2,0z"/>
-                <g id="XMLID_23_">
-                    <polygon id="XMLID_25_" class="st2" points="18.2,6.3 7.9,12.1 7.9,23.8 10.8,25.6 10.8,13.8 18.2,9.6 25.6,13.8 25.6,25.6
-					28.4,23.9 28.4,12.1 				"/>
-                    <polygon id="XMLID_24_" class="st2" points="19.6,25.6 18.2,26.4 16.7,25.6 16.7,13.8 13.8,15.4 13.8,27.3 18.2,29.7 22.5,27.3
-					22.5,15.4 19.6,13.8 				"/>
-                </g>
-            </g>
-        </g>
-    </g>
-    <metadata>
-        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-                 xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dc="http://purl.org/dc/elements/1.1/">
-            <rdf:Description about="https://iconscout.com/legal#licenses" dc:title="magento,color"
-                             dc:description="magento,color" dc:publisher="Iconscout" dc:date="2017-09-14"
-                             dc:format="image/svg+xml" dc:language="en">
-                <dc:creator>
-                    <rdf:Bag>
-                        <rdf:li>Alexis Doreau</rdf:li>
-                    </rdf:Bag>
-                </dc:creator>
-            </rdf:Description>
-        </rdf:RDF>
-    </metadata>
+
+<svg viewBox="0 0 240 234" xmlns="http://www.w3.org/2000/svg">
+    <rect fill="#fa0f00" height="234" rx="42.5" width="240"/>
+    <path d="m186.617 175.95037h-28.50642a6.24325 6.24325 0 0 1 -5.84652-3.76911l-30.94691-72.35915a1.36371 1.36371 0 0 0 -2.61145-.034l-19.286 45.94252a1.63479 1.63479 0 0 0 1.50656 2.26937h21.1992a3.26957 3.26957 0 0 1 3.01052 1.99409l9.2814 20.65452a3.81249 3.81249 0 0 1 -3.5078 5.30176h-77.17558a3.51828 3.51828 0 0 1 -3.2129-4.90437l49.08958-116.90224a6.639 6.639 0 0 1 6.23232-4.14376h28.31354a6.6281 6.6281 0 0 1 6.23289 4.14376l49.42942 116.90224a3.51717 3.51717 0 0 1 -3.20185 4.90437z"
+          fill="#fff"/>
 </svg>
