@@ -231,6 +231,7 @@ public class NewInterfaceForServiceDialog extends AbstractDialog {
     /**
      * Open service methods chooser.
      */
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     private void openMethodChooser() {
         final List<PhpNamedElementNode> methodsNodes = new LinkedList<>();
 
