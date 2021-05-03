@@ -129,9 +129,14 @@ public class NewDbSchemaDialog extends AbstractDialog {
      * On buttonOK action listener.
      */
     private void onOK() {
+        if (columnsTable.isEditing()) {
+            columnsTable.getCellEditor().stopCellEditing();
+        }
+
         if (!validateFormFields()) {
             return;
         }
+
         final DbSchemaXmlData dbSchemaXmlData = new DbSchemaXmlData(
                 getTableName(),
                 getTableResource(),

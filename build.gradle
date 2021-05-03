@@ -4,7 +4,7 @@
  */
 
 plugins {
-    id 'org.jetbrains.intellij' version '0.6.5'
+    id 'org.jetbrains.intellij' version '0.7.2'
     id 'checkstyle'
     id 'pmd'
     id 'org.jetbrains.changelog' version '0.6.2'

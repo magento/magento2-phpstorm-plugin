@@ -21,6 +21,7 @@ import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import com.magento.idea.magento2plugin.bundles.InspectionBundle;
 import com.magento.idea.magento2plugin.inspections.php.util.PhpClassImplementsInterfaceUtil;
 import com.magento.idea.magento2plugin.inspections.php.util.PhpClassImplementsNoninterceptableInterfaceUtil;
+import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
 import com.magento.idea.magento2plugin.magento.packages.Package;
@@ -145,7 +146,7 @@ public class PluginInspection extends PhpInspection {
                     final String targetClassMethodName,
                     final Method targetMethod
             ) {
-                if (targetClassMethodName.equals(Plugin.CONSTRUCT_METHOD_NAME)) {
+                if (targetClassMethodName.equals(MagentoPhpClass.CONSTRUCT_METHOD_NAME)) {
                     problemsHolder.registerProblem(
                             pluginMethod.getNameIdentifier(),
                             inspectionBundle.message("inspection.plugin.error.constructMethod"),
@@ -166,7 +167,7 @@ public class PluginInspection extends PhpInspection {
                             ProblemHighlightType.ERROR
                     );
                 }
-                if (!targetMethod.getAccess().toString().equals(Plugin.PUBLIC_ACCESS)) {
+                if (!targetMethod.getAccess().toString().equals(AbstractPhpFile.PUBLIC_ACCESS)) {
                     problemsHolder.registerProblem(
                             pluginMethod.getNameIdentifier(),
                             inspectionBundle.message("inspection.plugin.error.nonPublicMethod"),
@@ -200,10 +201,11 @@ public class PluginInspection extends PhpInspection {
                                     pluginMethodParameter,
                                     PhpBundle.message(
                                             WRONG_PARAM_TYPE,
-                                            new Object[]{declaredType, targetClassFqn}
-                                            ),
+                                            declaredType,
+                                            targetClassFqn
+                                    ),
                                     ProblemHighlightType.ERROR
-                                );
+                            );
                         }
                         if (!checkPossibleTypeIncompatibility(targetClassFqn, declaredType)) {
                             problemsHolder.registerProblem(
@@ -219,21 +221,24 @@ public class PluginInspection extends PhpInspection {
                     if (index == 2 && pluginPrefix.equals(Plugin.PluginType.around.toString())) {
                         if (!checkTypeIncompatibility(Plugin.CALLABLE_PARAM, declaredType)
                                 && !checkTypeIncompatibility(
-                                    Package.fqnSeparator.concat(Plugin.CLOSURE_PARAM),
-                                    declaredType)
+                                Package.fqnSeparator.concat(Plugin.CLOSURE_PARAM),
+                                declaredType)
                         ) {
                             problemsHolder.registerProblem(
                                     pluginMethodParameter,
                                     PhpBundle.message(
-                                        WRONG_PARAM_TYPE,
-                                        new Object[]{declaredType, "callable"}
+                                            WRONG_PARAM_TYPE,
+                                            declaredType,
+                                            "callable"
                                     ),
                                     ProblemHighlightType.ERROR);
                         }
                         continue;
                     }
                     if (index == 2 && pluginPrefix.equals(Plugin.PluginType.after.toString())
-                            && !targetMethod.getDeclaredType().toString().equals("void")) {
+                            && !MagentoPhpClass.VOID_RETURN_TYPE.equals(
+                                    targetMethod.getDeclaredType().toString()
+                    )) {
                         if (declaredType.isEmpty() || targetMethod.getDeclaredType()
                                 .toString().isEmpty()) {
                             continue;
@@ -244,9 +249,9 @@ public class PluginInspection extends PhpInspection {
                                     pluginMethodParameter,
                                     PhpBundle.message(
                                             WRONG_PARAM_TYPE,
-                                                new Object[]{declaredType,
-                                                targetMethod.getDeclaredType().toString()}
-                                                ),
+                                            declaredType,
+                                            targetMethod.getDeclaredType().toString()
+                                    ),
                                     ProblemHighlightType.ERROR
                             );
                         }
@@ -265,7 +270,9 @@ public class PluginInspection extends PhpInspection {
                         continue;
                     }
                     if (index == 2 && pluginPrefix.equals(Plugin.PluginType.after.toString())
-                            && targetMethod.getDeclaredType().toString().equals("void")) {
+                            && MagentoPhpClass.VOID_RETURN_TYPE.equals(
+                                    targetMethod.getDeclaredType().toString()
+                    )) {
                         if (declaredType.isEmpty()) {
                             continue;
                         }
@@ -274,8 +281,7 @@ public class PluginInspection extends PhpInspection {
                                     pluginMethodParameter,
                                     PhpBundle.message(
                                             WRONG_PARAM_TYPE,
-                                            new Object[]{declaredType, "null"}
-                                            ),
+                                            declaredType, "null"),
                                     ProblemHighlightType.ERROR);
                         }
                         continue;
@@ -306,9 +312,9 @@ public class PluginInspection extends PhpInspection {
                                 pluginMethodParameter,
                                 PhpBundle.message(
                                         WRONG_PARAM_TYPE,
-                                        new Object[]{declaredType,
-                                                targetMethodParameterDeclaredType}
-                                            ),
+                                        declaredType,
+                                        targetMethodParameterDeclaredType
+                                ),
                                 ProblemHighlightType.ERROR);
                     }
                     if (!checkPossibleTypeIncompatibility(
