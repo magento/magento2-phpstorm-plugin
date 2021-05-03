@@ -100,6 +100,10 @@ public class ObserverDeclarationInspection extends PhpInspection {
                         }
 
                         final String observerName = observerNameAttribute.getValue();
+                        if (observerName == null) {
+                            continue;
+                        }
+
                         final String observerKey = eventNameAttributeValue.concat("_")
                                 .concat(observerName);
                         if (targetObserversHash.containsKey(observerKey)) {
@@ -124,22 +128,21 @@ public class ObserverDeclarationInspection extends PhpInspection {
                         if (observerDisabledAttribute != null
                                 && observerDisabledAttribute.getValue() != null
                                 && observerDisabledAttribute.getValue().equals("true")
-                                && modulesWithSameObserverName.isEmpty()
+                                && !observerName.isEmpty()
                         ) {
-                            problemsHolder.registerProblem(
-                                    observerNameAttribute.getValueElement(),
-                                    inspectionBundle.message(
-                                            "inspection.observer.disabledObserverDoesNotExist"
-                                    ),
-                                    errorSeverity
-                            );
-                        }
-
-                        if (observerDisabledAttribute != null
-                                && observerDisabledAttribute.getValue() != null
-                                && observerDisabledAttribute.getValue().equals("true")
-                        ) {
+                            @Nullable final XmlAttributeValue valueElement
+                                    = observerNameAttribute.getValueElement();
+                            if (modulesWithSameObserverName.isEmpty() && valueElement != null) {
+                                    problemsHolder.registerProblem(
+                                            valueElement,
+                                            inspectionBundle.message(
+                                                "inspection.observer.disabledObserverDoesNotExist"
+                                            ),
+                                            errorSeverity
+                                    );
+                            } else {
                                 continue;
+                            }
                         }
 
                         for (final HashMap<String, String> moduleEntry:
