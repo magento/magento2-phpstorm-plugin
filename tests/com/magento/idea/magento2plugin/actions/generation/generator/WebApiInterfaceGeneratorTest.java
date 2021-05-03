@@ -63,6 +63,7 @@ public class WebApiInterfaceGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of web api interface for a service with primitive types.
      */
+    @SuppressWarnings({"PMD.JUnitTestContainsTooManyAsserts"})
     public void testWithPrimitiveTypes() {
         final PhpClass service = extractServiceByFqn(FIRST_SERVICE_FQN);
         final List<Method> publicMethods = PhpTypeMetadataParserUtil.getPublicMethods(service);
@@ -103,6 +104,7 @@ public class WebApiInterfaceGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of web api interface for a service with Object types.
      */
+    @SuppressWarnings({"PMD.JUnitTestContainsTooManyAsserts"})
     public void testWithObjectTypesAndPhpDocComments() {
         final PhpClass service = extractServiceByFqn(SECOND_SERVICE_FQN);
         final List<Method> publicMethods = PhpTypeMetadataParserUtil.getPublicMethods(service);
@@ -169,6 +171,7 @@ public class WebApiInterfaceGeneratorTest extends BaseGeneratorTestCase {
      * @param service PhpClass
      * @param generatedInterfaceName String
      */
+    @SuppressWarnings({"PMD.CyclomaticComplexity"})
     private void assertServiceHasInterfaceReference(
             final @NotNull PhpClass service,
             final @NotNull String generatedInterfaceName
