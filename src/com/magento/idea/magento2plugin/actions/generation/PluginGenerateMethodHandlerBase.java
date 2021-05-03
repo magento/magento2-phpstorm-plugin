@@ -44,7 +44,6 @@ import com.magento.idea.magento2plugin.util.magento.plugin.IsPluginAllowedForMet
 import gnu.trove.THashSet;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -318,16 +317,25 @@ public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeIns
             final PhpNamedElementNode... selected
     ) {
         final List<PhpNamedElementNode> newSelected = ContainerUtil.newArrayList(selected);
-        Collections.sort(newSelected, (o1, o2) -> {
+        newSelected.sort((o1, o2) -> {
             final PsiElement psiElement = o1.getPsiElement();
             final PsiElement psiElement2 = o2.getPsiElement();
             final PsiFile containingFile = psiElement.getContainingFile();
             final PsiFile containingFile2 = psiElement2.getContainingFile();
             return containingFile.equals(containingFile2)
-                    ? psiElement.getTextOffset() - psiElement2.getTextOffset()
-                    : containingFile.getName().compareTo(containingFile2.getName());
+                ? psiElement.getTextOffset() - psiElement2.getTextOffset()
+                : getDocumentPosition(containingFile, containingFile2);
         });
         return newSelected;
+    }
+
+    private static int getDocumentPosition(
+            final PsiFile containingFile,
+            final PsiFile containingFile2
+    ) {
+        return containingFile.getVirtualFile().getPresentableUrl().compareTo(
+            containingFile2.getVirtualFile().getPresentableUrl()
+        );
     }
 
     private static int getSuitableEditorPosition(final Editor editor, final PhpFile phpFile) {
@@ -371,9 +379,9 @@ public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeIns
             return false;
         }
         final IElementType elementType = element.getNode().getElementType();
-        return elementType == PhpElementTypes.CLASS_FIELDS
-                    || elementType == PhpElementTypes.CLASS_CONSTANTS
-                    || elementType == PhpStubElementTypes.CLASS_METHOD;
+        return elementType.equals(PhpElementTypes.CLASS_FIELDS)
+                    || elementType.equals(PhpElementTypes.CLASS_CONSTANTS)
+                    || elementType.equals(PhpStubElementTypes.CLASS_METHOD);
     }
 
     private static int getNextPos(final PsiElement element) {
