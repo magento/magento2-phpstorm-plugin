@@ -2,6 +2,7 @@
 
 namespace Foo\Bar\Setup\Patch\Data;
 
+use Magento\Catalog\Model\Category;
 use Magento\Eav\Setup\EavSetup;
 use Magento\Eav\Setup\EavSetupFactory;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
@@ -39,8 +40,6 @@ class AddTestAttributeCategoryAttribute implements DataPatchInterface
      * means run PatchInterface::revert()
      *
      * If we speak about data, under revert means: $transaction->rollback()
-     *
-     * @return $this
      */
     public function apply()
     {
@@ -48,7 +47,7 @@ class AddTestAttributeCategoryAttribute implements DataPatchInterface
         $eavSetup = $this->eavSetupFactory->create(['setup' => $this->moduleDataSetup]);
 
         $eavSetup->addAttribute(
-            \Magento\Catalog\Model\Category::ENTITY,
+            Category::ENTITY,
             'test_attribute',
             [
                 'input' => 'text',
