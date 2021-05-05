@@ -18,7 +18,7 @@ public class WebApiInterfaceData {
     private final List<Method> methods;
 
     /**
-     * Web Api interface DTO constructor.
+     * Web API interface DTO constructor.
      *
      * @param moduleName String
      * @param classFqn String

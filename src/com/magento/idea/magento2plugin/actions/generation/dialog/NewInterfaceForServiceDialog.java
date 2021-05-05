@@ -45,8 +45,8 @@ import org.jetbrains.annotations.NotNull;
 public class NewInterfaceForServiceDialog extends AbstractDialog {
 
     private static final String SERVICE_METHODS = "Covered Methods";
-    private static final String NAME_FIELD = "Api Name";
-    private static final String DESCRIPTION_FIELD = "Api Description";
+    private static final String NAME_FIELD = "API Name";
+    private static final String DESCRIPTION_FIELD = "API Description";
 
     private final @NotNull Project project;
     private final String moduleName;
@@ -81,7 +81,7 @@ public class NewInterfaceForServiceDialog extends AbstractDialog {
     private JLabel descriptionFieldErrorMessage;//NOPMD
 
     /**
-     * New Web Api Interface for the php class.
+     * New Web API Interface for the php class.
      *
      * @param project Project
      * @param directory PsiDirectory
@@ -128,7 +128,7 @@ public class NewInterfaceForServiceDialog extends AbstractDialog {
     }
 
     /**
-     * Open New Web Api interface for the php class dialog window.
+     * Open New Web API interface for the php class dialog window.
      *
      * @param project Project
      * @param directory PsiDirectory

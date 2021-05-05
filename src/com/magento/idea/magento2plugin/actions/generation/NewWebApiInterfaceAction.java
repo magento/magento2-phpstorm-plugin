@@ -13,6 +13,7 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewInterfaceForServiceDialog;
 import com.magento.idea.magento2plugin.project.Settings;
+import com.magento.idea.magento2plugin.util.RegExUtil;
 import com.magento.idea.magento2plugin.util.magento.IsFileInEditableModuleUtil;
 import com.magento.idea.magento2plugin.util.php.PhpPsiElementsUtil;
 import org.jetbrains.annotations.NotNull;
@@ -45,6 +46,15 @@ public class NewWebApiInterfaceAction extends AnAction {
                 || !IsFileInEditableModuleUtil.execute(phpClass.getContainingFile())) {
             return;
         }
+        // Excluding API generators for Test/ and *Test.php files
+        // in order to not overload the context menu.
+        final String filename = phpClass.getContainingFile().getName();
+
+        if (filename.matches(RegExUtil.Magento.TEST_FILE_NAME)
+                || phpClass.getPresentableFQN().matches(RegExUtil.Magento.TEST_CLASS_FQN)) {
+            return;
+        }
+
         currentPhpClass = phpClass;
         setIsAvailableForEvent(event, true);
     }

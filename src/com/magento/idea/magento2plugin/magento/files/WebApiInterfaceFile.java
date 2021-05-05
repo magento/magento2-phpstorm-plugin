@@ -9,14 +9,14 @@ import org.jetbrains.annotations.NotNull;
 
 public class WebApiInterfaceFile extends AbstractPhpFile {
 
-    public static final String TEMPLATE = "Web Api Interface";
-    public static final String HUMAN_READABLE_NAME = "Web Api Interface for service %serviceName";
+    public static final String TEMPLATE = "Web API Interface";
+    public static final String HUMAN_READABLE_NAME = "Web API Interface for service %serviceName";
     public static final String DEFAULT_METHOD_DESCRIPTION = "TODO: need to describe this method.";
     public static final String METHODS_DELIMITER = "METHODS_DELIMITER";
     private static final String DIRECTORY = "Api";
 
     /**
-     * Web Api service interface file constructor.
+     * Web API service interface file constructor.
      *
      * @param moduleName String
      * @param className String

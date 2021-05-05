@@ -26,7 +26,7 @@ public class WebApiInterfaceGenerator extends PhpFileGenerator {
     private final WebApiInterfaceData data;
 
     /**
-     * Web Api Interface generator constructor.
+     * Web API Interface generator constructor.
      *
      * @param data WebApiInterfaceData
      * @param project Project
@@ -39,7 +39,7 @@ public class WebApiInterfaceGenerator extends PhpFileGenerator {
     }
 
     /**
-     * Web Api Interface generator constructor.
+     * Web API Interface generator constructor.
      *
      * @param data WebApiInterfaceData
      * @param project Project

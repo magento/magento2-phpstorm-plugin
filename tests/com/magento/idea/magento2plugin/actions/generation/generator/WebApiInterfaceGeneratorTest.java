@@ -61,7 +61,7 @@ public class WebApiInterfaceGeneratorTest extends BaseGeneratorTestCase {
     }
 
     /**
-     * Test generation of web api interface for a service with primitive types.
+     * Test generation of Web API interface for a service with primitive types.
      */
     @SuppressWarnings({"PMD.JUnitTestContainsTooManyAsserts"})
     public void testWithPrimitiveTypes() {
@@ -102,7 +102,7 @@ public class WebApiInterfaceGeneratorTest extends BaseGeneratorTestCase {
     }
 
     /**
-     * Test generation of web api interface for a service with Object types.
+     * Test generation of Web API interface for a service with Object types.
      */
     @SuppressWarnings({"PMD.JUnitTestContainsTooManyAsserts"})
     public void testWithObjectTypesAndPhpDocComments() {
@@ -145,7 +145,7 @@ public class WebApiInterfaceGeneratorTest extends BaseGeneratorTestCase {
     }
 
     /**
-     * Asset that service methods have inherit doc after Web Api interface generation.
+     * Asset that service methods have inherit doc after Web API interface generation.
      *
      * @param service PhpClass
      * @param checkingMethods List[String]
