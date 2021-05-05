@@ -50,7 +50,6 @@ import com.magento.idea.magento2plugin.stubs.indexes.xml.MenuIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.ui.table.TableGroupWrapper;
 import com.magento.idea.magento2plugin.util.CamelCaseToSnakeCase;
-import com.magento.idea.magento2plugin.util.FirstLetterToLowercaseUtil;
 import com.magento.idea.magento2plugin.util.magento.GetAclResourcesListUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.Cursor;
@@ -445,7 +444,7 @@ public class NewEntityDialog extends AbstractDialog {
         final String dtoInterfaceClassName = entityName.concat(DTO_INTERFACE_SUFFIX);
 
         final String actionsPathPrefix = dialogData.getRoute() + File.separator
-                + FirstLetterToLowercaseUtil.convert(entityName) + File.separator;
+                + entityName.toLowerCase(Locale.getDefault()) + File.separator;
         final NamespaceBuilder dtoModelNamespace =
                 new DataModelFile(moduleName, dtoClassName).getNamespaceBuilder();
         final NamespaceBuilder dtoInterfaceNamespace =

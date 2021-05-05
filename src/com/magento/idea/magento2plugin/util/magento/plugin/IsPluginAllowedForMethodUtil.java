@@ -6,7 +6,7 @@
 package com.magento.idea.magento2plugin.util.magento.plugin;
 
 import com.jetbrains.php.lang.psi.elements.Method;
-import com.magento.idea.magento2plugin.magento.files.Plugin;
+import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
 
 public final class IsPluginAllowedForMethodUtil {
@@ -30,6 +30,6 @@ public final class IsPluginAllowedForMethodUtil {
         if (targetMethod.isStatic()) {
             return false;
         }
-        return targetMethod.getAccess().toString().equals(Plugin.PUBLIC_ACCESS);
+        return targetMethod.getAccess().toString().equals(AbstractPhpFile.PUBLIC_ACCESS);
     }
 }

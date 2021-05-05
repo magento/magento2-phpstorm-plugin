@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 4.0.0
 
+## 3.2.2
+
+### Fixed
+
+- New entity layout name and edit entity layout name inside it
+- `Java.lang.IllegalArgumentException` During adding a new method into an existing plugin
+
+## 3.2.1
+
+### Fixed
+
+- Directory validator
+- Entity data mapper file template
+
 ## 3.2.0
 
 ### Added
