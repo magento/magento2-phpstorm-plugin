@@ -50,7 +50,8 @@ public class PreferenceDeclarationInspection extends XmlSuppressableInspectionTo
 
                 if (preferenceForAttribute == null
                         || preferenceForAttribute.getValue() == null
-                        || preferenceForAttribute.getValueElement() == null) {
+                        || preferenceForAttribute.getValueElement() == null
+                        || preferenceForAttribute.getValueElement().getText().isEmpty()) {
                     return;
                 }
 
@@ -66,7 +67,8 @@ public class PreferenceDeclarationInspection extends XmlSuppressableInspectionTo
 
                 if (preferenceTypeAttribute == null
                         || preferenceTypeAttribute.getValue() == null
-                        || preferenceTypeAttribute.getValueElement() == null) {
+                        || preferenceTypeAttribute.getValueElement() == null
+                        || preferenceTypeAttribute.getValueElement().getText().isEmpty()) {
                     return;
                 }
 
