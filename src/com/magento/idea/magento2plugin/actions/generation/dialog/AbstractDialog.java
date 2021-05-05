@@ -192,8 +192,7 @@ public abstract class AbstractDialog extends JDialog {
         final JComponent component = ExtractComponentFromFieldUtil.extract(field, this);
 
         if (component instanceof JTextField) {
-            return ((JTextField) component).isEditable()
-                    ? ((JTextField) component).getText() : null;
+            return ((JTextField) component).getText();
         } else if (component instanceof JComboBox) {
             if (((JComboBox<?>) component).getSelectedIndex() == -1) {
                 return "";

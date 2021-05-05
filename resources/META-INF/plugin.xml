@@ -99,6 +99,9 @@
         <action id="MagentoCreateAWebApiDeclaration.Menu" class="com.magento.idea.magento2plugin.actions.generation.NewWebApiDeclarationAction">
             <add-to-group group-id="EditorPopupMenu"/>
         </action>
+        <action id="MagentoCreateAWebApiInterfaceForService.Menu" class="com.magento.idea.magento2plugin.actions.generation.NewWebApiInterfaceAction">
+            <add-to-group group-id="EditorPopupMenu"/>
+        </action>
 
         <action id="CopyMagentoPath"
                 class="com.magento.idea.magento2plugin.actions.CopyMagentoPath"
@@ -267,6 +270,8 @@
         <internalFileTemplate name="Magento Delete Entity By Id Command"/>
         <internalFileTemplate name="Magento Entity Edit Action Controller Class"/>
         <internalFileTemplate name="Magento Entity Delete Controller Class"/>
+        <internalFileTemplate name="Magento Web Api XML"/>
+        <internalFileTemplate name="Web Api Interface"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 

@@ -1,0 +1,24 @@
+<?php
+#parse("PHP File Header.php")
+
+namespace ${NAMESPACE};
+
+#if (${USES})
+#set ($uses = ${USES})
+#foreach ($use in $uses.split(","))
+use $use;
+#end
+
+#end
+/**
+ * ${DESCRIPTION}
+ *
+ * @api
+ */
+interface ${INTERFACE_NAME}
+{
+#set ($methods = ${METHODS})
+#foreach ($method in $methods.split(${METHODS_DELIMITER}))
+$method;
+#end
+}
