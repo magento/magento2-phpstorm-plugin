@@ -222,6 +222,13 @@
                          enabledByDefault="true" level="WARNING"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.InvalidDependencyInjectionTypeInspection"/>
 
+        <localInspection language="XML" groupPath="XML"
+                         shortName="PreferenceXmlInspections"
+                         bundle="magento2.inspection" key="inspection.displayName.PreferenceXmlInspections"
+                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
+                         enabledByDefault="true" level="WARNING"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.PreferenceDeclarationInspection"/>
+
         <internalFileTemplate name="Magento Composer JSON"/>
         <internalFileTemplate name="Magento Registration PHP"/>
         <internalFileTemplate name="Magento Module XML"/>

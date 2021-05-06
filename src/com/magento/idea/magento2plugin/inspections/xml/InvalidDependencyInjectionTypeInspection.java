@@ -55,7 +55,8 @@ public class InvalidDependencyInjectionTypeInspection extends XmlSuppressableIns
 
                 if (nameAttribute == null
                         || nameAttribute.getValue() == null
-                        || nameAttribute.getValueElement() == null) {
+                        || nameAttribute.getValueElement() == null
+                        || nameAttribute.getValueElement().getText().isEmpty()) {
                     return;
                 }
 
@@ -100,8 +101,9 @@ public class InvalidDependencyInjectionTypeInspection extends XmlSuppressableIns
                 final XmlAttribute xsiTypeAttr = tag.getAttribute(ModuleDiXml.XSI_TYPE_ATTR);
 
                 if (xsiTypeAttr == null
+                        || xsiTypeAttr.getValue() == null
                         || xsiTypeAttr.getValueElement() == null
-                        || xsiTypeAttr.getValue() == null) {
+                        || xsiTypeAttr.getValueElement().getText().isEmpty()) {
                     return;
                 }
                 final String xsiTypeValue = xsiTypeAttr.getValue();
