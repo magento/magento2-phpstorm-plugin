@@ -5,10 +5,10 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator.util;
 
-import java.util.Collections;
-import java.util.List;
 import com.jetbrains.php.lang.PhpLangUtil;
 import com.magento.idea.magento2plugin.util.RegExUtil;
+import java.util.Collections;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 public final class PhpClassGeneratorUtil {

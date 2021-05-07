@@ -18,8 +18,8 @@ import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-import javax.swing.JOptionPane;
 import java.util.Properties;
+import javax.swing.JOptionPane;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class PhpFileGenerator extends FileGenerator {
