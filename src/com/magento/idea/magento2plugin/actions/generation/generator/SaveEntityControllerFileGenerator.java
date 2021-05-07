@@ -7,8 +7,6 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2plugin.actions.generation.data.SaveEntityControllerFileData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.DataModelFile;
 import com.magento.idea.magento2plugin.magento.files.DataModelInterfaceFile;
@@ -65,7 +63,6 @@ public class SaveEntityControllerFileGenerator extends PhpFileGenerator {
      */
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
         String dtoType;
 
         if (data.isDtoWithInterface()) {
@@ -78,12 +75,12 @@ public class SaveEntityControllerFileGenerator extends PhpFileGenerator {
             dtoType = dataModelFile.getClassFqn();
         }
 
-        phpClassTypesBuilder
-                .appendProperty("NAMESPACE", file.getNamespace())
-                .appendProperty("ENTITY_NAME", data.getEntityName())
-                .appendProperty("CLASS_NAME", SaveActionFile.CLASS_NAME)
-                .appendProperty("ENTITY_ID", data.getEntityId())
-                .appendProperty("ADMIN_RESOURCE", data.getAcl())
+        typesBuilder
+                .append("NAMESPACE", file.getNamespace(), false)
+                .append("ENTITY_NAME", data.getEntityName(), false)
+                .append("CLASS_NAME", SaveActionFile.CLASS_NAME, false)
+                .append("ENTITY_ID", data.getEntityId(), false)
+                .append("ADMIN_RESOURCE", data.getAcl(), false)
                 .append("IMPLEMENTS", HttpMethod.POST.getInterfaceFqn())
                 .append("DATA_PERSISTOR", FrameworkLibraryType.DATA_PERSISTOR.getType())
                 .append("EXTENDS", BackendModuleType.EXTENDS.getType())
@@ -99,10 +96,6 @@ public class SaveEntityControllerFileGenerator extends PhpFileGenerator {
                 .append("COULD_NOT_SAVE", SaveActionFile.COULD_NOT_SAVE)
                 .append("CONTEXT", BackendModuleType.CONTEXT.getType())
                 .append("RESPONSE_INTERFACE", FrameworkLibraryType.RESPONSE_INTERFACE.getType())
-                .append("RESULT_INTERFACE", FrameworkLibraryType.RESULT_INTERFACE.getType())
-                .mergeProperties(attributes);
-
-        attributes.setProperty("USES",
-                PhpClassGeneratorUtil.formatUses(phpClassTypesBuilder.getUses()));
+                .append("RESULT_INTERFACE", FrameworkLibraryType.RESULT_INTERFACE.getType());
     }
 }

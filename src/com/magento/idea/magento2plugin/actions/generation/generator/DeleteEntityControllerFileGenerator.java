@@ -7,8 +7,6 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2plugin.actions.generation.data.DeleteEntityControllerFileData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.actions.DeleteActionFile;
 import com.magento.idea.magento2plugin.magento.files.commands.DeleteEntityByIdCommandFile;
@@ -64,14 +62,12 @@ public class DeleteEntityControllerFileGenerator extends PhpFileGenerator {
      */
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
-
-        phpClassTypesBuilder
-                .appendProperty("NAMESPACE", file.getNamespace())
-                .appendProperty("ENTITY_NAME", data.getEntityName())
-                .appendProperty("CLASS_NAME", DeleteActionFile.CLASS_NAME)
-                .appendProperty("ADMIN_RESOURCE", data.getAcl())
-                .appendProperty("ENTITY_ID", data.getEntityId())
+        typesBuilder
+                .append("NAMESPACE", file.getNamespace(), false)
+                .append("ENTITY_NAME", data.getEntityName(), false)
+                .append("CLASS_NAME", DeleteActionFile.CLASS_NAME, false)
+                .append("ADMIN_RESOURCE", data.getAcl(), false)
+                .append("ENTITY_ID", data.getEntityId(), false)
                 .append("DELETE_COMMAND",
                         new DeleteEntityByIdCommandFile(
                                 data.getModuleName(),
@@ -86,10 +82,6 @@ public class DeleteEntityControllerFileGenerator extends PhpFileGenerator {
                 .append("IMPLEMENTS_GET", HttpMethod.GET.getInterfaceFqn())
                 .append("NO_SUCH_ENTITY_EXCEPTION",
                         ExceptionType.NO_SUCH_ENTITY_EXCEPTION.getType())
-                .append("COULD_NOT_DELETE", ExceptionType.COULD_NOT_DELETE.getType())
-                .mergeProperties(attributes);
-
-        attributes.setProperty("USES",
-                PhpClassGeneratorUtil.formatUses(phpClassTypesBuilder.getUses()));
+                .append("COULD_NOT_DELETE", ExceptionType.COULD_NOT_DELETE.getType());
     }
 }

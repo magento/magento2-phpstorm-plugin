@@ -7,8 +7,6 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2plugin.actions.generation.data.FormGenericButtonBlockData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.FormGenericButtonBlockFile;
 import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryType;
@@ -63,22 +61,17 @@ public class FormGenericButtonBlockGenerator extends PhpFileGenerator {
      */
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
         final String entityIdGetter = "get" + Arrays.stream(data.getEntityId().split("_"))
                 .map(s -> s.substring(0, 1).toUpperCase(Locale.getDefault()) + s.substring(1))
                 .collect(Collectors.joining());
 
-        phpClassTypesBuilder
-                .appendProperty("NAMESPACE", file.getNamespace())
-                .appendProperty("ENTITY_NAME", data.getEntityName())
-                .appendProperty("CLASS_NAME", FormGenericButtonBlockFile.CLASS_NAME)
-                .appendProperty("ENTITY_ID", data.getEntityId())
-                .appendProperty("ENTITY_ID_GETTER", entityIdGetter)
+        typesBuilder
+                .append("NAMESPACE", file.getNamespace(), false)
+                .append("ENTITY_NAME", data.getEntityName(), false)
+                .append("CLASS_NAME", FormGenericButtonBlockFile.CLASS_NAME, false)
+                .append("ENTITY_ID", data.getEntityId(), false)
+                .append("ENTITY_ID_GETTER", entityIdGetter, false)
                 .append("CONTEXT", FormGenericButtonBlockFile.CONTEXT)
-                .append("URL", FrameworkLibraryType.URL.getType())
-                .mergeProperties(attributes);
-
-        attributes.setProperty("USES",
-                PhpClassGeneratorUtil.formatUses(phpClassTypesBuilder.getUses()));
+                .append("URL", FrameworkLibraryType.URL.getType());
     }
 }

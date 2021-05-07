@@ -7,8 +7,6 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2plugin.actions.generation.data.DeleteEntityByIdCommandData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.ModelFile;
 import com.magento.idea.magento2plugin.magento.files.ResourceModelFile;
@@ -63,18 +61,17 @@ public class DeleteEntityByIdCommandGenerator extends PhpFileGenerator {
      */
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
         final ModelFile modelFile = new ModelFile(data.getModuleName(), data.getModelName());
         final String modelType = modelFile.getClassFqn();
         final String modelFactoryType = modelType.concat("Factory");
         final ResourceModelFile resourceFile =
                 new ResourceModelFile(data.getModuleName(), data.getResourceModelName());
 
-        phpClassTypesBuilder
-                .appendProperty("ENTITY_NAME", data.getEntityName())
-                .appendProperty("NAMESPACE", file.getNamespace())
-                .appendProperty("CLASS_NAME", DeleteEntityByIdCommandFile.CLASS_NAME)
-                .appendProperty("ENTITY_ID", data.getEntityId())
+        typesBuilder
+                .append("ENTITY_NAME", data.getEntityName(), false)
+                .append("NAMESPACE", file.getNamespace(), false)
+                .append("CLASS_NAME", DeleteEntityByIdCommandFile.CLASS_NAME, false)
+                .append("ENTITY_ID", data.getEntityId(), false)
                 .append("Exception", "Exception")
                 .append("COULD_NOT_DELETE", ExceptionType.COULD_NOT_DELETE.getType())
                 .append("NO_SUCH_ENTITY_EXCEPTION",
@@ -82,10 +79,6 @@ public class DeleteEntityByIdCommandGenerator extends PhpFileGenerator {
                 .append("LOGGER", FrameworkLibraryType.LOGGER.getType())
                 .append("MODEL", modelType)
                 .append("MODEL_FACTORY", modelFactoryType)
-                .append("RESOURCE", resourceFile.getClassFqn())
-                .mergeProperties(attributes);
-
-        attributes.setProperty("USES",
-                PhpClassGeneratorUtil.formatUses(phpClassTypesBuilder.getUses()));
+                .append("RESOURCE", resourceFile.getClassFqn());
     }
 }

@@ -8,8 +8,6 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2plugin.actions.generation.data.GetListQueryModelData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.CollectionModelFile;
 import com.magento.idea.magento2plugin.magento.files.EntityDataMapperFile;
@@ -63,7 +61,6 @@ public class GetListQueryModelGenerator extends PhpFileGenerator {
      */
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
         final CollectionModelFile collectionModelFile =
                 new CollectionModelFile(
                         data.getModuleName(),
@@ -73,10 +70,10 @@ public class GetListQueryModelGenerator extends PhpFileGenerator {
         final NamespaceBuilder collectionNamespace =
                 collectionModelFile.getNamespaceBuilder();
 
-        phpClassTypesBuilder
-                .appendProperty("ENTITY_NAME", data.getEntityName())
-                .appendProperty("NAMESPACE", file.getNamespace())
-                .appendProperty("CLASS_NAME", GetListQueryFile.CLASS_NAME)
+        typesBuilder
+                .append("ENTITY_NAME", data.getEntityName(), false)
+                .append("NAMESPACE", file.getNamespace(), false)
+                .append("CLASS_NAME", GetListQueryFile.CLASS_NAME, false)
                 .append(
                         "ENTITY_COLLECTION_TYPE",
                         collectionNamespace.getClassFqn()
@@ -111,12 +108,6 @@ public class GetListQueryModelGenerator extends PhpFileGenerator {
                 .append(
                         "SEARCH_RESULT_FACTORY_TYPE",
                         FrameworkLibraryType.SEARCH_RESULT.getFactory()
-                )
-                .mergeProperties(attributes);
-
-        attributes.setProperty(
-                "USES",
-                PhpClassGeneratorUtil.formatUses(phpClassTypesBuilder.getUses())
-        );
+                );
     }
 }

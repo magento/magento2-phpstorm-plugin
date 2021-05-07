@@ -11,7 +11,6 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.magento.idea.magento2plugin.actions.generation.data.php.WebApiInterfaceData;
 import com.magento.idea.magento2plugin.actions.generation.generator.PhpFileGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.WebApiInterfaceFile;
 import com.magento.idea.magento2plugin.util.php.PhpTypeMetadataParserUtil;
@@ -75,7 +74,6 @@ public class WebApiInterfaceGenerator extends PhpFileGenerator {
 
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
         final StringBuilder methodsString = new StringBuilder();
         final List<String> typeList = new ArrayList<>();
 
@@ -99,13 +97,12 @@ public class WebApiInterfaceGenerator extends PhpFileGenerator {
             }
         }
 
-        phpClassTypesBuilder
-                .appendProperty("NAMESPACE", file.getNamespace())
-                .appendProperty("DESCRIPTION", data.getDescription())
-                .appendProperty("INTERFACE_NAME", data.getName())
-                .appendProperty("METHODS_DELIMITER", WebApiInterfaceFile.METHODS_DELIMITER)
-                .appendProperty("METHODS", methodsString.toString())
-                .mergeProperties(attributes);
+        typesBuilder
+                .append("NAMESPACE", file.getNamespace(), false)
+                .append("DESCRIPTION", data.getDescription(), false)
+                .append("INTERFACE_NAME", data.getName(), false)
+                .append("METHODS_DELIMITER", WebApiInterfaceFile.METHODS_DELIMITER, false)
+                .append("METHODS", methodsString.toString(), false);
 
         if (!typeList.isEmpty()) {
             attributes.setProperty(

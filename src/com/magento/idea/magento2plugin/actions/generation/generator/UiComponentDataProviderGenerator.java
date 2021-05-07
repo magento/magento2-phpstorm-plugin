@@ -7,8 +7,6 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataProviderData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderFile;
 import com.magento.idea.magento2plugin.magento.files.queries.GetListQueryFile;
@@ -67,19 +65,17 @@ public class UiComponentDataProviderGenerator extends PhpFileGenerator {
      */
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
-
-        phpClassTypesBuilder
-                .appendProperty("NAMESPACE", file.getNamespace())
-                .appendProperty("CLASS_NAME", data.getName())
-                .appendProperty("HAS_GET_LIST_QUERY", "false")
+        typesBuilder
+                .append("NAMESPACE", file.getNamespace(), false)
+                .append("CLASS_NAME", data.getName(), false)
+                .append("HAS_GET_LIST_QUERY", "false", false)
                 .append("EXTENDS", UiComponentDataProviderFile.DEFAULT_DATA_PROVIDER);
 
         if (data.getEntityIdFieldName() != null && data.getEntityName() != null) {
-            phpClassTypesBuilder.appendProperty("ENTITY_ID", data.getEntityIdFieldName());
+            typesBuilder.append("ENTITY_ID", data.getEntityIdFieldName(), false);
 
-            phpClassTypesBuilder
-                    .appendProperty("HAS_GET_LIST_QUERY", "true")
+            typesBuilder
+                    .append("HAS_GET_LIST_QUERY", "true", false)
                     .append(
                             "GET_LIST_QUERY_TYPE",
                             new GetListQueryFile(moduleName, data.getEntityName()).getClassFqn()
@@ -92,9 +88,5 @@ public class UiComponentDataProviderGenerator extends PhpFileGenerator {
                     .append("SEARCH_RESULT_FACTORY",
                             UiComponentDataProviderFile.SEARCH_RESULT_FACTORY);
         }
-        phpClassTypesBuilder.mergeProperties(attributes);
-
-        attributes.setProperty("USES",
-                PhpClassGeneratorUtil.formatUses(phpClassTypesBuilder.getUses()));
     }
 }
