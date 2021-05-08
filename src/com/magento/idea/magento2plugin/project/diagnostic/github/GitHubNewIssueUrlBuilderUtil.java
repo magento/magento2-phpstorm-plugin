@@ -16,7 +16,7 @@ public final class GitHubNewIssueUrlBuilderUtil {
             + "magento2-phpstorm-plugin/issues/new"
             + "?assignees=&labels=bug&template=bug_report.md";
     private static final String URI_PARAMS_PART = "&title=%title&body=%body";
-    private static final short MAX_URI_LENGTH = 8000;
+    private static final int MAX_URI_LENGTH = 8000;
 
     private GitHubNewIssueUrlBuilderUtil() {}
 
@@ -73,9 +73,9 @@ public final class GitHubNewIssueUrlBuilderUtil {
      *
      * @param title String
      *
-     * @return short
+     * @return int
      */
-    private static short getAllowedBodyLength(final @NotNull String title) {
-        return (short) (MAX_URI_LENGTH - formatNewBugIssueUrl(title, "").length());
+    private static int getAllowedBodyLength(final @NotNull String title) {
+        return MAX_URI_LENGTH - formatNewBugIssueUrl(title, "").length();
     }
 }

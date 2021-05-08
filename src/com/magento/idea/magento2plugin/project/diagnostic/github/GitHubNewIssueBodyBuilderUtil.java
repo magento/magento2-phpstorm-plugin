@@ -27,7 +27,7 @@ public final class GitHubNewIssueBodyBuilderUtil {
      * @param project Project
      * @param bugDescription String
      * @param stackTrace String
-     * @param maxAllowedBodyLength short
+     * @param maxAllowedBodyLength int
      *
      * @return String
      */
@@ -35,9 +35,9 @@ public final class GitHubNewIssueBodyBuilderUtil {
             final @NotNull Project project,
             final @NotNull String bugDescription,
             final @NotNull String stackTrace,
-            final short maxAllowedBodyLength
+            final int maxAllowedBodyLength
     ) {
-        final short maxAllowedStackTraceLength = getMaxAllowedStackTraceLength(
+        final int maxAllowedStackTraceLength = getMaxAllowedStackTraceLength(
                 project,
                 bugDescription,
                 maxAllowedBodyLength
@@ -91,16 +91,16 @@ public final class GitHubNewIssueBodyBuilderUtil {
      * @param bugDescription String
      * @param maxAllowedBodyLength String
      *
-     * @return short
+     * @return int
      */
-    private static short getMaxAllowedStackTraceLength(
+    private static int getMaxAllowedStackTraceLength(
             final @NotNull Project project,
             final @NotNull String bugDescription,
-            final short maxAllowedBodyLength
+            final int maxAllowedBodyLength
     ) {
         final String builtTemplateWithoutStackTrace = buildTemplate(project, bugDescription, "");
 
-        return (short) (maxAllowedBodyLength - encode(builtTemplateWithoutStackTrace).length());
+        return maxAllowedBodyLength - encode(builtTemplateWithoutStackTrace).length();
     }
 
     /**
