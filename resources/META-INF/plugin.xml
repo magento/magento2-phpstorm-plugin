@@ -234,7 +234,7 @@
                          bundle="magento2.inspection" key="inspection.displayName.PluginAttrTypeInspection"
                          groupBundle="magento2.inspection" groupKey="inspection.group.name"
                          enabledByDefault="true" level="WARNING"
-                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.PluginAttrTypeInspection"/>
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.PluginAttributeTypeInspection"/>
 
         <internalFileTemplate name="Magento Composer JSON"/>
         <internalFileTemplate name="Magento Registration PHP"/>

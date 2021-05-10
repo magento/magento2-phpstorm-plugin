@@ -7,7 +7,7 @@ package com.magento.idea.magento2plugin.inspections.xml;
 
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 
-public class PluginAttrTypeInspectionTest extends InspectionXmlFixtureTestCase {
+public class PluginAttributeTypeInspectionTest extends InspectionXmlFixtureTestCase {
 
     private static final String ARGUMENT_VALUE_IS_EMPTY =
             "inspection.error.idAttributeCanNotBeEmpty";
@@ -21,7 +21,7 @@ public class PluginAttrTypeInspectionTest extends InspectionXmlFixtureTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        myFixture.enableInspections(PluginAttrTypeInspection.class);
+        myFixture.enableInspections(PluginAttributeTypeInspection.class);
     }
 
     /**
@@ -40,7 +40,7 @@ public class PluginAttrTypeInspectionTest extends InspectionXmlFixtureTestCase {
     }
 
     /**
-     * Test for an no error for the "type" attribute because this class exists.
+     * Test for no error for the "type" attribute because this class exists.
      * <plugin name="unique_plugin_name" type="Magento\Catalog\Plugin\PluginClass" />
      */
     public void testAttrTypeClassExists() {

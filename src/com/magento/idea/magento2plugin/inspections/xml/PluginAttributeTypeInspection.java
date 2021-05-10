@@ -21,7 +21,7 @@ import com.magento.idea.magento2plugin.inspections.validator.PhpClassExistenceVa
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import org.jetbrains.annotations.NotNull;
 
-public class PluginAttrTypeInspection extends XmlSuppressableInspectionTool {
+public class PluginAttributeTypeInspection extends XmlSuppressableInspectionTool {
 
     @Override
     public @NotNull
