@@ -104,6 +104,30 @@ public final class PhpTypeMetadataParserUtil {
     }
 
     /**
+     * Get methods by names.
+     *
+     * @param phpClass PhpClass
+     * @param names String
+     *
+     * @return List[Method]
+     */
+    public static List<Method> getMethodsByNames(
+            final @NotNull PhpClass phpClass,
+            final @NotNull String... names
+    ) {
+        final List<Method> methods = new LinkedList<>();
+        final List<String> methodNames = Arrays.asList(names);
+
+        for (final Method method : phpClass.getMethods()) {
+            if (methodNames.contains(method.getName())) {
+                methods.add(method);
+            }
+        }
+
+        return methods;
+    }
+
+    /**
      * Get method declaration for interface.
      *
      * @param method Method

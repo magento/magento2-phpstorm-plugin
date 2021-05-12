@@ -14,6 +14,7 @@ public class DeleteEntityByIdCommandData {
     private final String entityId;
     private final String modelName;
     private final String resourceModelName;
+    private final String aclResource;
 
     /**
      * Delete Command DTO Constructor.
@@ -23,19 +24,22 @@ public class DeleteEntityByIdCommandData {
      * @param entityId String
      * @param modelName String
      * @param resourceModelName String
+     * @param aclResource String
      */
     public DeleteEntityByIdCommandData(
             final @NotNull String moduleName,
             final @NotNull String entityName,
             final @NotNull String entityId,
             final @NotNull String modelName,
-            final @NotNull String resourceModelName
+            final @NotNull String resourceModelName,
+            final @NotNull String aclResource
     ) {
         this.moduleName = moduleName;
         this.entityName = entityName;
         this.entityId = entityId;
         this.modelName = modelName;
         this.resourceModelName = resourceModelName;
+        this.aclResource = aclResource;
     }
 
     /**
@@ -81,5 +85,14 @@ public class DeleteEntityByIdCommandData {
      */
     public String getResourceModelName() {
         return resourceModelName;
+    }
+
+    /**
+     * Get ACL resource.
+     *
+     * @return String
+     */
+    public String getAclResource() {
+        return aclResource;
     }
 }

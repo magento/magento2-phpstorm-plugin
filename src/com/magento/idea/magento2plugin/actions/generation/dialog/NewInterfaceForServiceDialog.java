@@ -179,25 +179,10 @@ public class NewInterfaceForServiceDialog extends AbstractDialog {
         }
         final WebApiInterfaceData data = getDialogDataObject();
 
-        final PhpFile webApiInterfaceFile = (PhpFile) new WebApiInterfaceGenerator(
+        new WebApiInterfaceGenerator(
                 data,
                 project
         ).generate(NewWebApiInterfaceAction.ACTION_NAME, true);
-
-        if (webApiInterfaceFile != null) {
-            final PhpClass interfaceClass =
-                    GetFirstClassOfFile.getInstance().execute(webApiInterfaceFile);
-
-            new PreferenceDiXmlGenerator(
-                    new PreferenceDiXmFileData(
-                            moduleName,
-                            Objects.requireNonNull(interfaceClass).getPresentableFQN(),
-                            data.getClassFqn(),
-                            Areas.base.toString()
-                    ),
-                    project
-            ).generate(NewWebApiInterfaceAction.ACTION_NAME, true);
-        }
 
         this.setVisible(false);
     }

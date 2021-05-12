@@ -28,7 +28,8 @@ public class GetListQueryDtoConverter extends GetListQueryModelData
                 generationContextData.getModuleName(),
                 newEntityDialogData.getEntityName(),
                 newEntityDialogData.getEntityName().concat("Model"),
-                newEntityDialogData.getEntityName().concat("Collection")
+                newEntityDialogData.getEntityName().concat("Collection"),
+                newEntityDialogData.getAclId()
         );
     }
 }

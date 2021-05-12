@@ -7,17 +7,24 @@ package com.magento.idea.magento2plugin.actions.generation.generator.php;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
+import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.Method;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.magento.idea.magento2plugin.actions.generation.data.PreferenceDiXmFileData;
 import com.magento.idea.magento2plugin.actions.generation.data.php.WebApiInterfaceData;
 import com.magento.idea.magento2plugin.actions.generation.generator.PhpFileGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.PreferenceDiXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.WebApiInterfaceFile;
+import com.magento.idea.magento2plugin.magento.packages.Areas;
+import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.php.PhpTypeMetadataParserUtil;
 import com.magento.idea.magento2plugin.util.php.PhpTypeModifierUtil;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
@@ -60,16 +67,29 @@ public class WebApiInterfaceGenerator extends PhpFileGenerator {
     }
 
     @Override
-    protected void onFileGenerated(final PsiFile generatedFile) {
-        super.onFileGenerated(generatedFile);
+    protected void onFileGenerated(final PsiFile generatedFile, final @NotNull String actionName) {
+        super.onFileGenerated(generatedFile, actionName);
 
-        if (generatedFile != null) {
+        if (generatedFile instanceof PhpFile) {
             PhpTypeModifierUtil.addImplementForPhpClass(
                     data.getClassFqn(),
                     file.getClassFqn(),
                     project
             );
             PhpTypeModifierUtil.insertInheritDocCommentForMethods(data.getMethods());
+
+            final PhpClass interfaceClass =
+                    GetFirstClassOfFile.getInstance().execute((PhpFile) generatedFile);
+
+            new PreferenceDiXmlGenerator(
+                    new PreferenceDiXmFileData(
+                            data.getModuleName(),
+                            Objects.requireNonNull(interfaceClass).getPresentableFQN(),
+                            data.getClassFqn(),
+                            Areas.base.toString()
+                    ),
+                    project
+            ).generate(actionName, false);
         }
     }
 

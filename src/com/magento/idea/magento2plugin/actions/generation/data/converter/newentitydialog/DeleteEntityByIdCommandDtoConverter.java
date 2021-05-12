@@ -29,7 +29,8 @@ public class DeleteEntityByIdCommandDtoConverter extends DeleteEntityByIdCommand
                 newEntityDialogData.getEntityName(),
                 newEntityDialogData.getIdFieldName(),
                 newEntityDialogData.getEntityName().concat("Model"),
-                newEntityDialogData.getEntityName().concat("Resource")
+                newEntityDialogData.getEntityName().concat("Resource"),
+                newEntityDialogData.getAclId()
         );
     }
 }

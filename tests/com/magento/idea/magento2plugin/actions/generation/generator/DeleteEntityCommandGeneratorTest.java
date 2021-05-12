@@ -17,6 +17,7 @@ public class DeleteEntityCommandGeneratorTest extends BaseGeneratorTestCase {
     private static final String RESOURCE_MODEL_NAME = ENTITY_NAME + "Resource";
     private static final String EXPECTED_DIRECTORY = "src/app/code/Foo/Bar/Command/" + ENTITY_NAME;
     private static final String ENTITY_ID = "book_id";
+    private static final String ACL = "Foo_Bar::book_management";
 
     /**
      * Test generation of DeleteByIdCommand model for entity.
@@ -28,7 +29,8 @@ public class DeleteEntityCommandGeneratorTest extends BaseGeneratorTestCase {
                         ENTITY_NAME,
                         ENTITY_ID,
                         MODEL_NAME,
-                        RESOURCE_MODEL_NAME
+                        RESOURCE_MODEL_NAME,
+                        ACL
                 );
         final DeleteEntityByIdCommandGenerator deleteEntityByIdCommandGenerator =
                 new DeleteEntityByIdCommandGenerator(

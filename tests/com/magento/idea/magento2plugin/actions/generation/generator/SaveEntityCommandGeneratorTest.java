@@ -17,6 +17,7 @@ public class SaveEntityCommandGeneratorTest extends BaseGeneratorTestCase {
     private static final String DTO_NAME = ENTITY_NAME + "Data";
     private static final boolean IS_DTO_HAS_INTERFACE = false;
     private static final String EXPECTED_DIRECTORY = "src/app/code/Foo/Bar/Command/" + ENTITY_NAME;
+    private static final String ACL = "Foo_Bar::book_management";
 
     /**
      * Test generation of SaveCommand model for entity.
@@ -29,7 +30,8 @@ public class SaveEntityCommandGeneratorTest extends BaseGeneratorTestCase {
                 RESOURCE_MODEL_NAME,
                 DTO_NAME,
                 "",
-                IS_DTO_HAS_INTERFACE
+                IS_DTO_HAS_INTERFACE,
+                ACL
         );
         final SaveEntityCommandGenerator saveEntityCommandGenerator =
                 new SaveEntityCommandGenerator(

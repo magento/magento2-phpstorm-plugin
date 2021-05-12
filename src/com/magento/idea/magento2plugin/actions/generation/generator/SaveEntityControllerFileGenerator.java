@@ -92,7 +92,8 @@ public class SaveEntityControllerFileGenerator extends PhpFileGenerator {
                 .append("SAVE_COMMAND",
                         new SaveEntityCommandFile(
                                 data.getModuleName(),
-                                data.getEntityName()
+                                data.getEntityName(),
+                                data.isSaveCommandHasInterface()
                         ).getClassFqn()
                 )
                 .append("DATA_OBJECT", FrameworkLibraryType.DATA_OBJECT.getType())

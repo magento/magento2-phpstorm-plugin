@@ -218,6 +218,7 @@ public class NewEntityDialog extends AbstractDialog {
     private JLabel dbTableNameErrorMessage;
     private JLabel entityIdErrorMessage;
     private JLabel routeErrorMessage;
+    private JCheckBox createWebApi;
     private JTextField observerName;
     private final ProcessWorker.InProgressFlag onOkActionFired;
 
@@ -462,6 +463,7 @@ public class NewEntityDialog extends AbstractDialog {
                 moduleName,
                 ACTION_NAME,
                 OPEN_FILES_FLAG,
+                dialogData.hasWebApi(),
                 actionsPathPrefix.concat("index"),
                 actionsPathPrefix.concat("edit"),
                 actionsPathPrefix.concat("new"),
@@ -718,6 +720,7 @@ public class NewEntityDialog extends AbstractDialog {
                 getTableResource(),
                 createUiComponent.isSelected(),
                 createInterface.isSelected(),
+                createWebApi.isSelected(),
                 route.getText().trim(),
                 formLabel.getText().trim(),
                 formName.getText().trim(),

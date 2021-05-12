@@ -20,6 +20,7 @@ public class UiComponentGridDataProviderGeneratorTest extends BaseGeneratorTestC
     private static final String PROVIDER_CLASS_NAME = "GridDataProvider";
     private static final String PROVIDER_PATH = "Ui/Component/Listing";
     private static final String COLLECTION_NAME = "Collection";
+    private static final String ACL = "Foo_Bar::book_management";
 
     /**
      * Test data provider class file generation with custom type.
@@ -48,7 +49,8 @@ public class UiComponentGridDataProviderGeneratorTest extends BaseGeneratorTestC
                 PROVIDER_CLASS_NAME,
                 PROVIDER_PATH,
                 ENTITY_NAME,
-                ENTITY_ID_FIELD_NAME
+                ENTITY_ID_FIELD_NAME,
+                false
         ));
         final String filePath = this.getFixturePath("GridDataProvider.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -84,7 +86,8 @@ public class UiComponentGridDataProviderGeneratorTest extends BaseGeneratorTestC
                 MODULE_NAME,
                 ENTITY_NAME,
                 MODEL_NAME,
-                COLLECTION_NAME
+                COLLECTION_NAME,
+                ACL
         );
         new GetListQueryModelGenerator(getListData, project, false).generate("test");
     }
