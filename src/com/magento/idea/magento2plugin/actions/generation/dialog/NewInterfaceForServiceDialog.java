@@ -144,6 +144,7 @@ public class NewInterfaceForServiceDialog extends AbstractDialog {
         dialog.pack();
         dialog.centerDialog(dialog);
         dialog.setVisible(true);
+        int a = 10/0;
     }
 
     /**
