@@ -7,7 +7,12 @@ package com.magento.idea.magento2plugin.project.diagnostic.github;
 
 import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
+import com.intellij.ide.plugins.IdeaPluginDescriptor;
+import com.intellij.ide.plugins.PluginManagerCore;
+import com.intellij.openapi.application.ApplicationInfo;
+import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.SystemInfo;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -76,6 +81,9 @@ public final class GitHubNewIssueBodyBuilderUtil {
         final Properties properties = new Properties();
         properties.setProperty("BUG_DESCRIPTION", bugDescription);
         properties.setProperty("STACK_TRACE", stackTrace);
+        properties.setProperty("OS_VERSION", getOsVersion());
+        properties.setProperty("INTELLIJ_VERSION", getIntellijVersion());
+        properties.setProperty("PLUGIN_VERSION", getPluginVersion());
 
         try {
             return errorReportTemplate.getText(properties);
@@ -123,5 +131,35 @@ public final class GitHubNewIssueBodyBuilderUtil {
      */
     private static String decode(final @NotNull String value) {
         return URLDecoder.decode(value, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Get OS version.
+     *
+     * @return String
+     */
+    private static String getOsVersion() {
+        return SystemInfo.OS_NAME + " " + SystemInfo.OS_VERSION;
+    }
+
+    /**
+     * Get Intellij Idea version.
+     *
+     * @return String
+     */
+    private static String getIntellijVersion() {
+        return ApplicationInfo.getInstance().getFullVersion();
+    }
+
+    /**
+     * Get plugin version.
+     *
+     * @return String
+     */
+    private static String getPluginVersion() {
+        final IdeaPluginDescriptor magento2pluginDescriptor =
+                PluginManagerCore.getPlugin(PluginId.getId("com.magento.idea.magento2plugin"));
+
+        return magento2pluginDescriptor == null ? null : magento2pluginDescriptor.getVersion();
     }
 }

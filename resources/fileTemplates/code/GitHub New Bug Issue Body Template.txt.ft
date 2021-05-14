@@ -24,9 +24,12 @@ If applicable, add screenshots to help explain your problem.
 
 **Please complete the following information:** (*)
 
- - OS: [e.g. MacOS or Ubuntu Linux 20.04]
- - PhpStorm/Intellij version: [e.g. 2019.3.3]
- - Plugin Version: [e.g. 1.0.0]
+#set($os = "#if(${OS_VERSION})${OS_VERSION}#else[e.g. MacOS or Ubuntu Linux 20.04]#end")
+#set($intellijVersion = "#if(${INTELLIJ_VERSION})${INTELLIJ_VERSION}#else[e.g. 2019.3.3]#end")
+#set($pluginVersion = "#if(${PLUGIN_VERSION})${PLUGIN_VERSION}#else[e.g. 1.0.0]#end")
+ - OS: $os
+ - PhpStorm/Intellij version: $intellijVersion
+ - Plugin Version: $pluginVersion
 
 **Additional context**
 
