@@ -19,6 +19,10 @@ public class ProductAttributeMapper extends DefaultAttributeMapper {
 
         final ProductEntityData productEavEntityData = (ProductEntityData) eavEntityData;
         mappedAttributes.put(
+                AttributeProperty.SORT_ORDER.getProperty(),
+                Integer.toString(productEavEntityData.getSortOrder())
+        );
+        mappedAttributes.put(
                 AttributeProperty.GROUP.getProperty(),
                 wrapStringValueForTemplate(productEavEntityData.getGroup())
         );
@@ -47,7 +51,8 @@ public class ProductAttributeMapper extends DefaultAttributeMapper {
                 Boolean.toString(productEavEntityData.isVisibleOnFront())
         );
 
-        if (productEavEntityData.getApplyTo() != null && !productEavEntityData.getApplyTo().isEmpty()) {
+        if (productEavEntityData.getApplyTo() != null
+                && !productEavEntityData.getApplyTo().isEmpty()) {
             mappedAttributes.put(
                     AttributeProperty.APPLY_TO.getProperty(),
                     wrapStringValueForTemplate(productEavEntityData.getApplyTo())

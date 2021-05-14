@@ -6,10 +6,12 @@
 package com.magento.idea.magento2plugin.magento.packages.eav;
 
 public enum DataPatchDependency {
-    ENV_SETUP("Magento\\Eav\\Setup\\EavSetup"),
+    CUSTOMER_METADATA_INTERFACE("Magento\\Customer\\Api\\CustomerMetadataInterface"),
+    DATA_PATCH_INTERFACE("Magento\\Framework\\Setup\\Patch\\DataPatchInterface"),
+    EAV_CONFIG("Magento\\Eav\\Model\\Config"),
     EAV_SETUP_FACTORY("Magento\\Eav\\Setup\\EavSetupFactory"),
-    MODULE_DATA_SETUP_INTERFACE("Magento\\Framework\\Setup\\ModuleDataSetupInterface"),
-    DATA_PATCH_INTERFACE("Magento\\Framework\\Setup\\Patch\\DataPatchInterface");
+    ENV_SETUP("Magento\\Eav\\Setup\\EavSetup"),
+    MODULE_DATA_SETUP_INTERFACE("Magento\\Framework\\Setup\\ModuleDataSetupInterface");
 
     private String classPatch;
 

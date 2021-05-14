@@ -9,8 +9,8 @@ package com.magento.idea.magento2plugin.actions.generation.generator.util.eav;
 import com.magento.idea.magento2plugin.actions.generation.data.EavEntityDataInterface;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeBackendModel;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeInput;
-import com.magento.idea.magento2plugin.magento.packages.eav.AttributeSourceModel;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeProperty;
+import com.magento.idea.magento2plugin.magento.packages.eav.AttributeSourceModel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,10 +59,6 @@ public class DefaultAttributeMapper implements AttributeMapperInterface {
                 Boolean.toString(eavEntityData.isRequired())
         );
         mappedAttributes.put(
-                AttributeProperty.SORT_ORDER.getProperty(),
-                Integer.toString(eavEntityData.getSortOrder())
-        );
-        mappedAttributes.put(
                 AttributeProperty.VISIBLE.getProperty(),
                 Boolean.toString(eavEntityData.isVisible())
         );
@@ -75,7 +71,10 @@ public class DefaultAttributeMapper implements AttributeMapperInterface {
         if (!attributeOptions.isEmpty()) {
             mappedAttributes.put(
                     AttributeProperty.OPTION.getProperty(),
-                    getMappedOptions(eavEntityData.getOptions(), eavEntityData.getOptionsSortOrder())
+                    getMappedOptions(
+                            eavEntityData.getOptions(),
+                            eavEntityData.getOptionsSortOrder()
+                    )
             );
         }
 

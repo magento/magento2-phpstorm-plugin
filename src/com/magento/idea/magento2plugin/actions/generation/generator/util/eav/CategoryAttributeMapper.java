@@ -18,6 +18,10 @@ public class CategoryAttributeMapper extends DefaultAttributeMapper {
         final CategoryEntityData categoryEavEntityData = (CategoryEntityData) eavEntityData;
 
         mappedAttributes.put(
+                AttributeProperty.SORT_ORDER.getProperty(),
+                Integer.toString(categoryEavEntityData.getSortOrder())
+        );
+        mappedAttributes.put(
                 AttributeProperty.GLOBAL.getProperty(),
                 categoryEavEntityData.getScope()
         );

@@ -22,7 +22,10 @@ public enum AttributeProperty {
     VISIBLE_ON_FRONT("visible_on_front"),
     APPLY_TO("apply_to"),
     OPTION("option"),
-    BACKEND_MODEL("backend");
+    BACKEND_MODEL("backend"),
+    USER_DEFINED("user_defined"),
+    POSITION("position"),
+    SYSTEM("system");
 
     private String attribute;
 

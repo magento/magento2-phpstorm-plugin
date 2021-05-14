@@ -19,7 +19,9 @@ import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
 public class EavAttributeSetupPatchGenerator extends PhpFileGenerator {
+
     private final EavEntityDataInterface data;
+    protected final PhpClassTypesBuilder phpClassTypesBuilder;
 
     /**
      * Constructor.
@@ -47,6 +49,7 @@ public class EavAttributeSetupPatchGenerator extends PhpFileGenerator {
     ) {
         super(project, checkFileAlreadyExists);
         this.data = data;
+        this.phpClassTypesBuilder = new PhpClassTypesBuilder();
     }
 
     @Override
@@ -56,8 +59,6 @@ public class EavAttributeSetupPatchGenerator extends PhpFileGenerator {
 
     @Override
     protected void fillAttributes(final Properties attributes) {
-        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
-
         phpClassTypesBuilder
                 .appendProperty("CLASS_NAME", data.getDataPatchName())
                 .appendProperty("NAMESPACE", this.getFile().getNamespace())
