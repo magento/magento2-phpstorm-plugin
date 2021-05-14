@@ -54,7 +54,7 @@ public final class AttributeUtil {
      */
     public static String getScopeClassBySelectedItem(final ComboBoxItemData selectedScopeItem) {
         if (selectedScopeItem != null) {
-            selectedScopeItem.getKey().trim();
+            return selectedScopeItem.getKey().trim();
         }
 
         return AttributeScope.GLOBAL.getScope();
