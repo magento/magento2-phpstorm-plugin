@@ -42,18 +42,39 @@ public final class PhpClassTypesBuilder {
     }
 
     /**
-     * Append type.
+     * Append property or type.
      *
      * @param propertyName String
-     * @param typeFqn String
+     * @param propertyValue String
      *
      * @return PhpClassTypesBuilder
      */
     public PhpClassTypesBuilder append(
             final @NotNull String propertyName,
-            final @NotNull String typeFqn
+            final @NotNull String propertyValue
     ) {
-        return append(propertyName, typeFqn, null);
+        return append(propertyName, propertyValue, true);
+    }
+
+    /**
+     * Append property or type.
+     *
+     * @param propertyName String
+     * @param propertyValue String
+     * @param isAddToImports boolean
+     *
+     * @return PhpClassTypesBuilder
+     */
+    public PhpClassTypesBuilder append(
+            final @NotNull String propertyName,
+            final @NotNull String propertyValue,
+            final boolean isAddToImports
+    ) {
+        if (isAddToImports && PhpClassGeneratorUtil.isValidFqn(propertyValue)) {
+            return append(propertyName, propertyValue, null);
+        }
+
+        return appendProperty(propertyName, propertyValue);
     }
 
     /**
@@ -120,6 +141,26 @@ public final class PhpClassTypesBuilder {
         }
 
         return uses;
+    }
+
+    /**
+     * Check if any property exists.
+     *
+     * @return boolean
+     */
+    public boolean hasProperties() {
+        return !properties.isEmpty();
+    }
+
+    /**
+     * Check if property exists.
+     *
+     * @param propertyName String
+     *
+     * @return boolean
+     */
+    public boolean hasProperty(final @NotNull String propertyName) {
+        return properties.containsKey(propertyName);
     }
 
     /**

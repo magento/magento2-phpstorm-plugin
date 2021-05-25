@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
@@ -47,6 +47,7 @@ public class RegExUtil {
             = "(\\d+)\\.(\\d+)\\.(\\d+)[a-zA-Z0-9_\\-]*";
 
     public static class Magento {
+
         public static final String PHP_CLASS
                 = "[A-Z][a-zA-Z0-9]+";
 

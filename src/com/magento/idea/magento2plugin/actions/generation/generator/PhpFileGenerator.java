@@ -11,17 +11,24 @@ import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
+import java.util.Properties;
 import javax.swing.JOptionPane;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class PhpFileGenerator extends FileGenerator {
 
+    private static final String IMPORT_PROPERTY_NAME = "USES";
+
     protected AbstractPhpFile file;
+    // Util that simplifies file properties definition.
+    protected final PhpClassTypesBuilder typesBuilder;
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
@@ -46,6 +53,7 @@ public abstract class PhpFileGenerator extends FileGenerator {
         fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         directoryGenerator = DirectoryGenerator.getInstance();
         moduleIndex = new ModuleIndex(project);
+        typesBuilder = new PhpClassTypesBuilder();
     }
 
     /**
@@ -142,5 +150,23 @@ public abstract class PhpFileGenerator extends FileGenerator {
         }
 
         return file;
+    }
+
+    @Override
+    protected Properties getAttributes() {
+        final @NotNull Properties attributes = super.getAttributes();
+
+        if (typesBuilder.hasProperties()) {
+            typesBuilder.mergeProperties(attributes);
+        }
+
+        if (!typesBuilder.getUses().isEmpty() && !typesBuilder.hasProperty(IMPORT_PROPERTY_NAME)) {
+            attributes.setProperty(
+                    IMPORT_PROPERTY_NAME,
+                    PhpClassGeneratorUtil.formatUses(typesBuilder.getUses())
+            );
+        }
+
+        return attributes;
     }
 }
