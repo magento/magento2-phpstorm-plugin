@@ -19,10 +19,12 @@ import com.magento.idea.magento2plugin.actions.generation.generator.xml.WebApiDe
 import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.WebApiResource;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
+import com.magento.idea.magento2plugin.util.magento.GetAclResourcesListUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -172,7 +174,12 @@ public class NewWebApiDeclarationDialog extends AbstractDialog {
         for (final String method : HttpMethod.getHttpMethodList()) {
             httpMethod.addItem(new ComboBoxItemData(method, method));
         }
-        aclResource = new FilteredComboBox(WebApiResource.getDefaultResourcesList());
+
+        final List<String> aclResources = GetAclResourcesListUtil.execute(project);
+        final List<String> defaultResources = WebApiResource.getDefaultResourcesList();
+        defaultResources.addAll(aclResources);
+
+        aclResource = new FilteredComboBox(defaultResources);
     }
 
     /**
