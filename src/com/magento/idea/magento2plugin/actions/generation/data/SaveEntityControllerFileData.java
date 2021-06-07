@@ -16,7 +16,7 @@ public class SaveEntityControllerFileData {
     private final String dtoName;
     private final String dtoInterfaceName;
     private final boolean dtoWithInterface;
-    private final boolean isSaveCommandHasInterface;
+    private final boolean saveCommandHasInterface;
 
     /**
      * Controller save file constructor.
@@ -47,7 +47,7 @@ public class SaveEntityControllerFileData {
         this.dtoName = dtoName;
         this.dtoInterfaceName = dtoInterfaceName;
         this.dtoWithInterface = isDtoWithInterface;
-        this.isSaveCommandHasInterface = isSaveCommandHasInterface;
+        this.saveCommandHasInterface = isSaveCommandHasInterface;
     }
 
     /**
@@ -119,6 +119,6 @@ public class SaveEntityControllerFileData {
      * @return boolean
      */
     public boolean isSaveCommandHasInterface() {
-        return isSaveCommandHasInterface;
+        return saveCommandHasInterface;
     }
 }

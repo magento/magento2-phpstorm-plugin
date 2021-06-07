@@ -18,7 +18,7 @@ public class NewEntityDialogData implements DialogData {
     private final String tableResource;
     private final boolean adminUiComponents;
     private final boolean dtoInterface;
-    private final boolean hasWebApi;
+    private final boolean webApi;
 
     // Admin UI Components tab data.
     private final String route;
@@ -111,7 +111,7 @@ public class NewEntityDialogData implements DialogData {
         this.tableResource = tableResource;
         this.adminUiComponents = hasAdminUiComponents;
         this.dtoInterface = hasDtoInterface;
-        this.hasWebApi = hasWebApi;
+        this.webApi = hasWebApi;
         this.route = route;
         this.formLabel = formLabel;
         this.formName = formName;
@@ -201,7 +201,7 @@ public class NewEntityDialogData implements DialogData {
      * @return boolean
      */
     public boolean hasWebApi() {
-        return hasWebApi;
+        return webApi;
     }
 
     /**

@@ -21,7 +21,7 @@ public class EntityCreatorContextData implements GenerationContextData {
     private final String moduleName;
     private final String actionName;
     private final boolean hasOpenFileFlag;
-    private final boolean hasWebApi;
+    private final boolean webApi;
     private final String indexViewAction;
     private final String editViewAction;
     private final String newViewAction;
@@ -80,7 +80,7 @@ public class EntityCreatorContextData implements GenerationContextData {
         this.moduleName = moduleName;
         this.actionName = actionName;
         this.hasOpenFileFlag = hasOpenFileFlag;
-        this.hasWebApi = hasWebApi;
+        this.webApi = hasWebApi;
         this.indexViewAction = indexViewAction;
         this.editViewAction = editViewAction;
         this.newViewAction = newViewAction;
@@ -121,7 +121,7 @@ public class EntityCreatorContextData implements GenerationContextData {
      * @return boolean
      */
     public boolean hasWebApi() {
-        return hasWebApi;
+        return webApi;
     }
 
     /**
