@@ -7,8 +7,6 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2plugin.actions.generation.data.EditEntityActionData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.actions.EditActionFile;
 import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
@@ -62,22 +60,16 @@ public class EditEntityActionGenerator extends PhpFileGenerator {
      */
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
-
-        phpClassTypesBuilder
-                .appendProperty("NAMESPACE", file.getNamespace())
-                .appendProperty("ENTITY_NAME", data.getEntityName())
-                .appendProperty("CLASS_NAME", file.getClassName())
-                .appendProperty("ADMIN_RESOURCE", data.getAcl())
-                .appendProperty("MENU_IDENTIFIER", data.getMenu())
+        typesBuilder
+                .append("NAMESPACE", file.getNamespace(), false)
+                .append("ENTITY_NAME", data.getEntityName(), false)
+                .append("CLASS_NAME", file.getClassName(), false)
+                .append("ADMIN_RESOURCE", data.getAcl(), false)
+                .append("MENU_IDENTIFIER", data.getMenu(), false)
                 .append("EXTENDS", BackendModuleType.EXTENDS.getType())
                 .append("IMPLEMENTS", HttpMethod.GET.getInterfaceFqn())
                 .append("RESULT_INTERFACE", FrameworkLibraryType.RESULT_INTERFACE.getType())
                 .append("RESULT_FACTORY", FrameworkLibraryType.RESULT_FACTORY.getType())
-                .append("RESULT_PAGE", BackendModuleType.RESULT_PAGE.getType())
-                .mergeProperties(attributes);
-
-        attributes.setProperty("USES",
-                PhpClassGeneratorUtil.formatUses(phpClassTypesBuilder.getUses()));
+                .append("RESULT_PAGE", BackendModuleType.RESULT_PAGE.getType());
     }
 }

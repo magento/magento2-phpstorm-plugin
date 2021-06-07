@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config>
+    <type name="Magento\CatalogSearch\Helper\Data">
+        <plugin name="unique_plugin_name" type="Magento\Catalog\Plugin\PluginClass"/>
+    </type>
+</config>

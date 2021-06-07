@@ -8,7 +8,6 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2plugin.actions.generation.data.ModelData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.ModelFile;
 import com.magento.idea.magento2plugin.magento.files.ResourceModelFile;
@@ -60,30 +59,19 @@ public class ModuleModelGenerator extends PhpFileGenerator {
      */
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
         final ResourceModelFile resourceModelFile =
                 new ResourceModelFile(data.getModuleName(), data.getResourceName());
 
-        phpClassTypesBuilder
-                .appendProperty("NAME", data.getModelName())
-                .appendProperty(
-                        "NAMESPACE",
-                        file.getNamespace()
-                )
-                .appendProperty("DB_NAME", data.getDbTableName())
+        typesBuilder
+                .append("NAME", data.getModelName(), false)
+                .append("NAMESPACE", file.getNamespace(), false)
+                .append("DB_NAME", data.getDbTableName(), false)
+                .append("RESOURCE_MODEL", resourceModelFile.getClassFqn(), ResourceModelFile.ALIAS)
                 .append(
-                        "RESOURCE_MODEL",
-                        resourceModelFile.getClassFqn(),
-                        ResourceModelFile.ALIAS
-                )
-                .appendProperty(
                         "EXTENDS",
-                        PhpClassGeneratorUtil.getNameFromFqn(ModelFile.ABSTRACT_MODEL)
+                        PhpClassGeneratorUtil.getNameFromFqn(ModelFile.ABSTRACT_MODEL),
+                        false
                 )
-                .append("ABSTRACT_MODEL", ModelFile.ABSTRACT_MODEL)
-                .mergeProperties(attributes);
-
-        attributes.setProperty("USES",
-                PhpClassGeneratorUtil.formatUses(phpClassTypesBuilder.getUses()));
+                .append("ABSTRACT_MODEL", ModelFile.ABSTRACT_MODEL);
     }
 }
