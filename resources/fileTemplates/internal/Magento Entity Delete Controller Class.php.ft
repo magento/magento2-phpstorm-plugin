@@ -27,7 +27,7 @@ class ${CLASS_NAME} extends ${EXTENDS} implements ${IMPLEMENTS_POST}, ${IMPLEMEN
 
     /**
      * @param Context $context
-     * @param DeleteByIdCommand $deleteByIdCommand
+     * @param ${DELETE_COMMAND} $deleteByIdCommand
      */
     public function __construct(
         ${CONTEXT} $context,

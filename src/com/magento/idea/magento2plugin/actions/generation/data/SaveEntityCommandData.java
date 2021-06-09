@@ -16,6 +16,7 @@ public class SaveEntityCommandData {
     private final String dtoName;
     private final String dtoInterfaceName;
     private final boolean dtoWithInterface;
+    private final String aclResource;
 
     /**
      * Save Command DTO Constructor.
@@ -27,6 +28,7 @@ public class SaveEntityCommandData {
      * @param dtoName String
      * @param dtoInterfaceName String
      * @param isDtoWithInterface boolean
+     * @param aclResource String
      */
     public SaveEntityCommandData(
             final @NotNull String moduleName,
@@ -35,7 +37,8 @@ public class SaveEntityCommandData {
             final @NotNull String resourceModelName,
             final @NotNull String dtoName,
             final @NotNull String dtoInterfaceName,
-            final boolean isDtoWithInterface
+            final boolean isDtoWithInterface,
+            final @NotNull String aclResource
     ) {
         this.moduleName = moduleName;
         this.entityName = entityName;
@@ -44,6 +47,7 @@ public class SaveEntityCommandData {
         this.dtoName = dtoName;
         this.dtoInterfaceName = dtoInterfaceName;
         this.dtoWithInterface = isDtoWithInterface;
+        this.aclResource = aclResource;
     }
 
     /**
@@ -107,5 +111,14 @@ public class SaveEntityCommandData {
      */
     public boolean isDtoWithInterface() {
         return dtoWithInterface;
+    }
+
+    /**
+     * Get ACL resource.
+     *
+     * @return String
+     */
+    public String getAclResource() {
+        return aclResource;
     }
 }

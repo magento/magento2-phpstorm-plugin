@@ -14,6 +14,7 @@ public class QueryModelGeneratorTest extends BaseGeneratorTestCase {
     private static final String ENTITY_NAME = "Book";
     private static final String MODEL_NAME = "Book";
     private static final String COLLECTION_NAME = "Collection";
+    private static final String ACL = "Foo_Bar::book_management";
 
     /**
      * Test generation of GetListQuery model for entity.
@@ -24,7 +25,8 @@ public class QueryModelGeneratorTest extends BaseGeneratorTestCase {
                 MODULE_NAME,
                 ENTITY_NAME,
                 MODEL_NAME,
-                COLLECTION_NAME
+                COLLECTION_NAME,
+                ACL
         );
         final GetListQueryModelGenerator getListQueryModelGenerator =
                 new GetListQueryModelGenerator(

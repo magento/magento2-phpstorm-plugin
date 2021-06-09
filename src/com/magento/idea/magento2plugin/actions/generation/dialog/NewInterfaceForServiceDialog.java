@@ -9,20 +9,15 @@ import com.intellij.ide.util.MemberChooser;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.jetbrains.php.lang.actions.PhpNamedElementNode;
-import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.NewWebApiInterfaceAction;
-import com.magento.idea.magento2plugin.actions.generation.data.PreferenceDiXmFileData;
 import com.magento.idea.magento2plugin.actions.generation.data.php.WebApiInterfaceData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
-import com.magento.idea.magento2plugin.actions.generation.generator.PreferenceDiXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.php.WebApiInterfaceGenerator;
-import com.magento.idea.magento2plugin.magento.packages.Areas;
-import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import com.magento.idea.magento2plugin.util.php.PhpTypeMetadataParserUtil;
 import java.awt.event.KeyEvent;
@@ -31,7 +26,6 @@ import java.awt.event.WindowEvent;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -179,25 +173,10 @@ public class NewInterfaceForServiceDialog extends AbstractDialog {
         }
         final WebApiInterfaceData data = getDialogDataObject();
 
-        final PhpFile webApiInterfaceFile = (PhpFile) new WebApiInterfaceGenerator(
+        new WebApiInterfaceGenerator(
                 data,
                 project
         ).generate(NewWebApiInterfaceAction.ACTION_NAME, true);
-
-        if (webApiInterfaceFile != null) {
-            final PhpClass interfaceClass =
-                    GetFirstClassOfFile.getInstance().execute(webApiInterfaceFile);
-
-            new PreferenceDiXmlGenerator(
-                    new PreferenceDiXmFileData(
-                            moduleName,
-                            Objects.requireNonNull(interfaceClass).getPresentableFQN(),
-                            data.getClassFqn(),
-                            Areas.base.toString()
-                    ),
-                    project
-            ).generate(NewWebApiInterfaceAction.ACTION_NAME, true);
-        }
 
         this.setVisible(false);
     }

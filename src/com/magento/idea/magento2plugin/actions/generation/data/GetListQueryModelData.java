@@ -13,6 +13,7 @@ public class GetListQueryModelData {
     private final String entityName;
     private final String modelName;
     private final String collectionName;
+    private final String aclResource;
 
     /**
      * Query Model DTO Constructor.
@@ -21,17 +22,20 @@ public class GetListQueryModelData {
      * @param entityName String
      * @param modelName String
      * @param collectionName String
+     * @param aclResource String
      */
     public GetListQueryModelData(
             final @NotNull String moduleName,
             final @NotNull String entityName,
             final @NotNull String modelName,
-            final @NotNull String collectionName
+            final @NotNull String collectionName,
+            final @NotNull String aclResource
     ) {
         this.moduleName = moduleName;
         this.entityName = entityName;
         this.modelName = modelName;
         this.collectionName = collectionName;
+        this.aclResource = aclResource;
     }
 
     /**
@@ -68,5 +72,14 @@ public class GetListQueryModelData {
      */
     public String getCollectionName() {
         return collectionName;
+    }
+
+    /**
+     * Get entity acl resource.
+     *
+     * @return String
+     */
+    public String getAclResource() {
+        return aclResource;
     }
 }
