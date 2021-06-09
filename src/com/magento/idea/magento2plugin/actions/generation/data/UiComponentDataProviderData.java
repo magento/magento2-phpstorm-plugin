@@ -11,7 +11,7 @@ public class UiComponentDataProviderData {
     private final String path;
     private final String entityName;
     private final String entityIdFieldName;
-    private final boolean queryHasInterface;
+    private final boolean hasQueryInterface;
 
     /**
      * UiComponentGridDataProviderData constructor.
@@ -33,20 +33,20 @@ public class UiComponentDataProviderData {
      * @param path String
      * @param entityName String
      * @param entityIdFieldName String
-     * @param isQueryHasInterface boolean
+     * @param hasQueryInterface boolean
      */
     public UiComponentDataProviderData(
             final String name,
             final String path,
             final String entityName,
             final String entityIdFieldName,
-            final boolean isQueryHasInterface
+            final boolean hasQueryInterface
     ) {
         this.name = name;
         this.path = path;
         this.entityName = entityName;
         this.entityIdFieldName = entityIdFieldName;
-        this.queryHasInterface = isQueryHasInterface;
+        this.hasQueryInterface = hasQueryInterface;
     }
 
     /**
@@ -90,7 +90,7 @@ public class UiComponentDataProviderData {
      *
      * @return boolean
      */
-    public boolean isQueryHasInterface() {
-        return queryHasInterface;
+    public boolean isHasQueryInterface() {
+        return hasQueryInterface;
     }
 }

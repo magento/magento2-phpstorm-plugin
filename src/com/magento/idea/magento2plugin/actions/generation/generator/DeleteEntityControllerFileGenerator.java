@@ -72,7 +72,7 @@ public class DeleteEntityControllerFileGenerator extends PhpFileGenerator {
                         new DeleteEntityByIdCommandFile(
                                 data.getModuleName(),
                                 data.getEntityName(),
-                                data.isDeleteCommandHasInterface()
+                                data.isHasDeleteCommandInterface()
                         ).getClassFqn()
                 )
                 .append("CONTEXT", BackendModuleType.CONTEXT.getType())

@@ -81,7 +81,7 @@ public class UiComponentDataProviderGenerator extends PhpFileGenerator {
                             new GetListQueryFile(
                                     moduleName,
                                     data.getEntityName(),
-                                    data.isQueryHasInterface()
+                                    data.isHasQueryInterface()
                             ).getClassFqn()
                     )
                     .append("REPORTING_TYPE", FrameworkLibraryType.REPORTING.getType())

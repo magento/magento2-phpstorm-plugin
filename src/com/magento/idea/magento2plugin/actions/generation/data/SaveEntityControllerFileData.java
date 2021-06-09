@@ -15,8 +15,8 @@ public class SaveEntityControllerFileData {
     private final String entityId;
     private final String dtoName;
     private final String dtoInterfaceName;
-    private final boolean dtoWithInterface;
-    private final boolean saveCommandHasInterface;
+    private final boolean hasDtoInterface;
+    private final boolean hasSaveCommandInterface;
 
     /**
      * Controller save file constructor.
@@ -27,8 +27,8 @@ public class SaveEntityControllerFileData {
      * @param entityId String
      * @param dtoName String
      * @param dtoInterfaceName String
-     * @param isDtoWithInterface boolean
-     * @param isSaveCommandHasInterface boolean
+     * @param hasDtoInterface boolean
+     * @param hasSaveCommandInterface boolean
      */
     public SaveEntityControllerFileData(
             final @NotNull String entityName,
@@ -37,8 +37,8 @@ public class SaveEntityControllerFileData {
             final @NotNull String entityId,
             final @NotNull String dtoName,
             final @NotNull String dtoInterfaceName,
-            final boolean isDtoWithInterface,
-            final boolean isSaveCommandHasInterface
+            final boolean hasDtoInterface,
+            final boolean hasSaveCommandInterface
     ) {
         this.entityName = entityName;
         this.moduleName = moduleName;
@@ -46,8 +46,8 @@ public class SaveEntityControllerFileData {
         this.entityId = entityId;
         this.dtoName = dtoName;
         this.dtoInterfaceName = dtoInterfaceName;
-        this.dtoWithInterface = isDtoWithInterface;
-        this.saveCommandHasInterface = isSaveCommandHasInterface;
+        this.hasDtoInterface = hasDtoInterface;
+        this.hasSaveCommandInterface = hasSaveCommandInterface;
     }
 
     /**
@@ -109,8 +109,8 @@ public class SaveEntityControllerFileData {
      *
      * @return boolean
      */
-    public boolean isDtoWithInterface() {
-        return dtoWithInterface;
+    public boolean isHasDtoInterface() {
+        return hasDtoInterface;
     }
 
     /**
@@ -118,7 +118,7 @@ public class SaveEntityControllerFileData {
      *
      * @return boolean
      */
-    public boolean isSaveCommandHasInterface() {
-        return saveCommandHasInterface;
+    public boolean isHasSaveCommandInterface() {
+        return hasSaveCommandInterface;
     }
 }

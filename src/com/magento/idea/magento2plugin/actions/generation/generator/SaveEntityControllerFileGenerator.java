@@ -65,7 +65,7 @@ public class SaveEntityControllerFileGenerator extends PhpFileGenerator {
     protected void fillAttributes(final @NotNull Properties attributes) {
         String dtoType;
 
-        if (data.isDtoWithInterface()) {
+        if (data.isHasDtoInterface()) {
             final DataModelInterfaceFile dataModelInterfaceFile =
                     new DataModelInterfaceFile(data.getModuleName(), data.getDtoInterfaceName());
             dtoType = dataModelInterfaceFile.getClassFqn();
@@ -90,7 +90,7 @@ public class SaveEntityControllerFileGenerator extends PhpFileGenerator {
                         new SaveEntityCommandFile(
                                 data.getModuleName(),
                                 data.getEntityName(),
-                                data.isSaveCommandHasInterface()
+                                data.isHasSaveCommandInterface()
                         ).getClassFqn()
                 )
                 .append("DATA_OBJECT", FrameworkLibraryType.DATA_OBJECT.getType())

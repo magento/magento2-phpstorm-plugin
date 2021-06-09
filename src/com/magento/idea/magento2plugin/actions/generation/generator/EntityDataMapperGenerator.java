@@ -62,12 +62,12 @@ public class EntityDataMapperGenerator extends PhpFileGenerator {
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
         final ModelFile modelFile = new ModelFile(data.getModuleName(), data.getModelName());
-        final DataModelFile dtoFile = new DataModelFile(data.getDtoName(), data.getModuleName());
+        final DataModelFile dtoFile = new DataModelFile(data.getModuleName(), data.getDtoName());
         final DataModelInterfaceFile dtoInterfaceFile =
                 new DataModelInterfaceFile(data.getModuleName(), data.getDtoInterfaceName());
         String dtoType;
 
-        if (data.isDtoWithInterface()) {
+        if (data.isHasDtoInterface()) {
             dtoType = dtoInterfaceFile.getClassFqn();
         } else {
             dtoType = dtoFile.getClassFqn();

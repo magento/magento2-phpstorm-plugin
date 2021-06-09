@@ -13,7 +13,7 @@ public class DeleteEntityControllerFileData {
     private final String moduleName;
     private final String acl;
     private final String entityId;
-    private final boolean deleteCommandHasInterface;
+    private final boolean hasDeleteCommandInterface;
 
     /**
      * Controller Delete file constructor.
@@ -22,19 +22,20 @@ public class DeleteEntityControllerFileData {
      * @param moduleName String
      * @param acl String
      * @param entityId String
+     * @param hasDeleteCommandInterface boolean
      */
     public DeleteEntityControllerFileData(
             final @NotNull String entityName,
             final @NotNull String moduleName,
             final @NotNull String acl,
             final @NotNull String entityId,
-            final boolean isDeleteCommandHasInterface
+            final boolean hasDeleteCommandInterface
     ) {
         this.entityName = entityName;
         this.moduleName = moduleName;
         this.acl = acl;
         this.entityId = entityId;
-        this.deleteCommandHasInterface = isDeleteCommandHasInterface;
+        this.hasDeleteCommandInterface = hasDeleteCommandInterface;
     }
 
     /**
@@ -78,7 +79,7 @@ public class DeleteEntityControllerFileData {
      *
      * @return boolean
      */
-    public boolean isDeleteCommandHasInterface() {
-        return deleteCommandHasInterface;
+    public boolean isHasDeleteCommandInterface() {
+        return hasDeleteCommandInterface;
     }
 }
