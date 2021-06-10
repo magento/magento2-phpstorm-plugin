@@ -191,6 +191,10 @@ public class NewCronjobDialog extends AbstractDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
+
+        addComponentListener(
+                new FocusOnAFieldListener(() -> cronjobNameField.requestFocusInWindow())
+        );
     }
 
     /**
