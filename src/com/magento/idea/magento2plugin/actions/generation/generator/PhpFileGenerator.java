@@ -88,7 +88,7 @@ public abstract class PhpFileGenerator extends FileGenerator {
                 fileBaseDir,
                 actionName
         );
-        onFileGenerated(generatedFile);
+        onFileGenerated(generatedFile, actionName);
 
         return generatedFile;
     }
@@ -116,8 +116,10 @@ public abstract class PhpFileGenerator extends FileGenerator {
      * Implement this method to add on file has been generated behaviour.
      *
      * @param generatedFile PsiFile
+     * @param actionName String
      */
-    protected void onFileGenerated(final PsiFile generatedFile) {
+    @SuppressWarnings("PMD.UnusedFormalParameter")
+    protected void onFileGenerated(final PsiFile generatedFile, final @NotNull String actionName) {
         if (generatedFile == null) {
             JOptionPane.showMessageDialog(
                     null,

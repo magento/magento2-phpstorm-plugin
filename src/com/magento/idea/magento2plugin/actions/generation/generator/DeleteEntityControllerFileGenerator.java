@@ -71,7 +71,8 @@ public class DeleteEntityControllerFileGenerator extends PhpFileGenerator {
                 .append("DELETE_COMMAND",
                         new DeleteEntityByIdCommandFile(
                                 data.getModuleName(),
-                                data.getEntityName()
+                                data.getEntityName(),
+                                data.isHasDeleteCommandInterface()
                         ).getClassFqn()
                 )
                 .append("CONTEXT", BackendModuleType.CONTEXT.getType())

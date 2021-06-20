@@ -27,7 +27,8 @@ public class DeleteEntityGeneratorTest extends BaseGeneratorTestCase {
                         ENTITY_NAME,
                         MODULE_NAME,
                         ACL,
-                        ENTITY_ID
+                        ENTITY_ID,
+                        false
                 );
         final DeleteEntityControllerFileGenerator deleteEntityControllerFileGenerator =
                 new DeleteEntityControllerFileGenerator(

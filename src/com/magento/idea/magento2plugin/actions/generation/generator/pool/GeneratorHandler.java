@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin.actions.generation.generator.pool;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.DataObjectConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.GenerationContextData;
 import com.magento.idea.magento2plugin.actions.generation.generator.FileGenerator;
@@ -79,10 +80,21 @@ public abstract class GeneratorHandler {
      * Run generator.
      */
     public final void generate() {
-        generator.generate(
+        final PsiFile result = generator.generate(
                 getContextData().getActionName(),
                 getContextData().checkIfHasOpenFileFlag()
         );
+        afterFileGenerated(result);
+    }
+
+    /**
+     * Implement to do some actions after file is generated.
+     *
+     * @param file PsiFile
+     */
+    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
+    protected void afterFileGenerated(final PsiFile file) {
+        // override to do some stuff with generated file.
     }
 
     /**

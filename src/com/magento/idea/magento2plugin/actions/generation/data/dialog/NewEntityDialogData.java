@@ -18,6 +18,7 @@ public class NewEntityDialogData implements DialogData {
     private final String tableResource;
     private final boolean adminUiComponents;
     private final boolean dtoInterface;
+    private final boolean webApi;
 
     // Admin UI Components tab data.
     private final String route;
@@ -55,6 +56,7 @@ public class NewEntityDialogData implements DialogData {
      * @param tableResource String
      * @param hasAdminUiComponents boolean
      * @param hasDtoInterface boolean
+     * @param hasWebApi boolean
      * @param route String
      * @param formLabel String
      * @param formName String
@@ -82,6 +84,7 @@ public class NewEntityDialogData implements DialogData {
             final @NotNull String tableResource,
             final boolean hasAdminUiComponents,
             final boolean hasDtoInterface,
+            final boolean hasWebApi,
             final @NotNull String route,
             final @NotNull String formLabel,
             final @NotNull String formName,
@@ -108,6 +111,7 @@ public class NewEntityDialogData implements DialogData {
         this.tableResource = tableResource;
         this.adminUiComponents = hasAdminUiComponents;
         this.dtoInterface = hasDtoInterface;
+        this.webApi = hasWebApi;
         this.route = route;
         this.formLabel = formLabel;
         this.formName = formName;
@@ -189,6 +193,15 @@ public class NewEntityDialogData implements DialogData {
      */
     public boolean hasDtoInterface() {
         return dtoInterface;
+    }
+
+    /**
+     * Check if has web api services.
+     *
+     * @return boolean
+     */
+    public boolean hasWebApi() {
+        return webApi;
     }
 
     /**

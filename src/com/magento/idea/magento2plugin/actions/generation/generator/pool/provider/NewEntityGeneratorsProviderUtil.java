@@ -138,13 +138,11 @@ public final class NewEntityGeneratorsProviderUtil {
                 )
                 .addNext(
                         EntityDataMapperGeneratorHandler.class,
-                        new EntityDataMapperDtoConverter(context, dialogData),
-                        dialogData::hasAdminUiComponents
+                        new EntityDataMapperDtoConverter(context, dialogData)
                 )
                 .addNext(
                         GetListQueryGeneratorHandler.class,
-                        new GetListQueryDtoConverter(context, dialogData),
-                        dialogData::hasAdminUiComponents
+                        new GetListQueryDtoConverter(context, dialogData)
                 )
                 .addNext(
                         DataProviderGeneratorHandler.class,
@@ -173,13 +171,11 @@ public final class NewEntityGeneratorsProviderUtil {
                 )
                 .addNext(
                         SaveCommandGeneratorHandler.class,
-                        new SaveEntityCommandDtoConverter(context, dialogData),
-                        dialogData::hasAdminUiComponents
+                        new SaveEntityCommandDtoConverter(context, dialogData)
                 )
                 .addNext(
                         DeleteByIdCommandGeneratorHandler.class,
-                        new DeleteEntityByIdCommandDtoConverter(context, dialogData),
-                        dialogData::hasAdminUiComponents
+                        new DeleteEntityByIdCommandDtoConverter(context, dialogData)
                 )
                 .addNext(
                         FormSaveControllerGeneratorHandler.class,

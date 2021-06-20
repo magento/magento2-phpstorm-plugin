@@ -32,6 +32,7 @@ public class SaveEntityActionGeneratorTest extends BaseGeneratorTestCase {
                         ENTITY_ID,
                         DTO_NAME,
                         "",
+                        false,
                         false
                 );
         final SaveEntityControllerFileGenerator saveEntityControllerFileGenerator =
@@ -65,7 +66,8 @@ public class SaveEntityActionGeneratorTest extends BaseGeneratorTestCase {
                         ENTITY_ID,
                         DTO_NAME,
                         DTO_TYPE_INTERFACE,
-                        true
+                        true,
+                        false
                 );
         final SaveEntityControllerFileGenerator saveEntityControllerFileGenerator =
                 new SaveEntityControllerFileGenerator(
