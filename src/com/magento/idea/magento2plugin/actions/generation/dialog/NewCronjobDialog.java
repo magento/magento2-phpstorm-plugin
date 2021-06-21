@@ -193,7 +193,7 @@ public class NewCronjobDialog extends AbstractDialog {
         );
 
         addComponentListener(
-                new FocusOnAFieldListener(() -> cronjobNameField.requestFocusInWindow())
+                new FocusOnAFieldListener(() -> cronjobClassNameField.requestFocusInWindow())
         );
     }
 

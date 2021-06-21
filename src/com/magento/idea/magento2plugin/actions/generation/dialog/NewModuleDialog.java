@@ -152,7 +152,13 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
 
-        addComponentListener(new FocusOnAFieldListener(() -> packageName.requestFocusInWindow()));
+        addComponentListener(new FocusOnAFieldListener(() -> {
+            if (packageName.isVisible()) {
+                packageName.requestFocusInWindow();
+            } else {
+                moduleName.requestFocusInWindow();
+            }
+        }));
     }
 
     private void detectPackageName(final @NotNull PsiDirectory initialBaseDir) {
