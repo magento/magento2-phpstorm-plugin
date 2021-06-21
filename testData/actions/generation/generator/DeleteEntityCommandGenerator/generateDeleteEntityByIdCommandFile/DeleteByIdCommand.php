@@ -5,6 +5,7 @@ namespace Foo\Bar\Command\Book;
 use Exception;
 use Foo\Bar\Model\BookModel;
 use Foo\Bar\Model\BookModelFactory;
+use Foo\Bar\Model\Data\BookData;
 use Foo\Bar\Model\ResourceModel\BookResource;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -59,9 +60,9 @@ class DeleteByIdCommand
         try {
             /** @var BookModel $model */
             $model = $this->modelFactory->create();
-            $this->resource->load($model, $entityId, 'book_id');
+            $this->resource->load($model, $entityId, BookData::BOOK_ID);
 
-            if (!$model->getData('book_id')) {
+            if (!$model->getData(BookData::BOOK_ID)) {
                 throw new NoSuchEntityException(
                     __('Could not find Book with id: `%id`',
                         [

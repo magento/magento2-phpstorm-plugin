@@ -10,6 +10,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.actions.generation.NewEntityAction;
+import com.magento.idea.magento2plugin.actions.generation.context.EntityCreatorContext;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormButtonData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldsetData;
@@ -36,6 +37,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.pool.Generat
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.provider.NewEntityGeneratorsProviderUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DbSchemaGeneratorUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
+import com.magento.idea.magento2plugin.actions.generation.util.GenerationContextRegistry;
 import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.files.DataModelFile;
 import com.magento.idea.magento2plugin.magento.files.DataModelInterfaceFile;
@@ -404,6 +406,15 @@ public class NewEntityDialog extends AbstractDialog {
 
         final NewEntityDialogData dialogData = getNewEntityDialogData();
         final EntityCreatorContextData context = getEntityCreatorContextData(dialogData);
+        final EntityCreatorContext generationContext = new EntityCreatorContext();
+        generationContext.putUserData(
+                EntityCreatorContext.DTO_TYPE,
+                dialogData.hasDtoInterface()
+                        ? context.getDtoInterfaceNamespaceBuilder().getClassFqn()
+                        : context.getDtoModelNamespaceBuilder().getClassFqn()
+        );
+        generationContext.putUserData(EntityCreatorContext.ENTITY_ID, dialogData.getIdFieldName());
+        GenerationContextRegistry.getInstance().setContext(generationContext);
 
         final GeneratorPoolHandler generatorPoolHandler = new GeneratorPoolHandler(context);
 

@@ -2,6 +2,7 @@
 
 namespace Foo\Bar\Block\Form\Book;
 
+use Foo\Bar\Model\Data\BookData;
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 
 /**
@@ -21,7 +22,10 @@ class DeleteBlock extends GenericButton implements ButtonProviderInterface
             'delete',
             'deleteConfirm(\''
             . __('Are you sure you want to delete this book?')
-            . '\', \'' . $this->getUrl('*/*/delete', ['book_id' => $this->getBookId()]) . '\')',
+            . '\', \'' . $this->getUrl(
+                '*/*/delete',
+                [BookData::BOOK_ID => $this->getBookId()]
+            ) . '\')',
             [],
             20
         );

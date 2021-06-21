@@ -9,11 +9,14 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.magento.idea.magento2plugin.actions.generation.context.EntityCreatorContext;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormButtonData;
+import com.magento.idea.magento2plugin.actions.generation.dialog.util.ClassPropertyFormatterUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
+import com.magento.idea.magento2plugin.actions.generation.util.GenerationContextRegistry;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.FormButtonBlockFile;
 import com.magento.idea.magento2plugin.magento.files.FormGenericButtonBlockFile;
@@ -25,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import org.bouncycastle.util.Strings;
@@ -178,7 +182,21 @@ public class UiComponentFormButtonBlockGenerator extends FileGenerator {
 
         final Map<String, String> variables = new HashMap<>();
         variables.put("$varName", Strings.toLowerCase(entityName));
-        variables.put("$varId", entityIdField);
+
+        final EntityCreatorContext context =
+                (EntityCreatorContext) GenerationContextRegistry.getInstance().getContext();
+
+        if (buttonTypeSettings.isVariableExpected("$varIdConst") && context != null) {
+            final String dtoTypeFqn = context.getUserData(EntityCreatorContext.DTO_TYPE);
+            Objects.requireNonNull(dtoTypeFqn);
+            variables.put(
+                    "$varIdConst",
+                    ClassPropertyFormatterUtil.formatNameToConstant(entityIdField, dtoTypeFqn)
+            );
+            uses.add(dtoTypeFqn);
+        } else {
+            variables.put("$varIdConst", entityIdField);
+        }
         variables.put("$varEntityIdAccessor", entityIdAccessor);
 
         attributes.setProperty("ON_CLICK", buttonTypeSettings.getOnClick(variables));

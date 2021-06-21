@@ -3,6 +3,7 @@
 namespace Foo\Bar\Controller\Adminhtml\Company;
 
 use Foo\Bar\Command\Company\DeleteByIdCommand;
+use Foo\Bar\Model\Data\CompanyData;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
@@ -52,7 +53,7 @@ class Delete extends Action implements HttpPostActionInterface, HttpGetActionInt
         /** @var ResultInterface $resultRedirect */
         $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
         $resultRedirect->setPath('*/*/');
-        $entityId = (int)$this->getRequest()->getParam('company_id');
+        $entityId = (int)$this->getRequest()->getParam(CompanyData::COMPANY_ID);
 
         try {
             $this->deleteByIdCommand->execute($entityId);

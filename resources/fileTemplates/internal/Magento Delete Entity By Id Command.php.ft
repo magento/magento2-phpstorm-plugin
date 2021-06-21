@@ -56,9 +56,9 @@ class ${CLASS_NAME}
         try {
             /** @var ${MODEL} $model */
             $model = $this->modelFactory->create();
-            $this->resource->load($model, $entityId, '${ENTITY_ID}');
+            $this->resource->load($model, $entityId, ${ENTITY_ID_REFERENCE});
 
-            if (!$model->getData('${ENTITY_ID}')) {
+            if (!$model->getData(${ENTITY_ID_REFERENCE})) {
                 throw new ${NO_SUCH_ENTITY_EXCEPTION}(
                     __('Could not find ${ENTITY_NAME} with id: `%id`',
                         [

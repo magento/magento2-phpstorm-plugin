@@ -12,6 +12,7 @@ public class SaveEntityCommandGeneratorTest extends BaseGeneratorTestCase {
 
     private static final String MODULE_NAME = "Foo_Bar";
     private static final String ENTITY_NAME = "Book";
+    private static final String ENTITY_ID = "book_id";
     private static final String MODEL_NAME = ENTITY_NAME + "Model";
     private static final String RESOURCE_MODEL_NAME = ENTITY_NAME + "Resource";
     private static final String DTO_NAME = ENTITY_NAME + "Data";
@@ -26,6 +27,7 @@ public class SaveEntityCommandGeneratorTest extends BaseGeneratorTestCase {
         final SaveEntityCommandData saveEntityCommandData = new SaveEntityCommandData(
                 MODULE_NAME,
                 ENTITY_NAME,
+                ENTITY_ID,
                 MODEL_NAME,
                 RESOURCE_MODEL_NAME,
                 DTO_NAME,

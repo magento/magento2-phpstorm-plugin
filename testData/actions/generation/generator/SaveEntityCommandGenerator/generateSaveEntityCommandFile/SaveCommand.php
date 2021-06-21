@@ -63,7 +63,7 @@ class SaveCommand
             $model->addData($book->getData());
             $model->setHasDataChanges(true);
 
-            if (!$model->getId()) {
+            if (!$model->getData(BookData::BOOK_ID)) {
                 $model->isObjectNew(true);
             }
             $this->resource->save($model);
