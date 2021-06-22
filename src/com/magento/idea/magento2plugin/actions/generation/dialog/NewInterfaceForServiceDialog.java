@@ -119,6 +119,8 @@ public class NewInterfaceForServiceDialog extends AbstractDialog {
         );
 
         fillPredefinedValuesAndDisableInputs();
+
+        addComponentListener(new FocusOnAFieldListener(() -> nameField.requestFocusInWindow()));
     }
 
     /**

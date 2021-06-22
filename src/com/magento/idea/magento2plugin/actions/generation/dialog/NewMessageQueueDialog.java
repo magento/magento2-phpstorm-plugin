@@ -200,6 +200,8 @@ public class NewMessageQueueDialog extends AbstractDialog {
         });
 
         connectionName.addActionListener(e -> toggleConsumer());
+
+        addComponentListener(new FocusOnAFieldListener(() -> topicName.requestFocusInWindow()));
     }
 
     private void toggleConsumer() {

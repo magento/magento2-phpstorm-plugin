@@ -244,6 +244,8 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         formAreaSelect.addActionListener(e -> toggleAcl());
         formAreaSelect.setEnabled(false);
         acl.setText(getModuleName() + "::manage");
+
+        addComponentListener(new FocusOnAFieldListener(() -> formName.requestFocusInWindow()));
     }
 
     protected void initButtonsTable() {
