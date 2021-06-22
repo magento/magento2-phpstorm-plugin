@@ -232,6 +232,10 @@ public class NewUiComponentGridDialog extends AbstractDialog {
 
         dataProviderParentDirectory.setVisible(false);
         dataProviderParentDirectoryLabel.setVisible(false);
+
+        addComponentListener(
+                new FocusOnAFieldListener(() -> uiComponentName.requestFocusInWindow())
+        );
     }
 
     /**

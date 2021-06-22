@@ -135,6 +135,10 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
+
+        addComponentListener(
+                new FocusOnAFieldListener(() -> preferenceModule.requestFocusInWindow())
+        );
     }
 
     private void suggestPreferenceDirectory(final PhpClass targetClass) {
