@@ -112,6 +112,8 @@ public class NewWebApiDeclarationDialog extends AbstractDialog {
         );
 
         fillPredefinedValuesAndDisableInputs();
+
+        addComponentListener(new FocusOnAFieldListener(() -> routeUrl.requestFocusInWindow()));
     }
 
     /**

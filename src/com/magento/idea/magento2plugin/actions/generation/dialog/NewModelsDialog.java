@@ -131,6 +131,8 @@ public class NewModelsDialog extends AbstractDialog {
                 updateText();
             }
         });
+
+        addComponentListener(new FocusOnAFieldListener(() -> modelName.requestFocusInWindow()));
     }
 
     /**

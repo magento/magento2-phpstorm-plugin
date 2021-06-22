@@ -123,6 +123,8 @@ public class NewDbSchemaDialog extends AbstractDialog {
         );
         fillComboBoxes();
         initializeColumnsUiComponentGroup();
+
+        addComponentListener(new FocusOnAFieldListener(() -> tableName.requestFocusInWindow()));
     }
 
     /**
