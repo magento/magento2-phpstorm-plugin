@@ -19,7 +19,7 @@ public class DeleteEntityByIdCommandFile extends AbstractPhpFile {
     public static final String WEB_API_METHOD_NAME = "execute";
     private static final String DIRECTORY = "Command";
     private static final String WEB_API_INTERFACE_NAME_PATTERN = "Delete%entityName%ByIdInterface";
-    private static final String WEB_API_URL_PATTERN = "%entityName%/delete-by-id";
+    private static final String WEB_API_URL_PATTERN = "%entityName%/delete-by-id/:entityId";
     private final String entityName;
     private final boolean hasWebApiInterface;
 

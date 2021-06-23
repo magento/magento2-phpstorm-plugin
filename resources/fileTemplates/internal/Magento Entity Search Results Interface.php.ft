@@ -1,0 +1,31 @@
+<?php
+#parse("PHP File Header.php")
+
+namespace ${NAMESPACE};
+
+#set($uses = ${USES})
+#foreach ($use in $uses.split(","))
+use $use;
+#end
+
+/**
+ * ${ENTITY_NAME} entity search result.
+ */
+interface ${CLASS_NAME} extends ${PARENT_INTERFACE}
+{
+    /**
+     * Set items.
+     *
+     * @param ${DTO_TYPE}[] $items
+     *
+     * @return ${CLASS_NAME}
+     */
+    public function setItems(array $items): ${CLASS_NAME};
+
+    /**
+     * Get items.
+     *
+     * @return ${DTO_TYPE}[]
+     */
+    public function getItems(): array;
+}

@@ -11,6 +11,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Namespa
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.CollectionModelFile;
 import com.magento.idea.magento2plugin.magento.files.EntityDataMapperFile;
+import com.magento.idea.magento2plugin.magento.files.SearchResultsInterfaceFile;
 import com.magento.idea.magento2plugin.magento.files.queries.GetListQueryFile;
 import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryType;
 import java.util.Properties;
@@ -100,14 +101,24 @@ public class GetListQueryModelGenerator extends PhpFileGenerator {
                 .append(
                         "SEARCH_CRITERIA_TYPE",
                         FrameworkLibraryType.SEARCH_CRITERIA.getType()
-                )
-                .append(
-                        "SEARCH_RESULT_TYPE",
-                        FrameworkLibraryType.SEARCH_RESULT.getType()
-                )
-                .append(
-                        "SEARCH_RESULT_FACTORY_TYPE",
-                        FrameworkLibraryType.SEARCH_RESULT.getFactory()
                 );
+
+        String searchResultType;
+        String searchResultFactoryType;
+
+        if (data.isHasWebApi()) {
+            final SearchResultsInterfaceFile searchResultsInterfaceFile =
+                    new SearchResultsInterfaceFile(data.getModuleName(), data.getEntityName());
+
+            searchResultType = searchResultsInterfaceFile.getClassFqn();
+            searchResultFactoryType = searchResultType.concat("Factory");
+        } else {
+            searchResultType = FrameworkLibraryType.SEARCH_RESULT.getType();
+            searchResultFactoryType = FrameworkLibraryType.SEARCH_RESULT.getFactory();
+        }
+
+        typesBuilder
+                .append("SEARCH_RESULT_TYPE", searchResultType)
+                .append("SEARCH_RESULT_FACTORY_TYPE", searchResultFactoryType);
     }
 }

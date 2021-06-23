@@ -26,7 +26,8 @@ public class QueryModelGeneratorTest extends BaseGeneratorTestCase {
                 ENTITY_NAME,
                 MODEL_NAME,
                 COLLECTION_NAME,
-                ACL
+                ACL,
+                false
         );
         final GetListQueryModelGenerator getListQueryModelGenerator =
                 new GetListQueryModelGenerator(

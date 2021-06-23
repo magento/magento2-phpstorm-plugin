@@ -5,32 +5,30 @@
 
 package com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog;
 
-import com.magento.idea.magento2plugin.actions.generation.data.GetListQueryModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.DataObjectConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityCreatorContextData;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.NewEntityDialogData;
+import com.magento.idea.magento2plugin.actions.generation.data.php.SearchResultsData;
 import org.jetbrains.annotations.NotNull;
 
-public class GetListQueryDtoConverter extends GetListQueryModelData
-        implements DataObjectConverter {
+public class SearchResultsDtoConverter extends SearchResultsData implements DataObjectConverter {
 
     /**
-     * Get list query converter.
+     * Save entity command DTO converter.
      *
      * @param generationContextData EntityCreatorContextData
      * @param newEntityDialogData NewEntityDialogData
      */
-    public GetListQueryDtoConverter(
+    public SearchResultsDtoConverter(
             final @NotNull EntityCreatorContextData generationContextData,
             final @NotNull NewEntityDialogData newEntityDialogData
     ) {
         super(
                 generationContextData.getModuleName(),
                 newEntityDialogData.getEntityName(),
-                newEntityDialogData.getEntityName().concat("Model"),
-                newEntityDialogData.getEntityName().concat("Collection"),
-                newEntityDialogData.getAclId(),
-                newEntityDialogData.hasWebApi()
+                newEntityDialogData.hasDtoInterface()
+                        ? generationContextData.getDtoInterfaceNamespaceBuilder().getClassFqn()
+                        : generationContextData.getDtoModelNamespaceBuilder().getClassFqn()
         );
     }
 }

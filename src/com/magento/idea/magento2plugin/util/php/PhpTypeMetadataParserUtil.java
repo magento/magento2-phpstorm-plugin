@@ -144,6 +144,7 @@ public final class PhpTypeMetadataParserUtil {
         final int bodyStartIndex = methodText.indexOf('{');
         final PhpDocComment methodDoc = method.getDocComment();
         String methodDescription = "";
+        String methodDocReturn = null;
 
         if (bodyStartIndex != -1) {
             methodText = methodText.substring(0, bodyStartIndex).trim();
@@ -151,6 +152,9 @@ public final class PhpTypeMetadataParserUtil {
 
         if (methodDoc != null) {
             methodDescription = getShortDescription(method);
+            methodDocReturn = methodDoc.getReturnTag() != null
+                    ? methodDoc.getReturnTag().getText()
+                    : null;
         }
 
         if (methodDescription.isEmpty() && defaultMethodDescription != null) {
@@ -161,6 +165,30 @@ public final class PhpTypeMetadataParserUtil {
         final PhpDocComment newMethodDoc =
                 PhpDocCommentGenerator.constructDocComment(method.getProject(), method, false);
         methodDocAnnotation = newMethodDoc == null ? "" : newMethodDoc.getText();
+
+        if (newMethodDoc != null && !methodDocAnnotation.isEmpty()
+                && methodDocReturn != null
+                && newMethodDoc.getReturnTag() == null) {
+            int insertionPos = -1;
+            final int docEndPos = methodDocAnnotation.indexOf("*/");
+            final int lastThrowPos = methodDocAnnotation.lastIndexOf("@throws");
+
+            if (lastThrowPos != -1) {
+                insertionPos = lastThrowPos;
+            } else if (docEndPos != -1) {
+                insertionPos = docEndPos;
+            }
+
+            if (insertionPos != -1) {
+                methodDocAnnotation = new StringBuffer(methodDocAnnotation)
+                        .insert(
+                                insertionPos,
+                                docEndPos == insertionPos
+                                        ? "\n".concat(methodDocReturn).concat("\n")
+                                        : methodDocReturn.concat("\n")
+                        ).toString();
+            }
+        }
 
         if (!methodDocAnnotation.isEmpty()) {
             final int openingSymbolPosition = methodDocAnnotation.indexOf("/**");
