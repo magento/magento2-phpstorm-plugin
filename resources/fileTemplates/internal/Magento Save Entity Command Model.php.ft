@@ -59,7 +59,7 @@ class ${CLASS_NAME}
             $model->addData($${DTO_PROPERTY}->getData());
             $model->setHasDataChanges(true);
 
-            if (!$model->getId()) {
+            if (!$model->getData(${ENTITY_ID_CONST})) {
                 $model->isObjectNew(true);
             }
             $this->resource->save($model);

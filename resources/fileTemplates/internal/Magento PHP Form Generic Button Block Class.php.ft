@@ -40,7 +40,7 @@ class ${CLASS_NAME}
      */
     public function ${ENTITY_ID_GETTER}(): int
     {
-        return (int) $this->context->getRequest()->getParam('${ENTITY_ID}');
+        return (int) $this->context->getRequest()->getParam(${ENTITY_ID_REFERENCE});
     }
 
     /**

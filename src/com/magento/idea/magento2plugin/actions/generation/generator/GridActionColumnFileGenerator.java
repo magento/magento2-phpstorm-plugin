@@ -6,10 +6,14 @@
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
+import com.magento.idea.magento2plugin.actions.generation.context.EntityCreatorContext;
 import com.magento.idea.magento2plugin.actions.generation.data.GridActionColumnData;
+import com.magento.idea.magento2plugin.actions.generation.dialog.util.ClassPropertyFormatterUtil;
+import com.magento.idea.magento2plugin.actions.generation.util.GenerationContextRegistry;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.GridActionColumnFile;
 import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryType;
+import java.util.Objects;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
@@ -60,7 +64,6 @@ public class GridActionColumnFileGenerator extends PhpFileGenerator {
     protected void fillAttributes(final @NotNull Properties attributes) {
         typesBuilder
                 .append("ENTITY_NAME", data.getEntityName(), false)
-                .append("ENTITY_ID", data.getEntityIdColumn(), false)
                 .append("NAMESPACE", file.getNamespace(), false)
                 .append("CLASS_NAME", file.getClassName(), false)
                 .append("EDIT_URL_PATH", data.getEditUrlPath(), false)
@@ -69,5 +72,20 @@ public class GridActionColumnFileGenerator extends PhpFileGenerator {
                 .append("URL", FrameworkLibraryType.URL.getType())
                 .append("CONTEXT", GridActionColumnFile.CONTEXT)
                 .append("UI_COMPONENT_FACTORY", GridActionColumnFile.UI_COMPONENT_FACTORY);
+
+        final EntityCreatorContext context =
+                (EntityCreatorContext) GenerationContextRegistry.getInstance().getContext();
+        Objects.requireNonNull(context);
+        final String dtoTypeFqn = context.getUserData(EntityCreatorContext.DTO_TYPE);
+        Objects.requireNonNull(dtoTypeFqn);
+        typesBuilder.append(
+                "ENTITY_ID_REFERENCE",
+                ClassPropertyFormatterUtil.formatNameToConstant(
+                        data.getEntityIdColumn(),
+                        dtoTypeFqn
+                ),
+                false
+        );
+        typesBuilder.append("DTO_TYPE", dtoTypeFqn);
     }
 }

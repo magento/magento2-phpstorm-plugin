@@ -5,7 +5,9 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import com.magento.idea.magento2plugin.actions.generation.context.EntityCreatorContext;
 import com.magento.idea.magento2plugin.actions.generation.data.GridActionColumnData;
+import com.magento.idea.magento2plugin.actions.generation.util.GenerationContextRegistry;
 import com.magento.idea.magento2plugin.magento.files.GridActionColumnFile;
 
 public class GridActionColumnFileGeneratorTest extends BaseGeneratorTestCase {
@@ -15,6 +17,16 @@ public class GridActionColumnFileGeneratorTest extends BaseGeneratorTestCase {
     private static final String ENTITY_ID_COLUMN = "book_id";
     private static final String EDIT_URL_PATH = "book_book_edit";
     private static final String DELETE_URL_PATH = "book_book_delete";
+    private static final String ENTITY_DTO_TYPE = "Foo\\Bar\\Model\\Data\\BookData";
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        final EntityCreatorContext context = new EntityCreatorContext();
+        context.putUserData(EntityCreatorContext.DTO_TYPE, ENTITY_DTO_TYPE);
+        context.putUserData(EntityCreatorContext.ENTITY_ID, ENTITY_ID_COLUMN);
+        GenerationContextRegistry.getInstance().setContext(context);
+    }
 
     /**
      * Test generation of grid actions column file.

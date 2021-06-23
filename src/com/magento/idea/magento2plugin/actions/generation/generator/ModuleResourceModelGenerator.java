@@ -6,9 +6,13 @@
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
+import com.magento.idea.magento2plugin.actions.generation.context.EntityCreatorContext;
 import com.magento.idea.magento2plugin.actions.generation.data.ResourceModelData;
+import com.magento.idea.magento2plugin.actions.generation.dialog.util.ClassPropertyFormatterUtil;
+import com.magento.idea.magento2plugin.actions.generation.util.GenerationContextRegistry;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.ResourceModelFile;
+import java.util.Objects;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
@@ -63,5 +67,22 @@ public class ModuleResourceModelGenerator extends PhpFileGenerator {
                 .append("DB_NAME", data.getDbTableName(), false)
                 .append("ENTITY_ID_COLUMN", data.getEntityIdColumn(), false)
                 .append("EXTENDS", ResourceModelFile.ABSTRACT_DB);
+
+        final EntityCreatorContext context =
+                (EntityCreatorContext) GenerationContextRegistry.getInstance().getContext();
+
+        if (context != null && context.getUserData(EntityCreatorContext.DTO_TYPE) != null) {
+            final String dtoTypeFqn = context.getUserData(EntityCreatorContext.DTO_TYPE);
+            Objects.requireNonNull(dtoTypeFqn);
+            typesBuilder.append(
+                    "ENTITY_ID_REFERENCE",
+                    ClassPropertyFormatterUtil.formatNameToConstant(
+                            data.getEntityIdColumn(),
+                            dtoTypeFqn
+                    ),
+                    false
+            );
+            typesBuilder.append("DTO_TYPE", dtoTypeFqn);
+        }
     }
 }

@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog.util;
 
 import com.google.common.base.CaseFormat;
 import com.magento.idea.magento2plugin.actions.generation.data.code.ClassPropertyData;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
@@ -50,7 +51,7 @@ public final class ClassPropertyFormatterUtil {
                 CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name),
                 CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name),
                 name,
-                CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_UNDERSCORE, name)
+                formatNameToConstant(name)
         ).string();
     }
 
@@ -60,5 +61,31 @@ public final class ClassPropertyFormatterUtil {
      */
     public static String joinProperties(final List<String> properties) {
         return StringUtils.join(properties, ",");
+    }
+
+    /**
+     * Format property field to constant format with specified type.
+     *
+     * @param name String
+     *
+     * @return String
+     */
+    public static String formatNameToConstant(final String name, final String typeFqn) {
+        return String.format(
+                "%s::%s",
+                PhpClassGeneratorUtil.getNameFromFqn(typeFqn),
+                formatNameToConstant(name)
+        );
+    }
+
+    /**
+     * Format property field to constant format.
+     *
+     * @param name String
+     *
+     * @return String
+     */
+    public static String formatNameToConstant(final String name) {
+        return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_UNDERSCORE, name);
     }
 }
