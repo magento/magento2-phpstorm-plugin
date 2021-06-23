@@ -10,7 +10,7 @@ import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocComment;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpReturnType;
-import com.magento.idea.magento2plugin.actions.generation.ImportReferences.PhpClassReferenceResolver;
+import com.magento.idea.magento2plugin.actions.generation.references.PhpClassReferenceResolver;
 import com.magento.idea.magento2plugin.actions.generation.data.code.PluginMethodData;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;

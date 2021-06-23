@@ -21,12 +21,12 @@ import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpPsiElement;
-import com.magento.idea.magento2plugin.actions.generation.ImportReferences.PhpClassReferenceResolver;
 import com.magento.idea.magento2plugin.actions.generation.data.PluginFileData;
 import com.magento.idea.magento2plugin.actions.generation.data.code.PluginMethodData;
 import com.magento.idea.magento2plugin.actions.generation.generator.code.PluginMethodsGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
+import com.magento.idea.magento2plugin.actions.generation.references.PhpClassReferenceResolver;
 import com.magento.idea.magento2plugin.actions.generation.util.CodeStyleSettings;
 import com.magento.idea.magento2plugin.actions.generation.util.CollectInsertedMethods;
 import com.magento.idea.magento2plugin.actions.generation.util.FillTextBufferWithPluginMethods;
@@ -46,10 +46,9 @@ import java.util.Set;
 import javax.swing.JOptionPane;
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings({
-        "PMD.ExcessiveImports"
-})
+@SuppressWarnings({"PMD.ExcessiveImports"})
 public class PluginClassGenerator extends FileGenerator {
+
     private final PluginFileData pluginFileData;
     private final Project project;
     private final ValidatorBundle validatorBundle;
@@ -86,8 +85,10 @@ public class PluginClassGenerator extends FileGenerator {
      * Generate plugin.
      *
      * @param actionName String
+     *
      * @return PsiFile
      */
+    @Override
     public PsiFile generate(final String actionName) {
         final PsiFile[] pluginFile = {null};
         WriteCommandAction.runWriteCommandAction(project, () -> {
@@ -227,6 +228,7 @@ public class PluginClassGenerator extends FileGenerator {
         return getFirstClassOfFile.execute((PhpFile) pluginFile);
     }
 
+    @Override
     protected void fillAttributes(final Properties attributes) {
         attributes.setProperty("NAME", pluginFileData.getPluginClassName());
         attributes.setProperty("NAMESPACE", pluginFileData.getNamespace());
