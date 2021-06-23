@@ -2,6 +2,7 @@
 
 namespace Foo\Bar\Ui\Component\Listing;
 
+use Foo\Bar\Model\Data\BookData;
 use Foo\Bar\Query\Book\GetListQuery;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\Search\ReportingInterface;
@@ -84,7 +85,7 @@ class GridDataProvider extends DataProvider
             $result->getItems(),
             $result->getTotalCount(),
             $searchCriteria,
-            'entity_id'
+            BookData::BOOK_ID
         );
     }
 
@@ -102,10 +103,10 @@ class GridDataProvider extends DataProvider
         $itemsById = [];
 
         foreach ($this->loadedData['items'] as $item) {
-            $itemsById[(int)$item['entity_id']] = $item;
+            $itemsById[(int)$item[BookData::BOOK_ID]] = $item;
         }
 
-        if ($id = $this->request->getParam('entity_id', null)) {
+        if ($id = $this->request->getParam(BookData::BOOK_ID)) {
             $this->loadedData['entity'] = $itemsById[(int)$id];
         }
 

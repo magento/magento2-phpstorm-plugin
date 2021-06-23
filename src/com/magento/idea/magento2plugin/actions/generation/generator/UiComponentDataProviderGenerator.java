@@ -6,11 +6,15 @@
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
+import com.magento.idea.magento2plugin.actions.generation.context.EntityCreatorContext;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataProviderData;
+import com.magento.idea.magento2plugin.actions.generation.dialog.util.ClassPropertyFormatterUtil;
+import com.magento.idea.magento2plugin.actions.generation.util.GenerationContextRegistry;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderFile;
 import com.magento.idea.magento2plugin.magento.files.queries.GetListQueryFile;
 import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryType;
+import java.util.Objects;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
@@ -72,7 +76,20 @@ public class UiComponentDataProviderGenerator extends PhpFileGenerator {
                 .append("EXTENDS", UiComponentDataProviderFile.DEFAULT_DATA_PROVIDER);
 
         if (data.getEntityIdFieldName() != null && data.getEntityName() != null) {
-            typesBuilder.append("ENTITY_ID", data.getEntityIdFieldName(), false);
+            final EntityCreatorContext context =
+                    (EntityCreatorContext) GenerationContextRegistry.getInstance().getContext();
+            Objects.requireNonNull(context);
+            final String dtoTypeFqn = context.getUserData(EntityCreatorContext.DTO_TYPE);
+            Objects.requireNonNull(dtoTypeFqn);
+            typesBuilder.append(
+                    "ENTITY_ID_REFERENCE",
+                    ClassPropertyFormatterUtil.formatNameToConstant(
+                            data.getEntityIdFieldName(),
+                            dtoTypeFqn
+                    ),
+                    false
+            );
+            typesBuilder.append("DTO_TYPE", dtoTypeFqn);
 
             typesBuilder
                     .append("HAS_GET_LIST_QUERY", "true", false)

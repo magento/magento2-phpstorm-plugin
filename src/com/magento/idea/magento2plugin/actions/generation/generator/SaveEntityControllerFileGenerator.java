@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2plugin.actions.generation.data.SaveEntityControllerFileData;
+import com.magento.idea.magento2plugin.actions.generation.dialog.util.ClassPropertyFormatterUtil;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.DataModelFile;
 import com.magento.idea.magento2plugin.magento.files.DataModelInterfaceFile;
@@ -74,12 +75,16 @@ public class SaveEntityControllerFileGenerator extends PhpFileGenerator {
                     new DataModelFile(data.getModuleName(), data.getDtoName());
             dtoType = dataModelFile.getClassFqn();
         }
+        typesBuilder.append(
+                "ENTITY_ID_REFERENCE",
+                ClassPropertyFormatterUtil.formatNameToConstant(data.getEntityId(), dtoType),
+                false
+        );
 
         typesBuilder
                 .append("NAMESPACE", file.getNamespace(), false)
                 .append("ENTITY_NAME", data.getEntityName(), false)
                 .append("CLASS_NAME", SaveActionFile.CLASS_NAME, false)
-                .append("ENTITY_ID", data.getEntityId(), false)
                 .append("ADMIN_RESOURCE", data.getAcl(), false)
                 .append("IMPLEMENTS", HttpMethod.POST.getInterfaceFqn())
                 .append("DATA_PERSISTOR", FrameworkLibraryType.DATA_PERSISTOR.getType())

@@ -11,6 +11,7 @@ public class SaveEntityCommandData {
 
     private final String moduleName;
     private final String entityName;
+    private final String entityId;
     private final String modelName;
     private final String resourceModelName;
     private final String dtoName;
@@ -23,6 +24,7 @@ public class SaveEntityCommandData {
      *
      * @param moduleName String
      * @param entityName String
+     * @param entityId String
      * @param modelName String
      * @param resourceModelName String
      * @param dtoName String
@@ -33,6 +35,7 @@ public class SaveEntityCommandData {
     public SaveEntityCommandData(
             final @NotNull String moduleName,
             final @NotNull String entityName,
+            final @NotNull String entityId,
             final @NotNull String modelName,
             final @NotNull String resourceModelName,
             final @NotNull String dtoName,
@@ -42,6 +45,7 @@ public class SaveEntityCommandData {
     ) {
         this.moduleName = moduleName;
         this.entityName = entityName;
+        this.entityId = entityId;
         this.modelName = modelName;
         this.resourceModelName = resourceModelName;
         this.dtoName = dtoName;
@@ -66,6 +70,15 @@ public class SaveEntityCommandData {
      */
     public String getEntityName() {
         return entityName;
+    }
+
+    /**
+     * Get entity id.
+     *
+     * @return String
+     */
+    public String getEntityId() {
+        return entityId;
     }
 
     /**
