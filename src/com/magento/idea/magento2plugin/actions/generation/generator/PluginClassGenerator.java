@@ -73,7 +73,7 @@ public class PluginClassGenerator extends FileGenerator {
         this.directoryGenerator = DirectoryGenerator.getInstance();
         this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
-        this.fillTextBuffer = FillTextBufferWithPluginMethods.getInstance();
+        this.fillTextBuffer = new FillTextBufferWithPluginMethods();
         this.collectInsertedMethods = CollectInsertedMethods.getInstance();
         this.pluginFileData = pluginFileData;
         this.project = project;

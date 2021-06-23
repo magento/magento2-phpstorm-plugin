@@ -72,7 +72,7 @@ public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeIns
      */
     public PluginGenerateMethodHandlerBase(final Plugin.PluginType type) {
         this.type = type.toString();
-        this.fillTextBuffer = FillTextBufferWithPluginMethods.getInstance();
+        this.fillTextBuffer = new FillTextBufferWithPluginMethods();
         this.collectInsertedMethods = CollectInsertedMethods.getInstance();
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();

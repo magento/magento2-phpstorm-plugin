@@ -20,19 +20,6 @@ import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 
 public class FillTextBufferWithPluginMethods {
-    private static FillTextBufferWithPluginMethods INSTANCE = null;
-
-    /**
-     * Get util instance.
-     *
-     * @return FillTextBufferWithPluginMethods
-     */
-    public static FillTextBufferWithPluginMethods getInstance() {
-        if (null == INSTANCE) {
-            INSTANCE = new FillTextBufferWithPluginMethods();
-        }
-        return INSTANCE;
-    }
 
     /**
      * Fill text buffer with plugin methods.
@@ -43,27 +30,30 @@ public class FillTextBufferWithPluginMethods {
      * @param textBuf StringBuffer
      * @param pluginMethods PluginMethodData
      */
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     public void execute(
             final @NotNull Key<Object> targetClassKey,
             final Set<CharSequence> insertedMethodsNames,
             final @NotNull PhpClassReferenceResolver resolver,
             final @NotNull StringBuffer textBuf,
-            final @NotNull PluginMethodData[] pluginMethods
+            final @NotNull PluginMethodData... pluginMethods
     ) {
-        for (PluginMethodData pluginMethod : pluginMethods) {
+        for (final PluginMethodData pluginMethod : pluginMethods) {
             insertedMethodsNames.add(pluginMethod.getMethod().getName());
-            PhpDocComment comment = pluginMethod.getDocComment();
+            final PhpDocComment comment = pluginMethod.getDocComment();
+
             if (comment != null) {
                 textBuf.append(comment.getText());
             }
-            Method targetMethod = pluginMethod.getTargetMethod();
-            Parameter[] parameters = targetMethod.getParameters();
-            Collection<PsiElement> processElements = new ArrayList<>(Arrays.asList(parameters));
+            final Method targetMethod = pluginMethod.getTargetMethod();
+            final Parameter[] parameters = targetMethod.getParameters();
+            final Collection<PsiElement> processElements =
+                    new ArrayList<>(Arrays.asList(parameters));
             resolver.processElements(processElements);
-            PsiElement targetClass = (PsiElement) pluginMethod.getTargetMethod()
+            final PsiElement targetClass = (PsiElement) pluginMethod.getTargetMethod()
                     .getUserData(targetClassKey);
             resolver.processElement(targetClass);
-            PhpReturnType returnType = targetMethod.getReturnType();
+            final PhpReturnType returnType = targetMethod.getReturnType();
             if (returnType != null) {
                 resolver.processElement(returnType);
             }
