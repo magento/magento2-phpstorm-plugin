@@ -135,7 +135,7 @@ public final class PhpTypeMetadataParserUtil {
      *
      * @return String
      */
-    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
+    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity", "PMD.ConfusingTernary"})
     public static String getMethodDefinitionForInterface(
             final @NotNull Method method,
             final String defaultMethodDescription
@@ -152,9 +152,9 @@ public final class PhpTypeMetadataParserUtil {
 
         if (methodDoc != null) {
             methodDescription = getShortDescription(method);
-            methodDocReturn = methodDoc.getReturnTag() != null
-                    ? methodDoc.getReturnTag().getText()
-                    : null;
+            methodDocReturn = methodDoc.getReturnTag() == null
+                    ? null
+                    : methodDoc.getReturnTag().getText();
         }
 
         if (methodDescription.isEmpty() && defaultMethodDescription != null) {
