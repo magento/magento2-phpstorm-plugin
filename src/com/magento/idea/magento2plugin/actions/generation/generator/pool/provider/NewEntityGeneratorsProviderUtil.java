@@ -36,7 +36,36 @@ import com.magento.idea.magento2plugin.actions.generation.data.converter.newenti
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityCreatorContextData;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.NewEntityDialogData;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.GeneratorPoolHandler;
-import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.*;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.AclXmlGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.CollectionModelGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.DataModelGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.DataModelInterfaceGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.DataModelPreferenceGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.DataProviderGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.DbSchemaWhitelistGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.DbSchemaXmlGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.DeleteByIdCommandGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.EntityDataMapperGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormDeleteControllerGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormEditControllerGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormGenericButtonBlockGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormLayoutGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.FormSaveControllerGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.GetListQueryGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.GridActionColumnGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.GridLayoutXmlGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.IndexActionGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.MenuXmlGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.ModelGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.NewControllerGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.NewEntityLayoutGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.ResourceModelGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.RoutesXmlGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.SaveCommandGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.SearchResultsGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.SearchResultsInterfaceGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.UiComponentFormLayoutGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.UiComponentGridGeneratorHandler;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({
