@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.util;
 
 import com.intellij.openapi.util.Key;
@@ -10,17 +11,22 @@ import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocComment;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpReturnType;
-import com.magento.idea.magento2plugin.actions.generation.references.PhpClassReferenceResolver;
 import com.magento.idea.magento2plugin.actions.generation.data.code.PluginMethodData;
-import org.jetbrains.annotations.NotNull;
+import com.magento.idea.magento2plugin.actions.generation.references.PhpClassReferenceResolver;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
+import org.jetbrains.annotations.NotNull;
 
 public class FillTextBufferWithPluginMethods {
     private static FillTextBufferWithPluginMethods INSTANCE = null;
 
+    /**
+     * Get util instance.
+     *
+     * @return FillTextBufferWithPluginMethods
+     */
     public static FillTextBufferWithPluginMethods getInstance() {
         if (null == INSTANCE) {
             INSTANCE = new FillTextBufferWithPluginMethods();
@@ -28,7 +34,22 @@ public class FillTextBufferWithPluginMethods {
         return INSTANCE;
     }
 
-    public void execute(@NotNull Key<Object> targetClassKey, Set<CharSequence> insertedMethodsNames, @NotNull PhpClassReferenceResolver resolver, @NotNull StringBuffer textBuf, @NotNull PluginMethodData[] pluginMethods) {
+    /**
+     * Fill text buffer with plugin methods.
+     *
+     * @param targetClassKey Key[Object]
+     * @param insertedMethodsNames Set[CharSequence]
+     * @param resolver PhpClassReferenceResolver
+     * @param textBuf StringBuffer
+     * @param pluginMethods PluginMethodData
+     */
+    public void execute(
+            final @NotNull Key<Object> targetClassKey,
+            final Set<CharSequence> insertedMethodsNames,
+            final @NotNull PhpClassReferenceResolver resolver,
+            final @NotNull StringBuffer textBuf,
+            final @NotNull PluginMethodData[] pluginMethods
+    ) {
         for (PluginMethodData pluginMethod : pluginMethods) {
             insertedMethodsNames.add(pluginMethod.getMethod().getName());
             PhpDocComment comment = pluginMethod.getDocComment();
@@ -39,7 +60,8 @@ public class FillTextBufferWithPluginMethods {
             Parameter[] parameters = targetMethod.getParameters();
             Collection<PsiElement> processElements = new ArrayList<>(Arrays.asList(parameters));
             resolver.processElements(processElements);
-            PsiElement targetClass = (PsiElement) pluginMethod.getTargetMethod().getUserData(targetClassKey);
+            PsiElement targetClass = (PsiElement) pluginMethod.getTargetMethod()
+                    .getUserData(targetClassKey);
             resolver.processElement(targetClass);
             PhpReturnType returnType = targetMethod.getReturnType();
             if (returnType != null) {
