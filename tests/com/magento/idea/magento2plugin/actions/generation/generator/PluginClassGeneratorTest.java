@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
@@ -11,8 +12,10 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.PluginFileData;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
+import org.jetbrains.annotations.NotNull;
 
 public class PluginClassGeneratorTest extends BaseGeneratorTestCase {
+
     private static final String targetClassFnq = "Foo\\Bar\\Service\\SimpleService";
     private static final String targetMethodName = "execute";
     private static final String module = "Foo_Bar";
@@ -21,8 +24,10 @@ public class PluginClassGeneratorTest extends BaseGeneratorTestCase {
     private static final String pluginClassName = "TestPlugin";
     private static final String pluginDir = "Plugin";
 
-    public void testGeneratePluginClassFile()
-    {
+    /**
+     * Test of plugin generation.
+     */
+    public void testGeneratePluginClassFile() {
         PsiFile pluginClassFile;
         addPluginToTargetClass(Plugin.PluginType.before.toString());
         addPluginToTargetClass(Plugin.PluginType.around.toString());
@@ -38,8 +43,14 @@ public class PluginClassGeneratorTest extends BaseGeneratorTestCase {
         );
     }
 
-    private PsiFile addPluginToTargetClass(String pluginType)
-    {
+    /**
+     * Add plugins for the target class.
+     *
+     * @param pluginType String
+     *
+     * @return PsiFile
+     */
+    private PsiFile addPluginToTargetClass(final @NotNull String pluginType) {
         Project project = myFixture.getProject();
         PhpClass targetClass = GetPhpClassByFQN.getInstance(project).execute(targetClassFnq);
         Method targetMethod = targetClass.findMethodByName(targetMethodName);

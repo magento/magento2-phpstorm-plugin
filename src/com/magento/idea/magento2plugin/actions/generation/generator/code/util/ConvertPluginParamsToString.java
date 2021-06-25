@@ -92,12 +92,10 @@ public final class ConvertPluginParamsToString {
 
             if (type.equals(Plugin.PluginType.after) && iterator == 0) {
                 if (returnType != null
-                        && returnType.getText().equals(MagentoPhpClass.VOID_RETURN_TYPE)) {
-                    buf.append(", $result");
+                        && !returnType.getText().equals(MagentoPhpClass.VOID_RETURN_TYPE)) {
+                    buf.append(", ").append(returnType.getText()).append(" $result");
                 } else {
-                    if (returnType != null) {
-                        buf.append(", ").append(returnType.getText()).append(" $result");
-                    }
+                    buf.append(", $result");
                 }
             }
             if (type.equals(Plugin.PluginType.around) && iterator == 0) {
