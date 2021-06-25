@@ -70,7 +70,6 @@ public class SaveEntityCommandGenerator extends PhpFileGenerator {
                 .append("ENTITY_NAME", data.getEntityName(), false)
                 .append("CLASS_NAME", SaveEntityCommandFile.CLASS_NAME, false)
                 .append("EXCEPTION", "Exception")
-                .append("DATA_OBJECT", FrameworkLibraryType.DATA_OBJECT.getType())
                 .append("COULD_NOT_SAVE", ExceptionType.COULD_NOT_SAVE.getType())
                 .append("LOGGER", FrameworkLibraryType.LOGGER.getType());
 

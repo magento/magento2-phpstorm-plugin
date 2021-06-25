@@ -53,9 +53,9 @@ class DeleteByIdCommand
      * @param int $entityId
      *
      * @return void
-     * @throws CouldNotDeleteException|NoSuchEntityException
+     * @throws CouldNotDeleteException
      */
-    public function execute(int $entityId)
+    public function execute(int $entityId): void
     {
         try {
             /** @var BookModel $model */

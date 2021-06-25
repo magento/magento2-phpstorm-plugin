@@ -49,9 +49,9 @@ class ${CLASS_NAME}
      * @param int $entityId
      *
      * @return void
-     * @throws ${COULD_NOT_DELETE}|${NO_SUCH_ENTITY_EXCEPTION}
+     * @throws ${COULD_NOT_DELETE}
      */
-    public function execute(int $entityId)
+    public function execute(int $entityId): void
     {
         try {
             /** @var ${MODEL} $model */

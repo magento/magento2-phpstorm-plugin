@@ -46,7 +46,7 @@ class ${CLASS_NAME}
     /**
      * Save ${ENTITY_NAME}.
      *
-     * @param ${DTO}|${DATA_OBJECT} $${DTO_PROPERTY}
+     * @param ${DTO} $${DTO_PROPERTY}
      *
      * @return int
      * @throws ${COULD_NOT_SAVE}
@@ -74,6 +74,6 @@ class ${CLASS_NAME}
             throw new ${COULD_NOT_SAVE}(__('Could not save ${ENTITY_NAME}.'));
         }
 
-        return (int) $model->getEntityId();
+        return (int) $model->getData(${ENTITY_ID_CONST});
     }
 }

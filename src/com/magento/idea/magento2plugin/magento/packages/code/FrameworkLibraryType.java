@@ -26,6 +26,7 @@ public enum FrameworkLibraryType {
     SEARCH_CRITERIA("Magento\\Framework\\Api\\SearchCriteriaInterface"),
     SEARCH_CRITERIA_BUILDER("Magento\\Framework\\Api\\SearchCriteriaBuilder"),
     SEARCH_RESULT("Magento\\Framework\\Api\\SearchResultsInterface"),
+    SEARCH_RESULT_IMPLEMENTATION("Magento\\Framework\\Api\\SearchResults"),
     URL("Magento\\Framework\\UrlInterface");
 
     /**
