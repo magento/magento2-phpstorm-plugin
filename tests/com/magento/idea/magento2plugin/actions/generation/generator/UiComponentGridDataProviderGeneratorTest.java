@@ -99,7 +99,8 @@ public class UiComponentGridDataProviderGeneratorTest extends BaseGeneratorTestC
                 ENTITY_NAME,
                 MODEL_NAME,
                 COLLECTION_NAME,
-                ACL
+                ACL,
+                false
         );
         new GetListQueryModelGenerator(getListData, project, false).generate("test");
     }

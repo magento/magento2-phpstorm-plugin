@@ -156,6 +156,8 @@ public class NewEntityDialog extends AbstractDialog {
     private static final String DTO_INTERFACE_SUFFIX = "Interface";
     private static final String DATA_PROVIDER_SUFFIX = "DataProvider";
 
+    private static final String DEFAULT_MENU_SORT_ORDER = "100";
+
     private static final boolean OPEN_FILES_FLAG = false;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, ENTITY_ID})
@@ -291,6 +293,8 @@ public class NewEntityDialog extends AbstractDialog {
 
         createUiComponent.addItemListener(event -> toggleUiComponentsPanel());
         registerTabbedPane(tabbedPane1);
+
+        sortOrder.setText(DEFAULT_MENU_SORT_ORDER);
     }
 
     /**

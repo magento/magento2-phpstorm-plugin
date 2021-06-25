@@ -30,6 +30,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.converter.newenti
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.ResourceModelDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.RoutesXmlDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.SaveEntityCommandDtoConverter;
+import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.SearchResultsDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.UiComponentFormLayoutDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.converter.newentitydialog.UiComponentGridDtoConverter;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityCreatorContextData;
@@ -61,6 +62,8 @@ import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.ResourceModelGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.RoutesXmlGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.SaveCommandGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.SearchResultsGeneratorHandler;
+import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.SearchResultsInterfaceGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.UiComponentFormLayoutGeneratorHandler;
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.handler.UiComponentGridGeneratorHandler;
 import org.jetbrains.annotations.NotNull;
@@ -214,6 +217,16 @@ public final class NewEntityGeneratorsProviderUtil {
                 .addNext(
                         DbSchemaWhitelistGeneratorHandler.class,
                         new DbSchemaXmlDtoConverter(context, dialogData)
+                )
+                .addNext(
+                        SearchResultsInterfaceGeneratorHandler.class,
+                        new SearchResultsDtoConverter(context, dialogData),
+                        dialogData::hasWebApi
+                )
+                .addNext(
+                        SearchResultsGeneratorHandler.class,
+                        new SearchResultsDtoConverter(context, dialogData),
+                        dialogData::hasWebApi
                 );
     }
 }
