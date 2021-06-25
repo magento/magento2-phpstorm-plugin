@@ -42,7 +42,7 @@ public final class ConvertPluginParamsToString {
      *
      * @return String
      */
-    @SuppressWarnings({"PMD.NPathComplexity", "PMD.CyclomaticComplexity"})
+    @SuppressWarnings({"PMD.NPathComplexity", "PMD.CyclomaticComplexity", "PMD.ConfusingTernary"})
     public static String execute(
             final Collection<PsiElement> parameters,
             final @NotNull Plugin.PluginType type,
