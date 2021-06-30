@@ -17,12 +17,13 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpPsiElement;
-import com.jetbrains.php.lang.psi.elements.PhpReturnType;
 import com.magento.idea.magento2plugin.actions.generation.data.code.PluginMethodData;
 import com.magento.idea.magento2plugin.actions.generation.generator.code.util.ConvertPluginParamsToPhpDocStringUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.code.util.ConvertPluginParamsToString;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
+import com.magento.idea.magento2plugin.util.php.PhpTypeMetadataParserUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -123,12 +124,15 @@ public class PluginMethodsGenerator {
                 attributes,
                 type
         );
-        this.addReturnType(attributes, pluginMethodReturnType);
+
+        if (pluginMethodReturnType != null) {
+            this.addReturnType(attributes, pluginMethodReturnType);
+        }
 
         return attributes;
     }
 
-    private @NotNull String fillAttributes(
+    private String fillAttributes(
             final @Nullable PhpPsiElement scopeForUseOperator,
             final Properties attributes,
             final @NotNull Plugin.PluginType type
@@ -139,18 +143,17 @@ public class PluginMethodsGenerator {
         final String pluginMethodName = type.toString().concat(methodSuffix);
 
         attributes.setProperty("NAME", pluginMethodName);
-        final PhpReturnType targetMethodReturnType = myMethod.getReturnType();
-        String returnType = "";
+        String returnType = PhpTypeMetadataParserUtil.getMethodReturnType(this.myMethod);
 
-        if (targetMethodReturnType != null
-                && (type.equals(Plugin.PluginType.after) || type.equals(Plugin.PluginType.around))
-        ) {
-            returnType = targetMethodReturnType.getText();
-        } else if (type.equals(Plugin.PluginType.before)) {
+        if (returnType != null && PhpClassGeneratorUtil.isValidFqn(returnType)) {
+            returnType = PhpClassGeneratorUtil.getNameFromFqn(returnType);
+        }
+
+        if (type.equals(Plugin.PluginType.before)) {
             returnType = MagentoPhpClass.ARRAY_TYPE;
         }
 
-        final Collection<PsiElement> parameters = new ArrayList();
+        final Collection<PsiElement> parameters = new ArrayList<>();
         parameters.add(myTargetClass);
         parameters.addAll(Arrays.asList(myMethod.getParameters()));
         attributes.setProperty("PARAM_DOC", ConvertPluginParamsToPhpDocStringUtil.execute(

@@ -13,11 +13,11 @@ import com.jetbrains.php.lang.documentation.phpdoc.PhpDocUtil;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
 import com.jetbrains.php.lang.psi.elements.PhpPsiElement;
-import com.jetbrains.php.lang.psi.elements.PhpReturnType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
+import com.magento.idea.magento2plugin.util.php.PhpTypeMetadataParserUtil;
 import java.util.Collection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,7 +43,19 @@ public final class ConvertPluginParamsToPhpDocStringUtil {
             final Method myMethod
     ) {
         final StringBuilder stringBuilder = new StringBuilder(155);
-        final PhpReturnType returnType = myMethod.getReturnType();
+        String returnType;
+
+        if (type.equals(Plugin.PluginType.before)) {
+            returnType = MagentoPhpClass.ARRAY_TYPE;
+        } else {
+            returnType = PhpTypeMetadataParserUtil.getMethodReturnType(myMethod);
+
+            if (returnType != null && PhpClassGeneratorUtil.isValidFqn(returnType)) {
+                returnType = PhpClassGeneratorUtil.getNameFromFqn(returnType);
+            }
+        }
+
+        final PhpType returnPhpType = new PhpType().add(returnType);
         int increment = 0;
 
         for (final PsiElement parameter : parameters) {
@@ -81,12 +93,12 @@ public final class ConvertPluginParamsToPhpDocStringUtil {
 
             if (type.equals(Plugin.PluginType.after) && increment == 0) {
                 if (returnType != null) {
-                    if (returnType.getText().equals(MagentoPhpClass.VOID_RETURN_TYPE)) {
+                    if (returnType.equals(MagentoPhpClass.VOID_RETURN_TYPE)) {
                         stringBuilder.append("\n* @param null $result");
                     } else {
                         final String returnTypeStr = getStringTypePresentation(
                                 project,
-                                returnType.getType(),
+                                returnPhpType,
                                 null
                         );
                         stringBuilder.append("\n* @param ")
@@ -102,13 +114,13 @@ public final class ConvertPluginParamsToPhpDocStringUtil {
             increment++;
         }
 
-        if (!type.equals(Plugin.PluginType.before) && returnType != null) {
-            if (returnType.getText().equals(MagentoPhpClass.VOID_RETURN_TYPE)) {
+        if (returnType != null) {
+            if (returnType.equals(MagentoPhpClass.VOID_RETURN_TYPE)) {
                 stringBuilder.append("\n* @return ").append(MagentoPhpClass.VOID_RETURN_TYPE);
             } else {
                 final String returnTypeStr = getStringTypePresentation(
                         project,
-                        returnType.getType(),
+                        returnPhpType,
                         null
                 );
                 stringBuilder.append("\n* @return ").append(returnTypeStr);

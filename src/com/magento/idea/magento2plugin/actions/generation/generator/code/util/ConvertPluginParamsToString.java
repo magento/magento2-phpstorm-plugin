@@ -17,12 +17,12 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
 import com.jetbrains.php.lang.psi.elements.PhpPsiElement;
-import com.jetbrains.php.lang.psi.elements.PhpReturnType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
 import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.util.php.PhpTypeMetadataParserUtil;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
@@ -49,7 +49,11 @@ public final class ConvertPluginParamsToString {
             final Method myMethod
     ) {
         final StringBuilder buf = new StringBuilder(155);
-        final PhpReturnType returnType = myMethod.getReturnType();
+        String returnType = PhpTypeMetadataParserUtil.getMethodReturnType(myMethod);
+
+        if (returnType != null && PhpClassGeneratorUtil.isValidFqn(returnType)) {
+            returnType = PhpClassGeneratorUtil.getNameFromFqn(returnType);
+        }
         final Iterator<PsiElement> parametersIterator = parameters.iterator();
         int iterator = 0;
 
@@ -62,7 +66,7 @@ public final class ConvertPluginParamsToString {
             if (element instanceof Parameter) {
                 String parameterText = PhpCodeUtil.paramToString(element);
 
-                if (parameterText.indexOf(Package.fqnSeparator, 1) > 0) {
+                if (parameterText.contains(Package.fqnSeparator)) {
                     final String[] fqnArray = parameterText.split("\\\\");
                     parameterText = fqnArray[fqnArray.length - 1];
                 }
@@ -92,8 +96,8 @@ public final class ConvertPluginParamsToString {
 
             if (type.equals(Plugin.PluginType.after) && iterator == 0) {
                 if (returnType != null
-                        && !returnType.getText().equals(MagentoPhpClass.VOID_RETURN_TYPE)) {
-                    buf.append(", ").append(returnType.getText()).append(" $result");
+                        && !returnType.equals(MagentoPhpClass.VOID_RETURN_TYPE)) {
+                    buf.append(", ").append(returnType).append(" $result");
                 } else {
                     buf.append(", $result");
                 }
