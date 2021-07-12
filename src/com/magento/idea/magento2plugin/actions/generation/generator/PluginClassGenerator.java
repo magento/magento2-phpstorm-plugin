@@ -242,18 +242,32 @@ public class PluginClassGenerator extends FileGenerator {
         return pluginFileData.getPluginModule();
     }
 
+    /**
+     * Get methods insert position.
+     *
+     * @param pluginClass PhpClass
+     *
+     * @return int
+     */
     private int getInsertPos(final PhpClass pluginClass) {
         int insertPos = -1;
+
         final LeafPsiElement[] leafElements = PsiTreeUtil.getChildrenOfType(
                 pluginClass,
                 LeafPsiElement.class
         );
+
+        if (leafElements == null) {
+            return insertPos;
+        }
+
         for (final LeafPsiElement leafPsiElement: leafElements) {
             if (!leafPsiElement.getText().equals(MagentoPhpClass.CLOSING_TAG)) {
                 continue;
             }
             insertPos = leafPsiElement.getTextOffset();
         }
-        return insertPos;
+
+        return insertPos == -1 ? insertPos : insertPos - 1;
     }
 }

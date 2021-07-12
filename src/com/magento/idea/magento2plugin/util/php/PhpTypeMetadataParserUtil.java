@@ -230,10 +230,11 @@ public final class PhpTypeMetadataParserUtil {
     public static List<String> getMethodDefinitionPhpTypes(final @NotNull Method method) {
         final List<String> types = new ArrayList<>(getMethodParametersTypes(method));
 
-        final String returnType = getMethodReturnPhpType(method);
+        final String returnType = getMethodReturnType(method);
 
-        if (returnType != null) {
-            types.add(returnType);
+        if (returnType != null && PhpClassGeneratorUtil.isValidFqn(returnType)
+                && !PhpLangUtil.isReturnTypeHint(returnType, method.getProject())) {
+            types.add(StringUtils.stripStart(returnType, "\\"));
         }
         types.addAll(getMethodExceptionsTypes(method));
 
@@ -275,7 +276,7 @@ public final class PhpTypeMetadataParserUtil {
      *
      * @return String
      */
-    public static String getMethodReturnPhpType(final @NotNull Method method) {
+    public static String getMethodReturnType(final @NotNull Method method) {
         if (method.getContainingClass() == null) {
             return null;
         }
@@ -283,8 +284,12 @@ public final class PhpTypeMetadataParserUtil {
                 extractMultipleTypesFromString(method.getType().toString());
 
         for (final String returnedType : returnedTypes) {
+            if (PhpLangUtil.isReturnTypeHint(returnedType, method.getProject())) {
+                return returnedType;
+            }
+
             if (PhpLangUtil.isFqn(returnedType)) {
-                return StringUtils.stripStart(returnedType, "\\");
+                return returnedType;
             }
             final String guessedByName =
                     getUsedInPhpClassTypeByName(returnedType, method.getContainingClass());
