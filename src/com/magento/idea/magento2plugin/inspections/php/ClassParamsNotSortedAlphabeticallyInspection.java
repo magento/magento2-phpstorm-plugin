@@ -10,6 +10,7 @@ import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.inspections.PhpInspection;
+import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import com.magento.idea.magento2plugin.bundles.InspectionBundle;
@@ -35,13 +36,15 @@ public class ClassParamsNotSortedAlphabeticallyInspection extends PhpInspection 
                 }
 
                 if (!PhpClassFieldsSorterUtil.isSortedAlphabetically(clazz)) {
-                    problemsHolder.registerProblem(
-                            clazz,
-                            new InspectionBundle().message(
-                                    "inspection.weak.warning.php.class.fields.should.be.sorted"
-                            ),
-                            ProblemHighlightType.WEAK_WARNING
-                    );
+                    for (final Field field : PhpClassFieldsSorterUtil.getClassFields(clazz)) {
+                        problemsHolder.registerProblem(
+                                field,
+                                new InspectionBundle().message(
+                                        "inspection.weak.warning.php.class.fields.should.be.sorted"
+                                ),
+                                ProblemHighlightType.WEAK_WARNING
+                        );
+                    }
                 }
             }
         };

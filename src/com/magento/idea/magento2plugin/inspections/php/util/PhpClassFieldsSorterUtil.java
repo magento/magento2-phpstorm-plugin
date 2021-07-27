@@ -69,8 +69,10 @@ public final class PhpClassFieldsSorterUtil {
                     final int access2 = field2.getModifier().getAccess().getLevel();
 
                     if (access1 == access2) {
-                        return Comparator.comparing(PhpNamedElement::getName)
-                                .compare(field1, field2);
+                        return Comparator.comparing(
+                                PhpNamedElement::getName,
+                                String.CASE_INSENSITIVE_ORDER
+                        ).compare(field1, field2);
                     }
 
                     return access1 < access2 ? 1 : -1;
