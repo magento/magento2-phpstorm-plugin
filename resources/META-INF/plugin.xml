@@ -171,6 +171,14 @@
                          level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.php.ModuleDeclarationInRegistrationPhpInspection"/>
 
+        <localInspection language="PHP" groupPath="PHP"
+                         shortName="ClassParamsNotSortedAlphabeticallyInspection"
+                         bundle="magento2.inspection" key="inspection.displayName.ClassParamsShouldBeSortedInAlphabeticalOrderInspection"
+                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
+                         enabledByDefault="false"
+                         level="WEAK WARNING"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.php.ClassParamsNotSortedAlphabeticallyInspection"/>
+
         <localInspection language="XML" groupPath="XML"
                          shortName="ObserverDeclarationInspection"
                          bundle="magento2.inspection" key="inspection.displayName.ObserverDeclarationInspection"
