@@ -116,6 +116,7 @@
         <projectTemplatesFactory implementation="com.magento.idea.magento2plugin.generation.php.MagentoTemplatesFactory"/>
 
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.Settings"/>
+        <projectService serviceImplementation="com.magento.idea.magento2uct.settings.UctSettingsService"/>
 
         <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.completion.xml.XmlCompletionContributor" id="xml" />
         <completion.contributor language="PHP" implementationClass="com.magento.idea.magento2plugin.completion.php.PhpCompletionContributor" id="php" />
@@ -285,6 +286,8 @@
         <postStartupActivity implementation="com.magento.idea.magento2plugin.project.startup.CheckIfMagentoPathIsValidActivity"/>
 
         <errorHandler implementation="com.magento.idea.magento2plugin.project.diagnostic.DefaultErrorReportSubmitter"/>
+
+        <configurationType implementation="com.magento.idea.magento2uct.execution.configurations.UctRunConfigurationType"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.php">
