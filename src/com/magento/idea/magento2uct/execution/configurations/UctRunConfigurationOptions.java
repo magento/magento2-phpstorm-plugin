@@ -20,6 +20,8 @@ public class UctRunConfigurationOptions extends LocatableRunConfigurationOptions
             .provideDelegate(this, "minIssueLevel");
     private final StoredProperty<Boolean> hasIgnoreCurrentVersionIssues = property(false)
             .provideDelegate(this, "hasIgnoreCurrentVersionIssues");
+    private final StoredProperty<Boolean> isNewlyCreated = property(true)
+            .provideDelegate(this, "isNewlyCreated");
 
     /**
      * Set script name setting.
@@ -109,5 +111,23 @@ public class UctRunConfigurationOptions extends LocatableRunConfigurationOptions
      */
     public boolean hasIgnoreCurrentVersionIssues() {
         return hasIgnoreCurrentVersionIssues.getValue(this);
+    }
+
+    /**
+     * Set is settings is newly created.
+     *
+     * @param isNewlyCreated boolean
+     */
+    public void setIsNewlyCreated(final boolean isNewlyCreated) {
+        this.isNewlyCreated.setValue(this, isNewlyCreated);
+    }
+
+    /**
+     * Check if run configuration settings is newly created setting.
+     *
+     * @return boolean
+     */
+    public boolean isNewlyCreated() {
+        return isNewlyCreated.getValue(this);
     }
 }

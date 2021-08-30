@@ -30,7 +30,7 @@ public class UctRunConfigurationType implements ConfigurationType {
 
     @Override
     public Icon getIcon() {
-        return MagentoIcons.ADOBE;
+        return MagentoIcons.PLUGIN_ICON;
     }
 
     @Override

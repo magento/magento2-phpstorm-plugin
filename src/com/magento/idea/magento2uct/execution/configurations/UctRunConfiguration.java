@@ -7,6 +7,7 @@ package com.magento.idea.magento2uct.execution.configurations;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
+import com.intellij.execution.RunManager;
 import com.intellij.execution.configurations.CommandLineState;
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.GeneralCommandLine;
@@ -29,6 +30,7 @@ import com.jetbrains.php.config.interpreters.PhpInterpreter;
 import com.magento.idea.magento2uct.execution.filters.UctPhpFileFilter;
 import com.magento.idea.magento2uct.execution.filters.UctResultFileFilter;
 import com.magento.idea.magento2uct.settings.UctSettingsService;
+import com.magento.idea.magento2uct.util.module.UctExecutableValidatorUtil;
 import com.magento.idea.magento2uct.versioning.IssueSeverityLevel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -145,6 +147,24 @@ public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfig
         return getOptions().hasIgnoreCurrentVersionIssues();
     }
 
+    /**
+     * Set is settings is newly created.
+     *
+     * @param isNewlyCreated boolean
+     */
+    public void setIsNewlyCreated(final boolean isNewlyCreated) {
+        getOptions().setIsNewlyCreated(isNewlyCreated);
+    }
+
+    /**
+     * Check if run configuration settings is newly created setting.
+     *
+     * @return boolean
+     */
+    public boolean isNewlyCreated() {
+        return getOptions().isNewlyCreated();
+    }
+
     @Override
     public @NotNull SettingsEditor<? extends RunConfiguration> getConfigurationEditor() {
         return new UctSettingsEditor(getProject());
@@ -157,7 +177,10 @@ public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfig
 
     @Override
     public @Nullable @NlsActions.ActionText String suggestedName() {
-        return UctRunConfigurationType.SHORT_TITLE;
+        return this.getName().isEmpty() ? RunManager.getInstance(getProject()).suggestUniqueName(
+                UctRunConfigurationType.SHORT_TITLE,
+                this.getType()
+        ) : this.getName();
     }
 
     @Override
@@ -181,12 +204,18 @@ public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfig
                     );
                 }
 
+                final boolean isValidPath = UctExecutableValidatorUtil.validate(getScriptName());
+
                 if (getScriptName().isEmpty()) {
                     throw new ExecutionException("The UCT executable path is not specified");
                 } else {
-                    if (settingsService != null) {
+                    if (settingsService != null && isValidPath) {
                         settingsService.setUctExecutablePath(getScriptName());
                     }
+                }
+
+                if (!isValidPath) {
+                    throw new ExecutionException("The UCT executable path is not valid");
                 }
 
                 if (getComingVersion().isEmpty()) {

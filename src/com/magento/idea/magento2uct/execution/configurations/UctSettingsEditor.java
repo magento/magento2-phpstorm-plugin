@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2uct.execution.configurations;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
@@ -17,26 +18,29 @@ import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.UIUtil;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
+import com.magento.idea.magento2uct.execution.DownloadUctCommand;
 import com.magento.idea.magento2uct.settings.UctSettingsService;
+import com.magento.idea.magento2uct.util.module.UctExecutableValidatorUtil;
 import com.magento.idea.magento2uct.util.module.UctModuleLocatorUtil;
 import com.magento.idea.magento2uct.versioning.IssueSeverityLevel;
 import com.magento.idea.magento2uct.versioning.SupportedVersion;
 import java.awt.Color;
+import java.awt.Container;
 import java.nio.file.Path;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JSeparator;
 import javax.swing.event.DocumentEvent;
+import org.jdesktop.swingx.JXHyperlink;
 import org.jetbrains.annotations.NotNull;
 
 public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
 
     private final Project project;
     private String uctExecutablePath;
-    private boolean hasNotInnerExecutable;
 
     private JPanel contentPanel;
     private LabeledComponent<TextFieldWithBrowseButton> myScriptName;
@@ -58,6 +62,7 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
     private JLabel infoLabel;//NOPMD
     private JLabel infoLabel2;//NOPMD
     private JLabel uctLookupFailedWarning;//NOPMD
+    private JXHyperlink installTypeOne;//NOPMD
 
     /**
      * Form constructor.
@@ -75,6 +80,7 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
         uctLookupFailedWarning.setForeground(JBColor.orange);
         uctLookupFailedWarning.setVisible(false);
         warningPanel.setVisible(false);
+        installTypeOne.addActionListener(event -> downloadUctAction());
     }
 
     @Override
@@ -83,6 +89,7 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
 
         if (uctExecutablePath != null) {
             myScriptName.getComponent().setText(uctExecutablePath);
+            uctRunConfiguration.setScriptName(uctExecutablePath);
         }
 
         if (!uctRunConfiguration.getProjectRoot().isEmpty()) {
@@ -114,6 +121,9 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
 
     @Override
     protected void applyEditorTo(final @NotNull UctRunConfiguration uctRunConfiguration) {
+        if (uctRunConfiguration.isNewlyCreated()) {
+            uctRunConfiguration.setIsNewlyCreated(false);
+        }
         uctRunConfiguration.setScriptName(myScriptName.getComponent().getText());
         uctRunConfiguration.setProjectRoot(projectRoot.getComponent().getText());
 
@@ -147,6 +157,35 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
     @Override
     protected @NotNull JComponent createEditor() {
         return contentPanel;
+    }
+
+    /**
+     * Download UCT action.
+     */
+    private void downloadUctAction() {
+        ApplicationManager.getApplication().invokeAndWait(
+                () -> {
+                    final DownloadUctCommand command = new DownloadUctCommand(project);
+                    command.execute();
+                }
+        );
+        ApplicationManager.getApplication().invokeAndWait(
+                () -> {
+                    final Container parent = this.getComponent().getFocusCycleRootAncestor();
+
+                    if (parent != null) {
+                        parent.setVisible(false);
+                    }
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Open UCT Run Configuration after project updates indexes for newly "
+                                    + "created files.\nThe UCT runnable will be "
+                                    + "filled automatically.",
+                            "The UCT is installed successfully",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+                }
+        );
     }
 
     /**
@@ -188,11 +227,10 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
         if (!uctRunConfiguration.getScriptName().isEmpty()) {
             uctExecutablePath = uctRunConfiguration.getScriptName();
 
-            if (VfsUtil.findFile(Path.of(uctExecutablePath), false) != null) {
-                return uctExecutablePath;
-            } else {
-                uctRunConfiguration.setScriptName("");
-            }
+            return uctExecutablePath;
+        }
+        if (!uctRunConfiguration.isNewlyCreated()) {
+            return null;
         }
         final UctSettingsService settingsService = UctSettingsService.getInstance(project);
 
@@ -202,7 +240,7 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
         uctExecutablePath = settingsService.getUctExecutablePath();
 
         if (!uctExecutablePath.isEmpty()) {
-            if (VfsUtil.findFile(Path.of(uctExecutablePath), false) != null) {
+            if (UctExecutableValidatorUtil.validate(uctExecutablePath)) {
                 return uctExecutablePath;
             } else {
                 settingsService.setUctExecutablePath("");
