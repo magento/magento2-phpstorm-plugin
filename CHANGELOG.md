@@ -9,7 +9,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 ### Added
 
 - Added XML file header include code template in [#615](https://github.com/magento/magento2-phpstorm-plugin/pull/615)
-- Added autofocus on a first field for all existent dialogs in [#599](https://github.com/magento/magento2-phpstorm-plugin/pull/599)
 - Added Web API generation for the Magento Entity Creator in [#597](https://github.com/magento/magento2-phpstorm-plugin/pull/597) and [#607](https://github.com/magento/magento2-phpstorm-plugin/pull/607)
 - Added DI XML plugin type attribute inspections in [#588](https://github.com/magento/magento2-phpstorm-plugin/pull/588)
 - Added Web API interface for service (PHP class) generation in [#586](https://github.com/magento/magento2-phpstorm-plugin/pull/586)
