@@ -9,6 +9,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.testFramework.LightPlatformTestCase;
 import com.magento.idea.magento2plugin.BaseProjectTestCase;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.DefaultCodeStyleSettingsAdjustmentsUtil;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.project.util.GetProjectBasePath;
 import org.junit.After;
@@ -25,6 +26,8 @@ public abstract class BaseGeneratorTestCase extends BaseProjectTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         myFixture.setTestDataPath(TEST_DATA_FOLDER_PATH);
+        // Reset changed default code style settings to the previous default settings.
+        DefaultCodeStyleSettingsAdjustmentsUtil.execute(myFixture.getProject());
     }
 
     @Override
