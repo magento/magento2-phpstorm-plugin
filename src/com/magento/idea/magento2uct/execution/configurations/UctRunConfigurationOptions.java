@@ -14,6 +14,8 @@ public class UctRunConfigurationOptions extends LocatableRunConfigurationOptions
             .provideDelegate(this, "scriptName");
     private final StoredProperty<String> projectRoot = string("")
             .provideDelegate(this, "projectRoot");
+    private final StoredProperty<String> modulePath = string("")
+            .provideDelegate(this, "modulePath");
     private final StoredProperty<String> comingVersion = string("")
             .provideDelegate(this, "comingVersion");
     private final StoredProperty<Integer> minIssueLevel = property(3)
@@ -57,6 +59,24 @@ public class UctRunConfigurationOptions extends LocatableRunConfigurationOptions
      */
     public String getProjectRoot() {
         return projectRoot.getValue(this) != null ? projectRoot.getValue(this) : "";
+    }
+
+    /**
+     * Set path to analyse setting.
+     *
+     * @param modulePath String
+     */
+    public void setModulePath(final String modulePath) {
+        this.modulePath.setValue(this, modulePath);
+    }
+
+    /**
+     * Get path to analyse.
+     *
+     * @return String
+     */
+    public String getModulePath() {
+        return modulePath.getValue(this) != null ? modulePath.getValue(this) : "";
     }
 
     /**

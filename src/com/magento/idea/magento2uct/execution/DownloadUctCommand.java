@@ -7,18 +7,22 @@ package com.magento.idea.magento2uct.execution;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
+import com.intellij.execution.configurations.PtyCommandLine;
 import com.intellij.execution.filters.TextConsoleBuilderFactory;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.process.ProcessHandlerFactory;
 import com.intellij.execution.process.ProcessTerminatedListener;
 import com.intellij.execution.ui.ConsoleView;
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.wm.RegisterToolWindowTask;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowId;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.Content;
+import com.magento.idea.magento2plugin.MagentoIcons;
 import org.jetbrains.annotations.NotNull;
 
 public final class DownloadUctCommand {
@@ -55,7 +59,7 @@ public final class DownloadUctCommand {
      * @return OSProcessHandler
      */
     private OSProcessHandler createProcessHandler() throws ExecutionException {
-        final GeneralCommandLine commandLine = new GeneralCommandLine();
+        final GeneralCommandLine commandLine = createGeneralCommandLine(true);
         commandLine.setWorkDirectory(project.getBasePath());
         commandLine.setExePath("composer");
         commandLine.addParameters(
@@ -74,6 +78,30 @@ public final class DownloadUctCommand {
         ProcessTerminatedListener.attach(processHandler);
 
         return processHandler;
+    }
+
+    /**
+     * Create general command line.
+     *
+     * @param withPty boolean
+     *
+     * @return GeneralCommandLine
+     */
+    private GeneralCommandLine createGeneralCommandLine(boolean withPty) {
+        GeneralCommandLine commandLine;
+
+        if (withPty) {
+            if (!SystemInfo.isWindows) {
+                commandLine = new PtyCommandLine().withInitialColumns(2500);
+            } else {
+                commandLine = new GeneralCommandLine();
+                commandLine.getEnvironment().putIfAbsent("TERM", "xterm");
+            }
+        } else {
+            commandLine = new GeneralCommandLine();
+        }
+
+        return commandLine;
     }
 
     /**
@@ -97,7 +125,7 @@ public final class DownloadUctCommand {
                             true,
                             true,
                             null,
-                            null,
+                            AllIcons.Actions.Execute,
                             null
                     )
             );
@@ -109,6 +137,8 @@ public final class DownloadUctCommand {
                 .getContentManager()
                 .getFactory()
                 .createContent(consoleView.getComponent(), TAB_TITLE, true);
+        content.putUserData(ToolWindow.SHOW_CONTENT_ICON, Boolean.TRUE);
+        content.setIcon(MagentoIcons.PLUGIN_ICON_SMALL);
         toolWindow.getContentManager().addContent(content);
         toolWindow.show();
 

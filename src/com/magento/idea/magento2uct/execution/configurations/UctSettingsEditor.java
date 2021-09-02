@@ -12,11 +12,11 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.LabeledComponent;
 import com.intellij.openapi.ui.TextBrowseFolderListener;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.UIUtil;
+import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
 import com.magento.idea.magento2uct.execution.DownloadUctCommand;
 import com.magento.idea.magento2uct.settings.UctSettingsService;
@@ -26,7 +26,6 @@ import com.magento.idea.magento2uct.versioning.IssueSeverityLevel;
 import com.magento.idea.magento2uct.versioning.SupportedVersion;
 import java.awt.Color;
 import java.awt.Container;
-import java.nio.file.Path;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -45,6 +44,7 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
     private JPanel contentPanel;
     private LabeledComponent<TextFieldWithBrowseButton> myScriptName;
     private LabeledComponent<TextFieldWithBrowseButton> projectRoot;
+    private LabeledComponent<TextFieldWithBrowseButton> modulePath;
     private JComboBox<ComboBoxItemData> comingVersion;
     private JComboBox<ComboBoxItemData> minIssueLevel;
     private JRadioButton hasIgnoreCurrentVersionIssues;
@@ -63,6 +63,9 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
     private JLabel infoLabel2;//NOPMD
     private JLabel uctLookupFailedWarning;//NOPMD
     private JXHyperlink installTypeOne;//NOPMD
+    private JLabel licenseWarning;//NOPMD
+    private JLabel modulePathComment;//NOPMD
+    private JLabel modulePathLabel;//NOPMD
 
     /**
      * Form constructor.
@@ -102,6 +105,7 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
             projectRoot.getComponent().setText(projectRootCandidate);
             uctRunConfiguration.setProjectRoot(projectRootCandidate);
         }
+        modulePath.getComponent().setText(uctRunConfiguration.getModulePath());
 
         if (!uctRunConfiguration.getComingVersion().isEmpty()) {
             final String storedComingVersion = uctRunConfiguration.getComingVersion();
@@ -126,6 +130,7 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
         }
         uctRunConfiguration.setScriptName(myScriptName.getComponent().getText());
         uctRunConfiguration.setProjectRoot(projectRoot.getComponent().getText());
+        uctRunConfiguration.setModulePath(modulePath.getComponent().getText());
 
         final ComboBoxItemData selectedComingVersion =
                 (ComboBoxItemData) comingVersion.getSelectedItem();
@@ -182,7 +187,8 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
                                     + "created files.\nThe UCT runnable will be "
                                     + "filled automatically.",
                             "The UCT is installed successfully",
-                            JOptionPane.INFORMATION_MESSAGE
+                            JOptionPane.INFORMATION_MESSAGE,
+                            MagentoIcons.PLUGIN_ICON_MEDIUM
                     );
                 }
         );
@@ -350,38 +356,40 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
         }
     }
 
+    @SuppressWarnings({"PMD.UnusedPrivateMethod"})
     private void createUIComponents() {
         myScriptName = new LabeledComponent<>();
         myScriptName.setComponent(new TextFieldWithBrowseButton());
         myScriptName
                 .getComponent()
-                .addBrowseFolderListener(
-                        new TextBrowseFolderListener(
-                                new FileChooserDescriptor(
-                                        true,
-                                        false,
-                                        false,
-                                        false,
-                                        false,
-                                        false
-                                )
-                        )
-                );
+                .addBrowseFolderListener(new TextBrowseFolderListener(getFileChooserDescriptor()));
         projectRoot = new LabeledComponent<>();
         projectRoot.setComponent(new TextFieldWithBrowseButton());
         projectRoot
                 .getComponent()
-                .addBrowseFolderListener(
-                        new TextBrowseFolderListener(
-                                new FileChooserDescriptor(
-                                        false,
-                                        true,
-                                        false,
-                                        false,
-                                        false,
-                                        false
-                                )
-                        )
-                );
+                .addBrowseFolderListener(new TextBrowseFolderListener(getDirChooserDescriptor()));
+        modulePath = new LabeledComponent<>();
+        modulePath.setComponent(new TextFieldWithBrowseButton());
+        modulePath
+                .getComponent()
+                .addBrowseFolderListener(new TextBrowseFolderListener(getDirChooserDescriptor()));
+    }
+
+    /**
+     * Get file chooser descriptor.
+     *
+     * @return FileChooserDescriptor
+     */
+    private FileChooserDescriptor getFileChooserDescriptor() {
+        return new FileChooserDescriptor(false, true, false, false, false, false);
+    }
+
+    /**
+     * Get directory chooser descriptor.
+     *
+     * @return FileChooserDescriptor
+     */
+    private FileChooserDescriptor getDirChooserDescriptor() {
+        return new FileChooserDescriptor(false, true, false, false, false, false);
     }
 }

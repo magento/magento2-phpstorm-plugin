@@ -31,6 +31,7 @@ import com.magento.idea.magento2uct.execution.filters.UctPhpFileFilter;
 import com.magento.idea.magento2uct.execution.filters.UctResultFileFilter;
 import com.magento.idea.magento2uct.settings.UctSettingsService;
 import com.magento.idea.magento2uct.util.module.UctExecutableValidatorUtil;
+import com.magento.idea.magento2uct.util.module.UctModulePathValidatorUtil;
 import com.magento.idea.magento2uct.versioning.IssueSeverityLevel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -91,6 +92,24 @@ public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfig
      */
     public String getProjectRoot() {
         return getOptions().getProjectRoot();
+    }
+
+    /**
+     * Set path to analyse setting.
+     *
+     * @param modulePath String
+     */
+    public void setModulePath(final String modulePath) {
+        getOptions().setModulePath(modulePath);
+    }
+
+    /**
+     * Get path to analyse.
+     *
+     * @return String
+     */
+    public String getModulePath() {
+        return getOptions().getModulePath();
     }
 
     /**
@@ -245,6 +264,14 @@ public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfig
                         IssueSeverityLevel.getByLevel(getMinIssueLevel());
                 final IssueSeverityLevel defaultSeverityLevel =
                         IssueSeverityLevel.getDefaultIssueSeverityLevel();
+
+                if (!getModulePath().isEmpty()) {
+                    if (UctModulePathValidatorUtil.validate(getModulePath())) {
+                        commandLine.addParameter("--module-path=".concat(getModulePath()));
+                    } else {
+                        throw new ExecutionException("The path to analyse is not valid");
+                    }
+                }
 
                 if (!severityLevel.equals(defaultSeverityLevel)) {
                     commandLine
