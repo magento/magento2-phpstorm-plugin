@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Foo\Bar\Plugin;
-
 
 use Foo\Bar\Service\SimpleService;
 
