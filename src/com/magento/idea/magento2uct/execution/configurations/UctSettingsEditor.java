@@ -26,6 +26,8 @@ import com.magento.idea.magento2uct.versioning.IssueSeverityLevel;
 import com.magento.idea.magento2uct.versioning.SupportedVersion;
 import java.awt.Color;
 import java.awt.Container;
+import java.net.URI;
+import java.net.URISyntaxException;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -37,6 +39,10 @@ import org.jdesktop.swingx.JXHyperlink;
 import org.jetbrains.annotations.NotNull;
 
 public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
+
+    private static final String LEARN_MORE_URI =
+            "https://docs.magento.com/user-guide/getting-started.html#product-editions";
+    private static final String LEARN_MORE_TEXT = "Learn more.  ";
 
     private final Project project;
     private String uctExecutablePath;
@@ -66,6 +72,8 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
     private JLabel licenseWarning;//NOPMD
     private JLabel modulePathComment;//NOPMD
     private JLabel modulePathLabel;//NOPMD
+    private JXHyperlink learnMoreLink;//NOPMD
+    private JPanel adobeCommercePanel;//NOPMD
 
     /**
      * Form constructor.
@@ -78,6 +86,12 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
         this.project = project;
         initializeComboboxSources();
         validateSettingsForm();
+        try {
+            learnMoreLink.setURI(new URI(LEARN_MORE_URI));
+            learnMoreLink.setText(LEARN_MORE_TEXT);
+        } catch (URISyntaxException exception) {
+            learnMoreLink.setVisible(false);
+        }
         infoLabel.setForeground(JBColor.blue);
         infoLabel2.setForeground(JBColor.blue);
         uctLookupFailedWarning.setForeground(JBColor.orange);
