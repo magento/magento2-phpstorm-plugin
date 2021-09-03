@@ -34,6 +34,7 @@ public class UctResultFileFilter implements Filter {
         this.project = project;
     }
 
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     @Override
     public @Nullable Result applyFilter(final @NotNull String line, final int entireLength) {
         if (!canContainUctResult(line)) {
@@ -58,7 +59,7 @@ public class UctResultFileFilter implements Filter {
                             buildHyperLinkInfo(filePathCandidate)
                     );
                 } catch (IllegalStateException | IndexOutOfBoundsException exception) {
-                    // go to the next finding.
+                    continue;
                 }
             }
         }

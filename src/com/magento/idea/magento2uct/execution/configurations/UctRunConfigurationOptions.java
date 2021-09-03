@@ -20,9 +20,9 @@ public class UctRunConfigurationOptions extends LocatableRunConfigurationOptions
             .provideDelegate(this, "comingVersion");
     private final StoredProperty<Integer> minIssueLevel = property(3)
             .provideDelegate(this, "minIssueLevel");
-    private final StoredProperty<Boolean> hasIgnoreCurrentVersionIssues = property(false)
+    private final StoredProperty<Boolean> ignoreCurrentVersionIssues = property(false)
             .provideDelegate(this, "hasIgnoreCurrentVersionIssues");
-    private final StoredProperty<Boolean> isNewlyCreated = property(true)
+    private final StoredProperty<Boolean> newlyCreated = property(true)
             .provideDelegate(this, "isNewlyCreated");
 
     /**
@@ -40,7 +40,7 @@ public class UctRunConfigurationOptions extends LocatableRunConfigurationOptions
      * @return String
      */
     public String getScriptName() {
-        return myScriptName.getValue(this) != null ? myScriptName.getValue(this) : "";
+        return myScriptName.getValue(this) == null ? "" : myScriptName.getValue(this);
     }
 
     /**
@@ -58,7 +58,7 @@ public class UctRunConfigurationOptions extends LocatableRunConfigurationOptions
      * @return String
      */
     public String getProjectRoot() {
-        return projectRoot.getValue(this) != null ? projectRoot.getValue(this) : "";
+        return projectRoot.getValue(this) == null ? "" : projectRoot.getValue(this);
     }
 
     /**
@@ -76,7 +76,7 @@ public class UctRunConfigurationOptions extends LocatableRunConfigurationOptions
      * @return String
      */
     public String getModulePath() {
-        return modulePath.getValue(this) != null ? modulePath.getValue(this) : "";
+        return modulePath.getValue(this) == null ? "" : modulePath.getValue(this);
     }
 
     /**
@@ -94,7 +94,7 @@ public class UctRunConfigurationOptions extends LocatableRunConfigurationOptions
      * @return String
      */
     public String getComingVersion() {
-        return comingVersion.getValue(this) != null ? comingVersion.getValue(this) : "";
+        return comingVersion.getValue(this) == null ? "" : comingVersion.getValue(this);
     }
 
     /**
@@ -118,10 +118,10 @@ public class UctRunConfigurationOptions extends LocatableRunConfigurationOptions
     /**
      * Set ignoring for current version issues setting.
      *
-     * @param hasIgnoreCurrentVersionIssues boolean
+     * @param ignoreCurrentVersionIssues boolean
      */
-    public void setHasIgnoreCurrentVersionIssues(final boolean hasIgnoreCurrentVersionIssues) {
-        this.hasIgnoreCurrentVersionIssues.setValue(this, hasIgnoreCurrentVersionIssues);
+    public void setIgnoreCurrentVersionIssues(final boolean ignoreCurrentVersionIssues) {
+        this.ignoreCurrentVersionIssues.setValue(this, ignoreCurrentVersionIssues);
     }
 
     /**
@@ -130,16 +130,16 @@ public class UctRunConfigurationOptions extends LocatableRunConfigurationOptions
      * @return boolean
      */
     public boolean hasIgnoreCurrentVersionIssues() {
-        return hasIgnoreCurrentVersionIssues.getValue(this);
+        return ignoreCurrentVersionIssues.getValue(this);
     }
 
     /**
      * Set is settings is newly created.
      *
-     * @param isNewlyCreated boolean
+     * @param newlyCreated boolean
      */
-    public void setIsNewlyCreated(final boolean isNewlyCreated) {
-        this.isNewlyCreated.setValue(this, isNewlyCreated);
+    public void setNewlyCreated(final boolean newlyCreated) {
+        this.newlyCreated.setValue(this, newlyCreated);
     }
 
     /**
@@ -148,6 +148,6 @@ public class UctRunConfigurationOptions extends LocatableRunConfigurationOptions
      * @return boolean
      */
     public boolean isNewlyCreated() {
-        return isNewlyCreated.getValue(this);
+        return newlyCreated.getValue(this);
     }
 }

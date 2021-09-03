@@ -57,6 +57,12 @@ public final class UctModuleLocatorUtil {
      *
      * @return PsiDirectory
      */
+    @SuppressWarnings({
+            "PMD.CognitiveComplexity",
+            "PMD.NPathComplexity",
+            "PMD.CyclomaticComplexity",
+            "PMD.AvoidDeeplyNestedIfStmts"
+    })
     public static @Nullable PsiDirectory locateModule(final @NotNull Project project) {
         final String projectBasePath = project.getBasePath();
 

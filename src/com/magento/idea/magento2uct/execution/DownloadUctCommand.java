@@ -42,15 +42,11 @@ public final class DownloadUctCommand {
     /**
      * Start UCT downloading process.
      */
-    public void execute() {
+    public void execute() throws ExecutionException {
         final ConsoleView consoleView = createConsole();
-        try {
-            final OSProcessHandler processHandler = createProcessHandler();
-            consoleView.attachToProcess(processHandler);
-            processHandler.startNotify();
-        } catch (ExecutionException exception) {
-            //NOPMD
-        }
+        final OSProcessHandler processHandler = createProcessHandler();
+        consoleView.attachToProcess(processHandler);
+        processHandler.startNotify();
     }
 
     /**
@@ -87,15 +83,15 @@ public final class DownloadUctCommand {
      *
      * @return GeneralCommandLine
      */
-    private GeneralCommandLine createGeneralCommandLine(boolean withPty) {
+    private GeneralCommandLine createGeneralCommandLine(final boolean withPty) {
         GeneralCommandLine commandLine;
 
         if (withPty) {
-            if (!SystemInfo.isWindows) {
-                commandLine = new PtyCommandLine().withInitialColumns(2500);
-            } else {
+            if (SystemInfo.isWindows) {
                 commandLine = new GeneralCommandLine();
                 commandLine.getEnvironment().putIfAbsent("TERM", "xterm");
+            } else {
+                commandLine = new PtyCommandLine().withInitialColumns(2500);
             }
         } else {
             commandLine = new GeneralCommandLine();

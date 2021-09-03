@@ -31,6 +31,6 @@ public final class UctExecutableValidatorUtil {
             return false;
         }
 
-        return vfs.getName().equals(UCT_EXECUTABLE_FILENAME);
+        return UCT_EXECUTABLE_FILENAME.equals(vfs.getName());
     }
 }

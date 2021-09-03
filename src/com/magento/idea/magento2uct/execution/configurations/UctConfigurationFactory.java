@@ -26,7 +26,7 @@ public class UctConfigurationFactory extends ConfigurationFactory {
 
     @Override
     public @NotNull String getId() {
-        return UctRunConfigurationType.ID;
+        return UctRunConfigurationType.RUN_CONFIGURATION_TYPE_ID;
     }
 
     @Override

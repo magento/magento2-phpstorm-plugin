@@ -23,9 +23,7 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
     @Property
     private String uctExecutablePath;
 
-    /**
-     * UCT run configuration independent settings storage constructor.
-     */
+    @SuppressWarnings("PMD.UncommentedEmptyConstructor")
     public UctSettingsService() {
     }
 
@@ -55,7 +53,7 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
      * @return String
      */
     public String getUctExecutablePath() {
-        return !uctExecutablePath.isEmpty() ? uctExecutablePath : "";
+        return uctExecutablePath.isEmpty() ? "" : uctExecutablePath;
     }
 
     /**

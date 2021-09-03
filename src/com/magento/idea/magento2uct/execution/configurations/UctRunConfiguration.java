@@ -14,7 +14,6 @@ import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.configurations.LocatableConfigurationBase;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.configurations.RunProfileState;
-import com.intellij.execution.configurations.RuntimeConfigurationException;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.process.ProcessHandlerFactory;
@@ -36,6 +35,12 @@ import com.magento.idea.magento2uct.versioning.IssueSeverityLevel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings({
+        "PMD.NPathComplexity",
+        "PMD.CyclomaticComplexity",
+        "PMD.ExcessiveImports",
+        "PMD.CognitiveComplexity"
+})
 public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfigurationOptions> {
 
     /**
@@ -154,7 +159,7 @@ public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfig
      * @param hasIgnoreCurrentVersionIssues boolean
      */
     public void setHasIgnoreCurrentVersionIssues(final boolean hasIgnoreCurrentVersionIssues) {
-        getOptions().setHasIgnoreCurrentVersionIssues(hasIgnoreCurrentVersionIssues);
+        getOptions().setIgnoreCurrentVersionIssues(hasIgnoreCurrentVersionIssues);
     }
 
     /**
@@ -172,7 +177,7 @@ public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfig
      * @param isNewlyCreated boolean
      */
     public void setIsNewlyCreated(final boolean isNewlyCreated) {
-        getOptions().setIsNewlyCreated(isNewlyCreated);
+        getOptions().setNewlyCreated(isNewlyCreated);
     }
 
     /**
@@ -187,11 +192,6 @@ public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfig
     @Override
     public @NotNull SettingsEditor<? extends RunConfiguration> getConfigurationEditor() {
         return new UctSettingsEditor(getProject());
-    }
-
-    @Override
-    public void checkConfiguration() throws RuntimeConfigurationException {
-        super.checkConfiguration();
     }
 
     @Override
@@ -211,9 +211,7 @@ public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfig
 
             @Override
             protected @NotNull ProcessHandler startProcess() throws ExecutionException {
-                final UctSettingsService settingsService =
-                        UctSettingsService.getInstance(getProject());
-                PhpInterpreter interpreter = PhpProjectConfigurationFacade
+                final PhpInterpreter interpreter = PhpProjectConfigurationFacade
                         .getInstance(getProject())
                         .getInterpreter();
 
@@ -224,6 +222,8 @@ public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfig
                 }
 
                 final boolean isValidPath = UctExecutableValidatorUtil.validate(getScriptName());
+                final UctSettingsService settingsService =
+                        UctSettingsService.getInstance(getProject());
 
                 if (getScriptName().isEmpty()) {
                     throw new ExecutionException("The UCT executable path is not specified");
@@ -260,11 +260,6 @@ public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfig
                 final GeneralCommandLine commandLine =
                         commandSettingsBuilder.createGeneralCommandLine();
 
-                final IssueSeverityLevel severityLevel =
-                        IssueSeverityLevel.getByLevel(getMinIssueLevel());
-                final IssueSeverityLevel defaultSeverityLevel =
-                        IssueSeverityLevel.getDefaultIssueSeverityLevel();
-
                 if (!getModulePath().isEmpty()) {
                     if (UctModulePathValidatorUtil.validate(getModulePath())) {
                         commandLine.addParameter("--module-path=".concat(getModulePath()));
@@ -272,6 +267,10 @@ public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfig
                         throw new ExecutionException("The path to analyse is not valid");
                     }
                 }
+                final IssueSeverityLevel severityLevel =
+                        IssueSeverityLevel.getByLevel(getMinIssueLevel());
+                final IssueSeverityLevel defaultSeverityLevel =
+                        IssueSeverityLevel.getDefaultIssueSeverityLevel();
 
                 if (!severityLevel.equals(defaultSeverityLevel)) {
                     commandLine

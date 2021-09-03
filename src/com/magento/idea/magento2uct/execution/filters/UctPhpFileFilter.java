@@ -35,6 +35,7 @@ public class UctPhpFileFilter implements Filter {
         this.project = project;
     }
 
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     @Override
     public @Nullable Result applyFilter(final @NotNull String line, final int entireLength) {
         if (!canContainUctPhpFileLink(line)) {
@@ -59,7 +60,7 @@ public class UctPhpFileFilter implements Filter {
                             buildHyperLinkInfo(filePathCandidate)
                     );
                 } catch (IllegalStateException | IndexOutOfBoundsException exception) {
-                    // go to the next finding.
+                    continue;
                 }
             }
         }

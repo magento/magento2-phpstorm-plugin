@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2uct.execution.configurations;
 
+import com.intellij.execution.ExecutionException;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.options.SettingsEditor;
@@ -38,6 +39,7 @@ import javax.swing.event.DocumentEvent;
 import org.jdesktop.swingx.JXHyperlink;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveImports"})
 public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
 
     private static final String LEARN_MORE_URI =
@@ -53,7 +55,7 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
     private LabeledComponent<TextFieldWithBrowseButton> modulePath;
     private JComboBox<ComboBoxItemData> comingVersion;
     private JComboBox<ComboBoxItemData> minIssueLevel;
-    private JRadioButton hasIgnoreCurrentVersionIssues;
+    private JRadioButton ignoreCurrentVersionIssues;
     private JPanel warningPanel;
     private JLabel myScriptNameLabel;//NOPMD
     private JLabel comingVersionLabel;//NOPMD
@@ -109,15 +111,15 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
             uctRunConfiguration.setScriptName(uctExecutablePath);
         }
 
-        if (!uctRunConfiguration.getProjectRoot().isEmpty()) {
-            projectRoot.getComponent().setText(uctRunConfiguration.getProjectRoot());
-        } else {
-            final String projectRootCandidate = project.getBasePath() != null
-                    ? project.getBasePath()
-                    : "";
+        if (uctRunConfiguration.getProjectRoot().isEmpty()) {
+            final String projectRootCandidate = project.getBasePath() == null
+                    ? ""
+                    : project.getBasePath();
 
             projectRoot.getComponent().setText(projectRootCandidate);
             uctRunConfiguration.setProjectRoot(projectRootCandidate);
+        } else {
+            projectRoot.getComponent().setText(uctRunConfiguration.getProjectRoot());
         }
         modulePath.getComponent().setText(uctRunConfiguration.getModulePath());
 
@@ -132,7 +134,7 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
             setSelectedValueByItsKey(minIssueLevel, String.valueOf(storedLevel.getLevel()));
         }
 
-        hasIgnoreCurrentVersionIssues.setSelected(
+        ignoreCurrentVersionIssues.setSelected(
                 uctRunConfiguration.hasIgnoreCurrentVersionIssues()
         );
     }
@@ -149,10 +151,10 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
         final ComboBoxItemData selectedComingVersion =
                 (ComboBoxItemData) comingVersion.getSelectedItem();
 
-        if (selectedComingVersion != null) {
-            uctRunConfiguration.setComingVersion(selectedComingVersion.getKey());
-        } else {
+        if (selectedComingVersion == null) {
             uctRunConfiguration.setComingVersion("");
+        } else {
+            uctRunConfiguration.setComingVersion(selectedComingVersion.getKey());
         }
 
         final ComboBoxItemData selectedMinIssueLevel =
@@ -169,7 +171,7 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
         }
 
         uctRunConfiguration.setHasIgnoreCurrentVersionIssues(
-                hasIgnoreCurrentVersionIssues.isSelected()
+                ignoreCurrentVersionIssues.isSelected()
         );
     }
 
@@ -184,26 +186,41 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
     private void downloadUctAction() {
         ApplicationManager.getApplication().invokeAndWait(
                 () -> {
-                    final DownloadUctCommand command = new DownloadUctCommand(project);
-                    command.execute();
+                    try {
+                        final DownloadUctCommand command = new DownloadUctCommand(project);
+                        command.execute();
+                    } catch (ExecutionException exception) {
+                        final Container parent = this.getComponent().getFocusCycleRootAncestor();
+
+                        if (parent != null && parent.isVisible()) {
+                            parent.setVisible(false);
+                            JOptionPane.showMessageDialog(
+                                    null,
+                                    "Could not install the Upgrade Compatibility Tool "
+                                            + "for the current project",
+                                    "The UCT installation Error",
+                                    JOptionPane.ERROR_MESSAGE
+                            );
+                        }
+                    }
                 }
         );
         ApplicationManager.getApplication().invokeAndWait(
                 () -> {
                     final Container parent = this.getComponent().getFocusCycleRootAncestor();
 
-                    if (parent != null) {
+                    if (parent != null && parent.isVisible()) {
                         parent.setVisible(false);
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "Open UCT Run Configuration after project updates indexes for "
+                                        + "newly created files.\nThe UCT runnable will be "
+                                        + "filled automatically.",
+                                "The UCT is installed successfully",
+                                JOptionPane.INFORMATION_MESSAGE,
+                                MagentoIcons.PLUGIN_ICON_MEDIUM
+                        );
                     }
-                    JOptionPane.showMessageDialog(
-                            null,
-                            "Open UCT Run Configuration after project updates indexes for newly "
-                                    + "created files.\nThe UCT runnable will be "
-                                    + "filled automatically.",
-                            "The UCT is installed successfully",
-                            JOptionPane.INFORMATION_MESSAGE,
-                            MagentoIcons.PLUGIN_ICON_MEDIUM
-                    );
                 }
         );
     }
@@ -313,7 +330,7 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
                 .addDocumentListener(new DocumentAdapter() {
                     @SuppressWarnings("PMD.AccessorMethodGeneration")
                     @Override
-                    protected void textChanged(@NotNull DocumentEvent event) {
+                    protected void textChanged(final @NotNull DocumentEvent event) {
                         validateExecutablePathField();
                     }
                 });

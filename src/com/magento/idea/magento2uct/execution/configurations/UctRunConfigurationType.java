@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class UctRunConfigurationType implements ConfigurationType {
 
-    public static final String ID = "UctRunConfigurationType";
+    public static final String RUN_CONFIGURATION_TYPE_ID = "UctRunConfigurationType";
     public static final String TITLE = "Upgrade Compatibility Tool";
     public static final String SHORT_TITLE = "UCT Run";
     private static final String DESCRIPTION = "Magento 2 Upgrade Compatibility Tool Configuration";
@@ -35,7 +35,7 @@ public class UctRunConfigurationType implements ConfigurationType {
 
     @Override
     public @NotNull String getId() {
-        return ID;
+        return RUN_CONFIGURATION_TYPE_ID;
     }
 
     @Override
