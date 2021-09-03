@@ -23,7 +23,7 @@ apply plugin: 'idea'
 apply plugin: 'groovy'
 apply plugin: 'org.jetbrains.changelog'
 
-def phpPluginVersion = System.getProperty("phpPluginVersion", "212.5080.71")
+def phpPluginVersion = System.getProperty("phpPluginVersion", "212.5080.55")
 def ideaVersion = System.getProperty("ideaVersion", "2021.2.1")
 def javaVersion = 11
 
