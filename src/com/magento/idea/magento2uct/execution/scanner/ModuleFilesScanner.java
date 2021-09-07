@@ -3,12 +3,12 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2uct.versioning.scanner;
+package com.magento.idea.magento2uct.execution.scanner;
 
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.psi.PhpFile;
-import com.magento.idea.magento2uct.versioning.scanner.data.ComponentData;
+import com.magento.idea.magento2uct.execution.scanner.data.ComponentData;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

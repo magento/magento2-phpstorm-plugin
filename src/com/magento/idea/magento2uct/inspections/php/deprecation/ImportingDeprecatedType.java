@@ -5,21 +5,35 @@
 
 package com.magento.idea.magento2uct.inspections.php.deprecation;
 
-import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.inspections.PhpInspection;
+import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpReference;
 import com.jetbrains.php.lang.psi.elements.PhpUse;
 import com.jetbrains.php.lang.psi.elements.PhpUseList;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
-import com.magento.idea.magento2uct.bundles.UctInspectionBundle;
+import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2uct.versioning.VersionStateManager;
 import org.jetbrains.annotations.NotNull;
 
-public class ImportingDeprecatedType extends PhpInspection {
+public abstract class ImportingDeprecatedType extends PhpInspection {
+
+    /**
+     * Register type specific problem.
+     *
+     * @param problemsHolder ProblemsHolder
+     * @param use PhpUse
+     * @param isInterface boolean
+     */
+    protected abstract void registerProblem(
+            final @NotNull ProblemsHolder problemsHolder,
+            final PhpUse use,
+            final boolean isInterface
+    );
 
     @Override
     public @NotNull PsiElementVisitor buildVisitor(
@@ -28,16 +42,10 @@ public class ImportingDeprecatedType extends PhpInspection {
     ) {
         return new PhpElementVisitor() {
 
-            private final UctInspectionBundle bundle = new UctInspectionBundle();
-            private PhpClass phpClass;
-
-            @Override
-            public void visitPhpClass(final PhpClass clazz) {
-                phpClass = clazz;
-            }
-
             @Override
             public void visitPhpUseList(final PhpUseList useList) {
+                final PhpClass phpClass = getParentClass(useList);
+
                 if (phpClass == null) {
                     return;
                 }
@@ -54,22 +62,26 @@ public class ImportingDeprecatedType extends PhpInspection {
                                 isInterface = true;
                             }
                         }
-                        String bundleKey = "customCode.warnings.deprecated.1132";
-
-                        if (isInterface) {
-                            bundleKey = "customCode.warnings.deprecated.1332";
-                        }
-                        final String message = bundle.message(
-                                bundleKey,
-                                use.getFQN()
-                        );
-                        problemsHolder.registerProblem(
-                                use,
-                                message,
-                                ProblemHighlightType.LIKE_DEPRECATED
-                        );
+                        registerProblem(problemsHolder, use, isInterface);
                     }
                 }
+            }
+
+            /**
+             * Get parent class for use list.
+             *
+             * @param useList PhpUseList
+             *
+             * @return PhpClass
+             */
+            private PhpClass getParentClass(final PhpUseList useList) {
+                final PsiFile file = useList.getContainingFile();
+
+                if (!(file instanceof PhpFile)) {
+                    return null;
+                }
+
+                return GetFirstClassOfFile.getInstance().execute((PhpFile) file);
             }
         };
     }

@@ -7,7 +7,6 @@ package com.magento.idea.magento2uct.execution;
 
 import com.intellij.codeInspection.InspectionManager;
 import com.intellij.codeInspection.ProblemDescriptor;
-import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -23,21 +22,19 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpPsiElement;
 import com.jetbrains.php.lang.psi.elements.PhpUseList;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeAnalyserVisitor;
-import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2uct.execution.process.OutputWrapper;
+import com.magento.idea.magento2uct.execution.scanner.ModuleFilesScanner;
+import com.magento.idea.magento2uct.execution.scanner.ModuleScanner;
+import com.magento.idea.magento2uct.execution.scanner.data.ComponentData;
+import com.magento.idea.magento2uct.inspections.UctInspectionManager;
+import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.DeprecationInspection;
+import com.magento.idea.magento2uct.packages.SupportedIssue;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.magento.idea.magento2uct.inspections.php.deprecation.ExtendingDeprecatedClass;
-import com.magento.idea.magento2uct.inspections.php.deprecation.ImportingDeprecatedType;
-import com.magento.idea.magento2uct.versioning.processors.DeprecationIndexProcessor;
-import com.magento.idea.magento2uct.versioning.scanner.ModuleFilesScanner;
-import com.magento.idea.magento2uct.versioning.scanner.ModuleScanner;
-import com.magento.idea.magento2uct.versioning.scanner.data.ComponentData;
 import org.jetbrains.annotations.NotNull;
 
 public class GenerateUctReportCommand {
@@ -63,6 +60,8 @@ public class GenerateUctReportCommand {
      */
     public void execute() {
         output.write("Upgrade compatibility tool\n\n");
+        final UctInspectionManager inspectionManager = new UctInspectionManager(project);
+        final UctReportOutputUtil outputUtil = new UctReportOutputUtil(output);
 
         for (final ComponentData componentData : new ModuleScanner(getTargetPsiDirectory())) {
             boolean isModuleHeaderPrinted = false;
@@ -71,92 +70,29 @@ public class GenerateUctReportCommand {
                 if (!(psiFile instanceof PhpFile)) {
                     continue;
                 }
-                final PhpClass phpClass =
-                        GetFirstClassOfFile
-                                .getInstance()
-                                .execute((PhpFile) psiFile);
+                final UctProblemsHolder fileProblemsHolder = inspectionManager.run(psiFile);
 
-                if (phpClass != null) {
-                    final ExtendingDeprecatedClass extendingDeprecatedClass =
-                            new ExtendingDeprecatedClass();
-                    final ProblemsHolder extendingDeprecatedClassProblemsHolder = new ProblemsHolder(
-                            InspectionManager.getInstance(project),
-                            psiFile,
-                            false
-                    );
-                    final PhpElementVisitor extendingDeprecatedClassVisitor =
-                            (PhpElementVisitor) extendingDeprecatedClass.buildVisitor(
-                                    extendingDeprecatedClassProblemsHolder,
-                                    false
-                            );
-                    extendingDeprecatedClassVisitor.visitPhpClass(phpClass);
+                if (fileProblemsHolder == null) {
+                    continue;
+                }
 
-                    final ImportingDeprecatedType importingDeprecatedType =
-                            new ImportingDeprecatedType();
-                    final ProblemsHolder importingDeprecatedTypeProblemsHolder = new ProblemsHolder(
-                            InspectionManager.getInstance(project),
-                            psiFile,
-                            false
-                    );
-                    final PhpElementVisitor importingDeprecatedTypeVisitor =
-                            (PhpElementVisitor) importingDeprecatedType.buildVisitor(
-                                    importingDeprecatedTypeProblemsHolder,
-                                    false
-                            );
-                    importingDeprecatedTypeVisitor.visitPhpClass(phpClass);
-
-                    final PhpPsiElement scopeForUseOperator =
-                            PhpCodeInsightUtil.findScopeForUseOperator(phpClass);
-
-                    if (scopeForUseOperator != null) {
-                        final List<PhpUseList> imports =
-                                PhpCodeInsightUtil.collectImports(scopeForUseOperator);
-
-                        for (final PhpUseList phpUseList : imports) {
-                            importingDeprecatedTypeVisitor.visitPhpUseList(phpUseList);
-                        }
+                if (fileProblemsHolder.hasResults()) {
+                    if (!isModuleHeaderPrinted) {
+                        outputUtil.printModuleName(componentData.getName());
+                        isModuleHeaderPrinted = true;
                     }
+                    outputUtil.printProblemFile(psiFile.getVirtualFile().getPath());
+                }
 
-                    if (extendingDeprecatedClassProblemsHolder.hasResults()
-                            || importingDeprecatedTypeProblemsHolder.hasResults()) {
-                        if (!isModuleHeaderPrinted) {
-                            final String moduleName = "Module Name: ".concat(componentData.getName());
-                            output.print("<info>" + moduleName + "</info>\n");
-                            output.print("<info>" + "-".repeat(moduleName.length()) + "</info>\n\n");
-                            isModuleHeaderPrinted = true;
-                        }
+                for (final ProblemDescriptor descriptor : fileProblemsHolder.getResults()) {
+                    final Integer code = fileProblemsHolder.getErrorCodeForDescriptor(descriptor);
 
-                        final String file = "File: " + psiFile.getVirtualFile().getPath();
-                        output.print("<info>" + file + "</info>\n");
-                        output.print("<info>" + "-".repeat(file.length()) + "</info>\n\n");
-                    }
-
-                    // temporary output
-                    for (final ProblemDescriptor descriptor
-                            : extendingDeprecatedClassProblemsHolder.getResults()) {
-                        printErrorMessage(descriptor);
-                    }
-                    for (final ProblemDescriptor descriptor
-                            : importingDeprecatedTypeProblemsHolder.getResults()) {
-                        printErrorMessage(descriptor);
+                    if (code != null) {
+                        outputUtil.printIssue(descriptor, code);
                     }
                 }
             }
         }
-    }
-
-    private void printErrorMessage(final ProblemDescriptor descriptor) {
-        final String errorCode =
-                descriptor.getDescriptionTemplate().substring(0, 5);
-        final String errorMessage =
-                descriptor.getDescriptionTemplate().substring(5).trim();
-
-        final String outputText = " * <warning>[WARNING]</warning>"
-                + errorCode + " Line "
-                + descriptor.getLineNumber() + ": "
-                + errorMessage;
-
-        output.print(outputText + "\n");
     }
 
     /**
@@ -176,7 +112,7 @@ public class GenerateUctReportCommand {
             if (phpClass != null) {
                 final DeprecationInspection deprecationInspection =
                         new DeprecationInspection(phpClass);
-                final ProblemsHolder problemsHolder = new ProblemsHolder(
+                final UctProblemsHolder problemsHolder = new UctProblemsHolder(
                         InspectionManager.getInstance(project),
                         phpClass.getContainingFile(),
                         false
@@ -215,7 +151,6 @@ public class GenerateUctReportCommand {
                     visitor.visitPhpField(field);
                 }
 
-                // temporary output
                 for (final ProblemDescriptor descriptor : problemsHolder.getResults()) {
                     output.print(descriptor.getDescriptionTemplate());
                 }
@@ -243,5 +178,66 @@ public class GenerateUctReportCommand {
         return PsiManager
                 .getInstance(project)
                 .findDirectory(targetDirVirtualFile);
+    }
+
+    private static final class UctReportOutputUtil {
+
+        private static final String ISSUE_FORMAT = " * {SEVERITY}[{code}] Line {line}: {message}";
+        private final OutputWrapper stdout;
+
+        /**
+         * UCT report styled output util.
+         *
+         * @param output OutputWrapper
+         */
+        public UctReportOutputUtil(final @NotNull OutputWrapper output) {
+            stdout = output;
+        }
+
+        /**
+         * Print module name header.
+         *
+         * @param moduleName String
+         */
+        public void printModuleName(final @NotNull String moduleName) {
+            final String moduleNameLine = "Module Name: ".concat(moduleName);
+            stdout.print(stdout.wrapInfo(moduleNameLine).concat("\n"));
+            stdout.print(stdout.wrapInfo("-".repeat(moduleNameLine.length())).concat("\n"));
+        }
+
+        /**
+         * Print problem file header.
+         *
+         * @param filePath String
+         */
+        public void printProblemFile(final @NotNull String filePath) {
+            final String file = "File: ".concat(filePath);
+            stdout.print("\n".concat(stdout.wrapInfo(file)).concat("\n"));
+            stdout.print(stdout.wrapInfo("-".repeat(file.length())).concat("\n\n"));
+        }
+
+        /**
+         * Print issue message.
+         *
+         * @param descriptor ProblemDescriptor
+         * @param code int
+         */
+        public void printIssue(final @NotNull ProblemDescriptor descriptor, final int code) {
+            final String errorMessage = descriptor.getDescriptionTemplate().substring(6).trim();
+            final SupportedIssue issue = SupportedIssue.getByCode(code);
+
+            if (issue == null) {
+                return;
+            }
+
+            final String output = ISSUE_FORMAT
+                    .replace("{SEVERITY}", issue.getLevel().getFormattedLabel())
+                    .replace("{code}", Integer.toString(code))
+                    .replace("{line}", Integer.toString(descriptor.getLineNumber() + 1))
+                    .replace("{message}", errorMessage)
+                    .concat("\n");
+
+            stdout.print(output);
+        }
     }
 }

@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2uct.versioning;
+package com.magento.idea.magento2uct.packages;
 
 import java.util.LinkedList;
 import java.util.List;

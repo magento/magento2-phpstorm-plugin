@@ -3,27 +3,31 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2uct.versioning;
+package com.magento.idea.magento2uct.packages;
 
+import com.magento.idea.magento2uct.execution.process.OutputWrapper;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 public enum IssueSeverityLevel {
 
-    WARNING(3),
-    ERROR(2),
-    CRITICAL(1);
+    WARNING(3, OutputWrapper.WARNING_WRAPPER.replace("{text}", "[WARNING]")),
+    ERROR(2, OutputWrapper.ERROR_WRAPPER.replace("{text}", "[ERROR]")),
+    CRITICAL(1, OutputWrapper.CRITICAL_WRAPPER.replace("{text}", "[CRITICAL]"));
 
     private final int level;
+    private final String formattedLabel;
 
     /**
      * ENUM constructor.
      *
      * @param level int
+     * @param formattedLabel String
      */
-    IssueSeverityLevel(final int level) {
+    IssueSeverityLevel(final int level, final String formattedLabel) {
         this.level = level;
+        this.formattedLabel = formattedLabel;
     }
 
     /**
@@ -42,6 +46,15 @@ public enum IssueSeverityLevel {
      */
     public String getLabel() {
         return this.toString();
+    }
+
+    /**
+     * Get formatted label.
+     *
+     * @return String
+     */
+    public String getFormattedLabel() {
+        return formattedLabel;
     }
 
     /**

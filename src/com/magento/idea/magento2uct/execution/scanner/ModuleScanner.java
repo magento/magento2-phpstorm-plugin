@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2uct.versioning.scanner;
+package com.magento.idea.magento2uct.execution.scanner;
 
 import com.intellij.json.psi.JsonFile;
 import com.intellij.json.psi.JsonObject;
@@ -17,7 +17,7 @@ import com.intellij.psi.xml.XmlTag;
 import com.magento.idea.magento2plugin.magento.files.ComposerJson;
 import com.magento.idea.magento2plugin.magento.files.ModuleXml;
 import com.magento.idea.magento2plugin.magento.packages.Package;
-import com.magento.idea.magento2uct.versioning.scanner.data.ComponentData;
+import com.magento.idea.magento2uct.execution.scanner.data.ComponentData;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

@@ -13,7 +13,8 @@ import com.jetbrains.php.lang.psi.elements.ClassReference;
 import com.jetbrains.php.lang.psi.elements.ExtendsList;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
-import com.magento.idea.magento2uct.bundles.UctInspectionBundle;
+import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
+import com.magento.idea.magento2uct.packages.SupportedIssue;
 import com.magento.idea.magento2uct.versioning.VersionStateManager;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,8 +27,6 @@ public class ExtendingDeprecatedClass extends PhpInspection {
     ) {
         return new PhpElementVisitor() {
 
-            private final UctInspectionBundle bundle = new UctInspectionBundle();
-
             @Override
             public void visitPhpClass(final PhpClass clazz) {
                 PhpClass parentClass = clazz.getSuperClass();
@@ -35,22 +34,23 @@ public class ExtendingDeprecatedClass extends PhpInspection {
                 if (parentClass == null) {
                     return;
                 }
-                final ExtendsList extendsList = clazz.getExtendsList();
+                final ExtendsList list = clazz.getExtendsList();
                 final String parentClassFqn = parentClass.getFQN();
 
                 while (parentClass != null) {
                     if (VersionStateManager.getInstance().isDeprecated(parentClass.getFQN())) {
-                        final String message = bundle.message(
-                                "customCode.warnings.deprecated.1131",
-                                parentClass.getFQN()
-                        );
-
-                        for (final ClassReference classReference
-                                : extendsList.getReferenceElements()) {
+                        for (final ClassReference classReference : list.getReferenceElements()) {
                             if (parentClassFqn.equals(classReference.getFQN())) {
+                                if (problemsHolder instanceof UctProblemsHolder) {
+                                    ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
+                                            SupportedIssue.EXTENDING_DEPRECATED_CLASS.getCode()
+                                    );
+                                }
                                 problemsHolder.registerProblem(
                                         classReference,
-                                        message,
+                                        SupportedIssue.EXTENDING_DEPRECATED_CLASS.getMessage(
+                                                parentClass.getFQN()
+                                        ),
                                         ProblemHighlightType.LIKE_DEPRECATED
                                 );
                             }

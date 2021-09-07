@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2uct.versioning.scanner.data;
+package com.magento.idea.magento2uct.execution.scanner.data;
 
 import com.intellij.psi.PsiDirectory;
 import org.jetbrains.annotations.NotNull;

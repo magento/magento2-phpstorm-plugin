@@ -10,7 +10,7 @@ import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.magento.packages.File;
-import com.magento.idea.magento2uct.versioning.IndexRegistry;
+import com.magento.idea.magento2uct.packages.IndexRegistry;
 import com.magento.idea.magento2uct.versioning.IndexRepository;
 import com.magento.idea.magento2uct.versioning.Storage;
 import java.io.IOException;
