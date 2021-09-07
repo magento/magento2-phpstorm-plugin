@@ -412,7 +412,7 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
      * @return FileChooserDescriptor
      */
     private FileChooserDescriptor getFileChooserDescriptor() {
-        return new FileChooserDescriptor(false, true, false, false, false, false);
+        return new FileChooserDescriptor(true, false, false, false, false, false);
     }
 
     /**

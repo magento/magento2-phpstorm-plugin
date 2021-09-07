@@ -52,7 +52,10 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
      *
      * @return String
      */
-    public String getUctExecutablePath() {
+    public @NotNull String getUctExecutablePath() {
+        if (uctExecutablePath == null) {
+            return "";
+        }
         return uctExecutablePath.isEmpty() ? "" : uctExecutablePath;
     }
 
