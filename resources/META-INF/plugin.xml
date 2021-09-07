@@ -109,6 +109,20 @@
                 description="Copies Magento's path of file depending on file type">
             <add-to-group group-id="CopyFileReference" anchor="last"/>
         </action>
+        <group id="UctReindexMenu">
+            <separator/>
+            <action id="com.magento.idea.magento2uct.actions.ReindexVersionedIndexesAction"
+                    class="com.magento.idea.magento2uct.actions.ReindexVersionedIndexesAction"
+                    text="ReindexVersionedIndexesAction"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </group>
+        <group id="UctRunMenu">
+            <separator/>
+            <action id="com.magento.idea.magento2uct.actions.RunUpgradeCompatibilityToolAction"
+                    class="com.magento.idea.magento2uct.actions.RunUpgradeCompatibilityToolAction"
+                    text="Run The Upgrade Compatibility Tool Action"/>
+            <add-to-group group-id="RunMenu" anchor="last"/>
+        </group>
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -236,6 +250,23 @@
                          groupBundle="magento2.inspection" groupKey="inspection.group.name"
                          enabledByDefault="true" level="WARNING"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.PluginAttributeTypeInspection"/>
+
+        <!-- UCT inspection -->
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="ExtendingDeprecatedClass"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.ExtendingDeprecatedClass"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.deprecation.group.name"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.deprecation.ExtendingDeprecatedClass"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="ImportingDeprecatedType"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.ImportingDeprecatedType"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.deprecation.group.name"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.deprecation.ImportingDeprecatedType"/>
+        <!-- \UCT inspection -->
 
         <internalFileTemplate name="Magento Composer JSON"/>
         <internalFileTemplate name="Magento Registration PHP"/>

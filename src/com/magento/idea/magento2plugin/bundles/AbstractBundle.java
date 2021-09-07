@@ -8,7 +8,7 @@ package com.magento.idea.magento2plugin.bundles;
 import com.intellij.CommonBundle;
 import java.util.ResourceBundle;
 
-abstract class AbstractBundle {
+public abstract class AbstractBundle {
 
     abstract public String getBundleName();
 
