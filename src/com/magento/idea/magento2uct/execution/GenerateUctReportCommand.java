@@ -5,7 +5,6 @@
 
 package com.magento.idea.magento2uct.execution;
 
-import com.intellij.codeInspection.InspectionManager;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
@@ -13,28 +12,16 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.jetbrains.php.codeInsight.PhpCodeInsightUtil;
 import com.jetbrains.php.lang.psi.PhpFile;
-import com.jetbrains.php.lang.psi.elements.ClassConstantReference;
-import com.jetbrains.php.lang.psi.elements.Field;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.jetbrains.php.lang.psi.elements.PhpPsiElement;
-import com.jetbrains.php.lang.psi.elements.PhpUseList;
-import com.jetbrains.php.lang.psi.resolve.types.PhpTypeAnalyserVisitor;
-import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2uct.execution.process.OutputWrapper;
 import com.magento.idea.magento2uct.execution.scanner.ModuleFilesScanner;
 import com.magento.idea.magento2uct.execution.scanner.ModuleScanner;
 import com.magento.idea.magento2uct.execution.scanner.data.ComponentData;
 import com.magento.idea.magento2uct.inspections.UctInspectionManager;
 import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
-import com.magento.idea.magento2uct.inspections.php.DeprecationInspection;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
 import java.io.File;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 public class GenerateUctReportCommand {
@@ -92,73 +79,6 @@ public class GenerateUctReportCommand {
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Visit directory recursively.
-     *
-     * @param directory PsiDirectory
-     */
-    private void visitDirectory(final @NotNull PsiDirectory directory) {
-        final PsiFile[] files = directory.getFiles();
-
-        for (final PsiFile file : files) {
-            if (!(file instanceof PhpFile)) {
-                continue;
-            }
-            final PhpClass phpClass = GetFirstClassOfFile.getInstance().execute((PhpFile) file);
-
-            if (phpClass != null) {
-                final DeprecationInspection deprecationInspection =
-                        new DeprecationInspection(phpClass);
-                final UctProblemsHolder problemsHolder = new UctProblemsHolder(
-                        InspectionManager.getInstance(project),
-                        phpClass.getContainingFile(),
-                        false
-                );
-                final PhpTypeAnalyserVisitor visitor =
-                        (PhpTypeAnalyserVisitor) deprecationInspection.buildVisitor(
-                                problemsHolder,
-                                false
-                        );
-                visitor.visitPhpClass(phpClass);
-
-                final PhpPsiElement scopeForUseOperator =
-                        PhpCodeInsightUtil.findScopeForUseOperator(phpClass);
-
-                if (scopeForUseOperator != null) {
-                    final List<PhpUseList> imports =
-                            PhpCodeInsightUtil.collectImports(scopeForUseOperator);
-
-                    for (final PhpUseList phpUseList : imports) {
-                        visitor.visitPhpUseList(phpUseList);
-                    }
-                }
-
-                final List<ClassConstantReference> classConstantReferences =
-                        new ArrayList<>(
-                                PsiTreeUtil.findChildrenOfType(
-                                        phpClass,
-                                        ClassConstantReference.class
-                                )
-                        );
-                for (final ClassConstantReference constantReference : classConstantReferences) {
-                    visitor.visitPhpClassConstantReference(constantReference);
-                }
-
-                for (final Field field : phpClass.getOwnFields()) {
-                    visitor.visitPhpField(field);
-                }
-
-                for (final ProblemDescriptor descriptor : problemsHolder.getResults()) {
-                    output.print(descriptor.getDescriptionTemplate());
-                }
-            }
-        }
-
-        for (final PsiDirectory subDirectory : directory.getSubdirectories()) {
-            visitDirectory(subDirectory);
         }
     }
 

@@ -13,26 +13,26 @@ import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
 import org.jetbrains.annotations.NotNull;
 
-public class UsingDeprecatedClass extends UsingDeprecatedType {
+public class UsingDeprecatedInterface extends UsingDeprecatedType {
 
     @Override
     protected void registerProblem(
             final @NotNull ProblemsHolder problemsHolder,
             final Field field,
-            final String fieldClass,
+            final String fieldInterface,
             boolean isInterface
     ) {
-        if (isInterface) {
+        if (!isInterface) {
             return;
         }
         if (problemsHolder instanceof UctProblemsHolder) {
             ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.USING_DEPRECATED_CLASS.getCode()
+                    SupportedIssue.USING_DEPRECATED_INTERFACE.getCode()
             );
         }
         problemsHolder.registerProblem(
                 field,
-                SupportedIssue.USING_DEPRECATED_CLASS.getMessage(fieldClass),
+                SupportedIssue.USING_DEPRECATED_INTERFACE.getMessage(fieldInterface),
                 ProblemHighlightType.LIKE_DEPRECATED
         );
     }
@@ -44,17 +44,17 @@ public class UsingDeprecatedClass extends UsingDeprecatedType {
             final String deprecatedType,
             final boolean isInterface
     ) {
-        if (isInterface) {
+        if (!isInterface) {
             return;
         }
         if (problemsHolder instanceof UctProblemsHolder) {
             ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.USING_DEPRECATED_CLASS.getCode()
+                    SupportedIssue.USING_DEPRECATED_INTERFACE.getCode()
             );
         }
         problemsHolder.registerProblem(
                 reference,
-                SupportedIssue.USING_DEPRECATED_CLASS.getMessage(deprecatedType),
+                SupportedIssue.USING_DEPRECATED_INTERFACE.getMessage(deprecatedType),
                 ProblemHighlightType.LIKE_DEPRECATED
         );
     }
