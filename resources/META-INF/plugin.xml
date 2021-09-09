@@ -260,12 +260,19 @@
                          level="WARNING"
                          implementationClass="com.magento.idea.magento2uct.inspections.php.deprecation.ExtendingDeprecatedClass"/>
         <localInspection language="PHP" groupPath="UCT"
-                         shortName="ImportingDeprecatedType"
-                         bundle="uct.bundle.inspection" key="inspection.displayName.ImportingDeprecatedType"
+                         shortName="ImportingDeprecatedClass"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.ImportingDeprecatedClass"
                          groupBundle="uct.bundle.inspection" groupKey="inspection.deprecation.group.name"
                          enabledByDefault="true"
                          level="WARNING"
-                         implementationClass="com.magento.idea.magento2uct.inspections.php.deprecation.ImportingDeprecatedType"/>
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.deprecation.ImportingDeprecatedClass"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="ImportingDeprecatedInterface"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.ImportingDeprecatedInterface"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.deprecation.group.name"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.deprecation.ImportingDeprecatedInterface"/>
         <!-- \UCT inspection -->
 
         <internalFileTemplate name="Magento Composer JSON"/>

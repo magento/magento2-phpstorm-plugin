@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2uct.versioning;
 
+import com.magento.idea.magento2uct.packages.IndexRegistry;
 import com.magento.idea.magento2uct.versioning.indexes.VersionStateIndex;
 import java.io.File;
 import java.io.FileInputStream;

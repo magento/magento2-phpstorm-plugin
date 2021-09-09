@@ -28,10 +28,10 @@ import com.jetbrains.php.config.commandLine.PhpCommandSettingsBuilder;
 import com.jetbrains.php.config.interpreters.PhpInterpreter;
 import com.magento.idea.magento2uct.execution.filters.UctPhpFileFilter;
 import com.magento.idea.magento2uct.execution.filters.UctResultFileFilter;
+import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.settings.UctSettingsService;
-import com.magento.idea.magento2uct.util.module.UctExecutableValidatorUtil;
+import com.magento.idea.magento2uct.util.UctExecutableValidatorUtil;
 import com.magento.idea.magento2uct.util.module.UctModulePathValidatorUtil;
-import com.magento.idea.magento2uct.versioning.IssueSeverityLevel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

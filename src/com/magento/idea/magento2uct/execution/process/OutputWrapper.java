@@ -15,6 +15,11 @@ import org.jetbrains.annotations.NotNull;
 
 public final class OutputWrapper implements AnsiEscapeDecoder.ColoredTextAcceptor {
 
+    public static final String INFO_WRAPPER = "<info>{text}</info>";
+    public static final String WARNING_WRAPPER = "<warning>{text}</warning>";
+    public static final String ERROR_WRAPPER = "<error>{text}</error>";
+    public static final String CRITICAL_WRAPPER = "<critical>{text}</critical>";
+
     private final ProcessHandler processHandler;
     private final AnsiEscapeDecoder myAnsiEscapeDecoder = new AnsiEscapeDecoder();
 
@@ -82,55 +87,14 @@ public final class OutputWrapper implements AnsiEscapeDecoder.ColoredTextAccepto
     }
 
     /**
-     * Print info text.
+     * Wrap text into the tags in the information style.
      *
      * @param text String
-     */
-    public void info(final @NotNull String text) {
-        myAnsiEscapeDecoder.escapeText(
-                Color.YELLOW + text + Color.RESET,
-                ProcessOutputTypes.STDOUT,
-                this
-        );
-    }
-
-    /**
-     * Print warning text.
      *
-     * @param text String
+     * @return String
      */
-    public void warning(final @NotNull String text) {
-        myAnsiEscapeDecoder.escapeText(
-                Color.YELLOW_BOLD + text + Color.RESET,
-                ProcessOutputTypes.STDOUT,
-                this
-        );
-    }
-
-    /**
-     * Print error text.
-     *
-     * @param text String
-     */
-    public void error(final @NotNull String text) {
-        myAnsiEscapeDecoder.escapeText(
-                Color.RED_BOLD_BACKGROUND + text + Color.RESET,
-                ProcessOutputTypes.STDOUT,
-                this
-        );
-    }
-
-    /**
-     * Print critical text.
-     *
-     * @param text String
-     */
-    public void critical(final @NotNull String text) {
-        myAnsiEscapeDecoder.escapeText(
-                Color.RED_BRIGHT + text + Color.RESET,
-                ProcessOutputTypes.STDOUT,
-                this
-        );
+    public String wrapInfo(final @NotNull String text) {
+        return INFO_WRAPPER.replace("{text}", text);
     }
 
     /**

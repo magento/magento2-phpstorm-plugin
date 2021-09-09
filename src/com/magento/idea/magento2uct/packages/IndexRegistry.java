@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2uct.versioning;
+package com.magento.idea.magento2uct.packages;
 
 import com.magento.idea.magento2uct.versioning.indexes.DeprecationStateIndex;
 import java.util.Arrays;
