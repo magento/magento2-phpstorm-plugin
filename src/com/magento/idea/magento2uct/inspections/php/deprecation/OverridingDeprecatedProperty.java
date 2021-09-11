@@ -46,9 +46,10 @@ public class OverridingDeprecatedProperty extends PhpInspection {
                     for (final Field parentField : parentClass.getOwnFields()) {
                         if (!(parentField instanceof ClassConstImpl)
                                 && parentField.getName().equals(field.getName())
-                                && VersionStateManager.getInstance().isDeprecated(
-                                        parentField.getFQN()
-                        )) {
+                                && VersionStateManager
+                                .getInstance(field.getProject())
+                                .isDeprecated(parentField.getFQN())
+                        ) {
                             if (problemsHolder instanceof UctProblemsHolder) {
                                 ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
                                         SupportedIssue.OVERRIDING_DEPRECATED_PROPERTY.getCode()

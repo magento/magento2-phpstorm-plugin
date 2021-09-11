@@ -38,7 +38,8 @@ public class ExtendingDeprecatedClass extends PhpInspection {
                 final String parentClassFqn = parentClass.getFQN();
 
                 while (parentClass != null) {
-                    if (VersionStateManager.getInstance().isDeprecated(parentClass.getFQN())) {
+                    if (VersionStateManager.getInstance(clazz.getProject())
+                            .isDeprecated(parentClass.getFQN())) {
                         for (final ClassReference classReference : list.getReferenceElements()) {
                             if (parentClassFqn.equals(classReference.getFQN())) {
                                 if (problemsHolder instanceof UctProblemsHolder) {

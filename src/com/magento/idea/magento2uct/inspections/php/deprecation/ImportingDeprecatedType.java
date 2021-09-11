@@ -50,7 +50,8 @@ public abstract class ImportingDeprecatedType extends PhpInspection {
                     return;
                 }
                 for (final PhpUse use : useList.getDeclarations()) {
-                    if (VersionStateManager.getInstance().isDeprecated(use.getFQN())) {
+                    if (VersionStateManager.getInstance(useList.getProject())
+                            .isDeprecated(use.getFQN())) {
                         final PhpReference phpReference = use.getTargetReference();
                         boolean isInterface = false;
 

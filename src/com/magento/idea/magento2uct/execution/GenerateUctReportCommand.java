@@ -33,6 +33,7 @@ public class GenerateUctReportCommand {
      * Command constructor.
      *
      * @param project Project
+     * @param output OutputWrapper
      */
     public GenerateUctReportCommand(
             final @NotNull Project project,

@@ -42,7 +42,8 @@ public class InheritedDeprecatedInterface extends PhpInspection {
                     }
                     Pair<Boolean, String> parentCheckResult = null;
 
-                    if (VersionStateManager.getInstance().isDeprecated(interfaceFqn)
+                    if (VersionStateManager.getInstance(clazz.getProject())
+                            .isDeprecated(interfaceFqn)
                             || (parentCheckResult = hasDeprecatedParent(
                                     (PhpClass) interfaceClass
                     )).getFirst()) {
@@ -85,7 +86,8 @@ public class InheritedDeprecatedInterface extends PhpInspection {
                 continue;
             }
 
-            if (VersionStateManager.getInstance().isDeprecated(interfaceFqn)) {
+            if (VersionStateManager.getInstance(interfaceClass.getProject())
+                    .isDeprecated(interfaceFqn)) {
                 return new Pair<>(true, interfaceFqn);
             }
         }

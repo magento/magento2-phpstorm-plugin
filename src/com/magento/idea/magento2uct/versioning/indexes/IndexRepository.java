@@ -3,10 +3,10 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2uct.versioning;
+package com.magento.idea.magento2uct.versioning.indexes;
 
 import com.magento.idea.magento2uct.packages.IndexRegistry;
-import com.magento.idea.magento2uct.versioning.indexes.VersionStateIndex;
+import com.magento.idea.magento2uct.versioning.indexes.data.VersionStateIndex;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -20,6 +20,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class IndexRepository<K, V> implements Storage<K, V> {
 
@@ -29,10 +30,19 @@ public class IndexRepository<K, V> implements Storage<K, V> {
     private final String basePath;
     private final IndexRegistry index;
 
+    /**
+     * Index repository constructor.
+     */
     public IndexRepository() {
         this("", null);
     }
 
+    /**
+     * Index repository constructor.
+     *
+     * @param basePath String
+     * @param index IndexRegistry
+     */
     public IndexRepository(
             final @NotNull String basePath,
             final IndexRegistry index
@@ -43,6 +53,11 @@ public class IndexRepository<K, V> implements Storage<K, V> {
 
     @Override
     public void put(final @NotNull Map<K, V> data, final String version) {
+        if (basePath.isEmpty() || index == null) {
+            throw new IllegalArgumentException(
+                    "Project bath path and index type are required params for storing indexes."
+            );
+        }
         try {
             final Path path = Paths.get(basePath + DEFAULT_RELATIVE_PATH);
 
@@ -54,7 +69,8 @@ public class IndexRepository<K, V> implements Storage<K, V> {
                 throw new IllegalArgumentException(
                         String.format(
                                 "Specified version `%s` must be declared for the index `%s`",
-                                version, index.getKey()
+                                version,
+                                index.getKey()
                         )
                 );
             }
@@ -87,10 +103,13 @@ public class IndexRepository<K, V> implements Storage<K, V> {
     }
 
     @Override
-    public Map<K, V> get(final @NotNull String resourceName)
+    public @Nullable Map<K, V> load(final @NotNull String resourceName)
             throws IOException, ClassNotFoundException {
-        InputStream inputStream = getClass().getResourceAsStream(resourceName);
+        final InputStream inputStream = getClass().getResourceAsStream(resourceName);
 
+        if (inputStream == null) {
+            return null;
+        }
         try (ObjectInputStream objectInputStream = new ObjectInputStream(inputStream)) {
             return (HashMap<K, V>) objectInputStream.readObject();
         } catch (ClassCastException exception) {

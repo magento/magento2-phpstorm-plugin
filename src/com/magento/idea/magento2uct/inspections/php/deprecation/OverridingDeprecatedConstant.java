@@ -47,7 +47,8 @@ public class OverridingDeprecatedConstant extends PhpInspection {
                     for (final Field ownField : parentClass.getOwnFields()) {
                         if (ownField instanceof ClassConstImpl
                                 && ownField.getName().equals(constant.getName())
-                                && VersionStateManager.getInstance().isDeprecated(ownField.getFQN())
+                                && VersionStateManager.getInstance(field.getProject())
+                                .isDeprecated(ownField.getFQN())
                         ) {
                             if (problemsHolder instanceof UctProblemsHolder) {
                                 ((UctProblemsHolder) problemsHolder).setReservedErrorCode(

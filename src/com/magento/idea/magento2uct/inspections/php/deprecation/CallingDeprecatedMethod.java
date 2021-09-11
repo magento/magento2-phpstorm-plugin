@@ -36,7 +36,7 @@ public class CallingDeprecatedMethod extends PhpInspection {
                 }
                 final String type = ((Method) resolvedElement).getFQN();
 
-                if (VersionStateManager.getInstance().isDeprecated(type)) {
+                if (VersionStateManager.getInstance(reference.getProject()).isDeprecated(type)) {
                     if (problemsHolder instanceof UctProblemsHolder) {
                         ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
                                 SupportedIssue.CALLING_DEPRECATED_METHOD.getCode()
