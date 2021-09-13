@@ -39,7 +39,8 @@ public class UsingDeprecatedProperty extends PhpInspection {
                 }
                 final Field field = (Field) element;
 
-                if (VersionStateManager.getInstance().isDeprecated(field.getFQN())) {
+                if (VersionStateManager.getInstance(fieldReference.getProject())
+                        .isDeprecated(field.getFQN())) {
                     if (problemsHolder instanceof UctProblemsHolder) {
                         ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
                                 SupportedIssue.USING_DEPRECATED_PROPERTY.getCode()
@@ -58,7 +59,8 @@ public class UsingDeprecatedProperty extends PhpInspection {
                     if (containingClass == null) {
                         return;
                     }
-                    if (VersionStateManager.getInstance().isDeprecated(containingClass.getFQN())) {
+                    if (VersionStateManager.getInstance(fieldReference.getProject())
+                            .isDeprecated(containingClass.getFQN())) {
                         if (problemsHolder instanceof UctProblemsHolder) {
                             ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
                                     SupportedIssue.USING_DEPRECATED_PROPERTY.getCode()

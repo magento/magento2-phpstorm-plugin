@@ -13,16 +13,8 @@ import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.project.Settings;
-import com.magento.idea.magento2uct.execution.scanner.ModuleFilesScanner;
-import com.magento.idea.magento2uct.execution.scanner.ModuleScanner;
-import com.magento.idea.magento2uct.execution.scanner.data.ComponentData;
-import com.magento.idea.magento2uct.packages.IndexRegistry;
-import com.magento.idea.magento2uct.versioning.IndexRepository;
-import com.magento.idea.magento2uct.versioning.processors.DeprecationIndexProcessor;
-import java.util.HashMap;
-import java.util.Map;
+import com.magento.idea.magento2uct.ui.ReindexDialog;
 import org.jetbrains.annotations.NotNull;
 
 public class ReindexVersionedIndexesAction extends AnAction {
@@ -64,21 +56,7 @@ public class ReindexVersionedIndexesAction extends AnAction {
         if (directory == null) {
             return;
         }
-        final IndexRepository<String, Boolean> storage =
-                new IndexRepository<>(project.getBasePath(), IndexRegistry.DEPRECATION);
-        final Map<String, Boolean> deprecationData = new HashMap<>();
-
-        for (final ComponentData componentData : new ModuleScanner(directory)) {
-            for (final PsiFile psiFile : new ModuleFilesScanner(componentData)) {
-                deprecationData.putAll(new DeprecationIndexProcessor().process(psiFile));
-            }
-        }
-
-        if (!deprecationData.isEmpty()) {
-            storage.put(deprecationData, "2.3.0");
-        }
-
-        System.out.println(ACTION_NAME + " is run!!!!!!");
+        ReindexDialog.open(project, directory);
     }
 
     /**

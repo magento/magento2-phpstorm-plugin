@@ -39,7 +39,8 @@ public class UsingDeprecatedConstant extends PhpInspection {
                 }
                 final String constantClass = ((ClassConstImpl) element).getFQN();
 
-                if (!VersionStateManager.getInstance().isDeprecated(constantClass)) {
+                if (!VersionStateManager.getInstance(constantReference.getProject())
+                        .isDeprecated(constantClass)) {
                     return;
                 }
                 final PhpClass containingClass = ((ClassConstImpl) element).getContainingClass();

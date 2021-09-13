@@ -84,7 +84,7 @@ public abstract class UsingDeprecatedType extends PhpInspection {
                     isInterface = true;
                 }
 
-                if (VersionStateManager.getInstance().isDeprecated(fieldType)) {
+                if (VersionStateManager.getInstance(field.getProject()).isDeprecated(fieldType)) {
                     registerProblem(problemsHolder, field, fieldType, isInterface);
                 }
             }
@@ -99,7 +99,8 @@ public abstract class UsingDeprecatedType extends PhpInspection {
                 final PhpClass phpClass = (PhpClass) resolved;
                 final boolean isInterface = phpClass.isInterface();
 
-                if (VersionStateManager.getInstance().isDeprecated(phpClass.getFQN())) {
+                if (VersionStateManager.getInstance(reference.getProject())
+                        .isDeprecated(phpClass.getFQN())) {
                     registerReferenceProblem(
                             problemsHolder,
                             reference,

@@ -5,14 +5,17 @@
 
 package com.magento.idea.magento2uct.packages;
 
-import com.magento.idea.magento2uct.versioning.indexes.DeprecationStateIndex;
+import com.magento.idea.magento2uct.versioning.indexes.data.DeprecationStateIndex;
 import java.util.Arrays;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 public enum IndexRegistry {
 
-    DEPRECATION(DeprecationStateIndex.class, new String[]{"2.3.0"});
+    DEPRECATION(
+            DeprecationStateIndex.class,
+            SupportedVersion.getSupportedVersions().toArray(new String[0])
+    );
 
     private final String key;
     private final Class<?> type;
