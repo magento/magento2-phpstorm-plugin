@@ -10,12 +10,19 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.codeInsight.PhpCodeInsightUtil;
 import com.jetbrains.php.lang.psi.PhpFile;
+import com.jetbrains.php.lang.psi.elements.AssignmentExpression;
+import com.jetbrains.php.lang.psi.elements.ClassConstantReference;
+import com.jetbrains.php.lang.psi.elements.ClassReference;
+import com.jetbrains.php.lang.psi.elements.FieldReference;
+import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpPsiElement;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -82,6 +89,12 @@ public class UctInspectionManager {
         if (scopeForUseOperator != null) {
             elements.addAll(PhpCodeInsightUtil.collectImports(scopeForUseOperator));
         }
+        elements.addAll(PsiTreeUtil.findChildrenOfType(phpClass, ClassConstantReference.class));
+        elements.addAll(Arrays.asList(phpClass.getOwnFields()));
+        elements.addAll(PsiTreeUtil.findChildrenOfType(phpClass, MethodReference.class));
+        elements.addAll(PsiTreeUtil.findChildrenOfType(phpClass, AssignmentExpression.class));
+        elements.addAll(PsiTreeUtil.findChildrenOfType(phpClass, ClassReference.class));
+        elements.addAll(PsiTreeUtil.findChildrenOfType(phpClass, FieldReference.class));
 
         return elements;
     }
