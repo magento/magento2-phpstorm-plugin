@@ -110,13 +110,21 @@ public class IndexRepository<K, V> implements Storage<K, V> {
     @Override
     public @Nullable Map<K, V> load(final @NotNull String resourceName)
             throws IOException, ClassNotFoundException {
-        try (
-                InputStream inputStream = getClass().getResourceAsStream(resourceName);
-                ObjectInputStream objectInputStream = new ObjectInputStream(inputStream)
-        ) {
+        ObjectInputStream objectInputStream = null;
+
+        try (InputStream inputStream = getClass().getResourceAsStream(resourceName)) { //NOPMD
+            if (inputStream == null) {
+                return null;
+            }
+            objectInputStream = new ObjectInputStream(inputStream);
+
             return (HashMap<K, V>) objectInputStream.readObject();
         } catch (ClassCastException exception) {
             return null;
+        } finally {
+            if (objectInputStream != null) {
+                objectInputStream.close();
+            }
         }
     }
 }

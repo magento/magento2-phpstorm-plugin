@@ -18,12 +18,11 @@ import com.magento.idea.magento2plugin.magento.files.ComposerJson;
 import com.magento.idea.magento2plugin.magento.files.ModuleXml;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2uct.execution.scanner.data.ComponentData;
+import com.magento.idea.magento2uct.execution.scanner.filter.ModuleScannerFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
-import com.magento.idea.magento2uct.execution.scanner.filter.ModuleScannerFilter;
 import org.jetbrains.annotations.NotNull;
 
 public final class ModuleScanner implements Iterable<ComponentData> {

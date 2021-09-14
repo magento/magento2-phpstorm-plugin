@@ -131,7 +131,7 @@ public class ConfigurationDialog extends AbstractDialog {
 
         settingsService.setCurrentVersion(
                 currentVersionValue.isEmpty()
-                ? null
+                ? null//NOPMD
                 : SupportedVersion.getVersion(currentVersionValue)
         );
         final SupportedVersion targetVersionValue = SupportedVersion.getVersion(

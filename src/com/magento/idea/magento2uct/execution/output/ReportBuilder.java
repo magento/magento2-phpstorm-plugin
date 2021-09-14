@@ -86,7 +86,11 @@ public class ReportBuilder {
      *
      * @return JsonFile
      */
-    @SuppressWarnings({"PMD.NPathComplexity", "PMD.CyclomaticComplexity"})
+    @SuppressWarnings({
+            "PMD.NPathComplexity",
+            "PMD.CyclomaticComplexity",
+            "PMD.CognitiveComplexity",
+    })
     public JsonFile build() {
         if (report.getIssues().isEmpty() || report.getSummary() == null) {
             return null;
@@ -129,7 +133,7 @@ public class ReportBuilder {
         WriteCommandAction.runWriteCommandAction(project, () -> {
             savedFile.add((JsonFile) ideaDirectory.add(reportFile));
 
-            if (savedFile.size() == 0) {
+            if (savedFile.isEmpty()) {
                 return;
             }
             final JsonObject topNode = (JsonObject) savedFile.get(0).getTopLevelValue();
@@ -143,14 +147,14 @@ public class ReportBuilder {
             for (final Issue issue : report.getIssues()) {
                 final JsonObject issueObject = jsonElementGenerator.createObject("\"lineNumber\": "
                         + issue.getLine() + ","
-                        + "\"level\": \"" + issue.getLevel() + "\","
+                        + "\"level\": \"" + issue.getLevel() + "\","//NOPMD
                         + "\"message\": \"" + JSONObject.escape(issue.getMessage()) + "\","
                         + "\"code\": \"" + issue.getCode() + "\","
                         + "\"fileName\": \"" + JSONObject.escape(issue.getFilename()) + "\","
                         + "\"validationType\": \"" + issue.getValidationType() + "\""
                 );
                 if (issuesValueBuilder.length() > 0) {
-                    issuesValueBuilder.append(",");
+                    issuesValueBuilder.append(',');
                 }
                 issuesValueBuilder.append(issueObject.getText());
             }
@@ -163,7 +167,7 @@ public class ReportBuilder {
                     + "\"totalWarnings\": " + summary.getPhpWarnings() + ","
                     + "\"totalErrors\": " + summary.getPhpErrors() + ","
                     + "\"totalCriticalErrors\": " + summary.getPhpCriticalErrors() + ","
-                    + "\"complexityScore\": " + summary.getComplexityScore() + ""
+                    + "\"complexityScore\": " + summary.getComplexityScore()
             );
             JsonPsiUtil.addProperty(
                     topNode,
@@ -180,7 +184,7 @@ public class ReportBuilder {
             );
         });
 
-        return savedFile.size() > 0 ? savedFile.get(0) : reportFile;
+        return savedFile.isEmpty() ? reportFile : savedFile.get(0);
     }
 
     /**

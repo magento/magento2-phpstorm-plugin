@@ -49,7 +49,7 @@ public class ExcludeMagentoBundledFilter implements ModuleScannerFilter {
     private @Nullable String extractVendorFromModuleName(final @NotNull String moduleName) {
         String[] moduleNamePats = moduleName.split("_");
 
-        if (moduleNamePats.length > 1) {//NOPMD
+        if (moduleNamePats.length > 1) { //NOPMD
             return moduleNamePats[0].toLowerCase(Locale.ROOT);
         }
         moduleNamePats = moduleName.split("/");

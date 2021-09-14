@@ -81,9 +81,12 @@ public class UctReportOutputUtil {
      */
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     public void printSummary(final Summary summary) {
-        if (!summary.hasProblems()) {
+        if (summary.getProcessedModules() == 0) {
             stdout.print(stdout.wrapInfo("Couldn't find modules to analyse").concat("\n"));
             return;
+        }
+        if (!summary.hasProblems()) {
+            stdout.print("\n" + stdout.wrapInfo("No problems found").concat("\n"));
         }
         printNavigateToDetailedErrorsLink();
 
@@ -116,16 +119,13 @@ public class UctReportOutputUtil {
         printSummarySeparator(longestKey + 2, longestValue + 2);
 
         for (final Map.Entry<String, String> summaryEntry : summaryMap.entrySet()) {
-            final StringBuilder header = new StringBuilder(summaryEntry.getKey());
+            String header = summaryEntry.getKey();
             final String value = "  " + summaryEntry.getValue();
 
             if (header.length() < longestKey) {
-                header.append(" ".repeat(longestKey - header.length()));
+                header += " ".repeat(longestKey - header.length());//NOPMD
             }
-            stdout.print(
-                    " " + stdout.wrapSummary(header.toString())
-                            .concat("  ").concat(value).concat("\n")
-            );
+            stdout.print(" " + stdout.wrapSummary(header).concat("  ").concat(value).concat("\n"));
         }
         printSummarySeparator(longestKey + 2, longestValue + 2);
     }

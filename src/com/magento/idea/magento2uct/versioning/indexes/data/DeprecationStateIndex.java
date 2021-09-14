@@ -74,7 +74,7 @@ public class DeprecationStateIndex implements VersionStateIndex {
                     .replace("%key", registrationInfo.getKey());
             try {
                 putIndexData(version.getVersion(), storage.load(RESOURCE_PATH + indexName));
-            } catch (IOException | ClassNotFoundException exception) {//NOPMD
+            } catch (IOException | ClassNotFoundException exception) { //NOPMD
                 // Just go for the next version.
             }
         }

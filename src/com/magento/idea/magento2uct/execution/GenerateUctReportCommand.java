@@ -157,6 +157,11 @@ public class GenerateUctReportCommand {
                 summary.trackProcessFinished();
                 summary.setProcessedModules(scanner.getModuleCount());
                 outputUtil.printSummary(summary);
+
+                if (summary.getProcessedModules() == 0) {
+                    process.destroyProcess();
+                    return;
+                }
                 reportBuilder.addSummary(summary);
             });
 
@@ -173,8 +178,8 @@ public class GenerateUctReportCommand {
                         psiDocumentManager.commitDocument(document);
                     }
                     outputUtil.printReportFile(report.getVirtualFile().getPath());
-                    process.destroyProcess();
                 }
+                process.destroyProcess();
             });
         });
     }
