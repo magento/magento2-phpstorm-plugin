@@ -29,12 +29,12 @@ import java.awt.Color;
 import java.awt.Container;
 import java.net.URI;
 import java.net.URISyntaxException;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.event.DocumentEvent;
 import org.jdesktop.swingx.JXHyperlink;
 import org.jetbrains.annotations.NotNull;
@@ -55,7 +55,7 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
     private LabeledComponent<TextFieldWithBrowseButton> modulePath;
     private JComboBox<ComboBoxItemData> comingVersion;
     private JComboBox<ComboBoxItemData> minIssueLevel;
-    private JRadioButton ignoreCurrentVersionIssues;
+    private JCheckBox ignoreCurrentVersionIssues;
     private JPanel warningPanel;
     private JLabel myScriptNameLabel;//NOPMD
     private JLabel comingVersionLabel;//NOPMD
@@ -297,10 +297,6 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
         for (final String version : SupportedVersion.getSupportedVersions()) {
             comingVersion.addItem(new ComboBoxItemData(version, version));
         }
-
-        minIssueLevel.addItem(
-                new ComboBoxItemData("", "Choose a minimum issue level to show in report")
-        );
 
         for (final IssueSeverityLevel level : IssueSeverityLevel.getSeverityLabels()) {
             minIssueLevel.addItem(

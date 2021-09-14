@@ -280,6 +280,7 @@ public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfig
                 if (hasIgnoreCurrentVersionIssues()) {
                     commandLine.addParameter("--ignore-current-version-compatibility-issues");
                 }
+                commandLine.addParameter("--context=phpstorm");
                 commandLine.addParameter("--ansi");
 
                 final OSProcessHandler processHandler = ProcessHandlerFactory
