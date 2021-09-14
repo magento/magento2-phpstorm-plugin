@@ -19,6 +19,7 @@ public final class OutputWrapper implements AnsiEscapeDecoder.ColoredTextAccepto
     public static final String WARNING_WRAPPER = "<warning>{text}</warning>";
     public static final String ERROR_WRAPPER = "<error>{text}</error>";
     public static final String CRITICAL_WRAPPER = "<critical>{text}</critical>";
+    public static final String SUMMARY_WRAPPER = "<summary>{text}</summary>";
 
     private final ProcessHandler processHandler;
     private final AnsiEscapeDecoder myAnsiEscapeDecoder = new AnsiEscapeDecoder();
@@ -28,6 +29,7 @@ public final class OutputWrapper implements AnsiEscapeDecoder.ColoredTextAccepto
     private final Pattern errorWrappedTextPattern = Pattern.compile("(<error>.*<\\/error>)");
     private final Pattern criticalWrappedTextPattern =
             Pattern.compile("(<critical>.*<\\/critical>)");
+    private final Pattern summaryWrappedTextPattern = Pattern.compile("(<summary>.*<\\/summary>)");
 
     public OutputWrapper(final @NotNull ProcessHandler processHandler) {
         this.processHandler = processHandler;
@@ -44,6 +46,7 @@ public final class OutputWrapper implements AnsiEscapeDecoder.ColoredTextAccepto
         final Matcher warningGroupsMatcher = warningWrappedTextPattern.matcher(text);
         final Matcher errorGroupsMatcher = errorWrappedTextPattern.matcher(text);
         final Matcher criticalGroupsMatcher = criticalWrappedTextPattern.matcher(text);
+        final Matcher summaryGroupsMatcher = summaryWrappedTextPattern.matcher(text);
 
         reformattedText = reformatTagsToAnsi(
                 reformattedText,
@@ -72,6 +75,13 @@ public final class OutputWrapper implements AnsiEscapeDecoder.ColoredTextAccepto
                 "</critical>",
                 Color.RED_BRIGHT,
                 criticalGroupsMatcher
+        );
+        reformattedText = reformatTagsToAnsi(
+                reformattedText,
+                "<summary>",
+                "</summary>",
+                Color.GREEN,
+                summaryGroupsMatcher
         );
 
         myAnsiEscapeDecoder.escapeText(reformattedText, ProcessOutputTypes.STDOUT, this);
@@ -120,6 +130,17 @@ public final class OutputWrapper implements AnsiEscapeDecoder.ColoredTextAccepto
     }
 
     /**
+     * Wrap text into the tags into the summary style.
+     *
+     * @param text String
+     *
+     * @return String
+     */
+    public String wrapSummary(final @NotNull String text) {
+        return SUMMARY_WRAPPER.replace("{text}", text);
+    }
+
+    /**
      * Replace tags with the relevant ANSI codes.
      *
      * @param text String
@@ -162,7 +183,7 @@ public final class OutputWrapper implements AnsiEscapeDecoder.ColoredTextAccepto
         // Regular
         BLACK("\033[0;30m"),
         RED("\033[0;31m"),
-        GREEN("\033[0;32m"),
+        GREEN("\033[0;32m"), // SUMMARY
         YELLOW("\033[0;33m"), // INFO
         BLUE("\033[0;34m"),
         MAGENTA("\033[0;35m"),
