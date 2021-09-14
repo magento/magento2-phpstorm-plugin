@@ -239,7 +239,10 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
             uctExecutablePath = storedUctExecutable;
             return;
         }
-        final VirtualFile uctExecutableVf = UctModuleLocatorUtil.locateUctExecutable(project);
+        final VirtualFile uctExecutableVf = UctModuleLocatorUtil.locateUctExecutable(
+                project,
+                uctRunConfiguration.getProjectRoot()
+        );
 
         if (uctExecutableVf == null) {
             warningPanel.setVisible(true);
@@ -264,7 +267,11 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
         if (!uctRunConfiguration.getScriptName().isEmpty()) {
             uctExecutablePath = uctRunConfiguration.getScriptName();
 
-            return uctExecutablePath;
+            if (UctExecutableValidatorUtil.validate(uctExecutablePath)) {
+                return uctExecutablePath;
+            } else {
+                uctRunConfiguration.setScriptName("");
+            }
         }
         if (!uctRunConfiguration.isNewlyCreated()) {
             return null;

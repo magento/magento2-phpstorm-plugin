@@ -27,14 +27,18 @@ public final class UctModuleLocatorUtil {
     }
 
     /**
-     * Find UCT executable for the specified project.
+     * Find UCT executable for the specified magento 2 project path.
      *
      * @param project Project
+     * @param projectRoot String
      *
      * @return VirtualFile
      */
-    public static @Nullable VirtualFile locateUctExecutable(final @NotNull Project project) {
-        final PsiDirectory uctModuleDir = locateModule(project);
+    public static @Nullable VirtualFile locateUctExecutable(
+            final @NotNull Project project,
+            final @NotNull String projectRoot
+    ) {
+        final PsiDirectory uctModuleDir = locateModule(project, projectRoot);
 
         if (uctModuleDir == null) {
             return null;
@@ -54,6 +58,7 @@ public final class UctModuleLocatorUtil {
      * Find UCT module base directory.
      *
      * @param project Project
+     * @param projectRoot String
      *
      * @return PsiDirectory
      */
@@ -63,24 +68,27 @@ public final class UctModuleLocatorUtil {
             "PMD.CyclomaticComplexity",
             "PMD.AvoidDeeplyNestedIfStmts"
     })
-    public static @Nullable PsiDirectory locateModule(final @NotNull Project project) {
-        final String projectBasePath = project.getBasePath();
-
-        if (projectBasePath == null) {
+    public static @Nullable PsiDirectory locateModule(
+            final @NotNull Project project,
+            final @NotNull String projectRoot
+    ) {
+        if (projectRoot.isEmpty()) {
             return null;
         }
-        final VirtualFile projectBaseVf = VfsUtil.findFile(Path.of(projectBasePath), false);
+        final VirtualFile magentoProjectBaseVf = VfsUtil.findFile(Path.of(projectRoot), false);
 
-        if (projectBaseVf == null) {
+        if (magentoProjectBaseVf == null) {
             return null;
         }
         final PsiManager psiManager = PsiManager.getInstance(project);
-        final PsiDirectory projectBaseDir = psiManager.findDirectory(projectBaseVf);
+        final PsiDirectory magentoProjectBaseDir = psiManager.findDirectory(magentoProjectBaseVf);
 
-        if (projectBaseDir == null) {
+        if (magentoProjectBaseDir == null) {
             return null;
         }
-        final PsiFile composerConfigurationFile = projectBaseDir.findFile(ComposerJson.FILE_NAME);
+        final PsiFile composerConfigurationFile = magentoProjectBaseDir.findFile(
+                ComposerJson.FILE_NAME
+        );
 
         if (composerConfigurationFile instanceof JsonFile) {
             final boolean hasUctAsProjectDependency = composerConfigurationFile
@@ -89,7 +97,7 @@ public final class UctModuleLocatorUtil {
 
             if (hasUctAsProjectDependency) {
                 PsiDirectory uctBaseDir = findSubdirectoryByPath(
-                        projectBaseDir,
+                        magentoProjectBaseDir,
                         "vendor".concat(File.separator)
                                 .concat("magento")
                                 .concat(File.separator)
@@ -97,7 +105,7 @@ public final class UctModuleLocatorUtil {
                 );
                 if (uctBaseDir == null) {
                     uctBaseDir = findSubdirectoryByPath(
-                            projectBaseDir,
+                            magentoProjectBaseDir,
                             "app".concat(File.separator)
                                     .concat("code")
                                     .concat(File.separator)
@@ -109,6 +117,21 @@ public final class UctModuleLocatorUtil {
                 if (uctBaseDir != null) {
                     return uctBaseDir;
                 }
+            }
+            final String projectBasePath = project.getBasePath();
+
+            if (projectBasePath == null) {
+                return null;
+            }
+            final VirtualFile projectBaseVf = VfsUtil.findFile(Path.of(projectBasePath), false);
+
+            if (projectBaseVf == null) {
+                return null;
+            }
+            final PsiDirectory projectBaseDir = psiManager.findDirectory(projectBaseVf);
+
+            if (projectBaseDir == null) {
+                return null;
             }
 
             for (final PsiDirectory subDir : projectBaseDir.getSubdirectories()) {
