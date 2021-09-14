@@ -6,15 +6,23 @@
 package com.magento.idea.magento2uct.execution;
 
 import com.intellij.codeInspection.ProblemDescriptor;
+import com.intellij.execution.process.ProcessAdapter;
+import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.process.ProcessHandler;
+import com.intellij.json.psi.JsonFile;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.jetbrains.php.lang.psi.PhpFile;
+import com.magento.idea.magento2uct.execution.output.ReportBuilder;
+import com.magento.idea.magento2uct.execution.output.Summary;
+import com.magento.idea.magento2uct.execution.output.UctReportOutputUtil;
 import com.magento.idea.magento2uct.execution.process.OutputWrapper;
 import com.magento.idea.magento2uct.execution.scanner.ModuleFilesScanner;
 import com.magento.idea.magento2uct.execution.scanner.ModuleScanner;
@@ -51,6 +59,15 @@ public class GenerateUctReportCommand {
         this.output = output;
         this.process = process;
         settingsService = UctSettingsService.getInstance(project);
+
+        this.process.addProcessListener(new ProcessAdapter() {
+
+            @Override
+            public void processTerminated(final @NotNull ProcessEvent event) {
+                super.processTerminated(event);
+                output.write("\nProcess finished with exit code " + event.getExitCode() + "\n");
+            }
+        });
     }
 
     /**
@@ -74,9 +91,15 @@ public class GenerateUctReportCommand {
                 rootDirectory,
                 new ExcludeMagentoBundledFilter()
         );
+        final Summary summary = new Summary(
+                settingsService.getCurrentVersion(),
+                settingsService.getTargetVersion()
+        );
+        final ReportBuilder reportBuilder = new ReportBuilder(project);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             ApplicationManager.getApplication().runReadAction(() -> {
+                summary.trackProcessStarted();
                 for (final ComponentData componentData : scanner) {
                     if (process.isProcessTerminated()) {
                         return;
@@ -87,6 +110,7 @@ public class GenerateUctReportCommand {
                         if (!(psiFile instanceof PhpFile)) {
                             continue;
                         }
+                        final String filename = psiFile.getVirtualFile().getPath();
                         final UctProblemsHolder fileProblemsHolder = inspectionManager.run(psiFile);
 
                         if (fileProblemsHolder == null) {
@@ -98,7 +122,7 @@ public class GenerateUctReportCommand {
                                 outputUtil.printModuleName(componentData.getName());
                                 isModuleHeaderPrinted = true;
                             }
-                            outputUtil.printProblemFile(psiFile.getVirtualFile().getPath());
+                            outputUtil.printProblemFile(filename);
                         }
 
                         for (final ProblemDescriptor descriptor
@@ -107,15 +131,47 @@ public class GenerateUctReportCommand {
                                     descriptor
                             );
                             if (code != null) {
+                                final SupportedIssue issue = SupportedIssue.getByCode(code);
+
+                                if (issue != null) {
+                                    final String errorMessage = descriptor
+                                            .getDescriptionTemplate()
+                                            .substring(6)
+                                            .trim();
+                                    summary.addToSummary(issue.getLevel());
+                                    reportBuilder.addIssue(
+                                            descriptor.getLineNumber() + 1,
+                                            filename,
+                                            errorMessage,
+                                            issue
+                                    );
+                                }
                                 outputUtil.printIssue(descriptor, code);
                             }
                         }
                     }
                 }
-                if (scanner.getModuleCount() == 0) {
-                    output.print(output.wrapInfo("Couldn't find modules to analyse").concat("\n"));
+                summary.trackProcessFinished();
+                summary.setProcessedModules(scanner.getModuleCount());
+                outputUtil.printSummary(summary);
+                reportBuilder.addSummary(summary);
+            });
+
+            ApplicationManager.getApplication().invokeLaterOnWriteThread(() -> {
+                final JsonFile report = reportBuilder.build();
+
+                if (report != null) {
+                    final PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(
+                            project
+                    );
+                    final Document document = psiDocumentManager.getDocument(report);
+
+                    if (document != null) {
+                        psiDocumentManager.commitDocument(document);
+                    }
+                    outputUtil.printReportFile(report.getVirtualFile().getPath());
+                    process.destroyProcess();
                 }
-                process.destroyProcess();
             });
         });
     }
@@ -138,66 +194,5 @@ public class GenerateUctReportCommand {
         }
 
         return PsiManager.getInstance(project).findDirectory(targetDirVirtualFile);
-    }
-
-    private static final class UctReportOutputUtil {
-
-        private static final String ISSUE_FORMAT = " * {SEVERITY}[{code}] Line {line}: {message}";
-        private final OutputWrapper stdout;
-
-        /**
-         * UCT report styled output util.
-         *
-         * @param output OutputWrapper
-         */
-        public UctReportOutputUtil(final @NotNull OutputWrapper output) {
-            stdout = output;
-        }
-
-        /**
-         * Print module name header.
-         *
-         * @param moduleName String
-         */
-        public void printModuleName(final @NotNull String moduleName) {
-            final String moduleNameLine = "Module Name: ".concat(moduleName);
-            stdout.print("\n\n" + stdout.wrapInfo(moduleNameLine).concat("\n"));
-            stdout.print(stdout.wrapInfo("-".repeat(moduleNameLine.length())).concat("\n"));
-        }
-
-        /**
-         * Print problem file header.
-         *
-         * @param filePath String
-         */
-        public void printProblemFile(final @NotNull String filePath) {
-            final String file = "File: ".concat(filePath);
-            stdout.print("\n".concat(stdout.wrapInfo(file)).concat("\n"));
-            stdout.print(stdout.wrapInfo("-".repeat(file.length())).concat("\n\n"));
-        }
-
-        /**
-         * Print issue message.
-         *
-         * @param descriptor ProblemDescriptor
-         * @param code int
-         */
-        public void printIssue(final @NotNull ProblemDescriptor descriptor, final int code) {
-            final String errorMessage = descriptor.getDescriptionTemplate().substring(6).trim();
-            final SupportedIssue issue = SupportedIssue.getByCode(code);
-
-            if (issue == null) {
-                return;
-            }
-
-            final String output = ISSUE_FORMAT
-                    .replace("{SEVERITY}", issue.getLevel().getFormattedLabel())
-                    .replace("{code}", Integer.toString(code))
-                    .replace("{line}", Integer.toString(descriptor.getLineNumber() + 1))
-                    .replace("{message}", errorMessage)
-                    .concat("\n");
-
-            stdout.print(output);
-        }
     }
 }
