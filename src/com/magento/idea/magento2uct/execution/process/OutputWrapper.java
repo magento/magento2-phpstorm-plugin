@@ -87,7 +87,7 @@ public final class OutputWrapper implements AnsiEscapeDecoder.ColoredTextAccepto
     }
 
     /**
-     * Wrap text into the tags in the information style.
+     * Wrap text into the tags into the information style.
      *
      * @param text String
      *
@@ -95,6 +95,28 @@ public final class OutputWrapper implements AnsiEscapeDecoder.ColoredTextAccepto
      */
     public String wrapInfo(final @NotNull String text) {
         return INFO_WRAPPER.replace("{text}", text);
+    }
+
+    /**
+     * Wrap text into the tags into the error style.
+     *
+     * @param text String
+     *
+     * @return String
+     */
+    public String wrapError(final @NotNull String text) {
+        return ERROR_WRAPPER.replace("{text}", text);
+    }
+
+    /**
+     * Wrap text into the tags into the critical style.
+     *
+     * @param text String
+     *
+     * @return String
+     */
+    public String wrapCritical(final @NotNull String text) {
+        return CRITICAL_WRAPPER.replace("{text}", text);
     }
 
     /**

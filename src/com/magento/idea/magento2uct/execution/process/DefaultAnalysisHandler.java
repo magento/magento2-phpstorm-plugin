@@ -42,7 +42,8 @@ public class DefaultAnalysisHandler extends ProcessHandler {
     private void execute() {
         final GenerateUctReportCommand command = new GenerateUctReportCommand(
                 project,
-                new OutputWrapper(this)
+                new OutputWrapper(this),
+                this
         );
         command.execute();
     }

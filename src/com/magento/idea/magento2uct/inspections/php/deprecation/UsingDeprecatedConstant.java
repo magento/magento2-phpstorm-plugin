@@ -7,6 +7,7 @@ package com.magento.idea.magento2uct.inspections.php.deprecation;
 
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.jetbrains.php.lang.inspections.PhpInspection;
@@ -16,6 +17,7 @@ import com.jetbrains.php.lang.psi.elements.impl.ClassConstImpl;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
+import com.magento.idea.magento2uct.settings.UctSettingsService;
 import com.magento.idea.magento2uct.versioning.VersionStateManager;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,6 +34,14 @@ public class UsingDeprecatedConstant extends PhpInspection {
             public void visitPhpClassConstantReference(
                     final ClassConstantReference constantReference
             ) {
+                final Project project = constantReference.getProject();
+                final UctSettingsService settings = UctSettingsService.getInstance(project);
+
+                if (!settings.isEnabled() || !settings.isIssueLevelSatisfiable(
+                        SupportedIssue.USING_DEPRECATED_CONSTANT.getLevel())
+                ) {
+                    return;
+                }
                 final PsiElement element = constantReference.resolve();
 
                 if (!(element instanceof ClassConstImpl)) {
@@ -39,8 +49,7 @@ public class UsingDeprecatedConstant extends PhpInspection {
                 }
                 final String constantClass = ((ClassConstImpl) element).getFQN();
 
-                if (!VersionStateManager.getInstance(constantReference.getProject())
-                        .isDeprecated(constantClass)) {
+                if (!VersionStateManager.getInstance(project).isDeprecated(constantClass)) {
                     return;
                 }
                 final PhpClass containingClass = ((ClassConstImpl) element).getContainingClass();

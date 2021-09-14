@@ -6,6 +6,8 @@
 package com.magento.idea.magento2uct.execution;
 
 import com.intellij.codeInspection.ProblemDescriptor;
+import com.intellij.execution.process.ProcessHandler;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -17,70 +19,105 @@ import com.magento.idea.magento2uct.execution.process.OutputWrapper;
 import com.magento.idea.magento2uct.execution.scanner.ModuleFilesScanner;
 import com.magento.idea.magento2uct.execution.scanner.ModuleScanner;
 import com.magento.idea.magento2uct.execution.scanner.data.ComponentData;
+import com.magento.idea.magento2uct.execution.scanner.filter.ExcludeMagentoBundledFilter;
 import com.magento.idea.magento2uct.inspections.UctInspectionManager;
 import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import java.io.File;
+import com.magento.idea.magento2uct.settings.UctSettingsService;
 import java.nio.file.Paths;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class GenerateUctReportCommand {
 
     private final Project project;
     private final OutputWrapper output;
+    private final ProcessHandler process;
+    private final UctSettingsService settingsService;
 
     /**
      * Command constructor.
      *
      * @param project Project
      * @param output OutputWrapper
+     * @param process ProcessHandler
      */
     public GenerateUctReportCommand(
             final @NotNull Project project,
-            final @NotNull OutputWrapper output
+            final @NotNull OutputWrapper output,
+            final @NotNull ProcessHandler process
     ) {
         this.project = project;
         this.output = output;
+        this.process = process;
+        settingsService = UctSettingsService.getInstance(project);
     }
 
     /**
      * Execute command.
      */
     public void execute() {
-        output.write("Upgrade compatibility tool\n\n");
+        output.write("Upgrade compatibility tool\n");
         final UctInspectionManager inspectionManager = new UctInspectionManager(project);
         final UctReportOutputUtil outputUtil = new UctReportOutputUtil(output);
 
-        for (final ComponentData componentData : new ModuleScanner(getTargetPsiDirectory())) {
-            boolean isModuleHeaderPrinted = false;
+        final PsiDirectory rootDirectory = getTargetPsiDirectory();
 
-            for (final PsiFile psiFile : new ModuleFilesScanner(componentData)) {
-                if (!(psiFile instanceof PhpFile)) {
-                    continue;
-                }
-                final UctProblemsHolder fileProblemsHolder = inspectionManager.run(psiFile);
-
-                if (fileProblemsHolder == null) {
-                    continue;
-                }
-
-                if (fileProblemsHolder.hasResults()) {
-                    if (!isModuleHeaderPrinted) {
-                        outputUtil.printModuleName(componentData.getName());
-                        isModuleHeaderPrinted = true;
-                    }
-                    outputUtil.printProblemFile(psiFile.getVirtualFile().getPath());
-                }
-
-                for (final ProblemDescriptor descriptor : fileProblemsHolder.getResults()) {
-                    final Integer code = fileProblemsHolder.getErrorCodeForDescriptor(descriptor);
-
-                    if (code != null) {
-                        outputUtil.printIssue(descriptor, code);
-                    }
-                }
-            }
+        if (rootDirectory == null) {
+            output.print(
+                    output.wrapCritical("Specified invalid `Path To Analyse` field").concat("\n")
+            );
+            process.destroyProcess();
+            return;
         }
+        final ModuleScanner scanner = new ModuleScanner(
+                rootDirectory,
+                new ExcludeMagentoBundledFilter()
+        );
+
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            ApplicationManager.getApplication().runReadAction(() -> {
+                for (final ComponentData componentData : scanner) {
+                    if (process.isProcessTerminated()) {
+                        return;
+                    }
+                    boolean isModuleHeaderPrinted = false;
+
+                    for (final PsiFile psiFile : new ModuleFilesScanner(componentData)) {
+                        if (!(psiFile instanceof PhpFile)) {
+                            continue;
+                        }
+                        final UctProblemsHolder fileProblemsHolder = inspectionManager.run(psiFile);
+
+                        if (fileProblemsHolder == null) {
+                            continue;
+                        }
+
+                        if (fileProblemsHolder.hasResults()) {
+                            if (!isModuleHeaderPrinted) {
+                                outputUtil.printModuleName(componentData.getName());
+                                isModuleHeaderPrinted = true;
+                            }
+                            outputUtil.printProblemFile(psiFile.getVirtualFile().getPath());
+                        }
+
+                        for (final ProblemDescriptor descriptor
+                                : fileProblemsHolder.getResults()) {
+                            final Integer code = fileProblemsHolder.getErrorCodeForDescriptor(
+                                    descriptor
+                            );
+                            if (code != null) {
+                                outputUtil.printIssue(descriptor, code);
+                            }
+                        }
+                    }
+                }
+                if (scanner.getModuleCount() == 0) {
+                    output.print(output.wrapInfo("Couldn't find modules to analyse").concat("\n"));
+                }
+                process.destroyProcess();
+            });
+        });
     }
 
     /**
@@ -88,17 +125,19 @@ public class GenerateUctReportCommand {
      *
      * @return PsiDirectory
      */
-    private PsiDirectory getTargetPsiDirectory() {
-        final String targetDirPath = project.getBasePath() + File.separator + "CE" + File.separator + "app" + File.separator + "code" + File.separator + "Foo";
+    private @Nullable PsiDirectory getTargetPsiDirectory() {
+        final String targetDirPath = settingsService.getModulePath();
+
+        if (targetDirPath == null) {
+            return null;
+        }
         final VirtualFile targetDirVirtualFile = VfsUtil.findFile(Paths.get(targetDirPath), false);
 
         if (targetDirVirtualFile == null) {
             return null;
         }
 
-        return PsiManager
-                .getInstance(project)
-                .findDirectory(targetDirVirtualFile);
+        return PsiManager.getInstance(project).findDirectory(targetDirVirtualFile);
     }
 
     private static final class UctReportOutputUtil {
@@ -122,7 +161,7 @@ public class GenerateUctReportCommand {
          */
         public void printModuleName(final @NotNull String moduleName) {
             final String moduleNameLine = "Module Name: ".concat(moduleName);
-            stdout.print(stdout.wrapInfo(moduleNameLine).concat("\n"));
+            stdout.print("\n\n" + stdout.wrapInfo(moduleNameLine).concat("\n"));
             stdout.print(stdout.wrapInfo("-".repeat(moduleNameLine.length())).concat("\n"));
         }
 

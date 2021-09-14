@@ -19,8 +19,11 @@ import com.magento.idea.magento2plugin.magento.files.ModuleXml;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2uct.execution.scanner.data.ComponentData;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+
+import com.magento.idea.magento2uct.execution.scanner.filter.ModuleScannerFilter;
 import org.jetbrains.annotations.NotNull;
 
 public final class ModuleScanner implements Iterable<ComponentData> {
@@ -29,22 +32,36 @@ public final class ModuleScanner implements Iterable<ComponentData> {
 
     private final PsiDirectory rootDirectory;
     private final List<ComponentData> componentDataList;
+    private final List<ModuleScannerFilter> filters;
 
     /**
      * Magento 2 module components scanner constructor.
      *
      * @param rootDirectory PsiDirectory
+     * @param filters ModuleScannerFilter[]
      */
     public ModuleScanner(
-            final @NotNull PsiDirectory rootDirectory
+            final @NotNull PsiDirectory rootDirectory,
+            final @NotNull ModuleScannerFilter... filters
+
     ) {
         this.rootDirectory = rootDirectory;
+        this.filters = Arrays.asList(filters);
         componentDataList = new ArrayList<>();
     }
 
     @Override
     public @NotNull Iterator<ComponentData> iterator() {
         return run().iterator();
+    }
+
+    /**
+     * Get found modules qty.
+     *
+     * @return int
+     */
+    public int getModuleCount() {
+        return componentDataList.size();
     }
 
     /**
@@ -93,12 +110,16 @@ public final class ModuleScanner implements Iterable<ComponentData> {
                 composerBasedName = meta.getFirst();
                 composerType = meta.getSecond();
 
+                if (composerBasedName == null || composerType == null) {
+                    return;
+                }
+
                 if (name == null && FRAMEWORK_LIBRARY_NAME.equals(composerBasedName)) {
                     name = meta.getFirst();
                     type = composerType;
                 }
 
-                if (!type.equals(composerType)) {
+                if (!type.equals(composerType) && !composerType.equals("project")) {
                     return;
                 }
                 break;
@@ -106,14 +127,24 @@ public final class ModuleScanner implements Iterable<ComponentData> {
         }
 
         if (name != null) {
-            componentDataList.add(
-                    new ComponentData(
-                            name,
-                            composerBasedName,
-                            type,
-                            directory
-                    )
+            final ComponentData component = new ComponentData(
+                    name,
+                    composerBasedName,
+                    type,
+                    directory
             );
+            boolean isExcluded = false;
+
+            for (final ModuleScannerFilter filter : filters) {
+                if (filter.isExcluded(component)) {
+                    isExcluded = true;
+                    break;
+                }
+            }
+
+            if (!isExcluded) {
+                componentDataList.add(component);
+            }
             return;
         }
 

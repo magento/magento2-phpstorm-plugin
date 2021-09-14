@@ -7,6 +7,7 @@ package com.magento.idea.magento2uct.inspections.php.deprecation;
 
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElementVisitor;
 import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.jetbrains.php.lang.psi.elements.Field;
@@ -15,6 +16,7 @@ import com.jetbrains.php.lang.psi.elements.impl.ClassConstImpl;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeAnalyserVisitor;
 import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
+import com.magento.idea.magento2uct.settings.UctSettingsService;
 import com.magento.idea.magento2uct.versioning.VersionStateManager;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,6 +31,14 @@ public class OverridingDeprecatedConstant extends PhpInspection {
 
             @Override
             public void visitPhpField(final Field field) {
+                final Project project = field.getProject();
+                final UctSettingsService settings = UctSettingsService.getInstance(project);
+
+                if (!settings.isEnabled() || !settings.isIssueLevelSatisfiable(
+                        SupportedIssue.OVERRIDING_DEPRECATED_CONSTANT.getLevel())
+                ) {
+                    return;
+                }
                 super.visitPhpField(field);
 
                 if (!(field instanceof ClassConstImpl)) {
@@ -47,7 +57,7 @@ public class OverridingDeprecatedConstant extends PhpInspection {
                     for (final Field ownField : parentClass.getOwnFields()) {
                         if (ownField instanceof ClassConstImpl
                                 && ownField.getName().equals(constant.getName())
-                                && VersionStateManager.getInstance(field.getProject())
+                                && VersionStateManager.getInstance(project)
                                 .isDeprecated(ownField.getFQN())
                         ) {
                             if (problemsHolder instanceof UctProblemsHolder) {

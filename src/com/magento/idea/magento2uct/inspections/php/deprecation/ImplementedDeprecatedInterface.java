@@ -7,6 +7,7 @@ package com.magento.idea.magento2uct.inspections.php.deprecation;
 
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
@@ -16,6 +17,7 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
+import com.magento.idea.magento2uct.settings.UctSettingsService;
 import com.magento.idea.magento2uct.versioning.VersionStateManager;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +33,15 @@ public class ImplementedDeprecatedInterface extends PhpInspection {
 
             @Override
             public void visitPhpClass(final PhpClass clazz) {
+                final Project project = clazz.getProject();
+                final UctSettingsService settings = UctSettingsService.getInstance(project);
+
+                if (!settings.isEnabled() || !settings.isIssueLevelSatisfiable(
+                        SupportedIssue.IMPLEMENTED_DEPRECATED_INTERFACE.getLevel())
+                ) {
+                    return;
+                }
+
                 if (clazz.isInterface()) {
                     return;
                 }
@@ -42,7 +53,7 @@ public class ImplementedDeprecatedInterface extends PhpInspection {
                         continue;
                     }
                     final boolean isDeprecated = VersionStateManager
-                            .getInstance(clazz.getProject()).isDeprecated(interfaceFqn);
+                            .getInstance(project).isDeprecated(interfaceFqn);
                     Pair<Boolean, String> checkResult = null;
 
                     if (isDeprecated || (checkResult = InheritedDeprecatedInterface
