@@ -24,6 +24,24 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
     @Property
     private String uctExecutablePath;
 
+    @Property
+    private Boolean isEnabled;
+
+    @Property
+    private String currentVersion;
+
+    @Property
+    private String targetVersion;
+
+    @Property
+    private String modulePath;
+
+    @Property
+    private Integer minIssueSeverityLevel;
+
+    @Property
+    private Boolean shouldIgnoreCurrentVersion;
+
     @SuppressWarnings("PMD.UncommentedEmptyConstructor")
     public UctSettingsService() {
     }
@@ -44,7 +62,7 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
      *
      * @return UctSettingsService
      */
-    public @Nullable static UctSettingsService getInstance(final @NotNull Project project) {
+    public static UctSettingsService getInstance(final @NotNull Project project) {
         return project.getService(UctSettingsService.class);
     }
 
@@ -80,12 +98,76 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
     }
 
     /**
+     * Check if specified issue severity level is satisfiable for the specified minimum value.
+     *
+     * @param issueSeverityLevel IssueSeverityLevel
+     *
+     * @return boolean
+     */
+    public boolean isIssueLevelSatisfiable(final @NotNull IssueSeverityLevel issueSeverityLevel) {
+        if (minIssueSeverityLevel == null) {
+            return false;
+        }
+        final IssueSeverityLevel minimumSatisfiable = IssueSeverityLevel.getByLevel(
+                minIssueSeverityLevel
+        );
+
+        return issueSeverityLevel.getLevel() <= minimumSatisfiable.getLevel();
+    }
+
+    /**
+     * Set is analysis enabled value.
+     *
+     * @param isEnabled boolean
+     */
+    public void setIsEnabled(final boolean isEnabled) {
+        this.isEnabled = isEnabled;
+    }
+
+    /**
+     * Check if the built-in UCT feature is enabled.
+     *
+     * @return boolean
+     */
+    public boolean isEnabled() {
+        if (isEnabled == null) {
+            return false;
+        }
+        return isEnabled;
+    }
+
+    /**
+     * Set current version.
+     *
+     * @param version SupportedVersion
+     */
+    public void setCurrentVersion(final @Nullable SupportedVersion version) {
+        if (version == null) {
+            this.currentVersion = null;
+        } else {
+            this.currentVersion = version.getVersion();
+        }
+    }
+
+    /**
      * Get current version.
      *
      * @return SupportedVersion or null if current version is less than min supported version.
      */
-    public SupportedVersion getCurrentVersion() {
-        return SupportedVersion.V230;
+    public @Nullable SupportedVersion getCurrentVersion() {
+        if (currentVersion == null) {
+            return null;
+        }
+        return SupportedVersion.getVersion(currentVersion);
+    }
+
+    /**
+     * Set target version.
+     *
+     * @param version SupportedVersion
+     */
+    public void setTargetVersion(final @NotNull SupportedVersion version) {
+        this.targetVersion = version.getVersion();
     }
 
     /**
@@ -93,8 +175,20 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
      *
      * @return SupportedVersion
      */
-    public SupportedVersion getTargetVersion() {
-        return SupportedVersion.V231;
+    public @Nullable SupportedVersion getTargetVersion() {
+        if (targetVersion == null) {
+            return null;
+        }
+        return SupportedVersion.getVersion(targetVersion);
+    }
+
+    /**
+     * Set path to analyse.
+     *
+     * @param modulePath String
+     */
+    public void setModulePath(final @NotNull String modulePath) {
+        this.modulePath = modulePath;
     }
 
     /**
@@ -102,8 +196,17 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
      *
      * @return String
      */
-    public String getModulePath() {
-        return "test";
+    public @Nullable String getModulePath() {
+        return modulePath;
+    }
+
+    /**
+     * Set minimum issue severity level.
+     *
+     * @param minIssueSeverityLevel int
+     */
+    public void setMinIssueSeverityLevel(final int minIssueSeverityLevel) {
+        this.minIssueSeverityLevel = minIssueSeverityLevel;
     }
 
     /**
@@ -111,8 +214,20 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
      *
      * @return IssueSeverityLevel
      */
-    public IssueSeverityLevel getMinIssueLevel() {
-        return IssueSeverityLevel.WARNING;
+    public @Nullable IssueSeverityLevel getMinIssueLevel() {
+        if (minIssueSeverityLevel == null) {
+            return null;
+        }
+        return IssueSeverityLevel.getByLevel(minIssueSeverityLevel);
+    }
+
+    /**
+     * Set if analysis should ignore current version compatibility problems.
+     *
+     * @param shouldIgnoreCurrentVersion boolean
+     */
+    public void setShouldIgnoreCurrentVersion(final boolean shouldIgnoreCurrentVersion) {
+        this.shouldIgnoreCurrentVersion = shouldIgnoreCurrentVersion;
     }
 
     /**
@@ -120,7 +235,7 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
      *
      * @return boolean
      */
-    public boolean shouldIgnoreCurrentVersion() {
-        return false;
+    public @Nullable Boolean shouldIgnoreCurrentVersion() {
+        return shouldIgnoreCurrentVersion;
     }
 }

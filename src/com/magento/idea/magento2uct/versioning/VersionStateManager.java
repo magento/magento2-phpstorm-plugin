@@ -65,7 +65,12 @@ public final class VersionStateManager {
     private void compute(final VersionStateIndex index) {
         final SupportedVersion currentVersion = settingsService.getCurrentVersion();
         final SupportedVersion targetVersion = settingsService.getTargetVersion();
-        final boolean hasIgnoringFlag = settingsService.shouldIgnoreCurrentVersion();
+        final Boolean hasIgnoreFlagStoredValue = settingsService.shouldIgnoreCurrentVersion();
+        boolean hasIgnoringFlag = false;
+
+        if (hasIgnoreFlagStoredValue != null) {
+            hasIgnoringFlag = hasIgnoreFlagStoredValue;
+        }
 
         if (targetVersion == null) {
             return;

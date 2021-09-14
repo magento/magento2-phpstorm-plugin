@@ -6,6 +6,7 @@
 package com.magento.idea.magento2uct.inspections.php.deprecation;
 
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.jetbrains.php.lang.PhpLangUtil;
@@ -17,6 +18,8 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.impl.ClassConstImpl;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeAnalyserVisitor;
+import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
+import com.magento.idea.magento2uct.settings.UctSettingsService;
 import com.magento.idea.magento2uct.versioning.VersionStateManager;
 import org.jetbrains.annotations.NotNull;
 
@@ -52,6 +55,13 @@ public abstract class UsingDeprecatedType extends PhpInspection {
             final boolean isInterface
     );
 
+    /**
+     * Get issue severity level for concrete inspection.
+     *
+     * @return IssueSeverityLevel
+     */
+    protected abstract IssueSeverityLevel getSeverityLevel();
+
     @Override
     public @NotNull PsiElementVisitor buildVisitor(
             final @NotNull ProblemsHolder problemsHolder,
@@ -61,6 +71,13 @@ public abstract class UsingDeprecatedType extends PhpInspection {
 
             @Override
             public void visitPhpField(final Field field) {
+                final Project project = field.getProject();
+                final UctSettingsService settings = UctSettingsService.getInstance(project);
+
+                if (!settings.isEnabled()
+                        || !settings.isIssueLevelSatisfiable(getSeverityLevel())) {
+                    return;
+                }
                 super.visitPhpField(field);
                 final PhpClass phpClass = field.getContainingClass();
 
@@ -74,7 +91,7 @@ public abstract class UsingDeprecatedType extends PhpInspection {
                     return;
                 }
                 final ClassReference phpReference = PhpPsiElementFactory.createClassReference(
-                        phpClass.getProject(),
+                        project,
                         fieldType
                 );
                 boolean isInterface = false;
@@ -84,13 +101,20 @@ public abstract class UsingDeprecatedType extends PhpInspection {
                     isInterface = true;
                 }
 
-                if (VersionStateManager.getInstance(field.getProject()).isDeprecated(fieldType)) {
+                if (VersionStateManager.getInstance(project).isDeprecated(fieldType)) {
                     registerProblem(problemsHolder, field, fieldType, isInterface);
                 }
             }
 
             @Override
             public void visitPhpClassReference(final ClassReference reference) {
+                final Project project = reference.getProject();
+                final UctSettingsService settings = UctSettingsService.getInstance(project);
+
+                if (!settings.isEnabled()
+                        || !settings.isIssueLevelSatisfiable(getSeverityLevel())) {
+                    return;
+                }
                 final PsiElement resolved = reference.resolve();
 
                 if (!(resolved instanceof PhpClass)) {
@@ -99,7 +123,7 @@ public abstract class UsingDeprecatedType extends PhpInspection {
                 final PhpClass phpClass = (PhpClass) resolved;
                 final boolean isInterface = phpClass.isInterface();
 
-                if (VersionStateManager.getInstance(reference.getProject())
+                if (VersionStateManager.getInstance(project)
                         .isDeprecated(phpClass.getFQN())) {
                     registerReferenceProblem(
                             problemsHolder,

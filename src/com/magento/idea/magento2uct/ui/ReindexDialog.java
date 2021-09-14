@@ -11,7 +11,7 @@ import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.AbstractDialog;
 import com.magento.idea.magento2uct.actions.ReindexVersionedIndexesAction;
-import com.magento.idea.magento2uct.execution.RunAnalysisExecutor;
+import com.magento.idea.magento2uct.execution.DefaultExecutor;
 import com.magento.idea.magento2uct.execution.process.ReindexHandler;
 import com.magento.idea.magento2uct.packages.SupportedVersion;
 import java.awt.event.KeyEvent;
@@ -32,9 +32,9 @@ public class ReindexDialog extends AbstractDialog {
 
     private JPanel contentPanel;
     private JComboBox<ComboBoxItemData> targetVersion;
-    private JLabel targetVersionLabel;//NOPMD
     private JButton buttonOk;
     private JButton buttonCancel;
+    private JLabel targetVersionLabel;//NOPMD
 
     /**
      * Reindexing dialog.
@@ -108,7 +108,7 @@ public class ReindexDialog extends AbstractDialog {
         if (version == null) {
             return;
         }
-        final RunAnalysisExecutor executor = new RunAnalysisExecutor(
+        final DefaultExecutor executor = new DefaultExecutor(
                 project,
                 new ReindexHandler(
                         project,

@@ -10,6 +10,7 @@ import com.intellij.codeInspection.ProblemsHolder;
 import com.jetbrains.php.lang.psi.elements.ClassReference;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
+import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
 import org.jetbrains.annotations.NotNull;
 
@@ -57,5 +58,10 @@ public class UsingDeprecatedClass extends UsingDeprecatedType {
                 SupportedIssue.USING_DEPRECATED_CLASS.getMessage(deprecatedType),
                 ProblemHighlightType.LIKE_DEPRECATED
         );
+    }
+
+    @Override
+    protected IssueSeverityLevel getSeverityLevel() {
+        return SupportedIssue.USING_DEPRECATED_CLASS.getLevel();
     }
 }

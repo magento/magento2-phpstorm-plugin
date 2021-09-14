@@ -10,21 +10,19 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2plugin.project.Settings;
-import com.magento.idea.magento2uct.execution.DefaultExecutor;
-import com.magento.idea.magento2uct.execution.process.DefaultAnalysisHandler;
-import com.magento.idea.magento2uct.settings.UctSettingsService;
+import com.magento.idea.magento2uct.ui.ConfigurationDialog;
 import org.jetbrains.annotations.NotNull;
 
-public class RunUpgradeCompatibilityToolAction extends AnAction {
+public class ConfigureUctAction extends AnAction {
 
-    public static final String ACTION_NAME = "Run The Upgrade Compatibility Tool";
-    public static final String ACTION_DESCRIPTION = "Magento 2 Upgrade Compatibility Tool";
+    public static final String ACTION_NAME = "Configure The Upgrade Compatibility Tool";
+    public static final String ACTION_DESCRIPTION = "Magento 2 Upgrade Compatibility Tool Settings";
 
     /**
      * An action constructor.
      */
-    public RunUpgradeCompatibilityToolAction() {
-        super(ACTION_NAME, ACTION_DESCRIPTION, AllIcons.Actions.Execute);
+    public ConfigureUctAction() {
+        super(ACTION_NAME, ACTION_DESCRIPTION, AllIcons.Actions.InlayGear);
     }
 
     @Override
@@ -35,12 +33,7 @@ public class RunUpgradeCompatibilityToolAction extends AnAction {
         if (project == null || !Settings.isEnabled(project)) {
             return;
         }
-        final UctSettingsService uctSettingsService = UctSettingsService.getInstance(project);
         setIsAvailableForEvent(event, true);
-
-        if (!uctSettingsService.isEnabled()) {
-            event.getPresentation().setEnabled(false);
-        }
     }
 
     @Override
@@ -50,11 +43,7 @@ public class RunUpgradeCompatibilityToolAction extends AnAction {
         if (project == null) {
             return;
         }
-        final DefaultExecutor executor = new DefaultExecutor(
-                project,
-                new DefaultAnalysisHandler(project)
-        );
-        executor.run();
+        ConfigurationDialog.open(project);
     }
 
     /**

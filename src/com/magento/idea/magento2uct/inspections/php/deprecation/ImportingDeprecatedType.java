@@ -6,6 +6,7 @@
 package com.magento.idea.magento2uct.inspections.php.deprecation;
 
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
@@ -17,6 +18,8 @@ import com.jetbrains.php.lang.psi.elements.PhpUse;
 import com.jetbrains.php.lang.psi.elements.PhpUseList;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
+import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
+import com.magento.idea.magento2uct.settings.UctSettingsService;
 import com.magento.idea.magento2uct.versioning.VersionStateManager;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,6 +38,13 @@ public abstract class ImportingDeprecatedType extends PhpInspection {
             final boolean isInterface
     );
 
+    /**
+     * Get issue severity level for concrete inspection.
+     *
+     * @return IssueSeverityLevel
+     */
+    protected abstract IssueSeverityLevel getSeverityLevel();
+
     @Override
     public @NotNull PsiElementVisitor buildVisitor(
             final @NotNull ProblemsHolder problemsHolder,
@@ -44,14 +54,20 @@ public abstract class ImportingDeprecatedType extends PhpInspection {
 
             @Override
             public void visitPhpUseList(final PhpUseList useList) {
+                final Project project = useList.getProject();
+                final UctSettingsService settings = UctSettingsService.getInstance(project);
+
+                if (!settings.isEnabled()
+                        || !settings.isIssueLevelSatisfiable(getSeverityLevel())) {
+                    return;
+                }
                 final PhpClass phpClass = getParentClass(useList);
 
                 if (phpClass == null) {
                     return;
                 }
                 for (final PhpUse use : useList.getDeclarations()) {
-                    if (VersionStateManager.getInstance(useList.getProject())
-                            .isDeprecated(use.getFQN())) {
+                    if (VersionStateManager.getInstance(project).isDeprecated(use.getFQN())) {
                         final PhpReference phpReference = use.getTargetReference();
                         boolean isInterface = false;
 

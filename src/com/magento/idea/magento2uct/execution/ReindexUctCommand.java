@@ -71,6 +71,9 @@ public class ReindexUctCommand {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             ApplicationManager.getApplication().runReadAction(() -> {
                 for (final ComponentData componentData : new ModuleScanner(directory)) {
+                    if (process.isProcessTerminated()) {
+                        return;
+                    }
                     output.print(output.wrapInfo(componentData.getName()).concat("\n"));
 
                     for (final PsiFile psiFile : new ModuleFilesScanner(componentData)) {
