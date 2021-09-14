@@ -36,6 +36,7 @@ import java.nio.file.Paths;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings({"PMD.NPathComplexity", "PMD.ExcessiveImports", "PMD.CognitiveComplexity"})
 public class GenerateUctReportCommand {
 
     private final Project project;
@@ -73,11 +74,9 @@ public class GenerateUctReportCommand {
     /**
      * Execute command.
      */
+    @SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.AvoidInstantiatingObjectsInLoops"})
     public void execute() {
         output.write("Upgrade compatibility tool\n");
-        final UctInspectionManager inspectionManager = new UctInspectionManager(project);
-        final UctReportOutputUtil outputUtil = new UctReportOutputUtil(output);
-
         final PsiDirectory rootDirectory = getTargetPsiDirectory();
 
         if (rootDirectory == null) {
@@ -96,6 +95,7 @@ public class GenerateUctReportCommand {
                 settingsService.getTargetVersion()
         );
         final ReportBuilder reportBuilder = new ReportBuilder(project);
+        final UctReportOutputUtil outputUtil = new UctReportOutputUtil(output);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             ApplicationManager.getApplication().runReadAction(() -> {
@@ -111,6 +111,9 @@ public class GenerateUctReportCommand {
                             continue;
                         }
                         final String filename = psiFile.getVirtualFile().getPath();
+                        final UctInspectionManager inspectionManager = new UctInspectionManager(
+                                project
+                        );
                         final UctProblemsHolder fileProblemsHolder = inspectionManager.run(psiFile);
 
                         if (fileProblemsHolder == null) {

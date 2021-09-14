@@ -23,9 +23,10 @@ import org.jetbrains.annotations.NotNull;
 public class OverridingDeprecatedConstant extends PhpInspection {
 
     @Override
+    @SuppressWarnings("PMD.CognitiveComplexity")
     public @NotNull PsiElementVisitor buildVisitor(
             final @NotNull ProblemsHolder problemsHolder,
-            boolean isOnTheFly
+            final boolean isOnTheFly
     ) {
         return new PhpTypeAnalyserVisitor() {
 
@@ -44,7 +45,6 @@ public class OverridingDeprecatedConstant extends PhpInspection {
                 if (!(field instanceof ClassConstImpl)) {
                     return;
                 }
-                final ClassConstImpl constant = (ClassConstImpl) field;
                 final PhpClass phpClass = field.getContainingClass();
 
                 if (phpClass == null) {
@@ -52,6 +52,7 @@ public class OverridingDeprecatedConstant extends PhpInspection {
                 }
                 PhpClass parentClass = phpClass.getSuperClass();
                 boolean isFound = false;
+                final ClassConstImpl constant = (ClassConstImpl) field;
 
                 while (parentClass != null && !isFound) {
                     for (final Field ownField : parentClass.getOwnFields()) {

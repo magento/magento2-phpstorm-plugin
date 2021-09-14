@@ -26,7 +26,7 @@ public class UsingDeprecatedConstant extends PhpInspection {
     @Override
     public @NotNull PsiElementVisitor buildVisitor(
             final @NotNull ProblemsHolder problemsHolder,
-            boolean isOnTheFly
+            final boolean isOnTheFly
     ) {
         return new PhpElementVisitor() {
 

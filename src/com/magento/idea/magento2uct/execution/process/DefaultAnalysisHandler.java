@@ -30,7 +30,7 @@ public class DefaultAnalysisHandler extends ProcessHandler {
                 new ProcessAdapter() {
                     @Override
                     public void startNotified(final @NotNull ProcessEvent event) {
-                        execute();
+                        DefaultAnalysisHandler.this.execute();
                     }
                 }
         );
@@ -39,7 +39,7 @@ public class DefaultAnalysisHandler extends ProcessHandler {
     /**
      * Run the main analysis process.
      */
-    private void execute() {
+    public void execute() {
         final GenerateUctReportCommand command = new GenerateUctReportCommand(
                 project,
                 new OutputWrapper(this),

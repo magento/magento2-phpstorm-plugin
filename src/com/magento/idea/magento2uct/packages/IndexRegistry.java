@@ -21,9 +21,9 @@ public enum IndexRegistry {
     private final Class<?> type;
     private final String[] versions;
 
-    IndexRegistry(final Class<?> type, final String[] versions) {
+    IndexRegistry(final Class<?> type, final String... versions) {
         this.type = type;
-        this.versions = versions;
+        this.versions = Arrays.copyOf(versions, versions.length);
         key = this.toString();
     }
 

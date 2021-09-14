@@ -25,7 +25,7 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
     private String uctExecutablePath;
 
     @Property
-    private Boolean isEnabled;
+    private Boolean enabled;
 
     @Property
     private String currentVersion;
@@ -40,7 +40,7 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
     private Integer minIssueSeverityLevel;
 
     @Property
-    private Boolean shouldIgnoreCurrentVersion;
+    private Boolean ignoreCurrentVersion;
 
     @SuppressWarnings("PMD.UncommentedEmptyConstructor")
     public UctSettingsService() {
@@ -118,10 +118,10 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
     /**
      * Set is analysis enabled value.
      *
-     * @param isEnabled boolean
+     * @param enabled boolean
      */
-    public void setIsEnabled(final boolean isEnabled) {
-        this.isEnabled = isEnabled;
+    public void setEnabled(final boolean enabled) {
+        this.enabled = enabled;
     }
 
     /**
@@ -130,10 +130,10 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
      * @return boolean
      */
     public boolean isEnabled() {
-        if (isEnabled == null) {
+        if (enabled == null) {
             return false;
         }
-        return isEnabled;
+        return enabled;
     }
 
     /**
@@ -143,7 +143,7 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
      */
     public void setCurrentVersion(final @Nullable SupportedVersion version) {
         if (version == null) {
-            this.currentVersion = null;
+            this.currentVersion = null;//NOPMD
         } else {
             this.currentVersion = version.getVersion();
         }
@@ -224,10 +224,10 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
     /**
      * Set if analysis should ignore current version compatibility problems.
      *
-     * @param shouldIgnoreCurrentVersion boolean
+     * @param ignoreCurrentVersion boolean
      */
-    public void setShouldIgnoreCurrentVersion(final boolean shouldIgnoreCurrentVersion) {
-        this.shouldIgnoreCurrentVersion = shouldIgnoreCurrentVersion;
+    public void setIgnoreCurrentVersion(final boolean ignoreCurrentVersion) {
+        this.ignoreCurrentVersion = ignoreCurrentVersion;
     }
 
     /**
@@ -236,6 +236,6 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
      * @return boolean
      */
     public @Nullable Boolean shouldIgnoreCurrentVersion() {
-        return shouldIgnoreCurrentVersion;
+        return ignoreCurrentVersion;
     }
 }

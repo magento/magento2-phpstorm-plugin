@@ -63,9 +63,10 @@ public abstract class UsingDeprecatedType extends PhpInspection {
     protected abstract IssueSeverityLevel getSeverityLevel();
 
     @Override
+    @SuppressWarnings({"PMD.CognitiveComplexity", "PMD.NPathComplexity"})
     public @NotNull PsiElementVisitor buildVisitor(
             final @NotNull ProblemsHolder problemsHolder,
-            boolean isOnTheFly
+            final boolean isOnTheFly
     ) {
         return new PhpTypeAnalyserVisitor() {
 

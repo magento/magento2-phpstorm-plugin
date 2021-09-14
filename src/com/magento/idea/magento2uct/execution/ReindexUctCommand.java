@@ -67,6 +67,7 @@ public class ReindexUctCommand {
      *
      * @param version SupportedVersion
      */
+    @SuppressWarnings({"PMD.CognitiveComplexity", "PMD.AvoidInstantiatingObjectsInLoops"})
     public void execute(final @NotNull SupportedVersion version) {
         if (project.getBasePath() == null) {
             return;

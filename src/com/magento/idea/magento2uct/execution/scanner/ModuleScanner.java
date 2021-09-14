@@ -81,10 +81,16 @@ public final class ModuleScanner implements Iterable<ComponentData> {
      *
      * @param directory PsiDirectory
      */
+    @SuppressWarnings({
+            "PMD.NPathComplexity",
+            "PMD.CyclomaticComplexity",
+            "PMD.CognitiveComplexity",
+            "PMD.AvoidDeeplyNestedIfStmts"
+    })
     private void findModuleComponent(final @NotNull PsiDirectory directory) {
         String name = null;
         String composerBasedName = null;
-        String composerType = null;
+        String composerType;
         String type = "magento2-module";
 
         for (final PsiDirectory subDirectory : directory.getSubdirectories()) {
@@ -119,7 +125,7 @@ public final class ModuleScanner implements Iterable<ComponentData> {
                     type = composerType;
                 }
 
-                if (!type.equals(composerType) && !composerType.equals("project")) {
+                if (!type.equals(composerType) && !"project".equals(composerType)) {
                     return;
                 }
                 break;
@@ -160,6 +166,11 @@ public final class ModuleScanner implements Iterable<ComponentData> {
      *
      * @return Pair[String, String]
      */
+    @SuppressWarnings({
+            "PMD.NPathComplexity",
+            "PMD.CyclomaticComplexity",
+            "PMD.CognitiveComplexity"
+    })
     private Pair<String, String> scanModuleComposerMeta(final JsonFile composerFile) {
         final JsonValue topNode = composerFile.getTopLevelValue();
         String name = null;

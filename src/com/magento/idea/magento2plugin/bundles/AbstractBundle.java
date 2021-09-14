@@ -10,17 +10,38 @@ import java.util.ResourceBundle;
 
 public abstract class AbstractBundle {
 
-    abstract public String getBundleName();
+    public abstract String getBundleName();
 
-    public String message(String key, Object... params) {
-        ResourceBundle BUNDLE = ResourceBundle.getBundle(getBundleName());
+    /**
+     * Get bundle message.
+     *
+     * @param key String
+     * @param params Object[]
+     *
+     * @return String
+     */
+    public String message(final String key, final Object... params) {
+        final ResourceBundle bundle = ResourceBundle.getBundle(getBundleName());
 
-        return CommonBundle.message(BUNDLE, key, params);
+        return CommonBundle.message(bundle, key, params);
     }
 
-    public String messageOrDefault(String key, String defaultValue, Object... params) {
-        ResourceBundle BUNDLE = ResourceBundle.getBundle(getBundleName());
+    /**
+     * Get message or default value.
+     *
+     * @param key String
+     * @param defaultValue String
+     * @param params Object[]
+     *
+     * @return String
+     */
+    public String messageOrDefault(
+            final String key,
+            final String defaultValue,
+            final Object... params
+    ) {
+        final ResourceBundle bundle = ResourceBundle.getBundle(getBundleName());
 
-        return CommonBundle.messageOrDefault(BUNDLE, key, defaultValue, params);
+        return CommonBundle.messageOrDefault(bundle, key, defaultValue, params);
     }
 }

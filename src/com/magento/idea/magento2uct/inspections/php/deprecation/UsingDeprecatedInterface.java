@@ -21,7 +21,7 @@ public class UsingDeprecatedInterface extends UsingDeprecatedType {
             final @NotNull ProblemsHolder problemsHolder,
             final Field field,
             final String fieldInterface,
-            boolean isInterface
+            final boolean isInterface
     ) {
         if (!isInterface) {
             return;

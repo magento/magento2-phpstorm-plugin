@@ -16,10 +16,9 @@ import org.jetbrains.annotations.NotNull;
 
 public final class VersionStateManager {
 
-    private final Project project;
     private final UctSettingsService settingsService;
 
-    private static VersionStateManager INSTANCE;
+    private static VersionStateManager instance;
     private final DeprecationStateIndex deprecationStateIndex;
 
     /**
@@ -29,18 +28,17 @@ public final class VersionStateManager {
      *
      * @return VersionStateManager
      */
-    public static VersionStateManager getInstance(final @NotNull Project project) {
-        if (INSTANCE == null) {
-            INSTANCE = new VersionStateManager(project);
+    public synchronized static VersionStateManager getInstance(final @NotNull Project project) {//NOPMD
+        if (instance == null) {
+            instance = new VersionStateManager(project);
         }
-        return INSTANCE;
+        return instance;
     }
 
     /**
      * Version state manager constructor.
      */
     private VersionStateManager(final @NotNull Project project) {
-        this.project = project;
         settingsService = UctSettingsService.getInstance(project);
         deprecationStateIndex = new DeprecationStateIndex();
         compute(deprecationStateIndex);
@@ -63,19 +61,19 @@ public final class VersionStateManager {
      * @param index VersionStateIndex
      */
     private void compute(final VersionStateIndex index) {
-        final SupportedVersion currentVersion = settingsService.getCurrentVersion();
-        final SupportedVersion targetVersion = settingsService.getTargetVersion();
         final Boolean hasIgnoreFlagStoredValue = settingsService.shouldIgnoreCurrentVersion();
         boolean hasIgnoringFlag = false;
 
         if (hasIgnoreFlagStoredValue != null) {
             hasIgnoringFlag = hasIgnoreFlagStoredValue;
         }
+        final SupportedVersion targetVersion = settingsService.getTargetVersion();
 
         if (targetVersion == null) {
             return;
         }
         final List<SupportedVersion> versionsToLoad = new LinkedList<>();
+        final SupportedVersion currentVersion = settingsService.getCurrentVersion();
 
         for (final SupportedVersion version : SupportedVersion.values()) {
             if (version.compareTo(targetVersion) <= 0) {

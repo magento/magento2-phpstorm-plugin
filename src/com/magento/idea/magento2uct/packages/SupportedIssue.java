@@ -105,7 +105,7 @@ public enum SupportedIssue {
     private final IssueSeverityLevel level;
     private final String messageKey;
     private final Class<? extends LocalInspectionTool> inspectionClass;
-    private static final UctInspectionBundle bundle = new UctInspectionBundle();
+    private static final UctInspectionBundle BUNDLE = new UctInspectionBundle();
 
     /**
      * Known issue ENUM.
@@ -153,7 +153,7 @@ public enum SupportedIssue {
      * @return String
      */
     public String getMessage(final Object... args) {
-        return bundle.message(messageKey, args);
+        return BUNDLE.message(messageKey, args);
     }
 
     /**

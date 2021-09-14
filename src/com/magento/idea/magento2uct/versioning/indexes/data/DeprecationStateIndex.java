@@ -41,7 +41,7 @@ public class DeprecationStateIndex implements VersionStateIndex {
      * @return boolean
      */
     public boolean has(final @NotNull String key) {
-        final Pair<String, Boolean> lookupResult = isDeprecatedLookup(key);
+        final Pair<String, Boolean> lookupResult = checkIfDeprecated(key);
 
         if (lookupResult.getSecond() != null && lookupResult.getSecond()) {
             versionState = lookupResult.getFirst();
@@ -74,8 +74,8 @@ public class DeprecationStateIndex implements VersionStateIndex {
                     .replace("%key", registrationInfo.getKey());
             try {
                 putIndexData(version.getVersion(), storage.load(RESOURCE_PATH + indexName));
-            } catch (IOException | ClassNotFoundException exception) {
-                //
+            } catch (IOException | ClassNotFoundException exception) {//NOPMD
+                // Just go for the next version.
             }
         }
     }
@@ -102,7 +102,7 @@ public class DeprecationStateIndex implements VersionStateIndex {
      *
      * @return Pair[String, Boolean]
      */
-    private Pair<String, Boolean> isDeprecatedLookup(final @NotNull String lookupKey) {
+    private Pair<String, Boolean> checkIfDeprecated(final @NotNull String lookupKey) {
         for (final Map.Entry<String, Map<String, Boolean>> versionIndexEntry
                 : versioningData.entrySet()) {
             final String version = versionIndexEntry.getKey();

@@ -20,9 +20,9 @@ public class Summary {
     private int processedModules;
     private long processStartedTime;
     private long processEndedTime;
-    private int phpWarnings = 0;
-    private int phpErrors = 0;
-    private int phpCriticalErrors = 0;
+    private int phpWarnings;
+    private int phpErrors;
+    private int phpCriticalErrors;
 
     /**
      * Summary.

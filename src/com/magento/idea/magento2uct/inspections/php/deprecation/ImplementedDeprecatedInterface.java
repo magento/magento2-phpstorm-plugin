@@ -25,9 +25,14 @@ import org.jetbrains.annotations.NotNull;
 public class ImplementedDeprecatedInterface extends PhpInspection {
 
     @Override
+    @SuppressWarnings({
+            "PMD.CognitiveComplexity",
+            "PMD.ExcessiveMethodLength",
+            "PMD.NPathComplexity"
+    })
     public @NotNull PsiElementVisitor buildVisitor(
             final @NotNull ProblemsHolder problemsHolder,
-            boolean isOnTheFly
+            final boolean isOnTheFly
     ) {
         return new PhpElementVisitor() {
 
@@ -56,8 +61,8 @@ public class ImplementedDeprecatedInterface extends PhpInspection {
                             .getInstance(project).isDeprecated(interfaceFqn);
                     Pair<Boolean, String> checkResult = null;
 
-                    if (isDeprecated || (checkResult = InheritedDeprecatedInterface
-                            .hasDeprecatedParent((PhpClass) interfaceClass)).getFirst()) {
+                    if (isDeprecated || (checkResult = InheritedDeprecatedInterface//NOPMD
+                            .checkDeprecatedParent((PhpClass) interfaceClass)).getFirst()) {
                         if (problemsHolder instanceof UctProblemsHolder) {
                             ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
                                     SupportedIssue.IMPLEMENTED_DEPRECATED_INTERFACE.getCode()
@@ -128,7 +133,7 @@ public class ImplementedDeprecatedInterface extends PhpInspection {
                         return new Pair<>(true, interfaceFqn);
                     }
                     final Pair<Boolean, String> parentCheck = InheritedDeprecatedInterface
-                            .hasDeprecatedParent((PhpClass) interfaceClass);
+                            .checkDeprecatedParent((PhpClass) interfaceClass);
 
                     if (parentCheck.getFirst()) {
                         return parentCheck;

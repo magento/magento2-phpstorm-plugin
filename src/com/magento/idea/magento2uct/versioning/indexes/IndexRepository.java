@@ -8,12 +8,11 @@ package com.magento.idea.magento2uct.versioning.indexes;
 import com.magento.idea.magento2uct.packages.IndexRegistry;
 import com.magento.idea.magento2uct.versioning.indexes.data.VersionStateIndex;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -52,6 +51,7 @@ public class IndexRepository<K, V> implements Storage<K, V> {
     }
 
     @Override
+    @SuppressWarnings("PMD.CyclomaticComplexity")
     public void put(final @NotNull Map<K, V> data, final String version) {
         if (basePath.isEmpty() || index == null) {
             throw new IllegalArgumentException(
@@ -80,37 +80,40 @@ public class IndexRepository<K, V> implements Storage<K, V> {
             final File file = new File(path.toAbsolutePath() + File.separator + indexName);
 
             if (file.exists()) {
-                try {
-                    final InputStream inputStream = new FileInputStream(file);
-                    final ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+                try (
+                        InputStream inputStream = Files.newInputStream(Path.of(file.getPath()));
+                        ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+                ) {
                     final @NotNull Map<K, V> existedData =
                             (HashMap<K, V>) objectInputStream.readObject();
 
                     if (!existedData.isEmpty()) {
                         data.putAll(existedData);
                     }
-                } catch (ClassNotFoundException readException) {
-                    //
+                } catch (ClassNotFoundException readException) { //NOPMD
+                    // If an exception is occurred just go to file storing.
                 }
             }
-            final FileOutputStream outputStream = new FileOutputStream(file);
-            final ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-            objectOutputStream.writeObject(data);
-            objectOutputStream.close();
-        } catch (IOException exception) {
-            //
+            try (
+                    OutputStream outputStream = Files.newOutputStream(Path.of(file.getPath()));
+                    ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream)
+            ) {
+                objectOutputStream.writeObject(data);
+            } catch (IOException ioException) { //NOPMD
+                // No need to check, it runs only during development.
+            }
+        } catch (IOException exception) { //NOPMD
+            // No need to check, it runs only during development.
         }
     }
 
     @Override
     public @Nullable Map<K, V> load(final @NotNull String resourceName)
             throws IOException, ClassNotFoundException {
-        final InputStream inputStream = getClass().getResourceAsStream(resourceName);
-
-        if (inputStream == null) {
-            return null;
-        }
-        try (ObjectInputStream objectInputStream = new ObjectInputStream(inputStream)) {
+        try (
+                InputStream inputStream = getClass().getResourceAsStream(resourceName);
+                ObjectInputStream objectInputStream = new ObjectInputStream(inputStream)
+        ) {
             return (HashMap<K, V>) objectInputStream.readObject();
         } catch (ClassCastException exception) {
             return null;

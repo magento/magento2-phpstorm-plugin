@@ -25,9 +25,10 @@ import org.jetbrains.annotations.NotNull;
 public class UsingDeprecatedProperty extends PhpInspection {
 
     @Override
+    @SuppressWarnings("PMD.CognitiveComplexity")
     public @NotNull PsiElementVisitor buildVisitor(
             final @NotNull ProblemsHolder problemsHolder,
-            boolean isOnTheFly
+            final boolean isOnTheFly
     ) {
         return new PhpElementVisitor() {
 
@@ -44,7 +45,7 @@ public class UsingDeprecatedProperty extends PhpInspection {
                 final PsiElement element = fieldReference.resolve();
                 final PsiFile file = fieldReference.getContainingFile();
 
-                if (!(element instanceof Field) || element.getContainingFile() == file) {
+                if (!(element instanceof Field) || element.getContainingFile().equals(file)) {
                     return;
                 }
                 final Field field = (Field) element;

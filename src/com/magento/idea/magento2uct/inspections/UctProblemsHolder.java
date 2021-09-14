@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 public class UctProblemsHolder extends ProblemsHolder {
 
     private final Map<ProblemDescriptor, Integer> myProblemCodes = new HashMap<>();
-    private Integer reservedErrorCode = null;
+    private Integer reservedErrorCode;
 
     /**
      * UCT problems holder constructor.
@@ -67,7 +67,7 @@ public class UctProblemsHolder extends ProblemsHolder {
         // if problem has been added successfully
         if (problemCount != getMyProblems().size() && reservedErrorCode != null) {
             myProblemCodes.put(problemDescriptor, reservedErrorCode);
-            reservedErrorCode = null;
+            reservedErrorCode = null;//NOPMD
         }
     }
 

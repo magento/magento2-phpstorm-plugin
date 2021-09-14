@@ -40,7 +40,7 @@ public class ReindexHandler extends ProcessHandler {
                 new ProcessAdapter() {
                     @Override
                     public void startNotified(final @NotNull ProcessEvent event) {
-                        execute(version);
+                        ReindexHandler.this.execute(version);
                     }
                 }
         );
@@ -51,7 +51,7 @@ public class ReindexHandler extends ProcessHandler {
      *
      * @param version SupportedVersion
      */
-    private void execute(final @NotNull SupportedVersion version) {
+    public void execute(final @NotNull SupportedVersion version) {
         final ReindexUctCommand command = new ReindexUctCommand(
                 project,
                 directory,

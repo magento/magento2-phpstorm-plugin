@@ -36,6 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveImports"})
 public class ConfigurationDialog extends AbstractDialog {
 
     private final Project project;
@@ -125,7 +126,7 @@ public class ConfigurationDialog extends AbstractDialog {
             modulePathError.setText("The `Path To Analyse` field is empty or invalid");
             return;
         }
-        settingsService.setIsEnabled(enable.isSelected());
+        settingsService.setEnabled(enable.isSelected());
         final String currentVersionValue = currentVersion.getSelectedItem().toString();
 
         settingsService.setCurrentVersion(
@@ -146,7 +147,7 @@ public class ConfigurationDialog extends AbstractDialog {
                         ((ComboBoxItemData) issueSeverityLevel.getSelectedItem()).getKey()
                 )
         );
-        settingsService.setShouldIgnoreCurrentVersion(ignoreCurrentVersion.isSelected());
+        settingsService.setIgnoreCurrentVersion(ignoreCurrentVersion.isSelected());
 
         this.setVisible(false);
     }
@@ -154,6 +155,7 @@ public class ConfigurationDialog extends AbstractDialog {
     /**
      * Set default values for inputs.
      */
+    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.CognitiveComplexity"})
     private void setDefaultValues() {
         enable.setSelected(settingsService.isEnabled());
 

@@ -23,9 +23,10 @@ import org.jetbrains.annotations.NotNull;
 public class OverridingDeprecatedProperty extends PhpInspection {
 
     @Override
+    @SuppressWarnings("PMD.CognitiveComplexity")
     public @NotNull PsiElementVisitor buildVisitor(
             final @NotNull ProblemsHolder problemsHolder,
-            boolean isOnTheFly
+            final boolean isOnTheFly
     ) {
         return new PhpTypeAnalyserVisitor() {
 

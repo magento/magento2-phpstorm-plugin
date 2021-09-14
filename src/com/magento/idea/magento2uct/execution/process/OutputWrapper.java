@@ -15,11 +15,12 @@ import org.jetbrains.annotations.NotNull;
 
 public final class OutputWrapper implements AnsiEscapeDecoder.ColoredTextAcceptor {
 
-    public static final String INFO_WRAPPER = "<info>{text}</info>";
-    public static final String WARNING_WRAPPER = "<warning>{text}</warning>";
-    public static final String ERROR_WRAPPER = "<error>{text}</error>";
-    public static final String CRITICAL_WRAPPER = "<critical>{text}</critical>";
-    public static final String SUMMARY_WRAPPER = "<summary>{text}</summary>";
+    public static final String TEXT_PLACEHOLDER = "{text}";
+    public static final String INFO_WRAPPER = "<info>" + TEXT_PLACEHOLDER + "</info>";
+    public static final String WARNING_WRAPPER = "<warning>" + TEXT_PLACEHOLDER + "</warning>";
+    public static final String ERROR_WRAPPER = "<error>" + TEXT_PLACEHOLDER + "</error>";
+    public static final String CRITICAL_WRAPPER = "<critical>" + TEXT_PLACEHOLDER + "</critical>";
+    public static final String SUMMARY_WRAPPER = "<summary>" + TEXT_PLACEHOLDER + "</summary>";
 
     private final ProcessHandler processHandler;
     private final AnsiEscapeDecoder myAnsiEscapeDecoder = new AnsiEscapeDecoder();
@@ -104,7 +105,7 @@ public final class OutputWrapper implements AnsiEscapeDecoder.ColoredTextAccepto
      * @return String
      */
     public String wrapInfo(final @NotNull String text) {
-        return INFO_WRAPPER.replace("{text}", text);
+        return INFO_WRAPPER.replace(TEXT_PLACEHOLDER, text);
     }
 
     /**
@@ -115,7 +116,7 @@ public final class OutputWrapper implements AnsiEscapeDecoder.ColoredTextAccepto
      * @return String
      */
     public String wrapError(final @NotNull String text) {
-        return ERROR_WRAPPER.replace("{text}", text);
+        return ERROR_WRAPPER.replace(TEXT_PLACEHOLDER, text);
     }
 
     /**
@@ -126,7 +127,7 @@ public final class OutputWrapper implements AnsiEscapeDecoder.ColoredTextAccepto
      * @return String
      */
     public String wrapCritical(final @NotNull String text) {
-        return CRITICAL_WRAPPER.replace("{text}", text);
+        return CRITICAL_WRAPPER.replace(TEXT_PLACEHOLDER, text);
     }
 
     /**
@@ -137,7 +138,7 @@ public final class OutputWrapper implements AnsiEscapeDecoder.ColoredTextAccepto
      * @return String
      */
     public String wrapSummary(final @NotNull String text) {
-        return SUMMARY_WRAPPER.replace("{text}", text);
+        return SUMMARY_WRAPPER.replace(TEXT_PLACEHOLDER, text);
     }
 
     /**

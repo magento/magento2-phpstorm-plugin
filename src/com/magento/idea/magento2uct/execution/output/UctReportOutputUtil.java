@@ -57,12 +57,12 @@ public class UctReportOutputUtil {
      * @param code int
      */
     public void printIssue(final @NotNull ProblemDescriptor descriptor, final int code) {
-        final String errorMessage = descriptor.getDescriptionTemplate().substring(6).trim();
         final SupportedIssue issue = SupportedIssue.getByCode(code);
 
         if (issue == null) {
             return;
         }
+        final String errorMessage = descriptor.getDescriptionTemplate().substring(6).trim();
 
         final String output = ISSUE_FORMAT
                 .replace("{SEVERITY}", issue.getLevel().getFormattedLabel())
@@ -79,6 +79,7 @@ public class UctReportOutputUtil {
      *
      * @param summary Summary
      */
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     public void printSummary(final Summary summary) {
         if (!summary.hasProblems()) {
             stdout.print(stdout.wrapInfo("Couldn't find modules to analyse").concat("\n"));
@@ -115,14 +116,15 @@ public class UctReportOutputUtil {
         printSummarySeparator(longestKey + 2, longestValue + 2);
 
         for (final Map.Entry<String, String> summaryEntry : summaryMap.entrySet()) {
-            String header = summaryEntry.getKey();
+            final StringBuilder header = new StringBuilder(summaryEntry.getKey());
             final String value = "  " + summaryEntry.getValue();
 
             if (header.length() < longestKey) {
-                header += " ".repeat(longestKey - header.length());
+                header.append(" ".repeat(longestKey - header.length()));
             }
             stdout.print(
-                    " " + stdout.wrapSummary(header).concat("  ").concat(value).concat("\n")
+                    " " + stdout.wrapSummary(header.toString())
+                            .concat("  ").concat(value).concat("\n")
             );
         }
         printSummarySeparator(longestKey + 2, longestValue + 2);

@@ -59,10 +59,19 @@ public class DefaultExecutor implements Disposable {
     public void run() {
         FileDocumentManager.getInstance().saveAllDocuments();
 
-        ConsoleView view = createConsole();
+        final ConsoleView view = createConsole();
         view.attachToProcess(myProcess);
 
         myProcess.startNotify();
+    }
+
+    /**
+     * Get process.
+     *
+     * @return ProcessHandler
+     */
+    public ProcessHandler getMyProcess() {
+        return myProcess;
     }
 
     /**
@@ -119,7 +128,7 @@ public class DefaultExecutor implements Disposable {
             final ConsoleView view,
             final DefaultActionGroup actionGroup
     ) {
-        JPanel panel = new JPanel();
+        final JPanel panel = new JPanel();
         final ActionToolbar actionToolbar = ActionManager
                 .getInstance()
                 .createActionToolbar(
@@ -136,7 +145,7 @@ public class DefaultExecutor implements Disposable {
     }
 
     @Override
-    public void dispose() {
+    public void dispose() {//NOPMD
     }
 
     private class StopAction extends AnAction implements DumbAware {
@@ -151,13 +160,15 @@ public class DefaultExecutor implements Disposable {
 
         @Override
         public void actionPerformed(final @NotNull AnActionEvent event) {
-            myProcess.destroyProcess();
+            DefaultExecutor.this.getMyProcess().destroyProcess();
         }
 
         @Override
         public void update(final @NotNull AnActionEvent event) {
             event.getPresentation().setVisible(true);
-            event.getPresentation().setEnabled(!myProcess.isProcessTerminated());
+            event.getPresentation().setEnabled(
+                    !DefaultExecutor.this.getMyProcess().isProcessTerminated()
+            );
         }
     }
 }

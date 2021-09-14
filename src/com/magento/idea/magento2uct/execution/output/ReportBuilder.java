@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
 
@@ -87,6 +86,7 @@ public class ReportBuilder {
      *
      * @return JsonFile
      */
+    @SuppressWarnings({"PMD.NPathComplexity", "PMD.CyclomaticComplexity"})
     public JsonFile build() {
         if (report.getIssues().isEmpty() || report.getSummary() == null) {
             return null;
