@@ -28,6 +28,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
 
@@ -39,7 +41,10 @@ public class ReportBuilder {
 
     private final Project project;
     private final Report report;
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHms");
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
+            "dd_MMM_yyyy_HH:mm:ss",
+            Locale.US
+    );
 
     /**
      * Report builder.
