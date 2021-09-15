@@ -3,10 +3,12 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2uct.versioning;
+package com.magento.idea.magento2uct.packages;
 
 import java.util.LinkedList;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public enum SupportedVersion {
 
@@ -48,6 +50,22 @@ public enum SupportedVersion {
      */
     public String getVersion() {
         return version;
+    }
+
+    /**
+     * Get version ENUM by version code.
+     *
+     * @param versionCandidate String
+     *
+     * @return SupportedVersion
+     */
+    public @Nullable static SupportedVersion getVersion(final @NotNull String versionCandidate) {
+        for (final SupportedVersion version : SupportedVersion.values()) {
+            if (version.getVersion().equals(versionCandidate)) {
+                return version;
+            }
+        }
+        return null;
     }
 
     /**
