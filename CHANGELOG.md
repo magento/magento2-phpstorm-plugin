@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 4.1.0
 
+### Added
+
+- Added UI integration with the Adobe Commerce Upgrade Compatibility Tool in [#625](https://github.com/magento/magento2-phpstorm-plugin/pull/625)
+- Added MVP version of the built-in Upgrade Compatibility Tool, read more in [wiki](https://github.com/magento/magento2-phpstorm-plugin/wiki/4.1.0-Release#the-built-in-upgrade-compatibility-tool)
+
 ## 4.0.0
 
 ### Added
