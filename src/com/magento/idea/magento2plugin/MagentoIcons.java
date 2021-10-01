@@ -10,6 +10,11 @@ import javax.swing.Icon;
 
 @SuppressWarnings({"PMD.ClassNamingConventions"})
 public class MagentoIcons {
+
     public static final Icon WEB_API = IconLoader.getIcon("/icons/webapi.png", MagentoIcons.class);
     public static final Icon MODULE = IconLoader.getIcon("/icons/module.png", MagentoIcons.class);
+    public static final Icon PLUGIN_ICON_SMALL =
+            IconLoader.getIcon("/icons/pluginIcon16x16.svg", MagentoIcons.class);
+    public static final Icon PLUGIN_ICON_MEDIUM =
+            IconLoader.getIcon("/icons/pluginIcon64x64.svg", MagentoIcons.class);
 }

@@ -7,7 +7,7 @@
 <idea-plugin require-restart="true">
     <id>com.magento.idea.magento2plugin</id>
     <name>Magento PhpStorm</name>
-    <version>4.0.0</version>
+    <version>4.2.0</version>
     <vendor url="https://github.com/magento/magento2-phpstorm-plugin">Magento Inc.</vendor>
 
     <description><![CDATA[
@@ -24,7 +24,7 @@
     </change-notes>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="211.6693.111"/>
+    <idea-version since-build="212.5080.55"/>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
@@ -112,6 +112,24 @@
                 description="Copies Magento's path of file depending on file type">
             <add-to-group group-id="CopyFileReference" anchor="last"/>
         </action>
+        <group id="UctReindexMenu">
+            <separator/>
+            <action id="com.magento.idea.magento2uct.actions.ReindexVersionedIndexesAction"
+                    class="com.magento.idea.magento2uct.actions.ReindexVersionedIndexesAction"
+                    text="ReindexVersionedIndexesAction"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </group>
+        <group id="UctRunMenu">
+            <separator/>
+            <action id="com.magento.idea.magento2uct.actions.ConfigureUctAction"
+                    class="com.magento.idea.magento2uct.actions.ConfigureUctAction"
+                    text="Configure The Upgrade Compatibility Tool"/>
+            <action id="com.magento.idea.magento2uct.actions.RunUpgradeCompatibilityToolAction"
+                    class="com.magento.idea.magento2uct.actions.RunUpgradeCompatibilityToolAction"
+                    text="Run The Upgrade Compatibility Tool Action"/>
+            <separator/>
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </group>
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -119,6 +137,7 @@
         <projectTemplatesFactory implementation="com.magento.idea.magento2plugin.generation.php.MagentoTemplatesFactory"/>
 
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.Settings"/>
+        <projectService serviceImplementation="com.magento.idea.magento2uct.settings.UctSettingsService"/>
 
         <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.completion.xml.XmlCompletionContributor" id="xml" />
         <completion.contributor language="PHP" implementationClass="com.magento.idea.magento2plugin.completion.php.PhpCompletionContributor" id="php" />
@@ -239,6 +258,93 @@
                          enabledByDefault="true" level="WARNING"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.PluginAttributeTypeInspection"/>
 
+        <!-- UCT inspection -->
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="ExtendingDeprecatedClass"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.ExtendingDeprecatedClass"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.deprecation.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.deprecation.ExtendingDeprecatedClass"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="ImportingDeprecatedClass"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.ImportingDeprecatedClass"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.deprecation.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.deprecation.ImportingDeprecatedClass"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="ImportingDeprecatedInterface"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.ImportingDeprecatedInterface"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.deprecation.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.deprecation.ImportingDeprecatedInterface"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="UsingDeprecatedClass"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsingDeprecatedClass"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.deprecation.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.deprecation.UsingDeprecatedClass"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="UsingDeprecatedInterface"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsingDeprecatedInterface"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.deprecation.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.deprecation.UsingDeprecatedInterface"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="UsingDeprecatedConstant"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsingDeprecatedConstant"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.deprecation.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.deprecation.UsingDeprecatedConstant"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="OverridingDeprecatedConstant"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.OverridingDeprecatedConstant"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.deprecation.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.deprecation.OverridingDeprecatedConstant"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="OverridingDeprecatedProperty"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.OverridingDeprecatedProperty"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.deprecation.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.deprecation.OverridingDeprecatedProperty"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="InheritedDeprecatedInterface"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.InheritedDeprecatedInterface"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.deprecation.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.deprecation.InheritedDeprecatedInterface"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="ImplementedDeprecatedInterface"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.ImplementedDeprecatedInterface"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.deprecation.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.deprecation.ImplementedDeprecatedInterface"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="CallingDeprecatedMethod"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.CallingDeprecatedMethod"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.deprecation.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.deprecation.CallingDeprecatedMethod"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="UsingDeprecatedProperty"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsingDeprecatedProperty"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.deprecation.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.deprecation.UsingDeprecatedProperty"/>
+        <!-- \UCT inspection -->
+
         <internalFileTemplate name="Magento Composer JSON"/>
         <internalFileTemplate name="Magento Registration PHP"/>
         <internalFileTemplate name="Magento Module XML"/>
@@ -288,6 +394,8 @@
         <postStartupActivity implementation="com.magento.idea.magento2plugin.project.startup.CheckIfMagentoPathIsValidActivity"/>
 
         <errorHandler implementation="com.magento.idea.magento2plugin.project.diagnostic.DefaultErrorReportSubmitter"/>
+
+        <configurationType implementation="com.magento.idea.magento2uct.execution.configurations.UctRunConfigurationType"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.php">
