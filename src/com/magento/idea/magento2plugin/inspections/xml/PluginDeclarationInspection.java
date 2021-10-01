@@ -87,6 +87,8 @@ public class PluginDeclarationInspection extends PhpInspection {
                                 = pluginTypeXmlTag.getAttribute(ModuleDiXml.NAME_ATTR);
                         final XmlAttribute pluginTypeDisabledAttribute
                                 = pluginTypeXmlTag.getAttribute(ModuleDiXml.DISABLED_ATTR_NAME);
+                        final XmlAttribute pluginTypeTypeAttribute
+                                = pluginTypeXmlTag.getAttribute(ModuleDiXml.TYPE_ATTR);
 
                         if (pluginTypeNameAttribute == null) {
                             continue;

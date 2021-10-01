@@ -12,20 +12,22 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.MagentoIcons;
-import com.magento.idea.magento2plugin.actions.generation.dialog.OverrideInThemeDialog;
+import com.magento.idea.magento2plugin.actions.generation.dialog.OverrideLayoutInThemeDialog;
 import com.magento.idea.magento2plugin.magento.packages.ComponentType;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.magento.GetComponentNameByDirectoryUtil;
 import com.magento.idea.magento2plugin.util.magento.GetComponentTypeByNameUtil;
+import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 
-public class OverrideInThemeAction extends DumbAwareAction {
+public class OverrideTemplateInThemeAction extends DumbAwareAction {
+
     public static String actionName = "Override this template in a project theme";
     public static String actionDescription = "Override in project theme";
     private PsiFile psiFile;
 
-    public OverrideInThemeAction() {
+    public OverrideTemplateInThemeAction() {
         super(actionName, actionDescription, MagentoIcons.MODULE);
     }
 
@@ -42,10 +44,14 @@ public class OverrideInThemeAction extends DumbAwareAction {
 
         if (Settings.isEnabled(project)) {
             try {
-                status = isOverrideAllowed(
-                        psiFile.getVirtualFile(),
-                        project
+                event.getPresentation().setText("ballaal");
+                actionName = "balala";
+                if (Objects.requireNonNull(psiFile.getFileElementType()).getLanguage().getID().equals("PHP")) {
+                    status = isOverrideAllowed(
+                            psiFile.getVirtualFile(),
+                            project
                     );
+                }
             } catch (NullPointerException e) { //NOPMD
                 // Ignore
             }
@@ -81,7 +87,7 @@ public class OverrideInThemeAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent event) {
-        OverrideInThemeDialog.open(event.getProject(), this.psiFile);
+        OverrideLayoutInThemeDialog.open(event.getProject(), this.psiFile);
     }
 
     @Override

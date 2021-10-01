@@ -7,7 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
-import com.magento.idea.magento2plugin.actions.generation.OverrideInThemeAction;
+import com.magento.idea.magento2plugin.actions.generation.OverrideTemplateInThemeAction;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
@@ -27,7 +27,7 @@ import javax.swing.JRadioButton;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
 
-public class OverrideInThemeDialog extends AbstractDialog {
+public class OverrideLayoutInThemeDialog extends AbstractDialog {
     @NotNull
     private final Project project;
     private final PsiFile psiFile;
@@ -49,7 +49,7 @@ public class OverrideInThemeDialog extends AbstractDialog {
      * @param project Project
      * @param psiFile PsiFile
      */
-    public OverrideInThemeDialog(final @NotNull Project project, final PsiFile psiFile) {
+    public OverrideLayoutInThemeDialog(final @NotNull Project project, final PsiFile psiFile) {
         super();
 
         this.project = project;
@@ -57,7 +57,7 @@ public class OverrideInThemeDialog extends AbstractDialog {
 
         setContentPane(contentPane);
         setModal(true);
-        setTitle(OverrideInThemeAction.actionDescription);
+        setTitle(OverrideTemplateInThemeAction.actionDescription);
         getRootPane().setDefaultButton(buttonOK);
         fillThemeOptions();
 
@@ -126,7 +126,7 @@ public class OverrideInThemeDialog extends AbstractDialog {
      * @param psiFile PsiFile
      */
     public static void open(final @NotNull Project project, final PsiFile psiFile) {
-        final OverrideInThemeDialog dialog = new OverrideInThemeDialog(project, psiFile);
+        final OverrideLayoutInThemeDialog dialog = new OverrideLayoutInThemeDialog(project, psiFile);
         dialog.pack();
         dialog.centerDialog(dialog);
         dialog.setVisible(true);
