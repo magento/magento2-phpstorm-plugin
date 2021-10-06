@@ -189,6 +189,13 @@
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.php.ModuleDeclarationInRegistrationPhpInspection"/>
+        <localInspection language="PHP" groupPath="PHP"
+                         shortName="DoubleQuotesPhpInspection"
+                         bundle="magento2.inspection" key="inspection.displayName.DoubleQuotesPhpInspection"
+                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.php.DoubleQuotesPhpInspection"/>
 
         <localInspection language="XML" groupPath="XML"
                          shortName="ObserverDeclarationInspection"
