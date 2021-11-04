@@ -78,7 +78,7 @@ public final class VersionStateManager {
      *
      * @return boolean
      */
-    private boolean isValidFor(
+    private synchronized boolean isValidFor(
             final Boolean isSetIgnoreFlag,
             final SupportedVersion currentVersion,
             final SupportedVersion targetVersion
