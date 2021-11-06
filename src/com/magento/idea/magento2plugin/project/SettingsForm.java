@@ -47,6 +47,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     private JButton buttonReindex;
     private JPanel panel;
     private JButton regenerateUrnMapButton;
+    private JButton generateDebugStepFiltersButton;
     private JTextField magentoVersion;
     private JTextField moduleDefaultLicenseName;
     private JCheckBox mftfSupportEnabled;
@@ -88,6 +89,10 @@ public class SettingsForm implements PhpFrameworkConfigurable {
                 new RegenerateUrnMapListener(project)
         );
 
+        generateDebugStepFiltersButton.addMouseListener(
+                new GenerateDebugStepFiltersListener(project)
+        );
+
         refreshFormStatus(getSettings().pluginEnabled);
         pluginEnabled.addActionListener(e -> refreshFormStatus(pluginEnabled.isSelected()));
 
@@ -106,6 +111,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     private void refreshFormStatus(final boolean isEnabled) {
         buttonReindex.setEnabled(isEnabled);
         regenerateUrnMapButton.setEnabled(isEnabled);
+        generateDebugStepFiltersButton.setEnabled(isEnabled);
         magentoVersion.setEnabled(isEnabled);
         mftfSupportEnabled.setEnabled(isEnabled);
         magentoPath.setEnabled(isEnabled);
@@ -163,6 +169,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         getSettings().magentoPath = getMagentoPath();
         buttonReindex.setEnabled(getSettings().pluginEnabled);
         regenerateUrnMapButton.setEnabled(getSettings().pluginEnabled);
+        generateDebugStepFiltersButton.setEnabled(getSettings().pluginEnabled);
     }
 
     @NotNull
