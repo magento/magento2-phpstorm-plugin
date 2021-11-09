@@ -9,8 +9,9 @@ import com.intellij.openapi.util.Pair;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2uct.packages.IndexRegistry;
 import com.magento.idea.magento2uct.packages.SupportedVersion;
-import com.magento.idea.magento2uct.versioning.indexes.IndexRepository;
-import com.magento.idea.magento2uct.versioning.indexes.Storage;
+import com.magento.idea.magento2uct.versioning.indexes.storage.FileLoader;
+import com.magento.idea.magento2uct.versioning.indexes.storage.IndexLoader;
+import com.magento.idea.magento2uct.versioning.indexes.storage.ResourceLoader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -24,6 +25,7 @@ public class DeprecationStateIndex implements VersionStateIndex {
             + File.separator + "deprecation" + File.separator;
 
     private final Map<String, Map<String, Boolean>> versioningData;
+    private String projectBasePath;
     private String versionState;
 
     /**
@@ -31,6 +33,15 @@ public class DeprecationStateIndex implements VersionStateIndex {
      */
     public DeprecationStateIndex() {
         versioningData = new LinkedHashMap<>();
+    }
+
+    /**
+     * Set project base path.
+     *
+     * @param projectBasePath String
+     */
+    public void setProjectBasePath(final @NotNull String projectBasePath) {
+        this.projectBasePath = projectBasePath;
     }
 
     /**
@@ -62,22 +73,19 @@ public class DeprecationStateIndex implements VersionStateIndex {
 
     @Override
     public void load(final @NotNull List<SupportedVersion> versions) {
-        final Storage<String, Boolean> storage = new IndexRepository<>();
-        final IndexRegistry registrationInfo = IndexRegistry.getRegistryInfoByClass(
-                DeprecationStateIndex.class
-        );
-        assert registrationInfo != null;
+        final IndexLoader<String, Boolean> loader = new ResourceLoader<>();
+        processLoading(versions, loader);
+    }
 
-        for (final SupportedVersion version : versions) {
-            final String indexName = VersionStateIndex.FILE_NAME_PATTERN
-                    .replace("%version", version.getVersion())
-                    .replace("%key", registrationInfo.getKey());
-            try {
-                putIndexData(version.getVersion(), storage.load(RESOURCE_PATH + indexName));
-            } catch (IOException | ClassNotFoundException exception) { //NOPMD
-                // Just go for the next version.
-            }
+    @Override
+    public void loadFromFile(final @NotNull List<SupportedVersion> versions) {
+        if (projectBasePath == null) {
+            throw new IllegalArgumentException(
+                    "Project base path is mandatory for loading index data from the file."
+            );
         }
+        final IndexLoader<String, Boolean> loader = new FileLoader<>(projectBasePath);
+        processLoading(versions, loader);
     }
 
     /**
@@ -93,6 +101,33 @@ public class DeprecationStateIndex implements VersionStateIndex {
         }
 
         return data;
+    }
+
+    /**
+     * Process index loading.
+     *
+     * @param versions List[SupportedVersion]
+     * @param loader IndexLoader
+     */
+    private void processLoading(
+            final @NotNull List<SupportedVersion> versions,
+            final IndexLoader<String, Boolean> loader
+    ) {
+        final IndexRegistry registrationInfo = IndexRegistry.getRegistryInfoByClass(
+                DeprecationStateIndex.class
+        );
+        assert registrationInfo != null;
+
+        for (final SupportedVersion version : versions) {
+            final String indexName = VersionStateIndex.FILE_NAME_PATTERN
+                    .replace("%version", version.getVersion())
+                    .replace("%key", registrationInfo.getKey());
+            try {
+                putIndexData(version.getVersion(), loader.load(RESOURCE_PATH + indexName));
+            } catch (IOException | ClassNotFoundException exception) { //NOPMD
+                // Just go for the next version.
+            }
+        }
     }
 
     /**

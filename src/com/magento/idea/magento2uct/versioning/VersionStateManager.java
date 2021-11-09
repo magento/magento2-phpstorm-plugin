@@ -78,6 +78,7 @@ public final class VersionStateManager {
      *
      * @return boolean
      */
+    @SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
     private synchronized boolean isValidFor(
             final Boolean isSetIgnoreFlag,
             final SupportedVersion currentVersion,
