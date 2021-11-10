@@ -13,11 +13,9 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.magento.idea.magento2plugin.magento.files.ComposerJson;
-import com.magento.idea.magento2plugin.magento.packages.ComposerPackageModel;
-import com.magento.idea.magento2plugin.magento.packages.ComposerPackageModelImpl;
+import com.magento.idea.magento2plugin.magento.files.ComposerLock;
 import com.magento.idea.magento2plugin.magento.packages.File;
-import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.project.util.GetMagentoVersionUtil;
 
 public final class MagentoVersionUtil {
 
@@ -55,20 +53,16 @@ public final class MagentoVersionUtil {
                 return DEFAULT_VERSION;
             }
 
-            final ComposerPackageModel composerObject = new ComposerPackageModelImpl(jsonObject);
+            final String version = GetMagentoVersionUtil.getVersion(jsonObject);
 
-            if (composerObject.getType() != null
-                    && composerObject.getType().equals(Package.composerType)
-                    && composerObject.getVersion() != null) {
-                return composerObject.getVersion();
-            }
+            return version == null ? DEFAULT_VERSION : version;
         }
 
         return DEFAULT_VERSION;
     }
 
     private static String getFilePath(final String magentoPath) {
-        return magentoPath + File.separator + ComposerJson.FILE_NAME;
+        return magentoPath + File.separator + ComposerLock.FILE_NAME;
     }
 
     /**
