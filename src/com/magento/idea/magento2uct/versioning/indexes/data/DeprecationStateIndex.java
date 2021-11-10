@@ -6,7 +6,6 @@
 package com.magento.idea.magento2uct.versioning.indexes.data;
 
 import com.intellij.openapi.util.Pair;
-import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2uct.packages.IndexRegistry;
 import com.magento.idea.magento2uct.packages.SupportedVersion;
 import com.magento.idea.magento2uct.versioning.indexes.storage.FileLoader;
@@ -21,8 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class DeprecationStateIndex implements VersionStateIndex {
 
-    private static final String RESOURCE_PATH = File.separator + "uct"
-            + File.separator + "deprecation" + File.separator;
+    private static final String RESOURCE_DIR = "deprecation";
 
     private final Map<String, Map<String, Boolean>> versioningData;
     private String projectBasePath;
@@ -73,7 +71,7 @@ public class DeprecationStateIndex implements VersionStateIndex {
 
     @Override
     public void load(final @NotNull List<SupportedVersion> versions) {
-        final IndexLoader<String, Boolean> loader = new ResourceLoader<>();
+        final IndexLoader<String, Boolean> loader = new ResourceLoader<>(RESOURCE_DIR);
         processLoading(versions, loader);
     }
 
@@ -123,7 +121,7 @@ public class DeprecationStateIndex implements VersionStateIndex {
                     .replace("%version", version.getVersion())
                     .replace("%key", registrationInfo.getKey());
             try {
-                putIndexData(version.getVersion(), loader.load(RESOURCE_PATH + indexName));
+                putIndexData(version.getVersion(), loader.load(indexName));
             } catch (IOException | ClassNotFoundException exception) { //NOPMD
                 // Just go for the next version.
             }

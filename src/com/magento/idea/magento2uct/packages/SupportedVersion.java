@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2uct.packages;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -81,5 +82,24 @@ public enum SupportedVersion {
         }
 
         return versions;
+    }
+
+    /**
+     * Get previous versions.
+     *
+     * @param version SupportedVersion
+     *
+     * @return List[SupportedVersion]
+     */
+    public static List<SupportedVersion> getPriorVersions(final SupportedVersion version) {
+        final List<SupportedVersion> previousVersions = new ArrayList<>();
+
+        for (final SupportedVersion supportedVersion : SupportedVersion.values()) {
+            if (supportedVersion.compareTo(version) < 0) {
+                previousVersions.add(supportedVersion);
+            }
+        }
+
+        return previousVersions;
     }
 }
