@@ -18,13 +18,6 @@ import com.magento.idea.magento2uct.execution.scanner.ModuleScanner;
 import com.magento.idea.magento2uct.execution.scanner.data.ComponentData;
 import com.magento.idea.magento2uct.packages.IndexRegistry;
 import com.magento.idea.magento2uct.packages.SupportedVersion;
-import com.magento.idea.magento2uct.versioning.indexes.IndexRepository;
-import com.magento.idea.magento2uct.versioning.indexes.data.DeprecationStateIndex;
-import com.magento.idea.magento2uct.versioning.processors.DeprecationIndexProcessor;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 
 public class ReindexUctCommand {
@@ -66,22 +59,22 @@ public class ReindexUctCommand {
      * Execute command.
      *
      * @param version SupportedVersion
+     * @param index IndexRegistry
      */
-    @SuppressWarnings({"PMD.CognitiveComplexity", "PMD.AvoidInstantiatingObjectsInLoops"})
-    public void execute(final @NotNull SupportedVersion version) {
+    @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
+    public void execute(
+            final @NotNull SupportedVersion version,
+            final @NotNull IndexRegistry index
+    ) {
         if (project.getBasePath() == null) {
             return;
         }
         output.write("Indexing process...\n\n");
 
-        final IndexRepository<String, Boolean> indexRepository = new IndexRepository<>(
-                project.getBasePath(),
-                IndexRegistry.DEPRECATION
-        );
-        final Map<String, Boolean> deprecationData = new HashMap<>();
-
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             ApplicationManager.getApplication().runReadAction(() -> {
+                index.getProcessor().clearData();
+
                 for (final ComponentData componentData : new ModuleScanner(directory)) {
                     if (process.isProcessTerminated()) {
                         return;
@@ -89,29 +82,10 @@ public class ReindexUctCommand {
                     output.print(output.wrapInfo(componentData.getName()).concat("\n"));
 
                     for (final PsiFile psiFile : new ModuleFilesScanner(componentData)) {
-                        deprecationData.putAll(
-                                new DeprecationIndexProcessor().process(psiFile)
-                        );
+                        index.getProcessor().process(psiFile);
                     }
                 }
-
-                if (!deprecationData.isEmpty()) {
-                    final List<SupportedVersion> previousVersions = new ArrayList<>();
-
-                    for (final SupportedVersion supportedVersion : SupportedVersion.values()) {
-                        if (supportedVersion.compareTo(version) < 0) {
-                            previousVersions.add(supportedVersion);
-                        }
-                    }
-                    final DeprecationStateIndex deprecationIndex = new DeprecationStateIndex();
-                    deprecationIndex.load(previousVersions);
-                    final Map<String, Boolean> previousData = deprecationIndex.getIndexData();
-                    deprecationData.entrySet().removeAll(previousData.entrySet());
-
-                    if (!deprecationData.isEmpty()) {
-                        indexRepository.put(deprecationData, version.getVersion());
-                    }
-                }
+                index.getProcessor().save(project.getBasePath(), version);
 
                 process.destroyProcess();
             });
