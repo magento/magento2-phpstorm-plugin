@@ -5,7 +5,7 @@
 
 package com.magento.idea.magento2plugin.magento.files;
 
-public final class ComposerLock {
+public final class ComposerLock { // NOPMD
 
     public static final String FILE_NAME = "composer.lock";
     public static final String PACKAGES_PROP = "packages";
