@@ -5,31 +5,32 @@
 
 package com.magento.idea.magento2uct.versioning.indexes.data;
 
+import com.intellij.openapi.util.Pair;
 import com.magento.idea.magento2uct.packages.IndexRegistry;
 import com.magento.idea.magento2uct.packages.SupportedVersion;
 import com.magento.idea.magento2uct.versioning.indexes.storage.FileLoader;
 import com.magento.idea.magento2uct.versioning.indexes.storage.IndexLoader;
 import com.magento.idea.magento2uct.versioning.indexes.storage.ResourceLoader;
+import com.magento.idea.magento2uct.versioning.processors.util.VersioningDataOperationsUtil;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 
-public class ExistenceStateIndex implements VersionStateIndex {
+public class ApiCoverageStateIndex implements VersionStateIndex {
 
-    private static final String RESOURCE_DIR = "existence";
+    private static final String RESOURCE_DIR = "api";
 
     private final Map<String, Map<String, Boolean>> data;
+    private final Map<String, String> changelog = new HashMap<>();//NOPMD
     private String projectBasePath;
     private String version;//NOPMD
 
-    /**
-     * Existence state index constructor.
-     */
-    public ExistenceStateIndex() {
+    public ApiCoverageStateIndex() {
         data = new LinkedHashMap<>();
     }
 
@@ -52,29 +53,21 @@ public class ExistenceStateIndex implements VersionStateIndex {
     }
 
     /**
-     * Get deprecation index data.
+     * Get API coverage index data.
      *
      * @return Map[String, Boolean]
      */
     public Map<String, Boolean> getIndexData() {
-        final Map<String, Boolean> allData = new HashMap<>();
-        final Map<String, Boolean> removed = new HashMap<>();
+        final Pair<Map<String, Boolean>, Map<String, String>> gatheredData =
+                VersioningDataOperationsUtil.unionVersionDataWithChangelog(
+                        data,
+                        new ArrayList<>(Collections.singletonList(
+                                SupportedVersion.V230.getVersion()
+                        )),
+                        true
+                );
 
-        for (final Map.Entry<String, Map<String, Boolean>> vData : data.entrySet()) {
-            removed.putAll(
-                    vData.getValue().entrySet()
-                            .stream()
-                            .filter(element -> !element.getValue())
-                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
-            );
-            allData.putAll(vData.getValue());
-        }
-
-        return allData.entrySet()
-                .stream()
-                .filter(
-                        element -> !removed.containsKey(element.getKey())
-                ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        return gatheredData.getFirst();
     }
 
     @Override
@@ -104,16 +97,16 @@ public class ExistenceStateIndex implements VersionStateIndex {
             final @NotNull List<SupportedVersion> versions,
             final IndexLoader<String, Map<String, Boolean>> loader
     ) {
-        final IndexRegistry registrationInfo = IndexRegistry.getRegistryInfoByClass(
-                ExistenceStateIndex.class
+        final IndexRegistry apiIndexInfo = IndexRegistry.getRegistryInfoByClass(
+                ApiCoverageStateIndex.class
         );
-        assert registrationInfo != null;
+        assert apiIndexInfo != null;
 
-        final String indexesFileName = VersionStateIndex.SINGLE_FILE_NAME_PATTERN
-                .replace("%key", registrationInfo.getKey());
+        final String apiIndexesFileName = VersionStateIndex.SINGLE_FILE_NAME_PATTERN
+                .replace("%key", apiIndexInfo.getKey());
 
         try {
-            final Map<String, Map<String, Boolean>> loadedData = loader.load(indexesFileName);
+            final Map<String, Map<String, Boolean>> loadedData = loader.load(apiIndexesFileName);
 
             if (loadedData == null) {
                 return;

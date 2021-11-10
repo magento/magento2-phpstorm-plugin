@@ -5,8 +5,10 @@
 
 package com.magento.idea.magento2uct.packages;
 
+import com.magento.idea.magento2uct.versioning.indexes.data.ApiCoverageStateIndex;
 import com.magento.idea.magento2uct.versioning.indexes.data.DeprecationStateIndex;
 import com.magento.idea.magento2uct.versioning.indexes.data.ExistenceStateIndex;
+import com.magento.idea.magento2uct.versioning.processors.ApiCoverageIndexProcessor;
 import com.magento.idea.magento2uct.versioning.processors.DeprecationIndexProcessor;
 import com.magento.idea.magento2uct.versioning.processors.ExistenceIndexProcessor;
 import com.magento.idea.magento2uct.versioning.processors.IndexProcessor;
@@ -25,6 +27,11 @@ public enum IndexRegistry {
     EXISTENCE(
             ExistenceStateIndex.class,
             new ExistenceIndexProcessor(),
+            SupportedVersion.getSupportedVersions().toArray(new String[0])
+    ),
+    API_COVERAGE(
+            ApiCoverageStateIndex.class,
+            new ApiCoverageIndexProcessor(),
             SupportedVersion.getSupportedVersions().toArray(new String[0])
     );
 

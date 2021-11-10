@@ -139,6 +139,7 @@ public class ReindexDialog extends AbstractDialog {
             targetVersion.addItem(new ComboBoxItemData(version, version));
         }
         targetIndex = new ComboBox<>();
+        targetIndex.addItem(new ComboBoxItemData("", " --- Choose Target Index --- "));
 
         for (final String key : IndexRegistry.getIndexList()) {
             targetIndex.addItem(new ComboBoxItemData(key, key));
