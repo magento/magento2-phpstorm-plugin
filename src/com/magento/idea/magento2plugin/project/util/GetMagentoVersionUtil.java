@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.project.util;
 
 import com.intellij.json.psi.JsonObject;
 import com.intellij.json.psi.JsonProperty;
+import com.intellij.openapi.util.Pair;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.magento.idea.magento2plugin.magento.files.ComposerLock;
 import com.magento.idea.magento2plugin.magento.packages.code.MagentoVersion;
@@ -28,10 +29,10 @@ public final class GetMagentoVersionUtil {
      *
      * @param object JsonObject
      *
-     * @return String
+     * @return Pair[String, String]
      */
     @SuppressWarnings("PMD.CyclomaticComplexity")
-    public static @Nullable String getVersion(final @NotNull JsonObject object) {
+    public static @Nullable Pair<String, String> getVersion(final @NotNull JsonObject object) {
         final JsonProperty packagesProperty = object.findProperty(ComposerLock.PACKAGES_PROP);
 
         if (packagesProperty == null) {
@@ -77,7 +78,10 @@ public final class GetMagentoVersionUtil {
 
         for (final MagentoVersion version : versions) {
             if (foundMagentoPackages.containsKey(version.getName())) {
-                return foundMagentoPackages.get(version.getName());
+                return new Pair<>(
+                        foundMagentoPackages.get(version.getName()),
+                        version.getDisplayName()
+                );
             }
         }
 
