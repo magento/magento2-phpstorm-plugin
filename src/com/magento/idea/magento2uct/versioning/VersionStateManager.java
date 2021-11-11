@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2uct.packages.SupportedVersion;
 import com.magento.idea.magento2uct.settings.UctSettingsService;
 import com.magento.idea.magento2uct.versioning.indexes.data.DeprecationStateIndex;
+import com.magento.idea.magento2uct.versioning.indexes.data.ExistenceStateIndex;
 import com.magento.idea.magento2uct.versioning.indexes.data.VersionStateIndex;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,9 +19,11 @@ public final class VersionStateManager {
 
     private static VersionStateManager instance;
     private final DeprecationStateIndex deprecationStateIndex;
+    private final ExistenceStateIndex existenceStateIndex;
     private final Boolean isSetIgnoreFlag;
     private final SupportedVersion currentVersion;
     private final SupportedVersion targetVersion;
+    private final List<SupportedVersion> versionsToLoad;
 
     /**
      * Get instance of the version state manager.
@@ -57,16 +60,40 @@ public final class VersionStateManager {
     }
 
     /**
+     * Check if specified FQN is exists in the existence index.
+     *
+     * @param fqn String
+     *
+     * @return boolean
+     */
+    public boolean isExists(final @NotNull String fqn) {
+        return existenceStateIndex.has(fqn);
+    }
+
+    /**
+     * Get removed in version for the last checked FQN.
+     *
+     * @return String
+     */
+    public String getRemovedInVersion() {
+        return existenceStateIndex.getVersion();
+    }
+
+    /**
      * Version state manager constructor.
      */
     private VersionStateManager(final @NotNull Project project) {
         final UctSettingsService settingsService = UctSettingsService.getInstance(project);
-        deprecationStateIndex = new DeprecationStateIndex();
         isSetIgnoreFlag = settingsService.shouldIgnoreCurrentVersion();
         currentVersion = settingsService.getCurrentVersion();
         targetVersion = settingsService.getTargetVersion();
+        versionsToLoad = new LinkedList<>();
 
+        deprecationStateIndex = new DeprecationStateIndex();
         compute(deprecationStateIndex);
+
+        existenceStateIndex = new ExistenceStateIndex();
+        compute(existenceStateIndex);
     }
 
     /**
@@ -94,24 +121,27 @@ public final class VersionStateManager {
      *
      * @param index VersionStateIndex
      */
+    @SuppressWarnings({"PMD.CognitiveComplexity", "PMD.AvoidDeeplyNestedIfStmts"})
     private void compute(final VersionStateIndex index) {
         if (targetVersion == null) {
             return;
         }
-        final List<SupportedVersion> versionsToLoad = new LinkedList<>();
 
-        for (final SupportedVersion version : SupportedVersion.values()) {
-            if (version.compareTo(targetVersion) <= 0) {
-                if (isSetIgnoreFlag != null && isSetIgnoreFlag) {
-                    // If current version is NULL, it is less than minimum supported version.
-                    if (currentVersion == null || version.compareTo(currentVersion) > 0) {
+        if (versionsToLoad.isEmpty()) {
+            for (final SupportedVersion version : SupportedVersion.values()) {
+                if (version.compareTo(targetVersion) <= 0) {
+                    if (isSetIgnoreFlag != null && isSetIgnoreFlag) {
+                        // If current version is NULL, it is less than minimum supported version.
+                        if (currentVersion == null || version.compareTo(currentVersion) > 0) {
+                            versionsToLoad.add(version);
+                        }
+                    } else {
                         versionsToLoad.add(version);
                     }
-                } else {
-                    versionsToLoad.add(version);
                 }
             }
         }
+
         index.load(versionsToLoad);
     }
 }

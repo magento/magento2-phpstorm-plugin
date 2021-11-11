@@ -21,6 +21,7 @@ import com.magento.idea.magento2uct.inspections.php.deprecation.UsingDeprecatedC
 import com.magento.idea.magento2uct.inspections.php.deprecation.UsingDeprecatedConstant;
 import com.magento.idea.magento2uct.inspections.php.deprecation.UsingDeprecatedInterface;
 import com.magento.idea.magento2uct.inspections.php.deprecation.UsingDeprecatedProperty;
+import com.magento.idea.magento2uct.inspections.php.existence.ImportingNonExistentClass;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
@@ -99,11 +100,19 @@ public enum SupportedIssue {
             IssueSeverityLevel.WARNING,
             "customCode.warnings.deprecated.1534",
             UsingDeprecatedProperty.class
+    ),
+    IMPORTED_NON_EXISTENT_CLASS(
+            1112,
+            IssueSeverityLevel.CRITICAL,
+            "customCode.critical.existence.1112",
+            ImportingNonExistentClass.class,
+            "customCode.critical.existence.1112.changelog"
     );
 
     private final int code;
     private final IssueSeverityLevel level;
-    private final String messageKey;
+    private final String message;
+    private final String changelogMessage;
     private final Class<? extends LocalInspectionTool> inspectionClass;
     private static final UctInspectionBundle BUNDLE = new UctInspectionBundle();
 
@@ -112,19 +121,39 @@ public enum SupportedIssue {
      *
      * @param code IssueSeverityLevel
      * @param level IssueSeverityLevel
-     * @param messageKey String
+     * @param message String
      * @param inspectionClass Class
      */
     SupportedIssue(
             final int code,
             final IssueSeverityLevel level,
-            final String messageKey,
+            final String message,
             final Class<? extends LocalInspectionTool> inspectionClass
+    ) {
+        this(code, level, message, inspectionClass, null);
+    }
+
+    /**
+     * Known issue ENUM.
+     *
+     * @param code IssueSeverityLevel
+     * @param level IssueSeverityLevel
+     * @param message String
+     * @param inspectionClass Class
+     * @param changelogMessage String
+     */
+    SupportedIssue(
+            final int code,
+            final IssueSeverityLevel level,
+            final String message,
+            final Class<? extends LocalInspectionTool> inspectionClass,
+            final String changelogMessage
     ) {
         this.code = code;
         this.level = level;
-        this.messageKey = messageKey;
+        this.message = message;
         this.inspectionClass = inspectionClass;
+        this.changelogMessage = changelogMessage;
     }
 
     /**
@@ -153,7 +182,22 @@ public enum SupportedIssue {
      * @return String
      */
     public String getMessage(final Object... args) {
-        return BUNDLE.message(messageKey, args);
+        return BUNDLE.message(message, args);
+    }
+
+    /**
+     * Get bundle message for the issue (including changelog arguments).
+     *
+     * @param args Object
+     *
+     * @return String
+     */
+    public String getChangelogMessage(final Object... args) {
+        if (changelogMessage == null) {
+            return getMessage(args);
+        }
+
+        return BUNDLE.message(changelogMessage, args);
     }
 
     /**

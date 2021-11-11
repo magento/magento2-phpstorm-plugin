@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2uct.inspections.php.deprecation;
+package com.magento.idea.magento2uct.inspections.php.existence;
 
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -16,7 +16,7 @@ import com.magento.idea.magento2uct.packages.SupportedIssue;
 import com.magento.idea.magento2uct.versioning.VersionStateManager;
 import org.jetbrains.annotations.NotNull;
 
-public class ImportingDeprecatedClass extends ImportInspection {
+public class ImportingNonExistentClass extends ImportInspection {
 
     @Override
     protected void execute(
@@ -25,25 +25,31 @@ public class ImportingDeprecatedClass extends ImportInspection {
             final PhpUse use,
             final boolean isInterface
     ) {
-        if (VersionStateManager.getInstance(project).isDeprecated(use.getFQN())) {
-            if (isInterface) {
-                return;
-            }
+        if (VersionStateManager.getInstance(project).isExists(use.getFQN())) {
+            return;
+        }
+        final String removedIn = VersionStateManager.getInstance(project).getRemovedInVersion();
+        final String message = removedIn.isEmpty()
+                ? SupportedIssue.IMPORTED_NON_EXISTENT_CLASS.getMessage(use.getFQN())
+                : SupportedIssue.IMPORTED_NON_EXISTENT_CLASS.getChangelogMessage(
+                        use.getFQN(), removedIn);
+
+        if (!isInterface) {
             if (problemsHolder instanceof UctProblemsHolder) {
                 ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                        SupportedIssue.IMPORTING_DEPRECATED_CLASS.getCode()
+                        SupportedIssue.IMPORTED_NON_EXISTENT_CLASS.getCode()
                 );
             }
             problemsHolder.registerProblem(
                     use,
-                    SupportedIssue.IMPORTING_DEPRECATED_CLASS.getMessage(use.getFQN()),
-                    ProblemHighlightType.LIKE_DEPRECATED
+                    message,
+                    ProblemHighlightType.ERROR
             );
         }
     }
 
     @Override
     protected IssueSeverityLevel getSeverityLevel() {
-        return SupportedIssue.IMPORTING_DEPRECATED_CLASS.getLevel();
+        return SupportedIssue.IMPORTED_NON_EXISTENT_CLASS.getLevel();
     }
 }
