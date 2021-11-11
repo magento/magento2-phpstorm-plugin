@@ -340,6 +340,13 @@
                          enabledByDefault="false"
                          level="WARNING"
                          implementationClass="com.magento.idea.magento2uct.inspections.php.deprecation.UsingDeprecatedProperty"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="ImportingNonExistentClass"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.ImportingNonExistentClass"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.existence.group.name"
+                         enabledByDefault="false"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.existence.ImportingNonExistentClass"/>
         <!-- \UCT inspection -->
 
         <internalFileTemplate name="Magento Composer JSON"/>
