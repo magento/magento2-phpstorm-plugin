@@ -11,21 +11,24 @@ import java.util.List;
 
 public enum MagentoVersion {
 
-    ENTERPRISE_EDITION("magento/product-enterprise-edition", 1),
-    COMMUNITY_EDITION("magento/product-community-edition", 2);
+    ENTERPRISE_EDITION("magento/product-enterprise-edition", 1, "Adobe Commerce"),
+    COMMUNITY_EDITION("magento/product-community-edition", 2, "Magento Open Source");
 
     private final String name;
     private final int priority;
+    private final String displayName;
 
     /**
      * Magento version Enum constructor.
      *
      * @param name String
      * @param priority int
+     * @param displayName String
      */
-    MagentoVersion(final String name, final int priority) {
+    MagentoVersion(final String name, final int priority, final String displayName) {
         this.name = name;
         this.priority = priority;
+        this.displayName = displayName;
     }
 
     public String getName() {
@@ -34,6 +37,10 @@ public enum MagentoVersion {
 
     public int getPriority() {
         return priority;
+    }
+
+    public String getDisplayName() {
+        return displayName;
     }
 
     /**

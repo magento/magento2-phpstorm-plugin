@@ -8,6 +8,7 @@ package com.magento.idea.magento2plugin.util.magento;
 import com.intellij.json.psi.JsonFile;
 import com.intellij.json.psi.JsonObject;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
@@ -31,14 +32,34 @@ public final class MagentoVersionUtil {
      * @return String
      */
     public static String get(final Project project, final String magentoPath) {
+        final Pair<String, String> version = getVersionData(
+                project,
+                magentoPath
+        );
+
+        return version.getFirst();
+    }
+
+    /**
+     * Parse composer.lock to detect Magento 2 version
+     *
+     * @param project Project
+     * @param magentoPath String
+     *
+     * @return Pair[String, String]
+     */
+    public static Pair<String, String> getVersionData(
+            final Project project,
+            final String magentoPath
+    ) {
         final VirtualFile file = LocalFileSystem.getInstance().findFileByPath(
                 getFilePath(magentoPath)
         );
+        final Pair<String, String> versionData = new Pair<>(DEFAULT_VERSION, null);
 
         if (file == null) {
-            return DEFAULT_VERSION;
+            return versionData;
         }
-
         final PsiManager psiManager = PsiManager.getInstance(project);
         final PsiFile composerFile = psiManager.findFile(file);
 
@@ -50,15 +71,14 @@ public final class MagentoVersionUtil {
             );
 
             if (jsonObject == null) {
-                return DEFAULT_VERSION;
+                return versionData;
             }
+            final Pair<String, String> version = GetMagentoVersionUtil.getVersion(jsonObject);
 
-            final String version = GetMagentoVersionUtil.getVersion(jsonObject);
-
-            return version == null ? DEFAULT_VERSION : version;
+            return version == null ? versionData : version;
         }
 
-        return DEFAULT_VERSION;
+        return versionData;
     }
 
     private static String getFilePath(final String magentoPath) {
@@ -74,7 +94,7 @@ public final class MagentoVersionUtil {
      *         the value {@code false} if the argument version1 is less than to version2.
      */
     public static boolean compare(final String version1, final String version2) {
-        if (version1.equals(DEFAULT_VERSION)) {
+        if (DEFAULT_VERSION.equals(version1)) {
             return true;
         }
         if (version1.equals(version2)) {
