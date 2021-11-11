@@ -25,7 +25,7 @@ public class ImportingNonExistentClass extends ImportInspection {
             final PhpUse use,
             final boolean isInterface
     ) {
-        if (VersionStateManager.getInstance(project).isExists(use.getFQN())) {
+        if (isInterface || VersionStateManager.getInstance(project).isExists(use.getFQN())) {
             return;
         }
         final String removedIn = VersionStateManager.getInstance(project).getRemovedInVersion();
@@ -34,18 +34,16 @@ public class ImportingNonExistentClass extends ImportInspection {
                 : SupportedIssue.IMPORTED_NON_EXISTENT_CLASS.getChangelogMessage(
                         use.getFQN(), removedIn);
 
-        if (!isInterface) {
-            if (problemsHolder instanceof UctProblemsHolder) {
-                ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                        SupportedIssue.IMPORTED_NON_EXISTENT_CLASS.getCode()
-                );
-            }
-            problemsHolder.registerProblem(
-                    use,
-                    message,
-                    ProblemHighlightType.ERROR
+        if (problemsHolder instanceof UctProblemsHolder) {
+            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
+                    SupportedIssue.IMPORTED_NON_EXISTENT_CLASS.getCode()
             );
         }
+        problemsHolder.registerProblem(
+                use,
+                message,
+                ProblemHighlightType.ERROR
+        );
     }
 
     @Override
