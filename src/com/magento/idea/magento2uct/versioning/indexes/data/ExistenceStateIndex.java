@@ -66,9 +66,10 @@ public class ExistenceStateIndex implements VersionStateIndex {
 
         if (changelog.containsKey(fqn)) {
             version = changelog.get(fqn);
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     /**

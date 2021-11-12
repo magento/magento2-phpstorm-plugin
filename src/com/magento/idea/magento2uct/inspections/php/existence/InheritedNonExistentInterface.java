@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2uct.inspections.php.deprecation;
+package com.magento.idea.magento2uct.inspections.php.existence;
 
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -16,7 +16,7 @@ import com.magento.idea.magento2uct.packages.SupportedIssue;
 import com.magento.idea.magento2uct.versioning.VersionStateManager;
 import org.jetbrains.annotations.NotNull;
 
-public class InheritedDeprecatedInterface extends InheritedInterfaceInspection {
+public class InheritedNonExistentInterface extends InheritedInterfaceInspection {
 
     @Override
     protected void execute(
@@ -25,22 +25,25 @@ public class InheritedDeprecatedInterface extends InheritedInterfaceInspection {
             final ClassReference reference,
             final String interfaceFqn
     ) {
-        if (VersionStateManager.getInstance(project).isDeprecated(interfaceFqn)) {
-            if (problemsHolder instanceof UctProblemsHolder) {
-                ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                        SupportedIssue.INHERITED_DEPRECATED_INTERFACE.getCode()
-                );
-            }
-            problemsHolder.registerProblem(
-                    reference,
-                    SupportedIssue.INHERITED_DEPRECATED_INTERFACE.getMessage(interfaceFqn),
-                    ProblemHighlightType.LIKE_DEPRECATED
+        if (VersionStateManager.getInstance(project).isExists(interfaceFqn)) {
+            return;
+        }
+        final String removedIn = VersionStateManager.getInstance(project).getRemovedInVersion();
+        final String message = removedIn.isEmpty()
+                ? SupportedIssue.INHERITED_NON_EXISTENT_INTERFACE.getMessage(interfaceFqn)
+                : SupportedIssue.INHERITED_NON_EXISTENT_INTERFACE.getChangelogMessage(
+                interfaceFqn, removedIn);
+
+        if (problemsHolder instanceof UctProblemsHolder) {
+            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
+                    SupportedIssue.INHERITED_NON_EXISTENT_INTERFACE.getCode()
             );
         }
+        problemsHolder.registerProblem(reference, message, ProblemHighlightType.ERROR);
     }
 
     @Override
     protected IssueSeverityLevel getSeverityLevel() {
-        return SupportedIssue.INHERITED_DEPRECATED_INTERFACE.getLevel();
+        return SupportedIssue.INHERITED_NON_EXISTENT_INTERFACE.getLevel();
     }
 }
