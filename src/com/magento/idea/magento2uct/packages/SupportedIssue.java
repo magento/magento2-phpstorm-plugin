@@ -23,6 +23,7 @@ import com.magento.idea.magento2uct.inspections.php.deprecation.UsingDeprecatedI
 import com.magento.idea.magento2uct.inspections.php.deprecation.UsingDeprecatedProperty;
 import com.magento.idea.magento2uct.inspections.php.existence.ImportingNonExistentClass;
 import com.magento.idea.magento2uct.inspections.php.existence.ImportingNonExistentInterface;
+import com.magento.idea.magento2uct.inspections.php.existence.InheritedNonExistentInterface;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
@@ -115,6 +116,13 @@ public enum SupportedIssue {
             "customCode.critical.existence.1312",
             ImportingNonExistentInterface.class,
             "customCode.critical.existence.1312.changelog"
+    ),
+    INHERITED_NON_EXISTENT_INTERFACE(
+            1317,
+            IssueSeverityLevel.CRITICAL,
+            "customCode.critical.existence.1317",
+            InheritedNonExistentInterface.class,
+            "customCode.critical.existence.1317.changelog"
     );
 
     private final int code;

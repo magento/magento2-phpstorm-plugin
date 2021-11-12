@@ -59,10 +59,8 @@ public class ImplementedDeprecatedInterface extends PhpInspection {
                     }
                     final boolean isDeprecated = VersionStateManager
                             .getInstance(project).isDeprecated(interfaceFqn);
-                    Pair<Boolean, String> checkResult = null;
 
-                    if (isDeprecated || (checkResult = InheritedDeprecatedInterface//NOPMD
-                            .checkDeprecatedParent((PhpClass) interfaceClass)).getFirst()) {
+                    if (isDeprecated) {
                         if (problemsHolder instanceof UctProblemsHolder) {
                             ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
                                     SupportedIssue.IMPLEMENTED_DEPRECATED_INTERFACE.getCode()
@@ -71,9 +69,7 @@ public class ImplementedDeprecatedInterface extends PhpInspection {
                         problemsHolder.registerProblem(
                                 ref,
                                 SupportedIssue.IMPLEMENTED_DEPRECATED_INTERFACE.getMessage(
-                                        checkResult == null
-                                                ? interfaceFqn
-                                                : checkResult.getSecond()
+                                        interfaceFqn
                                 ),
                                 ProblemHighlightType.LIKE_DEPRECATED
                         );
@@ -131,12 +127,6 @@ public class ImplementedDeprecatedInterface extends PhpInspection {
                     if (VersionStateManager.getInstance(clazz.getProject())
                             .isDeprecated(interfaceFqn)) {
                         return new Pair<>(true, interfaceFqn);
-                    }
-                    final Pair<Boolean, String> parentCheck = InheritedDeprecatedInterface
-                            .checkDeprecatedParent((PhpClass) interfaceClass);
-
-                    if (parentCheck.getFirst()) {
-                        return parentCheck;
                     }
                 }
 

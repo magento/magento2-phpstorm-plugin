@@ -48,6 +48,9 @@ public abstract class ImportInspection extends PhpInspection {
                 }
 
                 for (final PhpUse use : useList.getDeclarations()) {
+                    if (use.getName().isEmpty()) {
+                        continue;
+                    }
                     execute(project, problemsHolder, use, isInterface(use));
                 }
             }
