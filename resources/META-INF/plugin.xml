@@ -368,6 +368,13 @@
                          enabledByDefault="false"
                          level="ERROR"
                          implementationClass="com.magento.idea.magento2uct.inspections.php.existence.ImplementedNonExistentInterface"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="ExtendedNonExistentClass"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.ExtendedNonExistentClass"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.existence.group.name"
+                         enabledByDefault="false"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.existence.ExtendedNonExistentClass"/>
         <!-- \UCT inspection -->
 
         <internalFileTemplate name="Magento Composer JSON"/>
