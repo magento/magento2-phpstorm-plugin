@@ -26,6 +26,7 @@ import com.magento.idea.magento2uct.inspections.php.existence.ImplementedNonExis
 import com.magento.idea.magento2uct.inspections.php.existence.ImportingNonExistentClass;
 import com.magento.idea.magento2uct.inspections.php.existence.ImportingNonExistentInterface;
 import com.magento.idea.magento2uct.inspections.php.existence.InheritedNonExistentInterface;
+import com.magento.idea.magento2uct.inspections.php.existence.OverriddenNonExistentConstant;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
@@ -139,6 +140,13 @@ public enum SupportedIssue {
             "customCode.critical.existence.1111",
             ExtendedNonExistentClass.class,
             "customCode.critical.existence.1111.changelog"
+    ),
+    OVERRIDDEN_NON_EXISTENT_CONSTANT(
+            1215,
+            IssueSeverityLevel.CRITICAL,
+            "customCode.critical.existence.1215",
+            OverriddenNonExistentConstant.class,
+            "customCode.critical.existence.1215.changelog"
     );
 
     private final int code;

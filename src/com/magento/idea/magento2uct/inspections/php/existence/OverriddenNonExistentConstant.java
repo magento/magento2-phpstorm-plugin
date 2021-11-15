@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2uct.inspections.php.deprecation;
+package com.magento.idea.magento2uct.inspections.php.existence;
 
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -18,7 +18,7 @@ import com.magento.idea.magento2uct.packages.SupportedIssue;
 import com.magento.idea.magento2uct.versioning.VersionStateManager;
 import org.jetbrains.annotations.NotNull;
 
-public class OverridingDeprecatedConstant extends OverriddenFieldInspection {
+public class OverriddenNonExistentConstant extends OverriddenFieldInspection {
 
     @Override
     protected void execute(
@@ -28,24 +28,26 @@ public class OverridingDeprecatedConstant extends OverriddenFieldInspection {
             final Field overriddenField,
             final PhpClass parentClass
     ) {
-        if (!VersionStateManager.getInstance(project).isDeprecated(overriddenField.getFQN())) {
+        if (VersionStateManager.getInstance(project).isExists(overriddenField.getFQN())) {
             return;
         }
+        final String messageArg = parentClass
+                .getFQN()
+                .concat("::")
+                .concat(overriddenField.getName());
+
+        final String removedIn = VersionStateManager.getInstance(project).getRemovedInVersion();
+        final String message = removedIn.isEmpty()
+                ? SupportedIssue.OVERRIDDEN_NON_EXISTENT_CONSTANT.getMessage(messageArg)
+                : SupportedIssue.OVERRIDDEN_NON_EXISTENT_CONSTANT.getChangelogMessage(
+                messageArg, removedIn);
 
         if (problemsHolder instanceof UctProblemsHolder) {
             ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.OVERRIDING_DEPRECATED_CONSTANT.getCode()
+                    SupportedIssue.OVERRIDDEN_NON_EXISTENT_CONSTANT.getCode()
             );
         }
-        problemsHolder.registerProblem(
-                field,
-                SupportedIssue.OVERRIDING_DEPRECATED_CONSTANT.getMessage(
-                        parentClass.getFQN()
-                                .concat("::")
-                                .concat(overriddenField.getName())
-                ),
-                ProblemHighlightType.LIKE_DEPRECATED
-        );
+        problemsHolder.registerProblem(field, message, ProblemHighlightType.ERROR);
     }
 
     @Override
@@ -55,6 +57,6 @@ public class OverridingDeprecatedConstant extends OverriddenFieldInspection {
 
     @Override
     protected IssueSeverityLevel getSeverityLevel() {
-        return SupportedIssue.OVERRIDING_DEPRECATED_CONSTANT.getLevel();
+        return SupportedIssue.OVERRIDDEN_NON_EXISTENT_CONSTANT.getLevel();
     }
 }

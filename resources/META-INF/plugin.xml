@@ -375,6 +375,13 @@
                          enabledByDefault="false"
                          level="ERROR"
                          implementationClass="com.magento.idea.magento2uct.inspections.php.existence.ExtendedNonExistentClass"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="OverriddenNonExistentConstant"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.OverriddenNonExistentConstant"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.existence.group.name"
+                         enabledByDefault="false"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.existence.OverriddenNonExistentConstant"/>
         <!-- \UCT inspection -->
 
         <internalFileTemplate name="Magento Composer JSON"/>
