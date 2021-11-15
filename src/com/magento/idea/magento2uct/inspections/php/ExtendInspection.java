@@ -19,8 +19,7 @@ import org.jetbrains.annotations.NotNull;
 public abstract class ExtendInspection extends PhpInspection {
 
     @Override
-    public @NotNull
-    PsiElementVisitor buildVisitor(
+    public @NotNull PsiElementVisitor buildVisitor(
             final @NotNull ProblemsHolder problemsHolder,
             final boolean isOnTheFly
     ) {
