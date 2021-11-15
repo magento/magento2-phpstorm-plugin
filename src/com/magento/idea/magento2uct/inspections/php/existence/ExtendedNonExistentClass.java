@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2uct.inspections.php.deprecation;
+package com.magento.idea.magento2uct.inspections.php.existence;
 
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -18,7 +18,7 @@ import com.magento.idea.magento2uct.packages.SupportedIssue;
 import com.magento.idea.magento2uct.versioning.VersionStateManager;
 import org.jetbrains.annotations.NotNull;
 
-public class ExtendingDeprecatedClass extends ExtendInspection {
+public class ExtendedNonExistentClass extends ExtendInspection {
 
     @Override
     protected void execute(
@@ -29,29 +29,30 @@ public class ExtendingDeprecatedClass extends ExtendInspection {
     ) {
         final String parentFqn = parentClass.getFQN();
 
-        if (!VersionStateManager.getInstance(project).isDeprecated(parentFqn)) {
+        if (VersionStateManager.getInstance(project).isExists(parentFqn)) {
             return;
         }
-        for (final ClassReference classReference : childExtends.getReferenceElements()) {
-            if (parentFqn.equals(classReference.getFQN())) {
-                if (problemsHolder instanceof UctProblemsHolder) {
-                    ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                            SupportedIssue.EXTENDING_DEPRECATED_CLASS.getCode()
-                    );
-                }
-                problemsHolder.registerProblem(
-                        classReference,
-                        SupportedIssue.EXTENDING_DEPRECATED_CLASS.getMessage(
-                                parentClass.getFQN()
-                        ),
-                        ProblemHighlightType.LIKE_DEPRECATED
-                );
+        final String removedIn = VersionStateManager.getInstance(project).getRemovedInVersion();
+        final String message = removedIn.isEmpty()
+                ? SupportedIssue.EXTENDED_NON_EXISTENT_CLASS.getMessage(parentFqn)
+                : SupportedIssue.EXTENDED_NON_EXISTENT_CLASS.getChangelogMessage(
+                parentFqn, removedIn);
+
+        if (problemsHolder instanceof UctProblemsHolder) {
+            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
+                    SupportedIssue.EXTENDED_NON_EXISTENT_CLASS.getCode()
+            );
+        }
+
+        for (final ClassReference reference : childExtends.getReferenceElements()) {
+            if (parentFqn.equals(reference.getFQN())) {
+                problemsHolder.registerProblem(reference, message, ProblemHighlightType.ERROR);
             }
         }
     }
 
     @Override
     protected IssueSeverityLevel getSeverityLevel() {
-        return SupportedIssue.EXTENDING_DEPRECATED_CLASS.getLevel();
+        return SupportedIssue.EXTENDED_NON_EXISTENT_CLASS.getLevel();
     }
 }
