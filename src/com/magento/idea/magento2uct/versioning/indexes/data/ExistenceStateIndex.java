@@ -56,7 +56,7 @@ public class ExistenceStateIndex implements VersionStateIndex {
      *
      * @return boolean
      */
-    public boolean has(final @NotNull String fqn) {
+    public synchronized boolean has(final @NotNull String fqn) {
         groupLoadedData();
         version = "";
 
