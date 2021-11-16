@@ -56,7 +56,8 @@ public class ExistenceStateIndex implements VersionStateIndex {
      *
      * @return boolean
      */
-    public boolean has(final @NotNull String fqn) {
+    @SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
+    public synchronized boolean has(final @NotNull String fqn) {
         groupLoadedData();
         version = "";
 

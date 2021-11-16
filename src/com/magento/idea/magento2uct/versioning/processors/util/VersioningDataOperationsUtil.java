@@ -7,7 +7,6 @@ package com.magento.idea.magento2uct.versioning.processors.util;
 
 import com.google.common.collect.Sets;
 import com.intellij.openapi.util.Pair;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +68,7 @@ public final class VersioningDataOperationsUtil {
             final boolean shouldKeepNew
     ) {
         final Map<String, Boolean> union = new HashMap<>();
-        final List<String> removed = new ArrayList<>();
+        final Map<String, Boolean> removedUnion = new HashMap<>();
         final Map<String, String> changelog = new HashMap<>();
 
         for (final Map.Entry<String, Map<String, Boolean>> vData : versioningData.entrySet()) {
@@ -80,10 +79,11 @@ public final class VersioningDataOperationsUtil {
             final Map<String, Boolean> removedData = removedSet.stream().collect(
                     Collectors.toMap(
                             Map.Entry::getKey,
-                            Map.Entry::getValue
+                            element -> true
                     )
             );
-            removedData.forEach((key, value) -> removed.add(key));
+            removedUnion.putAll(removedData);
+
             final Sets.SetView<Map.Entry<String, Boolean>> newDataSet = Sets.difference(
                     vData.getValue().entrySet(),
                     removedSet
@@ -102,9 +102,9 @@ public final class VersioningDataOperationsUtil {
                 }
             }
         }
-        final Set<Map.Entry<String, Boolean>> filteredUnionSet = Sets.filter(
+        final Sets.SetView<Map.Entry<String, Boolean>> filteredUnionSet = Sets.difference(
                 union.entrySet(),
-                entry -> !removed.contains(entry.getKey())
+                removedUnion.entrySet()
         );
         final Map<String, Boolean> filteredUnion = filteredUnionSet.stream().collect(
                 Collectors.toMap(
