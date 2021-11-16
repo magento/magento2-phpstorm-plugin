@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2uct.inspections.php.deprecation;
+package com.magento.idea.magento2uct.inspections.php.existence;
 
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -17,7 +17,7 @@ import com.magento.idea.magento2uct.packages.SupportedIssue;
 import com.magento.idea.magento2uct.versioning.VersionStateManager;
 import org.jetbrains.annotations.NotNull;
 
-public class CallingDeprecatedMethod extends CallMethodInspection {
+public class CalledNonExistentMethod extends CallMethodInspection {
 
     @Override
     protected void execute(
@@ -28,24 +28,25 @@ public class CallingDeprecatedMethod extends CallMethodInspection {
     ) {
         final String type = method.getFQN();
 
-        if (VersionStateManager.getInstance(project).isDeprecated(type)) {
-            if (problemsHolder instanceof UctProblemsHolder) {
-                ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                        SupportedIssue.CALLING_DEPRECATED_METHOD.getCode()
-                );
-            }
-            problemsHolder.registerProblem(
-                    methodReference,
-                    SupportedIssue.CALLING_DEPRECATED_METHOD.getMessage(
-                            type.replace(".", "::")
-                    ),
-                    ProblemHighlightType.LIKE_DEPRECATED
+        if (VersionStateManager.getInstance(project).isExists(type)) {
+            return;
+        }
+        final String removedIn = VersionStateManager.getInstance(project).getRemovedInVersion();
+        final String message = removedIn.isEmpty()
+                ? SupportedIssue.CALLED_NON_EXISTENT_METHOD.getMessage(type)
+                : SupportedIssue.CALLED_NON_EXISTENT_METHOD.getChangelogMessage(
+                type, removedIn);
+
+        if (problemsHolder instanceof UctProblemsHolder) {
+            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
+                    SupportedIssue.CALLED_NON_EXISTENT_METHOD.getCode()
             );
         }
+        problemsHolder.registerProblem(methodReference, message, ProblemHighlightType.ERROR);
     }
 
     @Override
     protected IssueSeverityLevel getSeverityLevel() {
-        return SupportedIssue.CALLING_DEPRECATED_METHOD.getLevel();
+        return SupportedIssue.CALLED_NON_EXISTENT_METHOD.getLevel();
     }
 }

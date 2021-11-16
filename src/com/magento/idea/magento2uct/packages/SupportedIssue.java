@@ -21,6 +21,7 @@ import com.magento.idea.magento2uct.inspections.php.deprecation.UsingDeprecatedC
 import com.magento.idea.magento2uct.inspections.php.deprecation.UsingDeprecatedConstant;
 import com.magento.idea.magento2uct.inspections.php.deprecation.UsingDeprecatedInterface;
 import com.magento.idea.magento2uct.inspections.php.deprecation.UsingDeprecatedProperty;
+import com.magento.idea.magento2uct.inspections.php.existence.CalledNonExistentMethod;
 import com.magento.idea.magento2uct.inspections.php.existence.ExtendedNonExistentClass;
 import com.magento.idea.magento2uct.inspections.php.existence.ImplementedNonExistentInterface;
 import com.magento.idea.magento2uct.inspections.php.existence.ImportingNonExistentClass;
@@ -155,6 +156,13 @@ public enum SupportedIssue {
             "customCode.critical.existence.1515",
             OverriddenNonExistentProperty.class,
             "customCode.critical.existence.1515.changelog"
+    ),
+    CALLED_NON_EXISTENT_METHOD(
+            1410,
+            IssueSeverityLevel.CRITICAL,
+            "customCode.critical.existence.1410",
+            CalledNonExistentMethod.class,
+            "customCode.critical.existence.1410.changelog"
     );
 
     private final int code;
