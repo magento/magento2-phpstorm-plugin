@@ -40,7 +40,7 @@ public abstract class CallMethodInspection extends PhpInspection {
                 if (!(resolvedElement instanceof Method)) {
                     return;
                 }
-                execute(project, problemsHolder, reference, ((Method) resolvedElement));
+                execute(project, problemsHolder, reference, (Method) resolvedElement);
             }
         };
     }
