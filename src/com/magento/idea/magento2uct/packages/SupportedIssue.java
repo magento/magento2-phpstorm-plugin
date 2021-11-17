@@ -32,6 +32,8 @@ import com.magento.idea.magento2uct.inspections.php.existence.OverriddenNonExist
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
+
+import com.magento.idea.magento2uct.inspections.php.existence.UsedNonExistentType;
 import org.jetbrains.annotations.Nullable;
 
 public enum SupportedIssue {
@@ -163,6 +165,13 @@ public enum SupportedIssue {
             "customCode.critical.existence.1410",
             CalledNonExistentMethod.class,
             "customCode.critical.existence.1410.changelog"
+    ),
+    USED_NON_EXISTENT_TYPE(
+            1110,
+            IssueSeverityLevel.CRITICAL,
+            "customCode.critical.existence.1110.changelog",
+            UsedNonExistentType.class,
+            "customCode.critical.existence.1110.changelog"
     );
 
     private final int code;
