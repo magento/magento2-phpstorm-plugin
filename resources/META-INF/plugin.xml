@@ -403,6 +403,13 @@
                          enabledByDefault="false"
                          level="ERROR"
                          implementationClass="com.magento.idea.magento2uct.inspections.php.existence.UsedNonExistentType"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="ImportedNonApiClass"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.ImportedNonApiClass"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.ImportedNonApiClass"/>
         <!-- \UCT inspection -->
 
         <internalFileTemplate name="Magento Composer JSON"/>

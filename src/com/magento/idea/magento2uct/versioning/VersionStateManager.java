@@ -8,6 +8,7 @@ package com.magento.idea.magento2uct.versioning;
 import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2uct.packages.SupportedVersion;
 import com.magento.idea.magento2uct.settings.UctSettingsService;
+import com.magento.idea.magento2uct.versioning.indexes.data.ApiCoverageStateIndex;
 import com.magento.idea.magento2uct.versioning.indexes.data.DeprecationStateIndex;
 import com.magento.idea.magento2uct.versioning.indexes.data.ExistenceStateIndex;
 import com.magento.idea.magento2uct.versioning.indexes.data.VersionStateIndex;
@@ -20,6 +21,7 @@ public final class VersionStateManager {
     private static VersionStateManager instance;
     private final DeprecationStateIndex deprecationStateIndex;
     private final ExistenceStateIndex existenceStateIndex;
+    private final ApiCoverageStateIndex apiCoverageStateIndex;
     private final Boolean isSetIgnoreFlag;
     private final SupportedVersion currentVersion;
     private final SupportedVersion targetVersion;
@@ -82,6 +84,17 @@ public final class VersionStateManager {
     }
 
     /**
+     * Check if specified FQN is marked as API.
+     *
+     * @param fqn String
+     *
+     * @return boolean
+     */
+    public boolean isApi(final @NotNull String fqn) {
+        return apiCoverageStateIndex.has(fqn);
+    }
+
+    /**
      * Version state manager constructor.
      */
     private VersionStateManager(final @NotNull Project project) {
@@ -96,6 +109,9 @@ public final class VersionStateManager {
 
         existenceStateIndex = new ExistenceStateIndex();
         compute(existenceStateIndex);
+
+        apiCoverageStateIndex = new ApiCoverageStateIndex(existenceStateIndex.getAllData());
+        compute(apiCoverageStateIndex);
     }
 
     /**

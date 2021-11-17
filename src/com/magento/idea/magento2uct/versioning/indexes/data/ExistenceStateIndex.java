@@ -80,6 +80,15 @@ public class ExistenceStateIndex implements VersionStateIndex {
     }
 
     /**
+     * Get versioning data.
+     *
+     * @return Map
+     */
+    public Map<String, Map<String, Boolean>> getAllData() {
+        return versioningData;
+    }
+
+    /**
      * Get deprecation index data.
      *
      * @return Map[String, Boolean]
