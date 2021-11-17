@@ -29,10 +29,9 @@ public class UsedNonExistentType extends UsedTypeInspection {
         if (VersionStateManager.getInstance(project).isExists(phpClass.getFQN())) {
             return;
         }
-        final String removedIn = VersionStateManager.getInstance(project).getRemovedInVersion();
         final String message = SupportedIssue.USED_NON_EXISTENT_TYPE.getMessage(
                 phpClass.getFQN(),
-                removedIn
+                VersionStateManager.getInstance(project).getRemovedInVersion(phpClass.getFQN())
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {

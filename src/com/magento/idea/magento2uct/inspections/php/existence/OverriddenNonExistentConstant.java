@@ -36,11 +36,10 @@ public class OverriddenNonExistentConstant extends OverriddenFieldInspection {
                 .concat("::")
                 .concat(overriddenField.getName());
 
-        final String removedIn = VersionStateManager.getInstance(project).getRemovedInVersion();
-        final String message = removedIn.isEmpty()
-                ? SupportedIssue.OVERRIDDEN_NON_EXISTENT_CONSTANT.getMessage(messageArg)
-                : SupportedIssue.OVERRIDDEN_NON_EXISTENT_CONSTANT.getChangelogMessage(
-                messageArg, removedIn);
+        final String message = SupportedIssue.OVERRIDDEN_NON_EXISTENT_CONSTANT.getMessage(
+                messageArg,
+                VersionStateManager.getInstance(project).getRemovedInVersion(messageArg)
+        );
 
         if (problemsHolder instanceof UctProblemsHolder) {
             ((UctProblemsHolder) problemsHolder).setReservedErrorCode(

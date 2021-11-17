@@ -73,10 +73,12 @@ public final class VersionStateManager {
     /**
      * Get removed in version for the last checked FQN.
      *
+     * @param fqn String
+     *
      * @return String
      */
-    public String getRemovedInVersion() {
-        return existenceStateIndex.getVersion();
+    public String getRemovedInVersion(final @NotNull String fqn) {
+        return existenceStateIndex.getVersion(fqn);
     }
 
     /**

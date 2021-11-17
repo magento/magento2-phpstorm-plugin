@@ -29,7 +29,6 @@ public class ExistenceStateIndex implements VersionStateIndex {
     private final Map<String, Boolean> targetVersionData;
     private final Map<String, String> changelog;
     private String projectBasePath;
-    private String version;
 
     /**
      * Existence state index constructor.
@@ -59,27 +58,25 @@ public class ExistenceStateIndex implements VersionStateIndex {
     @SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
     public synchronized boolean has(final @NotNull String fqn) {
         groupLoadedData();
-        version = "";
 
         if (targetVersionData.containsKey(fqn)) {
             return true;
         }
 
-        if (changelog.containsKey(fqn)) {
-            version = changelog.get(fqn);
-            return false;
-        }
-
-        return true;
+        return !changelog.containsKey(fqn);
     }
 
     /**
-     * Get version state after lookup.
+     * Get version for specified FQN from prepared changelog.
+     *
+     * @param fqn String
      *
      * @return String
      */
-    public String getVersion() {
-        return version;
+    public String getVersion(final @NotNull String fqn) {
+        final String version = changelog.get(fqn);
+
+        return version == null ? "some" : version;
     }
 
     /**

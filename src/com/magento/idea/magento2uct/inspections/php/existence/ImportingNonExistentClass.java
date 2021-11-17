@@ -28,11 +28,10 @@ public class ImportingNonExistentClass extends ImportInspection {
         if (isInterface || VersionStateManager.getInstance(project).isExists(use.getFQN())) {
             return;
         }
-        final String removedIn = VersionStateManager.getInstance(project).getRemovedInVersion();
-        final String message = removedIn.isEmpty()
-                ? SupportedIssue.IMPORTED_NON_EXISTENT_CLASS.getMessage(use.getFQN())
-                : SupportedIssue.IMPORTED_NON_EXISTENT_CLASS.getChangelogMessage(
-                        use.getFQN(), removedIn);
+        final String message = SupportedIssue.IMPORTED_NON_EXISTENT_CLASS.getMessage(
+                use.getFQN(),
+                VersionStateManager.getInstance(project).getRemovedInVersion(use.getFQN())
+        );
 
         if (problemsHolder instanceof UctProblemsHolder) {
             ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
