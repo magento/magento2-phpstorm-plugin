@@ -36,6 +36,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings("PMD.ExcessiveImports")
 public enum SupportedIssue {
 
     EXTENDING_DEPRECATED_CLASS(
