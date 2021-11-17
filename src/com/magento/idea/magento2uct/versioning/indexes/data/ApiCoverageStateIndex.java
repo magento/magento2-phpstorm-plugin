@@ -25,13 +25,18 @@ public class ApiCoverageStateIndex implements VersionStateIndex {
 
     private static final String RESOURCE_DIR = "api";
 
-    private final Map<String, Map<String, Boolean>> data;
-    private final Map<String, String> changelog = new HashMap<>();//NOPMD
+    private final Map<String, Map<String, Boolean>> versioningData;
+    private final Map<String, Boolean> targetVersionData;
+    private final Map<String, String> changelog;
     private String projectBasePath;
-    private String version;//NOPMD
 
+    /**
+     * Api coverage state index constructor.
+     */
     public ApiCoverageStateIndex() {
-        data = new LinkedHashMap<>();
+        versioningData = new LinkedHashMap<>();
+        targetVersionData = new HashMap<>();
+        changelog = new HashMap<>();
     }
 
     /**
@@ -44,12 +49,30 @@ public class ApiCoverageStateIndex implements VersionStateIndex {
     }
 
     /**
+     * Check if the specified FQN exists in the existence index.
+     *
+     * @param fqn String
+     *
+     * @return boolean
+     */
+    @SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
+    public synchronized boolean has(final @NotNull String fqn) {
+        groupLoadedData();
+
+        return targetVersionData.containsKey(fqn);
+    }
+
+    /**
      * Get version state after lookup.
+     *
+     * @param fqn String
      *
      * @return String
      */
-    public String getVersion() {
-        return version;
+    public String getVersion(final @NotNull String fqn) {
+        final String version = changelog.get(fqn);
+
+        return version == null ? "some" : version;
     }
 
     /**
@@ -58,16 +81,9 @@ public class ApiCoverageStateIndex implements VersionStateIndex {
      * @return Map[String, Boolean]
      */
     public Map<String, Boolean> getIndexData() {
-        final Pair<Map<String, Boolean>, Map<String, String>> gatheredData =
-                VersioningDataOperationsUtil.unionVersionDataWithChangelog(
-                        data,
-                        new ArrayList<>(Collections.singletonList(
-                                SupportedVersion.V230.getVersion()
-                        )),
-                        true
-                );
+        groupLoadedData();
 
-        return gatheredData.getFirst();
+        return targetVersionData;
     }
 
     @Override
@@ -139,7 +155,25 @@ public class ApiCoverageStateIndex implements VersionStateIndex {
             final Map<String, Boolean> indexData
     ) {
         if (indexData != null) {
-            data.put(version, indexData);
+            versioningData.put(version, indexData);
+        }
+    }
+
+    /**
+     * Group data according to purpose.
+     */
+    private void groupLoadedData() {
+        if (targetVersionData.isEmpty() && !versioningData.isEmpty()) {
+            final Pair<Map<String, Boolean>, Map<String, String>> gatheredData =
+                    VersioningDataOperationsUtil.unionVersionDataWithChangelog(
+                            versioningData,
+                            new ArrayList<>(Collections.singletonList(
+                                    SupportedVersion.V230.getVersion()
+                            )),
+                            true
+                    );
+            targetVersionData.putAll(gatheredData.getFirst());
+            changelog.putAll(gatheredData.getSecond());
         }
     }
 }
