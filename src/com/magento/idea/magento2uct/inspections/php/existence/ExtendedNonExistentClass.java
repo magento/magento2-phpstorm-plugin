@@ -32,11 +32,10 @@ public class ExtendedNonExistentClass extends ExtendInspection {
         if (VersionStateManager.getInstance(project).isExists(parentFqn)) {
             return;
         }
-        final String removedIn = VersionStateManager.getInstance(project).getRemovedInVersion();
-        final String message = removedIn.isEmpty()
-                ? SupportedIssue.EXTENDED_NON_EXISTENT_CLASS.getMessage(parentFqn)
-                : SupportedIssue.EXTENDED_NON_EXISTENT_CLASS.getChangelogMessage(
-                parentFqn, removedIn);
+        final String message = SupportedIssue.EXTENDED_NON_EXISTENT_CLASS.getMessage(
+                parentFqn,
+                VersionStateManager.getInstance(project).getRemovedInVersion(parentFqn)
+        );
 
         if (problemsHolder instanceof UctProblemsHolder) {
             ((UctProblemsHolder) problemsHolder).setReservedErrorCode(

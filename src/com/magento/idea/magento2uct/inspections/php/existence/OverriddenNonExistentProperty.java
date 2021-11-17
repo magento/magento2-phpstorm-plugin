@@ -36,11 +36,12 @@ public class OverriddenNonExistentProperty extends OverriddenFieldInspection {
                 .concat("::")
                 .concat(overriddenProperty.getName());
 
-        final String removedIn = VersionStateManager.getInstance(project).getRemovedInVersion();
-        final String message = removedIn.isEmpty()
-                ? SupportedIssue.OVERRIDDEN_NON_EXISTENT_PROPERTY.getMessage(messageArg)
-                : SupportedIssue.OVERRIDDEN_NON_EXISTENT_PROPERTY.getChangelogMessage(
-                messageArg, removedIn);
+        final String message = SupportedIssue.OVERRIDDEN_NON_EXISTENT_PROPERTY.getMessage(
+                messageArg,
+                VersionStateManager.getInstance(project).getRemovedInVersion(
+                        overriddenProperty.getFQN()
+                )
+        );
 
         if (problemsHolder instanceof UctProblemsHolder) {
             ((UctProblemsHolder) problemsHolder).setReservedErrorCode(

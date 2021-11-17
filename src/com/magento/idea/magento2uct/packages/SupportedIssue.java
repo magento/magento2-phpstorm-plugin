@@ -29,6 +29,7 @@ import com.magento.idea.magento2uct.inspections.php.existence.ImportingNonExiste
 import com.magento.idea.magento2uct.inspections.php.existence.InheritedNonExistentInterface;
 import com.magento.idea.magento2uct.inspections.php.existence.OverriddenNonExistentConstant;
 import com.magento.idea.magento2uct.inspections.php.existence.OverriddenNonExistentProperty;
+import com.magento.idea.magento2uct.inspections.php.existence.UsedNonExistentType;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
@@ -112,63 +113,60 @@ public enum SupportedIssue {
             1112,
             IssueSeverityLevel.CRITICAL,
             "customCode.critical.existence.1112",
-            ImportingNonExistentClass.class,
-            "customCode.critical.existence.1112.changelog"
+            ImportingNonExistentClass.class
     ),
     IMPORTED_NON_EXISTENT_INTERFACE(
             1312,
             IssueSeverityLevel.CRITICAL,
             "customCode.critical.existence.1312",
-            ImportingNonExistentInterface.class,
-            "customCode.critical.existence.1312.changelog"
+            ImportingNonExistentInterface.class
     ),
     INHERITED_NON_EXISTENT_INTERFACE(
             1317,
             IssueSeverityLevel.CRITICAL,
             "customCode.critical.existence.1317",
-            InheritedNonExistentInterface.class,
-            "customCode.critical.existence.1317.changelog"
+            InheritedNonExistentInterface.class
     ),
     IMPLEMENTED_NON_EXISTENT_INTERFACE(
             1318,
             IssueSeverityLevel.CRITICAL,
             "customCode.critical.existence.1318",
-            ImplementedNonExistentInterface.class,
-            "customCode.critical.existence.1318.changelog"
+            ImplementedNonExistentInterface.class
     ),
     EXTENDED_NON_EXISTENT_CLASS(
             1111,
             IssueSeverityLevel.CRITICAL,
             "customCode.critical.existence.1111",
-            ExtendedNonExistentClass.class,
-            "customCode.critical.existence.1111.changelog"
+            ExtendedNonExistentClass.class
     ),
     OVERRIDDEN_NON_EXISTENT_CONSTANT(
             1215,
             IssueSeverityLevel.CRITICAL,
             "customCode.critical.existence.1215",
-            OverriddenNonExistentConstant.class,
-            "customCode.critical.existence.1215.changelog"
+            OverriddenNonExistentConstant.class
     ),
     OVERRIDDEN_NON_EXISTENT_PROPERTY(
             1515,
             IssueSeverityLevel.CRITICAL,
             "customCode.critical.existence.1515",
-            OverriddenNonExistentProperty.class,
-            "customCode.critical.existence.1515.changelog"
+            OverriddenNonExistentProperty.class
     ),
     CALLED_NON_EXISTENT_METHOD(
             1410,
             IssueSeverityLevel.CRITICAL,
             "customCode.critical.existence.1410",
-            CalledNonExistentMethod.class,
-            "customCode.critical.existence.1410.changelog"
+            CalledNonExistentMethod.class
+    ),
+    USED_NON_EXISTENT_TYPE(
+            1110,
+            IssueSeverityLevel.CRITICAL,
+            "customCode.critical.existence.1110",
+            UsedNonExistentType.class
     );
 
     private final int code;
     private final IssueSeverityLevel level;
     private final String message;
-    private final String changelogMessage;
     private final Class<? extends LocalInspectionTool> inspectionClass;
     private static final UctInspectionBundle BUNDLE = new UctInspectionBundle();
 
@@ -186,30 +184,10 @@ public enum SupportedIssue {
             final String message,
             final Class<? extends LocalInspectionTool> inspectionClass
     ) {
-        this(code, level, message, inspectionClass, null);
-    }
-
-    /**
-     * Known issue ENUM.
-     *
-     * @param code IssueSeverityLevel
-     * @param level IssueSeverityLevel
-     * @param message String
-     * @param inspectionClass Class
-     * @param changelogMessage String
-     */
-    SupportedIssue(
-            final int code,
-            final IssueSeverityLevel level,
-            final String message,
-            final Class<? extends LocalInspectionTool> inspectionClass,
-            final String changelogMessage
-    ) {
         this.code = code;
         this.level = level;
         this.message = message;
         this.inspectionClass = inspectionClass;
-        this.changelogMessage = changelogMessage;
     }
 
     /**
@@ -239,21 +217,6 @@ public enum SupportedIssue {
      */
     public String getMessage(final Object... args) {
         return BUNDLE.message(message, args);
-    }
-
-    /**
-     * Get bundle message for the issue (including changelog arguments).
-     *
-     * @param args Object
-     *
-     * @return String
-     */
-    public String getChangelogMessage(final Object... args) {
-        if (changelogMessage == null) {
-            return getMessage(args);
-        }
-
-        return BUNDLE.message(changelogMessage, args);
     }
 
     /**
