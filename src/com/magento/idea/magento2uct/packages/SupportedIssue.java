@@ -9,6 +9,7 @@ import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.psi.PsiElementVisitor;
 import com.magento.idea.magento2uct.bundles.UctInspectionBundle;
 import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
+import com.magento.idea.magento2uct.inspections.php.api.ImportedNonApiClass;
 import com.magento.idea.magento2uct.inspections.php.deprecation.CallingDeprecatedMethod;
 import com.magento.idea.magento2uct.inspections.php.deprecation.ExtendingDeprecatedClass;
 import com.magento.idea.magento2uct.inspections.php.deprecation.ImplementedDeprecatedInterface;
@@ -162,6 +163,12 @@ public enum SupportedIssue {
             IssueSeverityLevel.CRITICAL,
             "customCode.critical.existence.1110",
             UsedNonExistentType.class
+    ),
+    IMPORTED_NON_API_CLASS(
+            1122,
+            IssueSeverityLevel.ERROR,
+            "customCode.critical.api.1122",
+            ImportedNonApiClass.class
     );
 
     private final int code;
