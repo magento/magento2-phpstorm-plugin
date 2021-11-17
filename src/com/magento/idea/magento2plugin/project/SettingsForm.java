@@ -52,7 +52,6 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     private JCheckBox mftfSupportEnabled;
     private TextFieldWithBrowseButton magentoPath;
     private final SettingsFormValidator validator = new SettingsFormValidator(this);
-    private String magentoEdition;
     private JLabel magentoVersionLabel;//NOPMD
     private JLabel magentoPathLabel;//NOPMD
 
@@ -99,12 +98,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
 
         addPathListener();
         addMagentoVersionListener();
-
-        final String storedMagentoEdition = getSettings().magentoEdition;
-
-        magentoVersionLabel.setText(
-                storedMagentoEdition == null ? DEFAULT_MAGENTO_EDITION_LABEL : storedMagentoEdition
-        );
+        updateMagentoVersion();
 
         return (JComponent) panel;
     }
@@ -141,11 +135,9 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     }
 
     private void resolveMagentoVersion() {
-        if (getSettings().magentoVersion == null) {
+        if (getSettings().magentoVersion == null || getSettings().magentoEdition == null) {
             this.updateMagentoVersion();
-            return;
         }
-        magentoVersion.setText(getSettings().magentoVersion);
     }
 
     private boolean isMagentoPathChanged() {
@@ -169,8 +161,6 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         getSettings().defaultLicense = moduleDefaultLicenseName.getText();
         getSettings().mftfSupportEnabled = mftfSupportEnabled.isSelected();
         getSettings().magentoPath = getMagentoPath();
-        getSettings().magentoVersion = getMagentoVersion();
-        getSettings().magentoEdition = getMagentoEdition();
         buttonReindex.setEnabled(getSettings().pluginEnabled);
         regenerateUrnMapButton.setEnabled(getSettings().pluginEnabled);
     }
@@ -178,10 +168,6 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     @NotNull
     public String getMagentoVersion() {
         return magentoVersion.getText().trim();
-    }
-
-    public @NotNull String getMagentoEdition() {
-        return magentoEdition == null ? DEFAULT_MAGENTO_EDITION_LABEL : magentoEdition;
     }
 
     @NotNull
@@ -260,8 +246,8 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         magentoVersion.setText(resolvedVersion);
         magentoVersionLabel.setText(resolvedEdition);
 
-        magentoEdition = resolvedEdition;
-        getSettings().magentoEdition = getMagentoEdition();
+        getSettings().magentoVersion = resolvedVersion;
+        getSettings().magentoEdition = resolvedEdition;
     }
 
     @Override
