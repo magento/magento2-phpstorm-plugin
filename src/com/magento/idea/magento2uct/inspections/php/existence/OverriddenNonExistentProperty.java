@@ -38,7 +38,9 @@ public class OverriddenNonExistentProperty extends OverriddenFieldInspection {
 
         final String message = SupportedIssue.OVERRIDDEN_NON_EXISTENT_PROPERTY.getMessage(
                 messageArg,
-                VersionStateManager.getInstance(project).getRemovedInVersion(messageArg)
+                VersionStateManager.getInstance(project).getRemovedInVersion(
+                        overriddenProperty.getFQN()
+                )
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {

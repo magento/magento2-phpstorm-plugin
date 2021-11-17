@@ -38,7 +38,9 @@ public class OverriddenNonExistentConstant extends OverriddenFieldInspection {
 
         final String message = SupportedIssue.OVERRIDDEN_NON_EXISTENT_CONSTANT.getMessage(
                 messageArg,
-                VersionStateManager.getInstance(project).getRemovedInVersion(messageArg)
+                VersionStateManager.getInstance(project).getRemovedInVersion(
+                        overriddenField.getFQN()
+                )
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {
