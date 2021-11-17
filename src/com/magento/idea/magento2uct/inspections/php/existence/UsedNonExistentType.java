@@ -8,45 +8,42 @@ package com.magento.idea.magento2uct.inspections.php.existence;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
-import com.jetbrains.php.lang.psi.elements.PhpUse;
+import com.jetbrains.php.lang.psi.elements.ClassReference;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
-import com.magento.idea.magento2uct.inspections.php.ImportInspection;
+import com.magento.idea.magento2uct.inspections.php.UsedTypeInspection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
 import com.magento.idea.magento2uct.versioning.VersionStateManager;
 import org.jetbrains.annotations.NotNull;
 
-public class ImportingNonExistentClass extends ImportInspection {
+public class UsedNonExistentType extends UsedTypeInspection {
 
     @Override
     protected void execute(
             final Project project,
             final @NotNull ProblemsHolder problemsHolder,
-            final PhpUse use,
-            final boolean isInterface
+            final PhpClass phpClass,
+            final ClassReference reference
     ) {
-        if (isInterface || VersionStateManager.getInstance(project).isExists(use.getFQN())) {
+        if (VersionStateManager.getInstance(project).isExists(phpClass.getFQN())) {
             return;
         }
-        final String message = SupportedIssue.IMPORTED_NON_EXISTENT_CLASS.getMessage(
-                use.getFQN(),
-                VersionStateManager.getInstance(project).getRemovedInVersion(use.getFQN())
+        final String message = SupportedIssue.USED_NON_EXISTENT_TYPE.getMessage(
+                phpClass.getFQN(),
+                VersionStateManager.getInstance(project).getRemovedInVersion(phpClass.getFQN())
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {
             ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.IMPORTED_NON_EXISTENT_CLASS.getCode()
+                    SupportedIssue.USED_NON_EXISTENT_TYPE.getCode()
             );
         }
-        problemsHolder.registerProblem(
-                use,
-                message,
-                ProblemHighlightType.ERROR
-        );
+        problemsHolder.registerProblem(reference, message, ProblemHighlightType.ERROR);
     }
 
     @Override
     protected IssueSeverityLevel getSeverityLevel() {
-        return SupportedIssue.IMPORTED_NON_EXISTENT_CLASS.getLevel();
+        return SupportedIssue.USED_NON_EXISTENT_TYPE.getLevel();
     }
 }

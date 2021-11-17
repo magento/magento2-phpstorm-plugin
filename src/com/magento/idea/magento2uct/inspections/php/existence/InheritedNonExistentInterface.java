@@ -28,11 +28,10 @@ public class InheritedNonExistentInterface extends InheritedInterfaceInspection 
         if (VersionStateManager.getInstance(project).isExists(interfaceFqn)) {
             return;
         }
-        final String removedIn = VersionStateManager.getInstance(project).getRemovedInVersion();
-        final String message = removedIn.isEmpty()
-                ? SupportedIssue.INHERITED_NON_EXISTENT_INTERFACE.getMessage(interfaceFqn)
-                : SupportedIssue.INHERITED_NON_EXISTENT_INTERFACE.getChangelogMessage(
-                interfaceFqn, removedIn);
+        final String message = SupportedIssue.INHERITED_NON_EXISTENT_INTERFACE.getMessage(
+                interfaceFqn,
+                VersionStateManager.getInstance(project).getRemovedInVersion(interfaceFqn)
+        );
 
         if (problemsHolder instanceof UctProblemsHolder) {
             ((UctProblemsHolder) problemsHolder).setReservedErrorCode(

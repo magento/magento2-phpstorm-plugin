@@ -31,11 +31,10 @@ public class CalledNonExistentMethod extends CallMethodInspection {
         if (VersionStateManager.getInstance(project).isExists(type)) {
             return;
         }
-        final String removedIn = VersionStateManager.getInstance(project).getRemovedInVersion();
-        final String message = removedIn.isEmpty()
-                ? SupportedIssue.CALLED_NON_EXISTENT_METHOD.getMessage(type)
-                : SupportedIssue.CALLED_NON_EXISTENT_METHOD.getChangelogMessage(
-                type, removedIn);
+        final String message = SupportedIssue.CALLED_NON_EXISTENT_METHOD.getMessage(
+                type,
+                VersionStateManager.getInstance(project).getRemovedInVersion(type)
+        );
 
         if (problemsHolder instanceof UctProblemsHolder) {
             ((UctProblemsHolder) problemsHolder).setReservedErrorCode(

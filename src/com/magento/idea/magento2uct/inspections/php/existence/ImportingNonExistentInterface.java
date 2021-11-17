@@ -28,11 +28,10 @@ public class ImportingNonExistentInterface extends ImportInspection {
         if (!isInterface || VersionStateManager.getInstance(project).isExists(use.getFQN())) {
             return;
         }
-        final String removedIn = VersionStateManager.getInstance(project).getRemovedInVersion();
-        final String message = removedIn.isEmpty()
-                ? SupportedIssue.IMPORTED_NON_EXISTENT_INTERFACE.getMessage(use.getFQN())
-                : SupportedIssue.IMPORTED_NON_EXISTENT_INTERFACE.getChangelogMessage(
-                use.getFQN(), removedIn);
+        final String message = SupportedIssue.IMPORTED_NON_EXISTENT_INTERFACE.getMessage(
+                use.getFQN(),
+                VersionStateManager.getInstance(project).getRemovedInVersion(use.getFQN())
+        );
 
         if (problemsHolder instanceof UctProblemsHolder) {
             ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
