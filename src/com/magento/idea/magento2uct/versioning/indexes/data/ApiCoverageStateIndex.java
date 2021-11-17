@@ -27,16 +27,27 @@ public class ApiCoverageStateIndex implements VersionStateIndex {
 
     private final Map<String, Map<String, Boolean>> versioningData;
     private final Map<String, Boolean> targetVersionData;
-    private final Map<String, String> changelog;
+    private final Map<String, Boolean> codebaseSet;
     private String projectBasePath;
 
     /**
      * Api coverage state index constructor.
      */
     public ApiCoverageStateIndex() {
+        this(new HashMap<>());
+    }
+
+    /**
+     * Api coverage state index constructor.
+     *
+     * @param existenceVersioningData Map
+     */
+    public ApiCoverageStateIndex(final Map<String, Map<String, Boolean>> existenceVersioningData) {
         versioningData = new LinkedHashMap<>();
         targetVersionData = new HashMap<>();
-        changelog = new HashMap<>();
+        codebaseSet = new HashMap<>(
+                VersioningDataOperationsUtil.unionVersionData(existenceVersioningData)
+        );
     }
 
     /**
@@ -59,20 +70,11 @@ public class ApiCoverageStateIndex implements VersionStateIndex {
     public synchronized boolean has(final @NotNull String fqn) {
         groupLoadedData();
 
-        return targetVersionData.containsKey(fqn);
-    }
+        if (targetVersionData.containsKey(fqn)) {
+            return true;
+        }
 
-    /**
-     * Get version state after lookup.
-     *
-     * @param fqn String
-     *
-     * @return String
-     */
-    public String getVersion(final @NotNull String fqn) {
-        final String version = changelog.get(fqn);
-
-        return version == null ? "some" : version;
+        return !codebaseSet.containsKey(fqn);
     }
 
     /**
@@ -173,7 +175,6 @@ public class ApiCoverageStateIndex implements VersionStateIndex {
                             true
                     );
             targetVersionData.putAll(gatheredData.getFirst());
-            changelog.putAll(gatheredData.getSecond());
         }
     }
 }

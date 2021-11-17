@@ -95,17 +95,6 @@ public final class VersionStateManager {
     }
 
     /**
-     * Get version in which an FQN was marked as an API.
-     *
-     * @param fqn String
-     *
-     * @return String
-     */
-    public String getMarkedAsApiInVersion(final @NotNull String fqn) {
-        return apiCoverageStateIndex.getVersion(fqn);
-    }
-
-    /**
      * Version state manager constructor.
      */
     private VersionStateManager(final @NotNull Project project) {
@@ -121,7 +110,7 @@ public final class VersionStateManager {
         existenceStateIndex = new ExistenceStateIndex();
         compute(existenceStateIndex);
 
-        apiCoverageStateIndex = new ApiCoverageStateIndex();
+        apiCoverageStateIndex = new ApiCoverageStateIndex(existenceStateIndex.getAllData());
         compute(apiCoverageStateIndex);
     }
 

@@ -11,8 +11,8 @@ import com.magento.idea.magento2uct.packages.SupportedVersion;
 import com.magento.idea.magento2uct.versioning.indexes.storage.FileLoader;
 import com.magento.idea.magento2uct.versioning.indexes.storage.IndexLoader;
 import com.magento.idea.magento2uct.versioning.indexes.storage.ResourceLoader;
+import com.magento.idea.magento2uct.versioning.processors.util.VersioningDataOperationsUtil;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,13 +92,7 @@ public class DeprecationStateIndex implements VersionStateIndex {
      * @return Map[String, Boolean]
      */
     public Map<String, Boolean> getIndexData() {
-        final Map<String, Boolean> data = new HashMap<>();
-
-        for (final Map.Entry<String, Map<String, Boolean>> vData : versioningData.entrySet()) {
-            data.putAll(vData.getValue());
-        }
-
-        return data;
+        return VersioningDataOperationsUtil.unionVersionData(versioningData);
     }
 
     /**

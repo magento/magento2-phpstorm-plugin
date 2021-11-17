@@ -115,4 +115,23 @@ public final class VersioningDataOperationsUtil {
 
         return new Pair<>(new HashMap<>(filteredUnion), new HashMap<>(changelog));
     }
+
+    /**
+     * Union versioning data into single set.
+     *
+     * @param versioningData Map
+     *
+     * @return Map[String, Boolean]
+     */
+    public static Map<String, Boolean> unionVersionData(
+            final Map<String, Map<String, Boolean>> versioningData
+    ) {
+        final Map<String, Boolean> union = new HashMap<>();
+
+        for (final Map.Entry<String, Map<String, Boolean>> vData : versioningData.entrySet()) {
+            union.putAll(vData.getValue());
+        }
+
+        return union;
+    }
 }
