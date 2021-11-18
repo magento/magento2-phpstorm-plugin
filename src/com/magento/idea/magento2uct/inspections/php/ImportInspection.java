@@ -70,7 +70,7 @@ public abstract class ImportInspection extends PhpInspection {
                     return element instanceof PhpClass && ((PhpClass) element).isInterface();
                 }
 
-                return false;
+                return use.getFQN().contains("Interface");
             }
         };
     }
