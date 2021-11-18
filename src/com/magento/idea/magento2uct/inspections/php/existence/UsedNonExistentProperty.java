@@ -19,7 +19,7 @@ import com.magento.idea.magento2uct.packages.SupportedIssue;
 import com.magento.idea.magento2uct.versioning.VersionStateManager;
 import org.jetbrains.annotations.NotNull;
 
-public class UsedNonExistentConstant extends UsedFieldInspection {
+public class UsedNonExistentProperty extends UsedFieldInspection {
 
     @Override
     protected void execute(
@@ -28,7 +28,20 @@ public class UsedNonExistentConstant extends UsedFieldInspection {
             final Field field,
             final FieldReference fieldReference
     ) {
-        // We do not need to check field in the constant inspection.
+        if (VersionStateManager.getInstance(project).isExists(field.getFQN())) {
+            return;
+        }
+        final String message = SupportedIssue.USED_NON_EXISTENT_PROPERTY.getMessage(
+                field.getFQN().replace(".", "::"),
+                VersionStateManager.getInstance(project).getRemovedInVersion(field.getFQN())
+        );
+
+        if (problemsHolder instanceof UctProblemsHolder) {
+            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
+                    SupportedIssue.USED_NON_EXISTENT_PROPERTY.getCode()
+            );
+        }
+        problemsHolder.registerProblem(fieldReference, message, ProblemHighlightType.ERROR);
     }
 
     @Override
@@ -38,24 +51,11 @@ public class UsedNonExistentConstant extends UsedFieldInspection {
             final ClassConstImpl constant,
             final ClassConstantReference constantReference
     ) {
-        if (VersionStateManager.getInstance(project).isExists(constant.getFQN())) {
-            return;
-        }
-        final String message = SupportedIssue.USED_NON_EXISTENT_CONSTANT.getMessage(
-                constant.getFQN().replace(".", "::"),
-                VersionStateManager.getInstance(project).getRemovedInVersion(constant.getFQN())
-        );
-
-        if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.USED_NON_EXISTENT_CONSTANT.getCode()
-            );
-        }
-        problemsHolder.registerProblem(constantReference, message, ProblemHighlightType.ERROR);
+        // We do not need to check constant in the field inspection.
     }
 
     @Override
     protected IssueSeverityLevel getSeverityLevel() {
-        return SupportedIssue.USED_NON_EXISTENT_CONSTANT.getLevel();
+        return SupportedIssue.USED_NON_EXISTENT_PROPERTY.getLevel();
     }
 }
