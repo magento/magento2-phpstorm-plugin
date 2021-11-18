@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2uct.inspections.php.deprecation;
+package com.magento.idea.magento2uct.inspections.php.existence;
 
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -11,7 +11,6 @@ import com.intellij.openapi.project.Project;
 import com.jetbrains.php.lang.psi.elements.ClassConstantReference;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.FieldReference;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.impl.ClassConstImpl;
 import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.UsedFieldInspection;
@@ -20,7 +19,7 @@ import com.magento.idea.magento2uct.packages.SupportedIssue;
 import com.magento.idea.magento2uct.versioning.VersionStateManager;
 import org.jetbrains.annotations.NotNull;
 
-public class UsingDeprecatedConstant extends UsedFieldInspection {
+public class UsedNonExistentProperty extends UsedFieldInspection {
 
     @Override
     protected void execute(
@@ -29,7 +28,20 @@ public class UsingDeprecatedConstant extends UsedFieldInspection {
             final Field field,
             final FieldReference fieldReference
     ) {
-        // We do not need to check field in the constant inspection.
+        if (VersionStateManager.getInstance(project).isExists(field.getFQN())) {
+            return;
+        }
+        final String message = SupportedIssue.USED_NON_EXISTENT_PROPERTY.getMessage(
+                field.getFQN().replace(".", "::"),
+                VersionStateManager.getInstance(project).getRemovedInVersion(field.getFQN())
+        );
+
+        if (problemsHolder instanceof UctProblemsHolder) {
+            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
+                    SupportedIssue.USED_NON_EXISTENT_PROPERTY.getCode()
+            );
+        }
+        problemsHolder.registerProblem(fieldReference, message, ProblemHighlightType.ERROR);
     }
 
     @Override
@@ -39,33 +51,11 @@ public class UsingDeprecatedConstant extends UsedFieldInspection {
             final ClassConstImpl constant,
             final ClassConstantReference constantReference
     ) {
-        final String constantFqn = constant.getFQN();
-
-        if (!VersionStateManager.getInstance(project).isDeprecated(constantFqn)) {
-            return;
-        }
-        final PhpClass containingClass = constant.getContainingClass();
-
-        if (containingClass == null) {
-            return;
-        }
-
-        if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.USING_DEPRECATED_CONSTANT.getCode()
-            );
-        }
-        problemsHolder.registerProblem(
-                constantReference,
-                SupportedIssue.USING_DEPRECATED_CONSTANT.getMessage(
-                        containingClass.getFQN().concat("::").concat(constant.getName())
-                ),
-                ProblemHighlightType.LIKE_DEPRECATED
-        );
+        // We do not need to check constant in the field inspection.
     }
 
     @Override
     protected IssueSeverityLevel getSeverityLevel() {
-        return SupportedIssue.USING_DEPRECATED_CONSTANT.getLevel();
+        return SupportedIssue.USED_NON_EXISTENT_PROPERTY.getLevel();
     }
 }
