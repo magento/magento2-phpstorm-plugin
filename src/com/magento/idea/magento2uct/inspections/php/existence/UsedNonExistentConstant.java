@@ -39,19 +39,11 @@ public class UsedNonExistentConstant extends UsedFieldInspection {
             final ClassConstImpl constant,
             final ClassConstantReference constantReference
     ) {
-        final String constantFqn = constant.getFQN();
-
-        if (VersionStateManager.getInstance(project).isExists(constantFqn)) {
+        if (VersionStateManager.getInstance(project).isExists(constant.getFQN())) {
             return;
         }
-        final PhpClass containingClass = constant.getContainingClass();
-
-        if (containingClass == null) {
-            return;
-        }
-        final String messageArg = containingClass.getFQN().concat("::").concat(constant.getName());
         final String message = SupportedIssue.USED_NON_EXISTENT_CONSTANT.getMessage(
-                messageArg,
+                constant.getFQN().replace(".", "::"),
                 VersionStateManager.getInstance(project).getRemovedInVersion(constant.getFQN())
         );
 
