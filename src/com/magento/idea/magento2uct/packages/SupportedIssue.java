@@ -30,6 +30,7 @@ import com.magento.idea.magento2uct.inspections.php.existence.ImportingNonExiste
 import com.magento.idea.magento2uct.inspections.php.existence.InheritedNonExistentInterface;
 import com.magento.idea.magento2uct.inspections.php.existence.OverriddenNonExistentConstant;
 import com.magento.idea.magento2uct.inspections.php.existence.OverriddenNonExistentProperty;
+import com.magento.idea.magento2uct.inspections.php.existence.UsedNonExistentConstant;
 import com.magento.idea.magento2uct.inspections.php.existence.UsedNonExistentType;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
@@ -164,6 +165,12 @@ public enum SupportedIssue {
             IssueSeverityLevel.CRITICAL,
             "customCode.critical.existence.1110",
             UsedNonExistentType.class
+    ),
+    USED_NON_EXISTENT_CONSTANT(
+            1214,
+            IssueSeverityLevel.CRITICAL,
+            "customCode.critical.existence.1214",
+            UsedNonExistentConstant.class
     ),
     IMPORTED_NON_API_CLASS(
             1122,
