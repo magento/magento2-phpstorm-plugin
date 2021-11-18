@@ -90,14 +90,14 @@ public abstract class UsedFieldInspection extends PhpInspection {
      *
      * @param project Project
      * @param problemsHolder ProblemsHolder
-     * @param field Field
-     * @param fieldReference FieldReference
+     * @param constant Field
+     * @param constantReference FieldReference
      */
     protected abstract void execute(
             final Project project,
             final @NotNull ProblemsHolder problemsHolder,
-            final ClassConstImpl field,
-            final ClassConstantReference fieldReference
+            final ClassConstImpl constant,
+            final ClassConstantReference constantReference
     );
 
     /**
