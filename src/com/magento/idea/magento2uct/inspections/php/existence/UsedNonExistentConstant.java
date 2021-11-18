@@ -29,6 +29,7 @@ public class UsedNonExistentConstant extends UsedFieldInspection {
             final Field field,
             final FieldReference fieldReference
     ) {
+        // We do not need to check field in the constant inspection.
     }
 
     @Override
