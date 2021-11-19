@@ -32,6 +32,7 @@ import com.magento.idea.magento2uct.inspections.UctInspectionManager;
 import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
 import com.magento.idea.magento2uct.settings.UctSettingsService;
+import com.magento.idea.magento2uct.util.inspection.SortDescriptorResultsUtil;
 import java.nio.file.Paths;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -129,7 +130,9 @@ public class GenerateUctReportCommand {
                         }
 
                         for (final ProblemDescriptor descriptor
-                                : fileProblemsHolder.getResults()) {
+                                : SortDescriptorResultsUtil.sort(
+                                        fileProblemsHolder.getResults()
+                        )) {
                             final Integer code = fileProblemsHolder.getErrorCodeForDescriptor(
                                     descriptor
                             );

@@ -162,6 +162,17 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
     }
 
     /**
+     * Get current version or default version instead.
+     *
+     * @return SupportedVersion
+     */
+    public @NotNull SupportedVersion getCurrentVersionOrDefault() {
+        final SupportedVersion currentVersion = getCurrentVersion();
+
+        return currentVersion == null ? SupportedVersion.V230 : currentVersion;
+    }
+
+    /**
      * Set target version.
      *
      * @param version SupportedVersion

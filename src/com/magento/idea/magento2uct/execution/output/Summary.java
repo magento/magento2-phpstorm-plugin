@@ -44,7 +44,7 @@ public class Summary {
      * @return String
      */
     public String getInstalledVersion() {
-        return installedVersion == null ? "" : installedVersion.getVersion();
+        return installedVersion == null ? "Less than 2.3.0" : installedVersion.getVersion();
     }
 
     /**
