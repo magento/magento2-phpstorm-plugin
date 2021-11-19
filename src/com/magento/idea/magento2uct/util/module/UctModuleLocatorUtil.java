@@ -20,7 +20,9 @@ import org.jetbrains.annotations.Nullable;
 
 public final class UctModuleLocatorUtil {
 
-    private static final String UCT_COMPOSER_NAME = "magento\\/upgrade-compatibility-tool";
+    private static final String UCT_COMPOSER_NAME = "magento/upgrade-compatibility-tool";
+    private static final String UCT_COMPOSER_ALTERNATIVE_NAME
+            = "magento\\/upgrade-compatibility-tool";
     private static final String UCT_EXECUTABLE_RELATIVE_PATH = "bin" + File.separator + "uct";
 
     private UctModuleLocatorUtil() {
@@ -140,9 +142,9 @@ public final class UctModuleLocatorUtil {
                 if (composerFile == null) {
                     continue;
                 }
-                final boolean isUctModule = composerFile.getText().contains(UCT_COMPOSER_NAME);
 
-                if (isUctModule) {
+                if (composerFile.getText().contains(UCT_COMPOSER_NAME)
+                        || composerFile.getText().contains(UCT_COMPOSER_ALTERNATIVE_NAME)) {
                     return subDir;
                 }
             }
