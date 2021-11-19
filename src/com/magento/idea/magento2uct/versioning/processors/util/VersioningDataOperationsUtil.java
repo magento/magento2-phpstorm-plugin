@@ -8,9 +8,6 @@ package com.magento.idea.magento2uct.versioning.processors.util;
 import com.google.common.collect.Sets;
 import com.intellij.openapi.util.Pair;
 import com.magento.idea.magento2uct.packages.SupportedVersion;
-
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
