@@ -35,9 +35,15 @@ public class UsingDeprecatedClass extends UsedTypeInspection {
                     SupportedIssue.USING_DEPRECATED_CLASS.getCode()
             );
         }
+        final String deprecatedIn = VersionStateManager.getInstance(project)
+                .getDeprecatedInVersion(phpClass.getFQN());
+
         problemsHolder.registerProblem(
                 reference,
-                SupportedIssue.USING_DEPRECATED_CLASS.getMessage(phpClass.getFQN()),
+                SupportedIssue.USING_DEPRECATED_CLASS.getMessage(
+                        phpClass.getFQN(),
+                        deprecatedIn
+                ),
                 ProblemHighlightType.LIKE_DEPRECATED
         );
     }

@@ -32,6 +32,9 @@ public class ExtendingDeprecatedClass extends ExtendInspection {
         if (!VersionStateManager.getInstance(project).isDeprecated(parentFqn)) {
             return;
         }
+        final String deprecatedIn = VersionStateManager.getInstance(project)
+                .getDeprecatedInVersion(parentFqn);
+
         for (final ClassReference classReference : childExtends.getReferenceElements()) {
             if (parentFqn.equals(classReference.getFQN())) {
                 if (problemsHolder instanceof UctProblemsHolder) {
@@ -42,7 +45,8 @@ public class ExtendingDeprecatedClass extends ExtendInspection {
                 problemsHolder.registerProblem(
                         classReference,
                         SupportedIssue.EXTENDING_DEPRECATED_CLASS.getMessage(
-                                parentClass.getFQN()
+                                parentClass.getFQN(),
+                                deprecatedIn
                         ),
                         ProblemHighlightType.LIKE_DEPRECATED
                 );

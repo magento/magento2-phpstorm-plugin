@@ -34,9 +34,15 @@ public class ImportingDeprecatedInterface extends ImportInspection {
                         SupportedIssue.IMPORTING_DEPRECATED_INTERFACE.getCode()
                 );
             }
+            final String deprecatedIn = VersionStateManager.getInstance(project)
+                    .getDeprecatedInVersion(use.getFQN());
+
             problemsHolder.registerProblem(
                     use,
-                    SupportedIssue.IMPORTING_DEPRECATED_INTERFACE.getMessage(use.getFQN()),
+                    SupportedIssue.IMPORTING_DEPRECATED_INTERFACE.getMessage(
+                            use.getFQN(),
+                            deprecatedIn
+                    ),
                     ProblemHighlightType.LIKE_DEPRECATED
             );
         }

@@ -35,10 +35,14 @@ public class UsingDeprecatedProperty extends UsedFieldInspection {
                         SupportedIssue.USING_DEPRECATED_PROPERTY.getCode()
                 );
             }
+            final String deprecatedIn = VersionStateManager.getInstance(project)
+                    .getDeprecatedInVersion(field.getFQN());
+
             problemsHolder.registerProblem(
                     fieldReference,
                     SupportedIssue.USING_DEPRECATED_PROPERTY.getMessage(
-                            field.getFQN().replace(".", "::")
+                            field.getFQN().replace(".", "::"),
+                            deprecatedIn
                     ),
                     ProblemHighlightType.LIKE_DEPRECATED
             );
@@ -54,10 +58,14 @@ public class UsingDeprecatedProperty extends UsedFieldInspection {
                             SupportedIssue.USING_DEPRECATED_PROPERTY.getCode()
                     );
                 }
+                final String deprecatedIn = VersionStateManager.getInstance(project)
+                        .getDeprecatedInVersion(containingClass.getFQN());
+
                 problemsHolder.registerProblem(
                         fieldReference,
                         SupportedIssue.USING_DEPRECATED_PROPERTY.getMessage(
-                                field.getFQN().replace(".", "::")
+                                field.getFQN().replace(".", "::"),
+                                deprecatedIn
                         ),
                         ProblemHighlightType.LIKE_DEPRECATED
                 );

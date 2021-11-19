@@ -31,10 +31,14 @@ public class ImplementedDeprecatedInterface extends ImplementInspection {
                         SupportedIssue.IMPLEMENTED_DEPRECATED_INTERFACE.getCode()
                 );
             }
+            final String deprecatedIn = VersionStateManager.getInstance(project)
+                    .getDeprecatedInVersion(interfaceFqn);
+
             problemsHolder.registerProblem(
                     reference,
                     SupportedIssue.IMPLEMENTED_DEPRECATED_INTERFACE.getMessage(
-                            interfaceFqn
+                            interfaceFqn,
+                            deprecatedIn
                     ),
                     ProblemHighlightType.LIKE_DEPRECATED
             );

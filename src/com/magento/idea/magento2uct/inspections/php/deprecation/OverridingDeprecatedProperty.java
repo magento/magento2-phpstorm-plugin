@@ -37,12 +37,16 @@ public class OverridingDeprecatedProperty extends OverriddenFieldInspection {
                     SupportedIssue.OVERRIDING_DEPRECATED_PROPERTY.getCode()
             );
         }
+        final String deprecatedIn = VersionStateManager.getInstance(project)
+                .getDeprecatedInVersion(overriddenField.getFQN());
+
         problemsHolder.registerProblem(
                 field,
                 SupportedIssue.OVERRIDING_DEPRECATED_PROPERTY.getMessage(
                         parentClass.getFQN()
                                 .concat("::")
-                                .concat(overriddenField.getName())
+                                .concat(overriddenField.getName()),
+                        deprecatedIn
                 ),
                 ProblemHighlightType.LIKE_DEPRECATED
         );

@@ -34,10 +34,14 @@ public class CallingDeprecatedMethod extends CallMethodInspection {
                         SupportedIssue.CALLING_DEPRECATED_METHOD.getCode()
                 );
             }
+            final String deprecatedIn = VersionStateManager.getInstance(project)
+                    .getDeprecatedInVersion(type);
+
             problemsHolder.registerProblem(
                     methodReference,
                     SupportedIssue.CALLING_DEPRECATED_METHOD.getMessage(
-                            type.replace(".", "::")
+                            type.replace(".", "::"),
+                            deprecatedIn
                     ),
                     ProblemHighlightType.LIKE_DEPRECATED
             );
