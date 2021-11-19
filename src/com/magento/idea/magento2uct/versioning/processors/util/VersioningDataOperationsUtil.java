@@ -64,6 +64,7 @@ public final class VersioningDataOperationsUtil {
      *
      * @return Pair[Map[String, Boolean], Map[String, String]]
      */
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     public static Pair<Map<String, Boolean>, Map<String, String>> unionVersionDataWithChangelog(
             final Map<String, Map<String, Boolean>> versioningData,
             final List<String> excludeFromChangelog,
