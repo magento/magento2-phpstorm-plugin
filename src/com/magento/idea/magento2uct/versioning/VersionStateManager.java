@@ -110,7 +110,7 @@ public final class VersionStateManager {
         existenceStateIndex = new ExistenceStateIndex();
         compute(existenceStateIndex);
 
-        apiCoverageStateIndex = new ApiCoverageStateIndex(existenceStateIndex.getAllData());
+        apiCoverageStateIndex = new ApiCoverageStateIndex(existenceStateIndex.getIndexData());
         compute(apiCoverageStateIndex);
     }
 

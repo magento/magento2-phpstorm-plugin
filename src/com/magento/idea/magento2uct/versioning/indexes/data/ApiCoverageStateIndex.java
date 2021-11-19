@@ -40,14 +40,12 @@ public class ApiCoverageStateIndex implements VersionStateIndex {
     /**
      * Api coverage state index constructor.
      *
-     * @param existenceVersioningData Map
+     * @param targetVersionCodebaseData Map
      */
-    public ApiCoverageStateIndex(final Map<String, Map<String, Boolean>> existenceVersioningData) {
+    public ApiCoverageStateIndex(final Map<String, Boolean> targetVersionCodebaseData) {
         versioningData = new LinkedHashMap<>();
         targetVersionData = new HashMap<>();
-        codebaseSet = new HashMap<>(
-                VersioningDataOperationsUtil.unionVersionData(existenceVersioningData)
-        );
+        codebaseSet = new HashMap<>(targetVersionCodebaseData);
     }
 
     /**

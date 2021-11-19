@@ -7,7 +7,9 @@ package com.magento.idea.magento2uct.versioning.processors.util;
 
 import com.google.common.collect.Sets;
 import com.intellij.openapi.util.Pair;
+import com.magento.idea.magento2uct.packages.SupportedVersion;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -62,18 +64,33 @@ public final class VersioningDataOperationsUtil {
      *
      * @return Pair[Map[String, Boolean], Map[String, String]]
      */
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     public static Pair<Map<String, Boolean>, Map<String, String>> unionVersionDataWithChangelog(
             final Map<String, Map<String, Boolean>> versioningData,
             final List<String> excludeFromChangelog,
             final boolean shouldKeepNew
     ) {
         final Map<String, Boolean> union = new HashMap<>();
-        final Map<String, Boolean> removedUnion = new HashMap<>();
+        Map<String, Boolean> removedUnion = new HashMap<>();
         final Map<String, String> changelog = new HashMap<>();
+        final List<String> versions = new LinkedList<>(versioningData.keySet());
 
-        for (final Map.Entry<String, Map<String, Boolean>> vData : versioningData.entrySet()) {
+        versions.sort((key1, key2) -> {
+            final SupportedVersion version1 = SupportedVersion.getVersion(key1);
+            final SupportedVersion version2 = SupportedVersion.getVersion(key2);
+
+            if (version1 == null || version2 == null) {
+                return 0;
+            }
+
+            return version1.compareTo(version2);
+        });
+
+        for (final String version : versions) {
+            final Map<String, Boolean> vData = versioningData.get(version);
+
             final Set<Map.Entry<String, Boolean>> removedSet = Sets.filter(
-                    vData.getValue().entrySet(),
+                    vData.entrySet(),
                     entry -> !entry.getValue()
             );
             final Map<String, Boolean> removedData = removedSet.stream().collect(
@@ -85,7 +102,7 @@ public final class VersioningDataOperationsUtil {
             removedUnion.putAll(removedData);
 
             final Sets.SetView<Map.Entry<String, Boolean>> newDataSet = Sets.difference(
-                    vData.getValue().entrySet(),
+                    vData.entrySet(),
                     removedSet
             );
             final Map<String, Boolean> newData = newDataSet.stream().collect(Collectors.toMap(
@@ -94,11 +111,27 @@ public final class VersioningDataOperationsUtil {
             ));
             union.putAll(newData);
 
-            if (!excludeFromChangelog.contains(vData.getKey())) {
+            final Sets.SetView<Map.Entry<String, Boolean>> returnedSet = Sets.intersection(
+                    newData.entrySet(),
+                    removedUnion.entrySet()
+            );
+
+            if (!returnedSet.isEmpty()) {
+                final Sets.SetView<Map.Entry<String, Boolean>> updatedRemovedUnionSet =
+                        Sets.difference(removedUnion.entrySet(), returnedSet);
+                removedUnion = new HashMap<>(updatedRemovedUnionSet.stream().collect(
+                        Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue
+                        )
+                ));
+            }
+
+            if (!excludeFromChangelog.contains(version)) {
                 if (shouldKeepNew) {
-                    newData.forEach((key, value) -> changelog.put(key, vData.getKey()));
+                    newData.forEach((key, value) -> changelog.put(key, version));
                 } else {
-                    removedData.forEach((key, value) -> changelog.put(key, vData.getKey()));
+                    removedData.forEach((key, value) -> changelog.put(key, version));
                 }
             }
         }

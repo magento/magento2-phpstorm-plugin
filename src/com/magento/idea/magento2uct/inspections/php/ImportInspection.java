@@ -67,10 +67,15 @@ public abstract class ImportInspection extends PhpInspection {
 
                 if (phpReference != null) {
                     final PsiElement element = phpReference.resolve();
+
+                    if (element == null) {
+                        return use.getFQN().contains("Interface");
+                    }
+
                     return element instanceof PhpClass && ((PhpClass) element).isInterface();
                 }
 
-                return false;
+                return use.getFQN().contains("Interface");
             }
         };
     }
