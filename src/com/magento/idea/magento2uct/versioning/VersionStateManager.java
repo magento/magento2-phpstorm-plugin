@@ -42,7 +42,7 @@ public final class VersionStateManager {
 
         if (instance == null
                 || !instance.isValidFor(settingsService.shouldIgnoreCurrentVersion(),
-                settingsService.getCurrentVersion(),
+                settingsService.getCurrentVersionOrDefault(),
                 settingsService.getTargetVersion()
         )) {
             instance = new VersionStateManager(project);
@@ -111,7 +111,7 @@ public final class VersionStateManager {
     private VersionStateManager(final @NotNull Project project) {
         final UctSettingsService settingsService = UctSettingsService.getInstance(project);
         isSetIgnoreFlag = settingsService.shouldIgnoreCurrentVersion();
-        currentVersion = settingsService.getCurrentVersion();
+        currentVersion = settingsService.getCurrentVersionOrDefault();
         targetVersion = settingsService.getTargetVersion();
         versionsToLoad = new LinkedList<>();
 

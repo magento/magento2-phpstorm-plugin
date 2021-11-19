@@ -127,7 +127,14 @@ public class ConfigurationDialog extends AbstractDialog {
             return;
         }
         settingsService.setEnabled(enable.isSelected());
-        final String currentVersionValue = currentVersion.getSelectedItem().toString();
+
+        final ComboBoxItemData currentVersionItemData =
+                (ComboBoxItemData) currentVersion.getSelectedItem();
+        String currentVersionValue = "";
+
+        if (currentVersionItemData != null) {
+            currentVersionValue = currentVersionItemData.getKey();
+        }
 
         settingsService.setCurrentVersion(
                 currentVersionValue.isEmpty()
