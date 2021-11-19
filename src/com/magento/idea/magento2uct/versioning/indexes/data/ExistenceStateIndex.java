@@ -89,7 +89,7 @@ public class ExistenceStateIndex implements VersionStateIndex {
     }
 
     /**
-     * Get deprecation index data.
+     * Get existence index data.
      *
      * @return Map[String, Boolean]
      */

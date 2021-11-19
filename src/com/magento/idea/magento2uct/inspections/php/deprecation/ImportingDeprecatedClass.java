@@ -34,9 +34,15 @@ public class ImportingDeprecatedClass extends ImportInspection {
                         SupportedIssue.IMPORTING_DEPRECATED_CLASS.getCode()
                 );
             }
+            final String deprecatedIn = VersionStateManager.getInstance(project)
+                    .getDeprecatedInVersion(use.getFQN());
+
             problemsHolder.registerProblem(
                     use,
-                    SupportedIssue.IMPORTING_DEPRECATED_CLASS.getMessage(use.getFQN()),
+                    SupportedIssue.IMPORTING_DEPRECATED_CLASS.getMessage(
+                            use.getFQN(),
+                            deprecatedIn
+                    ),
                     ProblemHighlightType.LIKE_DEPRECATED
             );
         }

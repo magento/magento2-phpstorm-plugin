@@ -55,10 +55,14 @@ public class UsingDeprecatedConstant extends UsedFieldInspection {
                     SupportedIssue.USING_DEPRECATED_CONSTANT.getCode()
             );
         }
+        final String deprecatedIn = VersionStateManager.getInstance(project)
+                .getDeprecatedInVersion(constantFqn);
+
         problemsHolder.registerProblem(
                 constantReference,
                 SupportedIssue.USING_DEPRECATED_CONSTANT.getMessage(
-                        containingClass.getFQN().concat("::").concat(constant.getName())
+                        containingClass.getFQN().concat("::").concat(constant.getName()),
+                        deprecatedIn
                 ),
                 ProblemHighlightType.LIKE_DEPRECATED
         );

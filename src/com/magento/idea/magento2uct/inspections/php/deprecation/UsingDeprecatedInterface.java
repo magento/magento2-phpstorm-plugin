@@ -36,9 +36,15 @@ public class UsingDeprecatedInterface extends UsedTypeInspection {
                     SupportedIssue.USING_DEPRECATED_INTERFACE.getCode()
             );
         }
+        final String deprecatedIn = VersionStateManager.getInstance(project)
+                .getDeprecatedInVersion(phpClass.getFQN());
+
         problemsHolder.registerProblem(
                 reference,
-                SupportedIssue.USING_DEPRECATED_INTERFACE.getMessage(phpClass.getFQN()),
+                SupportedIssue.USING_DEPRECATED_INTERFACE.getMessage(
+                        phpClass.getFQN(),
+                        deprecatedIn
+                ),
                 ProblemHighlightType.LIKE_DEPRECATED
         );
     }

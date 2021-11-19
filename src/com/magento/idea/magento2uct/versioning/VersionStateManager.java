@@ -62,6 +62,17 @@ public final class VersionStateManager {
     }
 
     /**
+     * Get deprecated in version for the specified FQN.
+     *
+     * @param fqn String
+     *
+     * @return String
+     */
+    public String getDeprecatedInVersion(final @NotNull String fqn) {
+        return deprecationStateIndex.getVersion(fqn);
+    }
+
+    /**
      * Check if specified FQN is exists in the existence index.
      *
      * @param fqn String
@@ -73,7 +84,7 @@ public final class VersionStateManager {
     }
 
     /**
-     * Get removed in version for the last checked FQN.
+     * Get removed in version for the specified FQN.
      *
      * @param fqn String
      *

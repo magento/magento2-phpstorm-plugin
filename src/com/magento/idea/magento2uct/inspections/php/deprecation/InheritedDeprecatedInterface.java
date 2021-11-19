@@ -31,9 +31,15 @@ public class InheritedDeprecatedInterface extends InheritedInterfaceInspection {
                         SupportedIssue.INHERITED_DEPRECATED_INTERFACE.getCode()
                 );
             }
+            final String deprecatedIn = VersionStateManager.getInstance(project)
+                    .getDeprecatedInVersion(interfaceFqn);
+
             problemsHolder.registerProblem(
                     reference,
-                    SupportedIssue.INHERITED_DEPRECATED_INTERFACE.getMessage(interfaceFqn),
+                    SupportedIssue.INHERITED_DEPRECATED_INTERFACE.getMessage(
+                            interfaceFqn,
+                            deprecatedIn
+                    ),
                     ProblemHighlightType.LIKE_DEPRECATED
             );
         }

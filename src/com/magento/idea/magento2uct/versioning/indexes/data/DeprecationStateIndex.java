@@ -13,6 +13,9 @@ import com.magento.idea.magento2uct.versioning.indexes.storage.IndexLoader;
 import com.magento.idea.magento2uct.versioning.indexes.storage.ResourceLoader;
 import com.magento.idea.magento2uct.versioning.processors.util.VersioningDataOperationsUtil;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,14 +26,17 @@ public class DeprecationStateIndex implements VersionStateIndex {
     private static final String RESOURCE_DIR = "deprecation";
 
     private final Map<String, Map<String, Boolean>> versioningData;
+    private final Map<String, Boolean> targetVersionData;
+    private final Map<String, String> changelog;
     private String projectBasePath;
-    private String versionState;
 
     /**
      * Deprecation state index constructor.
      */
     public DeprecationStateIndex() {
         versioningData = new LinkedHashMap<>();
+        targetVersionData = new HashMap<>();
+        changelog = new HashMap<>();
     }
 
     /**
@@ -49,24 +55,24 @@ public class DeprecationStateIndex implements VersionStateIndex {
      *
      * @return boolean
      */
-    public boolean has(final @NotNull String key) {
-        final Pair<String, Boolean> lookupResult = checkIfDeprecated(key);
+    @SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
+    public synchronized boolean has(final @NotNull String key) {
+        groupLoadedData();
 
-        if (lookupResult.getSecond() != null && lookupResult.getSecond()) {
-            versionState = lookupResult.getFirst();
-            return true;
-        }
-
-        return false;
+        return targetVersionData.containsKey(key);
     }
 
     /**
      * Get version state after lookup.
      *
+     * @param fqn String
+     *
      * @return String
      */
-    public String getVersion() {
-        return versionState;
+    public String getVersion(final @NotNull String fqn) {
+        final String version = changelog.get(fqn);
+
+        return version == null ? "some" : version;
     }
 
     @Override
@@ -92,7 +98,9 @@ public class DeprecationStateIndex implements VersionStateIndex {
      * @return Map[String, Boolean]
      */
     public Map<String, Boolean> getIndexData() {
-        return VersioningDataOperationsUtil.unionVersionData(versioningData);
+        groupLoadedData();
+
+        return targetVersionData;
     }
 
     /**
@@ -123,26 +131,6 @@ public class DeprecationStateIndex implements VersionStateIndex {
     }
 
     /**
-     * Lookup if key is deprecated.
-     *
-     * @param lookupKey String
-     *
-     * @return Pair[String, Boolean]
-     */
-    private Pair<String, Boolean> checkIfDeprecated(final @NotNull String lookupKey) {
-        for (final Map.Entry<String, Map<String, Boolean>> versionIndexEntry
-                : versioningData.entrySet()) {
-            final String version = versionIndexEntry.getKey();
-
-            if (versionIndexEntry.getValue().containsKey(lookupKey)) {
-                return new Pair<>(version, versionIndexEntry.getValue().get(lookupKey));
-            }
-        }
-
-        return new Pair<>(null, false);
-    }
-
-    /**
      * Put index for version.
      *
      * @param version String
@@ -151,6 +139,24 @@ public class DeprecationStateIndex implements VersionStateIndex {
     private void putIndexData(final @NotNull String version, final Map<String, Boolean> data) {
         if (data != null) {
             versioningData.put(version, data);
+        }
+    }
+
+    /**
+     * Group data according to purpose.
+     */
+    private void groupLoadedData() {
+        if (targetVersionData.isEmpty() && !versioningData.isEmpty()) {
+            final Pair<Map<String, Boolean>, Map<String, String>> gatheredData =
+                    VersioningDataOperationsUtil.unionVersionDataWithChangelog(
+                            versioningData,
+                            new ArrayList<>(Collections.singletonList(
+                                    SupportedVersion.V230.getVersion()
+                            )),
+                            true
+                    );
+            targetVersionData.putAll(gatheredData.getFirst());
+            changelog.putAll(gatheredData.getSecond());
         }
     }
 }
