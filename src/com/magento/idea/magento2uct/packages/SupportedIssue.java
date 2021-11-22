@@ -9,6 +9,7 @@ import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.psi.PsiElementVisitor;
 import com.magento.idea.magento2uct.bundles.UctInspectionBundle;
 import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
+import com.magento.idea.magento2uct.inspections.php.api.CalledNonApiMethod;
 import com.magento.idea.magento2uct.inspections.php.api.ImportedNonApiClass;
 import com.magento.idea.magento2uct.inspections.php.api.ImportedNonApiInterface;
 import com.magento.idea.magento2uct.inspections.php.deprecation.CallingDeprecatedMethod;
@@ -183,14 +184,20 @@ public enum SupportedIssue {
     IMPORTED_NON_API_CLASS(
             1122,
             IssueSeverityLevel.ERROR,
-            "customCode.critical.api.1122",
+            "customCode.errors.api.1122",
             ImportedNonApiClass.class
     ),
     IMPORTED_NON_API_INTERFACE(
             1322,
             IssueSeverityLevel.ERROR,
-            "customCode.critical.api.1322",
+            "customCode.errors.api.1322",
             ImportedNonApiInterface.class
+    ),
+    CALLED_NON_API_METHOD(
+            1429,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1429",
+            CalledNonApiMethod.class
     );
 
     private final int code;
