@@ -14,6 +14,8 @@ import com.magento.idea.magento2uct.inspections.php.api.ImportedNonApiClass;
 import com.magento.idea.magento2uct.inspections.php.api.ImportedNonApiInterface;
 import com.magento.idea.magento2uct.inspections.php.api.OverriddenNonApiConstant;
 import com.magento.idea.magento2uct.inspections.php.api.OverriddenNonApiProperty;
+import com.magento.idea.magento2uct.inspections.php.api.UsedNonApiConstant;
+import com.magento.idea.magento2uct.inspections.php.api.UsedNonApiProperty;
 import com.magento.idea.magento2uct.inspections.php.deprecation.CallingDeprecatedMethod;
 import com.magento.idea.magento2uct.inspections.php.deprecation.ExtendingDeprecatedClass;
 import com.magento.idea.magento2uct.inspections.php.deprecation.ImplementedDeprecatedInterface;
@@ -212,6 +214,18 @@ public enum SupportedIssue {
             IssueSeverityLevel.ERROR,
             "customCode.errors.api.1525",
             OverriddenNonApiProperty.class
+    ),
+    USED_NON_API_CONSTANT(
+            1224,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1224",
+            UsedNonApiConstant.class
+    ),
+    USED_NON_API_PROPERTY(
+            1524,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1524",
+            UsedNonApiProperty.class
     );
 
     private final int code;
