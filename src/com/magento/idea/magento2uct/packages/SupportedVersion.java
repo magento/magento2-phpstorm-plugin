@@ -36,7 +36,9 @@ public enum SupportedVersion {
     V242("2.4.2"),
     V2421("2.4.2-p1"),
     V2422("2.4.2-p2"),
-    V243("2.4.3");
+    V243("2.4.3"),
+    V2431("2.4.3-p1"),
+    V2441("2.4.4-beta1");
 
     private final String version;
 
