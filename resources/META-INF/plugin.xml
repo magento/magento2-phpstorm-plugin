@@ -438,6 +438,20 @@
                          enabledByDefault="false"
                          level="WARNING"
                          implementationClass="com.magento.idea.magento2uct.inspections.php.api.CalledNonApiMethod"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="OverriddenNonApiConstant"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.OverriddenNonApiConstant"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.OverriddenNonApiConstant"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="OverriddenNonApiProperty"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.OverriddenNonApiProperty"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.OverriddenNonApiProperty"/>
         <!-- \UCT inspection -->
 
         <internalFileTemplate name="Magento Composer JSON"/>
