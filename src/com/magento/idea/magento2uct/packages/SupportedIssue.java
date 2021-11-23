@@ -17,6 +17,7 @@ import com.magento.idea.magento2uct.inspections.php.api.ImportedNonApiInterface;
 import com.magento.idea.magento2uct.inspections.php.api.InheritedNonApiInterface;
 import com.magento.idea.magento2uct.inspections.php.api.OverriddenNonApiConstant;
 import com.magento.idea.magento2uct.inspections.php.api.OverriddenNonApiProperty;
+import com.magento.idea.magento2uct.inspections.php.api.PossibleDependencyOnImplDetails;
 import com.magento.idea.magento2uct.inspections.php.api.UsedNonApiConstant;
 import com.magento.idea.magento2uct.inspections.php.api.UsedNonApiProperty;
 import com.magento.idea.magento2uct.inspections.php.api.UsedNonApiType;
@@ -254,6 +255,12 @@ public enum SupportedIssue {
             IssueSeverityLevel.ERROR,
             "customCode.errors.api.1327",
             InheritedNonApiInterface.class
+    ),
+    POSSIBLE_DEPENDENCY_ON_IMPL_DETAILS(
+            1428,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1428",
+            PossibleDependencyOnImplDetails.class
     );
 
     private final int code;

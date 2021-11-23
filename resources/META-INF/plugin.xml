@@ -494,6 +494,13 @@
                          enabledByDefault="false"
                          level="WARNING"
                          implementationClass="com.magento.idea.magento2uct.inspections.php.api.InheritedNonApiInterface"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="PossibleDependencyOnImplDetails"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.PossibleDependencyOnImplDetails"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.PossibleDependencyOnImplDetails"/>
         <!-- \UCT inspection -->
 
         <internalFileTemplate name="Magento Composer JSON"/>
