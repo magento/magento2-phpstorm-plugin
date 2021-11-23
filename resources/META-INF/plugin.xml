@@ -473,6 +473,20 @@
                          enabledByDefault="false"
                          level="WARNING"
                          implementationClass="com.magento.idea.magento2uct.inspections.php.api.UsedNonApiType"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="ImplementedNonApiInterface"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.ImplementedNonApiInterface"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.ImplementedNonApiInterface"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="ExtendedNonApiClass"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.ExtendedNonApiClass"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.ExtendedNonApiClass"/>
         <!-- \UCT inspection -->
 
         <internalFileTemplate name="Magento Composer JSON"/>
