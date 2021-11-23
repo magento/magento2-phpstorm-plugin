@@ -34,9 +34,9 @@ public abstract class UsedTypeInspection extends PhpInspection {
 
             @Override
             public void visitPhpClassReference(final ClassReference reference) {
-                if ((reference.getContext() instanceof PhpUse)
-                        || (reference.getContext() instanceof ExtendsList)
-                        || (reference.getContext() instanceof ImplementsList)) {
+                if (reference.getContext() instanceof PhpUse
+                        || reference.getContext() instanceof ExtendsList
+                        || reference.getContext() instanceof ImplementsList) {
                     return;
                 }
                 final Project project = reference.getProject();
