@@ -10,6 +10,8 @@ import com.intellij.psi.PsiElementVisitor;
 import com.magento.idea.magento2uct.bundles.UctInspectionBundle;
 import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.api.CalledNonApiMethod;
+import com.magento.idea.magento2uct.inspections.php.api.ExtendedNonApiClass;
+import com.magento.idea.magento2uct.inspections.php.api.ImplementedNonApiInterface;
 import com.magento.idea.magento2uct.inspections.php.api.ImportedNonApiClass;
 import com.magento.idea.magento2uct.inspections.php.api.ImportedNonApiInterface;
 import com.magento.idea.magento2uct.inspections.php.api.OverriddenNonApiConstant;
@@ -233,6 +235,18 @@ public enum SupportedIssue {
             IssueSeverityLevel.ERROR,
             "customCode.errors.api.1124",
             UsedNonApiType.class
+    ),
+    IMPLEMENTED_NON_API_INTERFACE(
+            1328,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1328",
+            ImplementedNonApiInterface.class
+    ),
+    EXTENDED_NON_API_CLASS(
+            1121,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1121",
+            ExtendedNonApiClass.class
     );
 
     private final int code;
