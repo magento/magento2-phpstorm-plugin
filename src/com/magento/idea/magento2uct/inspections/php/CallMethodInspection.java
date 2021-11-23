@@ -28,7 +28,7 @@ public abstract class CallMethodInspection extends PhpInspection {
 
             @Override
             public void visitPhpMethodReference(final MethodReference reference) {
-;                final Project project = reference.getProject();
+                final Project project = reference.getProject();
                 final UctSettingsService settings = UctSettingsService.getInstance(project);
 
                 if (!settings.isEnabled()
