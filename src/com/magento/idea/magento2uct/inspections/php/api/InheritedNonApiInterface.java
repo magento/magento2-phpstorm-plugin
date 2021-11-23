@@ -23,14 +23,12 @@ public class InheritedNonApiInterface extends InheritedInterfaceInspection {
             final Project project,
             final @NotNull ProblemsHolder problemsHolder,
             final ClassReference reference,
-            final String interfaceFqn
+            final String fqn
     ) {
-        if (VersionStateManager.getInstance(project).isApi(interfaceFqn)) {
+        if (VersionStateManager.getInstance(project).isApi(fqn)) {
             return;
         }
-        final String message = SupportedIssue.INHERITED_NON_API_INTERFACE.getMessage(
-                interfaceFqn
-        );
+        final String message = SupportedIssue.INHERITED_NON_API_INTERFACE.getMessage(fqn);
 
         if (problemsHolder instanceof UctProblemsHolder) {
             ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
