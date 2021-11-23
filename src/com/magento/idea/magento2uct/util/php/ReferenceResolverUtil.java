@@ -26,12 +26,12 @@ public final class ReferenceResolverUtil {
      * @return PsiElement
      */
     public static PsiElement resolve(final @NotNull PhpReference reference) {
-        PsiElement resolved = null;
         final String fqn = reference.getFQN();
 
         if (fqn == null) {
             return null;
         }
+        PsiElement resolved = null;
 
         if (isFactoryOrProxy(fqn)) {
             final Collection<PhpClass> classes = PhpIndex.getInstance(reference.getProject())
@@ -57,7 +57,7 @@ public final class ReferenceResolverUtil {
      * @return boolean
      */
     private static boolean isFactoryOrProxy(final @NotNull String fqn) {
-        Matcher matcher = MagentoTypeEscapeUtil.FACTORY_PROXY_TYPE_PATTERN.matcher(fqn);
+        final Matcher matcher = MagentoTypeEscapeUtil.FACTORY_PROXY_TYPE_PATTERN.matcher(fqn);
 
         return matcher.find();
     }
