@@ -76,7 +76,7 @@ public class ExistenceStateIndex implements VersionStateIndex {
     public String getVersion(final @NotNull String fqn) {
         final String version = changelog.get(fqn);
 
-        return version == null ? "some" : version;
+        return version == null ? "2.3.0 or before" : version;
     }
 
     /**

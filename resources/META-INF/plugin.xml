@@ -501,6 +501,13 @@
                          enabledByDefault="false"
                          level="WARNING"
                          implementationClass="com.magento.idea.magento2uct.inspections.php.api.PossibleDependencyOnImplDetails"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="CalledNonInterfaceMethod"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.CalledNonInterfaceMethod"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.CalledNonInterfaceMethod"/>
         <!-- \UCT inspection -->
 
         <internalFileTemplate name="Magento Composer JSON"/>
