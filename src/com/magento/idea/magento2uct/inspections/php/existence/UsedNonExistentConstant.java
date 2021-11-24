@@ -47,8 +47,8 @@ public class UsedNonExistentConstant extends UsedFieldInspection {
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.USED_NON_EXISTENT_CONSTANT.getCode()
+            ((UctProblemsHolder) problemsHolder).setIssue(
+                    SupportedIssue.USED_NON_EXISTENT_CONSTANT
             );
         }
         problemsHolder.registerProblem(constantReference, message, ProblemHighlightType.ERROR);

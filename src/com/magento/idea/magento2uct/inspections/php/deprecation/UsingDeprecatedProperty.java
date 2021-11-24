@@ -31,8 +31,8 @@ public class UsingDeprecatedProperty extends UsedFieldInspection {
     ) {
         if (VersionStateManager.getInstance(project).isDeprecated(field.getFQN())) {
             if (problemsHolder instanceof UctProblemsHolder) {
-                ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                        SupportedIssue.USING_DEPRECATED_PROPERTY.getCode()
+                ((UctProblemsHolder) problemsHolder).setIssue(
+                        SupportedIssue.USING_DEPRECATED_PROPERTY
                 );
             }
             final String deprecatedIn = VersionStateManager.getInstance(project)
@@ -54,8 +54,8 @@ public class UsingDeprecatedProperty extends UsedFieldInspection {
             }
             if (VersionStateManager.getInstance(project).isDeprecated(containingClass.getFQN())) {
                 if (problemsHolder instanceof UctProblemsHolder) {
-                    ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                            SupportedIssue.USING_DEPRECATED_PROPERTY.getCode()
+                    ((UctProblemsHolder) problemsHolder).setIssue(
+                            SupportedIssue.USING_DEPRECATED_PROPERTY
                     );
                 }
                 final String deprecatedIn = VersionStateManager.getInstance(project)

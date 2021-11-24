@@ -36,9 +36,7 @@ public class UsedNonApiProperty extends UsedFieldInspection {
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.USED_NON_API_PROPERTY.getCode()
-            );
+            ((UctProblemsHolder) problemsHolder).setIssue(SupportedIssue.USED_NON_API_PROPERTY);
         }
         problemsHolder.registerProblem(propertyReference, message, ProblemHighlightType.WARNING);
     }

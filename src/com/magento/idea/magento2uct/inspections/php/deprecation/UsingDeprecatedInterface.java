@@ -32,8 +32,8 @@ public class UsingDeprecatedInterface extends UsedTypeInspection {
         }
 
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.USING_DEPRECATED_INTERFACE.getCode()
+            ((UctProblemsHolder) problemsHolder).setIssue(
+                    SupportedIssue.USING_DEPRECATED_INTERFACE
             );
         }
         final String deprecatedIn = VersionStateManager.getInstance(project)

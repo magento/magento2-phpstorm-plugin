@@ -38,8 +38,8 @@ public class ExtendedNonExistentClass extends ExtendInspection {
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.EXTENDED_NON_EXISTENT_CLASS.getCode()
+            ((UctProblemsHolder) problemsHolder).setIssue(
+                    SupportedIssue.EXTENDED_NON_EXISTENT_CLASS
             );
         }
 

@@ -44,8 +44,8 @@ public class OverriddenNonExistentProperty extends OverriddenFieldInspection {
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.OVERRIDDEN_NON_EXISTENT_PROPERTY.getCode()
+            ((UctProblemsHolder) problemsHolder).setIssue(
+                    SupportedIssue.OVERRIDDEN_NON_EXISTENT_PROPERTY
             );
         }
         problemsHolder.registerProblem(property, message, ProblemHighlightType.ERROR);

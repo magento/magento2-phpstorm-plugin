@@ -27,8 +27,8 @@ public class InheritedDeprecatedInterface extends InheritedInterfaceInspection {
     ) {
         if (VersionStateManager.getInstance(project).isDeprecated(interfaceFqn)) {
             if (problemsHolder instanceof UctProblemsHolder) {
-                ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                        SupportedIssue.INHERITED_DEPRECATED_INTERFACE.getCode()
+                ((UctProblemsHolder) problemsHolder).setIssue(
+                        SupportedIssue.INHERITED_DEPRECATED_INTERFACE
                 );
             }
             final String deprecatedIn = VersionStateManager.getInstance(project)

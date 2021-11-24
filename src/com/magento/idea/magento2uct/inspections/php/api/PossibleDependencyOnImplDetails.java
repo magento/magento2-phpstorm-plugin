@@ -34,8 +34,8 @@ public class PossibleDependencyOnImplDetails extends UsedTypeInspection {
             if (VersionStateManager.getInstance(project).isApi(implementedInterface.getFQN())) {
 
                 if (problemsHolder instanceof UctProblemsHolder) {
-                    ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                            SupportedIssue.POSSIBLE_DEPENDENCY_ON_IMPL_DETAILS.getCode()
+                    ((UctProblemsHolder) problemsHolder).setIssue(
+                            SupportedIssue.POSSIBLE_DEPENDENCY_ON_IMPL_DETAILS
                     );
                 }
 

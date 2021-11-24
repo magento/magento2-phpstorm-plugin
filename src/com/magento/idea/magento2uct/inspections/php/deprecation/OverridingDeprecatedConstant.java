@@ -33,8 +33,8 @@ public class OverridingDeprecatedConstant extends OverriddenFieldInspection {
         }
 
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.OVERRIDING_DEPRECATED_CONSTANT.getCode()
+            ((UctProblemsHolder) problemsHolder).setIssue(
+                    SupportedIssue.OVERRIDING_DEPRECATED_CONSTANT
             );
         }
         final String deprecatedIn = VersionStateManager.getInstance(project)

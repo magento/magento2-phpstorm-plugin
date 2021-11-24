@@ -31,8 +31,8 @@ public class UsingDeprecatedClass extends UsedTypeInspection {
             return;
         }
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.USING_DEPRECATED_CLASS.getCode()
+            ((UctProblemsHolder) problemsHolder).setIssue(
+                    SupportedIssue.USING_DEPRECATED_CLASS
             );
         }
         final String deprecatedIn = VersionStateManager.getInstance(project)

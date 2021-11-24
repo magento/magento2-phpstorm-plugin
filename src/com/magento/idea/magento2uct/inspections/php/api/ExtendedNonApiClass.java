@@ -35,8 +35,8 @@ public class ExtendedNonApiClass extends ExtendInspection {
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.EXTENDED_NON_API_CLASS.getCode()
+            ((UctProblemsHolder) problemsHolder).setIssue(
+                    SupportedIssue.EXTENDED_NON_API_CLASS
             );
         }
 

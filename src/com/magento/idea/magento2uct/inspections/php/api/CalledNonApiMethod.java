@@ -32,9 +32,7 @@ public class CalledNonApiMethod extends CallMethodInspection {
         final String message = SupportedIssue.CALLED_NON_API_METHOD.getMessage(method.getFQN());
 
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.CALLED_NON_API_METHOD.getCode()
-            );
+            ((UctProblemsHolder) problemsHolder).setIssue(SupportedIssue.CALLED_NON_API_METHOD);
         }
         problemsHolder.registerProblem(methodReference, message, ProblemHighlightType.WARNING);
     }

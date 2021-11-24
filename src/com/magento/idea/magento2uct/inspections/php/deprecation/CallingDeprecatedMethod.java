@@ -30,8 +30,8 @@ public class CallingDeprecatedMethod extends CallMethodInspection {
 
         if (VersionStateManager.getInstance(project).isDeprecated(type)) {
             if (problemsHolder instanceof UctProblemsHolder) {
-                ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                        SupportedIssue.CALLING_DEPRECATED_METHOD.getCode()
+                ((UctProblemsHolder) problemsHolder).setIssue(
+                        SupportedIssue.CALLING_DEPRECATED_METHOD
                 );
             }
             final String deprecatedIn = VersionStateManager.getInstance(project)

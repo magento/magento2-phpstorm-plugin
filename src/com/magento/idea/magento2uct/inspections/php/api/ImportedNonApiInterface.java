@@ -31,8 +31,8 @@ public class ImportedNonApiInterface extends ImportInspection {
         final String message = SupportedIssue.IMPORTED_NON_API_INTERFACE.getMessage(use.getFQN());
 
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.IMPORTED_NON_API_INTERFACE.getCode()
+            ((UctProblemsHolder) problemsHolder).setIssue(
+                    SupportedIssue.IMPORTED_NON_API_INTERFACE
             );
         }
         problemsHolder.registerProblem(use, message, ProblemHighlightType.WARNING);
