@@ -89,7 +89,8 @@ public class UctProblemsHolder extends ProblemsHolder {
         try {
             myProblemsField = ProblemsHolder.class.getDeclaredField("myProblems");
             myProblemsField.setAccessible(true);
-            final List<ProblemDescriptor> myProblems =
+
+            @SuppressWarnings("unchecked") final List<ProblemDescriptor> myProblems =
                     (List<ProblemDescriptor>) myProblemsField.get(this);
             myProblemsField.setAccessible(false);
 
