@@ -8,6 +8,7 @@ package com.magento.idea.magento2uct.versioning;
 import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2uct.packages.SupportedVersion;
 import com.magento.idea.magento2uct.settings.UctSettingsService;
+import com.magento.idea.magento2uct.util.php.MagentoTypeEscapeUtil;
 import com.magento.idea.magento2uct.versioning.indexes.data.ApiCoverageStateIndex;
 import com.magento.idea.magento2uct.versioning.indexes.data.DeprecationStateIndex;
 import com.magento.idea.magento2uct.versioning.indexes.data.ExistenceStateIndex;
@@ -58,7 +59,7 @@ public final class VersionStateManager {
      * @return boolean
      */
     public boolean isDeprecated(final @NotNull String fqn) {
-        return deprecationStateIndex.has(fqn);
+        return deprecationStateIndex.has(escapeFqn(fqn));
     }
 
     /**
@@ -69,7 +70,7 @@ public final class VersionStateManager {
      * @return String
      */
     public String getDeprecatedInVersion(final @NotNull String fqn) {
-        return deprecationStateIndex.getVersion(fqn);
+        return deprecationStateIndex.getVersion(escapeFqn(fqn));
     }
 
     /**
@@ -80,7 +81,7 @@ public final class VersionStateManager {
      * @return boolean
      */
     public boolean isExists(final @NotNull String fqn) {
-        return existenceStateIndex.has(fqn);
+        return existenceStateIndex.has(escapeFqn(fqn));
     }
 
     /**
@@ -91,7 +92,7 @@ public final class VersionStateManager {
      * @return String
      */
     public String getRemovedInVersion(final @NotNull String fqn) {
-        return existenceStateIndex.getVersion(fqn);
+        return existenceStateIndex.getVersion(escapeFqn(fqn));
     }
 
     /**
@@ -102,7 +103,7 @@ public final class VersionStateManager {
      * @return boolean
      */
     public boolean isApi(final @NotNull String fqn) {
-        return apiCoverageStateIndex.has(fqn);
+        return apiCoverageStateIndex.has(escapeFqn(fqn));
     }
 
     /**
@@ -172,5 +173,16 @@ public final class VersionStateManager {
         }
 
         index.load(versionsToLoad);
+    }
+
+    /**
+     * Escape FQN for adding Factory and Proxy support.
+     *
+     * @param fqn String
+     *
+     * @return String
+     */
+    private String escapeFqn(final @NotNull String fqn) {
+        return MagentoTypeEscapeUtil.escape(fqn);
     }
 }

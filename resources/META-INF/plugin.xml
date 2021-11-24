@@ -431,6 +431,83 @@
                          enabledByDefault="false"
                          level="WARNING"
                          implementationClass="com.magento.idea.magento2uct.inspections.php.api.ImportedNonApiInterface"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="CalledNonApiMethod"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.CalledNonApiMethod"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.CalledNonApiMethod"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="OverriddenNonApiConstant"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.OverriddenNonApiConstant"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.OverriddenNonApiConstant"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="OverriddenNonApiProperty"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.OverriddenNonApiProperty"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.OverriddenNonApiProperty"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="UsedNonApiConstant"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsedNonApiConstant"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.UsedNonApiConstant"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="UsedNonApiProperty"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsedNonApiProperty"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.UsedNonApiProperty"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="UsedNonApiType"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsedNonApiType"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.UsedNonApiType"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="ImplementedNonApiInterface"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.ImplementedNonApiInterface"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.ImplementedNonApiInterface"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="ExtendedNonApiClass"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.ExtendedNonApiClass"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.ExtendedNonApiClass"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="InheritedNonApiInterface"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.InheritedNonApiInterface"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.InheritedNonApiInterface"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="PossibleDependencyOnImplDetails"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.PossibleDependencyOnImplDetails"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.PossibleDependencyOnImplDetails"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="CalledNonInterfaceMethod"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.CalledNonInterfaceMethod"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.CalledNonInterfaceMethod"/>
         <!-- \UCT inspection -->
 
         <internalFileTemplate name="Magento Composer JSON"/>

@@ -9,8 +9,19 @@ import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.psi.PsiElementVisitor;
 import com.magento.idea.magento2uct.bundles.UctInspectionBundle;
 import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
+import com.magento.idea.magento2uct.inspections.php.api.CalledNonApiMethod;
+import com.magento.idea.magento2uct.inspections.php.api.CalledNonInterfaceMethod;
+import com.magento.idea.magento2uct.inspections.php.api.ExtendedNonApiClass;
+import com.magento.idea.magento2uct.inspections.php.api.ImplementedNonApiInterface;
 import com.magento.idea.magento2uct.inspections.php.api.ImportedNonApiClass;
 import com.magento.idea.magento2uct.inspections.php.api.ImportedNonApiInterface;
+import com.magento.idea.magento2uct.inspections.php.api.InheritedNonApiInterface;
+import com.magento.idea.magento2uct.inspections.php.api.OverriddenNonApiConstant;
+import com.magento.idea.magento2uct.inspections.php.api.OverriddenNonApiProperty;
+import com.magento.idea.magento2uct.inspections.php.api.PossibleDependencyOnImplDetails;
+import com.magento.idea.magento2uct.inspections.php.api.UsedNonApiConstant;
+import com.magento.idea.magento2uct.inspections.php.api.UsedNonApiProperty;
+import com.magento.idea.magento2uct.inspections.php.api.UsedNonApiType;
 import com.magento.idea.magento2uct.inspections.php.deprecation.CallingDeprecatedMethod;
 import com.magento.idea.magento2uct.inspections.php.deprecation.ExtendingDeprecatedClass;
 import com.magento.idea.magento2uct.inspections.php.deprecation.ImplementedDeprecatedInterface;
@@ -183,14 +194,80 @@ public enum SupportedIssue {
     IMPORTED_NON_API_CLASS(
             1122,
             IssueSeverityLevel.ERROR,
-            "customCode.critical.api.1122",
+            "customCode.errors.api.1122",
             ImportedNonApiClass.class
     ),
     IMPORTED_NON_API_INTERFACE(
             1322,
             IssueSeverityLevel.ERROR,
-            "customCode.critical.api.1322",
+            "customCode.errors.api.1322",
             ImportedNonApiInterface.class
+    ),
+    CALLED_NON_API_METHOD(
+            1429,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1429",
+            CalledNonApiMethod.class
+    ),
+    OVERRIDDEN_NON_API_CONSTANT(
+            1225,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1225",
+            OverriddenNonApiConstant.class
+    ),
+    OVERRIDDEN_NON_API_PROPERTY(
+            1525,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1525",
+            OverriddenNonApiProperty.class
+    ),
+    USED_NON_API_CONSTANT(
+            1224,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1224",
+            UsedNonApiConstant.class
+    ),
+    USED_NON_API_PROPERTY(
+            1524,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1524",
+            UsedNonApiProperty.class
+    ),
+    USED_NON_API_TYPE(
+            1124,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1124",
+            UsedNonApiType.class
+    ),
+    IMPLEMENTED_NON_API_INTERFACE(
+            1328,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1328",
+            ImplementedNonApiInterface.class
+    ),
+    EXTENDED_NON_API_CLASS(
+            1121,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1121",
+            ExtendedNonApiClass.class
+    ),
+    INHERITED_NON_API_INTERFACE(
+            1327,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1327",
+            InheritedNonApiInterface.class
+    ),
+    POSSIBLE_DEPENDENCY_ON_IMPL_DETAILS(
+            1428,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1428",
+            PossibleDependencyOnImplDetails.class
+    ),
+    CALLED_NON_INTERFACE_METHOD(
+            1449,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1449",
+            CalledNonInterfaceMethod.class
     );
 
     private final int code;
