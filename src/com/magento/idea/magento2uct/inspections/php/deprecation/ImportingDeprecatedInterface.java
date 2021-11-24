@@ -30,8 +30,8 @@ public class ImportingDeprecatedInterface extends ImportInspection {
                 return;
             }
             if (problemsHolder instanceof UctProblemsHolder) {
-                ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                        SupportedIssue.IMPORTING_DEPRECATED_INTERFACE.getCode()
+                ((UctProblemsHolder) problemsHolder).setIssue(
+                        SupportedIssue.IMPORTING_DEPRECATED_INTERFACE
                 );
             }
             final String deprecatedIn = VersionStateManager.getInstance(project)

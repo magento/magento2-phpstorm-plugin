@@ -32,8 +32,10 @@ import com.magento.idea.magento2uct.inspections.UctInspectionManager;
 import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
 import com.magento.idea.magento2uct.settings.UctSettingsService;
+import com.magento.idea.magento2uct.util.inspection.FilterDescriptorResultsUtil;
 import com.magento.idea.magento2uct.util.inspection.SortDescriptorResultsUtil;
 import java.nio.file.Paths;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -128,32 +130,25 @@ public class GenerateUctReportCommand {
                             }
                             outputUtil.printProblemFile(filename);
                         }
+                        final List<ProblemDescriptor> problems = SortDescriptorResultsUtil.sort(
+                                FilterDescriptorResultsUtil.filter(fileProblemsHolder)
+                        );
 
-                        for (final ProblemDescriptor descriptor
-                                : SortDescriptorResultsUtil.sort(
-                                        fileProblemsHolder.getResults()
-                        )) {
-                            final Integer code = fileProblemsHolder.getErrorCodeForDescriptor(
-                                    descriptor
+                        for (final ProblemDescriptor descriptor : problems) {
+                            final SupportedIssue issue = fileProblemsHolder.getIssue(descriptor);
+
+                            final String errorMessage = descriptor
+                                    .getDescriptionTemplate()
+                                    .substring(6)
+                                    .trim();
+                            summary.addToSummary(issue.getLevel());
+                            reportBuilder.addIssue(
+                                    descriptor.getLineNumber() + 1,
+                                    filename,
+                                    errorMessage,
+                                    issue
                             );
-                            if (code != null) {
-                                final SupportedIssue issue = SupportedIssue.getByCode(code);
-
-                                if (issue != null) {
-                                    final String errorMessage = descriptor
-                                            .getDescriptionTemplate()
-                                            .substring(6)
-                                            .trim();
-                                    summary.addToSummary(issue.getLevel());
-                                    reportBuilder.addIssue(
-                                            descriptor.getLineNumber() + 1,
-                                            filename,
-                                            errorMessage,
-                                            issue
-                                    );
-                                }
-                                outputUtil.printIssue(descriptor, code);
-                            }
+                            outputUtil.printIssue(descriptor, issue.getCode());
                         }
                     }
                 }

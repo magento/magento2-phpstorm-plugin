@@ -33,8 +33,8 @@ public class ImplementedNonApiInterface extends ImplementInspection {
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.IMPLEMENTED_NON_API_INTERFACE.getCode()
+            ((UctProblemsHolder) problemsHolder).setIssue(
+                    SupportedIssue.IMPLEMENTED_NON_API_INTERFACE
             );
         }
         problemsHolder.registerProblem(reference, message, ProblemHighlightType.WARNING);

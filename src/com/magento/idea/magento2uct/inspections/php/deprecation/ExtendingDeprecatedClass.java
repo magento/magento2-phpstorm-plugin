@@ -38,8 +38,8 @@ public class ExtendingDeprecatedClass extends ExtendInspection {
         for (final ClassReference classReference : childExtends.getReferenceElements()) {
             if (parentFqn.equals(classReference.getFQN())) {
                 if (problemsHolder instanceof UctProblemsHolder) {
-                    ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                            SupportedIssue.EXTENDING_DEPRECATED_CLASS.getCode()
+                    ((UctProblemsHolder) problemsHolder).setIssue(
+                            SupportedIssue.EXTENDING_DEPRECATED_CLASS
                     );
                 }
                 problemsHolder.registerProblem(

@@ -36,8 +36,8 @@ public class OverriddenNonApiConstant extends OverriddenFieldInspection {
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.OVERRIDDEN_NON_API_CONSTANT.getCode()
+            ((UctProblemsHolder) problemsHolder).setIssue(
+                    SupportedIssue.OVERRIDDEN_NON_API_CONSTANT
             );
         }
         problemsHolder.registerProblem(field, message, ProblemHighlightType.WARNING);

@@ -9,18 +9,19 @@ import com.intellij.codeInspection.InspectionManager;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiFile;
+import com.magento.idea.magento2uct.packages.SupportedIssue;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class UctProblemsHolder extends ProblemsHolder {
 
-    private final Map<ProblemDescriptor, Integer> myProblemCodes = new HashMap<>();
-    private Integer reservedErrorCode;
+    private final Map<ProblemDescriptor, SupportedIssue> myProblemCodes = new HashMap<>();
+    private SupportedIssue issue;
 
     /**
      * UCT problems holder constructor.
@@ -38,22 +39,22 @@ public class UctProblemsHolder extends ProblemsHolder {
     }
 
     /**
-     * Set reserved error code.
+     * Set reserved issue.
      *
-     * @param errorCode int
+     * @param issue SupportedIssue
      */
-    public void setReservedErrorCode(final int errorCode) {
-        reservedErrorCode = errorCode;
+    public void setIssue(final @NotNull SupportedIssue issue) {
+        this.issue = issue;
     }
 
     /**
-     * Get issue code by problem descriptor.
+     * Get issue by problem descriptor.
      *
      * @param problemDescriptor ProblemDescriptor
      *
      * @return Integer
      */
-    public @Nullable Integer getErrorCodeForDescriptor(
+    public @NotNull SupportedIssue getIssue(
             final @NotNull ProblemDescriptor problemDescriptor
     ) {
         return myProblemCodes.get(problemDescriptor);
@@ -61,13 +62,19 @@ public class UctProblemsHolder extends ProblemsHolder {
 
     @Override
     public void registerProblem(final @NotNull ProblemDescriptor problemDescriptor) {
+        if (issue == null) {
+            throw new InputMismatchException(
+                    "For the UCT CLI inspection it is mandatory to set an issue via "
+                            + "UctProblemsHolder.setIssue method"
+            );
+        }
         final int problemCount = getMyProblems().size();
         super.registerProblem(problemDescriptor);
 
         // if problem has been added successfully
-        if (problemCount != getMyProblems().size() && reservedErrorCode != null) {
-            myProblemCodes.put(problemDescriptor, reservedErrorCode);
-            reservedErrorCode = null;//NOPMD
+        if (problemCount != getMyProblems().size()) {
+            myProblemCodes.put(problemDescriptor, issue);
+            issue = null;//NOPMD
         }
     }
 

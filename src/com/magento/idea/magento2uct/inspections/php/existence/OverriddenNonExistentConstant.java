@@ -44,8 +44,8 @@ public class OverriddenNonExistentConstant extends OverriddenFieldInspection {
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.OVERRIDDEN_NON_EXISTENT_CONSTANT.getCode()
+            ((UctProblemsHolder) problemsHolder).setIssue(
+                    SupportedIssue.OVERRIDDEN_NON_EXISTENT_CONSTANT
             );
         }
         problemsHolder.registerProblem(field, message, ProblemHighlightType.ERROR);

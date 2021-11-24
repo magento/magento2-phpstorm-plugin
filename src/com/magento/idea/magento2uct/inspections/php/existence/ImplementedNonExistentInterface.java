@@ -34,8 +34,8 @@ public class ImplementedNonExistentInterface extends ImplementInspection {
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.IMPLEMENTED_NON_EXISTENT_INTERFACE.getCode()
+            ((UctProblemsHolder) problemsHolder).setIssue(
+                    SupportedIssue.IMPLEMENTED_NON_EXISTENT_INTERFACE
             );
         }
         problemsHolder.registerProblem(reference, message, ProblemHighlightType.ERROR);

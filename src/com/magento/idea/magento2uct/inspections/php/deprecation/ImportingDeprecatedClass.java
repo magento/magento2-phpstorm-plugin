@@ -30,8 +30,8 @@ public class ImportingDeprecatedClass extends ImportInspection {
                 return;
             }
             if (problemsHolder instanceof UctProblemsHolder) {
-                ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                        SupportedIssue.IMPORTING_DEPRECATED_CLASS.getCode()
+                ((UctProblemsHolder) problemsHolder).setIssue(
+                        SupportedIssue.IMPORTING_DEPRECATED_CLASS
                 );
             }
             final String deprecatedIn = VersionStateManager.getInstance(project)

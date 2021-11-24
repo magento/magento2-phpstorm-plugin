@@ -37,8 +37,8 @@ public class UsedNonExistentProperty extends UsedFieldInspection {
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.USED_NON_EXISTENT_PROPERTY.getCode()
+            ((UctProblemsHolder) problemsHolder).setIssue(
+                    SupportedIssue.USED_NON_EXISTENT_PROPERTY
             );
         }
         problemsHolder.registerProblem(fieldReference, message, ProblemHighlightType.ERROR);

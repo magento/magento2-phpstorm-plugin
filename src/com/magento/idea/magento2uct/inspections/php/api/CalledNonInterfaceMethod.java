@@ -69,8 +69,8 @@ public class CalledNonInterfaceMethod extends CallMethodInspection {
         }
 
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.CALLED_NON_INTERFACE_METHOD.getCode()
+            ((UctProblemsHolder) problemsHolder).setIssue(
+                    SupportedIssue.CALLED_NON_INTERFACE_METHOD
             );
         }
         problemsHolder.registerProblem(
