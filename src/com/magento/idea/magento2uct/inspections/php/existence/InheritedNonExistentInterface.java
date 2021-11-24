@@ -34,8 +34,8 @@ public class InheritedNonExistentInterface extends InheritedInterfaceInspection 
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.INHERITED_NON_EXISTENT_INTERFACE.getCode()
+            ((UctProblemsHolder) problemsHolder).setIssue(
+                    SupportedIssue.INHERITED_NON_EXISTENT_INTERFACE
             );
         }
         problemsHolder.registerProblem(reference, message, ProblemHighlightType.ERROR);

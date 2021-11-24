@@ -32,9 +32,7 @@ public class UsedNonApiType extends UsedTypeInspection {
         final String message = SupportedIssue.USED_NON_API_TYPE.getMessage(phpClass.getFQN());
 
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.USED_NON_API_TYPE.getCode()
-            );
+            ((UctProblemsHolder) problemsHolder).setIssue(SupportedIssue.USED_NON_API_TYPE);
         }
         problemsHolder.registerProblem(reference, message, ProblemHighlightType.WARNING);
     }

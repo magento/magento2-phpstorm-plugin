@@ -51,8 +51,8 @@ public class UsingDeprecatedConstant extends UsedFieldInspection {
         }
 
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.USING_DEPRECATED_CONSTANT.getCode()
+            ((UctProblemsHolder) problemsHolder).setIssue(
+                    SupportedIssue.USING_DEPRECATED_CONSTANT
             );
         }
         final String deprecatedIn = VersionStateManager.getInstance(project)

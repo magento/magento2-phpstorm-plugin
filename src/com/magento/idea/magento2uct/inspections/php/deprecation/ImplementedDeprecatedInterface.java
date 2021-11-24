@@ -27,8 +27,8 @@ public class ImplementedDeprecatedInterface extends ImplementInspection {
     ) {
         if (VersionStateManager.getInstance(project).isDeprecated(interfaceFqn)) {
             if (problemsHolder instanceof UctProblemsHolder) {
-                ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                        SupportedIssue.IMPLEMENTED_DEPRECATED_INTERFACE.getCode()
+                ((UctProblemsHolder) problemsHolder).setIssue(
+                        SupportedIssue.IMPLEMENTED_DEPRECATED_INTERFACE
                 );
             }
             final String deprecatedIn = VersionStateManager.getInstance(project)

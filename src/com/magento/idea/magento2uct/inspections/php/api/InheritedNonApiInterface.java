@@ -31,8 +31,8 @@ public class InheritedNonApiInterface extends InheritedInterfaceInspection {
         final String message = SupportedIssue.INHERITED_NON_API_INTERFACE.getMessage(fqn);
 
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.INHERITED_NON_API_INTERFACE.getCode()
+            ((UctProblemsHolder) problemsHolder).setIssue(
+                    SupportedIssue.INHERITED_NON_API_INTERFACE
             );
         }
         problemsHolder.registerProblem(reference, message, ProblemHighlightType.WARNING);

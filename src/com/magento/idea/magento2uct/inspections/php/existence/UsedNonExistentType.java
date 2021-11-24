@@ -35,8 +35,8 @@ public class UsedNonExistentType extends UsedTypeInspection {
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.USED_NON_EXISTENT_TYPE.getCode()
+            ((UctProblemsHolder) problemsHolder).setIssue(
+                    SupportedIssue.USED_NON_EXISTENT_TYPE
             );
         }
         problemsHolder.registerProblem(reference, message, ProblemHighlightType.ERROR);

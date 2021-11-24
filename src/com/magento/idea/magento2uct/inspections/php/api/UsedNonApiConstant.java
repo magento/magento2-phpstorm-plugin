@@ -46,8 +46,8 @@ public class UsedNonApiConstant extends UsedFieldInspection {
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.USED_NON_API_CONSTANT.getCode()
+            ((UctProblemsHolder) problemsHolder).setIssue(
+                    SupportedIssue.USED_NON_API_CONSTANT
             );
         }
         problemsHolder.registerProblem(constantReference, message, ProblemHighlightType.WARNING);

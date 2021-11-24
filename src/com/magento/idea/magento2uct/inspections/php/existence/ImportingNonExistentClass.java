@@ -34,8 +34,8 @@ public class ImportingNonExistentClass extends ImportInspection {
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.IMPORTED_NON_EXISTENT_CLASS.getCode()
+            ((UctProblemsHolder) problemsHolder).setIssue(
+                    SupportedIssue.IMPORTED_NON_EXISTENT_CLASS
             );
         }
         problemsHolder.registerProblem(

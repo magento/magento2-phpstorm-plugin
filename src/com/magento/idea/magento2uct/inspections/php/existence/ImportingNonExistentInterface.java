@@ -34,8 +34,8 @@ public class ImportingNonExistentInterface extends ImportInspection {
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.IMPORTED_NON_EXISTENT_INTERFACE.getCode()
+            ((UctProblemsHolder) problemsHolder).setIssue(
+                    SupportedIssue.IMPORTED_NON_EXISTENT_INTERFACE
             );
         }
         problemsHolder.registerProblem(

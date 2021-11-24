@@ -33,8 +33,8 @@ public class OverridingDeprecatedProperty extends OverriddenFieldInspection {
         }
 
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.OVERRIDING_DEPRECATED_PROPERTY.getCode()
+            ((UctProblemsHolder) problemsHolder).setIssue(
+                    SupportedIssue.OVERRIDING_DEPRECATED_PROPERTY
             );
         }
         final String deprecatedIn = VersionStateManager.getInstance(project)
