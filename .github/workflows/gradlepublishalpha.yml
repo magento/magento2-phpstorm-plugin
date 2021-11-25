@@ -23,7 +23,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run publish plugin
-        run: ./gradlew publishPlugin -i
+        run: ./gradlew publishPlugin -i --stacktrace --debug
         env:
           MAGENTO_PHPSTORM_intellijPublishToken: ${{ secrets.JET_BRAINS_TOKEN }}
           MAGENTO_PHPSTORM_isAlpha: true
