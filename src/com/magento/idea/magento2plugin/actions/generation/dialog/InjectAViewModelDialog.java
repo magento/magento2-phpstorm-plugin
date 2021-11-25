@@ -104,7 +104,7 @@ public class InjectAViewModelDialog extends AbstractDialog {
 
         setContentPane(contentPane);
         setModal(true);
-        setTitle(InjectAViewModelAction.actionDescription);
+        setTitle(InjectAViewModelAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
 
         buttonOK.addActionListener((final ActionEvent event) -> onOK());
@@ -122,6 +122,10 @@ public class InjectAViewModelDialog extends AbstractDialog {
                 (final ActionEvent event) -> onCancel(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+        );
+
+        addComponentListener(
+                new FocusOnAFieldListener(() -> viewModelClassName.requestFocusInWindow())
         );
     }
 
@@ -150,7 +154,7 @@ public class InjectAViewModelDialog extends AbstractDialog {
                 getViewModelClassName(),
                 moduleName,
                 namespaceBuilder.getNamespace()
-        ), project).generate(InjectAViewModelAction.actionName, true);
+        ), project).generate(InjectAViewModelAction.ACTION_NAME, true);
         if (viewModel == null) {
             final String errorMessage = validatorBundle.message(
                     "validator.class.alreadyDeclared",

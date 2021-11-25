@@ -71,6 +71,9 @@ public class PluginDeclarationInspection extends PhpInspection {
 
                     final XmlAttribute pluginNameAttribute =
                             pluginXmlTag.getAttribute(ModuleDiXml.NAME_ATTR);
+                    if (pluginNameAttribute == null) {
+                        continue;
+                    }
 
                     final String pluginNameAttributeValue = pluginNameAttribute.getValue();
                     if (pluginNameAttributeValue == null) {
@@ -90,6 +93,10 @@ public class PluginDeclarationInspection extends PhpInspection {
                         }
 
                         final String pluginTypeName = pluginTypeNameAttribute.getValue();
+                        if (pluginTypeName == null) {
+                            continue;
+                        }
+
                         final String pluginTypeKey = pluginNameAttributeValue.concat(
                                 Package.vendorModuleNameSeparator
                         ).concat(pluginTypeName);
@@ -115,15 +122,21 @@ public class PluginDeclarationInspection extends PhpInspection {
                         if (pluginTypeDisabledAttribute != null
                                 && pluginTypeDisabledAttribute.getValue() != null
                                 && pluginTypeDisabledAttribute.getValue().equals("true")
-                                && modulesWithSamePluginName.isEmpty()
+                                && !pluginTypeName.isEmpty()
                         ) {
-                            problemsHolder.registerProblem(
-                                    pluginTypeNameAttribute.getValueElement(),
-                                    inspectionBundle.message(
-                                            "inspection.plugin.disabledPluginDoesNotExist"
-                                    ),
-                                    errorSeverity
-                            );
+                            @Nullable final XmlAttributeValue valueElement
+                                    = pluginTypeNameAttribute.getValueElement();
+                            if (modulesWithSamePluginName.isEmpty() && valueElement != null) {
+                                problemsHolder.registerProblem(
+                                            valueElement,
+                                            inspectionBundle.message(
+                                                "inspection.plugin.disabledPluginDoesNotExist"
+                                            ),
+                                            errorSeverity
+                                );
+                            } else {
+                                continue;
+                            }
                         }
 
                         for (final Pair<String, String> moduleEntry: modulesWithSamePluginName) {

@@ -9,33 +9,75 @@
 #foreach ($use in $uses.split(","))
     use $use;
 #end
+#if (${HASINTERFACE} == "true")
+    #set ($hasInterface = true)
+#else
+    #set ($hasInterface = false)
+#end
 
-class ${NAME} #if (${EXTENDS})extends ${EXTENDS} #end #if (${IMPLEMENTS})implements ${IMPLEMENTS}#end
+class ${NAME} #if (${EXTENDS})extends ${EXTENDS} #end #if (${IMPLEMENTS} && $hasInterface)implements ${IMPLEMENTS}#end
 {
+      #if (${PROPERTIES} && !$hasInterface)
+            /**
+             * String constants for property names
+             */
+            #set ($properties = ${PROPERTIES})
+        #foreach ($property in $properties.split(","))
+            #set ($propertyData = $property.split(";"))
+            #set ($propertyUpperSnake = $propertyData.get(0))
+            #set ($propertyLowerSnake = $propertyData.get(1))
+                const $propertyUpperSnake = "$propertyLowerSnake";
+            #end
+
+    #end
     #if (${PROPERTIES})
         #set ($properties = ${PROPERTIES})
         #foreach ($property in $properties.split(","))
             #set ($propertyData = $property.split(";"))
             #set ($propertyUpperSnake = $propertyData.get(0))
+            #set ($propertyType = $propertyData.get(2))
             #set ($propertyUpperCamel = $propertyData.get(3))
             #set ($propertyLowerCamel = $propertyData.get(4))
             #if(!($foreach.first))
 
             #end
+            #if ($hasInterface)
             /**
              * @inheritDoc
              */
-            public function get$propertyUpperCamel()
+            #else
+            /**
+             * Getter for $propertyUpperCamel.
+             *
+             * @return $propertyType|null
+             */
+            #end
+            public function get$propertyUpperCamel(): ?$propertyType
             {
+                #if($propertyType == 'string')
                 return $this->getData(self::$propertyUpperSnake);
+                #{else}
+                return $this->getData(self::$propertyUpperSnake) === null ? null
+                    : ($propertyType) $this->getData(self::$propertyUpperSnake);
+                #end
             }
 
+            #if ($hasInterface)
             /**
              * @inheritDoc
              */
-            public function set$propertyUpperCamel($$propertyLowerCamel)
+            #else
+            /**
+             * Setter for $propertyUpperCamel.
+             *
+             * @param $propertyType|null $$propertyLowerCamel
+             *
+             * @return void
+             */
+            #end
+            public function set$propertyUpperCamel(?$propertyType $$propertyLowerCamel): void
             {
-                return $this->setData(self::$propertyUpperSnake, $$propertyLowerCamel);
+                $this->setData(self::$propertyUpperSnake, $$propertyLowerCamel);
             }
         #end
     #end

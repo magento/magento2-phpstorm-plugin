@@ -10,7 +10,24 @@ class Sample extends DataObject implements SampleInterface
     /**
      * @inheritDoc
      */
-    public function getSampleProperty()
+    public function getIdProperty(): ?int
+    {
+        return $this->getData(self::ID_PROPERTY) === null ? null
+            : (int)$this->getData(self::ID_PROPERTY);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setIdProperty(?int $idProperty): void
+    {
+        $this->setData(self::ID_PROPERTY, $idProperty);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSampleProperty(): ?string
     {
         return $this->getData(self::SAMPLE_PROPERTY);
     }
@@ -18,8 +35,8 @@ class Sample extends DataObject implements SampleInterface
     /**
      * @inheritDoc
      */
-    public function setSampleProperty($sampleProperty)
+    public function setSampleProperty(?string $sampleProperty): void
     {
-        return $this->setData(self::SAMPLE_PROPERTY, $sampleProperty);
+        $this->setData(self::SAMPLE_PROPERTY, $sampleProperty);
     }
 }

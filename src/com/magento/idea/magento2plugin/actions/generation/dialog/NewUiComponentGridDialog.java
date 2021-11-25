@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.NewUiComponentFormAction;
@@ -44,7 +43,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.UiComponentG
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
-import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderPhp;
+import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderFile;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
@@ -233,6 +232,10 @@ public class NewUiComponentGridDialog extends AbstractDialog {
 
         dataProviderParentDirectory.setVisible(false);
         dataProviderParentDirectoryLabel.setVisible(false);
+
+        addComponentListener(
+                new FocusOnAFieldListener(() -> uiComponentName.requestFocusInWindow())
+        );
     }
 
     /**
@@ -255,8 +258,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
      */
     public UiComponentDataProviderData getGridDataProviderData() {
         return new UiComponentDataProviderData(
-                getDataProviderClass(),
-                getDataProviderNamespace(),
+                getDataProviderClassName(),
                 getDataProviderDirectory()
         );
     }
@@ -287,9 +289,10 @@ public class NewUiComponentGridDialog extends AbstractDialog {
                 getModuleName(),
                 getArea(),
                 getUiComponentName(),
-                getDataProviderClassFqn(),
                 getEntityIdFieldName(),
                 getAcl(),
+                getDataProviderClassName(),
+                getDataProviderDirectory(),
                 getUiComponentGridToolbarData()
         );
     }
@@ -325,14 +328,20 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         dataProviderType.addActionListener(event -> onDataProviderTypeChange());
     }
 
-    private PsiFile generateRoutesXmlFile() {
-        return new RoutesXmlGenerator(new RoutesXmlData(
+    /**
+     * Generate routes file.
+     */
+    private void generateRoutesXmlFile() {
+        new RoutesXmlGenerator(new RoutesXmlData(
             getArea(),
             getRoute(),
             getModuleName()
         ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
     }
 
+    /**
+     * Generate Ui Component class.
+     */
     private void generateUiComponentFile() {
         final UiComponentGridXmlGenerator gridXmlGenerator = new UiComponentGridXmlGenerator(
                 getUiComponentGridData(),
@@ -341,8 +350,11 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         gridXmlGenerator.generate(NewUiComponentGridAction.ACTION_NAME, true);
     }
 
+    /**
+     * Generate data provider class.
+     */
     private void generateDataProviderClass() {
-        if (getDataProviderType().equals(UiComponentDataProviderPhp.CUSTOM_TYPE)) {
+        if (getDataProviderType().equals(UiComponentDataProviderFile.CUSTOM_TYPE)) {
             final UiComponentDataProviderGenerator dataProviderGenerator;
             dataProviderGenerator = new UiComponentDataProviderGenerator(
                 getGridDataProviderData(),
@@ -353,13 +365,16 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         }
     }
 
+    /**
+     * Generate data provider declaration.
+     */
     private void generateDataProviderDeclaration() {
-        if (getDataProviderType().equals(UiComponentDataProviderPhp.COLLECTION_TYPE)) {
+        if (getDataProviderType().equals(UiComponentDataProviderFile.COLLECTION_TYPE)) {
             final DataProviderDeclarationGenerator dataProviderGenerator;
             dataProviderGenerator = new DataProviderDeclarationGenerator(
                 new DataProviderDeclarationData(
                     getModuleName(),
-                    getDataProviderClass(),
+                    getDataProviderClassName(),
                     getCollection(),
                     getUiComponentName() + "_data_source",
                     getTableName()
@@ -368,13 +383,16 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         }
     }
 
-    private PsiFile generateViewControllerFile() {
+    /**
+     * Generate view controller file.
+     */
+    private void generateViewControllerFile() {
         final NamespaceBuilder namespace = new NamespaceBuilder(
                 getModuleName(),
                 getActionName(),
                 getControllerDirectory()
         );
-        return new ModuleControllerClassGenerator(new ControllerFileData(
+        new ModuleControllerClassGenerator(new ControllerFileData(
                 getControllerDirectory(),
                 getActionName(),
                 getModuleName(),
@@ -386,8 +404,11 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
     }
 
-    private PsiFile generateLayoutFile() {
-        return new LayoutXmlGenerator(new LayoutXmlData(
+    /**
+     * Generate layout file.
+     */
+    private void generateLayoutFile() {
+        new LayoutXmlGenerator(new LayoutXmlData(
             getArea(),
             getRoute(),
             getModuleName(),
@@ -397,8 +418,11 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
     }
 
-    private PsiFile generateMenuFile() {
-        return new MenuXmlGenerator(new MenuXmlData(
+    /**
+     * Generate menu xml file.
+     */
+    private void generateMenuFile() {
+        new MenuXmlGenerator(new MenuXmlData(
             getParentMenuItem(),
             getSortOrder(),
             getModuleName(),
@@ -409,8 +433,11 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         ), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
     }
 
-    private PsiFile generateAclXmlFile() {
-        return new AclXmlGenerator(new AclXmlData(
+    /**
+     * Generate ACL XML file.
+     */
+    private void generateAclXmlFile() {
+        new AclXmlGenerator(new AclXmlData(
             getParentAcl(),
             getAcl(),
             getAclTitle()
@@ -439,7 +466,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
 
     private void onDataProviderTypeChange() {
         final boolean visible = getDataProviderType().equals(
-                UiComponentDataProviderPhp.COLLECTION_TYPE
+                UiComponentDataProviderFile.COLLECTION_TYPE
         );
 
         collection.setVisible(visible);
@@ -492,8 +519,8 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     private List<String> getProviderTypeOptions() {
         return new ArrayList<>(
                 Arrays.asList(
-                        UiComponentDataProviderPhp.COLLECTION_TYPE,
-                        UiComponentDataProviderPhp.CUSTOM_TYPE
+                        UiComponentDataProviderFile.COLLECTION_TYPE,
+                        UiComponentDataProviderFile.CUSTOM_TYPE
                 )
         );
     }
@@ -529,14 +556,14 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     }
 
     private String getDataProviderClassFqn() {
-        if (!getDataProviderType().equals(UiComponentDataProviderPhp.CUSTOM_TYPE)) {
-            return UiComponentDataProviderPhp.DEFAULT_DATA_PROVIDER;
+        if (!getDataProviderType().equals(UiComponentDataProviderFile.CUSTOM_TYPE)) {
+            return UiComponentDataProviderFile.DEFAULT_DATA_PROVIDER;
         }
         return String.format(
                 "%s%s%s",
                 getDataProviderNamespace(),
                 Package.fqnSeparator,
-                getDataProviderClass()
+                getDataProviderClassName()
         );
     }
 
@@ -594,7 +621,12 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         return collectionFqn.substring(1);
     }
 
-    private String getDataProviderClass() {
+    /**
+     * Get data provider class name.
+     *
+     * @return String
+     */
+    private String getDataProviderClassName() {
         return providerClassName.getText().trim();
     }
 

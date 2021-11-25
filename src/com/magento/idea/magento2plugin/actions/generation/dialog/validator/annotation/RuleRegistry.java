@@ -17,7 +17,9 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierWithColonRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierWithForwardSlash;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.Lowercase;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.MenuIdentifierRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NumericRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassFqnRule;
@@ -42,6 +44,7 @@ public enum RuleRegistry {
     PHP_DIRECTORY(PhpDirectoryRule.class),
     IDENTIFIER(IdentifierRule.class),
     IDENTIFIER_WITH_COLON(IdentifierWithColonRule.class),
+    IDENTIFIER_WITH_FORWARD_SLASH(IdentifierWithForwardSlash.class),
     PHP_NAMESPACE_NAME(PhpNamespaceNameRule.class),
     START_WITH_NUMBER_OR_CAPITAL_LETTER(StartWithNumberOrCapitalLetterRule.class),
     ACL_RESOURCE_ID(AclResourceIdRule.class),
@@ -50,7 +53,8 @@ public enum RuleRegistry {
     CONFIG_PATH(ConfigPathRule.class),
     CLI_COMMAND(CliCommandRule.class),
     NUMERIC(NumericRule.class),
-    TABLE_NAME_LENGTH(TableNameLength.class);
+    TABLE_NAME_LENGTH(TableNameLength.class),
+    MENU_IDENTIFIER(MenuIdentifierRule.class);
 
     private Class<?> rule;
 

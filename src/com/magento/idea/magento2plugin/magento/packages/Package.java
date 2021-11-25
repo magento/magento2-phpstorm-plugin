@@ -12,6 +12,7 @@ public class Package { //NOPMD
     public static String frameworkRootGit = "lib/internal/Magento/Framework";
     public static String vendor = "vendor";
     public static String moduleBaseAreaDir = "etc";
+    public static String moduleViewEmailDir = "email";
     public static String moduleViewDir = "view";
     public static String moduleViewUiComponentDir = "ui_component";
     public static String vendorModuleNameSeparator = "_";

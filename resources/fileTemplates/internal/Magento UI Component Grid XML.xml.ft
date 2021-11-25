@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+#parse("XML File Header.xml")
 <listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
@@ -7,6 +8,13 @@
         </item>
     </argument>
     <settings>
+        <buttons>
+            <button name="add">
+                <url path="*/*/new"/>
+                <class>primary</class>
+                <label translate="true">Add New</label>
+            </button>
+        </buttons>
         <spinner>${NAME}_columns</spinner>
         <deps>
             <dep>${NAME}.${NAME}_data_source</dep>
@@ -56,5 +64,18 @@
                 <sorting>desc</sorting>
             </settings>
         </column>
+        #if (${COLUMNS})
+            #set($columns = ${COLUMNS})
+            #foreach ($column in $columns.split("\n"))
+                $column
+            #end
+        #end
+#if (${ACTION_COLUMN})
+        <actionsColumn name="actions" class="${ACTION_COLUMN}">
+            <settings>
+                <indexField>${ID_FIELD_NAME}</indexField>
+            </settings>
+        </actionsColumn>
+#end
     </columns>
 </listing>

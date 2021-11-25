@@ -1,8 +1,12 @@
 /**
 ${PARAM_DOC}
  */
-public function ${NAME}(${PARAM_LIST})
+public function ${NAME}(${PARAM_LIST})#if (${RETURN_TYPE}): ${RETURN_TYPE}#end
 {
     // TODO: Implement plugin method.
+    #if (${RETURN_TYPE})
+    #if (${RETURN_VARIABLES} && ${RETURN_TYPE} != "void")return ${RETURN_VARIABLES}; #end
+    #else
     #if (${RETURN_VARIABLES})return ${RETURN_VARIABLES}; #end
+    #end
 }

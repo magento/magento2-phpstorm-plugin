@@ -98,7 +98,7 @@
               <forms/>
             </constraints>
             <properties>
-              <text value="Magento version:"/>
+              <text value="Platform Version:"/>
             </properties>
           </component>
         </children>

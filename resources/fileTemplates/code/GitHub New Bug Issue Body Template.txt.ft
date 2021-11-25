@@ -1,0 +1,36 @@
+**Describe the bug** (*)
+
+${BUG_DESCRIPTION}
+
+```
+${STACK_TRACE}
+```
+
+**To Reproduce** (*)
+
+Steps to reproduce the behavior:
+1. Go to '...'
+2. Click on '....'
+3. Scroll down to '....'
+4. See error
+
+**Expected behavior** (*)
+
+A clear and concise description of what you expected to happen.
+
+**Screenshots**
+
+If applicable, add screenshots to help explain your problem.
+
+**Please complete the following information:** (*)
+
+#set($os = "#if(${OS_VERSION})${OS_VERSION}#else[e.g. MacOS or Ubuntu Linux 20.04]#end")
+#set($intellijVersion = "#if(${INTELLIJ_VERSION})${INTELLIJ_VERSION}#else[e.g. 2019.3.3]#end")
+#set($pluginVersion = "#if(${PLUGIN_VERSION})${PLUGIN_VERSION}#else[e.g. 1.0.0]#end")
+ - OS: $os
+ - PhpStorm/Intellij version: $intellijVersion
+ - Plugin Version: $pluginVersion
+
+**Additional context**
+
+Add any other context about the problem here.

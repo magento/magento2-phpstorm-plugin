@@ -5,18 +5,14 @@
 
 package com.magento.idea.magento2plugin.actions.generation.data;
 
-@SuppressWarnings({"PMD.ExcessiveParameterList"})
 public class CollectionData {
+
     private final String moduleName;
     private final String dbTableName;
     private final String modelName;
     private final String collectionName;
-    private final String collectionFqn;
     private final String collectionDirectory;
-    private final String collectionNamespace;
     private final String resourceModelName;
-    private final String resourceModelFqn;
-    private final String modelFqn;
 
     /**
      * Models Data.
@@ -24,35 +20,24 @@ public class CollectionData {
      * @param moduleName String
      * @param dbTableName String
      * @param modelName String
-     * @param collectionName String
-     * @param collectionFqn String
-     * @param collectionDirectory String
      * @param resourceModelName String
-     * @param resourceModelFqn String
-     * @param modelFqn String
+     * @param collectionName String
+     * @param collectionDirectory String
      */
     public CollectionData(
             final String moduleName,
             final String dbTableName,
             final String modelName,
-            final String collectionName,
-            final String collectionFqn,
-            final String collectionDirectory,
-            final String collectionNamespace,
             final String resourceModelName,
-            final String resourceModelFqn,
-            final String modelFqn
+            final String collectionName,
+            final String collectionDirectory
     ) {
         this.moduleName = moduleName;
         this.dbTableName = dbTableName;
         this.modelName = modelName;
         this.collectionName = collectionName;
-        this.collectionFqn = collectionFqn;
         this.collectionDirectory = collectionDirectory;
-        this.collectionNamespace = collectionNamespace;
         this.resourceModelName = resourceModelName;
-        this.resourceModelFqn = resourceModelFqn;
-        this.modelFqn = modelFqn;
     }
 
     /**
@@ -83,42 +68,6 @@ public class CollectionData {
     }
 
     /**
-     * Collection Name.
-     *
-     * @return String
-     */
-    public String getCollectionName() {
-        return collectionName;
-    }
-
-    /**
-     * Collection FQN.
-     *
-     * @return String
-     */
-    public String getCollectionFqn() {
-        return collectionFqn;
-    }
-
-    /**
-     * Collection Directory.
-     *
-     * @return String
-     */
-    public String getCollectionDirectory() {
-        return collectionDirectory;
-    }
-
-    /**
-     * Collection Namespace.
-     *
-     * @return String
-     */
-    public String getCollectionNamespace() {
-        return collectionNamespace;
-    }
-
-    /**
      * Resource Model Name.
      *
      * @return String
@@ -128,20 +77,20 @@ public class CollectionData {
     }
 
     /**
-     * Resource Model FQN.
+     * Collection Name.
      *
      * @return String
      */
-    public String getResourceModelFqn() {
-        return resourceModelFqn;
+    public String getCollectionName() {
+        return collectionName;
     }
 
     /**
-     * Model FQN.
+     * Collection Directory.
      *
      * @return String
      */
-    public String getModelFqn() {
-        return modelFqn;
+    public String getCollectionDirectory() {
+        return collectionDirectory;
     }
 }

@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.indexes;
 
 import com.intellij.openapi.project.Project;
@@ -13,41 +14,67 @@ import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.EventNameIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.EventObserverIndex;
 import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
-
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class EventIndex {
 
-    private static EventIndex INSTANCE;
+    private final Project project;
 
-    private Project project;
-
-    private EventIndex() {
+    /**
+     * Constructor.
+     */
+    public EventIndex(final Project project) {
+        this.project = project;
     }
 
-    public static EventIndex getInstance(final Project project) {
-        if (null == INSTANCE) {
-            INSTANCE = new EventIndex();
-        }
-        INSTANCE.project = project;
+    /**
+     * Gets event elements by event name.
+     */
+    public Collection<PsiElement> getEventElements(
+            final String name,
+            final GlobalSearchScope scope
+    ) {
+        final Collection<PsiElement> result = new ArrayList<>();
 
-        return INSTANCE;
-    }
-
-    public Collection<PsiElement> getEventElements(final String name, final GlobalSearchScope scope) {
-        Collection<PsiElement> result = new ArrayList<>();
-
-        Collection<VirtualFile> virtualFiles =
+        final Collection<VirtualFile> virtualFiles =
                 FileBasedIndex.getInstance().getContainingFiles(EventNameIndex.KEY, name, scope);
 
-        for (VirtualFile virtualFile : virtualFiles) {
-            XmlFile xmlFile = (XmlFile) PsiManager.getInstance(project).findFile(virtualFile);
-            Collection<XmlAttributeValue> valueElements = XmlPsiTreeUtil
+        for (final VirtualFile virtualFile : virtualFiles) {
+            final XmlFile xmlFile = (XmlFile) PsiManager.getInstance(project).findFile(virtualFile);
+            final Collection<XmlAttributeValue> valueElements = XmlPsiTreeUtil
                     .findAttributeValueElements(xmlFile, "event", "name", name);
             result.addAll(valueElements);
         }
+        return result;
+    }
+
+    /**
+     * Gets observers by event-observer name combination.
+     */
+    public Collection<PsiElement> getObservers(
+            final String eventName,
+            final String observerName,
+            final GlobalSearchScope scope
+    ) {
+        final Collection<PsiElement> result = new ArrayList<>();
+        final Collection<VirtualFile> virtualFiles
+                = FileBasedIndex.getInstance().getContainingFiles(
+                        EventObserverIndex.KEY, eventName, scope
+                );
+
+        for (final VirtualFile virtualFile: virtualFiles) {
+            final XmlFile eventsXmlFile
+                    = (XmlFile) PsiManager.getInstance(project).findFile(virtualFile);
+            if (eventsXmlFile != null) {
+                result.addAll(
+                        XmlPsiTreeUtil.findObserverTags(eventsXmlFile, eventName, observerName)
+                );
+            }
+        }
+
         return result;
     }
 }

@@ -1,0 +1,83 @@
+<?php
+#parse("PHP File Header.php")
+
+namespace ${NAMESPACE};
+
+#set($uses = ${USES})
+#foreach ($use in $uses.split(","))
+use $use;
+#end
+
+/**
+ * Delete ${ENTITY_NAME} by id Command.
+ */
+class ${CLASS_NAME}
+{
+    /**
+     * @var ${LOGGER}
+     */
+    private $logger;
+
+    /**
+     * @var ${MODEL_FACTORY}
+     */
+    private $modelFactory;
+
+    /**
+     * @var ${RESOURCE}
+     */
+    private $resource;
+
+    /**
+     * @param ${LOGGER} $logger
+     * @param ${MODEL_FACTORY} $modelFactory
+     * @param ${RESOURCE} $resource
+     */
+    public function __construct(
+        ${LOGGER} $logger,
+        ${MODEL_FACTORY} $modelFactory,
+        ${RESOURCE} $resource
+    ) {
+        $this->logger = $logger;
+        $this->modelFactory = $modelFactory;
+        $this->resource = $resource;
+    }
+
+    /**
+     * Delete ${ENTITY_NAME}.
+     *
+     * @param int $entityId
+     *
+     * @return void
+     * @throws ${COULD_NOT_DELETE}
+     */
+    public function execute(int $entityId): void
+    {
+        try {
+            /** @var ${MODEL} $model */
+            $model = $this->modelFactory->create();
+            $this->resource->load($model, $entityId, ${ENTITY_ID_REFERENCE});
+
+            if (!$model->getData(${ENTITY_ID_REFERENCE})) {
+                throw new ${NO_SUCH_ENTITY_EXCEPTION}(
+                    __('Could not find ${ENTITY_NAME} with id: `%id`',
+                        [
+                            'id' => $entityId
+                        ]
+                    )
+                );
+            }
+
+            $this->resource->delete($model);
+        } catch (Exception $exception) {
+            $this->logger->error(
+                __('Could not delete ${ENTITY_NAME}. Original message: {message}'),
+                [
+                    'message' => $exception->getMessage(),
+                    'exception' => $exception
+                ]
+            );
+            throw new ${COULD_NOT_DELETE}(__('Could not delete ${ENTITY_NAME}.'));
+        }
+    }
+}

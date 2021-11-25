@@ -10,6 +10,7 @@ import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.CollectionData;
 
 public class ModuleCollectionGeneratorTest extends BaseGeneratorTestCase {
+
     /**
      * Test generation of collection file.
      */
@@ -19,26 +20,45 @@ public class ModuleCollectionGeneratorTest extends BaseGeneratorTestCase {
                 "Foo_Bar",
                 "my_table",
                 "TestModel",
-                "TestCollection",
-                "Foo\\Bar\\Model\\ResourceModel\\TestModel\\TestCollection",
-                "Model/ResourceModel/TestModel",
-                "Foo\\Bar\\Model\\ResourceModel\\TestModel",
                 "TestResource",
-                "Foo\\Bar\\Model\\ResourceModel\\TestModel\\TestResource",
-                "Foo\\Bar\\Model\\TestModel"
+                "TestCollection",
+                "TestModel"
         );
         final ModuleCollectionGenerator generator = new ModuleCollectionGenerator(
                 collectionFileData,
                 project
         );
-        final PsiFile controllerFile = generator.generate("test");
+        final PsiFile collectionFile = generator.generate("test");
         final String filePath = this.getFixturePath("TestCollection.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
 
         assertGeneratedFileIsCorrect(
                 expectedFile,
                 "src/app/code/Foo/Bar/Model/ResourceModel/TestModel",
-                controllerFile
+                collectionFile
+        );
+    }
+
+    /**
+     * Test generation of collection file where resource model name equal to the model name.
+     */
+    public void testGenerateWithTheSameNamesForResourceModelAndModel() {
+        final PsiFile collectionFile = new ModuleCollectionGenerator(
+                new CollectionData(
+                        "Foo_Bar",
+                        "my_table",
+                        "Test",
+                        "Test",
+                        "Collection",
+                        "Test"
+                ),
+                myFixture.getProject()
+        ).generate("test");
+
+        assertGeneratedFileIsCorrect(
+                myFixture.configureByFile(this.getFixturePath("Collection.php")),
+                "src/app/code/Foo/Bar/Model/ResourceModel/Test",
+                collectionFile
         );
     }
 }

@@ -123,7 +123,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         this.project = project;
         this.initialBaseDir = initialBaseDir;
         this.camelCaseToHyphen = CamelCaseToHyphen.getInstance();
-        this.moduleIndex = ModuleIndex.getInstance(project);
+        this.moduleIndex = new ModuleIndex(project);
         detectPackageName(initialBaseDir);
         setContentPane(contentPane);
         setModal(true);
@@ -151,6 +151,14 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
+
+        addComponentListener(new FocusOnAFieldListener(() -> {
+            if (packageName.isVisible()) {
+                packageName.requestFocusInWindow();
+            } else {
+                moduleName.requestFocusInWindow();
+            }
+        }));
     }
 
     private void detectPackageName(final @NotNull PsiDirectory initialBaseDir) {
@@ -213,6 +221,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
                 getModuleName(),
                 getSetupVersion(),
                 getBaseDir(),
+                getModuleDependencies(),
                 true
         ), project).generate(NewModuleAction.actionName, true);
     }

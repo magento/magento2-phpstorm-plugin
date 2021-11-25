@@ -18,7 +18,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.TableNameLength;
 import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaWhitelistJsonGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.DbSchemaXmlGenerator;
-import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaXml;
+import com.magento.idea.magento2plugin.magento.packages.database.ColumnAttributes;
 import com.magento.idea.magento2plugin.magento.packages.database.TableColumnTypes;
 import com.magento.idea.magento2plugin.magento.packages.database.TableEngines;
 import com.magento.idea.magento2plugin.magento.packages.database.TableResources;
@@ -123,15 +123,22 @@ public class NewDbSchemaDialog extends AbstractDialog {
         );
         fillComboBoxes();
         initializeColumnsUiComponentGroup();
+
+        addComponentListener(new FocusOnAFieldListener(() -> tableName.requestFocusInWindow()));
     }
 
     /**
      * On buttonOK action listener.
      */
     private void onOK() {
+        if (columnsTable.isEditing()) {
+            columnsTable.getCellEditor().stopCellEditing();
+        }
+
         if (!validateFormFields()) {
             return;
         }
+
         final DbSchemaXmlData dbSchemaXmlData = new DbSchemaXmlData(
                 getTableName(),
                 getTableResource(),
@@ -192,36 +199,36 @@ public class NewDbSchemaDialog extends AbstractDialog {
      */
     private void initializeColumnsUiComponentGroup() {
         final List<String> columns = new LinkedList<>(Arrays.asList(
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME,
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_PADDING,
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_UNSIGNED,
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_NULLABLE,
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_IDENTITY,
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_LENGTH,
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_PRECISION,
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_SCALE,
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_ON_UPDATE,
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_DEFAULT,
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_COMMENT
+                ColumnAttributes.TYPE.getName(),
+                ColumnAttributes.NAME.getName(),
+                ColumnAttributes.PADDING.getName(),
+                ColumnAttributes.UNSIGNED.getName(),
+                ColumnAttributes.NULLABLE.getName(),
+                ColumnAttributes.IDENTITY.getName(),
+                ColumnAttributes.LENGTH.getName(),
+                ColumnAttributes.PRECISION.getName(),
+                ColumnAttributes.SCALE.getName(),
+                ColumnAttributes.ON_UPDATE.getName(),
+                ColumnAttributes.DEFAULT.getName(),
+                ColumnAttributes.COMMENT.getName()
         ));
         // Set default values for columns
         final Map<String, String> defaultValues = new HashMap<>();
-        defaultValues.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NULLABLE, "false");
-        defaultValues.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_IDENTITY, "false");
+        defaultValues.put(ColumnAttributes.NULLABLE.getName(), "false");
+        defaultValues.put(ColumnAttributes.IDENTITY.getName(), "false");
         // Set sources for columns
         final Map<String, List<String>> sources = new HashMap<>();
         final List<String> booleanSource = Arrays.asList("true", "false");
         final List<String> columnTypes = TableColumnTypes.getTableColumnTypesList();
         columnTypes.add(0, "");
         sources.put(
-                ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
+                ColumnAttributes.TYPE.getName(),
                 columnTypes
         );
-        sources.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_UNSIGNED, booleanSource);
-        sources.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NULLABLE, booleanSource);
-        sources.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_IDENTITY, booleanSource);
-        sources.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_ON_UPDATE, booleanSource);
+        sources.put(ColumnAttributes.UNSIGNED.getName(), booleanSource);
+        sources.put(ColumnAttributes.NULLABLE.getName(), booleanSource);
+        sources.put(ColumnAttributes.IDENTITY.getName(), booleanSource);
+        sources.put(ColumnAttributes.ON_UPDATE.getName(), booleanSource);
         // Initialize new Table Group
         columnsTableGroupWrapper = new TableGroupWrapper(
                 columnsTable,

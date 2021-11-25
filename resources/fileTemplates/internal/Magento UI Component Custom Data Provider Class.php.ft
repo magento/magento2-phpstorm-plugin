@@ -1,14 +1,123 @@
 <?php
 #parse("PHP File Header.php")
-#if (${NAMESPACE})
 
 namespace ${NAMESPACE};
+
+#set($uses = ${USES})
+#foreach ($use in $uses.split(","))
+use $use;
 #end
 
-use Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider;
-
-class ${CLASS_NAME} extends DataProvider
+#if(${HAS_GET_LIST_QUERY} == "true")
+    #set($hasGetListQuery = true)
+#else
+    #set($hasGetListQuery = false)
+#end
+/**
+ * DataProvider component.
+ */
+class ${CLASS_NAME} extends ${EXTENDS}
 {
+#if($hasGetListQuery)
+/**
+     * @var ${GET_LIST_QUERY_TYPE}
+     */
+    private $getListQuery;
+
+    /**
+     * @var ${SEARCH_RESULT_FACTORY}
+     */
+    private $searchResultFactory;
+
+    /**
+     * @var array
+     */
+    private $loadedData = [];
+
+    /**
+     * @param string $name
+     * @param string $primaryFieldName
+     * @param string $requestFieldName
+     * @param ${REPORTING_TYPE} $reporting
+     * @param ${SEARCH_CRITERIA_BUILDER} $searchCriteriaBuilder
+     * @param ${REQUEST_TYPE} $request
+     * @param ${FILTER_BUILDER} $filterBuilder
+     * @param ${GET_LIST_QUERY_TYPE} $getListQuery
+     * @param ${SEARCH_RESULT_FACTORY} $searchResultFactory
+     * @param array $meta
+     * @param array $data
+     */
+    public function __construct(
+        $name,
+        $primaryFieldName,
+        $requestFieldName,
+        ${REPORTING_TYPE} $reporting,
+        ${SEARCH_CRITERIA_BUILDER} $searchCriteriaBuilder,
+        ${REQUEST_TYPE} $request,
+        ${FILTER_BUILDER} $filterBuilder,
+        ${GET_LIST_QUERY_TYPE} $getListQuery,
+        ${SEARCH_RESULT_FACTORY} $searchResultFactory,
+        array $meta = [],
+        array $data = []
+    ) {
+        parent::__construct(
+            $name,
+            $primaryFieldName,
+            $requestFieldName,
+            $reporting,
+            $searchCriteriaBuilder,
+            $request,
+            $filterBuilder,
+            $meta,
+            $data
+        );
+        $this->getListQuery = $getListQuery;
+        $this->searchResultFactory = $searchResultFactory;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSearchResult()
+    {
+        $searchCriteria = $this->getSearchCriteria();
+        $result = $this->getListQuery->execute($searchCriteria);
+
+        return $this->searchResultFactory->create(
+            $result->getItems(),
+            $result->getTotalCount(),
+            $searchCriteria,
+            ${ENTITY_ID_REFERENCE}
+        );
+    }
+
+    /**
+     * Get data.
+     *
+     * @return array
+     */
+    public function getData(): array
+    {
+        if ($this->loadedData) {
+            return $this->loadedData;
+        }
+        $this->loadedData = parent::getData();
+        $itemsById = [];
+
+#set($entityId = "${ENTITY_ID_REFERENCE}")
+#set($entityIdAccessor = '[(int) $item[' + "${ENTITY_ID_REFERENCE}" + ']]')
+#set($getIdAccessor = "[(int) $id]")
+        foreach ($this->loadedData['items'] as $item) {
+            $itemsById$entityIdAccessor = $item;
+        }
+
+        if ($id = $this->request->getParam($entityId)) {
+            $this->loadedData['entity'] = $itemsById$getIdAccessor;
+        }
+
+        return $this->loadedData;
+    }
+#else
     /**
      * @inheritDoc
      */
@@ -19,4 +128,5 @@ class ${CLASS_NAME} extends DataProvider
             []
         ];
     }
+#end
 }
