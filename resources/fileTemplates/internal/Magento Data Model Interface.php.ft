@@ -28,20 +28,15 @@ interface ${NAME}
             #set ($propertyLowerCamel = $propertyData.get(4))
 
             /**
-             * Getter for $propertyUpperCamel.
-             *
-             * @return $propertyType|null
+             * @return $propertyType
              */
-            public function get$propertyUpperCamel(): ?$propertyType;
+            public function get$propertyUpperCamel();
 
             /**
-             * Setter for $propertyUpperCamel.
-             *
-             * @param $propertyType|null $$propertyLowerCamel
-             *
-             * @return void
+             * @param $propertyType $$propertyLowerCamel
+             * @return $this
              */
-            public function set$propertyUpperCamel(?$propertyType $$propertyLowerCamel): void;
+            public function set$propertyUpperCamel($$propertyLowerCamel);
         #end
     #end
 }

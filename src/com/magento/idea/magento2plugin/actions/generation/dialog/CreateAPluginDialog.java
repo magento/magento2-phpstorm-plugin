@@ -140,8 +140,6 @@ public class CreateAPluginDialog extends AbstractDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
-
-        addComponentListener(new FocusOnAFieldListener(() -> pluginModule.requestFocusInWindow()));
     }
 
     private void fillPluginTypeOptions() {
@@ -234,7 +232,7 @@ public class CreateAPluginDialog extends AbstractDialog {
     }
 
     private void createUIComponents() {
-        final List<String> allModulesList = new ModuleIndex(project)
+        final List<String> allModulesList = ModuleIndex.getInstance(project)
                 .getEditableModuleNames();
 
         this.pluginModule = new FilteredComboBox(allModulesList);

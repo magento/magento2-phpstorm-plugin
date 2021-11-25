@@ -8,40 +8,19 @@ package com.magento.idea.magento2plugin.bundles;
 import com.intellij.CommonBundle;
 import java.util.ResourceBundle;
 
-public abstract class AbstractBundle {
+abstract class AbstractBundle {
 
-    public abstract String getBundleName();
+    abstract public String getBundleName();
 
-    /**
-     * Get bundle message.
-     *
-     * @param key String
-     * @param params Object[]
-     *
-     * @return String
-     */
-    public String message(final String key, final Object... params) {
-        final ResourceBundle bundle = ResourceBundle.getBundle(getBundleName());
+    public String message(String key, Object... params) {
+        ResourceBundle BUNDLE = ResourceBundle.getBundle(getBundleName());
 
-        return CommonBundle.message(bundle, key, params);
+        return CommonBundle.message(BUNDLE, key, params);
     }
 
-    /**
-     * Get message or default value.
-     *
-     * @param key String
-     * @param defaultValue String
-     * @param params Object[]
-     *
-     * @return String
-     */
-    public String messageOrDefault(
-            final String key,
-            final String defaultValue,
-            final Object... params
-    ) {
-        final ResourceBundle bundle = ResourceBundle.getBundle(getBundleName());
+    public String messageOrDefault(String key, String defaultValue, Object... params) {
+        ResourceBundle BUNDLE = ResourceBundle.getBundle(getBundleName());
 
-        return CommonBundle.messageOrDefault(bundle, key, defaultValue, params);
+        return CommonBundle.messageOrDefault(BUNDLE, key, defaultValue, params);
     }
 }

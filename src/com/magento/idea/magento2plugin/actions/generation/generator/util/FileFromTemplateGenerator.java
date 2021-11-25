@@ -2,7 +2,6 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
-
 package com.magento.idea.magento2plugin.actions.generation.generator.util;
 
 import com.intellij.ide.fileTemplates.DefaultTemplatePropertiesProvider;
@@ -22,42 +21,38 @@ import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.util.IncorrectOperationException;
 import com.magento.idea.magento2plugin.magento.files.ModuleFileInterface;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class FileFromTemplateGenerator {
-    private final Project project;
+    private static FileFromTemplateGenerator INSTANCE = null;
+    private Project project;
 
-    public FileFromTemplateGenerator(final Project project) {
-        this.project = project;
+    public static FileFromTemplateGenerator getInstance(Project project) {
+        if (null == INSTANCE) {
+            INSTANCE = new FileFromTemplateGenerator();
+        }
+        INSTANCE.project = project;
+        return INSTANCE;
     }
 
-    /**
-     * Generate file.
-     *
-     * @param moduleFile ModuleFileInterface
-     * @param attributes Properties
-     * @param baseDir PsiDirectory
-     * @param actionName String
-     * @return PsiFile
-     */
     @Nullable
     public PsiFile generate(
-            final @NotNull ModuleFileInterface moduleFile,
-            final @NotNull Properties attributes,
-            final @NotNull PsiDirectory baseDir,
-            final @NotNull String actionName
-    ) {
-        final Ref<PsiFile> fileRef = new Ref<>(null);
-        final Ref<String> exceptionRef = new Ref<>(null);
-        final String filePath = baseDir.getText().concat("/").concat(moduleFile.getFileName());
+            @NotNull ModuleFileInterface moduleFile,
+            @NotNull Properties attributes,
+            @NotNull PsiDirectory baseDir,
+            @NotNull String actionName)
+    {
+        Ref<PsiFile> fileRef = new Ref<>(null);
+        Ref<String> exceptionRef = new Ref<>(null);
+        String filePath = baseDir.getText().concat("/").concat(moduleFile.getFileName());
         CommandProcessor.getInstance().executeCommand(project, () -> {
-            final Runnable run = () -> {
+            Runnable run = () -> {
                 try {
                     PsiFile file = createFile(moduleFile, filePath, baseDir, attributes);
                     if (file != null) {
@@ -70,24 +65,24 @@ public class FileFromTemplateGenerator {
             ApplicationManager.getApplication().runWriteAction(run);
         }, actionName, null);
 
-        if (exceptionRef.isNull()) {
+        if (!exceptionRef.isNull()) {
+            Messages.showErrorDialog(exceptionRef.get(), actionName);
+            return null;
+        } else {
             return fileRef.get();
         }
-
-        Messages.showErrorDialog(exceptionRef.get(), actionName);
-        return null;
     }
 
     @Nullable
     private PsiFile createFile(
-            final @NotNull ModuleFileInterface moduleFile,
-            final @NotNull String filePath,
-            final @NotNull PsiDirectory baseDir,
-            final @NotNull Properties attributes
-    ) throws IOException {
-        final List<String> path = StringUtil.split(filePath.replace(File.separator, "/"), "/");
-        final String fileName = path.get(path.size() - 1);
-        final PsiFile fileTemplate = createFileFromTemplate(
+            @NotNull ModuleFileInterface moduleFile,
+            @NotNull String filePath,
+            @NotNull PsiDirectory baseDir,
+            @NotNull Properties attributes
+    ) throws IOException, IncorrectOperationException {
+        List<String> path = StringUtil.split(filePath.replace(File.separator, "/"), "/");
+        String fileName = path.get(path.size() - 1);
+        PsiFile fileTemplate = createFileFromTemplate(
                 getTemplateManager(),
                 baseDir, moduleFile.getTemplate(), attributes, fileName, moduleFile.getLanguage());
         if (fileTemplate == null) {
@@ -104,25 +99,13 @@ public class FileFromTemplateGenerator {
         }
     }
 
-    /**
-     * Create file from code template.
-     *
-     * @param templateManager FileTemplateManager
-     * @param directory PsiDirectory
-     * @param templateName String
-     * @param properties Properties
-     * @param fileName String
-     * @param language Language
-     * @return PsiFile
-     * @throws IOException exception
-     */
     public PsiFile createFileFromTemplate(
-            final @NotNull FileTemplateManager templateManager,
-            final @NotNull PsiDirectory directory,
-            final @NotNull String templateName,
-            final @NotNull Properties properties,
-            final @NotNull String fileName,
-            final @NotNull Language language
+            @NotNull FileTemplateManager templateManager,
+            @NotNull PsiDirectory directory,
+            @NotNull String templateName,
+            @NotNull Properties properties,
+            @NotNull String fileName,
+            @NotNull Language language
     ) throws IOException {
         FileTemplate fileTemplate;
         try {
@@ -132,14 +115,8 @@ public class FileFromTemplateGenerator {
         }
 
         fillDefaultProperties(templateManager, properties, directory);
-        final String fileTemplateText = fileTemplate.getText(properties);
-        final PsiFile file = PsiFileFactory.getInstance(project).createFileFromText(
-                fileName,
-                language,
-                fileTemplateText,
-                true,
-                false
-        );
+        String fileTemplateText = fileTemplate.getText(properties);
+        PsiFile file = PsiFileFactory.getInstance(project).createFileFromText(fileName, language, fileTemplateText, true, false);
         if (fileTemplate.isReformatCode()) {
             CodeStyleManager.getInstance(project).reformat(file);
         }
@@ -147,34 +124,19 @@ public class FileFromTemplateGenerator {
         return file;
     }
 
-    /**
-     * Fill template properties.
-     *
-     * @param templateManager FileTemplateManager
-     * @param props Properties
-     * @param directory PsiDirectory
-     */
-    public void fillDefaultProperties(
-            final @NotNull FileTemplateManager templateManager,
-            final @NotNull Properties props,
-            final @NotNull PsiDirectory directory
-    ) {
-        final Properties hardCodedProperties = templateManager.getDefaultProperties();
+    public void fillDefaultProperties(@NotNull FileTemplateManager templateManager, @NotNull Properties props, @NotNull PsiDirectory directory) {
+        Properties hardCodedProperties = templateManager.getDefaultProperties();
         Iterator iterator = hardCodedProperties.keySet().iterator();
 
-        while (iterator.hasNext()) {
-            final Object propertyKey = iterator.next();
-            props.setProperty(
-                    (String)propertyKey,
-                    hardCodedProperties.getProperty((String)propertyKey)
-            );
+        while(iterator.hasNext()) {
+            Object propertyKey = iterator.next();
+            props.setProperty((String)propertyKey, hardCodedProperties.getProperty((String)propertyKey));
         }
 
         iterator = DefaultTemplatePropertiesProvider.EP_NAME.getExtensionList().iterator();
 
-        while (iterator.hasNext()) {
-            final DefaultTemplatePropertiesProvider provider
-                    = (DefaultTemplatePropertiesProvider)iterator.next();
+        while(iterator.hasNext()) {
+            DefaultTemplatePropertiesProvider provider = (DefaultTemplatePropertiesProvider)iterator.next();
             provider.fillProperties(directory, props);
         }
     }

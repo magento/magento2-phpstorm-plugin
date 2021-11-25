@@ -14,7 +14,6 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.magento.idea.magento2plugin.actions.generation.data.QueueConsumerData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateQueueConsumerXml;
-import com.magento.idea.magento2plugin.magento.packages.MessageQueueConnections;
 import java.util.Properties;
 
 public class QueueConsumerGenerator extends FileGenerator {
@@ -59,14 +58,9 @@ public class QueueConsumerGenerator extends FileGenerator {
                 final XmlTag consumerTag = rootTag.createChildTag("consumer", null, null, false);
                 consumerTag.setAttribute("name", consumerData.getConsumerName());
                 consumerTag.setAttribute("queue", consumerData.getQueueName());
+                consumerTag.setAttribute("consumerInstance", consumerData.getConsumerType());
                 consumerTag.setAttribute("connection", consumerData.getConnectionName());
-
-                if (consumerData.getConnectionName().equals(MessageQueueConnections.DB.getType())) {
-                    consumerTag.setAttribute("consumerInstance", consumerData.getConsumerClass());
-                    consumerTag.setAttribute("maxMessages", consumerData.getMaxMessages());
-                } else {
-                    consumerTag.setAttribute("handler", consumerData.getHandler());
-                }
+                consumerTag.setAttribute("maxMessages", consumerData.getMaxMessages());
 
                 rootTag.addSubTag(consumerTag, false);
             }

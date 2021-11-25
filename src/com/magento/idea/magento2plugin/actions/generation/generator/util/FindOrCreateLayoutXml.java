@@ -45,9 +45,9 @@ public final class FindOrCreateLayoutXml {
     ) {
         final DirectoryGenerator directoryGenerator = DirectoryGenerator.getInstance();
         final FileFromTemplateGenerator fileFromTemplateGenerator =
-                new FileFromTemplateGenerator(project);
+                FileFromTemplateGenerator.getInstance(project);
 
-        PsiDirectory parentDirectory = new ModuleIndex(project)
+        PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(moduleName);
         final ArrayList<String> fileDirectories = new ArrayList<>();
         fileDirectories.add(Package.moduleViewDir);

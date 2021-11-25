@@ -8,15 +8,16 @@ package com.magento.idea.magento2plugin.util.magento;
 import com.intellij.json.psi.JsonFile;
 import com.intellij.json.psi.JsonObject;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.magento.idea.magento2plugin.magento.files.ComposerLock;
+import com.magento.idea.magento2plugin.magento.files.ComposerJson;
+import com.magento.idea.magento2plugin.magento.packages.ComposerPackageModel;
+import com.magento.idea.magento2plugin.magento.packages.ComposerPackageModelImpl;
 import com.magento.idea.magento2plugin.magento.packages.File;
-import com.magento.idea.magento2plugin.project.util.GetMagentoVersionUtil;
+import com.magento.idea.magento2plugin.magento.packages.Package;
 
 public final class MagentoVersionUtil {
 
@@ -32,34 +33,14 @@ public final class MagentoVersionUtil {
      * @return String
      */
     public static String get(final Project project, final String magentoPath) {
-        final Pair<String, String> version = getVersionData(
-                project,
-                magentoPath
-        );
-
-        return version.getFirst();
-    }
-
-    /**
-     * Parse composer.lock to detect Magento 2 version
-     *
-     * @param project Project
-     * @param magentoPath String
-     *
-     * @return Pair[String, String]
-     */
-    public static Pair<String, String> getVersionData(
-            final Project project,
-            final String magentoPath
-    ) {
         final VirtualFile file = LocalFileSystem.getInstance().findFileByPath(
                 getFilePath(magentoPath)
         );
-        final Pair<String, String> versionData = new Pair<>(DEFAULT_VERSION, null);
 
         if (file == null) {
-            return versionData;
+            return DEFAULT_VERSION;
         }
+
         final PsiManager psiManager = PsiManager.getInstance(project);
         final PsiFile composerFile = psiManager.findFile(file);
 
@@ -71,18 +52,23 @@ public final class MagentoVersionUtil {
             );
 
             if (jsonObject == null) {
-                return versionData;
+                return DEFAULT_VERSION;
             }
-            final Pair<String, String> version = GetMagentoVersionUtil.getVersion(jsonObject);
 
-            return version == null ? versionData : version;
+            final ComposerPackageModel composerObject = new ComposerPackageModelImpl(jsonObject);
+
+            if (composerObject.getType() != null
+                    && composerObject.getType().equals(Package.composerType)
+                    && composerObject.getVersion() != null) {
+                return composerObject.getVersion();
+            }
         }
 
-        return versionData;
+        return DEFAULT_VERSION;
     }
 
     private static String getFilePath(final String magentoPath) {
-        return magentoPath + File.separator + ComposerLock.FILE_NAME;
+        return magentoPath + File.separator + ComposerJson.FILE_NAME;
     }
 
     /**
@@ -94,15 +80,11 @@ public final class MagentoVersionUtil {
      *         the value {@code false} if the argument version1 is less than to version2.
      */
     public static boolean compare(final String version1, final String version2) {
-        if (DEFAULT_VERSION.equals(version1)) {
+        if (version1.equals(DEFAULT_VERSION)) {
             return true;
         }
         if (version1.equals(version2)) {
             return true;
-        }
-
-        if (version1.isEmpty()) {
-            return false;
         }
 
         final String[] version1s = version1.split("\\.");

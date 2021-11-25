@@ -12,7 +12,6 @@ public class QueueConsumerData {
     private final String maxMessages;
     private final String connectionName;
     private final String moduleName;
-    private final String handler;
 
     /**
      * Constructor.
@@ -23,8 +22,7 @@ public class QueueConsumerData {
             final String consumerType,
             final String maxMessages,
             final String connectionName,
-            final String moduleName,
-            final String handler
+            final String moduleName
     ) {
         this.consumerName = consumerName;
         this.queueName = queueName;
@@ -32,7 +30,6 @@ public class QueueConsumerData {
         this.maxMessages = maxMessages;
         this.connectionName = connectionName;
         this.moduleName = moduleName;
-        this.handler = handler;
     }
 
     public String getConsumerName() {
@@ -43,7 +40,7 @@ public class QueueConsumerData {
         return queueName;
     }
 
-    public String getConsumerClass() {
+    public String getConsumerType() {
         return consumerType;
     }
 
@@ -57,9 +54,5 @@ public class QueueConsumerData {
 
     public String getModuleName() {
         return moduleName;
-    }
-
-    public String getHandler() {
-        return handler;
     }
 }

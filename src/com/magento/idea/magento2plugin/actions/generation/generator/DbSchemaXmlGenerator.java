@@ -16,7 +16,6 @@ import com.intellij.psi.xml.XmlTag;
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateDbSchemaXmlUtil;
 import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaXml;
-import com.magento.idea.magento2plugin.magento.packages.database.ColumnAttributes;
 import com.magento.idea.magento2plugin.magento.packages.database.TableColumnTypes;
 import java.util.HashMap;
 import java.util.InputMismatchException;
@@ -92,14 +91,14 @@ public class DbSchemaXmlGenerator extends FileGenerator {
 
         for (final Map<String, String> columnData : dbSchemaXmlData.getColumns()) {
             final String identityAttrValue =
-                    columnData.get(ColumnAttributes.IDENTITY.getName());
+                    columnData.get(ModuleDbSchemaXml.XML_ATTR_COLUMN_IDENTITY);
 
             if (!hasPrimaryKey && Boolean.parseBoolean(identityAttrValue)) {
                 hasPrimaryKey = true;
                 primaryKeyData.putAll(columnData);
             }
 
-            final String columnTypeValue = columnData.get(ColumnAttributes.TYPE.getName());
+            final String columnTypeValue = columnData.get(ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE);
             final TableColumnTypes columnType = TableColumnTypes.getByValue(columnTypeValue);
 
             if (columnType == null) {
@@ -118,11 +117,11 @@ public class DbSchemaXmlGenerator extends FileGenerator {
                 }
             }
             final String columnIdentityValue =
-                    columnData.get(ColumnAttributes.NAME.getName());
+                    columnData.get(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME);
 
             findOrCreateTag(
                     ModuleDbSchemaXml.XML_TAG_COLUMN,
-                    ColumnAttributes.NAME.getName(),
+                    ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME,
                     tableTag,
                     columnIdentityValue,
                     attributes
@@ -148,7 +147,7 @@ public class DbSchemaXmlGenerator extends FileGenerator {
     ) {
         final Map<String, String> attributes = new LinkedHashMap<>();
         attributes.put(
-                ColumnAttributes.TYPE.getName(),
+                ModuleDbSchemaXml.XML_ATTR_COLUMN_TYPE,
                 ModuleDbSchemaXml.XML_ATTR_TYPE_PK
         );
         attributes.put(
@@ -165,13 +164,13 @@ public class DbSchemaXmlGenerator extends FileGenerator {
         );
         final Map<String, String> pkColumnAttributes = new HashMap<>();
         final String columnIdentityValue = primaryKeyData.get(
-                ColumnAttributes.NAME.getName()
+                ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME
         );
-        pkColumnAttributes.put(ColumnAttributes.NAME.getName(), columnIdentityValue);
+        pkColumnAttributes.put(ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME, columnIdentityValue);
 
         findOrCreateTag(
                 ModuleDbSchemaXml.XML_TAG_COLUMN,
-                ColumnAttributes.NAME.getName(),
+                ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME,
                 pkTag,
                 columnIdentityValue,
                 pkColumnAttributes
@@ -203,7 +202,7 @@ public class DbSchemaXmlGenerator extends FileGenerator {
 
         findOrCreateTag(
                 ModuleDbSchemaXml.XML_TAG_COLUMN,
-                ColumnAttributes.NAME.getName(),
+                ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME,
                 pkIndexTag,
                 columnIdentityValue,
                 pkColumnAttributes

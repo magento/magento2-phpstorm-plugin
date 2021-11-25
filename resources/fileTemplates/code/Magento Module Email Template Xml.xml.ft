@@ -1,1 +1,0 @@
-<template id="${ID}" label="${LABEL}" file="${FILE_NAME}.html" type="${TYPE}" module="${MODULE}" area="${AREA}"/>

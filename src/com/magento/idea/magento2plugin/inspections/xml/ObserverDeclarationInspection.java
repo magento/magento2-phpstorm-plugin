@@ -44,7 +44,6 @@ public class ObserverDeclarationInspection extends PhpInspection {
 
     @NotNull
     @Override
-    @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.CognitiveComplexity"})
     public PsiElementVisitor buildVisitor(
             final @NotNull ProblemsHolder problemsHolder,
             final boolean isOnTheFly
@@ -56,8 +55,8 @@ public class ObserverDeclarationInspection extends PhpInspection {
             private final ProblemHighlightType errorSeverity = ProblemHighlightType.WARNING;
 
             @Override
-            public void visitFile(final @NotNull PsiFile file) {
-                if (!ModuleEventsXml.FILE_NAME.equals(file.getName())) {
+            public void visitFile(final PsiFile file) {
+                if (!file.getName().equals(ModuleEventsXml.FILE_NAME)) {
                     return;
                 }
 
@@ -67,21 +66,17 @@ public class ObserverDeclarationInspection extends PhpInspection {
                     return;
                 }
 
-                final EventIndex eventIndex = new EventIndex(file.getProject());
+                final EventIndex eventIndex = EventIndex.getInstance(file.getProject());
                 final HashMap<String, XmlTag> targetObserversHash = new HashMap<>();
 
                 for (final XmlTag eventXmlTag: xmlTags) {
                     final HashMap<String, XmlTag> eventProblems = new HashMap<>();
-                    if (!ModuleEventsXml.EVENT_TAG.equals(eventXmlTag.getName())) {
+                    if (!eventXmlTag.getName().equals("event")) {
                         continue;
                     }
 
                     final XmlAttribute eventNameAttribute =
                             eventXmlTag.getAttribute(Observer.NAME_ATTRIBUTE);
-
-                    if (eventNameAttribute == null) {
-                        continue;
-                    }
 
                     final String eventNameAttributeValue = eventNameAttribute.getValue();
                     if (eventNameAttributeValue == null) {
@@ -104,10 +99,6 @@ public class ObserverDeclarationInspection extends PhpInspection {
                         }
 
                         final String observerName = observerNameAttribute.getValue();
-                        if (observerName == null) {
-                            continue;
-                        }
-
                         final String observerKey = eventNameAttributeValue.concat("_")
                                 .concat(observerName);
                         if (targetObserversHash.containsKey(observerKey)) {
@@ -132,21 +123,15 @@ public class ObserverDeclarationInspection extends PhpInspection {
                         if (observerDisabledAttribute != null
                                 && observerDisabledAttribute.getValue() != null
                                 && observerDisabledAttribute.getValue().equals("true")
-                                && !observerName.isEmpty()
+                                && modulesWithSameObserverName.isEmpty()
                         ) {
-                            @Nullable final XmlAttributeValue valueElement
-                                    = observerNameAttribute.getValueElement();
-                            if (modulesWithSameObserverName.isEmpty() && valueElement != null) {
-                                problemsHolder.registerProblem(
-                                        valueElement,
-                                        inspectionBundle.message(
-                                                "inspection.observer.disabledObserverDoesNotExist"
-                                        ),
-                                        errorSeverity
-                                );
-                            } else {
-                                continue;
-                            }
+                            problemsHolder.registerProblem(
+                                    observerNameAttribute.getValueElement(),
+                                    inspectionBundle.message(
+                                            "inspection.observer.disabledObserverDoesNotExist"
+                                    ),
+                                    errorSeverity
+                            );
                         }
 
                         for (final HashMap<String, String> moduleEntry:
@@ -163,11 +148,11 @@ public class ObserverDeclarationInspection extends PhpInspection {
                                 problemsHolder.registerProblem(
                                         observerNameAttribute.getValueElement(),
                                         inspectionBundle.message(
-                                                "inspection.observer.duplicateInOtherPlaces",
-                                                observerName,
-                                                eventNameAttributeValue,
-                                                moduleName,
-                                                scope
+                                            "inspection.observer.duplicateInOtherPlaces",
+                                            observerName,
+                                            eventNameAttributeValue,
+                                            moduleName,
+                                            scope
                                         ),
                                         errorSeverity
                                 );
@@ -192,9 +177,9 @@ public class ObserverDeclarationInspection extends PhpInspection {
                 final Collection<PsiElement> indexedEvents = eventIndex.getEventElements(
                         eventNameAttributeValue,
                         GlobalSearchScope.getScopeRestrictedByFileTypes(
-                                GlobalSearchScope.allScope(file.getProject()),
-                                XmlFileType.INSTANCE
-                        ));
+                        GlobalSearchScope.allScope(file.getProject()),
+                        XmlFileType.INSTANCE
+                ));
 
                 for (final PsiElement indexedEvent: indexedEvents) {
                     final PsiFile indexedAttributeParent =
@@ -251,7 +236,7 @@ public class ObserverDeclarationInspection extends PhpInspection {
                 }
 
                 for (final XmlTag observerXmlTag: observerXmlTags) {
-                    if (!ModuleEventsXml.OBSERVER_TAG.equals(observerXmlTag.getName())) {
+                    if (!observerXmlTag.getName().equals("observer")) {
                         continue;
                     }
 
@@ -272,11 +257,10 @@ public class ObserverDeclarationInspection extends PhpInspection {
                     return;
                 }
 
-                if (!ModuleEventsXml.MODULE_TAG.equals(moduleDeclarationTag.getName())) {
+                if (!moduleDeclarationTag.getName().equals("module")) {
                     return;
                 }
-                final XmlAttribute moduleNameAttribute
-                        = moduleDeclarationTag.getAttribute(ModuleEventsXml.NAME_ATTRIBUTE);
+                final XmlAttribute moduleNameAttribute = moduleDeclarationTag.getAttribute("name");
                 if (moduleNameAttribute == null) {
                     return;
                 }

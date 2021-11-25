@@ -6,11 +6,12 @@
 package com.magento.idea.magento2plugin.actions.generation.data;
 
 public class ResourceModelData {
-
     private final String moduleName;
     private final String dbTableName;
     private final String resourceModelName;
     private final String entityIdColumn;
+    private final String namespace;
+    private final String fqn;
 
     /**
      * Resource Model Data.
@@ -19,17 +20,23 @@ public class ResourceModelData {
      * @param dbTableName String
      * @param resourceModelName String
      * @param entityIdColumn String
+     * @param namespace String
+     * @param fqn String
      */
     public ResourceModelData(
             final String moduleName,
             final String dbTableName,
             final String resourceModelName,
-            final String entityIdColumn
+            final String entityIdColumn,
+            final String namespace,
+            final String fqn
     ) {
         this.moduleName = moduleName;
         this.dbTableName = dbTableName;
         this.resourceModelName = resourceModelName;
         this.entityIdColumn = entityIdColumn;
+        this.namespace = namespace;
+        this.fqn = fqn;
     }
 
     /**
@@ -66,5 +73,23 @@ public class ResourceModelData {
      */
     public String getResourceModelName() {
         return resourceModelName;
+    }
+
+    /**
+     * Namespace getter.
+     *
+     * @return String.
+     */
+    public String getNamespace() {
+        return namespace;
+    }
+
+    /**
+     * FQN getter.
+     *
+     * @return String.
+     */
+    public String getFqn() {
+        return fqn;
     }
 }

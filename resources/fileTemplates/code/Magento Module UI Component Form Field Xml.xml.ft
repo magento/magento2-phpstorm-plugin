@@ -9,17 +9,4 @@
         <label translate="true">${LABEL}</label>
         <dataScope>${NAME}</dataScope>
     </settings>
-    #if(${FORM_ELEMENT} == 'checkbox')
-        <formElements>
-            <checkbox>
-                <settings>
-                    <valueMap>
-                        <map name="false" xsi:type="number">0</map>
-                        <map name="true" xsi:type="number">1</map>
-                    </valueMap>
-                    <prefer>toggle</prefer>
-                </settings>
-            </checkbox>
-        </formElements>
-    #end
 </field>

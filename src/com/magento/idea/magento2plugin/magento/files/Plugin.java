@@ -24,6 +24,12 @@ public class Plugin implements ModuleFileInterface {
         around//NOPMD
     }
 
+    //forbidden target method
+    public static final String CONSTRUCT_METHOD_NAME = "__construct";
+
+    //allowed methods access type
+    public static final String PUBLIC_ACCESS = "public";
+
     private String fileName;
 
     /**

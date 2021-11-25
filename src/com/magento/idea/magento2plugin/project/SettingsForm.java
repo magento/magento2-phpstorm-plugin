@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
@@ -12,7 +12,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComponentWithBrowseButton;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.php.frameworks.PhpFrameworkConfigurable;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
@@ -39,9 +38,6 @@ import org.jetbrains.annotations.Nullable;
         "PMD.TooManyMethods"
 })
 public class SettingsForm implements PhpFrameworkConfigurable {
-
-    private static final String DEFAULT_MAGENTO_EDITION_LABEL = "Platform Version:";
-
     private final Project project;
     private JCheckBox pluginEnabled;
     private JButton buttonReindex;
@@ -98,7 +94,6 @@ public class SettingsForm implements PhpFrameworkConfigurable {
 
         addPathListener();
         addMagentoVersionListener();
-        updateMagentoVersion();
 
         return (JComponent) panel;
     }
@@ -135,9 +130,11 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     }
 
     private void resolveMagentoVersion() {
-        if (getSettings().magentoVersion == null || getSettings().magentoEdition == null) {
+        if (getSettings().magentoVersion == null) {
             this.updateMagentoVersion();
+            return;
         }
+        magentoVersion.setText(getSettings().magentoVersion);
     }
 
     private boolean isMagentoPathChanged() {
@@ -161,6 +158,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         getSettings().defaultLicense = moduleDefaultLicenseName.getText();
         getSettings().mftfSupportEnabled = mftfSupportEnabled.isSelected();
         getSettings().magentoPath = getMagentoPath();
+        getSettings().magentoVersion = getMagentoVersion();
         buttonReindex.setEnabled(getSettings().pluginEnabled);
         regenerateUrnMapButton.setEnabled(getSettings().pluginEnabled);
     }
@@ -235,19 +233,8 @@ public class SettingsForm implements PhpFrameworkConfigurable {
      */
     public void updateMagentoVersion() {
         final String magentoPathValue = this.magentoPath.getTextField().getText();
-        final Pair<String, String> version = MagentoVersionUtil.getVersionData(
-                project,
-                magentoPathValue
-        );
-        final String resolvedVersion = version.getFirst();
-        final String resolvedEdition = version.getSecond() == null
-                ? DEFAULT_MAGENTO_EDITION_LABEL
-                : version.getSecond();
+        final String resolvedVersion = MagentoVersionUtil.get(project, magentoPathValue);
         magentoVersion.setText(resolvedVersion);
-        magentoVersionLabel.setText(resolvedEdition);
-
-        getSettings().magentoVersion = resolvedVersion;
-        getSettings().magentoEdition = resolvedEdition;
     }
 
     @Override

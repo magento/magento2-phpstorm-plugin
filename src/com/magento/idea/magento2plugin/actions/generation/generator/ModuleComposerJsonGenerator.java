@@ -44,10 +44,10 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
     ) {
         super(project);
         this.moduleComposerJsonData = moduleComposerJsonData;
-        this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
+        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         this.directoryGenerator = DirectoryGenerator.getInstance();
         this.camelCaseToHyphen = CamelCaseToHyphen.getInstance();
-        this.moduleIndex = new ModuleIndex(project);
+        this.moduleIndex = ModuleIndex.getInstance(project);
     }
 
     @Override

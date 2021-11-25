@@ -5,10 +5,8 @@
 
 package com.magento.idea.magento2plugin.magento.packages;
 
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
 import java.util.ArrayList;
 import java.util.List;
-import org.jetbrains.annotations.NotNull;
 
 public enum HttpMethod {
     GET("Magento\\Framework\\App\\Action\\HttpGetActionInterface"),
@@ -59,14 +57,5 @@ public enum HttpMethod {
         }
 
         return methodNameList;
-    }
-
-    /**
-     * Get name from type FQN.
-     *
-     * @return String
-     */
-    public @NotNull String getTypeName() {
-        return PhpClassGeneratorUtil.getNameFromFqn(getInterfaceFqn());
     }
 }

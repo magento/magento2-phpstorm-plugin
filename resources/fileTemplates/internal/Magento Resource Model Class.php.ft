@@ -21,11 +21,6 @@ class ${NAME}#if (${EXTENDS}) extends ${EXTENDS}#end#if (${IMPLEMENTS}) implemen
      */
     protected function _construct()
     {
-#if (${ENTITY_ID_REFERENCE})
-        $this->_init('${DB_NAME}', ${ENTITY_ID_REFERENCE});
-#else
         $this->_init('${DB_NAME}', '${ENTITY_ID_COLUMN}');
-#end
-        $this->_useIsObjectNew = true;
     }
 }

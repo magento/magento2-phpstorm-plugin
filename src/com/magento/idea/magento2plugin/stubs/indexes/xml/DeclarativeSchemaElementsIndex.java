@@ -80,9 +80,8 @@ public class DeclarativeSchemaElementsIndex extends FileBasedIndexExtension<Stri
         return 1;
     }
 
-    @NotNull
     @Override
-    public FileBasedIndex.InputFilter getInputFilter() {
+    public FileBasedIndex.@NotNull InputFilter getInputFilter() {
         return virtualFile -> (virtualFile.getFileType() == XmlFileType.INSTANCE
                 && virtualFile.getNameWithoutExtension().equals("db_schema"));
     }

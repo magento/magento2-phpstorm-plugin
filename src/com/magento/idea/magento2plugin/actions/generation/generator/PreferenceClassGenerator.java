@@ -42,7 +42,7 @@ public class PreferenceClassGenerator extends FileGenerator {
     ) {
         super(project);
         this.directoryGenerator = DirectoryGenerator.getInstance();
-        this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
+        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
         this.preferenceFileData = preferenceFileData;
         this.project = project;
@@ -80,7 +80,7 @@ public class PreferenceClassGenerator extends FileGenerator {
     }
 
     private PhpClass createPluginClass(final String actionName) {
-        PsiDirectory parentDirectory = new ModuleIndex(project)
+        PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(getPreferenceModule());
         final String[] pluginDirectories = preferenceFileData.getPreferenceDirectory()
                 .split(File.separator);

@@ -6,8 +6,6 @@
 package com.magento.idea.magento2plugin.magento.packages;
 
 public class MagentoPhpClass { //NOPMD
-
-    public static final String CONSTRUCT_METHOD_NAME = "__construct";
     public static final String CLOSING_TAG = "}";
     public static final String VOID_RETURN_TYPE = "void";
     public static final String MIXED_RETURN_TYPE = "mixed";

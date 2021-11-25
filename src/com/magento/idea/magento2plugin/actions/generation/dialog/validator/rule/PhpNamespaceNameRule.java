@@ -6,15 +6,13 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule;
 
 import com.jetbrains.php.refactoring.PhpNameUtil;
-import org.jetbrains.annotations.NotNull;
 
 public class PhpNamespaceNameRule implements ValidationRule {
-
     public static final String MESSAGE = "validator.namespace.isNotValid";
     private static final ValidationRule INSTANCE = new PhpNamespaceNameRule();
 
     @Override
-    public boolean check(final @NotNull String value) {
+    public boolean check(final String value) {
         return PhpNameUtil.isValidNamespaceName(value);
     }
 

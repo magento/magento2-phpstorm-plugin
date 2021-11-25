@@ -29,7 +29,7 @@ public class EventDispatchReferenceProvider extends PsiReferenceProvider {
     ) {
         final String value = StringUtil.unquoteString(element.getText());
         final List<PsiReference> psiReferences = new ArrayList<>();
-        final Collection<PsiElement> targets = new EventIndex(element.getProject())
+        final Collection<PsiElement> targets = EventIndex.getInstance(element.getProject())
                 .getEventElements(
                         value,
                         GlobalSearchScope.getScopeRestrictedByFileTypes(

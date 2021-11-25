@@ -1,12 +1,9 @@
 <?php
 
-namespace Foo\Bar\Ui\Component\Listing;
+namespace Foo\Bar\Ui\Listing;
 
 use Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider;
 
-/**
- * DataProvider component.
- */
 class GridDataProvider extends DataProvider
 {
     /**

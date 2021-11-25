@@ -29,22 +29,22 @@ public class PreferenceDiXmlGenerator extends FileGenerator {
     private final GetCodeTemplateUtil getCodeTemplateUtil;
     private final FindOrCreateDiXml findOrCreateDiXml;
     private final XmlFilePositionUtil positionUtil;
-    private final PreferenceDiXmFileData data;
+    private final PreferenceDiXmFileData preferenceDiXmFileData;
     private final Project project;
 
     /**
      * Constructor.
      *
-     * @param data PreferenceDiXmFileData
+     * @param preferenceDiXmFileData PreferenceDiXmFileData
      * @param project Project
      */
     public PreferenceDiXmlGenerator(
-            final @NotNull PreferenceDiXmFileData data,
+            final @NotNull PreferenceDiXmFileData preferenceDiXmFileData,
             final Project project
     ) {
         super(project);
 
-        this.data = data;
+        this.preferenceDiXmFileData = preferenceDiXmFileData;
         this.project = project;
         this.getCodeTemplateUtil = new GetCodeTemplateUtil(project);
         this.findOrCreateDiXml = new FindOrCreateDiXml(project);
@@ -52,22 +52,19 @@ public class PreferenceDiXmlGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(final @NotNull String actionName) {
+    public PsiFile generate(final String actionName) {
         final PsiFile diXmlFile = findOrCreateDiXml.execute(
                 actionName,
-                data.getPreferenceModule(),
-                data.getArea()
+                preferenceDiXmFileData.getPreferenceModule(),
+                preferenceDiXmFileData.getArea()
         );
 
-        final boolean isPreferenceDeclared = hasTypeAttributeValue((XmlFile) diXmlFile);
-
+        final boolean isPreferenceDeclared = getTypeAttributeValue((XmlFile) diXmlFile);
         if (isPreferenceDeclared) {
             return null;
         }
-
         WriteCommandAction.runWriteCommandAction(project, () -> {
             final StringBuffer textBuf = new StringBuffer();
-
             try {
                 textBuf.append(getCodeTemplateUtil.execute(
                         ModuleDiXml.TEMPLATE_PREFERENCE,
@@ -78,7 +75,6 @@ public class PreferenceDiXmlGenerator extends FileGenerator {
             }
 
             final int insertPos = positionUtil.getRootInsertPosition((XmlFile) diXmlFile);
-
             if (textBuf.length() > 0 && insertPos >= 0) {
                 final PsiDocumentManager psiDocumentManager =
                         PsiDocumentManager.getInstance(project);
@@ -93,22 +89,14 @@ public class PreferenceDiXmlGenerator extends FileGenerator {
         return diXmlFile;
     }
 
-    /**
-     * Check if type attribute has value.
-     *
-     * @param diXml XmlFile
-     *
-     * @return boolean
-     */
-    private boolean hasTypeAttributeValue(final XmlFile diXml) {
+    private boolean getTypeAttributeValue(final XmlFile diXml) {
         final Collection<XmlAttributeValue> preferences = XmlPsiTreeUtil
                 .findAttributeValueElements(
                         diXml,
                         ModuleDiXml.PREFERENCE_TAG_NAME,
                         ModuleDiXml.PREFERENCE_ATTR_FOR
                 );
-        final String fqn = data.getPreferenceFor();
-
+        final String fqn = preferenceDiXmFileData.getTargetClass().getPresentableFQN();
         for (final XmlAttributeValue preference: preferences) {
             if (PhpLangUtil.toPresentableFQN(preference.getValue()).equals(fqn)) {
                 return true;
@@ -118,14 +106,10 @@ public class PreferenceDiXmlGenerator extends FileGenerator {
         return false;
     }
 
-    /**
-     * Fill preference xml attributes.
-     *
-     * @param attributes Properties
-     */
     @Override
-    protected void fillAttributes(final @NotNull Properties attributes) {
-        attributes.setProperty("FOR", data.getPreferenceFor());
-        attributes.setProperty("TYPE", data.getPreferenceType());
+    protected void fillAttributes(final Properties attributes) {
+        attributes.setProperty("FOR", preferenceDiXmFileData.getTargetClass()
+                .getPresentableFQN());
+        attributes.setProperty("TYPE", preferenceDiXmFileData.getPreferenceFqn());
     }
 }

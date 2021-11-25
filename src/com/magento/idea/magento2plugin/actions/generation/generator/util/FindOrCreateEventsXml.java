@@ -38,8 +38,8 @@ public class FindOrCreateEventsXml {
     ) {
         final DirectoryGenerator directoryGenerator = DirectoryGenerator.getInstance();
         final FileFromTemplateGenerator fileFromTemplateGenerator =
-                new FileFromTemplateGenerator(project);
-        PsiDirectory parentDirectory = new ModuleIndex(project)
+                FileFromTemplateGenerator.getInstance(project);
+        PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(moduleName);
         final ArrayList<String> fileDirectories = new ArrayList<>();
         fileDirectories.add(Package.moduleBaseAreaDir);

@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+
 public class MagentoModuleGenerator extends WebProjectTemplate<MagentoProjectGeneratorSettings> {
     public static String actionName = "Magento 2 Module";
 
@@ -132,7 +133,7 @@ public class MagentoModuleGenerator extends WebProjectTemplate<MagentoProjectGen
      * @param project Project
      * @param baseDir Base directory
      * @param settings Settings
-     * @return void
+     * @return
      */
     private PsiFile generateRegistrationPhp(
             @NotNull final Project project,
@@ -164,7 +165,6 @@ public class MagentoModuleGenerator extends WebProjectTemplate<MagentoProjectGen
                 settings.getModuleName(),
                 settings.getModuleVersion(),
                 baseDir,
-                new ArrayList<>(),
                 false
         );
         final ModuleXmlGenerator moduleXmlGenerator =

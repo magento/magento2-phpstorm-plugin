@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
@@ -31,9 +31,6 @@ public class RegExUtil {
     public static final String IDENTIFIER_WITH_COLON
             = "[a-zA-Z0-9:_\\-]*";
 
-    public static final String IDENTIFIER_WITH_SLASH
-            = "[a-zA-Z0-9_\\-\\/]*";
-
     public static final String LOWER_SNAKE_CASE
             = "[a-z][a-z0-9_]*";
 
@@ -47,7 +44,6 @@ public class RegExUtil {
             = "(\\d+)\\.(\\d+)\\.(\\d+)[a-zA-Z0-9_\\-]*";
 
     public static class Magento {
-
         public static final String PHP_CLASS
                 = "[A-Z][a-zA-Z0-9]+";
 
@@ -70,19 +66,14 @@ public class RegExUtil {
 
         public static final String ROUTE_ID = "^[A-Za-z0-9_]{3,}$";
 
-        public static final String XML_IDENTIFIER =
-                "^([A-Z]+[a-zA-Z0-9]{1,}){1,}_[A-Z]+[A-Z0-9a-z]{1,}::[A-Za-z_0-9]{1,}$";
-
-        public static final String TEST_FILE_NAME = "\\w*Test.php";
-
-        public static final String TEST_CLASS_FQN =
-                "^(\\\\)?(\\w+\\\\){1}(\\w+\\\\){1}Test(\\\\\\w+)+$";
+        public static final String ACL_RESOURCE_ID
+                = "^([A-Z]+[a-zA-Z0-9]{1,}){1,}_[A-Z]+[A-Z0-9a-z]{1,}::[A-Za-z_0-9]{1,}$";
     }
 
-    public static class PhpRegex {
+    public class PhpRegex {
 
         public static final String CLASS_NAME
-                = "[a-zA-Z0-9_\\x7f-\\xff]*";
+                = "[A-Z][a-zA-Z0-9_\\x7f-\\xff]*";
 
         public static final String FQN
                 = CLASS_NAME + "(\\\\" + CLASS_NAME + ")*";
@@ -95,10 +86,5 @@ public class RegExUtil {
 
         public static final String CLASS_ELEMENT =
                 "\\\\?" + PhpRegex.FQN + "(" + CLASS_MEMBER_NAME + ")?.*";
-    }
-
-    public static class CustomTheme {
-        public static final String MODULE_NAME =
-                "app\\/design\\/(adminhtml|frontend)\\/\\w*\\/\\w*\\/\\w*";
     }
 }

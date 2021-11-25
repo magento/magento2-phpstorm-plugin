@@ -12,48 +12,27 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-import java.util.Arrays;
-import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class CopyMagentoPath extends CopyPathProvider {
-    public static final String PHTML_EXTENSION = "phtml";
-    public static final String JS_EXTENSION = "js";
-    public static final String CSS_EXTENSION = "css";
-    private final List<String> acceptedTypes
-            = Arrays.asList(PHTML_EXTENSION, JS_EXTENSION, CSS_EXTENSION);
-    public static final String SEPARATOR = "::";
+    public static final String PHTML = "phtml";
+    public static final String PHTML_SEPARATOR = "::";
     private int index;
-
     private final String[] templatePaths = {
         "view/frontend/templates/",
         "view/adminhtml/templates/",
-        "view/base/templates/",
-        "templates/"
-    };
-
-    private final String[] webPaths = {
-        "view/frontend/web/",
-        "view/adminhtml/web/",
-        "view/base/web/",
-        "web/"
+        "view/base/templates/"
     };
 
     @Override
     public void update(@NotNull final AnActionEvent event) {
         final VirtualFile virtualFile = event.getData(PlatformDataKeys.VIRTUAL_FILE);
-        if (isNotValidFile(virtualFile)) {
+        if (virtualFile != null && virtualFile.isDirectory()) {
             event.getPresentation().setVisible(false);
         }
-    }
-
-    private boolean isNotValidFile(final VirtualFile virtualFile) {
-        return virtualFile != null && virtualFile.isDirectory()
-                || virtualFile != null && !acceptedTypes.contains(virtualFile.getExtension());
     }
 
     @Nullable
@@ -63,44 +42,30 @@ public class CopyMagentoPath extends CopyPathProvider {
             @Nullable final VirtualFile virtualFile,
             @Nullable final Editor editor
     ) {
-        if (virtualFile == null) {
-            return null;
-        }
-        final PsiFile file
-                = PsiManager.getInstance(project).findFile(virtualFile);
-        if (file == null) {
-            return null;
-        }
-        final PsiDirectory directory = file.getContainingDirectory();
-        final String moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
-        if (moduleName == null) {
-            return null;
-        }
+        final PsiDirectory directory
+                = PsiManager.getInstance(project).findFile(virtualFile).getContainingDirectory();
         final StringBuilder fullPath = new StringBuilder(virtualFile.getPath());
+        final StringBuilder magentoPath
+                = new StringBuilder(GetModuleNameByDirectoryUtil.execute(directory, project));
+        String path = fullPath.toString();
 
-        index = -1;
-        String[] paths;
+        if (PHTML.equals(virtualFile.getExtension())) {
+            index = -1;
+            final int endIndex = getIndexOf(fullPath, templatePaths[++index]);
+            final int offset = templatePaths[index].length();
 
-        if (PHTML_EXTENSION.equals(virtualFile.getExtension())) {
-            paths = templatePaths;
-        } else if (JS_EXTENSION.equals(virtualFile.getExtension())
-                || CSS_EXTENSION.equals(virtualFile.getExtension())) {
-            paths = webPaths;
-        } else {
-            return fullPath.toString();
+            fullPath.replace(0, endIndex + offset, "");
+            magentoPath.append(PHTML_SEPARATOR);
+            magentoPath.append(fullPath);
+            path = magentoPath.toString();
         }
 
-        final int endIndex = getIndexOf(paths, fullPath, paths[++index]);
-        final int offset = paths[index].length();
-
-        fullPath.replace(0, endIndex + offset, "");
-
-        return moduleName + SEPARATOR + fullPath;
+        return path;
     }
 
-    private int getIndexOf(final String[] paths, final StringBuilder fullPath, final String path) {
+    private int getIndexOf(final StringBuilder fullPath, final String path) {
         return fullPath.lastIndexOf(path) == -1
-                ? getIndexOf(paths, fullPath, paths[++index])
+                ? getIndexOf(fullPath, templatePaths[++index])
                 : fullPath.lastIndexOf(path);
     }
 }

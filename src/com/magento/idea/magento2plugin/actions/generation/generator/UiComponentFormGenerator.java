@@ -14,37 +14,32 @@ import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFi
 import com.magento.idea.magento2plugin.actions.generation.generator.code.XmlDeclarationsGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderFile;
-import com.magento.idea.magento2plugin.magento.files.UiComponentFormXmlFile;
+import com.magento.idea.magento2plugin.magento.files.UiComponentFormXml;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
-import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.FileBasedIndexUtil;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 
 public class UiComponentFormGenerator extends FileGenerator {
-
-    private final UiComponentFormFileData data;
+    private final UiComponentFormFileData uiFormFileData;
     private final Project project;
 
     /**
-     * Ui Component form generator constructor.
+     * Constructor.
      *
-     * @param data UiFormFileData
+     * @param uiFormFileData UiFormFileData
      * @param project Project
      */
     public UiComponentFormGenerator(
-            final @NotNull UiComponentFormFileData data,
+            final @NotNull UiComponentFormFileData uiFormFileData,
             final Project project
     ) {
         super(project);
-        this.data = data;
+        this.uiFormFileData = uiFormFileData;
         this.project = project;
     }
 
@@ -52,7 +47,6 @@ public class UiComponentFormGenerator extends FileGenerator {
      * Creates a module UI form file.
      *
      * @param actionName String
-     *
      * @return PsiFile
      */
     @Override
@@ -60,24 +54,17 @@ public class UiComponentFormGenerator extends FileGenerator {
         final PsiFile formFile = createForm(
                 actionName
         );
-        generateButtonClasses(actionName);
+
+        createButtonClasses(actionName);
 
         return formFile;
     }
 
-    /**
-     * Generate buttons classes.
-     *
-     * @param actionName String
-     */
-    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
-    protected void generateButtonClasses(final @NotNull String actionName) {
-        for (final UiComponentFormButtonData buttonData : data.getButtons()) {
-            new UiComponentFormButtonBlockGenerator(
-                    buttonData,
-                    project,
-                    data.getEntityName(),
-                    data.getEntityId()
+    protected void createButtonClasses(final String actionName) {
+        for (final UiComponentFormButtonData buttonData: uiFormFileData.getButtons()) {
+            new UiComponentFormButtonPhpClassGenerator(//NOPMD
+                buttonData,
+                project
             ).generate(actionName);
         }
     }
@@ -86,7 +73,6 @@ public class UiComponentFormGenerator extends FileGenerator {
      * Finds or creates form.
      *
      * @param actionName String
-     *
      * @return PsiFile
      */
     protected PsiFile createForm(
@@ -94,87 +80,61 @@ public class UiComponentFormGenerator extends FileGenerator {
     ) {
         final DirectoryGenerator directoryGenerator = DirectoryGenerator.getInstance();
         final FileFromTemplateGenerator fileFromTemplateGenerator =
-                new FileFromTemplateGenerator(project);
+                FileFromTemplateGenerator.getInstance(project);
 
-        final String moduleName = data.getModuleName();
-        final PsiDirectory parentDirectory = new ModuleIndex(project)
+        final String moduleName = uiFormFileData.getModuleName();
+        PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(moduleName);
-
         final ArrayList<String> fileDirectories = new ArrayList<>();
         fileDirectories.add(Package.moduleViewDir);
-        final String area = data.getFormArea();
+        final String area = uiFormFileData.getFormArea();
         fileDirectories.add(getArea(area).toString());
         fileDirectories.add(Package.moduleViewUiComponentDir);
-
-        final PsiDirectory formDirectory =
-                directoryGenerator.findOrCreateSubdirectories(
-                        parentDirectory,
-                        fileDirectories.stream().collect(Collectors.joining(File.separator))
-                );
-
-        final String formName = data.getFormName();
-        final UiComponentFormXmlFile uiComponentFormXml = new UiComponentFormXmlFile(formName);
-        XmlFile formFile = (XmlFile) FileBasedIndexUtil.findModuleViewFile(
+        for (final String fileDirectory: fileDirectories) {
+            parentDirectory = directoryGenerator
+                .findOrCreateSubdirectory(parentDirectory, fileDirectory);
+        }
+        final String formName = uiFormFileData.getFormName();
+        final UiComponentFormXml uiComponentFormXml = new UiComponentFormXml(formName);
+        XmlFile formFile = (XmlFile) FileBasedIndexUtil.findModuleConfigFile(
                 uiComponentFormXml.getFileName(),
                 getArea(area),
-                moduleName,
-                project,
-                Package.moduleViewUiComponentDir
+                formName,
+                project
         );
-
         if (formFile == null) {
             formFile = (XmlFile) fileFromTemplateGenerator.generate(
                     uiComponentFormXml,
                     getAttributes(),
-                    formDirectory,
+                    parentDirectory,
                     actionName
             );
         }
 
-        if (formFile != null) {
-            new XmlDeclarationsGenerator(data, project).generate(formFile);
-        }
+        new XmlDeclarationsGenerator(uiFormFileData, project).generate(formFile);
 
         return formFile;
     }
 
-    /**
-     * Fill ui component form properties.
-     *
-     * @param attributes Properties
-     */
     @Override
-    protected void fillAttributes(final @NotNull Properties attributes) {
-        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
-
-        phpClassTypesBuilder
-                .appendProperty("NAME", data.getFormName())
-                .appendProperty("LABEL", data.getLabel())
-                .appendProperty("BUTTONS", data.getButtons().isEmpty() ? "" : "true")
-                .appendProperty("ROUTE", data.getRoute())
-                .appendProperty("SUBMIT_CONTROLLER",
-                        data.getSubmitControllerName().toLowerCase(new Locale("en","EN")))
-                .appendProperty("SUBMIT_ACTION",
-                        data.getSubmitActionName().toLowerCase(new Locale("en","EN")))
-                .appendProperty("DATA_PROVIDER",
-                        new UiComponentDataProviderFile(
-                                data.getModuleName(),
-                                data.getDataProviderName(),
-                                data.getDataProviderPath()
-                        ).getClassFqn()
-                )
-                .appendProperty("PRIMARY_FIELD", data.getFields().get(0).getName())
-                .mergeProperties(attributes);
+    protected void fillAttributes(final Properties attributes) {
+        attributes.setProperty("NAME", uiFormFileData.getFormName());
+        attributes.setProperty("LABEL", uiFormFileData.getLabel());
+        attributes.setProperty("BUTTONS", uiFormFileData.getButtons().isEmpty() ? "" : "true");
+        attributes.setProperty("ROUTE", uiFormFileData.getRoute());
+        attributes.setProperty(
+                "SUBMIT_CONTROLLER",
+                uiFormFileData.getSubmitControllerName().toLowerCase(new Locale("en","EN"))
+        );
+        attributes.setProperty(
+                "SUBMIT_ACTION",
+                uiFormFileData.getSubmitActionName().toLowerCase(new Locale("en","EN"))
+        );
+        attributes.setProperty("DATA_PROVIDER", uiFormFileData.getDataProviderFqn());
+        attributes.setProperty("PRIMARY_FIELD", uiFormFileData.getFields().get(0).getName());
     }
 
-    /**
-     * Get Area Enum by its name.
-     *
-     * @param area String
-     *
-     * @return Areas
-     */
-    private Areas getArea(final @NotNull String area) {
+    private Areas getArea(final String area) {
         return Areas.getAreaByString(area);
     }
 }

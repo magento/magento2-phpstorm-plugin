@@ -10,22 +10,21 @@
     </argument>
     <settings>
         <namespace>my_form</namespace>
-        <dataScope>data.general</dataScope>
         <deps>
             <dep>my_form.my_form_data_source</dep>
         </deps>
         <buttons>
-            <button name="saveEntity" class="Foo\Bar\Block\Form\Save"/>
-            <button name="backToEntity" class="Foo\Bar\Block\Form\Back"/>
-            <button name="deleteEntity" class="Foo\Bar\Block\Form\Delete"/>
-            <button name="customController" class="Foo\Bar\Block\Form\Custom"/>
+            <button name="saveEntity" class="Foo/Bar/Block/Form/Save"/>
+            <button name="backToEntity" class="Foo/Bar/Block/Form/Back"/>
+            <button name="deleteEntity" class="Foo/Bar/Block/Form/Delete"/>
+            <button name="customController" class="Foo/Bar/Block/Form/Custom"/>
         </buttons>
     </settings>
     <dataSource name="my_form_data_source" component="Magento_Ui/js/form/provider">
         <settings>
             <submitUrl path="customroute/myentity/save"/>
         </settings>
-        <dataProvider class="Foo\Bar\Ui\MyEntity\DataProvider" name="my_form_data_source">
+        <dataProvider class="Foo/Bar/Ui/MyEntity/DataProvider" name="my_form_data_source">
             <settings>
                 <requestFieldName>my_field</requestFieldName>
                 <primaryFieldName>my_field</primaryFieldName>

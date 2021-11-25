@@ -22,7 +22,6 @@ import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaXml;
-import com.magento.idea.magento2plugin.magento.packages.database.ColumnAttributes;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.DeclarativeSchemaElementsIndex;
 import java.util.ArrayList;
@@ -121,7 +120,7 @@ public class TableColumnNamesReferenceProvider extends PsiReferenceProvider {
                             for (final XmlTag columnTag : columnTags) {
                                 final String columnName =
                                         columnTag.getAttributeValue(
-                                                ColumnAttributes.NAME.getName()
+                                                ModuleDbSchemaXml.XML_ATTR_COLUMN_NAME
                                         );
                                 if (columnName != null
                                         && columnName.equals(columnIdentifier)) {

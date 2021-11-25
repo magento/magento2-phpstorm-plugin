@@ -55,7 +55,7 @@ public class AclResourceXmlInspection extends XmlSuppressableInspectionTool {
                     problemsHolder.registerProblem(
                             identifier,
                             inspectionBundle.message(
-                                "inspection.error.idAttributeCanNotBeEmpty",
+                                "inspection.aclResource.error.idAttributeCanNotBeEmpty",
                                 "id"
                             ),
                             ProblemHighlightType.WARNING
@@ -80,7 +80,7 @@ public class AclResourceXmlInspection extends XmlSuppressableInspectionTool {
                     problemsHolder.registerProblem(
                             identifier,
                             inspectionBundle.message(
-                                "inspection.error.missingAttribute",
+                                "inspection.aclResource.error.missingAttribute",
                                 "title"
                             ),
                             ProblemHighlightType.WARNING

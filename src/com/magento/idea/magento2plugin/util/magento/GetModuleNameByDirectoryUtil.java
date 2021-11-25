@@ -14,11 +14,11 @@ import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.magento.idea.magento2plugin.magento.files.RegistrationPhp;
 import com.magento.idea.magento2plugin.util.RegExUtil;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.jetbrains.annotations.Nullable;
 
 public final class GetModuleNameByDirectoryUtil {
+    public static final int THEME_SPLIT_COUNT = 1;
+    public static final String THEME_DIRECTORY_REGEX = "app\\/design\\/(adminhtml|frontend)\\/";
 
     private GetModuleNameByDirectoryUtil() {}
 
@@ -34,14 +34,10 @@ public final class GetModuleNameByDirectoryUtil {
             final Project project
     ) {
         // Check if directory is theme directory and return module name from directory path if yes
-        final String path = psiDirectory.getVirtualFile().getPath();
-        final Pattern pattern = Pattern.compile(RegExUtil.CustomTheme.MODULE_NAME);
-        final Matcher matcher = pattern.matcher(path);
-        while (matcher.find()) {
-            final String moduleNamePath =  matcher.group(0);
-            if (!moduleNamePath.isEmpty()) {
-                return moduleNamePath.split("/")[5];
-            }
+        final String[] splits = psiDirectory.getVirtualFile().getPath()
+                .split(THEME_DIRECTORY_REGEX);
+        if (splits.length > THEME_SPLIT_COUNT) {
+            return splits[1].split("\\/")[2];
         }
 
         final PhpFile registrationPhp = getRegistrationPhpRecursively(

@@ -120,8 +120,6 @@ public class CreateAnObserverDialog extends AbstractDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
-
-        addComponentListener(new FocusOnAFieldListener(() -> observerName.requestFocusInWindow()));
     }
 
     /**
@@ -194,7 +192,7 @@ public class CreateAnObserverDialog extends AbstractDialog {
     }
 
     private void createUIComponents() { //NOPMD
-        final List<String> allModulesList = new ModuleIndex(project)
+        final List<String> allModulesList = ModuleIndex.getInstance(project)
                 .getEditableModuleNames();
 
         this.observerModule = new FilteredComboBox(allModulesList);

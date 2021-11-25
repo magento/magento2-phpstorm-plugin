@@ -330,8 +330,4 @@
         </module>
     </module>
     <module name="SuppressWarningsFilter"/>
-    <module name="RegexpHeader">
-        <property name="header" value="^\/\*\n \* Copyright © Magento, Inc."/>
-        <property name="fileExtensions" value="java"/>
-    </module>
 </module>

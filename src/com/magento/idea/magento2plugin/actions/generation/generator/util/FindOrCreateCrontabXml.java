@@ -31,8 +31,8 @@ public class FindOrCreateCrontabXml {
         this.project = project;
 
         this.directoryGenerator = DirectoryGenerator.getInstance();
-        this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
-        this.moduleIndex = new ModuleIndex(project);
+        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        this.moduleIndex = ModuleIndex.getInstance(project);
     }
 
     /**

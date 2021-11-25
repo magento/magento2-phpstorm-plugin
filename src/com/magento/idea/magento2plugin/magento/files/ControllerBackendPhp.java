@@ -5,28 +5,43 @@
 
 package com.magento.idea.magento2plugin.magento.files;
 
-import org.jetbrains.annotations.NotNull;
+import com.intellij.lang.Language;
+import com.jetbrains.php.lang.PhpLanguage;
 
-public class ControllerBackendPhp extends AbstractPhpFile {
-
+@SuppressWarnings({
+        "PMD.FieldNamingConventions",
+        "PMD.NonThreadSafeSingleton",
+        "PMD.RedundantFieldInitializer"
+})
+public class ControllerBackendPhp implements ModuleFileInterface {
     public static final String TEMPLATE = "Magento Backend Controller Class";
     public static final String DEFAULT_DIR = "Controller/Adminhtml";
+    private static ControllerBackendPhp INSTANCE = null;
+    private String fileName;
 
-    public ControllerBackendPhp(
-            final @NotNull String moduleName,
-            final @NotNull String className
-    ) {
-        super(moduleName, className);
+    /**
+     * Returns a new instance of the class.
+     *
+     * @param className Controller class name
+     * @return ControllerBackendPhp
+     */
+    public static ControllerBackendPhp getInstance(final String className) {
+        if (null == INSTANCE) {
+            INSTANCE = new ControllerBackendPhp();
+        }
+
+        INSTANCE.setFileName(className.concat(".php"));
+
+        return INSTANCE;
     }
 
-    @Override
-    public String getDirectory() {
-        return DEFAULT_DIR;
-    }
-
-    @Override
-    public String getHumanReadableName() {
-        return null;
+    /**
+     * Get name of backend controller file.
+     *
+     * @return Name of the file.
+     */
+    public String getFileName() {
+        return this.fileName;
     }
 
     /**
@@ -36,5 +51,23 @@ public class ControllerBackendPhp extends AbstractPhpFile {
      */
     public String getTemplate() {
         return TEMPLATE;
+    }
+
+    /**
+     * Get return language.
+     *
+     * @return PHP language
+     */
+    public Language getLanguage() {
+        return PhpLanguage.INSTANCE;
+    }
+
+    /**
+     * Get name of controller file.
+     *
+     * @param filename Name of backend controller file.
+     */
+    private void setFileName(final String filename) {
+        this.fileName = filename;
     }
 }

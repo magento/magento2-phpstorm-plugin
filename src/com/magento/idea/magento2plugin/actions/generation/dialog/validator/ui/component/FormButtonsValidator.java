@@ -21,7 +21,6 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 public class FormButtonsValidator {
-
     private static final String BUTTON_CLASS_TEXT = "Button Class";
     private static final String BUTTON_DIRECTORY_TEXT = "Button Directory";
     private static final String BUTTON_LABEL_TEXT = "Button Label";

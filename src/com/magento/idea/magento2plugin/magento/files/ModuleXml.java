@@ -12,7 +12,6 @@ public class ModuleXml implements ModuleFileInterface {
     public static final String FILE_NAME = "module.xml";
     public static final String MODULE_ATTR_NAME = "name";
     public static final String TEMPLATE = "Magento Module XML";
-    public static final String NO_SEQUENCES_LABEL = "None";
     private static final ModuleXml INSTANCE = new ModuleXml();
 
     /**

@@ -11,7 +11,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFi
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldsetData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFileData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplateUtil;
-import com.magento.idea.magento2plugin.magento.files.UiComponentFormXmlFile;
+import com.magento.idea.magento2plugin.magento.files.UiComponentFormXml;
 import com.magento.idea.magento2plugin.util.FirstLetterToLowercaseUtil;
 import java.io.IOException;
 import java.util.Properties;
@@ -42,7 +42,7 @@ public class XmlDeclarationsGenerator {
      *
      * @param formFile XmlFile
      */
-    public void generate(final @NotNull XmlFile formFile) {
+    public void generate(final XmlFile formFile) {
         final PsiDocumentManager psiDocumentManager =
                 PsiDocumentManager.getInstance(project);
         final Document document = psiDocumentManager.getDocument(formFile);
@@ -95,7 +95,7 @@ public class XmlDeclarationsGenerator {
                 }
                 try {
                     fieldsStringBuffer.append(getCodeTemplateUtil.execute(
-                            UiComponentFormXmlFile.FIELD_TEMPLATE,
+                            UiComponentFormXml.FIELD_TEMPLATE,
                             fillAttributes(formFieldData)
                         )
                     );

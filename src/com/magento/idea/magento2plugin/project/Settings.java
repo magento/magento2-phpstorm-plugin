@@ -34,7 +34,6 @@ public class Settings implements PersistentStateComponent<Settings.State> {
     public boolean mftfSupportEnabled;
     public boolean myDoNotAskContentConfigAgain;
     public String magentoVersion;
-    public String magentoEdition;
 
     @Override
     @Nullable
@@ -45,8 +44,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
                 defaultLicense,
                 this.mftfSupportEnabled,
                 this.myDoNotAskContentConfigAgain,
-                this.magentoVersion,
-                this.magentoEdition
+                this.magentoVersion
         );
     }
 
@@ -69,7 +67,6 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         this.mftfSupportEnabled = state.isMftfSupportEnabled();
         this.myDoNotAskContentConfigAgain = state.isDoNotAskContentConfigAgain();
         this.magentoVersion = state.getMagentoVersion();
-        this.magentoEdition = state.getMagentoEdition();
     }
 
     public void addListener(final MagentoModuleDataListener listener) {
@@ -131,7 +128,6 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         public boolean mftfSupportEnabled;
         public boolean myDoNotAskContentConfigAgain;
         public String magentoVersion;
-        public String magentoEdition;
 
         public State() {//NOPMD
         }
@@ -145,7 +141,6 @@ public class Settings implements PersistentStateComponent<Settings.State> {
          * @param mftfSupportEnabled boolean
          * @param myDoNotAskContentConfigAgain boolean
          * @param magentoVersion String
-         * @param magentoEdition String
          */
         public State(
                 final boolean pluginEnabled,
@@ -153,8 +148,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
                 final String defaultLicenseName,
                 final boolean mftfSupportEnabled,
                 final boolean myDoNotAskContentConfigAgain,
-                final String magentoVersion,
-                final String magentoEdition
+                final String magentoVersion
         ) {
             this.pluginEnabled = pluginEnabled;
             this.magentoPath = magentoPath;
@@ -162,7 +156,6 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             this.mftfSupportEnabled = mftfSupportEnabled;
             this.myDoNotAskContentConfigAgain = myDoNotAskContentConfigAgain;
             this.magentoVersion = magentoVersion;
-            this.magentoEdition = magentoEdition;
         }
 
         @Attribute("enabled")
@@ -190,15 +183,6 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         @Tag("magentoVersion")
         public void setMagentoVersion(final String magentoVersion) {
             this.magentoVersion = magentoVersion;
-        }
-
-        public String getMagentoEdition() {
-            return magentoEdition;
-        }
-
-        @Tag("magentoEdition")
-        public void setMagentoEdition(final String magentoEdition) {
-            this.magentoEdition = magentoEdition;
         }
 
         /**

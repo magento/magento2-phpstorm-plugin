@@ -39,7 +39,7 @@ public class FindOrCreateDbSchemaWhitelistJson {
     public PsiFile execute(final @NotNull String actionName, final @NotNull String moduleName) {
         final DirectoryGenerator directoryGenerator = DirectoryGenerator.getInstance();
         final FileFromTemplateGenerator fileFromTemplateGenerator =
-                new FileFromTemplateGenerator(project);
+                FileFromTemplateGenerator.getInstance(project);
 
         final ModuleDbSchemaWhitelistJson moduleDbSchemaWhitelistJson =
                 ModuleDbSchemaWhitelistJson.getInstance();
@@ -52,7 +52,7 @@ public class FindOrCreateDbSchemaWhitelistJson {
         );
 
         if (dbSchemaWhitelistJson == null) {
-            PsiDirectory parentDirectory = new ModuleIndex(project)
+            PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                     .getModuleDirectoryByModuleName(moduleName);
             parentDirectory = directoryGenerator
                     .findOrCreateSubdirectory(parentDirectory, Package.moduleBaseAreaDir);

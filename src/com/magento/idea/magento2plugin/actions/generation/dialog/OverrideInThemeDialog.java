@@ -80,8 +80,6 @@ public class OverrideInThemeDialog extends AbstractDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
-
-        addComponentListener(new FocusOnAFieldListener(() -> theme.requestFocusInWindow()));
     }
 
     private void onOverride() {
@@ -133,7 +131,7 @@ public class OverrideInThemeDialog extends AbstractDialog {
     }
 
     private void fillThemeOptions() {
-        final List<String> themeNames = new ModuleIndex(project).getEditableThemeNames();
+        final List<String> themeNames = ModuleIndex.getInstance(project).getEditableThemeNames();
         for (final String themeName: themeNames) {
             theme.addItem(themeName);
         }

@@ -5,7 +5,7 @@
 
 package com.magento.idea.magento2plugin.linemarker.php;
 
-import com.intellij.openapi.application.ex.ApplicationManagerEx;
+import com.intellij.openapi.application.impl.ApplicationInfoImpl;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.linemarker.LinemarkerFixtureTestCase;
 
@@ -32,8 +32,8 @@ public class WebApiLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
         // work around for issue caused by
         // com.magento.idea.magento2plugin.linemarker.xml.LineMarkerXmlTagDecorator
         // in com.intellij.psi.impl.smartPointers.SmartPsiElementPointerImpl.createElementInfo
-        final boolean isInStressTestCurrent = ApplicationManagerEx.isInStressTest();
-        ApplicationManagerEx.setInStressTest(true);
+        final boolean isInStressTestCurrent = ApplicationInfoImpl.isInStressTest();
+        ApplicationInfoImpl.setInStressTest(true);
 
         myFixture.configureByFile(this.getFixturePath("TestService.php", "php"));
 
@@ -54,7 +54,7 @@ public class WebApiLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
         );
 
         //restore default value
-        ApplicationManagerEx.setInStressTest(isInStressTestCurrent);
+        ApplicationInfoImpl.setInStressTest(isInStressTestCurrent);
     }
 
     /**

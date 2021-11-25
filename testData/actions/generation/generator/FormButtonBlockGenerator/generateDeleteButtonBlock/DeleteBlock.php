@@ -1,33 +1,21 @@
 <?php
 
-namespace Foo\Bar\Block\Form\Book;
 
-use Foo\Bar\Model\Data\BookData;
+namespace Foo\Bar\Block\Form;
+
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 
 /**
- * Delete entity button.
+ * @inheritdoc
  */
-class DeleteBlock extends GenericButton implements ButtonProviderInterface
+class DeleteBlock implements ButtonProviderInterface
 {
     /**
-     * Retrieve Delete button settings.
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getButtonData(): array
+    public function getButtonData()
     {
-        return $this->wrapButtonSettings(
-            'Delete',
-            'delete',
-            'deleteConfirm(\''
-            . __('Are you sure you want to delete this book?')
-            . '\', \'' . $this->getUrl(
-                '*/*/delete',
-                [BookData::BOOK_ID => $this->getBookId()]
-            ) . '\')',
-            [],
-            20
-        );
+        return ['label' => __('Delete Entity'), 'class' => 'delete', 'on_click' => 'deleteConfirm(\'' . __('Are you sure you want to do this?') . '\', \'' . //TODO: adjust entity ID
+            $this->getUrl('*/*/${BUTTON_ROUTE}', ['entity_id' => '']) . '\', {"data": {}})', 'sort_order' => 30];
     }
 }

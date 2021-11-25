@@ -5,84 +5,173 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
-import com.magento.idea.magento2plugin.actions.generation.context.EntityCreatorContext;
+import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiFile;
+import com.jetbrains.php.lang.psi.PhpFile;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.ResourceModelData;
-import com.magento.idea.magento2plugin.actions.generation.dialog.util.ClassPropertyFormatterUtil;
-import com.magento.idea.magento2plugin.actions.generation.util.GenerationContextRegistry;
-import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
-import com.magento.idea.magento2plugin.magento.files.ResourceModelFile;
-import java.util.Objects;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
+import com.magento.idea.magento2plugin.bundles.CommonBundle;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
+import com.magento.idea.magento2plugin.indexes.ModuleIndex;
+import com.magento.idea.magento2plugin.magento.files.ResourceModelPhp;
+import com.magento.idea.magento2plugin.magento.packages.File;
+import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
+import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
-import org.jetbrains.annotations.NotNull;
+import javax.swing.JOptionPane;
 
-public class ModuleResourceModelGenerator extends PhpFileGenerator {
-
-    private final ResourceModelData data;
+public class ModuleResourceModelGenerator extends FileGenerator {
+    private final ResourceModelData resourceModelData;
+    private final Project project;
+    private final ValidatorBundle validatorBundle;
+    private final CommonBundle commonBundle;
+    private final GetFirstClassOfFile getFirstClassOfFile;
+    private final DirectoryGenerator directoryGenerator;
+    private final FileFromTemplateGenerator fileFromTemplateGenerator;
 
     /**
      * Generates new Resource Model PHP Class based on provided data.
      *
-     * @param data ResourceModelData
+     * @param resourceModelData ResourceModelData
      * @param project Project
      */
     public ModuleResourceModelGenerator(
-            final ResourceModelData data,
+            final ResourceModelData resourceModelData,
             final Project project
     ) {
-        this(data, project, true);
+        super(project);
+        this.project = project;
+        this.resourceModelData = resourceModelData;
+        this.directoryGenerator = DirectoryGenerator.getInstance();
+        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
+        this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
+        this.validatorBundle = new ValidatorBundle();
+        this.commonBundle = new CommonBundle();
     }
 
     /**
-     * Generates new Resource Model PHP Class based on provided data.
+     * Generates resource model class.
      *
-     * @param data ResourceModelData
-     * @param project Project
-     * @param checkFileAlreadyExists boolean
+     * @param actionName Action name
+     * @return PsiFile
      */
-    public ModuleResourceModelGenerator(
-            final ResourceModelData data,
-            final Project project,
-            final boolean checkFileAlreadyExists
-    ) {
-        super(project, checkFileAlreadyExists);
-        this.data = data;
-    }
+    public PsiFile generate(final String actionName) {
+        final PsiFile[] resourceModelFiles = new PsiFile[1];
 
-    @Override
-    protected AbstractPhpFile initFile() {
-        return new ResourceModelFile(data.getModuleName(), data.getResourceModelName());
-    }
-
-    /**
-     * Fill resource model file attributes.
-     *
-     * @param attributes Properties
-     */
-    @Override
-    protected void fillAttributes(final @NotNull Properties attributes) {
-        typesBuilder
-                .append("NAME", data.getResourceModelName(), false)
-                .append("NAMESPACE", file.getNamespace(), false)
-                .append("DB_NAME", data.getDbTableName(), false)
-                .append("ENTITY_ID_COLUMN", data.getEntityIdColumn(), false)
-                .append("EXTENDS", ResourceModelFile.ABSTRACT_DB);
-
-        final EntityCreatorContext context =
-                (EntityCreatorContext) GenerationContextRegistry.getInstance().getContext();
-
-        if (context != null && context.getUserData(EntityCreatorContext.DTO_TYPE) != null) {
-            final String dtoTypeFqn = context.getUserData(EntityCreatorContext.DTO_TYPE);
-            Objects.requireNonNull(dtoTypeFqn);
-            typesBuilder.append(
-                    "ENTITY_ID_REFERENCE",
-                    ClassPropertyFormatterUtil.formatNameToConstant(
-                            data.getEntityIdColumn(),
-                            dtoTypeFqn
-                    ),
-                    false
+        WriteCommandAction.runWriteCommandAction(project, () -> {
+            PhpClass resourceModel = GetPhpClassByFQN.getInstance(project).execute(
+                    getResourceModelFqn()
             );
-            typesBuilder.append("DTO_TYPE", dtoTypeFqn);
+
+            if (resourceModel != null) {
+                final String errorMessage = this.validatorBundle.message(
+                        "validator.file.alreadyExists",
+                        "Resource Model Class"
+                );
+                JOptionPane.showMessageDialog(
+                        null,
+                        errorMessage,
+                        commonBundle.message("common.error"),
+                        JOptionPane.ERROR_MESSAGE
+                );
+
+                return;
+            }
+
+            resourceModel = createClass(actionName);
+
+            if (resourceModel == null) {
+                final String errorMessage = this.validatorBundle.message(
+                        "validator.file.cantBeCreated",
+                        "Resource Model Class"
+                );
+                JOptionPane.showMessageDialog(
+                        null,
+                        errorMessage,
+                        commonBundle.message("common.error"),
+                        JOptionPane.ERROR_MESSAGE
+                );
+
+                return;
+            }
+
+            resourceModelFiles[0] = resourceModel.getContainingFile();
+        });
+
+        return resourceModelFiles[0];
+    }
+
+    /**
+     * Get module.
+     *
+     * @return String
+     */
+    public String getModuleName() {
+        return resourceModelData.getModuleName();
+    }
+
+    private String getResourceModelFqn() {
+        return resourceModelData.getFqn();
+    }
+
+    private PhpClass createClass(final String actionName) {
+        PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
+                .getModuleDirectoryByModuleName(getModuleName());
+        final PsiFile modelFile;
+
+        final String[] resourceModelDirectories = ResourceModelPhp.RESOURCE_MODEL_DIRECTORY.split(
+            File.separator
+        );
+        for (final String directory: resourceModelDirectories) {
+            parentDirectory = directoryGenerator.findOrCreateSubdirectory(
+                parentDirectory, directory
+            );
         }
+
+        final Properties attributes = getAttributes();
+        modelFile = fileFromTemplateGenerator.generate(
+                new ResourceModelPhp(resourceModelData.getResourceModelName()),
+                attributes,
+                parentDirectory,
+                actionName
+        );
+
+        if (modelFile == null) {
+            return null;
+        }
+
+        return getFirstClassOfFile.execute((PhpFile) modelFile);
+    }
+
+    protected void fillAttributes(final Properties attributes) {
+        attributes.setProperty("NAME", resourceModelData.getResourceModelName());
+        attributes.setProperty("NAMESPACE", resourceModelData.getNamespace());
+
+        attributes.setProperty("DB_NAME", resourceModelData.getDbTableName());
+        attributes.setProperty("ENTITY_ID_COLUMN", PhpClassGeneratorUtil.getNameFromFqn(
+                resourceModelData.getEntityIdColumn())
+        );
+        final List<String> uses = getUses();
+
+        attributes.setProperty(
+                "EXTENDS",
+                PhpClassGeneratorUtil.getNameFromFqn(ResourceModelPhp.ABSTRACT_DB)
+        );
+
+        attributes.setProperty("USES", PhpClassGeneratorUtil.formatUses(uses));
+    }
+
+    private List<String> getUses() {
+        return new ArrayList<>(Arrays.asList(
+                ResourceModelPhp.ABSTRACT_DB
+        ));
     }
 }

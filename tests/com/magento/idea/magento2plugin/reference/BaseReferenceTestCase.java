@@ -39,29 +39,13 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
     protected void assertHasReferenceToXmlAttributeValue(final String reference) {
         final PsiElement element = getElementFromCaret();
         for (final PsiReference psiReference: element.getReferences()) {
-            if (psiReference instanceof PolyVariantReferenceBase) {
-                final ResolveResult[] resolveResults
-                        = ((PolyVariantReferenceBase) psiReference).multiResolve(true);
+            final PsiElement resolved = psiReference.resolve();
+            if (!(resolved instanceof XmlAttributeValue)) {
+                continue;
+            }
 
-                for (final ResolveResult resolveResult : resolveResults) {
-                    final PsiElement resolved = resolveResult.getElement();
-                    if (!(resolved instanceof XmlAttributeValue)) {
-                        continue;
-                    }
-
-                    if (((XmlAttributeValue) resolved).getValue().equals(reference)) {
-                        return;
-                    }
-                }
-            } else {
-                final PsiElement resolved = psiReference.resolve();
-                if (!(resolved instanceof XmlAttributeValue)) {
-                    continue;
-                }
-
-                if (((XmlAttributeValue) resolved).getValue().equals(reference)) {
-                    return;
-                }
+            if (((XmlAttributeValue) resolved).getValue().equals(reference)) {
+                return;
             }
         }
         final String referenceNotFound =

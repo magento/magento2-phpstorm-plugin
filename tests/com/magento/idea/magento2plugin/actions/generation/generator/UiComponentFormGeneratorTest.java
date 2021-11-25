@@ -17,7 +17,6 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 public class UiComponentFormGeneratorTest extends BaseGeneratorTestCase {
-
     private static final String EXPECTED_DIRECTORY =
             "src/app/code/Foo/Bar/view/adminhtml/ui_component";
     private static final String MODULE_NAME = "Foo_Bar";
@@ -34,9 +33,9 @@ public class UiComponentFormGeneratorTest extends BaseGeneratorTestCase {
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
         final Project project = myFixture.getProject();
 
-        final List<UiComponentFormButtonData> buttons = getButtons();
-        final List<UiComponentFormFieldsetData> fieldsets = getFieldsets();
-        final List<UiComponentFormFieldData> fields = getFields();
+        final List buttons = getButtons();
+        final List fieldsets = getFieldsets();
+        final List fields = getFields();
 
         final UiComponentFormFileData uiComponentFormData = new UiComponentFormFileData(
                 FORM_NAME,
@@ -49,8 +48,7 @@ public class UiComponentFormGeneratorTest extends BaseGeneratorTestCase {
                 ROUTE,
                 "MyEntity",
                 "Save",
-                "DataProvider",
-                "Ui/MyEntity"
+                "Foo/Bar/Ui/MyEntity/DataProvider"
         );
         final UiComponentFormGenerator uiComponentFormGenerator = new UiComponentFormGenerator(
                 uiComponentFormData,
@@ -61,14 +59,9 @@ public class UiComponentFormGeneratorTest extends BaseGeneratorTestCase {
         assertGeneratedFileIsCorrect(expectedFile, EXPECTED_DIRECTORY, file);
     }
 
-    /**
-     * Get fields data.
-     *
-     * @return List
-     */
-    protected @NotNull List<UiComponentFormFieldData> getFields() {
-        final List<UiComponentFormFieldData> fields = new ArrayList<>();
-
+    @NotNull
+    protected List getFields() {
+        final List fields = new ArrayList();
         fields.add(new UiComponentFormFieldData(
                 "my_field",
                 "My Field",
@@ -87,18 +80,12 @@ public class UiComponentFormGeneratorTest extends BaseGeneratorTestCase {
                 "text",
                 "entity"
         ));
-
         return fields;
     }
 
-    /**
-     * Get fieldSets data.
-     *
-     * @return List
-     */
-    protected @NotNull List<UiComponentFormFieldsetData> getFieldsets() {
-        final List<UiComponentFormFieldsetData> fieldsets = new ArrayList<>();
-
+    @NotNull
+    protected List getFieldsets() {
+        final List fieldsets = new ArrayList();
         fieldsets.add(new UiComponentFormFieldsetData(
                 "general",
                 "General",
@@ -109,20 +96,14 @@ public class UiComponentFormGeneratorTest extends BaseGeneratorTestCase {
                 "Test Fieldset",
                 "20"
         ));
-
         return fieldsets;
     }
 
-    /**
-     * Get buttons data.
-     *
-     * @return List
-     */
-    protected @NotNull List<UiComponentFormButtonData> getButtons() {
-        final List<UiComponentFormButtonData> buttons = new ArrayList<>();
+    @NotNull
+    protected List getButtons() {
+        final List buttons = new ArrayList();
         final String namespace = "Foo/Bar/Block/Form";
         final String directory = "Block/Form";
-
         buttons.add(new UiComponentFormButtonData(
                 directory,
                 "SaveEntity",
@@ -132,7 +113,7 @@ public class UiComponentFormGeneratorTest extends BaseGeneratorTestCase {
                 "Save Entity",
                 "10",
                 FORM_NAME,
-                "Foo\\Bar\\Block\\Form\\Save"
+                "Foo/Bar/Block/Form/Save"
         ));
         buttons.add(new UiComponentFormButtonData(
                 directory,
@@ -143,7 +124,7 @@ public class UiComponentFormGeneratorTest extends BaseGeneratorTestCase {
                 "Back To Grid",
                 "20",
                 FORM_NAME,
-                "Foo\\Bar\\Block\\Form\\Back"
+                "Foo/Bar/Block/Form/Back"
         ));
         buttons.add(new UiComponentFormButtonData(
                 directory,
@@ -154,7 +135,7 @@ public class UiComponentFormGeneratorTest extends BaseGeneratorTestCase {
                 "Delete Entity",
                 "30",
                 FORM_NAME,
-                "Foo\\Bar\\Block\\Form\\Delete"
+                "Foo/Bar/Block/Form/Delete"
         ));
         buttons.add(new UiComponentFormButtonData(
                 directory,
@@ -165,9 +146,8 @@ public class UiComponentFormGeneratorTest extends BaseGeneratorTestCase {
                 "Custom Button",
                 "40",
                 FORM_NAME,
-                "Foo\\Bar\\Block\\Form\\Custom"
+                "Foo/Bar/Block/Form/Custom"
         ));
-
         return buttons;
     }
 }

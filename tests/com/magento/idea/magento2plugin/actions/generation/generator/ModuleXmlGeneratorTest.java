@@ -12,7 +12,6 @@ import com.magento.idea.magento2plugin.actions.generation.data.ModuleXmlData;
 import com.magento.idea.magento2plugin.magento.files.ModuleXml;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
-import java.util.Arrays;
 
 public class ModuleXmlGeneratorTest extends BaseGeneratorTestCase {
 
@@ -30,7 +29,6 @@ public class ModuleXmlGeneratorTest extends BaseGeneratorTestCase {
                 "Module",
                 null,
                 projectDir,
-                Arrays.asList("Magento_Catalog", "Magento_InventoryApi"),
                 true
         );
         final ModuleXmlGenerator moduleXmlGenerator = new ModuleXmlGenerator(
@@ -62,7 +60,6 @@ public class ModuleXmlGeneratorTest extends BaseGeneratorTestCase {
                 "Module",
                 null,
                 projectDir,
-                Arrays.asList("Magento_Catalog", "Magento_InventoryApi"),
                 false
         );
         final ModuleXmlGenerator moduleXmlGenerator = new ModuleXmlGenerator(

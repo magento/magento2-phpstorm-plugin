@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.NewControllerAction;
 import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
@@ -107,10 +108,6 @@ public class NewControllerDialog extends AbstractDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
-
-        addComponentListener(
-                new FocusOnAFieldListener(() -> controllerAreaSelect.requestFocusInWindow())
-        );
     }
 
     private String getModuleName() {
@@ -202,11 +199,8 @@ public class NewControllerDialog extends AbstractDialog {
         this.setVisible(false);
     }
 
-    /**
-     * Generate controller class file.
-     */
-    private void generateFile() {
-        new ModuleControllerClassGenerator(new ControllerFileData(
+    private PsiFile generateFile() {
+        return new ModuleControllerClassGenerator(new ControllerFileData(
                 getActionDirectory(),
                 getActionName(),
                 getModuleName(),
@@ -245,10 +239,7 @@ public class NewControllerDialog extends AbstractDialog {
                 File.separator,
                 Package.fqnSeparator
         );
-        final String controllerPart = getControllerName().replace(
-                File.separator,
-                Package.fqnSeparator
-        );
+        final String controllerPart = Package.fqnSeparator + getControllerName();
 
         return String.format(
                 "%s%s%s%s%s%s",

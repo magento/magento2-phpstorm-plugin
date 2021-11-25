@@ -33,9 +33,9 @@ import java.util.List;
 import java.util.Properties;
 import javax.swing.JOptionPane;
 
+@SuppressWarnings({"PMD.OnlyOneReturn", "PMD.DataflowAnomalyAnalysis"})
 public class ModuleControllerClassGenerator extends FileGenerator {
-
-    private final ControllerFileData data;
+    private final ControllerFileData controllerFileData;
     private final Project project;
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
@@ -46,18 +46,18 @@ public class ModuleControllerClassGenerator extends FileGenerator {
     /**
      * Generates new Controller PHP Class based on provided data.
      *
-     * @param data ControllerFileData
+     * @param controllerFileData ControllerFileData
      * @param project Project
      */
     public ModuleControllerClassGenerator(
-            final ControllerFileData data,
+            final ControllerFileData controllerFileData,
             final Project project
     ) {
         super(project);
         this.project = project;
-        this.data = data;
+        this.controllerFileData = controllerFileData;
         this.directoryGenerator = DirectoryGenerator.getInstance();
-        this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
+        this.fileFromTemplateGenerator = FileFromTemplateGenerator.getInstance(project);
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
@@ -67,10 +67,8 @@ public class ModuleControllerClassGenerator extends FileGenerator {
      * Generate controller class.
      *
      * @param actionName Action name
-     *
      * @return PsiFile
      */
-    @Override
     public PsiFile generate(final String actionName) {
         final PsiFile[] controllerFiles = new PsiFile[1];
 
@@ -123,7 +121,7 @@ public class ModuleControllerClassGenerator extends FileGenerator {
      * @return String
      */
     public String getControllerModule() {
-        return data.getControllerModule();
+        return controllerFileData.getControllerModule();
     }
 
     /**
@@ -139,17 +137,17 @@ public class ModuleControllerClassGenerator extends FileGenerator {
     private String getControllerFqn() {
         return String.format(
                 "%s%s%s",
-                data.getNamespace(),
+                controllerFileData.getNamespace(),
                 Package.fqnSeparator,
-                data.getActionClassName()
+                controllerFileData.getActionClassName()
         );
     }
 
     private PhpClass createControllerClass(final String actionName) {
-        PsiDirectory parentDirectory = new ModuleIndex(project)
+        PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(getControllerModule());
         final PsiFile controllerFile;
-        final String[] controllerDirectories = data.getActionDirectory().split(
+        final String[] controllerDirectories = controllerFileData.getActionDirectory().split(
                 File.separator
         );
         for (final String controllerDirectory: controllerDirectories) {
@@ -161,19 +159,16 @@ public class ModuleControllerClassGenerator extends FileGenerator {
         final Properties attributes = getAttributes();
         final String adminhtmlArea = Areas.adminhtml.toString();
 
-        if (data.getControllerArea().equals(adminhtmlArea)) {
+        if (controllerFileData.getControllerArea().equals(adminhtmlArea)) {
             controllerFile = fileFromTemplateGenerator.generate(
-                    new ControllerBackendPhp(data.getControllerModule(), data.getActionClassName()),
+                    ControllerBackendPhp.getInstance(controllerFileData.getActionClassName()),
                     attributes,
                     parentDirectory,
                     actionName
             );
         } else {
             controllerFile = fileFromTemplateGenerator.generate(
-                    new ControllerFrontendPhp(
-                            data.getControllerModule(),
-                            data.getActionClassName()
-                    ),
+                    ControllerFrontendPhp.getInstance(controllerFileData.getActionClassName()),
                     attributes,
                     parentDirectory,
                     actionName
@@ -187,13 +182,12 @@ public class ModuleControllerClassGenerator extends FileGenerator {
         return getFirstClassOfFile.execute((PhpFile) controllerFile);
     }
 
-    @Override
     protected void fillAttributes(final Properties attributes) {
-        final String actionClassName = data.getActionClassName();
+        final String actionClassName = controllerFileData.getActionClassName();
         attributes.setProperty("NAME", actionClassName);
-        attributes.setProperty("NAMESPACE", data.getNamespace());
+        attributes.setProperty("NAMESPACE", controllerFileData.getNamespace());
         final String httpMethodInterface = getHttpMethodInterfaceByMethod(
-                data.getHttpMethodName()
+                controllerFileData.getHttpMethodName()
         );
         attributes.setProperty(
                 "IMPLEMENTS",
@@ -202,10 +196,10 @@ public class ModuleControllerClassGenerator extends FileGenerator {
         final List<String> uses = getUses();
         uses.add(httpMethodInterface);
 
-        if (data.getIsInheritClass()) {
+        if (controllerFileData.getIsInheritClass()) {
             final String adminhtmlArea = Areas.adminhtml.toString();
 
-            if (data.getControllerArea().equals(adminhtmlArea)) {
+            if (controllerFileData.getControllerArea().equals(adminhtmlArea)) {
                 uses.add(Controller.ADMINHTML_CONTROLLER_FQN);
                 attributes.setProperty(
                         "EXTENDS",
@@ -213,7 +207,7 @@ public class ModuleControllerClassGenerator extends FileGenerator {
                 );
                 attributes.setProperty(
                         "ACL",
-                        PhpClassGeneratorUtil.getNameFromFqn(data.getAcl())
+                        PhpClassGeneratorUtil.getNameFromFqn(controllerFileData.getAcl())
                 );
             } else {
                 uses.add(Controller.FRONTEND_CONTROLLER_FQN);

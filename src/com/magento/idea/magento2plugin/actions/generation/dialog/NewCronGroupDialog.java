@@ -100,10 +100,6 @@ public class NewCronGroupDialog extends AbstractDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
-
-        addComponentListener(
-                new FocusOnAFieldListener(() -> cronGroupName.requestFocusInWindow())
-        );
     }
 
     /**

@@ -1,30 +1,21 @@
 <?php
 
-namespace Foo\Bar\Block\Form\Book;
+
+namespace Foo\Bar\Block\Form;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 
 /**
- * Save entity button.
+ * @inheritdoc
  */
-class SaveBlock extends GenericButton implements ButtonProviderInterface
+class SaveBlock implements ButtonProviderInterface
 {
     /**
-     * Retrieve Save button settings.
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getButtonData(): array
+    public function getButtonData()
     {
-        return $this->wrapButtonSettings(
-            'Save',
-            'save primary',
-            '',
-            [
-                'mage-init' => ['button' => ['event' => 'save']],
-                'form-role' => 'save'
-            ],
-            10
-        );
+        return ['label' => __('Save Entity'), 'class' => 'save primary', 'on_click' => '', 'data_attribute' => ['mage-init' => ['Magento_Ui/js/form/button-adapter' => ['actions' => [['targetName' => 'my_form.my_form', 'actionName' => 'save', 'params' => [true, //TODO: adjust entity ID
+            ['entity_id' => ''],]]]]]]];
     }
 }

@@ -48,7 +48,7 @@ public class CLICommandClassGenerator extends FileGenerator {
         this.phpClassData = phpClassData;
 
         this.dirGenerator = DirectoryGenerator.getInstance();
-        this.fileGenerator = new FileFromTemplateGenerator(project);
+        this.fileGenerator = FileFromTemplateGenerator.getInstance(project);
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
     }
@@ -83,7 +83,7 @@ public class CLICommandClassGenerator extends FileGenerator {
     private PsiDirectory getParentDirectory() {
         final String moduleName = this.phpClassData.getModuleName();
         final String[] subDirectories = this.phpClassData.getParentDirectory().split("/");
-        PsiDirectory parentDirectory = new ModuleIndex(project)
+        PsiDirectory parentDirectory = ModuleIndex.getInstance(project)
                 .getModuleDirectoryByModuleName(moduleName);
         for (final String subDirectory : subDirectories) {
             parentDirectory = dirGenerator.findOrCreateSubdirectory(parentDirectory, subDirectory);

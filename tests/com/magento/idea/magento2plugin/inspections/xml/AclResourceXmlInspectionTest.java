@@ -27,7 +27,7 @@ public class AclResourceXmlInspectionTest extends InspectionXmlFixtureTestCase {
         myFixture.configureByFile(getFixturePath(ModuleAclXml.FILE_NAME));
 
         final String errorMessage =  inspectionBundle.message(
-                "inspection.error.missingAttribute",
+                "inspection.aclResource.error.missingAttribute",
                 "title"
         );
 
@@ -41,7 +41,7 @@ public class AclResourceXmlInspectionTest extends InspectionXmlFixtureTestCase {
         myFixture.configureByFile(getFixturePath(ModuleAclXml.FILE_NAME));
 
         final String errorMessage =  inspectionBundle.message(
-                "inspection.error.missingAttribute",
+                "inspection.aclResource.error.missingAttribute",
                 "title"
         );
 
@@ -55,7 +55,7 @@ public class AclResourceXmlInspectionTest extends InspectionXmlFixtureTestCase {
         myFixture.configureByFile(getFixturePath(ModuleAclXml.FILE_NAME));
 
         final String errorMessage =  inspectionBundle.message(
-                "inspection.error.idAttributeCanNotBeEmpty",
+                "inspection.aclResource.error.idAttributeCanNotBeEmpty",
                 "id"
         );
 
