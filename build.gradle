@@ -70,7 +70,7 @@ publishPlugin {
     token = System.getenv("MAGENTO_PHPSTORM_intellijPublishToken")
 
     if (Boolean.valueOf(System.getenv("MAGENTO_PHPSTORM_isAlpha"))) {
-        channels = 'alpha'
+        channels = ['alpha']
         version = version + "-alpha-" + getDate()
     }
 }
