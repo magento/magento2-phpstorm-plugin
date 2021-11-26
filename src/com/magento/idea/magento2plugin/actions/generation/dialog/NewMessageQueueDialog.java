@@ -244,11 +244,12 @@ public class NewMessageQueueDialog extends AbstractDialog {
             generateTopology();
             generatePublisher();
             generateHandlerClass();
+
             if (getConnectionName().equals(MessageQueueConnections.DB.getType())) {
                 generateConsumerClass();
             }
-            this.setVisible(false);
         }
+        exit();
     }
 
     private void generateCommunication() {

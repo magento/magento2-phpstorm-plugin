@@ -140,12 +140,10 @@ public class NewCronGroupDialog extends AbstractDialog {
     }
 
     private void onOK() {
-        if (!validateFormFields()) {
-            return;
+        if (validateFormFields()) {
+            generateFile();
         }
-
-        generateFile();
-        this.setVisible(false);
+        exit();
     }
 
     @Override

@@ -157,30 +157,28 @@ public class CreateAPluginDialog extends AbstractDialog {
     }
 
     protected void onOK() {
-        if (!validateFormFields()) {
-            return;
+        if (validateFormFields()) {
+            new PluginClassGenerator(new PluginFileData(
+                    getPluginDirectory(),
+                    getPluginClassName(),
+                    getPluginType(),
+                    getPluginModule(),
+                    targetClass,
+                    targetMethod,
+                    getPluginClassFqn(),
+                    getNamespace()
+            ), project).generate(CreateAPluginAction.ACTION_NAME, true);
+
+            new PluginDiXmlGenerator(new PluginDiXmlData(
+                    getPluginArea(),
+                    getPluginModule(),
+                    targetClass,
+                    getPluginSortOrder(),
+                    getPluginName(),
+                    getPluginClassFqn()
+            ), project).generate(CreateAPluginAction.ACTION_NAME);
         }
-        new PluginClassGenerator(new PluginFileData(
-                getPluginDirectory(),
-                getPluginClassName(),
-                getPluginType(),
-                getPluginModule(),
-                targetClass,
-                targetMethod,
-                getPluginClassFqn(),
-                getNamespace()
-        ), project).generate(CreateAPluginAction.ACTION_NAME, true);
-
-        new PluginDiXmlGenerator(new PluginDiXmlData(
-                getPluginArea(),
-                getPluginModule(),
-                targetClass,
-                getPluginSortOrder(),
-                getPluginName(),
-                getPluginClassFqn()
-        ), project).generate(CreateAPluginAction.ACTION_NAME);
-
-        this.setVisible(false);
+        exit();
     }
 
     public String getPluginName() {

@@ -138,6 +138,7 @@ public class InjectAViewModelDialog extends AbstractDialog {
 
     protected void onOK() {
         if (!validateFormFields()) {
+            exit();
             return;
         }
         final String moduleName = GetModuleNameByDirectoryUtil.execute(
@@ -168,6 +169,7 @@ public class InjectAViewModelDialog extends AbstractDialog {
                     JOptionPane.ERROR_MESSAGE
             );
 
+            exit();
             return;
         }
 
@@ -176,9 +178,9 @@ public class InjectAViewModelDialog extends AbstractDialog {
                         this.getViewModelArgumentName(),
                         XsiTypes.object.toString(),
                         namespaceBuilder.getClassFqn()
-                ).generate(targetBlockTag);
+        ).generate(targetBlockTag);
 
-        this.setVisible(false);
+        exit();
     }
 
     public String getViewModelClassName() {

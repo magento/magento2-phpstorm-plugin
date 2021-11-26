@@ -303,19 +303,17 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     }
 
     private void onOK() {
-        if (!validateFormFields()) {
-            return;
+        if (validateFormFields()) {
+            generateViewControllerFile();
+            generateLayoutFile();
+            generateMenuFile();
+            generateAclXmlFile();
+            generateRoutesXmlFile();
+            generateDataProviderClass();
+            generateDataProviderDeclaration();
+            generateUiComponentFile();
         }
-
-        generateViewControllerFile();
-        generateLayoutFile();
-        generateMenuFile();
-        generateAclXmlFile();
-        generateRoutesXmlFile();
-        generateDataProviderClass();
-        generateDataProviderDeclaration();
-        generateUiComponentFile();
-        this.setVisible(false);
+        exit();
     }
 
     private void setDefaultValues() {

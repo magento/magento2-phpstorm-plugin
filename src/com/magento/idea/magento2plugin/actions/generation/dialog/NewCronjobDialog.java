@@ -281,6 +281,7 @@ public class NewCronjobDialog extends AbstractDialog {
      */
     private void onOK() {
         if (!validateFormFields()) {
+            exit();
             return;
         }
 
@@ -298,7 +299,7 @@ public class NewCronjobDialog extends AbstractDialog {
 
         // todo: catch validation exceptions
         this.generate(cronjobClassData, crontabXmlData);
-        this.setVisible(false);
+        exit();
     }
 
     /**

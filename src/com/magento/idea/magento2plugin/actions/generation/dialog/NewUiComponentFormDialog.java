@@ -416,18 +416,16 @@ public class NewUiComponentFormDialog extends AbstractDialog {
             fields.getCellEditor().stopCellEditing();
         }
 
-        if (!validateFormFields()) {
-            return;
+        if (validateFormFields()) {
+            generateRoutesXmlFile();
+            generateViewControllerFile();
+            generateSubmitControllerFile();
+            generateDataProviderFile();
+            generateLayoutFile();
+            generateFormFile();
+            generateAclXmlFile();
         }
-
-        generateRoutesXmlFile();
-        generateViewControllerFile();
-        generateSubmitControllerFile();
-        generateDataProviderFile();
-        generateLayoutFile();
-        generateFormFile();
-        generateAclXmlFile();
-        this.setVisible(false);
+        exit();
     }
 
     /**
