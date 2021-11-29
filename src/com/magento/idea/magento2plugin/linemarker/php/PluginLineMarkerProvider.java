@@ -92,6 +92,9 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
             );
 
             for (final PhpClass parent : phpClass.getSupers()) {
+                if (classPluginsMap.containsKey(parent.getFQN().substring(1))) {
+                    continue;
+                }
                 pluginsForClass.addAll(getPluginsForClass(parent));
             }
 
