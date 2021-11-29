@@ -37,6 +37,7 @@ public class WebApiLineMarkerProvider implements LineMarkerProvider {
         return null;
     }
 
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     @Override
     public void collectSlowLineMarkers(
             final @NotNull List<? extends PsiElement> psiElements,
@@ -82,10 +83,11 @@ public class WebApiLineMarkerProvider implements LineMarkerProvider {
     /**
      * Web API config nodes collector for service methods and classes. Has built in caching.
      */
+    @SuppressWarnings("PMD.AvoidDoubleBraceInitializationCheck")
     private static class WebApiRoutesCollector {
 
         private final Map<String, List<XmlTag>> routesCache = new HashMap<>();
-        private static final Map<String, Integer> HTTP_METHODS_SORT_ORDER = new HashMap<>() {//NOPMD
+        private static final Map<String, Integer> HTTP_METHODS_SORT_ORDER = new HashMap<>() {
             {
                 put("GET", 1);
                 put("PUT", 2);
