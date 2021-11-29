@@ -125,7 +125,7 @@ public class ReindexDialog extends AbstractDialog {
         );
         executor.run();
 
-        this.setVisible(false);
+        exit();
     }
 
     /**

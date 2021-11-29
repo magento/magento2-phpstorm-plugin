@@ -169,15 +169,12 @@ public class NewModelsDialog extends AbstractDialog {
      * Process generation.
      */
     private void onOK() {
-        if (!validateFormFields()) {
-            return;
+        if (validateFormFields()) {
+            generateModelFile();
+            generateResourceModelFile();
+            generateCollectionFile();
         }
-
-        generateModelFile();
-        generateResourceModelFile();
-        generateCollectionFile();
-
-        this.setVisible(false);
+        exit();
     }
 
     /**

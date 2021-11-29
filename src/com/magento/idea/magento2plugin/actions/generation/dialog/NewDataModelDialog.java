@@ -145,8 +145,8 @@ public class NewDataModelDialog extends AbstractDialog {
                 generateDataModelInterfaceFile();
                 generatePreferenceForInterface();
             }
-            this.setVisible(false);
         }
+        exit();
     }
 
     @Override

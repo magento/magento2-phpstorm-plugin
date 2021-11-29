@@ -117,11 +117,10 @@ public class NewViewModelDialog extends AbstractDialog {
     }
 
     protected void onOK() {
-        if (!validateFormFields()) {
-            return;
+        if (validateFormFields()) {
+            generateFile();
         }
-        generateFile();
-        this.setVisible(false);
+        exit();
     }
 
     private PsiFile generateFile() {

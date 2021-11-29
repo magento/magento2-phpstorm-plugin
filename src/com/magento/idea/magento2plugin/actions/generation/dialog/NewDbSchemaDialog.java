@@ -135,21 +135,18 @@ public class NewDbSchemaDialog extends AbstractDialog {
             columnsTable.getCellEditor().stopCellEditing();
         }
 
-        if (!validateFormFields()) {
-            return;
+        if (validateFormFields()) {
+            final DbSchemaXmlData dbSchemaXmlData = new DbSchemaXmlData(
+                    getTableName(),
+                    getTableResource(),
+                    getTableEngine(),
+                    getTableComment(),
+                    getColumns()
+            );
+            generateDbSchemaXmlFile(dbSchemaXmlData);
+            generateWhitelistJsonFile(dbSchemaXmlData);
         }
-
-        final DbSchemaXmlData dbSchemaXmlData = new DbSchemaXmlData(
-                getTableName(),
-                getTableResource(),
-                getTableEngine(),
-                getTableComment(),
-                getColumns()
-        );
-        generateDbSchemaXmlFile(dbSchemaXmlData);
-        generateWhitelistJsonFile(dbSchemaXmlData);
-
-        this.setVisible(false);
+        exit();
     }
 
     /**
