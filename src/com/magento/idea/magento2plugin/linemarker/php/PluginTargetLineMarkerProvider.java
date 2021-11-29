@@ -127,6 +127,9 @@ public class PluginTargetLineMarkerProvider implements LineMarkerProvider {
                     phpClass, phpClass.getPresentableFQN()
             );
             for (final PhpClass parent: phpClass.getSupers()) {
+                if (pluginClassesMap.containsKey(parent.getFQN().substring(1))) {
+                    continue;
+                }
                 classesForPlugin.addAll(getTargetClassesForPlugin(parent));
             }
 
