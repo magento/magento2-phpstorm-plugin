@@ -49,9 +49,9 @@ public class WebApiLineMarkerProvider implements LineMarkerProvider {
         if (!Settings.isEnabled(psiElements.get(0).getProject())) {
             return;
         }
+        final WebApiRoutesCollector collector = new WebApiRoutesCollector();
 
         for (final PsiElement psiElement : psiElements) {
-            final WebApiRoutesCollector collector = new WebApiRoutesCollector();
             List<XmlTag> results = new ArrayList<>();
 
             if (psiElement instanceof Method) {
@@ -64,14 +64,14 @@ public class WebApiLineMarkerProvider implements LineMarkerProvider {
                 continue;
             }
 
-            StringBuilder tooltipText = new StringBuilder(
+            final StringBuilder tooltipText = new StringBuilder(
                     "Navigate to Web API configuration:<pre>"
             );
             for (final XmlTag routeTag : results) {
-                tooltipText.append(routeTag.getName()).append("\n");
+                tooltipText.append(routeTag.getName()).append('\n');
             }
             tooltipText.append("</pre>");
-            NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder
+            final NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder
                     .create(MagentoIcons.WEB_API)
                     .setTargets(results)
                     .setTooltipText(tooltipText.toString());
@@ -85,7 +85,7 @@ public class WebApiLineMarkerProvider implements LineMarkerProvider {
     private static class WebApiRoutesCollector {
 
         private final Map<String, List<XmlTag>> routesCache = new HashMap<>();
-        private static final Map<String, Integer> HTTP_METHODS_SORT_ORDER = new HashMap<>() {
+        private static final Map<String, Integer> HTTP_METHODS_SORT_ORDER = new HashMap<>() {//NOPMD
             {
                 put("GET", 1);
                 put("PUT", 2);
@@ -155,7 +155,7 @@ public class WebApiLineMarkerProvider implements LineMarkerProvider {
             }
 
             for (final PhpClass parent : method.getContainingClass().getSupers()) {
-                for (Method parentMethod : parent.getMethods()) {
+                for (final Method parentMethod : parent.getMethods()) {
                     if (parentMethod.getName().equals(method.getName())) {
                         if (routesForMethod.containsKey(parentMethod.getFQN())) {
                             continue;
@@ -179,9 +179,9 @@ public class WebApiLineMarkerProvider implements LineMarkerProvider {
         private void sortRoutes(final List<XmlTag> routes) {
             routes.sort(
                     (firstTag, secondTag) -> {
-                        String substring = firstTag.getName().substring(2, 5);
-                        Integer firstSortOrder = HTTP_METHODS_SORT_ORDER.get(substring);
-                        Integer secondSortOrder = HTTP_METHODS_SORT_ORDER.get(
+                        final String substring = firstTag.getName().substring(2, 5);
+                        final Integer firstSortOrder = HTTP_METHODS_SORT_ORDER.get(substring);
+                        final Integer secondSortOrder = HTTP_METHODS_SORT_ORDER.get(
                                 secondTag.getName().substring(2, 5)
                         );
                         if (firstSortOrder.compareTo(secondSortOrder) == 0) {
