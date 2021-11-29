@@ -117,7 +117,7 @@ public class WebApiLineMarkerProvider implements LineMarkerProvider {
             final String methodFqn = method.getFQN();
 
             if (!routesCache.containsKey(methodFqn)) {
-                List<XmlTag> routesForMethod = extractRoutesForMethod(method);
+                final List<XmlTag> routesForMethod = extractRoutesForMethod(method);
                 sortRoutes(routesForMethod);
                 routesCache.put(methodFqn, routesForMethod);
             }
@@ -132,16 +132,40 @@ public class WebApiLineMarkerProvider implements LineMarkerProvider {
          * Results are not cached.
          */
         public List<XmlTag> extractRoutesForMethod(final @NotNull Method method) {
-            final List<XmlTag> routesForMethod = WebApiTypeIndex.getWebApiRoutes(method);
+            final List<XmlTag> routesForMethod = new ArrayList<>();
+            final Map<String, List<XmlTag>> routesForMethodMap = new HashMap<>();
+
+            for (final Map.Entry<String, List<XmlTag>> entry
+                    : extractRoutesForMethodRecursively(method, routesForMethodMap).entrySet()) {
+                routesForMethod.addAll(entry.getValue());
+            }
+
+            return routesForMethod;
+        }
+
+        private Map<String, List<XmlTag>> extractRoutesForMethodRecursively(
+                final @NotNull Method method,
+                final Map<String, List<XmlTag>> routesForMethod
+        ) {
+            routesForMethod.put(method.getFQN(), WebApiTypeIndex.getWebApiRoutes(method));
             final PhpClass phpClass = method.getContainingClass();
 
             if (phpClass == null) {
                 return routesForMethod;
             }
+
             for (final PhpClass parent : method.getContainingClass().getSupers()) {
                 for (Method parentMethod : parent.getMethods()) {
                     if (parentMethod.getName().equals(method.getName())) {
-                        routesForMethod.addAll(extractRoutesForMethod(parentMethod));
+                        if (routesForMethod.containsKey(parentMethod.getFQN())) {
+                            continue;
+                        }
+                        routesForMethod.putAll(
+                                extractRoutesForMethodRecursively(
+                                        parentMethod,
+                                        routesForMethod
+                                )
+                        );
                     }
                 }
             }
