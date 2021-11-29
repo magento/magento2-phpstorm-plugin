@@ -83,18 +83,18 @@ public class WebApiLineMarkerProvider implements LineMarkerProvider {
     /**
      * Web API config nodes collector for service methods and classes. Has built in caching.
      */
-    @SuppressWarnings("PMD.AvoidDoubleBraceInitializationCheck")
     private static class WebApiRoutesCollector {
 
         private final Map<String, List<XmlTag>> routesCache = new HashMap<>();
-        private static final Map<String, Integer> HTTP_METHODS_SORT_ORDER = new HashMap<>() {
-            {
-                put("GET", 1);
-                put("PUT", 2);
-                put("POS", 3);
-                put("DEL", 4);
-            }
-        };
+        private final Map<String, Integer> httpMethodsSortOrder;
+
+        public WebApiRoutesCollector() {
+            httpMethodsSortOrder = new HashMap<>();
+            httpMethodsSortOrder.put("GET", 1);
+            httpMethodsSortOrder.put("PUT", 2);
+            httpMethodsSortOrder.put("POS", 3);
+            httpMethodsSortOrder.put("DEL", 4);
+        }
 
         /**
          * Get sorted list of Web API routes related to the specified class.
@@ -182,8 +182,8 @@ public class WebApiLineMarkerProvider implements LineMarkerProvider {
             routes.sort(
                     (firstTag, secondTag) -> {
                         final String substring = firstTag.getName().substring(2, 5);
-                        final Integer firstSortOrder = HTTP_METHODS_SORT_ORDER.get(substring);
-                        final Integer secondSortOrder = HTTP_METHODS_SORT_ORDER.get(
+                        final Integer firstSortOrder = httpMethodsSortOrder.get(substring);
+                        final Integer secondSortOrder = httpMethodsSortOrder.get(
                                 secondTag.getName().substring(2, 5)
                         );
                         if (firstSortOrder.compareTo(secondSortOrder) == 0) {
