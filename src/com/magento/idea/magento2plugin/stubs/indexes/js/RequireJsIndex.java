@@ -43,30 +43,45 @@ public class RequireJsIndex extends FileBasedIndexExtension<String, String> {
             final Map<String, String> map = new HashMap<>();
             final JSFile jsFile = (JSFile) inputData.getPsiFile();
 
-            final JSVarStatement jsVarStatement = PsiTreeUtil.getChildOfType(jsFile, JSVarStatement.class);
+            final JSVarStatement jsVarStatement = PsiTreeUtil.getChildOfType(
+                    jsFile,
+                    JSVarStatement.class
+            );
+
             if (jsVarStatement == null) {
                 return map;
             }
             final JSVariable[] jsVariableList = jsVarStatement.getVariables();
+
             for (final JSVariable jsVariable : jsVariableList) {
                 final String name = jsVariable.getName();
+
                 if (name.equals("config")) {
-                    final JSObjectLiteralExpression config = PsiTreeUtil.getChildOfType(jsVariable, JSObjectLiteralExpression.class);
+                    final JSObjectLiteralExpression config = PsiTreeUtil.getChildOfType(
+                            jsVariable,
+                            JSObjectLiteralExpression.class
+                    );
+
                     if (config == null) {
                         return map;
                     }
                     parseConfigMap(map, config);
 
                     final JSProperty pathsMap = config.findProperty("paths");
+
                     if (pathsMap == null) {
                         return map;
                     }
-                    final JSObjectLiteralExpression[] pathGroupsWrappers = PsiTreeUtil.getChildrenOfType(pathsMap, JSObjectLiteralExpression.class);
+                    final JSObjectLiteralExpression[] pathGroupsWrappers = PsiTreeUtil
+                            .getChildrenOfType(pathsMap, JSObjectLiteralExpression.class);
+
                     for (final JSObjectLiteralExpression pathGroupsWrapper : pathGroupsWrappers) {
                         final JSProperty[] allConfigs = pathGroupsWrapper.getProperties();
+
                         for (final JSProperty mapping : allConfigs) {
                             final String nameConfig = mapping.getName();
                             final JSExpression value = mapping.getValue();
+
                             if (value == null) {
                                 continue;
                             }
@@ -86,21 +101,29 @@ public class RequireJsIndex extends FileBasedIndexExtension<String, String> {
             final JSObjectLiteralExpression config
     ) {
         final JSProperty configMap = config.findProperty("map");
+
         if (configMap == null) {
             return;
         }
 
-        final JSObjectLiteralExpression[] configGroupsWrappers = PsiTreeUtil.getChildrenOfType(configMap, JSObjectLiteralExpression.class);
+        final JSObjectLiteralExpression[] configGroupsWrappers = PsiTreeUtil.getChildrenOfType(
+                configMap,
+                JSObjectLiteralExpression.class
+        );
         for (final JSObjectLiteralExpression configGroupsWrapper : configGroupsWrappers) {
             final PsiElement[] configGroups = configGroupsWrapper.getChildren();
 
             for (final PsiElement configGroup : configGroups) {
-                final JSObjectLiteralExpression mappingWrapper = PsiTreeUtil.getChildOfType(configGroup, JSObjectLiteralExpression.class);
+                final JSObjectLiteralExpression mappingWrapper = PsiTreeUtil.getChildOfType(
+                        configGroup,
+                        JSObjectLiteralExpression.class
+                );
                 final JSProperty[] allConfigs = mappingWrapper.getProperties();
 
                 for (final JSProperty mapping : allConfigs) {
                     final String nameConfig = mapping.getName();
                     final JSExpression value = mapping.getValue();
+
                     if (value == null) {
                         continue;
                     }
@@ -118,10 +141,9 @@ public class RequireJsIndex extends FileBasedIndexExtension<String, String> {
 
     @Override
     public @NotNull FileBasedIndex.InputFilter getInputFilter() {
-        return virtualFile -> (
+        return virtualFile ->
                 virtualFile.getFileType().equals(JavaScriptFileType.INSTANCE)
-                        && virtualFile.getName().equals("requirejs-config.js")
-        );
+                        && virtualFile.getName().equals("requirejs-config.js");
     }
 
     @Override
@@ -134,6 +156,7 @@ public class RequireJsIndex extends FileBasedIndexExtension<String, String> {
         return 1;
     }
 
+    @Override
     public @NotNull DataExternalizer<String> getValueExternalizer() {
         return EnumeratorStringDescriptor.INSTANCE;
     }
