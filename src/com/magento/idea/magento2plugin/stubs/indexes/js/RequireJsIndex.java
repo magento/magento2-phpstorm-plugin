@@ -103,18 +103,7 @@ public class RequireJsIndex extends FileBasedIndexExtension<String, String> {
                 if (mappingWrapper == null) {
                     continue;
                 }
-                final JSProperty[] allConfigs = mappingWrapper.getProperties();
-
-                for (final JSProperty mapping : allConfigs) {
-                    final String nameConfig = mapping.getName();
-                    final JSExpression value = mapping.getValue();
-
-                    if (value == null) {
-                        continue;
-                    }
-                    final String valueConfig = value.getText();
-                    map.put(nameConfig, valueConfig);
-                }
+                processObjectProperties(map, mappingWrapper.getProperties());
             }
         }
     }
@@ -136,18 +125,23 @@ public class RequireJsIndex extends FileBasedIndexExtension<String, String> {
         }
 
         for (final JSObjectLiteralExpression pathGroupsWrapper : pathGroupsWrappers) {
-            final JSProperty[] allConfigs = pathGroupsWrapper.getProperties();
+            processObjectProperties(map, pathGroupsWrapper.getProperties());
+        }
+    }
 
-            for (final JSProperty mapping : allConfigs) {
-                final String nameConfig = mapping.getName();
-                final JSExpression value = mapping.getValue();
+    private void processObjectProperties(
+            final Map<String, String> map,
+            final JSProperty... allConfigs
+    ) {
+        for (final JSProperty mapping : allConfigs) {
+            final String nameConfig = mapping.getName();
+            final JSExpression value = mapping.getValue();
 
-                if (value == null) {
-                    continue;
-                }
-                final String valueConfig = value.getText();
-                map.put(nameConfig, valueConfig);
+            if (value == null) {
+                continue;
             }
+            final String valueConfig = value.getText();
+            map.put(nameConfig, valueConfig);
         }
     }
 
