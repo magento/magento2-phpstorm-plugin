@@ -2,36 +2,46 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.stubs.indexes.js;
 
 import com.intellij.lang.javascript.JavaScriptFileType;
-import com.intellij.lang.javascript.psi.*;
+import com.intellij.lang.javascript.psi.JSExpression;
+import com.intellij.lang.javascript.psi.JSFile;
+import com.intellij.lang.javascript.psi.JSObjectLiteralExpression;
+import com.intellij.lang.javascript.psi.JSProperty;
+import com.intellij.lang.javascript.psi.JSVarStatement;
+import com.intellij.lang.javascript.psi.JSVariable;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.util.indexing.*;
+import com.intellij.util.indexing.DataIndexer;
+import com.intellij.util.indexing.FileBasedIndex;
+import com.intellij.util.indexing.FileBasedIndexExtension;
+import com.intellij.util.indexing.FileContent;
+import com.intellij.util.indexing.ID;
 import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
-import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
 
 public class RequireJsIndex extends FileBasedIndexExtension<String, String> {
-    public static final ID<String, String> KEY =
-            ID.create("com.magento.idea.magento2plugin.stubs.indexes.require_js");
 
-    @NotNull
+    public static final ID<String, String> KEY = ID.create(
+            "com.magento.idea.magento2plugin.stubs.indexes.require_js"
+    );
+
     @Override
-    public ID<String, String> getName() {
+    public @NotNull ID<String, String> getName() {
         return KEY;
     }
 
-    @NotNull
     @Override
-    public DataIndexer<String, String, FileContent> getIndexer() {
+    public @NotNull DataIndexer<String, String, FileContent> getIndexer() {
         return inputData -> {
             Map<String, String> map = new HashMap<>();
-            JSFile jsFile = (JSFile)inputData.getPsiFile();
+            JSFile jsFile = (JSFile) inputData.getPsiFile();
 
             JSVarStatement jsVarStatement = PsiTreeUtil.getChildOfType(jsFile, JSVarStatement.class);
             if (jsVarStatement == null) {
@@ -98,17 +108,16 @@ public class RequireJsIndex extends FileBasedIndexExtension<String, String> {
         }
     }
 
-    @NotNull
     @Override
-    public KeyDescriptor<String> getKeyDescriptor() {
+    public @NotNull KeyDescriptor<String> getKeyDescriptor() {
         return new EnumeratorStringDescriptor();
     }
 
-    @NotNull
     @Override
-    public FileBasedIndex.InputFilter getInputFilter() {
+    public @NotNull FileBasedIndex.InputFilter getInputFilter() {
         return virtualFile -> (
-                virtualFile.getFileType().equals(JavaScriptFileType.INSTANCE) && virtualFile.getName().equals("requirejs-config.js")
+                virtualFile.getFileType().equals(JavaScriptFileType.INSTANCE)
+                        && virtualFile.getName().equals("requirejs-config.js")
         );
     }
 
@@ -122,8 +131,7 @@ public class RequireJsIndex extends FileBasedIndexExtension<String, String> {
         return 1;
     }
 
-    @NotNull
-    public DataExternalizer<String> getValueExternalizer() {
+    public @NotNull DataExternalizer<String> getValueExternalizer() {
         return EnumeratorStringDescriptor.INSTANCE;
     }
 }
