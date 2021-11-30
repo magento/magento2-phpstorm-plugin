@@ -10,6 +10,7 @@ import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlTag;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -180,20 +181,53 @@ public class WebApiLineMarkerProvider implements LineMarkerProvider {
          */
         private void sortRoutes(final List<XmlTag> routes) {
             routes.sort(
-                    (firstTag, secondTag) -> {
-                        final String substring = firstTag.getName().substring(2, 5);
-                        final Integer firstSortOrder = httpMethodsSortOrder.get(substring);
-                        final Integer secondSortOrder = httpMethodsSortOrder.get(
-                                secondTag.getName().substring(2, 5)
-                        );
+                    (tag1, tag2) -> {
+                        final String firstUrl = GetTagAttributeValueUtil.getValue(tag1, "url");
+                        final String secondUrl = GetTagAttributeValueUtil.getValue(tag2, "url");
+                        final String method1 = GetTagAttributeValueUtil.getValue(tag1, "method");
+                        final String method2 = GetTagAttributeValueUtil.getValue(tag2, "method");
+
+                        if (method1.isEmpty() || method2.isEmpty()) {
+                            return firstUrl.compareTo(secondUrl);
+                        }
+
+                        if (!httpMethodsSortOrder.containsKey(method1)
+                                || !httpMethodsSortOrder.containsKey(method2)) {
+                            return firstUrl.compareTo(secondUrl);
+                        }
+                        final Integer firstSortOrder = httpMethodsSortOrder.get(method1);
+                        final Integer secondSortOrder = httpMethodsSortOrder.get(method2);
+
                         if (firstSortOrder.compareTo(secondSortOrder) == 0) {
                             // Sort by route if HTTP methods are equal
-                            return firstTag.getName().compareTo(secondTag.getName());
+                            return firstUrl.compareTo(secondUrl);
                         }
 
                         return firstSortOrder.compareTo(secondSortOrder);
                     }
             );
+        }
+    }
+
+    @SuppressWarnings("PMD.UseUtilityClass")
+    private static class GetTagAttributeValueUtil {
+
+        public static @NotNull String getValue(
+                final XmlTag tag,
+                final @NotNull String attributeName
+        ) {
+            final XmlAttribute attribute = tag.getAttribute(attributeName);
+
+            if (attribute == null) {
+                return "";
+            }
+            final String value = attribute.getValue();
+
+            if (value == null) {
+                return "";
+            }
+
+            return value.trim();
         }
     }
 }
