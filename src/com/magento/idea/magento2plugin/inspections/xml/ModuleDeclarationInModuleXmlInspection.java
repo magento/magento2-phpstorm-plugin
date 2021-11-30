@@ -28,20 +28,22 @@ import org.jetbrains.annotations.NotNull;
 
 public class ModuleDeclarationInModuleXmlInspection extends XmlSuppressableInspectionTool {
 
-    @NotNull
     @Override
-    public PsiElementVisitor buildVisitor(
+    public @NotNull PsiElementVisitor buildVisitor(
             final @NotNull ProblemsHolder problemsHolder,
             final boolean isOnTheFly
     ) {
         return new XmlElementVisitor() {
+
             @Override
             public void visitXmlAttributeValue(final XmlAttributeValue value) {
                 final PsiFile file = value.getContainingFile();
                 final String filename = file.getName();
-                if (!filename.equals(ModuleXml.FILE_NAME)) {
+
+                if (!ModuleXml.FILE_NAME.equals(filename)) {
                     return;
                 }
+
                 if (!IsFileInEditableModuleUtil.execute(file)) {
                     return;
                 }
@@ -49,21 +51,23 @@ public class ModuleDeclarationInModuleXmlInspection extends XmlSuppressableInspe
                 if (isSubTag(value, (XmlFile) file)) {
                     return;
                 }
-
                 final PsiDirectory etcDirectory = file.getParent();
+
                 if (etcDirectory == null) {
                     return;
                 }
-
                 final String attributeName = XmlAttributeValuePattern.getLocalName(value);
+
                 if (attributeName != null && attributeName.equals(ModuleXml.MODULE_ATTR_NAME)) {
                     final String expectedName
                             = GetEditableModuleNameByRootFileUtil.execute(etcDirectory);
                     final String actualName = value.getValue();
+
                     if (actualName.equals(expectedName)) {
                         return;
                     }
                     final InspectionBundle inspectionBundle = new InspectionBundle();
+
                     problemsHolder.registerProblem(
                             value,
                             inspectionBundle.message(
@@ -81,26 +85,27 @@ public class ModuleDeclarationInModuleXmlInspection extends XmlSuppressableInspe
 
     protected boolean isSubTag(final XmlAttributeValue value, final XmlFile file) {
         final XmlAttribute xmlAttribute = PsiTreeUtil.getParentOfType(value, XmlAttribute.class);
+
         if (xmlAttribute == null) {
             return true;
         }
-
         final XmlTag xmlTag = PsiTreeUtil.getParentOfType(xmlAttribute, XmlTag.class);
+
         if (xmlTag == null) {
             return true;
         }
-
         final XmlDocument xmlDocument = file.getDocument();
+
         if (xmlDocument == null) {
             return true;
         }
-
         final XmlTag xmlRootTag = xmlDocument.getRootTag();
+
         if (xmlRootTag == null) {
             return true;
         }
-
         final XmlTag rootTag = PsiTreeUtil.getParentOfType(xmlTag, XmlTag.class);
+
         return rootTag == null || !(rootTag.getName().equals(xmlRootTag.getName()));
     }
 }
