@@ -81,7 +81,10 @@ public class RequireJsIndex extends FileBasedIndexExtension<String, String> {
         };
     }
 
-    private void parseConfigMap(Map<String, String> map, JSObjectLiteralExpression config) {
+    private void parseConfigMap(
+            final Map<String, String> map,
+            final JSObjectLiteralExpression config
+    ) {
         JSProperty configMap = config.findProperty("map");
         if (configMap == null) {
             return;
