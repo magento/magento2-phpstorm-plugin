@@ -187,6 +187,9 @@ public class PluginInspection extends PhpInspection {
 
                 int index = 0;
                 for (final Parameter pluginMethodParameter : pluginMethodParameters) {
+                    if (pluginMethodParameter.getName().isEmpty()) {
+                        continue;
+                    }
                     index++;
                     String declaredType = pluginMethodParameter.getDeclaredType().toString();
 
