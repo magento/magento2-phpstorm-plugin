@@ -63,7 +63,7 @@ public class ModuleDeclarationInModuleXmlInspection extends XmlSuppressableInspe
                             = GetEditableModuleNameByRootFileUtil.execute(etcDirectory);
                     final String actualName = value.getValue();
 
-                    if (actualName.equals(expectedName)) {
+                    if (actualName.equals(expectedName) || actualName.trim().isEmpty()) {
                         return;
                     }
                     final InspectionBundle inspectionBundle = new InspectionBundle();
