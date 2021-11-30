@@ -66,29 +66,7 @@ public class RequireJsIndex extends FileBasedIndexExtension<String, String> {
                         return map;
                     }
                     parseConfigMap(map, config);
-
-                    final JSProperty pathsMap = config.findProperty("paths");
-
-                    if (pathsMap == null) {
-                        return map;
-                    }
-                    final JSObjectLiteralExpression[] pathGroupsWrappers = PsiTreeUtil
-                            .getChildrenOfType(pathsMap, JSObjectLiteralExpression.class);
-
-                    for (final JSObjectLiteralExpression pathGroupsWrapper : pathGroupsWrappers) {
-                        final JSProperty[] allConfigs = pathGroupsWrapper.getProperties();
-
-                        for (final JSProperty mapping : allConfigs) {
-                            final String nameConfig = mapping.getName();
-                            final JSExpression value = mapping.getValue();
-
-                            if (value == null) {
-                                continue;
-                            }
-                            final String valueConfig = value.getText();
-                            map.put(nameConfig, valueConfig);
-                        }
-                    }
+                    parseConfigPaths(map, config);
                 }
             }
 
@@ -105,11 +83,11 @@ public class RequireJsIndex extends FileBasedIndexExtension<String, String> {
         if (configMap == null) {
             return;
         }
-
         final JSObjectLiteralExpression[] configGroupsWrappers = PsiTreeUtil.getChildrenOfType(
                 configMap,
                 JSObjectLiteralExpression.class
         );
+
         for (final JSObjectLiteralExpression configGroupsWrapper : configGroupsWrappers) {
             final PsiElement[] configGroups = configGroupsWrapper.getChildren();
 
@@ -130,6 +108,34 @@ public class RequireJsIndex extends FileBasedIndexExtension<String, String> {
                     final String valueConfig = value.getText();
                     map.put(nameConfig, valueConfig);
                 }
+            }
+        }
+    }
+
+    private void parseConfigPaths(
+            final Map<String, String> map,
+            final JSObjectLiteralExpression config
+    ) {
+        final JSProperty pathsMap = config.findProperty("paths");
+
+        if (pathsMap == null) {
+            return;
+        }
+        final JSObjectLiteralExpression[] pathGroupsWrappers = PsiTreeUtil
+                .getChildrenOfType(pathsMap, JSObjectLiteralExpression.class);
+
+        for (final JSObjectLiteralExpression pathGroupsWrapper : pathGroupsWrappers) {
+            final JSProperty[] allConfigs = pathGroupsWrapper.getProperties();
+
+            for (final JSProperty mapping : allConfigs) {
+                final String nameConfig = mapping.getName();
+                final JSExpression value = mapping.getValue();
+
+                if (value == null) {
+                    continue;
+                }
+                final String valueConfig = value.getText();
+                map.put(nameConfig, valueConfig);
             }
         }
     }
