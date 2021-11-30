@@ -56,7 +56,7 @@ public class RequireJsIndex extends FileBasedIndexExtension<String, String> {
             for (final JSVariable jsVariable : jsVariableList) {
                 final String name = jsVariable.getName();
 
-                if (name.equals("config")) {
+                if ("config".equals(name)) {
                     final JSObjectLiteralExpression config = PsiTreeUtil.getChildOfType(
                             jsVariable,
                             JSObjectLiteralExpression.class
@@ -143,7 +143,7 @@ public class RequireJsIndex extends FileBasedIndexExtension<String, String> {
     public @NotNull FileBasedIndex.InputFilter getInputFilter() {
         return virtualFile ->
                 virtualFile.getFileType().equals(JavaScriptFileType.INSTANCE)
-                        && virtualFile.getName().equals("requirejs-config.js");
+                        && "requirejs-config.js".equals(virtualFile.getName());
     }
 
     @Override
