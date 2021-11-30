@@ -87,6 +87,9 @@ public class RequireJsIndex extends FileBasedIndexExtension<String, String> {
                 configMap,
                 JSObjectLiteralExpression.class
         );
+        if (configGroupsWrappers == null) {
+            return;
+        }
 
         for (final JSObjectLiteralExpression configGroupsWrapper : configGroupsWrappers) {
             final PsiElement[] configGroups = configGroupsWrapper.getChildren();
@@ -96,6 +99,10 @@ public class RequireJsIndex extends FileBasedIndexExtension<String, String> {
                         configGroup,
                         JSObjectLiteralExpression.class
                 );
+
+                if (mappingWrapper == null) {
+                    continue;
+                }
                 final JSProperty[] allConfigs = mappingWrapper.getProperties();
 
                 for (final JSProperty mapping : allConfigs) {
@@ -123,6 +130,10 @@ public class RequireJsIndex extends FileBasedIndexExtension<String, String> {
         }
         final JSObjectLiteralExpression[] pathGroupsWrappers = PsiTreeUtil
                 .getChildrenOfType(pathsMap, JSObjectLiteralExpression.class);
+
+        if (pathGroupsWrappers == null) {
+            return;
+        }
 
         for (final JSObjectLiteralExpression pathGroupsWrapper : pathGroupsWrappers) {
             final JSProperty[] allConfigs = pathGroupsWrapper.getProperties();
