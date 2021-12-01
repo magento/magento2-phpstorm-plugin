@@ -85,7 +85,7 @@ public class PhpClassReferenceResolver extends PhpClassReferenceExtractor {
             final @NotNull PsiElement identifier
     ) {
         if (!PhpType.isPrimitiveType(name)) {
-            this.myCandidatesToImportStorage.processReference(name, fqn, identifier);
+            this.myCandidatesToImportStorage.processReference(name, fqn);
         }
     }
 
