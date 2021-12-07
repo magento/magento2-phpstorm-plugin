@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.NewDbSchemaAction;
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
@@ -143,7 +144,11 @@ public class NewDbSchemaDialog extends AbstractDialog {
                     getTableComment(),
                     getColumns()
             );
-            generateDbSchemaXmlFile(dbSchemaXmlData);
+            final PsiFile dbSchemaXmlFile = generateDbSchemaXmlFile(dbSchemaXmlData);
+
+            if (dbSchemaXmlFile == null) {
+                return;
+            }
             generateWhitelistJsonFile(dbSchemaXmlData);
         }
         exit();
@@ -170,8 +175,8 @@ public class NewDbSchemaDialog extends AbstractDialog {
      *
      * @param dbSchemaXmlData DbSchemaXmlData
      */
-    private void generateDbSchemaXmlFile(final @NotNull DbSchemaXmlData dbSchemaXmlData) {
-        new DbSchemaXmlGenerator(
+    private PsiFile generateDbSchemaXmlFile(final @NotNull DbSchemaXmlData dbSchemaXmlData) {
+        return new DbSchemaXmlGenerator(
                 dbSchemaXmlData,
                 project,
                 moduleName
