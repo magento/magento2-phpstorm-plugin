@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.generator.code.util;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.util.text.Strings;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.codeInsight.PhpCodeInsightUtil;
 import com.jetbrains.php.config.PhpLanguageFeature;
@@ -52,7 +53,11 @@ public final class ConvertPluginParamsToString {
         String returnType = PhpTypeMetadataParserUtil.getMethodReturnType(myMethod);
 
         if (returnType != null && PhpClassGeneratorUtil.isValidFqn(returnType)) {
-            returnType = PhpClassGeneratorUtil.getNameFromFqn(returnType);
+            if (Strings.endsWith(returnType, "[]")) {
+                returnType = "array";
+            } else {
+                returnType = PhpClassGeneratorUtil.getNameFromFqn(returnType);
+            }
         }
         final Iterator<PsiElement> parametersIterator = parameters.iterator();
         int iterator = 0;
