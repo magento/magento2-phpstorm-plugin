@@ -43,7 +43,12 @@ public final class ConvertPluginParamsToString {
      *
      * @return String
      */
-    @SuppressWarnings({"PMD.NPathComplexity", "PMD.CyclomaticComplexity", "PMD.ConfusingTernary"})
+    @SuppressWarnings({
+            "PMD.NPathComplexity",
+            "PMD.CyclomaticComplexity",
+            "PMD.CognitiveComplexity",
+            "PMD.ConfusingTernary"
+    })
     public static String execute(
             final Collection<PsiElement> parameters,
             final @NotNull Plugin.PluginType type,
@@ -75,14 +80,14 @@ public final class ConvertPluginParamsToString {
                 if (parameterText.contains("=")) {
                     final String[] paramParts = parameterText.split("=");
                     parameterText = paramParts[0];
-                    parameterText += " = ";
+                    parameterText += " = ";//NOPMD
                     String defaultValue = paramParts[1];
 
                     if (defaultValue.contains(Package.fqnSeparator)) {
                         final String[] fqnArray = defaultValue.split("\\\\");
                         defaultValue = fqnArray[fqnArray.length - 1];
                     }
-                    parameterText += defaultValue;
+                    parameterText += defaultValue;//NOPMD
                 } else if (parameterText.contains(Package.fqnSeparator)) {
                     final String[] fqnArray = parameterText.split("\\\\");
                     parameterText = fqnArray[fqnArray.length - 1];
