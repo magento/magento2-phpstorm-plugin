@@ -66,7 +66,19 @@ public final class ConvertPluginParamsToString {
             if (element instanceof Parameter) {
                 String parameterText = PhpCodeUtil.paramToString(element);
 
-                if (parameterText.contains(Package.fqnSeparator)) {
+                // Parameter has default value.
+                if (parameterText.contains("=")) {
+                    final String[] paramParts = parameterText.split("=");
+                    parameterText = paramParts[0];
+                    parameterText += " = ";
+                    String defaultValue = paramParts[1];
+
+                    if (defaultValue.contains(Package.fqnSeparator)) {
+                        final String[] fqnArray = defaultValue.split("\\\\");
+                        defaultValue = fqnArray[fqnArray.length - 1];
+                    }
+                    parameterText += defaultValue;
+                } else if (parameterText.contains(Package.fqnSeparator)) {
                     final String[] fqnArray = parameterText.split("\\\\");
                     parameterText = fqnArray[fqnArray.length - 1];
                 }
