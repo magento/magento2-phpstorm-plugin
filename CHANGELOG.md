@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 4.2.1
 
+### Fixed
+
+- Fixed ArrayIndexOutOfBoundsException when used Copy Path/Reference action on the requirejs-config.js file in [#808](https://github.com/magento/magento2-phpstorm-plugin/pull/808)
+- Fixed dialog disposition issue in [#811](https://github.com/magento/magento2-phpstorm-plugin/pull/811)
+- Fixed stack overflow error for line-marker providers in [#813](https://github.com/magento/magento2-phpstorm-plugin/pull/813)
+- Fixed stub ids not found for key in index in [#814](https://github.com/magento/magento2-phpstorm-plugin/pull/814)
+- Fixed failed to build require-js index in [815](https://github.com/magento/magento2-phpstorm-plugin/pull/815)
+- Fixed empty psi elements in the plugin inspections in [#816](https://github.com/magento/magento2-phpstorm-plugin/pull/816)
+- Fixed empty psi element in module xml inspection in [#817](https://github.com/magento/magento2-phpstorm-plugin/pull/817)
+- Fixed NullPointerException for the firstSortOrder.compareTo in [#818](https://github.com/magento/magento2-phpstorm-plugin/pull/818)
+- Fixed invalid column types provided exception during db_schema.xml file generation in [#819](https://github.com/magento/magento2-phpstorm-plugin/pull/819)
+- Fixed method designed for fully qualified names only in [#830](https://github.com/magento/magento2-phpstorm-plugin/pull/830)
+
 ## 4.2.0
 
 ### Added
