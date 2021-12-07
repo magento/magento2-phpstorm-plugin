@@ -92,7 +92,7 @@ public class UctReportOutputUtil {
 
         final Map<String, String> summaryMap = new LinkedHashMap<>();
         summaryMap.put("Installed version", summary.getInstalledVersion());
-        summaryMap.put("Adobe Commerce version", summary.getTargetVersion());
+        summaryMap.put("Magento Open Source or Adobe Commerce version", summary.getTargetVersion());
         summaryMap.put("Running time", summary.getProcessRunningTime());
         summaryMap.put("Checked modules", String.valueOf(summary.getProcessedModules()));
         summaryMap.put("Total warnings found", String.valueOf(summary.getPhpWarnings()));

@@ -126,7 +126,7 @@
         <properties>
           <enabled value="false"/>
           <font size="10"/>
-          <text value="The value is the directory where your Adobe Commerce instance is located."/>
+          <text value="The value is the directory where your Magento Open Source instance is located."/>
         </properties>
       </component>
       <component id="cc421" class="javax.swing.JLabel" binding="infoLabel">
