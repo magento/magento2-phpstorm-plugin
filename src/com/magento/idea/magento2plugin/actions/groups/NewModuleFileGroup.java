@@ -14,6 +14,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.util.IsClickedDirectoryInsideProject;
+import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import javax.swing.Icon;
@@ -45,7 +46,10 @@ public class NewModuleFileGroup extends NonTrivialActionGroup {
         }
 
         final Project project = event.getData(PlatformDataKeys.PROJECT);
-        if (!IsClickedDirectoryInsideProject.getInstance()
+
+        if (project == null
+                || !Settings.isEnabled(project)
+                || !IsClickedDirectoryInsideProject.getInstance()
                 .execute(project, (PsiDirectory) psiElement)) {
             event.getPresentation().setVisible(false);
             return;
@@ -53,10 +57,17 @@ public class NewModuleFileGroup extends NonTrivialActionGroup {
 
         final String moduleName = GetModuleNameByDirectoryUtil
                 .execute((PsiDirectory) psiElement, project);
-        if (Settings.isEnabled(project) && moduleName != null) {
-            event.getPresentation().setVisible(true);
-            return;
+
+        if (moduleName != null) {
+            final PsiDirectory moduleDirectory = new ModuleIndex(project)
+                    .getModuleDirectoryByModuleName(moduleName);
+
+            if (moduleDirectory != null) {
+                event.getPresentation().setVisible(true);
+                return;
+            }
         }
+
         event.getPresentation().setVisible(false);
     }
 }
