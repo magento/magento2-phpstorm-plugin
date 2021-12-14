@@ -102,10 +102,10 @@ public class ModuleComposerJsonGeneratorTest extends BaseGeneratorTestCase {
         );
         final ModuleComposerJsonData composerJsonData = new ModuleComposerJsonData(
                 packageName,
-                "Module",
+                "Test",
                 projectDir,
                 "test-description",
-                "test/module",
+                "test/module-test",
                 "1.0.0-dev",
                 licenses,
                 dependencies,
