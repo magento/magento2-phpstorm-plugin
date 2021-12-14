@@ -107,6 +107,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     private final ModuleIndex moduleIndex;
     private final CamelCaseToHyphen camelCaseToHyphen;
     private static final String MAGENTO_BEFORE_DECLARATIVE_SCHEMA_VERSION = "2.2.11";
+    private static final String DEFAULT_MODULE_PREFIX = "module";
 
     /**
      * Constructor.
@@ -246,7 +247,18 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     }
 
     public String getModuleName() {
-        return this.moduleName.getText().trim();
+        return this.removeSubstringFormString(DEFAULT_MODULE_PREFIX, this.moduleName.getText().trim());
+    }
+
+    /**
+     *
+     * @param target String
+     * @param replacement String
+     * @return String
+     */
+    private String removeSubstringFormString(@NotNull String target, @NotNull String replacement) {
+        String moduleRegex = "(?i)" + target;
+        return replacement.replaceAll(moduleRegex, "");
     }
 
     /**
@@ -332,6 +344,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     private String getComposerPackageName() {
         return camelCaseToHyphen.convert(getPackageName())
                 .concat("/")
+                .concat(DEFAULT_MODULE_PREFIX + "-")
                 .concat(camelCaseToHyphen.convert(getModuleName()));
     }
 
