@@ -264,9 +264,9 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
      * @return String
      */
     private String removeSubstringFormString(
-            @NotNull String target, @NotNull String replacement
+            final @NotNull String target, final @NotNull String replacement
     ) {
-        String moduleRegex = "(?i)" + target;
+        final String moduleRegex = "(?i)" + target;
         return replacement.replaceAll(moduleRegex, "");
     }
 
