@@ -114,6 +114,10 @@ public class MessageQueueClassGenerator extends FileGenerator {
     private PhpClass createHandlerClass(final String actionName) {
         PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(this.moduleName);
+
+        if (parentDirectory == null) {
+            return null;
+        }
         final PsiFile handlerFile;
         final String[] handlerDirectories = messageQueueClassDataName.getPath().split(
                 File.separator

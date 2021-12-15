@@ -88,6 +88,7 @@ public class PluginClassGenerator extends FileGenerator {
      *
      * @return PsiFile
      */
+    @SuppressWarnings("PMD.CognitiveComplexity")
     @Override
     public PsiFile generate(final String actionName) {
         final PsiFile[] pluginFile = {null};
@@ -206,6 +207,10 @@ public class PluginClassGenerator extends FileGenerator {
     private PhpClass createPluginClass(final String actionName) {
         PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(getPluginModule());
+
+        if (parentDirectory == null) {
+            return null;
+        }
         final String[] pluginDirectories = pluginFileData.getPluginDirectory()
                 .split(File.separator);
         for (final String pluginDirectory: pluginDirectories) {
@@ -262,7 +267,7 @@ public class PluginClassGenerator extends FileGenerator {
         }
 
         for (final LeafPsiElement leafPsiElement: leafElements) {
-            if (!leafPsiElement.getText().equals(MagentoPhpClass.CLOSING_TAG)) {
+            if (!MagentoPhpClass.CLOSING_TAG.equals(leafPsiElement.getText())) {
                 continue;
             }
             insertPos = leafPsiElement.getTextOffset();

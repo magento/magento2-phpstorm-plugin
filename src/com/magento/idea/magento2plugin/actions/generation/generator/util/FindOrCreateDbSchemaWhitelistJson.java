@@ -54,6 +54,10 @@ public class FindOrCreateDbSchemaWhitelistJson {
         if (dbSchemaWhitelistJson == null) {
             PsiDirectory parentDirectory = new ModuleIndex(project)
                     .getModuleDirectoryByModuleName(moduleName);
+
+            if (parentDirectory == null) {
+                return null;
+            }
             parentDirectory = directoryGenerator
                     .findOrCreateSubdirectory(parentDirectory, Package.moduleBaseAreaDir);
 

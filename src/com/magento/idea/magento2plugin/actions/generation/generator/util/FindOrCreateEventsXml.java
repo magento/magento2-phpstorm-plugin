@@ -36,11 +36,15 @@ public class FindOrCreateEventsXml {
             final String moduleName,
             final String area
     ) {
+        PsiDirectory parentDirectory = new ModuleIndex(project)
+                .getModuleDirectoryByModuleName(moduleName);
+        if (parentDirectory == null) {
+            return null;
+        }
+
         final DirectoryGenerator directoryGenerator = DirectoryGenerator.getInstance();
         final FileFromTemplateGenerator fileFromTemplateGenerator =
                 new FileFromTemplateGenerator(project);
-        PsiDirectory parentDirectory = new ModuleIndex(project)
-                .getModuleDirectoryByModuleName(moduleName);
         final ArrayList<String> fileDirectories = new ArrayList<>();
         fileDirectories.add(Package.moduleBaseAreaDir);
         if (!getArea(area).equals(Areas.base)) {

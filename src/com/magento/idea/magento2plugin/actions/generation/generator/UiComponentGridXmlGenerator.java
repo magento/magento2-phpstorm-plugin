@@ -67,6 +67,9 @@ public class UiComponentGridXmlGenerator extends FileGenerator {
         final PsiDirectory parentDirectory = moduleIndex.getModuleDirectoryByModuleName(
                 moduleName
         );
+        if (parentDirectory == null) {
+            return null;
+        }
         final String subdirectory = String.format(
                 "%s/%s/%s",
                 Package.moduleViewDir,

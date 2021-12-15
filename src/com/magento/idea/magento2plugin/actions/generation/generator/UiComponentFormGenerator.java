@@ -92,14 +92,16 @@ public class UiComponentFormGenerator extends FileGenerator {
     protected PsiFile createForm(
             final String actionName
     ) {
-        final DirectoryGenerator directoryGenerator = DirectoryGenerator.getInstance();
-        final FileFromTemplateGenerator fileFromTemplateGenerator =
-                new FileFromTemplateGenerator(project);
-
         final String moduleName = data.getModuleName();
         final PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(moduleName);
 
+        if (parentDirectory == null) {
+            return null;
+        }
+        final DirectoryGenerator directoryGenerator = DirectoryGenerator.getInstance();
+        final FileFromTemplateGenerator fileFromTemplateGenerator =
+                new FileFromTemplateGenerator(project);
         final ArrayList<String> fileDirectories = new ArrayList<>();
         fileDirectories.add(Package.moduleViewDir);
         final String area = data.getFormArea();
