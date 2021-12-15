@@ -246,17 +246,26 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         return this.packageName.getText().trim();
     }
 
+    /**
+     * Getter for Module Name.
+     *
+     * @return String
+     */
     public String getModuleName() {
-        return this.removeSubstringFormString(DEFAULT_MODULE_PREFIX, this.moduleName.getText().trim());
+        return this.removeSubstringFormString(
+                DEFAULT_MODULE_PREFIX, this.moduleName.getText().trim()
+        );
     }
 
     /**
-     *
+     * Remove substring from string.
      * @param target String
      * @param replacement String
      * @return String
      */
-    private String removeSubstringFormString(@NotNull String target, @NotNull String replacement) {
+    private String removeSubstringFormString(
+            @NotNull String target, @NotNull String replacement
+    ) {
         String moduleRegex = "(?i)" + target;
         return replacement.replaceAll(moduleRegex, "");
     }
