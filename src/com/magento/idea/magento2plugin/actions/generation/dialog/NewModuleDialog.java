@@ -53,6 +53,8 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     private static final String MODULE_VERSION = "module version";
     private static final String MODULE_NAME = "module name";
     private static final String PACKAGE_NAME = "package name";
+    private static final String MAGENTO_BEFORE_DECLARATIVE_SCHEMA_VERSION = "2.2.11";
+    private static final String DEFAULT_MODULE_PREFIX = "module";
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, PACKAGE_NAME})
@@ -106,8 +108,6 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     private String detectedPackageName;
     private final ModuleIndex moduleIndex;
     private final CamelCaseToHyphen camelCaseToHyphen;
-    private static final String MAGENTO_BEFORE_DECLARATIVE_SCHEMA_VERSION = "2.2.11";
-    private static final String DEFAULT_MODULE_PREFIX = "module";
 
     /**
      * Constructor.
@@ -252,22 +252,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
      * @return String
      */
     public String getModuleName() {
-        return this.removeSubstringFormString(
-                DEFAULT_MODULE_PREFIX, this.moduleName.getText().trim()
-        );
-    }
-
-    /**
-     * Remove substring from string.
-     * @param target String
-     * @param replacement String
-     * @return String
-     */
-    private String removeSubstringFormString(
-            final @NotNull String target, final @NotNull String replacement
-    ) {
-        final String moduleRegex = "(?i)" + target;
-        return replacement.replaceAll(moduleRegex, "");
+        return this.moduleName.getText().trim();
     }
 
     /**
