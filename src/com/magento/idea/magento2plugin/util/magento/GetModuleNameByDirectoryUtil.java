@@ -65,10 +65,10 @@ public final class GetModuleNameByDirectoryUtil {
         return getModuleName(childElements);
     }
 
-    private static MethodReference[] parseRegistrationPhpElements(//NOPMD
+    private static MethodReference[] parseRegistrationPhpElements(
             final PsiElement... elements
     ) {
-        for (final PsiElement element: elements) {
+        for (final PsiElement element : elements) {
             MethodReference[] methods = PsiTreeUtil.getChildrenOfType(
                 element,
                 MethodReference.class
@@ -79,12 +79,12 @@ public final class GetModuleNameByDirectoryUtil {
                 methods = parseRegistrationPhpElements(children);
             }
 
-            if (methods != null) {
+            if (methods.length > 0) {
                 return methods;
             }
         }
 
-        return null;
+        return new MethodReference[0];
     }
 
     private static PhpFile getRegistrationPhpRecursively(
@@ -110,12 +110,12 @@ public final class GetModuleNameByDirectoryUtil {
     private static String getModuleName(final PsiElement... childElements) {
         final MethodReference[] methods = parseRegistrationPhpElements(childElements);
 
-        if (methods == null) {
+        if (methods.length == 0) {
             return null;
         }
 
         for (final MethodReference method: methods) {
-            if (!method.getName().equals(RegistrationPhp.REGISTER_METHOD_NAME)) {
+            if (!RegistrationPhp.REGISTER_METHOD_NAME.equals(method.getName())) {
                 continue;
             }
             final PsiElement[] parameters =  method.getParameters();
@@ -147,7 +147,7 @@ public final class GetModuleNameByDirectoryUtil {
                 }
                 final String filename = ((PhpFile) containingFile).getName();
 
-                if (filename.equals(RegistrationPhp.FILE_NAME)) {
+                if (RegistrationPhp.FILE_NAME.equals(filename)) {
                     return (PhpFile) containingFile;
                 }
             }
