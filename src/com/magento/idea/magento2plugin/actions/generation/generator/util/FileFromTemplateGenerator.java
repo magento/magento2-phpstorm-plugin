@@ -56,7 +56,7 @@ public class FileFromTemplateGenerator {
     ) {
         final Ref<PsiFile> fileRef = new Ref<>(null);
         final Ref<String> exceptionRef = new Ref<>(null);
-        exceptionMessage = null;
+        exceptionMessage = null;//NOPMD
         final String filePath = baseDir.getText().concat("/").concat(moduleFile.getFileName());
 
         CommandProcessor.getInstance().executeCommand(project, () -> {
