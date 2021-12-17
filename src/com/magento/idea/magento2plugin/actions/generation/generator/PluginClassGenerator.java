@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
@@ -88,7 +89,7 @@ public class PluginClassGenerator extends FileGenerator {
      *
      * @return PsiFile
      */
-    @SuppressWarnings("PMD.CognitiveComplexity")
+    @SuppressWarnings({"PMD.CognitiveComplexity", "PMD.ExcessiveMethodLength"})
     @Override
     public PsiFile generate(final String actionName) {
         final PsiFile[] pluginFile = {null};
@@ -100,15 +101,27 @@ public class PluginClassGenerator extends FileGenerator {
                 pluginClass = createPluginClass(actionName);
             }
             if (pluginClass == null) {
-                final String errorMessage = validatorBundle.message(
-                        "validator.file.cantBeCreated",
-                        "Plugin Class"
-                );
-                JOptionPane.showMessageDialog(
-                        null,
-                        errorMessage,
-                        errorTitle,
-                        JOptionPane.ERROR_MESSAGE
+                String errorMessage;
+
+                if (fileFromTemplateGenerator.getLastExceptionMessage() == null) {
+                    errorMessage = validatorBundle.message(
+                            "validator.file.cantBeCreated",
+                            "Plugin Class"
+                    );
+                } else {
+                    errorMessage = validatorBundle.message(
+                            "validator.file.cantBeCreatedWithException",
+                            "Plugin Class",
+                            fileFromTemplateGenerator.getLastExceptionMessage()
+                    );
+                }
+                ApplicationManager.getApplication().invokeLater(
+                        () -> JOptionPane.showMessageDialog(
+                                null,
+                                errorMessage,
+                                errorTitle,
+                                JOptionPane.ERROR_MESSAGE
+                        )
                 );
 
                 return;
@@ -132,11 +145,13 @@ public class PluginClassGenerator extends FileGenerator {
                                 "validator.file.alreadyExists",
                                 "Plugin Class"
                         );
-                JOptionPane.showMessageDialog(
-                        null,
-                        errorMessage,
-                        errorTitle,
-                        JOptionPane.ERROR_MESSAGE
+                ApplicationManager.getApplication().invokeLater(
+                        () -> JOptionPane.showMessageDialog(
+                                null,
+                                errorMessage,
+                                errorTitle,
+                                JOptionPane.ERROR_MESSAGE
+                        )
                 );
 
                 return;
