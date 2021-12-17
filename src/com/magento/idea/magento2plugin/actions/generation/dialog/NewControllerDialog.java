@@ -249,12 +249,13 @@ public class NewControllerDialog extends AbstractDialog {
         );
 
         return String.format(
-                "%s%s%s%s%s%s",
+                "%s%s%s%s%s%s%s",
                 parts[0],
                 Package.fqnSeparator,
                 parts[1],
                 Package.fqnSeparator,
                 directoryPart,
+                Package.fqnSeparator,
                 controllerPart
         );
     }

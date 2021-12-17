@@ -10,6 +10,7 @@ import com.google.gson.JsonParser;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleComposerJsonData;
 import com.magento.idea.magento2plugin.actions.generation.generator.data.ModuleDirectoriesData;
@@ -120,8 +121,8 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
         final Object[] dependencies = dependenciesList.toArray();
         result = result.concat(ComposerJson.DEFAULT_DEPENDENCY);
         final boolean noDependency =
-                dependencies.length == 1 && dependencies[0].equals(
-                        ComposerJson.NO_DEPENDENCY_LABEL
+                dependencies.length == 1 && ComposerJson.NO_DEPENDENCY_LABEL.equals(
+                        dependencies[0]
                 );
         if (dependencies.length == 0 || noDependency) {
             result = result.concat("\n");
@@ -161,8 +162,12 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
                 "_-", "/"
         );
         try {
-            final PsiFile virtualFile = moduleIndex.getModuleDirectoryByModuleName(dependency)
-                    .findFile(ComposerJson.FILE_NAME);
+            final PsiDirectory moduleDir = moduleIndex.getModuleDirectoryByModuleName(dependency);
+
+            if (moduleDir == null) {
+                return Pair.create("", "");
+            }
+            final PsiFile virtualFile = moduleDir.findFile(ComposerJson.FILE_NAME);
 
             if (virtualFile != null) { //NOPMD
                 final VirtualFile composerJsonFile = virtualFile.getVirtualFile();

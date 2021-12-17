@@ -58,6 +58,7 @@ public class ModuleViewModelClassGenerator extends FileGenerator {
      * @param actionName String
      * @return PsiFile
      */
+    @Override
     public PsiFile generate(final String actionName) {
         final PhpClass block = GetPhpClassByFQN.getInstance(project).execute(getViewModelFqn());
         final String errorTitle = commonBundle.message("common.error");
@@ -106,6 +107,10 @@ public class ModuleViewModelClassGenerator extends FileGenerator {
     private PhpFile createViewModelClass(final String actionName) {
         PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(getViewModelModule());
+
+        if (parentDirectory == null) {
+            return null;
+        }
         final String[] viewModelDirectories = viewModelFileData.getViewModelDirectory()
                 .split(File.separator);
         for (final String viewModelDirectory: viewModelDirectories) {
@@ -128,6 +133,7 @@ public class ModuleViewModelClassGenerator extends FileGenerator {
         return (PhpFile) viewModelFile;
     }
 
+    @Override
     protected void fillAttributes(final Properties attributes) {
         final String viewModelClassName = viewModelFileData.getViewModelClassName();
         attributes.setProperty("NAME", viewModelClassName);
