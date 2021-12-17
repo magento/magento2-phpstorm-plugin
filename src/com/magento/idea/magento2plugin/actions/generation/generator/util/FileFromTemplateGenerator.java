@@ -31,9 +31,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class FileFromTemplateGenerator {
-    private final Project project;
 
-    public FileFromTemplateGenerator(final Project project) {
+    private final @NotNull Project project;
+
+    public FileFromTemplateGenerator(final @NotNull Project project) {
         this.project = project;
     }
 
@@ -56,10 +57,12 @@ public class FileFromTemplateGenerator {
         final Ref<PsiFile> fileRef = new Ref<>(null);
         final Ref<String> exceptionRef = new Ref<>(null);
         final String filePath = baseDir.getText().concat("/").concat(moduleFile.getFileName());
+
         CommandProcessor.getInstance().executeCommand(project, () -> {
             final Runnable run = () -> {
                 try {
-                    PsiFile file = createFile(moduleFile, filePath, baseDir, attributes);
+                    final PsiFile file = createFile(moduleFile, filePath, baseDir, attributes);
+
                     if (file != null) {
                         fileRef.set(file);
                     }
@@ -89,13 +92,19 @@ public class FileFromTemplateGenerator {
         final String fileName = path.get(path.size() - 1);
         final PsiFile fileTemplate = createFileFromTemplate(
                 getTemplateManager(),
-                baseDir, moduleFile.getTemplate(), attributes, fileName, moduleFile.getLanguage());
+                baseDir,
+                moduleFile.getTemplate(),
+                attributes,
+                fileName,
+                moduleFile.getLanguage()
+        );
+
         if (fileTemplate == null) {
             throw new IncorrectOperationException("Template not found!");
         } else {
             PsiElement file;
-
             file = baseDir.add(fileTemplate);
+
             if (file instanceof PsiFile) {
                 return (PsiFile)file;
             } else {
@@ -125,6 +134,7 @@ public class FileFromTemplateGenerator {
             final @NotNull Language language
     ) throws IOException {
         FileTemplate fileTemplate;
+
         try {
             fileTemplate = templateManager.getInternalTemplate(templateName);
         } catch (IllegalStateException e) {
@@ -140,6 +150,7 @@ public class FileFromTemplateGenerator {
                 true,
                 false
         );
+
         if (fileTemplate.isReformatCode()) {
             CodeStyleManager.getInstance(project).reformat(file);
         }
