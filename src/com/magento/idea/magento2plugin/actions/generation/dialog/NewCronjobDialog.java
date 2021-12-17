@@ -263,15 +263,19 @@ public class NewCronjobDialog extends AbstractDialog {
      * @return String
      */
     private String suggestCronjobName(final String cronjobClassname) {
+        if (moduleName == null) {
+            return "";
+        }
+
         if (cronjobClassname == null || cronjobClassname.isEmpty()) {
-            return this.moduleName.toLowerCase(new java.util.Locale("en","EN"));
+            return moduleName.toLowerCase(new java.util.Locale("en","EN"));
         }
 
         final String cronjobClassnameToSnakeCase = this.camelCaseToSnakeCase.convert(
                 cronjobClassname
         );
 
-        return this.moduleName.toLowerCase(new java.util.Locale("en","EN"))
+        return moduleName.toLowerCase(new java.util.Locale("en","EN"))
                 + "_"
                 + cronjobClassnameToSnakeCase;
     }
