@@ -149,6 +149,14 @@ public class UiComponentFormGenerator extends FileGenerator {
     protected void fillAttributes(final @NotNull Properties attributes) {
         final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
 
+        if (data.getFields().isEmpty()) {
+            phpClassTypesBuilder
+                    .appendProperty("PRIMARY_FIELD", "");
+        } else {
+            phpClassTypesBuilder
+                    .appendProperty("PRIMARY_FIELD", data.getFields().get(0).getName());
+        }
+
         phpClassTypesBuilder
                 .appendProperty("NAME", data.getFormName())
                 .appendProperty("LABEL", data.getLabel())
@@ -165,7 +173,6 @@ public class UiComponentFormGenerator extends FileGenerator {
                                 data.getDataProviderPath()
                         ).getClassFqn()
                 )
-                .appendProperty("PRIMARY_FIELD", data.getFields().get(0).getName())
                 .mergeProperties(attributes);
     }
 
