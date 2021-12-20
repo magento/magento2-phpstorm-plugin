@@ -26,6 +26,8 @@ import com.magento.idea.magento2plugin.indexes.CronGroupIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.CamelCaseToSnakeCase;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+import org.jetbrains.annotations.NotNull;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -117,7 +119,7 @@ public class NewCronjobDialog extends AbstractDialog {
      * @param project Project
      * @param directory Directory
      */
-    public NewCronjobDialog(final Project project, final PsiDirectory directory) {
+    public NewCronjobDialog(final @NotNull Project project, final @NotNull PsiDirectory directory) {
         super();
         this.project = project;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
@@ -244,11 +246,6 @@ public class NewCronjobDialog extends AbstractDialog {
 
     public String getCronjobScheduleConfigPath() {
         return this.configPathField.getText().trim();
-    }
-
-    @Override
-    protected void onCancel() {
-        dispose();
     }
 
     private void createUIComponents() {
