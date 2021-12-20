@@ -26,8 +26,6 @@ import com.magento.idea.magento2plugin.indexes.CronGroupIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.CamelCaseToSnakeCase;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-import org.jetbrains.annotations.NotNull;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -37,11 +35,13 @@ import java.awt.event.WindowEvent;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({
         "PMD.UncommentedEmptyMethodBody",
@@ -56,6 +56,11 @@ import javax.swing.KeyStroke;
         "PMD.ExcessiveImports",
 })
 public class NewCronjobDialog extends AbstractDialog {
+
+    private final Project project;
+    private final String moduleName;
+    private final CamelCaseToSnakeCase camelCaseToSnakeCase;
+
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -66,6 +71,7 @@ public class NewCronjobDialog extends AbstractDialog {
     private JRadioButton atMidnightRadioButton;
     private JPanel fixedSchedulePanel;
     private JPanel configurableSchedulePanel;
+
     private static final String CLASS_NAME = "class name";
     private static final String DIRECTORY = "directory";
     private static final String CRON_NAME = "name";
@@ -109,9 +115,11 @@ public class NewCronjobDialog extends AbstractDialog {
             message = {NotEmptyRule.MESSAGE, CRON_GROUP})
     private FilteredComboBox cronGroupComboBox;
 
-    private Project project;
-    private String moduleName;
-    private CamelCaseToSnakeCase camelCaseToSnakeCase;
+    private JLabel cronjobClassNameFieldErrorMessage;//NOPMD
+    private JLabel cronjobDirectoryFieldErrorMessage;//NOPMD
+    private JLabel cronjobNameFieldErrorMessage;//NOPMD
+    private JLabel cronGroupComboBoxErrorMessage;//NOPMD
+    private JLabel cronjobScheduleFieldErrorMessage;//NOPMD
 
     /**
      * Open a new cronjob generation dialog form.
@@ -282,10 +290,8 @@ public class NewCronjobDialog extends AbstractDialog {
      */
     private void onOK() {
         if (!validateFormFields()) {
-            exit();
             return;
         }
-
         final NamespaceBuilder namespaceBuilder = new NamespaceBuilder(
                 this.getCronjobModule(),
                 this.getCronjobClassName(),
