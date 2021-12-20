@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.NewBlockAction;
 import com.magento.idea.magento2plugin.actions.generation.data.BlockFileData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
@@ -26,6 +25,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
@@ -33,6 +33,7 @@ import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 
 public class NewBlockDialog extends AbstractDialog {
+
     private final PsiDirectory baseDir;
     private final String moduleName;
     private JPanel contentPanel;
@@ -44,17 +45,17 @@ public class NewBlockDialog extends AbstractDialog {
     private static final String NAME = "name";
     private static final String DIRECTORY = "directory";
 
-    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, NAME})
-    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
-            message = {PhpClassRule.MESSAGE, NAME})
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, NAME})
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS, message = {PhpClassRule.MESSAGE, NAME})
     private JTextField blockName;
 
-    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, DIRECTORY})
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, DIRECTORY})
     @FieldValidation(rule = RuleRegistry.PHP_DIRECTORY,
             message = {PhpDirectoryRule.MESSAGE, DIRECTORY})
     private JTextField blockParentDir;
+
+    private JLabel blockNameErrorMessage;//NOPMD
+    private JLabel blockParentDirErrorMessage;//NOPMD
 
     /**
      * Constructor.
@@ -113,8 +114,8 @@ public class NewBlockDialog extends AbstractDialog {
     protected void onOK() {
         if (validateFormFields()) {
             generateFile();
+            exit();
         }
-        exit();
     }
 
     private void generateFile() {
