@@ -117,8 +117,8 @@ public class NewBlockDialog extends AbstractDialog {
         exit();
     }
 
-    private PsiFile generateFile() {
-        return new ModuleBlockClassGenerator(new BlockFileData(
+    private void generateFile() {
+        new ModuleBlockClassGenerator(new BlockFileData(
                 getBlockDirectory(),
                 getBlockName(),
                 getModuleName(),
@@ -140,6 +140,7 @@ public class NewBlockDialog extends AbstractDialog {
 
     private void suggestBlockDirectory() {
         final String moduleIdentifierPath = getModuleIdentifierPath();
+
         if (moduleIdentifierPath == null) {
             blockParentDir.setText(BlockPhp.DEFAULT_DIR);
             return;
@@ -147,6 +148,7 @@ public class NewBlockDialog extends AbstractDialog {
         final String path = baseDir.getVirtualFile().getPath();
         final String[] pathParts = path.split(moduleIdentifierPath);
         final int minimumPathParts = 2;
+
         if (pathParts.length != minimumPathParts) {
             blockParentDir.setText(BlockPhp.DEFAULT_DIR);
             return;
@@ -161,14 +163,17 @@ public class NewBlockDialog extends AbstractDialog {
 
     private String getModuleIdentifierPath() {
         final String[]parts = moduleName.split(Package.vendorModuleNameSeparator);
+
         if (parts[0] == null || parts[1] == null || parts.length > 2) {
             return null;
         }
+
         return parts[0] + File.separator + parts[1];
     }
 
     private String getNamespace() {
         final String[]parts = moduleName.split(Package.vendorModuleNameSeparator);
+
         if (parts[0] == null || parts[1] == null || parts.length > 2) {
             return null;
         }
@@ -176,12 +181,7 @@ public class NewBlockDialog extends AbstractDialog {
                 File.separator,
                 Package.fqnSeparator
         );
-        return parts[0] + Package.fqnSeparator + parts[1] + Package.fqnSeparator + directoryPart;
-    }
 
-    @Override
-    public void onCancel() {
-        // add your code here if necessary
-        dispose();
+        return parts[0] + Package.fqnSeparator + parts[1] + Package.fqnSeparator + directoryPart;
     }
 }
