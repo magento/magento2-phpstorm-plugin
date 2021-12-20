@@ -31,7 +31,7 @@ public final class PhpClassImplementsNoninterceptableInterfaceUtil {
         }
 
         for (final PhpClass targetInterfaceClass: interfaces) {
-            if (targetInterfaceClass.getFQN().equals(Plugin.NON_INTERCEPTABLE_FQN)) {
+            if (Plugin.NON_INTERCEPTABLE_FQN.equals(targetInterfaceClass.getFQN())) {
                 return true;
             }
         }
