@@ -120,7 +120,7 @@ public class NewCronjobDialog extends AbstractDialog {
     private JLabel cronjobNameFieldErrorMessage;//NOPMD
     private JLabel cronGroupComboBoxErrorMessage;//NOPMD
     private JLabel cronjobScheduleFieldErrorMessage;//NOPMD
-    private JLabel configPathFieldErrorMessage;
+    private JLabel configPathFieldErrorMessage;//NOPMD
 
     /**
      * Open a new cronjob generation dialog form.
