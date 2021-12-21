@@ -30,6 +30,7 @@ import java.awt.event.WindowEvent;
 import java.util.Locale;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -70,6 +71,11 @@ public class NewCLICommandDialog extends AbstractDialog {
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, COMMAND_DESCRIPTION})
     private JTextArea cliCommandDescriptionField;
+
+    private JLabel cliCommandClassNameFieldErrorMessage;//NOPMD
+    private JLabel cliCommandParentDirectoryFieldErrorMessage;//NOPMD
+    private JLabel cliCommandNameFieldErrorMessage;//NOPMD
+    private JLabel cliCommandDescriptionFieldErrorMessage;//NOPMD
 
     private final CommonBundle commonBundle;
     private final Project project;
