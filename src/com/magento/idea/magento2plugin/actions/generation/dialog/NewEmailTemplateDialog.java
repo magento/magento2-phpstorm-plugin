@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -51,9 +52,11 @@ public class NewEmailTemplateDialog extends AbstractDialog {
     @FieldValidation(rule = RuleRegistry.IDENTIFIER,
             message = {IdentifierRule.MESSAGE, EMAIL_TEMPLATE_ID})
     private JTextField identifier;
+
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, LABEL})
     private JTextField label;
+
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, FILENAME})
     @FieldValidation(rule = RuleRegistry.IDENTIFIER,
@@ -63,6 +66,10 @@ public class NewEmailTemplateDialog extends AbstractDialog {
     private FilteredComboBox area;
     private FilteredComboBox templateType;
     private JTextField subject;
+
+    private JLabel identifierErrorMessage;//NOPMD
+    private JLabel labelErrorMessage;//NOPMD
+    private JLabel fileNameErrorMessage;//NOPMD
 
     /**
      * New email template dialog.
@@ -208,11 +215,9 @@ public class NewEmailTemplateDialog extends AbstractDialog {
         final boolean emailTemplateCanBeDeclared = !this.validator.validate(this);
 
         if (!validateFormFields() || emailTemplateCanBeDeclared) {
-            exit();
             return;
         }
         generateFile();
-
         exit();
     }
 
