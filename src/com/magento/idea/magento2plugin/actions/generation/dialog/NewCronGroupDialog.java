@@ -37,6 +37,7 @@ import javax.swing.SpinnerNumberModel;
         "PMD.ExcessiveImports,"
 })
 public class NewCronGroupDialog extends AbstractDialog {
+
     private final String moduleName;
     private final Project project;
     private JPanel contentPanel;
@@ -44,10 +45,8 @@ public class NewCronGroupDialog extends AbstractDialog {
     private JButton buttonCancel;
     private static final String NAME = "name";
 
-    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, NAME})
-    @FieldValidation(rule = RuleRegistry.IDENTIFIER,
-            message = {IdentifierRule.MESSAGE, NAME})
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, NAME})
+    @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE, NAME})
     private JTextField cronGroupName;
 
     private JSpinner scheduleGenerateEvery;
@@ -142,13 +141,8 @@ public class NewCronGroupDialog extends AbstractDialog {
     private void onOK() {
         if (validateFormFields()) {
             generateFile();
+            exit();
         }
-        exit();
-    }
-
-    @Override
-    protected void onCancel() {
-        dispose();
     }
 
     private void generateFile() {
