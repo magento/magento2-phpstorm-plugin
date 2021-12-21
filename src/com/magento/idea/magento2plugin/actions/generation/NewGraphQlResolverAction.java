@@ -28,18 +28,18 @@ public class NewGraphQlResolverAction extends AnAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent event) {
-        DataContext dataContext = event.getDataContext();
-        IdeView view = LangDataKeys.IDE_VIEW.getData(dataContext);
+        final DataContext dataContext = event.getDataContext();
+        final IdeView view = LangDataKeys.IDE_VIEW.getData(dataContext);
 
         if (view == null) {
             return;
         }
-        Project project = CommonDataKeys.PROJECT.getData(dataContext);
+        final Project project = CommonDataKeys.PROJECT.getData(dataContext);
 
         if (project == null) {
             return;
         }
-        PsiDirectory directory = view.getOrChooseDirectory();
+        final PsiDirectory directory = view.getOrChooseDirectory();
 
         if (directory == null) {
             return;
