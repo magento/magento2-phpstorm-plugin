@@ -35,6 +35,7 @@ import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("PMD.TooManyFields")
 public class NewModelsDialog extends AbstractDialog {
+
     private final String moduleName;
     private final Project project;
     private JPanel contentPane;
@@ -160,11 +161,6 @@ public class NewModelsDialog extends AbstractDialog {
         dialog.setVisible(true);
     }
 
-    @Override
-    protected void onCancel() {
-        dispose();
-    }
-
     /**
      * Process generation.
      */
@@ -173,8 +169,8 @@ public class NewModelsDialog extends AbstractDialog {
             generateModelFile();
             generateResourceModelFile();
             generateCollectionFile();
+            exit();
         }
-        exit();
     }
 
     /**
