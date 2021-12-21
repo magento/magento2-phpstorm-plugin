@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation;
 
 import com.intellij.ide.IdeView;
@@ -13,31 +14,32 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.NewViewModelDia
 import org.jetbrains.annotations.NotNull;
 
 public class NewViewModelAction extends AnAction {
-    public static String ACTION_NAME = "Magento 2 View Model";
-    public static String ACTION_DESCRIPTION = "Create a new Magento 2 View Model";
 
-    NewViewModelAction() {
+    public static final String ACTION_NAME = "Magento 2 View Model";
+    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 View Model";
+
+    public NewViewModelAction() {
         super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        DataContext dataContext = e.getDataContext();
-        IdeView view = LangDataKeys.IDE_VIEW.getData(dataContext);
+    public void actionPerformed(final @NotNull AnActionEvent event) {
+        final DataContext dataContext = event.getDataContext();
+        final IdeView view = LangDataKeys.IDE_VIEW.getData(dataContext);
+
         if (view == null) {
             return;
         }
+        final Project project = CommonDataKeys.PROJECT.getData(dataContext);
 
-        Project project = CommonDataKeys.PROJECT.getData(dataContext);
         if (project == null) {
             return;
         }
+        final PsiDirectory directory = view.getOrChooseDirectory();
 
-        PsiDirectory directory = view.getOrChooseDirectory();
         if (directory == null) {
             return;
         }
-
         NewViewModelDialog.open(project, directory);
     }
 

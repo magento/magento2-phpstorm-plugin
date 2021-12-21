@@ -33,6 +33,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
 public class NewViewModelDialog extends AbstractDialog {
+
     private static final String VIEW_MODEL_NAME = "View Model Name";
     private static final String VIEW_MODEL_DIR = "View Model Directory";
     private final PsiDirectory baseDir;
@@ -119,12 +120,12 @@ public class NewViewModelDialog extends AbstractDialog {
     protected void onOK() {
         if (validateFormFields()) {
             generateFile();
+            exit();
         }
-        exit();
     }
 
-    private PsiFile generateFile() {
-        return new ModuleViewModelClassGenerator(new ViewModelFileData(
+    private void generateFile() {
+        new ModuleViewModelClassGenerator(new ViewModelFileData(
                 getViewModelDirectory(),
                 getViewModelName(),
                 getModuleName(),
@@ -184,11 +185,5 @@ public class NewViewModelDialog extends AbstractDialog {
                 Package.fqnSeparator
         );
         return parts[0] + Package.fqnSeparator + parts[1] + Package.fqnSeparator + directoryPart;
-    }
-
-    @Override
-    public void onCancel() {
-        // add your code here if necessary
-        dispose();
     }
 }
