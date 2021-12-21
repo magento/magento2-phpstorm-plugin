@@ -28,6 +28,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -36,6 +37,8 @@ public class NewViewModelDialog extends AbstractDialog {
 
     private static final String VIEW_MODEL_NAME = "View Model Name";
     private static final String VIEW_MODEL_DIR = "View Model Directory";
+
+    private final Project project;
     private final PsiDirectory baseDir;
     private final String moduleName;
 
@@ -59,7 +62,8 @@ public class NewViewModelDialog extends AbstractDialog {
             message = {DirectoryRule.MESSAGE, VIEW_MODEL_DIR})
     private JTextField viewModelParentDir;
 
-    private final Project project;
+    private JLabel viewModelNameErrorMessage;//NOPMD
+    private JLabel viewModelParentDirErrorMessage;//NOPMD
 
     /**
      * Constructor.
