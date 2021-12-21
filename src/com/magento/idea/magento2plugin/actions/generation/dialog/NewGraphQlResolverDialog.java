@@ -29,8 +29,10 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import org.jetbrains.annotations.NotNull;
 
 public class NewGraphQlResolverDialog extends AbstractDialog {
+
     private final PsiDirectory baseDir;
     private final String moduleName;
     private JPanel contentPanel;
@@ -58,7 +60,10 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
      * @param project Project
      * @param directory PsiDirectory
      */
-    public NewGraphQlResolverDialog(final Project project, final PsiDirectory directory) {
+    public NewGraphQlResolverDialog(
+            final @NotNull Project project,
+            final @NotNull PsiDirectory directory
+    ) {
         super();
 
         this.project = project;
@@ -111,12 +116,12 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
     protected void onOK() {
         if (validateFormFields()) {
             generateFile();
+            exit();
         }
-        exit();
     }
 
-    private PsiFile generateFile() {
-        return new ModuleGraphQlResolverClassGenerator(new GraphQlResolverFileData(
+    private void generateFile() {
+        new ModuleGraphQlResolverClassGenerator(new GraphQlResolverFileData(
                 getGraphQlResolverDirectory(),
                 getGraphQlResolverClassName(),
                 getModuleName(),
@@ -181,11 +186,5 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
 
     private String getGraphQlResolverClassFqn() {
         return getNamespace().concat(Package.fqnSeparator).concat(getGraphQlResolverClassName());
-    }
-
-    @Override
-    public void onCancel() {
-        // add your code here if necessary
-        dispose();
     }
 }
