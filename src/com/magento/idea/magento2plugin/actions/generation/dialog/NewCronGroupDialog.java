@@ -25,6 +25,7 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -63,6 +64,8 @@ public class NewCronGroupDialog extends AbstractDialog {
     private JCheckBox addHistoryFailureLifetime;
     private FilteredComboBox useSeparateProcess;
     private JCheckBox addUseSeparateProcess;
+
+    private JLabel cronGroupNameErrorMessage;//NOPMD
 
     /**
      * New CRON group dialogue constructor.
