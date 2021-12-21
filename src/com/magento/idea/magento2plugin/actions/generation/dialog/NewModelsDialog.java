@@ -92,6 +92,12 @@ public class NewModelsDialog extends AbstractDialog {
     private JLabel entityIdColumnLabel;//NOPMD
     private JLabel collectionDirectoryLabel;//NOPMD
     private JLabel collectionNameLabel;//NOPMD
+    private JLabel modelNameErrorMessage;//NOPMD
+    private JLabel resourceModelNameErrorMessage;//NOPMD
+    private JLabel dbTableNameErrorMessage;//NOPMD
+    private JLabel entityIdColumnErrorMessage;//NOPMD
+    private JLabel collectionDirectoryErrorMessage;//NOPMD
+    private JLabel collectionNameErrorMessage;//NOPMD
 
     /**
      * Open new dialog for adding new controller.
