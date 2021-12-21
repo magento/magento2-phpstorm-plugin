@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.NewGraphQlResolverAction;
 import com.magento.idea.magento2plugin.actions.generation.data.GraphQlResolverFileData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
@@ -26,6 +25,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -53,6 +53,9 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
     @FieldValidation(rule = RuleRegistry.PHP_DIRECTORY,
             message = {PhpDirectoryRule.MESSAGE, PARENT_DIRECTORY})
     private JTextField graphQlResolverParentDir;
+
+    private JLabel graphQlResolverClassNameErrorMessage;//NOPMD
+    private JLabel graphQlResolverParentDirErrorMessage;//NOPMD
 
     /**
      * Constructor.
