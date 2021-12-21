@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.NewViewModelAction;
 import com.magento.idea.magento2plugin.actions.generation.data.ViewModelFileData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
@@ -28,13 +27,17 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
 public class NewViewModelDialog extends AbstractDialog {
+
     private static final String VIEW_MODEL_NAME = "View Model Name";
     private static final String VIEW_MODEL_DIR = "View Model Directory";
+
+    private final Project project;
     private final PsiDirectory baseDir;
     private final String moduleName;
 
@@ -58,7 +61,8 @@ public class NewViewModelDialog extends AbstractDialog {
             message = {DirectoryRule.MESSAGE, VIEW_MODEL_DIR})
     private JTextField viewModelParentDir;
 
-    private final Project project;
+    private JLabel viewModelNameErrorMessage;//NOPMD
+    private JLabel viewModelParentDirErrorMessage;//NOPMD
 
     /**
      * Constructor.
@@ -119,12 +123,12 @@ public class NewViewModelDialog extends AbstractDialog {
     protected void onOK() {
         if (validateFormFields()) {
             generateFile();
+            exit();
         }
-        exit();
     }
 
-    private PsiFile generateFile() {
-        return new ModuleViewModelClassGenerator(new ViewModelFileData(
+    private void generateFile() {
+        new ModuleViewModelClassGenerator(new ViewModelFileData(
                 getViewModelDirectory(),
                 getViewModelName(),
                 getModuleName(),
@@ -184,11 +188,5 @@ public class NewViewModelDialog extends AbstractDialog {
                 Package.fqnSeparator
         );
         return parts[0] + Package.fqnSeparator + parts[1] + Package.fqnSeparator + directoryPart;
-    }
-
-    @Override
-    public void onCancel() {
-        // add your code here if necessary
-        dispose();
     }
 }

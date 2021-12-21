@@ -18,6 +18,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.NewBlockDialog;
 import org.jetbrains.annotations.NotNull;
 
 public class NewBlockAction extends AnAction {
+
     public static final String ACTION_NAME = "Magento 2 Block";
     public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Block";
 
@@ -26,23 +27,24 @@ public class NewBlockAction extends AnAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull final AnActionEvent event) {
+    public void actionPerformed(final @NotNull AnActionEvent event) {
         final DataContext dataContext = event.getDataContext();
         final IdeView view = LangDataKeys.IDE_VIEW.getData(dataContext);
+
         if (view == null) {
             return;
         }
 
         final Project project = CommonDataKeys.PROJECT.getData(dataContext);
+
         if (project == null) {
             return;
         }
-
         final PsiDirectory directory = view.getOrChooseDirectory();
+
         if (directory == null) {
             return;
         }
-
         NewBlockDialog.open(project, directory);
     }
 
@@ -51,4 +53,3 @@ public class NewBlockAction extends AnAction {
         return false;
     }
 }
-

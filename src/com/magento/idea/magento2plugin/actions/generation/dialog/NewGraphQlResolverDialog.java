@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.NewGraphQlResolverAction;
 import com.magento.idea.magento2plugin.actions.generation.data.GraphQlResolverFileData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
@@ -26,11 +25,14 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import org.jetbrains.annotations.NotNull;
 
 public class NewGraphQlResolverDialog extends AbstractDialog {
+
     private final PsiDirectory baseDir;
     private final String moduleName;
     private JPanel contentPanel;
@@ -52,13 +54,19 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
             message = {PhpDirectoryRule.MESSAGE, PARENT_DIRECTORY})
     private JTextField graphQlResolverParentDir;
 
+    private JLabel graphQlResolverClassNameErrorMessage;//NOPMD
+    private JLabel graphQlResolverParentDirErrorMessage;//NOPMD
+
     /**
      * Constructor.
      *
      * @param project Project
      * @param directory PsiDirectory
      */
-    public NewGraphQlResolverDialog(final Project project, final PsiDirectory directory) {
+    public NewGraphQlResolverDialog(
+            final @NotNull Project project,
+            final @NotNull PsiDirectory directory
+    ) {
         super();
 
         this.project = project;
@@ -111,12 +119,12 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
     protected void onOK() {
         if (validateFormFields()) {
             generateFile();
+            exit();
         }
-        exit();
     }
 
-    private PsiFile generateFile() {
-        return new ModuleGraphQlResolverClassGenerator(new GraphQlResolverFileData(
+    private void generateFile() {
+        new ModuleGraphQlResolverClassGenerator(new GraphQlResolverFileData(
                 getGraphQlResolverDirectory(),
                 getGraphQlResolverClassName(),
                 getModuleName(),
@@ -181,11 +189,5 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
 
     private String getGraphQlResolverClassFqn() {
         return getNamespace().concat(Package.fqnSeparator).concat(getGraphQlResolverClassName());
-    }
-
-    @Override
-    public void onCancel() {
-        // add your code here if necessary
-        dispose();
     }
 }

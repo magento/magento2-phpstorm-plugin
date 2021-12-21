@@ -30,21 +30,25 @@ import java.awt.event.WindowEvent;
 import java.util.Locale;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({"PMD.MissingSerialVersionUID", "PMD.ExcessiveImports"})
 public class NewCLICommandDialog extends AbstractDialog {
-    private JPanel contentPane;
-    private JButton buttonCancel;
-    private JButton buttonOK;
+
     private static final String CLASS_NAME = "class name";
     private static final String PARENT_DIRECTORY = "parent directory";
     private static final String COMMAND_NAME = "command name";
     private static final String COMMAND_DESCRIPTION = "description";
+
+    private JPanel contentPane;
+    private JButton buttonCancel;
+    private JButton buttonOK;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, CLASS_NAME})
@@ -68,6 +72,11 @@ public class NewCLICommandDialog extends AbstractDialog {
             message = {NotEmptyRule.MESSAGE, COMMAND_DESCRIPTION})
     private JTextArea cliCommandDescriptionField;
 
+    private JLabel cliCommandClassNameFieldErrorMessage;//NOPMD
+    private JLabel cliCommandParentDirectoryFieldErrorMessage;//NOPMD
+    private JLabel cliCommandNameFieldErrorMessage;//NOPMD
+    private JLabel cliCommandDescriptionFieldErrorMessage;//NOPMD
+
     private final CommonBundle commonBundle;
     private final Project project;
     private final String moduleName;
@@ -79,7 +88,10 @@ public class NewCLICommandDialog extends AbstractDialog {
      * @param project Project
      * @param directory PsiDirectory
      */
-    public NewCLICommandDialog(final Project project, final PsiDirectory directory) {
+    public NewCLICommandDialog(
+            final @NotNull Project project,
+            final @NotNull PsiDirectory directory
+    ) {
         super();
         this.project = project;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
@@ -181,8 +193,8 @@ public class NewCLICommandDialog extends AbstractDialog {
     private void onOK() {
         if (validateFormFields() && isPHPClassValid()) {
             this.generate();
+            exit();
         }
-        exit();
     }
 
     private Boolean isPHPClassValid() {
