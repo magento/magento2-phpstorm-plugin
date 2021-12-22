@@ -47,23 +47,24 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({
         "PMD.ExcessiveImports"
 })
 public class NewDataModelDialog extends AbstractDialog {
 
-    private final Project project;
-    private final String moduleName;
-    private final ValidatorBundle validatorBundle;
-    private final CommonBundle commonBundle;
-    private final List<String> properties;
-
     private static final String MODEL_NAME = "Model Name";
     private static final String PROPERTY_NAME = "Name";
     private static final String PROPERTY_TYPE = "Type";
     private static final String PROPERTY_ACTION = "Action";
     private static final String PROPERTY_DELETE = "Delete";
+
+    private final Project project;
+    private final String moduleName;
+    private final ValidatorBundle validatorBundle;
+    private final CommonBundle commonBundle;
+    private final List<String> properties;
 
     private JPanel contentPanel;
     private JButton buttonOK;
@@ -72,16 +73,17 @@ public class NewDataModelDialog extends AbstractDialog {
     private JButton addProperty;
     private JCheckBox createInterface;
 
-    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, MODEL_NAME})
-    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
-            message = {PhpClassRule.MESSAGE, MODEL_NAME})
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, MODEL_NAME})
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS, message = {PhpClassRule.MESSAGE, MODEL_NAME})
     private JTextField modelName;
 
     /**
      * Constructor.
      */
-    public NewDataModelDialog(final Project project, final PsiDirectory directory) {
+    public NewDataModelDialog(
+            final @NotNull Project project,
+            final @NotNull PsiDirectory directory
+    ) {
         super();
 
         this.project = project;
@@ -122,7 +124,10 @@ public class NewDataModelDialog extends AbstractDialog {
     /**
      * Opens the dialog window.
      */
-    public static void open(final Project project, final PsiDirectory directory) {
+    public static void open(
+            final @NotNull Project project,
+            final @NotNull PsiDirectory directory
+    ) {
         final NewDataModelDialog dialog = new NewDataModelDialog(project, directory);
         dialog.pack();
         dialog.centerDialog(dialog);
@@ -145,8 +150,8 @@ public class NewDataModelDialog extends AbstractDialog {
                 generateDataModelInterfaceFile();
                 generatePreferenceForInterface();
             }
+            exit();
         }
-        exit();
     }
 
     @Override
@@ -188,11 +193,6 @@ public class NewDataModelDialog extends AbstractDialog {
         }
 
         return valid;
-    }
-
-    @Override
-    public void onCancel() {
-        dispose();
     }
 
     /**
