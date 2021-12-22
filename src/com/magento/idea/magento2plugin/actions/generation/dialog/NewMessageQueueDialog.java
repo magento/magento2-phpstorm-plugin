@@ -52,6 +52,7 @@ import org.jetbrains.annotations.NotNull;
         "PMD.ExcessiveImports",
 })
 public class NewMessageQueueDialog extends AbstractDialog {
+
     private static final String TOPIC_NAME = "Topic Name";
     private static final String HANDLER_NAME = "Handler Name";
     private static final String HANDLER_TYPE = "Handler Type";
@@ -64,6 +65,8 @@ public class NewMessageQueueDialog extends AbstractDialog {
     private static final String BINDING_TOPIC = "Binding Topic";
 
     private JComboBox connectionName;
+    private final Project project;
+    private final String moduleName;
 
     /* TODO: Improve validation */
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
@@ -146,13 +149,16 @@ public class NewMessageQueueDialog extends AbstractDialog {
     private JLabel consumerNameLabel;//NOPMD
     private JLabel handlerDirectoryLabel;//NOPMD
 
-    private final Project project;
-    private final String moduleName;
-
     /**
      * Constructor.
+     *
+     * @param project Project
+     * @param directory PsiDirectory
      */
-    public NewMessageQueueDialog(final Project project, final PsiDirectory directory) {
+    public NewMessageQueueDialog(
+            final @NotNull Project project,
+            final @NotNull PsiDirectory directory
+    ) {
         super();
 
         this.project = project;
@@ -224,17 +230,18 @@ public class NewMessageQueueDialog extends AbstractDialog {
 
     /**
      * Opens the dialog window.
+     *
+     * @param project Project
+     * @param directory PsiDirectory
      */
-    public static void open(final Project project, final PsiDirectory directory) {
+    public static void open(
+            final @NotNull Project project,
+            final @NotNull PsiDirectory directory
+    ) {
         final NewMessageQueueDialog dialog = new NewMessageQueueDialog(project, directory);
         dialog.pack();
         dialog.centerDialog(dialog);
         dialog.setVisible(true);
-    }
-
-    @Override
-    public void onCancel() {
-        dispose();
     }
 
     private void onOK() {
@@ -248,8 +255,8 @@ public class NewMessageQueueDialog extends AbstractDialog {
             if (getConnectionName().equals(MessageQueueConnections.DB.getType())) {
                 generateConsumerClass();
             }
+            exit();
         }
-        exit();
     }
 
     private void generateCommunication() {
