@@ -40,6 +40,7 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -76,6 +77,8 @@ public class NewDataModelDialog extends AbstractDialog {
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, MODEL_NAME})
     @FieldValidation(rule = RuleRegistry.PHP_CLASS, message = {PhpClassRule.MESSAGE, MODEL_NAME})
     private JTextField modelName;
+
+    private JLabel modelNameErrorMessage;//NOPMD
 
     /**
      * Constructor.
@@ -162,6 +165,17 @@ public class NewDataModelDialog extends AbstractDialog {
             valid = true;
             final String errorTitle = commonBundle.message("common.error");
             final int column = 0;
+
+            if (propertyTable.getRowCount() == 0) {
+                valid = false;
+                JOptionPane.showMessageDialog(
+                        null,
+                        validatorBundle.message("validator.properties.notEmpty"),
+                        errorTitle,
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+
             for (int row = 0; row < propertyTable.getRowCount(); row++) {
                 final String propertyName = ((String) propertyTable.getValueAt(row, column)).trim();
                 if (propertyName.isEmpty()) {
