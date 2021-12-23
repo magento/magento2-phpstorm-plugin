@@ -46,6 +46,7 @@ import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveImports"})
 public class NewDbSchemaDialog extends AbstractDialog {
+
     private static final String TABLE_NAME = "Table Name";
 
     private final Project project;
@@ -85,6 +86,7 @@ public class NewDbSchemaDialog extends AbstractDialog {
     private JLabel tableResourceLabel;//NOPMD
     private JLabel tableCommentLabel;//NOPMD
     private JLabel tableColumnsLabel;//NOPMD
+    private JLabel tableNameErrorMessage;//NOPMD
 
     /**
      * Constructor.
@@ -150,8 +152,8 @@ public class NewDbSchemaDialog extends AbstractDialog {
                 return;
             }
             generateWhitelistJsonFile(dbSchemaXmlData);
+            exit();
         }
-        exit();
     }
 
     /**
