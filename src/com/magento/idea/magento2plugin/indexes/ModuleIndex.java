@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.indexes;
 
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -118,8 +119,12 @@ public final class ModuleIndex {
      * @return PsiDirectory
      */
     public @Nullable PsiDirectory getModuleDirectoryByModuleName(final String moduleName) {
+        if (DumbService.getInstance(project).isDumb()) {
+            return null;
+        }
         final FileBasedIndex index = FileBasedIndex
                 .getInstance();
+
         final Collection<VirtualFile> files = index.getContainingFiles(
                 ModuleNameIndex.KEY,
                 moduleName,

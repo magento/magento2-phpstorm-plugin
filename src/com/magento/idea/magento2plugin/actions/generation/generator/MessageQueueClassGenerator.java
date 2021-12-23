@@ -21,10 +21,13 @@ import com.magento.idea.magento2plugin.magento.files.MessageQueueClassPhp;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import javax.swing.JOptionPane;
 
 public class MessageQueueClassGenerator extends FileGenerator {
+
     private final MessageQueueClassData messageQueueClassDataName;
     private final Project project;
     private final DirectoryGenerator directoryGenerator;
@@ -33,6 +36,7 @@ public class MessageQueueClassGenerator extends FileGenerator {
     private final CommonBundle commonBundle;
     private final String moduleName;
     private final GetFirstClassOfFile getFirstClassOfFile;
+    private final List<String> errors = new ArrayList<>();
 
     /**
      * Message queue handler constructor.
@@ -68,39 +72,33 @@ public class MessageQueueClassGenerator extends FileGenerator {
             );
 
             if (handler != null) {
-                final String errorMessage = this.validatorBundle.message(
+                errors.add(validatorBundle.message(
                         "validator.file.alreadyExists",
                         "Handler Class"
-                );
-                JOptionPane.showMessageDialog(
-                        null,
-                        errorMessage,
-                        commonBundle.message("common.error"),
-                        JOptionPane.ERROR_MESSAGE
-                );
-
+                ));
                 return;
             }
-
             handler = createHandlerClass(actionName);
 
             if (handler == null) {
-                final String errorMessage = this.validatorBundle.message(
+                errors.add(validatorBundle.message(
                         "validator.file.cantBeCreated",
                         "Handler Class"
-                );
-                JOptionPane.showMessageDialog(
-                        null,
-                        errorMessage,
-                        commonBundle.message("common.error"),
-                        JOptionPane.ERROR_MESSAGE
-                );
-
+                ));
                 return;
             }
 
             handlerFiles[0] = handler.getContainingFile();
         });
+
+        for (final String errorMessage : errors) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    errorMessage,
+                    commonBundle.message("common.error"),
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
 
         return handlerFiles[0];
     }
