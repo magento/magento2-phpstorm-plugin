@@ -135,8 +135,9 @@ public class WebApiTypeIndex extends ScalarIndexExtension<String> {
         }
         final String classFqn = phpClass.getPresentableFQN();
         final Collection<VirtualFile> containingFiles = FileBasedIndex
-            .getInstance().getContainingFiles(
-                    KEY,
+                .getInstance()
+                .getContainingFiles(
+                        KEY,
                         classFqn,
                         GlobalSearchScope.allScope(phpClass.getProject())
                 );
@@ -145,12 +146,19 @@ public class WebApiTypeIndex extends ScalarIndexExtension<String> {
         final String methodFqn = method.getName();
 
         for (final VirtualFile virtualFile : containingFiles) {
+            if (!(virtualFile instanceof XmlFile)) {
+                continue;
+            }
             final XmlFile file = (XmlFile) psiManager.findFile(virtualFile);
 
             if (file == null) {
                 continue;
             }
             final XmlTag rootTag = file.getRootTag();
+
+            if (rootTag == null) {
+                continue;
+            }
             fillRelatedTags(classFqn, methodFqn, rootTag, tags);
         }
 
