@@ -68,7 +68,10 @@ public class WebApiTypeIndex extends ScalarIndexExtension<String> {
             if (document == null) {
                 return map;
             }
-            final XmlTag[] xmlTags = PsiTreeUtil.getChildrenOfType(psiFile.getFirstChild(), XmlTag.class);
+            final XmlTag[] xmlTags = PsiTreeUtil.getChildrenOfType(
+                    psiFile.getFirstChild(),
+                    XmlTag.class
+            );
 
             if (xmlTags == null) {
                 return map;
