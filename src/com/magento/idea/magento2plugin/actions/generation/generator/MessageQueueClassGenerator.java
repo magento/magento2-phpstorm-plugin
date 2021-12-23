@@ -21,7 +21,6 @@ import com.magento.idea.magento2plugin.magento.files.MessageQueueClassPhp;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
