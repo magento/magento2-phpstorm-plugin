@@ -168,6 +168,8 @@ public class NewUiComponentGridDialog extends AbstractDialog {
             message = {NotEmptyRule.MESSAGE, "Parent Menu"})
     private FilteredComboBox parentMenu;
 
+    private JTextField tableName;
+
     private JLabel aclLabel;
     private JLabel routeLabel;//NOPMD
     private JLabel controllerLabel;//NOPMD
@@ -186,7 +188,20 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     private JLabel collectionLabel;//NOPMD
     private JLabel dataProviderParentDirectoryLabel;
     private JLabel tableNameLabel;
-    private JTextField tableName;
+    private JLabel uiComponentNameErrorMessage;//NOPMD
+    private JLabel idFieldErrorMessage;//NOPMD
+    private JLabel providerClassNameErrorMessage;//NOPMD
+    private JLabel dataProviderParentDirectoryErrorMessage;//NOPMD
+    private JLabel aclErrorMessage;//NOPMD
+    private JLabel parentAclErrorMessage;//NOPMD
+    private JLabel aclTitleErrorMessage;//NOPMD
+    private JLabel routeErrorMessage;//NOPMD
+    private JLabel controllerNameErrorMessage;//NOPMD
+    private JLabel actionNameErrorMessage;//NOPMD
+    private JLabel sortOrderErrorMessage;//NOPMD
+    private JLabel menuIdentifierErrorMessage;//NOPMD
+    private JLabel menuTitleErrorMessage;//NOPMD
+    private JLabel parentMenuErrorMessage;//NOPMD
 
     /**
      * New UI component grid dialog constructor.
