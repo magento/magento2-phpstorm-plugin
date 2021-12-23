@@ -51,13 +51,22 @@ public final class GitHubNewIssueBodyBuilderUtil {
         if (encode(stackTrace).length() <= maxAllowedStackTraceLength) {
             return buildTemplate(project, bugDescription, stackTrace);
         }
+        boolean isFound = false;
+        int step = 1;
+        String encodedCutStackTrace = "";
 
-        final String cutStackTrace = encode(stackTrace).substring(
-                0,
-                maxAllowedStackTraceLength - 1
-        );
+        while (!isFound) {
+            final String cutStackTrace = stackTrace.substring(0, maxAllowedStackTraceLength - step);
+            encodedCutStackTrace = encode(cutStackTrace);
 
-        return buildTemplate(project, bugDescription, decode(cutStackTrace));
+            if (encodedCutStackTrace.length() <= maxAllowedStackTraceLength) {
+                isFound = true;
+            } else {
+                step += 10;
+            }
+        }
+
+        return buildTemplate(project, bugDescription, decode(encodedCutStackTrace));
     }
 
     /**
