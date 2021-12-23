@@ -150,8 +150,8 @@ public class NewDbSchemaDialog extends AbstractDialog {
                 return;
             }
             generateWhitelistJsonFile(dbSchemaXmlData);
+            exit();
         }
-        exit();
     }
 
     /**
