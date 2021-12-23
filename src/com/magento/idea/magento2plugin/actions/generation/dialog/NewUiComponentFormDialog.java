@@ -195,6 +195,18 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     private JLabel dataProviderLabel;//NOPMD
     private JLabel dataProviderClassNameLabel;//NOPMD
     private JLabel dataProviderDirectoryLabel;//NOPMD
+    private JLabel formNameErrorMessage;//NOPMD
+    private JLabel formLabelErrorMessage;//NOPMD
+    private JLabel routeErrorMessage;//NOPMD
+    private JLabel viewControllerNameErrorMessage;//NOPMD
+    private JLabel viewActionNameErrorMessage;//NOPMD
+    private JLabel submitControllerNameErrorMessage;//NOPMD
+    private JLabel submitActionNameErrorMessage;//NOPMD
+    private JLabel dataProviderClassNameErrorMessage;//NOPMD
+    private JLabel dataProviderDirectoryErrorMessage;//NOPMD
+    private JLabel aclErrorMessage;//NOPMD
+    private JLabel parentAclErrorMessage;//NOPMD
+    private JLabel aclTitleErrorMessage;//NOPMD
 
     /**
      * Open new dialog for adding new controller.
