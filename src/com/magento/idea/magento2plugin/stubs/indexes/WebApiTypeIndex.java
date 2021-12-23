@@ -176,6 +176,7 @@ public class WebApiTypeIndex extends ScalarIndexExtension<String> {
      * @param parentTag XmlTag
      * @param tagsReferences List[XmlTag]
      */
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     private static void fillRelatedTags(
             final String classFqn,
             final String methodFqn,
