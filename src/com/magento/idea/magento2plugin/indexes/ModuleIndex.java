@@ -119,12 +119,12 @@ public final class ModuleIndex {
      * @return PsiDirectory
      */
     public @Nullable PsiDirectory getModuleDirectoryByModuleName(final String moduleName) {
-        final FileBasedIndex index = FileBasedIndex
-                .getInstance();
-
         if (DumbService.getInstance(project).isDumb()) {
             return null;
         }
+        final FileBasedIndex index = FileBasedIndex
+                .getInstance();
+
         final Collection<VirtualFile> files = index.getContainingFiles(
                 ModuleNameIndex.KEY,
                 moduleName,
