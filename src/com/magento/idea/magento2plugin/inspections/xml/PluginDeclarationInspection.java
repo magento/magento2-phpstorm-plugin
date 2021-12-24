@@ -119,8 +119,11 @@ public class PluginDeclarationInspection extends PhpInspection {
                                     pluginIndex,
                                     file
                         );
+                        final XmlAttribute pluginTypeAttribute =
+                                pluginTypeXmlTag.getAttribute(ModuleDiXml.TYPE_ATTR);
 
                         if (pluginTypeDisabledAttribute != null
+                                && pluginTypeAttribute == null
                                 && pluginTypeDisabledAttribute.getValue() != null
                                 && pluginTypeDisabledAttribute.getValue().equals("true")
                                 && !pluginTypeName.isEmpty()
