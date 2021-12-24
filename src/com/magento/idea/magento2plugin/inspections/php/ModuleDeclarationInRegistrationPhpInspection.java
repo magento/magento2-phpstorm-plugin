@@ -21,9 +21,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class ModuleDeclarationInRegistrationPhpInspection extends PhpInspection {
 
-    @NotNull
     @Override
-    public PsiElementVisitor buildVisitor(
+    public @NotNull PsiElementVisitor buildVisitor(
             final @NotNull ProblemsHolder problemsHolder,
             final boolean isOnTheFly
     ) {
@@ -33,19 +32,22 @@ public class ModuleDeclarationInRegistrationPhpInspection extends PhpInspection 
             public void visitPhpStringLiteralExpression(final StringLiteralExpression expression) {
                 final PsiFile file =  expression.getContainingFile();
                 final String filename = file.getName();
-                if (!filename.equals(RegistrationPhp.FILE_NAME)) {
+
+                if (!RegistrationPhp.FILE_NAME.equals(filename)) {
                         return;
                 }
+
                 if (!IsFileInEditableModuleUtil.execute(file)) {
                         return;
                 }
                 final String expectedName = GetEditableModuleNameByRootFileUtil.execute(file);
                 final String actualName = expression.getContents();
+
                 if (actualName.equals(expectedName)) {
                         return;
                 }
-
                 final InspectionBundle inspectionBundle = new InspectionBundle();
+
                 problemsHolder.registerProblem(
                         expression,
                         inspectionBundle.message(
