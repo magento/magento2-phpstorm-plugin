@@ -149,7 +149,7 @@ public class WebApiTypeIndex extends ScalarIndexExtension<String> {
         final String methodFqn = method.getName();
 
         for (final VirtualFile virtualFile : containingFiles) {
-            if (!(virtualFile instanceof XmlFile)) {
+            if (virtualFile.getFileType() != XmlFileType.INSTANCE) {
                 continue;
             }
             final XmlFile file = (XmlFile) psiManager.findFile(virtualFile);
