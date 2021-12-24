@@ -13,6 +13,7 @@ public enum FrameworkLibraryType {
     ABSTRACT_COLLECTION(
             "Magento\\Framework\\Model\\ResourceModel\\Db\\Collection\\AbstractCollection"
     ),
+    COMPONENT_REGISTRAR("Magento\\Framework\\Component\\ComponentRegistrar"),
     COLLECTION_PROCESSOR("Magento\\Framework\\Api\\SearchCriteria\\CollectionProcessorInterface"),
     DATA_PERSISTOR("Magento\\Framework\\App\\Request\\DataPersistorInterface"),
     DATA_OBJECT("Magento\\Framework\\DataObject"),
