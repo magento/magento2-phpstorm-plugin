@@ -11,6 +11,7 @@ import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.CheckUtil;
 import com.intellij.psi.meta.PsiMetaData;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -474,7 +475,7 @@ abstract public class LineMarkerXmlTagDecorator implements XmlTag {
 
     @Override
     public void checkAdd(@NotNull PsiElement psiElement) throws IncorrectOperationException {
-        xmlTag.checkAdd(psiElement);
+        CheckUtil.checkWritable(this);
     }
 
     @Override
