@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.linemarker.xml;
 
 import com.intellij.lang.ASTNode;
@@ -10,7 +11,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiInvalidElementAccessException;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.PsiReference;
+import com.intellij.psi.ResolveState;
 import com.intellij.psi.impl.CheckUtil;
 import com.intellij.psi.meta.PsiMetaData;
 import com.intellij.psi.scope.PsiScopeProcessor;
@@ -26,18 +33,17 @@ import com.intellij.xml.XmlElementDescriptor;
 import com.intellij.xml.XmlNSDescriptor;
 import com.magento.idea.magento2plugin.magento.packages.MagentoComponentManager;
 import com.magento.idea.magento2plugin.magento.packages.MagentoModule;
+import java.util.Map;
+import javax.swing.Icon;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import java.util.Map;
-
 /**
  * Decorator for XmlTag, which allows to render user-friendly line markers.
  */
-abstract public class LineMarkerXmlTagDecorator implements XmlTag {
+public abstract class LineMarkerXmlTagDecorator implements XmlTag {
 
     protected XmlTag xmlTag;
 
@@ -66,7 +72,9 @@ abstract public class LineMarkerXmlTagDecorator implements XmlTag {
     @NotNull
     private String getComponentName() {
         MagentoComponentManager moduleManager = MagentoComponentManager.getInstance(project);
-        MagentoModule module = moduleManager.getComponentOfTypeForFile(xmlTag.getContainingFile(), MagentoModule.class);
+        MagentoModule module = moduleManager.getComponentOfTypeForFile(
+                xmlTag.getContainingFile(), MagentoModule.class
+        );
 
         if (module == null) {
             return "";
@@ -76,10 +84,11 @@ abstract public class LineMarkerXmlTagDecorator implements XmlTag {
     }
 
     @NotNull
-    abstract public String getDescription();
+    public abstract String getDescription();
 
     /**
-     * Get line marker text. This method should be overridden to generate user-friendly XmlTag presentation.
+     * Get line marker text.
+     * This method should be overridden to generate user-friendly XmlTag presentation.
      */
     @Override
     @NotNull
@@ -139,17 +148,26 @@ abstract public class LineMarkerXmlTagDecorator implements XmlTag {
     }
 
     @Override
-    public XmlAttribute setAttribute(@NonNls String s, @NonNls String s1, @NonNls String s2) throws IncorrectOperationException {
+    public XmlAttribute setAttribute(
+            @NonNls String s, @NonNls String s1, @NonNls String s2
+    ) throws IncorrectOperationException {
         return xmlTag.setAttribute(s, s1, s2);
     }
 
     @Override
-    public XmlAttribute setAttribute(@NonNls String s, @NonNls String s1) throws IncorrectOperationException {
+    public XmlAttribute setAttribute(
+            @NonNls String s, @NonNls String s1
+    ) throws IncorrectOperationException {
         return xmlTag.setAttribute(s, s1);
     }
 
     @Override
-    public XmlTag createChildTag(@NonNls String s, @NonNls String s1, @Nullable @NonNls String s2, boolean b) {
+    public XmlTag createChildTag(
+            @NonNls String s,
+            @NonNls String s1,
+            @Nullable @NonNls String s2,
+            boolean b
+    ) {
         return xmlTag.createChildTag(s, s1, s2, b);
     }
 
@@ -248,197 +266,154 @@ abstract public class LineMarkerXmlTagDecorator implements XmlTag {
     }
 
     @Override
-    public boolean processElements(PsiElementProcessor psiElementProcessor, PsiElement psiElement) {
+    public boolean processElements(
+            PsiElementProcessor psiElementProcessor,
+            PsiElement psiElement
+    ) {
         return xmlTag.processElements(psiElementProcessor, psiElement);
     }
 
     @Override
     @NotNull
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public Project getProject() throws PsiInvalidElementAccessException {
         return xmlTag.getProject();
     }
 
     @Override
     @NotNull
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public Language getLanguage() {
         return xmlTag.getLanguage();
     }
 
     @Override
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public PsiManager getManager() {
         return xmlTag.getManager();
     }
 
     @Override
     @NotNull
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public PsiElement[] getChildren() {
         return xmlTag.getChildren();
     }
 
     @Override
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public PsiElement getParent() {
         return xmlTag.getParent();
     }
 
     @Override
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public PsiElement getFirstChild() {
         return xmlTag.getFirstChild();
     }
 
     @Override
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public PsiElement getLastChild() {
         return xmlTag.getLastChild();
     }
 
     @Override
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public PsiElement getNextSibling() {
         return xmlTag.getNextSibling();
     }
 
     @Override
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public PsiElement getPrevSibling() {
         return xmlTag.getPrevSibling();
     }
 
     @Override
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public PsiFile getContainingFile() throws PsiInvalidElementAccessException {
         return xmlTag.getContainingFile();
     }
 
     @Override
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public TextRange getTextRange() {
         return xmlTag.getTextRange();
     }
 
     @Override
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public int getStartOffsetInParent() {
         return xmlTag.getStartOffsetInParent();
     }
 
     @Override
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public int getTextLength() {
         return xmlTag.getTextLength();
     }
 
     @Override
     @Nullable
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public PsiElement findElementAt(int i) {
         return xmlTag.findElementAt(i);
     }
 
     @Override
     @Nullable
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public PsiReference findReferenceAt(int i) {
         return xmlTag.findReferenceAt(i);
     }
 
     @Override
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public int getTextOffset() {
         return xmlTag.getTextOffset();
     }
 
     @Override
     @NonNls
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public String getText() {
         return xmlTag.getText();
     }
 
     @Override
     @NotNull
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public char[] textToCharArray() {
         return xmlTag.textToCharArray();
     }
 
     @Override
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public PsiElement getNavigationElement() {
         return xmlTag.getNavigationElement();
     }
 
     @Override
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public PsiElement getOriginalElement() {
         return xmlTag.getOriginalElement();
     }
 
     @Override
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public boolean textMatches(@NotNull @NonNls CharSequence charSequence) {
         return xmlTag.textMatches(charSequence);
     }
 
     @Override
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public boolean textMatches(@NotNull PsiElement psiElement) {
         return xmlTag.textMatches(psiElement);
     }
 
     @Override
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public boolean textContains(char c) {
         return xmlTag.textContains(c);
     }
@@ -464,32 +439,49 @@ abstract public class LineMarkerXmlTagDecorator implements XmlTag {
     }
 
     @Override
-    public PsiElement addBefore(@NotNull PsiElement psiElement, @Nullable PsiElement psiElement1) throws IncorrectOperationException {
+    public PsiElement addBefore(
+            @NotNull PsiElement psiElement,
+            @Nullable PsiElement psiElement1
+    ) throws IncorrectOperationException {
         return xmlTag.addBefore(psiElement, psiElement1);
     }
 
     @Override
-    public PsiElement addAfter(@NotNull PsiElement psiElement, @Nullable PsiElement psiElement1) throws IncorrectOperationException {
+    public PsiElement addAfter(
+            @NotNull PsiElement psiElement,
+            @Nullable PsiElement psiElement1
+    ) throws IncorrectOperationException {
         return xmlTag.addAfter(psiElement, psiElement1);
     }
 
     @Override
     public void checkAdd(@NotNull PsiElement psiElement) throws IncorrectOperationException {
-        CheckUtil.checkWritable(this);
+        xmlTag.checkAdd(psiElement);
     }
 
     @Override
-    public PsiElement addRange(PsiElement psiElement, PsiElement psiElement1) throws IncorrectOperationException {
+    public PsiElement addRange(
+            PsiElement psiElement,
+            PsiElement psiElement1
+    ) throws IncorrectOperationException {
         return xmlTag.addRange(psiElement, psiElement1);
     }
 
     @Override
-    public PsiElement addRangeBefore(@NotNull PsiElement psiElement, @NotNull PsiElement psiElement1, PsiElement psiElement2) throws IncorrectOperationException {
+    public PsiElement addRangeBefore(
+            @NotNull PsiElement psiElement,
+            @NotNull PsiElement psiElement1,
+            PsiElement psiElement2
+    ) throws IncorrectOperationException {
         return xmlTag.addRangeBefore(psiElement, psiElement1, psiElement2);
     }
 
     @Override
-    public PsiElement addRangeAfter(PsiElement psiElement, PsiElement psiElement1, PsiElement psiElement2) throws IncorrectOperationException {
+    public PsiElement addRangeAfter(
+            PsiElement psiElement,
+            PsiElement psiElement1,
+            PsiElement psiElement2
+    ) throws IncorrectOperationException {
         return xmlTag.addRangeAfter(psiElement, psiElement1, psiElement2);
     }
 
@@ -504,7 +496,10 @@ abstract public class LineMarkerXmlTagDecorator implements XmlTag {
     }
 
     @Override
-    public void deleteChildRange(PsiElement psiElement, PsiElement psiElement1) throws IncorrectOperationException {
+    public void deleteChildRange(
+            PsiElement psiElement,
+            PsiElement psiElement1
+    ) throws IncorrectOperationException {
         xmlTag.deleteChildRange(psiElement, psiElement1);
     }
 
@@ -514,44 +509,34 @@ abstract public class LineMarkerXmlTagDecorator implements XmlTag {
     }
 
     @Override
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public boolean isValid() {
         return xmlTag.isValid();
     }
 
     @Override
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public boolean isWritable() {
         return xmlTag.isWritable();
     }
 
     @Override
     @Nullable
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public PsiReference getReference() {
         return xmlTag.getReference();
     }
 
     @Override
     @NotNull
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public PsiReference[] getReferences() {
         return xmlTag.getReferences();
     }
 
     @Override
     @Nullable
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public <T> T getCopyableUserData(Key<T> key) {
         return xmlTag.getCopyableUserData(key);
     }
@@ -562,66 +547,57 @@ abstract public class LineMarkerXmlTagDecorator implements XmlTag {
     }
 
     @Override
-    public boolean processDeclarations(@NotNull PsiScopeProcessor psiScopeProcessor, @NotNull ResolveState resolveState, @Nullable PsiElement psiElement, @NotNull PsiElement psiElement1) {
+    public boolean processDeclarations(
+            @NotNull PsiScopeProcessor psiScopeProcessor,
+            @NotNull ResolveState resolveState,
+            @Nullable PsiElement psiElement,
+            @NotNull PsiElement psiElement1
+    ) {
         return xmlTag.processDeclarations(psiScopeProcessor, resolveState, psiElement, psiElement1);
     }
 
     @Override
     @Nullable
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public PsiElement getContext() {
         return xmlTag.getContext();
     }
 
     @Override
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public boolean isPhysical() {
         return xmlTag.isPhysical();
     }
 
     @Override
     @NotNull
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public GlobalSearchScope getResolveScope() {
         return xmlTag.getResolveScope();
     }
 
     @Override
     @NotNull
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public SearchScope getUseScope() {
         return xmlTag.getUseScope();
     }
 
     @Override
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public ASTNode getNode() {
         return xmlTag.getNode();
     }
 
     @Override
     @NonNls
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public String toString() {
         return xmlTag.toString();
     }
 
     @Override
-    @Contract(
-            pure = true
-    )
+    @Contract(pure = true)
     public boolean isEquivalentTo(PsiElement psiElement) {
         return xmlTag.isEquivalentTo(psiElement);
     }
