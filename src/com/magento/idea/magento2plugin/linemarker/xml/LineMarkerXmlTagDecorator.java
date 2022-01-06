@@ -149,14 +149,17 @@ public abstract class LineMarkerXmlTagDecorator implements XmlTag {
 
     @Override
     public XmlAttribute setAttribute(
-            @NonNls String s, @NonNls String s1, @NonNls String s2
+            @NonNls String s,
+            @NonNls String s1,
+            @NonNls String s2
     ) throws IncorrectOperationException {
         return xmlTag.setAttribute(s, s1, s2);
     }
 
     @Override
     public XmlAttribute setAttribute(
-            @NonNls String s, @NonNls String s1
+            @NonNls String s,
+            @NonNls String s1
     ) throws IncorrectOperationException {
         return xmlTag.setAttribute(s, s1);
     }
