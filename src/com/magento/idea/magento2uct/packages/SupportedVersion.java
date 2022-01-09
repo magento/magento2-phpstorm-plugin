@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2uct.packages;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +36,10 @@ public enum SupportedVersion {
     V242("2.4.2"),
     V2421("2.4.2-p1"),
     V2422("2.4.2-p2"),
-    V243("2.4.3");
+    V243("2.4.3"),
+    V2431("2.4.3-p1"),
+    V2441("2.4.4-beta1"),
+    V2442("2.4.4-beta2");
 
     private final String version;
 
@@ -81,5 +85,24 @@ public enum SupportedVersion {
         }
 
         return versions;
+    }
+
+    /**
+     * Get previous versions.
+     *
+     * @param version SupportedVersion
+     *
+     * @return List[SupportedVersion]
+     */
+    public static List<SupportedVersion> getPriorVersions(final SupportedVersion version) {
+        final List<SupportedVersion> previousVersions = new ArrayList<>();
+
+        for (final SupportedVersion supportedVersion : SupportedVersion.values()) {
+            if (supportedVersion.compareTo(version) < 0) {
+                previousVersions.add(supportedVersion);
+            }
+        }
+
+        return previousVersions;
     }
 }

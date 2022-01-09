@@ -9,6 +9,19 @@ import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.psi.PsiElementVisitor;
 import com.magento.idea.magento2uct.bundles.UctInspectionBundle;
 import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
+import com.magento.idea.magento2uct.inspections.php.api.CalledNonApiMethod;
+import com.magento.idea.magento2uct.inspections.php.api.CalledNonInterfaceMethod;
+import com.magento.idea.magento2uct.inspections.php.api.ExtendedNonApiClass;
+import com.magento.idea.magento2uct.inspections.php.api.ImplementedNonApiInterface;
+import com.magento.idea.magento2uct.inspections.php.api.ImportedNonApiClass;
+import com.magento.idea.magento2uct.inspections.php.api.ImportedNonApiInterface;
+import com.magento.idea.magento2uct.inspections.php.api.InheritedNonApiInterface;
+import com.magento.idea.magento2uct.inspections.php.api.OverriddenNonApiConstant;
+import com.magento.idea.magento2uct.inspections.php.api.OverriddenNonApiProperty;
+import com.magento.idea.magento2uct.inspections.php.api.PossibleDependencyOnImplDetails;
+import com.magento.idea.magento2uct.inspections.php.api.UsedNonApiConstant;
+import com.magento.idea.magento2uct.inspections.php.api.UsedNonApiProperty;
+import com.magento.idea.magento2uct.inspections.php.api.UsedNonApiType;
 import com.magento.idea.magento2uct.inspections.php.deprecation.CallingDeprecatedMethod;
 import com.magento.idea.magento2uct.inspections.php.deprecation.ExtendingDeprecatedClass;
 import com.magento.idea.magento2uct.inspections.php.deprecation.ImplementedDeprecatedInterface;
@@ -21,11 +34,23 @@ import com.magento.idea.magento2uct.inspections.php.deprecation.UsingDeprecatedC
 import com.magento.idea.magento2uct.inspections.php.deprecation.UsingDeprecatedConstant;
 import com.magento.idea.magento2uct.inspections.php.deprecation.UsingDeprecatedInterface;
 import com.magento.idea.magento2uct.inspections.php.deprecation.UsingDeprecatedProperty;
+import com.magento.idea.magento2uct.inspections.php.existence.CalledNonExistentMethod;
+import com.magento.idea.magento2uct.inspections.php.existence.ExtendedNonExistentClass;
+import com.magento.idea.magento2uct.inspections.php.existence.ImplementedNonExistentInterface;
+import com.magento.idea.magento2uct.inspections.php.existence.ImportingNonExistentClass;
+import com.magento.idea.magento2uct.inspections.php.existence.ImportingNonExistentInterface;
+import com.magento.idea.magento2uct.inspections.php.existence.InheritedNonExistentInterface;
+import com.magento.idea.magento2uct.inspections.php.existence.OverriddenNonExistentConstant;
+import com.magento.idea.magento2uct.inspections.php.existence.OverriddenNonExistentProperty;
+import com.magento.idea.magento2uct.inspections.php.existence.UsedNonExistentConstant;
+import com.magento.idea.magento2uct.inspections.php.existence.UsedNonExistentProperty;
+import com.magento.idea.magento2uct.inspections.php.existence.UsedNonExistentType;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings("PMD.ExcessiveImports")
 public enum SupportedIssue {
 
     EXTENDING_DEPRECATED_CLASS(
@@ -99,11 +124,155 @@ public enum SupportedIssue {
             IssueSeverityLevel.WARNING,
             "customCode.warnings.deprecated.1534",
             UsingDeprecatedProperty.class
+    ),
+    IMPORTED_NON_EXISTENT_CLASS(
+            1112,
+            IssueSeverityLevel.CRITICAL,
+            "customCode.critical.existence.1112",
+            ImportingNonExistentClass.class
+    ),
+    IMPORTED_NON_EXISTENT_INTERFACE(
+            1312,
+            IssueSeverityLevel.CRITICAL,
+            "customCode.critical.existence.1312",
+            ImportingNonExistentInterface.class
+    ),
+    INHERITED_NON_EXISTENT_INTERFACE(
+            1317,
+            IssueSeverityLevel.CRITICAL,
+            "customCode.critical.existence.1317",
+            InheritedNonExistentInterface.class
+    ),
+    IMPLEMENTED_NON_EXISTENT_INTERFACE(
+            1318,
+            IssueSeverityLevel.CRITICAL,
+            "customCode.critical.existence.1318",
+            ImplementedNonExistentInterface.class
+    ),
+    EXTENDED_NON_EXISTENT_CLASS(
+            1111,
+            IssueSeverityLevel.CRITICAL,
+            "customCode.critical.existence.1111",
+            ExtendedNonExistentClass.class
+    ),
+    OVERRIDDEN_NON_EXISTENT_CONSTANT(
+            1215,
+            IssueSeverityLevel.CRITICAL,
+            "customCode.critical.existence.1215",
+            OverriddenNonExistentConstant.class
+    ),
+    OVERRIDDEN_NON_EXISTENT_PROPERTY(
+            1515,
+            IssueSeverityLevel.CRITICAL,
+            "customCode.critical.existence.1515",
+            OverriddenNonExistentProperty.class
+    ),
+    CALLED_NON_EXISTENT_METHOD(
+            1410,
+            IssueSeverityLevel.CRITICAL,
+            "customCode.critical.existence.1410",
+            CalledNonExistentMethod.class
+    ),
+    USED_NON_EXISTENT_TYPE(
+            1110,
+            IssueSeverityLevel.CRITICAL,
+            "customCode.critical.existence.1110",
+            UsedNonExistentType.class
+    ),
+    USED_NON_EXISTENT_CONSTANT(
+            1214,
+            IssueSeverityLevel.CRITICAL,
+            "customCode.critical.existence.1214",
+            UsedNonExistentConstant.class
+    ),
+    USED_NON_EXISTENT_PROPERTY(
+            1514,
+            IssueSeverityLevel.CRITICAL,
+            "customCode.critical.existence.1514",
+            UsedNonExistentProperty.class
+    ),
+    IMPORTED_NON_API_CLASS(
+            1122,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1122",
+            ImportedNonApiClass.class
+    ),
+    IMPORTED_NON_API_INTERFACE(
+            1322,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1322",
+            ImportedNonApiInterface.class
+    ),
+    CALLED_NON_API_METHOD(
+            1429,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1429",
+            CalledNonApiMethod.class
+    ),
+    OVERRIDDEN_NON_API_CONSTANT(
+            1225,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1225",
+            OverriddenNonApiConstant.class
+    ),
+    OVERRIDDEN_NON_API_PROPERTY(
+            1525,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1525",
+            OverriddenNonApiProperty.class
+    ),
+    USED_NON_API_CONSTANT(
+            1224,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1224",
+            UsedNonApiConstant.class
+    ),
+    USED_NON_API_PROPERTY(
+            1524,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1524",
+            UsedNonApiProperty.class
+    ),
+    USED_NON_API_TYPE(
+            1124,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1124",
+            UsedNonApiType.class
+    ),
+    IMPLEMENTED_NON_API_INTERFACE(
+            1328,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1328",
+            ImplementedNonApiInterface.class
+    ),
+    EXTENDED_NON_API_CLASS(
+            1121,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1121",
+            ExtendedNonApiClass.class
+    ),
+    INHERITED_NON_API_INTERFACE(
+            1327,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1327",
+            InheritedNonApiInterface.class
+    ),
+    POSSIBLE_DEPENDENCY_ON_IMPL_DETAILS(
+            1428,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1428",
+            PossibleDependencyOnImplDetails.class
+    ),
+    CALLED_NON_INTERFACE_METHOD(
+            1449,
+            IssueSeverityLevel.ERROR,
+            "customCode.errors.api.1449",
+            CalledNonInterfaceMethod.class
     );
 
     private final int code;
     private final IssueSeverityLevel level;
-    private final String messageKey;
+    private final String message;
     private final Class<? extends LocalInspectionTool> inspectionClass;
     private static final UctInspectionBundle BUNDLE = new UctInspectionBundle();
 
@@ -112,18 +281,18 @@ public enum SupportedIssue {
      *
      * @param code IssueSeverityLevel
      * @param level IssueSeverityLevel
-     * @param messageKey String
+     * @param message String
      * @param inspectionClass Class
      */
     SupportedIssue(
             final int code,
             final IssueSeverityLevel level,
-            final String messageKey,
+            final String message,
             final Class<? extends LocalInspectionTool> inspectionClass
     ) {
         this.code = code;
         this.level = level;
-        this.messageKey = messageKey;
+        this.message = message;
         this.inspectionClass = inspectionClass;
     }
 
@@ -153,7 +322,7 @@ public enum SupportedIssue {
      * @return String
      */
     public String getMessage(final Object... args) {
-        return BUNDLE.message(messageKey, args);
+        return BUNDLE.message(message, args);
     }
 
     /**

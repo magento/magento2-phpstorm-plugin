@@ -8,80 +8,57 @@ package com.magento.idea.magento2uct.inspections.php.deprecation;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiElementVisitor;
-import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.impl.ClassConstImpl;
-import com.jetbrains.php.lang.psi.resolve.types.PhpTypeAnalyserVisitor;
 import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
+import com.magento.idea.magento2uct.inspections.php.OverriddenFieldInspection;
+import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import com.magento.idea.magento2uct.settings.UctSettingsService;
 import com.magento.idea.magento2uct.versioning.VersionStateManager;
 import org.jetbrains.annotations.NotNull;
 
-public class OverridingDeprecatedConstant extends PhpInspection {
+public class OverridingDeprecatedConstant extends OverriddenFieldInspection {
 
     @Override
-    @SuppressWarnings("PMD.CognitiveComplexity")
-    public @NotNull PsiElementVisitor buildVisitor(
+    protected void execute(
+            final Project project,
             final @NotNull ProblemsHolder problemsHolder,
-            final boolean isOnTheFly
+            final Field field,
+            final Field overriddenField,
+            final PhpClass parentClass
     ) {
-        return new PhpTypeAnalyserVisitor() {
+        if (!VersionStateManager.getInstance(project).isDeprecated(overriddenField.getFQN())) {
+            return;
+        }
 
-            @Override
-            public void visitPhpField(final Field field) {
-                final Project project = field.getProject();
-                final UctSettingsService settings = UctSettingsService.getInstance(project);
+        if (problemsHolder instanceof UctProblemsHolder) {
+            ((UctProblemsHolder) problemsHolder).setIssue(
+                    SupportedIssue.OVERRIDING_DEPRECATED_CONSTANT
+            );
+        }
+        final String deprecatedIn = VersionStateManager.getInstance(project)
+                .getDeprecatedInVersion(overriddenField.getFQN());
 
-                if (!settings.isEnabled() || !settings.isIssueLevelSatisfiable(
-                        SupportedIssue.OVERRIDING_DEPRECATED_CONSTANT.getLevel())
-                ) {
-                    return;
-                }
-                super.visitPhpField(field);
+        problemsHolder.registerProblem(
+                field,
+                SupportedIssue.OVERRIDING_DEPRECATED_CONSTANT.getMessage(
+                        parentClass.getFQN()
+                                .concat("::")
+                                .concat(overriddenField.getName()),
+                        deprecatedIn
+                ),
+                ProblemHighlightType.LIKE_DEPRECATED
+        );
+    }
 
-                if (!(field instanceof ClassConstImpl)) {
-                    return;
-                }
-                final PhpClass phpClass = field.getContainingClass();
+    @Override
+    protected boolean isTypeValid(final Field field) {
+        return field instanceof ClassConstImpl;
+    }
 
-                if (phpClass == null) {
-                    return;
-                }
-                PhpClass parentClass = phpClass.getSuperClass();
-                boolean isFound = false;
-                final ClassConstImpl constant = (ClassConstImpl) field;
-
-                while (parentClass != null && !isFound) {
-                    for (final Field ownField : parentClass.getOwnFields()) {
-                        if (ownField instanceof ClassConstImpl
-                                && ownField.getName().equals(constant.getName())
-                                && VersionStateManager.getInstance(project)
-                                .isDeprecated(ownField.getFQN())
-                        ) {
-                            if (problemsHolder instanceof UctProblemsHolder) {
-                                ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                                        SupportedIssue.OVERRIDING_DEPRECATED_CONSTANT.getCode()
-                                );
-                            }
-                            problemsHolder.registerProblem(
-                                    constant,
-                                    SupportedIssue.OVERRIDING_DEPRECATED_CONSTANT.getMessage(
-                                            parentClass.getFQN()
-                                                    .concat("::")
-                                                    .concat(ownField.getName())
-                                    ),
-                                    ProblemHighlightType.LIKE_DEPRECATED
-                            );
-                            isFound = true;
-                            break;
-                        }
-                    }
-                    parentClass = parentClass.getSuperClass();
-                }
-            }
-        };
+    @Override
+    protected IssueSeverityLevel getSeverityLevel() {
+        return SupportedIssue.OVERRIDING_DEPRECATED_CONSTANT.getLevel();
     }
 }
