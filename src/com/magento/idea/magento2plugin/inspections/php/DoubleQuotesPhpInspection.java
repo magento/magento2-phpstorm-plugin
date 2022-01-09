@@ -29,7 +29,7 @@ public class DoubleQuotesPhpInspection extends PhpInspection {
             public void visitPhpStringLiteralExpression(final StringLiteralExpression expression) {
                 final String fileText = expression.getText();
 
-                if (fileText.charAt(1) != '"') {
+                if (fileText.charAt(0) != '"') {
                     return;
                 }
 
