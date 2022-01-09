@@ -7,7 +7,7 @@ package com.magento.idea.magento2plugin.inspections.php;
 public class DoubleQuotesPhpInspectionTest extends InspectionPhpFixtureTestCase {
 
     private final String errorMessage =  inspectionBundle.message(
-        "inspection.displayName.DoubleQuotesPhpInspection"
+        "inspection.warning.double.quotes.misuse"
     );
 
     @Override

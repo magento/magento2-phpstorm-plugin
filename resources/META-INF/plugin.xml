@@ -191,7 +191,7 @@
                          implementationClass="com.magento.idea.magento2plugin.inspections.php.ModuleDeclarationInRegistrationPhpInspection"/>
         <localInspection language="PHP" groupPath="PHP"
                          shortName="DoubleQuotesPhpInspection"
-                         bundle="magento2.inspection" key="inspection.displayName.DoubleQuotesPhpInspection"
+                         bundle="magento2.inspection" key="inspection.warning.double.quotes.misuse.name"
                          groupBundle="magento2.inspection" groupKey="inspection.group.name"
                          enabledByDefault="true"
                          level="WARNING"

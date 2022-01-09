@@ -41,7 +41,7 @@ public class DoubleQuotesPhpInspection extends PhpInspection {
                 problemsHolder.registerProblem(
                         expression,
                         inspectionBundle.message(
-                                "inspection.displayName.DoubleQuotesPhpInspection"
+                            "inspection.warning.double.quotes.misuse"
                         ),
                         ProblemHighlightType.WARNING
                 );
