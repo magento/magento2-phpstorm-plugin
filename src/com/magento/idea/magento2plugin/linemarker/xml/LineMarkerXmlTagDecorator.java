@@ -501,7 +501,10 @@ public abstract class LineMarkerXmlTagDecorator implements XmlTag {
 
     @Override
     public void checkDelete() throws IncorrectOperationException {
-        xmlTag.checkDelete();
+        if (xmlTag instanceof XmlTagImpl) {
+            ((XmlTagImpl) xmlTag).checkDelete();
+        }
+        throw new IncorrectOperationException(getClass().getName());
     }
 
     @Override
