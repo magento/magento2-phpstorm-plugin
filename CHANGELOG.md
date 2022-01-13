@@ -4,7 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
+## 4.3.0
+
 ## 4.2.0
+
+### Added
+
+- Extending of the built-in Upgrade Compatibility Tool [#read-more](https://github.com/magento/magento2-phpstorm-plugin/wiki/4.2.0-Release)
+
+### Changed
+
+- Enhanced Magento 2 version resolving in [#747](https://github.com/magento/magento2-phpstorm-plugin/pull/747), [#751](https://github.com/magento/magento2-phpstorm-plugin/pull/751), [#777](https://github.com/magento/magento2-phpstorm-plugin/pull/777)
+
+### Fixed
+
+- Fixed NullPointerException for the InjectAViewModelAction in [#800](https://github.com/magento/magento2-phpstorm-plugin/pull/800)
+- Fixed NullPointerException for a name attribute of the event tag and code style fixes in [#799](https://github.com/magento/magento2-phpstorm-plugin/pull/799)
+- Fixed NullPointerException for PluginReferenceProvider in [#801](https://github.com/magento/magento2-phpstorm-plugin/pull/801)
 
 ## 4.1.0
 

@@ -7,7 +7,7 @@
 <idea-plugin require-restart="true">
     <id>com.magento.idea.magento2plugin</id>
     <name>Magento PhpStorm</name>
-    <version>4.2.0</version>
+    <version>4.3.0</version>
     <vendor url="https://github.com/magento/magento2-phpstorm-plugin">Magento Inc.</vendor>
 
     <description><![CDATA[
@@ -340,6 +340,174 @@
                          enabledByDefault="false"
                          level="WARNING"
                          implementationClass="com.magento.idea.magento2uct.inspections.php.deprecation.UsingDeprecatedProperty"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="ImportingNonExistentClass"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.ImportingNonExistentClass"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.existence.group.name"
+                         enabledByDefault="false"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.existence.ImportingNonExistentClass"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="ImportingNonExistentInterface"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.ImportingNonExistentInterface"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.existence.group.name"
+                         enabledByDefault="false"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.existence.ImportingNonExistentInterface"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="InheritedNonExistentInterface"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.InheritedNonExistentInterface"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.existence.group.name"
+                         enabledByDefault="false"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.existence.InheritedNonExistentInterface"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="ImplementedNonExistentInterface"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.ImplementedNonExistentInterface"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.existence.group.name"
+                         enabledByDefault="false"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.existence.ImplementedNonExistentInterface"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="ExtendedNonExistentClass"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.ExtendedNonExistentClass"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.existence.group.name"
+                         enabledByDefault="false"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.existence.ExtendedNonExistentClass"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="OverriddenNonExistentConstant"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.OverriddenNonExistentConstant"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.existence.group.name"
+                         enabledByDefault="false"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.existence.OverriddenNonExistentConstant"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="OverriddenNonExistentProperty"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.OverriddenNonExistentProperty"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.existence.group.name"
+                         enabledByDefault="false"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.existence.OverriddenNonExistentProperty"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="CalledNonExistentMethod"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.CalledNonExistentMethod"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.existence.group.name"
+                         enabledByDefault="false"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.existence.CalledNonExistentMethod"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="UsedNonExistentType"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsedNonExistentType"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.existence.group.name"
+                         enabledByDefault="false"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.existence.UsedNonExistentType"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="UsedNonExistentConstant"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsedNonExistentConstant"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.existence.group.name"
+                         enabledByDefault="false"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.existence.UsedNonExistentConstant"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="UsedNonExistentProperty"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsedNonExistentProperty"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.existence.group.name"
+                         enabledByDefault="false"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.existence.UsedNonExistentProperty"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="ImportedNonApiClass"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.ImportedNonApiClass"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.ImportedNonApiClass"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="ImportedNonApiInterface"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.ImportedNonApiInterface"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.ImportedNonApiInterface"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="CalledNonApiMethod"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.CalledNonApiMethod"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.CalledNonApiMethod"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="OverriddenNonApiConstant"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.OverriddenNonApiConstant"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.OverriddenNonApiConstant"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="OverriddenNonApiProperty"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.OverriddenNonApiProperty"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.OverriddenNonApiProperty"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="UsedNonApiConstant"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsedNonApiConstant"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.UsedNonApiConstant"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="UsedNonApiProperty"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsedNonApiProperty"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.UsedNonApiProperty"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="UsedNonApiType"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsedNonApiType"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.UsedNonApiType"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="ImplementedNonApiInterface"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.ImplementedNonApiInterface"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.ImplementedNonApiInterface"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="ExtendedNonApiClass"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.ExtendedNonApiClass"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.ExtendedNonApiClass"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="InheritedNonApiInterface"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.InheritedNonApiInterface"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.InheritedNonApiInterface"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="PossibleDependencyOnImplDetails"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.PossibleDependencyOnImplDetails"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.PossibleDependencyOnImplDetails"/>
+        <localInspection language="PHP" groupPath="UCT"
+                         shortName="CalledNonInterfaceMethod"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.CalledNonInterfaceMethod"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.api.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.php.api.CalledNonInterfaceMethod"/>
         <!-- \UCT inspection -->
 
         <internalFileTemplate name="Magento Composer JSON"/>
