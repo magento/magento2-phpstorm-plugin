@@ -60,6 +60,32 @@
 3) The issue will appear in the `Ready for Grooming` column of the [Community Backlog](https://github.com/magento/magento2-phpstorm-plugin/projects/2). Once it will be discussed and approved the issue will be ready for development.
 4) Refer to the [Contributing Guide](https://github.com/magento/magento2-phpstorm-plugin/blob/2.1.0-develop/.github/CONTRIBUTING.md) for more information on how to contribute.
 
+## How to create SandBox for development
+1. Create sandbox folder
+2. Copy to sandbox folder `composer.json` and `composer.lock`
+3. In sandbox folder create `app/code` and `vendor/magento`
+4. Copy any of the magento modules (as for example: `framework`, `module-catalog`, `module-checkout`, `module-customer`, `module-sales`) into the `vendor/magento` folder. It is better to add as few modules as possible to reduce reindexing time during application running
+5. (Nice to have) Open IDE and go to `Preferences > Editor > File and Code Templates > Includes tab` and add default headers for `PHP File Header` and `XML File Header`
+   
+**PHP File Header:**
+```php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+declare(strict_types=1);
+```
+
+**XML File Header:**
+```xml
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+```
+
 ### <img src="https://upload.wikimedia.org/wikipedia/commons/7/76/Slack_Icon.png" width="20"> Join the [#phpstorm-plugin](https://magentocommeng.slack.com/archives/C010C2LUCEA) Slack channel to get more involved
 
 ## License
