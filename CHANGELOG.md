@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Fixed NullPointerException for the firstSortOrder.compareTo in [#818](https://github.com/magento/magento2-phpstorm-plugin/pull/818)
 - Fixed invalid column types provided exception during db_schema.xml file generation in [#819](https://github.com/magento/magento2-phpstorm-plugin/pull/819)
 - Fixed method designed for fully qualified names only in [#830](https://github.com/magento/magento2-phpstorm-plugin/pull/830)
+- Fixed NoClassDefFoundError for com.intellij.lang.jsgraphql.GraphQLIcons in [#850](https://github.com/magento/magento2-phpstorm-plugin/pull/850)
 
 ## 4.2.0
 
