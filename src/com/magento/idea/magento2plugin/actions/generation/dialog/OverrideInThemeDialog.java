@@ -13,6 +13,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annot
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.OverrideInThemeGenerator;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
+import com.magento.idea.magento2plugin.magento.packages.Areas;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -133,9 +134,9 @@ public class OverrideInThemeDialog extends AbstractDialog {
     private void fillThemeOptions() {
         final String area = psiFile.getVirtualFile().getPath().split("view/")[1].split("/")[0];
         final List<String> themeNames = new ModuleIndex(project).getEditableThemeNames();
-        final String baseArea = "base";
+
         for (final String themeName : themeNames) {
-            if (baseArea.equals(area) || themeName.split("/")[0].equals(area)) {
+            if (Areas.base.toString().equals(area) || themeName.split("/")[0].equals(area)) {
                 theme.addItem(themeName);
             }
         }
