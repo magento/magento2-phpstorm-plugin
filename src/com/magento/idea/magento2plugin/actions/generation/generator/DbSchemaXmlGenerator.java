@@ -15,23 +15,28 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateDbSchemaXmlUtil;
+import com.magento.idea.magento2plugin.bundles.CommonBundle;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaXml;
 import com.magento.idea.magento2plugin.magento.packages.database.ColumnAttributes;
 import com.magento.idea.magento2plugin.magento.packages.database.TableColumnTypes;
 import java.util.HashMap;
-import java.util.InputMismatchException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import javax.swing.JOptionPane;
 import org.jetbrains.annotations.NotNull;
 
 public class DbSchemaXmlGenerator extends FileGenerator {
+
     private final Project project;
     private final String moduleName;
     private final DbSchemaXmlData dbSchemaXmlData;
     private final FindOrCreateDbSchemaXmlUtil findOrCreateDbSchemaXmlUtil;
+    private final ValidatorBundle validatorBundle;
+    private final CommonBundle commonBundle;
 
     private final List<XmlTag> newTagsQueue;
     private final Map<XmlTag, XmlTag> newTagsChildParentRelationMap;
@@ -52,6 +57,8 @@ public class DbSchemaXmlGenerator extends FileGenerator {
         this.project = project;
         this.moduleName = moduleName;
         this.dbSchemaXmlData = dbSchemaXmlData;
+        this.validatorBundle = new ValidatorBundle();
+        this.commonBundle = new CommonBundle();
         findOrCreateDbSchemaXmlUtil = new FindOrCreateDbSchemaXmlUtil(project);
 
         newTagsQueue = new LinkedList<>();
@@ -62,6 +69,7 @@ public class DbSchemaXmlGenerator extends FileGenerator {
     @SuppressWarnings({
             "PMD.NPathComplexity",
             "PMD.CyclomaticComplexity",
+            "PMD.CognitiveComplexity",
             "PMD.ExcessiveImports",
             "PMD.AvoidInstantiatingObjectsInLoops"
     })
@@ -99,32 +107,39 @@ public class DbSchemaXmlGenerator extends FileGenerator {
                 primaryKeyData.putAll(columnData);
             }
 
+            final String columnName = columnData.get(ColumnAttributes.NAME.getName());
             final String columnTypeValue = columnData.get(ColumnAttributes.TYPE.getName());
             final TableColumnTypes columnType = TableColumnTypes.getByValue(columnTypeValue);
 
             if (columnType == null) {
-                throw new InputMismatchException(
-                        "Invalid column types provided. Should be compatible with "
-                                + TableColumnTypes.class
+                final String errorMessage = validatorBundle.message(
+                        "validator.dbSchema.invalidColumnType",
+                        columnName == null ? "" : columnName
+
                 );
+                JOptionPane.showMessageDialog(
+                        null,
+                        errorMessage,
+                        commonBundle.message("common.error"),
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return null;
             }
 
             final Map<String, String> attributes = new LinkedHashMap<>();
             final List<String> allowedColumns = ModuleDbSchemaXml.getAllowedAttributes(columnType);
+
             for (final Map.Entry<String, String> columnDataEntry : columnData.entrySet()) {
                 if (allowedColumns.contains(columnDataEntry.getKey())
                         && !columnDataEntry.getValue().isEmpty()) {
                     attributes.put(columnDataEntry.getKey(), columnDataEntry.getValue());
                 }
             }
-            final String columnIdentityValue =
-                    columnData.get(ColumnAttributes.NAME.getName());
-
             findOrCreateTag(
                     ModuleDbSchemaXml.XML_TAG_COLUMN,
                     ColumnAttributes.NAME.getName(),
                     tableTag,
-                    columnIdentityValue,
+                    columnName,
                     attributes
             );
         }

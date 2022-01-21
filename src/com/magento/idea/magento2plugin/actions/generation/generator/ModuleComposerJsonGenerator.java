@@ -5,12 +5,13 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+import com.intellij.json.psi.JsonFile;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleComposerJsonData;
 import com.magento.idea.magento2plugin.actions.generation.generator.data.ModuleDirectoriesData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
@@ -18,11 +19,12 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFro
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.ComposerJson;
 import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.util.List;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class ModuleComposerJsonGenerator extends FileGenerator {
 
@@ -120,8 +122,8 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
         final Object[] dependencies = dependenciesList.toArray();
         result = result.concat(ComposerJson.DEFAULT_DEPENDENCY);
         final boolean noDependency =
-                dependencies.length == 1 && dependencies[0].equals(
-                        ComposerJson.NO_DEPENDENCY_LABEL
+                dependencies.length == 1 && ComposerJson.NO_DEPENDENCY_LABEL.equals(
+                        dependencies[0]
                 );
         if (dependencies.length == 0 || noDependency) {
             result = result.concat("\n");
@@ -161,34 +163,46 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
                 "_-", "/"
         );
         try {
-            final PsiFile virtualFile = moduleIndex.getModuleDirectoryByModuleName(dependency)
-                    .findFile(ComposerJson.FILE_NAME);
+            final PsiDirectory moduleDir = moduleIndex.getModuleDirectoryByModuleName(dependency);
+
+            if (moduleDir == null) {
+                return Pair.create("", "");
+            }
+            final PsiFile virtualFile = moduleDir.findFile(ComposerJson.FILE_NAME);
 
             if (virtualFile != null) { //NOPMD
-                final VirtualFile composerJsonFile = virtualFile.getVirtualFile();
-                if (composerJsonFile.exists()) {
-                    final JsonElement jsonElement =
-                            new JsonParser().parse(
-                                    new FileReader(composerJsonFile.getPath())//NOPMD
-                            );
-                    final JsonElement versionJsonElement =
-                            jsonElement.getAsJsonObject().get("version");
-                    final JsonElement nameJsonElement = jsonElement.getAsJsonObject().get("name");
+                final VirtualFile composerJsonVirtualFile = virtualFile.getVirtualFile();
+
+                if (composerJsonVirtualFile.exists()) {
+                    final PsiFile composerJsonFile = PsiManager.getInstance(project)
+                            .findFile(composerJsonVirtualFile);
+                    if (!(composerJsonFile instanceof JsonFile)) {
+                        return Pair.create("", "");
+                    }
+                    final JSONParser parser = new JSONParser();
+                    final Object obj = parser.parse(
+                            composerJsonFile.getText()
+                    );
+                    final JSONObject jsonObject = (JSONObject) obj;
+                    final String versionJsonElement = jsonObject.get("version").toString();
+                    final String nameJsonElement = jsonObject.get("name").toString();
+
                     if (versionJsonElement != null) {
-                        version = versionJsonElement.getAsString();
+                        version = versionJsonElement;
                         final int minorVersionSeparator = version.lastIndexOf('.');
                         version = new StringBuilder(version)
                                 .replace(minorVersionSeparator + 1, version.length(),"*")
                                 .toString();
                     }
+
                     if (nameJsonElement != null) {
-                        moduleName = nameJsonElement.getAsString();
+                        moduleName = nameJsonElement;
                     }
                 }
             } else {
                 return Pair.create("", "");
             }
-        } catch (FileNotFoundException e) { //NOPMD
+        } catch (ParseException exception) { //NOPMD
             // It's fine
         }
 

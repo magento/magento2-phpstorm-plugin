@@ -89,11 +89,15 @@ public class CronjobClassGenerator extends FileGenerator {
      * @return PhpFile
      */
     private PhpFile createCronjobClass(final String actionName) {
-        final String cronjobClassName = this.cronjobClassData.getClassName();
         final String moduleName = this.cronjobClassData.getModuleName();
-        final String[] cronjobSubDirectories = this.cronjobClassData.getDirectory().split("/");
         PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(moduleName);
+
+        if (parentDirectory == null) {
+            return null;
+        }
+        final String cronjobClassName = this.cronjobClassData.getClassName();
+        final String[] cronjobSubDirectories = this.cronjobClassData.getDirectory().split("/");
 
         for (final String cronjobSubDirectory: cronjobSubDirectories) {
             parentDirectory = directoryGenerator

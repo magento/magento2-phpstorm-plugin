@@ -441,7 +441,7 @@ public class NewEntityDialog extends AbstractDialog {
         buttonOK.setEnabled(true);
 
         if (onOkActionFired.isFinished()) {
-            this.setVisible(false);
+            exit();
         }
     }
 

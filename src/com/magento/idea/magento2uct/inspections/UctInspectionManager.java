@@ -62,9 +62,10 @@ public class UctInspectionManager {
                 psiFile,
                 false
         );
+        final List<PsiElementVisitor> visitors = SupportedIssue.getVisitors(problemsHolder);
 
         for (final PsiElement element : collectElements(phpClass)) {
-            for (final PsiElementVisitor visitor : SupportedIssue.getVisitors(problemsHolder)) {
+            for (final PsiElementVisitor visitor : visitors) {
                 element.accept(visitor);
             }
         }

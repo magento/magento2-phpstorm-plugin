@@ -117,6 +117,10 @@ public class QueryGenerator extends FileGenerator {
     private PhpClass createDataProviderClass(final @NotNull String actionName) {
         final PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(this.moduleName);
+
+        if (parentDirectory == null) {
+            return null;
+        }
         final PsiDirectory dataProviderDirectory =
                 directoryGenerator.findOrCreateSubdirectories(parentDirectory, data.getPath());
 

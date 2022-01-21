@@ -5,14 +5,17 @@
 
 package com.magento.idea.magento2plugin.reference.provider;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceProvider;
+import com.intellij.psi.stubs.StubIndex;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpNamespace;
+import com.jetbrains.php.lang.psi.stubs.indexes.PhpNamespaceIndex;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import java.util.ArrayList;
@@ -26,13 +29,11 @@ import org.jetbrains.annotations.NotNull;
 @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops"})
 public class PhpClassReferenceProvider extends PsiReferenceProvider {
 
-    @NotNull
     @Override
-    public PsiReference[] getReferencesByElement(
+    public @NotNull PsiReference[] getReferencesByElement(
             final @NotNull PsiElement element,
             final @NotNull ProcessingContext context
     ) {
-
         final String origValue = element.getText();
 
         final Pattern pattern = Pattern.compile(RegExUtil.PhpRegex.FQN);
@@ -49,15 +50,21 @@ public class PhpClassReferenceProvider extends PsiReferenceProvider {
         final StringBuilder namespace = new StringBuilder();
         String namespacePart;
         final List<PsiReference> psiReferences = new ArrayList<>();
+
         for (int i = 0; i < fqnParts.length - 1; i++) {
             namespacePart = fqnParts[i];
+            namespace.append('\\');
+            namespace.append(namespacePart);
 
-            namespace.append("\\");//NOPMD
-            namespace.append(namespacePart);//NOPMD
-            final Collection<PhpNamespace> references =
-                    phpIndex.getNamespacesByName(namespace.toString().toLowerCase(
-                            new Locale("en","EN"))
-                    );
+            final String namespaceId = namespace
+                    .toString()
+                    .toLowerCase(new Locale("en","EN"));
+
+            final Collection<PhpNamespace> references = hasNamespaceInIndex(
+                    namespaceId,
+                    element.getProject()
+            ) ? phpIndex.getNamespacesByName(namespaceId) : new ArrayList<>();
+
             if (!references.isEmpty()) {
                 final TextRange range = new TextRange(
                         origValue.indexOf(classFQN) + namespace.toString().lastIndexOf(92),
@@ -70,6 +77,7 @@ public class PhpClassReferenceProvider extends PsiReferenceProvider {
 
         final String className = classFQN.substring(classFQN.lastIndexOf(92) + 1);
         final Collection<PhpClass> classes = phpIndex.getAnyByFQN(classFQN);
+
         if (!classes.isEmpty()) {
             final TextRange range = new TextRange(
                     origValue.lastIndexOf(92) + 1,
@@ -79,5 +87,25 @@ public class PhpClassReferenceProvider extends PsiReferenceProvider {
         }
 
         return psiReferences.toArray(new PsiReference[0]);
+    }
+
+    /**
+     * Check if php namespace index has specified identifier.
+     *
+     * @param namespaceIdentifier String
+     * @param project Project
+     *
+     * @return boolean
+     */
+    private boolean hasNamespaceInIndex(
+            final @NotNull String namespaceIdentifier,
+            final @NotNull Project project
+    ) {
+        final Collection<String> keys = StubIndex.getInstance().getAllKeys(
+                PhpNamespaceIndex.KEY,
+                project
+        );
+
+        return keys.contains(namespaceIdentifier);
     }
 }

@@ -58,6 +58,7 @@ public class ModuleBlockClassGenerator extends FileGenerator {
      * @param actionName String
      * @return PsiFile
      */
+    @Override
     public PsiFile generate(final String actionName) {
         final String errorTitle = commonBundle.message("common.error");
         final PhpClass block = GetPhpClassByFQN.getInstance(project).execute(getBlockFqn());
@@ -106,7 +107,12 @@ public class ModuleBlockClassGenerator extends FileGenerator {
     private PhpFile createBlockClass(final String actionName) {
         PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(getBlockModule());
+
+        if (parentDirectory == null) {
+            return null;
+        }
         final String[] blockDirectories = blockFileData.getBlockDirectory().split(File.separator);
+
         for (final String blockDirectory: blockDirectories) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectory(
                 parentDirectory,
@@ -127,6 +133,7 @@ public class ModuleBlockClassGenerator extends FileGenerator {
         return (PhpFile) blockFile;
     }
 
+    @Override
     protected void fillAttributes(final Properties attributes) {
         final String blockClassName = blockFileData.getBlockClassName();
         attributes.setProperty("NAME", blockClassName);

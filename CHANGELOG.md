@@ -4,7 +4,39 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
+## 4.2.2
+
+## 4.2.1
+
+### Fixed
+
+- Fixed ArrayIndexOutOfBoundsException when used Copy Path/Reference action on the requirejs-config.js file in [#808](https://github.com/magento/magento2-phpstorm-plugin/pull/808)
+- Fixed dialog disposition issue in [#811](https://github.com/magento/magento2-phpstorm-plugin/pull/811)
+- Fixed stack overflow error for line-marker providers in [#813](https://github.com/magento/magento2-phpstorm-plugin/pull/813)
+- Fixed stub ids not found for key in index in [#814](https://github.com/magento/magento2-phpstorm-plugin/pull/814)
+- Fixed failed to build require-js index in [815](https://github.com/magento/magento2-phpstorm-plugin/pull/815)
+- Fixed empty psi elements in the plugin inspections in [#816](https://github.com/magento/magento2-phpstorm-plugin/pull/816)
+- Fixed empty psi element in module xml inspection in [#817](https://github.com/magento/magento2-phpstorm-plugin/pull/817)
+- Fixed NullPointerException for the firstSortOrder.compareTo in [#818](https://github.com/magento/magento2-phpstorm-plugin/pull/818)
+- Fixed invalid column types provided exception during db_schema.xml file generation in [#819](https://github.com/magento/magento2-phpstorm-plugin/pull/819)
+- Fixed method designed for fully qualified names only in [#830](https://github.com/magento/magento2-phpstorm-plugin/pull/830)
+- Fixed NoClassDefFoundError for com.intellij.lang.jsgraphql.GraphQLIcons in [#850](https://github.com/magento/magento2-phpstorm-plugin/pull/850)
+
 ## 4.2.0
+
+### Added
+
+- Extending of the built-in Upgrade Compatibility Tool [#read-more](https://github.com/magento/magento2-phpstorm-plugin/wiki/4.2.0-Release)
+
+### Changed
+
+- Enhanced Magento 2 version resolving in [#747](https://github.com/magento/magento2-phpstorm-plugin/pull/747), [#751](https://github.com/magento/magento2-phpstorm-plugin/pull/751), [#777](https://github.com/magento/magento2-phpstorm-plugin/pull/777)
+
+### Fixed
+
+- Fixed NullPointerException for the InjectAViewModelAction in [#800](https://github.com/magento/magento2-phpstorm-plugin/pull/800)
+- Fixed NullPointerException for a name attribute of the event tag and code style fixes in [#799](https://github.com/magento/magento2-phpstorm-plugin/pull/799)
+- Fixed NullPointerException for PluginReferenceProvider in [#801](https://github.com/magento/magento2-phpstorm-plugin/pull/801)
 
 ## 4.1.0
 

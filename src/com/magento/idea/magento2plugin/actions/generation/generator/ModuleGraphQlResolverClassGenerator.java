@@ -117,7 +117,7 @@ public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
                 LeafPsiElement.class
         );
         for (final LeafPsiElement leafPsiElement: leafElements) {
-            if (!leafPsiElement.getText().equals(MagentoPhpClass.CLOSING_TAG)) {
+            if (!MagentoPhpClass.CLOSING_TAG.equals(leafPsiElement.getText())) {
                 continue;
             }
             insertPos = leafPsiElement.getTextOffset();
@@ -128,6 +128,10 @@ public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
     private PhpClass createGraphQlResolverClass(final String actionName) {
         PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(graphQlResolverFileData.getGraphQlResolverModule());
+
+        if (parentDirectory == null) {
+            return null;
+        }
         final String[] graphQlResolverDirectories = graphQlResolverFileData
                 .getGraphQlResolverDirectory().split(File.separator);
         for (final String graphQlResolverDirectory: graphQlResolverDirectories) {

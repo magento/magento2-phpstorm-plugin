@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.generator.code.util;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.util.text.Strings;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.codeInsight.PhpCodeInsightUtil;
 import com.jetbrains.php.config.PhpLanguageFeature;
@@ -42,7 +43,12 @@ public final class ConvertPluginParamsToString {
      *
      * @return String
      */
-    @SuppressWarnings({"PMD.NPathComplexity", "PMD.CyclomaticComplexity", "PMD.ConfusingTernary"})
+    @SuppressWarnings({
+            "PMD.NPathComplexity",
+            "PMD.CyclomaticComplexity",
+            "PMD.CognitiveComplexity",
+            "PMD.ConfusingTernary"
+    })
     public static String execute(
             final Collection<PsiElement> parameters,
             final @NotNull Plugin.PluginType type,
@@ -52,7 +58,11 @@ public final class ConvertPluginParamsToString {
         String returnType = PhpTypeMetadataParserUtil.getMethodReturnType(myMethod);
 
         if (returnType != null && PhpClassGeneratorUtil.isValidFqn(returnType)) {
-            returnType = PhpClassGeneratorUtil.getNameFromFqn(returnType);
+            if (Strings.endsWith(returnType, "[]")) {
+                returnType = "array";
+            } else {
+                returnType = PhpClassGeneratorUtil.getNameFromFqn(returnType);
+            }
         }
         final Iterator<PsiElement> parametersIterator = parameters.iterator();
         int iterator = 0;
@@ -66,7 +76,19 @@ public final class ConvertPluginParamsToString {
             if (element instanceof Parameter) {
                 String parameterText = PhpCodeUtil.paramToString(element);
 
-                if (parameterText.contains(Package.fqnSeparator)) {
+                // Parameter has default value.
+                if (parameterText.contains("=")) {
+                    final String[] paramParts = parameterText.split("=");
+                    parameterText = paramParts[0];
+                    parameterText += " = ";//NOPMD
+                    String defaultValue = paramParts[1];
+
+                    if (defaultValue.contains(Package.fqnSeparator)) {
+                        final String[] fqnArray = defaultValue.split("\\\\");
+                        defaultValue = fqnArray[fqnArray.length - 1];
+                    }
+                    parameterText += defaultValue;//NOPMD
+                } else if (parameterText.contains(Package.fqnSeparator)) {
                     final String[] fqnArray = parameterText.split("\\\\");
                     parameterText = fqnArray[fqnArray.length - 1];
                 }

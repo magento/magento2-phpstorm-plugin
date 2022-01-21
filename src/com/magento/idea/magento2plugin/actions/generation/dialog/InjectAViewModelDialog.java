@@ -104,7 +104,7 @@ public class InjectAViewModelDialog extends AbstractDialog {
 
         setContentPane(contentPane);
         setModal(true);
-        setTitle(InjectAViewModelAction.actionDescription);
+        setTitle(InjectAViewModelAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
 
         buttonOK.addActionListener((final ActionEvent event) -> onOK());
@@ -138,6 +138,7 @@ public class InjectAViewModelDialog extends AbstractDialog {
 
     protected void onOK() {
         if (!validateFormFields()) {
+            exit();
             return;
         }
         final String moduleName = GetModuleNameByDirectoryUtil.execute(
@@ -154,7 +155,7 @@ public class InjectAViewModelDialog extends AbstractDialog {
                 getViewModelClassName(),
                 moduleName,
                 namespaceBuilder.getNamespace()
-        ), project).generate(InjectAViewModelAction.actionName, true);
+        ), project).generate(InjectAViewModelAction.ACTION_NAME, true);
         if (viewModel == null) {
             final String errorMessage = validatorBundle.message(
                     "validator.class.alreadyDeclared",
@@ -168,6 +169,7 @@ public class InjectAViewModelDialog extends AbstractDialog {
                     JOptionPane.ERROR_MESSAGE
             );
 
+            exit();
             return;
         }
 
@@ -176,9 +178,9 @@ public class InjectAViewModelDialog extends AbstractDialog {
                         this.getViewModelArgumentName(),
                         XsiTypes.object.toString(),
                         namespaceBuilder.getClassFqn()
-                ).generate(targetBlockTag);
+        ).generate(targetBlockTag);
 
-        this.setVisible(false);
+        exit();
     }
 
     public String getViewModelClassName() {

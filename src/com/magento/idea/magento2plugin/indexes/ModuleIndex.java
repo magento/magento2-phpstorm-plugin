@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.indexes;
 
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -23,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.jetbrains.annotations.Nullable;
 
 public final class ModuleIndex {
 
@@ -116,9 +118,13 @@ public final class ModuleIndex {
      * @param moduleName String
      * @return PsiDirectory
      */
-    public PsiDirectory getModuleDirectoryByModuleName(final String moduleName) {
+    public @Nullable PsiDirectory getModuleDirectoryByModuleName(final String moduleName) {
+        if (DumbService.getInstance(project).isDumb()) {
+            return null;
+        }
         final FileBasedIndex index = FileBasedIndex
                 .getInstance();
+
         final Collection<VirtualFile> files = index.getContainingFiles(
                 ModuleNameIndex.KEY,
                 moduleName,
@@ -126,6 +132,10 @@ public final class ModuleIndex {
                     GlobalSearchScope.allScope(project),
                     PhpFileType.INSTANCE
             ));
+
+        if (files.isEmpty()) {
+            return null;
+        }
         final VirtualFile virtualFile = files.iterator().next();
 
         return PsiManager.getInstance(project).findDirectory(virtualFile.getParent());

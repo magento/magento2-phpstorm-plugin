@@ -7,55 +7,43 @@ package com.magento.idea.magento2uct.inspections.php.deprecation;
 
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.openapi.project.Project;
 import com.jetbrains.php.lang.psi.elements.ClassReference;
-import com.jetbrains.php.lang.psi.elements.Field;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
+import com.magento.idea.magento2uct.inspections.php.UsedTypeInspection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
+import com.magento.idea.magento2uct.versioning.VersionStateManager;
 import org.jetbrains.annotations.NotNull;
 
-public class UsingDeprecatedClass extends UsingDeprecatedType {
+public class UsingDeprecatedClass extends UsedTypeInspection {
 
     @Override
-    protected void registerProblem(
+    protected void execute(
+            final Project project,
             final @NotNull ProblemsHolder problemsHolder,
-            final Field field,
-            final String fieldClass,
-            final boolean isInterface
+            final PhpClass phpClass,
+            final ClassReference reference
     ) {
-        if (isInterface) {
+        if (phpClass.isInterface()
+                || !VersionStateManager.getInstance(project).isDeprecated(phpClass.getFQN())) {
             return;
         }
         if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.USING_DEPRECATED_CLASS.getCode()
+            ((UctProblemsHolder) problemsHolder).setIssue(
+                    SupportedIssue.USING_DEPRECATED_CLASS
             );
         }
-        problemsHolder.registerProblem(
-                field,
-                SupportedIssue.USING_DEPRECATED_CLASS.getMessage(fieldClass),
-                ProblemHighlightType.LIKE_DEPRECATED
-        );
-    }
+        final String deprecatedIn = VersionStateManager.getInstance(project)
+                .getDeprecatedInVersion(phpClass.getFQN());
 
-    @Override
-    protected void registerReferenceProblem(
-            final @NotNull ProblemsHolder problemsHolder,
-            final ClassReference reference,
-            final String deprecatedType,
-            final boolean isInterface
-    ) {
-        if (isInterface) {
-            return;
-        }
-        if (problemsHolder instanceof UctProblemsHolder) {
-            ((UctProblemsHolder) problemsHolder).setReservedErrorCode(
-                    SupportedIssue.USING_DEPRECATED_CLASS.getCode()
-            );
-        }
         problemsHolder.registerProblem(
                 reference,
-                SupportedIssue.USING_DEPRECATED_CLASS.getMessage(deprecatedType),
+                SupportedIssue.USING_DEPRECATED_CLASS.getMessage(
+                        phpClass.getFQN(),
+                        deprecatedIn
+                ),
                 ProblemHighlightType.LIKE_DEPRECATED
         );
     }

@@ -88,6 +88,10 @@ public class NewEntityLayoutGenerator extends FileGenerator {
         final PsiDirectory moduleBaseDir = moduleIndex.getModuleDirectoryByModuleName(
                 data.getModuleName()
         );
+
+        if (moduleBaseDir == null) {
+            return null;
+        }
         final PsiDirectory layoutBaseDir = directoryGenerator.findOrCreateSubdirectories(
                 moduleBaseDir,
                 file.getDirectory()

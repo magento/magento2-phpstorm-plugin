@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.NewBlockAction;
 import com.magento.idea.magento2plugin.actions.generation.data.BlockFileData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
@@ -26,6 +25,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
@@ -33,6 +33,7 @@ import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 
 public class NewBlockDialog extends AbstractDialog {
+
     private final PsiDirectory baseDir;
     private final String moduleName;
     private JPanel contentPanel;
@@ -44,17 +45,17 @@ public class NewBlockDialog extends AbstractDialog {
     private static final String NAME = "name";
     private static final String DIRECTORY = "directory";
 
-    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, NAME})
-    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
-            message = {PhpClassRule.MESSAGE, NAME})
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, NAME})
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS, message = {PhpClassRule.MESSAGE, NAME})
     private JTextField blockName;
 
-    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, DIRECTORY})
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, DIRECTORY})
     @FieldValidation(rule = RuleRegistry.PHP_DIRECTORY,
             message = {PhpDirectoryRule.MESSAGE, DIRECTORY})
     private JTextField blockParentDir;
+
+    private JLabel blockNameErrorMessage;//NOPMD
+    private JLabel blockParentDirErrorMessage;//NOPMD
 
     /**
      * Constructor.
@@ -111,15 +112,14 @@ public class NewBlockDialog extends AbstractDialog {
     }
 
     protected void onOK() {
-        if (!validateFormFields()) {
-            return;
+        if (validateFormFields()) {
+            generateFile();
+            exit();
         }
-        generateFile();
-        this.setVisible(false);
     }
 
-    private PsiFile generateFile() {
-        return new ModuleBlockClassGenerator(new BlockFileData(
+    private void generateFile() {
+        new ModuleBlockClassGenerator(new BlockFileData(
                 getBlockDirectory(),
                 getBlockName(),
                 getModuleName(),
@@ -141,6 +141,7 @@ public class NewBlockDialog extends AbstractDialog {
 
     private void suggestBlockDirectory() {
         final String moduleIdentifierPath = getModuleIdentifierPath();
+
         if (moduleIdentifierPath == null) {
             blockParentDir.setText(BlockPhp.DEFAULT_DIR);
             return;
@@ -148,6 +149,7 @@ public class NewBlockDialog extends AbstractDialog {
         final String path = baseDir.getVirtualFile().getPath();
         final String[] pathParts = path.split(moduleIdentifierPath);
         final int minimumPathParts = 2;
+
         if (pathParts.length != minimumPathParts) {
             blockParentDir.setText(BlockPhp.DEFAULT_DIR);
             return;
@@ -162,14 +164,17 @@ public class NewBlockDialog extends AbstractDialog {
 
     private String getModuleIdentifierPath() {
         final String[]parts = moduleName.split(Package.vendorModuleNameSeparator);
+
         if (parts[0] == null || parts[1] == null || parts.length > 2) {
             return null;
         }
+
         return parts[0] + File.separator + parts[1];
     }
 
     private String getNamespace() {
         final String[]parts = moduleName.split(Package.vendorModuleNameSeparator);
+
         if (parts[0] == null || parts[1] == null || parts.length > 2) {
             return null;
         }
@@ -177,12 +182,7 @@ public class NewBlockDialog extends AbstractDialog {
                 File.separator,
                 Package.fqnSeparator
         );
-        return parts[0] + Package.fqnSeparator + parts[1] + Package.fqnSeparator + directoryPart;
-    }
 
-    @Override
-    public void onCancel() {
-        // add your code here if necessary
-        dispose();
+        return parts[0] + Package.fqnSeparator + parts[1] + Package.fqnSeparator + directoryPart;
     }
 }

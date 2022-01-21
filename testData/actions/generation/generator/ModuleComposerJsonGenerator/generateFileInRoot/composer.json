@@ -5,8 +5,8 @@
   "type": "magento2-module",
   "require": {
     "magento/framework": "*",
-    "foo/bar": "*",
-    "magento/backend": "*"
+    "foo/bar": "1.0.*",
+    "magento/module-backend": "103.0.*"
   },
   "license": [
     "Test License 1",

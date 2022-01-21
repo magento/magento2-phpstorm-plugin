@@ -77,8 +77,16 @@ public abstract class PhpFileGenerator extends FileGenerator {
             return phpClass.getContainingFile();
         }
 
+        final PsiDirectory moduleDirectory = moduleIndex.getModuleDirectoryByModuleName(
+                file.getModuleName()
+        );
+
+        if (moduleDirectory == null) {
+            onFileGenerated(null, actionName);
+            return null;
+        }
         final PsiDirectory fileBaseDir = directoryGenerator.findOrCreateSubdirectories(
-                moduleIndex.getModuleDirectoryByModuleName(file.getModuleName()),
+                moduleDirectory,
                 file.getDirectory()
         );
 

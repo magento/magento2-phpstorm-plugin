@@ -13,6 +13,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.AbstractDialog;
 import com.magento.idea.magento2uct.actions.ReindexVersionedIndexesAction;
 import com.magento.idea.magento2uct.execution.DefaultExecutor;
 import com.magento.idea.magento2uct.execution.process.ReindexHandler;
+import com.magento.idea.magento2uct.packages.IndexRegistry;
 import com.magento.idea.magento2uct.packages.SupportedVersion;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -32,9 +33,11 @@ public class ReindexDialog extends AbstractDialog {
 
     private JPanel contentPanel;
     private JComboBox<ComboBoxItemData> targetVersion;
+    private JComboBox<ComboBoxItemData> targetIndex;
     private JButton buttonOk;
     private JButton buttonCancel;
     private JLabel targetVersionLabel;//NOPMD
+    private JLabel targetIndexLabel;//NOPMD
 
     /**
      * Reindexing dialog.
@@ -99,13 +102,16 @@ public class ReindexDialog extends AbstractDialog {
      * Execute reindexing action.
      */
     private void onOK() {
-        if (targetVersion.getSelectedItem() == null) {
+        if (targetVersion.getSelectedItem() == null || targetIndex.getSelectedItem() == null) {
             return;
         }
         final SupportedVersion version = SupportedVersion.getVersion(
                 targetVersion.getSelectedItem().toString()
         );
-        if (version == null) {
+        final IndexRegistry index = IndexRegistry.getRegistryInfoByKey(
+                targetIndex.getSelectedItem().toString()
+        );
+        if (version == null || index == null) {
             return;
         }
         final DefaultExecutor executor = new DefaultExecutor(
@@ -113,12 +119,13 @@ public class ReindexDialog extends AbstractDialog {
                 new ReindexHandler(
                         project,
                         directory,
-                        version
+                        version,
+                        index
                 )
         );
         executor.run();
 
-        this.setVisible(false);
+        exit();
     }
 
     /**
@@ -130,6 +137,12 @@ public class ReindexDialog extends AbstractDialog {
 
         for (final String version : SupportedVersion.getSupportedVersions()) {
             targetVersion.addItem(new ComboBoxItemData(version, version));
+        }
+        targetIndex = new ComboBox<>();
+        targetIndex.addItem(new ComboBoxItemData("", " --- Choose Target Index --- "));
+
+        for (final String key : IndexRegistry.getIndexList()) {
+            targetIndex.addItem(new ComboBoxItemData(key, key));
         }
     }
 }

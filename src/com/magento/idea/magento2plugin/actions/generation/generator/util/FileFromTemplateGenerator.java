@@ -12,7 +12,6 @@ import com.intellij.lang.Language;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiDirectory;
@@ -31,9 +30,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class FileFromTemplateGenerator {
-    private final Project project;
 
-    public FileFromTemplateGenerator(final Project project) {
+    private final @NotNull Project project;
+    private @Nullable String exceptionMessage;
+
+    public FileFromTemplateGenerator(final @NotNull Project project) {
         this.project = project;
     }
 
@@ -44,10 +45,10 @@ public class FileFromTemplateGenerator {
      * @param attributes Properties
      * @param baseDir PsiDirectory
      * @param actionName String
+     *
      * @return PsiFile
      */
-    @Nullable
-    public PsiFile generate(
+    public @Nullable PsiFile generate(
             final @NotNull ModuleFileInterface moduleFile,
             final @NotNull Properties attributes,
             final @NotNull PsiDirectory baseDir,
@@ -55,16 +56,19 @@ public class FileFromTemplateGenerator {
     ) {
         final Ref<PsiFile> fileRef = new Ref<>(null);
         final Ref<String> exceptionRef = new Ref<>(null);
+        exceptionMessage = null;//NOPMD
         final String filePath = baseDir.getText().concat("/").concat(moduleFile.getFileName());
+
         CommandProcessor.getInstance().executeCommand(project, () -> {
             final Runnable run = () -> {
                 try {
-                    PsiFile file = createFile(moduleFile, filePath, baseDir, attributes);
+                    final PsiFile file = createFile(moduleFile, filePath, baseDir, attributes);
+
                     if (file != null) {
                         fileRef.set(file);
                     }
-                } catch (IncorrectOperationException | IOException var9) {
-                    exceptionRef.set(var9.getMessage());
+                } catch (IncorrectOperationException | IOException exception) {
+                    exceptionRef.set(exception.getMessage());
                 }
             };
             ApplicationManager.getApplication().runWriteAction(run);
@@ -73,9 +77,18 @@ public class FileFromTemplateGenerator {
         if (exceptionRef.isNull()) {
             return fileRef.get();
         }
+        exceptionMessage = exceptionRef.get();
 
-        Messages.showErrorDialog(exceptionRef.get(), actionName);
         return null;
+    }
+
+    /**
+     * Get last thrown exception message if exists.
+     *
+     * @return String
+     */
+    public @Nullable String getLastExceptionMessage() {
+        return exceptionMessage;
     }
 
     @Nullable
@@ -89,13 +102,19 @@ public class FileFromTemplateGenerator {
         final String fileName = path.get(path.size() - 1);
         final PsiFile fileTemplate = createFileFromTemplate(
                 getTemplateManager(),
-                baseDir, moduleFile.getTemplate(), attributes, fileName, moduleFile.getLanguage());
+                baseDir,
+                moduleFile.getTemplate(),
+                attributes,
+                fileName,
+                moduleFile.getLanguage()
+        );
+
         if (fileTemplate == null) {
             throw new IncorrectOperationException("Template not found!");
         } else {
             PsiElement file;
-
             file = baseDir.add(fileTemplate);
+
             if (file instanceof PsiFile) {
                 return (PsiFile)file;
             } else {
@@ -125,6 +144,7 @@ public class FileFromTemplateGenerator {
             final @NotNull Language language
     ) throws IOException {
         FileTemplate fileTemplate;
+
         try {
             fileTemplate = templateManager.getInternalTemplate(templateName);
         } catch (IllegalStateException e) {
@@ -140,6 +160,7 @@ public class FileFromTemplateGenerator {
                 true,
                 false
         );
+
         if (fileTemplate.isReformatCode()) {
             CodeStyleManager.getInstance(project).reformat(file);
         }

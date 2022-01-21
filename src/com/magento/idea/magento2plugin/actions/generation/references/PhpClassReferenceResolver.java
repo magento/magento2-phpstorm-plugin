@@ -85,7 +85,7 @@ public class PhpClassReferenceResolver extends PhpClassReferenceExtractor {
             final @NotNull PsiElement identifier
     ) {
         if (!PhpType.isPrimitiveType(name)) {
-            this.myCandidatesToImportStorage.processReference(name, fqn, identifier);
+            this.myCandidatesToImportStorage.processReference(name, fqn);
         }
     }
 
@@ -142,22 +142,22 @@ public class PhpClassReferenceResolver extends PhpClassReferenceExtractor {
                 referencesToReplace.put(name, originalFqn);
             } else {
                 final String importedFqn = aliases.get(name);
-                if (!PhpLangUtil.equalsClassNames(importedFqn, originalFqn)) {
-                    if (importedFqn != null) {
-                        final String originalName = PhpLangUtil.toShortName(originalFqn);
-                        final String fqnForOriginalName = aliases.get(originalName);
-                        if (fqnForOriginalName != null
-                                && !PhpLangUtil.equalsClassNames(fqnForOriginalName, originalFqn)) {
-                            referencesToReplace.put(name, originalFqn);
-                        } else {
-                            referencesToReplace.put(name, originalName);
-                            if (fqnForOriginalName == null) {
-                                insertUseStatement(scopeHolder, originalName, originalFqn);
-                            }
-                        }
+
+                if (importedFqn != null
+                        && !PhpLangUtil.equalsClassNames(importedFqn, originalFqn)) {
+                    final String originalName = PhpLangUtil.toShortName(originalFqn);
+                    final String fqnForOriginalName = aliases.get(originalName);
+                    if (fqnForOriginalName != null
+                            && !PhpLangUtil.equalsClassNames(fqnForOriginalName, originalFqn)) {
+                        referencesToReplace.put(name, originalFqn);
                     } else {
-                        insertUseStatement(scopeHolder, name, originalFqn);
+                        referencesToReplace.put(name, originalName);
+                        if (fqnForOriginalName == null) {
+                            insertUseStatement(scopeHolder, originalName, originalFqn);
+                        }
                     }
+                } else {
+                    insertUseStatement(scopeHolder, name, originalFqn);
                 }
             }
         }
