@@ -131,9 +131,13 @@ public class OverrideInThemeDialog extends AbstractDialog {
     }
 
     private void fillThemeOptions() {
+        final String area = psiFile.getVirtualFile().getPath().split("view/")[1].split("/")[0];
         final List<String> themeNames = new ModuleIndex(project).getEditableThemeNames();
-        for (final String themeName: themeNames) {
-            theme.addItem(themeName);
+        final String baseArea = "base";
+        for (final String themeName : themeNames) {
+            if (baseArea.equals(area) || themeName.split("/")[0].equals(area)) {
+                theme.addItem(themeName);
+            }
         }
     }
 }
