@@ -8,6 +8,7 @@ import com.intellij.lang.jsgraphql.GraphQLFileType;
 import com.intellij.lang.jsgraphql.psi.*;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.*;
@@ -127,10 +128,12 @@ public class GraphQlResolverIndex extends ScalarIndexExtension<String> {
 
         PsiManager psiManager = PsiManager.getInstance(phpClass.getProject());
         for (VirtualFile virtualFile : containingFiles) {
-            GraphQLFile file = (GraphQLFile) psiManager.findFile(virtualFile);
-            if (file == null) {
+            final PsiFile fileCandidate = psiManager.findFile(virtualFile);
+
+            if (!(fileCandidate instanceof GraphQLFile)) {
                 continue;
             }
+            GraphQLFile file = (GraphQLFile) fileCandidate;
             PsiElement[] children = file.getChildren();
             findMatchingQuotedString(children, classFqn, quotedStrings);
         }
