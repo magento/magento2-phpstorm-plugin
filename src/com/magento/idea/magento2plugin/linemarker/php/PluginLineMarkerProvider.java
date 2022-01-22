@@ -5,10 +5,12 @@
 
 package com.magento.idea.magento2plugin.linemarker.php;
 
+import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.icons.AllIcons;
+import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -16,6 +18,7 @@ import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.magento.idea.magento2plugin.linemarker.SearchGutterIconNavigationHandler;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.stubs.indexes.PluginIndex;
 import java.util.ArrayList;
@@ -39,6 +42,7 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
     }
 
     @Override
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     public void collectSlowLineMarkers(
             final @NotNull List<? extends PsiElement> psiElements,
             final @NotNull Collection<? super LineMarkerInfo<?>> collection
@@ -69,12 +73,21 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
                 }
 
                 if (!results.isEmpty()) {
+                    final GutterIconNavigationHandler<PsiElement> navigationHandler =
+                            new SearchGutterIconNavigationHandler<>(
+                                    (Collection<? extends NavigatablePsiElement>) results,
+                                    TOOLTIP_TEXT
+                            );
+
                     collection.add(
                             NavigationGutterIconBuilder
                                     .create(AllIcons.Nodes.Plugin)
                                     .setTargets(results)
                                     .setTooltipText(TOOLTIP_TEXT)
-                                    .createLineMarkerInfo(PsiTreeUtil.getDeepestFirst(psiElement))
+                                    .createLineMarkerInfo(
+                                            PsiTreeUtil.getDeepestFirst(psiElement),
+                                            navigationHandler
+                                    )
                     );
                 }
             }
