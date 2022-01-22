@@ -74,16 +74,20 @@ public class PhpClassReferenceProvider extends PsiReferenceProvider {
                 psiReferences.add(new PolyVariantReferenceBase(element, range, references));
             }
         }
-
         final String className = classFQN.substring(classFQN.lastIndexOf(92) + 1);
-        final Collection<PhpClass> classes = phpIndex.getAnyByFQN(classFQN);
 
-        if (!classes.isEmpty()) {
-            final TextRange range = new TextRange(
-                    origValue.lastIndexOf(92) + 1,
-                    origValue.lastIndexOf(92) + 1 + className.length()
-            );
-            psiReferences.add(new PolyVariantReferenceBase(element, range, classes));
+        try {
+            final Collection<PhpClass> classes = phpIndex.getAnyByFQN(classFQN);
+
+            if (!classes.isEmpty()) {
+                final TextRange range = new TextRange(
+                        origValue.lastIndexOf(92) + 1,
+                        origValue.lastIndexOf(92) + 1 + className.length()
+                );
+                psiReferences.add(new PolyVariantReferenceBase(element, range, classes));
+            }
+        } catch (Exception exception) { //NOPMD
+            return psiReferences.toArray(new PsiReference[0]);
         }
 
         return psiReferences.toArray(new PsiReference[0]);
