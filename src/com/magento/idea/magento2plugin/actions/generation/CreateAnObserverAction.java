@@ -139,7 +139,8 @@ public class CreateAnObserverAction extends DumbAwareAction {
 
         return Observer.INTERFACE.equals(fqn)
                 || Observer.IMPLEMENTATION.equals(fqn)
-                || Observer.ENTITY_IMPL.equals(fqn);
+                || Observer.ENTITY_IMPL.equals(fqn)
+                || Observer.STAGING_IMPL.equals(fqn);
     }
 
     private boolean checkIsElementStringLiteral(final @NotNull PsiElement element) {
