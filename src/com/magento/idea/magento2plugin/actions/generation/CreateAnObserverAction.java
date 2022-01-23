@@ -136,7 +136,10 @@ public class CreateAnObserverAction extends DumbAwareAction {
             return false;
         }
         final String fqn = ((PhpClass) phpClass).getPresentableFQN();
-        return Observer.INTERFACE.equals(fqn);
+
+        return Observer.INTERFACE.equals(fqn)
+                || Observer.IMPLEMENTATION.equals(fqn)
+                || Observer.ENTITY_IMPL.equals(fqn);
     }
 
     private boolean checkIsElementStringLiteral(final @NotNull PsiElement element) {
