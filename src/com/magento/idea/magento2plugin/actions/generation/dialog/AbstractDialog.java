@@ -252,9 +252,9 @@ public abstract class AbstractDialog extends JDialog {
     }
 
     @Override
-    public void setVisible(boolean b) {
+    public void setVisible(final boolean status) {
         new PlaceholderInitializerUtil(this).initialize();
-        super.setVisible(b);
+        super.setVisible(status);
     }
 
     /**
