@@ -17,10 +17,10 @@ import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewCronjobDialog;
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings({"PMD.FieldNamingConventions", "PMD.OnlyOneReturn"})
 public class NewCronjobAction extends AnAction {
-    public static String ACTION_NAME = "Magento 2 Cron Job";
-    public static String ACTION_DESCRIPTION = "Create a new Magento 2 Cron Job";
+
+    public static final String ACTION_NAME = "Magento 2 Cron Job";
+    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Cron Job";
 
     public NewCronjobAction() {
         super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
@@ -34,17 +34,16 @@ public class NewCronjobAction extends AnAction {
         if (view == null) {
             return;
         }
-
         final Project project = CommonDataKeys.PROJECT.getData(dataContext);
+
         if (project == null) {
             return;
         }
-
         final PsiDirectory directory = view.getOrChooseDirectory();
+
         if (directory == null) {
             return;
         }
-
         NewCronjobDialog.open(project, directory);
     }
 

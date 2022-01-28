@@ -16,8 +16,8 @@ import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewControllerDialog;
 
-@SuppressWarnings({"PMD.OnlyOneReturn", "PMD.FieldNamingConventions"})
 public class NewControllerAction extends AnAction {
+
     public static final String ACTION_NAME = "Magento 2 Controller";
     public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Controller";
 
@@ -36,13 +36,13 @@ public class NewControllerAction extends AnAction {
         if (view == null) {
             return;
         }
-
         final Project project = CommonDataKeys.PROJECT.getData(dataContext);
+
         if (project == null) {
             return;
         }
-
         final PsiDirectory directory = view.getOrChooseDirectory();
+
         if (directory == null) {
             return;
         }

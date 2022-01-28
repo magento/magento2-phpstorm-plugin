@@ -173,11 +173,10 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     }
 
     protected void onOK() {
-        if (!validateFormFields()) {
-            return;
+        if (validateFormFields()) {
+            generateFiles();
         }
-        generateFiles();
-        this.setVisible(false);
+        exit();
     }
 
     private void generateFiles() {

@@ -21,13 +21,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class PluginTargetLineMarkerProvider implements LineMarkerProvider {
-    @Nullable
+
+    private static final String TARGET_CLASS_TOOLTIP_TEXT = "Navigate to target class";
+    private static final String TARGET_METHOD_TOOLTIP_TEXT = "Navigate to target method";
+
     @Override
-    public LineMarkerInfo getLineMarkerInfo(@NotNull final PsiElement psiElement) {
+    public @Nullable LineMarkerInfo<?> getLineMarkerInfo(final @NotNull PsiElement psiElement) {
         return null;
     }
 
@@ -36,48 +40,52 @@ public class PluginTargetLineMarkerProvider implements LineMarkerProvider {
             final @NotNull List<? extends PsiElement> psiElements,
             final @NotNull Collection<? super LineMarkerInfo<?>> collection
     ) {
-        if (!psiElements.isEmpty() && !Settings.isEnabled(psiElements.get(0).getProject())) {
+        if (psiElements.isEmpty()) {
+            return;
+        }
+
+        if (!Settings.isEnabled(psiElements.get(0).getProject())) {
             return;
         }
         final PluginClassCache pluginClassCache = new PluginClassCache();
-        final TargetClassesCollector targetClassesCollector =
-                new TargetClassesCollector(pluginClassCache);
-        final TargetMethodsCollector targetMethodsCollector =
-                new TargetMethodsCollector(pluginClassCache);
+        final TargetClassesCollector targetClassesCollector = new TargetClassesCollector(
+                pluginClassCache
+        );
+        final TargetMethodsCollector targetMethodsCollector = new TargetMethodsCollector(
+                pluginClassCache
+        );
 
         for (final PsiElement psiElement : psiElements) {
-            if (psiElement instanceof PhpClass || psiElement instanceof Method) {
-                List<? extends PsiElement> results;
+            if (psiElement instanceof PhpClass) {
+                final List<? extends PsiElement> results =
+                        targetClassesCollector.collect((PhpClass) psiElement);
 
-                if (psiElement instanceof PhpClass) {
-                    results = targetClassesCollector.collect((PhpClass) psiElement);
-                    if (!results.isEmpty()) {
-                        collection.add(NavigationGutterIconBuilder
-                                .create(AllIcons.Nodes.Class)
-                                .setTargets(results)
-                                .setTooltipText("Navigate to target class")
-                                .createLineMarkerInfo(PsiTreeUtil.getDeepestFirst(psiElement))
-                        );
-                    }
-                } else {
-                    results = targetMethodsCollector.collect((Method) psiElement);
-                    if (!results.isEmpty()) {
-                        collection.add(NavigationGutterIconBuilder
-                                .create(AllIcons.Nodes.Method)
-                                .setTargets(results)
-                                .setTooltipText("Navigate to target method")
-                                .createLineMarkerInfo(PsiTreeUtil.getDeepestFirst(psiElement))
-                        );
-                    }
+                if (!results.isEmpty()) {
+                    collection.add(NavigationGutterIconBuilder
+                            .create(AllIcons.Nodes.Class)
+                            .setTargets(results)
+                            .setTooltipText(TARGET_CLASS_TOOLTIP_TEXT)
+                            .createLineMarkerInfo(PsiTreeUtil.getDeepestFirst(psiElement))
+                    );
                 }
+            } else if (psiElement instanceof Method) {
+                final List<? extends PsiElement> results =
+                        targetMethodsCollector.collect((Method) psiElement);
 
+                if (!results.isEmpty()) {
+                    collection.add(NavigationGutterIconBuilder
+                            .create(AllIcons.Nodes.Method)
+                            .setTargets(results)
+                            .setTooltipText(TARGET_METHOD_TOOLTIP_TEXT)
+                            .createLineMarkerInfo(PsiTreeUtil.getDeepestFirst(psiElement))
+                    );
+                }
             }
         }
     }
 
     private static class PluginClassCache {
-        private final HashMap<String, List<PhpClass>> pluginClassesMap = // NOPMD
-                new HashMap<>();
+        private final Map<String, List<PhpClass>> pluginClassesMap = new HashMap<>();
 
         private List<PhpClass> getTargetClassesForPlugin(
                 @NotNull final PhpClass phpClass,
@@ -119,6 +127,9 @@ public class PluginTargetLineMarkerProvider implements LineMarkerProvider {
                     phpClass, phpClass.getPresentableFQN()
             );
             for (final PhpClass parent: phpClass.getSupers()) {
+                if (pluginClassesMap.containsKey(parent.getFQN().substring(1))) {
+                    continue;
+                }
                 classesForPlugin.addAll(getTargetClassesForPlugin(parent));
             }
 
@@ -127,9 +138,10 @@ public class PluginTargetLineMarkerProvider implements LineMarkerProvider {
     }
 
     private static class TargetClassesCollector implements Collector<PhpClass, PhpClass> {
+
         private final PluginTargetLineMarkerProvider.PluginClassCache pluginClassCache;
 
-        TargetClassesCollector(// NOPMD
+        public TargetClassesCollector(
                 final PluginTargetLineMarkerProvider.PluginClassCache pluginClassCache
         ) {
             this.pluginClassCache = pluginClassCache;
@@ -142,9 +154,10 @@ public class PluginTargetLineMarkerProvider implements LineMarkerProvider {
     }
 
     private static class TargetMethodsCollector implements Collector<Method, Method> {
+
         private final PluginTargetLineMarkerProvider.PluginClassCache pluginClassCache;
 
-        TargetMethodsCollector(// NOPMD
+        public TargetMethodsCollector(
                 final PluginTargetLineMarkerProvider.PluginClassCache pluginClassCache
         ) {
             this.pluginClassCache = pluginClassCache;
@@ -158,32 +171,33 @@ public class PluginTargetLineMarkerProvider implements LineMarkerProvider {
             if (null == getPluginPrefix(pluginMethod)) {
                 return results;
             }
-
             final PhpClass pluginClass = pluginMethod.getContainingClass();
+
             if (pluginClass == null) {
                 return results;
             }
 
             final List<PhpClass> targetClasses
                     = pluginClassCache.getTargetClassesForPlugin(pluginClass);
+
             if (targetClasses.isEmpty()) {
                 return results;
             }
 
-            for (final PhpClass targetClass: targetClasses) {
+            for (final PhpClass targetClass : targetClasses) {
                 final String pluginPrefix = getPluginPrefix(pluginMethod);
                 final String targetClassMethodName = getTargetMethodName(
                         pluginMethod, pluginPrefix
                 );
+
                 if (targetClassMethodName == null) {
                     continue;
                 }
-
                 final Method targetMethod = targetClass.findMethodByName(targetClassMethodName);
+
                 if (targetMethod == null) {
                     continue;
                 }
-
                 results.add(targetMethod);
             }
 
@@ -192,25 +206,31 @@ public class PluginTargetLineMarkerProvider implements LineMarkerProvider {
 
         private String getTargetMethodName(final Method pluginMethod, final String pluginPrefix) {
             final String targetClassMethodName = pluginMethod.getName().replace(pluginPrefix, "");
+
             if (targetClassMethodName.isEmpty()) {
                 return null;
             }
             final char firstCharOfTargetName = targetClassMethodName.charAt(0);
+
             if (Character.getType(firstCharOfTargetName) == Character.LOWERCASE_LETTER) {
                 return null;
             }
+
             return Character.toLowerCase(firstCharOfTargetName)
                     + targetClassMethodName.substring(1);
         }
 
         private String getPluginPrefix(final Method pluginMethod) {
             final String pluginMethodName = pluginMethod.getName();
+
             if (pluginMethodName.startsWith(Plugin.PluginType.around.toString())) {
                 return Plugin.PluginType.around.toString();
             }
+
             if (pluginMethodName.startsWith(Plugin.PluginType.before.toString())) {
                 return Plugin.PluginType.before.toString();
             }
+
             if (pluginMethodName.startsWith(Plugin.PluginType.after.toString())) {
                 return Plugin.PluginType.after.toString();
             }

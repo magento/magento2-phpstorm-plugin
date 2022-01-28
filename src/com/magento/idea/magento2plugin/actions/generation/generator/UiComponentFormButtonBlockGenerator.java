@@ -123,6 +123,10 @@ public class UiComponentFormButtonBlockGenerator extends FileGenerator {
         final PsiDirectory moduleBaseDir = moduleIndex.getModuleDirectoryByModuleName(
                 buttonData.getButtonModule()
         );
+
+        if (moduleBaseDir == null) {
+            return null;
+        }
         final PsiDirectory baseDirectory = directoryGenerator.findOrCreateSubdirectories(
                 moduleBaseDir,
                 buttonData.getButtonDirectory()

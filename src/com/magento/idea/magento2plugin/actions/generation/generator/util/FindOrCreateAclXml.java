@@ -31,12 +31,15 @@ public final class FindOrCreateAclXml {
      * @return PsiFile
      */
     public PsiFile execute(final String actionName, final String moduleName) {
+        PsiDirectory parentDirectory = new ModuleIndex(project)
+                .getModuleDirectoryByModuleName(moduleName);
+
+        if (parentDirectory == null) {
+            return null;
+        }
         final DirectoryGenerator directoryGenerator = DirectoryGenerator.getInstance();
         final FileFromTemplateGenerator fileFromTemplateGenerator =
                 new FileFromTemplateGenerator(project);
-
-        PsiDirectory parentDirectory = new ModuleIndex(project)
-                .getModuleDirectoryByModuleName(moduleName);
         parentDirectory = directoryGenerator
                 .findOrCreateSubdirectory(parentDirectory, Package.moduleBaseAreaDir);
 

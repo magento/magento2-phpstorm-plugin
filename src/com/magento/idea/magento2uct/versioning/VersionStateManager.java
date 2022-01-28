@@ -24,8 +24,8 @@ public final class VersionStateManager {
     private final ExistenceStateIndex existenceStateIndex;
     private final ApiCoverageStateIndex apiCoverageStateIndex;
     private final Boolean isSetIgnoreFlag;
-    private final SupportedVersion currentVersion;
-    private final SupportedVersion targetVersion;
+    private SupportedVersion currentVersion;
+    private SupportedVersion targetVersion;
     private final List<SupportedVersion> versionsToLoad;
 
     /**
@@ -48,6 +48,7 @@ public final class VersionStateManager {
         )) {
             instance = new VersionStateManager(project);
         }
+
         return instance;
     }
 
@@ -115,6 +116,8 @@ public final class VersionStateManager {
         currentVersion = settingsService.getCurrentVersionOrDefault();
         targetVersion = settingsService.getTargetVersion();
         versionsToLoad = new LinkedList<>();
+        // Correct settings if stored data isn't valid for current supported versions state.
+        correctSettings(project);
 
         deprecationStateIndex = new DeprecationStateIndex();
         compute(deprecationStateIndex);
@@ -124,6 +127,35 @@ public final class VersionStateManager {
 
         apiCoverageStateIndex = new ApiCoverageStateIndex(existenceStateIndex.getIndexData());
         compute(apiCoverageStateIndex);
+    }
+
+    /**
+     * Correct settings if corrupted.
+     *
+     * @param project Project
+     */
+    @SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
+    private synchronized void correctSettings(final @NotNull Project project) {
+        final UctSettingsService settingsService = UctSettingsService.getInstance(project);
+        final List<String> allVersions = SupportedVersion.getSupportedVersions();
+
+        if (currentVersion == null
+                || SupportedVersion.getVersion(currentVersion.getVersion()) == null) {
+            final SupportedVersion correctCurrentVersion = SupportedVersion.getVersion(
+                    allVersions.get(0)
+            );
+            settingsService.setCurrentVersion(correctCurrentVersion);
+            currentVersion = correctCurrentVersion;
+        }
+
+        if (targetVersion == null
+                || SupportedVersion.getVersion(targetVersion.getVersion()) == null) {
+            final SupportedVersion correctTargetVersion = SupportedVersion.getVersion(
+                    allVersions.get(allVersions.size() - 1)
+            );
+            settingsService.setTargetVersion(correctTargetVersion);
+            targetVersion = correctTargetVersion;
+        }
     }
 
     /**

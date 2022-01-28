@@ -75,6 +75,19 @@ public final class WebApiDeclarationGenerator extends FileGenerator {
     public PsiFile generate(final @NotNull String actionName) {
         final PsiDirectory moduleDirectory =
                 new ModuleIndex(project).getModuleDirectoryByModuleName(data.getModuleName());
+
+        if (moduleDirectory == null) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    validatorBundle.message(
+                            "validator.file.cantBeCreated",
+                            "Web API XML file"
+                    ),
+                    commonBundle.message("common.error"),
+                    JOptionPane.ERROR_MESSAGE
+            );
+            return null;
+        }
         final PsiDirectory fileDirectory =
                 directoryGenerator.findOrCreateSubdirectory(
                         moduleDirectory,

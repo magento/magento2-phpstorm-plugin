@@ -9,8 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum MessageQueueConnections {
+
     DB("db"),
-    AMPQ("ampq");
+    AMPQ("amqp");
 
     private final String type;
 
@@ -33,16 +34,6 @@ public enum MessageQueueConnections {
     }
 
     /**
-     * Get connection type by name.
-     *
-     * @param typeName type name
-     * @return Request Interface
-     */
-    public static String getConnectionTypeByName(final String typeName) {
-        return MessageQueueConnections.valueOf(typeName).getType();
-    }
-
-    /**
      * Get list of connection types.
      *
      * @return List connection types.
@@ -51,7 +42,7 @@ public enum MessageQueueConnections {
         final List<String> typeList = new ArrayList<>();
 
         for (final MessageQueueConnections type: MessageQueueConnections.values()) {
-            typeList.add(getConnectionTypeByName(type.name()));
+            typeList.add(type.getType());
         }
 
         return typeList;
