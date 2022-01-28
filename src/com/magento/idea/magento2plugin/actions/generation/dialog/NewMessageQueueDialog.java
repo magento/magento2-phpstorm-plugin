@@ -19,6 +19,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annot
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphaWithDashRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphaWithPeriodRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericWithUnderscoreRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.Lowercase;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NumericRule;
@@ -52,36 +53,37 @@ import org.jetbrains.annotations.NotNull;
         "PMD.ExcessiveImports",
 })
 public class NewMessageQueueDialog extends AbstractDialog {
+
     private static final String TOPIC_NAME = "Topic Name";
     private static final String HANDLER_NAME = "Handler Name";
-    private static final String HANDLER_TYPE = "Handler Type";
+    private static final String HANDLER_TYPE = "Handler Class";
+    private static final String HANDLER_DIR = "Handler Directory";
     private static final String CONSUMER_NAME = "Consumer Name";
     private static final String QUEUE_NAME = "Queue Name";
-    private static final String CONSUMER_TYPE = "Consumer Type";
+    private static final String CONSUMER_TYPE = "Consumer Class";
+    private static final String CONSUMER_DIR = "Consumer Directory";
     private static final String MAX_MESSAGES = "Maximum Messages";
     private static final String EXCHANGE_NAME = "Exchange Name";
     private static final String BINDING_ID = "Binding ID";
     private static final String BINDING_TOPIC = "Binding Topic";
 
     private JComboBox connectionName;
+    private final Project project;
+    private final String moduleName;
 
     /* TODO: Improve validation */
-    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, TOPIC_NAME})
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, TOPIC_NAME})
     @FieldValidation(rule = RuleRegistry.ALPHA_WITH_PERIOD,
             message = {AlphaWithPeriodRule.MESSAGE, TOPIC_NAME})
-    @FieldValidation(rule = RuleRegistry.LOWERCASE,
-            message = {Lowercase.MESSAGE, TOPIC_NAME})
+    @FieldValidation(rule = RuleRegistry.LOWERCASE, message = {Lowercase.MESSAGE, TOPIC_NAME})
     private JTextField topicName;
 
-    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, HANDLER_NAME})
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, HANDLER_NAME})
     @FieldValidation(rule = RuleRegistry.ALPHA_WITH_PERIOD,
             message = {AlphanumericWithUnderscoreRule.MESSAGE, HANDLER_NAME})
     private JTextField handlerName;
 
-    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, HANDLER_TYPE})
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, HANDLER_TYPE})
     @FieldValidation(rule = RuleRegistry.PHP_CLASS,
             message = {PhpClassFqnRule.MESSAGE, HANDLER_TYPE})
     private JTextField handlerClass;
@@ -90,16 +92,13 @@ public class NewMessageQueueDialog extends AbstractDialog {
             message = {NotEmptyRule.MESSAGE, CONSUMER_NAME})
     @FieldValidation(rule = RuleRegistry.ALPHA_WITH_PERIOD,
             message = {AlphaWithPeriodRule.MESSAGE, CONSUMER_NAME})
-    @FieldValidation(rule = RuleRegistry.LOWERCASE,
-            message = {Lowercase.MESSAGE, CONSUMER_NAME})
+    @FieldValidation(rule = RuleRegistry.LOWERCASE, message = {Lowercase.MESSAGE, CONSUMER_NAME})
     private JTextField consumerName;
 
-    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, QUEUE_NAME})
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, QUEUE_NAME})
     @FieldValidation(rule = RuleRegistry.ALPHA_WITH_PERIOD,
             message = {AlphaWithPeriodRule.MESSAGE, QUEUE_NAME})
-    @FieldValidation(rule = RuleRegistry.LOWERCASE,
-            message = {Lowercase.MESSAGE, QUEUE_NAME})
+    @FieldValidation(rule = RuleRegistry.LOWERCASE, message = {Lowercase.MESSAGE, QUEUE_NAME})
     private JTextField queueName;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
@@ -108,10 +107,8 @@ public class NewMessageQueueDialog extends AbstractDialog {
             message = {PhpClassFqnRule.MESSAGE, CONSUMER_TYPE})
     private JTextField consumerClass;
 
-    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, MAX_MESSAGES})
-    @FieldValidation(rule = RuleRegistry.NUMERIC,
-            message = {NumericRule.MESSAGE, MAX_MESSAGES})
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, MAX_MESSAGES})
+    @FieldValidation(rule = RuleRegistry.NUMERIC, message = {NumericRule.MESSAGE, MAX_MESSAGES})
     private JTextField maxMessages;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
@@ -120,8 +117,7 @@ public class NewMessageQueueDialog extends AbstractDialog {
             message = {AlphaWithDashRule.MESSAGE, EXCHANGE_NAME})
     private JTextField exchangeName;
 
-    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, BINDING_ID})
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, BINDING_ID})
     @FieldValidation(rule = RuleRegistry.ALPHANUMERIC_WITH_UNDERSCORE,
             message = {AlphaWithDashRule.MESSAGE, BINDING_ID})
     private JTextField bindingId;
@@ -132,7 +128,12 @@ public class NewMessageQueueDialog extends AbstractDialog {
             message = {AlphanumericWithUnderscoreRule.MESSAGE, BINDING_TOPIC})
     private JTextField bindingTopic;
 
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, CONSUMER_DIR})
+    @FieldValidation(rule = RuleRegistry.DIRECTORY, message = {DirectoryRule.MESSAGE, CONSUMER_DIR})
     private JTextField consumerDirectory;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, HANDLER_DIR})
+    @FieldValidation(rule = RuleRegistry.DIRECTORY, message = {DirectoryRule.MESSAGE, HANDLER_DIR})
     private JTextField handlerDirectory;
 
     private JPanel contentPanel;
@@ -146,13 +147,29 @@ public class NewMessageQueueDialog extends AbstractDialog {
     private JLabel consumerNameLabel;//NOPMD
     private JLabel handlerDirectoryLabel;//NOPMD
 
-    private final Project project;
-    private final String moduleName;
+    private JLabel topicNameErrorMessage;//NOPMD
+    private JLabel handlerNameErrorMessage;//NOPMD
+    private JLabel handlerClassErrorMessage;//NOPMD
+    private JLabel consumerNameErrorMessage;//NOPMD
+    private JLabel queueNameErrorMessage;//NOPMD
+    private JLabel consumerClassErrorMessage;//NOPMD
+    private JLabel maxMessagesErrorMessage;//NOPMD
+    private JLabel exchangeNameErrorMessage;//NOPMD
+    private JLabel bindingIdErrorMessage;//NOPMD
+    private JLabel bindingTopicErrorMessage;//NOPMD
+    private JLabel consumerDirectoryErrorMessage;//NOPMD
+    private JLabel handlerDirectoryErrorMessage;//NOPMD
 
     /**
      * Constructor.
+     *
+     * @param project Project
+     * @param directory PsiDirectory
      */
-    public NewMessageQueueDialog(final Project project, final PsiDirectory directory) {
+    public NewMessageQueueDialog(
+            final @NotNull Project project,
+            final @NotNull PsiDirectory directory
+    ) {
         super();
 
         this.project = project;
@@ -224,17 +241,18 @@ public class NewMessageQueueDialog extends AbstractDialog {
 
     /**
      * Opens the dialog window.
+     *
+     * @param project Project
+     * @param directory PsiDirectory
      */
-    public static void open(final Project project, final PsiDirectory directory) {
+    public static void open(
+            final @NotNull Project project,
+            final @NotNull PsiDirectory directory
+    ) {
         final NewMessageQueueDialog dialog = new NewMessageQueueDialog(project, directory);
         dialog.pack();
         dialog.centerDialog(dialog);
         dialog.setVisible(true);
-    }
-
-    @Override
-    public void onCancel() {
-        dispose();
     }
 
     private void onOK() {
@@ -244,10 +262,11 @@ public class NewMessageQueueDialog extends AbstractDialog {
             generateTopology();
             generatePublisher();
             generateHandlerClass();
+
             if (getConnectionName().equals(MessageQueueConnections.DB.getType())) {
                 generateConsumerClass();
             }
-            this.setVisible(false);
+            exit();
         }
     }
 

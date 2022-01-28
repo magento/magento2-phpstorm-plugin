@@ -25,6 +25,7 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -37,6 +38,7 @@ import javax.swing.SpinnerNumberModel;
         "PMD.ExcessiveImports,"
 })
 public class NewCronGroupDialog extends AbstractDialog {
+
     private final String moduleName;
     private final Project project;
     private JPanel contentPanel;
@@ -44,10 +46,8 @@ public class NewCronGroupDialog extends AbstractDialog {
     private JButton buttonCancel;
     private static final String NAME = "name";
 
-    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, NAME})
-    @FieldValidation(rule = RuleRegistry.IDENTIFIER,
-            message = {IdentifierRule.MESSAGE, NAME})
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, NAME})
+    @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE, NAME})
     private JTextField cronGroupName;
 
     private JSpinner scheduleGenerateEvery;
@@ -64,6 +64,8 @@ public class NewCronGroupDialog extends AbstractDialog {
     private JCheckBox addHistoryFailureLifetime;
     private FilteredComboBox useSeparateProcess;
     private JCheckBox addUseSeparateProcess;
+
+    private JLabel cronGroupNameErrorMessage;//NOPMD
 
     /**
      * New CRON group dialogue constructor.
@@ -140,17 +142,10 @@ public class NewCronGroupDialog extends AbstractDialog {
     }
 
     private void onOK() {
-        if (!validateFormFields()) {
-            return;
+        if (validateFormFields()) {
+            generateFile();
+            exit();
         }
-
-        generateFile();
-        this.setVisible(false);
-    }
-
-    @Override
-    protected void onCancel() {
-        dispose();
     }
 
     private void generateFile() {

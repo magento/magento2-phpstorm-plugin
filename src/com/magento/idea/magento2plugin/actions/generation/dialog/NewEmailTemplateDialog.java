@@ -21,8 +21,6 @@ import com.magento.idea.magento2plugin.magento.files.EmailTemplateHtml;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -31,36 +29,47 @@ import java.util.Arrays;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
 public class NewEmailTemplateDialog extends AbstractDialog {
-    private final String moduleName;
-    private final Project project;
-    private final NewEmailTemplateDialogValidator validator;
+
     private static final String EMAIL_TEMPLATE_ID = "id";
     private static final String LABEL = "label";
     private static final String FILENAME = "file name";
+
+    private final String moduleName;
+    private final Project project;
+    private final NewEmailTemplateDialogValidator validator;
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
+
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, EMAIL_TEMPLATE_ID})
     @FieldValidation(rule = RuleRegistry.IDENTIFIER,
             message = {IdentifierRule.MESSAGE, EMAIL_TEMPLATE_ID})
     private JTextField identifier;
+
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, LABEL})
     private JTextField label;
+
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, FILENAME})
     @FieldValidation(rule = RuleRegistry.IDENTIFIER,
             message = {IdentifierRule.MESSAGE, FILENAME})
     private JTextField fileName;
+
     private FilteredComboBox area;
     private FilteredComboBox templateType;
     private JTextField subject;
+
+    private JLabel identifierErrorMessage;//NOPMD
+    private JLabel labelErrorMessage;//NOPMD
+    private JLabel fileNameErrorMessage;//NOPMD
 
     /**
      * New email template dialog.
@@ -83,6 +92,8 @@ public class NewEmailTemplateDialog extends AbstractDialog {
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
+
+            @Override
             public void windowClosing(final WindowEvent windowEvent) {
                 onCancel();
             }
@@ -90,11 +101,7 @@ public class NewEmailTemplateDialog extends AbstractDialog {
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
-                new ActionListener() {
-                    public void actionPerformed(final ActionEvent actionEvent) {
-                        onCancel();
-                    }
-                },
+                actionEvent -> onCancel(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
@@ -206,12 +213,12 @@ public class NewEmailTemplateDialog extends AbstractDialog {
 
     private void onOK() {
         final boolean emailTemplateCanBeDeclared = !this.validator.validate(this);
+
         if (!validateFormFields() || emailTemplateCanBeDeclared) {
             return;
         }
-
         generateFile();
-        this.setVisible(false);
+        exit();
     }
 
     private void generateFile() {
@@ -226,11 +233,6 @@ public class NewEmailTemplateDialog extends AbstractDialog {
                 project
         );
         xmlGenerator.generate(NewEmailTemplateAction.ACTION_NAME, true);
-    }
-
-    protected void onCancel() {
-        // add your code here if necessary
-        dispose();
     }
 
     @SuppressWarnings({"PMD.UnusedPrivateMethod"})

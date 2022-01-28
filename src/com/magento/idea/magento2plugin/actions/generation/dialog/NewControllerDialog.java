@@ -33,6 +33,7 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -43,6 +44,7 @@ import javax.swing.KeyStroke;
         "PMD.ExcessiveImports"
 })
 public class NewControllerDialog extends AbstractDialog {
+
     private final String moduleName;
     private final Project project;
     private JPanel contentPane;
@@ -50,7 +52,6 @@ public class NewControllerDialog extends AbstractDialog {
     private JButton buttonCancel;
     private FilteredComboBox controllerAreaSelect;
     private FilteredComboBox httpMethodSelect;
-    private JTextField controllerParentDir;
     private JCheckBox inheritClass;
     private JPanel adminPanel;
     private JTextField acl;
@@ -64,11 +65,15 @@ public class NewControllerDialog extends AbstractDialog {
             message = {PhpDirectoryRule.MESSAGE, CONTROLLER_NAME})
     private JTextField controllerName;
 
-    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, ACTION_NAME})
-    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
-            message = {PhpClassRule.MESSAGE, ACTION_NAME})
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, ACTION_NAME})
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS, message = {PhpClassRule.MESSAGE, ACTION_NAME})
     private JTextField actionName;
+
+    private JTextField controllerParentDir;
+
+    private JLabel actionNameErrorMessage;//NOPMD
+    private JLabel controllerNameErrorMessage;//NOPMD
+    private JLabel controllerParentDirErrorMessage;//NOPMD
 
     /**
      * Open new dialog for adding new controller.
@@ -194,12 +199,10 @@ public class NewControllerDialog extends AbstractDialog {
     }
 
     private void onOK() {
-        if (!validateFormFields()) {
-            return;
+        if (validateFormFields()) {
+            generateFile();
+            exit();
         }
-
-        generateFile();
-        this.setVisible(false);
     }
 
     /**
@@ -251,23 +254,19 @@ public class NewControllerDialog extends AbstractDialog {
         );
 
         return String.format(
-                "%s%s%s%s%s%s",
+                "%s%s%s%s%s%s%s",
                 parts[0],
                 Package.fqnSeparator,
                 parts[1],
                 Package.fqnSeparator,
                 directoryPart,
+                Package.fqnSeparator,
                 controllerPart
         );
     }
 
     private Boolean getIsInheritClass() {
         return inheritClass.isSelected();
-    }
-
-    @Override
-    protected void onCancel() {
-        dispose();
     }
 
     private List<String> getAreaList() {

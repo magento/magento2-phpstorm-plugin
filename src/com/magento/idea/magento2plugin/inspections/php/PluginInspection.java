@@ -30,14 +30,13 @@ import com.magento.idea.magento2plugin.util.magento.plugin.GetTargetClassNamesBy
 import java.util.ArrayList;
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.NPathComplexity"})
+@SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.NPathComplexity", "PMD.CognitiveComplexity"})
 public class PluginInspection extends PhpInspection {
 
     private static final String WRONG_PARAM_TYPE = "inspection.wrong_param_type";
 
-    @NotNull
     @Override
-    public PsiElementVisitor buildVisitor(
+    public @NotNull PsiElementVisitor buildVisitor(
             final @NotNull ProblemsHolder problemsHolder,
             final boolean isOnTheFly
     ) {
@@ -146,7 +145,7 @@ public class PluginInspection extends PhpInspection {
                     final String targetClassMethodName,
                     final Method targetMethod
             ) {
-                if (targetClassMethodName.equals(MagentoPhpClass.CONSTRUCT_METHOD_NAME)) {
+                if (MagentoPhpClass.CONSTRUCT_METHOD_NAME.equals(targetClassMethodName)) {
                     problemsHolder.registerProblem(
                             pluginMethod.getNameIdentifier(),
                             inspectionBundle.message("inspection.plugin.error.constructMethod"),
@@ -167,7 +166,7 @@ public class PluginInspection extends PhpInspection {
                             ProblemHighlightType.ERROR
                     );
                 }
-                if (!targetMethod.getAccess().toString().equals(AbstractPhpFile.PUBLIC_ACCESS)) {
+                if (!AbstractPhpFile.PUBLIC_ACCESS.equals(targetMethod.getAccess().toString())) {
                     problemsHolder.registerProblem(
                             pluginMethod.getNameIdentifier(),
                             inspectionBundle.message("inspection.plugin.error.nonPublicMethod"),
@@ -187,6 +186,9 @@ public class PluginInspection extends PhpInspection {
 
                 int index = 0;
                 for (final Parameter pluginMethodParameter : pluginMethodParameters) {
+                    if (pluginMethodParameter.getName().isEmpty()) {
+                        continue;
+                    }
                     index++;
                     String declaredType = pluginMethodParameter.getDeclaredType().toString();
 
@@ -276,7 +278,7 @@ public class PluginInspection extends PhpInspection {
                         if (declaredType.isEmpty()) {
                             continue;
                         }
-                        if (!declaredType.equals(MagentoPhpClass.PHP_NULL)) {
+                        if (!MagentoPhpClass.PHP_NULL.equals(declaredType)) {
                             problemsHolder.registerProblem(
                                     pluginMethodParameter,
                                     PhpBundle.message(

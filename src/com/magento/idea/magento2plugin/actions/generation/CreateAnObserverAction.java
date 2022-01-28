@@ -28,6 +28,7 @@ import com.magento.idea.magento2plugin.project.Settings;
 import org.jetbrains.annotations.NotNull;
 
 public class CreateAnObserverAction extends DumbAwareAction {
+
     public static final String ACTION_NAME = "Create a new Observer for this event";
     public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Observer";
     public String targetEvent;
@@ -40,19 +41,24 @@ public class CreateAnObserverAction extends DumbAwareAction {
      * Updates the state of action.
      */
     @Override
-    public void update(final AnActionEvent event) {
+    public void update(final @NotNull AnActionEvent event) {
         final Project project = event.getData(PlatformDataKeys.PROJECT);
+        if (project == null) {
+            return;
+        }
+
         if (!Settings.isEnabled(project)) {
             this.setStatus(event, false);
             return;
         }
         final PsiFile psiFile = event.getData(PlatformDataKeys.PSI_FILE);
+
         if (!(psiFile instanceof PhpFile)) {
             this.setStatus(event, false);
             return;
         }
-
         final PsiElement element = getElement(event);
+
         if (element == null) {
             this.setStatus(event, false);
             return;
@@ -67,21 +73,36 @@ public class CreateAnObserverAction extends DumbAwareAction {
         this.setStatus(event, false);
     }
 
-    private PsiElement getElement(@NotNull final AnActionEvent event) {
+    @Override
+    public void actionPerformed(final @NotNull AnActionEvent event) {
+        if (event.getProject() == null) {
+            return;
+        }
+        CreateAnObserverDialog.open(event.getProject(), this.targetEvent);
+    }
+
+    @Override
+    public boolean isDumbAware() {
+        return false;
+    }
+
+    private PsiElement getElement(final @NotNull AnActionEvent event) {
         final Caret caret = event.getData(PlatformDataKeys.CARET);
+
         if (caret == null) {
             return null;
         }
-        final int offset = caret.getOffset();
         final PsiFile psiFile = event.getData(PlatformDataKeys.PSI_FILE);
-        final PsiElement element = psiFile.findElementAt(offset);
-        if (element == null) {
+
+        if (psiFile == null) {
             return null;
         }
-        return element;
+        final int offset = caret.getOffset();
+
+        return psiFile.findElementAt(offset);
     }
 
-    private boolean isObserverEventNameClicked(@NotNull final PsiElement element) {
+    private boolean isObserverEventNameClicked(final @NotNull PsiElement element) {
         return checkIsElementStringLiteral(element)
                 && checkIsParametersList(element.getParent().getParent())
                 && checkIsMethodReference(element.getParent().getParent().getParent())
@@ -90,11 +111,11 @@ public class CreateAnObserverAction extends DumbAwareAction {
                 );
     }
 
-    private boolean checkIsParametersList(@NotNull final PsiElement element) {
+    private boolean checkIsParametersList(final @NotNull PsiElement element) {
         return element instanceof ParameterList;
     }
 
-    private boolean checkIsMethodReference(@NotNull final PsiElement element) {
+    private boolean checkIsMethodReference(final @NotNull PsiElement element) {
         return element instanceof MethodReference;
     }
 
@@ -107,7 +128,7 @@ public class CreateAnObserverAction extends DumbAwareAction {
         if (!(method instanceof Method)) {
             return false;
         }
-        if (!((Method) method).getName().equals(Observer.DISPATCH_METHOD)) {
+        if (!Observer.DISPATCH_METHOD.equals(((Method) method).getName())) {
             return false;
         }
         final PsiElement phpClass = method.getParent();
@@ -115,32 +136,26 @@ public class CreateAnObserverAction extends DumbAwareAction {
             return false;
         }
         final String fqn = ((PhpClass) phpClass).getPresentableFQN();
-        return fqn.equals(Observer.INTERFACE);
+
+        return Observer.INTERFACE.equals(fqn)
+                || Observer.IMPLEMENTATION.equals(fqn)
+                || Observer.ENTITY_IMPL.equals(fqn)
+                || Observer.STAGING_IMPL.equals(fqn);
     }
 
-    private boolean checkIsElementStringLiteral(@NotNull final PsiElement element) {
+    private boolean checkIsElementStringLiteral(final @NotNull PsiElement element) {
         final ASTNode astNode = element.getNode();
         if (astNode == null) {
             return false;
         }
         final IElementType elementType = astNode.getElementType();
 
-        return elementType == PhpTokenTypes.STRING_LITERAL
-                || elementType == PhpTokenTypes.STRING_LITERAL_SINGLE_QUOTE;
+        return elementType.equals(PhpTokenTypes.STRING_LITERAL)
+                || elementType.equals(PhpTokenTypes.STRING_LITERAL_SINGLE_QUOTE);
     }
 
     private void setStatus(final AnActionEvent event, final boolean status) {
         event.getPresentation().setVisible(status);
         event.getPresentation().setEnabled(status);
-    }
-
-    @Override
-    public void actionPerformed(@NotNull final AnActionEvent event) {
-        CreateAnObserverDialog.open(event.getProject(), this.targetEvent);
-    }
-
-    @Override
-    public boolean isDumbAware() {
-        return false;
     }
 }

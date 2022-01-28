@@ -141,16 +141,13 @@ public class NewWebApiDeclarationDialog extends AbstractDialog {
      * Fire generation process if all fields are valid.
      */
     private void onOK() {
-        if (!validateFormFields()) {
-            return;
+        if (validateFormFields()) {
+            new WebApiDeclarationGenerator(
+                    getDialogDataObject(),
+                    project
+            ).generate(NewWebApiDeclarationAction.ACTION_NAME, true);
         }
-
-        new WebApiDeclarationGenerator(
-                getDialogDataObject(),
-                project
-        ).generate(NewWebApiDeclarationAction.ACTION_NAME, true);
-
-        this.setVisible(false);
+        exit();
     }
 
     /**

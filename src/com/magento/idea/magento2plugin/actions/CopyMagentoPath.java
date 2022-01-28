@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class CopyMagentoPath extends CopyPathProvider {
+
     public static final String PHTML_EXTENSION = "phtml";
     public static final String JS_EXTENSION = "js";
     public static final String CSS_EXTENSION = "css";
@@ -56,23 +57,23 @@ public class CopyMagentoPath extends CopyPathProvider {
                 || virtualFile != null && !acceptedTypes.contains(virtualFile.getExtension());
     }
 
-    @Nullable
     @Override
-    public String getPathToElement(
-            @NotNull final Project project,
-            @Nullable final VirtualFile virtualFile,
-            @Nullable final Editor editor
+    public @Nullable String getPathToElement(
+            final @NotNull Project project,
+            final @Nullable VirtualFile virtualFile,
+            final @Nullable Editor editor
     ) {
         if (virtualFile == null) {
             return null;
         }
-        final PsiFile file
-                = PsiManager.getInstance(project).findFile(virtualFile);
+        final PsiFile file = PsiManager.getInstance(project).findFile(virtualFile);
+
         if (file == null) {
             return null;
         }
         final PsiDirectory directory = file.getContainingDirectory();
         final String moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
+
         if (moduleName == null) {
             return null;
         }
@@ -89,8 +90,14 @@ public class CopyMagentoPath extends CopyPathProvider {
         } else {
             return fullPath.toString();
         }
+        int endIndex;
 
-        final int endIndex = getIndexOf(paths, fullPath, paths[++index]);
+        try {
+            endIndex = getIndexOf(paths, fullPath, paths[++index]);
+        } catch (ArrayIndexOutOfBoundsException exception) {
+            // endIndex could not be found.
+            return "";
+        }
         final int offset = paths[index].length();
 
         fullPath.replace(0, endIndex + offset, "");
@@ -98,6 +105,15 @@ public class CopyMagentoPath extends CopyPathProvider {
         return moduleName + SEPARATOR + fullPath;
     }
 
+    /**
+     * Get index where web|template path starts in the fullPath.
+     *
+     * @param paths String[]
+     * @param fullPath StringBuilder
+     * @param path String
+     *
+     * @return int
+     */
     private int getIndexOf(final String[] paths, final StringBuilder fullPath, final String path) {
         return fullPath.lastIndexOf(path) == -1
                 ? getIndexOf(paths, fullPath, paths[++index])

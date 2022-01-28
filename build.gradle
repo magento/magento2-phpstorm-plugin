@@ -41,7 +41,7 @@ intellij {
             'properties',
             'CSS',
             'JavaScriptLanguage',
-            'com.intellij.lang.jsgraphql:3.0.0',
+            'com.intellij.lang.jsgraphql:3.1.2',
             'platform-images',
             'copyright'
     ]
@@ -69,7 +69,7 @@ sourceSets {
 publishPlugin {
     token = System.getenv("MAGENTO_PHPSTORM_intellijPublishToken")
     if (Boolean.valueOf(System.getenv("MAGENTO_PHPSTORM_isAlpha"))) {
-        channels 'alpha'
+        channels = ['alpha']
         version = version + "-alpha-" + getDate()
     }
 }

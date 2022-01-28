@@ -92,14 +92,16 @@ public class UiComponentFormGenerator extends FileGenerator {
     protected PsiFile createForm(
             final String actionName
     ) {
-        final DirectoryGenerator directoryGenerator = DirectoryGenerator.getInstance();
-        final FileFromTemplateGenerator fileFromTemplateGenerator =
-                new FileFromTemplateGenerator(project);
-
         final String moduleName = data.getModuleName();
         final PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(moduleName);
 
+        if (parentDirectory == null) {
+            return null;
+        }
+        final DirectoryGenerator directoryGenerator = DirectoryGenerator.getInstance();
+        final FileFromTemplateGenerator fileFromTemplateGenerator =
+                new FileFromTemplateGenerator(project);
         final ArrayList<String> fileDirectories = new ArrayList<>();
         fileDirectories.add(Package.moduleViewDir);
         final String area = data.getFormArea();
@@ -147,6 +149,14 @@ public class UiComponentFormGenerator extends FileGenerator {
     protected void fillAttributes(final @NotNull Properties attributes) {
         final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
 
+        if (data.getFields().isEmpty()) {
+            phpClassTypesBuilder
+                    .appendProperty("PRIMARY_FIELD", "");
+        } else {
+            phpClassTypesBuilder
+                    .appendProperty("PRIMARY_FIELD", data.getFields().get(0).getName());
+        }
+
         phpClassTypesBuilder
                 .appendProperty("NAME", data.getFormName())
                 .appendProperty("LABEL", data.getLabel())
@@ -163,7 +173,6 @@ public class UiComponentFormGenerator extends FileGenerator {
                                 data.getDataProviderPath()
                         ).getClassFqn()
                 )
-                .appendProperty("PRIMARY_FIELD", data.getFields().get(0).getName())
                 .mergeProperties(attributes);
     }
 

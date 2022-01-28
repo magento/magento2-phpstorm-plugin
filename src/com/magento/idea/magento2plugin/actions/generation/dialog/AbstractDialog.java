@@ -60,8 +60,18 @@ public abstract class AbstractDialog extends JDialog {
         dialog.setLocation(coordinateX, coordinateY);
     }
 
+    /**
+     * Default on cancel action.
+     */
     protected void onCancel() {
-        this.setVisible(false);
+        this.exit();
+    }
+
+    /**
+     * Right way to hide dialog window.
+     */
+    protected void exit() {
+        dispose();
     }
 
     /**

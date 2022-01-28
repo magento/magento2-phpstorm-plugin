@@ -156,7 +156,7 @@ public class ConfigurationDialog extends AbstractDialog {
         );
         settingsService.setIgnoreCurrentVersion(ignoreCurrentVersion.isSelected());
 
-        this.setVisible(false);
+        exit();
     }
 
     /**
