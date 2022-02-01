@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings({"PMD.ExcessiveImports"})
 public class GraphQlResolverIndex extends ScalarIndexExtension<String> {
     public static final ID<String, Void> KEY
             = ID.create("com.magento.idea.magento2plugin.stubs.indexes.resolver_usages");
