@@ -9,6 +9,9 @@ import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpReturnType;
+import com.jetbrains.php.lang.psi.elements.impl.ClassConstImpl;
+import com.jetbrains.php.lang.psi.elements.impl.ClassConstantReferenceImpl;
+import com.jetbrains.php.lang.psi.elements.impl.ParameterImpl;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import java.util.Collection;
@@ -39,6 +42,7 @@ public abstract class PhpClassReferenceExtractor {
         @Override
         public void visitPhpParameter(final Parameter parameter) {
             PhpClassReferenceExtractor.this.processParameterReference(parameter);
+            PhpClassReferenceExtractor.this.processUsedForDefaultValueTypeReference(parameter);
         }
 
         /**
@@ -74,6 +78,39 @@ public abstract class PhpClassReferenceExtractor {
         if (parameterType.isEmpty() || complexType == null) {
             return;
         }
+        this.processReference(getNameFromFqn(complexType), complexType, parameter);
+    }
+
+    /**
+     * Process reference for complex type if it is exists in the default parameter value.
+     *
+     * @param parameter Parameter
+     */
+    public void processUsedForDefaultValueTypeReference(final @NotNull Parameter parameter) {
+        if (!(parameter instanceof ParameterImpl)) {
+            return;
+        }
+        final PsiElement defaultValue = parameter.getDefaultValue();
+
+        if (!(defaultValue instanceof ClassConstantReferenceImpl)) {
+            return;
+        }
+        final PsiElement constant = ((ClassConstantReferenceImpl) defaultValue).resolve();
+
+        if (!(constant instanceof ClassConstImpl)) {
+            return;
+        }
+        final PhpClass usedTypeClass = ((ClassConstImpl) constant).getContainingClass();
+
+        if (usedTypeClass == null) {
+            return;
+        }
+        final String complexType = extractComplexType(usedTypeClass.getType());
+
+        if (complexType == null) {
+            return;
+        }
+        
         this.processReference(getNameFromFqn(complexType), complexType, parameter);
     }
 

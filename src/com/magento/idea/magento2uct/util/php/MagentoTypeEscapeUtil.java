@@ -32,7 +32,13 @@ public final class MagentoTypeEscapeUtil {
         String result = typeFqn;
 
         while (matcher.find()) {
-            result = result.substring(0, matcher.start(0)) + result.substring(matcher.end(0));
+            final int begin = matcher.start(0);
+            final int end = matcher.end(0);
+
+            if (begin < 0 || begin > end || end > result.length()) {
+                continue;
+            }
+            result = result.substring(0, begin) + result.substring(end);
         }
 
         return typeFqn.equals(result) ? typeFqn : result;

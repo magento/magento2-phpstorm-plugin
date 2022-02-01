@@ -69,6 +69,10 @@ public class OverrideInThemeGenerator {
 
         final ModuleIndex moduleIndex = new ModuleIndex(project);
         PsiDirectory directory = moduleIndex.getModuleDirectoryByModuleName(themeName);
+
+        if (directory == null) {
+            return;
+        }
         directory = getTargetDirectory(directory, pathComponents);
 
         if (directory.findFile(baseFile.getName()) != null) {
@@ -134,11 +138,13 @@ public class OverrideInThemeGenerator {
             PsiDirectory directory, //NOPMD
             final List<String> pathComponents
     ) {
+        PsiDirectory result = directory;
         final DirectoryGenerator generator = DirectoryGenerator.getInstance();
+
         for (final String directoryName : pathComponents) {
-            directory = generator.findOrCreateSubdirectory(directory, directoryName);
+            result = generator.findOrCreateSubdirectory(directory, directoryName);
         }
 
-        return directory;
+        return result;
     }
 }

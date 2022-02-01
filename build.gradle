@@ -15,7 +15,7 @@ repositories {
 }
 
 group 'com.magento.idea'
-version '4.2.0'
+version '4.2.3'
 
 apply plugin: 'org.jetbrains.intellij'
 apply plugin: 'java'
@@ -41,7 +41,7 @@ intellij {
             'properties',
             'CSS',
             'JavaScriptLanguage',
-            'com.intellij.lang.jsgraphql:3.0.0',
+            'com.intellij.lang.jsgraphql:3.1.2',
             'platform-images',
             'copyright'
     ]
@@ -107,6 +107,7 @@ idea {
 
 dependencies {
     testImplementation 'junit:junit:4.13'
+    implementation 'org.json:json:20211205'
 }
 
 test {

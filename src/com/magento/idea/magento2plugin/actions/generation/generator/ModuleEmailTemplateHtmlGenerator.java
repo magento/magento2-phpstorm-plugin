@@ -51,6 +51,7 @@ public class ModuleEmailTemplateHtmlGenerator extends FileGenerator {
      * @param actionName Action name
      * @return PsiFile
      */
+    @Override
     public PsiFile generate(final String actionName) {
         final PsiFile templateFile = FileBasedIndexUtil.findModuleViewFile(
                 this.emailTemplateData.getFileName(),
@@ -67,6 +68,10 @@ public class ModuleEmailTemplateHtmlGenerator extends FileGenerator {
         PsiDirectory parentDirectory = this.moduleIndex.getModuleDirectoryByModuleName(
                 this.emailTemplateData.getModule()
         );
+
+        if (parentDirectory == null) {
+            return null;
+        }
         final ArrayList<String> fileDirectories = new ArrayList<>();
 
         fileDirectories.add(Package.moduleViewDir);
@@ -96,7 +101,7 @@ public class ModuleEmailTemplateHtmlGenerator extends FileGenerator {
         attributes.setProperty("SUBJECT", emailTemplateData.getSubject());
         attributes.setProperty("TYPE", emailTemplateData.getType());
 
-        if (emailTemplateData.getType().equals(EmailTemplateHtml.HTML_TYPE)) {
+        if (EmailTemplateHtml.HTML_TYPE.equals(emailTemplateData.getType())) {
             attributes.setProperty("HTML_TYPE", "true");
         }
     }

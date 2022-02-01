@@ -7,7 +7,7 @@
 <idea-plugin require-restart="true">
     <id>com.magento.idea.magento2plugin</id>
     <name>Magento PhpStorm</name>
-    <version>4.2.0</version>
+    <version>4.2.3</version>
     <vendor url="https://github.com/magento/magento2-phpstorm-plugin">Magento Inc.</vendor>
 
     <description><![CDATA[
@@ -561,6 +561,11 @@
         <errorHandler implementation="com.magento.idea.magento2plugin.project.diagnostic.DefaultErrorReportSubmitter"/>
 
         <configurationType implementation="com.magento.idea.magento2uct.execution.configurations.UctRunConfigurationType"/>
+
+        <testSourcesFilter implementation="com.magento.idea.magento2plugin.lang.roots.MagentoTestSourceFilter"/>
+        <searchScopesProvider implementation="com.magento.idea.magento2plugin.lang.psi.search.MagentoSearchScopesProvider"/>
+
+        <multiHostInjector implementation="com.magento.idea.magento2plugin.lang.injection.UiComponentSyntaxInjector"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.php">

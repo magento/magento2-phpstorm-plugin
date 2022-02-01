@@ -31,12 +31,15 @@ public final class FindOrCreateMenuXml {
      * @return PsiFile
      */
     public PsiFile execute(final String actionName, final String moduleName) {
+        PsiDirectory parentDirectory = new ModuleIndex(project)
+                .getModuleDirectoryByModuleName(moduleName);
+
+        if (parentDirectory == null) {
+            return null;
+        }
         final DirectoryGenerator directoryGenerator = DirectoryGenerator.getInstance();
         final FileFromTemplateGenerator fileFromTemplateGenerator =
                 new FileFromTemplateGenerator(project);
-
-        PsiDirectory parentDirectory = new ModuleIndex(project)
-                .getModuleDirectoryByModuleName(moduleName);
         final ArrayList<String> fileDirectories = new ArrayList<>();
         fileDirectories.add(Package.moduleBaseAreaDir);
         fileDirectories.add(Areas.adminhtml.toString());

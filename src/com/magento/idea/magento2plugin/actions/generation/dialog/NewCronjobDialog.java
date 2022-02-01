@@ -35,11 +35,13 @@ import java.awt.event.WindowEvent;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({
         "PMD.UncommentedEmptyMethodBody",
@@ -54,6 +56,11 @@ import javax.swing.KeyStroke;
         "PMD.ExcessiveImports",
 })
 public class NewCronjobDialog extends AbstractDialog {
+
+    private final Project project;
+    private final String moduleName;
+    private final CamelCaseToSnakeCase camelCaseToSnakeCase;
+
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -64,6 +71,7 @@ public class NewCronjobDialog extends AbstractDialog {
     private JRadioButton atMidnightRadioButton;
     private JPanel fixedSchedulePanel;
     private JPanel configurableSchedulePanel;
+
     private static final String CLASS_NAME = "class name";
     private static final String DIRECTORY = "directory";
     private static final String CRON_NAME = "name";
@@ -107,9 +115,12 @@ public class NewCronjobDialog extends AbstractDialog {
             message = {NotEmptyRule.MESSAGE, CRON_GROUP})
     private FilteredComboBox cronGroupComboBox;
 
-    private Project project;
-    private String moduleName;
-    private CamelCaseToSnakeCase camelCaseToSnakeCase;
+    private JLabel cronjobClassNameFieldErrorMessage;//NOPMD
+    private JLabel cronjobDirectoryFieldErrorMessage;//NOPMD
+    private JLabel cronjobNameFieldErrorMessage;//NOPMD
+    private JLabel cronGroupComboBoxErrorMessage;//NOPMD
+    private JLabel cronjobScheduleFieldErrorMessage;//NOPMD
+    private JLabel configPathFieldErrorMessage;//NOPMD
 
     /**
      * Open a new cronjob generation dialog form.
@@ -117,7 +128,7 @@ public class NewCronjobDialog extends AbstractDialog {
      * @param project Project
      * @param directory Directory
      */
-    public NewCronjobDialog(final Project project, final PsiDirectory directory) {
+    public NewCronjobDialog(final @NotNull Project project, final @NotNull PsiDirectory directory) {
         super();
         this.project = project;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
@@ -246,11 +257,6 @@ public class NewCronjobDialog extends AbstractDialog {
         return this.configPathField.getText().trim();
     }
 
-    @Override
-    protected void onCancel() {
-        dispose();
-    }
-
     private void createUIComponents() {
         final List<String> cronGroups = CronGroupIndex.getInstance(project).getGroups();
 
@@ -263,15 +269,19 @@ public class NewCronjobDialog extends AbstractDialog {
      * @return String
      */
     private String suggestCronjobName(final String cronjobClassname) {
+        if (moduleName == null) {
+            return "";
+        }
+
         if (cronjobClassname == null || cronjobClassname.isEmpty()) {
-            return this.moduleName.toLowerCase(new java.util.Locale("en","EN"));
+            return moduleName.toLowerCase(new java.util.Locale("en","EN"));
         }
 
         final String cronjobClassnameToSnakeCase = this.camelCaseToSnakeCase.convert(
                 cronjobClassname
         );
 
-        return this.moduleName.toLowerCase(new java.util.Locale("en","EN"))
+        return moduleName.toLowerCase(new java.util.Locale("en","EN"))
                 + "_"
                 + cronjobClassnameToSnakeCase;
     }
@@ -283,7 +293,6 @@ public class NewCronjobDialog extends AbstractDialog {
         if (!validateFormFields()) {
             return;
         }
-
         final NamespaceBuilder namespaceBuilder = new NamespaceBuilder(
                 this.getCronjobModule(),
                 this.getCronjobClassName(),
@@ -298,7 +307,7 @@ public class NewCronjobDialog extends AbstractDialog {
 
         // todo: catch validation exceptions
         this.generate(cronjobClassData, crontabXmlData);
-        this.setVisible(false);
+        exit();
     }
 
     /**
