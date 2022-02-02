@@ -2,6 +2,7 @@
 
 namespace Foo\Bar\Ui\Component\Listing\Column;
 
+use Foo\Bar\Model\Data\BookData;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
@@ -61,9 +62,9 @@ class BookBlockActions extends Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as &$item) {
-                if (isset($item['book_id'])) {
+                if (isset($item[BookData::BOOK_ID])) {
                     $entityName = static::ENTITY_NAME;
-                    $urlData = ['book_id' => $item['book_id']];
+                    $urlData = [BookData::BOOK_ID => $item[BookData::BOOK_ID]];
 
                     $editUrl = $this->urlBuilder->getUrl(static::EDIT_URL_PATH, $urlData);
                     $deleteUrl = $this->urlBuilder->getUrl(static::DELETE_URL_PATH, $urlData);

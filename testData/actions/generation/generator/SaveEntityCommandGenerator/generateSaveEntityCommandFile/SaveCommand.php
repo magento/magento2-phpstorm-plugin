@@ -7,7 +7,6 @@ use Foo\Bar\Model\BookModel;
 use Foo\Bar\Model\BookModelFactory;
 use Foo\Bar\Model\Data\BookData;
 use Foo\Bar\Model\ResourceModel\BookResource;
-use Magento\Framework\DataObject;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Psr\Log\LoggerInterface;
 
@@ -50,7 +49,7 @@ class SaveCommand
     /**
      * Save Book.
      *
-     * @param BookData|DataObject $book
+     * @param BookData $book
      *
      * @return int
      * @throws CouldNotSaveException
@@ -63,7 +62,7 @@ class SaveCommand
             $model->addData($book->getData());
             $model->setHasDataChanges(true);
 
-            if (!$model->getId()) {
+            if (!$model->getData(BookData::BOOK_ID)) {
                 $model->isObjectNew(true);
             }
             $this->resource->save($model);
@@ -78,6 +77,6 @@ class SaveCommand
             throw new CouldNotSaveException(__('Could not save Book.'));
         }
 
-        return (int)$model->getEntityId();
+        return (int)$model->getData(BookData::BOOK_ID);
     }
 }

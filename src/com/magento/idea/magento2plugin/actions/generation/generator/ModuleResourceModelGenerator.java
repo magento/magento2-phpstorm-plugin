@@ -6,12 +6,13 @@
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
+import com.magento.idea.magento2plugin.actions.generation.context.EntityCreatorContext;
 import com.magento.idea.magento2plugin.actions.generation.data.ResourceModelData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
+import com.magento.idea.magento2plugin.actions.generation.dialog.util.ClassPropertyFormatterUtil;
+import com.magento.idea.magento2plugin.actions.generation.util.GenerationContextRegistry;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.ResourceModelFile;
-import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
@@ -60,20 +61,28 @@ public class ModuleResourceModelGenerator extends PhpFileGenerator {
      */
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
+        typesBuilder
+                .append("NAME", data.getResourceModelName(), false)
+                .append("NAMESPACE", file.getNamespace(), false)
+                .append("DB_NAME", data.getDbTableName(), false)
+                .append("ENTITY_ID_COLUMN", data.getEntityIdColumn(), false)
+                .append("EXTENDS", ResourceModelFile.ABSTRACT_DB);
 
-        phpClassTypesBuilder
-                .appendProperty("NAME", data.getResourceModelName())
-                .appendProperty(
-                        "NAMESPACE",
-                        file.getNamespace()
-                )
-                .appendProperty("DB_NAME", data.getDbTableName())
-                .appendProperty("ENTITY_ID_COLUMN", data.getEntityIdColumn())
-                .append("EXTENDS", ResourceModelFile.ABSTRACT_DB)
-                .mergeProperties(attributes);
+        final EntityCreatorContext context =
+                (EntityCreatorContext) GenerationContextRegistry.getInstance().getContext();
 
-        final List<String> uses = phpClassTypesBuilder.getUses();
-        attributes.setProperty("USES", PhpClassGeneratorUtil.formatUses(uses));
+        if (context != null && context.getUserData(EntityCreatorContext.DTO_TYPE) != null) {
+            final String dtoTypeFqn = context.getUserData(EntityCreatorContext.DTO_TYPE);
+            Objects.requireNonNull(dtoTypeFqn);
+            typesBuilder.append(
+                    "ENTITY_ID_REFERENCE",
+                    ClassPropertyFormatterUtil.formatNameToConstant(
+                            data.getEntityIdColumn(),
+                            dtoTypeFqn
+                    ),
+                    false
+            );
+            typesBuilder.append("DTO_TYPE", dtoTypeFqn);
+        }
     }
 }

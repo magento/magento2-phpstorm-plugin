@@ -29,9 +29,9 @@ import com.jetbrains.php.lang.psi.PhpPsiUtil;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpPsiElement;
-import com.magento.idea.magento2plugin.actions.generation.ImportReferences.PhpClassReferenceResolver;
 import com.magento.idea.magento2plugin.actions.generation.data.code.PluginMethodData;
 import com.magento.idea.magento2plugin.actions.generation.generator.code.PluginMethodsGenerator;
+import com.magento.idea.magento2plugin.actions.generation.references.PhpClassReferenceResolver;
 import com.magento.idea.magento2plugin.actions.generation.util.CodeStyleSettings;
 import com.magento.idea.magento2plugin.actions.generation.util.CollectInsertedMethods;
 import com.magento.idea.magento2plugin.actions.generation.util.FillTextBufferWithPluginMethods;
@@ -72,7 +72,7 @@ public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeIns
      */
     public PluginGenerateMethodHandlerBase(final Plugin.PluginType type) {
         this.type = type.toString();
-        this.fillTextBuffer = FillTextBufferWithPluginMethods.getInstance();
+        this.fillTextBuffer = new FillTextBufferWithPluginMethods();
         this.collectInsertedMethods = CollectInsertedMethods.getInstance();
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();

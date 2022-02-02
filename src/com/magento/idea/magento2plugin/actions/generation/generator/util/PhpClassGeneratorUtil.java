@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator.util;
 
+import com.jetbrains.php.lang.PhpLangUtil;
+import com.magento.idea.magento2plugin.util.RegExUtil;
 import java.util.Collections;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -37,5 +39,16 @@ public final class PhpClassGeneratorUtil {
         final String[] fqnArray = fqn.split("\\\\");
 
         return fqnArray[fqnArray.length - 1];
+    }
+
+    /**
+     * Check if provided string is a valid PHP class FQN.
+     *
+     * @param fqnCandidate String
+     *
+     * @return boolean
+     */
+    public static boolean isValidFqn(final @NotNull String fqnCandidate) {
+        return PhpLangUtil.isFqn(fqnCandidate) || fqnCandidate.matches(RegExUtil.PhpRegex.FQN);
     }
 }

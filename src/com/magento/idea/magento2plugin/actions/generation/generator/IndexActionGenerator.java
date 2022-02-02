@@ -7,8 +7,6 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2plugin.actions.generation.data.IndexActionData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.actions.IndexActionFile;
 import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
@@ -62,24 +60,16 @@ public class IndexActionGenerator extends PhpFileGenerator {
      */
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
-
-        phpClassTypesBuilder
-                .appendProperty("ENTITY_NAME", data.getEntityName())
-                .appendProperty("CLASS_NAME", IndexActionFile.CLASS_NAME)
-                .appendProperty("ACL", data.getAcl())
-                .appendProperty("MENU", data.getMenu())
-                .appendProperty("NAMESPACE", file.getNamespace())
+        typesBuilder
+                .append("ENTITY_NAME", data.getEntityName(), false)
+                .append("CLASS_NAME", IndexActionFile.CLASS_NAME, false)
+                .append("ACL", data.getAcl(), false)
+                .append("MENU", data.getMenu(), false)
+                .append("NAMESPACE", file.getNamespace(), false)
                 .append("PARENT_CLASS_NAME", BackendModuleType.EXTENDS.getType())
                 .append("HTTP_GET_METHOD", HttpMethod.GET.getInterfaceFqn())
                 .append("RESULT", FrameworkLibraryType.RESULT_INTERFACE.getType())
                 .append("RESPONSE", FrameworkLibraryType.RESPONSE_INTERFACE.getType())
-                .append("RESULT_FACTORY", FrameworkLibraryType.RESULT_FACTORY.getType())
-                .mergeProperties(attributes);
-
-        attributes.setProperty(
-                "USES",
-                PhpClassGeneratorUtil.formatUses(phpClassTypesBuilder.getUses())
-        );
+                .append("RESULT_FACTORY", FrameworkLibraryType.RESULT_FACTORY.getType());
     }
 }

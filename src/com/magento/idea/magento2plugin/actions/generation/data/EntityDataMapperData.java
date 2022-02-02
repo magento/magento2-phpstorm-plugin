@@ -15,7 +15,7 @@ public class EntityDataMapperData {
     private final String modelName;
     private final String dtoName;
     private final String dtoInterfaceName;
-    private final boolean dtoWithInterface;
+    private final boolean hasDtoInterface;
 
     /**
      * Magento entity data mapper data constructor.
@@ -25,7 +25,7 @@ public class EntityDataMapperData {
      * @param modelName String
      * @param dtoName String
      * @param dtoInterfaceName String
-     * @param isDtoWithInterface boolean
+     * @param hasDtoInterface boolean
      */
     public EntityDataMapperData(
             final @NotNull String moduleName,
@@ -33,14 +33,14 @@ public class EntityDataMapperData {
             final @NotNull String modelName,
             final @NotNull String dtoName,
             final @NotNull String dtoInterfaceName,
-            final boolean isDtoWithInterface
+            final boolean hasDtoInterface
     ) {
         this.moduleName = moduleName;
         this.entityName = entityName;
         this.modelName = modelName;
         this.dtoName = dtoName;
         this.dtoInterfaceName = dtoInterfaceName;
-        this.dtoWithInterface = isDtoWithInterface;
+        this.hasDtoInterface = hasDtoInterface;
     }
 
     /**
@@ -93,7 +93,7 @@ public class EntityDataMapperData {
      *
      * @return boolean
      */
-    public boolean isDtoWithInterface() {
-        return dtoWithInterface;
+    public boolean isHasDtoInterface() {
+        return hasDtoInterface;
     }
 }

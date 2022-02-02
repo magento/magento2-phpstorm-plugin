@@ -18,11 +18,12 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.generator.xml.WebApiDeclarationGenerator;
 import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.WebApiResource;
-import com.magento.idea.magento2plugin.ui.FilteredComboBox;
+import com.magento.idea.magento2plugin.util.magento.GetAclResourcesListUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -54,7 +55,7 @@ public class NewWebApiDeclarationDialog extends AbstractDialog {
     private JComboBox<ComboBoxItemData> httpMethod;
     private JTextField serviceClass;
     private JTextField serviceMethod;
-    private JComboBox aclResource;
+    private JComboBox<ComboBoxItemData> aclResource;
 
     // labels
     private JLabel routeUrlLabel;//NOPMD
@@ -111,6 +112,8 @@ public class NewWebApiDeclarationDialog extends AbstractDialog {
         );
 
         fillPredefinedValuesAndDisableInputs();
+
+        addComponentListener(new FocusOnAFieldListener(() -> routeUrl.requestFocusInWindow()));
     }
 
     /**
@@ -168,11 +171,19 @@ public class NewWebApiDeclarationDialog extends AbstractDialog {
     @SuppressWarnings({"PMD.UnusedPrivateMethod", "PMD.AvoidInstantiatingObjectsInLoops"})
     private void createUIComponents() {
         httpMethod = new ComboBox<>();
+        aclResource = new ComboBox<>();
 
         for (final String method : HttpMethod.getHttpMethodList()) {
             httpMethod.addItem(new ComboBoxItemData(method, method));
         }
-        aclResource = new FilteredComboBox(WebApiResource.getDefaultResourcesList());
+
+        final List<String> aclResources = GetAclResourcesListUtil.execute(project);
+        final List<String> defaultResources = WebApiResource.getDefaultResourcesList();
+        defaultResources.addAll(aclResources);
+
+        for (final String acl : defaultResources) {
+            aclResource.addItem(new ComboBoxItemData(acl, acl));
+        }
     }
 
     /**

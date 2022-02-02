@@ -59,12 +59,12 @@ class ${CLASS_NAME} extends ${PARENT_CLASS}
      */
     public function prepareDataSource(array $dataSource): array
     {
-    #set($entityIdAccessor = "['" + ${ENTITY_ID} + "']")
+    #set($entityIdAccessor = "[" + ${ENTITY_ID_REFERENCE} + "]")
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as &$item) {
                 if (isset($item$entityIdAccessor)) {
                     $entityName = static::ENTITY_NAME;
-                    $urlData = ['${ENTITY_ID}' => $item$entityIdAccessor];
+                    $urlData = [${ENTITY_ID_REFERENCE} => $item$entityIdAccessor];
 
                     $editUrl = $this->urlBuilder->getUrl(static::EDIT_URL_PATH, $urlData);
                     $deleteUrl = $this->urlBuilder->getUrl(static::DELETE_URL_PATH, $urlData);

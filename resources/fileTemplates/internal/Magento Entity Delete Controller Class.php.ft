@@ -27,7 +27,7 @@ class ${CLASS_NAME} extends ${EXTENDS} implements ${IMPLEMENTS_POST}, ${IMPLEMEN
 
     /**
      * @param Context $context
-     * @param DeleteByIdCommand $deleteByIdCommand
+     * @param ${DELETE_COMMAND} $deleteByIdCommand
      */
     public function __construct(
         ${CONTEXT} $context,
@@ -47,7 +47,7 @@ class ${CLASS_NAME} extends ${EXTENDS} implements ${IMPLEMENTS_POST}, ${IMPLEMEN
         /** @var ${RESULT_INTERFACE} $resultRedirect */
         $resultRedirect = $this->resultFactory->create(${RESULT_FACTORY}::TYPE_REDIRECT);
         $resultRedirect->setPath('*/*/');
-        $entityId = (int) $this->getRequest()->getParam('${ENTITY_ID}');
+        $entityId = (int) $this->getRequest()->getParam(${ENTITY_ID_REFERENCE});
 
         try {
             $this->deleteByIdCommand->execute($entityId);

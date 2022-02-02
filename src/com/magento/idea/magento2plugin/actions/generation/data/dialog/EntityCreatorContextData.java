@@ -21,6 +21,7 @@ public class EntityCreatorContextData implements GenerationContextData {
     private final String moduleName;
     private final String actionName;
     private final boolean hasOpenFileFlag;
+    private final boolean webApi;
     private final String indexViewAction;
     private final String editViewAction;
     private final String newViewAction;
@@ -41,6 +42,7 @@ public class EntityCreatorContextData implements GenerationContextData {
      * @param moduleName String
      * @param actionName String
      * @param hasOpenFileFlag boolean
+     * @param hasWebApi boolean
      * @param indexViewAction String
      * @param editViewAction String
      * @param newViewAction String
@@ -60,6 +62,7 @@ public class EntityCreatorContextData implements GenerationContextData {
             final @NotNull String moduleName,
             final @NotNull String actionName,
             final boolean hasOpenFileFlag,
+            final boolean hasWebApi,
             final @NotNull String indexViewAction,
             final @NotNull String editViewAction,
             final @NotNull String newViewAction,
@@ -77,6 +80,7 @@ public class EntityCreatorContextData implements GenerationContextData {
         this.moduleName = moduleName;
         this.actionName = actionName;
         this.hasOpenFileFlag = hasOpenFileFlag;
+        this.webApi = hasWebApi;
         this.indexViewAction = indexViewAction;
         this.editViewAction = editViewAction;
         this.newViewAction = newViewAction;
@@ -109,6 +113,15 @@ public class EntityCreatorContextData implements GenerationContextData {
     @Override
     public boolean checkIfHasOpenFileFlag() {
         return hasOpenFileFlag;
+    }
+
+    /**
+     * Check if entity creator should generate Web API for entity management services.
+     *
+     * @return boolean
+     */
+    public boolean hasWebApi() {
+        return webApi;
     }
 
     /**

@@ -23,7 +23,7 @@ public class WebApiXmlDeclarationGeneratorTest extends BaseGeneratorTestCase {
     private static final String RESOURCE = "self";
 
     /**
-     * Test generation of web api xml declaration for a service.
+     * Test generation of Web API xml declaration for a service.
      */
     public void testGenerateWebApiXmlDeclarationForService() {
         final WebApiXmlRouteData data = new WebApiXmlRouteData(

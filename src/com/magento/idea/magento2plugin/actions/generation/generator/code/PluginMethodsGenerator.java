@@ -17,12 +17,13 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpPsiElement;
-import com.jetbrains.php.lang.psi.elements.PhpReturnType;
 import com.magento.idea.magento2plugin.actions.generation.data.code.PluginMethodData;
 import com.magento.idea.magento2plugin.actions.generation.generator.code.util.ConvertPluginParamsToPhpDocStringUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.code.util.ConvertPluginParamsToString;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
 import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
+import com.magento.idea.magento2plugin.util.php.PhpTypeMetadataParserUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -105,17 +106,32 @@ public class PluginMethodsGenerator {
         return pluginMethods.toArray(new PluginMethodData[0]);
     }
 
+    /**
+     * Fill attributes for plugin method.
+     *
+     * @param scopeForUseOperator PhpPsiElement
+     * @param type Plugin.PluginType
+     *
+     * @return Properties
+     */
     private Properties getAccessMethodAttributes(
             final @Nullable PhpPsiElement scopeForUseOperator,
             final @NotNull Plugin.PluginType type
     ) {
         final Properties attributes = new Properties();
-        final String typeHint = this.fillAttributes(scopeForUseOperator, attributes, type);
-        this.addTypeHintsAndReturnType(attributes, typeHint);
+        final String pluginMethodReturnType = this.fillAttributes(
+                scopeForUseOperator,
+                attributes,
+                type
+        );
+
+        if (pluginMethodReturnType != null) {
+            this.addReturnType(attributes, pluginMethodReturnType);
+        }
+
         return attributes;
     }
 
-    @NotNull
     private String fillAttributes(
             final @Nullable PhpPsiElement scopeForUseOperator,
             final Properties attributes,
@@ -127,12 +143,17 @@ public class PluginMethodsGenerator {
         final String pluginMethodName = type.toString().concat(methodSuffix);
 
         attributes.setProperty("NAME", pluginMethodName);
-        final PhpReturnType targetMethodReturnType = myMethod.getReturnType();
-        String typeHint = "";
-        if (targetMethodReturnType != null) {
-            typeHint = targetMethodReturnType.getText();
+        String returnType = PhpTypeMetadataParserUtil.getMethodReturnType(this.myMethod);
+
+        if (returnType != null && PhpClassGeneratorUtil.isValidFqn(returnType)) {
+            returnType = PhpClassGeneratorUtil.getNameFromFqn(returnType);
         }
-        final Collection<PsiElement> parameters = new ArrayList();
+
+        if (type.equals(Plugin.PluginType.before)) {
+            returnType = MagentoPhpClass.ARRAY_TYPE;
+        }
+
+        final Collection<PsiElement> parameters = new ArrayList<>();
         parameters.add(myTargetClass);
         parameters.addAll(Arrays.asList(myMethod.getParameters()));
         attributes.setProperty("PARAM_DOC", ConvertPluginParamsToPhpDocStringUtil.execute(
@@ -148,29 +169,35 @@ public class PluginMethodsGenerator {
             attributes.setProperty("RETURN_VARIABLES", returnVariables);
         }
 
-        return typeHint;
+        return returnType;
     }
 
-    private void addTypeHintsAndReturnType(final Properties attributes, final String typeHint) {
+    /**
+     * Add return type to the properties.
+     *
+     * @param attributes Properties
+     * @param returnDocType String
+     */
+    private void addReturnType(final Properties attributes, final String returnDocType) {
         final Project project = this.pluginClass.getProject();
-        if (PhpLanguageFeature.SCALAR_TYPE_HINTS.isSupported(project)
-                && isDocTypeConvertable(typeHint)) {
-            attributes.setProperty("SCALAR_TYPE_HINT", convertDocTypeToHint(project, typeHint));
-        }
-
-        final boolean hasFeatureVoid = PhpLanguageFeature.RETURN_VOID.isSupported(project);
-        if (hasFeatureVoid) {
-            attributes.setProperty("VOID_RETURN_TYPE", MagentoPhpClass.VOID_RETURN_TYPE);
-        }
 
         if (PhpLanguageFeature.RETURN_TYPES.isSupported(project)
-                && isDocTypeConvertable(typeHint)) {
-            attributes.setProperty("RETURN_TYPE", convertDocTypeToHint(project, typeHint));
+                && isDocTypeConvertable(returnDocType)) {
+            attributes.setProperty(
+                    "RETURN_TYPE",
+                    convertDocTypeToHint(project, returnDocType)
+            );
         }
-
     }
 
-    private static boolean isDocTypeConvertable(final String typeHint) {
+    /**
+     * Check if PHP DOC type could be converted to scalar PHP type.
+     *
+     * @param typeHint String
+     *
+     * @return boolean
+     */
+    private static boolean isDocTypeConvertable(final @NotNull String typeHint) {
         return !typeHint.equalsIgnoreCase(MagentoPhpClass.MIXED_RETURN_TYPE)
             && !typeHint.equalsIgnoreCase(MagentoPhpClass.STATIC_MODIFIER)
             && !typeHint.equalsIgnoreCase(MagentoPhpClass.PHP_TRUE)
@@ -193,12 +220,28 @@ public class PluginMethodsGenerator {
                 : (hasNullableTypeFeature ? "?" : "") + split[0];
     }
 
-    @NotNull
-    private static String convertDocTypeToHint(final Project project, final String typeHint) {
+    /**
+     * Convert PHP DOC type to hint.
+     *
+     * @param project Project
+     * @param typeHint String
+     *
+     * @return String
+     */
+    private static @NotNull String convertDocTypeToHint(
+            final @NotNull Project project,
+            final @NotNull String typeHint
+    ) {
         String hint = typeHint.contains("[]") ? "array" : typeHint;
         hint = hint.contains("boolean") ? "bool" : hint;
+
         if (typeWithNull(typeHint)) {
             hint = convertNullableType(project, hint);
+        }
+
+        if (PhpLanguageFeature.RETURN_VOID.isSupported(project)
+                && typeHint.equals(MagentoPhpClass.VOID_RETURN_TYPE)) {
+            hint = MagentoPhpClass.VOID_RETURN_TYPE;
         }
 
         return hint;

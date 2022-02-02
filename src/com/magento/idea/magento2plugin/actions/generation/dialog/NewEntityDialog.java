@@ -10,6 +10,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.actions.generation.NewEntityAction;
+import com.magento.idea.magento2plugin.actions.generation.context.EntityCreatorContext;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormButtonData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldsetData;
@@ -36,6 +37,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.pool.Generat
 import com.magento.idea.magento2plugin.actions.generation.generator.pool.provider.NewEntityGeneratorsProviderUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DbSchemaGeneratorUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
+import com.magento.idea.magento2plugin.actions.generation.util.GenerationContextRegistry;
 import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.files.DataModelFile;
 import com.magento.idea.magento2plugin.magento.files.DataModelInterfaceFile;
@@ -154,6 +156,8 @@ public class NewEntityDialog extends AbstractDialog {
     private static final String DTO_INTERFACE_SUFFIX = "Interface";
     private static final String DATA_PROVIDER_SUFFIX = "DataProvider";
 
+    private static final String DEFAULT_MENU_SORT_ORDER = "100";
+
     private static final boolean OPEN_FILES_FLAG = false;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, ENTITY_ID})
@@ -218,6 +222,7 @@ public class NewEntityDialog extends AbstractDialog {
     private JLabel dbTableNameErrorMessage;
     private JLabel entityIdErrorMessage;
     private JLabel routeErrorMessage;
+    private JCheckBox createWebApi;
     private JTextField observerName;
     private final ProcessWorker.InProgressFlag onOkActionFired;
 
@@ -288,6 +293,8 @@ public class NewEntityDialog extends AbstractDialog {
 
         createUiComponent.addItemListener(event -> toggleUiComponentsPanel());
         registerTabbedPane(tabbedPane1);
+
+        sortOrder.setText(DEFAULT_MENU_SORT_ORDER);
     }
 
     /**
@@ -403,6 +410,15 @@ public class NewEntityDialog extends AbstractDialog {
 
         final NewEntityDialogData dialogData = getNewEntityDialogData();
         final EntityCreatorContextData context = getEntityCreatorContextData(dialogData);
+        final EntityCreatorContext generationContext = new EntityCreatorContext();
+        generationContext.putUserData(
+                EntityCreatorContext.DTO_TYPE,
+                dialogData.hasDtoInterface()
+                        ? context.getDtoInterfaceNamespaceBuilder().getClassFqn()
+                        : context.getDtoModelNamespaceBuilder().getClassFqn()
+        );
+        generationContext.putUserData(EntityCreatorContext.ENTITY_ID, dialogData.getIdFieldName());
+        GenerationContextRegistry.getInstance().setContext(generationContext);
 
         final GeneratorPoolHandler generatorPoolHandler = new GeneratorPoolHandler(context);
 
@@ -462,6 +478,7 @@ public class NewEntityDialog extends AbstractDialog {
                 moduleName,
                 ACTION_NAME,
                 OPEN_FILES_FLAG,
+                dialogData.hasWebApi(),
                 actionsPathPrefix.concat("index"),
                 actionsPathPrefix.concat("edit"),
                 actionsPathPrefix.concat("new"),
@@ -718,6 +735,7 @@ public class NewEntityDialog extends AbstractDialog {
                 getTableResource(),
                 createUiComponent.isSelected(),
                 createInterface.isSelected(),
+                createWebApi.isSelected(),
                 route.getText().trim(),
                 formLabel.getText().trim(),
                 formName.getText().trim(),
