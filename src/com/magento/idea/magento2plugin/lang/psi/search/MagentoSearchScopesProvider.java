@@ -10,6 +10,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NlsContexts;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.search.SearchScopeProvider;
+import com.magento.idea.magento2plugin.project.Settings;
 import java.util.Collections;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +28,10 @@ public class MagentoSearchScopesProvider implements SearchScopeProvider {
             final @NotNull Project project,
             final @NotNull DataContext dataContext
     ) {
+        if (!Settings.isEnabled(project)) {
+            return Collections.emptyList();
+        }
+
         return Collections.singletonList(AllFilesExceptTestsScope.getInstance(project));
     }
 }

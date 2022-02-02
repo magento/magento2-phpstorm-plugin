@@ -14,6 +14,7 @@ import com.intellij.psi.PsiLanguageInjectionHost;
 import com.intellij.psi.html.HtmlTag;
 import com.intellij.psi.templateLanguages.OuterLanguageElement;
 import com.intellij.psi.xml.XmlText;
+import com.magento.idea.magento2plugin.project.Settings;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,6 +26,10 @@ public class UiComponentSyntaxInjector implements MultiHostInjector {
             final @NotNull MultiHostRegistrar registrar,
             final @NotNull PsiElement host
     ) {
+        if (!Settings.isEnabled(host.getProject())) {
+            return;
+        }
+
         if (!isUiComponentTag(host)) {
             return;
         }
