@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 4.3.0
 
+## 4.2.3
+
+### Fixed
+
+- Fixed a simple-json library is absent in the distribution in [#951](https://github.com/magento/magento2-phpstorm-plugin/pull/951)
+
 ## 4.2.2
 
 ### Added
