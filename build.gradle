@@ -106,6 +106,7 @@ idea {
 
 dependencies {
     testImplementation 'junit:junit:4.13'
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 }
 
 test {
