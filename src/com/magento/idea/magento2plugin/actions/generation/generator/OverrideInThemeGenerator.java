@@ -49,7 +49,7 @@ public class OverrideInThemeGenerator {
                     .execute(baseFile.getContainingDirectory(), project));
 
         List<String> pathComponents;
-        if (componentType.equals(ComponentType.module.toString())) {
+        if (componentType.equals(ComponentType.MODULE.toString())) {
             pathComponents = getModulePathComponents(
                     baseFile,
                     GetComponentNameByDirectoryUtil.execute(
@@ -61,7 +61,7 @@ public class OverrideInThemeGenerator {
                 pathComponents.add("override");
                 pathComponents.add("base");
             }
-        } else if (componentType.equals(ComponentType.theme.toString())) {
+        } else if (componentType.equals(ComponentType.THEME.toString())) {
             pathComponents = getThemePathComponents(baseFile);
         } else {
             return;

@@ -21,12 +21,13 @@ import com.magento.idea.magento2plugin.util.magento.GetComponentTypeByNameUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class OverrideInThemeAction extends DumbAwareAction {
-    public static String actionName = "Override this template in a project theme";
-    public static String actionDescription = "Override in project theme";
+
+    public static final String ACTION_NAME = "Override this template in a project theme";
+    public static final String ACTION_DESCRIPTION = "Override in project theme";
     private PsiFile psiFile;
 
     public OverrideInThemeAction() {
-        super(actionName, actionDescription, MagentoIcons.MODULE);
+        super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
     }
 
     /**
@@ -65,9 +66,9 @@ public class OverrideInThemeAction extends DumbAwareAction {
                 GetComponentNameByDirectoryUtil.execute(psiFile.getContainingDirectory(), project)
         );
 
-        if (componentType.equals(ComponentType.module.toString())) {
+        if (componentType.equals(ComponentType.MODULE.toString())) {
             isAllowed = file.getPath().contains(Package.moduleViewDir);
-        } else if (componentType.equals(ComponentType.theme.toString())) {
+        } else if (componentType.equals(ComponentType.THEME.toString())) {
             isAllowed = true;
         }
 

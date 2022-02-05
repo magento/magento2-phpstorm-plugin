@@ -58,7 +58,7 @@ public class OverrideInThemeDialog extends AbstractDialog {
 
         setContentPane(contentPane);
         setModal(true);
-        setTitle(OverrideInThemeAction.actionDescription);
+        setTitle(OverrideInThemeAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
         fillThemeOptions();
 

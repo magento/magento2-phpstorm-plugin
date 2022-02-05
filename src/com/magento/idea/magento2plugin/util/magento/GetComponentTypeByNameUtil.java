@@ -25,9 +25,9 @@ public final class GetComponentTypeByNameUtil {
     public static String execute(final String componentName) {
         String componentType = null;
         if (isModule(componentName)) {
-            componentType = ComponentType.module.toString();
+            componentType = ComponentType.MODULE.toString();
         } else if (isTheme(componentName)) {
-            componentType = ComponentType.theme.toString();
+            componentType = ComponentType.THEME.toString();
         }
 
         return componentType;
