@@ -66,9 +66,9 @@ public class OverrideInThemeAction extends DumbAwareAction {
                 GetComponentNameByDirectoryUtil.execute(psiFile.getContainingDirectory(), project)
         );
 
-        if (componentType.equals(ComponentType.MODULE.toString())) {
+        if (componentType.equals(ComponentType.module.toString())) {
             isAllowed = file.getPath().contains(Package.moduleViewDir);
-        } else if (componentType.equals(ComponentType.THEME.toString())) {
+        } else if (componentType.equals(ComponentType.theme.toString())) {
             isAllowed = true;
         }
 

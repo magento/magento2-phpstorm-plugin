@@ -43,7 +43,7 @@ public class NewRoutesXmlAction extends AbstractContextAction {
         );
 
         return allowedDirectories.contains(targetDirectory.getName())
-                && moduleData.getType().equals(ComponentType.MODULE);
+                && moduleData.getType().equals(ComponentType.module);
     }
 
     @Override

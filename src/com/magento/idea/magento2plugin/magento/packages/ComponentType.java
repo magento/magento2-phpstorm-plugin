@@ -7,9 +7,10 @@ package com.magento.idea.magento2plugin.magento.packages;
 
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings({"PMD.FieldNamingConventions"})
 public enum ComponentType {
-    MODULE,
-    THEME;
+    module,
+    theme;
 
     /**
      * Get component type by value.
