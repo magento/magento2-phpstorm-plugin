@@ -56,6 +56,15 @@
             <add-to-group group-id="PhpGenerateGroup" anchor="last"/>
         </group>
 
+        <group id="MagentoContextBasedActionsGroup" class="com.intellij.ide.actions.NonEmptyActionGroup" text="Context Actions" popup="false" compact="true" searchable="true">
+            <separator/>
+            <!-- Context dependent actions -->
+            <action id="MagentoCreateRoutesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewRoutesXmlAction"/>
+            <!-- Context dependent actions -->
+            <separator/>
+            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml"/>
+        </group>
+
         <!-- Module file generators -->
         <group id="MagentoNewModuleFileGroup" class="com.magento.idea.magento2plugin.actions.groups.NewModuleFileGroup" text="Module File" popup="true">
             <action id="MagentoCreateEntity" class="com.magento.idea.magento2plugin.actions.generation.NewEntityAction" />
