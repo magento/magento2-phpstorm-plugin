@@ -60,6 +60,7 @@
             <separator/>
             <!-- Context dependent actions -->
             <action id="MagentoCreateRoutesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewRoutesXmlAction"/>
+            <action id="MagentoCreateDiFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewDiXmlAction"/>
             <!-- Context dependent actions -->
             <separator/>
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml"/>
