@@ -81,6 +81,7 @@ public class NewEmailTemplateDialog extends AbstractDialog {
         super();
         setContentPane(contentPane);
         setModal(true);
+        setTitle(NewEmailTemplateAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
         this.project = project;
         this.validator = new NewEmailTemplateDialogValidator(project);

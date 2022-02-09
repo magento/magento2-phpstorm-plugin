@@ -12,6 +12,7 @@ import com.magento.idea.magento2plugin.magento.files.RoutesXml;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 
 public class RoutesXmlGeneratorTest extends BaseGeneratorTestCase {
+
     private static final String EXPECTED_DIRECTORY = "src/app/code/Foo/Bar/etc/adminhtml";
     private static final String MODULE_NAME = "Foo_Bar";
     private static final String ROUTE = "customroute";
@@ -20,7 +21,7 @@ public class RoutesXmlGeneratorTest extends BaseGeneratorTestCase {
      * Test generating routes XML file.
      */
     public void testGenerateRoutesXmlFile() {
-        final String filePath = this.getFixturePath(RoutesXml.fileName);
+        final String filePath = this.getFixturePath(RoutesXml.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
         final Project project = myFixture.getProject();
         final RoutesXmlData routesXmlData = new RoutesXmlData(
