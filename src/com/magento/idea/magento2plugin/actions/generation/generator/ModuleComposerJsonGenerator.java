@@ -184,16 +184,15 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
                             composerJsonFile.getText()
                     );
                     final JSONObject jsonObject = (JSONObject) obj;
-                    final String versionJsonElement = jsonObject.get("version").toString();
+                    final String versionJsonElement = jsonObject.get("version") != null
+                            ? jsonObject.get("version").toString() : "*";
                     final String nameJsonElement = jsonObject.get("name").toString();
 
-                    if (versionJsonElement != null) {
-                        version = versionJsonElement;
-                        final int minorVersionSeparator = version.lastIndexOf('.');
-                        version = new StringBuilder(version)
-                                .replace(minorVersionSeparator + 1, version.length(),"*")
-                                .toString();
-                    }
+                    version = versionJsonElement;
+                    final int minorVersionSeparator = version.lastIndexOf('.');
+                    version = new StringBuilder(version)
+                            .replace(minorVersionSeparator + 1, version.length(),"*")
+                            .toString();
 
                     if (nameJsonElement != null) {
                         moduleName = nameJsonElement;
