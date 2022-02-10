@@ -21,7 +21,7 @@ public class NewAclXmlAction extends AbstractContextAction {
     public static final String ACTION_DESCRIPTION = "Create a new Magento 2 acl.xml file";
 
     /**
-     * New routes.xml file generation action constructor.
+     * New acl.xml file generation action constructor.
      */
     public NewAclXmlAction() {
         super(ACTION_NAME, ACTION_DESCRIPTION, ModuleAclXml.getInstance());
