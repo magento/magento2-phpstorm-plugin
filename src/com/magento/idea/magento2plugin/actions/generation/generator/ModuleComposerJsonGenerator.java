@@ -158,10 +158,9 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
     private Pair<String, String> getDependencyData(
             final String dependency
     ) {
-        String version = "*";
-        String moduleName = camelCaseToHyphen.convert(dependency).replace(
-                "_-", "/"
-        );
+        String version = "";
+        String moduleName = "";
+
         try {
             final PsiDirectory moduleDir = moduleIndex.getModuleDirectoryByModuleName(dependency);
 
@@ -186,16 +185,18 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
                     final JSONObject jsonObject = (JSONObject) obj;
                     final String versionJsonElement = jsonObject.get("version") == null
                             ? "*" : jsonObject.get("version").toString();
-                    final String nameJsonElement = jsonObject.get("name").toString();
 
+                    if (jsonObject.get("name") == null) {
+                        return Pair.create("", "");
+                    }
+                    moduleName = jsonObject.get("name").toString().trim();
                     version = versionJsonElement;
-                    final int minorVersionSeparator = version.lastIndexOf('.');
-                    version = new StringBuilder(version)
-                            .replace(minorVersionSeparator + 1, version.length(),"*")
-                            .toString();
 
-                    if (nameJsonElement != null) {
-                        moduleName = nameJsonElement;
+                    if (!versionJsonElement.equals("*")) {
+                        final int minorVersionSeparator = version.lastIndexOf('.');
+                        version = new StringBuilder(version)
+                                .replace(minorVersionSeparator + 1, version.length(),"*")
+                                .toString();
                     }
                 }
             } else {
