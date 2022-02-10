@@ -18,7 +18,6 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Directo
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.ComposerJson;
-import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
 import java.util.List;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
@@ -28,10 +27,10 @@ import org.json.simple.parser.ParseException;
 
 public class ModuleComposerJsonGenerator extends FileGenerator {
 
+    private static final String ANY_VERSION = "*";
     private final ModuleComposerJsonData moduleComposerJsonData;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final DirectoryGenerator directoryGenerator;
-    private final CamelCaseToHyphen camelCaseToHyphen;
     private final ModuleIndex moduleIndex;
 
     /**
@@ -48,7 +47,6 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
         this.moduleComposerJsonData = moduleComposerJsonData;
         this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         this.directoryGenerator = DirectoryGenerator.getInstance();
-        this.camelCaseToHyphen = CamelCaseToHyphen.getInstance();
         this.moduleIndex = new ModuleIndex(project);
     }
 
@@ -183,19 +181,18 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
                             composerJsonFile.getText()
                     );
                     final JSONObject jsonObject = (JSONObject) obj;
-                    final String versionJsonElement = jsonObject.get("version") == null
-                            ? "*" : jsonObject.get("version").toString();
 
                     if (jsonObject.get("name") == null) {
                         return Pair.create("", "");
                     }
                     moduleName = jsonObject.get("name").toString().trim();
-                    version = versionJsonElement;
+                    version = jsonObject.get("version") == null
+                            ? ANY_VERSION : jsonObject.get("version").toString();
 
-                    if (!versionJsonElement.equals("*")) {
+                    if (!ANY_VERSION.equals(version)) {
                         final int minorVersionSeparator = version.lastIndexOf('.');
                         version = new StringBuilder(version)
-                                .replace(minorVersionSeparator + 1, version.length(),"*")
+                                .replace(minorVersionSeparator + 1, version.length(), ANY_VERSION)
                                 .toString();
                     }
                 }
