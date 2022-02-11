@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.completion.xml;
 
 import com.magento.idea.magento2plugin.magento.files.ModuleConfigXml;
@@ -9,22 +10,22 @@ import com.magento.idea.magento2plugin.magento.files.ModuleSystemXmlFile;
 
 public class BackendModelXmlCompletionRegistrarTest extends CompletionXmlFixtureTestCase {
 
-    private static final String[] systemXmlBackendModelLookupStringCheck = new String[]{
+    private static final String[] SYSTEM_XML_BACKEND_MODEL_LOOKUP_STRING_CHECK = {
                 "Magento\\Backend\\Model\\Source\\Roles"
         };
-    private static final String[] configXmlBackendModelLookupStringCheck = new String[]{
+    private static final String[] CONFIG_XML_BACKEND_MODEL_LOOKUP_STRING_CHECK = {
                 "Magento\\Backend\\Model\\Source\\YesNo"
     };
 
     public void testSystemXmlElementProvideCompletion() {
-        String filePath = this.getFixturePath(ModuleSystemXmlFile.FILE_NAME);
+        final String filePath = this.getFixturePath(ModuleSystemXmlFile.FILE_NAME);
         myFixture.configureByFile(filePath);
 
-        assertCompletionContains(filePath, systemXmlBackendModelLookupStringCheck);
+        assertCompletionContains(filePath, SYSTEM_XML_BACKEND_MODEL_LOOKUP_STRING_CHECK);
     }
 
     public void testSystemXmlElementCompletionWontShow() {
-        String filePath = this.getFixturePath(
+        final String filePath = this.getFixturePath(
             ModuleSystemXmlFile.FILE_NAME
         );
         myFixture.copyFileToProject(filePath);
@@ -33,35 +34,35 @@ public class BackendModelXmlCompletionRegistrarTest extends CompletionXmlFixture
     }
 
     public void testSystemXmlBackendModelAttributeMatchWithFile() {
-        String filePath = this.getFixturePath(
+        final String filePath = this.getFixturePath(
             ModuleSystemXmlFile.FILE_NAME
         );
 
-        assertFileContainsCompletions(filePath, systemXmlBackendModelLookupStringCheck);
+        assertFileContainsCompletions(filePath, SYSTEM_XML_BACKEND_MODEL_LOOKUP_STRING_CHECK);
     }
 
     public void testSystemXmlBackendModelAttributeDontMatchWithFile() {
-        String filePath = this.getFixturePath(
+        final String filePath = this.getFixturePath(
             "other-file-than-system.xml"
         );
 
         assertFileNotContainsCompletions(
                 filePath,
-                systemXmlBackendModelLookupStringCheck
+                SYSTEM_XML_BACKEND_MODEL_LOOKUP_STRING_CHECK
         );
     }
 
     public void testConfigXmlElementProvideCompletion() {
-        String filePath = this.getFixturePath(
+        final String filePath = this.getFixturePath(
             ModuleConfigXml.FILE_NAME
         );
         myFixture.copyFileToProject(filePath);
 
-        assertCompletionContains(filePath, configXmlBackendModelLookupStringCheck);
+        assertCompletionContains(filePath, CONFIG_XML_BACKEND_MODEL_LOOKUP_STRING_CHECK);
     }
 
     public void testConfigXmlElementCompletionWontShow() {
-        String filePath = this.getFixturePath(
+        final String filePath = this.getFixturePath(
             ModuleConfigXml.FILE_NAME
         );
         myFixture.copyFileToProject(filePath);
@@ -70,21 +71,21 @@ public class BackendModelXmlCompletionRegistrarTest extends CompletionXmlFixture
     }
 
     public void testConfigXmlBackendModelAttributeMatchWithFile() {
-        String filePath = this.getFixturePath(
+        final String filePath = this.getFixturePath(
             ModuleConfigXml.FILE_NAME
         );
 
-        assertFileContainsCompletions(filePath, configXmlBackendModelLookupStringCheck);
+        assertFileContainsCompletions(filePath, CONFIG_XML_BACKEND_MODEL_LOOKUP_STRING_CHECK);
     }
 
     public void testConfigXmlBackendModelAttributeDontMatchWithFile() {
-        String filePath = this.getFixturePath(
+        final String filePath = this.getFixturePath(
             "other-file-than-config.xml"
         );
 
         assertFileNotContainsCompletions(
                 filePath,
-                configXmlBackendModelLookupStringCheck
+                CONFIG_XML_BACKEND_MODEL_LOOKUP_STRING_CHECK
         );
     }
 }
