@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class NewConfigXmlAction extends AbstractContextAction {
 
-    public static final String ACTION_NAME = "Magento 2 Config";
+    public static final String ACTION_NAME = "Magento 2 Config File";
     public static final String ACTION_DESCRIPTION = "Create a new Magento 2 config.xml file";
 
     /**
