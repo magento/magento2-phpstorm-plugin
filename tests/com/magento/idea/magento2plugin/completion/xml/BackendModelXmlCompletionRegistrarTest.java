@@ -5,7 +5,7 @@
 package com.magento.idea.magento2plugin.completion.xml;
 
 import com.magento.idea.magento2plugin.magento.files.ModuleConfigXml;
-import com.magento.idea.magento2plugin.magento.files.ModuleSystemXml;
+import com.magento.idea.magento2plugin.magento.files.ModuleSystemXmlFile;
 
 public class BackendModelXmlCompletionRegistrarTest extends CompletionXmlFixtureTestCase {
 
@@ -17,7 +17,7 @@ public class BackendModelXmlCompletionRegistrarTest extends CompletionXmlFixture
     };
 
     public void testSystemXmlElementProvideCompletion() {
-        String filePath = this.getFixturePath(ModuleSystemXml.FILE_NAME);
+        String filePath = this.getFixturePath(ModuleSystemXmlFile.FILE_NAME);
         myFixture.configureByFile(filePath);
 
         assertCompletionContains(filePath, systemXmlBackendModelLookupStringCheck);
@@ -25,7 +25,7 @@ public class BackendModelXmlCompletionRegistrarTest extends CompletionXmlFixture
 
     public void testSystemXmlElementCompletionWontShow() {
         String filePath = this.getFixturePath(
-            ModuleSystemXml.FILE_NAME
+            ModuleSystemXmlFile.FILE_NAME
         );
         myFixture.copyFileToProject(filePath);
 
@@ -34,7 +34,7 @@ public class BackendModelXmlCompletionRegistrarTest extends CompletionXmlFixture
 
     public void testSystemXmlBackendModelAttributeMatchWithFile() {
         String filePath = this.getFixturePath(
-            ModuleSystemXml.FILE_NAME
+            ModuleSystemXmlFile.FILE_NAME
         );
 
         assertFileContainsCompletions(filePath, systemXmlBackendModelLookupStringCheck);

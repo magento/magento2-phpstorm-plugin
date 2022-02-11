@@ -4,7 +4,7 @@
  */
 package com.magento.idea.magento2plugin.completion.xml;
 
-import com.magento.idea.magento2plugin.magento.files.ModuleSystemXml;
+import com.magento.idea.magento2plugin.magento.files.ModuleSystemXmlFile;
 import com.magento.idea.magento2plugin.magento.files.ModuleWidgetXml;
 import java.io.IOException;
 
@@ -15,14 +15,14 @@ public class SourceModelXmlCompletionRegistrarTest extends CompletionXmlFixtureT
     };
 
     public void testSourceModelXmlElementMustProvideCompletion() {
-        String filePath = this.getFixturePath(ModuleSystemXml.FILE_NAME);
+        String filePath = this.getFixturePath(ModuleSystemXmlFile.FILE_NAME);
         myFixture.copyFileToProject(filePath);
 
         assertCompletionContains(filePath, lookupStringsCheck);
     }
 
     public void testSourceModelXmlElementMatchWithFilePositiveCase() {
-        String filePath = this.getFixturePath(ModuleSystemXml.FILE_NAME);
+        String filePath = this.getFixturePath(ModuleSystemXmlFile.FILE_NAME);
         myFixture.copyFileToProject(filePath);
 
         assertFileContainsCompletions(filePath, lookupStringsCheck);

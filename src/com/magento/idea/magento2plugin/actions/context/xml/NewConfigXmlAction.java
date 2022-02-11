@@ -33,7 +33,14 @@ public class NewConfigXmlAction extends AbstractContextAction {
             final @NotNull PsiDirectory targetDirectory,
             final PsiFile targetFile
     ) {
+        final PsiDirectory configDir = moduleData.getConfigDir();
+
+        if (configDir == null) {
+            return false;
+        }
+
         return targetDirectory.getName().equals(Package.moduleBaseAreaDir)
+                && targetDirectory.equals(configDir)
                 && moduleData.getType().equals(ComponentType.module);
     }
 

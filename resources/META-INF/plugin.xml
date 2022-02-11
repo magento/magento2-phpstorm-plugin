@@ -64,6 +64,7 @@
             <action id="MagentoCreateWebapiFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewWebapiXmlAction"/>
             <action id="MagentoCreateAclFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewAclXmlAction"/>
             <action id="MagentoCreateConfigFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewConfigXmlAction"/>
+            <action id="MagentoCreateSystemFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewSystemXmlAction"/>
             <!-- Context dependent actions -->
             <separator/>
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml"/>
