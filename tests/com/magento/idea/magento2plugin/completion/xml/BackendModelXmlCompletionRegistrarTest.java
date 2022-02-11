@@ -11,10 +11,10 @@ import com.magento.idea.magento2plugin.magento.files.ModuleSystemXmlFile;
 public class BackendModelXmlCompletionRegistrarTest extends CompletionXmlFixtureTestCase {
 
     private static final String[] SYSTEM_XML_BACKEND_MODEL_LOOKUP_STRING_CHECK = {
-                "Magento\\Backend\\Model\\Source\\Roles"
-        };
+            "Magento\\Backend\\Model\\Source\\Roles"
+    };
     private static final String[] CONFIG_XML_BACKEND_MODEL_LOOKUP_STRING_CHECK = {
-                "Magento\\Backend\\Model\\Source\\YesNo"
+            "Magento\\Backend\\Model\\Source\\YesNo"
     };
 
     public void testSystemXmlElementProvideCompletion() {
