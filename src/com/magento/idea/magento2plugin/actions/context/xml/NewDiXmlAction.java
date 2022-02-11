@@ -36,6 +36,12 @@ public class NewDiXmlAction extends AbstractContextAction {
             final @NotNull PsiDirectory targetDirectory,
             final PsiFile targetFile
     ) {
+        final PsiDirectory configDir = moduleData.getConfigDir();
+        final PsiDirectory globalScopeDir = getGlobalScopeDir(targetDirectory);
+
+        if (configDir == null || globalScopeDir == null) {
+            return false;
+        }
         final List<String> allowedDirectories = Arrays.asList(
                 Package.moduleBaseAreaDir,
                 Areas.adminhtml.toString(),
@@ -45,12 +51,6 @@ public class NewDiXmlAction extends AbstractContextAction {
                 Areas.graphql.toString(),
                 Areas.crontab.toString()
         );
-        final PsiDirectory configDir = moduleData.getConfigDir();
-        final PsiDirectory globalScopeDir = getGlobalScopeDir(targetDirectory);
-
-        if (configDir == null || globalScopeDir == null) {
-            return false;
-        }
 
         return allowedDirectories.contains(targetDirectory.getName())
                 && globalScopeDir.equals(configDir)
