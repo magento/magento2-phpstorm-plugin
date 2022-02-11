@@ -63,6 +63,7 @@
             <action id="MagentoCreateDiFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewDiXmlAction"/>
             <action id="MagentoCreateWebapiFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewWebapiXmlAction"/>
             <action id="MagentoCreateAclFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewAclXmlAction"/>
+            <action id="MagentoCreateConfigFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewConfigXmlAction"/>
             <!-- Context dependent actions -->
             <separator/>
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml"/>
@@ -566,6 +567,7 @@
         <internalFileTemplate name="Magento Entity Delete Controller Class"/>
         <internalFileTemplate name="Magento Web API XML"/>
         <internalFileTemplate name="Web API Interface"/>
+        <internalFileTemplate name="Magento Config XML"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 
