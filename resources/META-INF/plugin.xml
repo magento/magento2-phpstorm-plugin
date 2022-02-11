@@ -172,6 +172,7 @@
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.DataIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.PageIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.TestNameIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.TestExtendsIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.AclResourceIndex" />
