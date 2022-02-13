@@ -73,8 +73,8 @@ public final class FindOrCreateRoutesXml {
     private Properties getAttributes(final String area) {
         final Properties attributes = new Properties();
         attributes.setProperty("ROUTER_ID", area.equals(Areas.frontend.toString())
-                ? RoutesXml.routerIdStandart
-                : RoutesXml.routerIdAdmin
+                ? RoutesXml.ROUTER_ID_STANDARD
+                : RoutesXml.ROUTER_ID_ADMIN
         );
         return attributes;
     }

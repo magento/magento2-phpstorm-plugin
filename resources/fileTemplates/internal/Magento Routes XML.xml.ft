@@ -1,6 +1,11 @@
 <?xml version="1.0"?>
 #parse("XML File Header.xml")
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
-    <router id="${ROUTER_ID}">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
+    <router id="${ROUTER_ID}">#if (${HAS_ROUTE_DATA})
+        <route id="${ROUTE_ID}" frontName="${FRONT_NAME}">
+            <module name="${MODULE_NAME}"/>
+        </route>
+#end
     </router>
 </config>

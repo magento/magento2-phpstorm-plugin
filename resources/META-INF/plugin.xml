@@ -56,6 +56,19 @@
             <add-to-group group-id="PhpGenerateGroup" anchor="last"/>
         </group>
 
+        <group id="MagentoContextBasedActionsGroup" class="com.intellij.ide.actions.NonEmptyActionGroup" text="Context Actions" popup="false" compact="true" searchable="true">
+            <separator/>
+            <!-- Context dependent actions -->
+            <action id="MagentoCreateRoutesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewRoutesXmlAction"/>
+            <action id="MagentoCreateDiFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewDiXmlAction"/>
+            <action id="MagentoCreateWebapiFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewWebapiXmlAction"/>
+            <action id="MagentoCreateAclFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewAclXmlAction"/>
+            <action id="MagentoCreateConfigFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewConfigXmlAction"/>
+            <!-- Context dependent actions -->
+            <separator/>
+            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml"/>
+        </group>
+
         <!-- Module file generators -->
         <group id="MagentoNewModuleFileGroup" class="com.magento.idea.magento2plugin.actions.groups.NewModuleFileGroup" text="Module File" popup="true">
             <action id="MagentoCreateEntity" class="com.magento.idea.magento2plugin.actions.generation.NewEntityAction" />
@@ -159,6 +172,7 @@
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.DataIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.PageIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.TestNameIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.TestExtendsIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.AclResourceIndex" />
@@ -553,6 +567,7 @@
         <internalFileTemplate name="Magento Entity Delete Controller Class"/>
         <internalFileTemplate name="Magento Web API XML"/>
         <internalFileTemplate name="Web API Interface"/>
+        <internalFileTemplate name="Magento Config XML"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 

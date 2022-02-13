@@ -8,12 +8,10 @@ package com.magento.idea.magento2plugin.magento.files;
 import com.intellij.lang.Language;
 import com.intellij.lang.xml.XMLLanguage;
 
-public class RoutesXml implements ModuleFileInterface {
+public final class ModuleConfigXmlFile implements ModuleFileInterface {
 
-    public static final String FILE_NAME = "routes.xml";
-    public static final String TEMPLATE = "Magento Routes XML";
-    public static final String ROUTER_ID_STANDARD = "standard";
-    public static final String ROUTER_ID_ADMIN = "admin";
+    public static final String FILE_NAME = "config.xml";
+    public static final String TEMPLATE = "Magento Config XML";
 
     @Override
     public String getFileName() {
