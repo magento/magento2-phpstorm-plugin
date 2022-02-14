@@ -65,6 +65,7 @@
             <action id="MagentoCreateAclFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewAclXmlAction"/>
             <action id="MagentoCreateConfigFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewConfigXmlAction"/>
             <action id="MagentoCreateSystemFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewSystemXmlAction"/>
+            <action id="MagentoCreateExtensionAttributesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewExtensionAttributesXmlAction"/>
             <action id="MagentoCreateWidgetFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewWidgetXmlAction"/>
             <!-- Context dependent actions -->
             <separator/>
@@ -570,6 +571,7 @@
         <internalFileTemplate name="Magento Web API XML"/>
         <internalFileTemplate name="Web API Interface"/>
         <internalFileTemplate name="Magento Config XML"/>
+        <internalFileTemplate name="Magento Extension Attributes XML"/>
         <internalFileTemplate name="Magento Widget XML"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
