@@ -18,7 +18,8 @@ import org.jetbrains.annotations.NotNull;
 public class NewExtensionAttributesXmlAction extends AbstractContextAction {
 
     public static final String ACTION_NAME = "Magento 2 Extension Attributes File";
-    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 extension_attributes.xml file";
+    public static final String ACTION_DESCRIPTION =
+            "Create a new Magento 2 extension_attributes.xml file";
 
     /**
      * New extension_attributes.xml file generation action constructor.
