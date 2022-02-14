@@ -2,89 +2,114 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.completion.xml;
 
 import com.magento.idea.magento2plugin.magento.files.ModuleConfigXml;
-import com.magento.idea.magento2plugin.magento.files.ModuleSystemXml;
+import com.magento.idea.magento2plugin.magento.files.ModuleSystemXmlFile;
 
 public class BackendModelXmlCompletionRegistrarTest extends CompletionXmlFixtureTestCase {
 
-    private static final String[] systemXmlBackendModelLookupStringCheck = new String[]{
-                "Magento\\Backend\\Model\\Source\\Roles"
-        };
-    private static final String[] configXmlBackendModelLookupStringCheck = new String[]{
-                "Magento\\Backend\\Model\\Source\\YesNo"
+    private static final String[] SYSTEM_XML_BACKEND_MODEL_LOOKUP_STRING_CHECK = {
+            "Magento\\Backend\\Model\\Source\\Roles"
+    };
+    private static final String[] CONFIG_XML_BACKEND_MODEL_LOOKUP_STRING_CHECK = {
+            "Magento\\Backend\\Model\\Source\\YesNo"
     };
 
+    /**
+     * Test system.xml file element completion.
+     */
     public void testSystemXmlElementProvideCompletion() {
-        String filePath = this.getFixturePath(ModuleSystemXml.FILE_NAME);
+        final String filePath = this.getFixturePath(ModuleSystemXmlFile.FILE_NAME);
         myFixture.configureByFile(filePath);
 
-        assertCompletionContains(filePath, systemXmlBackendModelLookupStringCheck);
+        assertCompletionContains(filePath, SYSTEM_XML_BACKEND_MODEL_LOOKUP_STRING_CHECK);
     }
 
+    /**
+     * Test system.xml file element completion won't show.
+     */
     public void testSystemXmlElementCompletionWontShow() {
-        String filePath = this.getFixturePath(
-            ModuleSystemXml.FILE_NAME
+        final String filePath = this.getFixturePath(
+                ModuleSystemXmlFile.FILE_NAME
         );
         myFixture.copyFileToProject(filePath);
 
         assertCompletionNotShowing(filePath);
     }
 
+    /**
+     * Test system.xml backend model attribute match with the file.
+     */
     public void testSystemXmlBackendModelAttributeMatchWithFile() {
-        String filePath = this.getFixturePath(
-            ModuleSystemXml.FILE_NAME
+        final String filePath = this.getFixturePath(
+                ModuleSystemXmlFile.FILE_NAME
         );
 
-        assertFileContainsCompletions(filePath, systemXmlBackendModelLookupStringCheck);
+        assertFileContainsCompletions(filePath, SYSTEM_XML_BACKEND_MODEL_LOOKUP_STRING_CHECK);
     }
 
+    /**
+     * Test system.xml backend model attribute doesn't match with the file.
+     */
     public void testSystemXmlBackendModelAttributeDontMatchWithFile() {
-        String filePath = this.getFixturePath(
-            "other-file-than-system.xml"
+        final String filePath = this.getFixturePath(
+                "other-file-than-system.xml"
         );
 
         assertFileNotContainsCompletions(
                 filePath,
-                systemXmlBackendModelLookupStringCheck
+                SYSTEM_XML_BACKEND_MODEL_LOOKUP_STRING_CHECK
         );
     }
 
+    /**
+     * Test config.xml file element completion.
+     */
     public void testConfigXmlElementProvideCompletion() {
-        String filePath = this.getFixturePath(
-            ModuleConfigXml.FILE_NAME
+        final String filePath = this.getFixturePath(
+                ModuleConfigXml.FILE_NAME
         );
         myFixture.copyFileToProject(filePath);
 
-        assertCompletionContains(filePath, configXmlBackendModelLookupStringCheck);
+        assertCompletionContains(filePath, CONFIG_XML_BACKEND_MODEL_LOOKUP_STRING_CHECK);
     }
 
+    /**
+     * Test config.xml file element completion won't show.
+     */
     public void testConfigXmlElementCompletionWontShow() {
-        String filePath = this.getFixturePath(
-            ModuleConfigXml.FILE_NAME
+        final String filePath = this.getFixturePath(
+                ModuleConfigXml.FILE_NAME
         );
         myFixture.copyFileToProject(filePath);
 
         assertCompletionNotShowing(filePath);
     }
 
+    /**
+     * Test config.xml backend model attribute match with the file.
+     */
     public void testConfigXmlBackendModelAttributeMatchWithFile() {
-        String filePath = this.getFixturePath(
-            ModuleConfigXml.FILE_NAME
+        final String filePath = this.getFixturePath(
+                ModuleConfigXml.FILE_NAME
         );
 
-        assertFileContainsCompletions(filePath, configXmlBackendModelLookupStringCheck);
+        assertFileContainsCompletions(filePath, CONFIG_XML_BACKEND_MODEL_LOOKUP_STRING_CHECK);
     }
 
+    /**
+     * Test config.xml backend model attribute doesn't match with the file.
+     */
     public void testConfigXmlBackendModelAttributeDontMatchWithFile() {
-        String filePath = this.getFixturePath(
-            "other-file-than-config.xml"
+        final String filePath = this.getFixturePath(
+                "other-file-than-config.xml"
         );
 
         assertFileNotContainsCompletions(
                 filePath,
-                configXmlBackendModelLookupStringCheck
+                CONFIG_XML_BACKEND_MODEL_LOOKUP_STRING_CHECK
         );
     }
 }

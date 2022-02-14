@@ -20,6 +20,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.magento.files.ModuleFileInterface;
+import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -152,6 +153,18 @@ public abstract class AbstractContextAction extends CreateFromTemplateActionBase
         template.setFileName(moduleFile.getFileName());
 
         return template;
+    }
+
+    protected @Nullable PsiDirectory getGlobalScopeDir(final @NotNull PsiDirectory directory) {
+        PsiDirectory globalScopeDir;
+
+        if (Package.moduleBaseAreaDir.equals(directory.getName())) {
+            globalScopeDir = directory;
+        } else {
+            globalScopeDir = directory.getParentDirectory();
+        }
+
+        return globalScopeDir;
     }
 
     @Override
