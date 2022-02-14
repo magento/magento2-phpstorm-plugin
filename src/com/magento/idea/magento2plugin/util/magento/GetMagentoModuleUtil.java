@@ -16,8 +16,10 @@ import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.jetbrains.php.lang.psi.elements.impl.ClassConstImpl;
 import com.magento.idea.magento2plugin.magento.files.RegistrationPhp;
 import com.magento.idea.magento2plugin.magento.packages.ComponentType;
+import com.magento.idea.magento2plugin.magento.packages.Package;
 import java.util.Collection;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class GetMagentoModuleUtil {
 
@@ -46,6 +48,9 @@ public final class GetMagentoModuleUtil {
         if (registrationFile == null) {
             return null;
         }
+        final PsiDirectory configDir = registrationFile
+                .getContainingDirectory()
+                .findSubdirectory(Package.moduleBaseAreaDir);
         final Collection<MethodReference> methodReferences = PsiTreeUtil.findChildrenOfType(
                 registrationFile,
                 MethodReference.class
@@ -71,7 +76,7 @@ public final class GetMagentoModuleUtil {
                 return null;
             }
 
-            return new MagentoModuleData(name, resolvedType);
+            return new MagentoModuleData(name, resolvedType, configDir);
         }
 
         return null;
@@ -124,13 +129,36 @@ public final class GetMagentoModuleUtil {
 
         private final String name;
         private final ComponentType type;
+        private final PsiDirectory configDir;
 
+        /**
+         * Default constructor.
+         *
+         * @param name String
+         * @param type ComponentType
+         */
         public MagentoModuleData(
                 final @NotNull String name,
                 final @NotNull ComponentType type
         ) {
+            this(name, type, null);
+        }
+
+        /**
+         * Constructor with a config directory specified.
+         *
+         * @param name String
+         * @param type ComponentType
+         * @param configDir PsiDirectory
+         */
+        public MagentoModuleData(
+                final @NotNull String name,
+                final @NotNull ComponentType type,
+                final @Nullable PsiDirectory configDir
+        ) {
             this.name = name;
             this.type = type;
+            this.configDir = configDir;
         }
 
         public String getName() {
@@ -139,6 +167,10 @@ public final class GetMagentoModuleUtil {
 
         public ComponentType getType() {
             return type;
+        }
+
+        public @Nullable PsiDirectory getConfigDir() {
+            return configDir;
         }
     }
 }

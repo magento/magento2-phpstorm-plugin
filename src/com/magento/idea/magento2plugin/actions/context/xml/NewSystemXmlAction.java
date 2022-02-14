@@ -9,25 +9,22 @@ import com.intellij.ide.fileTemplates.actions.AttributesDefaults;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.context.AbstractContextAction;
-import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
+import com.magento.idea.magento2plugin.magento.files.ModuleSystemXmlFile;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.ComponentType;
-import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil;
-import java.util.Arrays;
-import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
-public class NewDiXmlAction extends AbstractContextAction {
+public class NewSystemXmlAction extends AbstractContextAction {
 
-    public static final String ACTION_NAME = "Magento 2 Dependency Injection File";
-    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 di.xml file";
+    public static final String ACTION_NAME = "Magento 2 System File";
+    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 system.xml file";
 
     /**
-     * New di.xml file generation action constructor.
+     * New system.xml file generation action constructor.
      */
-    public NewDiXmlAction() {
-        super(ACTION_NAME, ACTION_DESCRIPTION, ModuleDiXml.getInstance());
+    public NewSystemXmlAction() {
+        super(ACTION_NAME, ACTION_DESCRIPTION, new ModuleSystemXmlFile());
     }
 
     @Override
@@ -36,24 +33,15 @@ public class NewDiXmlAction extends AbstractContextAction {
             final @NotNull PsiDirectory targetDirectory,
             final PsiFile targetFile
     ) {
+        final PsiDirectory parentDir = targetDirectory.getParentDirectory();
         final PsiDirectory configDir = moduleData.getConfigDir();
-        final PsiDirectory globalScopeDir = getGlobalScopeDir(targetDirectory);
 
-        if (configDir == null || globalScopeDir == null) {
+        if (parentDir == null || configDir == null) {
             return false;
         }
-        final List<String> allowedDirectories = Arrays.asList(
-                Package.moduleBaseAreaDir,
-                Areas.adminhtml.toString(),
-                Areas.frontend.toString(),
-                Areas.webapi_rest.toString(),
-                Areas.webapi_soap.toString(),
-                Areas.graphql.toString(),
-                Areas.crontab.toString()
-        );
 
-        return allowedDirectories.contains(targetDirectory.getName())
-                && globalScopeDir.equals(configDir)
+        return targetDirectory.getName().equals(Areas.adminhtml.toString())
+                && parentDir.equals(configDir)
                 && moduleData.getType().equals(ComponentType.module);
     }
 
