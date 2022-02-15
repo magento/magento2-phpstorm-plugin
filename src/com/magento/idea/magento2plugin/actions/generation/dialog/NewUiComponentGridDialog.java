@@ -79,6 +79,7 @@ import org.jetbrains.annotations.NotNull;
         "PMD.GodClass"
 })
 public class NewUiComponentGridDialog extends AbstractDialog {
+
     private static final String ACTION_NAME = "Action Name";
     private static final String DATA_PROVIDER_CLASS_NAME = "Data Provider Class Name";
     private static final String DATA_PROVIDER_DIRECTORY = "Data Provider Directory";
@@ -91,6 +92,16 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     private JButton buttonOK;
     private JButton buttonCancel;
 
+    private JCheckBox addToolBar;
+    private JCheckBox addBookmarksCheckBox;
+    private JCheckBox addColumnsControlCheckBox;
+    private JCheckBox addFullTextSearchCheckBox;
+    private JCheckBox addListingFiltersCheckBox;
+    private JCheckBox addListingPagingCheckBox;
+    private FilteredComboBox collection;
+    private FilteredComboBox dataProviderType;
+    private FilteredComboBox areaSelect;
+
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, NAME})
     @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE, NAME})
     private JTextField uiComponentName;
@@ -98,17 +109,6 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, NAME})
     @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE, NAME})
     private JTextField idField;
-
-    private JCheckBox addToolBar;
-    private JCheckBox addBookmarksCheckBox;
-    private JCheckBox addColumnsControlCheckBox;
-    private JCheckBox addFullTextSearchCheckBox;
-    private JCheckBox addListingFiltersCheckBox;
-    private JCheckBox addListingPagingCheckBox;
-
-    private FilteredComboBox collection;
-    private FilteredComboBox dataProviderType;
-    private FilteredComboBox areaSelect;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, DATA_PROVIDER_CLASS_NAME})
@@ -168,6 +168,8 @@ public class NewUiComponentGridDialog extends AbstractDialog {
             message = {NotEmptyRule.MESSAGE, "Parent Menu"})
     private FilteredComboBox parentMenu;
 
+    private JTextField tableName;
+
     private JLabel aclLabel;
     private JLabel routeLabel;//NOPMD
     private JLabel controllerLabel;//NOPMD
@@ -186,7 +188,20 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     private JLabel collectionLabel;//NOPMD
     private JLabel dataProviderParentDirectoryLabel;
     private JLabel tableNameLabel;
-    private JTextField tableName;
+    private JLabel uiComponentNameErrorMessage;//NOPMD
+    private JLabel idFieldErrorMessage;//NOPMD
+    private JLabel providerClassNameErrorMessage;//NOPMD
+    private JLabel dataProviderParentDirectoryErrorMessage;//NOPMD
+    private JLabel aclErrorMessage;//NOPMD
+    private JLabel parentAclErrorMessage;//NOPMD
+    private JLabel aclTitleErrorMessage;//NOPMD
+    private JLabel routeErrorMessage;//NOPMD
+    private JLabel controllerNameErrorMessage;//NOPMD
+    private JLabel actionNameErrorMessage;//NOPMD
+    private JLabel sortOrderErrorMessage;//NOPMD
+    private JLabel menuIdentifierErrorMessage;//NOPMD
+    private JLabel menuTitleErrorMessage;//NOPMD
+    private JLabel parentMenuErrorMessage;//NOPMD
 
     /**
      * New UI component grid dialog constructor.
@@ -194,7 +209,10 @@ public class NewUiComponentGridDialog extends AbstractDialog {
      * @param project Project
      * @param directory PsiDirectory
      */
-    public NewUiComponentGridDialog(final Project project, final PsiDirectory directory) {
+    public NewUiComponentGridDialog(
+            final @NotNull Project project,
+            final @NotNull PsiDirectory directory
+    ) {
         super();
         this.project = project;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
@@ -232,6 +250,10 @@ public class NewUiComponentGridDialog extends AbstractDialog {
 
         dataProviderParentDirectory.setVisible(false);
         dataProviderParentDirectoryLabel.setVisible(false);
+
+        addComponentListener(
+                new FocusOnAFieldListener(() -> uiComponentName.requestFocusInWindow())
+        );
     }
 
     /**
@@ -240,7 +262,10 @@ public class NewUiComponentGridDialog extends AbstractDialog {
      * @param project Project
      * @param directory PsiDirectory
      */
-    public static void open(final Project project, final PsiDirectory directory) {
+    public static void open(
+            final @NotNull Project project,
+            final @NotNull PsiDirectory directory
+    ) {
         final NewUiComponentGridDialog dialog = new NewUiComponentGridDialog(project, directory);
         dialog.pack();
         dialog.centerDialog(dialog);
@@ -299,19 +324,17 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     }
 
     private void onOK() {
-        if (!validateFormFields()) {
-            return;
+        if (validateFormFields()) {
+            generateViewControllerFile();
+            generateLayoutFile();
+            generateMenuFile();
+            generateAclXmlFile();
+            generateRoutesXmlFile();
+            generateDataProviderClass();
+            generateDataProviderDeclaration();
+            generateUiComponentFile();
+            exit();
         }
-
-        generateViewControllerFile();
-        generateLayoutFile();
-        generateMenuFile();
-        generateAclXmlFile();
-        generateRoutesXmlFile();
-        generateDataProviderClass();
-        generateDataProviderDeclaration();
-        generateUiComponentFile();
-        this.setVisible(false);
     }
 
     private void setDefaultValues() {
@@ -350,7 +373,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
      * Generate data provider class.
      */
     private void generateDataProviderClass() {
-        if (getDataProviderType().equals(UiComponentDataProviderFile.CUSTOM_TYPE)) {
+        if (UiComponentDataProviderFile.CUSTOM_TYPE.equals(getDataProviderType())) {
             final UiComponentDataProviderGenerator dataProviderGenerator;
             dataProviderGenerator = new UiComponentDataProviderGenerator(
                 getGridDataProviderData(),
@@ -365,7 +388,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
      * Generate data provider declaration.
      */
     private void generateDataProviderDeclaration() {
-        if (getDataProviderType().equals(UiComponentDataProviderFile.COLLECTION_TYPE)) {
+        if (UiComponentDataProviderFile.COLLECTION_TYPE.equals(getDataProviderType())) {
             final DataProviderDeclarationGenerator dataProviderGenerator;
             dataProviderGenerator = new DataProviderDeclarationGenerator(
                 new DataProviderDeclarationData(
@@ -461,8 +484,8 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     }
 
     private void onDataProviderTypeChange() {
-        final boolean visible = getDataProviderType().equals(
-                UiComponentDataProviderFile.COLLECTION_TYPE
+        final boolean visible = UiComponentDataProviderFile.COLLECTION_TYPE.equals(
+                getDataProviderType()
         );
 
         collection.setVisible(visible);
@@ -552,7 +575,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     }
 
     private String getDataProviderClassFqn() {
-        if (!getDataProviderType().equals(UiComponentDataProviderFile.CUSTOM_TYPE)) {
+        if (!UiComponentDataProviderFile.CUSTOM_TYPE.equals(getDataProviderType())) {
             return UiComponentDataProviderFile.DEFAULT_DATA_PROVIDER;
         }
         return String.format(

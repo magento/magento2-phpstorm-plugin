@@ -120,6 +120,8 @@ public class CreateAnObserverDialog extends AbstractDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
+
+        addComponentListener(new FocusOnAFieldListener(() -> observerName.requestFocusInWindow()));
     }
 
     /**
@@ -148,27 +150,25 @@ public class CreateAnObserverDialog extends AbstractDialog {
      * Perform code generation using input data.
      */
     private void onOK() {
-        if (!validateFormFields()) {
-            return;
+        if (validateFormFields()) {
+            new ObserverClassGenerator(new ObserverFileData(
+                    getObserverDirectory(),
+                    getObserverClassName(),
+                    getObserverModule(),
+                    targetEvent,
+                    getObserverClassFqn(),
+                    getNamespace()
+            ), project).generate(CreateAnObserverAction.ACTION_NAME, true);
+
+            new ObserverEventsXmlGenerator(new ObserverEventsXmlData(
+                    getObserverArea(),
+                    getObserverModule(),
+                    targetEvent,
+                    getObserverName(),
+                    getObserverClassFqn()
+            ), project).generate(CreateAPluginAction.ACTION_NAME);
         }
-        new ObserverClassGenerator(new ObserverFileData(
-                getObserverDirectory(),
-                getObserverClassName(),
-                getObserverModule(),
-                targetEvent,
-                getObserverClassFqn(),
-                getNamespace()
-        ), project).generate(CreateAnObserverAction.ACTION_NAME, true);
-
-        new ObserverEventsXmlGenerator(new ObserverEventsXmlData(
-                getObserverArea(),
-                getObserverModule(),
-                targetEvent,
-                getObserverName(),
-                getObserverClassFqn()
-        ), project).generate(CreateAPluginAction.ACTION_NAME);
-
-        this.setVisible(false);
+        exit();
     }
 
     public String getObserverClassName() {

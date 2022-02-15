@@ -71,6 +71,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
@@ -80,6 +81,25 @@ import javax.swing.table.TableColumn;
         "PMD.GodClass"
 })
 public class NewUiComponentFormDialog extends AbstractDialog {
+
+    private static final String VIEW_ACTION_NAME = "View Action Name";
+    private static final String SUBMIT_ACTION_NAME = "Submit Action Name";
+    private static final String DATA_PROVIDER_CLASS_NAME = "Data Provider Class Name";
+    private static final String DATA_PROVIDER_DIRECTORY = "Data Provider Directory";
+
+    private static final String CLASS_COLUMN = "Class";
+    private static final String DIRECTORY_COLUMN = "Directory";
+    private static final String TYPE_COLUMN = "Type";
+    private static final String LABEL_COLUMN = "Label";
+    private static final String SORT_ORDER_COLUMN = "Sort Order";
+    private static final String ACTION_COLUMN = "Action";
+    private static final String DELETE_COLUMN = "Delete";
+    private static final String NAME_COLUMN = "Name";
+    private static final String FIELDSET_COLUMN = "Fieldset";
+    private static final String FORM_ELEMENT_TYPE_COLUMN = "Form Element Type";
+    private static final String DATA_TYPE_COLUMN = "Data Type";
+    private static final String SOURCE_COLUMN = "Source";
+
     private final FormButtonsValidator formButtonsValidator;
     private final FormFieldsetsValidator formFieldsetsValidator;
     private final FormFieldsValidator formFieldsValidator;
@@ -89,11 +109,6 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     private JButton buttonOK;
     private JButton buttonCancel;
     private FilteredComboBox formAreaSelect;
-
-    private static final String VIEW_ACTION_NAME = "View Action Name";
-    private static final String SUBMIT_ACTION_NAME = "Submit Action Name";
-    private static final String DATA_PROVIDER_CLASS_NAME = "Data Provider Class Name";
-    private static final String DATA_PROVIDER_DIRECTORY = "Data Provider Directory";
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, "Name"})
     @FieldValidation(rule = RuleRegistry.IDENTIFIER, message = {IdentifierRule.MESSAGE, "Name"})
@@ -180,19 +195,18 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     private JLabel dataProviderLabel;//NOPMD
     private JLabel dataProviderClassNameLabel;//NOPMD
     private JLabel dataProviderDirectoryLabel;//NOPMD
-
-    private static final String CLASS_COLUMN = "Class";
-    private static final String DIRECTORY_COLUMN = "Directory";
-    private static final String TYPE_COLUMN = "Type";
-    private static final String LABEL_COLUMN = "Label";
-    private static final String SORT_ORDER_COLUMN = "Sort Order";
-    private static final String ACTION_COLUMN = "Action";
-    private static final String DELETE_COLUMN = "Delete";
-    private static final String NAME_COLUMN = "Name";
-    private static final String FIELDSET_COLUMN = "Fieldset";
-    private static final String FORM_ELEMENT_TYPE_COLUMN = "Form Element Type";
-    private static final String DATA_TYPE_COLUMN = "Data Type";
-    private static final String SOURCE_COLUMN = "Source";
+    private JLabel formNameErrorMessage;//NOPMD
+    private JLabel formLabelErrorMessage;//NOPMD
+    private JLabel routeErrorMessage;//NOPMD
+    private JLabel viewControllerNameErrorMessage;//NOPMD
+    private JLabel viewActionNameErrorMessage;//NOPMD
+    private JLabel submitControllerNameErrorMessage;//NOPMD
+    private JLabel submitActionNameErrorMessage;//NOPMD
+    private JLabel dataProviderClassNameErrorMessage;//NOPMD
+    private JLabel dataProviderDirectoryErrorMessage;//NOPMD
+    private JLabel aclErrorMessage;//NOPMD
+    private JLabel parentAclErrorMessage;//NOPMD
+    private JLabel aclTitleErrorMessage;//NOPMD
 
     /**
      * Open new dialog for adding new controller.
@@ -200,7 +214,10 @@ public class NewUiComponentFormDialog extends AbstractDialog {
      * @param project Project
      * @param directory PsiDirectory
      */
-    public NewUiComponentFormDialog(final Project project, final PsiDirectory directory) {
+    public NewUiComponentFormDialog(
+            final @NotNull Project project,
+            final @NotNull PsiDirectory directory
+    ) {
         super();
         this.project = project;
         formButtonsValidator = new FormButtonsValidator(this);
@@ -244,6 +261,8 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         formAreaSelect.addActionListener(e -> toggleAcl());
         formAreaSelect.setEnabled(false);
         acl.setText(getModuleName() + "::manage");
+
+        addComponentListener(new FocusOnAFieldListener(() -> formName.requestFocusInWindow()));
     }
 
     protected void initButtonsTable() {
@@ -394,7 +413,10 @@ public class NewUiComponentFormDialog extends AbstractDialog {
      * @param project Project
      * @param directory PsiDirectory
      */
-    public static void open(final Project project, final PsiDirectory directory) {
+    public static void open(
+            final @NotNull Project project,
+            final @NotNull PsiDirectory directory
+    ) {
         final NewUiComponentFormDialog dialog = new NewUiComponentFormDialog(project, directory);
         dialog.pack();
         dialog.centerDialog(dialog);
@@ -402,18 +424,28 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     }
 
     private void onOK() {
-        if (!validateFormFields()) {
-            return;
+        if (formButtons.isEditing()) {
+            formButtons.getCellEditor().stopCellEditing();
         }
 
-        generateRoutesXmlFile();
-        generateViewControllerFile();
-        generateSubmitControllerFile();
-        generateDataProviderFile();
-        generateLayoutFile();
-        generateFormFile();
-        generateAclXmlFile();
-        this.setVisible(false);
+        if (fieldsets.isEditing()) {
+            fieldsets.getCellEditor().stopCellEditing();
+        }
+
+        if (fields.isEditing()) {
+            fields.getCellEditor().stopCellEditing();
+        }
+
+        if (validateFormFields()) {
+            generateRoutesXmlFile();
+            generateViewControllerFile();
+            generateSubmitControllerFile();
+            generateDataProviderFile();
+            generateLayoutFile();
+            generateFormFile();
+            generateAclXmlFile();
+            exit();
+        }
     }
 
     /**
@@ -522,11 +554,6 @@ public class NewUiComponentFormDialog extends AbstractDialog {
             getAcl(),
             getAclTitle()
         ), getModuleName(), project).generate(NewUiComponentFormAction.ACTION_NAME, false);
-    }
-
-    @Override
-    protected void onCancel() {
-        dispose();
     }
 
     private List<String> getAreaList() {

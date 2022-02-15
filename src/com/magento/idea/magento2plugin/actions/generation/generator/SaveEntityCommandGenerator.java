@@ -8,8 +8,7 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 import com.google.common.base.CaseFormat;
 import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2plugin.actions.generation.data.SaveEntityCommandData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
+import com.magento.idea.magento2plugin.actions.generation.dialog.util.ClassPropertyFormatterUtil;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.DataModelFile;
 import com.magento.idea.magento2plugin.magento.files.DataModelInterfaceFile;
@@ -66,14 +65,11 @@ public class SaveEntityCommandGenerator extends PhpFileGenerator {
      */
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
-
-        phpClassTypesBuilder
-                .appendProperty("NAMESPACE", file.getNamespace())
-                .appendProperty("ENTITY_NAME", data.getEntityName())
-                .appendProperty("CLASS_NAME", SaveEntityCommandFile.CLASS_NAME)
+        typesBuilder
+                .append("NAMESPACE", file.getNamespace(), false)
+                .append("ENTITY_NAME", data.getEntityName(), false)
+                .append("CLASS_NAME", SaveEntityCommandFile.CLASS_NAME, false)
                 .append("EXCEPTION", "Exception")
-                .append("DATA_OBJECT", FrameworkLibraryType.DATA_OBJECT.getType())
                 .append("COULD_NOT_SAVE", ExceptionType.COULD_NOT_SAVE.getType())
                 .append("LOGGER", FrameworkLibraryType.LOGGER.getType());
 
@@ -84,34 +80,32 @@ public class SaveEntityCommandGenerator extends PhpFileGenerator {
         final String modelType = modelFile.getClassFqn();
         final String modelFactoryType = modelType.concat("Factory");
         final String resourceType = resourceModelFile.getClassFqn();
+        String dtoType;
 
         if (data.isDtoWithInterface()) {
             final DataModelInterfaceFile dataModelInterfaceFile =
                     new DataModelInterfaceFile(data.getModuleName(), data.getDtoInterfaceName());
-            final String dtoType = dataModelInterfaceFile.getClassFqn();
-            phpClassTypesBuilder.append("DTO", dtoType);
+            dtoType = dataModelInterfaceFile.getClassFqn();
         } else {
             final DataModelFile dataModelFile =
                     new DataModelFile(data.getModuleName(), data.getDtoName());
-            final String dtoType = dataModelFile.getClassFqn();
-            phpClassTypesBuilder.append("DTO", dtoType);
+            dtoType = dataModelFile.getClassFqn();
         }
+        typesBuilder.append("DTO", dtoType);
+        typesBuilder.append(
+                "ENTITY_ID_CONST",
+                ClassPropertyFormatterUtil.formatNameToConstant(data.getEntityId(), dtoType),
+                false
+        );
 
         final String dtoProperty = CaseFormat.UPPER_CAMEL.to(
                 CaseFormat.LOWER_CAMEL, data.getEntityName()
         );
 
-        phpClassTypesBuilder
-                .appendProperty("DTO_PROPERTY", dtoProperty)
+        typesBuilder
+                .append("DTO_PROPERTY", dtoProperty, false)
                 .append("MODEL", modelType)
                 .append("MODEL_FACTORY", modelFactoryType)
                 .append("RESOURCE", resourceType);
-
-        phpClassTypesBuilder.mergeProperties(attributes);
-
-        attributes.setProperty(
-                "USES",
-                PhpClassGeneratorUtil.formatUses(phpClassTypesBuilder.getUses())
-        );
     }
 }

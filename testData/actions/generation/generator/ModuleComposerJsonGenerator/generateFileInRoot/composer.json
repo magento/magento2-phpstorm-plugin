@@ -1,12 +1,12 @@
 {
-  "name": "test/module",
+  "name": "test/module-test",
   "version": "1.0.0-dev",
   "description": "test-description",
   "type": "magento2-module",
   "require": {
     "magento/framework": "*",
-    "foo/bar": "*",
-    "magento/backend": "*"
+    "foo/bar": "1.0.*",
+    "magento/module-backend": "103.0.*"
   },
   "license": [
     "Test License 1",
@@ -17,7 +17,7 @@
       "registration.php"
     ],
     "psr-4": {
-      "TestWithDependencies\\Module\\": ""
+      "TestWithDependencies\\Test\\": ""
     }
   }
 }

@@ -154,24 +154,24 @@ public class XmlCompletionContributor extends CompletionContributor {
 
         // <source_model>php class completion</source_model> in system.xml files.
         extend(CompletionType.BASIC, PlatformPatterns.psiElement(XmlTokenType.XML_DATA_CHARACTERS)
-            .inside(XmlPatterns.xmlTag().withName(ModuleSystemXml.XML_TAG_SOURCE_MODEL)
-                .withParent(XmlPatterns.xmlTag().withName(ModuleSystemXml.FIELD_ELEMENT_NAME))
-            ).inFile(XmlPatterns.xmlFile().withName(StandardPatterns.string().matches(ModuleSystemXml.FILE_NAME))),
+            .inside(XmlPatterns.xmlTag().withName(ModuleSystemXmlFile.XML_TAG_SOURCE_MODEL)
+                .withParent(XmlPatterns.xmlTag().withName(ModuleSystemXmlFile.FIELD_ELEMENT_NAME))
+            ).inFile(XmlPatterns.xmlFile().withName(StandardPatterns.string().matches(ModuleSystemXmlFile.FILE_NAME))),
             new PhpClassCompletionProvider()
         );
 
         // <frontend_model>completion</frontend_model>
         extend(CompletionType.BASIC,
                 PlatformPatterns.psiElement(XmlTokenType.XML_DATA_CHARACTERS)
-                        .inside(XmlPatterns.xmlTag().withName(ModuleSystemXml.XML_TAG_FRONTEND_MODEL)),
+                        .inside(XmlPatterns.xmlTag().withName(ModuleSystemXmlFile.XML_TAG_FRONTEND_MODEL)),
                 new PhpClassCompletionProvider()
         );
 
         // <backend_model>completion</backend_model> in system.xml
         extend(CompletionType.BASIC, PlatformPatterns.psiElement(XmlTokenType.XML_DATA_CHARACTERS)
-            .inside(XmlPatterns.xmlTag().withName(ModuleSystemXml.XML_TAG_BACKEND_MODEL)
-                    .withParent(XmlPatterns.xmlTag().withName(ModuleSystemXml.FIELD_ELEMENT_NAME))
-            ).inFile(XmlPatterns.xmlFile().withName(StandardPatterns.string().matches(ModuleSystemXml.FILE_NAME))),
+            .inside(XmlPatterns.xmlTag().withName(ModuleSystemXmlFile.XML_TAG_BACKEND_MODEL)
+                    .withParent(XmlPatterns.xmlTag().withName(ModuleSystemXmlFile.FIELD_ELEMENT_NAME))
+            ).inFile(XmlPatterns.xmlFile().withName(StandardPatterns.string().matches(ModuleSystemXmlFile.FILE_NAME))),
             new PhpClassCompletionProvider()
         );
 

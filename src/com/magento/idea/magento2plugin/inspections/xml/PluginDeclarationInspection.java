@@ -9,6 +9,7 @@ import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.util.Pair;
+import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
@@ -118,8 +119,11 @@ public class PluginDeclarationInspection extends PhpInspection {
                                     pluginIndex,
                                     file
                         );
+                        final XmlAttribute pluginTypeAttribute =
+                                pluginTypeXmlTag.getAttribute(ModuleDiXml.TYPE_ATTR);
 
                         if (pluginTypeDisabledAttribute != null
+                                && pluginTypeAttribute == null
                                 && pluginTypeDisabledAttribute.getValue() != null
                                 && pluginTypeDisabledAttribute.getValue().equals("true")
                                 && !pluginTypeName.isEmpty()
@@ -175,6 +179,11 @@ public class PluginDeclarationInspection extends PhpInspection {
                     final PsiFile file
             ) {
                 final List<Pair<String, String>> modulesName = new ArrayList<>();
+                final PsiDirectory parentDirectory = file.getContainingDirectory();
+
+                if (parentDirectory == null) {
+                    return modulesName;
+                }
                 final String currentFileDirectory = file.getContainingDirectory().toString();
                 final String currentFileFullPath =
                         currentFileDirectory.concat(File.separator).concat(file.getName());

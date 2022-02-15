@@ -7,8 +7,6 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2plugin.actions.generation.data.EntityDataMapperData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.DataModelFile;
 import com.magento.idea.magento2plugin.magento.files.DataModelInterfaceFile;
@@ -63,34 +61,26 @@ public class EntityDataMapperGenerator extends PhpFileGenerator {
      */
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
-
         final ModelFile modelFile = new ModelFile(data.getModuleName(), data.getModelName());
-        final DataModelFile dtoFile = new DataModelFile(data.getDtoName(), data.getModuleName());
+        final DataModelFile dtoFile = new DataModelFile(data.getModuleName(), data.getDtoName());
         final DataModelInterfaceFile dtoInterfaceFile =
                 new DataModelInterfaceFile(data.getModuleName(), data.getDtoInterfaceName());
         String dtoType;
 
-        if (data.isDtoWithInterface()) {
+        if (data.isHasDtoInterface()) {
             dtoType = dtoInterfaceFile.getClassFqn();
         } else {
             dtoType = dtoFile.getClassFqn();
         }
 
-        phpClassTypesBuilder
-                .appendProperty("NAMESPACE", file.getNamespace())
-                .appendProperty("ENTITY_NAME", data.getEntityName())
-                .appendProperty("CLASS_NAME", file.getClassName())
+        typesBuilder
+                .append("NAMESPACE", file.getNamespace(), false)
+                .append("ENTITY_NAME", data.getEntityName(), false)
+                .append("CLASS_NAME", file.getClassName(), false)
                 .append("DATA_OBJECT", FrameworkLibraryType.DATA_OBJECT.getType())
                 .append("DTO_TYPE", dtoType)
                 .append("MAGENTO_MODEL_TYPE", modelFile.getClassFqn())
                 .append("DTO_FACTORY", dtoType.concat("Factory"))
-                .append("ABSTRACT_COLLECTION", FrameworkLibraryType.ABSTRACT_COLLECTION.getType())
-                .mergeProperties(attributes);
-
-        attributes.setProperty(
-                "USES",
-                PhpClassGeneratorUtil.formatUses(phpClassTypesBuilder.getUses())
-        );
+                .append("ABSTRACT_COLLECTION", FrameworkLibraryType.ABSTRACT_COLLECTION.getType());
     }
 }

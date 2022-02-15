@@ -18,6 +18,7 @@ import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.CLICommandTemplate;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
         "PMD.AvoidUncheckedExceptionsInSignatures",
@@ -69,11 +70,17 @@ public class CLICommandClassGenerator extends FileGenerator {
         return cliCommandFile;
     }
 
-    private PhpFile createCLICommandClass(final String actionName) {
+    private @Nullable PhpFile createCLICommandClass(final String actionName) {
+        final PsiDirectory parentDirectory = getParentDirectory();
+
+        if (parentDirectory == null) {
+            return null;
+        }
+
         final PsiFile cliCommandFile = fileGenerator.generate(
                 this.getCLICommandTemplate(),
                 getAttributes(),
-                this.getParentDirectory(),
+                parentDirectory,
                 actionName
         );
 
@@ -82,9 +89,14 @@ public class CLICommandClassGenerator extends FileGenerator {
 
     private PsiDirectory getParentDirectory() {
         final String moduleName = this.phpClassData.getModuleName();
-        final String[] subDirectories = this.phpClassData.getParentDirectory().split("/");
         PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(moduleName);
+
+        if (parentDirectory == null) {
+            return null;
+        }
+        final String[] subDirectories = this.phpClassData.getParentDirectory().split("/");
+
         for (final String subDirectory : subDirectories) {
             parentDirectory = dirGenerator.findOrCreateSubdirectory(parentDirectory, subDirectory);
         }

@@ -38,6 +38,10 @@ public abstract class FindOrCreateQueueXml {
      */
     public PsiFile execute(final String actionName, final String moduleName) {
         PsiDirectory parentDirectory = this.moduleIndex.getModuleDirectoryByModuleName(moduleName);
+
+        if (parentDirectory == null) {
+            return null;
+        }
         final ArrayList<String> fileDirectories = new ArrayList<>();
 
         fileDirectories.add(Package.moduleBaseAreaDir);

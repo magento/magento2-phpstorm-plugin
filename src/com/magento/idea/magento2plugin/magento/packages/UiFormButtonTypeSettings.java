@@ -17,8 +17,8 @@ public enum UiFormButtonTypeSettings {
             + "            ]", 10, "Save entity button."),
     DELETE("Delete", "delete", "'deleteConfirm(\\''\n"
             + "            . __('Are you sure you want to delete this $varName?')\n"
-            + "            . '\\', \\'' . $this->getUrl('*/*/delete', ['$varId' => "
-            + "$this->$varEntityIdAccessor]) . '\\')'", "[]", 20, "Delete entity button."),
+            + "            . '\\', \\'' . $this->getUrl(\n'*/*/delete',\n[$varIdConst => "
+            + "$this->$varEntityIdAccessor]\n) . '\\')'", "[]", 20, "Delete entity button."),
     BACK("Back To Grid", "back",
             "sprintf(\"location.href = '%s';\", $this->getUrl('*/*/'))",
             "[]", 30, "Back to list button."),
@@ -114,6 +114,17 @@ public enum UiFormButtonTypeSettings {
      */
     public String getDataAttrs(final Map<String, String> variables) {
         return parseVariables(dataAttrs, variables);
+    }
+
+    /**
+     * Check if specified variable used for current button.
+     *
+     * @param variableName String
+     *
+     * @return boolean
+     */
+    public boolean isVariableExpected(final @NotNull String variableName) {
+        return onClick.contains(variableName) || dataAttrs.contains(variableName);
     }
 
     /**

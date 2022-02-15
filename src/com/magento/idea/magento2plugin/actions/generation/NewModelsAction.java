@@ -17,8 +17,9 @@ import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewModelsDialog;
 
 public class NewModelsAction extends AnAction {
+
     public static final String ACTION_NAME = "Magento 2 Models";
-    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 models";
+    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 model";
 
     /**
      * New controller action constructor.
@@ -35,17 +36,16 @@ public class NewModelsAction extends AnAction {
         if (view == null) {
             return;
         }
-
         final Project project = CommonDataKeys.PROJECT.getData(dataContext);
+
         if (project == null) {
             return;
         }
-
         final PsiDirectory directory = view.getOrChooseDirectory();
+
         if (directory == null) {
             return;
         }
-
         NewModelsDialog.open(project, directory);
     }
 

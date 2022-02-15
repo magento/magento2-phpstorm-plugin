@@ -77,7 +77,7 @@ class ${CLASS_NAME} extends ${EXTENDS} implements ${IMPLEMENTS}
                 $this->dataPersistor->set('entity', $params);
 
                 return $resultRedirect->setPath('*/*/edit', [
-                '${ENTITY_ID}'=> $this->getRequest()->getParam('${ENTITY_ID}')
+                ${ENTITY_ID_REFERENCE} => $this->getRequest()->getParam(${ENTITY_ID_REFERENCE})
                 ]);
         }
 

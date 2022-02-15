@@ -84,7 +84,7 @@ class Save extends Action implements HttpPostActionInterface
             $this->dataPersistor->set('entity', $params);
 
             return $resultRedirect->setPath('*/*/edit', [
-                'entity_id' => $this->getRequest()->getParam('entity_id')
+                CompanyInterface::COMPANY_ID => $this->getRequest()->getParam(CompanyInterface::COMPANY_ID)
             ]);
         }
 

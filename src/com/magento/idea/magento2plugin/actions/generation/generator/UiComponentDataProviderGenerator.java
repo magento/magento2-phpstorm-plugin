@@ -6,13 +6,15 @@
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
+import com.magento.idea.magento2plugin.actions.generation.context.EntityCreatorContext;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataProviderData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
+import com.magento.idea.magento2plugin.actions.generation.dialog.util.ClassPropertyFormatterUtil;
+import com.magento.idea.magento2plugin.actions.generation.util.GenerationContextRegistry;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.UiComponentDataProviderFile;
 import com.magento.idea.magento2plugin.magento.files.queries.GetListQueryFile;
 import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryType;
+import java.util.Objects;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
@@ -67,22 +69,37 @@ public class UiComponentDataProviderGenerator extends PhpFileGenerator {
      */
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
-
-        phpClassTypesBuilder
-                .appendProperty("NAMESPACE", file.getNamespace())
-                .appendProperty("CLASS_NAME", data.getName())
-                .appendProperty("HAS_GET_LIST_QUERY", "false")
+        typesBuilder
+                .append("NAMESPACE", file.getNamespace(), false)
+                .append("CLASS_NAME", data.getName(), false)
+                .append("HAS_GET_LIST_QUERY", "false", false)
                 .append("EXTENDS", UiComponentDataProviderFile.DEFAULT_DATA_PROVIDER);
 
         if (data.getEntityIdFieldName() != null && data.getEntityName() != null) {
-            phpClassTypesBuilder.appendProperty("ENTITY_ID", data.getEntityIdFieldName());
+            final EntityCreatorContext context =
+                    (EntityCreatorContext) GenerationContextRegistry.getInstance().getContext();
+            Objects.requireNonNull(context);
+            final String dtoTypeFqn = context.getUserData(EntityCreatorContext.DTO_TYPE);
+            Objects.requireNonNull(dtoTypeFqn);
+            typesBuilder.append(
+                    "ENTITY_ID_REFERENCE",
+                    ClassPropertyFormatterUtil.formatNameToConstant(
+                            data.getEntityIdFieldName(),
+                            dtoTypeFqn
+                    ),
+                    false
+            );
+            typesBuilder.append("DTO_TYPE", dtoTypeFqn);
 
-            phpClassTypesBuilder
-                    .appendProperty("HAS_GET_LIST_QUERY", "true")
+            typesBuilder
+                    .append("HAS_GET_LIST_QUERY", "true", false)
                     .append(
                             "GET_LIST_QUERY_TYPE",
-                            new GetListQueryFile(moduleName, data.getEntityName()).getClassFqn()
+                            new GetListQueryFile(
+                                    moduleName,
+                                    data.getEntityName(),
+                                    data.isHasQueryInterface()
+                            ).getClassFqn()
                     )
                     .append("REPORTING_TYPE", FrameworkLibraryType.REPORTING.getType())
                     .append("SEARCH_CRITERIA_BUILDER",
@@ -92,9 +109,5 @@ public class UiComponentDataProviderGenerator extends PhpFileGenerator {
                     .append("SEARCH_RESULT_FACTORY",
                             UiComponentDataProviderFile.SEARCH_RESULT_FACTORY);
         }
-        phpClassTypesBuilder.mergeProperties(attributes);
-
-        attributes.setProperty("USES",
-                PhpClassGeneratorUtil.formatUses(phpClassTypesBuilder.getUses()));
     }
 }

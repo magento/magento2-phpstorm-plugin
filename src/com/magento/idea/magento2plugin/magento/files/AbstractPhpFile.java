@@ -13,6 +13,9 @@ import org.jetbrains.annotations.NotNull;
 public abstract class AbstractPhpFile implements ModuleFileInterface {
 
     public static final String FILE_EXTENSION = "php";
+
+    public static final String PUBLIC_ACCESS = "public";
+
     private final String moduleName;
     private final String className;
     private NamespaceBuilder namespaceBuilder;

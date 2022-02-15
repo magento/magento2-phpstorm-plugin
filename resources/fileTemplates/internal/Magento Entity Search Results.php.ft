@@ -1,0 +1,31 @@
+<?php
+#parse("PHP File Header.php")
+
+namespace ${NAMESPACE};
+
+#set($uses = ${USES})
+#foreach ($use in $uses.split(","))
+use $use;
+#end
+
+/**
+ * ${ENTITY_NAME} entity search results implementation.
+ */
+class ${CLASS_NAME} extends ${PARENT_CLASS_NAME} implements ${INTERFACE_NAME}
+{
+    /**
+     * @inheritDoc
+     */
+    public function setItems(array $items): ${INTERFACE_NAME}
+    {
+        return parent::setItems($items);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getItems(): array
+    {
+        return parent::getItems();
+    }
+}

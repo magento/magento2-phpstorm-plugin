@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
@@ -12,6 +12,7 @@ import com.intellij.psi.xml.XmlTokenType;
 import com.magento.idea.magento2plugin.magento.files.MftfActionGroup;
 import com.magento.idea.magento2plugin.magento.files.MftfTest;
 import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaXml;
+import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 import com.magento.idea.magento2plugin.magento.files.UiComponentXml;
 // CHECKSTYLE IGNORE check FOR NEXT 5 LINES
@@ -263,6 +264,19 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
             )
         );
 
+        // <test name="A" extends="B" />
+        registrar.registerReferenceProvider(
+                XmlPatterns.xmlAttributeValue().withParent(XmlPatterns.xmlAttribute()
+                        .withName(MftfTest.NAME_ATTRIBUTE)
+                        .withParent(XmlPatterns.xmlTag().withName(MftfTest.TEST_TAG)
+                                .withParent(XmlPatterns.xmlTag().withName(MftfTest.ROOT_TAG))
+                        )
+                ),
+                new CompositeReferenceProvider(
+                        new TestExtendedByReferenceProvider()
+                )
+        );
+
         // <someXmlTag component="requireJsMappingKey" />
         registrar.registerReferenceProvider(
             XmlPatterns.xmlAttributeValue().withParent(
@@ -387,7 +401,7 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
                         XmlPatterns.xmlAttribute().withName("disabled")
                     )
                 )
-            ).inFile(xmlFile().withName(string().endsWith("di.xml"))),
+            ).inFile(xmlFile().withName(string().matches(ModuleDiXml.FILE_NAME))),
             new PluginReferenceProvider()
         );
 

@@ -7,8 +7,6 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2plugin.actions.generation.data.CollectionData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.CollectionModelFile;
 import com.magento.idea.magento2plugin.magento.files.ModelFile;
@@ -65,17 +63,16 @@ public class ModuleCollectionGenerator extends PhpFileGenerator {
      */
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
-
         final ResourceModelFile resourceModelFile =
                 new ResourceModelFile(data.getModuleName(), data.getResourceModelName());
         final ModelFile modelFile = new ModelFile(data.getModuleName(), data.getModelName());
 
-        phpClassTypesBuilder.appendProperty("NAME", data.getCollectionName())
-                .appendProperty("NAMESPACE", file.getNamespaceBuilder().getNamespace())
-                .appendProperty("DB_NAME", data.getDbTableName())
-                .appendProperty("MODEL", data.getModelName())
-                .appendProperty("RESOURCE_MODEL", data.getResourceModelName())
+        typesBuilder
+                .append("NAME", data.getCollectionName(), false)
+                .append("NAMESPACE", file.getNamespaceBuilder().getNamespace(), false)
+                .append("DB_NAME", data.getDbTableName(), false)
+                .append("MODEL", data.getModelName(), false)
+                .append("RESOURCE_MODEL", data.getResourceModelName(), false)
                 .append("EXTENDS", CollectionModelFile.ABSTRACT_COLLECTION)
                 .append(
                         "RESOURCE_MODEL",
@@ -86,14 +83,6 @@ public class ModuleCollectionGenerator extends PhpFileGenerator {
                         "MODEL",
                         modelFile.getClassFqn(),
                         ModelFile.ALIAS
-                )
-                .mergeProperties(attributes);
-
-        attributes.setProperty(
-                "USES",
-                PhpClassGeneratorUtil.formatUses(
-                        phpClassTypesBuilder.getUses()
-                )
-        );
+                );
     }
 }

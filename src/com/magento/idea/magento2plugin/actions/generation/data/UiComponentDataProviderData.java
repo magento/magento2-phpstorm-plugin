@@ -11,6 +11,7 @@ public class UiComponentDataProviderData {
     private final String path;
     private final String entityName;
     private final String entityIdFieldName;
+    private final boolean hasQueryInterface;
 
     /**
      * UiComponentGridDataProviderData constructor.
@@ -22,7 +23,7 @@ public class UiComponentDataProviderData {
             final String name,
             final String path
     ) {
-        this(name, path, null, null);
+        this(name, path, null, null, false);
     }
 
     /**
@@ -32,17 +33,20 @@ public class UiComponentDataProviderData {
      * @param path String
      * @param entityName String
      * @param entityIdFieldName String
+     * @param hasQueryInterface boolean
      */
     public UiComponentDataProviderData(
             final String name,
             final String path,
             final String entityName,
-            final String entityIdFieldName
+            final String entityIdFieldName,
+            final boolean hasQueryInterface
     ) {
         this.name = name;
         this.path = path;
         this.entityName = entityName;
         this.entityIdFieldName = entityIdFieldName;
+        this.hasQueryInterface = hasQueryInterface;
     }
 
     /**
@@ -79,5 +83,14 @@ public class UiComponentDataProviderData {
      */
     public String getEntityIdFieldName() {
         return entityIdFieldName;
+    }
+
+    /**
+     * Check if query service has Web API interface.
+     *
+     * @return boolean
+     */
+    public boolean isHasQueryInterface() {
+        return hasQueryInterface;
     }
 }

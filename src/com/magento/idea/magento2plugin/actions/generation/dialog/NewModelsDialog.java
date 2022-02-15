@@ -8,6 +8,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.ui.DocumentAdapter;
+import com.magento.idea.magento2plugin.actions.generation.NewModelsAction;
 import com.magento.idea.magento2plugin.actions.generation.data.CollectionData;
 import com.magento.idea.magento2plugin.actions.generation.data.ModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.ResourceModelData;
@@ -35,6 +36,7 @@ import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("PMD.TooManyFields")
 public class NewModelsDialog extends AbstractDialog {
+
     private final String moduleName;
     private final Project project;
     private JPanel contentPane;
@@ -91,6 +93,12 @@ public class NewModelsDialog extends AbstractDialog {
     private JLabel entityIdColumnLabel;//NOPMD
     private JLabel collectionDirectoryLabel;//NOPMD
     private JLabel collectionNameLabel;//NOPMD
+    private JLabel modelNameErrorMessage;//NOPMD
+    private JLabel resourceModelNameErrorMessage;//NOPMD
+    private JLabel dbTableNameErrorMessage;//NOPMD
+    private JLabel entityIdColumnErrorMessage;//NOPMD
+    private JLabel collectionDirectoryErrorMessage;//NOPMD
+    private JLabel collectionNameErrorMessage;//NOPMD
 
     /**
      * Open new dialog for adding new controller.
@@ -105,6 +113,7 @@ public class NewModelsDialog extends AbstractDialog {
 
         setContentPane(contentPane);
         setModal(true);
+        setTitle(NewModelsAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
         buttonOK.addActionListener(e -> onOK());
         buttonCancel.addActionListener(e -> onCancel());
@@ -131,6 +140,8 @@ public class NewModelsDialog extends AbstractDialog {
                 updateText();
             }
         });
+
+        addComponentListener(new FocusOnAFieldListener(() -> modelName.requestFocusInWindow()));
     }
 
     /**
@@ -158,24 +169,16 @@ public class NewModelsDialog extends AbstractDialog {
         dialog.setVisible(true);
     }
 
-    @Override
-    protected void onCancel() {
-        dispose();
-    }
-
     /**
      * Process generation.
      */
     private void onOK() {
-        if (!validateFormFields()) {
-            return;
+        if (validateFormFields()) {
+            generateModelFile();
+            generateResourceModelFile();
+            generateCollectionFile();
+            exit();
         }
-
-        generateModelFile();
-        generateResourceModelFile();
-        generateCollectionFile();
-
-        this.setVisible(false);
     }
 
     /**

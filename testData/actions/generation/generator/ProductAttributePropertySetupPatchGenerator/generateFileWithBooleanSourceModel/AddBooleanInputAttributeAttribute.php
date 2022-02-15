@@ -40,8 +40,6 @@ class AddBooleanInputAttributeAttribute implements DataPatchInterface
      * means run PatchInterface::revert()
      *
      * If we speak about data, under revert means: $transaction->rollback()
-     *
-     * @return $this
      */
     public function apply()
     {
