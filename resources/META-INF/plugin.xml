@@ -68,6 +68,7 @@
             <action id="MagentoCreateExtensionAttributesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewExtensionAttributesXmlAction"/>
             <action id="MagentoCreateWidgetFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewWidgetXmlAction"/>
             <action id="MagentoCreateMviewFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewMviewXmlAction"/>
+            <action id="MagentoCreateIndexerFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewIndexerXmlAction"/>
             <!-- Context dependent actions -->
             <separator/>
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml"/>
@@ -575,6 +576,7 @@
         <internalFileTemplate name="Magento Extension Attributes XML"/>
         <internalFileTemplate name="Magento Widget XML"/>
         <internalFileTemplate name="Magento Mview XML"/>
+        <internalFileTemplate name="Magento Indexer XML"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 
