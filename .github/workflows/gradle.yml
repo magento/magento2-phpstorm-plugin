@@ -104,9 +104,10 @@ jobs:
       - id: file_changes
         uses: trilom/file-changes-action@v1.2.4
       - name: Run Code Style Check
-        run: ./gradlew checkstyleCI --stacktrace --no-daemon
+        run: ./gradlew checkstyleCI -i --no-daemon
         env:
           MODIFIED_FILES: ${{ steps.file_changes.outputs.files}}
+          ACTIONS_STEP_DEBUG: true
       - name: Run PMD Quality Check
         run: ./gradlew pmdCI -i --no-daemon
         env:
