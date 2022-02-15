@@ -63,7 +63,7 @@ public class CustomerEavAttributePatchGenerator extends EavAttributeSetupPatchGe
                 ).append(
                         "CUSTOMER_METADATA_INTERFACE",
                         DataPatchDependency.CUSTOMER_METADATA_INTERFACE.getClassPatch()
-                );
+        );
 
         final String selectedCustomerForms = getFormsForAttribute((CustomerEntityData) data);
 
