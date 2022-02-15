@@ -5,7 +5,7 @@ name: Run automated tests
 
 on:
   pull_request:
-    branches: [ master, 4.3.0-develop, mainline-eav-attr-code-genearators ]
+    branches: [ master, '*-develop', 'mainline*' ]
 
 jobs:
   build-linux:
@@ -104,7 +104,7 @@ jobs:
       - id: file_changes
         uses: trilom/file-changes-action@v1.2.4
       - name: Run Code Style Check
-        run: ./gradlew checkstyleCI -i --no-daemon
+        run: ./gradlew checkstyleCI --stacktrace --no-daemon
         env:
           MODIFIED_FILES: ${{ steps.file_changes.outputs.files}}
       - name: Run PMD Quality Check
