@@ -67,6 +67,7 @@
             <action id="MagentoCreateSystemFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewSystemXmlAction"/>
             <action id="MagentoCreateExtensionAttributesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewExtensionAttributesXmlAction"/>
             <action id="MagentoCreateWidgetFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewWidgetXmlAction"/>
+            <action id="MagentoCreateMviewFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewMviewXmlAction"/>
             <!-- Context dependent actions -->
             <separator/>
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml"/>
@@ -573,6 +574,7 @@
         <internalFileTemplate name="Magento Config XML"/>
         <internalFileTemplate name="Magento Extension Attributes XML"/>
         <internalFileTemplate name="Magento Widget XML"/>
+        <internalFileTemplate name="Magento Mview XML"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 
