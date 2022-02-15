@@ -17,8 +17,11 @@ import java.util.Map;
 
 public class CustomerAttributeSetupPatchGeneratorTest extends BaseGeneratorTestCase {
 
-    private final static String MODULE_NAME = "Foo_Bar";
+    private static final String MODULE_NAME = "Foo_Bar";
 
+    /**
+     * Test generating the customer attribute data patch.
+     */
     public void testGenerateMultiselectAttributeDataPatch() {
         final Project project = myFixture.getProject();
 
@@ -45,11 +48,17 @@ public class CustomerAttributeSetupPatchGeneratorTest extends BaseGeneratorTestC
 
         final CustomerEavAttributePatchGenerator setupPatchGenerator =
                 new CustomerEavAttributePatchGenerator(customerEntityData, project);
-        final PsiFile dataPatchFile = setupPatchGenerator.generate("testGenerateMultiselectAttributeDataPatch");
+        final PsiFile dataPatchFile = setupPatchGenerator.generate(
+                "testGenerateMultiselectAttributeDataPatch"
+        );
 
         final String filePatch = this.getFixturePath("AddMultiselectTestCustomerAttribute.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePatch);
 
-        assertGeneratedFileIsCorrect(expectedFile, "src/app/code/Foo/Bar/Setup/Patch/Data", dataPatchFile);
+        assertGeneratedFileIsCorrect(
+                expectedFile,
+                "src/app/code/Foo/Bar/Setup/Patch/Data",
+                dataPatchFile
+        );
     }
 }

@@ -88,7 +88,7 @@ public class CustomerEavAttributePatchGenerator extends EavAttributeSetupPatchGe
 
         if (customerEntityData.isUseInAdminhtmlCheckoutForm()) {
             usedInForms.add(
-                "'" + CustomerForm.ADMINHTML_CHECKOUT.getFormCode() + "'"
+                    "'" + CustomerForm.ADMINHTML_CHECKOUT.getFormCode() + "'"
             );
         }
 
