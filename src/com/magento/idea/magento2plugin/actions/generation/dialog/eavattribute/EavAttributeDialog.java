@@ -45,7 +45,12 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings({"PMD.GodClass", "PMD.TooManyMethods"})
+@SuppressWarnings({
+        "PMD.GodClass",
+        "PMD.TooManyMethods",
+        "PMD.ExcessiveImports",
+        "PMD.AccessorMethodGeneration"
+})
 public abstract class  EavAttributeDialog extends AbstractDialog {
 
     protected String moduleName;
@@ -297,6 +302,10 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
         generateSourceModelFile();
     }
 
+    @SuppressWarnings({
+            "PMD.EmptyMethodInAbstractClassShouldBeAbstract",
+            "PMD.UncommentedEmptyMethodBody"
+    })
     protected void generateExtraFilesAfterDataPatchGeneration(
             final EavEntityDataInterface eavEntityDataInterface
     ) {}
@@ -319,7 +328,6 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
         );
     }
 
-    @SuppressWarnings("PMD.AccessorMethodGeneration")
     protected void setAttributeInputComboBoxAction(
             final JComboBox<ComboBoxItemData> sourceComboBox,
             final JComboBox<ComboBoxItemData> inputComboBox
@@ -333,7 +341,6 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
         );
     }
 
-    @SuppressWarnings("PMD.AccessorMethodGeneration")
     protected void setSourceComboBoxAction(final JComboBox<ComboBoxItemData> sourceComboBox) {
         if (sourceComboBox == null) {
             return;
@@ -344,7 +351,6 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
         );
     }
 
-    @SuppressWarnings("PMD.AccessorMethodGeneration")
     protected void setSourceModelPanelAction(
             final JPanel attributeCustomSourceModelPanel,
             final JTextField sourceModelDirectoryTexField
@@ -358,7 +364,6 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
         );
     }
 
-    @SuppressWarnings("PMD.AccessorMethodGeneration")
     protected void addOptionPanelListener(
             final JComboBox<ComboBoxItemData> attributeSourceComboBox,
             final JComboBox<ComboBoxItemData> attributeInputComboBox,
@@ -407,7 +412,6 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
                 .addDocumentListener(new AttributeCodeAdapter(attributeCodeTextField));
     }
 
-    @SuppressWarnings("PMD.AccessorMethodGeneration")
     protected void setAutocompleteListenerForDataPathNameField(
             final JTextField mainTextField,
             final JTextField dependentTextField
@@ -421,7 +425,6 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
                 .addDocumentListener(new DataPatchNameAdapter(dependentTextField, getEntityName()));
     }
 
-    @SuppressWarnings("PMD.AccessorMethodGeneration")
     protected void setAutocompleteListenerForSourceModelNameField(
             final JTextField mainTextField,
             final JTextField dependentTextField

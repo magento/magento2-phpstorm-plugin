@@ -76,9 +76,6 @@ public class EavAttributeSetupPatchGenerator extends PhpFileGenerator {
                 .append(
                         "MODULE_DATA_SETUP_INTERFACE",
                         DataPatchDependency.MODULE_DATA_SETUP_INTERFACE.getClassPatch()
-                ).append(
-                        "ATTRIBUTE_RESOURCE",
-                        DataPatchDependency.ATTRIBUTE_RESOURCE.getClassPatch()
                 )
                 .append(
                         "EAV_SETUP_FACTORY",

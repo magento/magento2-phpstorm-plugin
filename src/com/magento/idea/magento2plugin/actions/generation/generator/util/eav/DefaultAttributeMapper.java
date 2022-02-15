@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 public class DefaultAttributeMapper implements AttributeMapperInterface {
+    private final static String PHP_DOUBLE_ARROW_OPERATOR = " => ";
+
     @Override
     public List<String> mapAttributesByEntityData(final EavEntityDataInterface entityData) {
         final List<String> attributesWithValues = new ArrayList<>();
@@ -118,7 +120,7 @@ public class DefaultAttributeMapper implements AttributeMapperInterface {
     }
 
     protected String getParsedOptions(final Map<Integer, String> optionValues) {
-        final String valueNode = "->" + wrapStringValueForTemplate("value") + " => ";
+        final String valueNode = "->" + wrapStringValueForTemplate("value") + PHP_DOUBLE_ARROW_OPERATOR;
         final StringBuilder optionsContent = new StringBuilder();
 
         for (final Integer optionKey : optionValues.keySet()) {
@@ -131,8 +133,8 @@ public class DefaultAttributeMapper implements AttributeMapperInterface {
             optionsContent
                     .append("->")
                     .append(wrapStringValueForTemplate("option_" + optionKey))
-                    .append(" => ")
-                    .append("[")
+                    .append(PHP_DOUBLE_ARROW_OPERATOR)
+                    .append('[')
                     .append(wrapStringValueForTemplate(optionValue))
                     .append("], ");
         }
@@ -141,7 +143,7 @@ public class DefaultAttributeMapper implements AttributeMapperInterface {
     }
 
     protected String getParsedOptionSortOrders(final Map<Integer, String> optionSortOrders) {
-        final String orderNode = "->" + wrapStringValueForTemplate("order") + " => ";
+        final String orderNode = "->" + wrapStringValueForTemplate("order") + PHP_DOUBLE_ARROW_OPERATOR;
         final StringBuilder ordersContent = new StringBuilder();
 
         for (final Integer optionKey : optionSortOrders.keySet()) {
@@ -154,9 +156,9 @@ public class DefaultAttributeMapper implements AttributeMapperInterface {
             ordersContent
                     .append("->")
                     .append(wrapStringValueForTemplate("option_" + optionKey))
-                    .append(" => ")
+                    .append(PHP_DOUBLE_ARROW_OPERATOR)
                     .append(orderValue)
-                    .append(",");
+                    .append(',');
         }
 
         return orderNode + "[" + ordersContent + "->]->";

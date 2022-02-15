@@ -57,8 +57,10 @@ public class CustomerEavAttributePatchGenerator extends EavAttributeSetupPatchGe
                 .append(
                         "EAV_CONFIG_CLASS",
                         DataPatchDependency.EAV_CONFIG.getClassPatch()
-                )
-                .append(
+                ).append(
+                        "ATTRIBUTE_RESOURCE",
+                        DataPatchDependency.ATTRIBUTE_RESOURCE.getClassPatch()
+                ).append(
                         "CUSTOMER_METADATA_INTERFACE",
                         DataPatchDependency.CUSTOMER_METADATA_INTERFACE.getClassPatch()
                 );
