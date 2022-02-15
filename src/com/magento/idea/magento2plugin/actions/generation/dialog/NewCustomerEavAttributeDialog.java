@@ -22,7 +22,13 @@ import com.magento.idea.magento2plugin.magento.packages.uicomponent.AvailableSou
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.List;
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
@@ -237,7 +243,7 @@ public class NewCustomerEavAttributeDialog extends EavAttributeDialog {
                 useInAdminhtmlCustomerCheckBox.isSelected()
         );
         customerEntityData.setUseInAdminhtmlCheckoutForm(
-            useInAdminhtmlCheckoutCheckBox.isSelected()
+                useInAdminhtmlCheckoutCheckBox.isSelected()
         );
         customerEntityData.setUseInCustomerAccountCreateForm(
                 useInCustomerAccountCreateCheckBox.isSelected()
@@ -269,8 +275,10 @@ public class NewCustomerEavAttributeDialog extends EavAttributeDialog {
         attributeSourceComboBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(final ItemEvent itemEvent) {
-                final ComboBoxItemData selectedInputItem = (ComboBoxItemData) attributeInputComboBox.getSelectedItem();
-                final String selectedInput = selectedInputItem == null ? "" : selectedInputItem.toString();
+                final ComboBoxItemData selectedInputItem =
+                        (ComboBoxItemData) attributeInputComboBox.getSelectedItem();
+                final String selectedInput = selectedInputItem == null
+                        ? "" : selectedInputItem.toString();
                 final boolean isAllowedInput =
                         AttributeInput.SELECT.getInput().equals(selectedInput)
                                 || AttributeInput.MULTISELECT.getInput().equals(selectedInput);
@@ -324,7 +332,7 @@ public class NewCustomerEavAttributeDialog extends EavAttributeDialog {
         });
     }
 
-    private void createUIComponents() {
+    private void createUIComponents() { //NOPMD - suppressed UnusedPrivateMethod
         // TODO: place custom component creation code here
     }
 }
