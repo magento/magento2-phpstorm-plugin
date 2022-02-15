@@ -86,6 +86,12 @@ public class CustomerEavAttributePatchGenerator extends EavAttributeSetupPatchGe
             );
         }
 
+        if (customerEntityData.isUseInAdminhtmlCheckoutForm()) {
+            usedInForms.add(
+                "'" + CustomerForm.ADMINHTML_CHECKOUT.getFormCode() + "'"
+            );
+        }
+
         if (customerEntityData.isUseInCustomerAccountCreateForm()) {
             usedInForms.add(
                     "'" + CustomerForm.CUSTOMER_ACCOUNT_CREATE.getFormCode() + "'"

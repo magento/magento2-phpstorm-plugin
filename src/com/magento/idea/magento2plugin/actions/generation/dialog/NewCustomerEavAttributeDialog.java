@@ -1,7 +1,6 @@
 /*
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
- *
  */
 
 package com.magento.idea.magento2plugin.actions.generation.dialog;
@@ -83,6 +82,7 @@ public class NewCustomerEavAttributeDialog extends EavAttributeDialog {
     private JCheckBox filterableInGridCheckBox;
     private JCheckBox visibleInGridCheckBox;
     private JCheckBox systemAttributeCheckBox;
+    private JCheckBox useInAdminhtmlCheckoutCheckBox;
 
     /**
      * Constructor.
@@ -236,6 +236,9 @@ public class NewCustomerEavAttributeDialog extends EavAttributeDialog {
         customerEntityData.setUseInAdminhtmlCustomerForm(
                 useInAdminhtmlCustomerCheckBox.isSelected()
         );
+        customerEntityData.setUseInAdminhtmlCheckoutForm(
+            useInAdminhtmlCheckoutCheckBox.isSelected()
+        );
         customerEntityData.setUseInCustomerAccountCreateForm(
                 useInCustomerAccountCreateCheckBox.isSelected()
         );
@@ -319,5 +322,9 @@ public class NewCustomerEavAttributeDialog extends EavAttributeDialog {
                 }
             }
         });
+    }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
     }
 }

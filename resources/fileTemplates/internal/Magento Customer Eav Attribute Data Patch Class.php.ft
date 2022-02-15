@@ -26,18 +26,27 @@ class ${CLASS_NAME} implements ${IMPLEMENTS}
      */
     private $eavConfig;
 
+    /**
+     * @var ${ATTRIBUTE_RESOURCE}
+     */
+    private $attributeResource;
+
      /**
      * @param ${MODULE_DATA_SETUP_INTERFACE} $moduleDataSetup
      * @param ${EAV_SETUP_FACTORY} $eavSetupFactory
+     * @param ${EAV_CONFIG_CLASS} $eavConfig
+     * @param ${ATTRIBUTE_RESOURCE} $attributeResource
      */
     public function __construct(
         ${MODULE_DATA_SETUP_INTERFACE} $moduleDataSetup,
         ${EAV_SETUP_FACTORY} $eavSetupFactory,
-        ${EAV_CONFIG_CLASS} $eavConfig
+        ${EAV_CONFIG_CLASS} $eavConfig,
+        ${ATTRIBUTE_RESOURCE} $attributeResource
     ) {
         $this->moduleDataSetup = $moduleDataSetup;
         $this->eavSetupFactory = $eavSetupFactory;
         $this->eavConfig = $eavConfig;
+        $this->attributeResource = $attributeResource;
     }
 
     /**
@@ -78,7 +87,7 @@ class ${CLASS_NAME} implements ${IMPLEMENTS}
                 'used_in_forms',
                 [${CUSTOMER_FORMS}]
             );
-            $attribute->save();
+            $this->attributeResource->save($attribute);
         #end
 
         return $this;

@@ -11,7 +11,8 @@ public enum DataPatchDependency {
     EAV_CONFIG("Magento\\Eav\\Model\\Config"),
     EAV_SETUP_FACTORY("Magento\\Eav\\Setup\\EavSetupFactory"),
     ENV_SETUP("Magento\\Eav\\Setup\\EavSetup"),
-    MODULE_DATA_SETUP_INTERFACE("Magento\\Framework\\Setup\\ModuleDataSetupInterface");
+    MODULE_DATA_SETUP_INTERFACE("Magento\\Framework\\Setup\\ModuleDataSetupInterface"),
+    ATTRIBUTE_RESOURCE("Magento\\Customer\\Model\\ResourceModel\\Attribute");
 
     private String classPatch;
 

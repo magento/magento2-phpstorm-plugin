@@ -4,6 +4,7 @@ namespace Foo\Bar\Setup\Patch\Data;
 
 use Magento\Customer\Api\CustomerMetadataInterface;
 use Magento\Customer\Model\Customer;
+use Magento\Customer\Model\ResourceModel\Attribute;
 use Magento\Eav\Model\Config;
 use Magento\Eav\Setup\EavSetup;
 use Magento\Eav\Setup\EavSetupFactory;
@@ -28,18 +29,27 @@ class AddMultiselectTestCustomerAttribute implements DataPatchInterface
     private $eavConfig;
 
     /**
+     * @var Attribute
+     */
+    private $attributeResource;
+
+    /**
      * @param ModuleDataSetupInterface $moduleDataSetup
      * @param EavSetupFactory $eavSetupFactory
+     * @param Config $eavConfig
+     * @param Attribute $attributeResource
      */
     public function __construct(
         ModuleDataSetupInterface $moduleDataSetup,
         EavSetupFactory $eavSetupFactory,
-        Config $eavConfig
+        Config $eavConfig,
+        Attribute $attributeResource
     )
     {
         $this->moduleDataSetup = $moduleDataSetup;
         $this->eavSetupFactory = $eavSetupFactory;
         $this->eavConfig = $eavConfig;
+        $this->attributeResource = $attributeResource;
     }
 
     /**
@@ -95,7 +105,7 @@ class AddMultiselectTestCustomerAttribute implements DataPatchInterface
             'used_in_forms',
             ['adminhtml_customer']
         );
-        $attribute->save();
+        $this->attributeResource->save($attribute);
 
         return $this;
     }

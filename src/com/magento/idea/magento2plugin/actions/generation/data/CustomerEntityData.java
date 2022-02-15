@@ -1,7 +1,6 @@
 /*
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
- *
  */
 
 package com.magento.idea.magento2plugin.actions.generation.data;
@@ -29,6 +28,7 @@ public class CustomerEntityData implements EavEntityDataInterface {
     private boolean visible;
     private boolean userDefined;
     private boolean useInAdminhtmlCustomerForm;
+    private boolean useInAdminhtmlCheckoutForm;
     private boolean useInCustomerAccountCreateForm;
     private boolean useInCustomerAccountEditForm;
     private boolean usedInGrid;
@@ -117,6 +117,10 @@ public class CustomerEntityData implements EavEntityDataInterface {
 
     public void setUseInAdminhtmlCustomerForm(final boolean useInAdminhtmlCustomerForm) {
         this.useInAdminhtmlCustomerForm = useInAdminhtmlCustomerForm;
+    }
+
+    public void setUseInAdminhtmlCheckoutForm(final boolean useInAdminhtmlCheckoutForm) {
+        this.useInAdminhtmlCheckoutForm = useInAdminhtmlCheckoutForm;
     }
 
     public void setUseInCustomerAccountCreateForm(final boolean useInCustomerAccountCreateForm) {
@@ -233,6 +237,10 @@ public class CustomerEntityData implements EavEntityDataInterface {
 
     public boolean isUseInAdminhtmlCustomerForm() {
         return useInAdminhtmlCustomerForm;
+    }
+
+    public boolean isUseInAdminhtmlCheckoutForm() {
+        return useInAdminhtmlCheckoutForm;
     }
 
     public boolean isUseInCustomerAccountCreateForm() {
