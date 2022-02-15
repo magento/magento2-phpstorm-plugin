@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.NewDbSchemaAction;
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
@@ -45,6 +46,7 @@ import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveImports"})
 public class NewDbSchemaDialog extends AbstractDialog {
+
     private static final String TABLE_NAME = "Table Name";
 
     private final Project project;
@@ -84,6 +86,7 @@ public class NewDbSchemaDialog extends AbstractDialog {
     private JLabel tableResourceLabel;//NOPMD
     private JLabel tableCommentLabel;//NOPMD
     private JLabel tableColumnsLabel;//NOPMD
+    private JLabel tableNameErrorMessage;//NOPMD
 
     /**
      * Constructor.
@@ -123,6 +126,8 @@ public class NewDbSchemaDialog extends AbstractDialog {
         );
         fillComboBoxes();
         initializeColumnsUiComponentGroup();
+
+        addComponentListener(new FocusOnAFieldListener(() -> tableName.requestFocusInWindow()));
     }
 
     /**
@@ -133,21 +138,22 @@ public class NewDbSchemaDialog extends AbstractDialog {
             columnsTable.getCellEditor().stopCellEditing();
         }
 
-        if (!validateFormFields()) {
-            return;
+        if (validateFormFields()) {
+            final DbSchemaXmlData dbSchemaXmlData = new DbSchemaXmlData(
+                    getTableName(),
+                    getTableResource(),
+                    getTableEngine(),
+                    getTableComment(),
+                    getColumns()
+            );
+            final PsiFile dbSchemaXmlFile = generateDbSchemaXmlFile(dbSchemaXmlData);
+
+            if (dbSchemaXmlFile == null) {
+                return;
+            }
+            generateWhitelistJsonFile(dbSchemaXmlData);
+            exit();
         }
-
-        final DbSchemaXmlData dbSchemaXmlData = new DbSchemaXmlData(
-                getTableName(),
-                getTableResource(),
-                getTableEngine(),
-                getTableComment(),
-                getColumns()
-        );
-        generateDbSchemaXmlFile(dbSchemaXmlData);
-        generateWhitelistJsonFile(dbSchemaXmlData);
-
-        this.setVisible(false);
     }
 
     /**
@@ -171,8 +177,8 @@ public class NewDbSchemaDialog extends AbstractDialog {
      *
      * @param dbSchemaXmlData DbSchemaXmlData
      */
-    private void generateDbSchemaXmlFile(final @NotNull DbSchemaXmlData dbSchemaXmlData) {
-        new DbSchemaXmlGenerator(
+    private PsiFile generateDbSchemaXmlFile(final @NotNull DbSchemaXmlData dbSchemaXmlData) {
+        return new DbSchemaXmlGenerator(
                 dbSchemaXmlData,
                 project,
                 moduleName

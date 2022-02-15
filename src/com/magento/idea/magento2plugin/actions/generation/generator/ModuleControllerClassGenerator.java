@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.JOptionPane;
 
 public class ModuleControllerClassGenerator extends FileGenerator {
@@ -73,6 +74,8 @@ public class ModuleControllerClassGenerator extends FileGenerator {
     @Override
     public PsiFile generate(final String actionName) {
         final PsiFile[] controllerFiles = new PsiFile[1];
+        final AtomicBoolean isControllerExists = new AtomicBoolean(false);
+        final AtomicBoolean isControllerCanNotBeCreated = new AtomicBoolean(false);
 
         WriteCommandAction.runWriteCommandAction(project, () -> {
             PhpClass controller = GetPhpClassByFQN.getInstance(project).execute(
@@ -80,39 +83,39 @@ public class ModuleControllerClassGenerator extends FileGenerator {
             );
 
             if (controller != null) {
-                final String errorMessage = this.validatorBundle.message(
-                        "validator.file.alreadyExists",
-                        "Controller Class"
-                );
-                JOptionPane.showMessageDialog(
-                        null,
-                        errorMessage,
-                        commonBundle.message("common.error"),
-                        JOptionPane.ERROR_MESSAGE
-                );
-
+                isControllerExists.set(true);
                 return;
             }
-
             controller = createControllerClass(actionName);
 
             if (controller == null) {
-                final String errorMessage = this.validatorBundle.message(
-                        "validator.file.cantBeCreated",
-                        "Controller Class"
-                );
-                JOptionPane.showMessageDialog(
-                        null,
-                        errorMessage,
-                        commonBundle.message("common.error"),
-                        JOptionPane.ERROR_MESSAGE
-                );
-
+                isControllerCanNotBeCreated.set(true);
                 return;
             }
-
             controllerFiles[0] = controller.getContainingFile();
         });
+
+        if (isControllerExists.get()) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    validatorBundle.message(
+                            "validator.file.alreadyExists",
+                            "Controller Class"
+                    ),
+                    commonBundle.message("common.error"),
+                    JOptionPane.ERROR_MESSAGE
+            );
+        } else if (isControllerCanNotBeCreated.get()) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    validatorBundle.message(
+                            "validator.file.cantBeCreated",
+                            "Controller Class"
+                    ),
+                    commonBundle.message("common.error"),
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
 
         return controllerFiles[0];
     }
@@ -148,6 +151,10 @@ public class ModuleControllerClassGenerator extends FileGenerator {
     private PhpClass createControllerClass(final String actionName) {
         PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(getControllerModule());
+
+        if (parentDirectory == null) {
+            return null;
+        }
         final PsiFile controllerFile;
         final String[] controllerDirectories = data.getActionDirectory().split(
                 File.separator

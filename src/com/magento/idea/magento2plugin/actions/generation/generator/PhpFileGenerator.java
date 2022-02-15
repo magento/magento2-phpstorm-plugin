@@ -11,17 +11,24 @@ import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
+import java.util.Properties;
 import javax.swing.JOptionPane;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class PhpFileGenerator extends FileGenerator {
 
+    private static final String IMPORT_PROPERTY_NAME = "USES";
+
     protected AbstractPhpFile file;
+    // Util that simplifies file properties definition.
+    protected final PhpClassTypesBuilder typesBuilder;
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
@@ -46,6 +53,7 @@ public abstract class PhpFileGenerator extends FileGenerator {
         fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
         directoryGenerator = DirectoryGenerator.getInstance();
         moduleIndex = new ModuleIndex(project);
+        typesBuilder = new PhpClassTypesBuilder();
     }
 
     /**
@@ -69,8 +77,16 @@ public abstract class PhpFileGenerator extends FileGenerator {
             return phpClass.getContainingFile();
         }
 
+        final PsiDirectory moduleDirectory = moduleIndex.getModuleDirectoryByModuleName(
+                file.getModuleName()
+        );
+
+        if (moduleDirectory == null) {
+            onFileGenerated(null, actionName);
+            return null;
+        }
         final PsiDirectory fileBaseDir = directoryGenerator.findOrCreateSubdirectories(
-                moduleIndex.getModuleDirectoryByModuleName(file.getModuleName()),
+                moduleDirectory,
                 file.getDirectory()
         );
 
@@ -80,7 +96,7 @@ public abstract class PhpFileGenerator extends FileGenerator {
                 fileBaseDir,
                 actionName
         );
-        onFileGenerated(generatedFile);
+        onFileGenerated(generatedFile, actionName);
 
         return generatedFile;
     }
@@ -108,8 +124,10 @@ public abstract class PhpFileGenerator extends FileGenerator {
      * Implement this method to add on file has been generated behaviour.
      *
      * @param generatedFile PsiFile
+     * @param actionName String
      */
-    protected void onFileGenerated(final PsiFile generatedFile) {
+    @SuppressWarnings("PMD.UnusedFormalParameter")
+    protected void onFileGenerated(final PsiFile generatedFile, final @NotNull String actionName) {
         if (generatedFile == null) {
             JOptionPane.showMessageDialog(
                     null,
@@ -142,5 +160,23 @@ public abstract class PhpFileGenerator extends FileGenerator {
         }
 
         return file;
+    }
+
+    @Override
+    protected Properties getAttributes() {
+        final @NotNull Properties attributes = super.getAttributes();
+
+        if (typesBuilder.hasProperties()) {
+            typesBuilder.mergeProperties(attributes);
+        }
+
+        if (!typesBuilder.getUses().isEmpty() && !typesBuilder.hasProperty(IMPORT_PROPERTY_NAME)) {
+            attributes.setProperty(
+                    IMPORT_PROPERTY_NAME,
+                    PhpClassGeneratorUtil.formatUses(typesBuilder.getUses())
+            );
+        }
+
+        return attributes;
     }
 }

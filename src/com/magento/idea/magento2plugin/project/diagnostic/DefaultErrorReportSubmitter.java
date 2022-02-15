@@ -17,7 +17,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NlsActions;
 import com.intellij.util.Consumer;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
-import com.magento.idea.magento2plugin.project.diagnostic.github.GitHubNewIssueBodyBuilderUtil;
 import com.magento.idea.magento2plugin.project.diagnostic.github.GitHubNewIssueUrlBuilderUtil;
 import java.awt.Component;
 import java.time.LocalDateTime;
@@ -70,16 +69,12 @@ public class DefaultErrorReportSubmitter extends ErrorReportSubmitter {
             stackTrace.append(event.getThrowableText()).append("\r\n");
         }
 
-        final String bugReportBody = GitHubNewIssueBodyBuilderUtil.buildNewBugReportBody(
-                project,
-                additionalInfo == null ? DEFAULT_ISSUE_DESCRIPTION : additionalInfo,
-                stackTrace.toString()
-        );
-
         BrowserUtil.browse(
                 GitHubNewIssueUrlBuilderUtil.buildNewBugIssueUrl(
                         getDefaultIssueTitle(),
-                        bugReportBody
+                        additionalInfo == null ? DEFAULT_ISSUE_DESCRIPTION : additionalInfo,
+                        stackTrace.toString(),
+                        project
                 )
         );
 

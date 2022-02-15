@@ -13,6 +13,7 @@ public class DeleteEntityControllerFileData {
     private final String moduleName;
     private final String acl;
     private final String entityId;
+    private final boolean hasDeleteCommandInterface;
 
     /**
      * Controller Delete file constructor.
@@ -21,17 +22,20 @@ public class DeleteEntityControllerFileData {
      * @param moduleName String
      * @param acl String
      * @param entityId String
+     * @param hasDeleteCommandInterface boolean
      */
     public DeleteEntityControllerFileData(
             final @NotNull String entityName,
             final @NotNull String moduleName,
             final @NotNull String acl,
-            final @NotNull String entityId
+            final @NotNull String entityId,
+            final boolean hasDeleteCommandInterface
     ) {
         this.entityName = entityName;
         this.moduleName = moduleName;
         this.acl = acl;
         this.entityId = entityId;
+        this.hasDeleteCommandInterface = hasDeleteCommandInterface;
     }
 
     /**
@@ -68,5 +72,14 @@ public class DeleteEntityControllerFileData {
      */
     public String getEntityId() {
         return entityId;
+    }
+
+    /**
+     * Check if delete command has Web API interface.
+     *
+     * @return boolean
+     */
+    public boolean isHasDeleteCommandInterface() {
+        return hasDeleteCommandInterface;
     }
 }

@@ -25,7 +25,7 @@ public class ModuleComposerJsonGeneratorTest extends BaseGeneratorTestCase {
         final PsiDirectory projectDir = getProjectDirectory();
 
         final String expectedDirectory =
-                projectDir.getVirtualFile().getPath() + "/TestWithDependencies/Module";
+                projectDir.getVirtualFile().getPath() + "/TestWithDependencies/Test";
         final PsiFile composerJson = generateComposerJson(
                 true,
                 projectDir,
@@ -65,7 +65,7 @@ public class ModuleComposerJsonGeneratorTest extends BaseGeneratorTestCase {
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
         final PsiDirectory projectDir = getProjectDirectory();
         final String expectedDirectory = projectDir.getVirtualFile().getPath()
-                + "/TestWithoutDependencies/Module";
+                + "/TestWithoutDependencies/Test";
         final PsiFile composerJson = generateComposerJson(
                 true,
                 projectDir,
@@ -102,10 +102,10 @@ public class ModuleComposerJsonGeneratorTest extends BaseGeneratorTestCase {
         );
         final ModuleComposerJsonData composerJsonData = new ModuleComposerJsonData(
                 packageName,
-                "Module",
+                "Test",
                 projectDir,
                 "test-description",
-                "test/module",
+                "test/module-test",
                 "1.0.0-dev",
                 licenses,
                 dependencies,

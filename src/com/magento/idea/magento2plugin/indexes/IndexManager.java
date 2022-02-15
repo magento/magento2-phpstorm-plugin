@@ -23,6 +23,7 @@ import com.magento.idea.magento2plugin.stubs.indexes.mftf.ActionGroupIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.mftf.DataIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.mftf.PageIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.mftf.SectionIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.mftf.TestExtendsIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.mftf.TestNameIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.AclResourceIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.DeclarativeSchemaElementsIndex;
@@ -69,6 +70,7 @@ public class IndexManager {
             PageIndex.KEY,
             SectionIndex.KEY,
             TestNameIndex.KEY,
+            TestExtendsIndex.KEY,
             //graphql
             GraphQlResolverIndex.KEY,
             //product types

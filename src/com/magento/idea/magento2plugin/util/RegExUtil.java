@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
@@ -47,6 +47,7 @@ public class RegExUtil {
             = "(\\d+)\\.(\\d+)\\.(\\d+)[a-zA-Z0-9_\\-]*";
 
     public static class Magento {
+
         public static final String PHP_CLASS
                 = "[A-Z][a-zA-Z0-9]+";
 
@@ -72,11 +73,16 @@ public class RegExUtil {
         public static final String XML_IDENTIFIER =
                 "^([A-Z]+[a-zA-Z0-9]{1,}){1,}_[A-Z]+[A-Z0-9a-z]{1,}::[A-Za-z_0-9]{1,}$";
 
+        public static final String TEST_FILE_NAME = "\\w*Test.php";
+
+        public static final String TEST_CLASS_FQN =
+                "^(\\\\)?(\\w+\\\\){1}(\\w+\\\\){1}Test(\\\\\\w+)+$";
+
         public static final String COMMA_SEPARATED_STRING =
                 "^[^\\s,]+(?:,\\s*[^\\s,]+)*$";
     }
 
-    public class PhpRegex {
+    public static class PhpRegex {
 
         public static final String CLASS_NAME
                 = "[a-zA-Z0-9_\\x7f-\\xff]*";

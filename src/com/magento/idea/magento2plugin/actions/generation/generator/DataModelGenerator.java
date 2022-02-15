@@ -7,8 +7,6 @@ package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassTypesBuilder;
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile;
 import com.magento.idea.magento2plugin.magento.files.DataModelFile;
 import com.magento.idea.magento2plugin.magento.files.DataModelInterfaceFile;
@@ -60,29 +58,20 @@ public class DataModelGenerator extends PhpFileGenerator {
      */
     @Override
     protected void fillAttributes(final @NotNull Properties attributes) {
-        final PhpClassTypesBuilder phpClassTypesBuilder = new PhpClassTypesBuilder();
-
-        phpClassTypesBuilder
-                .appendProperty("NAMESPACE", file.getNamespace())
-                .appendProperty("NAME", data.getName())
-                .appendProperty("PROPERTIES", data.getProperties())
-                .appendProperty("HASINTERFACE", Boolean.toString(data.hasInterface()))
+        typesBuilder
+                .append("NAMESPACE", file.getNamespace(), false)
+                .append("NAME", data.getName(), false)
+                .append("PROPERTIES", data.getProperties(), false)
+                .append("HASINTERFACE", Boolean.toString(data.hasInterface()), false)
                 .append("EXTENDS", DataModelFile.DATA_OBJECT);
 
         if (data.hasInterface()) {
-            phpClassTypesBuilder.append(
+            typesBuilder.append(
                     "IMPLEMENTS",
                     new DataModelInterfaceFile(
                             data.getModuleName(),
                             data.getInterfaceName()
                     ).getClassFqn());
         }
-
-        phpClassTypesBuilder.mergeProperties(attributes);
-
-        attributes.setProperty(
-                "USES",
-                PhpClassGeneratorUtil.formatUses(phpClassTypesBuilder.getUses())
-        );
     }
 }

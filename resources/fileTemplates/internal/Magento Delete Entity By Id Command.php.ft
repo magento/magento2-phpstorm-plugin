@@ -49,16 +49,16 @@ class ${CLASS_NAME}
      * @param int $entityId
      *
      * @return void
-     * @throws ${COULD_NOT_DELETE}|${NO_SUCH_ENTITY_EXCEPTION}
+     * @throws ${COULD_NOT_DELETE}
      */
-    public function execute(int $entityId)
+    public function execute(int $entityId): void
     {
         try {
             /** @var ${MODEL} $model */
             $model = $this->modelFactory->create();
-            $this->resource->load($model, $entityId, '${ENTITY_ID}');
+            $this->resource->load($model, $entityId, ${ENTITY_ID_REFERENCE});
 
-            if (!$model->getData('${ENTITY_ID}')) {
+            if (!$model->getData(${ENTITY_ID_REFERENCE})) {
                 throw new ${NO_SUCH_ENTITY_EXCEPTION}(
                     __('Could not find ${ENTITY_NAME} with id: `%id`',
                         [

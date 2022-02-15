@@ -2,6 +2,7 @@
 
 namespace Foo\Bar\Block\Form\Book;
 
+use Foo\Bar\Model\Data\BookData;
 use Magento\Backend\Block\Widget\Context;
 use Magento\Framework\UrlInterface;
 
@@ -38,7 +39,7 @@ class GenericButton
      */
     public function getBookId(): int
     {
-        return (int)$this->context->getRequest()->getParam('book_id');
+        return (int)$this->context->getRequest()->getParam(BookData::BOOK_ID);
     }
 
     /**

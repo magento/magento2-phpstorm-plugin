@@ -32,12 +32,15 @@ public final class FindOrCreateRoutesXml {
      * @return PsiFile
      */
     public PsiFile execute(final String actionName, final String moduleName, final String area) {
+        PsiDirectory parentDirectory = new ModuleIndex(project)
+                .getModuleDirectoryByModuleName(moduleName);
+
+        if (parentDirectory == null) {
+            return null;
+        }
         final DirectoryGenerator directoryGenerator = DirectoryGenerator.getInstance();
         final FileFromTemplateGenerator fileFromTemplateGenerator =
                 new FileFromTemplateGenerator(project);
-
-        PsiDirectory parentDirectory = new ModuleIndex(project)
-                .getModuleDirectoryByModuleName(moduleName);
         final ArrayList<String> fileDirectories = new ArrayList<>();
         fileDirectories.add(Package.moduleBaseAreaDir);
         fileDirectories.add(getArea(area).toString());
@@ -70,8 +73,8 @@ public final class FindOrCreateRoutesXml {
     private Properties getAttributes(final String area) {
         final Properties attributes = new Properties();
         attributes.setProperty("ROUTER_ID", area.equals(Areas.frontend.toString())
-                ? RoutesXml.routerIdStandart
-                : RoutesXml.routerIdAdmin
+                ? RoutesXml.ROUTER_ID_STANDARD
+                : RoutesXml.ROUTER_ID_ADMIN
         );
         return attributes;
     }

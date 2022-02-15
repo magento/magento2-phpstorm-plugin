@@ -40,6 +40,7 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -47,23 +48,24 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({
         "PMD.ExcessiveImports"
 })
 public class NewDataModelDialog extends AbstractDialog {
 
-    private final Project project;
-    private final String moduleName;
-    private final ValidatorBundle validatorBundle;
-    private final CommonBundle commonBundle;
-    private final List<String> properties;
-
     private static final String MODEL_NAME = "Model Name";
     private static final String PROPERTY_NAME = "Name";
     private static final String PROPERTY_TYPE = "Type";
     private static final String PROPERTY_ACTION = "Action";
     private static final String PROPERTY_DELETE = "Delete";
+
+    private final Project project;
+    private final String moduleName;
+    private final ValidatorBundle validatorBundle;
+    private final CommonBundle commonBundle;
+    private final List<String> properties;
 
     private JPanel contentPanel;
     private JButton buttonOK;
@@ -72,16 +74,19 @@ public class NewDataModelDialog extends AbstractDialog {
     private JButton addProperty;
     private JCheckBox createInterface;
 
-    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
-            message = {NotEmptyRule.MESSAGE, MODEL_NAME})
-    @FieldValidation(rule = RuleRegistry.PHP_CLASS,
-            message = {PhpClassRule.MESSAGE, MODEL_NAME})
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, MODEL_NAME})
+    @FieldValidation(rule = RuleRegistry.PHP_CLASS, message = {PhpClassRule.MESSAGE, MODEL_NAME})
     private JTextField modelName;
+
+    private JLabel modelNameErrorMessage;//NOPMD
 
     /**
      * Constructor.
      */
-    public NewDataModelDialog(final Project project, final PsiDirectory directory) {
+    public NewDataModelDialog(
+            final @NotNull Project project,
+            final @NotNull PsiDirectory directory
+    ) {
         super();
 
         this.project = project;
@@ -115,12 +120,17 @@ public class NewDataModelDialog extends AbstractDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
+
+        addComponentListener(new FocusOnAFieldListener(() -> modelName.requestFocusInWindow()));
     }
 
     /**
      * Opens the dialog window.
      */
-    public static void open(final Project project, final PsiDirectory directory) {
+    public static void open(
+            final @NotNull Project project,
+            final @NotNull PsiDirectory directory
+    ) {
         final NewDataModelDialog dialog = new NewDataModelDialog(project, directory);
         dialog.pack();
         dialog.centerDialog(dialog);
@@ -143,7 +153,7 @@ public class NewDataModelDialog extends AbstractDialog {
                 generateDataModelInterfaceFile();
                 generatePreferenceForInterface();
             }
-            this.setVisible(false);
+            exit();
         }
     }
 
@@ -155,6 +165,17 @@ public class NewDataModelDialog extends AbstractDialog {
             valid = true;
             final String errorTitle = commonBundle.message("common.error");
             final int column = 0;
+
+            if (propertyTable.getRowCount() == 0) {
+                valid = false;
+                JOptionPane.showMessageDialog(
+                        null,
+                        validatorBundle.message("validator.properties.notEmpty"),
+                        errorTitle,
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+
             for (int row = 0; row < propertyTable.getRowCount(); row++) {
                 final String propertyName = ((String) propertyTable.getValueAt(row, column)).trim();
                 if (propertyName.isEmpty()) {
@@ -186,11 +207,6 @@ public class NewDataModelDialog extends AbstractDialog {
         }
 
         return valid;
-    }
-
-    @Override
-    public void onCancel() {
-        dispose();
     }
 
     /**

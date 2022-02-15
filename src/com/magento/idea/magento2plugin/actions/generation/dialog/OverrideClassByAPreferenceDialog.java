@@ -135,6 +135,10 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
+
+        addComponentListener(
+                new FocusOnAFieldListener(() -> preferenceModule.requestFocusInWindow())
+        );
     }
 
     private void suggestPreferenceDirectory(final PhpClass targetClass) {
@@ -164,6 +168,7 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
 
     protected void onOK() {
         if (!validateFormFields()) {
+            exit();
             return;
         }
         final PsiFile diXml = new PreferenceDiXmlGenerator(new PreferenceDiXmFileData(
@@ -199,7 +204,7 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
                 isInterface
         ), project).generate(OverrideClassByAPreferenceAction.ACTION_NAME, true);
 
-        this.setVisible(false);
+        exit();
     }
 
     public String getPreferenceClassName() {

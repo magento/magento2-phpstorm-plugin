@@ -30,7 +30,8 @@ public class DataProviderDtoConverter extends UiComponentDataProviderData
                 newEntityDialogData.getEntityName().concat("DataProvider"),
                 UiComponentDataProviderFile.DIRECTORY,
                 newEntityDialogData.getEntityName(),
-                newEntityDialogData.getIdFieldName()
+                newEntityDialogData.getIdFieldName(),
+                newEntityDialogData.hasWebApi()
         );
     }
 }

@@ -18,7 +18,7 @@ public class SaveEntityActionGeneratorTest extends BaseGeneratorTestCase {
     private static final String EXPECTED_DIRECTORY =
             "/src/app/code/Foo/Bar/Controller/Adminhtml/" + ENTITY_NAME;
     private static final String ACL = "Foo_Bar::company_id";
-    private static final String ENTITY_ID = "entity_id";
+    private static final String ENTITY_ID = "company_id";
 
     /**
      * Test generation of Save controller for entity without interface.
@@ -32,6 +32,7 @@ public class SaveEntityActionGeneratorTest extends BaseGeneratorTestCase {
                         ENTITY_ID,
                         DTO_NAME,
                         "",
+                        false,
                         false
                 );
         final SaveEntityControllerFileGenerator saveEntityControllerFileGenerator =
@@ -65,7 +66,8 @@ public class SaveEntityActionGeneratorTest extends BaseGeneratorTestCase {
                         ENTITY_ID,
                         DTO_NAME,
                         DTO_TYPE_INTERFACE,
-                        true
+                        true,
+                        false
                 );
         final SaveEntityControllerFileGenerator saveEntityControllerFileGenerator =
                 new SaveEntityControllerFileGenerator(

@@ -4,7 +4,140 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
+## 4.3.0
+
+## 4.2.3
+
+### Fixed
+
+- Fixed a simple-json library is absent in the distribution in [#951](https://github.com/magento/magento2-phpstorm-plugin/pull/951)
+
+## 4.2.2
+
+### Added
+
+- Added custom search scope to exclude test files from search [#read-more](https://github.com/magento/magento2-phpstorm-plugin/wiki/4.2.2-Release)
+- Added the ability to open all plugins in the Find Tool Window [#read-more](https://github.com/magento/magento2-phpstorm-plugin/wiki/4.2.2-Release)
+- Added uiComponent registration syntax highlighting as JSON [#read-more](https://github.com/magento/magento2-phpstorm-plugin/wiki/4.2.2-Release)
+- Added new Magento version support (2.4.4-beta4) for the UCT feature in [#922](https://github.com/magento/magento2-phpstorm-plugin/pull/922)
+
+### Changed
+
+- Eliminated com.google.gson.JsonParser#parse usage in [#928](https://github.com/magento/magento2-phpstorm-plugin/pull/928)
+- Eliminated LineMarkerXmlTagDecorator#checkDelete usage in [#910](https://github.com/magento/magento2-phpstorm-plugin/pull/910)
+- Eliminated LineMarkerXmlTagDecorator#checkAdd usage in [#909](https://github.com/magento/magento2-phpstorm-plugin/pull/909)
+- Enhanced errors showing for the new Magento 2 UI Component Form dialog window in [#892](https://github.com/magento/magento2-phpstorm-plugin/pull/892)
+- Enhanced errors showing for the new Magento 2 UI Component Grid dialog window in [#891](https://github.com/magento/magento2-phpstorm-plugin/pull/891)
+- Enhanced errors showing for the new Magento 2 DB Schema XML dialog window in [#890](https://github.com/magento/magento2-phpstorm-plugin/pull/890)
+- Enhanced errors showing for the new Magento 2 Message Queue dialog window in [#889](https://github.com/magento/magento2-phpstorm-plugin/pull/889)
+- Enhanced errors showing for the new Magento 2 Data Model dialog window in [#888](https://github.com/magento/magento2-phpstorm-plugin/pull/888)
+- Enhanced errors showing for the new Magento 2 Models dialog window in [#887](https://github.com/magento/magento2-phpstorm-plugin/pull/887)
+- Enhanced errors showing for the new Magento 2 Email Template dialog window in [#886](https://github.com/magento/magento2-phpstorm-plugin/pull/886)
+- Enhanced errors showing for the new Magento 2 CLI Command dialog window in [#885](https://github.com/magento/magento2-phpstorm-plugin/pull/885)
+- Enhanced errors showing for the new Magento 2 GraphQl Resolver dialog window in [#884](https://github.com/magento/magento2-phpstorm-plugin/pull/884)
+- Enhanced errors showing for the new Magento 2 View Model dialog window in [#883](https://github.com/magento/magento2-phpstorm-plugin/pull/883)
+- Enhanced errors showing for the new Magento 2 Cron Group dialog window in [#882](https://github.com/magento/magento2-phpstorm-plugin/pull/882)
+- Enhanced errors showing for the new Magento 2 Cron Job dialog window in [#881](https://github.com/magento/magento2-phpstorm-plugin/pull/881)
+- Enhanced errors showing for the new Magento 2 Controller dialog window in [#880](https://github.com/magento/magento2-phpstorm-plugin/pull/880)
+- Enhanced errors showing for the new Magento 2 Block dialog window in [#865](https://github.com/magento/magento2-phpstorm-plugin/pull/865)
+
+### Fixed
+
+- Fixed overriding layouts and templates allows to select an incompatible theme in [#930](https://github.com/magento/magento2-phpstorm-plugin/pull/930)
+- Fixed observer action visibility in [#936](https://github.com/magento/magento2-phpstorm-plugin/pull/936)
+- Fixed general exception while accessing phpIndex.getAnyByFQN(classFQN) in [#934](https://github.com/magento/magento2-phpstorm-plugin/pull/934)
+- Fixed ClassCastException for the GraphQlResolverIndex.getGraphQLUsages in [#927](https://github.com/magento/magento2-phpstorm-plugin/pull/927)
+- Fixed plugin inspection does not work correctly in [#902](https://github.com/magento/magento2-phpstorm-plugin/pull/902)
+- Fixed module name declaration inspection flags valid code in [#898](https://github.com/magento/magento2-phpstorm-plugin/pull/898)
+- Fixed ClassCastException: PsiPlainTextFileImpl cannot be cast to class XmlFile in WebApiTypeIndex in [#897](https://github.com/magento/magento2-phpstorm-plugin/pull/897)
+- Fixed IndexNotReadyException while opening a context menu in [#896](https://github.com/magento/magento2-phpstorm-plugin/pull/896)
+- Fixed IllegalArgumentException: URLDecoder: Incomplete trailing escape (%) pattern in [#894](https://github.com/magento/magento2-phpstorm-plugin/pull/894)
+- Fixed Throwable: AWT events are not allowed inside write action (UI Form) in [#893](https://github.com/magento/magento2-phpstorm-plugin/pull/893)
+- Fixed Slow operations are prohibited on EDT when calling update method on the CreateAPluginAction in [#862](https://github.com/magento/magento2-phpstorm-plugin/pull/862)
+- Fixed Throwable: when an IOException is thrown during new plugin generation in [#860](https://github.com/magento/magento2-phpstorm-plugin/pull/860)
+- Fixed IndexOutOfBoundsException in case when entered no fields during ui form generation in [#859](https://github.com/magento/magento2-phpstorm-plugin/pull/859)
+- Fixed NullPointerException when opening new cron job dialog for an invalid Magento 2 module in [#856](https://github.com/magento/magento2-phpstorm-plugin/pull/856)
+- Fixed NoSuchElementException when creating new controller in [#844](https://github.com/magento/magento2-phpstorm-plugin/pull/844)
+- Fixed Message Queue Connection does not match Naming Conventions in [#854](https://github.com/magento/magento2-phpstorm-plugin/pull/854)
+- Fixed StringIndexOutOfBoundsException during UCT inspection via action execution in [852](https://github.com/magento/magento2-phpstorm-plugin/pull/852)
+- Fixed NullPointerException in the PluginDeclarationInspection.fetchModuleNamesWhereSamePluginNameUsed (calling toString on null) in [#849](https://github.com/magento/magento2-phpstorm-plugin/pull/849)
+
+## 4.2.1
+
+### Fixed
+
+- Fixed ArrayIndexOutOfBoundsException when used Copy Path/Reference action on the requirejs-config.js file in [#808](https://github.com/magento/magento2-phpstorm-plugin/pull/808)
+- Fixed dialog disposition issue in [#811](https://github.com/magento/magento2-phpstorm-plugin/pull/811)
+- Fixed stack overflow error for line-marker providers in [#813](https://github.com/magento/magento2-phpstorm-plugin/pull/813)
+- Fixed stub ids not found for key in index in [#814](https://github.com/magento/magento2-phpstorm-plugin/pull/814)
+- Fixed failed to build require-js index in [815](https://github.com/magento/magento2-phpstorm-plugin/pull/815)
+- Fixed empty psi elements in the plugin inspections in [#816](https://github.com/magento/magento2-phpstorm-plugin/pull/816)
+- Fixed empty psi element in module xml inspection in [#817](https://github.com/magento/magento2-phpstorm-plugin/pull/817)
+- Fixed NullPointerException for the firstSortOrder.compareTo in [#818](https://github.com/magento/magento2-phpstorm-plugin/pull/818)
+- Fixed invalid column types provided exception during db_schema.xml file generation in [#819](https://github.com/magento/magento2-phpstorm-plugin/pull/819)
+- Fixed method designed for fully qualified names only in [#830](https://github.com/magento/magento2-phpstorm-plugin/pull/830)
+- Fixed NoClassDefFoundError for com.intellij.lang.jsgraphql.GraphQLIcons in [#850](https://github.com/magento/magento2-phpstorm-plugin/pull/850)
+
+## 4.2.0
+
+### Added
+
+- Extending of the built-in Upgrade Compatibility Tool [#read-more](https://github.com/magento/magento2-phpstorm-plugin/wiki/4.2.0-Release)
+
+### Changed
+
+- Enhanced Magento 2 version resolving in [#747](https://github.com/magento/magento2-phpstorm-plugin/pull/747), [#751](https://github.com/magento/magento2-phpstorm-plugin/pull/751), [#777](https://github.com/magento/magento2-phpstorm-plugin/pull/777)
+
+### Fixed
+
+- Fixed NullPointerException for the InjectAViewModelAction in [#800](https://github.com/magento/magento2-phpstorm-plugin/pull/800)
+- Fixed NullPointerException for a name attribute of the event tag and code style fixes in [#799](https://github.com/magento/magento2-phpstorm-plugin/pull/799)
+- Fixed NullPointerException for PluginReferenceProvider in [#801](https://github.com/magento/magento2-phpstorm-plugin/pull/801)
+
+## 4.1.0
+
+### Added
+
+- Added UI integration with the Adobe Commerce Upgrade Compatibility Tool in [#625](https://github.com/magento/magento2-phpstorm-plugin/pull/625)
+- Added MVP version of the built-in Upgrade Compatibility Tool, read more in [wiki](https://github.com/magento/magento2-phpstorm-plugin/wiki/4.1.0-Release#the-built-in-upgrade-compatibility-tool)
+
 ## 4.0.0
+
+### Added
+
+- Added XML file header include code template in [#615](https://github.com/magento/magento2-phpstorm-plugin/pull/615)
+- Added Web API generation for the Magento Entity Creator in [#597](https://github.com/magento/magento2-phpstorm-plugin/pull/597) and [#607](https://github.com/magento/magento2-phpstorm-plugin/pull/607)
+- Added DI XML plugin type attribute inspections in [#588](https://github.com/magento/magento2-phpstorm-plugin/pull/588)
+- Added Web API interface for service (PHP class) generation in [#586](https://github.com/magento/magento2-phpstorm-plugin/pull/586)
+- Added DI XML type tag attributes inspections that related to the PHP/Magento types in [#582](https://github.com/magento/magento2-phpstorm-plugin/pull/582)
+- Added DI XML preference tag attributes inspections in [#578](https://github.com/magento/magento2-phpstorm-plugin/pull/578)
+- Added Web API XML service tag attributes inspections in [#577](https://github.com/magento/magento2-phpstorm-plugin/pull/577)
+- Added an error handler to help user with a new bug issue creation on the GitHub side in [#552](https://github.com/magento/magento2-phpstorm-plugin/pull/552) and [#593](https://github.com/magento/magento2-phpstorm-plugin/pull/593)
+- Added Web API declaration generation in [#548](https://github.com/magento/magento2-phpstorm-plugin/pull/548) and [#595](https://github.com/magento/magento2-phpstorm-plugin/pull/595)
+- Added JS and CSS support for Copy Magento Path action in [#536](https://github.com/magento/magento2-phpstorm-plugin/pull/536)
+
+### Changed
+
+- Changed the content of the generated plugin class in [#612](https://github.com/magento/magento2-phpstorm-plugin/pull/612)
+- Changed using of hardcoded entity id value into the constant in all files generated by the Entity Creator in [#606](https://github.com/magento/magento2-phpstorm-plugin/pull/606)
+
+### Fixed
+
+- Fixed a casting exception in the XML index in [#617](https://github.com/magento/magento2-phpstorm-plugin/pull/617)
+- Fixed a bug with plugin generation for complex non-primitive types in [#609](https://github.com/magento/magento2-phpstorm-plugin/pull/609)
+- Fixed a bug with the namespace generation in a generated controller in [#571](https://github.com/magento/magento2-phpstorm-plugin/pull/571)
+- Fixed a bug with directory validation for the generation dialogues in [#565](https://github.com/magento/magento2-phpstorm-plugin/pull/565)
+- Fixed wrong entity data mapper file template position in [#549](https://github.com/magento/magento2-phpstorm-plugin/pull/549)
+- Fixed incorrect data saving into table model within editing a table in [#544](https://github.com/magento/magento2-phpstorm-plugin/pull/544)
+- Fixed an error when plugin or observer name is not set in [#533](https://github.com/magento/magento2-phpstorm-plugin/pull/533)
+- Fixed incorrect duplication warning for disabled plugin in di.xml in [#529](https://github.com/magento/magento2-phpstorm-plugin/pull/529)
+
+## 3.2.2
+
+### Fixed
+
+- New entity layout name and edit entity layout name inside it
+- `Java.lang.IllegalArgumentException` During adding a new method into an existing plugin
 
 ## 3.2.1
 

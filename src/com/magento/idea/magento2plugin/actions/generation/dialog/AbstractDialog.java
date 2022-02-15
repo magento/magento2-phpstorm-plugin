@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.util.Pair;
+import com.magento.idea.magento2plugin.actions.generation.dialog.prompt.PlaceholderInitializerUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.reflection.ExtractComponentFromFieldUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.util.DialogFieldErrorUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.TypeFieldsRulesParser;
@@ -16,6 +17,8 @@ import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
@@ -57,8 +60,18 @@ public abstract class AbstractDialog extends JDialog {
         dialog.setLocation(coordinateX, coordinateY);
     }
 
+    /**
+     * Default on cancel action.
+     */
     protected void onCancel() {
-        this.setVisible(false);
+        this.exit();
+    }
+
+    /**
+     * Right way to hide dialog window.
+     */
+    protected void exit() {
+        dispose();
     }
 
     /**
@@ -192,8 +205,7 @@ public abstract class AbstractDialog extends JDialog {
         final JComponent component = ExtractComponentFromFieldUtil.extract(field, this);
 
         if (component instanceof JTextField) {
-            return ((JTextField) component).isEditable()
-                    ? ((JTextField) component).getText() : null;
+            return ((JTextField) component).getText();
         } else if (component instanceof JComboBox) {
             if (((JComboBox<?>) component).getSelectedIndex() == -1) {
                 return "";
@@ -247,5 +259,67 @@ public abstract class AbstractDialog extends JDialog {
         }
 
         return getParentTabPaneForComponent(parent);
+    }
+
+    @Override
+    public void setVisible(final boolean status) {
+        new PlaceholderInitializerUtil(this).initialize();
+        super.setVisible(status);
+    }
+
+    /**
+     * Listener that helps focus on a field for dialogues after it is opened.
+     *
+     * <p><b>This inner class designed to simplify focusing on a field for the
+     * implementations of this abstract class.</b></p>
+     * <p><b>To use this listener:</b></p>
+     * <p>1) specify method in which desired field is focused:</p><br/>
+     * <pre>
+     *     public void focusOnTheSampleField() {
+     *             sampleField.requestFocusInWindow();
+     *     }
+     * </pre>
+     *
+     * <p>2) call in the constructor method:</p><br/>
+     * <pre>
+     *     addComponentListener(
+     *             new FocusOnAFieldListener(this::focusOnTheSampleField)
+     *     )
+     * </pre>
+     *
+     * @see #requestFocusInWindow()
+     */
+    public static final class FocusOnAFieldListener implements ComponentListener {
+
+        private final @NotNull Runnable makeAFieldFocusedAction;
+
+        /**
+         * Focus on a field listener constructor.
+         *
+         * @param makeAFieldFocused Runnable method in which desired field is focused.
+         */
+        public FocusOnAFieldListener(final @NotNull Runnable makeAFieldFocused) {
+            makeAFieldFocusedAction = makeAFieldFocused;
+        }
+
+        @Override
+        @SuppressWarnings("PMD.UncommentedEmptyMethodBody")
+        public void componentResized(final ComponentEvent event) {
+        }
+
+        @Override
+        @SuppressWarnings("PMD.UncommentedEmptyMethodBody")
+        public void componentMoved(final ComponentEvent event) {
+        }
+
+        @Override
+        public void componentShown(final ComponentEvent event) {
+            makeAFieldFocusedAction.run();
+        }
+
+        @Override
+        @SuppressWarnings("PMD.UncommentedEmptyMethodBody")
+        public void componentHidden(final ComponentEvent event) {
+        }
     }
 }

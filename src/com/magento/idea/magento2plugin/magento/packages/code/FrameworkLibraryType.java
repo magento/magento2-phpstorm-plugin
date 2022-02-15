@@ -13,6 +13,7 @@ public enum FrameworkLibraryType {
     ABSTRACT_COLLECTION(
             "Magento\\Framework\\Model\\ResourceModel\\Db\\Collection\\AbstractCollection"
     ),
+    COMPONENT_REGISTRAR("Magento\\Framework\\Component\\ComponentRegistrar"),
     COLLECTION_PROCESSOR("Magento\\Framework\\Api\\SearchCriteria\\CollectionProcessorInterface"),
     DATA_PERSISTOR("Magento\\Framework\\App\\Request\\DataPersistorInterface"),
     DATA_OBJECT("Magento\\Framework\\DataObject"),
@@ -26,6 +27,7 @@ public enum FrameworkLibraryType {
     SEARCH_CRITERIA("Magento\\Framework\\Api\\SearchCriteriaInterface"),
     SEARCH_CRITERIA_BUILDER("Magento\\Framework\\Api\\SearchCriteriaBuilder"),
     SEARCH_RESULT("Magento\\Framework\\Api\\SearchResultsInterface"),
+    SEARCH_RESULT_IMPLEMENTATION("Magento\\Framework\\Api\\SearchResults"),
     URL("Magento\\Framework\\UrlInterface");
 
     /**

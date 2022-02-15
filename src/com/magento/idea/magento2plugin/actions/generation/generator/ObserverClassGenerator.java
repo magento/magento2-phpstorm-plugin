@@ -122,7 +122,7 @@ public class ObserverClassGenerator extends FileGenerator {
                 LeafPsiElement.class
         );
         for (final LeafPsiElement leafPsiElement: leafElements) {
-            if (!leafPsiElement.getText().equals(MagentoPhpClass.CLOSING_TAG)) {
+            if (!MagentoPhpClass.CLOSING_TAG.equals(leafPsiElement.getText())) {
                 continue;
             }
             insertPos = leafPsiElement.getTextOffset();
@@ -133,6 +133,10 @@ public class ObserverClassGenerator extends FileGenerator {
     private PhpClass createObserverClass(final String actionName) {
         PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(observerFileData.getObserverModule());
+
+        if (parentDirectory == null) {
+            return null;
+        }
         final String[] observerDirectories = observerFileData.getObserverDirectory()
                 .split(File.separator);
         for (final String observerDirectory: observerDirectories) {

@@ -87,7 +87,7 @@ class ${CLASS_NAME} extends ${EXTENDS}
             $result->getItems(),
             $result->getTotalCount(),
             $searchCriteria,
-            '#if(${ENTITY_ID})${ENTITY_ID}#{else}entity_id#end'
+            ${ENTITY_ID_REFERENCE}
         );
     }
 
@@ -104,14 +104,14 @@ class ${CLASS_NAME} extends ${EXTENDS}
         $this->loadedData = parent::getData();
         $itemsById = [];
 
-#set($entityId = "#if(${ENTITY_ID})${ENTITY_ID}#{else}entity_id#end")
-#set($entityIdAccessor = '[(int) $item[' + "'$entityId'" + ']]')
+#set($entityId = "${ENTITY_ID_REFERENCE}")
+#set($entityIdAccessor = '[(int) $item[' + "${ENTITY_ID_REFERENCE}" + ']]')
 #set($getIdAccessor = "[(int) $id]")
         foreach ($this->loadedData['items'] as $item) {
             $itemsById$entityIdAccessor = $item;
         }
 
-        if ($id = $this->request->getParam('$entityId', null)) {
+        if ($id = $this->request->getParam($entityId)) {
             $this->loadedData['entity'] = $itemsById$getIdAccessor;
         }
 
