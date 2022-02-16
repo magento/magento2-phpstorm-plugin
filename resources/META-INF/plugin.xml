@@ -72,6 +72,7 @@
             <action id="MagentoCreateViewFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewViewXmlAction"/>
             <action id="MagentoCreateFieldsetFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewFieldsetXmlAction"/>
             <action id="MagentoCreateSectionsFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewSectionsXmlAction"/>
+            <action id="MagentoCreateEmailTemplatesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewEmailTemplatesXmlAction"/>
             <!-- Context dependent actions -->
             <separator/>
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml"/>
@@ -583,6 +584,7 @@
         <internalFileTemplate name="Magento View XML"/>
         <internalFileTemplate name="Magento Fieldset XML"/>
         <internalFileTemplate name="Magento Sections XML"/>
+        <internalFileTemplate name="Magento Module Email Templates Xml"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 
