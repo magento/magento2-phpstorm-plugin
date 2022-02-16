@@ -70,6 +70,7 @@
             <action id="MagentoCreateMviewFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewMviewXmlAction"/>
             <action id="MagentoCreateIndexerFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewIndexerXmlAction"/>
             <action id="MagentoCreateViewFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewViewXmlAction"/>
+            <action id="MagentoCreateFieldsetFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewFieldsetXmlAction"/>
             <!-- Context dependent actions -->
             <separator/>
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml"/>
@@ -579,6 +580,7 @@
         <internalFileTemplate name="Magento Mview XML"/>
         <internalFileTemplate name="Magento Indexer XML"/>
         <internalFileTemplate name="Magento View XML"/>
+        <internalFileTemplate name="Magento Fieldset XML"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 
