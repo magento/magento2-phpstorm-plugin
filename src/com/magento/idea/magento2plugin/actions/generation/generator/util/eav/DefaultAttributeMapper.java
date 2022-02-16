@@ -1,7 +1,6 @@
 /*
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
- *
  */
 
 package com.magento.idea.magento2plugin.actions.generation.generator.util.eav;
@@ -9,14 +8,16 @@ package com.magento.idea.magento2plugin.actions.generation.generator.util.eav;
 import com.magento.idea.magento2plugin.actions.generation.data.EavEntityDataInterface;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeBackendModel;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeInput;
-import com.magento.idea.magento2plugin.magento.packages.eav.AttributeSourceModel;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeProperty;
+import com.magento.idea.magento2plugin.magento.packages.eav.AttributeSourceModel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class DefaultAttributeMapper implements AttributeMapperInterface {
+    private static final String PHP_DOUBLE_ARROW_OPERATOR = " => ";
+
     @Override
     public List<String> mapAttributesByEntityData(final EavEntityDataInterface entityData) {
         final List<String> attributesWithValues = new ArrayList<>();
@@ -59,10 +60,6 @@ public class DefaultAttributeMapper implements AttributeMapperInterface {
                 Boolean.toString(eavEntityData.isRequired())
         );
         mappedAttributes.put(
-                AttributeProperty.SORT_ORDER.getProperty(),
-                Integer.toString(eavEntityData.getSortOrder())
-        );
-        mappedAttributes.put(
                 AttributeProperty.VISIBLE.getProperty(),
                 Boolean.toString(eavEntityData.isVisible())
         );
@@ -75,7 +72,10 @@ public class DefaultAttributeMapper implements AttributeMapperInterface {
         if (!attributeOptions.isEmpty()) {
             mappedAttributes.put(
                     AttributeProperty.OPTION.getProperty(),
-                    getMappedOptions(eavEntityData.getOptions(), eavEntityData.getOptionsSortOrder())
+                    getMappedOptions(
+                            eavEntityData.getOptions(),
+                            eavEntityData.getOptionsSortOrder()
+                    )
             );
         }
 
@@ -119,7 +119,8 @@ public class DefaultAttributeMapper implements AttributeMapperInterface {
     }
 
     protected String getParsedOptions(final Map<Integer, String> optionValues) {
-        final String valueNode = "->" + wrapStringValueForTemplate("value") + " => ";
+        final String valueNode = "->" + wrapStringValueForTemplate("value")
+                + PHP_DOUBLE_ARROW_OPERATOR;
         final StringBuilder optionsContent = new StringBuilder();
 
         for (final Integer optionKey : optionValues.keySet()) {
@@ -132,8 +133,8 @@ public class DefaultAttributeMapper implements AttributeMapperInterface {
             optionsContent
                     .append("->")
                     .append(wrapStringValueForTemplate("option_" + optionKey))
-                    .append(" => ")
-                    .append("[")
+                    .append(PHP_DOUBLE_ARROW_OPERATOR)
+                    .append('[')
                     .append(wrapStringValueForTemplate(optionValue))
                     .append("], ");
         }
@@ -142,7 +143,8 @@ public class DefaultAttributeMapper implements AttributeMapperInterface {
     }
 
     protected String getParsedOptionSortOrders(final Map<Integer, String> optionSortOrders) {
-        final String orderNode = "->" + wrapStringValueForTemplate("order") + " => ";
+        final String orderNode = "->" + wrapStringValueForTemplate("order")
+                + PHP_DOUBLE_ARROW_OPERATOR;
         final StringBuilder ordersContent = new StringBuilder();
 
         for (final Integer optionKey : optionSortOrders.keySet()) {
@@ -155,9 +157,9 @@ public class DefaultAttributeMapper implements AttributeMapperInterface {
             ordersContent
                     .append("->")
                     .append(wrapStringValueForTemplate("option_" + optionKey))
-                    .append(" => ")
+                    .append(PHP_DOUBLE_ARROW_OPERATOR)
                     .append(orderValue)
-                    .append(",");
+                    .append(',');
         }
 
         return orderNode + "[" + ordersContent + "->]->";

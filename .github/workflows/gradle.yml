@@ -5,7 +5,7 @@ name: Run automated tests
 
 on:
   pull_request:
-    branches: [ master, 4.3.0-develop ]
+    branches: [ master, '*-develop', 'mainline*' ]
 
 jobs:
   build-linux:
@@ -107,6 +107,7 @@ jobs:
         run: ./gradlew checkstyleCI -i --no-daemon
         env:
           MODIFIED_FILES: ${{ steps.file_changes.outputs.files}}
+          ACTIONS_STEP_DEBUG: true
       - name: Run PMD Quality Check
         run: ./gradlew pmdCI -i --no-daemon
         env:
