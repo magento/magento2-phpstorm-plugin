@@ -18,7 +18,8 @@ import org.jetbrains.annotations.NotNull;
 public class NewEmailTemplatesXmlAction extends AbstractContextAction {
 
     public static final String ACTION_NAME = "Magento 2 Email Templates File";
-    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 email_templates.xml file";
+    public static final String ACTION_DESCRIPTION =
+            "Create a new Magento 2 email_templates.xml file";
 
     /**
      * New email_templates.xml file generation action constructor.
