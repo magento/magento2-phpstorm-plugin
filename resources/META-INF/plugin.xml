@@ -74,6 +74,7 @@
             <action id="MagentoCreateSectionsFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewSectionsXmlAction"/>
             <action id="MagentoCreateEmailTemplatesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewEmailTemplatesXmlAction"/>
             <action id="MagentoCreateCrontabFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewCrontabXmlAction"/>
+            <action id="MagentoCreatePageTypesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewPageTypesXmlAction"/>
             <!-- Context dependent actions -->
             <separator/>
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml"/>
@@ -586,6 +587,7 @@
         <internalFileTemplate name="Magento Fieldset XML"/>
         <internalFileTemplate name="Magento Sections XML"/>
         <internalFileTemplate name="Magento Module Email Templates Xml"/>
+        <internalFileTemplate name="Magento Page Types XML"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 
