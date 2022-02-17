@@ -9,7 +9,7 @@ import com.intellij.ide.fileTemplates.actions.AttributesDefaults;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.context.AbstractContextAction;
-import com.magento.idea.magento2plugin.magento.files.ModuleCrontabXmlFile;
+import com.magento.idea.magento2plugin.magento.files.CrontabXmlTemplate;
 import com.magento.idea.magento2plugin.magento.packages.ComponentType;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil;
@@ -24,7 +24,7 @@ public class NewCrontabXmlAction extends AbstractContextAction {
      * New crontab.xml file generation action constructor.
      */
     public NewCrontabXmlAction() {
-        super(ACTION_NAME, ACTION_DESCRIPTION, new ModuleCrontabXmlFile());
+        super(ACTION_NAME, ACTION_DESCRIPTION, new CrontabXmlTemplate());
     }
 
     @Override
