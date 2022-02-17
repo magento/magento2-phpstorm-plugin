@@ -204,10 +204,6 @@ public class NewEntityDialog extends AbstractDialog {
     @FieldValidation(rule = RuleRegistry.MENU_IDENTIFIER, message = {MenuIdentifierRule.MESSAGE})
     private JTextField menuIdentifier;
     private JLabel formNameLabel;
-    private JTextPane exampleIdentifier;
-    private JTextPane exampleAclId;
-    private JTextPane exampleFormName;
-    private JTextPane exampleGridName;
     private JPanel uiComponentsPanel;
     private JPanel formNamePanel;
     private JPanel gridNamePanel;
