@@ -407,7 +407,7 @@
                       <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties>
-                      <text value="Action"/>
+                      <text value="Action Name"/>
                     </properties>
                   </component>
                   <component id="2ec13" class="javax.swing.JLabel" binding="controllerLabel">
@@ -415,7 +415,7 @@
                       <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                     </constraints>
                     <properties>
-                      <text value="Controller"/>
+                      <text value="Action Path"/>
                     </properties>
                   </component>
                   <component id="ddde2" class="javax.swing.JTextField" binding="route">
@@ -424,7 +424,12 @@
                         <preferred-size width="150" height="-1"/>
                       </grid>
                     </constraints>
-                    <properties/>
+                    <properties>
+                      <toolTipText value="The unique name of your router"/>
+                    </properties>
+                    <clientProperties>
+                      <promptText class="java.lang.String" value="entity_type"/>
+                    </clientProperties>
                   </component>
                   <component id="2b2ed" class="javax.swing.JTextField" binding="controllerName">
                     <constraints>
@@ -432,7 +437,12 @@
                         <preferred-size width="150" height="-1"/>
                       </grid>
                     </constraints>
-                    <properties/>
+                    <properties>
+                      <toolTipText value="Can consist of few directories, for an ex.: Product/Custom"/>
+                    </properties>
+                    <clientProperties>
+                      <promptText class="java.lang.String" value="Folder name for Action"/>
+                    </clientProperties>
                   </component>
                   <component id="d08e6" class="javax.swing.JTextField" binding="actionName">
                     <constraints>
@@ -441,6 +451,9 @@
                       </grid>
                     </constraints>
                     <properties/>
+                    <clientProperties>
+                      <promptText class="java.lang.String" value="Class name for Action"/>
+                    </clientProperties>
                   </component>
                   <component id="e7551" class="javax.swing.JLabel" binding="controllerGeneralLabel">
                     <constraints>
