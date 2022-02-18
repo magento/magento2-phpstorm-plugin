@@ -17,7 +17,7 @@ public class ProductAttributePropertySetupPatchGeneratorTest extends BaseGenerat
     private static final String MODULE_NAME = "Foo_Bar";
     private static final String LABEL = "Test Label";
     private static final String TYPE = "static";
-    private static final String SORT_ORDER = 10;
+    private static final int SORT_ORDER = 10;
     private static final String GROUP = "General";
     private static final String FILE_PATH = "src/app/code/Foo/Bar/Setup/Patch/Data";
 
