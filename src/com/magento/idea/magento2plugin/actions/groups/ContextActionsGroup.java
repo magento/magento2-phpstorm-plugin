@@ -16,10 +16,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class ContextActionsGroup extends NonEmptyActionGroup {
 
-    public ContextActionsGroup() {
-        super();
-    }
-
     @Override
     public void update(final @NotNull AnActionEvent event) {
         if (getChildrenCount() > 0) {
