@@ -56,7 +56,7 @@
             <add-to-group group-id="PhpGenerateGroup" anchor="last"/>
         </group>
 
-        <group id="MagentoContextBasedActionsGroup" class="com.intellij.ide.actions.NonEmptyActionGroup" text="Context Actions" popup="false" compact="true" searchable="true">
+        <group id="MagentoContextBasedActionsGroup" class="com.magento.idea.magento2plugin.actions.groups.ContextActionsGroup" text="Context Actions" popup="false" compact="true" searchable="true">
             <separator/>
             <!-- Context dependent actions -->
             <action id="MagentoCreateAclFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewAclXmlAction"/>
