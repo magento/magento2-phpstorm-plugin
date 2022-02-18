@@ -428,7 +428,7 @@
                       <toolTipText value="The unique name of your router"/>
                     </properties>
                     <clientProperties>
-                      <promptText class="java.lang.String" value="entity_type"/>
+                      <promptText class="java.lang.String" value="entity_name"/>
                     </clientProperties>
                   </component>
                   <component id="2b2ed" class="javax.swing.JTextField" binding="controllerName">
