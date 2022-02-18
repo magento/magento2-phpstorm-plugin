@@ -175,7 +175,7 @@
                   <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Controller Name"/>
+                  <text value="Action Path"/>
                 </properties>
               </component>
               <component id="bb0f3" class="javax.swing.JTextField" binding="submitControllerName">
@@ -184,7 +184,12 @@
                     <preferred-size width="150" height="-1"/>
                   </grid>
                 </constraints>
-                <properties/>
+                <properties>
+                  <toolTipText value="Can consist of few directories, for an ex.: Product/Custom"/>
+                </properties>
+                <clientProperties>
+                  <promptText class="java.lang.String" value="Folder name for Action"/>
+                </clientProperties>
               </component>
               <component id="27a44" class="javax.swing.JLabel" binding="submitActionNameLabel">
                 <constraints>
@@ -203,6 +208,9 @@
                 <properties>
                   <text value="Save"/>
                 </properties>
+                <clientProperties>
+                  <promptText class="java.lang.String" value="Class name for Action"/>
+                </clientProperties>
               </component>
               <component id="5065a" class="javax.swing.JLabel" binding="saveControllerLabel">
                 <constraints>
@@ -246,7 +254,7 @@
                   <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Controller Name"/>
+                  <text value="Action Path"/>
                 </properties>
               </component>
               <component id="f609b" class="javax.swing.JTextField" binding="viewControllerName">
@@ -255,7 +263,12 @@
                     <preferred-size width="150" height="-1"/>
                   </grid>
                 </constraints>
-                <properties/>
+                <properties>
+                  <toolTipText value="Can consist of few directories, for an ex.: Product/Custom"/>
+                </properties>
+                <clientProperties>
+                  <promptText class="java.lang.String" value="Folder name for Action"/>
+                </clientProperties>
               </component>
               <component id="6a2bd" class="javax.swing.JLabel" binding="viewControllerLabel">
                 <constraints>
@@ -275,6 +288,9 @@
                 <properties>
                   <text value="Edit"/>
                 </properties>
+                <clientProperties>
+                  <promptText class="java.lang.String" value="Class name for Action"/>
+                </clientProperties>
               </component>
               <component id="e2e73" class="javax.swing.JLabel" binding="actionNameLabel">
                 <constraints>
