@@ -14,8 +14,11 @@ import com.magento.idea.magento2plugin.magento.packages.eav.AttributeScope;
 
 public class CategoryAttributePropertySetupPatchGeneratorTest extends BaseGeneratorTestCase {
 
-    private final static String MODULE_NAME = "Foo_Bar";
+    private static final String MODULE_NAME = "Foo_Bar";
 
+    /**
+     * Tests the generated patch file.
+     */
     public void testGenerateFile() {
         final Project project = myFixture.getProject();
 
@@ -41,9 +44,16 @@ public class CategoryAttributePropertySetupPatchGeneratorTest extends BaseGenera
         final String filePatch = this.getFixturePath("AddTestAttributeCategoryAttribute.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePatch);
 
-        assertGeneratedFileIsCorrect(expectedFile, "src/app/code/Foo/Bar/Setup/Patch/Data", dataPatchFile);
+        assertGeneratedFileIsCorrect(
+                expectedFile,
+                "src/app/code/Foo/Bar/Setup/Patch/Data",
+                dataPatchFile
+        );
     }
 
+    /**
+     * Tests the generated form file.
+     */
     public void testGenerateFormFile() {
         final Project project = myFixture.getProject();
 
@@ -75,6 +85,10 @@ public class CategoryAttributePropertySetupPatchGeneratorTest extends BaseGenera
         final String fileCategoryForm = this.getFixturePath("category_form.xml");
         final PsiFile expectedCategoryFile = myFixture.configureByFile(fileCategoryForm);
 
-        assertGeneratedFileIsCorrect(expectedCategoryFile, "src/app/code/Foo/Bar/view/adminhtml/ui_component", categoryForm);
+        assertGeneratedFileIsCorrect(
+                expectedCategoryFile,
+                "src/app/code/Foo/Bar/view/adminhtml/ui_component",
+                categoryForm
+        );
     }
 }

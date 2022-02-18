@@ -10,7 +10,11 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.xml.XmlDocument;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
-import com.intellij.util.indexing.*;
+import com.intellij.util.indexing.DataIndexer;
+import com.intellij.util.indexing.FileBasedIndex;
+import com.intellij.util.indexing.FileContent;
+import com.intellij.util.indexing.ID;
+import com.intellij.util.indexing.ScalarIndexExtension;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.magento.idea.magento2plugin.magento.files.ProductTypeXml;
@@ -20,7 +24,7 @@ import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 
 public class ProductTypeIndex extends ScalarIndexExtension<String> {
-    private final static String TEST_DIRECTORY_PATTERN = ".*\\/[Tt]ests?\\/?.*";
+    private static final String TEST_DIRECTORY_PATTERN = ".*\\/[Tt]ests?\\/?.*";
     private final KeyDescriptor<String> myKeyDescriptor = new EnumeratorStringDescriptor();
     public static final ID<String, Void> KEY = ID.create(
             "com.magento.idea.magento2plugin.stubs.indexes.product_types");
@@ -69,7 +73,9 @@ public class ProductTypeIndex extends ScalarIndexExtension<String> {
 
     private void parseRootTag(final Map<String, Void> map, final XmlTag xmlRootTag) {
         for (final XmlTag productTypeTag : xmlRootTag.findSubTags(ProductTypeXml.XML_TAG_TYPE)) {
-            final String productTypeName = productTypeTag.getAttributeValue(ProductTypeXml.XML_ATTRIBUTE_NAME);
+            final String productTypeName = productTypeTag.getAttributeValue(
+                    ProductTypeXml.XML_ATTRIBUTE_NAME
+            );
             map.put(productTypeName, null);
         }
     }
@@ -86,6 +92,7 @@ public class ProductTypeIndex extends ScalarIndexExtension<String> {
     }
 
     @Override
+    @SuppressWarnings({"PMD.LiteralsFirstInComparisons"})
     public FileBasedIndex.InputFilter getInputFilter() {
         return file ->
                 file.getFileType() == XmlFileType.INSTANCE

@@ -10,10 +10,10 @@ import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.SourceModelData;
 
 public class SourceModelGeneratorTest extends BaseGeneratorTestCase {
-    private final static String MODULE_NAME = "Foo_Bar";
+    private static final String MODULE_NAME = "Foo_Bar";
 
     /**
-     * Test source model generation
+     * Test source model generation.
      */
     public void testGenerateFile() {
         final Project project = myFixture.getProject();
@@ -36,7 +36,7 @@ public class SourceModelGeneratorTest extends BaseGeneratorTestCase {
     }
 
     /**
-     * Test source model in custom directory generation
+     * Test source model in custom directory generation.
      */
     public void testGenerateFileInCustomDirectory() {
         final Project project = myFixture.getProject();

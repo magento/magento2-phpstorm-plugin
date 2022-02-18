@@ -14,6 +14,14 @@ public class CategoryFormXmlData {
     private final String attributeInput;
     private final int sortOrder;
 
+    /**
+     * Category Form data class.
+     *
+     * @param fieldSetName name of the fieldset
+     * @param fieldName field name
+     * @param attributeInput attribute input
+     * @param sortOrder sort order
+     */
     public CategoryFormXmlData(
             @NotNull final String fieldSetName,
             @NotNull final String fieldName,

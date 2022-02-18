@@ -12,10 +12,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class GetProductTypesListUtil
-{
+public final class GetProductTypesListUtil {
+
     private GetProductTypesListUtil() {}
 
+    /**
+     * Product types util.
+     *
+     * @param project Project
+     * @return List
+     */
     public static List<String> execute(final Project project) {
         final Collection<String> productTypesList =
                 FileBasedIndex.getInstance().getAllKeys(ProductTypeIndex.KEY, project);

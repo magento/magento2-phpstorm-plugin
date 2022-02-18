@@ -30,7 +30,8 @@ public class OptionsPanelVisibilityChangeListener implements ItemListener {
     public void itemStateChanged(final ItemEvent itemEvent) {
         final String selectedSource = itemEvent.getItem().toString();
 
-        final ComboBoxItemData selectedInputItem = (ComboBoxItemData) inputComboBox.getSelectedItem();
+        final ComboBoxItemData selectedInputItem =
+                (ComboBoxItemData) inputComboBox.getSelectedItem();
         final String selectedInput = selectedInputItem == null ? "" : selectedInputItem.toString();
 
         final boolean isAttributeWithoutSource =

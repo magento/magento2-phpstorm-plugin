@@ -19,6 +19,11 @@ public class AvailableSourcesByInput {
         this.input = input;
     }
 
+    /**
+     * Source items getter.
+     *
+     * @return List
+     */
     public List<ComboBoxItemData> getItems() {
         final List<ComboBoxItemData> items = new ArrayList<>();
         final ComboBoxItemData generateSourceItem = new ComboBoxItemData(

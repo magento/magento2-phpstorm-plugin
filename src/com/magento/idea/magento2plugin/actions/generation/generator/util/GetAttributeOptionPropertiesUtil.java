@@ -11,8 +11,8 @@ import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 
 public final class GetAttributeOptionPropertiesUtil {
-    public final static String OPTION_VALUE = "Value";
-    public final static String OPTION_SORT_ORDER = "Sort Order";
+    public static final String OPTION_VALUE = "Value";
+    public static final String OPTION_SORT_ORDER = "Sort Order";
 
     private GetAttributeOptionPropertiesUtil() {}
 

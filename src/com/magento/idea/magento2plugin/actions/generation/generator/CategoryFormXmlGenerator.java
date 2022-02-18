@@ -16,7 +16,10 @@ import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.magento.idea.magento2plugin.actions.generation.data.CategoryFormXmlData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.*;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplateUtil;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.XmlFilePositionUtil;
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
@@ -45,6 +48,13 @@ public class CategoryFormXmlGenerator extends FileGenerator {
     private final CommonBundle commonBundle;
     private boolean allowedFieldsetNodeInclude = true;
 
+    /**
+     * Category form XML Generator.
+     *
+     * @param categoryFormXmlData Category form data class
+     * @param project Project
+     * @param moduleName module name
+     */
     public CategoryFormXmlGenerator(
             final @NotNull CategoryFormXmlData categoryFormXmlData,
             final @NotNull Project project,
@@ -141,11 +151,11 @@ public class CategoryFormXmlGenerator extends FileGenerator {
                 new ModuleIndex(project).getModuleDirectoryByModuleName(moduleName);
 
         for (final String handlerDirectory: CategoryFormXmlFile.DIRECTORY.split(File.separator)) {
-             directory = directoryGenerator.findOrCreateSubdirectory(
-                     directory,
-                     handlerDirectory
-             );
-         }
+            directory = directoryGenerator.findOrCreateSubdirectory(
+                directory,
+                handlerDirectory
+            );
+        }
         return directory;
     }
 
@@ -190,9 +200,14 @@ public class CategoryFormXmlGenerator extends FileGenerator {
     }
 
     @Nullable
-    private XmlTag findMatchedFieldsetByName(final List<XmlTag> fieldsetList, final String fieldsetName) {
+    private XmlTag findMatchedFieldsetByName(
+            final List<XmlTag> fieldsetList,
+            final String fieldsetName
+    ) {
         for (final XmlTag fieldset: fieldsetList) {
-            final String attributeValue = fieldset.getAttributeValue(CategoryFormXmlFile.XML_ATTR_FIELDSET_NAME);
+            final String attributeValue = fieldset.getAttributeValue(
+                    CategoryFormXmlFile.XML_ATTR_FIELDSET_NAME
+            );
             if (attributeValue != null && attributeValue.equals(fieldsetName)) {
                 return fieldset;
             }

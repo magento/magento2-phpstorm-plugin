@@ -2,6 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
@@ -13,7 +14,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ProductAttributePropertySetupPatchGeneratorTest extends BaseGeneratorTestCase {
-    private final static String MODULE_NAME = "Foo_Bar";
+    private static final String MODULE_NAME = "Foo_Bar";
+    private static final String LABEL = "Test Label";
+    private static final String TYPE = "static";
+    private static final String SORT_ORDER = 10;
+    private static final String GROUP = "General";
+    private static final String FILE_PATH = "src/app/code/Foo/Bar/Setup/Patch/Data";
 
     /**
      * Test Data patch for product's eav attribute generator.
@@ -28,14 +34,14 @@ public class ProductAttributePropertySetupPatchGeneratorTest extends BaseGenerat
         productEntityData.setVisibleOnFront(false);
         productEntityData.setVisible(true);
         productEntityData.setScope(AttributeScope.GLOBAL.getScope());
-        productEntityData.setLabel("Test Label");
-        productEntityData.setType("static");
+        productEntityData.setLabel(LABEL);
+        productEntityData.setType(TYPE);
         productEntityData.setUsedInGrid(false);
         productEntityData.setRequired(false);
         productEntityData.setInput("text");
         productEntityData.setFilterableInGrid(false);
-        productEntityData.setSortOrder(10);
-        productEntityData.setGroup("General");
+        productEntityData.setSortOrder(SORT_ORDER);
+        productEntityData.setGroup(GROUP);
 
         productEntityData.setDataPatchName("AddTestAttribute");
         productEntityData.setModuleName(MODULE_NAME);
@@ -47,9 +53,12 @@ public class ProductAttributePropertySetupPatchGeneratorTest extends BaseGenerat
         final String filePatch = this.getFixturePath("AddTestAttribute.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePatch);
 
-        assertGeneratedFileIsCorrect(expectedFile, "src/app/code/Foo/Bar/Setup/Patch/Data", dataPatchFile);
+        assertGeneratedFileIsCorrect(expectedFile, FILE_PATH, dataPatchFile);
     }
 
+    /**
+     * Tests the generated file with the boolean source model.
+     */
     public void testGenerateFileWithBooleanSourceModel() {
         final Project project = myFixture.getProject();
 
@@ -60,29 +69,34 @@ public class ProductAttributePropertySetupPatchGeneratorTest extends BaseGenerat
         productEntityData.setVisibleOnFront(false);
         productEntityData.setVisible(true);
         productEntityData.setScope(AttributeScope.GLOBAL.getScope());
-        productEntityData.setLabel("Test Label");
-        productEntityData.setType("static");
+        productEntityData.setLabel(LABEL);
+        productEntityData.setType(TYPE);
         productEntityData.setUsedInGrid(false);
         productEntityData.setRequired(false);
         productEntityData.setInput("boolean");
         productEntityData.setSource(AttributeSourceModel.BOOLEAN.getSource());
         productEntityData.setFilterableInGrid(false);
-        productEntityData.setSortOrder(10);
-        productEntityData.setGroup("General");
+        productEntityData.setSortOrder(SORT_ORDER);
+        productEntityData.setGroup(GROUP);
 
         productEntityData.setDataPatchName("AddBooleanInputAttributeAttribute");
         productEntityData.setModuleName(MODULE_NAME);
 
         final EavAttributeSetupPatchGenerator setupPatchGenerator =
                 new EavAttributeSetupPatchGenerator(productEntityData, project);
-        final PsiFile dataPatchFile = setupPatchGenerator.generate("testGenerateFileWithBooleanSourceModel");
+        final PsiFile dataPatchFile = setupPatchGenerator.generate(
+                "testGenerateFileWithBooleanSourceModel"
+        );
 
         final String filePatch = this.getFixturePath("AddBooleanInputAttributeAttribute.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePatch);
 
-        assertGeneratedFileIsCorrect(expectedFile, "src/app/code/Foo/Bar/Setup/Patch/Data", dataPatchFile);
+        assertGeneratedFileIsCorrect(expectedFile, FILE_PATH, dataPatchFile);
     }
 
+    /**
+     * Tests the generated file with the source model.
+     */
     public void testGenerateFileWithGeneratedSourceModel() {
         final Project project = myFixture.getProject();
 
@@ -101,21 +115,26 @@ public class ProductAttributePropertySetupPatchGeneratorTest extends BaseGenerat
         productEntityData.setSource("\\Foo\\Bar\\Model\\Source\\AttributeWithCustomSource");
         productEntityData.setFilterableInGrid(false);
         productEntityData.setSortOrder(10);
-        productEntityData.setGroup("General");
+        productEntityData.setGroup(GROUP);
 
         productEntityData.setDataPatchName("AddAttributeWithCustomSourceAttribute");
         productEntityData.setModuleName(MODULE_NAME);
 
         final EavAttributeSetupPatchGenerator setupPatchGenerator =
                 new EavAttributeSetupPatchGenerator(productEntityData, project);
-        final PsiFile dataPatchFile = setupPatchGenerator.generate("testGenerateFileWithBooleanSourceModel");
+        final PsiFile dataPatchFile = setupPatchGenerator.generate(
+                "testGenerateFileWithBooleanSourceModel"
+        );
 
         final String filePatch = this.getFixturePath("AddAttributeWithCustomSourceAttribute.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePatch);
 
-        assertGeneratedFileIsCorrect(expectedFile, "src/app/code/Foo/Bar/Setup/Patch/Data", dataPatchFile);
+        assertGeneratedFileIsCorrect(expectedFile, FILE_PATH, dataPatchFile);
     }
 
+    /**
+     * Tests file with the `apply to` attribute.
+     */
     public void testGenerateFileWithApplyToAttribute() {
         final Project project = myFixture.getProject();
 
@@ -133,7 +152,7 @@ public class ProductAttributePropertySetupPatchGeneratorTest extends BaseGenerat
         productEntityData.setInput("text");
         productEntityData.setFilterableInGrid(false);
         productEntityData.setSortOrder(10);
-        productEntityData.setGroup("General");
+        productEntityData.setGroup(GROUP);
         productEntityData.setApplyTo("configurable,simple");
 
         productEntityData.setDataPatchName("AddAppliedToAttribute");
@@ -141,14 +160,19 @@ public class ProductAttributePropertySetupPatchGeneratorTest extends BaseGenerat
 
         final EavAttributeSetupPatchGenerator setupPatchGenerator =
                 new EavAttributeSetupPatchGenerator(productEntityData, project);
-        final PsiFile dataPatchFile = setupPatchGenerator.generate("testGenerateFileWithApplyToAttribute");
+        final PsiFile dataPatchFile = setupPatchGenerator.generate(
+                "testGenerateFileWithApplyToAttribute"
+        );
 
         final String filePatch = this.getFixturePath("AddAppliedToAttribute.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePatch);
 
-        assertGeneratedFileIsCorrect(expectedFile, "src/app/code/Foo/Bar/Setup/Patch/Data", dataPatchFile);
+        assertGeneratedFileIsCorrect(expectedFile, FILE_PATH, dataPatchFile);
     }
 
+    /**
+     * Tests file with options.
+     */
     public void testGenerateFileWithOptions() {
         final Project project = myFixture.getProject();
 
@@ -167,7 +191,7 @@ public class ProductAttributePropertySetupPatchGeneratorTest extends BaseGenerat
         productEntityData.setSource(AttributeSourceModel.NULLABLE_SOURCE.getSource());
         productEntityData.setFilterableInGrid(false);
         productEntityData.setSortOrder(10);
-        productEntityData.setGroup("General");
+        productEntityData.setGroup(GROUP);
 
         final Map<Integer, String> options = new HashMap<>();
         options.put(0, "option1");
@@ -186,6 +210,6 @@ public class ProductAttributePropertySetupPatchGeneratorTest extends BaseGenerat
         final String filePatch = this.getFixturePath("AddAttributeWithOptionsAttribute.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePatch);
 
-        assertGeneratedFileIsCorrect(expectedFile, "src/app/code/Foo/Bar/Setup/Patch/Data", dataPatchFile);
+        assertGeneratedFileIsCorrect(expectedFile, FILE_PATH, dataPatchFile);
     }
 }
