@@ -27,10 +27,12 @@ import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
+import com.magento.idea.magento2plugin.util.php.PhpTypeMetadataParserUtil;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -50,7 +52,7 @@ import org.jetbrains.annotations.NotNull;
 public class CreateAPluginDialog extends AbstractDialog {
     @NotNull
     private final Project project;
-    private final Method targetMethod;
+    private Method targetMethod;
     private final PhpClass targetClass;
     private JPanel contentPane;
     private JButton buttonOK;
@@ -63,12 +65,19 @@ public class CreateAPluginDialog extends AbstractDialog {
     private static final String SORT_ORDER = "sort order";
     private static final String PLUGIN_NAME = "plugin name";
     private static final String TARGET_MODULE = "target module";
+    private static final String TARGET_METHOD = "target method";
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, TARGET_MODULE})
     @FieldValidation(rule = RuleRegistry.BOX_NOT_EMPTY,
             message = {BoxNotEmptyRule.MESSAGE, TARGET_MODULE})
     private FilteredComboBox pluginModule;
+
+    @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
+            message = {NotEmptyRule.MESSAGE, TARGET_METHOD})
+    @FieldValidation(rule = RuleRegistry.BOX_NOT_EMPTY,
+            message = {BoxNotEmptyRule.MESSAGE, TARGET_METHOD})
+    private FilteredComboBox targetMethodSelect;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, CLASS_NAME})
@@ -99,6 +108,7 @@ public class CreateAPluginDialog extends AbstractDialog {
     private JLabel pluginNameLabel;//NOPMD
     private JLabel pluginClassNameLabel;//NOPMD
     private JLabel pluginSortOrderLabel;//NOPMD
+    private JLabel targetMethodLabel;
 
     /**
      * Constructor.
@@ -123,6 +133,10 @@ public class CreateAPluginDialog extends AbstractDialog {
         getRootPane().setDefaultButton(buttonOK);
         fillPluginTypeOptions();
         fillTargetAreaOptions();
+
+        if (targetMethod != null) {
+            this.targetMethodLabel.setVisible(false);
+        }
 
         buttonOK.addActionListener((final ActionEvent event) -> onOK());
         buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
@@ -157,6 +171,9 @@ public class CreateAPluginDialog extends AbstractDialog {
     }
 
     protected void onOK() {
+        if (targetMethod == null) {
+            targetMethod = getSelectedTargetMethod();
+        }
         if (validateFormFields()) {
             new PluginClassGenerator(new PluginFileData(
                     getPluginDirectory(),
@@ -210,6 +227,25 @@ public class CreateAPluginDialog extends AbstractDialog {
     }
 
     /**
+     * Searches and returns a selected target method.
+     *
+     * @return Method target method
+     */
+    public Method getSelectedTargetMethod() {
+        final String selectedMethodString = this.targetMethodSelect.getSelectedItem().toString();
+        final List<Method> publicMethods = PhpTypeMetadataParserUtil.getPublicMethods(
+                this.targetClass
+        );
+        for (final Method method: publicMethods) {
+            if (method.getName().equals(selectedMethodString)) {
+                return method;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Open an action dialog.
      *
      * @param project Project
@@ -236,6 +272,18 @@ public class CreateAPluginDialog extends AbstractDialog {
                 .getEditableModuleNames();
 
         this.pluginModule = new FilteredComboBox(allModulesList);
+
+        final List<Method> publicMethods
+                = PhpTypeMetadataParserUtil.getPublicMethods(this.targetClass);
+        final List<String> methodList = new ArrayList<>();
+        for (final Method method: publicMethods) {
+            methodList.add(method.getName());
+        }
+
+        this.targetMethodSelect = new FilteredComboBox(methodList);
+        if (targetMethod != null) {
+            this.targetMethodSelect.setVisible(false);
+        }
     }
 
     private String getNamespace() {

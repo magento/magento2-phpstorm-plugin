@@ -53,6 +53,8 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     private static final String MODULE_VERSION = "module version";
     private static final String MODULE_NAME = "module name";
     private static final String PACKAGE_NAME = "package name";
+    private static final String MAGENTO_BEFORE_DECLARATIVE_SCHEMA_VERSION = "2.2.11";
+    private static final String DEFAULT_MODULE_PREFIX = "module";
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, PACKAGE_NAME})
@@ -106,7 +108,6 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     private String detectedPackageName;
     private final ModuleIndex moduleIndex;
     private final CamelCaseToHyphen camelCaseToHyphen;
-    private static final String MAGENTO_BEFORE_DECLARATIVE_SCHEMA_VERSION = "2.2.11";
 
     /**
      * Constructor.
@@ -244,6 +245,11 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         return this.packageName.getText().trim();
     }
 
+    /**
+     * Getter for Module Name.
+     *
+     * @return String
+     */
     public String getModuleName() {
         return this.moduleName.getText().trim();
     }
@@ -331,6 +337,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     private String getComposerPackageName() {
         return camelCaseToHyphen.convert(getPackageName())
                 .concat("/")
+                .concat(DEFAULT_MODULE_PREFIX + "-")
                 .concat(camelCaseToHyphen.convert(getModuleName()));
     }
 

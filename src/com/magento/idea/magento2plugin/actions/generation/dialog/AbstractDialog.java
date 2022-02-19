@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.util.Pair;
+import com.magento.idea.magento2plugin.actions.generation.dialog.prompt.PlaceholderInitializerUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.reflection.ExtractComponentFromFieldUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.util.DialogFieldErrorUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.TypeFieldsRulesParser;
@@ -258,6 +259,12 @@ public abstract class AbstractDialog extends JDialog {
         }
 
         return getParentTabPaneForComponent(parent);
+    }
+
+    @Override
+    public void setVisible(final boolean status) {
+        new PlaceholderInitializerUtil(this).initialize();
+        super.setVisible(status);
     }
 
     /**

@@ -1,0 +1,7 @@
+#if(${INCLUDE_FIELDSET})
+<fieldset name="${FIELDSET_NAME}">
+#end
+<field name="${FIELD_NAME}" sortOrder="${SORT_ORDER}" formElement="${FORM_ELEMENT}"/>
+#if(${INCLUDE_FIELDSET})
+</fieldset>
+#end

@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class CreateAPluginAction extends DumbAwareAction {
 
-    public static final String ACTION_NAME = "Create a new Plugin for this method";
+    public static final String ACTION_NAME = "Create a new Plugin";
     public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Plugin";
     private final GetFirstClassOfFile getFirstClassOfFile;
     private Method targetMethod;
@@ -58,7 +58,6 @@ public class CreateAPluginAction extends DumbAwareAction {
                     || !(psiFile instanceof PhpFile)
                     || phpClass.isFinal()
                     || PhpClassImplementsNoninterceptableInterfaceUtil.execute(phpClass)
-                    || this.targetMethod == null
             ) {
                 this.setStatus(event, false);
                 return;
@@ -103,6 +102,7 @@ public class CreateAPluginAction extends DumbAwareAction {
         return Pair.create(psiFile, phpClass);
     }
 
+    @SuppressWarnings({"PMD.CyclomaticComplexity"})
     private void fetchTargetMethod(
             final @NotNull AnActionEvent event,
             final PsiFile psiFile,
@@ -125,6 +125,11 @@ public class CreateAPluginAction extends DumbAwareAction {
             this.targetMethod = (Method) element;
             return;
         }
+
+        if (element instanceof PhpClass) {
+            return;
+        }
+
         final PsiElement parent = element.getParent();
 
         if (parent instanceof Method && parent.getParent().equals(phpClass)

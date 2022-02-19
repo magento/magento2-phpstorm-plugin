@@ -23,11 +23,13 @@ import com.magento.idea.magento2plugin.stubs.indexes.mftf.ActionGroupIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.mftf.DataIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.mftf.PageIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.mftf.SectionIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.mftf.TestExtendsIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.mftf.TestNameIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.AclResourceIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.DeclarativeSchemaElementsIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.MenuIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.PhpClassNameIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.xml.ProductTypeIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.UIComponentIndex;
 
 @SuppressWarnings({"PMD.ClassNamingConventions", "PMD.UseUtilityClass"})
@@ -68,8 +70,11 @@ public class IndexManager {
             PageIndex.KEY,
             SectionIndex.KEY,
             TestNameIndex.KEY,
+            TestExtendsIndex.KEY,
             //graphql
-            GraphQlResolverIndex.KEY
+            GraphQlResolverIndex.KEY,
+            //product types
+            ProductTypeIndex.KEY
         };
 
         for (final ID<?, ?> id: indexIds) {

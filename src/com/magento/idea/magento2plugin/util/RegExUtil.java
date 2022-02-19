@@ -77,6 +77,9 @@ public class RegExUtil {
 
         public static final String TEST_CLASS_FQN =
                 "^(\\\\)?(\\w+\\\\){1}(\\w+\\\\){1}Test(\\\\\\w+)+$";
+
+        public static final String COMMA_SEPARATED_STRING =
+                "^[^\\s,]+(?:,\\s*[^\\s,]+)*$";
     }
 
     public static class PhpRegex {

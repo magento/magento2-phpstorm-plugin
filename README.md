@@ -8,7 +8,6 @@
 
 [![Version](http://phpstorm.espend.de/badge/8024/version)](https://plugins.jetbrains.com/plugin/8024)
 [![Downloads](http://phpstorm.espend.de/badge/8024/downloads)](https://plugins.jetbrains.com/plugin/8024)
-![merge-chance-badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fmerge-chance.info%2Fbadge%3Frepo%3Dmagento/magento2-phpstorm-plugin)
 [![Made With Love](https://img.shields.io/badge/Made%20With-Love-orange.svg)](https://magento.com)
 
 ## Installation
@@ -43,7 +42,7 @@
 
 1. Check out this repository
 1. Open a folder with the project in the IntelliJ Ultimate using the `open` action button.
-1. Make sure that you on the latest develop branch (e.g `4.2.3-develop`)
+1. Make sure that you on the latest develop branch (e.g `4.3.0-develop`)
 1. Right-click on the `build.gradle` file, choose "Import Gradle project" (if this is not exist look for "Build module '<root folder name>'") (you need to have Gradle plugin installed)
 1. Check if the right SDK version is used for the project.
    - Current Java version for the project is **java 11**, so you should additionally download **SDK 11** and choose it in the module settings: `Right click by the project root > Open Module Settings > Project Settings > Project > Project SDK`
@@ -59,6 +58,32 @@
    - **New feature proposal** - Know how to make a killer feature? Do not hesitate to submit your proposal.
 3) The issue will appear in the `Ready for Grooming` column of the [Community Backlog](https://github.com/magento/magento2-phpstorm-plugin/projects/2). Once it will be discussed and approved the issue will be ready for development.
 4) Refer to the [Contributing Guide](https://github.com/magento/magento2-phpstorm-plugin/blob/2.1.0-develop/.github/CONTRIBUTING.md) for more information on how to contribute.
+
+## How to create SandBox for development
+1. Create sandbox folder
+2. Copy to sandbox folder `composer.json` and `composer.lock`
+3. In sandbox folder create `app/code` and `vendor/magento`
+4. Copy any of the magento modules (as for example: `framework`, `module-catalog`, `module-checkout`, `module-customer`, `module-sales`) into the `vendor/magento` folder. It is better to add as few modules as possible to reduce reindexing time during application running
+5. (Nice to have) Open IDE and go to `Preferences > Editor > File and Code Templates > Includes tab` and add default headers for `PHP File Header` and `XML File Header`
+   
+**PHP File Header:**
+```php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+declare(strict_types=1);
+```
+
+**XML File Header:**
+```xml
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+```
 
 ### <img src="https://upload.wikimedia.org/wikipedia/commons/7/76/Slack_Icon.png" width="20"> Join the [#phpstorm-plugin](https://magentocommeng.slack.com/archives/C010C2LUCEA) Slack channel to get more involved
 
