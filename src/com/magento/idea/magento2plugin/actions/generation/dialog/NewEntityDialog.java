@@ -80,7 +80,6 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
@@ -204,10 +203,6 @@ public class NewEntityDialog extends AbstractDialog {
     @FieldValidation(rule = RuleRegistry.MENU_IDENTIFIER, message = {MenuIdentifierRule.MESSAGE})
     private JTextField menuIdentifier;
     private JLabel formNameLabel;
-    private JTextPane exampleIdentifier;
-    private JTextPane exampleAclId;
-    private JTextPane exampleFormName;
-    private JTextPane exampleGridName;
     private JPanel uiComponentsPanel;
     private JPanel formNamePanel;
     private JPanel gridNamePanel;
