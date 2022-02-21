@@ -96,7 +96,7 @@ public class NewModuleAction extends com.intellij.openapi.actionSystem.AnAction 
                 final boolean isCustomVendorDirValid =
                         MagentoBasePathUtil.isCustomVendorDirValid(sourceDirPath);
 
-                if (!isCustomCodeSourceDirValid && !isCustomVendorDirValid) {
+                if (!isCustomCodeSourceDirValid && !isCustomVendorDirValid) { //NOPMD
                     event.getPresentation().setVisible(false);
                     return;
                 }
