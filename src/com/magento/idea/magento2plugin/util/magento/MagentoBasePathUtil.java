@@ -51,7 +51,7 @@ public final class MagentoBasePathUtil {
     public static boolean isCustomVendorDirValid(final @NotNull String path) {
         final String[] pathParts = path.split(Package.V_FILE_SEPARATOR);
 
-        if (pathParts.length < 3) {
+        if (pathParts.length < 3) { //NOPMD
             return false;
         }
 
@@ -76,7 +76,7 @@ public final class MagentoBasePathUtil {
     public static boolean isCustomCodeSourceDirValid(final @NotNull String path) {
         final String[] pathParts = path.split(Package.V_FILE_SEPARATOR);
 
-        if (pathParts.length < 2) {
+        if (pathParts.length < 2) { //NOPMD
             return false;
         }
 

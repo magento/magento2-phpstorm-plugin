@@ -24,7 +24,6 @@ import com.magento.idea.magento2plugin.actions.generation.generator.ModuleXmlGen
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.ComposerJson;
 import com.magento.idea.magento2plugin.magento.packages.Licenses;
-import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
 import com.magento.idea.magento2plugin.util.magento.MagentoBasePathUtil;

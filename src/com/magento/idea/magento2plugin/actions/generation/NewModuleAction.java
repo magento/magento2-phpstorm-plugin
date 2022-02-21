@@ -91,9 +91,12 @@ public class NewModuleAction extends com.intellij.openapi.actionSystem.AnAction 
                     .execute((PsiDirectory) psiElement, project);
             if (moduleName == null) {
                 final String sourceDirPath = ((PsiDirectory) psiElement).getVirtualFile().getPath();
+                final boolean isCustomCodeSourceDirValid =
+                        MagentoBasePathUtil.isCustomCodeSourceDirValid(sourceDirPath);
+                final boolean isCustomVendorDirValid =
+                        MagentoBasePathUtil.isCustomVendorDirValid(sourceDirPath);
 
-                if (!MagentoBasePathUtil.isCustomCodeSourceDirValid(sourceDirPath)
-                        && !MagentoBasePathUtil.isCustomVendorDirValid(sourceDirPath)) {
+                if (!isCustomCodeSourceDirValid && !isCustomVendorDirValid) {
                     event.getPresentation().setVisible(false);
                     return;
                 }
