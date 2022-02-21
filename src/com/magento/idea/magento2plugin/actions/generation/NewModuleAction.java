@@ -19,6 +19,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.NewModuleDialog
 import com.magento.idea.magento2plugin.actions.generation.util.IsClickedDirectoryInsideProject;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+import com.magento.idea.magento2plugin.util.magento.MagentoBasePathUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class NewModuleAction extends com.intellij.openapi.actionSystem.AnAction {
@@ -89,6 +90,13 @@ public class NewModuleAction extends com.intellij.openapi.actionSystem.AnAction 
             final String moduleName = GetModuleNameByDirectoryUtil
                     .execute((PsiDirectory) psiElement, project);
             if (moduleName == null) {
+                final String sourceDirPath = ((PsiDirectory) psiElement).getVirtualFile().getPath();
+
+                if (!MagentoBasePathUtil.isCustomCodeSourceDirValid(sourceDirPath)
+                        && !MagentoBasePathUtil.isCustomVendorDirValid(sourceDirPath)) {
+                    event.getPresentation().setVisible(false);
+                    return;
+                }
                 event.getPresentation().setVisible(true);
                 return;
             }

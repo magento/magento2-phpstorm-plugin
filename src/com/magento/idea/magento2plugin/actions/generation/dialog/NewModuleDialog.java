@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog;//NOPMD
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.NewModuleAction;
@@ -26,6 +27,7 @@ import com.magento.idea.magento2plugin.magento.packages.Licenses;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
+import com.magento.idea.magento2plugin.util.magento.MagentoBasePathUtil;
 import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -163,8 +165,9 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     }
 
     private void detectPackageName(final @NotNull PsiDirectory initialBaseDir) {
-        final PsiDirectory parentDir = initialBaseDir.getParent();
-        if (parentDir != null && parentDir.toString().endsWith(Package.packagesRoot)) {
+        final VirtualFile initialBaseDirVf = initialBaseDir.getVirtualFile();
+
+        if (MagentoBasePathUtil.isCustomVendorDirValid(initialBaseDirVf.getPath())) {
             packageName.setVisible(false);
             packageNameLabel.setVisible(false);
             this.detectedPackageName = initialBaseDir.getName();
