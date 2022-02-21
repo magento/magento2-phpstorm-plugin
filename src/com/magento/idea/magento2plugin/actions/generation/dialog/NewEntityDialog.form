@@ -47,7 +47,7 @@
                   <text value=""/>
                 </properties>
                 <clientProperties>
-                  <promptText class="java.lang.String" value=" Example: EntityName"/>
+                  <promptText class="java.lang.String" value="EntityName"/>
                 </clientProperties>
               </component>
               <component id="5f234" class="javax.swing.JTextField" binding="dbTableName">
@@ -60,7 +60,7 @@
                   <text value=""/>
                 </properties>
                 <clientProperties>
-                  <promptText class="java.lang.String" value=" Example: entity_name"/>
+                  <promptText class="java.lang.String" value="entity_name"/>
                 </clientProperties>
               </component>
               <component id="6e23b" class="javax.swing.JLabel" binding="dbTableNameLabel">
@@ -81,7 +81,7 @@
                   <text value="entity_id"/>
                 </properties>
                 <clientProperties>
-                  <promptText class="java.lang.String" value=" Example: entity_id"/>
+                  <promptText class="java.lang.String" value="entity_id"/>
                 </clientProperties>
               </component>
               <component id="c37c7" class="javax.swing.JLabel" binding="entityIdColumnNameLabel">
@@ -204,7 +204,7 @@
                 </constraints>
                 <properties/>
                 <clientProperties>
-                  <promptText class="java.lang.String" value=" Example: entity_name"/>
+                  <promptText class="java.lang.String" value="entity_name"/>
                 </clientProperties>
               </component>
               <component id="fec21" class="javax.swing.JLabel" binding="routeLabel">
@@ -265,7 +265,7 @@
                       <text value=""/>
                     </properties>
                     <clientProperties>
-                      <promptText class="java.lang.String" value=" Example: entity_form"/>
+                      <promptText class="java.lang.String" value="entity_form"/>
                     </clientProperties>
                   </component>
                   <component id="24c0b" class="javax.swing.JLabel" binding="formNameErrorMessage">
@@ -295,7 +295,7 @@
                     </constraints>
                     <properties/>
                     <clientProperties>
-                      <promptText class="java.lang.String" value=" Example: entity_listing"/>
+                      <promptText class="java.lang.String" value="entity_listing"/>
                     </clientProperties>
                   </component>
                   <component id="774bf" class="javax.swing.JLabel" binding="gridNameErrorMessage">
@@ -448,7 +448,7 @@
                       <margin top="2" left="6" bottom="2" right="6"/>
                     </properties>
                     <clientProperties>
-                      <promptText class="java.lang.String" value=" Example: Vendor_Module::management"/>
+                      <promptText class="java.lang.String" value="Vendor_Module::management"/>
                     </clientProperties>
                   </component>
                   <component id="34ebf" class="javax.swing.JLabel" binding="aclErrorMessage">
@@ -549,7 +549,7 @@
                     </constraints>
                     <properties/>
                     <clientProperties>
-                      <promptText class="java.lang.String" value=" Example: Vendor_Module::management"/>
+                      <promptText class="java.lang.String" value="Vendor_Module::management"/>
                     </clientProperties>
                   </component>
                   <component id="2ecdc" class="javax.swing.JLabel" binding="menuIdentifierErrorMessage">
