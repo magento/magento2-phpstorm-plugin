@@ -20,6 +20,7 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.jetbrains.php.lang.psi.PhpFile;
+import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
 import com.magento.idea.magento2uct.execution.output.ReportBuilder;
 import com.magento.idea.magento2uct.execution.output.Summary;
 import com.magento.idea.magento2uct.execution.output.UctReportOutputUtil;
@@ -36,11 +37,14 @@ import com.magento.idea.magento2uct.util.inspection.FilterDescriptorResultsUtil;
 import com.magento.idea.magento2uct.util.inspection.SortDescriptorResultsUtil;
 import java.nio.file.Paths;
 import java.util.List;
+import com.intellij.openapi.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({"PMD.NPathComplexity", "PMD.ExcessiveImports", "PMD.CognitiveComplexity"})
 public class GenerateUctReportCommand {
+
+    private static final String DEFAULT_MAGENTO_EDITION_LABEL = "Magento Open Source";
 
     private final Project project;
     private final OutputWrapper output;
@@ -99,6 +103,13 @@ public class GenerateUctReportCommand {
         );
         final ReportBuilder reportBuilder = new ReportBuilder(project);
         final UctReportOutputUtil outputUtil = new UctReportOutputUtil(output);
+        final Pair<String, String> version = MagentoVersionUtil.getVersionData(
+                project,
+                project.getBasePath()
+        );
+        final String resolvedEdition = version.getSecond() == null
+                ? DEFAULT_MAGENTO_EDITION_LABEL
+                : version.getSecond();
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             ApplicationManager.getApplication().runReadAction(() -> {
@@ -154,7 +165,7 @@ public class GenerateUctReportCommand {
                 }
                 summary.trackProcessFinished();
                 summary.setProcessedModules(scanner.getModuleCount());
-                outputUtil.printSummary(summary);
+                outputUtil.printSummary(summary, resolvedEdition);
 
                 if (summary.getProcessedModules() == 0) {
                     process.destroyProcess();
