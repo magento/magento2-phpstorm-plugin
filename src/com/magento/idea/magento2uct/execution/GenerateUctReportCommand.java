@@ -13,6 +13,7 @@ import com.intellij.json.psi.JsonFile;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
@@ -37,7 +38,6 @@ import com.magento.idea.magento2uct.util.inspection.FilterDescriptorResultsUtil;
 import com.magento.idea.magento2uct.util.inspection.SortDescriptorResultsUtil;
 import java.nio.file.Paths;
 import java.util.List;
-import com.intellij.openapi.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
