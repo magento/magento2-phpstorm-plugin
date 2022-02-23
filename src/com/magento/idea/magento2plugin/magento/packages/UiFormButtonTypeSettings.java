@@ -18,10 +18,10 @@ public enum UiFormButtonTypeSettings {
     DELETE(
             "Delete",
             "delete",
-            "sprintf(\"deleteConfirm('%s', '%s')\", \n" +
-                    "__('Are you sure you want to delete this $varName?'),\n" +
-                    "$this->getUrl(\n'*/*/delete',\n['$varIdConst' => " +
-                    "$this->$varEntityIdAccessor]\n)\n)",
+            "sprintf(\"deleteConfirm('%s', '%s')\", \n"
+                    + "__('Are you sure you want to delete this $varName?'),\n"
+                    + "$this->getUrl(\n'*/*/delete',\n[$varIdConst => "
+                    + "$this->$varEntityIdAccessor]\n)\n)",
             "[]",
             20,
             "Delete entity button."),
