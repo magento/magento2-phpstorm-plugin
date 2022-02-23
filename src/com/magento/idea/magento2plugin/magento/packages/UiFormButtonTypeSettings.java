@@ -14,15 +14,28 @@ public enum UiFormButtonTypeSettings {
     SAVE("Save", "save primary", "''", "[\n"
             + "                'mage-init' => ['button' => ['event' => 'save']],\n"
             + "                'form-role' => 'save'\n"
-            + "            ]", 10, "Save entity button."),
-    DELETE("Delete", "delete", "'deleteConfirm(\\''\n"
-            + "            . __('Are you sure you want to delete this $varName?')\n"
-            + "            . '\\', \\'' . $this->getUrl(\n'*/*/delete',\n[$varIdConst => "
-            + "$this->$varEntityIdAccessor]\n) . '\\')'", "[]", 20, "Delete entity button."),
+            + "            ]", 30, "Save entity button."),
+    DELETE(
+            "Delete",
+            "delete",
+            "sprintf(\"deleteConfirm('%s', '%s')\", \n" +
+                    "__('Are you sure you want to delete this $varName?'),\n" +
+                    "$this->getUrl(\n'*/*/delete',\n['$varIdConst' => " +
+                    "$this->$varEntityIdAccessor]\n)\n)",
+            "[]",
+            20,
+            "Delete entity button."),
     BACK("Back To Grid", "back",
             "sprintf(\"location.href = '%s';\", $this->getUrl('*/*/'))",
-            "[]", 30, "Back to list button."),
-    CUSTOM("Custom Button", "custom", "''", "[]", 0, "Custom button.");
+            "[]", 10, "Back to list button."),
+    CUSTOM(
+            "Custom Button",
+            "custom",
+            "''",
+            "[]",
+            0,
+            "Custom button."
+    );
 
     private final String label;
     private final String classes;
