@@ -9,8 +9,10 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
+import java.io.File;
+import java.util.Arrays;
+import org.jetbrains.annotations.NotNull;
 
 public final class MagentoBasePathUtil {
 
@@ -37,5 +39,55 @@ public final class MagentoBasePathUtil {
                     Package.frameworkRootGit.split(File.separator)) != null;
         }
         return false;
+    }
+
+    /**
+     * Check if specified path belongs to the correct vendor name.
+     *
+     * @param path String
+     *
+     * @return boolean
+     */
+    public static boolean isCustomVendorDirValid(final @NotNull String path) {
+        final String[] pathParts = path.split(Package.V_FILE_SEPARATOR);
+
+        if (pathParts.length < 3) { //NOPMD
+            return false;
+        }
+
+        final String[] sourceCandidateParts = Arrays.copyOfRange(
+                pathParts,
+                pathParts.length - 3,
+                pathParts.length - 1
+        );
+
+        return Package.packagesRoot.equals(
+                String.join(Package.V_FILE_SEPARATOR, sourceCandidateParts)
+        );
+    }
+
+    /**
+     * Check if specified path belongs to the correct packages folder.
+     *
+     * @param path String
+     *
+     * @return boolean
+     */
+    public static boolean isCustomCodeSourceDirValid(final @NotNull String path) {
+        final String[] pathParts = path.split(Package.V_FILE_SEPARATOR);
+
+        if (pathParts.length < 2) { //NOPMD
+            return false;
+        }
+
+        final String[] sourceCandidateParts = Arrays.copyOfRange(
+                pathParts,
+                pathParts.length - 2,
+                pathParts.length
+        );
+
+        return Package.packagesRoot.equals(
+                String.join(Package.V_FILE_SEPARATOR, sourceCandidateParts)
+        );
     }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "test/module",
+  "name": "test/module-test",
   "version": "1.0.0-dev",
   "description": "test-description",
   "type": "magento2-module",
@@ -17,7 +17,7 @@
       "registration.php"
     ],
     "psr-4": {
-      "TestWithDependencies\\Module\\": ""
+      "TestWithDependencies\\Test\\": ""
     }
   }
 }

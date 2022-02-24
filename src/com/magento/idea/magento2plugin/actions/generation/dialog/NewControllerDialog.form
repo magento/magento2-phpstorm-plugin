@@ -75,7 +75,11 @@
             </constraints>
             <properties>
               <text value=""/>
+              <toolTipText value="Can consist of few directories, for an ex.: Product/Custom"/>
             </properties>
+            <clientProperties>
+              <promptText class="java.lang.String" value="Folder name for Action"/>
+            </clientProperties>
           </component>
           <component id="d25a" class="javax.swing.JLabel">
             <constraints>
@@ -109,7 +113,12 @@
                 <preferred-size width="150" height="-1"/>
               </grid>
             </constraints>
-            <properties/>
+            <properties>
+              <text value=""/>
+            </properties>
+            <clientProperties>
+              <promptText class="java.lang.String" value="Class name for Action"/>
+            </clientProperties>
           </component>
           <component id="77374" class="javax.swing.JLabel" binding="actionNameErrorMessage">
             <constraints>

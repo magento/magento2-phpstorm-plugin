@@ -264,6 +264,19 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
             )
         );
 
+        // <test name="A" extends="B" />
+        registrar.registerReferenceProvider(
+                XmlPatterns.xmlAttributeValue().withParent(XmlPatterns.xmlAttribute()
+                        .withName(MftfTest.NAME_ATTRIBUTE)
+                        .withParent(XmlPatterns.xmlTag().withName(MftfTest.TEST_TAG)
+                                .withParent(XmlPatterns.xmlTag().withName(MftfTest.ROOT_TAG))
+                        )
+                ),
+                new CompositeReferenceProvider(
+                        new TestExtendedByReferenceProvider()
+                )
+        );
+
         // <someXmlTag component="requireJsMappingKey" />
         registrar.registerReferenceProvider(
             XmlPatterns.xmlAttributeValue().withParent(

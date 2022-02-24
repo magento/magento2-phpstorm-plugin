@@ -49,6 +49,7 @@ public class RoutesXmlGenerator extends FileGenerator {
      * @return PsiFile
      */
     @Override
+    @SuppressWarnings("PMD.CognitiveComplexity")
     public PsiFile generate(final String actionName) {
         final XmlFile routesXml = (XmlFile) findOrCreateRoutesXml.execute(
                 actionName,
@@ -71,8 +72,8 @@ public class RoutesXmlGenerator extends FileGenerator {
                 routerTag.setAttribute(
                         "id",
                         routesXmlData.getArea().equals(Areas.frontend.toString())
-                            ? RoutesXml.routerIdStandart
-                            : RoutesXml.routerIdAdmin
+                            ? RoutesXml.ROUTER_ID_STANDARD
+                            : RoutesXml.ROUTER_ID_ADMIN
                 );
             }
             @NotNull final XmlTag[] buttonsTags = routerTag.findSubTags("route");

@@ -7,7 +7,7 @@
 <idea-plugin require-restart="true">
     <id>com.magento.idea.magento2plugin</id>
     <name>Magento PhpStorm</name>
-    <version>4.2.3</version>
+    <version>4.3.0</version>
     <vendor url="https://github.com/magento/magento2-phpstorm-plugin">Magento Inc.</vendor>
 
     <description><![CDATA[
@@ -54,6 +54,30 @@
                     text="Magento Around Plugin..."
                     description="Create Magento around plugin method."/>
             <add-to-group group-id="PhpGenerateGroup" anchor="last"/>
+        </group>
+
+        <group id="MagentoContextBasedActionsGroup" class="com.magento.idea.magento2plugin.actions.groups.ContextActionsGroup" text="Context Actions" popup="false" compact="true" searchable="true">
+            <separator/>
+            <!-- Context dependent actions -->
+            <action id="MagentoCreateAclFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewAclXmlAction"/>
+            <action id="MagentoCreateConfigFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewConfigXmlAction"/>
+            <action id="MagentoCreateCrontabFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewCrontabXmlAction"/>
+            <action id="MagentoCreateDiFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewDiXmlAction"/>
+            <action id="MagentoCreateEmailTemplatesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewEmailTemplatesXmlAction"/>
+            <action id="MagentoCreateExtensionAttributesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewExtensionAttributesXmlAction"/>
+            <action id="MagentoCreateFieldsetFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewFieldsetXmlAction"/>
+            <action id="MagentoCreateIndexerFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewIndexerXmlAction"/>
+            <action id="MagentoCreateMviewFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewMviewXmlAction"/>
+            <action id="MagentoCreatePageTypesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewPageTypesXmlAction"/>
+            <action id="MagentoCreateRoutesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewRoutesXmlAction"/>
+            <action id="MagentoCreateSectionsFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewSectionsXmlAction"/>
+            <action id="MagentoCreateSystemFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewSystemXmlAction"/>
+            <action id="MagentoCreateViewFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewViewXmlAction"/>
+            <action id="MagentoCreateWebapiFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewWebapiXmlAction"/>
+            <action id="MagentoCreateWidgetFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewWidgetXmlAction"/>
+            <!-- Context dependent actions -->
+            <separator/>
+            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml"/>
         </group>
 
         <!-- Module file generators -->
@@ -159,6 +183,7 @@
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.DataIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.PageIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.TestNameIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.TestExtendsIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.AclResourceIndex" />
@@ -553,6 +578,16 @@
         <internalFileTemplate name="Magento Entity Delete Controller Class"/>
         <internalFileTemplate name="Magento Web API XML"/>
         <internalFileTemplate name="Web API Interface"/>
+        <internalFileTemplate name="Magento Config XML"/>
+        <internalFileTemplate name="Magento Extension Attributes XML"/>
+        <internalFileTemplate name="Magento Widget XML"/>
+        <internalFileTemplate name="Magento Mview XML"/>
+        <internalFileTemplate name="Magento Indexer XML"/>
+        <internalFileTemplate name="Magento View XML"/>
+        <internalFileTemplate name="Magento Fieldset XML"/>
+        <internalFileTemplate name="Magento Sections XML"/>
+        <internalFileTemplate name="Magento Module Email Templates Xml"/>
+        <internalFileTemplate name="Magento Page Types XML"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 

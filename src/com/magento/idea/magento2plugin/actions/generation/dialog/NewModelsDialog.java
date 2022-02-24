@@ -8,6 +8,7 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.ui.DocumentAdapter;
+import com.magento.idea.magento2plugin.actions.generation.NewModelsAction;
 import com.magento.idea.magento2plugin.actions.generation.data.CollectionData;
 import com.magento.idea.magento2plugin.actions.generation.data.ModelData;
 import com.magento.idea.magento2plugin.actions.generation.data.ResourceModelData;
@@ -112,6 +113,7 @@ public class NewModelsDialog extends AbstractDialog {
 
         setContentPane(contentPane);
         setModal(true);
+        setTitle(NewModelsAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
         buttonOK.addActionListener(e -> onOK());
         buttonCancel.addActionListener(e -> onCancel());
