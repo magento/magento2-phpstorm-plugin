@@ -24,7 +24,7 @@ class SaveBlock extends GenericButton implements ButtonProviderInterface
                 'mage-init' => ['button' => ['event' => 'save']],
                 'form-role' => 'save'
             ],
-            10
+            30
         );
     }
 }
