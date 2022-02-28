@@ -18,6 +18,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierWithColonRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierWithForwardSlash;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.LayoutNameRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.Lowercase;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.MenuIdentifierRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
@@ -54,7 +55,8 @@ public enum RuleRegistry {
     CLI_COMMAND(CliCommandRule.class),
     NUMERIC(NumericRule.class),
     TABLE_NAME_LENGTH(TableNameLength.class),
-    MENU_IDENTIFIER(MenuIdentifierRule.class);
+    MENU_IDENTIFIER(MenuIdentifierRule.class),
+    LAYOUT_NAME(LayoutNameRule.class);
 
     private Class<?> rule;
 

@@ -75,6 +75,7 @@
             <action id="MagentoCreateViewFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewViewXmlAction"/>
             <action id="MagentoCreateWebapiFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewWebapiXmlAction"/>
             <action id="MagentoCreateWidgetFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewWidgetXmlAction"/>
+            <action id="MagentoCreateLayoutFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewLayoutXmlAction"/>
             <!-- Context dependent actions -->
             <separator/>
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml"/>
@@ -578,16 +579,6 @@
         <internalFileTemplate name="Magento Entity Delete Controller Class"/>
         <internalFileTemplate name="Magento Web API XML"/>
         <internalFileTemplate name="Web API Interface"/>
-        <internalFileTemplate name="Magento Config XML"/>
-        <internalFileTemplate name="Magento Extension Attributes XML"/>
-        <internalFileTemplate name="Magento Widget XML"/>
-        <internalFileTemplate name="Magento Mview XML"/>
-        <internalFileTemplate name="Magento Indexer XML"/>
-        <internalFileTemplate name="Magento View XML"/>
-        <internalFileTemplate name="Magento Fieldset XML"/>
-        <internalFileTemplate name="Magento Sections XML"/>
-        <internalFileTemplate name="Magento Module Email Templates Xml"/>
-        <internalFileTemplate name="Magento Page Types XML"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 

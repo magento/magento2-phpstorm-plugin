@@ -60,7 +60,11 @@ public final class FindOrCreateLayoutXml {
             parentDirectory = directoryGenerator
                     .findOrCreateSubdirectory(parentDirectory, fileDirectory);
         }
-        final LayoutXml layoutXml = new  LayoutXml(routeId, controllerName, controllerActionName);
+
+        LayoutXml layoutXml = new  LayoutXml(routeId, controllerName, controllerActionName);
+        if ("".equals(controllerName)) {
+            layoutXml = new  LayoutXml(routeId);
+        }
         PsiFile layoutXmlFile = FileBasedIndexUtil.findModuleViewFile(
                 layoutXml.getFileName(),
                 getArea(area),
