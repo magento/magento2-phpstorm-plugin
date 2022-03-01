@@ -76,7 +76,9 @@ class ${CLASS_NAME} extends ${EXTENDS}
     }
 
     /**
-     * @inheritDoc
+     * Returns Search result
+     *
+     * @return ${SEARCH_RESULT_FACTORY}
      */
     public function getSearchResult()
     {
@@ -119,7 +121,9 @@ class ${CLASS_NAME} extends ${EXTENDS}
     }
 #else
     /**
-     * @inheritDoc
+     * Get data.
+     *
+     * @return array
      */
     public function getData()
     {
