@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class TestCLICommandPHPClass extends Command
 {
     /**
-     * @inheritDoc
+     * Initialization of the command
      */
     protected function configure()
     {
