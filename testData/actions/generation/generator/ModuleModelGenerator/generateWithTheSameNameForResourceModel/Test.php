@@ -13,7 +13,9 @@ class Test extends AbstractModel
     protected $_eventPrefix = 'my_table_model';
 
     /**
-     * @inheritdoc
+     * Initialize resource
+     *
+     * @return void
      */
     protected function _construct()
     {

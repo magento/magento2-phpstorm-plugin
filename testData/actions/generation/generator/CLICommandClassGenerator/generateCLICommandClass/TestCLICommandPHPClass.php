@@ -1,6 +1,8 @@
 <?php
 
+
 namespace Foo\Bar\Console\Command;
+
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

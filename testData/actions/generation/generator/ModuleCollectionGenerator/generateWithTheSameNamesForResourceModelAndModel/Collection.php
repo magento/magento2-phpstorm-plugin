@@ -14,7 +14,7 @@ class Collection extends AbstractCollection
     protected $_eventPrefix = 'my_table_collection';
 
     /**
-     * @inheritdoc
+     * Initialize resource model
      */
     protected function _construct()
     {

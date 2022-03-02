@@ -74,7 +74,9 @@ class GridDataProvider extends DataProvider
     }
 
     /**
-     * @inheritDoc
+     * Returns Search result
+     *
+     * @return SearchResultFactory
      */
     public function getSearchResult()
     {
