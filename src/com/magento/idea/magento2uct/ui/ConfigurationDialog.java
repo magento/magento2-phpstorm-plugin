@@ -40,6 +40,7 @@ public class ConfigurationDialog extends AbstractDialog {
     private LabeledComponent<TextFieldWithBrowseButton> modulePath;
     private LabeledComponent<TextFieldWithBrowseButton> additionalPath;
     private JCheckBox ignoreCurrentVersion;
+    private JCheckBox hasAdditionalPath;
     private JComboBox<ComboBoxItemData> currentVersion;
     private JComboBox<ComboBoxItemData> targetVersion;
     private JComboBox<ComboBoxItemData> issueSeverityLevel;
@@ -54,7 +55,6 @@ public class ConfigurationDialog extends AbstractDialog {
     private JLabel modulePathError;//NOPMD
     private JLabel enableComment;//NOPMD
     private JLabel enableCommentPath;//NOPMD
-    private JCheckBox hasAdditionalPath;
     private JLabel additionalPathLabel;//NOPMD
     private JLabel additionalPathError;//NOPMD
 
@@ -103,6 +103,7 @@ public class ConfigurationDialog extends AbstractDialog {
         enableComment.setForeground(JBColor.blue);
         enableCommentPath.setForeground(JBColor.blue);
         setDefaultValues();
+        refreshAdditionalFields(hasAdditionalPath.isSelected());
     }
 
     /**
@@ -129,8 +130,9 @@ public class ConfigurationDialog extends AbstractDialog {
             modulePathError.setText("The `Path To Analyse` field is empty or invalid");
             return;
         }
-        if (additionalPath.getComponent().getText().isEmpty()
-                || !UctModulePathValidatorUtil.validate(additionalPath.getComponent().getText())) {
+        if (hasAdditionalPath.isSelected() && additionalPath.getComponent().getText().isEmpty()
+                || hasAdditionalPath.isSelected()
+                && !UctModulePathValidatorUtil.validate(additionalPath.getComponent().getText())) {
             additionalPathError.setText("The `Path To Analyse` field is empty or invalid");
             return;
         }
@@ -232,17 +234,11 @@ public class ConfigurationDialog extends AbstractDialog {
         ignoreCurrentVersion.setSelected(Objects.requireNonNullElse(shouldIgnore, false));
 
         final Boolean isShowAdditionalPath = settingsService.getHasAdditionalPath();
-        additionalPath.setEnabled(
+        hasAdditionalPath.setSelected(
                 Objects.requireNonNullElse(isShowAdditionalPath, false)
         );
 
-        if (settingsService.getAdditionalPath() == null) {
-            final String basePath = Settings.getMagentoPath(project);
-
-            if (basePath != null) {
-                additionalPath.getComponent().setText(basePath);
-            }
-        } else {
+        if (settingsService.getAdditionalPath() != null) {
             additionalPath.getComponent().setText(settingsService.getAdditionalPath());
         }
     }
@@ -307,5 +303,8 @@ public class ConfigurationDialog extends AbstractDialog {
 
     private void refreshAdditionalFields(final boolean isEnabled) {
         additionalPath.setEnabled(isEnabled);
+        additionalPath.setVisible(isEnabled);
+        additionalPathLabel.setVisible(isEnabled);
+        additionalPathError.setVisible(isEnabled);
     }
 }
