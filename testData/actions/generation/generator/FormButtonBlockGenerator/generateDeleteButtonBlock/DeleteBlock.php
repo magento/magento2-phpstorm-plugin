@@ -20,12 +20,13 @@ class DeleteBlock extends GenericButton implements ButtonProviderInterface
         return $this->wrapButtonSettings(
             'Delete',
             'delete',
-            'deleteConfirm(\''
-            . __('Are you sure you want to delete this book?')
-            . '\', \'' . $this->getUrl(
-                '*/*/delete',
-                [BookData::BOOK_ID => $this->getBookId()]
-            ) . '\')',
+            sprintf("deleteConfirm('%s', '%s')",
+                __('Are you sure you want to delete this book?'),
+                $this->getUrl(
+                    '*/*/delete',
+                    [BookData::BOOK_ID => $this->getBookId()]
+                )
+            ),
             [],
             20
         );

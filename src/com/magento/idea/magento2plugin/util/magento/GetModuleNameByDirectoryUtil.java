@@ -44,7 +44,11 @@ public final class GetModuleNameByDirectoryUtil {
             final String moduleNamePath =  matcher.group(0);
 
             if (!moduleNamePath.isEmpty()) {
-                return moduleNamePath.split("/")[5];
+                final String[] moduleNamePathParts = moduleNamePath.split("/");
+
+                if (moduleNamePathParts.length >= 6) { //NOPMD
+                    return moduleNamePath.split("/")[5];
+                }
             }
         }
 
