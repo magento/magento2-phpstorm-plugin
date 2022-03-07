@@ -27,13 +27,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Objects;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveImports"})
@@ -44,7 +38,9 @@ public class ConfigurationDialog extends AbstractDialog {
 
     private JCheckBox enable;
     private LabeledComponent<TextFieldWithBrowseButton> modulePath;
+    private LabeledComponent<TextFieldWithBrowseButton> additionalPath;
     private JCheckBox ignoreCurrentVersion;
+    private JCheckBox hasAdditionalPath;
     private JComboBox<ComboBoxItemData> currentVersion;
     private JComboBox<ComboBoxItemData> targetVersion;
     private JComboBox<ComboBoxItemData> issueSeverityLevel;
@@ -59,6 +55,8 @@ public class ConfigurationDialog extends AbstractDialog {
     private JLabel modulePathError;//NOPMD
     private JLabel enableComment;//NOPMD
     private JLabel enableCommentPath;//NOPMD
+    private JLabel additionalPathLabel;//NOPMD
+    private JLabel additionalPathError;//NOPMD
 
     /**
      * Configuration dialog.
@@ -76,6 +74,7 @@ public class ConfigurationDialog extends AbstractDialog {
         setTitle(ConfigureUctAction.ACTION_NAME);
         getRootPane().setDefaultButton(buttonOk);
 
+        hasAdditionalPath.addActionListener(event -> refreshAdditionalFields(hasAdditionalPath.isSelected()));
         buttonOk.addActionListener(event -> onOK());
         buttonCancel.addActionListener(event -> onCancel());
 
@@ -98,9 +97,13 @@ public class ConfigurationDialog extends AbstractDialog {
         modulePathError.setText("");
         modulePathError.setFont(UIUtil.getLabelFont(UIUtil.FontSize.SMALL));
         modulePathError.setForeground(new Color(252, 119, 83));
+        additionalPathError.setText("");
+        additionalPathError.setFont(UIUtil.getLabelFont(UIUtil.FontSize.SMALL));
+        additionalPathError.setForeground(new Color(252, 119, 83));
         enableComment.setForeground(JBColor.blue);
         enableCommentPath.setForeground(JBColor.blue);
         setDefaultValues();
+        refreshAdditionalFields(hasAdditionalPath.isSelected());
     }
 
     /**
@@ -120,10 +123,17 @@ public class ConfigurationDialog extends AbstractDialog {
      */
     private void onOK() {
         modulePathError.setText("");
+        additionalPathError.setText("");
 
         if (modulePath.getComponent().getText().isEmpty()
                 || !UctModulePathValidatorUtil.validate(modulePath.getComponent().getText())) {
             modulePathError.setText("The `Path To Analyse` field is empty or invalid");
+            return;
+        }
+        if (hasAdditionalPath.isSelected() && additionalPath.getComponent().getText().isEmpty()
+                || hasAdditionalPath.isSelected()
+                && !UctModulePathValidatorUtil.validate(additionalPath.getComponent().getText())) {
+            additionalPathError.setText("The `Path To Analyse` field is empty or invalid");
             return;
         }
         settingsService.setEnabled(enable.isSelected());
@@ -155,7 +165,8 @@ public class ConfigurationDialog extends AbstractDialog {
                 )
         );
         settingsService.setIgnoreCurrentVersion(ignoreCurrentVersion.isSelected());
-
+        settingsService.setHasAdditionalPath(hasAdditionalPath.isSelected());
+        settingsService.setAdditionalPath(additionalPath.getComponent().getText());
         exit();
     }
 
@@ -221,6 +232,15 @@ public class ConfigurationDialog extends AbstractDialog {
         }
         final Boolean shouldIgnore = settingsService.shouldIgnoreCurrentVersion();
         ignoreCurrentVersion.setSelected(Objects.requireNonNullElse(shouldIgnore, false));
+
+        final Boolean isShowAdditionalPath = settingsService.getHasAdditionalPath();
+        hasAdditionalPath.setSelected(
+                Objects.requireNonNullElse(isShowAdditionalPath, false)
+        );
+
+        if (settingsService.getAdditionalPath() != null) {
+            additionalPath.getComponent().setText(settingsService.getAdditionalPath());
+        }
     }
 
     /**
@@ -271,5 +291,20 @@ public class ConfigurationDialog extends AbstractDialog {
                         new FileChooserDescriptor(false, true, false, false, false, false)
                 )
         );
+
+        additionalPath = new LabeledComponent<>();
+        additionalPath.setComponent(new TextFieldWithBrowseButton());
+        additionalPath.getComponent().addBrowseFolderListener(
+                new TextBrowseFolderListener(
+                        new FileChooserDescriptor(false, true, false, false, false, false)
+                )
+        );
+    }
+
+    private void refreshAdditionalFields(final boolean isEnabled) {
+        additionalPath.setEnabled(isEnabled);
+        additionalPath.setVisible(isEnabled);
+        additionalPathLabel.setVisible(isEnabled);
+        additionalPathError.setVisible(isEnabled);
     }
 }
