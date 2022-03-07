@@ -15,8 +15,10 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.imageio.ImageIO;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,6 +29,8 @@ public class CopyMagentoPath extends CopyPathProvider {
     public static final String CSS_EXTENSION = "css";
     private final List<String> acceptedTypes
             = Arrays.asList(PHTML_EXTENSION, JS_EXTENSION, CSS_EXTENSION);
+    private static final List<String> SUPPORTED_IMAGE_EXTENSIONS
+            = new ArrayList<>(Arrays.asList(ImageIO.getReaderFormatNames()));
     public static final String SEPARATOR = "::";
     private int index;
 
@@ -44,6 +48,15 @@ public class CopyMagentoPath extends CopyPathProvider {
         "web/"
     };
 
+    /**
+     * Copy Magento Path actions for phtml, css, js, images extensions.
+     */
+    public CopyMagentoPath() {
+        super();
+
+        SUPPORTED_IMAGE_EXTENSIONS.add("svg");
+    }
+
     @Override
     public void update(@NotNull final AnActionEvent event) {
         final VirtualFile virtualFile = event.getData(PlatformDataKeys.VIRTUAL_FILE);
@@ -54,7 +67,8 @@ public class CopyMagentoPath extends CopyPathProvider {
 
     private boolean isNotValidFile(final VirtualFile virtualFile) {
         return virtualFile != null && virtualFile.isDirectory()
-                || virtualFile != null && !acceptedTypes.contains(virtualFile.getExtension());
+                || virtualFile != null && !acceptedTypes.contains(virtualFile.getExtension())
+                && !SUPPORTED_IMAGE_EXTENSIONS.contains(virtualFile.getExtension());
     }
 
     @Override
@@ -85,24 +99,23 @@ public class CopyMagentoPath extends CopyPathProvider {
         if (PHTML_EXTENSION.equals(virtualFile.getExtension())) {
             paths = templatePaths;
         } else if (JS_EXTENSION.equals(virtualFile.getExtension())
-                || CSS_EXTENSION.equals(virtualFile.getExtension())) {
+                || CSS_EXTENSION.equals(virtualFile.getExtension())
+                || SUPPORTED_IMAGE_EXTENSIONS.contains(virtualFile.getExtension())) {
             paths = webPaths;
         } else {
             return fullPath.toString();
         }
-        int endIndex;
 
         try {
-            endIndex = getIndexOf(paths, fullPath, paths[++index]);
+            final int endIndex = getIndexOf(paths, fullPath, paths[++index]);
+            final int offset = paths[index].length();
+
+            fullPath.replace(0, endIndex + offset, "");
+
+            return moduleName + SEPARATOR + fullPath;
         } catch (ArrayIndexOutOfBoundsException exception) {
-            // endIndex could not be found.
-            return "";
+            return fullPath.toString();
         }
-        final int offset = paths[index].length();
-
-        fullPath.replace(0, endIndex + offset, "");
-
-        return moduleName + SEPARATOR + fullPath;
     }
 
     /**
