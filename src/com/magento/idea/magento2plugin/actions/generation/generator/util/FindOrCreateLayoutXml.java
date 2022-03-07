@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Properties;
 
 public final class FindOrCreateLayoutXml {
+
     private final Project project;
 
     public FindOrCreateLayoutXml(final Project project) {
@@ -61,9 +62,10 @@ public final class FindOrCreateLayoutXml {
                     .findOrCreateSubdirectory(parentDirectory, fileDirectory);
         }
 
-        LayoutXml layoutXml = new  LayoutXml(routeId, controllerName, controllerActionName);
-        if ("".equals(controllerName)) {
-            layoutXml = new  LayoutXml(routeId);
+        LayoutXml layoutXml = new LayoutXml(routeId, controllerName, controllerActionName);
+
+        if (controllerName.isEmpty()) {
+            layoutXml = new LayoutXml(routeId);
         }
         PsiFile layoutXmlFile = FileBasedIndexUtil.findModuleViewFile(
                 layoutXml.getFileName(),
