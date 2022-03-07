@@ -21,10 +21,6 @@ import com.magento.idea.magento2plugin.actions.generation.generator.FileGenerato
 import com.magento.idea.magento2plugin.actions.generation.generator.code.util.DiXmlTagManipulatorUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplateUtil;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.XmlFilePositionUtil;
-import com.magento.idea.magento2plugin.bundles.CommonBundle;
-import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
@@ -43,8 +39,6 @@ public final class ArgumentInjectionGenerator extends FileGenerator {
     private final ModuleDiXml file;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
-    private final CommonBundle commonBundle;
-    private final ValidatorBundle validatorBundle;
     private String generationErrorMessage;
 
     /**
@@ -62,8 +56,6 @@ public final class ArgumentInjectionGenerator extends FileGenerator {
         file = new ModuleDiXml();
         directoryGenerator = DirectoryGenerator.getInstance();
         fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
-        commonBundle = new CommonBundle();
-        validatorBundle = new ValidatorBundle();
     }
 
     /**
@@ -128,7 +120,7 @@ public final class ArgumentInjectionGenerator extends FileGenerator {
                     data.getValueType(),
                     data.getValue()
             );
-        } catch (Exception exception) {
+        } catch (Exception exception) { // NOPMD
             generationErrorMessage = exception.getMessage();
         }
         final PsiFile diXmlFileToReformat = diXmlFile;
@@ -183,7 +175,7 @@ public final class ArgumentInjectionGenerator extends FileGenerator {
         );
 
         if (diXmlFile == null) {
-            PsiDirectory diXmlFileDir = null;
+            PsiDirectory diXmlFileDir;
 
             if (data.getArea().equals(Areas.base)) {
                 diXmlFileDir = directoryGenerator.findOrCreateSubdirectory(

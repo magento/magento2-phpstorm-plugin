@@ -8,7 +8,6 @@ package com.magento.idea.magento2plugin.actions.generation;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDirectory;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -36,6 +35,7 @@ public class InjectConstructorArgumentAction extends AnAction {
     }
 
     @Override
+    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
     public void update(final @NotNull AnActionEvent event) {
         setIsAvailableForEvent(event, false);
         final Project project = event.getProject();
@@ -69,7 +69,7 @@ public class InjectConstructorArgumentAction extends AnAction {
         }
 
         if (!method.getAccess().isPublic()
-                || !method.getName().equals(MagentoPhpClass.CONSTRUCT_METHOD_NAME)) {
+                || !MagentoPhpClass.CONSTRUCT_METHOD_NAME.equals(method.getName())) {
             return;
         }
         currentPhpClass = phpClass;
@@ -79,19 +79,14 @@ public class InjectConstructorArgumentAction extends AnAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent event) {
-        final PsiDirectory directory =
-                currentPhpClass.getContainingFile().getContainingDirectory();
-
         if (event.getProject() == null
                 || currentPhpClass == null
-                || directory == null
                 || currentParameter == null) {
             return;
         }
 
         NewArgumentInjectionDialog.open(
                 event.getProject(),
-                directory,
                 currentPhpClass,
                 currentParameter
         );

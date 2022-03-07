@@ -58,7 +58,7 @@ public class DiArrayValueData {
                 if (left.length > 0) {
                     final DiArrayValueData childrenHolder = item.getChildren();
 
-                    if (childrenHolder == null) {
+                    if (childrenHolder == null) { // NOPMD
                         break;
                     }
                     target = childrenHolder.getItemByPath(String.join(":", left));
@@ -108,12 +108,12 @@ public class DiArrayValueData {
         return stringBuilder.toString();
     }
 
+    @SuppressWarnings({"PMD.CognitiveComplexity", "PMD.CyclomaticComplexity"})
     private String buildArrayTree(final DiArrayValueData data, final int indentSize) {
         final StringBuilder stringBuilder = new StringBuilder();
-
-        stringBuilder.append(indent(0));
-        stringBuilder.append("[");
-        stringBuilder.append("\n");
+        stringBuilder
+                .append(indent(0))
+                .append("[\n");
         int currentItem = 0;
         final int itemsCount = data.getItems().size();
 
@@ -122,7 +122,7 @@ public class DiArrayValueData {
             String value = item.getValue();
 
             if (item.getType().equals(DiArgumentType.STRING)) {
-                value = "'" + value + "'";
+                value = "'" + value + "'";// NOPMD
             } else if (item.getType().equals(DiArgumentType.ARRAY) && item.hasChildren()) {
                 value = buildArrayTree(item.getChildren(), indentSize + 1);
             } else if (item.getType().equals(DiArgumentType.ARRAY) && !item.hasChildren()) {
@@ -134,18 +134,20 @@ public class DiArrayValueData {
             }
 
             stringBuilder
-                    .append("'" + item.getName() + "'")
-                    .append(" => ")
+                    .append('\'')
+                    .append(item.getName())
+                    .append("' => ")
                     .append(value);
 
             if (currentItem != itemsCount - 1) {
-                stringBuilder.append(",");
+                stringBuilder.append(',');
             }
-            stringBuilder.append("\n");
+            stringBuilder.append('\n');
             currentItem++;
         }
-        stringBuilder.append(indent(indentSize));
-        stringBuilder.append("]");
+        stringBuilder
+                .append(indent(indentSize))
+                .append(']');
 
         return stringBuilder.toString();
     }

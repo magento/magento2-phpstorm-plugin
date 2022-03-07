@@ -11,7 +11,6 @@ import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.fileTypes.FileTypes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
-import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.EditorTextField;
 import com.jetbrains.php.PhpIndex;
@@ -34,7 +33,6 @@ import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.DiArgumentType;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
-import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -54,6 +52,12 @@ import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings({
+        "PMD.TooManyFields",
+        "PMD.UnusedPrivateField",
+        "PMD.ExcessiveImports",
+        "PMD.AvoidInstantiatingObjectsInLoops"
+})
 public class NewArgumentInjectionDialog extends AbstractDialog {
 
     private static final String TARGET_AREA = "Target Area";
@@ -64,9 +68,7 @@ public class NewArgumentInjectionDialog extends AbstractDialog {
     private static final String CONST_VALUE = "Target Constant";
 
     private final @NotNull Project project;
-    private final String moduleName;
     private final PhpClass targetClass;
-    private final Parameter targetParameter;
 
     private JPanel contentPane;
     private JButton buttonCancel;
@@ -130,7 +132,7 @@ public class NewArgumentInjectionDialog extends AbstractDialog {
     private JButton addArrayValueBtn;
     private JTextArea arrayView;
 
-    final DiArrayValueData arrayValues;
+    private final DiArrayValueData arrayValues;
 
     // labels
     private JLabel argumentTypeLabel;//NOPMD
@@ -152,13 +154,17 @@ public class NewArgumentInjectionDialog extends AbstractDialog {
      * New argument injection dialog constructor.
      *
      * @param project Project
-     * @param directory PsiDirectory
      * @param targetClass PhpClass
      * @param parameter Parameter
      */
+    @SuppressWarnings({
+            "PMD.AccessorMethodGeneration",
+            "PMD.ExcessiveMethodLength",
+            "PMD.CognitiveComplexity",
+            "PMD.CyclomaticComplexity",
+    })
     public NewArgumentInjectionDialog(
             final @NotNull Project project,
-            final @NotNull PsiDirectory directory,
             final @NotNull PhpClass targetClass,
             final @NotNull Parameter parameter
     ) {
@@ -166,8 +172,6 @@ public class NewArgumentInjectionDialog extends AbstractDialog {
 
         this.project = project;
         this.targetClass = targetClass;
-        this.targetParameter = parameter;
-        this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
         arrayValues = new DiArrayValueData();
 
         setContentPane(contentPane);
@@ -197,7 +201,7 @@ public class NewArgumentInjectionDialog extends AbstractDialog {
         addComponentListener(new FocusOnAFieldListener(() -> targetModule.requestFocusInWindow()));
 
         targetClassField.setText(targetClass.getPresentableFQN());
-        targetArgument.setText(targetParameter.getName());
+        targetArgument.setText(parameter.getName());
 
         // make all value panes invisible
         objectValuePane.setVisible(false);
@@ -335,18 +339,16 @@ public class NewArgumentInjectionDialog extends AbstractDialog {
      * Open a new argument injection dialog.
      *
      * @param project Project
-     * @param directory PsiDirectory
      * @param targetClass PhpClass
      * @param parameter Parameter
      */
     public static void open(
             final @NotNull Project project,
-            final @NotNull PsiDirectory directory,
             final @NotNull PhpClass targetClass,
             final @NotNull Parameter parameter
     ) {
         final NewArgumentInjectionDialog dialog =
-                new NewArgumentInjectionDialog(project, directory, targetClass, parameter);
+                new NewArgumentInjectionDialog(project, targetClass, parameter);
         dialog.pack();
         dialog.centerDialog(dialog);
         dialog.setVisible(true);
@@ -397,7 +399,7 @@ public class NewArgumentInjectionDialog extends AbstractDialog {
     /**
      * Create custom components and fill their entries.
      */
-    @SuppressWarnings({"PMD.UnusedPrivateMethod", "PMD.AvoidInstantiatingObjectsInLoops"})
+    @SuppressWarnings({"PMD.UnusedPrivateMethod"})
     private void createUIComponents() {
         targetModule = new FilteredComboBox(new ModuleIndex(project).getEditableModuleNames());
         targetArea = new ComboBox<>();
@@ -425,9 +427,10 @@ public class NewArgumentInjectionDialog extends AbstractDialog {
         booleanValue.addItem(new ComboBoxItemData("", " --- Select Value --- "));
         booleanValue.addItem(new ComboBoxItemData("false", "False"));
         booleanValue.addItem(new ComboBoxItemData("true", "True"));
+        final String selectConstantText = " --- Select Constant --- ";
 
-        initParameterConstValue.addItem(new ComboBoxItemData("", " --- Select Constant --- "));
-        constantValue.addItem(new ComboBoxItemData("", " --- Select Constant --- "));
+        initParameterConstValue.addItem(new ComboBoxItemData("", selectConstantText));
+        constantValue.addItem(new ComboBoxItemData("", selectConstantText));
 
         initParameterTypeValue = new EditorTextField("", project, FileTypes.PLAIN_TEXT);
         constantTypeValue = new EditorTextField("", project, FileTypes.PLAIN_TEXT);
@@ -479,7 +482,7 @@ public class NewArgumentInjectionDialog extends AbstractDialog {
         final Collection<PhpClass> classes = phpIndex.getClassesByFQN(fqn);
         PhpClass clazz = null;
 
-        if (!interfaces.isEmpty()) {
+        if (!interfaces.isEmpty()) { // NOPMD
             clazz = interfaces.iterator().next();
         } else if (!classes.isEmpty()) {
             clazz = classes.iterator().next();
@@ -509,7 +512,7 @@ public class NewArgumentInjectionDialog extends AbstractDialog {
         subArrayKey.addItem(new ComboBoxItemData("", " --- Top Array --- "));
         populateSubArrayKeyCombobox(arrayValues, "");
 
-        if (subArrayKey.getItemCount() > 1) {
+        if (subArrayKey.getItemCount() > 1) { // NOPMD
             subArrayKeyLabel.setVisible(true);
             subArrayKey.setVisible(true);
         }
@@ -564,6 +567,7 @@ public class NewArgumentInjectionDialog extends AbstractDialog {
         }
     }
 
+    @SuppressWarnings({"PMD.CognitiveComplexity", "PMD.CyclomaticComplexity"})
     private @NotNull String getArgumentValue() {
         final ComboBoxItemData item = (ComboBoxItemData) argumentType.getSelectedItem();
 

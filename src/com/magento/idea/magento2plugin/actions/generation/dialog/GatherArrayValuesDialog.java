@@ -9,7 +9,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.util.ui.UIUtil;
 import com.magento.idea.magento2plugin.actions.generation.InjectConstructorArgumentAction;
-
+import com.magento.idea.magento2plugin.actions.generation.data.xml.DiArrayValueData;
+import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
+import com.magento.idea.magento2plugin.magento.packages.DiArgumentType;
+import com.magento.idea.magento2plugin.ui.table.TableGroupWrapper;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -28,12 +31,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
-
-import com.magento.idea.magento2plugin.actions.generation.data.xml.DiArrayValueData;
-import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
-import com.magento.idea.magento2plugin.magento.packages.DiArgumentType;
-import com.magento.idea.magento2plugin.magento.packages.PropertiesTypes;
-import com.magento.idea.magento2plugin.ui.table.TableGroupWrapper;
 import org.jetbrains.annotations.NotNull;
 
 public class GatherArrayValuesDialog extends AbstractDialog {
@@ -42,16 +39,14 @@ public class GatherArrayValuesDialog extends AbstractDialog {
     private static final String ITEM_TYPE = "Type";
     private static final String ITEM_VALUE = "Value";
 
-    private final @NotNull Project project;
-    private DiArrayValueData arrayValueData;
-
-    private TableGroupWrapper tableGroupWrapper;
+    private final @NotNull Project project;// NOPMD
+    private final DiArrayValueData arrayValueData;
 
     private JPanel contentPane;
     private JButton buttonCancel;
     private JButton buttonOK;
-    private JPanel itemsPane;
-    private JScrollPane itemsScrollPane;
+    private JPanel itemsPane;// NOPMD
+    private JScrollPane itemsScrollPane;// NOPMD
     private JTable itemsTable;
     private JButton buttonAdd;
     private JLabel itemsTableErrorMessage;
@@ -151,7 +146,7 @@ public class GatherArrayValuesDialog extends AbstractDialog {
         final Map<String, List<String>> sources = new HashMap<>();
         sources.put(ITEM_TYPE, DiArgumentType.getValueList());
 
-        tableGroupWrapper = new TableGroupWrapper(
+        final TableGroupWrapper tableGroupWrapper = new TableGroupWrapper(
                 itemsTable,
                 buttonAdd,
                 columns,
@@ -168,8 +163,6 @@ public class GatherArrayValuesDialog extends AbstractDialog {
         final List<String> itemsNames = new ArrayList<>();
 
         for (final DiArrayValueData.DiArrayItemData item : items) {
-            final DiArgumentType type = item.getType();
-            final String value = item.getValue().trim();
             final String name = item.getName().trim();
 
             if (name.isEmpty()) {
@@ -179,6 +172,8 @@ public class GatherArrayValuesDialog extends AbstractDialog {
                 );
             }
             itemsNames.add(name);
+            final DiArgumentType type = item.getType();
+            final String value = item.getValue().trim();
 
             final boolean isValid = type.isValid(value);
 
@@ -206,13 +201,14 @@ public class GatherArrayValuesDialog extends AbstractDialog {
         return new Pair<>(Boolean.TRUE, "");
     }
 
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     private List<DiArrayValueData.DiArrayItemData> extractItems(
             final DefaultTableModel tableModel
     ) {
         final List<DiArrayValueData.DiArrayItemData> items = new ArrayList<>();
 
         for (int rowNumber = 0; rowNumber < tableModel.getRowCount(); rowNumber++) {
-            DiArrayValueData.DiArrayItemData item = new DiArrayValueData.DiArrayItemData(
+            final DiArrayValueData.DiArrayItemData item = new DiArrayValueData.DiArrayItemData(
                     tableModel.getValueAt(rowNumber, 0).toString(),
                     DiArgumentType.getByValue(tableModel.getValueAt(rowNumber, 1).toString()),
                     tableModel.getValueAt(rowNumber, 2).toString().trim()

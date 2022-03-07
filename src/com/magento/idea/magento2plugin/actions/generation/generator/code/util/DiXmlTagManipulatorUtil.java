@@ -7,18 +7,9 @@ package com.magento.idea.magento2plugin.actions.generation.generator.code.util;
 
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.XmlElementFactory;
-import com.intellij.psi.impl.source.xml.XmlTagImpl;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
-import com.intellij.psi.xml.XmlTagChild;
-import com.intellij.psi.xml.XmlTagValue;
-import com.intellij.util.xml.DomElement;
-import com.intellij.xml.util.XmlPsiUtil;
-import com.intellij.xml.util.XmlStringUtil;
-import com.intellij.xml.util.XmlTagUtil;
-import com.intellij.xml.util.XmlUtil;
-import com.magento.idea.magento2plugin.actions.generation.data.xml.DiArrayValueData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.CommitXmlFileUtil;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.magento.packages.DiArgumentType;
@@ -26,11 +17,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 
 public final class DiXmlTagManipulatorUtil {
+
+    private DiXmlTagManipulatorUtil() {}
 
     /**
      * Insert new tag.
@@ -82,6 +73,7 @@ public final class DiXmlTagManipulatorUtil {
      * @param type DiArgumentType
      * @param value String
      */
+    @SuppressWarnings("PMD.CognitiveComplexity")
     public static void insertArgumentInTypeTag(
             final @NotNull XmlTag typeTag,
             final @NotNull String name,
