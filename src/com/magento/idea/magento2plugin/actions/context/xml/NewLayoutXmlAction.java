@@ -5,7 +5,6 @@
 
 package com.magento.idea.magento2plugin.actions.context.xml;
 
-import com.intellij.ide.fileTemplates.actions.AttributesDefaults;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -13,7 +12,6 @@ import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewLayoutTemplateDialog;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
@@ -105,14 +103,5 @@ public class NewLayoutXmlAction extends AnAction {
     ) {
         event.getPresentation().setVisible(isAvailable);
         event.getPresentation().setEnabled(isAvailable);
-    }
-
-    protected AttributesDefaults getProperties(
-            final @NotNull AttributesDefaults defaults,
-            final @NotNull GetMagentoModuleUtil.MagentoModuleData moduleData,
-            final PsiDirectory targetDirectory,
-            final PsiFile targetFile
-    ) {
-        return null;
     }
 }
