@@ -18,6 +18,7 @@ import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
 public class LayoutXmlTemplateGenerator extends FileGenerator {
+
     private final LayoutXmlData layoutXmlData;
     private final Project project;
     private final FindOrCreateLayoutXml findOrCreateLayoutXml;
@@ -42,10 +43,11 @@ public class LayoutXmlTemplateGenerator extends FileGenerator {
      * Creates a module layout file.
      *
      * @param actionName String
+     *
      * @return PsiFile
      */
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile generate(final @NotNull String actionName) {
         final XmlFile layoutXml = (XmlFile) findOrCreateLayoutXml.execute(
                 actionName,
                 layoutXmlData.getRoute(),
@@ -54,17 +56,26 @@ public class LayoutXmlTemplateGenerator extends FileGenerator {
                 layoutXmlData.getModuleName(),
                 layoutXmlData.getArea()
         );
+
+        if (layoutXml == null) {
+            return null;
+        }
         final PsiDocumentManager psiDocumentManager =
                 PsiDocumentManager.getInstance(project);
         final Document document = psiDocumentManager.getDocument(layoutXml);
+
+        if (document == null) {
+            return null;
+        }
         WriteCommandAction.runWriteCommandAction(project, () -> {
             final XmlTag rootTag = layoutXml.getRootTag();
+
             if (rootTag == null) {
                 return;
             }
-
             psiDocumentManager.commitDocument(document);
         });
+
         return layoutXml;
     }
 
