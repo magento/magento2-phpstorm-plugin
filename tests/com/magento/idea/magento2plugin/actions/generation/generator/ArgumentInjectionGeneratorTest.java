@@ -15,6 +15,7 @@ import com.magento.idea.magento2plugin.magento.packages.DiArgumentType;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("PMD.TooManyMethods")
 public class ArgumentInjectionGeneratorTest extends BaseGeneratorTestCase {
 
     private static final String EXPECTED_DIRECTORY = "src/app/code/Foo/Bar/etc/frontend";
