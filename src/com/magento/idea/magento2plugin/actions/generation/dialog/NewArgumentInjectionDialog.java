@@ -15,6 +15,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.ui.EditorTextField;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.completion.PhpCompletionUtil;
+import com.jetbrains.php.lang.PhpLangUtil;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -33,11 +34,13 @@ import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.DiArgumentType;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
+import com.magento.idea.magento2plugin.util.php.PhpTypeMetadataParserUtil;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import javax.swing.JButton;
@@ -69,6 +72,7 @@ public class NewArgumentInjectionDialog extends AbstractDialog {
 
     private final @NotNull Project project;
     private final PhpClass targetClass;
+    private final Parameter targetParameter;
 
     private JPanel contentPane;
     private JButton buttonCancel;
@@ -172,6 +176,7 @@ public class NewArgumentInjectionDialog extends AbstractDialog {
 
         this.project = project;
         this.targetClass = targetClass;
+        targetParameter = parameter;
         arrayValues = new DiArrayValueData();
 
         setContentPane(contentPane);
@@ -333,6 +338,7 @@ public class NewArgumentInjectionDialog extends AbstractDialog {
                 }
             }
         });
+        guessTargetType();
     }
 
     /**
@@ -616,6 +622,39 @@ public class NewArgumentInjectionDialog extends AbstractDialog {
         }
 
         return "";
+    }
+
+    @SuppressWarnings("PMD.CyclomaticComplexity")
+    private void guessTargetType() {
+        final String mainType = PhpTypeMetadataParserUtil.getMainType(targetParameter);
+
+        if (mainType == null) {
+            return;
+        }
+        String targetDiType = "";
+
+        if (Arrays.asList("int", "float").contains(mainType)) {
+            targetDiType = DiArgumentType.NUMBER.getArgumentType();
+        } else if (DiArgumentType.STRING.getArgumentType().equals(mainType)) {
+            targetDiType = DiArgumentType.STRING.getArgumentType();
+        } else if ("bool".equals(mainType)) {
+            targetDiType = DiArgumentType.BOOLEAN.getArgumentType();
+        } else if (PhpLangUtil.isFqn(mainType)) {
+            targetDiType = DiArgumentType.OBJECT.getArgumentType();
+        } else if ("array".equals(mainType)) {
+            targetDiType = DiArgumentType.ARRAY.getArgumentType();
+        }
+
+        if (targetDiType.isEmpty()) {
+            return;
+        }
+
+        for (int i = 0; i < argumentType.getItemCount(); i++) {
+            if (targetDiType.equals(argumentType.getItemAt(i).getKey())) {
+                argumentType.setSelectedIndex(i);
+                break;
+            }
+        }
     }
 
     private DiArgumentData getDialogDataObject() {
