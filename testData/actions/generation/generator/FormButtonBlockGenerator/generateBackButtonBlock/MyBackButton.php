@@ -21,7 +21,7 @@ class MyBackButton extends GenericButton implements ButtonProviderInterface
             'back',
             sprintf("location.href = '%s';", $this->getUrl('*/*/')),
             [],
-            30
+            10
         );
     }
 }
