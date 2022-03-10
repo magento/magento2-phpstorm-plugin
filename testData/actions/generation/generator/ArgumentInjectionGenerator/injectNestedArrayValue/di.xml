@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Foo\Bar\Model\Test">
+        <arguments>
+            <argument name="methods" xsi:type="array">
+                <item name="method1" xsi:type="string">QW1</item>
+                <item name="method2" xsi:type="string">QW2</item>
+                <item name="method3" xsi:type="string">QW3</item>
+                <item name="method4" xsi:type="string">QW4</item>
+                <item name="nested" xsi:type="array">
+                    <item name="nested1" xsi:type="string">NT1</item>
+                    <item name="nested2" xsi:type="boolean">true</item>
+                    <item name="nested3" xsi:type="null"/>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+</config>

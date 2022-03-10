@@ -127,6 +127,9 @@
         <action id="MagentoCreateAWebApiInterfaceForService.Menu" class="com.magento.idea.magento2plugin.actions.generation.NewWebApiInterfaceAction">
             <add-to-group group-id="EditorPopupMenu"/>
         </action>
+        <action id="MagentoInjectConstructorArgumentAction.Menu" class="com.magento.idea.magento2plugin.actions.generation.InjectConstructorArgumentAction">
+            <add-to-group group-id="EditorPopupMenu"/>
+        </action>
 
         <action id="CopyMagentoPath"
                 class="com.magento.idea.magento2plugin.actions.CopyMagentoPath"
