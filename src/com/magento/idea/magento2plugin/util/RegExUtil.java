@@ -25,6 +25,9 @@ public class RegExUtil {
     public static final String NUMERIC
             = "[0-9]*";
 
+    public static final String EXTENDED_NUMERIC
+            = "-?\\d+(\\.\\d+)?";
+
     public static final String IDENTIFIER
             = "[a-zA-Z0-9_\\-]*";
 
