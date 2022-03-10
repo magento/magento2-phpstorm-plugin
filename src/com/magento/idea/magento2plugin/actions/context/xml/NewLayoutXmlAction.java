@@ -12,8 +12,10 @@ import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewLayoutTemplateDialog;
+import com.magento.idea.magento2plugin.magento.files.LayoutXml;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.ComponentType;
 import com.magento.idea.magento2plugin.magento.packages.Package;
@@ -22,6 +24,7 @@ import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil;
 import java.util.Arrays;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class NewLayoutXmlAction extends AnAction {
 
@@ -47,11 +50,11 @@ public class NewLayoutXmlAction extends AnAction {
         }
         final DataContext context = event.getDataContext();
         final PsiElement targetElement = LangDataKeys.PSI_ELEMENT.getData(context);
+        final PsiDirectory targetDirectoryCandidate = resolveTargetDirectory(targetElement);
 
-        if (!(targetElement instanceof PsiDirectory)) {
+        if (targetDirectoryCandidate == null) {
             return;
         }
-        final PsiDirectory targetDirectoryCandidate = (PsiDirectory) targetElement;
         final GetMagentoModuleUtil.MagentoModuleData moduleData = GetMagentoModuleUtil
                 .getByContext(targetDirectoryCandidate, project);
 
@@ -103,5 +106,32 @@ public class NewLayoutXmlAction extends AnAction {
     ) {
         event.getPresentation().setVisible(isAvailable);
         event.getPresentation().setEnabled(isAvailable);
+    }
+
+    /**
+     * Resolve target directory.
+     *
+     * @param targetElement PsiElement
+     *
+     * @return PsiDirectory
+     */
+    private @Nullable PsiDirectory resolveTargetDirectory(final PsiElement targetElement) {
+        PsiDirectory target = null;
+
+        if (targetElement instanceof PsiDirectory) {
+            target = (PsiDirectory) targetElement;
+        } else if (targetElement instanceof PsiFile) {
+            target = ((PsiFile) targetElement).getContainingDirectory();
+        }
+
+        if (target == null) {
+            return null;
+        }
+
+        if (LayoutXml.PARENT_DIR.equals(target.getName())) {
+            target = target.getParentDirectory();
+        }
+
+        return target;
     }
 }

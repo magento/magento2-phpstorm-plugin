@@ -1,5 +1,10 @@
 <?xml version="1.0"?>
 #parse("XML File Header.xml")
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" #if (${IS_ADMIN})layout="admin-1column"#end
+#if (${IS_ADMIN} == "true")
+    #set ($isAdmin = true)
+#else
+    #set ($isAdmin = false)
+#end
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" #if ($isAdmin)layout="admin-1column"#end
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
 </page>

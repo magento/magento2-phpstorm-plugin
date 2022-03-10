@@ -168,7 +168,7 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
     }
 
     /**
-     * Get parts of inserted layout name
+     * Get parts of inserted layout name.
      *
      * @return String[]
      */
@@ -187,6 +187,7 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
             controllerName = layoutNameParts[1];
             actionName = layoutNameParts[2];
         }
+
         return new String[]{routeName, controllerName, actionName};
     }
 

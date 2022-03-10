@@ -15,6 +15,7 @@ import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.FileBasedIndexUtil;
 import java.util.ArrayList;
 import java.util.Properties;
+import org.jetbrains.annotations.NotNull;
 
 public final class FindOrCreateLayoutXml {
 
@@ -23,12 +24,7 @@ public final class FindOrCreateLayoutXml {
 
     public FindOrCreateLayoutXml(final Project project) {
         this.project = project;
-        this.properties = new Properties();
-    }
-
-    public FindOrCreateLayoutXml(final Project project, Properties properties) {
-        this.project = project;
-        this.properties = properties;
+        properties = new Properties();
     }
 
     /**
@@ -82,9 +78,10 @@ public final class FindOrCreateLayoutXml {
                 LayoutXml.PARENT_DIR
         );
         if (layoutXmlFile == null) {
+            fillDefaultAttributes(area, properties);
             layoutXmlFile = fileFromTemplateGenerator.generate(
                     layoutXml,
-                    this.properties,
+                    properties,
                     parentDirectory,
                     actionName
             );
@@ -94,5 +91,16 @@ public final class FindOrCreateLayoutXml {
 
     private Areas getArea(final String area) {
         return Areas.getAreaByString(area);
+    }
+
+    private void fillDefaultAttributes(
+            final @NotNull String area,
+            final @NotNull Properties properties
+    ) {
+        if (Areas.adminhtml.toString().equals(area)) {
+            properties.setProperty("IS_ADMIN", Boolean.TRUE.toString());
+        } else {
+            properties.setProperty("IS_ADMIN", Boolean.FALSE.toString());
+        }
     }
 }
