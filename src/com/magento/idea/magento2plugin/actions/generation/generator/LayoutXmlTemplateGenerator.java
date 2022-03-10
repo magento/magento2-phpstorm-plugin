@@ -14,6 +14,8 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.magento.idea.magento2plugin.actions.generation.data.LayoutXmlData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FindOrCreateLayoutXml;
+import com.magento.idea.magento2plugin.magento.packages.Areas;
+import java.util.Objects;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,7 +38,8 @@ public class LayoutXmlTemplateGenerator extends FileGenerator {
         super(project);
         this.layoutXmlData = layoutXmlData;
         this.project = project;
-        this.findOrCreateLayoutXml = new FindOrCreateLayoutXml(project);
+        final Properties attributes = getAttributes();
+        this.findOrCreateLayoutXml = new FindOrCreateLayoutXml(project, attributes);
     }
 
     /**
@@ -80,5 +83,11 @@ public class LayoutXmlTemplateGenerator extends FileGenerator {
     }
 
     @Override
-    protected void fillAttributes(final Properties attributes) {} //NOPMD
+    protected void fillAttributes(final Properties attributes) {
+        if (Objects.equals(layoutXmlData.getArea(), Areas.adminhtml.toString())) {
+            attributes.setProperty("IS_ADMIN", Boolean.TRUE.toString());
+        } else {
+            attributes.setProperty("IS_ADMIN", Boolean.FALSE.toString());
+        }
+    }
 }

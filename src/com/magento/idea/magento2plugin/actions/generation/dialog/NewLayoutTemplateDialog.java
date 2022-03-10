@@ -123,13 +123,14 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
      */
     private void onOK() {
         if (validateFormFields() && isUnderscoreCorrect()) {
+            final String[] layoutNameParts = getLayoutNameParts();
             new LayoutXmlTemplateGenerator(
                     new LayoutXmlData(
                             getArea(),
-                            getRouteName(),
+                            layoutNameParts[0],
                             moduleName,
-                            getControllerName(),
-                            getActionName()
+                            layoutNameParts[1],
+                            layoutNameParts[2]
                     ),
                     project
             ).generate(NewLayoutXmlAction.ACTION_NAME, true);
@@ -164,6 +165,29 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
         if (areaIndexMap.containsKey(selectedDirName)) {
             area.setSelectedIndex(areaIndexMap.get(selectedDirName));
         }
+    }
+
+    /**
+     * Get parts of inserted layout name
+     *
+     * @return String[]
+     */
+    private String[] getLayoutNameParts() {
+
+        final String[] layoutNameParts = layoutName.getText().trim().split("_");
+        String routeName = "";
+        String controllerName = "";
+        String actionName = "";
+
+        if (layoutNameParts.length >= 1) { // NOPMD
+            routeName = layoutNameParts[0];
+        }
+
+        if (layoutNameParts.length == 3) { // NOPMD
+            controllerName = layoutNameParts[1];
+            actionName = layoutNameParts[2];
+        }
+        return new String[]{routeName, controllerName, actionName};
     }
 
     /**
@@ -211,61 +235,11 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
     }
 
     /**
-     * Get action name.
-     *
-     * @return String
-     */
-    private String getActionName() {
-        if (layoutName.getText().trim().contains("_")) {
-            final int position = layoutName.getText().trim().lastIndexOf("_") + 1;
-            return layoutName.getText().trim().substring(position);
-        }
-
-        return "";
-    }
-
-    /**
      * Get area.
      *
      * @return String
      */
     private String getArea() {
         return area.getSelectedItem().toString();
-    }
-
-    /**
-     * Get controller name.
-     *
-     * @return String
-     */
-    private String getControllerName() {
-        final String newLayoutName = layoutName.getText().trim();
-        if (newLayoutName.contains("_")) {
-            final int start = newLayoutName.indexOf('_') + 1;
-            int end = newLayoutName.lastIndexOf('_');
-
-            if (start == end) {
-                end = newLayoutName.length() - 1;
-            }
-            return newLayoutName.substring(start, end);
-        }
-
-        return "";
-    }
-
-    /**
-     * Get route name.
-     *
-     * @return String
-     */
-    private String getRouteName() {
-        final String newLayoutName = layoutName.getText().trim();
-        int position = newLayoutName.length();
-
-        if (newLayoutName.contains("_")) {
-            position = newLayoutName.indexOf('_');
-        }
-
-        return newLayoutName.substring(0, position);
     }
 }

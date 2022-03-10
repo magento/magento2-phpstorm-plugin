@@ -19,9 +19,16 @@ import java.util.Properties;
 public final class FindOrCreateLayoutXml {
 
     private final Project project;
+    private final Properties properties;
 
     public FindOrCreateLayoutXml(final Project project) {
         this.project = project;
+        this.properties = new Properties();
+    }
+
+    public FindOrCreateLayoutXml(final Project project, Properties properties) {
+        this.project = project;
+        this.properties = properties;
     }
 
     /**
@@ -77,7 +84,7 @@ public final class FindOrCreateLayoutXml {
         if (layoutXmlFile == null) {
             layoutXmlFile = fileFromTemplateGenerator.generate(
                     layoutXml,
-                    new Properties(),
+                    this.properties,
                     parentDirectory,
                     actionName
             );
