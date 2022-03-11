@@ -13,6 +13,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.Method;
+import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import org.jetbrains.annotations.NotNull;
@@ -49,6 +50,23 @@ public final class PhpPsiElementsUtil {
         }
 
         return element instanceof Method ? (Method) element : null;
+    }
+
+    /**
+     * Get method argument from event.
+     *
+     * @param event AnActionEvent
+     *
+     * @return Method
+     */
+    public static Parameter getMethodArgument(final @NotNull AnActionEvent event) {
+        PsiElement element = getElementUnderCursor(event);
+
+        if (element instanceof LeafPsiElement && element.getParent() instanceof Parameter) {
+            element = element.getParent();
+        }
+
+        return element instanceof Parameter ? (Parameter) element : null;
     }
 
     /**
