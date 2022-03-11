@@ -74,7 +74,7 @@ class GridDataProvider extends DataProvider
     }
 
     /**
-     * Returns Search result
+     * Returns Search result.
      *
      * @return SearchResultFactory
      */

@@ -76,7 +76,7 @@ class ${CLASS_NAME} extends ${EXTENDS}
     }
 
     /**
-     * Returns Search result
+     * Returns Search result.
      *
      * @return ${SEARCH_RESULT_FACTORY}
      */

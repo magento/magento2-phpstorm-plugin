@@ -13,7 +13,7 @@ class Test extends AbstractModel
     protected $_eventPrefix = 'my_table_model';
 
     /**
-     * Initialize resource
+     * Initialize resource.
      *
      * @return void
      */

@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class TestCLICommandPHPClass extends Command
 {
     /**
-     * Initialization of the command
+     * Initialization of the command.
      */
     protected function configure()
     {
@@ -19,7 +19,7 @@ class TestCLICommandPHPClass extends Command
     }
 
     /**
-     * CLI command description
+     * CLI command description.
      *
      * @param InputInterface $input
      * @param OutputInterface $output

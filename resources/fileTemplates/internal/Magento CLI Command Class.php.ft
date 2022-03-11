@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ${NAME} extends Command
 {
         /**
-         * Initialization of the command
+         * Initialization of the command.
          */
         protected function configure()
         {
@@ -22,7 +22,7 @@ class ${NAME} extends Command
         }
 
         /**
-         * CLI command description
+         * CLI command description.
          *
          * @param InputInterface $input
          * @param OutputInterface $output

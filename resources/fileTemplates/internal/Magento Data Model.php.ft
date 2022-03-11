@@ -19,7 +19,7 @@ class ${NAME} #if (${EXTENDS})extends ${EXTENDS} #end #if (${IMPLEMENTS} && $has
 {
       #if (${PROPERTIES} && !$hasInterface)
             /**
-             * String constants for property names
+             * String constants for property names.
              */
             #set ($properties = ${PROPERTIES})
         #foreach ($property in $properties.split(","))

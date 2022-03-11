@@ -14,6 +14,7 @@ class BookSearchResults extends SearchResults implements BookSearchResultsInterf
      * Set items list.
      *
      * @param array $items
+     *
      * @return BookSearchResultsInterface
      */
     public function setItems(array $items): BookSearchResultsInterface

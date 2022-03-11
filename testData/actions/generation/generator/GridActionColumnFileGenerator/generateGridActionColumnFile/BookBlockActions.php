@@ -54,9 +54,10 @@ class BookBlockActions extends Column
     }
 
     /**
-     * Prepare Data Source
+     * Prepare Data Source.
      *
      * @param array $dataSource
+     *
      * @return array
      */
     public function prepareDataSource(array $dataSource): array
