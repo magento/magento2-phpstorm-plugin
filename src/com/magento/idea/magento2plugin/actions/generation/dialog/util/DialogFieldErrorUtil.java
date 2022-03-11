@@ -19,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
+import javax.swing.text.JTextComponent;
 import org.jetbrains.annotations.NotNull;
 
 public final class DialogFieldErrorUtil {
@@ -163,6 +164,40 @@ public final class DialogFieldErrorUtil {
         });
 
         return true;
+    }
+
+    /**
+     * Show error message for field for component.
+     *
+     * @param fieldComponent JTextComponent
+     * @param messageHolder JLabel
+     * @param message String
+     */
+    public static void showErrorMessageForField(
+            final @NotNull JTextComponent fieldComponent,
+            final @NotNull JLabel messageHolder,
+            final @NotNull String message
+    ) {
+        highlightField(fieldComponent);
+
+        messageHolder.setVisible(true);
+        messageHolder.setFont(UIUtil.getLabelFont(UIUtil.FontSize.MINI));
+        messageHolder.setForeground(ERROR_COLOR);
+        messageHolder.setText(message);
+
+        fieldComponent.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(final FocusEvent event) {
+                messageHolder.setVisible(false);
+                messageHolder.setText("");
+            }
+
+            @Override
+            public void focusLost(final FocusEvent event) {
+                messageHolder.setVisible(false);
+                messageHolder.setText("");
+            }
+        });
     }
 
     /**

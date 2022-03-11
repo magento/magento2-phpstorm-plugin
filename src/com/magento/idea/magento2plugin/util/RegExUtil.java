@@ -49,6 +49,9 @@ public class RegExUtil {
     public static final String MAGENTO_VERSION
             = "(\\d+)\\.(\\d+)\\.(\\d+)[a-zA-Z0-9_\\-]*";
 
+    public static final String LAYOUT_NAME
+            = "^([a-zA-Z0-9]+){1,}(_[a-zA-Z0-9]+){0,2}";
+
     public static class Magento {
 
         public static final String PHP_CLASS

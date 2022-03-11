@@ -15,12 +15,16 @@ import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.FileBasedIndexUtil;
 import java.util.ArrayList;
 import java.util.Properties;
+import org.jetbrains.annotations.NotNull;
 
 public final class FindOrCreateLayoutXml {
+
     private final Project project;
+    private final Properties properties;
 
     public FindOrCreateLayoutXml(final Project project) {
         this.project = project;
+        properties = new Properties();
     }
 
     /**
@@ -60,7 +64,12 @@ public final class FindOrCreateLayoutXml {
             parentDirectory = directoryGenerator
                     .findOrCreateSubdirectory(parentDirectory, fileDirectory);
         }
-        final LayoutXml layoutXml = new  LayoutXml(routeId, controllerName, controllerActionName);
+
+        LayoutXml layoutXml = new LayoutXml(routeId, controllerName, controllerActionName);
+
+        if (controllerName.isEmpty()) {
+            layoutXml = new LayoutXml(routeId);
+        }
         PsiFile layoutXmlFile = FileBasedIndexUtil.findModuleViewFile(
                 layoutXml.getFileName(),
                 getArea(area),
@@ -69,9 +78,10 @@ public final class FindOrCreateLayoutXml {
                 LayoutXml.PARENT_DIR
         );
         if (layoutXmlFile == null) {
+            fillDefaultAttributes(area, properties);
             layoutXmlFile = fileFromTemplateGenerator.generate(
                     layoutXml,
-                    new Properties(),
+                    properties,
                     parentDirectory,
                     actionName
             );
@@ -81,5 +91,16 @@ public final class FindOrCreateLayoutXml {
 
     private Areas getArea(final String area) {
         return Areas.getAreaByString(area);
+    }
+
+    private void fillDefaultAttributes(
+            final @NotNull String area,
+            final @NotNull Properties properties
+    ) {
+        if (Areas.adminhtml.toString().equals(area)) {
+            properties.setProperty("IS_ADMIN", Boolean.TRUE.toString());
+        } else {
+            properties.setProperty("IS_ADMIN", Boolean.FALSE.toString());
+        }
     }
 }
