@@ -29,8 +29,7 @@ public final class CommitXmlFileUtil {
     public static XmlFile execute(
             final XmlFile xmlFile,
             final List<XmlTag> subTags,
-            final Map<XmlTag,
-            XmlTag> childParentRelationMap
+            final Map<XmlTag, XmlTag> childParentRelationMap
     ) {
         WriteCommandAction.runWriteCommandAction(xmlFile.getProject(), () -> {
             for (final XmlTag tag : Lists.reverse(subTags)) {
@@ -49,5 +48,27 @@ public final class CommitXmlFileUtil {
             psiDocumentManager.commitDocument(document);
         }
         return xmlFile;
+    }
+
+    /**
+     * Make some XML editing operation in the safe env.
+     *
+     * @param xmlFile XmlFile
+     * @param runnable Runnable
+     */
+    public static void execute(
+            final XmlFile xmlFile,
+            final Runnable runnable
+    ) {
+        WriteCommandAction.runWriteCommandAction(xmlFile.getProject(), runnable);
+
+        final PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(
+                xmlFile.getProject()
+        );
+        final Document document = psiDocumentManager.getDocument(xmlFile);
+
+        if (document != null) {
+            psiDocumentManager.commitDocument(document);
+        }
     }
 }

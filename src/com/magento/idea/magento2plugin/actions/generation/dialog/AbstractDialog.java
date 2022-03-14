@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.util.Pair;
+import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.prompt.PlaceholderInitializerUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.reflection.ExtractComponentFromFieldUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.util.DialogFieldErrorUtil;
@@ -209,8 +210,17 @@ public abstract class AbstractDialog extends JDialog {
         } else if (component instanceof JComboBox) {
             if (((JComboBox<?>) component).getSelectedIndex() == -1) {
                 return "";
+            }
+            final Object selectedItem = ((JComboBox<?>) component).getSelectedItem();
+
+            if (selectedItem == null) {
+                return "";
+            }
+
+            if (selectedItem instanceof ComboBoxItemData) {
+                return ((ComboBoxItemData) selectedItem).getKey();
             } else {
-                return ((JComboBox) component).getSelectedItem().toString();
+                return selectedItem.toString();
             }
         } else if (component instanceof JTextArea) {
             return ((JTextArea) component).getText();
