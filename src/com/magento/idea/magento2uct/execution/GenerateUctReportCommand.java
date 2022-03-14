@@ -26,6 +26,8 @@ import com.magento.idea.magento2uct.execution.output.UctReportOutputUtil;
 import com.magento.idea.magento2uct.execution.process.OutputWrapper;
 import com.magento.idea.magento2uct.execution.scanner.ModuleFilesScanner;
 import com.magento.idea.magento2uct.execution.scanner.ModuleScanner;
+import com.magento.idea.magento2uct.execution.scanner.ThemeFilesScanner;
+import com.magento.idea.magento2uct.execution.scanner.ThemeScanner;
 import com.magento.idea.magento2uct.execution.scanner.data.ComponentData;
 import com.magento.idea.magento2uct.execution.scanner.filter.ExcludeMagentoBundledFilter;
 import com.magento.idea.magento2uct.inspections.UctInspectionManager;
@@ -81,6 +83,7 @@ public class GenerateUctReportCommand {
     public void execute() {
         output.write("Upgrade compatibility tool\n");
         final PsiDirectory rootDirectory = getTargetPsiDirectory();
+        final PsiDirectory additionalDirectory = getAdditionalTargetPsiDirectory();
 
         if (rootDirectory == null) {
             output.print(
@@ -99,6 +102,10 @@ public class GenerateUctReportCommand {
         );
         final ReportBuilder reportBuilder = new ReportBuilder(project);
         final UctReportOutputUtil outputUtil = new UctReportOutputUtil(output);
+        final ThemeScanner themeScanner = new ThemeScanner(
+                additionalDirectory,
+                new ExcludeMagentoBundledFilter()
+        );
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             ApplicationManager.getApplication().runReadAction(() -> {
@@ -127,6 +134,56 @@ public class GenerateUctReportCommand {
                             if (!isModuleHeaderPrinted) {
                                 outputUtil.printModuleName(componentData.getName());
                                 isModuleHeaderPrinted = true;
+                            }
+                            outputUtil.printProblemFile(filename);
+                        }
+                        final List<ProblemDescriptor> problems = SortDescriptorResultsUtil.sort(
+                                FilterDescriptorResultsUtil.filter(fileProblemsHolder)
+                        );
+
+                        for (final ProblemDescriptor descriptor : problems) {
+                            final SupportedIssue issue = fileProblemsHolder.getIssue(descriptor);
+
+                            final String errorMessage = descriptor
+                                    .getDescriptionTemplate()
+                                    .substring(6)
+                                    .trim();
+                            summary.addToSummary(issue.getLevel());
+                            reportBuilder.addIssue(
+                                    descriptor.getLineNumber() + 1,
+                                    filename,
+                                    errorMessage,
+                                    issue
+                            );
+                            outputUtil.printIssue(descriptor, issue.getCode());
+                        }
+                    }
+                }
+                for (final ComponentData themeComponentData: themeScanner) {
+                    if (process.isProcessTerminated()) {
+                        return;
+                    }
+                    boolean isThemeHeaderPrinted = false;
+
+                    for (final PsiFile psiFile : new ThemeFilesScanner(themeComponentData)) {
+                        if (!(psiFile instanceof PhpFile)) {
+                            continue;
+                        }
+
+                        final String filename = psiFile.getVirtualFile().getPath();
+                        final UctInspectionManager inspectionManager = new UctInspectionManager(
+                                project
+                        );
+                        final UctProblemsHolder fileProblemsHolder = inspectionManager.run(psiFile);
+
+                        if (fileProblemsHolder == null) {
+                            continue;
+                        }
+
+                        if (fileProblemsHolder.hasResults()) {
+                            if (!isThemeHeaderPrinted) {
+                                outputUtil.printModuleName(themeComponentData.getName());
+                                isThemeHeaderPrinted = true;
                             }
                             outputUtil.printProblemFile(filename);
                         }
@@ -194,6 +251,27 @@ public class GenerateUctReportCommand {
             return null;
         }
         final VirtualFile targetDirVirtualFile = VfsUtil.findFile(Paths.get(targetDirPath), false);
+
+        if (targetDirVirtualFile == null) {
+            return null;
+        }
+
+        return PsiManager.getInstance(project).findDirectory(targetDirVirtualFile);
+    }
+
+    /**
+     * Get additional target psi directory.
+     *
+     * @return PsiDirectory
+     */
+    private @Nullable PsiDirectory getAdditionalTargetPsiDirectory() {
+        final String additionalTargetDirPath = settingsService.getAdditionalPath();
+
+        if (additionalTargetDirPath == null) {
+            return null;
+        }
+        final VirtualFile targetDirVirtualFile
+                = VfsUtil.findFile(Paths.get(additionalTargetDirPath), false);
 
         if (targetDirVirtualFile == null) {
             return null;
