@@ -11,12 +11,17 @@ import com.intellij.json.psi.JsonProperty;
 import com.intellij.json.psi.JsonValue;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.xml.XmlFile;
-import com.intellij.psi.xml.XmlTag;
+import com.intellij.psi.util.PsiTreeUtil;
+import com.jetbrains.php.lang.psi.PhpFile;
+import com.jetbrains.php.lang.psi.elements.ClassConstantReference;
+import com.jetbrains.php.lang.psi.elements.MethodReference;
+import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import com.jetbrains.php.lang.psi.elements.impl.ClassConstImpl;
 import com.magento.idea.magento2plugin.magento.files.ComposerJson;
-import com.magento.idea.magento2plugin.magento.files.ModuleXml;
-import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.magento.files.RegistrationPhp;
+import com.magento.idea.magento2plugin.magento.packages.ComponentType;
 import com.magento.idea.magento2uct.execution.scanner.data.ComponentData;
 import com.magento.idea.magento2uct.execution.scanner.filter.ModuleScannerFilter;
 import java.util.ArrayList;
@@ -27,11 +32,11 @@ import org.jetbrains.annotations.NotNull;
 
 public final class ModuleScanner implements Iterable<ComponentData> {
 
-    private static final String FRAMEWORK_LIBRARY_NAME = "magento/framework";
-
-    private final PsiDirectory rootDirectory;
+    private final List<PsiDirectory> rootDirectories;
     private final List<ComponentData> componentDataList;
     private final List<ModuleScannerFilter> filters;
+    private int modulesQty;
+    private int themesQty;
 
     /**
      * Magento 2 module components scanner constructor.
@@ -44,9 +49,25 @@ public final class ModuleScanner implements Iterable<ComponentData> {
             final @NotNull ModuleScannerFilter... filters
 
     ) {
-        this.rootDirectory = rootDirectory;
+        this(List.of(rootDirectory), filters);
+    }
+
+    /**
+     * Magento 2 module components scanner constructor.
+     *
+     * @param directories List[PsiDirectory]
+     * @param filters ModuleScannerFilter[]
+     */
+    public ModuleScanner(
+            final List<PsiDirectory> directories,
+            final @NotNull ModuleScannerFilter... filters
+
+    ) {
+        this.rootDirectories = new ArrayList<>(directories);
         this.filters = Arrays.asList(filters);
         componentDataList = new ArrayList<>();
+        modulesQty = 0;
+        themesQty = 0;
     }
 
     @Override
@@ -60,7 +81,16 @@ public final class ModuleScanner implements Iterable<ComponentData> {
      * @return int
      */
     public int getModuleCount() {
-        return componentDataList.size();
+        return modulesQty;
+    }
+
+    /**
+     * Get found themes qty.
+     *
+     * @return int
+     */
+    public int getThemeCount() {
+        return themesQty;
     }
 
     /**
@@ -70,7 +100,10 @@ public final class ModuleScanner implements Iterable<ComponentData> {
      */
     private List<ComponentData> run() {
         componentDataList.clear();
-        findModuleComponent(rootDirectory);
+
+        for (final PsiDirectory rootDirectory : rootDirectories) {
+            findModuleComponent(rootDirectory);
+        }
 
         return componentDataList;
     }
@@ -89,68 +122,51 @@ public final class ModuleScanner implements Iterable<ComponentData> {
     private void findModuleComponent(final @NotNull PsiDirectory directory) {
         String name = null;
         String composerBasedName = null;
-        String composerType;
-        String type = "magento2-module";
+        ComponentType type = null;
 
-        for (final PsiDirectory subDirectory : directory.getSubdirectories()) {
-            if (Package.moduleBaseAreaDir.equals(subDirectory.getName())) {
-                for (final PsiFile file : subDirectory.getFiles()) {
-                    if (file instanceof XmlFile && ModuleXml.FILE_NAME.equals(file.getName())) {
-                        final XmlTag rootTag = ((XmlFile) file).getRootTag();
+        final PsiFile registration = directory.findFile(RegistrationPhp.FILE_NAME);
 
-                        if (rootTag != null && rootTag.getSubTags().length > 0) {
-                            final XmlTag moduleTag = rootTag.getSubTags()[0];
-                            name = moduleTag.getAttributeValue("name");
-                        }
+        if (registration instanceof PhpFile) {
+            final Pair<String, ComponentType> registrationMeta = scanRegistrationMeta(
+                    (PhpFile) registration
+            );
+
+            if (registrationMeta != null) {
+                name = registrationMeta.getFirst();
+                type = registrationMeta.getSecond();
+            }
+
+            if (name != null) {
+                final PsiFile composerFile = directory.findFile(ComposerJson.FILE_NAME);
+
+                if (composerFile instanceof JsonFile) {
+                    composerBasedName = getComposerComponentName((JsonFile) composerFile);
+                }
+                final ComponentData component = new ComponentData(
+                        name,
+                        composerBasedName,
+                        type,
+                        directory
+                );
+                boolean isExcluded = false;
+
+                for (final ModuleScannerFilter filter : filters) {
+                    if (filter.isExcluded(component)) {
+                        isExcluded = true;
                         break;
                     }
                 }
-                break;
-            }
-        }
 
-        for (final PsiFile file : directory.getFiles()) {
-            if (file instanceof JsonFile && ComposerJson.FILE_NAME.equals(file.getName())) {
-                final Pair<String, String> meta = scanModuleComposerMeta((JsonFile) file);
-                composerBasedName = meta.getFirst();
-                composerType = meta.getSecond();
-
-                if (composerBasedName == null || composerType == null) {
-                    return;
+                if (!isExcluded) {
+                    if (component.getType().equals(ComponentType.theme)) {
+                        themesQty++;
+                    } else {
+                        modulesQty++;
+                    }
+                    componentDataList.add(component);
                 }
-
-                if (name == null && FRAMEWORK_LIBRARY_NAME.equals(composerBasedName)) {
-                    name = meta.getFirst();
-                    type = composerType;
-                }
-
-                if (!type.equals(composerType) && !"project".equals(composerType)) {
-                    return;
-                }
-                break;
+                return;
             }
-        }
-
-        if (name != null) {
-            final ComponentData component = new ComponentData(
-                    name,
-                    composerBasedName,
-                    type,
-                    directory
-            );
-            boolean isExcluded = false;
-
-            for (final ModuleScannerFilter filter : filters) {
-                if (filter.isExcluded(component)) {
-                    isExcluded = true;
-                    break;
-                }
-            }
-
-            if (!isExcluded) {
-                componentDataList.add(component);
-            }
-            return;
         }
 
         for (final PsiDirectory subDirectory : directory.getSubdirectories()) {
@@ -159,44 +175,80 @@ public final class ModuleScanner implements Iterable<ComponentData> {
     }
 
     /**
-     * Scan module metadata from the composer.json file.
+     * Scan module name from the composer.json file.
      *
      * @param composerFile JsonFile
      *
-     * @return Pair[String, String]
+     * @return String
      */
-    @SuppressWarnings({
-            "PMD.NPathComplexity",
-            "PMD.CyclomaticComplexity",
-            "PMD.CognitiveComplexity"
-    })
-    private Pair<String, String> scanModuleComposerMeta(final JsonFile composerFile) {
+    private String getComposerComponentName(final JsonFile composerFile) {
         final JsonValue topNode = composerFile.getTopLevelValue();
         String name = null;
-        String type = null;
 
         if (topNode instanceof JsonObject) {
             for (final JsonProperty property : ((JsonObject) topNode).getPropertyList()) {
-                switch (property.getName()) {
-                    case "name":
-                        if (property.getValue() != null) {
-                            name = property.getValue().getText().replace("\"", "");
-                        }
-                        break;
-                    case "type":
-                        if (property.getValue() != null) {
-                            type = property.getValue().getText().replace("\"", "");
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                if (name != null && type != null) {
+                if ("name".equals(property.getName())) {
+                    if (property.getValue() != null) {
+                        name = property.getValue().getText().replace("\"", "");
+                    }
                     break;
                 }
             }
         }
 
-        return new Pair<>(name, type);
+        return name;
+    }
+
+    private Pair<String, ComponentType> scanRegistrationMeta(final PhpFile registrationFile) {
+        for (final MethodReference reference
+                : PsiTreeUtil.findChildrenOfType(registrationFile, MethodReference.class)) {
+
+            if (!RegistrationPhp.REGISTER_METHOD_NAME.equals(reference.getName())) {
+                continue;
+            }
+            final PsiElement typeHolder = reference.getParameter(0);
+            final PsiElement nameHolder = reference.getParameter(1);
+
+            if (typeHolder == null || nameHolder == null) {
+                return null;
+            }
+            final String type = unwrapParameterValue(typeHolder);
+            final String name = unwrapParameterValue(nameHolder);
+
+            if (name == null || type == null) {
+                return null;
+            }
+            final ComponentType resolvedType = ComponentType.getByValue(type);
+
+            if (resolvedType == null) {
+                return null;
+            }
+
+            return new Pair<>(name, resolvedType);
+        }
+
+        return null;
+    }
+
+    private String unwrapParameterValue(final @NotNull PsiElement parameterValue) {
+        if (parameterValue instanceof ClassConstantReference) {
+            final PsiElement resolvedValue = ((ClassConstantReference) parameterValue).resolve();
+
+            if (!(resolvedValue instanceof ClassConstImpl)) {
+                return null;
+            }
+            final ClassConstImpl resolvedConst = (ClassConstImpl) resolvedValue;
+            final PsiElement value = resolvedConst.getDefaultValue();
+
+            if (value == null) {
+                return null;
+            }
+
+            return unwrapParameterValue(value);
+        } else if (parameterValue instanceof StringLiteralExpression) {
+            return ((StringLiteralExpression) parameterValue).getContents();
+        }
+
+        return null;
     }
 }

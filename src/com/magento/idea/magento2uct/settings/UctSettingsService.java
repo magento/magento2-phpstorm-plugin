@@ -257,7 +257,7 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
     }
 
     /**
-     * Set if show additional path
+     * Set if show additional path.
      *
      * @param hasAdditionalPath boolean
      */
@@ -266,12 +266,12 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
     }
 
     /**
-     * Check if show additional path
+     * Check if show additional path.
      *
      * @return boolean
      */
-    public @Nullable Boolean getHasAdditionalPath() {
-        return hasAdditionalPath;
+    public @NotNull Boolean getHasAdditionalPath() {
+        return hasAdditionalPath != null && hasAdditionalPath;
     }
 
     /**

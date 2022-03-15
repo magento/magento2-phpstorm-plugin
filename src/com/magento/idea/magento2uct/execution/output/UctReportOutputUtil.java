@@ -95,6 +95,7 @@ public class UctReportOutputUtil {
         summaryMap.put("Adobe Commerce version", summary.getTargetVersion());
         summaryMap.put("Running time", summary.getProcessRunningTime());
         summaryMap.put("Checked modules", String.valueOf(summary.getProcessedModules()));
+        summaryMap.put("Checked themes", String.valueOf(summary.getProcessedThemes()));
         summaryMap.put("Total warnings found", String.valueOf(summary.getPhpWarnings()));
         summaryMap.put("Total errors found", String.valueOf(summary.getPhpErrors()));
         summaryMap.put("Total critical errors found",
