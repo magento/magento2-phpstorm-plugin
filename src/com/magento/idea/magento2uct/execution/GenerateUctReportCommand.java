@@ -139,7 +139,7 @@ public class GenerateUctReportCommand {
 
                         if (fileProblemsHolder.hasResults()) {
                             if (!isModuleHeaderPrinted) {
-                                outputUtil.printModuleName(componentData.getName());
+                                outputUtil.printModuleName(componentData);
                                 isModuleHeaderPrinted = true;
                             }
                             outputUtil.printProblemFile(filename);
@@ -171,7 +171,7 @@ public class GenerateUctReportCommand {
                 summary.setProcessedThemes(scanner.getThemeCount());
                 outputUtil.printSummary(summary);
 
-                if (summary.getProcessedModules() == 0) {
+                if (summary.getProcessedModules() == 0 && summary.getProcessedThemes() == 0) {
                     process.destroyProcess();
                     return;
                 }
