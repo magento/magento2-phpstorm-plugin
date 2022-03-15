@@ -27,7 +27,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Objects;
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveImports"})
@@ -40,7 +46,7 @@ public class ConfigurationDialog extends AbstractDialog {
     private LabeledComponent<TextFieldWithBrowseButton> modulePath;
     private LabeledComponent<TextFieldWithBrowseButton> additionalPath;
     private JCheckBox ignoreCurrentVersion;
-    private JCheckBox hasAdditionalPath;
+    private JCheckBox hasAdditionalPath;//NOPMD
     private JComboBox<ComboBoxItemData> currentVersion;
     private JComboBox<ComboBoxItemData> targetVersion;
     private JComboBox<ComboBoxItemData> issueSeverityLevel;
@@ -74,7 +80,8 @@ public class ConfigurationDialog extends AbstractDialog {
         setTitle(ConfigureUctAction.ACTION_NAME);
         getRootPane().setDefaultButton(buttonOk);
 
-        hasAdditionalPath.addActionListener(event -> refreshAdditionalFields(hasAdditionalPath.isSelected()));
+        hasAdditionalPath.addActionListener(event ->
+                refreshAdditionalFields(hasAdditionalPath.isSelected()));
         buttonOk.addActionListener(event -> onOK());
         buttonCancel.addActionListener(event -> onCancel());
 
@@ -121,6 +128,7 @@ public class ConfigurationDialog extends AbstractDialog {
     /**
      * Save configuration.
      */
+    @SuppressWarnings("PMD.CyclomaticComplexity")
     private void onOK() {
         modulePathError.setText("");
         additionalPathError.setText("");
