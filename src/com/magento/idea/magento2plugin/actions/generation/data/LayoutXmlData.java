@@ -39,6 +39,30 @@ public class LayoutXmlData {
         this.uiComponentName = uiComponentName;
     }
 
+    /**
+     * Layout XML data.
+     *
+     * @param area String
+     * @param route String
+     * @param moduleName String
+     * @param controllerName String
+     * @param actionName String
+     */
+    public LayoutXmlData(
+            final String area,
+            final String route,
+            final String moduleName,
+            final String controllerName,
+            final String actionName
+    ) {
+        this.area = area;
+        this.route = route;
+        this.moduleName = moduleName;
+        this.controllerName = controllerName;
+        this.actionName = actionName;
+        this.uiComponentName = "";
+    }
+
     public String getArea() {
         return area;
     }

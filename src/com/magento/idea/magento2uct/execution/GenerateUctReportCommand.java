@@ -13,6 +13,7 @@ import com.intellij.json.psi.JsonFile;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
@@ -20,6 +21,7 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.jetbrains.php.lang.psi.PhpFile;
+import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
 import com.magento.idea.magento2uct.execution.output.ReportBuilder;
 import com.magento.idea.magento2uct.execution.output.Summary;
 import com.magento.idea.magento2uct.execution.output.UctReportOutputUtil;
@@ -42,6 +44,8 @@ import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({"PMD.NPathComplexity", "PMD.ExcessiveImports", "PMD.CognitiveComplexity"})
 public class GenerateUctReportCommand {
+
+    private static final String DEFAULT_MAGENTO_EDITION_LABEL = "Magento Open Source";
 
     private final Project project;
     private final OutputWrapper output;
@@ -113,6 +117,13 @@ public class GenerateUctReportCommand {
         );
         final ReportBuilder reportBuilder = new ReportBuilder(project);
         final UctReportOutputUtil outputUtil = new UctReportOutputUtil(output);
+        final Pair<String, String> version = MagentoVersionUtil.getVersionData(
+                project,
+                project.getBasePath()
+        );
+        final String resolvedEdition = version.getSecond() == null
+                ? DEFAULT_MAGENTO_EDITION_LABEL
+                : version.getSecond();
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             ApplicationManager.getApplication().runReadAction(() -> {
@@ -169,7 +180,7 @@ public class GenerateUctReportCommand {
                 summary.trackProcessFinished();
                 summary.setProcessedModules(scanner.getModuleCount());
                 summary.setProcessedThemes(scanner.getThemeCount());
-                outputUtil.printSummary(summary);
+                outputUtil.printSummary(summary, resolvedEdition);
 
                 if (summary.getProcessedModules() == 0 && summary.getProcessedThemes() == 0) {
                     process.destroyProcess();

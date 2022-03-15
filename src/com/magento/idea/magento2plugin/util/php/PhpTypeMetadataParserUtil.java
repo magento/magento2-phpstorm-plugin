@@ -135,7 +135,12 @@ public final class PhpTypeMetadataParserUtil {
      *
      * @return String
      */
-    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity", "PMD.ConfusingTernary"})
+    @SuppressWarnings({
+            "PMD.CyclomaticComplexity",
+            "PMD.CognitiveComplexity",
+            "PMD.NPathComplexity",
+            "PMD.ConfusingTernary"
+    })
     public static String getMethodDefinitionForInterface(
             final @NotNull Method method,
             final String defaultMethodDescription
@@ -270,6 +275,29 @@ public final class PhpTypeMetadataParserUtil {
     }
 
     /**
+     * Get main type for the specified parameter (?int -> main type is int).
+     *
+     * @param parameter Parameter
+     *
+     * @return String
+     */
+    public static String getMainType(final @NotNull Parameter parameter) {
+        final List<String> types = extractMultipleTypesFromString(
+                parameter.getDeclaredType().toString()
+        );
+
+        for (final String type : types) {
+            if (PhpLangUtil.isFqn(type)) {
+                return type;
+            } else if (PhpLangUtil.isParameterTypeHint(type, parameter.getProject())) {
+                return type;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Get method return type.
      *
      * @param method Method
@@ -309,6 +337,7 @@ public final class PhpTypeMetadataParserUtil {
      *
      * @return List[String]
      */
+    @SuppressWarnings("PMD.CognitiveComplexity")
     public static List<String> getMethodExceptionsTypes(final @NotNull Method method) {
         final List<String> types = new ArrayList<>();
 

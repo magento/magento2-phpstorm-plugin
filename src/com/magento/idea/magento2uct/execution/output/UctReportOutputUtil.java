@@ -89,9 +89,10 @@ public class UctReportOutputUtil {
      * Print summary information.
      *
      * @param summary Summary
+     * @param platformName String
      */
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
-    public void printSummary(final Summary summary) {
+    public void printSummary(final Summary summary, final String platformName) {
         if (summary.getProcessedModules() == 0 && summary.getProcessedThemes() == 0) {
             stdout.print(stdout.wrapInfo("Couldn't find modules to analyse").concat("\n"));
             return;
@@ -103,7 +104,7 @@ public class UctReportOutputUtil {
 
         final Map<String, String> summaryMap = new LinkedHashMap<>();
         summaryMap.put("Installed version", summary.getInstalledVersion());
-        summaryMap.put("Adobe Commerce version", summary.getTargetVersion());
+        summaryMap.put(platformName + " version", summary.getTargetVersion());
         summaryMap.put("Running time", summary.getProcessRunningTime());
         summaryMap.put("Checked modules", String.valueOf(summary.getProcessedModules()));
         summaryMap.put("Checked themes", String.valueOf(summary.getProcessedThemes()));
