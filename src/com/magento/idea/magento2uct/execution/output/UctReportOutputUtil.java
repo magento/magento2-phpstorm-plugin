@@ -91,7 +91,7 @@ public class UctReportOutputUtil {
      * @param summary Summary
      * @param platformName String
      */
-    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
+    @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.CyclomaticComplexity"})
     public void printSummary(final Summary summary, final String platformName) {
         if (summary.getProcessedModules() == 0 && summary.getProcessedThemes() == 0) {
             stdout.print(stdout.wrapInfo("Couldn't find modules to analyse").concat("\n"));

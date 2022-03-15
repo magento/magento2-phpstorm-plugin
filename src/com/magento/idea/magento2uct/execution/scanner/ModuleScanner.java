@@ -199,6 +199,7 @@ public final class ModuleScanner implements Iterable<ComponentData> {
         return name;
     }
 
+    @SuppressWarnings("PMD.AvoidBranchingStatementAsLastInLoop")
     private Pair<String, ComponentType> scanRegistrationMeta(final PhpFile registrationFile) {
         for (final MethodReference reference
                 : PsiTreeUtil.findChildrenOfType(registrationFile, MethodReference.class)) {
