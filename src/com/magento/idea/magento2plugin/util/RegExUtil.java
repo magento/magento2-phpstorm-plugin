@@ -107,4 +107,9 @@ public class RegExUtil {
         public static final String MODULE_NAME =
                 "app\\/design\\/(adminhtml|frontend)\\/\\w*\\/\\w*\\/\\w*";
     }
+
+    public static class ViewArea {
+        public static final String AREA =
+                "\\/(adminhtml|frontend)\\/";
+    }
 }
