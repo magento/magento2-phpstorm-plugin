@@ -1,3 +1,8 @@
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 package com.magento.idea.magento2plugin.actions.comparator;
 
 import com.intellij.diff.DiffContentFactory;
@@ -25,6 +30,7 @@ import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.nio.file.Path;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -72,7 +78,8 @@ public class CompareTemplateAction extends AnAction {
         final String fullPath = selectedFile.getPath();
         final String area = getArea(fullPath);
         final String originalModuleName = getOriginalModuleName(project, psiFile);
-        final PsiDirectory originalModuleDirectory = new ModuleIndex(project).getModuleDirectoryByModuleName(originalModuleName);
+        final PsiDirectory originalModuleDirectory =
+                new ModuleIndex(project).getModuleDirectoryByModuleName(originalModuleName);
 
         if (originalModuleDirectory == null
                 || area == null
@@ -123,9 +130,11 @@ public class CompareTemplateAction extends AnAction {
     }
 
     @NotNull
-    private MutableDiffRequestChain createMutableChainFromFiles(@Nullable Project project,
-                                                                         @NotNull VirtualFile file1,
-                                                                         @NotNull VirtualFile file2) {
+    private MutableDiffRequestChain createMutableChainFromFiles(
+            @Nullable Project project,
+            @NotNull VirtualFile file1,
+            @NotNull VirtualFile file2
+    ) {
         DiffContentFactory contentFactory = DiffContentFactory.getInstance();
         DiffRequestFactory requestFactory = DiffRequestFactory.getInstance();
 
