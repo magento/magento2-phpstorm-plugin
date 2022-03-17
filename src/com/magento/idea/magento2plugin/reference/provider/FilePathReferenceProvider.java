@@ -117,7 +117,6 @@ public class FilePathReferenceProvider extends PsiReferenceProvider {
         if (fileName.matches(".*\\.\\w+$")) {
             // extension presents
             files = FilenameIndex.getVirtualFilesByName(
-                    element.getProject(),
                     fileName,
                     GlobalSearchScope.allScope(element.getProject())
             );
