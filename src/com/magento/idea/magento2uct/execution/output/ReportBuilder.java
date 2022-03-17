@@ -163,6 +163,7 @@ public class ReportBuilder {
                     + "installedVersion\": \"" + summary.getInstalledVersion() + "\","
                     + "\"AdobeCommerceVersion\": \"" + summary.getTargetVersion() + "\","
                     + "\"checkedModules\": " + summary.getProcessedModules() + ","
+                    + "\"checkedThemes\": " + summary.getProcessedThemes() + ","
                     + "\"runningTime\": \"" + summary.getProcessRunningTime() + "\","
                     + "\"totalWarnings\": " + summary.getPhpWarnings() + ","
                     + "\"totalErrors\": " + summary.getPhpErrors() + ","

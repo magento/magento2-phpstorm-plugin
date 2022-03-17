@@ -14,7 +14,11 @@ use $use;
 class ${CLASS_NAME} extends ${PARENT_CLASS_NAME} implements ${INTERFACE_NAME}
 {
     /**
-     * @inheritDoc
+     * Set items list.
+     *
+     * @param array $items
+     *
+     * @return ${INTERFACE_NAME}
      */
     public function setItems(array $items): ${INTERFACE_NAME}
     {
@@ -22,7 +26,9 @@ class ${CLASS_NAME} extends ${PARENT_CLASS_NAME} implements ${INTERFACE_NAME}
     }
 
     /**
-     * @inheritDoc
+     * Get items list.
+     *
+     * @return array
      */
     public function getItems(): array
     {
