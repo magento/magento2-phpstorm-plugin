@@ -14,7 +14,7 @@ class TestCollection extends AbstractCollection
     protected $_eventPrefix = 'my_table_collection';
 
     /**
-     * @inheritdoc
+     * Initialize collection model.
      */
     protected function _construct()
     {
