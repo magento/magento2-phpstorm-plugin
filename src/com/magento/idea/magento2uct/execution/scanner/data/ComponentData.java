@@ -6,13 +6,14 @@
 package com.magento.idea.magento2uct.execution.scanner.data;
 
 import com.intellij.psi.PsiDirectory;
+import com.magento.idea.magento2plugin.magento.packages.ComponentType;
 import org.jetbrains.annotations.NotNull;
 
 public class ComponentData {
 
     private final String name;
     private final String composerName;
-    private final String type;
+    private final ComponentType type;
     private final PsiDirectory directory;
 
     /**
@@ -20,13 +21,13 @@ public class ComponentData {
      *
      * @param name String
      * @param composerName String
-     * @param type String
+     * @param type ComponentType
      * @param directory PsiDirectory
      */
     public ComponentData(
             final @NotNull String name,
             final String composerName,
-            final @NotNull String type,
+            final @NotNull ComponentType type,
             final @NotNull PsiDirectory directory
     ) {
         this.name = name;
@@ -56,9 +57,9 @@ public class ComponentData {
     /**
      * Get component type.
      *
-     * @return String
+     * @return ComponentType
      */
-    public String getType() {
+    public ComponentType getType() {
         return type;
     }
 

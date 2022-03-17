@@ -10,7 +10,8 @@ import org.jetbrains.annotations.NotNull;
 @SuppressWarnings({"PMD.FieldNamingConventions"})
 public enum ComponentType {
     module,
-    theme;
+    theme,
+    library;
 
     /**
      * Get component type by value.

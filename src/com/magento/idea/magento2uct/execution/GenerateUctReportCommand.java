@@ -37,6 +37,7 @@ import com.magento.idea.magento2uct.settings.UctSettingsService;
 import com.magento.idea.magento2uct.util.inspection.FilterDescriptorResultsUtil;
 import com.magento.idea.magento2uct.util.inspection.SortDescriptorResultsUtil;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -84,7 +85,7 @@ public class GenerateUctReportCommand {
     @SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.AvoidInstantiatingObjectsInLoops"})
     public void execute() {
         output.write("Upgrade compatibility tool\n");
-        final PsiDirectory rootDirectory = getTargetPsiDirectory();
+        final PsiDirectory rootDirectory = getTargetPsiDirectory(settingsService.getModulePath());
 
         if (rootDirectory == null) {
             output.print(
@@ -93,8 +94,21 @@ public class GenerateUctReportCommand {
             process.destroyProcess();
             return;
         }
+        final List<PsiDirectory> directoriesToScan = new ArrayList<>();
+        directoriesToScan.add(rootDirectory);
+
+        if (settingsService.getHasAdditionalPath()) {
+            final PsiDirectory additionalDirectory = getTargetPsiDirectory(
+                    settingsService.getAdditionalPath()
+            );
+
+            if (additionalDirectory != null) {
+                directoriesToScan.add(additionalDirectory);
+            }
+        }
+
         final ModuleScanner scanner = new ModuleScanner(
-                rootDirectory,
+                directoriesToScan,
                 new ExcludeMagentoBundledFilter()
         );
         final Summary summary = new Summary(
@@ -136,7 +150,7 @@ public class GenerateUctReportCommand {
 
                         if (fileProblemsHolder.hasResults()) {
                             if (!isModuleHeaderPrinted) {
-                                outputUtil.printModuleName(componentData.getName());
+                                outputUtil.printModuleName(componentData);
                                 isModuleHeaderPrinted = true;
                             }
                             outputUtil.printProblemFile(filename);
@@ -165,9 +179,10 @@ public class GenerateUctReportCommand {
                 }
                 summary.trackProcessFinished();
                 summary.setProcessedModules(scanner.getModuleCount());
+                summary.setProcessedThemes(scanner.getThemeCount());
                 outputUtil.printSummary(summary, resolvedEdition);
 
-                if (summary.getProcessedModules() == 0) {
+                if (summary.getProcessedModules() == 0 && summary.getProcessedThemes() == 0) {
                     process.destroyProcess();
                     return;
                 }
@@ -196,11 +211,11 @@ public class GenerateUctReportCommand {
     /**
      * Get target psi directory.
      *
+     * @param targetDirPath String
+     *
      * @return PsiDirectory
      */
-    private @Nullable PsiDirectory getTargetPsiDirectory() {
-        final String targetDirPath = settingsService.getModulePath();
-
+    private @Nullable PsiDirectory getTargetPsiDirectory(final String targetDirPath) {
         if (targetDirPath == null) {
             return null;
         }
