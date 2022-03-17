@@ -5,28 +5,29 @@
 
 package com.magento.idea.magento2plugin.actions.generation;
 
+import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.MagentoIcons;
-import com.magento.idea.magento2plugin.actions.generation.dialog.OverrideInThemeDialog;
+import com.magento.idea.magento2plugin.actions.generation.dialog.OverrideLayoutInThemeDialog;
+import com.magento.idea.magento2plugin.magento.files.LayoutXml;
+import com.magento.idea.magento2plugin.magento.files.UiComponentGridXmlFile;
 import com.magento.idea.magento2plugin.magento.packages.ComponentType;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.project.Settings;
-import com.magento.idea.magento2plugin.util.magento.GetComponentNameByDirectoryUtil;
-import com.magento.idea.magento2plugin.util.magento.GetComponentTypeByNameUtil;
+import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil;
 import org.jetbrains.annotations.NotNull;
 
-public class OverrideInThemeAction extends DumbAwareAction {
+public class OverrideLayoutInThemeAction extends AnAction {
 
-    public static final String ACTION_NAME = "Override this template in a project theme";
-    public static final String ACTION_DESCRIPTION = "Override in project theme";
+    public static final String ACTION_NAME = "Override this layout in a project theme";
+    public static final String ACTION_DESCRIPTION = "Override layout in project theme";
     private PsiFile psiFile;
 
-    public OverrideInThemeAction() {
+    public OverrideLayoutInThemeAction() {
         super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
     }
 
@@ -60,15 +61,22 @@ public class OverrideInThemeAction extends DumbAwareAction {
             return false;
         }
 
+        if (!UiComponentGridXmlFile.FILE_EXTENSION
+                .equals(psiFile.getVirtualFile().getExtension())) {
+            return false;
+        }
+
+        if (!LayoutXml.PARENT_DIR.equals(psiFile.getContainingDirectory().getName())
+                && !LayoutXml.PAGE_LAYOUT_DIR.equals(psiFile.getContainingDirectory().getName())) {
+            return false;
+        }
         boolean isAllowed = false;
+        final GetMagentoModuleUtil.MagentoModuleData moduleData =
+                GetMagentoModuleUtil.getByContext(psiFile.getContainingDirectory(), project);
 
-        final String componentType = GetComponentTypeByNameUtil.execute(
-                GetComponentNameByDirectoryUtil.execute(psiFile.getContainingDirectory(), project)
-        );
-
-        if (componentType.equals(ComponentType.module.toString())) {
+        if (moduleData.getType().equals(ComponentType.module)) {
             isAllowed = file.getPath().contains(Package.moduleViewDir);
-        } else if (componentType.equals(ComponentType.theme.toString())) {
+        } else if (moduleData.getType().equals(ComponentType.theme)) {
             isAllowed = true;
         }
 
@@ -82,11 +90,6 @@ public class OverrideInThemeAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent event) {
-        OverrideInThemeDialog.open(event.getProject(), this.psiFile);
-    }
-
-    @Override
-    public boolean isDumbAware() {
-        return false;
+        OverrideLayoutInThemeDialog.open(event.getProject(), this.psiFile);
     }
 }
