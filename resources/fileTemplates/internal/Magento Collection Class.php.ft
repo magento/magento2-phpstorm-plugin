@@ -17,7 +17,7 @@ class ${NAME}#if (${EXTENDS}) extends ${EXTENDS}#end#if (${IMPLEMENTS}) implemen
     protected $_eventPrefix = '${DB_NAME}_collection';
 
     /**
-     * @inheritdoc
+     * Initialize collection model.
      */
     protected function _construct()
     {

@@ -13,7 +13,7 @@ class TestResourceModel extends AbstractDb
     protected $_eventPrefix = 'my_table_resource_model';
 
     /**
-     * @inheritdoc
+     * Initialize resource model.
      */
     protected function _construct()
     {
