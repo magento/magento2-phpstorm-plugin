@@ -2,11 +2,16 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.reference.provider;
 
 import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.vfs.*;
-import com.intellij.psi.*;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.PsiReference;
+import com.intellij.psi.PsiReferenceProvider;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.ProcessingContext;
@@ -16,14 +21,20 @@ import com.magento.idea.magento2plugin.reference.provider.util.GetModuleNameUtil
 import com.magento.idea.magento2plugin.reference.provider.util.GetModuleSourceFilesUtil;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 import gnu.trove.THashMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import org.jetbrains.annotations.NotNull;
-import java.util.*;
 
 public class FilePathReferenceProvider extends PsiReferenceProvider {
 
     @NotNull
     @Override
-    public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
+    public PsiReference[] getReferencesByElement(
+            @NotNull PsiElement element,
+            @NotNull ProcessingContext context
+    ) {
 
         List<PsiReference> psiReferences = new ArrayList<>();
 
@@ -56,7 +67,8 @@ public class FilePathReferenceProvider extends PsiReferenceProvider {
                     continue;
                 }
                 String rootPathUrl = fileUrl.substring(0, fileUrl.indexOf(filePath));
-                String[] relativePathParts = fileUrl.substring(fileUrl.indexOf(filePath)).split("/");
+                String[] relativePathParts
+                        = fileUrl.substring(fileUrl.indexOf(filePath)).split("/");
 
                 if (!currentPathIsBuilt) {
                     currentPath = currentPath.isEmpty()
@@ -73,13 +85,15 @@ public class FilePathReferenceProvider extends PsiReferenceProvider {
                             ? psiManager.findDirectory(currentVf)
                             : psiManager.findFile(currentVf);
                     if (null != psiElement) {
+                        final int currentPathIndex = currentPath.lastIndexOf("/") == -1
+                                ? 0 : currentPath.lastIndexOf("/") + 1;
 
                         TextRange pathRange = new TextRange(
-                            origValue.indexOf(filePath)
-                                + (currentPath.lastIndexOf("/") == -1 ? 0 : currentPath.lastIndexOf("/") + 1),
-                            origValue.indexOf(filePath)
-                                + (currentPath.lastIndexOf("/") == -1 ? 0 : currentPath.lastIndexOf("/") + 1)
-                                + pathPart.length()
+                                origValue.indexOf(filePath)
+                                    + currentPathIndex,
+                                origValue.indexOf(filePath)
+                                    + currentPathIndex
+                                    + pathPart.length()
                         );
 
                         if (!psiPathElements.containsKey(pathRange)) {
@@ -94,17 +108,18 @@ public class FilePathReferenceProvider extends PsiReferenceProvider {
             }
 
             if (psiPathElements.size() > 0) {
-                psiPathElements.forEach(((textRange, psiElements) ->
-                        psiReferences.add(new PolyVariantReferenceBase(element, textRange, psiElements))
-                ));
+                psiPathElements.forEach((textRange, psiElements) ->
+                        psiReferences.add(
+                                new PolyVariantReferenceBase(element, textRange, psiElements)
+                        )
+                );
             }
         }
 
         return psiReferences.toArray(new PsiReference[psiReferences.size()]);
     }
 
-    private Collection<VirtualFile> getFiles(@NotNull PsiElement element)
-    {
+    private Collection<VirtualFile> getFiles(@NotNull PsiElement element) {
         Collection<VirtualFile> files = new ArrayList<>();
 
         String filePath = GetFilePathUtil.getInstance().execute(element.getText());
@@ -123,7 +138,8 @@ public class FilePathReferenceProvider extends PsiReferenceProvider {
             files.removeIf(f -> !f.getPath().endsWith(filePath));
 
             // filter by module
-            Collection<VirtualFile> vfs = GetModuleSourceFilesUtil.getInstance().execute(element.getText(), element.getProject());
+            Collection<VirtualFile> vfs = GetModuleSourceFilesUtil.getInstance()
+                    .execute(element.getText(), element.getProject());
             if (null != vfs) {
                 files.removeIf(f -> {
                     for (VirtualFile vf : vfs) {
@@ -136,11 +152,12 @@ public class FilePathReferenceProvider extends PsiReferenceProvider {
             }
         } else if (isModuleNamePresent(element)) {
             // extension absent
-            Collection<VirtualFile> vfs = GetModuleSourceFilesUtil.getInstance().execute(element.getText(), element.getProject());
+            Collection<VirtualFile> vfs = GetModuleSourceFilesUtil.getInstance()
+                    .execute(element.getText(), element.getProject());
             if (null != vfs) {
                 for (VirtualFile vf : vfs) {
-                    Collection<VirtualFile> vfChildren = GetAllSubFilesOfVirtualFileUtil.
-                            getInstance().execute(vf);
+                    Collection<VirtualFile> vfChildren = GetAllSubFilesOfVirtualFileUtil
+                            .getInstance().execute(vf);
                     if (null != vfChildren) {
                         vfChildren.removeIf(f -> {
                             if (!f.isDirectory()) {
@@ -160,8 +177,7 @@ public class FilePathReferenceProvider extends PsiReferenceProvider {
         return files;
     }
 
-    private boolean isModuleNamePresent(@NotNull PsiElement element)
-    {
+    private boolean isModuleNamePresent(@NotNull PsiElement element) {
         return GetModuleNameUtil.getInstance().execute(element.getText()) != null;
     }
 }
