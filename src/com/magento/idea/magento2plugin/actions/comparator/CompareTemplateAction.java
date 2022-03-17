@@ -105,7 +105,8 @@ public class CompareTemplateAction extends AnAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent event) {
         final Project project = event.getProject();
-        final DiffRequestChain chain = createMutableChainFromFiles(project, selectedFile, originalFile);
+        final DiffRequestChain chain =
+                createMutableChainFromFiles(project, selectedFile, originalFile);
 
         DiffManager.getInstance().showDiff(project, chain, DiffDialogHints.DEFAULT);
     }
