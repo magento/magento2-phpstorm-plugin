@@ -82,6 +82,7 @@ public class CompareTemplateAction extends AnAction {
             return;
         }
         final String originalModuleName = getOriginalModuleName(project, psiFile);
+
         final PsiDirectory originalModuleDirectory =
                 new ModuleIndex(project).getModuleDirectoryByModuleName(originalModuleName);
 
