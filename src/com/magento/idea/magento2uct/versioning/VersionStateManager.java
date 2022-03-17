@@ -53,6 +53,19 @@ public final class VersionStateManager {
     }
 
     /**
+     * Checks if specified FQN was/is in the MBE/VBE.
+     *
+     * @param fqn String
+     *
+     * @return boolean
+     */
+    public synchronized boolean isPresentInCodebase(final @NotNull String fqn) {
+        String safeFqn = MagentoTypeEscapeUtil.escapeProperty(escapeFqn(fqn));
+
+        return existenceStateIndex.isPresentInCodebase(safeFqn);
+    }
+
+    /**
      * Check if specified FQN exists in the deprecation index.
      *
      * @param fqn String
@@ -215,6 +228,8 @@ public final class VersionStateManager {
      * @return String
      */
     private String escapeFqn(final @NotNull String fqn) {
-        return MagentoTypeEscapeUtil.escape(fqn);
+        return MagentoTypeEscapeUtil.escape(
+                fqn.trim().charAt(0) == '\\' ? fqn.trim() : '\\' + fqn.trim()
+        );
     }
 }

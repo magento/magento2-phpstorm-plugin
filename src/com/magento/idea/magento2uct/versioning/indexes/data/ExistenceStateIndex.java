@@ -67,6 +67,17 @@ public class ExistenceStateIndex implements VersionStateIndex {
     }
 
     /**
+     * Checks if specified FQN was/is in the MBE/VBE.
+     *
+     * @param fqn String
+     *
+     * @return boolean
+     */
+    public synchronized boolean isPresentInCodebase(final @NotNull String fqn) {
+        return changelog.containsKey(fqn);
+    }
+
+    /**
      * Get version for specified FQN from prepared changelog.
      *
      * @param fqn String
