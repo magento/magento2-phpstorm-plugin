@@ -53,7 +53,7 @@ class ${CLASS_NAME} extends ${PARENT_CLASS}
     }
 
     /**
-     * Prepare Data Source.
+     * Prepare data source.
      *
      * @param array $dataSource
      *

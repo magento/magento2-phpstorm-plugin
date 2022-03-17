@@ -14,7 +14,7 @@ class Collection extends AbstractCollection
     protected $_eventPrefix = 'my_table_collection';
 
     /**
-     * Initialize resource model.
+     * Initialize collection model.
      */
     protected function _construct()
     {

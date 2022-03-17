@@ -13,7 +13,7 @@ class TestModel extends AbstractModel
     protected $_eventPrefix = 'my_table_model';
 
     /**
-     * Initialize resource.
+     * Initialize magento model.
      *
      * @return void
      */
