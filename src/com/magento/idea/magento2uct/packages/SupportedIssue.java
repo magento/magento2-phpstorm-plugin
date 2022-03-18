@@ -7,6 +7,7 @@ package com.magento.idea.magento2uct.packages;
 
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.xml.XmlFile;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.magento.idea.magento2uct.bundles.UctInspectionBundle;
 import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
@@ -401,6 +402,7 @@ public enum SupportedIssue {
     public static List<Class<?>> getSupportedFileTypes() {
         final List<Class<?>> types = new ArrayList<>();
         types.add(PhpFile.class);
+        types.add(XmlFile.class);
 
         return types;
     }

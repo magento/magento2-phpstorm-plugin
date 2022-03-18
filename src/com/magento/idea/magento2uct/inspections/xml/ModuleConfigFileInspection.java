@@ -7,9 +7,11 @@ package com.magento.idea.magento2uct.inspections.xml;
 
 import com.intellij.codeInspection.InspectionManager;
 import com.intellij.codeInspection.ProblemDescriptor;
+import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.codeInspection.XmlSuppressableInspectionTool;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -39,6 +41,17 @@ abstract class ModuleConfigFileInspection extends XmlSuppressableInspectionTool 
             "product_types.xml",
             "widget.xml",
     };
+    private ProblemsHolder problemsHolder;
+
+    @Override
+    public @NotNull PsiElementVisitor buildVisitor(
+            final @NotNull ProblemsHolder holder,
+            final boolean isOnTheFly
+    ) {
+        problemsHolder = holder;
+
+        return super.buildVisitor(holder, isOnTheFly);
+    }
 
     @Override
     public @Nullable ProblemDescriptor[] checkFile(
@@ -48,8 +61,9 @@ abstract class ModuleConfigFileInspection extends XmlSuppressableInspectionTool 
     ) {
         final Project project = file.getProject();
         final UctSettingsService settings = UctSettingsService.getInstance(project);
+        final ProblemsHolder holder = getProblemsHolder();
 
-        if (!settings.isEnabled()) {
+        if (!settings.isEnabled() || holder == null) {
             return getEmptyResult();
         }
 
@@ -72,7 +86,7 @@ abstract class ModuleConfigFileInspection extends XmlSuppressableInspectionTool 
                 continue;
             }
             // Inspection logic.
-            doInspection(fqn, token, manager, isOnTheFly, descriptors);
+            doInspection(fqn, token, manager, holder, isOnTheFly, descriptors);
         }
 
         return descriptors.toArray(new ProblemDescriptor[0]);
@@ -84,6 +98,7 @@ abstract class ModuleConfigFileInspection extends XmlSuppressableInspectionTool 
      * @param fqn String
      * @param target PsiElement
      * @param manager InspectionManager
+     * @param holder ProblemsHolder
      * @param isOnTheFly boolean
      * @param descriptors List[ProblemDescriptor]
      */
@@ -91,9 +106,14 @@ abstract class ModuleConfigFileInspection extends XmlSuppressableInspectionTool 
             final @NotNull String fqn,
             final @NotNull PsiElement target,
             final @NotNull InspectionManager manager,
+            final @NotNull ProblemsHolder holder,
             final boolean isOnTheFly,
             final @NotNull List<ProblemDescriptor> descriptors
     );
+
+    private @Nullable ProblemsHolder getProblemsHolder() {
+        return problemsHolder;
+    }
 
     /**
      * Retrieves an empty result.

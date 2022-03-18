@@ -135,9 +135,6 @@ public class GenerateUctReportCommand {
                     boolean isModuleHeaderPrinted = false;
 
                     for (final PsiFile psiFile : new ModuleFilesScanner(componentData)) {
-                        if (!(psiFile instanceof PhpFile)) {
-                            continue;
-                        }
                         final String filename = psiFile.getVirtualFile().getPath();
                         final UctInspectionManager inspectionManager = new UctInspectionManager(
                                 project
