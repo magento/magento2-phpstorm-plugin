@@ -22,6 +22,7 @@ public class LayoutXml implements ModuleFileInterface {
     public static final String XML_ATTRIBUTE_TEMPLATE = "template";
     public static final String ARGUMENTS_TEMPLATE = "Magento Module Class Arguments In Xml";
     public static final String PARENT_DIR = "layout";
+    public static final String PAGE_LAYOUT_DIR = "page_layout";
     public static final String NAME_ATTRIBUTE = "name";
     public static final String CONTENT_CONTAINER_NAME = "content";
 
