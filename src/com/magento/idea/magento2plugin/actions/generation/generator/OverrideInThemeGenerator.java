@@ -17,11 +17,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class OverrideInThemeGenerator {
+public abstract class OverrideInThemeGenerator {
 
-    public final ValidatorBundle validatorBundle;
-
-    public final Project project;
+    protected final Project project;
+    protected final ValidatorBundle validatorBundle;
 
     /**
      * OverrideInThemeGenerator constructor.
@@ -37,12 +36,12 @@ public class OverrideInThemeGenerator {
      *  Get target directory.
      *
      * @param directory PsiDirectory
-     * @param pathComponents String[]
+     * @param pathComponents List[String]
      *
      * @return PsiDirectory
      */
-    public static PsiDirectory getTargetDirectory(
-            PsiDirectory directory, //NOPMD
+    protected PsiDirectory getTargetDirectory(
+            final PsiDirectory directory,
             final List<String> pathComponents
     ) {
         PsiDirectory result = directory;
@@ -62,13 +61,16 @@ public class OverrideInThemeGenerator {
      *
      * @param file PsiFile
      * @param componentName String
-     * @return String[]
+     *
+     * @return List[String]
      */
-    public static List<String> getModulePathComponents(
+    protected List<String> getModulePathComponents(
             final PsiFile file,
-            final String componentName) {
+            final String componentName
+    ) {
         final List<String> pathComponents = new ArrayList<>();
         PsiDirectory parent = file.getParent();
+
         while (!parent.getName().equals(Areas.frontend.toString())
                 && !parent.getName().equals(Areas.adminhtml.toString())
                 && !parent.getName().equals(Areas.base.toString())
@@ -89,7 +91,7 @@ public class OverrideInThemeGenerator {
      *
      * @return String[]
      */
-    public static List<String> getThemePathComponents(final PsiFile file) {
+    protected List<String> getThemePathComponents(final PsiFile file) {
         final List<String> pathComponents = new ArrayList<>();
         final Pattern pattern = Pattern.compile(RegExUtil.Magento.MODULE_NAME);
 

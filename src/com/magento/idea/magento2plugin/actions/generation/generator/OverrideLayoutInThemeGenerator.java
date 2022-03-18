@@ -41,15 +41,16 @@ public class OverrideLayoutInThemeGenerator extends OverrideInThemeGenerator {
     public void execute(
             final PsiFile baseFile,
             final String themeName,
-            final boolean isOverride) {
+            final boolean isOverride
+    ) {
         final GetMagentoModuleUtil.MagentoModuleData moduleData =
                 GetMagentoModuleUtil.getByContext(baseFile.getContainingDirectory(), project);
 
         if (moduleData == null) {
             return;
         }
-
         List<String> pathComponents;
+
         if (moduleData.getType().equals(ComponentType.module)) {
             pathComponents = getModulePathComponents(
                     baseFile,

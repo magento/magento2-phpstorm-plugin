@@ -33,14 +33,15 @@ import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
 
 public class OverrideTemplateInThemeDialog extends AbstractDialog {
-    @NotNull
-    private final Project project;
+
+    private static final String THEME_NAME = "target theme";
+
+    private final @NotNull Project project;
     private final PsiFile psiFile;
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
     private JLabel selectTheme; //NOPMD
-    private static final String THEME_NAME = "target theme";
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, THEME_NAME})
@@ -52,7 +53,10 @@ public class OverrideTemplateInThemeDialog extends AbstractDialog {
      * @param project Project
      * @param psiFile PsiFile
      */
-    public OverrideTemplateInThemeDialog(final @NotNull Project project, final PsiFile psiFile) {
+    public OverrideTemplateInThemeDialog(
+            final @NotNull Project project,
+            final @NotNull PsiFile psiFile
+    ) {
         super();
 
         this.project = project;
@@ -89,32 +93,32 @@ public class OverrideTemplateInThemeDialog extends AbstractDialog {
         addComponentListener(new FocusOnAFieldListener(() -> theme.requestFocusInWindow()));
     }
 
-    private void onOK() {
-        if (validateFormFields()) {
-            final OverrideTemplateInThemeGenerator overrideInThemeGenerator =
-                    new OverrideTemplateInThemeGenerator(project);
-
-            overrideInThemeGenerator.execute(psiFile, this.getTheme());
-        }
-        exit();
-    }
-
-    public String getTheme() {
-        return this.theme.getSelectedItem().toString();
-    }
-
     /**
      * Open popup.
      *
      * @param project Project
      * @param psiFile PsiFile
      */
-    public static void open(final @NotNull Project project, final PsiFile psiFile) {
+    public static void open(final @NotNull Project project, final @NotNull PsiFile psiFile) {
         final OverrideTemplateInThemeDialog dialog =
                 new OverrideTemplateInThemeDialog(project, psiFile);
         dialog.pack();
         dialog.centerDialog(dialog);
         dialog.setVisible(true);
+    }
+
+    private void onOK() {
+        if (validateFormFields()) {
+            final OverrideTemplateInThemeGenerator overrideInThemeGenerator =
+                    new OverrideTemplateInThemeGenerator(project);
+
+            overrideInThemeGenerator.execute(psiFile, this.getTheme());
+            exit();
+        }
+    }
+
+    private String getTheme() {
+        return this.theme.getSelectedItem().toString();
     }
 
     private void fillThemeOptions() {
@@ -139,6 +143,7 @@ public class OverrideTemplateInThemeDialog extends AbstractDialog {
             area = moduleData.getName().split(Package.V_FILE_SEPARATOR)[0];
         }
         final List<String> themeNames = new ModuleIndex(project).getEditableThemeNames();
+
         for (final String themeName : themeNames) {
             if (Areas.base.toString().equals(area)
                     || themeName.split(Package.V_FILE_SEPARATOR)[0].equals(area)) {

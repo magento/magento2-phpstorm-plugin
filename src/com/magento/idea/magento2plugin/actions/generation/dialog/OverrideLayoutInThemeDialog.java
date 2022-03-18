@@ -33,14 +33,15 @@ import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
 
 public class OverrideLayoutInThemeDialog extends AbstractDialog {
-    @NotNull
-    private final Project project;
+
+    private static final String THEME_NAME = "target theme";
+
+    private final @NotNull Project project;
     private final PsiFile psiFile;
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
     private JLabel selectTheme; //NOPMD
-    private static final String THEME_NAME = "target theme";
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, THEME_NAME})
@@ -54,7 +55,10 @@ public class OverrideLayoutInThemeDialog extends AbstractDialog {
      * @param project Project
      * @param psiFile PsiFile
      */
-    public OverrideLayoutInThemeDialog(final @NotNull Project project, final PsiFile psiFile) {
+    public OverrideLayoutInThemeDialog(
+            final @NotNull Project project,
+            final @NotNull PsiFile psiFile
+    ) {
         super();
 
         this.project = project;
@@ -89,6 +93,38 @@ public class OverrideLayoutInThemeDialog extends AbstractDialog {
         addComponentListener(new FocusOnAFieldListener(() -> theme.requestFocusInWindow()));
     }
 
+    /**
+     * Open popup.
+     *
+     * @param project Project
+     * @param psiFile PsiFile
+     */
+    public static void open(final @NotNull Project project, final @NotNull PsiFile psiFile) {
+        final OverrideLayoutInThemeDialog dialog =
+                new OverrideLayoutInThemeDialog(project, psiFile);
+        dialog.pack();
+        dialog.centerDialog(dialog);
+        dialog.setVisible(true);
+    }
+
+    private void onOK() {
+        if (validateFormFields()) {
+            final OverrideLayoutInThemeGenerator overrideLayoutInThemeGenerator =
+                    new OverrideLayoutInThemeGenerator(project);
+
+            overrideLayoutInThemeGenerator.execute(psiFile, getTheme(), isOverride());
+            exit();
+        }
+    }
+
+    private String getTheme() {
+        return this.theme.getSelectedItem().toString();
+    }
+
+    private boolean isOverride() {
+        return this.radioButtonOverride.isSelected();
+    }
+
     private void onOverride() {
         this.radioButtonOverride.setSelected(true);
         this.radioButtonExtend.setSelected(false);
@@ -97,43 +133,6 @@ public class OverrideLayoutInThemeDialog extends AbstractDialog {
     private void onExtend() {
         this.radioButtonOverride.setSelected(false);
         this.radioButtonExtend.setSelected(true);
-    }
-
-    private void onOK() {
-        if (validateFormFields()) {
-            final OverrideLayoutInThemeGenerator overrideLayoutInThemeGenerator =
-                    new OverrideLayoutInThemeGenerator(project);
-
-            overrideLayoutInThemeGenerator.execute(psiFile, this.getTheme(), this.isOverride());
-        }
-        exit();
-    }
-
-    public String getTheme() {
-        return this.theme.getSelectedItem().toString();
-    }
-
-    /**
-     * Is Override.
-     *
-     * @return boolean
-     */
-    public boolean isOverride() {
-        return this.radioButtonOverride.isSelected();
-    }
-
-    /**
-     * Open popup.
-     *
-     * @param project Project
-     * @param psiFile PsiFile
-     */
-    public static void open(final @NotNull Project project, final PsiFile psiFile) {
-        final OverrideLayoutInThemeDialog dialog =
-                new OverrideLayoutInThemeDialog(project, psiFile);
-        dialog.pack();
-        dialog.centerDialog(dialog);
-        dialog.setVisible(true);
     }
 
     private void fillThemeOptions() {
@@ -158,6 +157,7 @@ public class OverrideLayoutInThemeDialog extends AbstractDialog {
             area = moduleData.getName().split(Package.V_FILE_SEPARATOR)[0];
         }
         final List<String> themeNames = new ModuleIndex(project).getEditableThemeNames();
+
         for (final String themeName : themeNames) {
             if (Areas.base.toString().equals(area)
                     || themeName.split(Package.V_FILE_SEPARATOR)[0].equals(area)) {
