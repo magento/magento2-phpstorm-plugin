@@ -16,11 +16,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
 public class ExistenceStateIndex implements VersionStateIndex {
 
     private static final String RESOURCE_DIR = "existence";
@@ -28,6 +31,7 @@ public class ExistenceStateIndex implements VersionStateIndex {
     private final Map<String, Map<String, Boolean>> versioningData;
     private final Map<String, Boolean> targetVersionData;
     private final Map<String, String> changelog;
+    private final Set<String> codebase;
     private String projectBasePath;
 
     /**
@@ -37,6 +41,7 @@ public class ExistenceStateIndex implements VersionStateIndex {
         versioningData = new LinkedHashMap<>();
         targetVersionData = new HashMap<>();
         changelog = new HashMap<>();
+        codebase = new HashSet<>();
     }
 
     /**
@@ -55,7 +60,6 @@ public class ExistenceStateIndex implements VersionStateIndex {
      *
      * @return boolean
      */
-    @SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
     public synchronized boolean has(final @NotNull String fqn) {
         groupLoadedData();
 
@@ -74,7 +78,7 @@ public class ExistenceStateIndex implements VersionStateIndex {
      * @return boolean
      */
     public synchronized boolean isPresentInCodebase(final @NotNull String fqn) {
-        return changelog.containsKey(fqn);
+        return codebase.contains(fqn);
     }
 
     /**
@@ -198,6 +202,7 @@ public class ExistenceStateIndex implements VersionStateIndex {
                     );
             targetVersionData.putAll(gatheredData.getFirst());
             changelog.putAll(gatheredData.getSecond());
+            codebase.addAll(VersioningDataOperationsUtil.unionVersionData(versioningData).keySet());
         }
     }
 }

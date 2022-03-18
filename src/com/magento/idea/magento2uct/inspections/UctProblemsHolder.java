@@ -74,7 +74,6 @@ public class UctProblemsHolder extends ProblemsHolder {
         // if problem has been added successfully
         if (problemCount != getMyProblems().size()) {
             myProblemCodes.put(problemDescriptor, issue);
-            issue = null;//NOPMD
         }
     }
 

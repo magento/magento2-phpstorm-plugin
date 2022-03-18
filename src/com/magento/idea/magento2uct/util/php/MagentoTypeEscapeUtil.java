@@ -15,8 +15,7 @@ public final class MagentoTypeEscapeUtil {
             = "(Factory|\\\\Proxy|Factory\\\\Proxy)($|\\.)";
     public static final Pattern FACTORY_PROXY_TYPE_PATTERN
             = Pattern.compile(FACTORY_PROXY_TYPE_REGEX, Pattern.MULTILINE);
-    public static final String PHP_PROPERTY_REFERENCE_SEPARATOR = "::";
-    public static final String JAVA_PROPERTY_REFERENCE_SEPARATOR = ".";
+    public static final String JAVA_REFERENCE_SEPARATOR = ".";
 
     private MagentoTypeEscapeUtil() {
     }
@@ -43,7 +42,7 @@ public final class MagentoTypeEscapeUtil {
             result = result.substring(0, begin) + result.substring(end);
         }
 
-        return typeFqn.equals(result) ? typeFqn : result;
+        return typeFqn.equals(result) ? escapeProperty(typeFqn) : escapeProperty(result);
     }
 
     /**
@@ -54,11 +53,10 @@ public final class MagentoTypeEscapeUtil {
      * @return String
      */
     public static @NotNull String escapeProperty(final @NotNull String typeFqn) {
-        if (typeFqn.contains(PHP_PROPERTY_REFERENCE_SEPARATOR)
-                && typeFqn.split(PHP_PROPERTY_REFERENCE_SEPARATOR).length == 1) {
+        if (MagentoReferenceUtil.isReference(typeFqn)) {
             return typeFqn.replace(
-                    PHP_PROPERTY_REFERENCE_SEPARATOR,
-                    JAVA_PROPERTY_REFERENCE_SEPARATOR
+                    MagentoReferenceUtil.PHP_REFERENCE_SEPARATOR,
+                    JAVA_REFERENCE_SEPARATOR
             );
         }
 

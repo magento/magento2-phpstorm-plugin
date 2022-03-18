@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
 public final class VersionStateManager {
 
     private static VersionStateManager instance;
@@ -35,7 +36,6 @@ public final class VersionStateManager {
      *
      * @return VersionStateManager
      */
-    @SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
     public static synchronized VersionStateManager getInstance(
             final @NotNull Project project
     ) { //NOPMD
@@ -60,9 +60,7 @@ public final class VersionStateManager {
      * @return boolean
      */
     public synchronized boolean isPresentInCodebase(final @NotNull String fqn) {
-        String safeFqn = MagentoTypeEscapeUtil.escapeProperty(escapeFqn(fqn));
-
-        return existenceStateIndex.isPresentInCodebase(safeFqn);
+        return existenceStateIndex.isPresentInCodebase(escapeFqn(fqn));
     }
 
     /**
