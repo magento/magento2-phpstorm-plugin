@@ -18,6 +18,7 @@ public class Summary {
     private final SupportedVersion installedVersion;
     private final SupportedVersion targetVersion;
     private int processedModules;
+    private int processedThemes;
     private long processStartedTime;
     private long processEndedTime;
     private int phpWarnings;
@@ -72,6 +73,24 @@ public class Summary {
      */
     public void setProcessedModules(final int processedModules) {
         this.processedModules = processedModules;
+    }
+
+    /**
+     * Get processed theme qty.
+     *
+     * @return int
+     */
+    public int getProcessedThemes() {
+        return processedThemes;
+    }
+
+    /**
+     * Set processed theme qty.
+     *
+     * @param processedThemes int
+     */
+    public void setProcessedThemes(final int processedThemes) {
+        this.processedThemes = processedThemes;
     }
 
     /**

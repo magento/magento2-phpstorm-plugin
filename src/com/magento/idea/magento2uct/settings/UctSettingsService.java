@@ -42,6 +42,12 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
     @Property
     private Boolean ignoreCurrentVersion;
 
+    @Property
+    private Boolean hasAdditionalPath;
+
+    @Property
+    private String additionalPath;
+
     @SuppressWarnings("PMD.UncommentedEmptyConstructor")
     public UctSettingsService() {
     }
@@ -248,5 +254,41 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
      */
     public @Nullable Boolean shouldIgnoreCurrentVersion() {
         return ignoreCurrentVersion;
+    }
+
+    /**
+     * Set if show additional path.
+     *
+     * @param hasAdditionalPath boolean
+     */
+    public void setHasAdditionalPath(final boolean hasAdditionalPath) {
+        this.hasAdditionalPath = hasAdditionalPath;
+    }
+
+    /**
+     * Check if show additional path.
+     *
+     * @return boolean
+     */
+    public @NotNull Boolean getHasAdditionalPath() {
+        return hasAdditionalPath != null && hasAdditionalPath;
+    }
+
+    /**
+     * Set path to analyse.
+     *
+     * @param additionalPath String
+     */
+    public void setAdditionalPath(final @NotNull String additionalPath) {
+        this.additionalPath = additionalPath;
+    }
+
+    /**
+     * Get target module path (path to analyse).
+     *
+     * @return String
+     */
+    public @Nullable String getAdditionalPath() {
+        return additionalPath;
     }
 }

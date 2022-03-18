@@ -118,7 +118,10 @@
         <action id="InjectAViewModelAction.Menu" class="com.magento.idea.magento2plugin.actions.generation.InjectAViewModelAction">
             <add-to-group group-id="EditorPopupMenu"/>
         </action>
-        <action id="OverrideInTheme.Menu" class="com.magento.idea.magento2plugin.actions.generation.OverrideInThemeAction">
+        <action id="OverrideTemplateInTheme.Menu" class="com.magento.idea.magento2plugin.actions.generation.OverrideTemplateInThemeAction">
+            <add-to-group group-id="ProjectViewPopupMenu"/>
+        </action>
+        <action id="OverrideLayoutInTheme.Menu" class="com.magento.idea.magento2plugin.actions.generation.OverrideLayoutInThemeAction">
             <add-to-group group-id="ProjectViewPopupMenu"/>
         </action>
         <action id="MagentoCreateAWebApiDeclaration.Menu" class="com.magento.idea.magento2plugin.actions.generation.NewWebApiDeclarationAction">
@@ -128,6 +131,9 @@
             <add-to-group group-id="EditorPopupMenu"/>
         </action>
         <action id="MagentoInjectConstructorArgumentAction.Menu" class="com.magento.idea.magento2plugin.actions.generation.InjectConstructorArgumentAction">
+            <add-to-group group-id="EditorPopupMenu"/>
+        </action>
+        <action id="MagentoCompareTemplate.Menu" class="com.magento.idea.magento2plugin.actions.comparator.CompareTemplateAction">
             <add-to-group group-id="EditorPopupMenu"/>
         </action>
 

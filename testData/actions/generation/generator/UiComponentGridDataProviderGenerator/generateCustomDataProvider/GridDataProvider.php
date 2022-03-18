@@ -10,7 +10,9 @@ use Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider;
 class GridDataProvider extends DataProvider
 {
     /**
-     * @inheritDoc
+     * Get data.
+     *
+     * @return array
      */
     public function getData()
     {

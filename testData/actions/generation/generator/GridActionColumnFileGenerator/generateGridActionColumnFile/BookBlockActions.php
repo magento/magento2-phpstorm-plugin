@@ -20,11 +20,9 @@ class BookBlockActions extends Column
 
     /**
      * Url paths.
-     * #@+
      */
     private const EDIT_URL_PATH = 'book_book_edit';
     private const DELETE_URL_PATH = 'book_book_delete';
-    /** #@- */
 
     /**
      * @var UrlInterface
@@ -56,7 +54,11 @@ class BookBlockActions extends Column
     }
 
     /**
-     * @inheritDoc
+     * Prepare data source.
+     *
+     * @param array $dataSource
+     *
+     * @return array
      */
     public function prepareDataSource(array $dataSource): array
     {

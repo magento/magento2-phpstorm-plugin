@@ -7,7 +7,7 @@ use Magento\Framework\DataObject;
 class Sample extends DataObject
 {
     /**
-     * String constants for property names
+     * String constants for property names.
      */
     const ID_PROPERTY = "id_property";
     const SAMPLE_PROPERTY = "sample_property";
