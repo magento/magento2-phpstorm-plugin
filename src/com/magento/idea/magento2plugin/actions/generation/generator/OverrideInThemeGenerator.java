@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class OverrideInThemeGenerator {
 
     protected final Project project;
