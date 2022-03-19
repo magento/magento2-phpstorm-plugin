@@ -20,7 +20,6 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.jetbrains.php.lang.psi.PhpFile;
 import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
 import com.magento.idea.magento2uct.execution.output.ReportBuilder;
 import com.magento.idea.magento2uct.execution.output.Summary;
