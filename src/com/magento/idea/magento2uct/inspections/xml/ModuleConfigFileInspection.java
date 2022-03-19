@@ -17,6 +17,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlToken;
 import com.intellij.psi.xml.XmlTokenType;
+import com.jetbrains.php.lang.PhpLangUtil;
 import com.magento.idea.magento2uct.settings.UctSettingsService;
 import com.magento.idea.magento2uct.versioning.VersionStateManager;
 import java.util.ArrayList;

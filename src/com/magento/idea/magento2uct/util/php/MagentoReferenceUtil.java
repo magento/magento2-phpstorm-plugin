@@ -38,7 +38,8 @@ public final class MagentoReferenceUtil {
         if (isReference(referenceCandidate)) {
             final String referencePart = referenceCandidate.split(PHP_REFERENCE_SEPARATOR)[1];
 
-            return StringUtil.isJavaIdentifier(referencePart);
+            return StringUtil.isJavaIdentifier(referencePart)
+                    && !isConstantReference(referenceCandidate);
         }
 
         return false;
@@ -55,7 +56,7 @@ public final class MagentoReferenceUtil {
         if (isReference(referenceCandidate)) {
             final String referencePart = referenceCandidate.split(PHP_REFERENCE_SEPARATOR)[1];
 
-            return StringUtil.isUpperCase(referencePart);
+            return StringUtil.isUpperCase(referencePart.replace("_", ""));
         }
 
         return false;

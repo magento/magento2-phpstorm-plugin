@@ -17,7 +17,7 @@ import com.magento.idea.magento2uct.versioning.VersionStateManager;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
-public class UsedNonExistentTypeInConfig extends ModuleConfigFileInspection {
+public class UsedDeprecatedConstantInConfig extends ModuleConfigFileInspection {
 
     @Override
     protected void doInspection(
@@ -28,27 +28,27 @@ public class UsedNonExistentTypeInConfig extends ModuleConfigFileInspection {
             final boolean isOnTheFly,
             final @NotNull List<ProblemDescriptor> descriptors
     ) {
-        if (MagentoReferenceUtil.isReference(fqn)) {
+        if (!MagentoReferenceUtil.isConstantReference(fqn)) {
             return;
         }
-        if (!VersionStateManager.getInstance(manager.getProject()).isExists(fqn)) {
-            final String message = SupportedIssue.USED_NON_EXISTENT_TYPE_IN_CONFIG.getMessage(
+        if (VersionStateManager.getInstance(manager.getProject()).isDeprecated(fqn)) {
+            final String message = SupportedIssue.USED_DEPRECATED_CONSTANT_IN_CONFIG.getMessage(
                     fqn,
                     VersionStateManager.getInstance(
                             manager.getProject()
-                    ).getRemovedInVersion(fqn)
+                    ).getDeprecatedInVersion(fqn)
             );
 
             if (holder instanceof UctProblemsHolder) {
                 ((UctProblemsHolder) holder).setIssue(
-                        SupportedIssue.USED_NON_EXISTENT_TYPE_IN_CONFIG
+                        SupportedIssue.USED_DEPRECATED_CONSTANT_IN_CONFIG
                 );
             }
             final ProblemDescriptor descriptor = manager.createProblemDescriptor(
                     target,
                     message,
                     null,
-                    ProblemHighlightType.ERROR,
+                    ProblemHighlightType.WARNING,
                     isOnTheFly,
                     false
             );

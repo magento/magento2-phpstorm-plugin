@@ -17,7 +17,7 @@ import com.magento.idea.magento2uct.versioning.VersionStateManager;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
-public class UsedNonExistentTypeInConfig extends ModuleConfigFileInspection {
+public class UsedNonExistentMethodInConfig extends ModuleConfigFileInspection {
 
     @Override
     protected void doInspection(
@@ -28,11 +28,11 @@ public class UsedNonExistentTypeInConfig extends ModuleConfigFileInspection {
             final boolean isOnTheFly,
             final @NotNull List<ProblemDescriptor> descriptors
     ) {
-        if (MagentoReferenceUtil.isReference(fqn)) {
+        if (!MagentoReferenceUtil.isMethodReference(fqn)) {
             return;
         }
         if (!VersionStateManager.getInstance(manager.getProject()).isExists(fqn)) {
-            final String message = SupportedIssue.USED_NON_EXISTENT_TYPE_IN_CONFIG.getMessage(
+            final String message = SupportedIssue.USED_NON_EXISTENT_METHOD_IN_CONFIG.getMessage(
                     fqn,
                     VersionStateManager.getInstance(
                             manager.getProject()
@@ -41,7 +41,7 @@ public class UsedNonExistentTypeInConfig extends ModuleConfigFileInspection {
 
             if (holder instanceof UctProblemsHolder) {
                 ((UctProblemsHolder) holder).setIssue(
-                        SupportedIssue.USED_NON_EXISTENT_TYPE_IN_CONFIG
+                        SupportedIssue.USED_NON_EXISTENT_METHOD_IN_CONFIG
                 );
             }
             final ProblemDescriptor descriptor = manager.createProblemDescriptor(

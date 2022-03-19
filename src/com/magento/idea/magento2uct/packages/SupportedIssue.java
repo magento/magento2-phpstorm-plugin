@@ -47,7 +47,11 @@ import com.magento.idea.magento2uct.inspections.php.existence.OverriddenNonExist
 import com.magento.idea.magento2uct.inspections.php.existence.UsedNonExistentConstant;
 import com.magento.idea.magento2uct.inspections.php.existence.UsedNonExistentProperty;
 import com.magento.idea.magento2uct.inspections.php.existence.UsedNonExistentType;
+import com.magento.idea.magento2uct.inspections.xml.UsedDeprecatedConstantInConfig;
+import com.magento.idea.magento2uct.inspections.xml.UsedDeprecatedMethodInConfig;
 import com.magento.idea.magento2uct.inspections.xml.UsedDeprecatedTypeInConfig;
+import com.magento.idea.magento2uct.inspections.xml.UsedNonExistentConstantInConfig;
+import com.magento.idea.magento2uct.inspections.xml.UsedNonExistentMethodInConfig;
 import com.magento.idea.magento2uct.inspections.xml.UsedNonExistentTypeInConfig;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -285,6 +289,30 @@ public enum SupportedIssue {
             IssueSeverityLevel.WARNING,
             "customCode.warnings.deprecated.1134",
             UsedDeprecatedTypeInConfig.class
+    ),
+    USED_DEPRECATED_CONSTANT_IN_CONFIG(
+            1234,
+            IssueSeverityLevel.WARNING,
+            "customCode.warnings.deprecated.1234",
+            UsedDeprecatedConstantInConfig.class
+    ),
+    USED_DEPRECATED_METHOD_IN_CONFIG(
+            1439,
+            IssueSeverityLevel.WARNING,
+            "customCode.warnings.deprecated.1439",
+            UsedDeprecatedMethodInConfig.class
+    ),
+    USED_NON_EXISTENT_CONSTANT_IN_CONFIG(
+            1214,
+            IssueSeverityLevel.WARNING,
+            "customCode.critical.existence.1214",
+            UsedNonExistentConstantInConfig.class
+    ),
+    USED_NON_EXISTENT_METHOD_IN_CONFIG(
+            1410,
+            IssueSeverityLevel.WARNING,
+            "customCode.critical.existence.1410",
+            UsedNonExistentMethodInConfig.class
     );
 
     private final int code;
