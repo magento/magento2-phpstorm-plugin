@@ -10,6 +10,7 @@ import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.codeInspection.XmlSuppressableInspectionTool;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
@@ -17,16 +18,19 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlToken;
 import com.intellij.psi.xml.XmlTokenType;
-import com.jetbrains.php.lang.PhpLangUtil;
 import com.magento.idea.magento2uct.settings.UctSettingsService;
 import com.magento.idea.magento2uct.versioning.VersionStateManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 abstract class ModuleConfigFileInspection extends XmlSuppressableInspectionTool {
+
+    private static final String LAYOUT_FILE_REGEX = "\\/(layout|ui_component)\\/.*\\.xml";
+    private static final Pattern LAYOUT_FILE_PATTERN = Pattern.compile(LAYOUT_FILE_REGEX);
 
     private final String[] supportedFiles = new String[]{
             "di.xml",
@@ -68,7 +72,8 @@ abstract class ModuleConfigFileInspection extends XmlSuppressableInspectionTool 
             return getEmptyResult();
         }
 
-        if (Arrays.stream(supportedFiles).noneMatch(name -> name.equals(file.getName()))) {
+        if (Arrays.stream(supportedFiles).noneMatch(name -> name.equals(file.getName()))
+                && !isLayoutFile(file)) {
             return getEmptyResult();
         }
         final List<IElementType> allowedTokenTypes = new ArrayList<>();
@@ -123,5 +128,15 @@ abstract class ModuleConfigFileInspection extends XmlSuppressableInspectionTool 
      */
     private ProblemDescriptor[] getEmptyResult() {
         return new ProblemDescriptor[0];
+    }
+
+    private boolean isLayoutFile(final @NotNull PsiFile file) {
+        final VirtualFile virtualFile = file.getVirtualFile();
+
+        if (virtualFile == null) {
+            return false;
+        }
+
+        return LAYOUT_FILE_PATTERN.matcher(virtualFile.getPath()).find();
     }
 }
