@@ -32,7 +32,7 @@ abstract class ModuleConfigFileInspection extends XmlSuppressableInspectionTool 
     private static final String LAYOUT_FILE_REGEX = "\\/(layout|ui_component)\\/.*\\.xml";
     private static final Pattern LAYOUT_FILE_PATTERN = Pattern.compile(LAYOUT_FILE_REGEX);
 
-    private final String[] supportedFiles = new String[]{
+    private final String[] supportedFiles = {
             "di.xml",
             "system.xml",
             "events.xml",
