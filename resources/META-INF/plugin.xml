@@ -661,5 +661,7 @@
         <frameworkProjectConfigurableProvider implementation="com.magento.idea.magento2plugin.project.ConfigurableProvider"/>
         <frameworkUsageProvider implementation="com.magento.idea.magento2plugin.project.UsagesProvider"/>
         <libraryRoot id="phpstorm.meta.php" path="/.phpstorm.meta.php/" runtime="false"/>
+
+        <referenceResolver2 implementation="com.magento.idea.magento2plugin.lang.php.MagentoProxyDeclarationFilter" order="first"/>
     </extensions>
 </idea-plugin>
