@@ -11,8 +11,8 @@ import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocComment;
 import com.jetbrains.php.lang.psi.PhpPsiElementFactory;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.Parameter;
-import com.jetbrains.php.lang.psi.elements.PhpReturnType;
 import com.magento.idea.magento2plugin.actions.generation.data.code.PluginMethodData;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
 import com.magento.idea.magento2plugin.actions.generation.references.PhpClassReferenceResolver;
 import com.magento.idea.magento2plugin.util.php.PhpTypeMetadataParserUtil;
 import java.util.ArrayList;
@@ -55,19 +55,19 @@ public class FillTextBufferWithPluginMethods {
             final PsiElement targetClass = (PsiElement) pluginMethod.getTargetMethod()
                     .getUserData(targetClassKey);
             resolver.processElement(targetClass);
-            PhpReturnType returnType = targetMethod.getReturnType();
-            final String returnTypeFqn =
-                    PhpTypeMetadataParserUtil.getMethodReturnType(targetMethod);
 
-            if (returnType == null && returnTypeFqn != null) {
-                returnType = PhpPsiElementFactory.createReturnType(
-                        pluginMethod.getTargetMethod().getProject(),
-                        returnTypeFqn
+            final String returnTypeCandidate = PhpTypeMetadataParserUtil.getMethodReturnType(
+                    targetMethod
+            );
+
+            if (returnTypeCandidate != null
+                    && PhpClassGeneratorUtil.isValidFqn(returnTypeCandidate)) {
+                resolver.processElement(
+                        PhpPsiElementFactory.createReturnType(
+                                pluginMethod.getTargetMethod().getProject(),
+                                returnTypeCandidate
+                        )
                 );
-            }
-
-            if (returnType != null) {
-                resolver.processElement(returnType);
             }
 
             textBuf.append('\n');
