@@ -8,7 +8,6 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
-import com.magento.idea.magento2plugin.actions.CopyMagentoPath;
 import com.magento.idea.magento2plugin.actions.generation.OverrideTemplateInThemeAction;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
@@ -17,6 +16,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.OverrideTemp
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.ComponentType;
+import com.magento.idea.magento2plugin.magento.packages.OverridableFileType;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil;
 import java.awt.event.ActionEvent;
@@ -65,9 +65,12 @@ public class OverrideTemplateInThemeDialog extends AbstractDialog {
         setContentPane(contentPane);
         setModal(true);
 
-        if (CopyMagentoPath.PHTML_EXTENSION.equals(psiFile.getVirtualFile().getExtension())) {
+        final String fileType = psiFile.getVirtualFile().getExtension();
+        if (OverridableFileType.isFilePhtml(fileType)) {
             setTitle(OverrideTemplateInThemeAction.ACTION_TEMPLATE_DESCRIPTION);
-        } else {
+        } else if (OverridableFileType.isFileJS(fileType)) {
+            setTitle(OverrideTemplateInThemeAction.ACTION_JS_DESCRIPTION);
+        } else if (OverridableFileType.isFileStyle(fileType)) {
             setTitle(OverrideTemplateInThemeAction.ACTION_STYLES_DESCRIPTION);
         }
         getRootPane().setDefaultButton(buttonOK);
@@ -121,27 +124,37 @@ public class OverrideTemplateInThemeDialog extends AbstractDialog {
         return this.theme.getSelectedItem().toString();
     }
 
+    @SuppressWarnings("PMD.CognitiveComplexity")
     private void fillThemeOptions() {
         final GetMagentoModuleUtil.MagentoModuleData moduleData =
                 GetMagentoModuleUtil.getByContext(psiFile.getContainingDirectory(), project);
-
-        if (moduleData == null) {
-            return;
-        }
         String area = ""; // NOPMD
 
-        if (moduleData.getType().equals(ComponentType.module)) {
-            final PsiDirectory viewDir = moduleData.getViewDir();
-
-            if (viewDir == null) {
+        if (moduleData == null) {
+            if (psiFile.getVirtualFile().getExtension()
+                    .equals(OverridableFileType.JS.getType())) {
+                area = "base";
+            } else {
                 return;
             }
-            final String filePath = psiFile.getVirtualFile().getPath();
-            final String relativePath = filePath.replace(viewDir.getVirtualFile().getPath(), "");
-            area = relativePath.split(Package.V_FILE_SEPARATOR)[1];
         } else {
-            area = moduleData.getName().split(Package.V_FILE_SEPARATOR)[0];
+            if (moduleData.getType().equals(ComponentType.module)) {
+                final PsiDirectory viewDir = moduleData.getViewDir();
+
+                if (viewDir == null) {
+                    return;
+                }
+                final String filePath = psiFile.getVirtualFile().getPath();
+                final String relativePath = filePath.replace(
+                        viewDir.getVirtualFile().getPath(),
+                        ""
+                );
+                area = relativePath.split(Package.V_FILE_SEPARATOR)[1];
+            } else {
+                area = moduleData.getName().split(Package.V_FILE_SEPARATOR)[0];
+            }
         }
+
         final List<String> themeNames = new ModuleIndex(project).getEditableThemeNames();
 
         for (final String themeName : themeNames) {
