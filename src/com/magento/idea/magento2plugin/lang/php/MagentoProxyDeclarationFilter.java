@@ -32,22 +32,22 @@ public class MagentoProxyDeclarationFilter implements PhpMultipleDeclarationFilt
             return candidates;
         } else if (psiElement.getContainingFile() == null) {
             return candidates;
-        } else {
-            return ContainerUtil.filter(candidates,
-                    (candidate) -> {
-                        final PsiFile file = candidate.getContainingFile();
-
-                        if (file == null) {
-                            return false;
-                        }
-                        final VirtualFile virtualFile = file.getVirtualFile();
-
-                        if (virtualFile == null) {
-                            return false;
-                        }
-
-                        return !virtualFile.getPath().contains("/generated/");
-                    });
         }
+
+        return ContainerUtil.filter(candidates,
+                (candidate) -> {
+                    final PsiFile file = candidate.getContainingFile();
+
+                    if (file == null) {
+                        return false;
+                    }
+                    final VirtualFile virtualFile = file.getVirtualFile();
+
+                    if (virtualFile == null) {
+                        return false;
+                    }
+
+                    return !virtualFile.getPath().contains("/generated/");
+                });
     }
 }
