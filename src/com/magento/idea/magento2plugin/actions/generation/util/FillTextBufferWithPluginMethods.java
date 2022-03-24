@@ -11,7 +11,6 @@ import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocComment;
 import com.jetbrains.php.lang.psi.PhpPsiElementFactory;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.Parameter;
-import com.jetbrains.php.lang.psi.elements.PhpReturnType;
 import com.magento.idea.magento2plugin.actions.generation.data.code.PluginMethodData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
 import com.magento.idea.magento2plugin.actions.generation.references.PhpClassReferenceResolver;
@@ -57,18 +56,18 @@ public class FillTextBufferWithPluginMethods {
                     .getUserData(targetClassKey);
             resolver.processElement(targetClass);
 
-            final String returnTypeFqn =
-                    PhpTypeMetadataParserUtil.getMethodReturnType(targetMethod);
+            final String returnTypeCandidate = PhpTypeMetadataParserUtil.getMethodReturnType(
+                    targetMethod
+            );
 
-            if (returnTypeFqn != null && PhpClassGeneratorUtil.isValidFqn(returnTypeFqn)) {
-                final PhpReturnType returnType = PhpPsiElementFactory.createReturnType(
-                        pluginMethod.getTargetMethod().getProject(),
-                        returnTypeFqn
+            if (returnTypeCandidate != null
+                    && PhpClassGeneratorUtil.isValidFqn(returnTypeCandidate)) {
+                resolver.processElement(
+                        PhpPsiElementFactory.createReturnType(
+                                pluginMethod.getTargetMethod().getProject(),
+                                returnTypeCandidate
+                        )
                 );
-
-                if (returnType != null) {
-                    resolver.processElement(returnType);
-                }
             }
 
             textBuf.append('\n');
