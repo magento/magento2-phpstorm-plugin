@@ -15,6 +15,7 @@ import com.intellij.psi.PsiFile;
 import com.maddyhome.idea.copyright.actions.UpdateCopyrightProcessor;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.packages.ComponentType;
+import com.magento.idea.magento2plugin.magento.packages.OverridableFileType;
 import com.magento.idea.magento2plugin.util.magento.GetComponentNameByDirectoryUtil;
 import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil;
 import java.util.List;
@@ -40,24 +41,29 @@ public class OverrideTemplateInThemeGenerator extends OverrideInThemeGenerator {
 
         final GetMagentoModuleUtil.MagentoModuleData moduleData =
                 GetMagentoModuleUtil.getByContext(baseFile.getContainingDirectory(), project);
+        List<String> pathComponents;
 
         if (moduleData == null) {
-            return;
-        }
-
-        List<String> pathComponents;
-        if (moduleData.getType().equals(ComponentType.module)) {
-            pathComponents = getModulePathComponents(
-                    baseFile,
-                    GetComponentNameByDirectoryUtil.execute(
-                            baseFile.getContainingDirectory(),
-                            project
-                    )
-            );
-        } else if (moduleData.getType().equals(ComponentType.theme)) {
-            pathComponents = getThemePathComponents(baseFile);
+            if (baseFile.getVirtualFile().getExtension().equals(OverridableFileType.JS.getType())) {
+                pathComponents = getLibPathComponets(baseFile);
+            } else {
+                return;
+            }
         } else {
-            return;
+
+            if (moduleData.getType().equals(ComponentType.module)) {
+                pathComponents = getModulePathComponents(
+                        baseFile,
+                        GetComponentNameByDirectoryUtil.execute(
+                                baseFile.getContainingDirectory(),
+                                project
+                        )
+                );
+            } else if (moduleData.getType().equals(ComponentType.theme)) {
+                pathComponents = getThemePathComponents(baseFile);
+            } else {
+                return;
+            }
         }
 
         final ModuleIndex moduleIndex = new ModuleIndex(project);
