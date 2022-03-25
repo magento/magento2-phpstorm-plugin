@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin.magento.packages;
 
 public class Package { //NOPMD
+    public static final String V_FILE_SEPARATOR = "/";
     public static String packagesRoot = "app/code";
     public static String libWebRoot = "lib/web";
     public static String frameworkRootComposer = "vendor/magento/framework";

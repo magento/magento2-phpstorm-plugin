@@ -20,11 +20,9 @@ class ${CLASS_NAME} extends ${PARENT_CLASS}
 
     /**
      * Url paths.
-     * #@+
      */
     private const EDIT_URL_PATH = '${EDIT_URL_PATH}';
     private const DELETE_URL_PATH = '${DELETE_URL_PATH}';
-    /** #@- */
 
     /**
      * @var ${URL}
@@ -55,7 +53,11 @@ class ${CLASS_NAME} extends ${PARENT_CLASS}
     }
 
     /**
-     * @inheritDoc
+     * Prepare data source.
+     *
+     * @param array $dataSource
+     *
+     * @return array
      */
     public function prepareDataSource(array $dataSource): array
     {

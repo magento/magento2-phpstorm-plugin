@@ -10,6 +10,7 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.SlowOperations;
 import com.jetbrains.php.lang.psi.elements.ClassConstantReference;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
@@ -51,6 +52,9 @@ public final class GetMagentoModuleUtil {
         final PsiDirectory configDir = registrationFile
                 .getContainingDirectory()
                 .findSubdirectory(Package.moduleBaseAreaDir);
+        final PsiDirectory viewDir = registrationFile
+                .getContainingDirectory()
+                .findSubdirectory(Package.moduleViewDir);
         final Collection<MethodReference> methodReferences = PsiTreeUtil.findChildrenOfType(
                 registrationFile,
                 MethodReference.class
@@ -76,7 +80,7 @@ public final class GetMagentoModuleUtil {
                 return null;
             }
 
-            return new MagentoModuleData(name, resolvedType, configDir);
+            return new MagentoModuleData(name, resolvedType, configDir, viewDir);
         }
 
         return null;
@@ -105,7 +109,10 @@ public final class GetMagentoModuleUtil {
 
     private static String parseParameterValue(final PsiElement valueHolder) {
         if (valueHolder instanceof ClassConstantReference) {
-            final PsiElement resolved = ((ClassConstantReference) valueHolder).resolve();
+            final ClassConstantReference constantReference = (ClassConstantReference) valueHolder;
+            final PsiElement resolved = SlowOperations.allowSlowOperations(
+                    constantReference::resolve
+            );
 
             if (!(resolved instanceof ClassConstImpl)) {
                 return null;
@@ -130,6 +137,7 @@ public final class GetMagentoModuleUtil {
         private final String name;
         private final ComponentType type;
         private final PsiDirectory configDir;
+        private final PsiDirectory viewDir;
 
         /**
          * Default constructor.
@@ -141,7 +149,7 @@ public final class GetMagentoModuleUtil {
                 final @NotNull String name,
                 final @NotNull ComponentType type
         ) {
-            this(name, type, null);
+            this(name, type, null, null);
         }
 
         /**
@@ -150,15 +158,18 @@ public final class GetMagentoModuleUtil {
          * @param name String
          * @param type ComponentType
          * @param configDir PsiDirectory
+         * @param viewDir PsiDirectory
          */
         public MagentoModuleData(
                 final @NotNull String name,
                 final @NotNull ComponentType type,
-                final @Nullable PsiDirectory configDir
+                final @Nullable PsiDirectory configDir,
+                final @Nullable PsiDirectory viewDir
         ) {
             this.name = name;
             this.type = type;
             this.configDir = configDir;
+            this.viewDir = viewDir;
         }
 
         public String getName() {
@@ -171,6 +182,10 @@ public final class GetMagentoModuleUtil {
 
         public @Nullable PsiDirectory getConfigDir() {
             return configDir;
+        }
+
+        public @Nullable PsiDirectory getViewDir() {
+            return viewDir;
         }
     }
 }

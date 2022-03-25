@@ -52,11 +52,6 @@ public class UctInspectionManager {
         if (!(psiFile instanceof PhpFile)) {
             return null;
         }
-        final PhpClass phpClass = GetFirstClassOfFile.getInstance().execute((PhpFile) psiFile);
-
-        if (phpClass == null) {
-            return null;
-        }
         final UctProblemsHolder problemsHolder = new UctProblemsHolder(
                 InspectionManager.getInstance(project),
                 psiFile,
@@ -64,7 +59,7 @@ public class UctInspectionManager {
         );
         final List<PsiElementVisitor> visitors = SupportedIssue.getVisitors(problemsHolder);
 
-        for (final PsiElement element : collectElements(phpClass)) {
+        for (final PsiElement element : collectElements(psiFile)) {
             for (final PsiElementVisitor visitor : visitors) {
                 element.accept(visitor);
             }
@@ -76,26 +71,31 @@ public class UctInspectionManager {
     /**
      * Collect elements for PHP based inspections.
      *
-     * @param phpClass PhpClass
+     * @param psiFile PsiFile
      *
      * @return List[PsiElement]
      */
-    private List<PsiElement> collectElements(final @NotNull PhpClass phpClass) {
+    private List<PsiElement> collectElements(final @NotNull PsiFile psiFile) {
         final List<PsiElement> elements = new LinkedList<>();
-        elements.add(phpClass);
 
-        final PhpPsiElement scopeForUseOperator = PhpCodeInsightUtil.findScopeForUseOperator(
-                phpClass
-        );
-        if (scopeForUseOperator != null) {
-            elements.addAll(PhpCodeInsightUtil.collectImports(scopeForUseOperator));
+        final PhpClass phpClass = GetFirstClassOfFile.getInstance().execute((PhpFile) psiFile);
+
+        if (phpClass != null) {
+            elements.add(phpClass);
+            final PhpPsiElement scopeForUseOperator = PhpCodeInsightUtil.findScopeForUseOperator(
+                    phpClass
+            );
+
+            if (scopeForUseOperator != null) {
+                elements.addAll(PhpCodeInsightUtil.collectImports(scopeForUseOperator));
+            }
+            elements.addAll(Arrays.asList(phpClass.getOwnFields()));
         }
-        elements.addAll(PsiTreeUtil.findChildrenOfType(phpClass, ClassConstantReference.class));
-        elements.addAll(Arrays.asList(phpClass.getOwnFields()));
-        elements.addAll(PsiTreeUtil.findChildrenOfType(phpClass, MethodReference.class));
-        elements.addAll(PsiTreeUtil.findChildrenOfType(phpClass, AssignmentExpression.class));
-        elements.addAll(PsiTreeUtil.findChildrenOfType(phpClass, ClassReference.class));
-        elements.addAll(PsiTreeUtil.findChildrenOfType(phpClass, FieldReference.class));
+        elements.addAll(PsiTreeUtil.findChildrenOfType(psiFile, ClassConstantReference.class));
+        elements.addAll(PsiTreeUtil.findChildrenOfType(psiFile, MethodReference.class));
+        elements.addAll(PsiTreeUtil.findChildrenOfType(psiFile, AssignmentExpression.class));
+        elements.addAll(PsiTreeUtil.findChildrenOfType(psiFile, ClassReference.class));
+        elements.addAll(PsiTreeUtil.findChildrenOfType(psiFile, FieldReference.class));
 
         return elements;
     }

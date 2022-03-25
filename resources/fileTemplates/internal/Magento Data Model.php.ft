@@ -19,7 +19,7 @@ class ${NAME} #if (${EXTENDS})extends ${EXTENDS} #end #if (${IMPLEMENTS} && $has
 {
       #if (${PROPERTIES} && !$hasInterface)
             /**
-             * String constants for property names
+             * String constants for property names.
              */
             #set ($properties = ${PROPERTIES})
         #foreach ($property in $properties.split(","))
@@ -41,17 +41,11 @@ class ${NAME} #if (${EXTENDS})extends ${EXTENDS} #end #if (${IMPLEMENTS} && $has
             #if(!($foreach.first))
 
             #end
-            #if ($hasInterface)
-            /**
-             * @inheritDoc
-             */
-            #else
             /**
              * Getter for $propertyUpperCamel.
              *
              * @return $propertyType|null
              */
-            #end
             public function get$propertyUpperCamel(): ?$propertyType
             {
                 #if($propertyType == 'string')
@@ -62,11 +56,6 @@ class ${NAME} #if (${EXTENDS})extends ${EXTENDS} #end #if (${IMPLEMENTS} && $has
                 #end
             }
 
-            #if ($hasInterface)
-            /**
-             * @inheritDoc
-             */
-            #else
             /**
              * Setter for $propertyUpperCamel.
              *
@@ -74,7 +63,6 @@ class ${NAME} #if (${EXTENDS})extends ${EXTENDS} #end #if (${IMPLEMENTS} && $has
              *
              * @return void
              */
-            #end
             public function set$propertyUpperCamel(?$propertyType $$propertyLowerCamel): void
             {
                 $this->setData(self::$propertyUpperSnake, $$propertyLowerCamel);

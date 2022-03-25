@@ -11,7 +11,11 @@ use Magento\Framework\Api\SearchResults;
 class BookSearchResults extends SearchResults implements BookSearchResultsInterface
 {
     /**
-     * @inheritDoc
+     * Set items list.
+     *
+     * @param array $items
+     *
+     * @return BookSearchResultsInterface
      */
     public function setItems(array $items): BookSearchResultsInterface
     {
@@ -19,7 +23,9 @@ class BookSearchResults extends SearchResults implements BookSearchResultsInterf
     }
 
     /**
-     * @inheritDoc
+     * Get items list.
+     *
+     * @return array
      */
     public function getItems(): array
     {

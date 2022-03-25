@@ -75,6 +75,7 @@
             <action id="MagentoCreateViewFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewViewXmlAction"/>
             <action id="MagentoCreateWebapiFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewWebapiXmlAction"/>
             <action id="MagentoCreateWidgetFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewWidgetXmlAction"/>
+            <action id="MagentoCreateLayoutFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewLayoutXmlAction"/>
             <!-- Context dependent actions -->
             <separator/>
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml"/>
@@ -125,13 +126,22 @@
         <action id="InjectAViewModelAction.Menu" class="com.magento.idea.magento2plugin.actions.generation.InjectAViewModelAction">
             <add-to-group group-id="EditorPopupMenu"/>
         </action>
-        <action id="OverrideInTheme.Menu" class="com.magento.idea.magento2plugin.actions.generation.OverrideInThemeAction">
+        <action id="OverrideTemplateInTheme.Menu" class="com.magento.idea.magento2plugin.actions.generation.OverrideTemplateInThemeAction">
+            <add-to-group group-id="ProjectViewPopupMenu"/>
+        </action>
+        <action id="OverrideLayoutInTheme.Menu" class="com.magento.idea.magento2plugin.actions.generation.OverrideLayoutInThemeAction">
             <add-to-group group-id="ProjectViewPopupMenu"/>
         </action>
         <action id="MagentoCreateAWebApiDeclaration.Menu" class="com.magento.idea.magento2plugin.actions.generation.NewWebApiDeclarationAction">
             <add-to-group group-id="EditorPopupMenu"/>
         </action>
         <action id="MagentoCreateAWebApiInterfaceForService.Menu" class="com.magento.idea.magento2plugin.actions.generation.NewWebApiInterfaceAction">
+            <add-to-group group-id="EditorPopupMenu"/>
+        </action>
+        <action id="MagentoInjectConstructorArgumentAction.Menu" class="com.magento.idea.magento2plugin.actions.generation.InjectConstructorArgumentAction">
+            <add-to-group group-id="EditorPopupMenu"/>
+        </action>
+        <action id="MagentoCompareTemplate.Menu" class="com.magento.idea.magento2plugin.actions.comparator.CompareTemplateAction">
             <add-to-group group-id="EditorPopupMenu"/>
         </action>
 
@@ -616,5 +626,7 @@
         <frameworkProjectConfigurableProvider implementation="com.magento.idea.magento2plugin.project.ConfigurableProvider"/>
         <frameworkUsageProvider implementation="com.magento.idea.magento2plugin.project.UsagesProvider"/>
         <libraryRoot id="phpstorm.meta.php" path="/.phpstorm.meta.php/" runtime="false"/>
+
+        <referenceResolver2 implementation="com.magento.idea.magento2plugin.lang.php.MagentoProxyDeclarationFilter" order="first"/>
     </extensions>
 </idea-plugin>

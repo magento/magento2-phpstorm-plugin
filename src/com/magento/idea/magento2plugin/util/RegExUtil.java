@@ -25,6 +25,9 @@ public class RegExUtil {
     public static final String NUMERIC
             = "[0-9]*";
 
+    public static final String EXTENDED_NUMERIC
+            = "-?\\d+(\\.\\d+)?";
+
     public static final String IDENTIFIER
             = "[a-zA-Z0-9_\\-]*";
 
@@ -45,6 +48,9 @@ public class RegExUtil {
 
     public static final String MAGENTO_VERSION
             = "(\\d+)\\.(\\d+)\\.(\\d+)[a-zA-Z0-9_\\-]*";
+
+    public static final String LAYOUT_NAME
+            = "^([a-zA-Z0-9]+){1,}(_[a-zA-Z0-9]+){0,2}";
 
     public static class Magento {
 

@@ -8,8 +8,10 @@ package com.magento.idea.magento2uct.execution.output;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.magento.idea.magento2uct.bundles.UctInspectionBundle;
 import com.magento.idea.magento2uct.execution.process.OutputWrapper;
+import com.magento.idea.magento2uct.execution.scanner.data.ComponentData;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,10 +33,19 @@ public class UctReportOutputUtil {
     /**
      * Print module name header.
      *
-     * @param moduleName String
+     * @param componentData ComponentData
      */
-    public void printModuleName(final @NotNull String moduleName) {
-        final String moduleNameLine = "Module Name: ".concat(moduleName);
+    public void printModuleName(final @NotNull ComponentData componentData) {
+        final String componentType = componentData.getType().toString();
+        final String componentTypeFormatted = componentType
+                .substring(0, 1)
+                .toUpperCase(new Locale("en","EN"))
+                .concat(componentType.substring(1));
+
+        final String moduleNameLine = componentTypeFormatted
+                .concat(" Name: ")
+                .concat(componentData.getName());
+
         stdout.print("\n\n" + stdout.wrapInfo(moduleNameLine).concat("\n"));
         stdout.print(stdout.wrapInfo("-".repeat(moduleNameLine.length())).concat("\n"));
     }
@@ -78,10 +89,11 @@ public class UctReportOutputUtil {
      * Print summary information.
      *
      * @param summary Summary
+     * @param platformName String
      */
-    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
-    public void printSummary(final Summary summary) {
-        if (summary.getProcessedModules() == 0) {
+    @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.CyclomaticComplexity"})
+    public void printSummary(final Summary summary, final String platformName) {
+        if (summary.getProcessedModules() == 0 && summary.getProcessedThemes() == 0) {
             stdout.print(stdout.wrapInfo("Couldn't find modules to analyse").concat("\n"));
             return;
         }
@@ -92,9 +104,10 @@ public class UctReportOutputUtil {
 
         final Map<String, String> summaryMap = new LinkedHashMap<>();
         summaryMap.put("Installed version", summary.getInstalledVersion());
-        summaryMap.put("Adobe Commerce version", summary.getTargetVersion());
+        summaryMap.put(platformName + " version", summary.getTargetVersion());
         summaryMap.put("Running time", summary.getProcessRunningTime());
         summaryMap.put("Checked modules", String.valueOf(summary.getProcessedModules()));
+        summaryMap.put("Checked themes", String.valueOf(summary.getProcessedThemes()));
         summaryMap.put("Total warnings found", String.valueOf(summary.getPhpWarnings()));
         summaryMap.put("Total errors found", String.valueOf(summary.getPhpErrors()));
         summaryMap.put("Total critical errors found",
