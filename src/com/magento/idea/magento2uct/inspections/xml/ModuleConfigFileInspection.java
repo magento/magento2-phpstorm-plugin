@@ -45,6 +45,15 @@ abstract class ModuleConfigFileInspection extends XmlSuppressableInspectionTool 
             "mview.xml",
             "product_types.xml",
             "widget.xml",
+            "queue.xml",
+            "product_options.xml",
+            "export.xml",
+            "import.xml",
+            "analytics.xml",
+            "reports.xml",
+            "pdf.xml",
+            "cache.xml",
+            "validation.xml"
     };
     private ProblemsHolder problemsHolder;
 
