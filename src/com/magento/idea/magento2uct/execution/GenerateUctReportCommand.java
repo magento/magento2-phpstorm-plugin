@@ -20,7 +20,6 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.jetbrains.php.lang.psi.PhpFile;
 import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
 import com.magento.idea.magento2uct.execution.output.ReportBuilder;
 import com.magento.idea.magento2uct.execution.output.Summary;
@@ -135,9 +134,6 @@ public class GenerateUctReportCommand {
                     boolean isModuleHeaderPrinted = false;
 
                     for (final PsiFile psiFile : new ModuleFilesScanner(componentData)) {
-                        if (!(psiFile instanceof PhpFile)) {
-                            continue;
-                        }
                         final String filename = psiFile.getVirtualFile().getPath();
                         final UctInspectionManager inspectionManager = new UctInspectionManager(
                                 project

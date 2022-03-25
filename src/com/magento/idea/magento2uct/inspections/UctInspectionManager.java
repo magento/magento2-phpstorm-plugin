@@ -11,6 +11,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.xml.XmlFile;
 import com.jetbrains.php.codeInsight.PhpCodeInsightUtil;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.AssignmentExpression;
@@ -49,7 +50,9 @@ public class UctInspectionManager {
      * @return ProblemsHolder
      */
     public @Nullable UctProblemsHolder run(final PsiFile psiFile) {
-        if (!(psiFile instanceof PhpFile)) {
+        if (SupportedIssue.getSupportedFileTypes().stream().noneMatch(
+                clazz -> clazz.isInstance(psiFile))
+        ) {
             return null;
         }
         final UctProblemsHolder problemsHolder = new UctProblemsHolder(
@@ -78,25 +81,29 @@ public class UctInspectionManager {
     private List<PsiElement> collectElements(final @NotNull PsiFile psiFile) {
         final List<PsiElement> elements = new LinkedList<>();
 
-        final PhpClass phpClass = GetFirstClassOfFile.getInstance().execute((PhpFile) psiFile);
+        if (psiFile instanceof PhpFile) {
+            final PhpClass phpClass = GetFirstClassOfFile.getInstance().execute((PhpFile) psiFile);
 
-        if (phpClass != null) {
-            elements.add(phpClass);
-            final PhpPsiElement scopeForUseOperator = PhpCodeInsightUtil.findScopeForUseOperator(
-                    phpClass
-            );
+            if (phpClass != null) {
+                elements.add(phpClass);
+                final PhpPsiElement scopeForUseOperator = PhpCodeInsightUtil
+                        .findScopeForUseOperator(phpClass);
 
-            if (scopeForUseOperator != null) {
-                elements.addAll(PhpCodeInsightUtil.collectImports(scopeForUseOperator));
+                if (scopeForUseOperator != null) {
+                    elements.addAll(PhpCodeInsightUtil.collectImports(scopeForUseOperator));
+                }
+                elements.addAll(Arrays.asList(phpClass.getOwnFields()));
             }
-            elements.addAll(Arrays.asList(phpClass.getOwnFields()));
-        }
-        elements.addAll(PsiTreeUtil.findChildrenOfType(psiFile, ClassConstantReference.class));
-        elements.addAll(PsiTreeUtil.findChildrenOfType(psiFile, MethodReference.class));
-        elements.addAll(PsiTreeUtil.findChildrenOfType(psiFile, AssignmentExpression.class));
-        elements.addAll(PsiTreeUtil.findChildrenOfType(psiFile, ClassReference.class));
-        elements.addAll(PsiTreeUtil.findChildrenOfType(psiFile, FieldReference.class));
 
+            elements.addAll(PsiTreeUtil.findChildrenOfType(psiFile, ClassConstantReference.class));
+            elements.addAll(PsiTreeUtil.findChildrenOfType(psiFile, MethodReference.class));
+            elements.addAll(PsiTreeUtil.findChildrenOfType(psiFile, AssignmentExpression.class));
+            elements.addAll(PsiTreeUtil.findChildrenOfType(psiFile, ClassReference.class));
+            elements.addAll(PsiTreeUtil.findChildrenOfType(psiFile, FieldReference.class));
+        } else if (psiFile instanceof XmlFile) {
+            elements.add(psiFile);
+        }
+        
         return elements;
     }
 }

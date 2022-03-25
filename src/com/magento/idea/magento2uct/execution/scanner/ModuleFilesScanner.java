@@ -7,8 +7,8 @@ package com.magento.idea.magento2uct.execution.scanner;
 
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
-import com.jetbrains.php.lang.psi.PhpFile;
 import com.magento.idea.magento2uct.execution.scanner.data.ComponentData;
+import com.magento.idea.magento2uct.packages.SupportedIssue;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -53,9 +53,12 @@ public class ModuleFilesScanner implements Iterable<PsiFile> {
      */
     private void collectFilesInDirectoryRecursively(final @NotNull PsiDirectory directory) {
         for (final PsiFile file : directory.getFiles()) {
-            if (file instanceof PhpFile) {
-                files.add(file);
+            if (SupportedIssue.getSupportedFileTypes().stream().noneMatch(
+                    clazz -> clazz.isInstance(file))
+            ) {
+                continue;
             }
+            files.add(file);
         }
 
         for (final PsiDirectory subDirectory : directory.getSubdirectories()) {
