@@ -9,11 +9,13 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.PsiReferenceProvider;
 import com.intellij.psi.ResolveResult;
 import com.intellij.psi.impl.file.PsiDirectoryImpl;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
+import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.ParameterList;
@@ -21,6 +23,10 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.inspections.BaseInspectionsTestCase;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
@@ -36,6 +42,7 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
         myFixture.setTestDataPath(testDataFolderPath);
     }
 
+    @SuppressWarnings("PMD.CognitiveComplexity")
     protected void assertHasReferenceToXmlAttributeValue(final String reference) {
         final PsiElement element = getElementFromCaret();
         for (final PsiReference psiReference: element.getReferences()) {
@@ -70,6 +77,7 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
         fail(String.format(referenceNotFound, reference));
     }
 
+    @SuppressWarnings("PMD.CognitiveComplexity")
     protected void assertHasReferenceToXmlTag(final String tagName) {
         final PsiElement element = getElementFromCaret();
         for (final PsiReference psiReference: element.getReferences()) {
@@ -106,7 +114,40 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
 
     protected void assertHasReferenceToFile(final String reference) {
         final PsiElement element = getElementFromCaret();
-        for (final PsiReference psiReference : element.getReferences()) {
+
+        assertHasReferenceToFile(reference, Arrays.asList(element.getReferences()));
+    }
+
+    protected void assertHasReferenceToFile(
+            final String reference,
+            final Class<? extends PsiReferenceProvider> providerClass
+    ) {
+        final PsiElement element = getLeafElementFromCaret();
+        final List<PsiReference> references = new ArrayList<>();
+
+        try {
+            final PsiReferenceProvider provider = providerClass.getConstructor().newInstance();
+            references.addAll(
+                    Arrays.asList(
+                            provider.getReferencesByElement(element, new ProcessingContext())
+                    )
+            );
+        } catch (NoSuchMethodException
+                | IllegalAccessException
+                | InvocationTargetException
+                | InstantiationException exception
+        ) {
+            references.addAll(Arrays.asList(element.getReferences()));
+        }
+
+        assertHasReferenceToFile(reference, references);
+    }
+
+    protected void assertHasReferenceToFile(
+            final String reference,
+            final List<PsiReference> references
+    ) {
+        for (final PsiReference psiReference : references) {
             final PsiElement resolved = psiReference.resolve();
             if (!(resolved instanceof PsiFile)) {
                 continue;
@@ -249,5 +290,9 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
 
     private PsiElement getElementFromCaret() {
         return myFixture.getFile().findElementAt(myFixture.getCaretOffset()).getParent();
+    }
+
+    private PsiElement getLeafElementFromCaret() {
+        return myFixture.getFile().findElementAt(myFixture.getCaretOffset());
     }
 }
