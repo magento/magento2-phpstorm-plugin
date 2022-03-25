@@ -18,6 +18,7 @@ import com.jetbrains.php.frameworks.PhpFrameworkConfigurable;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
 import com.magento.idea.magento2plugin.init.ConfigurationManager;
 import com.magento.idea.magento2plugin.magento.packages.MagentoComponentManager;
+import com.magento.idea.magento2plugin.project.util.GetProjectBasePath;
 import com.magento.idea.magento2plugin.project.validator.SettingsFormValidator;
 import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
 import java.awt.event.MouseAdapter;
@@ -197,13 +198,22 @@ public class SettingsForm implements PhpFrameworkConfigurable {
                 "Magento Root Directory",
                 "Choose Magento root directory",
                 this.magentoPath,
-                null,
+                project,
                 descriptor,
                 TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
             ) {
                     @Nullable
                     @Override
                     protected VirtualFile getInitialFile() {
+
+                        final String text = getComponentText();
+                        if (text.length() == 0) {
+                            final VirtualFile file = GetProjectBasePath.execute(project);
+                            if (file != null) {
+                                return file;
+                            }
+                        }
+
                         return super.getInitialFile();
                     }
                 };

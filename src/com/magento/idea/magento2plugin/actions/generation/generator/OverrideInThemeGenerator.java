@@ -11,11 +11,13 @@ import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class OverrideInThemeGenerator {
@@ -45,16 +47,12 @@ public abstract class OverrideInThemeGenerator {
             final PsiDirectory directory,
             final List<String> pathComponents
     ) {
-        PsiDirectory result = directory;
-        PsiDirectory tempDirectory = directory;
         final DirectoryGenerator generator = DirectoryGenerator.getInstance();
 
-        for (final String directoryName : pathComponents) {
-            result = generator.findOrCreateSubdirectory(tempDirectory, directoryName);
-            tempDirectory = result;
-        }
-
-        return result;
+        return generator.findOrCreateSubdirectories(
+                directory,
+                pathComponents.stream().collect(Collectors.joining(File.separator))
+        );
     }
 
     /**
@@ -97,11 +95,42 @@ public abstract class OverrideInThemeGenerator {
         final Pattern pattern = Pattern.compile(RegExUtil.Magento.MODULE_NAME);
 
         PsiDirectory parent = file.getParent();
-        do {
+        boolean isLib = true;
+        for (final String filePart : parent.toString().split("/")) {
+            if (Pattern.matches(String.valueOf(pattern), filePart)) {
+                isLib = false;
+            }
+        }
+
+        if (isLib) {
+            pathComponents.addAll(getLibPathComponets(file));
+        } else {
+            do {
+                pathComponents.add(parent.getName());
+                parent = parent.getParent();
+            } while (!pattern.matcher(parent.getName()).find());
+            pathComponents.add(parent.getName());
+            Collections.reverse(pathComponents);
+        }
+
+        return pathComponents;
+    }
+
+    /**
+     * Get file path to lib.
+     *
+     * @param file PsiFile
+     * @return List
+     */
+    protected List<String> getLibPathComponets(final PsiFile file) {
+        final List<String> pathComponents = new ArrayList<>();
+        PsiDirectory parent = file.getParent();
+
+        while (!"web".equals(parent.getName())) {
             pathComponents.add(parent.getName());
             parent = parent.getParent();
-        } while (!pattern.matcher(parent.getName()).find());
-        pathComponents.add(parent.getName());
+        }
+        pathComponents.add("web");
         Collections.reverse(pathComponents);
 
         return pathComponents;

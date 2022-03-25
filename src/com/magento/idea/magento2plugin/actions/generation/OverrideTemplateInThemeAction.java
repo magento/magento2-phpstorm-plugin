@@ -10,16 +10,19 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.MagentoIcons;
-import com.magento.idea.magento2plugin.actions.CopyMagentoPath;
 import com.magento.idea.magento2plugin.actions.generation.dialog.OverrideTemplateInThemeDialog;
+import com.magento.idea.magento2plugin.magento.packages.OverridableFileType;
+import com.magento.idea.magento2plugin.magento.packages.Package;
+import java.util.Arrays;
 import org.jetbrains.annotations.NotNull;
 
 public class OverrideTemplateInThemeAction extends OverrideFileInThemeAction {
 
     public static final String ACTION_NAME = "Override this file in a project theme";
-    public static final String ACTION_TEMPLATE_DESCRIPTION = "Override template in project theme";
-    public static final String ACTION_STYLES_DESCRIPTION = "Override styles in project theme";
-    public static final String LESS_FILE_EXTENSION = "less";
+    public static final String ACTION_TEMPLATE_DESCRIPTION =
+            "Override template file in project theme";
+    public static final String ACTION_STYLES_DESCRIPTION = "Override styles file in project theme";
+    public static final String ACTION_JS_DESCRIPTION = "Override javascript file in project theme";
 
     public OverrideTemplateInThemeAction() {
         super(ACTION_NAME, ACTION_TEMPLATE_DESCRIPTION, MagentoIcons.MODULE);
@@ -47,11 +50,18 @@ public class OverrideTemplateInThemeAction extends OverrideFileInThemeAction {
         }
         final String fileExtension = virtualFile.getExtension();
 
-        if (!CopyMagentoPath.PHTML_EXTENSION.equals(fileExtension)
-                && !LESS_FILE_EXTENSION.equals(fileExtension)) {
+        if (!OverridableFileType.getOverwritableFileExtensions().contains(fileExtension)) {
             return false;
         }
 
-        return isFileInModuleOrTheme(file, project);
+        if (OverridableFileType.isFileJS(fileExtension)
+                && !virtualFile.getCanonicalPath().contains(Package.libWebRoot)
+                && !Arrays.asList(virtualFile.getCanonicalPath()
+                .split(Package.V_FILE_SEPARATOR)).contains("web")) {
+            return false;
+        }
+
+        return OverridableFileType.isFileJS(fileExtension)
+                || isFileInModuleOrTheme(file, project);
     }
 }
