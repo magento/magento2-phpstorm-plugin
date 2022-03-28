@@ -106,6 +106,13 @@ public class RegExUtil {
                 "\\\\?" + PhpRegex.FQN + "(" + CLASS_MEMBER_NAME + ")?.*";
     }
 
+    public static class JsRegex {
+
+        // Targets paths like `'Sandbox_Test/js/test'`
+        public static final String FILE_PATH
+                = "(\\W{1}[A-Z][a-zA-Z0-9]+_[A-Z][a-zA-Z0-9]+[\\/\\w*-]{1,}\\W{1})";
+    }
+
     public static class CustomTheme {
         public static final String MODULE_NAME =
                 "app\\/design\\/(adminhtml|frontend)\\/\\w*\\/\\w*\\/\\w*";

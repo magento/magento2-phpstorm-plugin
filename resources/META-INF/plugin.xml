@@ -552,6 +552,50 @@
                          enabledByDefault="false"
                          level="WARNING"
                          implementationClass="com.magento.idea.magento2uct.inspections.php.api.CalledNonInterfaceMethod"/>
+
+        <localInspection language="XML" groupPath="UCT"
+                         shortName="UsedDeprecatedTypeInConfig"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsedDeprecatedTypeInConfig"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.deprecation.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.xml.UsedDeprecatedTypeInConfig"/>
+        <localInspection language="XML" groupPath="UCT"
+                         shortName="UsedDeprecatedConstantInConfig"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsedDeprecatedConstantInConfig"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.deprecation.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.xml.UsedDeprecatedConstantInConfig"/>
+        <localInspection language="XML" groupPath="UCT"
+                         shortName="UsedDeprecatedMethodInConfig"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsedDeprecatedMethodInConfig"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.deprecation.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.xml.UsedDeprecatedMethodInConfig"/>
+
+        <localInspection language="XML" groupPath="UCT"
+                         shortName="UsedNonExistentTypeInConfig"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsedNonExistentTypeInConfig"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.existence.group.name"
+                         enabledByDefault="false"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2uct.inspections.xml.UsedNonExistentTypeInConfig"/>
+        <localInspection language="XML" groupPath="UCT"
+                         shortName="UsedNonExistentConstantInConfig"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsedNonExistentConstantInConfig"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.existence.group.name"
+                         enabledByDefault="false"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2uct.inspections.xml.UsedNonExistentConstantInConfig"/>
+        <localInspection language="XML" groupPath="UCT"
+                         shortName="UsedNonExistentMethodInConfig"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsedNonExistentMethodInConfig"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.existence.group.name"
+                         enabledByDefault="false"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2uct.inspections.xml.UsedNonExistentMethodInConfig"/>
         <!-- \UCT inspection -->
 
         <internalFileTemplate name="Magento Composer JSON"/>
