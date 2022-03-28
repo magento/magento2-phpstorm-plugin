@@ -12,6 +12,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericWithUnderscoreRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.BoxNotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.CliCommandRule;
+import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.CommaSeparatedStringRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.ConfigPathRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.CronScheduleRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
@@ -59,7 +60,8 @@ public enum RuleRegistry {
     EXTENDED_NUMERIC(ExtendedNumericRule.class),
     TABLE_NAME_LENGTH(TableNameLength.class),
     MENU_IDENTIFIER(MenuIdentifierRule.class),
-    LAYOUT_NAME(LayoutNameRule.class);
+    LAYOUT_NAME(LayoutNameRule.class),
+    COMMA_SEPARATED_STRING(CommaSeparatedStringRule.class);
 
     private Class<?> rule;
 
