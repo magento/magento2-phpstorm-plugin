@@ -1,0 +1,22 @@
+<?php
+#parse("PHP File Header.php")
+
+namespace ${NAMESPACE};
+
+#set ($uses = ${USES})
+#foreach ($use in $uses.split(","))
+use $use;
+#end
+
+class ${NAME} extends ${EXTENDS}
+{
+    /**
+     * Retrieve All options
+     *
+     * @return array
+     */
+    public function getAllOptions(): array
+    {
+        return [];
+    }
+}
