@@ -29,7 +29,6 @@ import com.magento.idea.magento2plugin.stubs.indexes.xml.AclResourceIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.DeclarativeSchemaElementsIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.MenuIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.PhpClassNameIndex;
-import com.magento.idea.magento2plugin.stubs.indexes.xml.ProductTypeIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.UIComponentIndex;
 
 @SuppressWarnings({"PMD.ClassNamingConventions", "PMD.UseUtilityClass"})
@@ -72,9 +71,7 @@ public class IndexManager {
             TestNameIndex.KEY,
             TestExtendsIndex.KEY,
             //graphql
-            GraphQlResolverIndex.KEY,
-            //product types
-            ProductTypeIndex.KEY
+            GraphQlResolverIndex.KEY
         };
 
         for (final ID<?, ?> id: indexIds) {
