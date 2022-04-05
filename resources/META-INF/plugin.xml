@@ -7,7 +7,7 @@
 <idea-plugin require-restart="true">
     <id>com.magento.idea.magento2plugin</id>
     <name>Magento PhpStorm</name>
-    <version>4.3.0</version>
+    <version>4.4.0</version>
     <vendor url="https://github.com/magento/magento2-phpstorm-plugin">Magento Inc.</vendor>
 
     <description><![CDATA[
@@ -99,6 +99,14 @@
             <action id="MagentoMessageQueue" class="com.magento.idea.magento2plugin.actions.generation.NewMessageQueueAction" />
             <action id="NewDbSchema" class="com.magento.idea.magento2plugin.actions.generation.NewDbSchemaAction" />
             <add-to-group group-id="NewGroup" anchor="last"/>
+        </group>
+
+        <!-- Eav Attribute generators -->
+        <group id="NewEavAttributeGroup" class="com.magento.idea.magento2plugin.actions.groups.NewEavAttributeGroup" text="Magento 2 EAV Attribute" popup="true">
+            <action id="NewProductEavAttribute" class="com.magento.idea.magento2plugin.actions.generation.eavattribute.NewProductEavAttributeAction" />
+            <action id="NewCatalogEavAttribute" class="com.magento.idea.magento2plugin.actions.generation.eavattribute.NewCategoryEavAttributeAction" />
+            <action id="NewCustomerAttribute" class="com.magento.idea.magento2plugin.actions.generation.NewCustomerEavAttributeAction" />
+            <add-to-group group-id="MagentoNewModuleFileGroup" anchor="last"/>
         </group>
 
         <!-- Complex generators -->
@@ -200,6 +208,7 @@
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.MenuIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.DeclarativeSchemaElementsIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.UIComponentIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.ProductTypeIndex" />
 
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.PluginLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.PluginTargetLineMarkerProvider"/>

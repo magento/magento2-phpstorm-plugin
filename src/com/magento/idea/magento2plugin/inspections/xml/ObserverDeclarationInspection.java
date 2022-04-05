@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2plugin.inspections.xml;//NOPMD
+package com.magento.idea.magento2plugin.inspections.xml;
 
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -39,7 +39,11 @@ import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.NPathComplexity"})
+@SuppressWarnings({
+        "PMD.ExcessiveMethodLength",
+        "PMD.NPathComplexity",
+        "PMD.ExcessiveImports",
+})
 public class ObserverDeclarationInspection extends PhpInspection {
 
     @NotNull
