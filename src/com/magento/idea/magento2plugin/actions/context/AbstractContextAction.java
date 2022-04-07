@@ -52,6 +52,7 @@ public abstract class AbstractContextAction extends CreateFromTemplateActionBase
     }
 
     @Override
+    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
     public void update(final @NotNull AnActionEvent event) {
         event.getPresentation().setEnabled(false);
         event.getPresentation().setVisible(false);
