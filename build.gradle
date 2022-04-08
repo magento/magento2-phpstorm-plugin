@@ -114,3 +114,8 @@ test {
 
     maxHeapSize = '1G'
 }
+
+runPluginVerifier {
+    ideVersions = []
+    localPaths = []
+}
