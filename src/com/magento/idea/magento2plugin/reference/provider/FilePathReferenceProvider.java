@@ -33,7 +33,8 @@ public class FilePathReferenceProvider extends PsiReferenceProvider {
             "PMD.CognitiveComplexity",
             "PMD.CyclomaticComplexity",
             "PMD.NPathComplexity",
-            "PMD.AvoidInstantiatingObjectsInLoops"
+            "PMD.AvoidInstantiatingObjectsInLoops",
+            "PMD.AvoidDeeplyNestedIfStmts"
     })
     @NotNull
     @Override
@@ -92,14 +93,13 @@ public class FilePathReferenceProvider extends PsiReferenceProvider {
                     if (null != psiElement) {
                         final int currentPathIndex = currentPath.lastIndexOf('/') == -1
                                 ? 0 : currentPath.lastIndexOf('/') + 1;
+                        final int startOffset = origValue.indexOf(filePath) + currentPathIndex;
+                        final int endOffset = startOffset + pathPart.length();
 
-                        final TextRange pathRange = new TextRange(
-                                origValue.indexOf(filePath)
-                                    + currentPathIndex,
-                                origValue.indexOf(filePath)
-                                    + currentPathIndex
-                                    + pathPart.length()
-                        );
+                        if (!isProperRange(startOffset, endOffset)) {
+                            continue;
+                        }
+                        final TextRange pathRange = new TextRange(startOffset, endOffset);
 
                         if (psiPathElements.containsKey(pathRange)) {
                             psiPathElements.get(pathRange).add(psiElement);
@@ -185,5 +185,9 @@ public class FilePathReferenceProvider extends PsiReferenceProvider {
 
     private boolean isModuleNamePresent(final @NotNull PsiElement element) {
         return GetModuleNameUtil.getInstance().execute(element.getText()) != null;
+    }
+
+    private boolean isProperRange(final int startOffset, final int endOffset) {
+        return startOffset <= endOffset && startOffset >= 0;
     }
 }
