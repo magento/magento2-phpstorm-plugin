@@ -18,7 +18,10 @@ import com.jetbrains.php.lang.psi.elements.impl.ClassConstImpl;
 import com.magento.idea.magento2plugin.magento.files.RegistrationPhp;
 import com.magento.idea.magento2plugin.magento.packages.ComponentType;
 import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.util.RegExUtil;
 import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,12 +52,9 @@ public final class GetMagentoModuleUtil {
         if (registrationFile == null) {
             return null;
         }
-        final PsiDirectory configDir = registrationFile
-                .getContainingDirectory()
-                .findSubdirectory(Package.moduleBaseAreaDir);
-        final PsiDirectory viewDir = registrationFile
-                .getContainingDirectory()
-                .findSubdirectory(Package.moduleViewDir);
+        final PsiDirectory moduleDir = registrationFile.getContainingDirectory();
+        final PsiDirectory configDir = moduleDir.findSubdirectory(Package.moduleBaseAreaDir);
+        final PsiDirectory viewDir = moduleDir.findSubdirectory(Package.moduleViewDir);
         final Collection<MethodReference> methodReferences = PsiTreeUtil.findChildrenOfType(
                 registrationFile,
                 MethodReference.class
@@ -80,10 +80,40 @@ public final class GetMagentoModuleUtil {
                 return null;
             }
 
-            return new MagentoModuleData(name, resolvedType, configDir, viewDir);
+            return new MagentoModuleData(name, resolvedType, moduleDir, configDir, viewDir);
         }
 
         return null;
+    }
+
+    /**
+     * Check if specified module is in the app/code directory.
+     *
+     * @param moduleData MagentoModuleData
+     *
+     * @return boolean
+     */
+    public static boolean isEditableModule(final @NotNull MagentoModuleData moduleData) {
+        final Pattern pattern = Pattern.compile(RegExUtil.Magento.CUSTOM_VENDOR_NAME);
+        final Matcher matcher = pattern.matcher(
+                moduleData.getModuleDir().getVirtualFile().getPath()
+        );
+
+        return matcher.find();
+    }
+
+    /**
+     * Check if specified directory is in the app/code.
+     *
+     * @param directory PsiDirectory
+     *
+     * @return boolean
+     */
+    public static boolean isDirectoryInEditableModule(final @NotNull PsiDirectory directory) {
+        final Pattern pattern = Pattern.compile(RegExUtil.Magento.CUSTOM_VENDOR_NAME);
+        final Matcher matcher = pattern.matcher(directory.getVirtualFile().getPath());
+
+        return matcher.find();
     }
 
     private static PsiFile getModuleRegistrationFile(
@@ -136,6 +166,7 @@ public final class GetMagentoModuleUtil {
 
         private final String name;
         private final ComponentType type;
+        private final PsiDirectory moduleDir;
         private final PsiDirectory configDir;
         private final PsiDirectory viewDir;
 
@@ -144,12 +175,14 @@ public final class GetMagentoModuleUtil {
          *
          * @param name String
          * @param type ComponentType
+         * @param moduleDir PsiDirectory
          */
         public MagentoModuleData(
                 final @NotNull String name,
-                final @NotNull ComponentType type
+                final @NotNull ComponentType type,
+                final @NotNull PsiDirectory moduleDir
         ) {
-            this(name, type, null, null);
+            this(name, type, moduleDir, null, null);
         }
 
         /**
@@ -157,17 +190,20 @@ public final class GetMagentoModuleUtil {
          *
          * @param name String
          * @param type ComponentType
+         * @param moduleDir PsiDirectory
          * @param configDir PsiDirectory
          * @param viewDir PsiDirectory
          */
         public MagentoModuleData(
                 final @NotNull String name,
                 final @NotNull ComponentType type,
+                final @NotNull PsiDirectory moduleDir,
                 final @Nullable PsiDirectory configDir,
                 final @Nullable PsiDirectory viewDir
         ) {
             this.name = name;
             this.type = type;
+            this.moduleDir = moduleDir;
             this.configDir = configDir;
             this.viewDir = viewDir;
         }
@@ -178,6 +214,10 @@ public final class GetMagentoModuleUtil {
 
         public ComponentType getType() {
             return type;
+        }
+
+        public PsiDirectory getModuleDir() {
+            return moduleDir;
         }
 
         public @Nullable PsiDirectory getConfigDir() {
