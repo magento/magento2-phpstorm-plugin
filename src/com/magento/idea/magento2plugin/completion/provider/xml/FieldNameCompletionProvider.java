@@ -40,8 +40,6 @@ public class FieldNameCompletionProvider extends CompletionProvider<CompletionPa
         if (position == null || !Settings.isEnabled(position.getProject())) {
             return;
         }
-        final String prefix = result.getPrefixMatcher().getPrefix().trim();
-
         final XmlTag startingTag = PsiTreeUtil.getParentOfType(
                 position,
                 XmlTag.class
@@ -59,6 +57,7 @@ public class FieldNameCompletionProvider extends CompletionProvider<CompletionPa
         if (currentPath == null) {
             return;
         }
+        final String prefix = result.getPrefixMatcher().getPrefix().trim();
         final String capture = currentPath + "." + prefix;
 
         for (final LookupElement element : makeCompletion(capture, position.getProject())) {
@@ -97,7 +96,7 @@ public class FieldNameCompletionProvider extends CompletionProvider<CompletionPa
                             }
                             final String[] pathParts = input.split("\\.");
 
-                            if (pathParts.length != 3) {
+                            if (pathParts.length != 3) { //NOPMD
                                 return;
                             }
                             final String fieldId = pathParts[2];

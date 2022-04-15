@@ -40,7 +40,6 @@ public class GroupNameCompletionProvider extends CompletionProvider<CompletionPa
         if (position == null || !Settings.isEnabled(position.getProject())) {
             return;
         }
-        final String prefix = result.getPrefixMatcher().getPrefix().trim();
         final XmlTag startingTag = PsiTreeUtil.getParentOfType(
                 position,
                 XmlTag.class
@@ -57,6 +56,7 @@ public class GroupNameCompletionProvider extends CompletionProvider<CompletionPa
         if (currentPath == null) {
             return;
         }
+        final String prefix = result.getPrefixMatcher().getPrefix().trim();
         final String capture = currentPath + "." + prefix;
 
         for (final LookupElement element : makeCompletion(capture, position.getProject())) {
@@ -97,7 +97,7 @@ public class GroupNameCompletionProvider extends CompletionProvider<CompletionPa
                             }
                             final String[] groupNameParts = input.split("\\.");
 
-                            if (groupNameParts.length != 2) {
+                            if (groupNameParts.length != 2) { //NOPMD
                                 return;
                             }
                             final String groupId = groupNameParts[1];

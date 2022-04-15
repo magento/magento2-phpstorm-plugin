@@ -27,7 +27,9 @@ public class SystemConfigurationContributor extends CompletionContributor {
     /**
      * Contributes completions to the system.xml and config.xml files.
      */
+    @SuppressWarnings("PMD.ExcessiveMethodLength")
     public SystemConfigurationContributor() {
+        super();
         final XmlFilePattern.Capture systemXmlFileCapture = XmlPatterns
                 .xmlFile()
                 .withName(StandardPatterns.string().endsWith(ModuleSystemXmlFile.FILE_NAME));
