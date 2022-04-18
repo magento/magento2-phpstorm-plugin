@@ -1,11 +1,13 @@
-/**
+/*
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.magento.packages;
 
 import com.intellij.json.psi.JsonFile;
 import com.intellij.json.psi.JsonObject;
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -18,29 +20,27 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.ModulePackageIndex;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class MagentoComponentManager {
+@Service
+public final class MagentoComponentManager {
+
     private Map<String, MagentoComponent> components = new HashMap<>();
     private long cacheStartTime;
     private static final int CACHE_LIFE_TIME = 20000;
-    private static MagentoComponentManager magentoComponentManager;
-    private Project project;
+    private final Project project;
 
-    private MagentoComponentManager(Project project){
+    public MagentoComponentManager(final Project project) {
         this.project = project;
     }
 
-    public static MagentoComponentManager getInstance(@NotNull Project project) {
-        if (magentoComponentManager == null) {
-            magentoComponentManager = new MagentoComponentManager(project);
-        }
-        return magentoComponentManager;
+    public static MagentoComponentManager getInstance(final @NotNull Project project) {
+        return project.getService(MagentoComponentManager.class);
     }
 
     public Collection<MagentoComponent> getAllComponents() {
@@ -60,8 +60,8 @@ public class MagentoComponentManager {
         return result;
     }
 
-    synchronized private Map<String, MagentoComponent> getComponents() {
-        if (DumbService.getInstance(project).isDumb() || project.isDisposed()) {
+    private synchronized Map<String, MagentoComponent> getComponents() {
+        if (project.isDisposed() || DumbService.getInstance(project).isDumb()) {
             return new HashMap<>();
         }
 
