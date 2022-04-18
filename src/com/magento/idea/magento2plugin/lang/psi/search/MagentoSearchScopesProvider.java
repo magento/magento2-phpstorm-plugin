@@ -32,6 +32,6 @@ public class MagentoSearchScopesProvider implements SearchScopeProvider {
             return Collections.emptyList();
         }
 
-        return Collections.singletonList(AllFilesExceptTestsScope.getInstance(project));
+        return Collections.singletonList(new AllFilesExceptTestsScope(project));
     }
 }
