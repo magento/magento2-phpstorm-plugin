@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 4.3.1
 
+### Changed
+
+- Added raw plugin verifier configuration in [#1065](https://github.com/magento/magento2-phpstorm-plugin/pull/1065)
+
+### Fixed
+
+- Fixed bug with the file separator on Windows OS (while saving plugin settings) in [#1062](https://github.com/magento/magento2-phpstorm-plugin/pull/1062)
+- Fixed bug with wrong text range for FilePathReferenceProvider.getReferencesByElement in [#1063](https://github.com/magento/magento2-phpstorm-plugin/pull/1063)
+- Fixed module files action group is accessible from the theme context in [#1064](https://github.com/magento/magento2-phpstorm-plugin/pull/1064)
+- Fixed bug with directory index is already disposed for Project in AllFilesExceptTestsScope.contains in [#1080](https://github.com/magento/magento2-phpstorm-plugin/pull/1080)
+- Fixed bug with DumbService cannot be created because container is already disposed in MagentoComponentManager.getComponents in [#1081](https://github.com/magento/magento2-phpstorm-plugin/pull/1081)
+
 ## 4.3.0
 
 ### Added
