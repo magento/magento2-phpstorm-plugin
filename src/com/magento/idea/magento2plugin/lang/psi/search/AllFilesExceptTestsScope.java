@@ -16,33 +16,14 @@ import org.jetbrains.annotations.Nullable;
 public final class AllFilesExceptTestsScope extends GlobalSearchScope {
 
     public static final String SCOPE_NAME = "All Files Except Tests";
-    private static AllFilesExceptTestsScope instance;
     private final Project project;
-
-    /**
-     * Get search scope instance.
-     *
-     * @param project Project
-     *
-     * @return AllFilesExceptTestsScope
-     */
-    @SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
-    public static synchronized AllFilesExceptTestsScope getInstance(
-            final @Nullable Project project
-    ) {
-        if (instance == null) {
-            instance = new AllFilesExceptTestsScope(project);
-        }
-
-        return instance;
-    }
 
     /**
      * Magento search scope constructor.
      *
      * @param project Project
      */
-    private AllFilesExceptTestsScope(final @Nullable Project project) {
+    public AllFilesExceptTestsScope(final @Nullable Project project) {
         super(project);
         this.project = project;
     }
