@@ -8,7 +8,6 @@ package com.magento.idea.magento2plugin.util.magento;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
-import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import java.util.Arrays;
@@ -33,11 +32,11 @@ public final class MagentoBasePathUtil {
         if (file != null && file.isDirectory()) {
             return VfsUtil.findRelativeFile(
                     file,
-                    Package.frameworkRootComposer.split(VfsUtilCore.VFS_SEPARATOR)
+                    Package.frameworkRootComposer.split(Package.V_FILE_SEPARATOR)
             ) != null
                 || VfsUtil.findRelativeFile(
                         file,
-                    Package.frameworkRootGit.split(VfsUtilCore.VFS_SEPARATOR)) != null;
+                    Package.frameworkRootGit.split(Package.V_FILE_SEPARATOR)) != null;
         }
         return false;
     }
