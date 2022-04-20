@@ -8,9 +8,9 @@ package com.magento.idea.magento2plugin.util.magento;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.magento.idea.magento2plugin.magento.packages.Package;
-import java.io.File;
 import java.util.Arrays;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,14 +29,15 @@ public final class MagentoBasePathUtil {
             return false;
         }
         final VirtualFile file = LocalFileSystem.getInstance().findFileByPath(path);
+
         if (file != null && file.isDirectory()) {
             return VfsUtil.findRelativeFile(
                     file,
-                    Package.frameworkRootComposer.split(File.separator)
+                    Package.frameworkRootComposer.split(VfsUtilCore.VFS_SEPARATOR)
             ) != null
                 || VfsUtil.findRelativeFile(
                         file,
-                    Package.frameworkRootGit.split(File.separator)) != null;
+                    Package.frameworkRootGit.split(VfsUtilCore.VFS_SEPARATOR)) != null;
         }
         return false;
     }
