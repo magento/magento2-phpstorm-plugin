@@ -50,7 +50,7 @@ public class RegExUtil {
             = "(\\d+)\\.(\\d+)\\.(\\d+)[a-zA-Z0-9_\\-]*";
 
     public static final String LAYOUT_NAME
-            = "^([a-zA-Z0-9]+){1,}(_[a-zA-Z0-9]+){0,2}";
+            = "^([a-zA-Z0-9]+){1}(_[a-zA-Z0-9]+){0,}";
 
     public static class Magento {
 
