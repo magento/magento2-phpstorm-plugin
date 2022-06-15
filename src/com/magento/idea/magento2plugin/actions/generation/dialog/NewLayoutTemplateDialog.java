@@ -11,13 +11,11 @@ import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.actions.context.xml.NewLayoutXmlAction;
 import com.magento.idea.magento2plugin.actions.generation.data.LayoutXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
-import com.magento.idea.magento2plugin.actions.generation.dialog.util.DialogFieldErrorUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.LayoutXmlTemplateGenerator;
-import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.KeyEvent;
@@ -122,7 +120,7 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
      * Fire generation process if all fields are valid.
      */
     private void onOK() {
-        if (validateFormFields() && isUnderscoreCorrect()) {
+        if (validateFormFields()) {
             final String[] layoutNameParts = getLayoutNameParts();
             new LayoutXmlTemplateGenerator(
                     new LayoutXmlData(
@@ -188,51 +186,11 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
             actionName = layoutNameParts[2];
         }
 
+        if (layoutNameParts.length == 2 || layoutNameParts.length > 3) { // NOPMD
+            routeName = layoutName.getText().trim();
+        }
+
         return new String[]{routeName, controllerName, actionName};
-    }
-
-    /**
-     * Check is count of underscore is correct in layout name.
-     *
-     * @return boolean
-     */
-    private boolean isUnderscoreCorrect() {
-        final String name = layoutName.getText().trim();
-
-        if (name.contains("_")) {
-            final int count = countUnderscore(name);
-
-            if (count != 0 && count != 2) {
-                DialogFieldErrorUtil.showErrorMessageForField(
-                        layoutName,
-                        layoutNameErrorMessage,
-                        new ValidatorBundle()
-                                .message("validator.layoutNameUnderscoreQtyInvalid")
-                );
-
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Count underscore symbols in string.
-     *
-     * @param name String
-     * @return int
-     */
-    private int countUnderscore(final String name) {
-        int count = 0;
-
-        for (int i = 0; i < name.length(); i++) {
-            if (name.charAt(i) == '_') { //NOPMD
-                count++;
-            }
-        }
-
-        return count;
     }
 
     /**
