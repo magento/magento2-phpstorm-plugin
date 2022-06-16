@@ -38,6 +38,10 @@ public class OverrideClassByAPreferenceAction extends DumbAwareAction {
     public void update(final AnActionEvent event) {
         targetClass = null;// NOPMD
         final Project project = event.getData(PlatformDataKeys.PROJECT);
+
+        if (project == null) {
+            return;
+        }
         if (Settings.isEnabled(project)) {
             final Pair<PsiFile, PhpClass> pair = this.findPhpClass(event);
             final PsiFile psiFile = pair.getFirst();
