@@ -49,8 +49,8 @@ public class CompareTemplateAction extends AnAction {
      *
      * @param event AnActionEvent
      */
-    @SuppressWarnings("PMD.NPathComplexity")
     @Override
+    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
     public void update(final @NotNull AnActionEvent event) {
         setStatus(event, false);
         final Project project = event.getData(PlatformDataKeys.PROJECT);
@@ -83,6 +83,9 @@ public class CompareTemplateAction extends AnAction {
         }
         final String originalModuleName = getOriginalModuleName(project, psiFile);
 
+        if (originalModuleName == null) {
+            return;
+        }
         final PsiDirectory originalModuleDirectory =
                 new ModuleIndex(project).getModuleDirectoryByModuleName(originalModuleName);
 
