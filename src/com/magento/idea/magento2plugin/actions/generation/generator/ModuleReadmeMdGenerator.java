@@ -11,7 +11,7 @@ import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleReadmeMdData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
-import com.magento.idea.magento2plugin.magento.files.ModuleReadmeMd;
+import com.magento.idea.magento2plugin.magento.files.ModuleReadmeMdFile;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,14 +49,10 @@ public class ModuleReadmeMdGenerator extends FileGenerator {
     public PsiFile generate(final String actionName) {
         final PsiDirectory moduleDir = resolveModuleRoot(moduleReadmeMdData);
 
-        if (moduleDir == null) {
-            return null;
-        }
-
         return fileFromTemplateGenerator.generate(
-                ModuleReadmeMd.getInstance(),
+                new ModuleReadmeMdFile(),
                 getAttributes(),
-                moduleDir,
+                moduleDir != null ? moduleDir : moduleReadmeMdData.getBaseDir(),
                 actionName
         );
     }
