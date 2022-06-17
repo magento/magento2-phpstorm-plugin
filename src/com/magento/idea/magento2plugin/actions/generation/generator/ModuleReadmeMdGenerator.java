@@ -6,17 +6,18 @@
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleReadmeMdData;
-import com.magento.idea.magento2plugin.actions.generation.generator.data.ModuleDirectoriesData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.magento.files.ModuleReadmeMd;
-import com.magento.idea.magento2plugin.magento.files.RegistrationPhp;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ModuleReadmeMdGenerator extends FileGenerator {
+
     private final ModuleReadmeMdData moduleReadmeMdData;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final DirectoryGenerator directoryGenerator;
@@ -41,28 +42,21 @@ public class ModuleReadmeMdGenerator extends FileGenerator {
      * Generate file.
      *
      * @param actionName String
+     *
      * @return PsiFile
      */
     @Override
     public PsiFile generate(final String actionName) {
-        if (moduleReadmeMdData.hasCreateModuleDirs()) {
-            final ModuleDirectoriesData moduleDirectoriesData = directoryGenerator
-                    .createOrFindModuleDirectories(
-                            moduleReadmeMdData.getPackageName(),
-                            moduleReadmeMdData.getModuleName(),
-                            moduleReadmeMdData.getBaseDir()
-                    );
-            return fileFromTemplateGenerator.generate(
-                    ModuleReadmeMd.getInstance(),
-                    getAttributes(),
-                    moduleDirectoriesData.getModuleDirectory(),
-                    actionName
-            );
+        final PsiDirectory moduleDir = resolveModuleRoot(moduleReadmeMdData);
+
+        if (moduleDir == null) {
+            return null;
         }
+
         return fileFromTemplateGenerator.generate(
-                RegistrationPhp.getInstance(),
+                ModuleReadmeMd.getInstance(),
                 getAttributes(),
-                moduleReadmeMdData.getBaseDir(),
+                moduleDir,
                 actionName
         );
     }
@@ -76,5 +70,11 @@ public class ModuleReadmeMdGenerator extends FileGenerator {
     protected void fillAttributes(final Properties attributes) {
         attributes.setProperty("PACKAGE", moduleReadmeMdData.getPackageName());
         attributes.setProperty("MODULE_NAME", moduleReadmeMdData.getModuleName());
+    }
+
+    private @Nullable PsiDirectory resolveModuleRoot(final @NotNull ModuleReadmeMdData data) {
+        final PsiDirectory packageDir = data.getBaseDir().findSubdirectory(data.getPackageName());
+
+        return packageDir != null ? packageDir.findSubdirectory(data.getModuleName()) : null;
     }
 }

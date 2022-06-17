@@ -9,6 +9,7 @@ import com.intellij.lang.Language;
 import com.intellij.lang.html.HTMLLanguage;
 
 public class ModuleReadmeMd implements ModuleFileInterface {
+
     public static final String FILE_NAME = "README.md";
     public static final String TEMPLATE = "Magento Module Readme File MD";
     private static final ModuleReadmeMd INSTANCE = new ModuleReadmeMd();
@@ -35,6 +36,3 @@ public class ModuleReadmeMd implements ModuleFileInterface {
         return HTMLLanguage.INSTANCE;
     }
 }
-
-
-

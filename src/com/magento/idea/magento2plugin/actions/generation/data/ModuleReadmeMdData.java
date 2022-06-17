@@ -6,12 +6,13 @@
 package com.magento.idea.magento2plugin.actions.generation.data;
 
 import com.intellij.psi.PsiDirectory;
+import org.jetbrains.annotations.NotNull;
 
 public class ModuleReadmeMdData {
+
     private final String packageName;
     private final String moduleName;
     private final PsiDirectory baseDir;
-    private final boolean createModuleDirs;
 
     /**
      * Constructor.
@@ -19,33 +20,26 @@ public class ModuleReadmeMdData {
      * @param packageName String
      * @param moduleName String
      * @param baseDir PsiDirectory
-     * @param createModuleDirs boolean
      */
     public ModuleReadmeMdData(
-            final String packageName,
-            final String moduleName,
-            final PsiDirectory baseDir,
-            final boolean createModuleDirs
+            final @NotNull String packageName,
+            final @NotNull String moduleName,
+            final @NotNull PsiDirectory baseDir
     ) {
         this.packageName = packageName;
         this.moduleName = moduleName;
         this.baseDir = baseDir;
-        this.createModuleDirs = createModuleDirs;
     }
 
-    public String getPackageName() {
-        return this.packageName;
+    public @NotNull String getPackageName() {
+        return packageName;
     }
 
-    public String getModuleName() {
-        return this.moduleName;
+    public @NotNull String getModuleName() {
+        return moduleName;
     }
 
-    public PsiDirectory getBaseDir() {
-        return this.baseDir;
-    }
-
-    public boolean hasCreateModuleDirs() {
-        return this.createModuleDirs;
+    public @NotNull PsiDirectory getBaseDir() {
+        return baseDir;
     }
 }
