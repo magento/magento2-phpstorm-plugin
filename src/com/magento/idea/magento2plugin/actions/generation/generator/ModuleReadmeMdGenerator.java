@@ -9,7 +9,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleReadmeMdData;
-import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.magento.files.ModuleReadmeMdFile;
 import java.util.Properties;
@@ -20,7 +19,6 @@ public class ModuleReadmeMdGenerator extends FileGenerator {
 
     private final ModuleReadmeMdData moduleReadmeMdData;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
-    private final DirectoryGenerator directoryGenerator;
 
     /**
      * Construct generator.
@@ -35,7 +33,6 @@ public class ModuleReadmeMdGenerator extends FileGenerator {
         super(project);
         this.moduleReadmeMdData = moduleReadmeMdData;
         this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
-        this.directoryGenerator = DirectoryGenerator.getInstance();
     }
 
     /**
@@ -52,7 +49,7 @@ public class ModuleReadmeMdGenerator extends FileGenerator {
         return fileFromTemplateGenerator.generate(
                 new ModuleReadmeMdFile(),
                 getAttributes(),
-                moduleDir != null ? moduleDir : moduleReadmeMdData.getBaseDir(),
+                moduleDir == null ? moduleReadmeMdData.getBaseDir() : moduleDir,
                 actionName
         );
     }
@@ -71,6 +68,6 @@ public class ModuleReadmeMdGenerator extends FileGenerator {
     private @Nullable PsiDirectory resolveModuleRoot(final @NotNull ModuleReadmeMdData data) {
         final PsiDirectory packageDir = data.getBaseDir().findSubdirectory(data.getPackageName());
 
-        return packageDir != null ? packageDir.findSubdirectory(data.getModuleName()) : null;
+        return packageDir == null ? null : packageDir.findSubdirectory(data.getModuleName());
     }
 }
