@@ -13,6 +13,11 @@ public final class ModuleConfigXmlFile implements ModuleFileInterface {
     public static final String FILE_NAME = "config.xml";
     public static final String TEMPLATE = "Magento Config XML";
 
+    public static final String ROOT_TAG_NAME = "config";
+    public static final String DEFAULT_SCOPE = "default";
+    public static final String STORE_SCOPE = "stores";
+    public static final String WEBSITE_SCOPE = "websites";
+
     @Override
     public String getFileName() {
         return FILE_NAME;
