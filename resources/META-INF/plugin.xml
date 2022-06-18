@@ -657,6 +657,7 @@
         <internalFileTemplate name="Magento Sections XML"/>
         <internalFileTemplate name="Magento Module Email Templates Xml"/>
         <internalFileTemplate name="Magento Page Types XML"/>
+        <internalFileTemplate name="Magento Module Readme File MD"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 

@@ -53,6 +53,15 @@ public abstract class BaseGeneratorTestCase extends BaseProjectTestCase {
         assertEquals(expectedFile.getName(), resultFile.getName());
     }
 
+    @SuppressWarnings({"PMD.JUnitAssertionsShouldIncludeMessage"})
+    protected void assertGeneratedFileIsCorrect(
+            final PsiFile expectedFile,
+            final PsiFile resultFile
+    ) {
+        assertEquals(expectedFile.getText(), resultFile.getText());
+        assertEquals(expectedFile.getName(), resultFile.getName());
+    }
+
     protected PsiDirectory getProjectDirectory() {
         return myFixture.getPsiManager().findDirectory(
                 GetProjectBasePath.execute(myFixture.getProject())
