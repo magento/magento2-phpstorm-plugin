@@ -2,13 +2,14 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.util.magento.plugin;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.PluginIndex;
-
+import com.magento.idea.magento2plugin.stubs.indexes.data.PluginData;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -35,14 +36,14 @@ public class GetTargetClassNamesByPluginClassName {
                 .getAllKeys(PluginIndex.KEY, project);
 
         for (String targetClassName : allKeys) {
-            List<Set<String>> pluginsList = FileBasedIndex.getInstance()
+            List<Set<PluginData>> pluginsList = FileBasedIndex.getInstance()
                     .getValues(com.magento.idea.magento2plugin.stubs.indexes.PluginIndex.KEY, targetClassName, GlobalSearchScope.allScope(project));
             if (pluginsList.isEmpty()) {
                 continue;
             }
-            for (Set<String> plugins : pluginsList) {
-                for (String plugin : plugins) {
-                    if (!plugin.equals(currentClassName)) {
+            for (Set<PluginData> plugins : pluginsList) {
+                for (PluginData plugin : plugins) {
+                    if (!plugin.getType().equals(currentClassName)) {
                         continue;
                     }
                     targetClassNames.add(targetClassName);
