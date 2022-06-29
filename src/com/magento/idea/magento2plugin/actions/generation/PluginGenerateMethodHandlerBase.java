@@ -42,7 +42,6 @@ import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.magento.plugin.GetTargetClassNamesByPluginClassName;
 import com.magento.idea.magento2plugin.util.magento.plugin.IsPluginAllowedForMethodUtil;
 import gnu.trove.THashSet;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -88,9 +87,9 @@ public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeIns
             return false;
         }
         final GetTargetClassNamesByPluginClassName targetClassesService
-                = GetTargetClassNamesByPluginClassName.getInstance(editor.getProject());
+                = new GetTargetClassNamesByPluginClassName(editor.getProject());
         final String currentClass = phpClass.getFQN().substring(1);
-        final ArrayList<String> targetClassNames = targetClassesService.execute(currentClass);
+        final List<String> targetClassNames = targetClassesService.execute(currentClass);
         return !targetClassNames.isEmpty();
     }
 
@@ -241,9 +240,9 @@ public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeIns
         final TreeMap<String, PhpNamedElementNode> nodes = new TreeMap();
 
         final GetTargetClassNamesByPluginClassName targetClassesService =
-                GetTargetClassNamesByPluginClassName.getInstance(phpClass.getProject());
+                new GetTargetClassNamesByPluginClassName(phpClass.getProject());
         final String currentClass = phpClass.getFQN().substring(1);
-        final ArrayList<String> targetClassNames = targetClassesService.execute(currentClass);
+        final List<String> targetClassNames = targetClassesService.execute(currentClass);
         for (final String targetClassName : targetClassNames) {
             final PhpClass targetClass = GetPhpClassByFQN.getInstance(
                     phpClass.getProject()

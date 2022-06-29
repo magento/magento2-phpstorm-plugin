@@ -16,33 +16,38 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Returns all targets class names for the plugin
+ * Returns all targets class names for the plugin.
  */
 public class GetTargetClassNamesByPluginClassName {
-    private static GetTargetClassNamesByPluginClassName INSTANCE = null;
-    private Project project;
+    private final Project project;
 
-    public static GetTargetClassNamesByPluginClassName getInstance(Project project) {
-        if (null == INSTANCE) {
-            INSTANCE = new GetTargetClassNamesByPluginClassName();
-        }
-        INSTANCE.project = project;
-        return INSTANCE;
+    public GetTargetClassNamesByPluginClassName(final Project project) {
+        this.project = project;
     }
 
-    public ArrayList<String> execute(String currentClassName) {
-        ArrayList<String> targetClassNames = new ArrayList<>();
-        Collection<String> allKeys = FileBasedIndex.getInstance()
+    /**
+     * Get current class names for the plugin.
+     *
+     * @param currentClassName plugin class name.
+     * @return list of plugin classes
+     */
+    public List<String> execute(final String currentClassName) {
+        final List<String> targetClassNames = new ArrayList<>();
+        final Collection<String> allKeys = FileBasedIndex.getInstance()
                 .getAllKeys(PluginIndex.KEY, project);
 
-        for (String targetClassName : allKeys) {
-            List<Set<PluginData>> pluginsList = FileBasedIndex.getInstance()
-                    .getValues(com.magento.idea.magento2plugin.stubs.indexes.PluginIndex.KEY, targetClassName, GlobalSearchScope.allScope(project));
+        for (final String targetClassName : allKeys) {
+            final List<Set<PluginData>> pluginsList = FileBasedIndex.getInstance()
+                    .getValues(
+                        PluginIndex.KEY,
+                        targetClassName,
+                        GlobalSearchScope.allScope(project)
+                    );
             if (pluginsList.isEmpty()) {
                 continue;
             }
-            for (Set<PluginData> plugins : pluginsList) {
-                for (PluginData plugin : plugins) {
+            for (final Set<PluginData> plugins : pluginsList) {
+                for (final PluginData plugin : plugins) {
                     if (!plugin.getType().equals(currentClassName)) {
                         continue;
                     }

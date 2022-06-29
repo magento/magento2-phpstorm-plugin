@@ -16,29 +16,30 @@ import org.jetbrains.annotations.NotNull;
 public class PluginSetDataExternalizer  implements DataExternalizer<Set<PluginData>> {
     public static final PluginSetDataExternalizer INSTANCE = new PluginSetDataExternalizer();
 
-    public PluginSetDataExternalizer() {
-    }
-
+    @SuppressWarnings("checkstyle:LineLength")
     @Override
-    public synchronized void save(@NotNull DataOutput out, Set<PluginData> value) throws IOException {
+    public void save(final @NotNull DataOutput out, final Set<PluginData> value) throws IOException {
         out.writeInt(value.size());
 
-        for (PluginData plugin : value) {
+        for (final PluginData plugin : value) {
             out.writeUTF(plugin.getType());
             out.writeInt(plugin.getSortOrder());
         }
     }
 
     @Override
-    public synchronized Set<PluginData> read(@NotNull DataInput in) throws IOException {
-        int size = in.readInt();
-        HashSet<PluginData> result = new HashSet<>(size);
+    public Set<PluginData> read(final @NotNull DataInput income) throws IOException {
+        final int size = income.readInt();
+        final HashSet<PluginData> result = new HashSet<>(size);
 
         for (int r = size; r > 0; --r) {
-            PluginData pluginData = new PluginData(in.readUTF(), in.readInt());
-            result.add(pluginData);
+            result.add(getPluginDataObject(income.readUTF(), income.readInt()));
         }
 
         return result;
+    }
+
+    private PluginData getPluginDataObject(final String pluginType, final Integer sortOrder) {
+        return new PluginData(pluginType,  sortOrder);
     }
 }

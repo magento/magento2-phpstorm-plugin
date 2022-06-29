@@ -150,9 +150,9 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
         }
 
         public List<PluginMethodData> getPluginMethods(final List<PluginData> pluginDataList) {
-            List<PluginMethodData> result = new ArrayList<>();
+            final List<PluginMethodData> result = new ArrayList<>();
 
-            for (PluginData pluginData: pluginDataList) {
+            for (final PluginData pluginData: pluginDataList) {
                 for (final PhpClass plugin: pluginData.getPhpClassCollection()) {
                     //@todo add module sequence ID if sortOrder equal zero. It should be negative value.
                     result.addAll(getPluginMethods(plugin, pluginData.getSortOrder()));
@@ -162,7 +162,7 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
             return result;
         }
 
-        public List<PluginMethodData> getPluginMethods(final @NotNull PhpClass pluginClass, int sortOrder) {
+        public List<PluginMethodData> getPluginMethods(final @NotNull PhpClass pluginClass, final int sortOrder) {
             final List<PluginMethodData> methodList = new ArrayList<>();
 
             for (final Method method : pluginClass.getMethods()) {
@@ -171,12 +171,17 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
 
                     if (pluginMethodName.length() > MIN_PLUGIN_METHOD_NAME_LENGTH) {
                         //@todo module sequence value should be set here instead of zero.
-                        methodList.add(new PluginMethodData(method, sortOrder, 0));
+                        methodList.add(getPluginMethodDataObject(method, sortOrder, 0));
                     }
                 }
             }
 
             return methodList;
+        }
+
+        @NotNull
+        private PluginMethodData getPluginMethodDataObject(final Method method, final int sortOrder, final int moduleSequence) {
+            return new PluginMethodData(method, sortOrder, moduleSequence);
         }
     }
 
@@ -192,10 +197,10 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
 
         @Override
         public List<PhpClass> collect(final @NotNull PhpClass psiElement) {
-            List<PluginData> pluginDataList = pluginClassCache.getPluginsForClass(psiElement);
-            List<PhpClass> phpClassList =  new ArrayList<>();
+            final List<PluginData> pluginDataList = pluginClassCache.getPluginsForClass(psiElement);
+            final List<PhpClass> phpClassList =  new ArrayList<>();
 
-            for (PluginData pluginData: pluginDataList) {
+            for (final PluginData pluginData: pluginDataList) {
                 phpClassList.addAll(pluginData.getPhpClassCollection());
             }
 
@@ -207,6 +212,7 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
 
         private final PluginLineMarkerProvider.PluginClassCache pluginClassCache;
         private final Map<String, Integer> pluginMethodsSortOrder;
+        private static final String AFTER_PLUGIN_PREFIX = "after";
 
         public MethodPluginCollector(
                 final PluginLineMarkerProvider.PluginClassCache pluginClassCache
@@ -215,7 +221,7 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
             pluginMethodsSortOrder = new HashMap<>();
             pluginMethodsSortOrder.put("before", 1);
             pluginMethodsSortOrder.put("around", 2);
-            pluginMethodsSortOrder.put("after", 3);
+            pluginMethodsSortOrder.put(AFTER_PLUGIN_PREFIX, 3);
         }
 
         @SuppressWarnings("checkstyle:LineLength")
@@ -238,13 +244,13 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
             return results;
         }
 
-        @SuppressWarnings({"checkstyle:Indentation", "checkstyle:OperatorWrap", "checkstyle:LineLength"})
-        private void sortMethods(final @NotNull List<PluginMethodData> methodDataList, List<Method> results) {
-            List<Integer> bufferSortOrderList = new ArrayList<>();
+        @SuppressWarnings({"checkstyle:Indentation", "checkstyle:OperatorWrap", "checkstyle:LineLength", "PMD.NPathComplexity"})
+        private void sortMethods(final @NotNull List<PluginMethodData> methodDataList, final List<Method> results) {
+            final List<Integer> bufferSortOrderList = new ArrayList<>();
             int biggestSortOrder = 0;
 
-            for (PluginMethodData pluginMethodData: methodDataList) {
-                String methodName = pluginMethodData.getMethodName();
+            for (final PluginMethodData pluginMethodData: methodDataList) {
+                final String methodName = pluginMethodData.getMethodName();
 
                 if (methodName.startsWith("around")) {
                     bufferSortOrderList.add(pluginMethodData.getSortOrder());
@@ -261,10 +267,10 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
                 (PluginMethodData method1, PluginMethodData method2) -> {
                     final String firstMethodName =  method1.getMethodName();
                     final String secondMethodName =  method2.getMethodName();
-                    final int firstIndexEnd = firstMethodName.startsWith("after") ? 5 : 6;
-                    final int secondIndexEnd = secondMethodName.startsWith("after") ? 5 : 6;
-                    String firstMethodPrefix =  firstMethodName.substring(0,firstIndexEnd);
-                    String secondMethodPrefix =  secondMethodName.substring(0,secondIndexEnd);
+                    final int firstIndexEnd = firstMethodName.startsWith(AFTER_PLUGIN_PREFIX) ? 5 : 6;
+                    final int secondIndexEnd = secondMethodName.startsWith(AFTER_PLUGIN_PREFIX) ? 5 : 6;
+                    final String firstMethodPrefix =  firstMethodName.substring(0,firstIndexEnd);
+                    final String secondMethodPrefix =  secondMethodName.substring(0,secondIndexEnd);
 
                     if (!pluginMethodsSortOrder.containsKey(firstMethodPrefix)
                         || !pluginMethodsSortOrder.containsKey(secondMethodPrefix)) {
@@ -280,17 +286,17 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
 
                     Integer firstBuffer = 0;
                     Integer secondBuffer = 0;
-                    Integer firstModuleSequence = (method1.getModuleSequence() + biggestSortOrderValue) * -1;
-                    Integer secondModuleSequence = (method2.getModuleSequence() + biggestSortOrderValue) * -1;
-                    Integer firstSortOrder = method1.getSortOrder() != 0 ?
-                        method1.getSortOrder() :
-                        firstModuleSequence;
-                    Integer secondSortOrder = method2.getSortOrder() != 0 ?
-                        method2.getSortOrder() :
-                        secondModuleSequence;
+                    final Integer firstModuleSequence = (method1.getModuleSequence() + biggestSortOrderValue) * -1;
+                    final Integer secondModuleSequence = (method2.getModuleSequence() + biggestSortOrderValue) * -1;
+                    final Integer firstSortOrder = method1.getSortOrder() == 0 ?
+                        firstModuleSequence :
+                        method1.getSortOrder();
+                    final Integer secondSortOrder = method2.getSortOrder() == 0 ?
+                        secondModuleSequence :
+                        method2.getSortOrder();
 
-                    if (!bufferSortOrderList.isEmpty() && firstMethodPrefix.equals("after")) {
-                        for (Integer bufferSortOrder : bufferSortOrderList) {
+                    if (!bufferSortOrderList.isEmpty() && firstMethodPrefix.equals(AFTER_PLUGIN_PREFIX)) {
+                        for (final Integer bufferSortOrder : bufferSortOrderList) {
                             if (bufferSortOrder < firstSortOrder && firstBuffer < bufferSortOrder + 1) {
                                 firstBuffer = bufferSortOrder + 1;
                             }
@@ -316,7 +322,7 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
                 }
             );
 
-            for (PluginMethodData pluginMethodData: methodDataList) {
+            for (final PluginMethodData pluginMethodData: methodDataList) {
                 results.add(pluginMethodData.getMethod());
             }
         }

@@ -11,7 +11,11 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlDocument;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
-import com.intellij.util.indexing.*;
+import com.intellij.util.indexing.DataIndexer;
+import com.intellij.util.indexing.FileBasedIndex;
+import com.intellij.util.indexing.FileBasedIndexExtension;
+import com.intellij.util.indexing.FileContent;
+import com.intellij.util.indexing.ID;
 import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
@@ -39,14 +43,16 @@ public class PluginIndex extends FileBasedIndexExtension<String, Set<PluginData>
 
     @NotNull
     @Override
+    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
     public DataIndexer<String, Set<PluginData>, FileContent> getIndexer() {
         return new DataIndexer<>() {
+            @SuppressWarnings("checkstyle:LineLength")
             @NotNull
             @Override
-            public Map<String, Set<PluginData>> map(@NotNull FileContent fileContent) {
-                Map<String, Set<PluginData>> map = new HashMap<>();
+            public Map<String, Set<PluginData>> map(final @NotNull FileContent fileContent) {
+                final Map<String, Set<PluginData>> map = new HashMap<>();
 
-                PsiFile psiFile = fileContent.getPsiFile();
+                final PsiFile psiFile = fileContent.getPsiFile();
                 if (!Settings.isEnabled(psiFile.getProject())) {
                     return map;
                 }
@@ -54,26 +60,27 @@ public class PluginIndex extends FileBasedIndexExtension<String, Set<PluginData>
                 if (!(psiFile instanceof XmlFile)) {
                     return map;
                 }
-                XmlDocument document = ((XmlFile) psiFile).getDocument();
-                if(document == null) {
+                final XmlDocument document = ((XmlFile) psiFile).getDocument();
+                if (document == null) {
                     return map;
                 }
 
-                XmlTag xmlTags[] = PsiTreeUtil.getChildrenOfType(psiFile.getFirstChild(), XmlTag.class);
+                final XmlTag[] xmlTags = PsiTreeUtil.getChildrenOfType(psiFile.getFirstChild(), XmlTag.class);
                 if (xmlTags == null) {
                     return map;
                 }
 
-                for (XmlTag xmlTag: xmlTags) {
+                for (final XmlTag xmlTag: xmlTags) {
                     if (xmlTag.getName().equals("config")) {
-                        for (XmlTag typeNode: xmlTag.findSubTags("type")) {
-                            String typeName = typeNode.getAttributeValue("name");
-                            if (typeName != null) {
-                                Set<PluginData> plugins = getPluginsForType(typeNode);
-                                if (plugins.size() > 0) {
-                                    map.put(PhpLangUtil.toPresentableFQN(typeName), plugins);
-                                }
+                        for (final XmlTag typeNode: xmlTag.findSubTags("type")) {
+                            final String typeName = typeNode.getAttributeValue("name");
+                            final Set<PluginData> plugins = getPluginsForType(typeNode);
+
+                            if (typeName == null || plugins.isEmpty()) {
+                                continue;
                             }
+
+                            map.put(PhpLangUtil.toPresentableFQN(typeName), plugins);
                         }
                     }
                 }
@@ -81,21 +88,26 @@ public class PluginIndex extends FileBasedIndexExtension<String, Set<PluginData>
                 return map;
             }
 
-            private Set<PluginData> getPluginsForType(XmlTag typeNode) {
-                Set<PluginData> results = new HashSet<>();
+            @SuppressWarnings("checkstyle:LineLength")
+            private Set<PluginData> getPluginsForType(final XmlTag typeNode) {
+                final Set<PluginData> results = new HashSet<>();
 
-                for (XmlTag pluginTag: typeNode.findSubTags(ModuleDiXml.PLUGIN_TAG_NAME)) {
-                    String pluginType = pluginTag.getAttributeValue(ModuleDiXml.TYPE_ATTR);
+                for (final XmlTag pluginTag: typeNode.findSubTags(ModuleDiXml.PLUGIN_TAG_NAME)) {
+                    final String pluginType = pluginTag.getAttributeValue(ModuleDiXml.TYPE_ATTR);
                     String pluginSortOrder = pluginTag.getAttributeValue(ModuleDiXml.SORT_ORDER_ATTR);
 
                     if (pluginType != null) {
                         pluginSortOrder = pluginSortOrder == null ? "0" : pluginSortOrder;
-                        PluginData pluginData = new PluginData(pluginType,  Integer.parseInt(pluginSortOrder));
+                        final PluginData pluginData = getPluginDataObject(pluginType,  Integer.parseInt(pluginSortOrder));
                         results.add(pluginData);
                     }
                 }
 
                 return results;
+            }
+
+            private PluginData getPluginDataObject(final String pluginType, final Integer sortOrder) {
+                return new PluginData(pluginType,  sortOrder);
             }
         };
     }
@@ -114,9 +126,9 @@ public class PluginIndex extends FileBasedIndexExtension<String, Set<PluginData>
 
     @NotNull
     @Override
+    @SuppressWarnings("checkstyle:LineLength")
     public FileBasedIndex.InputFilter getInputFilter() {
-        return virtualFile -> (virtualFile.getFileType() == XmlFileType.INSTANCE
-                && virtualFile.getNameWithoutExtension().equals("di"));
+        return virtualFile -> virtualFile.getFileType().equals(XmlFileType.INSTANCE) && "di".equals(virtualFile.getNameWithoutExtension());
     }
 
     @Override

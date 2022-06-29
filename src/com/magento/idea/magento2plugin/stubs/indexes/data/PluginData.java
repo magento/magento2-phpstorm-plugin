@@ -48,7 +48,7 @@ public class PluginData {
      *
      * @param phpClass collection PHP plugin class
      */
-    public void setPhpClass(@NotNull PhpClass phpClass) {
+    public void setPhpClass(final @NotNull PhpClass phpClass) {
         final PhpIndex phpIndex = PhpIndex.getInstance(phpClass.getProject());
 
         phpClassCollection = phpIndex.getClassesByFQN(getType());
