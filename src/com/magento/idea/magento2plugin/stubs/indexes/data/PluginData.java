@@ -76,7 +76,7 @@ public class PluginData {
      * @return boolean
      */
     @Override
-    public boolean equals(Object object) {
+    public boolean equals(final Object object) {
         if (!(object instanceof PluginData)) {
             return false;
         }
