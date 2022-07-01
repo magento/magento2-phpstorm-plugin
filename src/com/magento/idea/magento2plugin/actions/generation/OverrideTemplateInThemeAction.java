@@ -45,10 +45,16 @@ public class OverrideTemplateInThemeAction extends OverrideFileInThemeAction {
     ) {
         final VirtualFile virtualFile = file.getVirtualFile();
 
-        if (virtualFile == null || virtualFile.isDirectory()) {
+        if (virtualFile == null
+                || virtualFile.isDirectory()
+                || virtualFile.getCanonicalPath() == null) {
             return false;
         }
         final String fileExtension = virtualFile.getExtension();
+
+        if (fileExtension == null) {
+            return false;
+        }
 
         if (!OverridableFileType.getOverwritableFileExtensions().contains(fileExtension)) {
             return false;
