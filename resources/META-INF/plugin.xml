@@ -60,6 +60,7 @@
             <separator/>
             <!-- Context dependent actions -->
             <action id="MagentoCreateAclFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewAclXmlAction"/>
+            <action id="MagentoCreateGraphQlSchemaFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewGraphQLSchemaAction"/>
             <action id="MagentoCreateConfigFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewConfigXmlAction"/>
             <action id="MagentoCreateCrontabFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewCrontabXmlAction"/>
             <action id="MagentoCreateDiFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewDiXmlAction"/>
@@ -626,6 +627,7 @@
         <internalFileTemplate name="Magento Routes XML"/>
         <internalFileTemplate name="Magento Layout XML"/>
         <internalFileTemplate name="Magento ACL XML"/>
+        <internalFileTemplate name="Magento GraphQL Schema"/>
         <internalFileTemplate name="Magento Collection Class"/>
         <internalFileTemplate name="Magento Model Class"/>
         <internalFileTemplate name="Magento Resource Model Class"/>
