@@ -9,8 +9,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
-import com.magento.idea.magento2plugin.magento.files.GraphQLSchema;
 import com.magento.idea.magento2plugin.magento.files.ModuleFileInterface;
+import com.magento.idea.magento2plugin.magento.files.SchemaGraphQLsFile;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.FileBasedIndexUtil;
@@ -44,7 +44,7 @@ public final class FindOrCreateGraphQLSchema {
                 new FileFromTemplateGenerator(project);
         parentDirectory = directoryGenerator
                 .findOrCreateSubdirectory(parentDirectory, Package.moduleBaseAreaDir);
-        final GraphQLSchema graphQlSchemaFile = GraphQLSchema.getInstance();
+        final SchemaGraphQLsFile graphQlSchemaFile = SchemaGraphQLsFile.getInstance();
         PsiFile graphQlSchema = FileBasedIndexUtil.findModuleConfigFile(
                 graphQlSchemaFile.getFileName(),
                 Areas.getAreaByString(Areas.base.name()),

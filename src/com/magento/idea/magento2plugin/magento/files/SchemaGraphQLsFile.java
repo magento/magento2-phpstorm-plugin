@@ -6,16 +6,16 @@
 package com.magento.idea.magento2plugin.magento.files;
 
 import com.intellij.lang.Language;
-import com.jetbrains.php.lang.PhpLanguage;
+import com.intellij.lang.jsgraphql.GraphQLLanguage;
 
-public class GraphQLSchema implements ModuleFileInterface {
+public class SchemaGraphQLsFile implements ModuleFileInterface {
 
     public static final String FILE_NAME = "schema.graphqls";
 
     public static final String TEMPLATE = "Magento GraphQL Schema";
-    private static final GraphQLSchema INSTANCE = new GraphQLSchema();
+    private static final SchemaGraphQLsFile INSTANCE = new SchemaGraphQLsFile();
 
-    public static GraphQLSchema getInstance() {
+    public static SchemaGraphQLsFile getInstance() {
         return INSTANCE;
     }
 
@@ -31,6 +31,6 @@ public class GraphQLSchema implements ModuleFileInterface {
 
     @Override
     public Language getLanguage() {
-        return PhpLanguage.INSTANCE;
+        return GraphQLLanguage.INSTANCE;
     }
 }

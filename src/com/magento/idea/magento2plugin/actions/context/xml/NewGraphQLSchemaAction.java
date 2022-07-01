@@ -9,7 +9,7 @@ import com.intellij.ide.fileTemplates.actions.AttributesDefaults;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.context.AbstractContextAction;
-import com.magento.idea.magento2plugin.magento.files.GraphQLSchema;
+import com.magento.idea.magento2plugin.magento.files.SchemaGraphQLsFile;
 import com.magento.idea.magento2plugin.magento.packages.ComponentType;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil;
@@ -25,7 +25,7 @@ public class NewGraphQLSchemaAction extends AbstractContextAction {
      * New  schema.graphqls file action constructor.
      */
     public NewGraphQLSchemaAction() {
-        super(ACTION_NAME, ACTION_DESCRIPTION, GraphQLSchema.getInstance());
+        super(ACTION_NAME, ACTION_DESCRIPTION, SchemaGraphQLsFile.getInstance());
     }
 
     @Override
