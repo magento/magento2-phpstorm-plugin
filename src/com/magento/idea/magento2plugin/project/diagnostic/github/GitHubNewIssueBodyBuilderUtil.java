@@ -64,6 +64,11 @@ public final class GitHubNewIssueBodyBuilderUtil {
             } else {
                 step += 10;
             }
+            final int index = maxAllowedStackTraceLength - step;
+
+            if (index > stackTrace.length() || index - step < 0) {
+                isFound = true;
+            }
         }
 
         return buildTemplate(project, bugDescription, decode(encodedCutStackTrace));
