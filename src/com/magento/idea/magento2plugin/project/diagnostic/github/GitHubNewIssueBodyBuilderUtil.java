@@ -42,7 +42,7 @@ public final class GitHubNewIssueBodyBuilderUtil {
             final @NotNull String stackTrace,
             final int maxAllowedBodyLength
     ) {
-        final int maxAllowedStackTraceLength = getMaxAllowedStackTraceLength(
+        int maxAllowedStackTraceLength = getMaxAllowedStackTraceLength(
                 project,
                 bugDescription,
                 maxAllowedBodyLength
@@ -56,6 +56,9 @@ public final class GitHubNewIssueBodyBuilderUtil {
         String encodedCutStackTrace = "";
 
         while (!isFound) {
+            if (stackTrace.length() < maxAllowedStackTraceLength) {
+                maxAllowedStackTraceLength = stackTrace.length();
+            }
             final String cutStackTrace = stackTrace.substring(0, maxAllowedStackTraceLength - step);
             encodedCutStackTrace = encode(cutStackTrace);
 
@@ -63,11 +66,6 @@ public final class GitHubNewIssueBodyBuilderUtil {
                 isFound = true;
             } else {
                 step += 10;
-            }
-            final int index = maxAllowedStackTraceLength - step;
-
-            if (index > stackTrace.length() || index - step < 0) {
-                isFound = true;
             }
         }
 
