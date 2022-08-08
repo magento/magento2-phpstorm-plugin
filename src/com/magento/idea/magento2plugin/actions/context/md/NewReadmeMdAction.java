@@ -31,13 +31,17 @@ public class NewReadmeMdAction extends AbstractContextAction {
             final PsiDirectory targetDirectory,
             final PsiFile targetFile
     ) {
+        if (!moduleData.getType().equals(ComponentType.module)) {
+            return false;
+        }
         final PsiDirectory moduleDirectory = new ModuleIndex(targetDirectory.getProject())
                 .getModuleDirectoryByModuleName(moduleData.getName());
-        final String magentoModuleName = moduleData.getName().split(Package.vendorModuleNameSeparator)[1];
+        final String magentoModuleName = moduleData
+                .getName()
+                .split(Package.vendorModuleNameSeparator)[1];
 
         return targetDirectory.getName().equals(magentoModuleName)
-                && targetDirectory.equals(moduleDirectory)
-                && moduleData.getType().equals(ComponentType.module);
+                && targetDirectory.equals(moduleDirectory);
     }
 
     @Override
