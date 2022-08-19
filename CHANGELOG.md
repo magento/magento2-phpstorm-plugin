@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 4.4.0
 
+### Added
+
+- Code generation of Readme file [#1133](https://github.com/magento/magento2-phpstorm-plugin/pull/1133)
+- Code generation of GraphQl schema file [#1123](https://github.com/magento/magento2-phpstorm-plugin/pull/1123)
+- Optional generation of Readme file during the creation of a new module [#1110](https://github.com/magento/magento2-phpstorm-plugin/pull/1110)
+- Code completion for `system.xml` and `config.xml` [#1077](https://github.com/magento/magento2-phpstorm-plugin/pull/1077)
+
+### Fixed
+
+- Fixed null data in ModuleIndex class [#1132](https://github.com/magento/magento2-phpstorm-plugin/pull/1132)
+- Fixed StringIndexOutOfBoundsException: GitHubNewIssueBodyBuilderUtil [#1130](https://github.com/magento/magento2-phpstorm-plugin/pull/1130)
+- Fixed ArrayIndexOutOfBoundsException: Index 1 out of bounds for length 0 in OverrideClassByAPreferenceDialog [#1129](https://github.com/magento/magento2-phpstorm-plugin/pull/1129)
+- Fixed PatternSyntaxException: MagentoBasePathUtil.isMagentoFolderValid:35 for Windows styled dir path separator [#1126](https://github.com/magento/magento2-phpstorm-plugin/pull/1126)
+- Fixed NullPointerException in the OverrideTemplateInThemeAction.isOverrideAllowed for virtualFile.getCanonicalPath() [#1125](https://github.com/magento/magento2-phpstorm-plugin/pull/1125)
+- Fixed IllegalArgumentException: Argument for @NotNull parameter 'dataKey' must not be null in CompareTemplateAction [#1117](https://github.com/magento/magento2-phpstorm-plugin/pull/1117)
+- Fixed argument for @NotNull parameter 'project' must not be null in the OverrideClassByAPreferenceAction [#1116](https://github.com/magento/magento2-phpstorm-plugin/pull/1116)
+- Fixed New layout action doesn't accept valid layout names [#1114](https://github.com/magento/magento2-phpstorm-plugin/pull/1114)
+
 ## 4.3.0
 
 ### Added
