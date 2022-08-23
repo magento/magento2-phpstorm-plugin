@@ -27,7 +27,7 @@ import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.magento.plugin.GetTargetClassNamesByPluginClassName;
-import java.util.ArrayList;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.NPathComplexity", "PMD.CognitiveComplexity"})
@@ -75,10 +75,8 @@ public class PluginInspection extends PhpInspection {
                         ((PhpClass) parentClass).getNameIdentifier();
                 final String currentClass = ((PhpClass) parentClass).getFQN().substring(1);
                 final GetTargetClassNamesByPluginClassName targetClassesService =
-                        GetTargetClassNamesByPluginClassName.getInstance(
-                                problemsHolder.getProject()
-                        );
-                final ArrayList<String> targetClassNames =
+                        new GetTargetClassNamesByPluginClassName(problemsHolder.getProject());
+                final List<String> targetClassNames =
                         targetClassesService.execute(currentClass);
 
                 for (final String targetClassName : targetClassNames) {
