@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
@@ -33,10 +33,6 @@ public class PluginData {
 
     public int getSortOrder() {
         return sortOrder;
-    }
-
-    public @NotNull Collection<PhpClass> getPhpClass() {
-        return phpClassCollection;
     }
 
     public Collection<PhpClass> getPhpClassCollection() {
