@@ -97,8 +97,8 @@ public class PluginTargetLineMarkerProvider implements LineMarkerProvider {
             }
 
             final GetTargetClassNamesByPluginClassName targetClassesService =
-                    GetTargetClassNamesByPluginClassName.getInstance(phpClass.getProject());
-            final ArrayList<String> targetClassNames = targetClassesService.execute(classFQN);
+                    new GetTargetClassNamesByPluginClassName(phpClass.getProject());
+            final List<String> targetClassNames = targetClassesService.execute(classFQN);
 
             final List<PhpClass> results = new ArrayList<>();
 
