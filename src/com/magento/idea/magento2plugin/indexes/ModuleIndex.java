@@ -121,7 +121,7 @@ public final class ModuleIndex {
      * @return PsiDirectory
      */
     public @Nullable PsiDirectory getModuleDirectoryByModuleName(final String moduleName) {
-        if (DumbService.getInstance(project).isDumb()) {
+        if (DumbService.getInstance(project).isDumb() || moduleName == null) {
             return null;
         }
         final FileBasedIndex index = FileBasedIndex
