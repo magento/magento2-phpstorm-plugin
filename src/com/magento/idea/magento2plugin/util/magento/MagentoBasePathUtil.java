@@ -10,7 +10,6 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.magento.idea.magento2plugin.magento.packages.Package;
-import java.io.File;
 import java.util.Arrays;
 import org.jetbrains.annotations.NotNull;
 
