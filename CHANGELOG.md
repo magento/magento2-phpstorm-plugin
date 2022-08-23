@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Code generation of GraphQl schema file [#1123](https://github.com/magento/magento2-phpstorm-plugin/pull/1123)
 - Optional generation of Readme file during the creation of a new module [#1110](https://github.com/magento/magento2-phpstorm-plugin/pull/1110)
 - Code completion for `system.xml` and `config.xml` [#1077](https://github.com/magento/magento2-phpstorm-plugin/pull/1077)
+- Added easier navigation through plugins [#1121](https://github.com/magento/magento2-phpstorm-plugin/pull/1121)
 
 ### Fixed
 
