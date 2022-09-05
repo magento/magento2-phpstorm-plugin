@@ -23,14 +23,14 @@ import com.magento.idea.magento2plugin.util.magento.MagentoBasePathUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class NewModuleAction extends com.intellij.openapi.actionSystem.AnAction {
-    public static String actionName = "Magento 2 Module";
-    public static String actionDescription = "Create a new Magento 2 Module";
+    public static final String ACTION_NAME = "Magento 2 Module";
+    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Module";
 
     /**
      * Constructor.
      */
     public NewModuleAction() {
-        super(actionName, actionDescription, MagentoIcons.MODULE);
+        super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
     }
 
     @Override
@@ -66,6 +66,10 @@ public class NewModuleAction extends com.intellij.openapi.actionSystem.AnAction 
     @Override
     public void update(final AnActionEvent event) {
         final Project project = event.getData(PlatformDataKeys.PROJECT);
+
+        if (project == null) {
+            return;
+        }
 
         if (Settings.isEnabled(project)) {
             final String magentoPath = Settings.getMagentoPath(project);
