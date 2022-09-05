@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Fixed
 
+- Fixed IllegalArgumentException in NewModuleAction class [#1150](https://github.com/magento/magento2-phpstorm-plugin/pull/1150)
 - Fixed null data in ModuleIndex class [#1132](https://github.com/magento/magento2-phpstorm-plugin/pull/1132)
 - Fixed StringIndexOutOfBoundsException: GitHubNewIssueBodyBuilderUtil [#1130](https://github.com/magento/magento2-phpstorm-plugin/pull/1130)
 - Fixed ArrayIndexOutOfBoundsException: Index 1 out of bounds for length 0 in OverrideClassByAPreferenceDialog [#1129](https://github.com/magento/magento2-phpstorm-plugin/pull/1129)
