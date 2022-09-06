@@ -8,6 +8,7 @@ package com.magento.idea.magento2plugin.actions.context.md;
 import com.intellij.ide.fileTemplates.actions.AttributesDefaults;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
+import com.intellij.util.IncorrectOperationException;
 import com.magento.idea.magento2plugin.actions.context.AbstractContextAction;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.ModuleReadmeMdFile;
@@ -41,7 +42,8 @@ public class NewReadmeMdAction extends AbstractContextAction {
                 .split(Package.vendorModuleNameSeparator)[1];
 
         return targetDirectory.getName().equals(magentoModuleName)
-                && targetDirectory.equals(moduleDirectory);
+                && targetDirectory.equals(moduleDirectory)
+                && this.isFileCanBeCreated(moduleDirectory);
     }
 
     @Override
@@ -56,5 +58,17 @@ public class NewReadmeMdAction extends AbstractContextAction {
         defaults.addPredefined("MODULE_NAME", templateData[1]);
 
         return defaults;
+    }
+
+    private @NotNull Boolean isFileCanBeCreated(
+            final @NotNull PsiDirectory moduleDirectory
+    ) {
+        try {
+            moduleDirectory.checkCreateFile(ModuleReadmeMdFile.FILE_NAME);
+        } catch (IncorrectOperationException exception) {
+            return false;
+        }
+
+        return true;
     }
 }
