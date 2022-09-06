@@ -268,7 +268,7 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
         generateDataPatchFile(eavEntityDataInterface);
         generateExtraFilesAfterDataPatchGeneration(eavEntityDataInterface);
 
-        setVisible(false);
+        exit();
     }
 
     protected void generateSourceModelFile() {
