@@ -16,6 +16,7 @@ import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.util.IsClickedDirectoryInsideProject;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.project.Settings;
+import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
@@ -62,7 +63,8 @@ public class NewModuleFileGroup extends NonTrivialActionGroup {
             final PsiDirectory moduleDirectory = new ModuleIndex(project)
                     .getModuleDirectoryByModuleName(moduleName);
 
-            if (moduleDirectory != null) {
+            if (moduleDirectory != null
+                    && GetMagentoModuleUtil.isDirectoryInEditableModule(moduleDirectory)) {
                 event.getPresentation().setVisible(true);
                 return;
             }

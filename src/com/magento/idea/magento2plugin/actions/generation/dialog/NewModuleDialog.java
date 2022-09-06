@@ -133,7 +133,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         detectPackageName(initialBaseDir);
         setContentPane(contentPane);
         setModal(true);
-        setTitle(NewModuleAction.actionDescription);
+        setTitle(NewModuleAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
         setLicenses();
         setModuleDependencies();
@@ -214,7 +214,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
                 getModuleLicense(),
                 getModuleDependencies(),
                 true
-        ), project).generate(NewModuleAction.actionName);
+        ), project).generate(NewModuleAction.ACTION_NAME);
     }
 
     private PsiFile generateRegistrationPhp() {
@@ -223,7 +223,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
                     getModuleName(),
                     getBaseDir(),
                     true
-            ), project).generate(NewModuleAction.actionName);
+            ), project).generate(NewModuleAction.ACTION_NAME);
     }
 
     private void generateModuleXml() {
@@ -234,7 +234,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
                 getBaseDir(),
                 getModuleDependencies(),
                 true
-        ), project).generate(NewModuleAction.actionName, true);
+        ), project).generate(NewModuleAction.ACTION_NAME, true);
     }
 
     private void generateReadmeMd() {
@@ -242,7 +242,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
                 getPackageName(),
                 getModuleName(),
                 getBaseDir()
-        ), project).generate(NewModuleAction.actionName);
+        ), project).generate(NewModuleAction.ACTION_NAME);
     }
 
     private PsiDirectory getBaseDir() {

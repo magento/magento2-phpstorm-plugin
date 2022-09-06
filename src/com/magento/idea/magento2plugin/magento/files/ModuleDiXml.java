@@ -46,6 +46,7 @@ public class ModuleDiXml implements ModuleFileInterface {
 
     // attributes
     public static String NAME_ATTR = "name";
+    public static String SORT_ORDER_ATTR = "sortOrder";
     public static String TYPE_ATTR = "type";
     public static String PREFERENCE_ATTR_FOR = "for";
     public static String CLI_COMMAND_ATTR_COMMANDS = "commands";

@@ -15,9 +15,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Code generation of GraphQl schema file [#1123](https://github.com/magento/magento2-phpstorm-plugin/pull/1123)
 - Optional generation of Readme file during the creation of a new module [#1110](https://github.com/magento/magento2-phpstorm-plugin/pull/1110)
 - Code completion for `system.xml` and `config.xml` [#1077](https://github.com/magento/magento2-phpstorm-plugin/pull/1077)
+- Added easier navigation through plugins [#1121](https://github.com/magento/magento2-phpstorm-plugin/pull/1121)
 
 ### Fixed
 
+- Fixed IOException: Invalid file name at ReportBuilder [#1154](https://github.com/magento/magento2-phpstorm-plugin/pull/1154)
+- Fixed IllegalArgumentException in NewModuleAction class [#1150](https://github.com/magento/magento2-phpstorm-plugin/pull/1150)
 - Fixed null data in ModuleIndex class [#1132](https://github.com/magento/magento2-phpstorm-plugin/pull/1132)
 - Fixed StringIndexOutOfBoundsException: GitHubNewIssueBodyBuilderUtil [#1130](https://github.com/magento/magento2-phpstorm-plugin/pull/1130)
 - Fixed ArrayIndexOutOfBoundsException: Index 1 out of bounds for length 0 in OverrideClassByAPreferenceDialog [#1129](https://github.com/magento/magento2-phpstorm-plugin/pull/1129)
@@ -26,6 +29,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Fixed IllegalArgumentException: Argument for @NotNull parameter 'dataKey' must not be null in CompareTemplateAction [#1117](https://github.com/magento/magento2-phpstorm-plugin/pull/1117)
 - Fixed argument for @NotNull parameter 'project' must not be null in the OverrideClassByAPreferenceAction [#1116](https://github.com/magento/magento2-phpstorm-plugin/pull/1116)
 - Fixed New layout action doesn't accept valid layout names [#1114](https://github.com/magento/magento2-phpstorm-plugin/pull/1114)
+
+## 4.3.1
+
+### Changed
+
+- Added raw plugin verifier configuration in [#1065](https://github.com/magento/magento2-phpstorm-plugin/pull/1065)
+
+### Fixed
+
+- Fixed bug with the file separator on Windows OS (while saving plugin settings) in [#1062](https://github.com/magento/magento2-phpstorm-plugin/pull/1062)
+- Fixed bug with wrong text range for FilePathReferenceProvider.getReferencesByElement in [#1063](https://github.com/magento/magento2-phpstorm-plugin/pull/1063)
+- Fixed module files action group is accessible from the theme context in [#1064](https://github.com/magento/magento2-phpstorm-plugin/pull/1064)
+- Fixed bug with directory index is already disposed for Project in AllFilesExceptTestsScope.contains in [#1080](https://github.com/magento/magento2-phpstorm-plugin/pull/1080)
+- Fixed bug with DumbService cannot be created because container is already disposed in MagentoComponentManager.getComponents in [#1081](https://github.com/magento/magento2-phpstorm-plugin/pull/1081)
 
 ## 4.3.0
 

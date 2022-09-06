@@ -1,7 +1,8 @@
-/**
+/*
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.stubs.indexes;
 
 import com.intellij.ide.highlighter.XmlFileType;
@@ -10,41 +11,48 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlDocument;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
-import com.intellij.util.indexing.*;
+import com.intellij.util.indexing.DataIndexer;
+import com.intellij.util.indexing.FileBasedIndex;
+import com.intellij.util.indexing.FileBasedIndexExtension;
+import com.intellij.util.indexing.FileContent;
+import com.intellij.util.indexing.ID;
 import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.jetbrains.php.lang.PhpLangUtil;
-import com.jetbrains.php.lang.psi.stubs.indexes.StringSetDataExternalizer;
+import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.project.Settings;
-import org.jetbrains.annotations.NotNull;
-
+import com.magento.idea.magento2plugin.stubs.indexes.data.PluginData;
+import com.magento.idea.magento2plugin.stubs.indexes.data.PluginSetDataExternalizer;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.jetbrains.annotations.NotNull;
 
-public class PluginIndex extends FileBasedIndexExtension<String, Set<String>> {
-    public static final ID<String, Set<String>> KEY
+public class PluginIndex extends FileBasedIndexExtension<String, Set<PluginData>> {
+    public static final ID<String, Set<PluginData>> KEY
             = ID.create("com.magento.idea.magento2plugin.stubs.indexes.plugin_to_type");
     private final KeyDescriptor<String> myKeyDescriptor = new EnumeratorStringDescriptor();
 
     @NotNull
     @Override
-    public ID<String, Set<String>> getName() {
+    public ID<String, Set<PluginData>> getName() {
         return KEY;
     }
 
     @NotNull
     @Override
-    public DataIndexer<String, Set<String>, FileContent> getIndexer() {
-        return new DataIndexer<String, Set<String>, FileContent>() {
+    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
+    public DataIndexer<String, Set<PluginData>, FileContent> getIndexer() {
+        return new DataIndexer<>() {
+            @SuppressWarnings("checkstyle:LineLength")
             @NotNull
             @Override
-            public Map<String, Set<String>> map(@NotNull FileContent fileContent) {
-                Map<String, Set<String>> map = new HashMap<>();
+            public Map<String, Set<PluginData>> map(final @NotNull FileContent fileContent) {
+                final Map<String, Set<PluginData>> map = new HashMap<>();
 
-                PsiFile psiFile = fileContent.getPsiFile();
+                final PsiFile psiFile = fileContent.getPsiFile();
                 if (!Settings.isEnabled(psiFile.getProject())) {
                     return map;
                 }
@@ -52,26 +60,27 @@ public class PluginIndex extends FileBasedIndexExtension<String, Set<String>> {
                 if (!(psiFile instanceof XmlFile)) {
                     return map;
                 }
-                XmlDocument document = ((XmlFile) psiFile).getDocument();
-                if(document == null) {
+                final XmlDocument document = ((XmlFile) psiFile).getDocument();
+                if (document == null) {
                     return map;
                 }
 
-                XmlTag xmlTags[] = PsiTreeUtil.getChildrenOfType(psiFile.getFirstChild(), XmlTag.class);
+                final XmlTag[] xmlTags = PsiTreeUtil.getChildrenOfType(psiFile.getFirstChild(), XmlTag.class);
                 if (xmlTags == null) {
                     return map;
                 }
 
-                for (XmlTag xmlTag: xmlTags) {
+                for (final XmlTag xmlTag: xmlTags) {
                     if (xmlTag.getName().equals("config")) {
-                        for (XmlTag typeNode: xmlTag.findSubTags("type")) {
-                            String typeName = typeNode.getAttributeValue("name");
-                            if (typeName != null) {
-                                Set<String> plugins = getPluginsForType(typeNode);
-                                if (plugins.size() > 0) {
-                                    map.put(PhpLangUtil.toPresentableFQN(typeName), plugins);
-                                }
+                        for (final XmlTag typeNode: xmlTag.findSubTags("type")) {
+                            final String typeName = typeNode.getAttributeValue("name");
+                            final Set<PluginData> plugins = getPluginsForType(typeNode);
+
+                            if (typeName == null || plugins.isEmpty()) {
+                                continue;
                             }
+
+                            map.put(PhpLangUtil.toPresentableFQN(typeName), plugins);
                         }
                     }
                 }
@@ -79,16 +88,26 @@ public class PluginIndex extends FileBasedIndexExtension<String, Set<String>> {
                 return map;
             }
 
-            private Set<String> getPluginsForType(XmlTag typeNode) {
-                Set<String> results = new HashSet<String>();
+            @SuppressWarnings("checkstyle:LineLength")
+            private Set<PluginData> getPluginsForType(final XmlTag typeNode) {
+                final Set<PluginData> results = new HashSet<>();
 
-                for (XmlTag pluginTag: typeNode.findSubTags("plugin")) {
-                    String pluginType = pluginTag.getAttributeValue("type");
+                for (final XmlTag pluginTag: typeNode.findSubTags(ModuleDiXml.PLUGIN_TAG_NAME)) {
+                    final String pluginType = pluginTag.getAttributeValue(ModuleDiXml.TYPE_ATTR);
+                    String pluginSortOrder = pluginTag.getAttributeValue(ModuleDiXml.SORT_ORDER_ATTR);
+
                     if (pluginType != null) {
-                        results.add(PhpLangUtil.toPresentableFQN(pluginType));
+                        pluginSortOrder = pluginSortOrder == null ? "0" : pluginSortOrder;
+                        final PluginData pluginData = getPluginDataObject(pluginType,  Integer.parseInt(pluginSortOrder));
+                        results.add(pluginData);
                     }
                 }
+
                 return results;
+            }
+
+            private PluginData getPluginDataObject(final String pluginType, final Integer sortOrder) {
+                return new PluginData(pluginType,  sortOrder);
             }
         };
     }
@@ -101,15 +120,15 @@ public class PluginIndex extends FileBasedIndexExtension<String, Set<String>> {
 
     @NotNull
     @Override
-    public DataExternalizer<Set<String>> getValueExternalizer() {
-        return new StringSetDataExternalizer();
+    public DataExternalizer<Set<PluginData>> getValueExternalizer() {
+        return PluginSetDataExternalizer.INSTANCE;
     }
 
     @NotNull
     @Override
+    @SuppressWarnings("checkstyle:LineLength")
     public FileBasedIndex.InputFilter getInputFilter() {
-        return virtualFile -> (virtualFile.getFileType() == XmlFileType.INSTANCE
-                && virtualFile.getNameWithoutExtension().equals("di"));
+        return virtualFile -> virtualFile.getFileType().equals(XmlFileType.INSTANCE) && "di".equals(virtualFile.getNameWithoutExtension());
     }
 
     @Override

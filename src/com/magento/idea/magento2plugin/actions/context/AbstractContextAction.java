@@ -20,7 +20,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.magento.files.ModuleFileInterface;
+import com.magento.idea.magento2plugin.magento.packages.ComponentType;
 import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,13 +52,14 @@ public abstract class AbstractContextAction extends CreateFromTemplateActionBase
     }
 
     @Override
+    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
     public void update(final @NotNull AnActionEvent event) {
         event.getPresentation().setEnabled(false);
         event.getPresentation().setVisible(false);
 
         final Project project = event.getProject();
 
-        if (project == null) {
+        if (project == null || !Settings.isEnabled(project)) {
             return;
         }
         final DataContext context = event.getDataContext();
@@ -86,6 +89,12 @@ public abstract class AbstractContextAction extends CreateFromTemplateActionBase
                 || !isVisible(moduleData, targetDirectory, targetFile)) {
             return;
         }
+
+        if (moduleData.getType().equals(ComponentType.module)
+                && !GetMagentoModuleUtil.isEditableModule(moduleData)) {
+            return;
+        }
+
         customDataContext = SimpleDataContext
                 .builder()
                 .add(
