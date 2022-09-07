@@ -10,7 +10,10 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.containers.ContainerUtil;
+import com.jetbrains.php.lang.PhpLangUtil;
 import com.jetbrains.php.lang.psi.PhpMultipleDeclarationFilter;
+import com.jetbrains.php.lang.psi.elements.Method;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
 import com.magento.idea.magento2plugin.project.Settings;
 import java.util.Collection;
@@ -47,7 +50,23 @@ public class MagentoProxyDeclarationFilter implements PhpMultipleDeclarationFilt
                         return false;
                     }
 
-                    return !virtualFile.getPath().contains("/generated/");
+                    return !virtualFile.getPath().contains("/generated/") && isValidFqn(candidate);
                 });
+    }
+
+    private <E extends PhpNamedElement> boolean isValidFqn(final E candidate) {
+        PhpClass targetClass = null;
+
+        if (candidate instanceof Method) {
+            targetClass = (PhpClass) candidate.getParent();
+        } else if (candidate instanceof PhpClass) {
+            targetClass = (PhpClass) candidate;
+        }
+
+        if (targetClass == null) {
+            return true;
+        }
+
+        return PhpLangUtil.isFqn(targetClass.getFQN()) && !targetClass.getFQN().endsWith("\\");
     }
 }
