@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Fixed
 
+- Fixed IncorrectOperationException: Rebind cannot be performed for class PolyVariantReferenceBase [#1173](https://github.com/magento/magento2-phpstorm-plugin/pull/1173)
 - Fixed create an observer for an event doesn't work through the context menu [#1166](https://github.com/magento/magento2-phpstorm-plugin/pull/1166)
 - Fixed IOException: Invalid file name at ReportBuilder [#1154](https://github.com/magento/magento2-phpstorm-plugin/pull/1154)
 - Fixed IllegalArgumentException in NewModuleAction class [#1150](https://github.com/magento/magento2-phpstorm-plugin/pull/1150)
