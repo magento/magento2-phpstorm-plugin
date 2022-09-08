@@ -10,6 +10,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementResolveResult;
 import com.intellij.psi.PsiPolyVariantReferenceBase;
 import com.intellij.psi.ResolveResult;
+import com.intellij.util.IncorrectOperationException;
 import java.util.Collection;
 import org.jetbrains.annotations.NotNull;
 
@@ -47,5 +48,13 @@ public class PolyVariantReferenceBase extends PsiPolyVariantReferenceBase<PsiEle
             resolveResults[index++] = new PsiElementResolveResult(target);//NOPMD
         }
         return resolveResults;
+    }
+
+    @SuppressWarnings("PMD.AvoidUncheckedExceptionsInSignatures")
+    @Override
+    public PsiElement bindToElement(
+            final @NotNull PsiElement element
+    ) throws IncorrectOperationException {
+        return null;
     }
 }
