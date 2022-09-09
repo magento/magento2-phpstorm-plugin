@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Code generation of a Data Patch file with a Customer EAV attribute [#583](https://github.com/magento/magento2-phpstorm-plugin/pull/583)
 - Code generation of a Data Patch file with a Product EAV attribute [#527](https://github.com/magento/magento2-phpstorm-plugin/pull/527)
 - Code generation of a Data Patch file with a Category EAV attribute [#569](https://github.com/magento/magento2-phpstorm-plugin/pull/569)
+- Added inspection to check if type attribute value in the virtual type tag exists [#1176](https://github.com/magento/magento2-phpstorm-plugin/pull/1176)
 - Code generation of Readme file [#1133](https://github.com/magento/magento2-phpstorm-plugin/pull/1133)
 - Code generation of GraphQl schema file [#1123](https://github.com/magento/magento2-phpstorm-plugin/pull/1123)
 - Optional generation of Readme file during the creation of a new module [#1110](https://github.com/magento/magento2-phpstorm-plugin/pull/1110)
