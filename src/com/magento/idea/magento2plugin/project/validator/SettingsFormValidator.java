@@ -28,11 +28,29 @@ public class SettingsFormValidator {
      *
      * @throws ConfigurationException Exception
      */
+    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.AvoidDeeplyNestedIfStmts"})
     public void validate() throws ConfigurationException {
         if (form.isBeingUsed()) {
-            if (!MagentoBasePathUtil.isMagentoFolderValid(form.getMagentoPath())) {
+            final String magentoRootPath = form.getMagentoPath();
+            final boolean isMagentoFrameworkDirExist =
+                    MagentoBasePathUtil.isMagentoFolderValid(magentoRootPath);
+
+            if (!MagentoBasePathUtil.isComposerJsonExists(magentoRootPath)) {
+
+                if (isMagentoFrameworkDirExist) {
+                    throw new ConfigurationException(
+                            validatorBundle.message("validator.package.validPathComposerFiles")
+                    );
+                }
+
                 throw new ConfigurationException(
                         validatorBundle.message("validator.package.validPath")
+                );
+            }
+
+            if (!isMagentoFrameworkDirExist) {
+                throw new ConfigurationException(
+                        validatorBundle.message("validator.package.validPathVendor")
                 );
             }
 

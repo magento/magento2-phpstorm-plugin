@@ -9,6 +9,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.magento.idea.magento2plugin.magento.files.ComposerJson;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import java.util.Arrays;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +19,7 @@ public final class MagentoBasePathUtil {
     private MagentoBasePathUtil() {}
 
     /**
-     * Method detects Magento Framework Root.
+     * Method detects Magento Framework Root (check if magento framework exists).
      *
      * @param path String
      * @return boolean
@@ -40,6 +41,25 @@ public final class MagentoBasePathUtil {
         }
 
         return false;
+    }
+
+    /**
+     * Check if composer.json exists in directory.
+     *
+     * @param path String
+     * @return boolean
+     */
+    public static Boolean isComposerJsonExists(final String path) {
+        if (StringUtil.isEmptyOrSpaces(path)) {
+            return false;
+        }
+        final VirtualFile magentoRoot = LocalFileSystem.getInstance().findFileByPath(path);
+
+        if (magentoRoot == null || !magentoRoot.isDirectory()) {
+            return false;
+        }
+
+        return magentoRoot.findChild(ComposerJson.FILE_NAME) != null;
     }
 
     /**
