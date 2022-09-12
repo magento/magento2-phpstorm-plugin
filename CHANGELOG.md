@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Optional generation of Readme file during the creation of a new module [#1110](https://github.com/magento/magento2-phpstorm-plugin/pull/1110)
 - Code completion for `system.xml` and `config.xml` [#1077](https://github.com/magento/magento2-phpstorm-plugin/pull/1077)
 - Added easier navigation through plugins [#1121](https://github.com/magento/magento2-phpstorm-plugin/pull/1121)
+- Added inspection to check if type attr value in the virtual type tag attribute value exists [#1176](https://github.com/magento/magento2-phpstorm-plugin/pull/1176)
 
 ### Fixed
 
@@ -32,6 +33,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Fixed IllegalArgumentException: Argument for @NotNull parameter 'dataKey' must not be null in CompareTemplateAction [#1117](https://github.com/magento/magento2-phpstorm-plugin/pull/1117)
 - Fixed argument for @NotNull parameter 'project' must not be null in the OverrideClassByAPreferenceAction [#1116](https://github.com/magento/magento2-phpstorm-plugin/pull/1116)
 - Fixed New layout action doesn't accept valid layout names [#1114](https://github.com/magento/magento2-phpstorm-plugin/pull/1114)
+- Fixed IncorrectOperationException: Rebind cannot be performed for class [#1173](https://github.com/magento/magento2-phpstorm-plugin/pull/1173)
+- Fixed Create an observer for an event doesn't work through the context menu [#1166](https://github.com/magento/magento2-phpstorm-plugin/pull/1166)
 
 ## 4.3.1
 
