@@ -11,7 +11,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Code generation of a Data Patch file with a Customer EAV attribute [#583](https://github.com/magento/magento2-phpstorm-plugin/pull/583)
 - Code generation of a Data Patch file with a Product EAV attribute [#527](https://github.com/magento/magento2-phpstorm-plugin/pull/527)
 - Code generation of a Data Patch file with a Category EAV attribute [#569](https://github.com/magento/magento2-phpstorm-plugin/pull/569)
-- Added inspection to check if type attribute value in the virtual type tag exists [#1176](https://github.com/magento/magento2-phpstorm-plugin/pull/1176)
 - Code generation of Readme file [#1133](https://github.com/magento/magento2-phpstorm-plugin/pull/1133)
 - Code generation of GraphQl schema file [#1123](https://github.com/magento/magento2-phpstorm-plugin/pull/1123)
 - Optional generation of Readme file during the creation of a new module [#1110](https://github.com/magento/magento2-phpstorm-plugin/pull/1110)
@@ -33,8 +32,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Fixed IllegalArgumentException: Argument for @NotNull parameter 'dataKey' must not be null in CompareTemplateAction [#1117](https://github.com/magento/magento2-phpstorm-plugin/pull/1117)
 - Fixed argument for @NotNull parameter 'project' must not be null in the OverrideClassByAPreferenceAction [#1116](https://github.com/magento/magento2-phpstorm-plugin/pull/1116)
 - Fixed New layout action doesn't accept valid layout names [#1114](https://github.com/magento/magento2-phpstorm-plugin/pull/1114)
-- Fixed IncorrectOperationException: Rebind cannot be performed for class [#1173](https://github.com/magento/magento2-phpstorm-plugin/pull/1173)
-- Fixed Create an observer for an event doesn't work through the context menu [#1166](https://github.com/magento/magento2-phpstorm-plugin/pull/1166)
 
 ## 4.3.1
 
