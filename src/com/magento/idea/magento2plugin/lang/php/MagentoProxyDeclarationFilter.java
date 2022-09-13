@@ -58,7 +58,7 @@ public class MagentoProxyDeclarationFilter implements PhpMultipleDeclarationFilt
         PhpClass targetClass = null;
 
         if (candidate instanceof Method) {
-            targetClass = (PhpClass) candidate.getParent();
+            targetClass = ((Method) candidate).getContainingClass();
         } else if (candidate instanceof PhpClass) {
             targetClass = (PhpClass) candidate;
         }
