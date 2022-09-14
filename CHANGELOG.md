@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Code completion for `system.xml` and `config.xml` [#1077](https://github.com/magento/magento2-phpstorm-plugin/pull/1077)
 - Added easier navigation through plugins [#1121](https://github.com/magento/magento2-phpstorm-plugin/pull/1121)
 - Added inspection to check if type attr value in the virtual type tag attribute value exists [#1176](https://github.com/magento/magento2-phpstorm-plugin/pull/1176)
+- Added checks and detailed error messages during plugin activation [#1181](https://github.com/magento/magento2-phpstorm-plugin/pull/1181)
 
 ### Fixed
 
