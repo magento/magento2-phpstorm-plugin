@@ -10,8 +10,8 @@ import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.ModuleSetupDataPatchData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
 import com.magento.idea.magento2plugin.magento.files.ModuleSetupDataPatchFile;
-import org.jetbrains.annotations.NotNull;
 import java.util.Properties;
+import org.jetbrains.annotations.NotNull;
 
 public class ModuleSetupDataPatchGenerator extends FileGenerator {
 

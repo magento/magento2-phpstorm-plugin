@@ -9,7 +9,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.context.CustomGeneratorContextAction;
-import com.magento.idea.magento2plugin.actions.generation.dialog.NewSetupDataPatch.NewSetupDataPatchDialog;
+import com.magento.idea.magento2plugin.actions.generation.dialog.NewSetupDataPatchDialog;
 import com.magento.idea.magento2plugin.magento.packages.ComponentType;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil;
@@ -57,12 +57,24 @@ public class NewSetupDataPatchAction extends CustomGeneratorContextAction {
         if (!moduleData.getType().equals(ComponentType.module)) {
             return false;
         }
-        final PsiDirectory parentDirFirst = targetDirectory.getParentDirectory();
-        final PsiDirectory parentDirSecond = parentDirFirst != null ?
-                parentDirFirst.getParentDirectory() : null;
+        final String targetDirName = targetDirectory.getName();
 
-        return targetDirectory.getName().equals(ROOT_DIRECTORY) ||
-                (parentDirFirst != null && parentDirFirst.getName().equals(ROOT_DIRECTORY)) ||
-                (parentDirSecond != null && parentDirSecond.getName().equals(ROOT_DIRECTORY));
+        if (!(ROOT_DIRECTORY.equals(targetDirName) || PATCH_DIRECTORY.equals(targetDirName)
+                || DATA_DIRECTORY.equals(targetDirName))
+        ) {
+            return false;
+        }
+
+        final PsiDirectory parentDirFirst = targetDirectory.getParentDirectory();
+        PsiDirectory parentDirSecond = null;
+
+        if (parentDirFirst != null) {
+            parentDirSecond = parentDirFirst.getParentDirectory();
+        }
+
+
+        return ROOT_DIRECTORY.equals(targetDirName)
+                || parentDirFirst != null && ROOT_DIRECTORY.equals(parentDirFirst.getName())
+                || parentDirSecond != null && ROOT_DIRECTORY.equals(parentDirSecond.getName());
     }
 }

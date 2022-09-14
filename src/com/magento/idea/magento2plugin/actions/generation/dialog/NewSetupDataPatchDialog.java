@@ -3,33 +3,30 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2plugin.actions.generation.dialog.NewSetupDataPatch;
+package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.context.php.NewSetupDataPatchAction;
 import com.magento.idea.magento2plugin.actions.generation.ModuleSetupDataPatchData;
-import com.magento.idea.magento2plugin.actions.generation.dialog.AbstractDialog;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleSetupDataPatchGenerator;
 import com.magento.idea.magento2plugin.magento.files.ModuleSetupDataPatchFile;
-
-
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.Objects;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.Objects;
 
 public class NewSetupDataPatchDialog extends AbstractDialog {
 
@@ -48,8 +45,8 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
     @FieldValidation(rule = RuleRegistry.PHP_CLASS,
             message = {PhpClassRule.MESSAGE, CLASS_NAME})
     private JTextField className;
-    private JLabel classNameLabel;
-    private JLabel classNameErrorMessage;
+    private JLabel classNameLabel;//NOPMD
+    private JLabel classNameErrorMessage;//NOPMD
 
 
     /**
@@ -61,8 +58,8 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
     public NewSetupDataPatchDialog(
             final Project project,
             final PsiDirectory directory,
-            String modulePackage,
-            String moduleName
+            final String modulePackage,
+            final String moduleName
     ) {
         super();
 
@@ -109,8 +106,8 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
     public static void open(
             final Project project,
             final PsiDirectory directory,
-            String modulePackage,
-            String moduleName
+            final String modulePackage,
+            final String moduleName
     ) {
         final NewSetupDataPatchDialog dialog = new NewSetupDataPatchDialog(
                 project,
@@ -149,11 +146,11 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
     }
 
     private boolean validateFields() {
-        PsiDirectory targetDirectory = getDirectory(baseDir);
+        final PsiDirectory targetDirectory = getDirectory(baseDir);
 
-        if (targetDirectory.getName().equals(NewSetupDataPatchAction.DATA_DIRECTORY)) {
+        if (NewSetupDataPatchAction.DATA_DIRECTORY.equals(targetDirectory.getName())) {
             final PsiFile[] files = targetDirectory.getFiles();
-            for (PsiFile file : files) {
+            for (final PsiFile file : files) {
                 if (file.getName().equals(getClassName() + ModuleSetupDataPatchFile.FILE_NAME)) {
                     showErrorMessage(
                             fieldsValidationsList.get(0).getField(),
@@ -167,34 +164,35 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
         return validateFormFields();
     }
 
-    private PsiDirectory getDirectory(PsiDirectory targetDirectory){
-        if(baseDir.getName().equals(NewSetupDataPatchAction.ROOT_DIRECTORY)) {
-            PsiDirectory subDirectoryPatch =
-                    baseDir.findSubdirectory(NewSetupDataPatchAction.PATCH_DIRECTORY);
+    private PsiDirectory getDirectory(final PsiDirectory targetDirectory) {
+        if (NewSetupDataPatchAction.ROOT_DIRECTORY.equals(baseDir.getName())) {
+            final PsiDirectory subDirectoryPatch = baseDir.findSubdirectory(
+                    NewSetupDataPatchAction.PATCH_DIRECTORY
+            );
 
             if (subDirectoryPatch != null) {
                 return subDirectoryPatch.findSubdirectory(NewSetupDataPatchAction.DATA_DIRECTORY);
             }
         }
-        if(baseDir.getName().equals(NewSetupDataPatchAction.PATCH_DIRECTORY)) {
+        if (NewSetupDataPatchAction.PATCH_DIRECTORY.equals(baseDir.getName())) {
             return baseDir.findSubdirectory(NewSetupDataPatchAction.DATA_DIRECTORY);
         }
 
         return targetDirectory;
     }
 
-    private PsiDirectory createDirectory(PsiDirectory targetDirectory) {
-        if(targetDirectory.getName().equals(NewSetupDataPatchAction.ROOT_DIRECTORY)){
-            PsiDirectory subDirectoryPatch = targetDirectory.findSubdirectory(
+    private PsiDirectory createDirectory(final PsiDirectory targetDirectory) {
+        if (NewSetupDataPatchAction.ROOT_DIRECTORY.equals(targetDirectory.getName())) {
+            final PsiDirectory subDirectoryPatch = targetDirectory.findSubdirectory(
                     NewSetupDataPatchAction.PATCH_DIRECTORY
             );
 
-            if(subDirectoryPatch == null) {
+            if (subDirectoryPatch == null) {
                 return targetDirectory.createSubdirectory(
                         NewSetupDataPatchAction.PATCH_DIRECTORY
                 ).createSubdirectory(NewSetupDataPatchAction.DATA_DIRECTORY);
             }
-            PsiDirectory subDirectoryData = subDirectoryPatch.findSubdirectory(
+            final PsiDirectory subDirectoryData = subDirectoryPatch.findSubdirectory(
                     NewSetupDataPatchAction.DATA_DIRECTORY
             );
 
@@ -204,8 +202,8 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
                     )
             );
         }
-        if(targetDirectory.getName().equals(NewSetupDataPatchAction.PATCH_DIRECTORY)){
-            PsiDirectory subDirectoryData = targetDirectory.findSubdirectory(
+        if (NewSetupDataPatchAction.PATCH_DIRECTORY.equals(targetDirectory.getName())) {
+            final PsiDirectory subDirectoryData = targetDirectory.findSubdirectory(
                     NewSetupDataPatchAction.DATA_DIRECTORY
             );
 
