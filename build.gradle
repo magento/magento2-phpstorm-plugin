@@ -4,7 +4,7 @@
  */
 
 plugins {
-    id 'org.jetbrains.intellij' version '1.5.3'
+    id 'org.jetbrains.intellij' version '1.1.4'
     id 'checkstyle'
     id 'pmd'
     id 'org.jetbrains.changelog' version '1.2.1'
@@ -23,8 +23,8 @@ apply plugin: 'idea'
 apply plugin: 'groovy'
 apply plugin: 'org.jetbrains.changelog'
 
-def phpPluginVersion = System.getProperty("phpPluginVersion", "222.3739.54")
-def ideaVersion = System.getProperty("ideaVersion", "2022.2.1")
+def phpPluginVersion = System.getProperty("phpPluginVersion", "212.5080.55")
+def ideaVersion = System.getProperty("ideaVersion", "2021.2.1")
 def javaVersion = 11
 
 sourceCompatibility = javaVersion
@@ -41,7 +41,7 @@ intellij {
             'properties',
             'CSS',
             'JavaScriptLanguage',
-            'com.intellij.lang.jsgraphql:3.2.1',
+            'com.intellij.lang.jsgraphql:3.1.2',
             'platform-images',
             'copyright'
     ]
