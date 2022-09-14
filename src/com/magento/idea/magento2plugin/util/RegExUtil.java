@@ -84,6 +84,9 @@ public class RegExUtil {
         public static final String TEST_CLASS_FQN =
                 "^(\\\\)?(\\w+\\\\){1}(\\w+\\\\){1}Test(\\\\\\w+)+$";
 
+        public static final String CUSTOM_VENDOR_NAME =
+                "app\\/code\\/(\\w+)\\/";
+
         public static final String COMMA_SEPARATED_STRING =
                 "^[^\\s,]+(?:,\\s*[^\\s,]+)*$";
     }
@@ -114,6 +117,7 @@ public class RegExUtil {
     }
 
     public static class CustomTheme {
+
         public static final String MODULE_NAME =
                 "app\\/design\\/(adminhtml|frontend)\\/\\w*\\/\\w*\\/\\w*";
     }

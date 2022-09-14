@@ -34,10 +34,10 @@ public final class MagentoBasePathUtil {
             return VfsUtil.findRelativeFile(
                     file,
                     Package.frameworkRootComposer.split(Package.V_FILE_SEPARATOR)
-            ) != null
-                || VfsUtil.findRelativeFile(
-                        file,
-                    Package.frameworkRootGit.split(Package.V_FILE_SEPARATOR)) != null;
+            ) != null || VfsUtil.findRelativeFile(
+                    file,
+                    Package.frameworkRootGit.split(Package.V_FILE_SEPARATOR)
+            ) != null;
         }
 
         return false;
