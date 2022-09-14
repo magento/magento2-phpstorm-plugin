@@ -36,13 +36,11 @@ public class SettingsFormValidator {
                     MagentoBasePathUtil.isMagentoFolderValid(magentoRootPath);
 
             if (!MagentoBasePathUtil.isComposerJsonExists(magentoRootPath)) {
-
                 if (isMagentoFrameworkDirExist) {
                     throw new ConfigurationException(
                             validatorBundle.message("validator.package.validPathComposerFiles")
                     );
                 }
-
                 throw new ConfigurationException(
                         validatorBundle.message("validator.package.validPath")
                 );
