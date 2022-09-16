@@ -25,7 +25,6 @@ import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.GraphQlResolverPhp;
-import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
@@ -34,6 +33,7 @@ import javax.swing.JOptionPane;
 import org.jetbrains.annotations.NotNull;
 
 public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
+
     private final GraphQlResolverFileData graphQlResolverFileData;
     private final Project project;
     private final ValidatorBundle validatorBundle;
@@ -132,15 +132,15 @@ public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
         if (parentDirectory == null) {
             return null;
         }
-        final String[] graphQlResolverDirectories = graphQlResolverFileData
-                .getGraphQlResolverDirectory().split(File.separator);
-        for (final String graphQlResolverDirectory: graphQlResolverDirectories) {
-            parentDirectory = directoryGenerator.findOrCreateSubdirectory(
+        final String graphQlResolverDirectory = graphQlResolverFileData
+                .getGraphQlResolverDirectory();
+
+        if (!graphQlResolverDirectory.isBlank()) {
+            parentDirectory = directoryGenerator.findOrCreateSubdirectories(
                     parentDirectory,
                     graphQlResolverDirectory
             );
         }
-
         final Properties attributes = getAttributes();
         final PsiFile graphQlResolverFile = fileFromTemplateGenerator.generate(
                 GraphQlResolverPhp.getInstance(
