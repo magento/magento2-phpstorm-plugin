@@ -49,11 +49,15 @@ public class CreateResolverClassQuickFix implements LocalQuickFix {
         if (fqnPartsList.size() < CLASSPATH_MIN_DEPTH) {
             JOptionPane.showMessageDialog(
                     null,
-                    inspectionBundle.message("inspection.error.class.tooShortFormat", resolverFqn),
-                    inspectionBundle.message("inspection.error.class.tooShortFormatTitle"),
+                    inspectionBundle.message(
+                            "inspection.error.graphqlResolverClass.tooShortFormat",
+                            resolverFqn
+                    ),
+                    inspectionBundle.message(
+                            "inspection.error.graphqlResolverClass.tooShortFormatTitle"
+                    ),
                     JOptionPane.ERROR_MESSAGE
             );
-
             return;
         }
 

@@ -33,6 +33,7 @@ import javax.swing.JOptionPane;
 import org.jetbrains.annotations.NotNull;
 
 public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
+
     private final GraphQlResolverFileData graphQlResolverFileData;
     private final Project project;
     private final ValidatorBundle validatorBundle;
@@ -131,16 +132,15 @@ public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
         if (parentDirectory == null) {
             return null;
         }
-
         final String graphQlResolverDirectory = graphQlResolverFileData
                 .getGraphQlResolverDirectory();
+
         if (!graphQlResolverDirectory.isBlank()) {
             parentDirectory = directoryGenerator.findOrCreateSubdirectories(
                     parentDirectory,
                     graphQlResolverDirectory
             );
         }
-
         final Properties attributes = getAttributes();
         final PsiFile graphQlResolverFile = fileFromTemplateGenerator.generate(
                 GraphQlResolverPhp.getInstance(

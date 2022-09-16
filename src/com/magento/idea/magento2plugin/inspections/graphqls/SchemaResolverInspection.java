@@ -25,29 +25,29 @@ public class SchemaResolverInspection extends LocalInspectionTool {
 
     private final InspectionBundle inspectionBundle = new InspectionBundle();
 
-    @NotNull
     @Override
-    public GraphQLVisitor buildVisitor(
-            @NotNull final ProblemsHolder holder,
+    public @NotNull GraphQLVisitor buildVisitor(
+            final @NotNull ProblemsHolder holder,
             final boolean isOnTheFly
     ) {
         return new GraphQLVisitor() {
             @Override
-            public void visitValue(@NotNull final GraphQLValue element) {
+            public void visitValue(final @NotNull GraphQLValue element) {
                 final String getVisitedElementValue = element.getText();
                 final PsiElement parentElementValue = element.getParent();
+
                 if (getVisitedElementValue == null
                         || !(parentElementValue instanceof GraphQLNamedElement)) {
                     return;
                 }
-
                 final String attributeName = ((GraphQLNamedElement) parentElementValue).getName();
+
                 if (!GraphQlResolver.CLASS_ARGUMENT.equals(attributeName)) {
                     return;
                 }
-
                 final String resolverFQN
                         = GraphQlUtil.resolverStringToPhpFQN(getVisitedElementValue);
+
                 if (!resolverFQN.matches(RegExUtil.PhpRegex.FQN)) {
                     holder.registerProblem(
                             element,
@@ -57,10 +57,8 @@ public class SchemaResolverInspection extends LocalInspectionTool {
                             ),
                             ProblemHighlightType.WARNING
                     );
-
                     return;
                 }
-
                 final GetPhpClassByFQN getPhpClassByFQN
                         = GetPhpClassByFQN.getInstance(holder.getProject());
                 final PhpClass resolverClass = getPhpClassByFQN.execute(resolverFQN);
