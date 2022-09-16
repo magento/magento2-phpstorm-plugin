@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class NewEventsXmlAction extends AbstractContextAction {
 
-    public static final String ACTION_NAME = "Magento 2 Events Observer File";
+    public static final String ACTION_NAME = "Magento 2 Events File";
     public static final String ACTION_DESCRIPTION = "Create a new Magento 2 events.xml file";
 
     /**
