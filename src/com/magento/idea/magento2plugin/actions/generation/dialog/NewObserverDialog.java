@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
+import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.actions.context.php.NewObserverAction;
 import com.magento.idea.magento2plugin.actions.generation.ModuleObserverData;
@@ -28,12 +29,14 @@ import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.stubs.indexes.EventNameIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
+import com.magento.idea.magento2plugin.util.CamelCaseToSnakeCase;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Locale;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -41,15 +44,17 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.event.DocumentEvent;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
         "PMD.ExcessiveImports",
-        "PMD.UnusedPrivateMethod",
         "PMD.AvoidInstantiatingObjectsInLoops",
         "PMD.ReturnEmptyCollectionRatherThanNull"
 })
 public class NewObserverDialog extends AbstractDialog {
+
     private static final String OBSERVER_NAME = "Observer Name";
     private static final String CLASS_NAME = "Class Name";
     private final Project project;
@@ -127,6 +132,14 @@ public class NewObserverDialog extends AbstractDialog {
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
 
+        className.getDocument().addDocumentListener(new DocumentAdapter() {
+            @SuppressWarnings("PMD.AccessorMethodGeneration")
+            @Override
+            public void textChanged(final @NotNull DocumentEvent event) {
+                autoCompleteObserverName();
+            }
+        });
+
         addComponentListener(
                 new FocusOnAFieldListener(() -> className.requestFocusInWindow())
         );
@@ -155,6 +168,10 @@ public class NewObserverDialog extends AbstractDialog {
         dialog.setVisible(true);
     }
 
+    private  String getModuleName() {
+        return modulePackage.concat(Package.fqnSeparator).concat(moduleName);
+    }
+
     public String getObserverName() {
         return observerName.getText().trim();
     }
@@ -181,7 +198,8 @@ public class NewObserverDialog extends AbstractDialog {
 
             if (!getDirectoryStructure().isEmpty()) {
                 observerDirectory = DirectoryGenerator.getInstance().findOrCreateSubdirectories(
-                        baseDir, getDirectoryStructure()
+                        baseDir,
+                        getDirectoryStructure()
                 );
             }
             new ModuleObserverGenerator(
@@ -192,36 +210,27 @@ public class NewObserverDialog extends AbstractDialog {
                             getEvenName(),
                             observerDirectory,
                             ModuleObserverFile.resolveClassNameFromInput(getClassName())
-                    ), project).generate(NewObserverAction.ACTION_NAME, true);
-
-            new ObserverEventsXmlGenerator(new ObserverEventsXmlData(
-                    getObserverArea(),
-                    getModuleName().replace(
-                            Package.fqnSeparator,
-                            Package.vendorModuleNameSeparator
                     ),
-                    getEvenName(),
-                    getObserverName(),
-                    getObserverClassFqn().concat(Package.fqnSeparator).concat(
-                            ModuleObserverFile.resolveClassNameFromInput(getClassName())
-                    )
-            ), project).generate(NewObserverAction.ACTION_NAME);
+                    project
+            ).generate(NewObserverAction.ACTION_NAME, true);
+
+            new ObserverEventsXmlGenerator(
+                    new ObserverEventsXmlData(
+                            getObserverArea(),
+                            getModuleName().replace(
+                                    Package.fqnSeparator,
+                                    Package.vendorModuleNameSeparator
+                            ),
+                            getEvenName(),
+                            getObserverName(),
+                            getObserverClassFqn().concat(Package.fqnSeparator).concat(
+                                    ModuleObserverFile.resolveClassNameFromInput(getClassName())
+                            )
+                    ),
+                    project
+            ).generate(NewObserverAction.ACTION_NAME);
             exit();
         }
-    }
-
-    private void createUIComponents() {
-        observerArea = new ComboBox<>();
-
-        for (final Areas areaEntry : Areas.values()) {
-            observerArea.addItem(new ComboBoxItemData(areaEntry.toString(), areaEntry.toString()));
-        }
-
-        final Collection<String> events = FileBasedIndex.getInstance().getAllKeys(
-                EventNameIndex.KEY, project
-        );
-
-        this.eventName = new FilteredComboBox(new ArrayList<>(events));
     }
 
     private boolean validateFields() {
@@ -276,10 +285,6 @@ public class NewObserverDialog extends AbstractDialog {
         return directory.getFiles();
     }
 
-    private  String getModuleName() {
-        return modulePackage.concat(Package.fqnSeparator).concat(moduleName);
-    }
-
     private String getObserverClassFqn() {
         final String folderStructureFqn = getDirectoryStructure().replace(
                 Package.V_FILE_SEPARATOR, Package.fqnSeparator
@@ -291,5 +296,38 @@ public class NewObserverDialog extends AbstractDialog {
         }
 
         return getModuleName().concat(Package.fqnSeparator).concat(folderFqn);
+    }
+
+    private void autoCompleteObserverName() {
+        final String className = getClassName();
+
+        if (className.isEmpty()) {
+            return;
+        }
+        final String modifiedClassName = ModuleObserverFile.resolveClassNameFromInput(className);
+        final String classNameInSnakeCase = CamelCaseToSnakeCase.getInstance()
+                .convert(modifiedClassName);
+
+        final String modulePackageModified = modulePackage.substring(0, 1)
+                .toLowerCase(Locale.getDefault()) + modulePackage.substring(1);
+        final String moduleNameModified = moduleName.substring(0, 1)
+                .toLowerCase(Locale.getDefault()) + moduleName.substring(1);
+
+        observerName.setText(
+                modulePackageModified + "_" + moduleNameModified + "_" + classNameInSnakeCase
+        );
+    }
+
+    @SuppressWarnings({"PMD.UnusedPrivateMethod"})
+    private void createUIComponents() {
+        observerArea = new ComboBox<>();
+
+        for (final Areas areaEntry : Areas.values()) {
+            observerArea.addItem(new ComboBoxItemData(areaEntry.toString(), areaEntry.toString()));
+        }
+        final Collection<String> events = FileBasedIndex.getInstance().getAllKeys(
+                EventNameIndex.KEY, project
+        );
+        this.eventName = new FilteredComboBox(new ArrayList<>(events));
     }
 }
