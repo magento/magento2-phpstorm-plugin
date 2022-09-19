@@ -7,8 +7,10 @@ package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.actions.context.php.NewObserverAction;
@@ -24,6 +26,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleObserverGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ObserverEventsXmlGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
+import com.magento.idea.magento2plugin.lang.roots.MagentoTestSourceFilter;
 import com.magento.idea.magento2plugin.magento.files.ModuleObserverFile;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.Package;
@@ -36,6 +39,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -328,6 +332,24 @@ public class NewObserverDialog extends AbstractDialog {
         final Collection<String> events = FileBasedIndex.getInstance().getAllKeys(
                 EventNameIndex.KEY, project
         );
+        // Filter all events declared only for tests.
+        events.removeIf(event -> {
+            final Collection<VirtualFile> files = FileBasedIndex.getInstance()
+                    .getContainingFiles(
+                            EventNameIndex.KEY,
+                            event,
+                            GlobalSearchScope.allScope(project)
+                    );
+            final List<VirtualFile> realObservers = new ArrayList<>();
+
+            for (final VirtualFile file : files) {
+                if (!MagentoTestSourceFilter.isTestSources(file, project)) {
+                    realObservers.add(file);
+                }
+            }
+
+            return realObservers.isEmpty();
+        });
         this.eventName = new FilteredComboBox(new ArrayList<>(events));
     }
 }
