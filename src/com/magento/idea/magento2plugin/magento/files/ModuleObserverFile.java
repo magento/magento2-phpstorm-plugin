@@ -33,7 +33,7 @@ public class ModuleObserverFile implements ModuleFileInterface {
         if (input.length() <= FILE_SUFFIX.length()) {
             return input + FILE_SUFFIX;
         }
-        String suffix = input.substring(input.length() - FILE_SUFFIX.length());
+        final String suffix = input.substring(input.length() - FILE_SUFFIX.length());
 
         if (FILE_SUFFIX.equals(suffix)) {
             return input;

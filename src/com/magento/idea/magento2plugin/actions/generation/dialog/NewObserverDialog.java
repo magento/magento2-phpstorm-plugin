@@ -28,6 +28,12 @@ import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.stubs.indexes.EventNameIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.Collection;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -35,12 +41,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.ArrayList;
-import java.util.Collection;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
@@ -226,7 +226,6 @@ public class NewObserverDialog extends AbstractDialog {
 
     private boolean validateFields() {
         final PsiFile[] directoryFiles = getDirectoryFiles(baseDir);
-        final String directory = getDirectoryStructure();
 
         if (directoryFiles != null) {
             for (final PsiFile file : directoryFiles) {
@@ -243,7 +242,9 @@ public class NewObserverDialog extends AbstractDialog {
                 }
             }
         }
-        if (!directory.isEmpty() && !DirectoryRule.getInstance().check(directory)) {
+        if (!getDirectoryStructure().isEmpty()
+                && !DirectoryRule.getInstance().check(getDirectoryStructure())
+        ) {
             showErrorMessage(
                     this.getClass().getDeclaredFields()[11],
                     "The Directory Path field does not contain a valid directory."
@@ -261,7 +262,7 @@ public class NewObserverDialog extends AbstractDialog {
         if (!getDirectoryStructure().isEmpty()) {
             final String[] directories = getDirectoryStructure().split(Package.V_FILE_SEPARATOR);
 
-            for(final String dir : directories) {
+            for (final String dir : directories) {
                 final PsiDirectory subdirectory = directory.findSubdirectory(dir);
 
                 if (subdirectory == null) {
@@ -286,7 +287,7 @@ public class NewObserverDialog extends AbstractDialog {
         String folderFqn = NewObserverAction.ROOT_DIRECTORY;
 
         if (!folderStructureFqn.isEmpty()) {
-            folderFqn +=  Package.fqnSeparator.concat(folderStructureFqn);
+            folderFqn =  folderFqn.concat(Package.fqnSeparator).concat(folderStructureFqn);
         }
 
         return getModuleName().concat(Package.fqnSeparator).concat(folderFqn);
