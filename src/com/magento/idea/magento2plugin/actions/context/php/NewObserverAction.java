@@ -52,7 +52,8 @@ public class NewObserverAction extends CustomGeneratorContextAction {
             final PsiDirectory targetDirectory,
             final PsiFile targetFile
     ) {
-        if (!moduleData.getType().equals(ComponentType.module)) {
+        if (!moduleData.getType().equals(ComponentType.module)
+                || !moduleData.getModuleDir().equals(targetDirectory.getParentDirectory())) {
             return false;
         }
 

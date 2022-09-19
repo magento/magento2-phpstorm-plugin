@@ -10,6 +10,7 @@ import com.magento.idea.magento2plugin.actions.generation.ModuleObserverData;
 import com.magento.idea.magento2plugin.magento.files.ModuleObserverFile;
 
 public final class ModuleObserverGeneratorTest extends BaseGeneratorTestCase {
+
     private static final String CLASS_NAME = "TestClassObserver";
 
     /**
