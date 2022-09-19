@@ -6,6 +6,19 @@
 -->
 
 <idea-plugin>
+    <actions>
+        <group id="GraphQL.MagentoContextBasedActionsGroup">
+            <add-to-group group-id="MagentoContextBasedActionsGroup" anchor="last"/>
+            <action id="MagentoCreateGraphQlSchemaFile"
+                    class="com.magento.idea.magento2plugin.actions.context.xml.NewGraphQLSchemaAction"/>
+        </group>
+        <group id="GraphQL.MagentoNewModuleFileGroup"
+               text="GraphQL"
+               popup="false">
+            <add-to-group group-id="MagentoNewModuleFileGroup" anchor="last"/>
+            <action id="MagentoCreateAGraphQlResolver" class="com.magento.idea.magento2plugin.actions.generation.NewGraphQlResolverAction" />
+        </group>
+    </actions>
     <extensions defaultExtensionNs="com.intellij">
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.graphql.GraphQlResolverIndex" />
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.GraphQlResolverUsageLineMarkerProvider"/>
@@ -22,5 +35,8 @@
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.graphqls.SchemaResolverInspection"/>
+
+        <internalFileTemplate name="Magento GraphQL Resolver Class"/>
+        <internalFileTemplate name="Magento GraphQL Schema"/>
     </extensions>
 </idea-plugin>

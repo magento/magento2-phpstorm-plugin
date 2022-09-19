@@ -77,7 +77,7 @@ class ${CLASS_NAME} implements ${IMPLEMENTS}
         $eavSetup->addAttributeToSet(
                 ${CUSTOMER_METADATA_INTERFACE}::ENTITY_TYPE_CUSTOMER,
                 ${CUSTOMER_METADATA_INTERFACE}::ATTRIBUTE_SET_ID_CUSTOMER,
-                null,
+                'Default',
                 '${ATTRIBUTE_CODE}'
         );
 
