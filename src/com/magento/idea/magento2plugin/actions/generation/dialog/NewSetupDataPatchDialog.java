@@ -15,12 +15,13 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annot
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleSetupDataPatchGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.magento.files.ModuleSetupDataPatchFile;
+import com.magento.idea.magento2plugin.magento.packages.File;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Objects;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -128,11 +129,15 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
     }
 
     private void generateFile() {
+        final PsiDirectory directory = DirectoryGenerator.getInstance().findOrCreateSubdirectories(
+                baseDir, NewSetupDataPatchAction.PATCH_DIRECTORY + File.separator
+                        + NewSetupDataPatchAction.DATA_DIRECTORY
+        );
         final ModuleSetupDataPatchGenerator generator = new ModuleSetupDataPatchGenerator(
                 new ModuleSetupDataPatchData(
                         modulePackage,
                         moduleName,
-                        createDirectory(baseDir),
+                        directory,
                         getClassName()
                 ),
                 project
@@ -146,16 +151,22 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
     }
 
     private boolean validateFields() {
-        final PsiDirectory targetDirectory = getDirectory(baseDir);
+        final PsiDirectory patchDirectory = baseDir.findSubdirectory(
+                NewSetupDataPatchAction.PATCH_DIRECTORY
+        );
+        PsiDirectory directory = null;
 
-        if (NewSetupDataPatchAction.DATA_DIRECTORY.equals(targetDirectory.getName())) {
-            final PsiFile[] files = targetDirectory.getFiles();
-            for (final PsiFile file : files) {
+        if (patchDirectory != null) {
+            directory = patchDirectory.findSubdirectory(NewSetupDataPatchAction.DATA_DIRECTORY);
+        }
+
+        if (directory != null) {
+            for (final PsiFile file : directory.getFiles()) {
                 final String className = ModuleSetupDataPatchFile.resolveClassNameFromInput(
                         getClassName()
                 );
 
-                if (file.getName().equals(className + ".php")) {
+                if (file.getName().equals(className + ModuleSetupDataPatchFile.EXTENSION)) {
                     showErrorMessage(
                             fieldsValidationsList.get(0).getField(),
                             "Class name `" + className + "` already exist."
@@ -165,59 +176,7 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
                 }
             }
         }
+
         return validateFormFields();
-    }
-
-    private PsiDirectory getDirectory(final PsiDirectory targetDirectory) {
-        if (NewSetupDataPatchAction.ROOT_DIRECTORY.equals(baseDir.getName())) {
-            final PsiDirectory subDirectoryPatch = baseDir.findSubdirectory(
-                    NewSetupDataPatchAction.PATCH_DIRECTORY
-            );
-
-            if (subDirectoryPatch != null) {
-                return subDirectoryPatch.findSubdirectory(NewSetupDataPatchAction.DATA_DIRECTORY);
-            }
-        }
-        if (NewSetupDataPatchAction.PATCH_DIRECTORY.equals(baseDir.getName())) {
-            return baseDir.findSubdirectory(NewSetupDataPatchAction.DATA_DIRECTORY);
-        }
-
-        return targetDirectory;
-    }
-
-    private PsiDirectory createDirectory(final PsiDirectory targetDirectory) {
-        if (NewSetupDataPatchAction.ROOT_DIRECTORY.equals(targetDirectory.getName())) {
-            final PsiDirectory subDirectoryPatch = targetDirectory.findSubdirectory(
-                    NewSetupDataPatchAction.PATCH_DIRECTORY
-            );
-
-            if (subDirectoryPatch == null) {
-                return targetDirectory.createSubdirectory(
-                        NewSetupDataPatchAction.PATCH_DIRECTORY
-                ).createSubdirectory(NewSetupDataPatchAction.DATA_DIRECTORY);
-            }
-            final PsiDirectory subDirectoryData = subDirectoryPatch.findSubdirectory(
-                    NewSetupDataPatchAction.DATA_DIRECTORY
-            );
-
-            return Objects.requireNonNullElseGet(
-                    subDirectoryData, () -> subDirectoryPatch.createSubdirectory(
-                            NewSetupDataPatchAction.DATA_DIRECTORY
-                    )
-            );
-        }
-        if (NewSetupDataPatchAction.PATCH_DIRECTORY.equals(targetDirectory.getName())) {
-            final PsiDirectory subDirectoryData = targetDirectory.findSubdirectory(
-                    NewSetupDataPatchAction.DATA_DIRECTORY
-            );
-
-            return Objects.requireNonNullElseGet(
-                    subDirectoryData, () -> targetDirectory.createSubdirectory(
-                            NewSetupDataPatchAction.DATA_DIRECTORY
-                    )
-            );
-        }
-
-        return targetDirectory;
     }
 }

@@ -13,6 +13,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.NewSetupDataPat
 import com.magento.idea.magento2plugin.magento.packages.ComponentType;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil;
+import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 
 public class NewSetupDataPatchAction extends CustomGeneratorContextAction {
@@ -34,18 +35,16 @@ public class NewSetupDataPatchAction extends CustomGeneratorContextAction {
         if (event.getProject() == null || moduleData == null || getDirectory() == null) {
             return;
         }
-        final String[] templateData = moduleData.getName().split(Package.vendorModuleNameSeparator);
+        final String[] module = moduleData.getName().split(Package.vendorModuleNameSeparator);
 
-        if (templateData.length != 2) { //NOPMD
+        if (module.length != 2) { //NOPMD
             return;
         }
-
-        NewSetupDataPatchDialog.open(
-                event.getProject(),
-                getDirectory(),
-                templateData[0],
-                templateData[1]
+        final PsiDirectory rooDirectory = moduleData.getModuleDir().findSubdirectory(
+                ROOT_DIRECTORY
         );
+
+        NewSetupDataPatchDialog.open(event.getProject(), rooDirectory, module[0], module[1]);
     }
 
     @Override
@@ -57,24 +56,31 @@ public class NewSetupDataPatchAction extends CustomGeneratorContextAction {
         if (!moduleData.getType().equals(ComponentType.module)) {
             return false;
         }
-        final String targetDirName = targetDirectory.getName();
 
-        if (!(ROOT_DIRECTORY.equals(targetDirName) || PATCH_DIRECTORY.equals(targetDirName)
-                || DATA_DIRECTORY.equals(targetDirName))
-        ) {
-            return false;
+        if (ROOT_DIRECTORY.equals(targetDirectory.getName())) {
+            return Objects.requireNonNull(targetDirectory.getParentDirectory()).getName().equals(
+                    moduleData.getModuleDir().getName()
+            );
         }
 
-        final PsiDirectory parentDirFirst = targetDirectory.getParentDirectory();
-        PsiDirectory parentDirSecond = null;
-
-        if (parentDirFirst != null) {
-            parentDirSecond = parentDirFirst.getParentDirectory();
+        if (PATCH_DIRECTORY.equals(targetDirectory.getName())) {
+            return ROOT_DIRECTORY.equals(Objects.requireNonNull(
+                    targetDirectory.getParentDirectory()).getName()
+            );
         }
 
+        if (DATA_DIRECTORY.equals(targetDirectory.getName())) {
+            final PsiDirectory parentDirectory = Objects.requireNonNull(
+                    targetDirectory.getParentDirectory()
+            );
 
-        return ROOT_DIRECTORY.equals(targetDirName)
-                || parentDirFirst != null && ROOT_DIRECTORY.equals(parentDirFirst.getName())
-                || parentDirSecond != null && ROOT_DIRECTORY.equals(parentDirSecond.getName());
+            if (PATCH_DIRECTORY.equals(parentDirectory.getName())) {
+                return ROOT_DIRECTORY.equals(Objects.requireNonNull(
+                        parentDirectory.getParentDirectory()).getName()
+                );
+            }
+        }
+
+        return false;
     }
 }
