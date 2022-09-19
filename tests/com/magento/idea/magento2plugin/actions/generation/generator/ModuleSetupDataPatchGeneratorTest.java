@@ -10,14 +10,15 @@ import com.magento.idea.magento2plugin.actions.generation.ModuleSetupDataPatchDa
 import com.magento.idea.magento2plugin.magento.files.ModuleSetupDataPatchFile;
 
 public final class ModuleSetupDataPatchGeneratorTest extends BaseGeneratorTestCase {
-    private static final String CLASS_NAME = "TestClass";
+
+    private static final String CLASS_NAME = "TestClassPatch";
 
     /**
      * Test module README.md file generation.
      */
     public void testGenerateModuleSetupDataPatchFile() {
         final PsiFile expectedFile = myFixture.configureByFile(
-                getFixturePath(CLASS_NAME + ModuleSetupDataPatchFile.FILE_NAME)
+                getFixturePath(CLASS_NAME + ModuleSetupDataPatchFile.EXTENSION)
         );
         final ModuleSetupDataPatchGenerator generator = new ModuleSetupDataPatchGenerator(
                 new ModuleSetupDataPatchData(

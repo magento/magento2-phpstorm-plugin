@@ -142,7 +142,7 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
     }
 
     public String getClassName() {
-        return className.getText();
+        return className.getText().trim();
     }
 
     private boolean validateFields() {
@@ -151,10 +151,14 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
         if (NewSetupDataPatchAction.DATA_DIRECTORY.equals(targetDirectory.getName())) {
             final PsiFile[] files = targetDirectory.getFiles();
             for (final PsiFile file : files) {
-                if (file.getName().equals(getClassName() + ModuleSetupDataPatchFile.FILE_NAME)) {
+                final String className = ModuleSetupDataPatchFile.resolveClassNameFromInput(
+                        getClassName()
+                );
+
+                if (file.getName().equals(className + ".php")) {
                     showErrorMessage(
                             fieldsValidationsList.get(0).getField(),
-                            "Class name " + getClassName() + " already exist."
+                            "Class name `" + className + "` already exist."
                     );
 
                     return false;

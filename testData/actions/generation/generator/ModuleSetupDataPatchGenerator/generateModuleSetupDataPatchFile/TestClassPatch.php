@@ -6,7 +6,7 @@ use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 
 /**
- * Patch is mechanism, that allows to do atomic upgrade data changes
+ * Patch is mechanism, that allows to do atomic upgrade data changes.
  */
 class TestClassPatch implements DataPatchInterface
 {
@@ -26,7 +26,7 @@ class TestClassPatch implements DataPatchInterface
     }
 
     /**
-     * Do Upgrade
+     * Do Upgrade.
      *
      * @return void
      */

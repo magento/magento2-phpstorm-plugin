@@ -57,7 +57,9 @@ public class ModuleSetupDataPatchGenerator extends FileGenerator {
      */
     @Override
     protected void fillAttributes(final Properties attributes) {
-        attributes.setProperty("CLASS_NAME", moduleSetupPatchData.getClassName() + "Patch");
+        attributes.setProperty("CLASS_NAME", ModuleSetupDataPatchFile.resolveClassNameFromInput(
+                moduleSetupPatchData.getClassName()
+        ));
         attributes.setProperty(
                 "MODULE_NAME",
                 moduleSetupPatchData.getPackageName() + "\\" + moduleSetupPatchData.getModuleName()
