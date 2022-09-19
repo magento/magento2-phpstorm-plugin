@@ -24,9 +24,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Code completion for `system.xml` and `config.xml` [#1077](https://github.com/magento/magento2-phpstorm-plugin/pull/1077)
 - Added easier navigation through plugins [#1121](https://github.com/magento/magento2-phpstorm-plugin/pull/1121)
 - Added inspection to check if type attr value in the virtual type tag attribute value exists [#1176](https://github.com/magento/magento2-phpstorm-plugin/pull/1176)
+- Added checks and detailed error messages during plugin activation [#1181](https://github.com/magento/magento2-phpstorm-plugin/pull/1181)
 
 ### Fixed
 
+- Fixed NullPointerException at ObserverDeclarationInspection.java:188 [#1143](https://github.com/magento/magento2-phpstorm-plugin/issues/1143)
 - Fixed IncorrectOperationException: Rebind cannot be performed for class PolyVariantReferenceBase [#1173](https://github.com/magento/magento2-phpstorm-plugin/pull/1173)
 - Fixed create an observer for an event doesn't work through the context menu [#1166](https://github.com/magento/magento2-phpstorm-plugin/pull/1166)
 - Fixed IOException: Invalid file name at ReportBuilder [#1154](https://github.com/magento/magento2-phpstorm-plugin/pull/1154)
