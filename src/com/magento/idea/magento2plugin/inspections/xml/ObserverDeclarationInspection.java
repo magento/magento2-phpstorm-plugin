@@ -8,6 +8,7 @@ package com.magento.idea.magento2plugin.inspections.xml;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.ide.highlighter.XmlFileType;
+import com.intellij.openapi.externalSystem.service.execution.NotSupportedException;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
@@ -71,6 +72,10 @@ public class ObserverDeclarationInspection extends PhpInspection {
                     return;
                 }
 
+                // This added to cover case if file exists only in memory.
+                if (file.getContainingDirectory() == null) {
+                    return;
+                }
                 final EventIndex eventIndex = new EventIndex(file.getProject());
                 final HashMap<String, XmlTag> targetObserversHash = new HashMap<>();
 
@@ -108,7 +113,8 @@ public class ObserverDeclarationInspection extends PhpInspection {
                         }
 
                         final String observerName = observerNameAttribute.getValue();
-                        if (observerName == null) {
+                        if (observerName == null
+                                || observerNameAttribute.getValueElement() == null) {
                             continue;
                         }
 
@@ -188,6 +194,11 @@ public class ObserverDeclarationInspection extends PhpInspection {
                     final EventIndex eventIndex,
                     final PsiFile file
             ) {
+                if (file.getContainingDirectory() == null) {
+                    throw new NotSupportedException(
+                            "Operation is not supported for files in memory"
+                    );
+                }
                 final List<HashMap<String, String>> modulesName = new ArrayList<>();
                 final String currentFileDirectory = file.getContainingDirectory().toString();
                 final String currentFileFullPath = currentFileDirectory

@@ -96,7 +96,7 @@ class AddMultiselectTestCustomerAttribute implements DataPatchInterface
         $eavSetup->addAttributeToSet(
             CustomerMetadataInterface::ENTITY_TYPE_CUSTOMER,
             CustomerMetadataInterface::ATTRIBUTE_SET_ID_CUSTOMER,
-            null,
+            'Default',
             'multiselect_test'
         );
 
