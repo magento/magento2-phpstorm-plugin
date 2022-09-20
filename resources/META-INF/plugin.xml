@@ -134,6 +134,9 @@
         <action id="OverrideLayoutInTheme.Menu" class="com.magento.idea.magento2plugin.actions.generation.OverrideLayoutInThemeAction">
             <add-to-group group-id="ProjectViewPopupMenu"/>
         </action>
+        <action id="OverrideTemplateInModule.Menu" class="com.magento.idea.magento2plugin.actions.generation.OverrideTemplateInModuleAction">
+            <add-to-group group-id="ProjectViewPopupMenu"/>
+        </action>
         <action id="MagentoCreateAWebApiDeclaration.Menu" class="com.magento.idea.magento2plugin.actions.generation.NewWebApiDeclarationAction">
             <add-to-group group-id="EditorPopupMenu"/>
         </action>

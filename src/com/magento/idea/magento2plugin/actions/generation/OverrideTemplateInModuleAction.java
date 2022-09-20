@@ -10,21 +10,16 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.MagentoIcons;
-import com.magento.idea.magento2plugin.actions.generation.dialog.OverrideTemplateInThemeDialog;
+import com.magento.idea.magento2plugin.actions.generation.dialog.OverrideTemplateInModuleDialog;
 import com.magento.idea.magento2plugin.magento.packages.OverridableFileType;
-import com.magento.idea.magento2plugin.magento.packages.Package;
-import java.util.Arrays;
 import org.jetbrains.annotations.NotNull;
 
-public class OverrideTemplateInThemeAction extends OverrideFileAction {
-
-    public static final String ACTION_NAME = "Override this file in a project theme";
+public class OverrideTemplateInModuleAction extends OverrideFileAction {
+    public static final String ACTION_NAME = "Override this file in a module";
     public static final String ACTION_TEMPLATE_DESCRIPTION =
-            "Override template file in project theme";
-    public static final String ACTION_STYLES_DESCRIPTION = "Override styles file in project theme";
-    public static final String ACTION_JS_DESCRIPTION = "Override javascript file in project theme";
+            "Override template file in a module";
 
-    public OverrideTemplateInThemeAction() {
+    public OverrideTemplateInModuleAction() {
         super(ACTION_NAME, ACTION_TEMPLATE_DESCRIPTION, MagentoIcons.MODULE);
     }
 
@@ -35,7 +30,8 @@ public class OverrideTemplateInThemeAction extends OverrideFileAction {
         if (project == null || psiFile == null) {
             return;
         }
-        OverrideTemplateInThemeDialog.open(project, psiFile);
+
+        OverrideTemplateInModuleDialog.open(project, psiFile);
     }
 
     @Override
@@ -60,14 +56,10 @@ public class OverrideTemplateInThemeAction extends OverrideFileAction {
             return false;
         }
 
-        if (OverridableFileType.isFileJS(fileExtension)
-                && !virtualFile.getCanonicalPath().contains(Package.libWebRoot)
-                && !Arrays.asList(virtualFile.getCanonicalPath()
-                .split(Package.V_FILE_SEPARATOR)).contains("web")) {
+        if (!this.isFileInModule(file, project)) {
             return false;
         }
 
-        return OverridableFileType.isFileJS(fileExtension)
-                || isFileInModuleOrTheme(file, project);
+        return OverridableFileType.isFilePhtml(fileExtension);
     }
 }

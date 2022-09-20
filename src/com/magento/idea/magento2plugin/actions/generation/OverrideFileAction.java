@@ -18,7 +18,7 @@ import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil;
 import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class OverrideFileInThemeAction extends AnAction {
+public abstract class OverrideFileAction extends AnAction {
 
     protected PsiFile psiFile;
 
@@ -29,7 +29,7 @@ public abstract class OverrideFileInThemeAction extends AnAction {
      * @param actionDescription String
      * @param module Icon
      */
-    public OverrideFileInThemeAction(
+    public OverrideFileAction(
             final String actionName,
             final String actionDescription,
             final Icon module
@@ -96,6 +96,29 @@ public abstract class OverrideFileInThemeAction extends AnAction {
         } else {
             return moduleData.getType().equals(ComponentType.theme);
         }
+    }
+
+    /**
+     * Checks if file has a path specific to the Magento 2 module.
+     *
+     * @param file PsiFile
+     * @param project Project
+     *
+     * @return boolean
+     */
+    protected boolean isFileInModule(
+            final @NotNull PsiFile file,
+            final @NotNull Project project
+    ) {
+        final GetMagentoModuleUtil.MagentoModuleData moduleData =
+                GetMagentoModuleUtil.getByContext(file.getContainingDirectory(), project);
+
+        if (moduleData == null) {
+            return false;
+        }
+        final VirtualFile virtualFile = file.getVirtualFile();
+        return moduleData.getType().equals(ComponentType.module)
+                && virtualFile.getPath().contains("/" + Package.moduleViewDir + "/");
     }
 
     private void setStatus(final AnActionEvent event, final boolean status) {

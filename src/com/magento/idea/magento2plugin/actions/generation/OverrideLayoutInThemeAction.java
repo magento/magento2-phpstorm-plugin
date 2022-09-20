@@ -15,7 +15,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.OverrideLayoutI
 import com.magento.idea.magento2plugin.magento.files.LayoutXml;
 import org.jetbrains.annotations.NotNull;
 
-public class OverrideLayoutInThemeAction extends OverrideFileInThemeAction {
+public class OverrideLayoutInThemeAction extends OverrideFileAction {
 
     public static final String ACTION_NAME = "Override this layout in a project theme";
     public static final String ACTION_DESCRIPTION = "Override layout in project theme";
