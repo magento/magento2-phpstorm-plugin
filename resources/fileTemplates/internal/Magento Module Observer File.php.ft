@@ -1,0 +1,26 @@
+<?php
+#parse("PHP File Header.php")
+
+namespace ${NAMESPACE};
+
+use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Event\Observer;
+
+/**
+* Observes the `${EVENT_NAME}` event.
+*/
+class ${CLASS_NAME} implements ObserverInterface
+{
+    /**
+     * Observer for ${EVENT_NAME}.
+     *
+     * @param Observer $observer
+     *
+     * @return void
+     */
+    public function execute(Observer $observer)
+    {
+        $event = $observer->getEvent();
+        // TODO: Implement observer method.
+    }
+}
