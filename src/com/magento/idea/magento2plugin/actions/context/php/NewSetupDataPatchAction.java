@@ -13,14 +13,13 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.NewSetupDataPat
 import com.magento.idea.magento2plugin.magento.packages.ComponentType;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil;
-import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 
 public class NewSetupDataPatchAction extends CustomGeneratorContextAction {
 
     public static final String ACTION_NAME = "Magento 2 Setup Data Patch";
     public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Setup Data Patch";
-    public static final String ROOT_DIRECTORY = "Setup";
+    public static final String SETUP_DIRECTORY = "Setup";
     public static final String PATCH_DIRECTORY = "Patch";
     public static final String DATA_DIRECTORY = "Data";
 
@@ -40,11 +39,14 @@ public class NewSetupDataPatchAction extends CustomGeneratorContextAction {
         if (module.length != 2) { //NOPMD
             return;
         }
-        final PsiDirectory rooDirectory = moduleData.getModuleDir().findSubdirectory(
-                ROOT_DIRECTORY
+        final PsiDirectory rootDirectory = moduleData.getModuleDir().findSubdirectory(
+                SETUP_DIRECTORY
         );
 
-        NewSetupDataPatchDialog.open(event.getProject(), rooDirectory, module[0], module[1]);
+        if (rootDirectory == null) {
+            return;
+        }
+        NewSetupDataPatchDialog.open(event.getProject(), rootDirectory, module[0], module[1]);
     }
 
     @Override
@@ -57,28 +59,30 @@ public class NewSetupDataPatchAction extends CustomGeneratorContextAction {
             return false;
         }
 
-        if (ROOT_DIRECTORY.equals(targetDirectory.getName())) {
-            return Objects.requireNonNull(targetDirectory.getParentDirectory()).getName().equals(
-                    moduleData.getModuleDir().getName()
-            );
+        if (SETUP_DIRECTORY.equals(targetDirectory.getName())) {
+            return moduleData.getModuleDir().equals(targetDirectory.getParentDirectory());
         }
 
         if (PATCH_DIRECTORY.equals(targetDirectory.getName())) {
-            return ROOT_DIRECTORY.equals(Objects.requireNonNull(
-                    targetDirectory.getParentDirectory()).getName()
-            );
+            final PsiDirectory setupDirCandidate = targetDirectory.getParentDirectory();
+
+            return setupDirCandidate != null
+                    && SETUP_DIRECTORY.equals(setupDirCandidate.getName())
+                    && moduleData.getModuleDir().equals(setupDirCandidate.getParentDirectory());
         }
 
         if (DATA_DIRECTORY.equals(targetDirectory.getName())) {
-            final PsiDirectory parentDirectory = Objects.requireNonNull(
-                    targetDirectory.getParentDirectory()
-            );
+            final PsiDirectory patchDirCandidate = targetDirectory.getParentDirectory();
 
-            if (PATCH_DIRECTORY.equals(parentDirectory.getName())) {
-                return ROOT_DIRECTORY.equals(Objects.requireNonNull(
-                        parentDirectory.getParentDirectory()).getName()
-                );
+            if (patchDirCandidate == null) {
+                return false;
             }
+            final PsiDirectory setupDirCandidate = patchDirCandidate.getParentDirectory();
+
+            return setupDirCandidate != null
+                    && PATCH_DIRECTORY.equals(patchDirCandidate.getName())
+                    && SETUP_DIRECTORY.equals(setupDirCandidate.getName())
+                    && moduleData.getModuleDir().equals(setupDirCandidate.getParentDirectory());
         }
 
         return false;

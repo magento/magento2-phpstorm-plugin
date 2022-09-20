@@ -18,6 +18,8 @@ import com.magento.idea.magento2plugin.actions.generation.generator.ModuleSetupD
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.magento.files.ModuleSetupDataPatchFile;
 import com.magento.idea.magento2plugin.magento.packages.File;
+import org.jetbrains.annotations.NotNull;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -57,8 +59,8 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
      * @param directory PsiDirectory
      */
     public NewSetupDataPatchDialog(
-            final Project project,
-            final PsiDirectory directory,
+            final @NotNull Project project,
+            final @NotNull PsiDirectory directory,
             final String modulePackage,
             final String moduleName
     ) {
@@ -105,8 +107,8 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
      * @param directory PsiDirectory
      */
     public static void open(
-            final Project project,
-            final PsiDirectory directory,
+            final @NotNull Project project,
+            final @NotNull PsiDirectory directory,
             final String modulePackage,
             final String moduleName
     ) {
@@ -130,7 +132,8 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
 
     private void generateFile() {
         final PsiDirectory directory = DirectoryGenerator.getInstance().findOrCreateSubdirectories(
-                baseDir, NewSetupDataPatchAction.PATCH_DIRECTORY + File.separator
+                baseDir,
+                NewSetupDataPatchAction.PATCH_DIRECTORY + File.separator
                         + NewSetupDataPatchAction.DATA_DIRECTORY
         );
         final ModuleSetupDataPatchGenerator generator = new ModuleSetupDataPatchGenerator(
