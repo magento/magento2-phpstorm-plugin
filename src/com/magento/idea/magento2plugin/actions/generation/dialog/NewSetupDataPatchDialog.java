@@ -18,8 +18,6 @@ import com.magento.idea.magento2plugin.actions.generation.generator.ModuleSetupD
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.magento.files.ModuleSetupDataPatchFile;
 import com.magento.idea.magento2plugin.magento.packages.File;
-import org.jetbrains.annotations.NotNull;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -30,6 +28,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import org.jetbrains.annotations.NotNull;
 
 public class NewSetupDataPatchDialog extends AbstractDialog {
 
