@@ -17,6 +17,7 @@ import com.magento.idea.magento2plugin.actions.context.php.NewObserverAction;
 import com.magento.idea.magento2plugin.actions.generation.ModuleObserverData;
 import com.magento.idea.magento2plugin.actions.generation.data.ObserverEventsXmlData;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
+import com.magento.idea.magento2plugin.actions.generation.dialog.reflection.GetReflectionFieldUtil;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
@@ -37,6 +38,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -239,15 +241,17 @@ public class NewObserverDialog extends AbstractDialog {
 
     private boolean validateFields() {
         final PsiFile[] directoryFiles = getDirectoryFiles(baseDir);
+        final Field classNameField = GetReflectionFieldUtil.getByName("className", this.getClass());
 
-        if (directoryFiles != null) {
+        if (directoryFiles != null && classNameField != null) {
             for (final PsiFile file : directoryFiles) {
                 final String className = ModuleObserverFile.resolveClassNameFromInput(
                         getClassName()
                 );
+
                 if (file.getName().equals(className + ModuleObserverFile.EXTENSION)) {
                     showErrorMessage(
-                            fieldsValidationsList.get(1).getField(),
+                            classNameField,
                             "Class name " + className + " already exist."
                     );
 
@@ -255,11 +259,16 @@ public class NewObserverDialog extends AbstractDialog {
                 }
             }
         }
-        if (!getDirectoryStructure().isEmpty()
+        final Field directoryStructureField = GetReflectionFieldUtil.getByName(
+                "directoryStructure",
+                this.getClass()
+        );
+
+        if (!getDirectoryStructure().isEmpty() && directoryStructureField != null
                 && !DirectoryRule.getInstance().check(getDirectoryStructure())
         ) {
             showErrorMessage(
-                    this.getClass().getDeclaredFields()[11],
+                    directoryStructureField,
                     "The Directory Path field does not contain a valid directory."
             );
 
