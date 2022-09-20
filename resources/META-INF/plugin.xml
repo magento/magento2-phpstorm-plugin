@@ -78,7 +78,8 @@
             <action id="MagentoCreateWidgetFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewWidgetXmlAction"/>
             <action id="MagentoCreateLayoutFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewLayoutXmlAction"/>
             <action id="MagentoCreateReadmeFile" class="com.magento.idea.magento2plugin.actions.context.md.NewReadmeMdAction"/>
-            <action id="MagentoDataPatchFile" class="com.magento.idea.magento2plugin.actions.context.php.NewSetupDataPatchAction"/>
+            <action id="MagentoNewObserverFile" class="com.magento.idea.magento2plugin.actions.context.php.NewObserverAction"/>
+            <action id="MagentoNewSetupDataPatchFile" class="com.magento.idea.magento2plugin.actions.context.php.NewSetupDataPatchAction"/>
             <!-- Context dependent actions -->
             <separator/>
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml"/>
