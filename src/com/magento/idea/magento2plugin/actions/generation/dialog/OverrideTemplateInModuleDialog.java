@@ -39,6 +39,8 @@ public class OverrideTemplateInModuleDialog extends AbstractDialog {
     private JComboBox module;
     private JButton buttonOK;
     private JButton buttonCancel;
+    private JComboBox OverridingBlock;
+    private JLabel selectBlock;
 
     /**
      * Constructor.
