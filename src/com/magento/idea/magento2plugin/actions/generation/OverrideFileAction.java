@@ -113,12 +113,7 @@ public abstract class OverrideFileAction extends AnAction {
         final GetMagentoModuleUtil.MagentoModuleData moduleData =
                 GetMagentoModuleUtil.getByContext(file.getContainingDirectory(), project);
 
-        if (moduleData == null) {
-            return false;
-        }
-        final VirtualFile virtualFile = file.getVirtualFile();
-        return moduleData.getType().equals(ComponentType.module)
-                && virtualFile.getPath().contains("/" + Package.moduleViewDir + "/");
+        return moduleData != null && moduleData.getType().equals(ComponentType.module);
     }
 
     private void setStatus(final AnActionEvent event, final boolean status) {

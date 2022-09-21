@@ -102,7 +102,7 @@ public class OverrideTemplateInModuleDialog extends AbstractDialog {
             final OverrideTemplateInModuleGenerator overrideInModuleGenerator =
                     new OverrideTemplateInModuleGenerator(project);
 
-            overrideInModuleGenerator.execute(psiFile, this.getModule());
+            overrideInModuleGenerator.execute(psiFile, getModule());
             exit();
         }
     }

@@ -15,6 +15,7 @@ import com.magento.idea.magento2plugin.magento.packages.OverridableFileType;
 import org.jetbrains.annotations.NotNull;
 
 public class OverrideTemplateInModuleAction extends OverrideFileAction {
+
     public static final String ACTION_NAME = "Override this file in a module";
     public static final String ACTION_TEMPLATE_DESCRIPTION =
             "Override template file in a module";
@@ -43,23 +44,13 @@ public class OverrideTemplateInModuleAction extends OverrideFileAction {
 
         if (virtualFile == null
                 || virtualFile.isDirectory()
-                || virtualFile.getCanonicalPath() == null) {
-            return false;
-        }
-        final String fileExtension = virtualFile.getExtension();
-
-        if (fileExtension == null) {
-            return false;
-        }
-
-        if (!OverridableFileType.getOverwritableFileExtensions().contains(fileExtension)) {
+                || virtualFile.getCanonicalPath() == null
+                || !this.isFileInModule(file, project)
+                || virtualFile.getExtension() == null
+        ) {
             return false;
         }
 
-        if (!this.isFileInModule(file, project)) {
-            return false;
-        }
-
-        return OverridableFileType.isFilePhtml(fileExtension);
+        return OverridableFileType.isFilePhtml(virtualFile.getExtension());
     }
 }
