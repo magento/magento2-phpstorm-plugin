@@ -8,6 +8,7 @@
     <id>com.magento.idea.magento2plugin</id>
     <name>Magento PhpStorm</name>
     <version>4.4.1</version>
+    
     <vendor url="https://github.com/magento/magento2-phpstorm-plugin">Magento Inc.</vendor>
 
     <description><![CDATA[
@@ -64,6 +65,7 @@
             <action id="MagentoCreateCrontabFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewCrontabXmlAction"/>
             <action id="MagentoCreateDiFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewDiXmlAction"/>
             <action id="MagentoCreateEmailTemplatesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewEmailTemplatesXmlAction"/>
+            <action id="MagentoCreateEventsFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewEventsXmlAction"/>
             <action id="MagentoCreateExtensionAttributesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewExtensionAttributesXmlAction"/>
             <action id="MagentoCreateFieldsetFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewFieldsetXmlAction"/>
             <action id="MagentoCreateIndexerFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewIndexerXmlAction"/>
@@ -77,6 +79,8 @@
             <action id="MagentoCreateWidgetFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewWidgetXmlAction"/>
             <action id="MagentoCreateLayoutFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewLayoutXmlAction"/>
             <action id="MagentoCreateReadmeFile" class="com.magento.idea.magento2plugin.actions.context.md.NewReadmeMdAction"/>
+            <action id="MagentoNewObserverFile" class="com.magento.idea.magento2plugin.actions.context.php.NewObserverAction"/>
+            <action id="MagentoNewSetupDataPatchFile" class="com.magento.idea.magento2plugin.actions.context.php.NewSetupDataPatchAction"/>
             <!-- Context dependent actions -->
             <separator/>
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml"/>
