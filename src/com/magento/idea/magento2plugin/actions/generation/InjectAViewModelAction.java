@@ -144,6 +144,8 @@ public class InjectAViewModelAction extends DumbAwareAction {
     private boolean isEditableModule(final Project project, final PsiFile psiFile) {
         final List<String> allModulesList = new ModuleIndex(project).getEditableModuleNames();
 
-        return allModulesList.contains(GetModuleNameByDirectoryUtil.execute(psiFile.getContainingDirectory(), project));
+        return allModulesList.contains(
+                GetModuleNameByDirectoryUtil.execute(psiFile.getContainingDirectory(), project)
+        );
     }
 }
