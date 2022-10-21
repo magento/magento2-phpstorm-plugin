@@ -38,7 +38,14 @@ public abstract class UsedFieldInspection extends PhpInspection {
                         || !settings.isIssueLevelSatisfiable(getSeverityLevel())) {
                     return;
                 }
-                final PsiElement element = fieldReference.resolve();
+
+                PsiElement element = null;
+                try {
+                    element = fieldReference.resolve();
+                } catch (Throwable exception) { //NOPMD
+                    //do nothing
+                }
+
                 final PsiFile file = fieldReference.getContainingFile();
 
                 if (!(element instanceof Field) || element.getContainingFile().equals(file)) {

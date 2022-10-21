@@ -40,7 +40,13 @@ public abstract class InheritedInterfaceInspection extends PhpInspection {
 
                 for (final ClassReference ref : clazz.getExtendsList().getReferenceElements()) {
                     final String interfaceFqn = ref.getFQN();
-                    final PsiElement interfaceClass = ref.resolve();
+                    PsiElement interfaceClass = null;
+
+                    try {
+                        interfaceClass = ref.resolve();
+                    } catch (Throwable exception) { //NOPMD
+                        //do nothing
+                    }
 
                     if (interfaceFqn == null || !(interfaceClass instanceof PhpClass)) {
                         continue;

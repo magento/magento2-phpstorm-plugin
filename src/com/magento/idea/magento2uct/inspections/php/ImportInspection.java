@@ -66,7 +66,12 @@ public abstract class ImportInspection extends PhpInspection {
                 final PhpReference phpReference = use.getTargetReference();
 
                 if (phpReference != null) {
-                    final PsiElement element = phpReference.resolve();
+                    PsiElement element = null;
+                    try {
+                        element = phpReference.resolve();
+                    } catch (Throwable exception) { //NOPMD
+                        //do nothing
+                    }
 
                     if (element == null) {
                         return use.getFQN().contains("Interface");

@@ -50,7 +50,13 @@ public class ModuleDeclarationInRegistrationPhpInspection extends PhpInspection 
                 if (callerReference == null) {
                     return;
                 }
-                final PsiElement caller = callerReference.resolve();
+
+                PsiElement caller = null;
+                try {
+                    caller = callerReference.resolve();
+                } catch (Throwable exception) { //NOPMD
+                    //do nothing
+                }
 
                 if (!(caller instanceof Method)) {
                     return;

@@ -35,7 +35,13 @@ public abstract class CallMethodInspection extends PhpInspection {
                         || !settings.isIssueLevelSatisfiable(getSeverityLevel())) {
                     return;
                 }
-                final PsiElement resolvedElement = reference.resolve();
+
+                PsiElement resolvedElement = null;
+                try {
+                    resolvedElement = reference.resolve();
+                } catch (Throwable exception) { //NOPMD
+                    //do nothing
+                }
 
                 if (!(resolvedElement instanceof Method)) {
                     return;

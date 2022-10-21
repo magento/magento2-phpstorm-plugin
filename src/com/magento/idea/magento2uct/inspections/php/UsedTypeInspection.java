@@ -46,7 +46,13 @@ public abstract class UsedTypeInspection extends PhpInspection {
                         || !settings.isIssueLevelSatisfiable(getSeverityLevel())) {
                     return;
                 }
-                PsiElement resolved = ReferenceResolverUtil.resolve(reference);
+
+                PsiElement resolved = null;
+                try {
+                    resolved = ReferenceResolverUtil.resolve(reference);
+                } catch (Throwable exception) { //NOPMD
+                    //do nothing
+                }
 
                 if (resolved instanceof Method
                         && MagentoPhpClass.CONSTRUCT_METHOD_NAME
