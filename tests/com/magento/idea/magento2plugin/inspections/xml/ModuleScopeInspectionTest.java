@@ -43,7 +43,7 @@ public class ModuleScopeInspectionTest extends InspectionXmlFixtureTestCase {
         assertHasNoHighlighting(errorMessage);
     }
 
-    private void configureFixture(String fixturePath) {
+    private void configureFixture(final String fixturePath) {
         myFixture.copyFileToProject(getFixturePath("app/code/Test/TestModule/registration.php"));
         myFixture.configureByFile(getFixturePath(fixturePath));
     }
