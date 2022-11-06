@@ -17,7 +17,7 @@ public class ModuleScopeInspectionTest extends InspectionXmlFixtureTestCase {
     }
 
     /**
-     * Inspection highlights warning if the area of a config file is wrong
+     * Inspection highlights warning if the area of a config file is wrong.
      */
     public void testIncorrectArea() {
         configureFixture("app/code/Test/TestModule/etc/adminhtmltypo/di.xml");

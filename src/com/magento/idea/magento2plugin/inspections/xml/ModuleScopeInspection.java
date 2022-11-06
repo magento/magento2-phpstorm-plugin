@@ -8,7 +8,6 @@ package com.magento.idea.magento2plugin.inspections.xml;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.codeInspection.XmlSuppressableInspectionTool;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
@@ -19,10 +18,12 @@ import com.magento.idea.magento2plugin.magento.packages.ComponentType;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil;
 import org.jetbrains.annotations.NotNull;
-import java.util.*;
 
 public class ModuleScopeInspection extends XmlSuppressableInspectionTool {
 
+    /**
+     * Inspection for the module config area.
+     */
     @NotNull
     @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.CognitiveComplexity"})
     public PsiElementVisitor buildVisitor(
@@ -30,7 +31,6 @@ public class ModuleScopeInspection extends XmlSuppressableInspectionTool {
             final boolean isOnTheFly
     ) {
         return new XmlElementVisitor() {
-            private final HashMap<String, VirtualFile> loadedFileHash = new HashMap<>();//NOPMD
             private final InspectionBundle inspectionBundle = new InspectionBundle();
             private final ProblemHighlightType errorSeverity = ProblemHighlightType.WARNING;
 
@@ -53,7 +53,8 @@ public class ModuleScopeInspection extends XmlSuppressableInspectionTool {
                 final GetMagentoModuleUtil.MagentoModuleData moduleData = GetMagentoModuleUtil
                         .getByContext(targetDirectory, file.getProject());
 
-                if (moduleData == null || moduleData.getType() == null || !moduleData.getType().equals(ComponentType.module)) {
+                if (moduleData == null || moduleData.getType() == null
+                        || !moduleData.getType().equals(ComponentType.module)) {
                     return;
                 }
 
