@@ -1,0 +1,27 @@
+<html>
+<body>
+<h1>Magento area type check.</h1>
+<p>
+    Magento is organized into these main areas:
+
+    Admin (adminhtml): entry point for this area is pub/index.php. The Admin panel area includes the code needed for store management. The /app/design/adminhtml directory contains all the code for components you’ll see while working in the Admin.
+
+    Storefront (frontend): entry point for this area is pub/index.php. The storefront (or frontend) contains template and layout files that define the appearance of your storefront.
+
+    Basic (base): used as a fallback for files absent in adminhtml and frontend areas.
+
+    Cron (crontab): In pub/cron.php, the \Magento\Framework\App\Cron class always loads the ‘crontab’ area.
+
+    You can also send requests to Magento using the SOAP, REST and GraphQL APIs. These three areas
+
+    Web API REST (webapi_rest): entry point for this area is pub/index.php. The REST area has a front controller that understands how to do URL lookups for REST-based URLs.
+
+    GraphQL (graphql): entry point for this area is pub/index.php.
+
+    Web API SOAP (webapi_soap): entry point for this area is pub/index.php.
+</p>
+<p>
+    See https://developer.adobe.com/commerce/php/architecture/modules/areas/ for more information.
+</p>
+</body>
+</html>

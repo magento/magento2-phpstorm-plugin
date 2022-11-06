@@ -314,6 +314,13 @@
                          enabledByDefault="true" level="WARNING"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.PluginAttributeTypeInspection"/>
 
+        <localInspection language="XML" groupPath="XML"
+                         shortName="ModuleScopeInspection"
+                         bundle="magento2.inspection" key="inspection.displayName.ModuleScopeInspection"
+                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
+                         enabledByDefault="true" level="WARNING"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.ModuleScopeInspection"/>
+
         <!-- UCT inspection -->
         <localInspection language="PHP" groupPath="UCT"
                          shortName="ExtendingDeprecatedClass"
