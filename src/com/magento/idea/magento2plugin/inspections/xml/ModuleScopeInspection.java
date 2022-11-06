@@ -7,19 +7,21 @@ package com.magento.idea.magento2plugin.inspections.xml;
 
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.codeInspection.XmlSuppressableInspectionTool;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.XmlElementVisitor;
 import com.magento.idea.magento2plugin.bundles.InspectionBundle;
-import com.magento.idea.magento2plugin.magento.files.ModuleEventsXml;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
-import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.magento.idea.magento2plugin.magento.packages.ComponentType;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil;
 import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
-public class ModuleScopeInspection extends PhpInspection {
+public class ModuleScopeInspection extends XmlSuppressableInspectionTool {
 
     @NotNull
     @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.CognitiveComplexity"})
@@ -34,10 +36,6 @@ public class ModuleScopeInspection extends PhpInspection {
 
             @Override
             public void visitFile(final @NotNull PsiFile file) {
-                if (!ModuleEventsXml.FILE_NAME.equals(file.getName())) {
-                    return;
-                }
-
                 final PsiDirectory targetDirectory = file.getParent();
                 if (targetDirectory == null) {
                     return;
@@ -61,7 +59,7 @@ public class ModuleScopeInspection extends PhpInspection {
 
                 final String directoryName = targetDirectory.getName();
                 final Areas area = Areas.getAreaByString(targetDirectory.getName());
-                if (area == null || directoryName.equals(Areas.base)) {
+                if (area == null || directoryName.equals(Areas.base.toString())) {
                     problemsHolder.registerProblem(
                             file,
                             inspectionBundle.message(
