@@ -24,7 +24,7 @@
     </change-notes>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="222.3739.54"/>
+    <idea-version since-build="212.5080.55"/>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
@@ -60,11 +60,11 @@
             <separator/>
             <!-- Context dependent actions -->
             <action id="MagentoCreateAclFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewAclXmlAction"/>
-            <action id="MagentoCreateGraphQlSchemaFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewGraphQLSchemaAction"/>
             <action id="MagentoCreateConfigFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewConfigXmlAction"/>
             <action id="MagentoCreateCrontabFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewCrontabXmlAction"/>
             <action id="MagentoCreateDiFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewDiXmlAction"/>
             <action id="MagentoCreateEmailTemplatesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewEmailTemplatesXmlAction"/>
+            <action id="MagentoCreateEventsFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewEventsXmlAction"/>
             <action id="MagentoCreateExtensionAttributesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewExtensionAttributesXmlAction"/>
             <action id="MagentoCreateFieldsetFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewFieldsetXmlAction"/>
             <action id="MagentoCreateIndexerFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewIndexerXmlAction"/>
@@ -78,6 +78,8 @@
             <action id="MagentoCreateWidgetFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewWidgetXmlAction"/>
             <action id="MagentoCreateLayoutFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewLayoutXmlAction"/>
             <action id="MagentoCreateReadmeFile" class="com.magento.idea.magento2plugin.actions.context.md.NewReadmeMdAction"/>
+            <action id="MagentoNewObserverFile" class="com.magento.idea.magento2plugin.actions.context.php.NewObserverAction"/>
+            <action id="MagentoNewSetupDataPatchFile" class="com.magento.idea.magento2plugin.actions.context.php.NewSetupDataPatchAction"/>
             <!-- Context dependent actions -->
             <separator/>
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml"/>
@@ -91,7 +93,6 @@
             <action id="MagentoCreateACronjob" class="com.magento.idea.magento2plugin.actions.generation.NewCronjobAction" />
             <action id="MagentoCreateACronGroup" class="com.magento.idea.magento2plugin.actions.generation.NewCronGroupAction" />
             <action id="MagentoCreateAViewModel" class="com.magento.idea.magento2plugin.actions.generation.NewViewModelAction" />
-            <action id="MagentoCreateAGraphQlResolver" class="com.magento.idea.magento2plugin.actions.generation.NewGraphQlResolverAction" />
             <action id="MagentoCreateCLICommand" class="com.magento.idea.magento2plugin.actions.generation.NewCLICommandAction" />
             <action id="MagentoCreateEmailTemplate" class="com.magento.idea.magento2plugin.actions.generation.NewEmailTemplateAction" />
             <action id="MagentoCreateUiComponentGrid" class="com.magento.idea.magento2plugin.actions.generation.NewUiComponentGridAction" />
@@ -628,7 +629,6 @@
         <internalFileTemplate name="Magento Regular Class"/>
         <internalFileTemplate name="Magento Observer Class"/>
         <internalFileTemplate name="Magento Events XML"/>
-        <internalFileTemplate name="Magento GraphQL Resolver Class"/>
         <internalFileTemplate name="Magento Cron Job Class"/>
         <internalFileTemplate name="Magento Cron Tab XML"/>
         <internalFileTemplate name="Magento CLI Command Class"/>
@@ -642,7 +642,6 @@
         <internalFileTemplate name="Magento Routes XML"/>
         <internalFileTemplate name="Magento Layout XML"/>
         <internalFileTemplate name="Magento ACL XML"/>
-        <internalFileTemplate name="Magento GraphQL Schema"/>
         <internalFileTemplate name="Magento Collection Class"/>
         <internalFileTemplate name="Magento Model Class"/>
         <internalFileTemplate name="Magento Resource Model Class"/>
