@@ -29,6 +29,9 @@ import java.awt.Color;
 import java.awt.Container;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -45,6 +48,10 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
     private static final String LEARN_MORE_URI =
             "https://docs.magento.com/user-guide/getting-started.html#product-editions";
     private static final String LEARN_MORE_TEXT = "Learn more.  ";
+    @SuppressWarnings("checkstyle:LineLength")
+    private static final String MAGENTO_VERSION_REGEX = "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$";
+    public static final Pattern MAGENTO_VERSION_PATTERN
+            = Pattern.compile(MAGENTO_VERSION_REGEX);
 
     private final Project project;
     private String uctExecutablePath;
@@ -126,6 +133,14 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
         if (!uctRunConfiguration.getComingVersion().isEmpty()) {
             final String storedComingVersion = uctRunConfiguration.getComingVersion();
             setSelectedValueByItsKey(comingVersion, storedComingVersion);
+
+            if (!Objects.requireNonNull(
+                    comingVersion.getSelectedItem()).toString().equals(storedComingVersion)) {
+                final ComboBoxItemData customVersion
+                        = new ComboBoxItemData(storedComingVersion, storedComingVersion);
+                comingVersion.addItem(customVersion);
+                comingVersion.setSelectedItem(customVersion);
+            }
         }
 
         if (uctRunConfiguration.getMinIssueLevel() > 0) {
@@ -148,8 +163,8 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
         uctRunConfiguration.setProjectRoot(projectRoot.getComponent().getText());
         uctRunConfiguration.setModulePath(modulePath.getComponent().getText());
 
-        final ComboBoxItemData selectedComingVersion =
-                (ComboBoxItemData) comingVersion.getSelectedItem();
+        ComboBoxItemData selectedComingVersion
+                = getCorrectedSelectedItem(comingVersion.getSelectedItem());
 
         if (selectedComingVersion == null) {
             uctRunConfiguration.setComingVersion("");
@@ -299,7 +314,7 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
      */
     @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     private void initializeComboboxSources() {
-        comingVersion.addItem(new ComboBoxItemData("", "Choose a target version"));
+        comingVersion.setToolTipText("Choose a target version");
 
         for (final String version : SupportedVersion.getSupportedVersions()) {
             comingVersion.addItem(new ComboBoxItemData(version, version));
@@ -339,7 +354,7 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
                 });
 
         comingVersion.addItemListener(event -> {
-            final ComboBoxItemData selectedItem = (ComboBoxItemData) event.getItem();
+            final ComboBoxItemData selectedItem = getCorrectedSelectedItem(event.getItem());
 
             validateComingVersionField(selectedItem);
         });
@@ -366,11 +381,35 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
      * @param selectedItem ComboBoxItemData
      */
     private void validateComingVersionField(final ComboBoxItemData selectedItem) {
+        final Matcher matcher = MAGENTO_VERSION_PATTERN.matcher(selectedItem.getText());
+
         if (selectedItem != null && selectedItem.getKey().isEmpty()) {
             comingVersionError.setText("Please, specify target version");
+        } else if (!matcher.find()) {
+            comingVersionError.setText("Please, correct target version");
         } else {
             comingVersionError.setText("");
         }
+    }
+
+    /**
+     * Get existing item or select and convert custom version.
+     *
+     * @param selectedItem String|ComboBoxItemData
+     * @return ComboBoxItemData
+     */
+    private ComboBoxItemData getCorrectedSelectedItem(final Object selectedItem) {
+        ComboBoxItemData selectedComingVersion;
+
+        if (selectedItem instanceof ComboBoxItemData) {
+            selectedComingVersion = (ComboBoxItemData) selectedItem;
+        } else {
+            final String customSelectedVersion = selectedItem.toString();
+            selectedComingVersion
+                    = new ComboBoxItemData(customSelectedVersion, customSelectedVersion);
+        }
+
+        return selectedComingVersion;
     }
 
     /**

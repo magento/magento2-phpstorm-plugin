@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2uct.execution.configurations;
 
+import static com.magento.idea.magento2uct.execution.configurations.UctSettingsEditor.MAGENTO_VERSION_PATTERN;
+
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
 import com.intellij.execution.RunManager;
@@ -32,6 +34,7 @@ import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.settings.UctSettingsService;
 import com.magento.idea.magento2uct.util.UctExecutableValidatorUtil;
 import com.magento.idea.magento2uct.util.module.UctModulePathValidatorUtil;
+import java.util.regex.Matcher;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -239,6 +242,11 @@ public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfig
 
                 if (getComingVersion().isEmpty()) {
                     throw new ExecutionException("The coming/target version is not specified");
+                }
+
+                final Matcher matcher = MAGENTO_VERSION_PATTERN.matcher(getComingVersion());
+                if (!matcher.find()) {
+                    throw new ExecutionException("The coming/target version is not correct");
                 }
 
                 if (getProjectRoot().isEmpty()) {
