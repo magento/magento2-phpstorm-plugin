@@ -37,9 +37,9 @@ class Save extends Action implements HttpPostActionInterface
     private SaveCommand $saveCommand;
 
     /**
-     * @var CompanyInterfaceFactory
+     * @var CompanyDataFactory
      */
-    private CompanyInterfaceFactory $entityDataFactory;
+    private CompanyDataFactory $entityDataFactory;
 
     /**
      * @param Context $context
