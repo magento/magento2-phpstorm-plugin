@@ -19,12 +19,12 @@ class GridDataProvider extends DataProvider
     /**
      * @var GetListQuery
      */
-    private $getListQuery;
+    private GetListQuery $getListQuery;
 
     /**
      * @var SearchResultFactory
      */
-    private $searchResultFactory;
+    private SearchResultFactory $searchResultFactory;
 
     /**
      * @var array

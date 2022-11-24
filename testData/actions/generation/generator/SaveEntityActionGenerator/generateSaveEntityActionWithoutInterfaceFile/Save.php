@@ -24,22 +24,22 @@ class Save extends Action implements HttpPostActionInterface
      *
      * @see _isAllowed()
      */
-    const ADMIN_RESOURCE = 'Foo_Bar::company_id';
+    public const ADMIN_RESOURCE = 'Foo_Bar::company_id';
 
     /**
      * @var DataPersistorInterface
      */
-    private $dataPersistor;
+    private DataPersistorInterface $dataPersistor;
 
     /**
      * @var SaveCommand
      */
-    private $saveCommand;
+    private SaveCommand $saveCommand;
 
     /**
-     * @var CompanyDataFactory
+     * @var CompanyInterfaceFactory
      */
-    private $entityDataFactory;
+    private CompanyInterfaceFactory $entityDataFactory;
 
     /**
      * @param Context $context
