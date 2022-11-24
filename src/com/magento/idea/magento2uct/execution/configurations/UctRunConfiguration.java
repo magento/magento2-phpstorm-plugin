@@ -263,14 +263,12 @@ public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfig
                     commandSettingsBuilder.addArgument("--coming-version=" + getComingVersion());
                 }
 
-                commandSettingsBuilder.addArgument(getProjectRoot());
-
                 final GeneralCommandLine commandLine =
                         commandSettingsBuilder.createGeneralCommandLine();
 
                 if (!getModulePath().isEmpty()) {
                     if (UctModulePathValidatorUtil.validate(getModulePath())) {
-                        commandLine.addParameter("--module-path=".concat(getModulePath()));
+                        commandLine.addParameter(getModulePath());
                     } else {
                         throw new ExecutionException("The path to analyse is not valid");
                     }

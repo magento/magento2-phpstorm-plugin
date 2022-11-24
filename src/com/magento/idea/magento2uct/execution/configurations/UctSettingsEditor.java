@@ -163,7 +163,7 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
         uctRunConfiguration.setProjectRoot(projectRoot.getComponent().getText());
         uctRunConfiguration.setModulePath(modulePath.getComponent().getText());
 
-        ComboBoxItemData selectedComingVersion
+        final ComboBoxItemData selectedComingVersion
                 = getCorrectedSelectedItem(comingVersion.getSelectedItem());
 
         if (selectedComingVersion == null) {
@@ -385,7 +385,7 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
 
         if (selectedItem != null && selectedItem.getKey().isEmpty()) {
             comingVersionError.setText("Please, specify target version");
-        } else if (!matcher.find()) {
+        } else if (!matcher.find()) { // NOPMD
             comingVersionError.setText("Please, correct target version");
         } else {
             comingVersionError.setText("");
