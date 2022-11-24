@@ -16,27 +16,27 @@ class ${CLASS_NAME}
     /**
      * @var ${COLLECTION_PROCESSOR_TYPE}
      */
-    private $collectionProcessor;
+    private ${COLLECTION_PROCESSOR_TYPE} $collectionProcessor;
 
     /**
      * @var ${ENTITY_COLLECTION_FACTORY_TYPE}
      */
-    private $entityCollectionFactory;
+    private ${ENTITY_COLLECTION_FACTORY_TYPE} $entityCollectionFactory;
 
     /**
      * @var ${ENTITY_DATA_MAPPER_TYPE}
      */
-    private $entityDataMapper;
+    private ${ENTITY_DATA_MAPPER_TYPE} $entityDataMapper;
 
     /**
      * @var ${SEARCH_CRITERIA_BUILDER_TYPE}
      */
-    private $searchCriteriaBuilder;
+    private ${SEARCH_CRITERIA_BUILDER_TYPE} $searchCriteriaBuilder;
 
     /**
      * @var ${SEARCH_RESULT_FACTORY_TYPE}
      */
-    private $searchResultFactory;
+    private ${SEARCH_RESULT_FACTORY_TYPE} $searchResultFactory;
 
     /**
      * @param ${COLLECTION_PROCESSOR_TYPE} $collectionProcessor
