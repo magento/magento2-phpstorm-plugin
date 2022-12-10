@@ -16,7 +16,7 @@ class Index extends Action implements HttpGetActionInterface
     /**
      * Authorization level of a basic admin session.
      */
-    const ADMIN_RESOURCE = 'Foo_Bar::book_management';
+    public const ADMIN_RESOURCE = 'Foo_Bar::book_management';
 
     /**
      * Execute action based on request and return result.

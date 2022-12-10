@@ -18,12 +18,12 @@ class ${CLASS_NAME} extends ${EXTENDS} implements ${IMPLEMENTS_POST}, ${IMPLEMEN
      *
      * @see _isAllowed()
      */
-    const ADMIN_RESOURCE = '${ADMIN_RESOURCE}';
+    public const ADMIN_RESOURCE = '${ADMIN_RESOURCE}';
 
     /**
      * @var ${DELETE_COMMAND}
      */
-    private $deleteByIdCommand;
+    private ${DELETE_COMMAND} $deleteByIdCommand;
 
     /**
      * @param Context $context
