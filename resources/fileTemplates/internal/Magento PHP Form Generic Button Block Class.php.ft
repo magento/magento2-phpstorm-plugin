@@ -16,12 +16,12 @@ class ${CLASS_NAME}
     /**
      * @var ${CONTEXT}
      */
-    private $context;
+    private ${CONTEXT} $context;
 
     /**
      * @var ${URL}
      */
-    private $urlBuilder;
+    private ${URL} $urlBuilder;
 
     /**
      * @param ${CONTEXT} $context

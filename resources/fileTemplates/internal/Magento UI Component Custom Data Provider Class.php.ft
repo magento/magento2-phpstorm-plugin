@@ -22,12 +22,12 @@ class ${CLASS_NAME} extends ${EXTENDS}
 /**
      * @var ${GET_LIST_QUERY_TYPE}
      */
-    private $getListQuery;
+    private ${GET_LIST_QUERY_TYPE} $getListQuery;
 
     /**
      * @var ${SEARCH_RESULT_FACTORY}
      */
-    private $searchResultFactory;
+    private ${SEARCH_RESULT_FACTORY} $searchResultFactory;
 
     /**
      * @var array

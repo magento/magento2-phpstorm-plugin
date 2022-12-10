@@ -18,7 +18,7 @@ class ${CLASS_NAME} extends ${EXTENDS} implements ${IMPLEMENTS}
      *
      * @see _isAllowed()
      */
-    const ADMIN_RESOURCE = '${ADMIN_RESOURCE}';
+    public const ADMIN_RESOURCE = '${ADMIN_RESOURCE}';
 
     /**
      * Create new ${ENTITY_NAME} action.

@@ -18,7 +18,7 @@ class NewAction extends Action implements HttpGetActionInterface
      *
      * @see _isAllowed()
      */
-    const ADMIN_RESOURCE = 'Foo_Bar::company_id';
+    public const ADMIN_RESOURCE = 'Foo_Bar::company_id';
 
     /**
      * Create new Company action.
