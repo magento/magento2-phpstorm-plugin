@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 5.0.0
 
+### Fixed
+
+- Fixed wrong director(y|ies) generation for GraphQL resolver class [#1192](https://github.com/magento/magento2-phpstorm-plugin/pull/1192)
+- Fixed IndexOutOfBoundsException: CreateResolverClassQuickFix.applyFix(CreateResolverClassQuickFix.java:43) [#1192](https://github.com/magento/magento2-phpstorm-plugin/pull/1192)
+
 ## 4.4.0
 
 ### Added

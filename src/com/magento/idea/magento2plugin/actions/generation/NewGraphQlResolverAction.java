@@ -23,7 +23,7 @@ public class NewGraphQlResolverAction extends AnAction {
     public static final String ACTION_DESCRIPTION = "Create a new Magento 2 GraphQL Resolver";
 
     public NewGraphQlResolverAction() {
-        super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
+        super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.GRAPHQL);
     }
 
     @Override
