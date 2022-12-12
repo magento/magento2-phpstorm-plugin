@@ -227,7 +227,8 @@ public final class VersionStateManager {
      */
     private String escapeFqn(final @NotNull String fqn) {
         return MagentoTypeEscapeUtil.escape(
-                fqn.trim().length() > 0 && fqn.trim().charAt(0) == '\\' ? fqn.trim() : '\\' + fqn.trim()
+                fqn.trim().length() > 0 && fqn.trim().charAt(0)
+                        == '\\' ? fqn.trim() : '\\' + fqn.trim()
         );
     }
 }
