@@ -17,4 +17,5 @@ public class MagentoIcons {
             IconLoader.getIcon("/icons/pluginIcon16x16.svg", MagentoIcons.class);
     public static final Icon PLUGIN_ICON_MEDIUM =
             IconLoader.getIcon("/icons/pluginIcon64x64.svg", MagentoIcons.class);
+    public static final Icon GRAPHQL = IconLoader.getIcon("/icons/graphql.svg", MagentoIcons.class);
 }
