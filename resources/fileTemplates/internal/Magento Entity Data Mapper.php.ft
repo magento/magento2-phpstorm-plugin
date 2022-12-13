@@ -16,7 +16,7 @@ class ${CLASS_NAME}
     /**
      * @var ${DTO_FACTORY}
      */
-    private $entityDtoFactory;
+    private ${DTO_FACTORY} $entityDtoFactory;
 
     /**
      * @param ${DTO_FACTORY} $entityDtoFactory

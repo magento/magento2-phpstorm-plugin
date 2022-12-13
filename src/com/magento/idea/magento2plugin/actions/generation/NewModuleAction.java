@@ -19,17 +19,18 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.NewModuleDialog
 import com.magento.idea.magento2plugin.actions.generation.util.IsClickedDirectoryInsideProject;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+import com.magento.idea.magento2plugin.util.magento.MagentoBasePathUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class NewModuleAction extends com.intellij.openapi.actionSystem.AnAction {
-    public static String actionName = "Magento 2 Module";
-    public static String actionDescription = "Create a new Magento 2 Module";
+    public static final String ACTION_NAME = "Magento 2 Module";
+    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Module";
 
     /**
      * Constructor.
      */
     public NewModuleAction() {
-        super(actionName, actionDescription, MagentoIcons.MODULE);
+        super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
     }
 
     @Override
@@ -66,6 +67,10 @@ public class NewModuleAction extends com.intellij.openapi.actionSystem.AnAction 
     public void update(final AnActionEvent event) {
         final Project project = event.getData(PlatformDataKeys.PROJECT);
 
+        if (project == null) {
+            return;
+        }
+
         if (Settings.isEnabled(project)) {
             final String magentoPath = Settings.getMagentoPath(project);
             if (magentoPath == null) {
@@ -89,6 +94,16 @@ public class NewModuleAction extends com.intellij.openapi.actionSystem.AnAction 
             final String moduleName = GetModuleNameByDirectoryUtil
                     .execute((PsiDirectory) psiElement, project);
             if (moduleName == null) {
+                final String sourceDirPath = ((PsiDirectory) psiElement).getVirtualFile().getPath();
+                final boolean isCustomCodeSourceDirValid =
+                        MagentoBasePathUtil.isCustomCodeSourceDirValid(sourceDirPath);
+                final boolean isCustomVendorDirValid =
+                        MagentoBasePathUtil.isCustomVendorDirValid(sourceDirPath);
+
+                if (!isCustomCodeSourceDirValid && !isCustomVendorDirValid) { //NOPMD
+                    event.getPresentation().setVisible(false);
+                    return;
+                }
                 event.getPresentation().setVisible(true);
                 return;
             }

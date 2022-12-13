@@ -25,6 +25,9 @@ public class RegExUtil {
     public static final String NUMERIC
             = "[0-9]*";
 
+    public static final String EXTENDED_NUMERIC
+            = "-?\\d+(\\.\\d+)?";
+
     public static final String IDENTIFIER
             = "[a-zA-Z0-9_\\-]*";
 
@@ -45,6 +48,9 @@ public class RegExUtil {
 
     public static final String MAGENTO_VERSION
             = "(\\d+)\\.(\\d+)\\.(\\d+)[a-zA-Z0-9_\\-]*";
+
+    public static final String LAYOUT_NAME
+            = "^([a-zA-Z0-9]+){1}(_[a-zA-Z0-9]+){0,}";
 
     public static class Magento {
 
@@ -78,6 +84,9 @@ public class RegExUtil {
         public static final String TEST_CLASS_FQN =
                 "^(\\\\)?(\\w+\\\\){1}(\\w+\\\\){1}Test(\\\\\\w+)+$";
 
+        public static final String CUSTOM_VENDOR_NAME =
+                "app\\/code\\/(\\w+)\\/";
+
         public static final String COMMA_SEPARATED_STRING =
                 "^[^\\s,]+(?:,\\s*[^\\s,]+)*$";
     }
@@ -100,7 +109,15 @@ public class RegExUtil {
                 "\\\\?" + PhpRegex.FQN + "(" + CLASS_MEMBER_NAME + ")?.*";
     }
 
+    public static class JsRegex {
+
+        // Targets paths like `'Sandbox_Test/js/test'`
+        public static final String FILE_PATH
+                = "(\\W{1}[A-Z][a-zA-Z0-9]+_[A-Z][a-zA-Z0-9]+[\\/\\w*-]{1,}\\W{1})";
+    }
+
     public static class CustomTheme {
+
         public static final String MODULE_NAME =
                 "app\\/design\\/(adminhtml|frontend)\\/\\w*\\/\\w*\\/\\w*";
     }

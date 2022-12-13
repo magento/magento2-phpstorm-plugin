@@ -42,7 +42,7 @@
 
 1. Check out this repository
 1. Open a folder with the project in the IntelliJ Ultimate using the `open` action button.
-1. Make sure that you on the latest develop branch (e.g `4.3.0-develop`)
+1. Make sure that you on the latest develop branch (e.g `5.0.0-develop`)
 1. Right-click on the `build.gradle` file, choose "Import Gradle project" (if this is not exist look for "Build module '<root folder name>'") (you need to have Gradle plugin installed)
 1. Check if the right SDK version is used for the project.
    - Current Java version for the project is **java 11**, so you should additionally download **SDK 11** and choose it in the module settings: `Right click by the project root > Open Module Settings > Project Settings > Project > Project SDK`

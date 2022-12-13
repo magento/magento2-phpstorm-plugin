@@ -13,7 +13,9 @@ class TestModel extends AbstractModel
     protected $_eventPrefix = 'my_table_model';
 
     /**
-     * @inheritdoc
+     * Initialize magento model.
+     *
+     * @return void
      */
     protected function _construct()
     {

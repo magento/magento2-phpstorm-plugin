@@ -146,7 +146,7 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
         if (fqnParts.length != 0) {
             fqnParts = ArrayUtil.remove(fqnParts, fqnParts.length - 1);
         }
-        if (fqnParts[1] != null) {
+        if (fqnParts.length > 1 && fqnParts[1] != null) {
             fqnParts = ArrayUtil.remove(fqnParts, 1);
         }
         if (fqnParts[0] != null) {

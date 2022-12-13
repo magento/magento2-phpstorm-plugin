@@ -4,7 +4,125 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
+## 5.0.0
+
+### Added
+
+- Code generation of a Data Patch Boilerplate file [#1188](https://github.com/magento/magento2-phpstorm-plugin/pull/1188)
+- Code generation of an Observer from the context menu [#1200](https://github.com/magento/magento2-phpstorm-plugin/pull/1200)
+- Code generation of events.xml file [#1189](https://github.com/magento/magento2-phpstorm-plugin/pull/1189)
+- Config Scope directory inspection [#1261](https://github.com/magento/magento2-phpstorm-plugin/pull/1261)
+
+### Changed
+
+- EAV attributes code generators: Added default values of the group property [#1259](https://github.com/magento/magento2-phpstorm-plugin/pull/1259)
+- All code generators: Added constants visibility and class property types [#1260](https://github.com/magento/magento2-phpstorm-plugin/pull/1260)
+- UCT custom coming versions [#1251](https://github.com/magento/magento2-phpstorm-plugin/pull/1251)
+
+### Fixed
+
+- Fixed wrong director(y|ies) generation for GraphQL resolver class [#1192](https://github.com/magento/magento2-phpstorm-plugin/pull/1192)
+- Fixed IndexOutOfBoundsException: CreateResolverClassQuickFix.applyFix(CreateResolverClassQuickFix.java:43) [#1192](https://github.com/magento/magento2-phpstorm-plugin/pull/1192)
+- Index out of range [#1239](https://github.com/magento/magento2-phpstorm-plugin/pull/1239)
+
+## 4.4.0
+
+### Added
+
+- Code generation of a Data Patch file with a Customer EAV attribute [#583](https://github.com/magento/magento2-phpstorm-plugin/pull/583)
+- Code generation of a Data Patch file with a Product EAV attribute [#527](https://github.com/magento/magento2-phpstorm-plugin/pull/527)
+- Code generation of a Data Patch file with a Category EAV attribute [#569](https://github.com/magento/magento2-phpstorm-plugin/pull/569)
+- Code generation of Readme file [#1133](https://github.com/magento/magento2-phpstorm-plugin/pull/1133)
+- Code generation of GraphQl schema file [#1123](https://github.com/magento/magento2-phpstorm-plugin/pull/1123)
+- Optional generation of Readme file during the creation of a new module [#1110](https://github.com/magento/magento2-phpstorm-plugin/pull/1110)
+- Code completion for `system.xml` and `config.xml` [#1077](https://github.com/magento/magento2-phpstorm-plugin/pull/1077)
+- Added easier navigation through plugins [#1121](https://github.com/magento/magento2-phpstorm-plugin/pull/1121)
+- Added inspection to check if type attr value in the virtual type tag attribute value exists [#1176](https://github.com/magento/magento2-phpstorm-plugin/pull/1176)
+- Added checks and detailed error messages during plugin activation [#1181](https://github.com/magento/magento2-phpstorm-plugin/pull/1181)
+
+### Fixed
+
+- Fixed NullPointerException at ObserverDeclarationInspection.java:188 [#1143](https://github.com/magento/magento2-phpstorm-plugin/issues/1143)
+- Fixed IncorrectOperationException: Rebind cannot be performed for class PolyVariantReferenceBase [#1173](https://github.com/magento/magento2-phpstorm-plugin/pull/1173)
+- Fixed create an observer for an event doesn't work through the context menu [#1166](https://github.com/magento/magento2-phpstorm-plugin/pull/1166)
+- Fixed IOException: Invalid file name at ReportBuilder [#1154](https://github.com/magento/magento2-phpstorm-plugin/pull/1154)
+- Fixed IllegalArgumentException in NewModuleAction class [#1150](https://github.com/magento/magento2-phpstorm-plugin/pull/1150)
+- Fixed null data in ModuleIndex class [#1132](https://github.com/magento/magento2-phpstorm-plugin/pull/1132)
+- Fixed StringIndexOutOfBoundsException: GitHubNewIssueBodyBuilderUtil [#1130](https://github.com/magento/magento2-phpstorm-plugin/pull/1130)
+- Fixed ArrayIndexOutOfBoundsException: Index 1 out of bounds for length 0 in OverrideClassByAPreferenceDialog [#1129](https://github.com/magento/magento2-phpstorm-plugin/pull/1129)
+- Fixed PatternSyntaxException: MagentoBasePathUtil.isMagentoFolderValid:35 for Windows styled dir path separator [#1126](https://github.com/magento/magento2-phpstorm-plugin/pull/1126)
+- Fixed NullPointerException in the OverrideTemplateInThemeAction.isOverrideAllowed for virtualFile.getCanonicalPath() [#1125](https://github.com/magento/magento2-phpstorm-plugin/pull/1125)
+- Fixed IllegalArgumentException: Argument for @NotNull parameter 'dataKey' must not be null in CompareTemplateAction [#1117](https://github.com/magento/magento2-phpstorm-plugin/pull/1117)
+- Fixed argument for @NotNull parameter 'project' must not be null in the OverrideClassByAPreferenceAction [#1116](https://github.com/magento/magento2-phpstorm-plugin/pull/1116)
+- Fixed New layout action doesn't accept valid layout names [#1114](https://github.com/magento/magento2-phpstorm-plugin/pull/1114)
+
+## 4.3.1
+
+### Changed
+
+- Added raw plugin verifier configuration in [#1065](https://github.com/magento/magento2-phpstorm-plugin/pull/1065)
+
+### Fixed
+
+- Fixed bug with the file separator on Windows OS (while saving plugin settings) in [#1062](https://github.com/magento/magento2-phpstorm-plugin/pull/1062)
+- Fixed bug with wrong text range for FilePathReferenceProvider.getReferencesByElement in [#1063](https://github.com/magento/magento2-phpstorm-plugin/pull/1063)
+- Fixed module files action group is accessible from the theme context in [#1064](https://github.com/magento/magento2-phpstorm-plugin/pull/1064)
+- Fixed bug with directory index is already disposed for Project in AllFilesExceptTestsScope.contains in [#1080](https://github.com/magento/magento2-phpstorm-plugin/pull/1080)
+- Fixed bug with DumbService cannot be created because container is already disposed in MagentoComponentManager.getComponents in [#1081](https://github.com/magento/magento2-phpstorm-plugin/pull/1081)
+
 ## 4.3.0
+
+### Added
+
+- Code generation of `layout.xml` file [#1021](https://github.com/magento/magento2-phpstorm-plugin/pull/1021)
+- Code generation of `page_types.xml` file [#1003](https://github.com/magento/magento2-phpstorm-plugin/pull/1003)
+- Code generation of `crontab.xml file` [#1001](https://github.com/magento/magento2-phpstorm-plugin/pull/1001)
+- Code generation of `email_templates.xml` file [#998](https://github.com/magento/magento2-phpstorm-plugin/pull/998)
+- Code generation of `sections.xml` file [#997](https://github.com/magento/magento2-phpstorm-plugin/pull/997)
+- Code generation of `fieldset.xml` file [#996](https://github.com/magento/magento2-phpstorm-plugin/pull/996)
+- Code generation of `view.xml` file [#990](https://github.com/magento/magento2-phpstorm-plugin/pull/990)
+- Code generation of `indexer.xml` file [#988](https://github.com/magento/magento2-phpstorm-plugin/pull/988)
+- Code generation of `mview.xml` file [#987](https://github.com/magento/magento2-phpstorm-plugin/pull/987)
+- Code generation of `widget.xml` file [#983](https://github.com/magento/magento2-phpstorm-plugin/pull/983)
+- Code generation of `extension_attributes.xml` file [#982](https://github.com/magento/magento2-phpstorm-plugin/pull/982)
+- Code generation of `system.xml` file [#978](https://github.com/magento/magento2-phpstorm-plugin/pull/978)
+- Code generation of `config.xml` file [#976](https://github.com/magento/magento2-phpstorm-plugin/pull/976)
+- Code generation of `webapi.xml` file [#971](https://github.com/magento/magento2-phpstorm-plugin/pull/971)
+- Code generation of `di.xml` file [#970](https://github.com/magento/magento2-phpstorm-plugin/pull/970)
+- Code generation of `acl.xml` file [#969](https://github.com/magento/magento2-phpstorm-plugin/pull/969)
+- Code generation of `routes.xml` file [#958](https://github.com/magento/magento2-phpstorm-plugin/pull/958)
+- Images support for Copy Magento Path [#1020](https://github.com/magento/magento2-phpstorm-plugin/pull/1020)
+- Add/Replace an argument of a constructor via di.xml [#1027](https://github.com/magento/magento2-phpstorm-plugin/pull/1027)
+- Possibility to compare overridden template with the original one [#1032](https://github.com/magento/magento2-phpstorm-plugin/pull/1032)
+- Themes support of the UCT action execution [#1029](https://github.com/magento/magento2-phpstorm-plugin/pull/1029)
+- Configuration files support of the UCT action execution [#1038](https://github.com/magento/magento2-phpstorm-plugin/pull/1038)
+- Possibility to override a LESS file [#1036](https://github.com/magento/magento2-phpstorm-plugin/pull/1036)
+- Added references for the extended MFTF tests [#974](https://github.com/magento/magento2-phpstorm-plugin/pull/974)
+
+### Changed
+
+- Improved RequireJS Mapping [#1045](https://github.com/magento/magento2-phpstorm-plugin/pull/1045)
+- Improved the override a theme file feature [#1046](https://github.com/magento/magento2-phpstorm-plugin/pull/1046)
+- Improved DocBlock code generator [#1022](https://github.com/magento/magento2-phpstorm-plugin/pull/1022)
+- Added the possibility to create a plugin for a method in the parent class [#981](https://github.com/magento/magento2-phpstorm-plugin/pull/981)
+- Extended custom search scope (to exclude test files from search) with the `is integration enabled` flag [#944](https://github.com/magento/magento2-phpstorm-plugin/pull/944)
+- Extended uiComponent highlighting with the `is integration enabled` flag [#942](https://github.com/magento/magento2-phpstorm-plugin/pull/942)
+- Added "module" prefix to module name in `composer.json` [#848](https://github.com/magento/magento2-phpstorm-plugin/pull/848)
+
+### Fixed
+
+- Sort order of the context actions [#1004](https://github.com/magento/magento2-phpstorm-plugin/pull/1004)
+- Fixed the email template form title [#956](https://github.com/magento/magento2-phpstorm-plugin/pull/956)
+- Placeholders on forms [#1009](https://github.com/magento/magento2-phpstorm-plugin/pull/1009) [#1008](https://github.com/magento/magento2-phpstorm-plugin/pull/1008) [#1005](https://github.com/magento/magento2-phpstorm-plugin/pull/1005) [#962](https://github.com/magento/magento2-phpstorm-plugin/pull/962) [#938](https://github.com/magento/magento2-phpstorm-plugin/pull/938)
+- Creating new module with the package name in the valid package directory on Windows OS [#1013](https://github.com/magento/magento2-phpstorm-plugin/pull/1013)
+- Inspection titles [#1015](https://github.com/magento/magento2-phpstorm-plugin/pull/1015)
+- Fixed ArrayIndexOutOfBoundsException [#1018](https://github.com/magento/magento2-phpstorm-plugin/pull/1018)
+- Generating UI form Delete button [#1019](https://github.com/magento/magento2-phpstorm-plugin/pull/1019)
+- Removed deprecated method FilenameIndex#getVirtualFilesByName [#1037](https://github.com/magento/magento2-phpstorm-plugin/pull/1037)
+- Removed deprecated method Function#getReturnType [#1043](https://github.com/magento/magento2-phpstorm-plugin/pull/1043)
+- Issue with wrong references resolved for a class if a proxy class is generated for it [#1044](https://github.com/magento/magento2-phpstorm-plugin/pull/1044)
+- Fixed Magento installation path suggestion [#1047](https://github.com/magento/magento2-phpstorm-plugin/pull/1047)
+- Issue during composer json generation if in dependent module version tag is not specified [#972](https://github.com/magento/magento2-phpstorm-plugin/pull/972)
 
 ## 4.2.3
 

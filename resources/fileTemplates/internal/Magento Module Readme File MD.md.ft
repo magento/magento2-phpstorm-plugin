@@ -1,0 +1,3 @@
+# ${PACKAGE}_${MODULE_NAME} module
+
+#include("MD File Description.md")

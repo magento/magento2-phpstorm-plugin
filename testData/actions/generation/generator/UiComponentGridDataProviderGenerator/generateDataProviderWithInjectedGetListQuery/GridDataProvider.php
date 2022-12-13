@@ -19,12 +19,12 @@ class GridDataProvider extends DataProvider
     /**
      * @var GetListQuery
      */
-    private $getListQuery;
+    private GetListQuery $getListQuery;
 
     /**
      * @var SearchResultFactory
      */
-    private $searchResultFactory;
+    private SearchResultFactory $searchResultFactory;
 
     /**
      * @var array
@@ -74,7 +74,9 @@ class GridDataProvider extends DataProvider
     }
 
     /**
-     * @inheritDoc
+     * Returns searching result.
+     *
+     * @return SearchResultFactory
      */
     public function getSearchResult()
     {

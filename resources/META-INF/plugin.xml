@@ -7,7 +7,7 @@
 <idea-plugin require-restart="true">
     <id>com.magento.idea.magento2plugin</id>
     <name>Magento PhpStorm</name>
-    <version>4.3.0</version>
+    <version>5.0.0</version>
     <vendor url="https://github.com/magento/magento2-phpstorm-plugin">Magento Inc.</vendor>
 
     <description><![CDATA[
@@ -64,6 +64,7 @@
             <action id="MagentoCreateCrontabFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewCrontabXmlAction"/>
             <action id="MagentoCreateDiFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewDiXmlAction"/>
             <action id="MagentoCreateEmailTemplatesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewEmailTemplatesXmlAction"/>
+            <action id="MagentoCreateEventsFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewEventsXmlAction"/>
             <action id="MagentoCreateExtensionAttributesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewExtensionAttributesXmlAction"/>
             <action id="MagentoCreateFieldsetFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewFieldsetXmlAction"/>
             <action id="MagentoCreateIndexerFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewIndexerXmlAction"/>
@@ -75,6 +76,10 @@
             <action id="MagentoCreateViewFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewViewXmlAction"/>
             <action id="MagentoCreateWebapiFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewWebapiXmlAction"/>
             <action id="MagentoCreateWidgetFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewWidgetXmlAction"/>
+            <action id="MagentoCreateLayoutFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewLayoutXmlAction"/>
+            <action id="MagentoCreateReadmeFile" class="com.magento.idea.magento2plugin.actions.context.md.NewReadmeMdAction"/>
+            <action id="MagentoNewObserverFile" class="com.magento.idea.magento2plugin.actions.context.php.NewObserverAction"/>
+            <action id="MagentoNewSetupDataPatchFile" class="com.magento.idea.magento2plugin.actions.context.php.NewSetupDataPatchAction"/>
             <!-- Context dependent actions -->
             <separator/>
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml"/>
@@ -88,7 +93,6 @@
             <action id="MagentoCreateACronjob" class="com.magento.idea.magento2plugin.actions.generation.NewCronjobAction" />
             <action id="MagentoCreateACronGroup" class="com.magento.idea.magento2plugin.actions.generation.NewCronGroupAction" />
             <action id="MagentoCreateAViewModel" class="com.magento.idea.magento2plugin.actions.generation.NewViewModelAction" />
-            <action id="MagentoCreateAGraphQlResolver" class="com.magento.idea.magento2plugin.actions.generation.NewGraphQlResolverAction" />
             <action id="MagentoCreateCLICommand" class="com.magento.idea.magento2plugin.actions.generation.NewCLICommandAction" />
             <action id="MagentoCreateEmailTemplate" class="com.magento.idea.magento2plugin.actions.generation.NewEmailTemplateAction" />
             <action id="MagentoCreateUiComponentGrid" class="com.magento.idea.magento2plugin.actions.generation.NewUiComponentGridAction" />
@@ -125,13 +129,22 @@
         <action id="InjectAViewModelAction.Menu" class="com.magento.idea.magento2plugin.actions.generation.InjectAViewModelAction">
             <add-to-group group-id="EditorPopupMenu"/>
         </action>
-        <action id="OverrideInTheme.Menu" class="com.magento.idea.magento2plugin.actions.generation.OverrideInThemeAction">
+        <action id="OverrideTemplateInTheme.Menu" class="com.magento.idea.magento2plugin.actions.generation.OverrideTemplateInThemeAction">
+            <add-to-group group-id="ProjectViewPopupMenu"/>
+        </action>
+        <action id="OverrideLayoutInTheme.Menu" class="com.magento.idea.magento2plugin.actions.generation.OverrideLayoutInThemeAction">
             <add-to-group group-id="ProjectViewPopupMenu"/>
         </action>
         <action id="MagentoCreateAWebApiDeclaration.Menu" class="com.magento.idea.magento2plugin.actions.generation.NewWebApiDeclarationAction">
             <add-to-group group-id="EditorPopupMenu"/>
         </action>
         <action id="MagentoCreateAWebApiInterfaceForService.Menu" class="com.magento.idea.magento2plugin.actions.generation.NewWebApiInterfaceAction">
+            <add-to-group group-id="EditorPopupMenu"/>
+        </action>
+        <action id="MagentoInjectConstructorArgumentAction.Menu" class="com.magento.idea.magento2plugin.actions.generation.InjectConstructorArgumentAction">
+            <add-to-group group-id="EditorPopupMenu"/>
+        </action>
+        <action id="MagentoCompareTemplate.Menu" class="com.magento.idea.magento2plugin.actions.comparator.CompareTemplateAction">
             <add-to-group group-id="EditorPopupMenu"/>
         </action>
 
@@ -168,8 +181,11 @@
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.Settings"/>
         <projectService serviceImplementation="com.magento.idea.magento2uct.settings.UctSettingsService"/>
 
-        <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.completion.xml.XmlCompletionContributor" id="xml" />
-        <completion.contributor language="PHP" implementationClass="com.magento.idea.magento2plugin.completion.php.PhpCompletionContributor" id="php" />
+        <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.completion.xml.XmlCompletionContributor" id="xml"/>
+        <completion.contributor language="PHP" implementationClass="com.magento.idea.magento2plugin.completion.php.PhpCompletionContributor" id="php"/>
+
+        <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.completion.xml.SystemConfigurationContributor" id="magentoSystemConfiguration"/>
+        <xml.tagNameProvider implementation="com.magento.idea.magento2plugin.completion.provider.xml.ConfigXmlTagNameProvider"/>
 
         <psi.referenceContributor language="XML" implementation="com.magento.idea.magento2plugin.reference.xml.XmlReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.magento.idea.magento2plugin.reference.php.PhpReferenceContributor"/>
@@ -199,6 +215,9 @@
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.DeclarativeSchemaElementsIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.UIComponentIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.ProductTypeIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.SystemXmlSectionIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.SystemXmlGroupIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.SystemXmlFieldIndex" />
 
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.PluginLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.PluginTargetLineMarkerProvider"/>
@@ -276,6 +295,13 @@
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.InvalidDependencyInjectionTypeInspection"/>
 
         <localInspection language="XML" groupPath="XML"
+                         shortName="InvalidVirtualTypeSourceClassInspection"
+                         bundle="magento2.inspection" key="inspection.displayName.InvalidVirtualTypeSourceClassInspection"
+                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
+                         enabledByDefault="true" level="WARNING"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.InvalidVirtualTypeSourceClassInspection"/>
+
+        <localInspection language="XML" groupPath="XML"
                          shortName="PreferenceXmlInspections"
                          bundle="magento2.inspection" key="inspection.displayName.PreferenceXmlInspections"
                          groupBundle="magento2.inspection" groupKey="inspection.group.name"
@@ -288,6 +314,13 @@
                          groupBundle="magento2.inspection" groupKey="inspection.group.name"
                          enabledByDefault="true" level="WARNING"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.PluginAttributeTypeInspection"/>
+
+        <localInspection language="XML" groupPath="XML"
+                         shortName="ModuleScopeInspection"
+                         bundle="magento2.inspection" key="inspection.displayName.ModuleScopeInspection"
+                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
+                         enabledByDefault="true" level="WARNING"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.ModuleScopeInspection"/>
 
         <!-- UCT inspection -->
         <localInspection language="PHP" groupPath="UCT"
@@ -542,6 +575,50 @@
                          enabledByDefault="false"
                          level="WARNING"
                          implementationClass="com.magento.idea.magento2uct.inspections.php.api.CalledNonInterfaceMethod"/>
+
+        <localInspection language="XML" groupPath="UCT"
+                         shortName="UsedDeprecatedTypeInConfig"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsedDeprecatedTypeInConfig"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.deprecation.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.xml.UsedDeprecatedTypeInConfig"/>
+        <localInspection language="XML" groupPath="UCT"
+                         shortName="UsedDeprecatedConstantInConfig"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsedDeprecatedConstantInConfig"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.deprecation.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.xml.UsedDeprecatedConstantInConfig"/>
+        <localInspection language="XML" groupPath="UCT"
+                         shortName="UsedDeprecatedMethodInConfig"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsedDeprecatedMethodInConfig"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.deprecation.group.name"
+                         enabledByDefault="false"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2uct.inspections.xml.UsedDeprecatedMethodInConfig"/>
+
+        <localInspection language="XML" groupPath="UCT"
+                         shortName="UsedNonExistentTypeInConfig"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsedNonExistentTypeInConfig"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.existence.group.name"
+                         enabledByDefault="false"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2uct.inspections.xml.UsedNonExistentTypeInConfig"/>
+        <localInspection language="XML" groupPath="UCT"
+                         shortName="UsedNonExistentConstantInConfig"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsedNonExistentConstantInConfig"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.existence.group.name"
+                         enabledByDefault="false"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2uct.inspections.xml.UsedNonExistentConstantInConfig"/>
+        <localInspection language="XML" groupPath="UCT"
+                         shortName="UsedNonExistentMethodInConfig"
+                         bundle="uct.bundle.inspection" key="inspection.displayName.UsedNonExistentMethodInConfig"
+                         groupBundle="uct.bundle.inspection" groupKey="inspection.existence.group.name"
+                         enabledByDefault="false"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2uct.inspections.xml.UsedNonExistentMethodInConfig"/>
         <!-- \UCT inspection -->
 
         <internalFileTemplate name="Magento Composer JSON"/>
@@ -552,7 +629,6 @@
         <internalFileTemplate name="Magento Regular Class"/>
         <internalFileTemplate name="Magento Observer Class"/>
         <internalFileTemplate name="Magento Events XML"/>
-        <internalFileTemplate name="Magento GraphQL Resolver Class"/>
         <internalFileTemplate name="Magento Cron Job Class"/>
         <internalFileTemplate name="Magento Cron Tab XML"/>
         <internalFileTemplate name="Magento CLI Command Class"/>
@@ -597,6 +673,7 @@
         <internalFileTemplate name="Magento Sections XML"/>
         <internalFileTemplate name="Magento Module Email Templates Xml"/>
         <internalFileTemplate name="Magento Page Types XML"/>
+        <internalFileTemplate name="Magento Module Readme File MD"/>
 
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
 
@@ -616,5 +693,7 @@
         <frameworkProjectConfigurableProvider implementation="com.magento.idea.magento2plugin.project.ConfigurableProvider"/>
         <frameworkUsageProvider implementation="com.magento.idea.magento2plugin.project.UsagesProvider"/>
         <libraryRoot id="phpstorm.meta.php" path="/.phpstorm.meta.php/" runtime="false"/>
+
+        <referenceResolver2 implementation="com.magento.idea.magento2plugin.lang.php.MagentoProxyDeclarationFilter" order="first"/>
     </extensions>
 </idea-plugin>

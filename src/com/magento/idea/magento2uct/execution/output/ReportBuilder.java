@@ -41,7 +41,7 @@ public class ReportBuilder {
     private final Project project;
     private final Report report;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(
-            "dd_MMM_yyyy_HH:mm:ss",
+            "dd-MMM-yyyy-HH-mm-ss",
             Locale.US
     );
 
@@ -163,6 +163,7 @@ public class ReportBuilder {
                     + "installedVersion\": \"" + summary.getInstalledVersion() + "\","
                     + "\"AdobeCommerceVersion\": \"" + summary.getTargetVersion() + "\","
                     + "\"checkedModules\": " + summary.getProcessedModules() + ","
+                    + "\"checkedThemes\": " + summary.getProcessedThemes() + ","
                     + "\"runningTime\": \"" + summary.getProcessRunningTime() + "\","
                     + "\"totalWarnings\": " + summary.getPhpWarnings() + ","
                     + "\"totalErrors\": " + summary.getPhpErrors() + ","

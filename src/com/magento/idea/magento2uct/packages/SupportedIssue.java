@@ -7,6 +7,8 @@ package com.magento.idea.magento2uct.packages;
 
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.xml.XmlFile;
+import com.jetbrains.php.lang.psi.PhpFile;
 import com.magento.idea.magento2uct.bundles.UctInspectionBundle;
 import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.api.CalledNonApiMethod;
@@ -45,7 +47,14 @@ import com.magento.idea.magento2uct.inspections.php.existence.OverriddenNonExist
 import com.magento.idea.magento2uct.inspections.php.existence.UsedNonExistentConstant;
 import com.magento.idea.magento2uct.inspections.php.existence.UsedNonExistentProperty;
 import com.magento.idea.magento2uct.inspections.php.existence.UsedNonExistentType;
+import com.magento.idea.magento2uct.inspections.xml.UsedDeprecatedConstantInConfig;
+import com.magento.idea.magento2uct.inspections.xml.UsedDeprecatedMethodInConfig;
+import com.magento.idea.magento2uct.inspections.xml.UsedDeprecatedTypeInConfig;
+import com.magento.idea.magento2uct.inspections.xml.UsedNonExistentConstantInConfig;
+import com.magento.idea.magento2uct.inspections.xml.UsedNonExistentMethodInConfig;
+import com.magento.idea.magento2uct.inspections.xml.UsedNonExistentTypeInConfig;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
@@ -268,6 +277,42 @@ public enum SupportedIssue {
             IssueSeverityLevel.ERROR,
             "customCode.errors.api.1449",
             CalledNonInterfaceMethod.class
+    ),
+    USED_NON_EXISTENT_TYPE_IN_CONFIG(
+            1110,
+            IssueSeverityLevel.CRITICAL,
+            "customCode.critical.existence.1110",
+            UsedNonExistentTypeInConfig.class
+    ),
+    USED_DEPRECATED_TYPE_IN_CONFIG(
+            1134,
+            IssueSeverityLevel.WARNING,
+            "customCode.warnings.deprecated.1134",
+            UsedDeprecatedTypeInConfig.class
+    ),
+    USED_DEPRECATED_CONSTANT_IN_CONFIG(
+            1234,
+            IssueSeverityLevel.WARNING,
+            "customCode.warnings.deprecated.1234",
+            UsedDeprecatedConstantInConfig.class
+    ),
+    USED_DEPRECATED_METHOD_IN_CONFIG(
+            1439,
+            IssueSeverityLevel.WARNING,
+            "customCode.warnings.deprecated.1439",
+            UsedDeprecatedMethodInConfig.class
+    ),
+    USED_NON_EXISTENT_CONSTANT_IN_CONFIG(
+            1214,
+            IssueSeverityLevel.WARNING,
+            "customCode.critical.existence.1214",
+            UsedNonExistentConstantInConfig.class
+    ),
+    USED_NON_EXISTENT_METHOD_IN_CONFIG(
+            1410,
+            IssueSeverityLevel.WARNING,
+            "customCode.critical.existence.1410",
+            UsedNonExistentMethodInConfig.class
     );
 
     private final int code;
@@ -375,6 +420,19 @@ public enum SupportedIssue {
         }
 
         return visitors;
+    }
+
+    /**
+     * Get supported file types.
+     *
+     * @return List
+     */
+    public static List<Class<?>> getSupportedFileTypes() {
+        final List<Class<?>> types = new ArrayList<>();
+        types.add(PhpFile.class);
+        types.add(XmlFile.class);
+
+        return types;
     }
 
     /**

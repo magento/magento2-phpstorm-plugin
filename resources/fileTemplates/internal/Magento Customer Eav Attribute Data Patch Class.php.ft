@@ -12,31 +12,31 @@ use $use;
 class ${CLASS_NAME} implements ${IMPLEMENTS}
 {
     /**
-     * @var ${MODULE_DATA_SETUP_INTERFACE}
-     */
-     private $moduleDataSetup;
-
-     /**
-     * @var ${EAV_SETUP_FACTORY}
-     */
-    private $eavSetupFactory;
+    * @var ${MODULE_DATA_SETUP_INTERFACE}
+    */
+    private ${MODULE_DATA_SETUP_INTERFACE} $moduleDataSetup;
 
     /**
-     * @var ${EAV_CONFIG_CLASS}
-     */
-    private $eavConfig;
+    * @var ${EAV_SETUP_FACTORY}
+    */
+    private ${EAV_SETUP_FACTORY} $eavSetupFactory;
 
     /**
-     * @var ${ATTRIBUTE_RESOURCE}
-     */
-    private $attributeResource;
+    * @var ${EAV_CONFIG_CLASS}
+    */
+    private ${EAV_CONFIG_CLASS} $eavConfig;
 
-     /**
-     * @param ${MODULE_DATA_SETUP_INTERFACE} $moduleDataSetup
-     * @param ${EAV_SETUP_FACTORY} $eavSetupFactory
-     * @param ${EAV_CONFIG_CLASS} $eavConfig
-     * @param ${ATTRIBUTE_RESOURCE} $attributeResource
-     */
+    /**
+    * @var ${ATTRIBUTE_RESOURCE}
+    */
+    private ${ATTRIBUTE_RESOURCE} $attributeResource;
+
+    /**
+    * @param ${MODULE_DATA_SETUP_INTERFACE} $moduleDataSetup
+    * @param ${EAV_SETUP_FACTORY} $eavSetupFactory
+    * @param ${EAV_CONFIG_CLASS} $eavConfig
+    * @param ${ATTRIBUTE_RESOURCE} $attributeResource
+    */
     public function __construct(
         ${MODULE_DATA_SETUP_INTERFACE} $moduleDataSetup,
         ${EAV_SETUP_FACTORY} $eavSetupFactory,
@@ -77,7 +77,7 @@ class ${CLASS_NAME} implements ${IMPLEMENTS}
         $eavSetup->addAttributeToSet(
                 ${CUSTOMER_METADATA_INTERFACE}::ENTITY_TYPE_CUSTOMER,
                 ${CUSTOMER_METADATA_INTERFACE}::ATTRIBUTE_SET_ID_CUSTOMER,
-                null,
+                'Default',
                 '${ATTRIBUTE_CODE}'
         );
 

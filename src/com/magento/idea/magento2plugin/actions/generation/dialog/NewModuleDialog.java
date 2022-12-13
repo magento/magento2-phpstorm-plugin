@@ -6,10 +6,12 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog;//NOPMD
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.NewModuleAction;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleComposerJsonData;
+import com.magento.idea.magento2plugin.actions.generation.data.ModuleReadmeMdData;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleRegistrationPhpData;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleXmlData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
@@ -18,14 +20,15 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.StartWithNumberOrCapitalLetterRule;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleComposerJsonGenerator;
+import com.magento.idea.magento2plugin.actions.generation.generator.ModuleReadmeMdGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleRegistrationPhpGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleXmlGenerator;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.ComposerJson;
 import com.magento.idea.magento2plugin.magento.packages.Licenses;
-import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.CamelCaseToHyphen;
+import com.magento.idea.magento2plugin.util.magento.MagentoBasePathUtil;
 import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -34,6 +37,7 @@ import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -100,6 +104,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
 
     private JButton buttonOK;
     private JButton buttonCancel;
+    private JCheckBox moduleReadmeMdCheckbox;
 
     @NotNull
     private final Project project;
@@ -128,7 +133,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         detectPackageName(initialBaseDir);
         setContentPane(contentPane);
         setModal(true);
-        setTitle(NewModuleAction.actionDescription);
+        setTitle(NewModuleAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
         setLicenses();
         setModuleDependencies();
@@ -163,8 +168,9 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     }
 
     private void detectPackageName(final @NotNull PsiDirectory initialBaseDir) {
-        final PsiDirectory parentDir = initialBaseDir.getParent();
-        if (parentDir != null && parentDir.toString().endsWith(Package.packagesRoot)) {
+        final VirtualFile initialBaseDirVf = initialBaseDir.getVirtualFile();
+
+        if (MagentoBasePathUtil.isCustomVendorDirValid(initialBaseDirVf.getPath())) {
             packageName.setVisible(false);
             packageNameLabel.setVisible(false);
             this.detectedPackageName = initialBaseDir.getName();
@@ -189,6 +195,11 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         if (registrationPhp == null) {
             return;
         }
+
+        if (isCreateModuleReadme()) {
+            generateReadmeMd();
+        }
+
         generateModuleXml();
     }
 
@@ -203,7 +214,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
                 getModuleLicense(),
                 getModuleDependencies(),
                 true
-        ), project).generate(NewModuleAction.actionName);
+        ), project).generate(NewModuleAction.ACTION_NAME);
     }
 
     private PsiFile generateRegistrationPhp() {
@@ -212,7 +223,7 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
                     getModuleName(),
                     getBaseDir(),
                     true
-            ), project).generate(NewModuleAction.actionName);
+            ), project).generate(NewModuleAction.ACTION_NAME);
     }
 
     private void generateModuleXml() {
@@ -223,7 +234,15 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
                 getBaseDir(),
                 getModuleDependencies(),
                 true
-        ), project).generate(NewModuleAction.actionName, true);
+        ), project).generate(NewModuleAction.ACTION_NAME, true);
+    }
+
+    private void generateReadmeMd() {
+        new ModuleReadmeMdGenerator(new ModuleReadmeMdData(
+                getPackageName(),
+                getModuleName(),
+                getBaseDir()
+        ), project).generate(NewModuleAction.ACTION_NAME);
     }
 
     private PsiDirectory getBaseDir() {
@@ -315,6 +334,15 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
 
     public List<String> getModuleDependencies() {
         return moduleDependencies.getSelectedValuesList();
+    }
+
+    /**
+     * Getter for Module Readme Md Checkbox.
+     *
+     * @return Boolean
+     */
+    public Boolean isCreateModuleReadme() {
+        return this.moduleReadmeMdCheckbox.isSelected();
     }
 
     /**

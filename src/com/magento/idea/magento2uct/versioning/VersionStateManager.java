@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
 public final class VersionStateManager {
 
     private static VersionStateManager instance;
@@ -35,7 +36,6 @@ public final class VersionStateManager {
      *
      * @return VersionStateManager
      */
-    @SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
     public static synchronized VersionStateManager getInstance(
             final @NotNull Project project
     ) { //NOPMD
@@ -50,6 +50,17 @@ public final class VersionStateManager {
         }
 
         return instance;
+    }
+
+    /**
+     * Checks if specified FQN was/is in the MBE/VBE.
+     *
+     * @param fqn String
+     *
+     * @return boolean
+     */
+    public synchronized boolean isPresentInCodebase(final @NotNull String fqn) {
+        return existenceStateIndex.isPresentInCodebase(escapeFqn(fqn));
     }
 
     /**
@@ -215,6 +226,9 @@ public final class VersionStateManager {
      * @return String
      */
     private String escapeFqn(final @NotNull String fqn) {
-        return MagentoTypeEscapeUtil.escape(fqn);
+        return MagentoTypeEscapeUtil.escape(
+                !fqn.trim().isEmpty() && fqn.trim().charAt(0)
+                        == '\\' ? fqn.trim() : '\\' + fqn.trim()
+        );
     }
 }
