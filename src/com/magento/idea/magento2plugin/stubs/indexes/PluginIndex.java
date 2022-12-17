@@ -103,10 +103,10 @@ public class PluginIndex extends FileBasedIndexExtension<String, Set<PluginData>
                         final PluginData pluginData = getPluginDataObject(pluginType,  Integer.parseInt(pluginSortOrder));
                         try {
                             phpIndex.getAnyByFQN(pluginData.getType());
+                            results.add(pluginData);
                         } catch (Throwable exception) { //NOPMD
                             //do nothing
                         }
-                        results.add(pluginData);
                     }
                 }
 
