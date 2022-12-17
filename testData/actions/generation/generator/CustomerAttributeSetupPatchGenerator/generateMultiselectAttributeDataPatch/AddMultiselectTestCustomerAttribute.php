@@ -16,22 +16,22 @@ class AddMultiselectTestCustomerAttribute implements DataPatchInterface
     /**
      * @var ModuleDataSetupInterface
      */
-    private $moduleDataSetup;
+    private ModuleDataSetupInterface $moduleDataSetup;
 
     /**
      * @var EavSetupFactory
      */
-    private $eavSetupFactory;
+    private EavSetupFactory $eavSetupFactory;
 
     /**
      * @var Config
      */
-    private $eavConfig;
+    private Config $eavConfig;
 
     /**
      * @var Attribute
      */
-    private $attributeResource;
+    private Attribute $attributeResource;
 
     /**
      * @param ModuleDataSetupInterface $moduleDataSetup

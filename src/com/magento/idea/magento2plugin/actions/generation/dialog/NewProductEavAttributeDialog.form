@@ -47,7 +47,9 @@
                 <preferred-size width="150" height="-1"/>
               </grid>
             </constraints>
-            <properties/>
+            <properties>
+              <text value="Product Details"/>
+            </properties>
           </component>
           <component id="20b6c" class="javax.swing.JLabel">
             <constraints>
