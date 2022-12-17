@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 5.0.1
 
+### Fixed
+
+- Throwable: Stub index points to a file without PSI [#1232](https://github.com/magento/magento2-phpstorm-plugin/pull/1232)
+
 ## 5.0.0
 
 ### Added
