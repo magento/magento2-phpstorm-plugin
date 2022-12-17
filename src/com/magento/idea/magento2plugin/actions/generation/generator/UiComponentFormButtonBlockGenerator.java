@@ -208,7 +208,7 @@ public class UiComponentFormButtonBlockGenerator extends FileGenerator {
         attributes.setProperty("SORT_ORDER", String.valueOf(buttonTypeSettings.getSortOrder()));
         attributes.setProperty("ENTITY_NAME", Strings.toLowerCase(entityName));
         attributes.setProperty("ENTITY_ID", entityIdField);
-        if (buttonData.getButtonClassName().equals(FormButtonBlockFile.TYPE_DELETE)) {
+        if (buttonData.getButtonType().equals(FormButtonBlockFile.TYPE_DELETE)) {
             attributes.setProperty("GET_ID", entityIdAccessor);
         }
 
