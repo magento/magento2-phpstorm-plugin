@@ -98,7 +98,7 @@ public class PluginIndex extends FileBasedIndexExtension<String, Set<PluginData>
                     final String pluginType = pluginTag.getAttributeValue(ModuleDiXml.TYPE_ATTR);
                     String pluginSortOrder = pluginTag.getAttributeValue(ModuleDiXml.SORT_ORDER_ATTR);
 
-                    if (pluginType != null) {
+                    if (pluginType != null && !pluginType.isEmpty()) {
                         pluginSortOrder = pluginSortOrder == null ? "0" : pluginSortOrder;
                         final PluginData pluginData = getPluginDataObject(pluginType,  Integer.parseInt(pluginSortOrder));
                         try {
