@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 ### Fixed
 
 - Throwable: Stub index points to a file without PSI [#1232](https://github.com/magento/magento2-phpstorm-plugin/pull/1232)
+- Create an entity - delete button is displayed in a new entity form [#1268](https://github.com/magento/magento2-phpstorm-plugin/pull/1268)
 
 ## 5.0.0
 
