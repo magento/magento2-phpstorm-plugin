@@ -143,7 +143,7 @@ public class InjectAViewModelDialog extends AbstractDialog {
         }
 
         if (targetBlockTag.getContainingFile() == null
-            || targetBlockTag.getContainingFile().getParent() == null) {
+                || targetBlockTag.getContainingFile().getParent() == null) {
             return;
         }
 
