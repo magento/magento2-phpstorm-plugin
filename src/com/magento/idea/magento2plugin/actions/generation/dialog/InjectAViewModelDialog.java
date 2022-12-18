@@ -142,14 +142,15 @@ public class InjectAViewModelDialog extends AbstractDialog {
             return;
         }
 
-        if (targetBlockTag.getContainingFile() == null || targetBlockTag.getContainingFile().getParent() == null) {
-                return;
+        if (targetBlockTag.getContainingFile() == null
+            || targetBlockTag.getContainingFile().getParent() == null) {
+            return;
         }
+
         final String moduleName = GetModuleNameByDirectoryUtil.execute(
                 targetBlockTag.getContainingFile().getParent(),
                 project
         );
-
         final NamespaceBuilder namespaceBuilder = new NamespaceBuilder(
                 moduleName,
                 getViewModelClassName(),
