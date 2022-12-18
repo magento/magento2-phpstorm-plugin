@@ -144,12 +144,11 @@ public class InjectAViewModelDialog extends AbstractDialog {
 
         if (targetBlockTag.getContainingFile() == null || targetBlockTag.getContainingFile().getParent() == null) {
                 return;
-        } else {
-        final String moduleName = GetModuleNameByDirectoryUtil.execute(
-                    targetBlockTag.getContainingFile().getParent(),
-                    project
-            );
         }
+        final String moduleName = GetModuleNameByDirectoryUtil.execute(
+                targetBlockTag.getContainingFile().getParent(),
+                project
+        );
 
         final NamespaceBuilder namespaceBuilder = new NamespaceBuilder(
                 moduleName,
