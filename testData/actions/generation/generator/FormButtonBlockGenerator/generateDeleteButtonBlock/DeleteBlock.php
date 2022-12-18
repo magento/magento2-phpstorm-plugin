@@ -17,6 +17,10 @@ class DeleteBlock extends GenericButton implements ButtonProviderInterface
      */
     public function getButtonData(): array
     {
+        if (!$this->getBookId()) {
+            return [];
+        }
+
         return $this->wrapButtonSettings(
             'Delete',
             'delete',
