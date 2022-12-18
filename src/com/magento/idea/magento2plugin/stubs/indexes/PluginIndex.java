@@ -19,6 +19,7 @@ import com.intellij.util.indexing.ID;
 import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
+import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.PhpLangUtil;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.project.Settings;
@@ -90,16 +91,22 @@ public class PluginIndex extends FileBasedIndexExtension<String, Set<PluginData>
 
             @SuppressWarnings("checkstyle:LineLength")
             private Set<PluginData> getPluginsForType(final XmlTag typeNode) {
+                final PhpIndex phpIndex = PhpIndex.getInstance(typeNode.getProject());
                 final Set<PluginData> results = new HashSet<>();
 
                 for (final XmlTag pluginTag: typeNode.findSubTags(ModuleDiXml.PLUGIN_TAG_NAME)) {
                     final String pluginType = pluginTag.getAttributeValue(ModuleDiXml.TYPE_ATTR);
                     String pluginSortOrder = pluginTag.getAttributeValue(ModuleDiXml.SORT_ORDER_ATTR);
 
-                    if (pluginType != null) {
+                    if (pluginType != null && !pluginType.isEmpty()) {
                         pluginSortOrder = pluginSortOrder == null ? "0" : pluginSortOrder;
                         final PluginData pluginData = getPluginDataObject(pluginType,  Integer.parseInt(pluginSortOrder));
-                        results.add(pluginData);
+                        try {
+                            phpIndex.getAnyByFQN(pluginData.getType());
+                            results.add(pluginData);
+                        } catch (Throwable exception) { //NOPMD
+                            //do nothing
+                        }
                     }
                 }
 

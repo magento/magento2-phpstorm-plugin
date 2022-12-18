@@ -15,7 +15,7 @@ class ${NAME}#if (${EXTENDS}) extends ${EXTENDS}#end#if (${IMPLEMENTS}) implemen
     /**
      * Authorization level of a basic admin session
      */
-    const ADMIN_RESOURCE = '${ACL}';
+    public const ADMIN_RESOURCE = '${ACL}';
 
 #end
     /**

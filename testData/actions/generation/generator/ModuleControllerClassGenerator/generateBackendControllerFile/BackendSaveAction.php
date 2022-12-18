@@ -13,7 +13,7 @@ class BackendSaveAction extends Action implements HttpPostActionInterface
     /**
      * Authorization level of a basic admin session
      */
-    const ADMIN_RESOURCE = 'Foo_Bar::entity';
+    public const ADMIN_RESOURCE = 'Foo_Bar::entity';
 
     /**
      * Execute action based on request and return result

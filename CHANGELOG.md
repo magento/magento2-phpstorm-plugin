@@ -4,12 +4,33 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
-## 4.4.1
+## 5.0.1
+
+### Fixed
+
+- Throwable: Stub index points to a file without PSI [#1232](https://github.com/magento/magento2-phpstorm-plugin/pull/1232)
+- Create an entity - delete button is displayed in a new entity form [#1268](https://github.com/magento/magento2-phpstorm-plugin/pull/1268)
+
+## 5.0.0
+
+### Added
+
+- Code generation of a Data Patch Boilerplate file [#1188](https://github.com/magento/magento2-phpstorm-plugin/pull/1188)
+- Code generation of an Observer from the context menu [#1200](https://github.com/magento/magento2-phpstorm-plugin/pull/1200)
+- Code generation of events.xml file [#1189](https://github.com/magento/magento2-phpstorm-plugin/pull/1189)
+- Config Scope directory inspection [#1261](https://github.com/magento/magento2-phpstorm-plugin/pull/1261)
+
+### Changed
+
+- EAV attributes code generators: Added default values of the group property [#1259](https://github.com/magento/magento2-phpstorm-plugin/pull/1259)
+- All code generators: Added constants visibility and class property types [#1260](https://github.com/magento/magento2-phpstorm-plugin/pull/1260)
+- UCT custom coming versions [#1251](https://github.com/magento/magento2-phpstorm-plugin/pull/1251)
 
 ### Fixed
 
 - Fixed wrong director(y|ies) generation for GraphQL resolver class [#1192](https://github.com/magento/magento2-phpstorm-plugin/pull/1192)
 - Fixed IndexOutOfBoundsException: CreateResolverClassQuickFix.applyFix(CreateResolverClassQuickFix.java:43) [#1192](https://github.com/magento/magento2-phpstorm-plugin/pull/1192)
+- Index out of range [#1239](https://github.com/magento/magento2-phpstorm-plugin/pull/1239)
 
 ## 4.4.0
 

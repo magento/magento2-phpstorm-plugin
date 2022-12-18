@@ -18,22 +18,22 @@ class ${CLASS_NAME} extends ${EXTENDS} implements ${IMPLEMENTS}
      *
      * @see _isAllowed()
      */
-    const ADMIN_RESOURCE = '${ADMIN_RESOURCE}';
+    public const ADMIN_RESOURCE = '${ADMIN_RESOURCE}';
 
      /**
      * @var ${DATA_PERSISTOR}
      */
-    private $dataPersistor;
+    private ${DATA_PERSISTOR} $dataPersistor;
 
     /**
      * @var ${SAVE_COMMAND}
      */
-    private $saveCommand;
+    private ${SAVE_COMMAND} $saveCommand;
 
     /**
      * @var ${ENTITY_DTO_FACTORY}
      */
-    private $entityDataFactory;
+    private ${ENTITY_DTO_FACTORY} $entityDataFactory;
 
     /**
      * @param Context $context
