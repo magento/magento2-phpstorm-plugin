@@ -16,7 +16,7 @@ class ${CLASS_NAME} extends ${PARENT_CLASS_NAME} implements ${HTTP_GET_METHOD}
     /**
      * Authorization level of a basic admin session.
      */
-    const ADMIN_RESOURCE = '${ACL}';
+    public const ADMIN_RESOURCE = '${ACL}';
 
     /**
      * Execute action based on request and return result.

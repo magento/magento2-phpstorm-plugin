@@ -16,7 +16,7 @@ interface ${NAME}
             #set ($propertyData = $property.split(";"))
             #set ($propertyUpperSnake = $propertyData.get(0))
             #set ($propertyLowerSnake = $propertyData.get(1))
-            const $propertyUpperSnake = "$propertyLowerSnake";
+            public const $propertyUpperSnake = "$propertyLowerSnake";
         #end
     #end
     #if (${PROPERTIES})

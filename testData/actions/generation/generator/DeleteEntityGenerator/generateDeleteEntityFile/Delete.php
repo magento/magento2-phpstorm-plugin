@@ -23,12 +23,12 @@ class Delete extends Action implements HttpPostActionInterface, HttpGetActionInt
      *
      * @see _isAllowed()
      */
-    const ADMIN_RESOURCE = 'Foo_Bar::company_id';
+    public const ADMIN_RESOURCE = 'Foo_Bar::company_id';
 
     /**
      * @var DeleteByIdCommand
      */
-    private $deleteByIdCommand;
+    private DeleteByIdCommand $deleteByIdCommand;
 
     /**
      * @param Context $context

@@ -14,12 +14,12 @@ class GenericButton
     /**
      * @var Context
      */
-    private $context;
+    private Context $context;
 
     /**
      * @var UrlInterface
      */
-    private $urlBuilder;
+    private UrlInterface $urlBuilder;
 
     /**
      * @param Context $context

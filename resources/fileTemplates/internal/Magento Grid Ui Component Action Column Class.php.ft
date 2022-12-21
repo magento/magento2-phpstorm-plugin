@@ -27,7 +27,7 @@ class ${CLASS_NAME} extends ${PARENT_CLASS}
     /**
      * @var ${URL}
      */
-    private $urlBuilder;
+    private ${URL} $urlBuilder;
 
     /**
      * @param ${CONTEXT} $context
