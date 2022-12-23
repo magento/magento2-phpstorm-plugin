@@ -22,7 +22,7 @@ public class DeleteEntityGeneratorTest extends BaseGeneratorTestCase {
             "/src/app/code/Foo/Bar/Controller/Adminhtml/" + ENTITY_NAME;
 
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         super.setUp();
         final EntityCreatorContext context = new EntityCreatorContext();
         context.putUserData(EntityCreatorContext.DTO_TYPE, ENTITY_DTO_TYPE);

@@ -4,10 +4,10 @@
  */
 
 plugins {
-    id 'org.jetbrains.intellij' version '1.5.2'
+    id 'org.jetbrains.intellij' version '1.11.0'
     id 'checkstyle'
     id 'pmd'
-    id 'org.jetbrains.changelog' version '1.2.1'
+    id 'org.jetbrains.changelog' version '2.0.0'
 }
 
 repositories {
@@ -105,12 +105,26 @@ idea {
 }
 
 dependencies {
-    testImplementation 'junit:junit:4.13'
-    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+    implementation(
+            "org.junit.jupiter:junit-jupiter:5.8.2",
+            "com.googlecode.json-simple:json-simple:1.1.1"
+    )
+    testRuntimeOnly('org.junit.vintage:junit-vintage-engine:5.9.0')
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.9.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.00")
 }
 
 test {
-    useJUnit()
-
+    useJUnitPlatform {
+        includeEngines("junit-vintage")
+    }
+    dependsOn cleanTest
+    testLogging.showStandardStreams = true
+    testLogging {
+        lifecycle {
+            events "skipped", "failed", "standard_error", "standard_out"
+            exceptionFormat "short"
+        }
+    }
     maxHeapSize = '1G'
 }
