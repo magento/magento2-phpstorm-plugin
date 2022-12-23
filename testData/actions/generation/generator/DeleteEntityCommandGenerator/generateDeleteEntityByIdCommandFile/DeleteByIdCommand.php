@@ -19,17 +19,17 @@ class DeleteByIdCommand
     /**
      * @var LoggerInterface
      */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @var BookModelFactory
      */
-    private $modelFactory;
+    private BookModelFactory $modelFactory;
 
     /**
      * @var BookResource
      */
-    private $resource;
+    private BookResource $resource;
 
     /**
      * @param LoggerInterface $logger

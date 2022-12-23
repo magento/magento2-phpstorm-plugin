@@ -15,20 +15,21 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class MagentoTemplatesFactory extends ProjectTemplatesFactory {
-    public MagentoTemplatesFactory() {
-    }
 
     @NotNull
     public String[] getGroups() {
         return new String[]{PhpEmptyProjectGenerator.PHP_PROJECT_TEMPLATE_GROUP};
     }
 
-    public Icon getGroupIcon(String group) {
+    public Icon getGroupIcon(final String group) {
         return PhpIcons.PhpIcon;
     }
 
     @NotNull
-    public ProjectTemplate[] createTemplates(@Nullable String group, WizardContext context) {
+    public ProjectTemplate[] createTemplates(
+            final @Nullable String group,
+            final WizardContext context
+    ) {
         return new ProjectTemplate[]{new MagentoModuleGenerator()};
     }
 }

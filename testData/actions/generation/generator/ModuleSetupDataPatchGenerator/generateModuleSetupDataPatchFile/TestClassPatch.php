@@ -13,7 +13,7 @@ class TestClassPatch implements DataPatchInterface
     /**
      * @var ModuleDataSetupInterface
      */
-    private $moduleDataSetup;
+    private ModuleDataSetupInterface $moduleDataSetup;
 
     /**
      * @param ModuleDataSetupInterface $moduleDataSetup
