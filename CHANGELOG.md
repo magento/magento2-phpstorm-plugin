@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Create an entity - The translation function is not call on the buttons label [#1273](https://github.com/magento/magento2-phpstorm-plugin/pull/1273)
 - Covered possible NullPointerException in InjectAViewModelDialog.java [#1213](https://github.com/magento/magento2-phpstorm-plugin/pull/1213)
 - AWT events are not allowed inside write action [#1271](https://github.com/magento/magento2-phpstorm-plugin/pull/1271)
+- MapReduceIndexMappingException: java.lang.NumberFormatException: For input string: "" [#1235](https://github.com/magento/magento2-phpstorm-plugin/pull/1235)
 
 ## 5.0.0
 
