@@ -64,7 +64,6 @@ public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
 
     @Override
     public PsiFile generate(final String actionName) {
-        final PsiFile[] graphQlFile = {null};
 
         final PhpClass[] graphQlResolverClass = {GetPhpClassByFQN.getInstance(project)
                 .execute(graphQlResolverFileData.getGraphQlResolverClassFqn())};
@@ -90,6 +89,7 @@ public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
             return null;
         }
 
+        final PsiFile[] graphQlFile = {null};
         WriteCommandAction.runWriteCommandAction(project, () -> {
             final Properties attributes = new Properties();
             final String methodTemplate = PhpCodeUtil.getCodeTemplate(
