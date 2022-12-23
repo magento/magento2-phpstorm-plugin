@@ -65,34 +65,37 @@ public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
     @Override
     public PsiFile generate(final String actionName) {
         final PsiFile[] graphQlFile = {null};
+
+        final PhpClass[] graphQlResolverClass = {GetPhpClassByFQN.getInstance(project)
+                .execute(graphQlResolverFileData.getGraphQlResolverClassFqn())};
+
+        if (graphQlResolverClass[0] == null) {
+            WriteCommandAction.runWriteCommandAction(project, () -> {
+                graphQlResolverClass[0] = createGraphQlResolverClass(actionName);
+            });
+        }
+
+        if (graphQlResolverClass[0] == null) {
+            final String errorMessage = validatorBundle.message(
+                    "validator.file.cantBeCreated",
+                    "GraphQL Resolver Class"
+            );
+            JOptionPane.showMessageDialog(
+                    null,
+                    errorMessage,
+                    commonBundle.message("common.error"),
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            return null;
+        }
+
         WriteCommandAction.runWriteCommandAction(project, () -> {
-            PhpClass graphQlResolverClass = GetPhpClassByFQN.getInstance(project)
-                    .execute(graphQlResolverFileData.getGraphQlResolverClassFqn());
-
-            if (graphQlResolverClass == null) {
-                graphQlResolverClass = createGraphQlResolverClass(actionName);
-            }
-
-            if (graphQlResolverClass == null) {
-                final String errorMessage = validatorBundle.message(
-                        "validator.file.cantBeCreated",
-                        "GraphQL Resolver Class"
-                );
-                JOptionPane.showMessageDialog(
-                        null,
-                        errorMessage,
-                        commonBundle.message("common.error"),
-                        JOptionPane.ERROR_MESSAGE
-                );
-
-                return;
-            }
-
             final Properties attributes = new Properties();
             final String methodTemplate = PhpCodeUtil.getCodeTemplate(
                     GraphQlResolverPhp.GRAPHQL_RESOLVER_TEMPLATE_NAME, attributes, project);
 
-            graphQlFile[0] = graphQlResolverClass.getContainingFile();
+            graphQlFile[0] = graphQlResolverClass[0].getContainingFile();
             final CodeStyleSettings codeStyleSettings = new CodeStyleSettings(
                     (PhpFile) graphQlFile[0]
             );
@@ -100,13 +103,14 @@ public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
 
             final PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(project);
             final Document document = psiDocumentManager.getDocument(graphQlFile[0]);
-            final int insertPos = getInsertPos(graphQlResolverClass);
+            final int insertPos = getInsertPos(graphQlResolverClass[0]);
             document.insertString(insertPos, methodTemplate);
             final int endPos = insertPos + methodTemplate.length() + 1;
             CodeStyleManager.getInstance(project).reformatText(graphQlFile[0], insertPos, endPos);
             psiDocumentManager.commitDocument(document);
             codeStyleSettings.restore();
         });
+
         return graphQlFile[0];
     }
 
@@ -116,7 +120,7 @@ public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
                 graphQlResolverClass,
                 LeafPsiElement.class
         );
-        for (final LeafPsiElement leafPsiElement: leafElements) {
+        for (final LeafPsiElement leafPsiElement : leafElements) {
             if (!MagentoPhpClass.CLOSING_TAG.equals(leafPsiElement.getText())) {
                 continue;
             }
