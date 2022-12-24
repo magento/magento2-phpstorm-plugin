@@ -16,17 +16,17 @@ class ${CLASS_NAME}
     /**
      * @var ${LOGGER}
      */
-    private $logger;
+    private ${LOGGER} $logger;
 
     /**
      * @var ${MODEL_FACTORY}
      */
-    private $modelFactory;
+    private ${MODEL_FACTORY} $modelFactory;
 
     /**
      * @var ${RESOURCE}
      */
-    private $resource;
+    private ${RESOURCE} $resource;
 
     /**
      * @param ${LOGGER} $logger

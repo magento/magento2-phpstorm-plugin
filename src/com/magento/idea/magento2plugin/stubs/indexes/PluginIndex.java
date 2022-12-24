@@ -94,11 +94,10 @@ public class PluginIndex extends FileBasedIndexExtension<String, Set<PluginData>
 
                 for (final XmlTag pluginTag: typeNode.findSubTags(ModuleDiXml.PLUGIN_TAG_NAME)) {
                     final String pluginType = pluginTag.getAttributeValue(ModuleDiXml.TYPE_ATTR);
-                    String pluginSortOrder = pluginTag.getAttributeValue(ModuleDiXml.SORT_ORDER_ATTR);
+                    final String pluginSortOrder = pluginTag.getAttributeValue(ModuleDiXml.SORT_ORDER_ATTR);
 
                     if (pluginType != null) {
-                        pluginSortOrder = pluginSortOrder == null ? "0" : pluginSortOrder;
-                        final PluginData pluginData = getPluginDataObject(pluginType,  Integer.parseInt(pluginSortOrder));
+                        final PluginData pluginData = getPluginDataObject(pluginType, getIntegerOrZeroValue(pluginSortOrder));
                         results.add(pluginData);
                     }
                 }
@@ -106,7 +105,22 @@ public class PluginIndex extends FileBasedIndexExtension<String, Set<PluginData>
                 return results;
             }
 
-            private PluginData getPluginDataObject(final String pluginType, final Integer sortOrder) {
+            private Integer getIntegerOrZeroValue(final String sortOrder) {
+                if (sortOrder == null || sortOrder.isEmpty()) {
+                    return 0;
+                }
+
+                try {
+                    return Integer.parseInt(sortOrder);
+                } catch (NumberFormatException e) {
+                    return 0;
+                }
+            }
+
+            private PluginData getPluginDataObject(
+                    final String pluginType,
+                    final Integer sortOrder
+            ) {
                 return new PluginData(pluginType,  sortOrder);
             }
         };

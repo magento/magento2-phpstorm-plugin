@@ -27,7 +27,7 @@ class BookBlockActions extends Column
     /**
      * @var UrlInterface
      */
-    private $urlBuilder;
+    private UrlInterface $urlBuilder;
 
     /**
      * @param ContextInterface $context

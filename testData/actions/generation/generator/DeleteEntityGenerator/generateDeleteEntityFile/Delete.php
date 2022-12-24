@@ -23,12 +23,12 @@ class Delete extends Action implements HttpPostActionInterface, HttpGetActionInt
      *
      * @see _isAllowed()
      */
-    const ADMIN_RESOURCE = 'Foo_Bar::company_id';
+    public const ADMIN_RESOURCE = 'Foo_Bar::company_id';
 
     /**
      * @var DeleteByIdCommand
      */
-    private $deleteByIdCommand;
+    private DeleteByIdCommand $deleteByIdCommand;
 
     /**
      * @param Context $context
@@ -58,7 +58,7 @@ class Delete extends Action implements HttpPostActionInterface, HttpGetActionInt
         try {
             $this->deleteByIdCommand->execute($entityId);
             $this->messageManager->addSuccessMessage(__('You have successfully deleted Company entity'));
-        } catch (CouldNotDeleteException | NoSuchEntityException $exception) {
+        } catch (CouldNotDeleteException|NoSuchEntityException $exception) {
             $this->messageManager->addErrorMessage($exception->getMessage());
         }
 

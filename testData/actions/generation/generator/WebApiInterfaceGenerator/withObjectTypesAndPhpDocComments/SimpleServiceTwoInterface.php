@@ -22,7 +22,7 @@ interface SimpleServiceTwoInterface
 
     /**
      * TODO: need to describe this method.
-     *
+     * @return void
      */
     public function fetch(): void;
 }

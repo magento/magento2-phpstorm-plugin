@@ -11,6 +11,7 @@ import com.magento.idea.magento2plugin.actions.generation.context.EntityCreatorC
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormButtonData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.actions.generation.util.GenerationContextRegistry;
+import org.junit.Before;
 
 public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
 
@@ -25,7 +26,8 @@ public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
             = "src/app/code/Foo/Bar/Block/Form/" + ENTITY_NAME;
 
     @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         super.setUp();
         final EntityCreatorContext context = new EntityCreatorContext();
         context.putUserData(EntityCreatorContext.DTO_TYPE, ENTITY_DTO_TYPE);
