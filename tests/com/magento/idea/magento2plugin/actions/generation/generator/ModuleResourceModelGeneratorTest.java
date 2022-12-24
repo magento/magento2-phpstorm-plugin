@@ -18,7 +18,7 @@ public class ModuleResourceModelGeneratorTest extends BaseGeneratorTestCase {
     private static final String ENTITY_DTO_TYPE = "Foo\\Bar\\Model\\Data\\EntityData";
 
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         super.setUp();
         final EntityCreatorContext context = new EntityCreatorContext();
         context.putUserData(EntityCreatorContext.DTO_TYPE, ENTITY_DTO_TYPE);

@@ -23,7 +23,7 @@ public abstract class BaseGeneratorTestCase extends BaseProjectTestCase {
 
     @Override
     @Before
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         super.setUp();
         myFixture.setTestDataPath(TEST_DATA_FOLDER_PATH);
         // Reset changed default code style settings to the previous default settings.
@@ -32,7 +32,7 @@ public abstract class BaseGeneratorTestCase extends BaseProjectTestCase {
 
     @Override
     @After
-    protected void tearDown() throws Exception {
+    public void tearDown() throws Exception {
         super.tearDown();
         LightPlatformTestCase.closeAndDeleteProject();
     }

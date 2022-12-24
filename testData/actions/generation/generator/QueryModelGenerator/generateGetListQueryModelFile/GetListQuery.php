@@ -19,27 +19,27 @@ class GetListQuery
     /**
      * @var CollectionProcessorInterface
      */
-    private $collectionProcessor;
+    private CollectionProcessorInterface $collectionProcessor;
 
     /**
      * @var CollectionFactory
      */
-    private $entityCollectionFactory;
+    private CollectionFactory $entityCollectionFactory;
 
     /**
      * @var BookDataMapper
      */
-    private $entityDataMapper;
+    private BookDataMapper $entityDataMapper;
 
     /**
      * @var SearchCriteriaBuilder
      */
-    private $searchCriteriaBuilder;
+    private SearchCriteriaBuilder $searchCriteriaBuilder;
 
     /**
      * @var SearchResultsInterfaceFactory
      */
-    private $searchResultFactory;
+    private SearchResultsInterfaceFactory $searchResultFactory;
 
     /**
      * @param CollectionProcessorInterface $collectionProcessor

@@ -16,7 +16,7 @@ class UnicornDataMapper
     /**
      * @var UnicornDataInterfaceFactory
      */
-    private $entityDtoFactory;
+    private UnicornDataInterfaceFactory $entityDtoFactory;
 
     /**
      * @param UnicornDataInterfaceFactory $entityDtoFactory

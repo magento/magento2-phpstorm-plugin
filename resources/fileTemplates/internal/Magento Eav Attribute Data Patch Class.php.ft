@@ -15,12 +15,12 @@ class ${CLASS_NAME} implements ${IMPLEMENTS} {
      /**
      * @var ${MODULE_DATA_SETUP_INTERFACE}
      */
-     private $moduleDataSetup;
+     private ${MODULE_DATA_SETUP_INTERFACE} $moduleDataSetup;
 
     /**
      * @var ${EAV_SETUP_FACTORY}
      */
-    private $eavSetupFactory;
+    private ${EAV_SETUP_FACTORY} $eavSetupFactory;
 
     /**
      * @param ${MODULE_DATA_SETUP_INTERFACE} $moduleDataSetup

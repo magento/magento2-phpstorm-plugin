@@ -18,7 +18,7 @@ class Edit extends Action implements HttpGetActionInterface
      *
      * @see _isAllowed()
      */
-    const ADMIN_RESOURCE = 'Foo_Bar::management';
+    public const ADMIN_RESOURCE = 'Foo_Bar::management';
 
     /**
      * Edit Book action.

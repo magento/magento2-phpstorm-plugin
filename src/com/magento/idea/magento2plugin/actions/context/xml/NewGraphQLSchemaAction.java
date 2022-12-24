@@ -8,6 +8,7 @@ package com.magento.idea.magento2plugin.actions.context.xml;
 import com.intellij.ide.fileTemplates.actions.AttributesDefaults;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
+import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.context.AbstractContextAction;
 import com.magento.idea.magento2plugin.magento.files.SchemaGraphQLsFile;
 import com.magento.idea.magento2plugin.magento.packages.ComponentType;
@@ -25,7 +26,12 @@ public class NewGraphQLSchemaAction extends AbstractContextAction {
      * New  schema.graphqls file action constructor.
      */
     public NewGraphQLSchemaAction() {
-        super(ACTION_NAME, ACTION_DESCRIPTION, SchemaGraphQLsFile.getInstance());
+        super(
+                ACTION_NAME,
+                ACTION_DESCRIPTION,
+                SchemaGraphQLsFile.getInstance(),
+                MagentoIcons.GRAPHQL
+        );
     }
 
     @Override
