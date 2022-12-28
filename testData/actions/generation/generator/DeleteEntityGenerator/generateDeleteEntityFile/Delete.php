@@ -58,7 +58,7 @@ class Delete extends Action implements HttpPostActionInterface, HttpGetActionInt
         try {
             $this->deleteByIdCommand->execute($entityId);
             $this->messageManager->addSuccessMessage(__('You have successfully deleted Company entity'));
-        } catch (CouldNotDeleteException | NoSuchEntityException $exception) {
+        } catch (CouldNotDeleteException|NoSuchEntityException $exception) {
             $this->messageManager->addErrorMessage($exception->getMessage());
         }
 

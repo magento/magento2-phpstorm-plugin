@@ -8,13 +8,18 @@ package com.magento.idea.magento2plugin.inspections.graphqls;
 import com.magento.idea.magento2plugin.inspections.BaseInspectionsTestCase;
 import com.magento.idea.magento2plugin.magento.packages.File;
 
-abstract public class InspectionGraphqlsFixtureTestCase extends BaseInspectionsTestCase {
+public abstract class InspectionGraphqlsFixtureTestCase extends BaseInspectionsTestCase {
 
-    private static final String testDataFolderPath = "testData" + File.separator + "inspections" + File.separator;
-    private static final String fixturesFolderPath = "graphqls" + File.separator;
+    private static final String testDataFolderPath = "testData" //NOPMD
+            + File.separator
+            + "inspections"
+            + File.separator;
+
+    private static final String fixturesFolderPath = "graphqls" //NOPMD
+            + File.separator;
 
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         super.setUp();
         myFixture.setTestDataPath(testDataFolderPath);
     }
@@ -24,7 +29,7 @@ abstract public class InspectionGraphqlsFixtureTestCase extends BaseInspectionsT
         return false;
     }
 
-    protected String getFixturePath(String fileName) {
+    protected String getFixturePath(final String fileName) {
         return prepareFixturePath(fileName, fixturesFolderPath);
     }
 }

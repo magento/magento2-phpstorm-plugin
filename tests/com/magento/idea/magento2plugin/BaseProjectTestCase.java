@@ -2,23 +2,28 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin;
 
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.testFramework.PlatformTestUtil;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
-import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.magento.packages.File;
+import com.magento.idea.magento2plugin.project.Settings;
 
 /**
- * Configure test environment with Magento 2 project
+ * Configure test environment with Magento 2 project.
  */
-abstract public class BaseProjectTestCase extends BasePlatformTestCase {
-    private static final String testDataProjectPath = "testData" + File.separator + "project";
-    private static final String testDataProjectDirectory = "magento2";
+public abstract class BaseProjectTestCase extends BasePlatformTestCase {
+    private static final String testDataProjectPath = "testData" //NOPMD
+            + File.separator
+            + "project";
+
+    private static final String testDataProjectDirectory = "magento2"; //NOPMD
 
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         super.setUp();
         copyMagento2ToTestProject();
         enablePluginAndReindex();
@@ -39,27 +44,37 @@ abstract public class BaseProjectTestCase extends BasePlatformTestCase {
     }
 
     protected void enablePluginAndReindex() {
-        Settings settings = Settings.getInstance(myFixture.getProject());
+        final Settings settings = Settings.getInstance(myFixture.getProject());
         settings.magentoPath = "/src";
         settings.pluginEnabled = true;
         settings.mftfSupportEnabled = true;
         IndexManager.manualReindex();
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue();
     }
 
     protected void disablePluginAndReindex() {
-        Settings settings = Settings.getInstance(myFixture.getProject());
+        final Settings settings = Settings.getInstance(myFixture.getProject());
         settings.pluginEnabled = false;
         IndexManager.manualReindex();
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue();
     }
 
     protected void disableMftfSupportAndReindex() {
-        Settings settings = Settings.getInstance(myFixture.getProject());
+        final Settings settings = Settings.getInstance(myFixture.getProject());
         settings.mftfSupportEnabled = false;
         IndexManager.manualReindex();
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue();
     }
 
-    protected String prepareFixturePath(String fileName, String fixturesFolderPath) {
-        return fixturesFolderPath + getClass().getSimpleName().replace("Test", "") + File.separator + name() + File.separator + fileName;
+    protected String prepareFixturePath(
+            final String fileName,
+            final String fixturesFolderPath
+    ) {
+        return fixturesFolderPath + getClass().getSimpleName().replace("Test", "")
+                + File.separator
+                + name()
+                + File.separator
+                + fileName;
     }
 
     private String name() {

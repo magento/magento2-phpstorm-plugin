@@ -30,7 +30,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run automated tests
-        run: ./gradlew test -i --no-daemon
+        run: ./gradlew test --no-daemon
 
   build-windows:
     runs-on: windows-latest
@@ -54,7 +54,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run automated tests
-        run: ./gradlew test -i --no-daemon
+        run: ./gradlew test --no-daemon
 
   build-macos:
     runs-on: macos-latest
@@ -78,7 +78,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run automated tests
-        run: ./gradlew test -i --no-daemon
+        run: ./gradlew test --no-daemon
 
   static-tests:
     runs-on: ubuntu-latest
@@ -104,11 +104,11 @@ jobs:
       - id: file_changes
         uses: trilom/file-changes-action@v1.2.4
       - name: Run Code Style Check
-        run: ./gradlew checkstyleCI -i --no-daemon
+        run: ./gradlew checkstyleCI --no-daemon
         env:
           MODIFIED_FILES: ${{ steps.file_changes.outputs.files}}
           ACTIONS_STEP_DEBUG: true
       - name: Run PMD Quality Check
-        run: ./gradlew pmdCI -i --no-daemon
+        run: ./gradlew pmdCI --no-daemon
         env:
           MODIFIED_FILES: ${{ steps.file_changes.outputs.files}}
