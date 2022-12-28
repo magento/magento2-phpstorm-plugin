@@ -17,7 +17,7 @@ class MyCustom extends GenericButton implements ButtonProviderInterface
     public function getButtonData(): array
     {
         return $this->wrapButtonSettings(
-            __('Custom Button'),
+            __('Custom Button')->getText(),
             'custom',
             '',
             [],
