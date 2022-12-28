@@ -17,7 +17,7 @@ class MyBackButton extends GenericButton implements ButtonProviderInterface
     public function getButtonData(): array
     {
         return $this->wrapButtonSettings(
-            __('Back To Grid'),
+            __('Back To Grid')->getText(),
             'back',
             sprintf("location.href = '%s';", $this->getUrl('*/*/')),
             [],
