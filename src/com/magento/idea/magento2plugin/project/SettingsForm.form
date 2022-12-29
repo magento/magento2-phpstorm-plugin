@@ -3,12 +3,14 @@
   <grid id="27dc6" binding="panel" default-binding="true" layout-manager="GridLayoutManager" row-count="3" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="570" height="671"/>
+      <xy x="20" y="20" width="972" height="671"/>
     </constraints>
     <properties/>
     <border type="none"/>
     <children>
       <grid id="61372" layout-manager="FormLayout">
+        <rowspec value="center:max(d;4px):noGrow"/>
+        <rowspec value="top:3dlu:noGrow"/>
         <rowspec value="center:max(d;4px):noGrow"/>
         <rowspec value="top:3dlu:noGrow"/>
         <rowspec value="center:max(d;4px):noGrow"/>
@@ -99,6 +101,24 @@
             </constraints>
             <properties>
               <text value="Platform Version:"/>
+            </properties>
+          </component>
+          <component id="fb6ab" class="javax.swing.JLabel" binding="additionalCodeSourceDirectoryLabel">
+            <constraints>
+              <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <forms/>
+            </constraints>
+            <properties>
+              <text value="Additional code source directory:"/>
+            </properties>
+          </component>
+          <component id="bf2f" class="com.intellij.openapi.ui.TextFieldWithBrowseButton" binding="additionalCodeSourceDirectory">
+            <constraints>
+              <grid row="8" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+              <forms/>
+            </constraints>
+            <properties>
+              <toolTipText value=""/>
             </properties>
           </component>
         </children>

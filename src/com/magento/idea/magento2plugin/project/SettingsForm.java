@@ -23,12 +23,7 @@ import com.magento.idea.magento2plugin.project.validator.SettingsFormValidator;
 import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.jetbrains.annotations.Nls;
@@ -55,6 +50,8 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     private final SettingsFormValidator validator = new SettingsFormValidator(this);
     private JLabel magentoVersionLabel;//NOPMD
     private JLabel magentoPathLabel;//NOPMD
+    private JLabel additionalCodeSourceDirectoryLabel;//NOPMD
+    private TextFieldWithBrowseButton additionalCodeSourceDirectory;
 
     public SettingsForm(@NotNull final Project project) {
         this.project = project;
@@ -95,9 +92,11 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         moduleDefaultLicenseName.setText(getSettings().defaultLicense);
         mftfSupportEnabled.setSelected(getSettings().mftfSupportEnabled);
         magentoPath.getTextField().setText(getSettings().magentoPath);
+        additionalCodeSourceDirectory.getTextField().setText(getSettings().additionalCodeSourceDirectory);
         resolveMagentoVersion();
 
         addPathListener();
+        addAdditionalCodeSourceListener();
         addMagentoVersionListener();
         updateMagentoVersion();
 
@@ -130,9 +129,10 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         final boolean mftfSupportChanged = mftfSupportEnabled.isSelected()
                 != getSettings().mftfSupportEnabled;
         final boolean magentoPathChanged = isMagentoPathChanged();
+        final boolean additionalCodeSourceDirectoryChanged = isAdditionalCodeSourceDirectoryChanged();
 
         return statusChanged || licenseChanged || mftfSupportChanged
-                || magentoPathChanged || versionChanged;
+                || magentoPathChanged || versionChanged || additionalCodeSourceDirectoryChanged;
     }
 
     private void resolveMagentoVersion() {
@@ -143,6 +143,11 @@ public class SettingsForm implements PhpFrameworkConfigurable {
 
     private boolean isMagentoPathChanged() {
         return !magentoPath.getTextField().getText().equals(getSettings().magentoPath);
+    }
+
+    private boolean isAdditionalCodeSourceDirectoryChanged() {
+        return !additionalCodeSourceDirectory.getTextField()
+            .getText().equals(getSettings().additionalCodeSourceDirectory);
     }
 
     @Override
@@ -162,6 +167,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         getSettings().defaultLicense = moduleDefaultLicenseName.getText();
         getSettings().mftfSupportEnabled = mftfSupportEnabled.isSelected();
         getSettings().magentoPath = getMagentoPath();
+        getSettings().additionalCodeSourceDirectory = getAdditionalCodeSourceDirectory();
         buttonReindex.setEnabled(getSettings().pluginEnabled);
         regenerateUrnMapButton.setEnabled(getSettings().pluginEnabled);
     }
@@ -174,6 +180,11 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     @NotNull
     public String getMagentoPath() {
         return magentoPath.getTextField().getText().trim();
+    }
+
+    @NotNull
+    public String getAdditionalCodeSourceDirectory() {
+        return additionalCodeSourceDirectory.getTextField().getText().trim();
     }
 
     @Override
@@ -218,6 +229,36 @@ public class SettingsForm implements PhpFrameworkConfigurable {
                     }
                 };
         this.magentoPath.addActionListener(browseFolderListener);
+    }
+
+    private void addAdditionalCodeSourceListener() {
+        final FileChooserDescriptor descriptor =
+            FileChooserDescriptorFactory.createSingleFolderDescriptor();
+        final ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseFolderListener
+            = new ComponentWithBrowseButton.BrowseFolderActionListener<JTextField>(
+            "Source Directory",
+            "Choose Additional Code Source directory",
+            this.additionalCodeSourceDirectory,
+            project,
+            descriptor,
+            TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
+        ) {
+            @Nullable
+            @Override
+            protected VirtualFile getInitialFile() {
+
+                final String text = getComponentText();
+                if (text.length() == 0) {
+                    final VirtualFile file = GetProjectBasePath.execute(project);
+                    if (file != null) {
+                        return file;
+                    }
+                }
+
+                return super.getInitialFile();
+            }
+        };
+        this.additionalCodeSourceDirectory.addActionListener(browseFolderListener);
     }
 
     private void addMagentoVersionListener() {

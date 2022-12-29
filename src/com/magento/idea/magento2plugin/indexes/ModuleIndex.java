@@ -16,6 +16,7 @@ import com.intellij.util.SlowOperations;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.PhpFileType;
 import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.project.util.GetProjectBasePath;
 import com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex;
 import com.magento.idea.magento2plugin.util.RegExUtil;
@@ -41,7 +42,7 @@ public final class ModuleIndex {
     }
 
     public List<String> getEditableModuleNames() {
-        return getModuleNames(Package.vendor, true);
+        return getModuleNames("/" + Package.vendor + "/|/tests/|/test/", true);
     }
 
     public List<String> getEditableThemeNames() {
@@ -83,7 +84,6 @@ public final class ModuleIndex {
                 .getInstance();
         final List<String> allModulesList = new ArrayList<>();
         final Collection<String> allModules = index.getAllKeys(ModuleNameIndex.KEY, project);
-        final Pattern compiled = Pattern.compile(filterPattern);
         for (final String moduleName : allModules) {
             if (!moduleName.matches(pattern)) {
                 continue;
@@ -98,19 +98,41 @@ public final class ModuleIndex {
                 continue;
             }
             final VirtualFile virtualFile = files.iterator().next();
-            if (withinProject && !VfsUtilCore
-                    .isAncestor(GetProjectBasePath.execute(project), virtualFile, false)) {
+            if (!isValid(filterPattern, withinProject, virtualFile)) {
                 continue;
             }
 
-            final Matcher matcher = compiled.matcher(virtualFile.getPath());
-            if (matcher.find()) {
-                continue;
-            }
             allModulesList.add(moduleName);
         }
         Collections.sort(allModulesList);
         return allModulesList;
+    }
+
+    private boolean isValid(String filterPattern, boolean withinProject, VirtualFile virtualFile) {
+        if (!withinProject) {
+            return true;
+        }
+
+        VirtualFile baseFile = GetProjectBasePath.execute(project);
+        if (baseFile == null) {
+            return false;
+        }
+
+        final String path = virtualFile.getPath();
+        final String additionalSourceDir = Settings.getAdditionalCodeSourceDirectory(project);
+        if (additionalSourceDir != null
+            && !additionalSourceDir.isEmpty()
+            && path.startsWith(additionalSourceDir)) {
+            return true;
+        }
+
+        if (!VfsUtilCore.isAncestor(baseFile, virtualFile, false)) {
+            return false;
+        };
+
+        final Pattern compiled = Pattern.compile(filterPattern);
+        final Matcher matcher = compiled.matcher(virtualFile.getPath());
+        return !matcher.find();
     }
 
     /**

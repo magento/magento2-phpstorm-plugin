@@ -31,6 +31,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
     public boolean pluginEnabled;
     public static String defaultLicense = "Proprietary";
     public String magentoPath;
+    public String additionalCodeSourceDirectory;
     public boolean mftfSupportEnabled;
     public boolean myDoNotAskContentConfigAgain;
     public String magentoVersion;
@@ -42,6 +43,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         return new Settings.State(
                 this.pluginEnabled,
                 this.magentoPath,
+                this.additionalCodeSourceDirectory,
                 defaultLicense,
                 this.mftfSupportEnabled,
                 this.myDoNotAskContentConfigAgain,
@@ -65,6 +67,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
     public void loadState(final @NotNull Settings.State state) {
         this.pluginEnabled = state.isPluginEnabled();
         this.magentoPath = state.getMagentoPath();
+        this.additionalCodeSourceDirectory = state.getAdditionalCodeSourceDirectory();
         this.defaultLicense = state.getDefaultLicenseName();
         this.mftfSupportEnabled = state.isMftfSupportEnabled();
         this.myDoNotAskContentConfigAgain = state.isDoNotAskContentConfigAgain();
@@ -122,12 +125,18 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         return getInstance(project).magentoPath;
     }
 
+    @Nullable
+    public static String getAdditionalCodeSourceDirectory(final @NotNull Project project) {
+        return getInstance(project).additionalCodeSourceDirectory;
+    }
+
     @SuppressWarnings({"PMD.DataClass"})
     @Tag
     public static class State {
         public boolean pluginEnabled;
         public String defaultLicenseName;
         public String magentoPath;
+        public String additionalCodeSourceDirectory;
         public boolean mftfSupportEnabled;
         public boolean myDoNotAskContentConfigAgain;
         public String magentoVersion;
@@ -150,6 +159,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         public State(
                 final boolean pluginEnabled,
                 final String magentoPath,
+                final String additionalCodeSourceDirectory,
                 final String defaultLicenseName,
                 final boolean mftfSupportEnabled,
                 final boolean myDoNotAskContentConfigAgain,
@@ -158,6 +168,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         ) {
             this.pluginEnabled = pluginEnabled;
             this.magentoPath = magentoPath;
+            this.additionalCodeSourceDirectory = additionalCodeSourceDirectory;
             this.defaultLicenseName = defaultLicenseName;
             this.mftfSupportEnabled = mftfSupportEnabled;
             this.myDoNotAskContentConfigAgain = myDoNotAskContentConfigAgain;
@@ -181,6 +192,15 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         @Tag("magentoPath")
         public void setMagentoPath(final String magentoPath) {
             this.magentoPath = magentoPath;
+        }
+
+        public String getAdditionalCodeSourceDirectory() {
+            return this.additionalCodeSourceDirectory;
+        }
+
+        @Tag("additionalCodeSourceDirectory")
+        public void setAdditionalCodeSourceDirectory(final String additionalCodeSourceDirectory) {
+            this.additionalCodeSourceDirectory = additionalCodeSourceDirectory;
         }
 
         public String getMagentoVersion() {
@@ -253,6 +273,9 @@ public class Settings implements PersistentStateComponent<Settings.State> {
                     if (this.magentoPath != null) {
                         return this.magentoPath.equals(state.magentoPath);
                     }
+                    if (this.additionalCodeSourceDirectory != null) {
+                        return this.additionalCodeSourceDirectory.equals(state.additionalCodeSourceDirectory);
+                    }
                     if (this.defaultLicenseName != null) {
                         return this.defaultLicenseName.equals(state.defaultLicenseName);
                     } else {
@@ -269,6 +292,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         public int hashCode() {
             int result = this.isPluginEnabled() ? 1 : 0;
             result = 31 * result + (this.magentoPath != null ? this.magentoPath.hashCode() : 0);
+            result = 31 * result + (this.additionalCodeSourceDirectory != null ? this.additionalCodeSourceDirectory.hashCode() : 0);
             result = 31 * result + (this.isMftfSupportEnabled() ? 1 : 0);
             result = 31 * result + (this.isDoNotAskContentConfigAgain() ? 1 : 0);
             result = 31 * result + (
