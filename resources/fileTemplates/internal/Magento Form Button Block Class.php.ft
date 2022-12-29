@@ -20,8 +20,14 @@ class ${NAME} extends ${GENERIC_BUTTON} implements ${DATA_PROVIDER_TYPE}
      */
     public function getButtonData(): array
     {
+#if (${GET_ID})
+        if (!$this->${GET_ID}) {
+            return [];
+        }
+
+#end
         return $this->wrapButtonSettings(
-            '${LABEL}',
+            __('${LABEL}')->getText(),
             '${CLASS}',
             ${ON_CLICK},
             ${DATA_ATTRS},

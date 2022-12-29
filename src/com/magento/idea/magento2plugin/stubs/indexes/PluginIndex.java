@@ -96,7 +96,7 @@ public class PluginIndex extends FileBasedIndexExtension<String, Set<PluginData>
                     final String pluginType = pluginTag.getAttributeValue(ModuleDiXml.TYPE_ATTR);
                     final String pluginSortOrder = pluginTag.getAttributeValue(ModuleDiXml.SORT_ORDER_ATTR);
 
-                    if (pluginType != null) {
+                    if (pluginType != null && !pluginType.isEmpty()) {
                         final PluginData pluginData = getPluginDataObject(pluginType, getIntegerOrZeroValue(pluginSortOrder));
                         results.add(pluginData);
                     }
@@ -121,7 +121,7 @@ public class PluginIndex extends FileBasedIndexExtension<String, Set<PluginData>
                     final String pluginType,
                     final Integer sortOrder
             ) {
-                return new PluginData(pluginType,  sortOrder);
+                return new PluginData(pluginType, sortOrder);
             }
         };
     }
