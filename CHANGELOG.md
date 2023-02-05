@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 5.1.0
 
+### Added
+
+- Possibility to add second code source directory [#1297](https://github.com/magento/magento2-phpstorm-plugin/pull/1297)
+
 ## 5.0.1
 
 ### Fixed

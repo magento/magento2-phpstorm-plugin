@@ -18,6 +18,7 @@ import com.jetbrains.php.lang.psi.elements.impl.ClassConstImpl;
 import com.magento.idea.magento2plugin.magento.files.RegistrationPhp;
 import com.magento.idea.magento2plugin.magento.packages.ComponentType;
 import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import java.util.Collection;
 import java.util.regex.Matcher;
@@ -94,12 +95,7 @@ public final class GetMagentoModuleUtil {
      * @return boolean
      */
     public static boolean isEditableModule(final @NotNull MagentoModuleData moduleData) {
-        final Pattern pattern = Pattern.compile(RegExUtil.Magento.CUSTOM_VENDOR_NAME);
-        final Matcher matcher = pattern.matcher(
-                moduleData.getModuleDir().getVirtualFile().getPath()
-        );
-
-        return matcher.find();
+        return isDirectoryInEditableModule(moduleData.getModuleDir());
     }
 
     /**
@@ -110,6 +106,12 @@ public final class GetMagentoModuleUtil {
      * @return boolean
      */
     public static boolean isDirectoryInEditableModule(final @NotNull PsiDirectory directory) {
+        final String path = directory.getVirtualFile().getPath();
+        final String additionalSourceDir = Settings.getAdditionalCodeSourceDirectory(directory.getProject());
+        if (additionalSourceDir != null && !additionalSourceDir.isEmpty() && path.startsWith(additionalSourceDir)) {
+            return true;
+        }
+
         final Pattern pattern = Pattern.compile(RegExUtil.Magento.CUSTOM_VENDOR_NAME);
         final Matcher matcher = pattern.matcher(directory.getVirtualFile().getPath());
 
