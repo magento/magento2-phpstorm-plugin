@@ -235,7 +235,7 @@ public class NewEntityDialog extends AbstractDialog {
         this.properties = new ArrayList<>();
 
         setContentPane(contentPane);
-        setModal(true);
+        setModal(false);
         setTitle(NewEntityAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
 

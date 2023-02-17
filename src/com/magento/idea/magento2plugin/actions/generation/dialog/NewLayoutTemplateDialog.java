@@ -73,7 +73,7 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
         this.directory = directory;
 
         setContentPane(contentPane);
-        setModal(true);
+        setModal(false);
         setTitle(NewLayoutXmlAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
 

@@ -115,7 +115,7 @@ public class NewObserverDialog extends AbstractDialog {
         this.moduleName = moduleName;
 
         setContentPane(contentPanel);
-        setModal(true);
+        setModal(false);
         setTitle(NewObserverAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
 
