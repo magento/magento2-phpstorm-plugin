@@ -13,14 +13,14 @@ checkstyle {
     toolVersion = "10.9.3"
     ignoreFailures = false
     maxWarnings = 0
-    configFile rootProject.file("gradle-tasks/checkstyle/checkstyle.xml")
+    configFile rootProject.file("${rootDir}/gradle-tasks/checkstyle/checkstyle.xml")
 }
 
 pmd {
     toolVersion = "6.21.0"
     consoleOutput = true
     ruleSets = [
-            rootProject.file("gradle-tasks/pmd/ruleset.xml")
+            rootProject.file("${rootDir}/gradle-tasks/pmd/ruleset.xml")
     ]
 }
 
