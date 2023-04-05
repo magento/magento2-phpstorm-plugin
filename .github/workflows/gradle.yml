@@ -19,7 +19,7 @@ jobs:
           java-version: 11
           distribution: 'temurin'
           cache: gradle
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
@@ -45,7 +45,7 @@ jobs:
           java-version: 11
           distribution: 'temurin'
           cache: gradle
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
@@ -71,7 +71,7 @@ jobs:
           java-version: 11
           distribution: 'temurin'
           cache: gradle
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
@@ -97,7 +97,7 @@ jobs:
           java-version: 11
           distribution: 'temurin'
           cache: gradle
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
