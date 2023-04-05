@@ -28,11 +28,6 @@ tasks.withType(Checkstyle) {
     // Specify all files that should be checked
     classpath = files()
     source "${project.rootDir}"
-
-    reports {
-        xml.enabled false
-        html.enabled true
-    }
 }
 
 // Execute Checkstyle on all files
