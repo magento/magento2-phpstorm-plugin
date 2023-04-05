@@ -13,26 +13,20 @@ checkstyle {
     toolVersion = "8.31"
     ignoreFailures = false
     maxWarnings = 0
-    configFile rootProject.file("gradle-tasks/checkstyle/checkstyle.xml")
+    configFile rootProject.file("${rootDir}/gradle-tasks/checkstyle/checkstyle.xml")
 }
 
 pmd {
     toolVersion = "6.21.0"
     consoleOutput = true
-    ruleSets = [
-            rootProject.file("gradle-tasks/pmd/ruleset.xml")
-    ]
+    ruleSetFiles = files("${rootDir}/gradle-tasks/pmd/ruleset.xml")
+    ruleSets = []
 }
 
 tasks.withType(Checkstyle) {
     // Specify all files that should be checked
     classpath = files()
     source "${project.rootDir}"
-
-    reports {
-        xml.enabled false
-        html.enabled true
-    }
 }
 
 // Execute Checkstyle on all files
@@ -49,11 +43,6 @@ tasks.withType(Pmd) {
     // Specify all files that should be checked
     classpath = files()
     source "${project.rootDir}"
-
-    reports {
-        xml.enabled false
-        html.enabled true
-    }
 }
 
 // Execute Checkstyle on all files
