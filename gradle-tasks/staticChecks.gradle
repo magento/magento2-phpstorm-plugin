@@ -19,9 +19,8 @@ checkstyle {
 pmd {
     toolVersion = "6.21.0"
     consoleOutput = true
-    ruleSets = [
-            rootProject.file("${rootDir}/gradle-tasks/pmd/ruleset.xml")
-    ]
+    ruleSetFiles = files("${rootDir}/gradle-tasks/pmd/ruleset.xml")
+    ruleSets = []
 }
 
 tasks.withType(Checkstyle) {
