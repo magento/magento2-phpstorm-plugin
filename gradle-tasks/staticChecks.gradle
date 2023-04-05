@@ -10,7 +10,7 @@ import groovy.json.JsonSlurper
  */
 
 checkstyle {
-    toolVersion = "10.9.3"
+    toolVersion = "8.31"
     ignoreFailures = false
     maxWarnings = 0
     configFile rootProject.file("${rootDir}/gradle-tasks/checkstyle/checkstyle.xml")
