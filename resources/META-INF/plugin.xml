@@ -24,7 +24,7 @@
     </change-notes>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="222.3739.54"/>
+    <idea-version since-build="231.8109.175"/>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
@@ -33,6 +33,7 @@
     -->
     <depends>com.jetbrains.php</depends>
     <depends>JavaScript</depends>
+    <depends>com.intellij.css</depends>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.platform.images</depends>
     <depends>com.intellij.copyright</depends>
