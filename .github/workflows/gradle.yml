@@ -12,12 +12,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up JDK 11
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
           java-version: 11
-      - uses: actions/cache@v2
+          distribution: 'temurin'
+          cache: gradle
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
@@ -30,18 +32,20 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run automated tests
-        run: ./gradlew test -i --no-daemon
+        run: ./gradlew test --no-daemon
 
   build-windows:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up JDK 11
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
           java-version: 11
-      - uses: actions/cache@v2
+          distribution: 'temurin'
+          cache: gradle
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
@@ -54,18 +58,20 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run automated tests
-        run: ./gradlew test -i --no-daemon
+        run: ./gradlew test --no-daemon
 
   build-macos:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up JDK 11
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
           java-version: 11
-      - uses: actions/cache@v2
+          distribution: 'temurin'
+          cache: gradle
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
@@ -78,18 +84,20 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run automated tests
-        run: ./gradlew test -i --no-daemon
+        run: ./gradlew test --no-daemon
 
   static-tests:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up JDK 11
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
           java-version: 11
-      - uses: actions/cache@v2
+          distribution: 'temurin'
+          cache: gradle
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
@@ -104,11 +112,11 @@ jobs:
       - id: file_changes
         uses: trilom/file-changes-action@v1.2.4
       - name: Run Code Style Check
-        run: ./gradlew checkstyleCI -i --no-daemon
+        run: ./gradlew checkstyleCI --no-daemon
         env:
           MODIFIED_FILES: ${{ steps.file_changes.outputs.files}}
           ACTIONS_STEP_DEBUG: true
       - name: Run PMD Quality Check
-        run: ./gradlew pmdCI -i --no-daemon
+        run: ./gradlew pmdCI --no-daemon
         env:
           MODIFIED_FILES: ${{ steps.file_changes.outputs.files}}

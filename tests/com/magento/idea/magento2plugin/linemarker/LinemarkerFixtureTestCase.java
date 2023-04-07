@@ -19,7 +19,7 @@ public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
             = "testData" + File.separator + "linemarker" + File.separator;
 
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         super.setUp();
         myFixture.setTestDataPath(TEST_DATA_PATH);
     }

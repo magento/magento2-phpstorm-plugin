@@ -27,7 +27,7 @@ class ${NAME} extends ${GENERIC_BUTTON} implements ${DATA_PROVIDER_TYPE}
 
 #end
         return $this->wrapButtonSettings(
-            '${LABEL}',
+            __('${LABEL}')->getText(),
             '${CLASS}',
             ${ON_CLICK},
             ${DATA_ATTRS},

@@ -17,7 +17,7 @@ class SaveBlock extends GenericButton implements ButtonProviderInterface
     public function getButtonData(): array
     {
         return $this->wrapButtonSettings(
-            'Save',
+            __('Save')->getText(),
             'save primary',
             '',
             [

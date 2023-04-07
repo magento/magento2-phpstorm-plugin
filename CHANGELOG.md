@@ -4,12 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
+## 5.2.0
+
+## 5.1.0
+
+### Fixed
+
+- Fixed the parsing of plugin sort order value[#1235](https://github.com/magento/magento2-phpstorm-plugin/pull/1235)
+- Fixed compatibility with 2023.1 [#1214](https://github.com/magento/magento2-phpstorm-plugin/pull/1214)
+
 ## 5.0.1
 
 ### Fixed
 
 - Throwable: Stub index points to a file without PSI [#1232](https://github.com/magento/magento2-phpstorm-plugin/pull/1232)
-- Create an entity - delete button is displayed in a new entity form [#1268](https://github.com/magento/magento2-phpstorm-plugin/pull/1268)
+- Create an entity - The delete button is displayed in a new entity form [#1268](https://github.com/magento/magento2-phpstorm-plugin/pull/1268)
+- Create an entity - The translation function is not call on the buttons label [#1273](https://github.com/magento/magento2-phpstorm-plugin/pull/1273)
 - Covered possible NullPointerException in InjectAViewModelDialog.java [#1213](https://github.com/magento/magento2-phpstorm-plugin/pull/1213)
 - AWT events are not allowed inside write action [#1271](https://github.com/magento/magento2-phpstorm-plugin/pull/1271)
 - MapReduceIndexMappingException: java.lang.NumberFormatException: For input string: "" [#1235](https://github.com/magento/magento2-phpstorm-plugin/pull/1235)
