@@ -16,9 +16,12 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlTag;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.InjectAViewModelDialog;
+import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.files.CommonXml;
 import com.magento.idea.magento2plugin.magento.files.LayoutXml;
 import com.magento.idea.magento2plugin.project.Settings;
+import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 public class InjectAViewModelAction extends DumbAwareAction {
@@ -40,6 +43,15 @@ public class InjectAViewModelAction extends DumbAwareAction {
         final Project project = event.getData(PlatformDataKeys.PROJECT);
 
         if (project == null) {
+            return;
+        }
+        final PsiFile psiFile = event.getData(PlatformDataKeys.PSI_FILE);
+
+        if (psiFile == null) {
+            return;
+        }
+
+        if (!isEditableModule(project, psiFile)) {
             return;
         }
 
@@ -127,5 +139,13 @@ public class InjectAViewModelAction extends DumbAwareAction {
     private void setStatus(final AnActionEvent event, final boolean status) {
         event.getPresentation().setVisible(status);
         event.getPresentation().setEnabled(status);
+    }
+
+    private boolean isEditableModule(final Project project, final PsiFile psiFile) {
+        final List<String> allModulesList = new ModuleIndex(project).getEditableModuleNames();
+
+        return allModulesList.contains(
+                GetModuleNameByDirectoryUtil.execute(psiFile.getContainingDirectory(), project)
+        );
     }
 }
