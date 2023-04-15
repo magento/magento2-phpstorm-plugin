@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Fixed
 
-- java.lang.NoClassDefFoundError: org/codehaus/plexus/util/StringUtils [#1235](https://github.com/magento/magento2-phpstorm-plugin/pull/1530)
+- java.lang.NoClassDefFoundError: org/codehaus/plexus/util/StringUtils [#1530](https://github.com/magento/magento2-phpstorm-plugin/pull/1530)
 
 ## 5.1.0
 

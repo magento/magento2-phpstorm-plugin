@@ -59,7 +59,6 @@ public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
                 = "Failed that documents not contains linemarker with the tooltip `%s`";
 
         final List<LineMarkerInfo<?>> lineMarkers = getDocumentLineMarkers();
-        assertNotEmpty(lineMarkers);
         for (final LineMarkerInfo lineMarkerInfo: lineMarkers) {
             final String lineMarkerTooltip = lineMarkerInfo.getLineMarkerTooltip();
             final Icon lineMarkerIcon = lineMarkerInfo.getIcon();
