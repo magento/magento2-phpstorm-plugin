@@ -11,7 +11,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 public class SourceModelNameAdapter extends DocumentAdapter {
@@ -46,7 +46,7 @@ public class SourceModelNameAdapter extends DocumentAdapter {
         final StringBuilder sourceModelClassName = new StringBuilder();
 
         for (final String codePart : SplitEavAttributeCodeUtil.execute(attributeCode)) {
-            sourceModelClassName.append(StringUtils.capitalise(codePart));
+            sourceModelClassName.append(StringUtils.capitalize(codePart));
         }
 
         sourceModelNameTexField.setText(sourceModelClassName.toString());
