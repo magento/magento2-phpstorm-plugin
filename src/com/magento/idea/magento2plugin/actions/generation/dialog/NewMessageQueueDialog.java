@@ -176,7 +176,7 @@ public class NewMessageQueueDialog extends AbstractDialog {
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
         setContentPane(contentPanel);
-        setModal(true);
+        setModal(false);
         setTitle(NewMessageQueueAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
 

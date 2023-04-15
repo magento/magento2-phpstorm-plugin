@@ -218,7 +218,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
         setContentPane(contentPanel);
-        setModal(true);
+        setModal(false);
         setTitle(NewUiComponentGridAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
 
