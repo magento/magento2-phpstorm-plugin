@@ -64,7 +64,7 @@ public class RegExUtil {
                 = "[A-Z][a-zA-Z0-9]+_[A-Z][a-zA-Z0-9]+";
 
         public static final String THEME_NAME
-                = "[a-z]+/[A-Z][a-zA-Z0-9_]+/[a-z][a-zA-Z0-9_]+";
+                = "[a-z]+/[a-zA-Z0-9_]+/[a-z][a-zA-Z0-9_]+";
 
         public static final String MFTF_CURLY_BRACES
                 = ".*\\{\\{[^\\}]+\\}\\}.*";
