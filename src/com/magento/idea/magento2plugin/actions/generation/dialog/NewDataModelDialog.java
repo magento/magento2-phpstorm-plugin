@@ -96,7 +96,7 @@ public class NewDataModelDialog extends AbstractDialog {
         this.properties = new ArrayList<>();
 
         setContentPane(contentPanel);
-        setModal(true);
+        setModal(false);
         setTitle(NewDataModelAction.ACTION_DESCRIPTION);
         getRootPane().setDefaultButton(buttonOK);
 
