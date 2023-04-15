@@ -11,7 +11,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 public class DataPatchNameAdapter extends DocumentAdapter {
@@ -73,7 +73,7 @@ public class DataPatchNameAdapter extends DocumentAdapter {
         String fileName = "";
 
         for (final String fileNamePart : SplitEavAttributeCodeUtil.execute(attributeCode)) {
-            fileName = String.join("", fileName, StringUtils.capitalise(fileNamePart));
+            fileName = String.join("", fileName, StringUtils.capitalize(fileNamePart));
         }
 
         dataPatchNameTextField.setText(
@@ -81,7 +81,7 @@ public class DataPatchNameAdapter extends DocumentAdapter {
                         "",
                         NAME_PREFIX,
                         fileName,
-                        StringUtils.capitalise(entityType), NAME_SUFFIX
+                        StringUtils.capitalize(entityType), NAME_SUFFIX
                 )
         );
     }
