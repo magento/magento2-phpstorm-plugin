@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.inspections.xml.fix;
 
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
-import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlAttributeValue;
@@ -42,12 +41,7 @@ public class XmlModuleNameQuickFix implements LocalQuickFix {
     }
 
     private void applyFix(final XmlAttributeValue value) {
-        WriteCommandAction.writeCommandAction(
-                value.getManager().getProject(),
-                value.getContainingFile()
-        ).run(() ->
-                doFix(value)
-        );
+        doFix(value);
     }
 
     protected void doFix(

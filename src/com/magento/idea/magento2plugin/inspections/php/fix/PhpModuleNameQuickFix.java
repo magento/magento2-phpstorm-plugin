@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.inspections.php.fix;
 
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
-import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.magento.idea.magento2plugin.bundles.InspectionBundle;
@@ -42,11 +41,6 @@ public class PhpModuleNameQuickFix implements LocalQuickFix {
     }
 
     private void applyFix(final StringLiteralExpression expression) {
-        WriteCommandAction.writeCommandAction(
-                expression.getManager().getProject(),
-                expression.getContainingFile()
-        ).run(() ->
-                expression.updateText(expectedModuleName)
-        );
+        expression.updateText(expectedModuleName);
     }
 }
