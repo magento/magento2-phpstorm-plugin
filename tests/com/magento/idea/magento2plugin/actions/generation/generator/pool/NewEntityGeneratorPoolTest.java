@@ -87,7 +87,6 @@ public class NewEntityGeneratorPoolTest extends BaseGeneratorTestCase {
                 true,
                 true,
                 true,
-                true,
                 "test",
                 "test",
                 "test",

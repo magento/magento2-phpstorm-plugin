@@ -135,10 +135,6 @@ public class UiComponentGridXmlGenerator extends FileGenerator {
                 phpClassTypesBuilder.appendProperty("COLUMNS_CONTROLS", TRUE);
             }
 
-            if (toolbarData.isAddFulltextSearch()) {
-                phpClassTypesBuilder.appendProperty("FULLTEXT_SEARCH", TRUE);
-            }
-
             if (toolbarData.isAddListingFilters()) {
                 phpClassTypesBuilder.appendProperty("LISTING_FILTERS", TRUE);
             }

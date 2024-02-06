@@ -18,25 +18,19 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.generator.LayoutXmlTemplateGenerator;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+
+import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import org.jetbrains.annotations.NotNull;
 
 public class NewLayoutTemplateDialog extends AbstractDialog {
 
     private static final String LAYOUT_NAME = "Layout Name";
 
-    private final @NotNull Project project;
+    private final Project project;
     private final String moduleName;
     private final PsiDirectory directory;
 
@@ -45,27 +39,17 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
     private JButton buttonCancel;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, LAYOUT_NAME})
-    @FieldValidation(rule = RuleRegistry.LAYOUT_NAME,
-            message = {IdentifierRule.MESSAGE, LAYOUT_NAME})
+    @FieldValidation(rule = RuleRegistry.LAYOUT_NAME, message = {IdentifierRule.MESSAGE, LAYOUT_NAME})
     private JTextField layoutName;
 
     private JComboBox<ComboBoxItemData> area;
 
     // labels
-    private JLabel layoutNameLabel; // NOPMD
-    private JLabel areaLabel; // NOPMD
-    private JLabel layoutNameErrorMessage; // NOPMD
+    private JLabel layoutNameLabel;
+    private JLabel areaLabel;
+    private JLabel layoutNameErrorMessage;
 
-    /**
-     * NewLayoutTemplateDialog constructor.
-     *
-     * @param project Project
-     * @param directory PsiDirectory
-     */
-    public NewLayoutTemplateDialog(
-            final @NotNull Project project,
-            final @NotNull PsiDirectory directory
-    ) {
+    public NewLayoutTemplateDialog(Project project, PsiDirectory directory) {
         super();
 
         this.project = project;
@@ -84,12 +68,11 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(final WindowEvent event) {
+            public void windowClosing(WindowEvent event) {
                 onCancel();
             }
         });
 
-        // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
                 event -> onCancel(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
@@ -100,104 +83,77 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
         autoSelectCurrentArea();
     }
 
-    /**
-     * Open a new layout template dialog.
-     *
-     * @param project Project
-     * @param directory Directory
-     */
-    public static void open(
-            final @NotNull Project project,
-            final @NotNull PsiDirectory directory
-    ) {
-        final NewLayoutTemplateDialog dialog = new NewLayoutTemplateDialog(project, directory);
+    public static void open(Project project, PsiDirectory directory) {
+        NewLayoutTemplateDialog dialog = new NewLayoutTemplateDialog(project, directory);
         dialog.pack();
         dialog.centerDialog(dialog);
         dialog.setVisible(true);
     }
 
-    /**
-     * Fire generation process if all fields are valid.
-     */
     private void onOK() {
         if (validateFormFields()) {
-            final String[] layoutNameParts = getLayoutNameParts();
-            new LayoutXmlTemplateGenerator(
-                    new LayoutXmlData(
-                            getArea(),
-                            layoutNameParts[0],
-                            moduleName,
-                            layoutNameParts[1],
-                            layoutNameParts[2]
-                    ),
-                    project
-            ).generate(NewLayoutXmlAction.ACTION_NAME, true);
+            String[] layoutNameParts = getLayoutNameParts();
+            LayoutXmlData layoutXmlData = new LayoutXmlData(
+                    getArea(),
+                    layoutNameParts[0],
+                    moduleName,
+                    layoutNameParts[1],
+                    layoutNameParts[2]
+            );
+            new LayoutXmlTemplateGenerator(layoutXmlData, project)
+                    .generate(NewLayoutXmlAction.ACTION_NAME, true);
             exit();
         }
     }
 
-    /**
-     * Create custom components and fill their entries.
-     */
     @SuppressWarnings({"PMD.UnusedPrivateMethod", "PMD.AvoidInstantiatingObjectsInLoops"})
     private void createUIComponents() {
         area = new ComboBox<>();
 
-        for (final Areas areaEntry : Areas.values()) {
-            if (!areaEntry.equals(Areas.adminhtml) && !areaEntry.equals(Areas.frontend)) {
-                continue;
+        for (Areas areaEntry : Areas.values()) {
+            if (areaEntry.equals(Areas.adminhtml) || areaEntry.equals(Areas.frontend)) {
+                area.addItem(new ComboBoxItemData(areaEntry.toString(), areaEntry.toString()));
             }
-            area.addItem(new ComboBoxItemData(areaEntry.toString(), areaEntry.toString()));
         }
     }
 
     private void autoSelectCurrentArea() {
-        final String selectedDirName = directory.getName();
-        final Map<String, Integer> areaIndexMap = new HashMap<>();
+        String selectedDirName = directory.getName();
+        Map<String, Integer> areaIndexMap = new HashMap<>();
 
         for (int i = 0; i < area.getItemCount(); i++) {
-            final ComboBoxItemData item = area.getItemAt(i);
+            ComboBoxItemData item = area.getItemAt(i);
             areaIndexMap.put(item.getKey(), i);
         }
 
-        if (areaIndexMap.containsKey(selectedDirName)) {
-            area.setSelectedIndex(areaIndexMap.get(selectedDirName));
+        Integer selectedIndex = areaIndexMap.get(selectedDirName);
+        if (selectedIndex != null) {
+            area.setSelectedIndex(selectedIndex);
         }
     }
 
-    /**
-     * Get parts of inserted layout name.
-     *
-     * @return String[]
-     */
     private String[] getLayoutNameParts() {
-
-        final String[] layoutNameParts = layoutName.getText().trim().split("_");
+        String[] layoutNameParts = layoutName.getText().trim().split("_");
         String routeName = "";
         String controllerName = "";
         String actionName = "";
 
-        if (layoutNameParts.length >= 1) { // NOPMD
+        if (layoutNameParts.length >= 1) {
             routeName = layoutNameParts[0];
         }
 
-        if (layoutNameParts.length == 3) { // NOPMD
+        if (layoutNameParts.length == 3) {
             controllerName = layoutNameParts[1];
             actionName = layoutNameParts[2];
         }
 
-        if (layoutNameParts.length == 2 || layoutNameParts.length > 3) { // NOPMD
+        if (layoutNameParts.length == 2 || layoutNameParts.length > 3) {
             routeName = layoutName.getText().trim();
         }
 
         return new String[]{routeName, controllerName, actionName};
     }
 
-    /**
-     * Get area.
-     *
-     * @return String
-     */
     private String getArea() {
         return area.getSelectedItem().toString();
     }

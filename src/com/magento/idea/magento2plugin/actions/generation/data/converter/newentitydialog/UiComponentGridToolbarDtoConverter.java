@@ -29,7 +29,6 @@ public class UiComponentGridToolbarDtoConverter extends UiComponentGridToolbarDa
                 newEntityDialogData.hasToolbar(),
                 newEntityDialogData.hasToolbarBookmarks(),
                 newEntityDialogData.hasToolbarColumnsControl(),
-                newEntityDialogData.hasToolbarFullTextSearch(),
                 newEntityDialogData.hasToolbarListingFilters(),
                 newEntityDialogData.hasToolbarListingPaging()
 
