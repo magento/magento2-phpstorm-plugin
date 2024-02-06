@@ -304,7 +304,7 @@
             <properties>
               <hideActionText value="true"/>
               <selected value="true"/>
-              <text value="Aminhtml Customer"/>
+              <text value="Adminhtml Customer"/>
             </properties>
           </component>
           <component id="ccf9d" class="javax.swing.JCheckBox" binding="useInCustomerAccountCreateCheckBox">
