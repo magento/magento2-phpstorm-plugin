@@ -5,14 +5,14 @@
 
 package com.magento.idea.magento2plugin.project.startup;
 
-import kotlin.Unit;
-import kotlin.coroutines.Continuation;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.openapi.startup.ProjectActivity;
+import com.intellij.openapi.startup.StartupActivity;
 import com.magento.idea.magento2plugin.init.ConfigurationManager;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.magento.MagentoBasePathUtil;
+import kotlin.Unit;
+import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,7 +38,8 @@ public class CheckIfMagentoPathIsValidActivity implements StartupActivity, Proje
 
     @Nullable
     @Override
-    public Object execute(@NotNull Project project, @NotNull Continuation<? super Unit> continuation) {
+    public Object execute(@NotNull Project project,
+                          @NotNull Continuation<? super Unit> continuation) {
         registerSettings(project);
         return null;
     }
