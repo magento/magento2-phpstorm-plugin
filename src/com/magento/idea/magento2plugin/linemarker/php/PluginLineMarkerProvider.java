@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -236,7 +236,7 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
 
             final List<PluginData> pluginDataList = pluginClassCache.getPluginsForClass(methodClass);
             final List<PluginMethodData> pluginMethods = pluginClassCache.getPluginMethods(pluginDataList);
-            final String classMethodName = WordUtils.capitalize(psiElement.getName());
+            final String classMethodName = StringUtils.capitalize(psiElement.getName());
 
             pluginMethods.removeIf(pluginMethod -> !isPluginMethodName(pluginMethod.getMethodName(), classMethodName));
             sortMethods(pluginMethods, results);

@@ -7,7 +7,7 @@ package com.magento.idea.magento2plugin.actions.generation.data.code;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class ClassPropertyData {
     private final List<String> data = new ArrayList<>();
