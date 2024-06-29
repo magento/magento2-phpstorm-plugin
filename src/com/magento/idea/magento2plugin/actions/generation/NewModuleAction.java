@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin.actions.generation;
 
 import com.intellij.ide.IdeView;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -110,5 +111,10 @@ public class NewModuleAction extends com.intellij.openapi.actionSystem.AnAction 
         }
 
         event.getPresentation().setVisible(false);
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 }

@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin.actions.generation;
 
 import com.intellij.ide.IdeView;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -15,6 +16,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.dialog.NewEntityDialog;
+import org.jetbrains.annotations.NotNull;
 
 public class NewEntityAction extends AnAction {
     public static final String ACTION_NAME = "Magento 2 Entity";
@@ -52,5 +54,10 @@ public class NewEntityAction extends AnAction {
     @Override
     public boolean isDumbAware() {
         return false;
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 }

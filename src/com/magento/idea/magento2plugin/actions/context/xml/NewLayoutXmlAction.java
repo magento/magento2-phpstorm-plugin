@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.actions.context.xml;
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -92,6 +93,11 @@ public class NewLayoutXmlAction extends AnAction {
         }
 
         NewLayoutTemplateDialog.open(event.getProject(), targetDirectory);
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 
     /**

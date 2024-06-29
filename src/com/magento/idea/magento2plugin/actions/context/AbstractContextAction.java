@@ -9,6 +9,7 @@ import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.ide.fileTemplates.actions.AttributesDefaults;
 import com.intellij.ide.fileTemplates.actions.CreateFromTemplateActionBase;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.DataKey;
@@ -68,6 +69,11 @@ public abstract class AbstractContextAction extends CreateFromTemplateActionBase
     ) {
         super(title, description, icon);
         this.moduleFile = moduleFile;
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 
     @Override

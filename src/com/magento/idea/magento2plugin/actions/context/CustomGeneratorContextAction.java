@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.actions.context;
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
@@ -80,6 +81,11 @@ public abstract class CustomGeneratorContextAction extends AnAction {
 
     public @Nullable PsiFile getFile() {
         return file;
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 
     /**
