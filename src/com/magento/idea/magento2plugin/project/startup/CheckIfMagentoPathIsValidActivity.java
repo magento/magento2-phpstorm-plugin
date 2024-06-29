@@ -18,19 +18,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class CheckIfMagentoPathIsValidActivity implements StartupActivity, ProjectActivity {
 
-    public void registerSettings(final @NotNull Project project) {
-        final Settings settings = Settings.getInstance(project);
-        final String path = settings.magentoPath;
-        if (settings.pluginEnabled && (path == null || path.isEmpty())) {
-            if (MagentoBasePathUtil.isMagentoFolderValid(project.getBasePath())) {
-                settings.setMagentoPath(project.getBasePath());
-                return;
-            }
-            settings.pluginEnabled = false;
-            ConfigurationManager.suggestToConfigureMagentoPath(project);
-        }
-    }
-
     @Override
     public void runActivity(final @NotNull Project project) {
         registerSettings(project);
@@ -42,5 +29,18 @@ public class CheckIfMagentoPathIsValidActivity implements StartupActivity, Proje
                           @NotNull Continuation<? super Unit> continuation) {
         registerSettings(project);
         return null;
+    }
+
+    private void registerSettings(final @NotNull Project project) {
+        final Settings settings = Settings.getInstance(project);
+        final String path = settings.magentoPath;
+        if (settings.pluginEnabled && (path == null || path.isEmpty())) {
+            if (MagentoBasePathUtil.isMagentoFolderValid(project.getBasePath())) {
+                settings.setMagentoPath(project.getBasePath());
+                return;
+            }
+            settings.pluginEnabled = false;
+            ConfigurationManager.suggestToConfigureMagentoPath(project);
+        }
     }
 }

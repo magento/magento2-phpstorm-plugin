@@ -8,13 +8,14 @@ import com.intellij.json.psi.*;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ComposerPackageModelImpl implements ComposerPackageModel {
-    private JsonObject sourceComposerJson;
+    private final JsonObject sourceComposerJson;
 
     public static final String NAME = "name";
     public static final String TYPE = "type";
@@ -67,12 +68,12 @@ public class ComposerPackageModelImpl implements ComposerPackageModel {
             JsonArray jsonArray = getPropertyValueOfType(FILES, JsonArray.class);
             if (jsonArray != null) {
                 List<String> files = new ArrayList<>();
-                for(JsonValue value: jsonArray.getValueList()) {
+                for (JsonValue value : jsonArray.getValueList()) {
                     if (value instanceof JsonStringLiteral) {
                         files.add(StringUtils.strip(value.getText(), "\""));
                     }
                 }
-                return files.size() > 0 ? files.toArray(new String[files.size()]) : null;
+                return !files.isEmpty() ? files.toArray(new String[files.size()]) : null;
             }
         }
 
@@ -86,16 +87,16 @@ public class ComposerPackageModelImpl implements ComposerPackageModel {
         if (autoloadObject != null) {
             JsonObject jsonObject = getPropertyValueOfType(PSR4, JsonObject.class);
             if (jsonObject != null) {
-                Map <String, String> map = new HashMap<String, String>();
-                for (JsonProperty property: jsonObject.getPropertyList()) {
+                Map<String, String> map = new HashMap<String, String>();
+                for (JsonProperty property : jsonObject.getPropertyList()) {
                     JsonValue value = property.getValue();
 
-                    if (value != null && value instanceof JsonStringLiteral) {
+                    if (value instanceof JsonStringLiteral) {
                         map.put(property.getName(), StringUtils.strip(value.getText(), "\""));
                     }
                 }
 
-                return map.size() > 0 ? map : null;
+                return !map.isEmpty() ? map : null;
             }
         }
 
@@ -103,13 +104,14 @@ public class ComposerPackageModelImpl implements ComposerPackageModel {
     }
 
     @Nullable
-    public <T extends JsonValue> T getPropertyValueOfType(String propertyName, @NotNull Class<T> aClass) {
+    public <T extends JsonValue> T getPropertyValueOfType(String propertyName,
+                                                          @NotNull Class<T> aClass) {
         JsonProperty property = sourceComposerJson.findProperty(propertyName);
         if (property == null) {
             return null;
         }
         JsonValue value = property.getValue();
-        if (value != null && aClass.isInstance(value)) {
+        if (aClass.isInstance(value)) {
             return aClass.cast(value);
         }
 
@@ -118,7 +120,10 @@ public class ComposerPackageModelImpl implements ComposerPackageModel {
 
     @Nullable
     private String getStringPropertyValue(String propertyName) {
-        JsonStringLiteral stringLiteral = getPropertyValueOfType(propertyName, JsonStringLiteral.class);
+        JsonStringLiteral stringLiteral = getPropertyValueOfType(
+                propertyName,
+                JsonStringLiteral.class
+        );
 
         if (stringLiteral != null) {
             return StringUtils.strip(stringLiteral.getText(), "\"");
