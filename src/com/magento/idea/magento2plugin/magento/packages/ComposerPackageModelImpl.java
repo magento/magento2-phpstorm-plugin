@@ -2,17 +2,21 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.magento.packages;
 
-import com.intellij.json.psi.*;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
+import com.intellij.json.psi.JsonArray;
+import com.intellij.json.psi.JsonObject;
+import com.intellij.json.psi.JsonProperty;
+import com.intellij.json.psi.JsonStringLiteral;
+import com.intellij.json.psi.JsonValue;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ComposerPackageModelImpl implements ComposerPackageModel {
     private final JsonObject sourceComposerJson;
@@ -104,15 +108,16 @@ public class ComposerPackageModelImpl implements ComposerPackageModel {
     }
 
     @Nullable
+    @Override
     public <T extends JsonValue> T getPropertyValueOfType(String propertyName,
-                                                          @NotNull Class<T> aClass) {
+                                                          @NotNull Class<T> thisClass) {
         JsonProperty property = sourceComposerJson.findProperty(propertyName);
         if (property == null) {
             return null;
         }
         JsonValue value = property.getValue();
-        if (aClass.isInstance(value)) {
-            return aClass.cast(value);
+        if (thisClass.isInstance(value)) {
+            return thisClass.cast(value);
         }
 
         return null;
