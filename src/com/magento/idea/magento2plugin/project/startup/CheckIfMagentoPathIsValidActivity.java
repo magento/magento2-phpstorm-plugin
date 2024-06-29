@@ -25,8 +25,8 @@ public class CheckIfMagentoPathIsValidActivity implements StartupActivity, Proje
 
     @Nullable
     @Override
-    public Object execute(@NotNull Project project,
-                          @NotNull Continuation<? super Unit> continuation) {
+    public Object execute(@NotNull final Project project,
+                          @NotNull final Continuation<? super Unit> continuation) {
         registerSettings(project);
         return null;
     }
