@@ -83,7 +83,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({

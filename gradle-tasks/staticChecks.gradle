@@ -23,34 +23,34 @@ pmd {
     ruleSets = []
 }
 
-tasks.withType(Checkstyle) {
+tasks.withType(Checkstyle).configureEach {
     // Specify all files that should be checked
     classpath = files()
     source "${project.rootDir}"
 }
 
 // Execute Checkstyle on all files
-task checkstyle(type: Checkstyle) {
+tasks.register('checkstyle', Checkstyle) {
 }
 
 // Execute Checkstyle on all modified files
-task checkstyleCI(type: Checkstyle) {
+tasks.register('checkstyleCI', Checkstyle) {
     def changedFiles = getChangedFiles()
     include changedFiles
 }
 
-tasks.withType(Pmd) {
+tasks.withType(Pmd).configureEach {
     // Specify all files that should be checked
     classpath = files()
     source "${project.rootDir}"
 }
 
 // Execute Checkstyle on all files
-task pmd(type: Pmd) {
+tasks.register('pmd', Pmd) {
 }
 
 // Execute Checkstyle on all modified files
-task pmdCI(type: Pmd) {
+tasks.register('pmdCI', Pmd) {
     def changedFiles = getChangedFiles()
     include changedFiles
 }

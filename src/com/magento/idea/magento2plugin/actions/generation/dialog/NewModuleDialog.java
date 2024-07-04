@@ -48,7 +48,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({"PMD.TooManyFields", "PMD.DataClass", "PMD.UnusedPrivateMethod"})
