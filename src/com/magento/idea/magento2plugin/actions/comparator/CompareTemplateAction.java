@@ -8,6 +8,7 @@ package com.magento.idea.magento2plugin.actions.comparator;
 import com.intellij.diff.DiffDialogHints;
 import com.intellij.diff.DiffManager;
 import com.intellij.diff.chains.DiffRequestChain;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
@@ -142,5 +143,10 @@ public class CompareTemplateAction extends AnAction {
     private void setStatus(final AnActionEvent event, final boolean status) {
         event.getPresentation().setVisible(status);
         event.getPresentation().setEnabled(status);
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 }

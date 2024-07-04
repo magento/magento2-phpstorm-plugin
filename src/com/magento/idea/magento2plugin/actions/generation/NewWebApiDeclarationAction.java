@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.actions.generation;
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
@@ -74,6 +75,11 @@ public class NewWebApiDeclarationAction extends AnAction {
         final String methodName = currentPhpMethod.getName();
 
         NewWebApiDeclarationDialog.open(event.getProject(), directory, classFqn, methodName);
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 
     /**

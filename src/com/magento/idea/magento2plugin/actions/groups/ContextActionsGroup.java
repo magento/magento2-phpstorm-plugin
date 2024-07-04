@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin.actions.groups;
 
 import com.intellij.ide.actions.NonEmptyActionGroup;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import java.util.Arrays;
@@ -31,6 +32,11 @@ public class ContextActionsGroup extends NonEmptyActionGroup {
         }
 
         super.update(event);
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 
     private static class ContextActionsComparator implements Comparator<AnAction> {

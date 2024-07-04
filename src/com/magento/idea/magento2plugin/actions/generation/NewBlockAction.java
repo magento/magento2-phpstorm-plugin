@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin.actions.generation;
 
 import com.intellij.ide.IdeView;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -51,5 +52,10 @@ public class NewBlockAction extends AnAction {
     @Override
     public boolean isDumbAware() {
         return false;
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 }

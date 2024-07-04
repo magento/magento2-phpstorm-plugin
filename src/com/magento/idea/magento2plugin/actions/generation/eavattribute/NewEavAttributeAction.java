@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin.actions.generation.eavattribute;
 
 import com.intellij.ide.IdeView;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -46,6 +47,11 @@ public abstract class NewEavAttributeAction extends AnAction {
 
         final EavAttributeDialog eavAttributeDialog = getDialogWindow(project, directory);
         eavAttributeDialog.open();
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 
     @Override
