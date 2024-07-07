@@ -7,12 +7,14 @@ package com.magento.idea.magento2plugin.magento.packages.code;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 public enum MagentoVersion {
 
     ENTERPRISE_EDITION("magento/product-enterprise-edition", 1, "Adobe Commerce"),
-    COMMUNITY_EDITION("magento/product-community-edition", 2, "Magento Open Source");
+    COMMUNITY_EDITION("magento/product-community-edition", 2, "Magento Open Source"),
+    MAGEOS_COMMUNITY_EDITION("mage-os/product-community-edition", 3, "Mage-OS Community Edition");
 
     private final String name;
     private final int priority;
@@ -52,9 +54,7 @@ public enum MagentoVersion {
         final List<MagentoVersion> versions = new ArrayList<>(
                 Arrays.asList(MagentoVersion.values())
         );
-        versions.sort(
-                (version1, version2) -> version1.getPriority() > version2.getPriority() ? 1 : 0
-        );
+        versions.sort(Comparator.comparingInt(MagentoVersion::getPriority));
 
         return versions;
     }
