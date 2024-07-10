@@ -105,7 +105,7 @@ public class InjectAViewModelAction extends DumbAwareAction implements ActionUpd
         if (xmlTag == null) {
             return null;
         }
-        XmlTag resultTag;
+        final XmlTag resultTag;
 
         if (CommonXml.ATTRIBUTE_ARGUMENTS.equals(xmlTag.getName())) {
             resultTag = PsiTreeUtil.getParentOfType(xmlTag, XmlTag.class);

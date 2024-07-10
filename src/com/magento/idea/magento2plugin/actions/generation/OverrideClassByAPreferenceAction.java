@@ -21,7 +21,8 @@ import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import org.jetbrains.annotations.NotNull;
 
-public class OverrideClassByAPreferenceAction extends DumbAwareAction implements ActionUpdateThreadAware {
+public class OverrideClassByAPreferenceAction extends DumbAwareAction
+        implements ActionUpdateThreadAware {
     public static final String ACTION_NAME = "Override this class by a new Preference";
     public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Preference";
     public static final String INTERFACE_ACTION = "Override this interface by a new Preference";

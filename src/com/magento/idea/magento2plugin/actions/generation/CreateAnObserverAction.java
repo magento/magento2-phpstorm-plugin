@@ -30,7 +30,8 @@ import com.magento.idea.magento2plugin.magento.files.Observer;
 import com.magento.idea.magento2plugin.project.Settings;
 import org.jetbrains.annotations.NotNull;
 
-public class CreateAnObserverAction extends DumbAwareAction implements ActionUpdateThreadAware {
+public class CreateAnObserverAction extends DumbAwareAction
+        implements ActionUpdateThreadAware {
 
     public static final String ACTION_NAME = "Create a new Observer for this event";
     public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Observer";
