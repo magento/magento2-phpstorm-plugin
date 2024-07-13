@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation;
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
+import com.intellij.openapi.actionSystem.ActionUpdateThreadAware;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.editor.Caret;
@@ -24,7 +26,7 @@ import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.magento.plugin.IsPluginAllowedForMethodUtil;
 import org.jetbrains.annotations.NotNull;
 
-public class CreateAPluginAction extends DumbAwareAction {
+public class CreateAPluginAction extends DumbAwareAction implements ActionUpdateThreadAware {
 
     public static final String ACTION_NAME = "Create a new Plugin";
     public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Plugin";
@@ -88,6 +90,11 @@ public class CreateAPluginAction extends DumbAwareAction {
     @Override
     public boolean isDumbAware() {
         return false;
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 
     private Pair<PsiFile, PhpClass> findPhpClass(final @NotNull AnActionEvent event) {
