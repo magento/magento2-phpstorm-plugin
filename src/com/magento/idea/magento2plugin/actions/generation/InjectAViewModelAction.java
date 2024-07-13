@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation;
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
+import com.intellij.openapi.actionSystem.ActionUpdateThreadAware;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.editor.Caret;
@@ -21,7 +23,7 @@ import com.magento.idea.magento2plugin.magento.files.LayoutXml;
 import com.magento.idea.magento2plugin.project.Settings;
 import org.jetbrains.annotations.NotNull;
 
-public class InjectAViewModelAction extends DumbAwareAction {
+public class InjectAViewModelAction extends DumbAwareAction implements ActionUpdateThreadAware {
 
     public static final String ACTION_NAME = "Inject a new View Model for this block";
     public static final String ACTION_DESCRIPTION = "Inject a new Magento 2 View Model";
@@ -68,6 +70,11 @@ public class InjectAViewModelAction extends DumbAwareAction {
         return false;
     }
 
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
+    }
+
     /**
      * Get focused (target) element for the event.
      *
@@ -98,7 +105,7 @@ public class InjectAViewModelAction extends DumbAwareAction {
         if (xmlTag == null) {
             return null;
         }
-        XmlTag resultTag;
+        final XmlTag resultTag;
 
         if (CommonXml.ATTRIBUTE_ARGUMENTS.equals(xmlTag.getName())) {
             resultTag = PsiTreeUtil.getParentOfType(xmlTag, XmlTag.class);
