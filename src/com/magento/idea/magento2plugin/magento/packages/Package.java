@@ -19,4 +19,5 @@ public class Package { //NOPMD
     public static String vendorModuleNameSeparator = "_";
     public static String fqnSeparator = "\\";
     public static String composerType = "project";
+    public static String mageOsFrameworkRootComposer = "vendor/mage-os/framework";
 }
