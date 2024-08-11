@@ -4,7 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
+## 5.3.0
+
 ## 5.2.0
+
+### Fixed
+
+- Fixed action update thread deprecation [#2072](https://github.com/magento/magento2-phpstorm-plugin/pull/2072)
+- Fixed compatibility with 2024.1 [#2071](https://github.com/magento/magento2-phpstorm-plugin/pull/2071)
 
 ## 5.1.0
 

@@ -2,10 +2,13 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.magento.packages;
 
-import org.jetbrains.annotations.Nullable;
+import com.intellij.json.psi.JsonValue;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface ComposerPackageModel {
     @Nullable
@@ -25,4 +28,7 @@ public interface ComposerPackageModel {
 
     @Nullable
     Map<String, String> getAutoloadPsr4();
+
+    <T extends JsonValue> T getPropertyValueOfType(String propertyName,
+                                                   @NotNull Class<T> thisClass);
 }

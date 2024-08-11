@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation;
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
+import com.intellij.openapi.actionSystem.ActionUpdateThreadAware;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -19,7 +21,8 @@ import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import org.jetbrains.annotations.NotNull;
 
-public class OverrideClassByAPreferenceAction extends DumbAwareAction {
+public class OverrideClassByAPreferenceAction extends DumbAwareAction
+        implements ActionUpdateThreadAware {
     public static final String ACTION_NAME = "Override this class by a new Preference";
     public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Preference";
     public static final String INTERFACE_ACTION = "Override this interface by a new Preference";
@@ -73,6 +76,11 @@ public class OverrideClassByAPreferenceAction extends DumbAwareAction {
     @Override
     public boolean isDumbAware() {
         return false;
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 
     private Pair<PsiFile, PhpClass> findPhpClass(@NotNull final AnActionEvent event) {

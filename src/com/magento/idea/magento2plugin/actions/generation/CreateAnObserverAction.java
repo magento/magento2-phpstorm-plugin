@@ -6,6 +6,8 @@
 package com.magento.idea.magento2plugin.actions.generation;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
+import com.intellij.openapi.actionSystem.ActionUpdateThreadAware;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.editor.Caret;
@@ -28,7 +30,8 @@ import com.magento.idea.magento2plugin.magento.files.Observer;
 import com.magento.idea.magento2plugin.project.Settings;
 import org.jetbrains.annotations.NotNull;
 
-public class CreateAnObserverAction extends DumbAwareAction {
+public class CreateAnObserverAction extends DumbAwareAction
+        implements ActionUpdateThreadAware {
 
     public static final String ACTION_NAME = "Create a new Observer for this event";
     public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Observer";
@@ -85,6 +88,11 @@ public class CreateAnObserverAction extends DumbAwareAction {
     @Override
     public boolean isDumbAware() {
         return false;
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 
     private PsiElement getElement(final @NotNull AnActionEvent event) {

@@ -7,6 +7,7 @@ package com.magento.idea.magento2uct.actions;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.IdeView;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
@@ -57,6 +58,11 @@ public class ReindexVersionedIndexesAction extends AnAction {
             return;
         }
         ReindexDialog.open(project, directory);
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 
     /**

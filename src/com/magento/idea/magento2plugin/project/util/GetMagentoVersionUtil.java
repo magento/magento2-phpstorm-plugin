@@ -15,7 +15,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,32 +48,20 @@ public final class GetMagentoVersionUtil {
         final Map<String, String> foundMagentoPackages = new HashMap<>();
 
         for (final JsonObject packageItem : packages) {
-            final JsonProperty nameProperty = packageItem.findProperty(
-                    ComposerLock.PACKAGE_NAME_PROP
-            );
+            final @Nullable ImmutablePair<String, String> magentoPackage = findMagentoPackage(
+                    packageItem,
+                    versionNames);
 
-            if (nameProperty == null || nameProperty.getValue() == null) {
+            if (magentoPackage == null) {
                 continue;
             }
-            final String name = StringUtils.strip(nameProperty.getValue().getText(), "\"");
 
-            if (versionNames.contains(name)) {
-                final JsonProperty versionProperty = packageItem.findProperty(
-                        ComposerLock.PACKAGE_VERSION_PROP
-                );
+            foundMagentoPackages.put(magentoPackage.getLeft(), magentoPackage.getRight());
 
-                if (versionProperty == null || versionProperty.getValue() == null) {
-                    continue;
-                }
-
-                final String value = StringUtils.strip(
-                        versionProperty.getValue().getText(), "\""
-                );
-                foundMagentoPackages.put(name, value);
-
-                if (MagentoVersion.ENTERPRISE_EDITION.getName().equals(name)) {
-                    break;
-                }
+            if (foundMagentoPackages.containsKey(MagentoVersion.ENTERPRISE_EDITION.getName())
+                    || foundMagentoPackages.containsKey(
+                            MagentoVersion.MAGEOS_COMMUNITY_EDITION.getName())) {
+                break;
             }
         }
 
@@ -86,5 +75,35 @@ public final class GetMagentoVersionUtil {
         }
 
         return null;
+    }
+
+    private static @Nullable ImmutablePair<String, String> findMagentoPackage(
+            final JsonObject packageItem,
+            final List<String> versionNames
+    ) {
+        final JsonProperty nameProperty = packageItem.findProperty(
+                ComposerLock.PACKAGE_NAME_PROP
+        );
+
+        if (nameProperty == null || nameProperty.getValue() == null) {
+            return null;
+        }
+        final String name = StringUtils.strip(nameProperty.getValue().getText(), "\"");
+
+        if (!versionNames.contains(name)) {
+            return null;
+        }
+
+        final JsonProperty versionProperty = packageItem.findProperty(
+                ComposerLock.PACKAGE_VERSION_PROP
+        );
+
+        if (versionProperty == null || versionProperty.getValue() == null) {
+            return null;
+        }
+
+        final String value = StringUtils.strip(versionProperty.getValue().getText(), "\"");
+
+        return ImmutablePair.of(name, value);
     }
 }

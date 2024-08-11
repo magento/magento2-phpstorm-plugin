@@ -11,7 +11,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClas
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public final class ClassPropertyFormatterUtil {
 

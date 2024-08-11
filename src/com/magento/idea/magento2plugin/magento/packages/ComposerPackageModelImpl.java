@@ -2,19 +2,25 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 package com.magento.idea.magento2plugin.magento.packages;
 
-import com.intellij.json.psi.*;
-import org.apache.commons.lang.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.json.psi.JsonArray;
+import com.intellij.json.psi.JsonObject;
+import com.intellij.json.psi.JsonProperty;
+import com.intellij.json.psi.JsonStringLiteral;
+import com.intellij.json.psi.JsonValue;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ComposerPackageModelImpl implements ComposerPackageModel {
-    private JsonObject sourceComposerJson;
+    private final JsonObject sourceComposerJson;
+    private static final int VENDOR_AND_PACKAGE_PARTS_LENGTH = 2;
 
     public static final String NAME = "name";
     public static final String TYPE = "type";
@@ -23,7 +29,7 @@ public class ComposerPackageModelImpl implements ComposerPackageModel {
     public static final String PSR4 = "psr4";
     public static final String FILES = "file";
 
-    public ComposerPackageModelImpl(@NotNull JsonObject sourceComposerJson) {
+    public ComposerPackageModelImpl(@NotNull final JsonObject sourceComposerJson) {
         this.sourceComposerJson = sourceComposerJson;
     }
 
@@ -42,10 +48,10 @@ public class ComposerPackageModelImpl implements ComposerPackageModel {
     @Nullable
     @Override
     public String getVendor() {
-        String nameProperty = getStringPropertyValue(NAME);
+        final String nameProperty = getStringPropertyValue(NAME);
         if (nameProperty != null) {
-            String[] vendorAndPackage = nameProperty.split("/");
-            if (vendorAndPackage.length == 2) {
+            final String[] vendorAndPackage = nameProperty.split("/");
+            if (vendorAndPackage.length == VENDOR_AND_PACKAGE_PARTS_LENGTH) {
                 return vendorAndPackage[0];
             }
         }
@@ -62,63 +68,69 @@ public class ComposerPackageModelImpl implements ComposerPackageModel {
     @Nullable
     @Override
     public String[] getAutoloadFiles() {
-        JsonObject autoloadObject = getPropertyValueOfType(AUTOLOAD, JsonObject.class);
+        final JsonObject autoloadObject = getPropertyValueOfType(AUTOLOAD, JsonObject.class);
         if (autoloadObject != null) {
-            JsonArray jsonArray = getPropertyValueOfType(FILES, JsonArray.class);
-            if (jsonArray != null) {
-                List<String> files = new ArrayList<>();
-                for(JsonValue value: jsonArray.getValueList()) {
-                    if (value instanceof JsonStringLiteral) {
-                        files.add(StringUtils.strip(value.getText(), "\""));
-                    }
-                }
-                return files.size() > 0 ? files.toArray(new String[files.size()]) : null;
-            }
+            return new String[0];
         }
 
-        return null;
+        final JsonArray jsonArray = getPropertyValueOfType(FILES, JsonArray.class);
+        if (jsonArray != null) {
+            final List<String> files = new ArrayList<>();
+            for (final JsonValue value : jsonArray.getValueList()) {
+                if (value instanceof JsonStringLiteral) {
+                    files.add(StringUtils.strip(value.getText(), "\""));
+                }
+            }
+            return files.isEmpty() ? new String[0] : files.toArray(new String[0]);
+        }
+
+        return new String[0];
     }
 
     @Nullable
     @Override
     public Map<String, String> getAutoloadPsr4() {
-        JsonObject autoloadObject = getPropertyValueOfType(AUTOLOAD, JsonObject.class);
-        if (autoloadObject != null) {
-            JsonObject jsonObject = getPropertyValueOfType(PSR4, JsonObject.class);
-            if (jsonObject != null) {
-                Map <String, String> map = new HashMap<String, String>();
-                for (JsonProperty property: jsonObject.getPropertyList()) {
-                    JsonValue value = property.getValue();
+        final JsonObject autoloadObject = getPropertyValueOfType(AUTOLOAD, JsonObject.class);
+        final Map<String, String> map = new HashMap<>();
+        if (autoloadObject == null) {
+            return map;
+        }
 
-                    if (value != null && value instanceof JsonStringLiteral) {
-                        map.put(property.getName(), StringUtils.strip(value.getText(), "\""));
-                    }
+        final JsonObject jsonObject = getPropertyValueOfType(PSR4, JsonObject.class);
+        if (jsonObject != null) {
+            for (final JsonProperty property : jsonObject.getPropertyList()) {
+                final JsonValue value = property.getValue();
+                if (value instanceof JsonStringLiteral) {
+                    map.put(property.getName(), StringUtils.strip(value.getText(), "\""));
                 }
-
-                return map.size() > 0 ? map : null;
             }
         }
 
-        return null;
+        return map;
     }
 
     @Nullable
-    public <T extends JsonValue> T getPropertyValueOfType(String propertyName, @NotNull Class<T> aClass) {
-        JsonProperty property = sourceComposerJson.findProperty(propertyName);
+    @Override
+    public <T extends JsonValue> T getPropertyValueOfType(final String propertyName,
+                                                          @NotNull final Class<T> thisClass) {
+        final JsonProperty property = sourceComposerJson.findProperty(propertyName);
         if (property == null) {
             return null;
         }
-        JsonValue value = property.getValue();
-        if (value != null && aClass.isInstance(value)) {
-            return aClass.cast(value);
+        final JsonValue value = property.getValue();
+        if (thisClass.isInstance(value)) {
+            return thisClass.cast(value);
         }
 
         return null;
     }
 
     @Nullable
-    private String getStringPropertyValue(String propertyName) {
-        JsonStringLiteral stringLiteral = getPropertyValueOfType(propertyName, JsonStringLiteral.class);
+    private String getStringPropertyValue(final String propertyName) {
+        final JsonStringLiteral stringLiteral = getPropertyValueOfType(
+                propertyName,
+                JsonStringLiteral.class
+        );
 
         if (stringLiteral != null) {
             return StringUtils.strip(stringLiteral.getText(), "\"");

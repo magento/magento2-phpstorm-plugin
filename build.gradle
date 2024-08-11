@@ -4,10 +4,10 @@
  */
 
 plugins {
-    id 'org.jetbrains.intellij' version '1.13.3'
+    id 'org.jetbrains.intellij' version '1.17.3'
     id 'checkstyle'
     id 'pmd'
-    id 'org.jetbrains.changelog' version '2.0.0'
+    id 'org.jetbrains.changelog' version '2.2.0'
 }
 
 repositories {
@@ -15,7 +15,7 @@ repositories {
 }
 
 group 'com.magento.idea'
-version '5.2.0'
+version '5.3.0'
 
 apply plugin: 'org.jetbrains.intellij'
 apply plugin: 'java'
@@ -23,12 +23,14 @@ apply plugin: 'idea'
 apply plugin: 'groovy'
 apply plugin: 'org.jetbrains.changelog'
 
-def phpPluginVersion = System.getProperty("phpPluginVersion", "231.8109.199")
-def ideaVersion = System.getProperty("ideaVersion", "2023.1")
+def phpPluginVersion = System.getProperty("phpPluginVersion", "241.14494.158")
+def ideaVersion = System.getProperty("ideaVersion", "2024.1")
 def javaVersion = 17
 
-sourceCompatibility = javaVersion
-targetCompatibility = javaVersion
+java {
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+}
 
 intellij {
     version = ideaVersion
@@ -41,7 +43,7 @@ intellij {
             'properties',
             'com.intellij.css',
             'JavaScript',
-            'com.intellij.lang.jsgraphql:3.4.0',
+            'com.intellij.lang.jsgraphql:241.14494.150',
             'platform-images',
             'copyright'
     ]

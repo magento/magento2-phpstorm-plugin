@@ -37,6 +37,9 @@ public final class MagentoBasePathUtil {
             ) != null || VfsUtil.findRelativeFile(
                     file,
                     Package.frameworkRootGit.split(Package.V_FILE_SEPARATOR)
+            ) != null || VfsUtil.findRelativeFile(
+                    file,
+                    Package.mageOsFrameworkRootComposer.split(Package.V_FILE_SEPARATOR)
             ) != null;
         }
 

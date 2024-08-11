@@ -90,7 +90,7 @@ public class NewObserverDialog extends AbstractDialog {
     private JLabel classNameErrorMessage;// NOPMD
     private JLabel directoryStructureLabel;// NOPMD
     private JLabel directoryStructureErrorMessage;// NOPMD
-    private JLabel evenNamesLabel;// NOPMD
+    private JLabel eventNamesLabel;// NOPMD
     private JLabel targetAreaLabel;// NOPMD
 
     /**
@@ -186,7 +186,7 @@ public class NewObserverDialog extends AbstractDialog {
         return className.getText().trim();
     }
 
-    public String getEvenName() {
+    public String getEventName() {
         return eventName.getSelectedItem().toString();
     }
 
@@ -213,7 +213,7 @@ public class NewObserverDialog extends AbstractDialog {
                             modulePackage,
                             moduleName,
                             getObserverClassFqn(),
-                            getEvenName(),
+                            getEventName(),
                             observerDirectory,
                             ModuleObserverFile.resolveClassNameFromInput(getClassName())
                     ),
@@ -227,7 +227,7 @@ public class NewObserverDialog extends AbstractDialog {
                                     Package.fqnSeparator,
                                     Package.vendorModuleNameSeparator
                             ),
-                            getEvenName(),
+                            getEventName(),
                             getObserverName(),
                             getObserverClassFqn().concat(Package.fqnSeparator).concat(
                                     ModuleObserverFile.resolveClassNameFromInput(getClassName())

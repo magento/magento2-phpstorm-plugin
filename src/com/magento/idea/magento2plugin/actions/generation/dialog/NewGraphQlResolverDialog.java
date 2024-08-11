@@ -113,7 +113,12 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
         final NewGraphQlResolverDialog dialog = new NewGraphQlResolverDialog(project, directory);
         dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+
+        // TODO: It's a workaround. Proper fix should be done as:
+        // https://github.com/magento/magento2-phpstorm-plugin/issues/2080
+        try (var token = com.intellij.concurrency.ThreadContext.resetThreadContext()) {
+            dialog.setVisible(true);
+        }
     }
 
     protected void onOK() {

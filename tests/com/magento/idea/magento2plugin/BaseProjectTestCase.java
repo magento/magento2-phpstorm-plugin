@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin;
 
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.testFramework.IndexingTestUtil;
 import com.intellij.testFramework.PlatformTestUtil;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
@@ -50,6 +51,7 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
         settings.mftfSupportEnabled = true;
         IndexManager.manualReindex();
         PlatformTestUtil.dispatchAllEventsInIdeEventQueue();
+        IndexingTestUtil.waitUntilIndexesAreReady(myFixture.getProject());
     }
 
     protected void disablePluginAndReindex() {
@@ -57,6 +59,7 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
         settings.pluginEnabled = false;
         IndexManager.manualReindex();
         PlatformTestUtil.dispatchAllEventsInIdeEventQueue();
+        IndexingTestUtil.waitUntilIndexesAreReady(myFixture.getProject());
     }
 
     protected void disableMftfSupportAndReindex() {
@@ -64,6 +67,7 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
         settings.mftfSupportEnabled = false;
         IndexManager.manualReindex();
         PlatformTestUtil.dispatchAllEventsInIdeEventQueue();
+        IndexingTestUtil.waitUntilIndexesAreReady(myFixture.getProject());
     }
 
     protected String prepareFixturePath(
