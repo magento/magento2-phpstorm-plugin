@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 5.3.0
 
+### Added
+
+- Mage-os support [#2081](https://github.com/magento/magento2-phpstorm-plugin/pull/2081)
+
+### Fixed
+
+- Workaround for "thread context was already set" exception [#2082](https://github.com/magento/magento2-phpstorm-plugin/pull/2082)
+- NewObserverDialog form typo [#2087](https://github.com/magento/magento2-phpstorm-plugin/pull/2087)
+- ActionUpdateThread.OLD_EDT deprecation on DumbAwareActions [#2088](https://github.com/magento/magento2-phpstorm-plugin/pull/2088)
+
 ## 5.2.0
 
 ### Fixed
