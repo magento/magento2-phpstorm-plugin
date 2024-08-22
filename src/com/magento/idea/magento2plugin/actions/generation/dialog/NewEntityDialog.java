@@ -123,7 +123,6 @@ public class NewEntityDialog extends AbstractDialog {
     private JCheckBox addToolBar;
     private JCheckBox addBookmarksCheckBox;
     private JCheckBox addColumnsControlCheckBox;
-    private JCheckBox addFullTextSearchCheckBox;
     private JCheckBox addListingFiltersCheckBox;
     private JCheckBox addListingPagingCheckBox;
     private JComboBox<ComboBoxItemData> tableEngine;
@@ -740,7 +739,6 @@ public class NewEntityDialog extends AbstractDialog {
                 addColumnsControlCheckBox.isSelected(),
                 addListingFiltersCheckBox.isSelected(),
                 addListingPagingCheckBox.isSelected(),
-                addFullTextSearchCheckBox.isSelected(),
                 getParentAcl(),
                 acl.getText().trim(),
                 aclTitle.getText().trim(),

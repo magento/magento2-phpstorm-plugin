@@ -95,7 +95,6 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     private JCheckBox addToolBar;
     private JCheckBox addBookmarksCheckBox;
     private JCheckBox addColumnsControlCheckBox;
-    private JCheckBox addFullTextSearchCheckBox;
     private JCheckBox addListingFiltersCheckBox;
     private JCheckBox addListingPagingCheckBox;
     private FilteredComboBox collection;
@@ -294,7 +293,6 @@ public class NewUiComponentGridDialog extends AbstractDialog {
                 getAddToolBar(),
                 getAddBookmarksCheckBox(),
                 getAddColumnsControlCheckBox(),
-                getAddFullTextSearchCheckBox(),
                 getAddListingFiltersCheckBox(),
                 getAddListingPagingCheckBox()
         );
@@ -472,7 +470,6 @@ public class NewUiComponentGridDialog extends AbstractDialog {
 
         addBookmarksCheckBox.setEnabled(enabled);
         addColumnsControlCheckBox.setEnabled(enabled);
-        addFullTextSearchCheckBox.setEnabled(enabled);
         addListingFiltersCheckBox.setEnabled(enabled);
         addListingPagingCheckBox.setEnabled(enabled);
     }
@@ -592,10 +589,6 @@ public class NewUiComponentGridDialog extends AbstractDialog {
 
     private Boolean getAddColumnsControlCheckBox() {
         return addColumnsControlCheckBox.isSelected();
-    }
-
-    private Boolean getAddFullTextSearchCheckBox() {
-        return addFullTextSearchCheckBox.isSelected();
     }
 
     private Boolean getAddListingFiltersCheckBox() {
