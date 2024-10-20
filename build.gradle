@@ -42,8 +42,12 @@ intellijPlatform {
     version = ideaVersion
     projectName = 'com.magento.idea.magento2plugin'
 
-    patchPluginXml {
-        changeNotes = provider { changelog.getLatest().toHTML() }
+    pluginConfiguration {
+        id = 'com.magento.idea.magento2plugin'
+        name = 'Magento PhpStorm'
+        version = '5.4.0'
+        description = 'This is a PhpStorm IDE plugin for a better Magento 2 development workflow.'
+        changeNotes = provider { changelog.getLatest().toHTML() } as Provider<? extends String>
     }
 }
 
