@@ -2,9 +2,10 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {
-    id 'org.jetbrains.intellij' version '1.17.3'
+    id "org.jetbrains.intellij.platform" version "2.1.0"
     id 'checkstyle'
     id 'pmd'
     id 'org.jetbrains.changelog' version '2.2.0'
@@ -12,19 +13,24 @@ plugins {
 
 repositories {
     mavenCentral()
+
+    intellijPlatform {
+        defaultRepositories()
+        marketplace()
+    }
 }
 
 group 'com.magento.idea'
-version '5.3.0'
+version '5.4.0'
 
-apply plugin: 'org.jetbrains.intellij'
+apply plugin: 'org.jetbrains.intellij.platform'
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'groovy'
 apply plugin: 'org.jetbrains.changelog'
 
-def phpPluginVersion = System.getProperty("phpPluginVersion", "241.14494.158")
-def ideaVersion = System.getProperty("ideaVersion", "2024.1")
+def phpPluginVersion = System.getProperty("phpPluginVersion", "242.20224.427")
+def ideaVersion = System.getProperty("ideaVersion", "2024.2")
 def javaVersion = 17
 
 java {
@@ -32,28 +38,16 @@ java {
     targetCompatibility = javaVersion
 }
 
-intellij {
+intellijPlatform {
     version = ideaVersion
-    type = 'IU'
-    pluginName = 'com.magento.idea.magento2plugin'
-    plugins = [
-            "com.jetbrains.php:$phpPluginVersion",
-            'yaml',
-            'java-i18n',
-            'properties',
-            'com.intellij.css',
-            'JavaScript',
-            'com.intellij.lang.jsgraphql:241.14494.150',
-            'platform-images',
-            'copyright'
-    ]
-    updateSinceUntilBuild = false
-    sameSinceUntilBuild = false
-    downloadSources = !Boolean.valueOf(System.getenv('CI'))
-    sandboxDir = "${project.rootDir}/.idea-sandbox"
+    projectName = 'com.magento.idea.magento2plugin'
 
-    patchPluginXml {
-        changeNotes = provider { changelog.getLatest().toHTML() }
+    pluginConfiguration {
+        id = 'com.magento.idea.magento2plugin'
+        name = 'Magento PhpStorm'
+        version = '5.4.0'
+        description = 'This is a PhpStorm IDE plugin for a better Magento 2 development workflow.'
+        changeNotes = provider { changelog.getLatest().toHTML() } as Provider<? extends String>
     }
 }
 
@@ -114,6 +108,17 @@ dependencies {
     testRuntimeOnly('org.junit.vintage:junit-vintage-engine:5.9.0')
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.9.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.00")
+
+    intellijPlatform {
+        intellijIdeaUltimate '2024.2.3'
+        plugin("com.jetbrains.php", phpPluginVersion)
+        plugin("com.intellij.lang.jsgraphql", "242.20224.155")
+        bundledPlugin "JavaScript"
+        instrumentationTools()
+        bundledPlugin 'com.intellij.java'
+
+        testFramework TestFrameworkType.Platform.INSTANCE
+    }
 }
 
 test {
