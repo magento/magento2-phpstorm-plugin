@@ -137,7 +137,6 @@ tasks {
     }
 
     test {
-        exclude("com/magento/idea/magento2plugin/actions/**") //https://github.com/magento/magento2-phpstorm-plugin/issues/2474
         useJUnitPlatform()
     }
 
@@ -238,4 +237,12 @@ fun getChangedFiles(): List<String> {
 
     // Return the list of touched files
     return files
+}
+
+kover {
+    currentProject {
+        instrumentation {
+            excludedClasses.add("org.apache.velocity.*")
+        }
+    }
 }
