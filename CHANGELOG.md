@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 5.4.0
 
+## 5.3.1
+
+### Fixed
+
+- Custom theme couldn't be detected [#2348](https://github.com/magento/magento2-phpstorm-plugin/pull/2348)
+
 ## 5.3.0
 
 ### Added
@@ -425,7 +431,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Added
 
-- PWA pure function Live Template 
+- PWA pure function Live Template
 
 ### Fixed
 
@@ -510,7 +516,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Code Inspection: GraphQL resolver in the scope of a PHP Class
 - Code Inspection: Duplicated Observer Usage in events XML
 - Moved plugin configuration from `Settings > Preferences > Languages & Frameworks > PHP > Magento` to
-        `Settings > Preferences > Languages & Frameworks > PHP > Frameworks > Magento`
+  `Settings > Preferences > Languages & Frameworks > PHP > Frameworks > Magento`
 - Fixed support of 202## 0.* versions of IDE's
 
 ## 0.3.0
@@ -535,7 +541,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Added project detector
 - Move configuration section to "Languages & Frameworks > Php > Magento"
 - Remove deprecated elements
-    
+
 ## 0.2.2
 
 ### Added
@@ -545,13 +551,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 ### Fixed
 
 - Fixed "Project disposed" exception
-   
+
 ## 0.2.1
-   
+
 ### Added
 
 - added module name for "Goto configuration" labels
-    
+
 ## 0.2.0
 
 ### Added
@@ -559,9 +565,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - WebApi routes
 - nicer "Goto configuration" labels
 - plugin settings (manual reindex, URN generation, plugin on/off)
- 
-## 0.1
- 
+
+## 0.1.0
+
 ### Added
 
 - Context type completion for:
@@ -574,9 +580,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - virtualType arguments resolution
 - webapi.xml interface/method completion/references
 - Support for old people using PhpStorm 8 or JDK## 1.7
-    
+
 ## 0.0.9
-   
+
 ### Added
 
 - Added Reference and completion support for layouts
@@ -601,13 +607,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Added reference to configuration and observers (classes or virtualType)
 - Added reference to observers from configuration
 - Added reference to event dispatch from configuration
-    
+
 ## 0.0.6
 
 ### Added
 
 - Added reference and completion support for virtual types/classes/arguments in DI configuration
-    
+
 ## 0.0.5
 
 ### Added
