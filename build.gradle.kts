@@ -109,6 +109,10 @@ intellijPlatform {
     }
 }
 
+apply {
+    from("${project.rootDir}/gradle-tasks/staticChecks.gradle")
+}
+
 changelog {
     groups.empty()
     repositoryUrl = providers.gradleProperty("pluginRepositoryUrl")
