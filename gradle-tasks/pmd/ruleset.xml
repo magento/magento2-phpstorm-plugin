@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<ruleset name="Custom Rules"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+    <description>
+        Magento PhpStorm rules
+    </description>
+    <rule ref="category/java/bestpractices.xml">
+        <exclude name="JUnit4TestShouldUseTestAnnotation"/>
+        <exclude name="JUnit4TestShouldUseBeforeAnnotation"/>
+    </rule>
+    <rule ref="category/java/codestyle.xml">
+        <exclude name="AtLeastOneConstructor" />
+        <exclude name="LongVariable" />
+        <exclude name="OnlyOneReturn" />
+    </rule>
+    <rule ref="category/java/design.xml">
+        <exclude name="LawOfDemeter"/>
+        <exclude name="DataClass"/>
+    </rule>
+    <rule ref="category/java/documentation.xml">
+        <exclude name="CommentRequired" />
+        <exclude name="CommentSize" />
+    </rule>
+    <rule ref="category/java/errorprone.xml">
+        <exclude name="BeanMembersShouldSerialize"/>
+        <exclude name="DataflowAnomalyAnalysis"/>
+        <exclude name="MissingSerialVersionUID"/>
+    </rule>
+    <exclude-pattern>.*/resources/.*</exclude-pattern>
+    <exclude-pattern>.*/testData/.*</exclude-pattern>
+    <rule ref="category/java/multithreading.xml">
+        <exclude name="UseConcurrentHashMap" />
+    </rule>
+    <rule ref="category/java/performance.xml"/>
+    <rule ref="category/java/security.xml" />
+</ruleset>
