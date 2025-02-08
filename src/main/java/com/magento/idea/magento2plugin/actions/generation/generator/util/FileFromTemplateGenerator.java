@@ -5,7 +5,6 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator.util;
 
-import com.intellij.ide.fileTemplates.DefaultTemplatePropertiesProvider;
 import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.lang.Language;
@@ -23,7 +22,6 @@ import com.intellij.util.IncorrectOperationException;
 import com.magento.idea.magento2plugin.magento.files.ModuleFileInterface;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
@@ -151,8 +149,10 @@ public class FileFromTemplateGenerator {
             fileTemplate = templateManager.getInstance(project).getCodeTemplate(templateName);
         }
 
-        fillDefaultProperties(templateManager, properties, directory);
-        final String fileTemplateText = fileTemplate.getText(properties);
+        Properties mergedProperties = new Properties();
+        mergedProperties.putAll(FileTemplateManager.getInstance(project).getDefaultProperties());
+        mergedProperties.putAll(properties);
+        final String fileTemplateText = fileTemplate.getText(mergedProperties);
         final PsiFile file = PsiFileFactory.getInstance(project).createFileFromText(
                 fileName,
                 language,
@@ -166,38 +166,6 @@ public class FileFromTemplateGenerator {
         }
 
         return file;
-    }
-
-    /**
-     * Fill template properties.
-     *
-     * @param templateManager FileTemplateManager
-     * @param props Properties
-     * @param directory PsiDirectory
-     */
-    public void fillDefaultProperties(
-            final @NotNull FileTemplateManager templateManager,
-            final @NotNull Properties props,
-            final @NotNull PsiDirectory directory
-    ) {
-        final Properties hardCodedProperties = templateManager.getDefaultProperties();
-        Iterator iterator = hardCodedProperties.keySet().iterator();
-
-        while (iterator.hasNext()) {
-            final Object propertyKey = iterator.next();
-            props.setProperty(
-                    (String)propertyKey,
-                    hardCodedProperties.getProperty((String)propertyKey)
-            );
-        }
-
-        iterator = DefaultTemplatePropertiesProvider.EP_NAME.getExtensionList().iterator();
-
-        while (iterator.hasNext()) {
-            final DefaultTemplatePropertiesProvider provider
-                    = (DefaultTemplatePropertiesProvider)iterator.next();
-            provider.fillProperties(directory, props);
-        }
     }
 
     public FileTemplateManager getTemplateManager() {

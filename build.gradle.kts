@@ -32,7 +32,11 @@ repositories {
 }
 
 dependencies {
-    testImplementation(libs.junit)
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
+
+    testImplementation("org.junit.vintage:junit-vintage-engine:5.10.0")
+
     implementation("com.googlecode.json-simple:json-simple:1.1.1")
     implementation("org.codehaus.plexus:plexus-utils:3.4.0")
 
@@ -127,6 +131,11 @@ tasks {
 
     publishPlugin {
         dependsOn(patchChangelog)
+    }
+
+    test {
+        exclude("com/magento/idea/magento2plugin/actions/**") //https://github.com/magento/magento2-phpstorm-plugin/issues/2474
+        useJUnitPlatform()
     }
 }
 
