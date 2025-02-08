@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 5.4.0
 
+### Changed
+
+- Updated Gradle Intellij plugin to version 2 [#2473](https://github.com/magento/magento2-phpstorm-plugin/pull/2473)
+The project no longer requires the paid Ultimate edition of IntelliJ IDEA. It can now run seamlessly in the Community edition.
+Enabled code emulation directly within PHPStorm, eliminating the dependency on IntelliJ IDEA for this functionality.
+
 ## 5.3.1
 
 ### Fixed
