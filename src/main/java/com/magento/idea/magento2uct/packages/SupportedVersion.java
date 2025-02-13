@@ -90,7 +90,7 @@ public enum SupportedVersion {
 
             // Read JSON response
             try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(connection.getInputStream()))
+                    new InputStreamReader(connection.getInputStream()))
             ) {
                 StringBuilder response = new StringBuilder();
                 String line;

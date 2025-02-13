@@ -266,7 +266,7 @@ public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfig
 
                 if (!getComingVersion().isEmpty()) {
                     commandSettingsBuilder.addArgument(
-                        "--current-version=" + Settings.getInstance(getProject()).magentoVersion
+                            "--current-version=" + Settings.getInstance(getProject()).magentoVersion
                     );
                 }
 
