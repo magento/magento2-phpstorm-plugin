@@ -168,7 +168,7 @@ public class ApiCoverageStateIndex implements VersionStateIndex {
                     VersioningDataOperationsUtil.unionVersionDataWithChangelog(
                             versioningData,
                             new ArrayList<>(Collections.singletonList(
-                                    SupportedVersion.valueOf("2.4.7").getVersion()
+                                    SupportedVersion.valueOf("2.3.0").getVersion()
                             )),
                             true
                     );

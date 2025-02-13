@@ -339,7 +339,6 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
         comingVersionError.setForeground(new Color(252, 119, 83));
 
         validateExecutablePathField();
-        validateComingVersionField((ComboBoxItemData) comingVersion.getSelectedItem());
 
         myScriptName
                 .getComponent()
@@ -381,15 +380,15 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
      * @param selectedItem ComboBoxItemData
      */
     private void validateComingVersionField(final ComboBoxItemData selectedItem) {
-//        final Matcher matcher = MAGENTO_VERSION_PATTERN.matcher(selectedItem.getText());
-//
-//        if (selectedItem != null && selectedItem.getKey().isEmpty()) {
-//            comingVersionError.setText("Please, specify target version");
-//        } else if (!matcher.find()) { // NOPMD
-//            comingVersionError.setText("Please, correct target version");
-//        } else {
-//            comingVersionError.setText("");
-//        }
+        final Matcher matcher = MAGENTO_VERSION_PATTERN.matcher(selectedItem.getText());
+
+        if (selectedItem != null && selectedItem.getKey().isEmpty()) {
+            comingVersionError.setText("Please, specify target version");
+        } else if (!matcher.find()) { // NOPMD
+            comingVersionError.setText("Please, correct target version");
+        } else {
+            comingVersionError.setText("");
+        }
     }
 
     /**
