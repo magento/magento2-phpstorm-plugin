@@ -64,8 +64,7 @@ public enum SupportedVersion {
     }
 
     /**
-     * Fetch supported versions dynamically from Packagist.
-     * <p>
+     * Fetch supported versions dynamically from Packagist
      * This method performs an HTTP GET request to fetch version data in JSON format
      * from a predefined URL and parses it into a list of version strings.
      *
@@ -84,11 +83,15 @@ public enum SupportedVersion {
             connection.setRequestProperty("Accept", "application/json");
 
             if (connection.getResponseCode() != 200) {
-                throw new Exception("Failed to fetch data, HTTP response code: " + connection.getResponseCode());
+                throw new Exception(
+                    "Failed to fetch data, HTTP response code: " + connection.getResponseCode()
+                );
             }
 
             // Read JSON response
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(connection.getInputStream()))
+            ) {
                 StringBuilder response = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {
@@ -114,7 +117,10 @@ public enum SupportedVersion {
                 }
             }
         } catch (Exception e) {
-            throw new Exception("Error fetching or parsing supported versions: " + e.getMessage(), e);
+            throw new Exception(
+                "Error fetching or parsing supported versions: " + e.getMessage(),
+                e
+            );
         } finally {
             if (connection != null) {
                 connection.disconnect();
