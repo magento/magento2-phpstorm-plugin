@@ -43,7 +43,7 @@ import org.jdesktop.swingx.JXHyperlink;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveImports"})
-public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
+public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> { //NOPMD - suppressed TooManyMethods
 
     private static final String LEARN_MORE_URI =
             "https://docs.magento.com/user-guide/getting-started.html#product-editions";
@@ -398,7 +398,7 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
      * @return ComboBoxItemData
      */
     private ComboBoxItemData getCorrectedSelectedItem(final Object selectedItem) {
-        ComboBoxItemData selectedComingVersion;
+        final ComboBoxItemData selectedComingVersion;
 
         if (selectedItem instanceof ComboBoxItemData) {
             selectedComingVersion = (ComboBoxItemData) selectedItem;

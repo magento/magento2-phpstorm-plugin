@@ -57,7 +57,7 @@ public enum SupportedVersion {
     public static List<String> getSupportedVersions() {
         try {
             return fetchSupportedVersions();
-        } catch (Exception e) {
+        } catch (Exception e) { //NOPMD - suppressed AvoidCatchingGenericException
             // Return an empty list or log the exception
             return List.of();
         }
@@ -71,9 +71,9 @@ public enum SupportedVersion {
      * @return List[String] containing supported version strings
      * @throws Exception if an error occurs during HTTP connection or JSON parsing
      */
-    public static List<String> fetchSupportedVersions() throws Exception {
-        String url = "https://repo.packagist.org/p2/magento/community-edition.json";
-        List<String> versions = new ArrayList<>();
+    public static List<String> fetchSupportedVersions() throws Exception { //NOPMD - suppressed SignatureDeclareThrowsException
+        final String url = "https://repo.packagist.org/p2/magento/community-edition.json";
+        final List<String> versions = new ArrayList<>();
 
         HttpURLConnection connection = null;
         try {
@@ -82,8 +82,8 @@ public enum SupportedVersion {
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Accept", "application/json");
 
-            if (connection.getResponseCode() != 200) {
-                throw new Exception(
+            if (connection.getResponseCode() != 200) { //NOPMD - suppressed AvoidLiteralsInIfCondition
+                throw new Exception( //NOPMD - suppressed AvoidThrowingRawExceptionTypes
                     "Failed to fetch data, HTTP response code: " + connection.getResponseCode()
                 );
             }
@@ -92,35 +92,30 @@ public enum SupportedVersion {
             try (BufferedReader reader = new BufferedReader(
                     new InputStreamReader(connection.getInputStream()))
             ) {
-                StringBuilder response = new StringBuilder();
+                final StringBuilder response = new StringBuilder();
                 String line;
-                while ((line = reader.readLine()) != null) {
+                while ((line = reader.readLine()) != null) { //NOPMD - suppressed AssignmentInOperand
                     response.append(line);
                 }
 
                 // Parse JSON for version data
-                JSONObject jsonResponse = new JSONObject(response.toString());
-                JSONArray packageObject = jsonResponse
+                final JSONObject jsonResponse = new JSONObject(response.toString());
+                final JSONArray packageObject = jsonResponse
                         .getJSONObject("packages")
                         .getJSONArray("magento/community-edition");
 
-                for (Object o : packageObject) {
-                    JSONObject version = (JSONObject) o;
+                for (final Object o : packageObject) {
+                    final JSONObject version = (JSONObject) o;
                     if (version == null) {
                         continue;
                     }
-                    String versionstring = version.getString("version");
+                    final String versionstring = version.getString("version");
                     if (versionstring == null) {
                         continue;
                     }
                     versions.add(versionstring);
                 }
             }
-        } catch (Exception e) {
-            throw new Exception(
-                "Error fetching or parsing supported versions: " + e.getMessage(),
-                e
-            );
         } finally {
             if (connection != null) {
                 connection.disconnect();
