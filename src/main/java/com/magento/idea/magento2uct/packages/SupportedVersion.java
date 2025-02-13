@@ -5,42 +5,22 @@
 
 package com.magento.idea.magento2uct.packages;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public enum SupportedVersion {
-
-    V230("2.3.0"),
-    V231("2.3.1"),
-    V232("2.3.2"),
-    V2322("2.3.2-p2"),
-    V233("2.3.3"),
-    V2331("2.3.3-p1"),
-    V234("2.3.4"),
-    V2341("2.3.4-p1"),
-    V2342("2.3.4-p2"),
-    V235("2.3.5"),
-    V2351("2.3.5-p1"),
-    V2352("2.3.5-p2"),
-    V236("2.3.6"),
-    V2361("2.3.6-p1"),
-    V237("2.3.7"),
-    V2371("2.3.7-p1"),
-    V240("2.4.0"),
-    V2401("2.4.0-p1"),
-    V241("2.4.1"),
-    V2411("2.4.1-p1"),
-    V242("2.4.2"),
-    V2421("2.4.2-p1"),
-    V2422("2.4.2-p2"),
-    V243("2.4.3"),
-    V2431("2.4.3-p1"),
-    V2444("2.4.4-beta4");
-
+    ;
     private final String version;
+    private static final Integer SUCCESS_CODE = 200;
 
     SupportedVersion(final String version) {
         this.version = version;
@@ -77,10 +57,75 @@ public enum SupportedVersion {
      * @return List[String]
      */
     public static List<String> getSupportedVersions() {
-        final List<String> versions = new LinkedList<>();
+        try {
+            return fetchSupportedVersions();
+        } catch (Exception e) { //NOPMD - suppressed AvoidCatchingGenericException
+            // Return an empty list or log the exception
+            return List.of();
+        }
+    }
 
-        for (final SupportedVersion version : SupportedVersion.values()) {
-            versions.add(version.getVersion());
+    /**
+     * Fetch supported versions dynamically from Packagist
+     * This method performs an HTTP GET request to fetch version data in JSON format
+     * from a predefined URL and parses it into a list of version strings.
+     *
+     * @return List[String] containing supported version strings
+     * @throws IOException if an error occurs during HTTP connection or JSON parsing
+     */
+    public static List<String> fetchSupportedVersions() throws IOException {
+        final String url = "https://repo.packagist.org/p2/magento/community-edition.json";
+        final List<String> versions = new ArrayList<>();
+
+        HttpURLConnection connection = null;
+        try {
+            // Establish HTTP connection
+            connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Accept", "application/json");
+
+            if (connection.getResponseCode() != SUCCESS_CODE) {
+                throw new IOException(//NOPMD - suppressed AvoidThrowingRawExceptionTypes
+                    "Failed to fetch data, HTTP response code: " + connection.getResponseCode()
+                );
+            }
+
+            // Read JSON response
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(connection.getInputStream()))
+            ) {
+                final StringBuilder response = new StringBuilder();
+                String line;
+                while (true) {
+                    line = reader.readLine();
+                    if (line == null) {
+                        break;
+                    }
+                    response.append(line);
+                }
+
+                // Parse JSON for version data
+                final JSONObject jsonResponse = new JSONObject(response.toString());
+                final JSONArray packageObject = jsonResponse
+                        .getJSONObject("packages")
+                        .getJSONArray("magento/community-edition");
+
+                for (final Object o : packageObject) {
+                    final JSONObject version = (JSONObject) o;
+                    if (version == null) {
+                        continue;
+                    }
+                    final String versionstring = version.getString("version");
+                    if (versionstring == null) {
+                        continue;
+                    }
+                    versions.add(versionstring);
+                }
+            }
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
 
         return versions;

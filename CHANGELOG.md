@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 5.4.0
 
+### Fixed
+
+- Fixed Upgrade Compatibility Tool [#2482](https://github.com/magento/magento2-phpstorm-plugin/pull/2482)
+  Replaced hardcoded Magento versions with dynamic fetching via Packagist API.
+  Fixed UI icon references.
+  Updated Run command.
+
 ### Changed
 
 - Updated Gradle Intellij plugin to version 2 [#2473](https://github.com/magento/magento2-phpstorm-plugin/pull/2473)
