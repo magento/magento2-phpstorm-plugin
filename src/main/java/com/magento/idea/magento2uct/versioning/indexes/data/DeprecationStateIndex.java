@@ -151,7 +151,7 @@ public class DeprecationStateIndex implements VersionStateIndex {
                     VersioningDataOperationsUtil.unionVersionDataWithChangelog(
                             versioningData,
                             new ArrayList<>(Collections.singletonList(
-                                    SupportedVersion.V230.getVersion()
+                                    SupportedVersion.valueOf("2.4.7").getVersion()
                             )),
                             true
                     );
