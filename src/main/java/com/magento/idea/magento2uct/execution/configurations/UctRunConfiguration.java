@@ -43,7 +43,8 @@ import org.jetbrains.annotations.Nullable;
         "PMD.NPathComplexity",
         "PMD.CyclomaticComplexity",
         "PMD.ExcessiveImports",
-        "PMD.CognitiveComplexity"
+        "PMD.CognitiveComplexity",
+        "PMD.ExcessiveMethodLength"
 })
 public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfigurationOptions> {
 
