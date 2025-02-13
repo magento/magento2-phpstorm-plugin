@@ -6,6 +6,7 @@
 package com.magento.idea.magento2uct.packages;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -19,6 +20,7 @@ import org.json.JSONObject;
 public enum SupportedVersion {
     ;
     private final String version;
+    private static final Integer SUCCESS_CODE = 200;
 
     SupportedVersion(final String version) {
         this.version = version;
@@ -69,9 +71,9 @@ public enum SupportedVersion {
      * from a predefined URL and parses it into a list of version strings.
      *
      * @return List[String] containing supported version strings
-     * @throws Exception if an error occurs during HTTP connection or JSON parsing
+     * @throws IOException if an error occurs during HTTP connection or JSON parsing
      */
-    public static List<String> fetchSupportedVersions() throws Exception { //NOPMD - suppressed SignatureDeclareThrowsException
+    public static List<String> fetchSupportedVersions() throws IOException {
         final String url = "https://repo.packagist.org/p2/magento/community-edition.json";
         final List<String> versions = new ArrayList<>();
 
@@ -82,8 +84,8 @@ public enum SupportedVersion {
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Accept", "application/json");
 
-            if (connection.getResponseCode() != 200) { //NOPMD - suppressed AvoidLiteralsInIfCondition
-                throw new Exception( //NOPMD - suppressed AvoidThrowingRawExceptionTypes
+            if (connection.getResponseCode() != SUCCESS_CODE) {
+                throw new IOException(//NOPMD - suppressed AvoidThrowingRawExceptionTypes
                     "Failed to fetch data, HTTP response code: " + connection.getResponseCode()
                 );
             }
@@ -94,7 +96,7 @@ public enum SupportedVersion {
             ) {
                 final StringBuilder response = new StringBuilder();
                 String line;
-                while ((line = reader.readLine()) != null) { //NOPMD - suppressed AssignmentInOperand
+                while ((line = reader.readLine()) != null) {//NOPMD - suppressed AssignmentInOperand
                     response.append(line);
                 }
 
