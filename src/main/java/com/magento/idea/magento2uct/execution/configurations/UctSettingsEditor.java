@@ -42,8 +42,12 @@ import javax.swing.event.DocumentEvent;
 import org.jdesktop.swingx.JXHyperlink;
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveImports"})
-public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> { //NOPMD - suppressed TooManyMethods
+@SuppressWarnings({
+        "PMD.TooManyFields",
+        "PMD.ExcessiveImports",
+        "PMD.TooManyMethods"
+})
+public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
 
     private static final String LEARN_MORE_URI =
             "https://docs.magento.com/user-guide/getting-started.html#product-editions";

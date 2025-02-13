@@ -96,7 +96,11 @@ public enum SupportedVersion {
             ) {
                 final StringBuilder response = new StringBuilder();
                 String line;
-                while ((line = reader.readLine()) != null) {//NOPMD - suppressed AssignmentInOperand
+                while (true) {
+                    line = reader.readLine();
+                    if (line == null) {
+                        break;
+                    }
                     response.append(line);
                 }
 
