@@ -42,7 +42,11 @@ import javax.swing.event.DocumentEvent;
 import org.jdesktop.swingx.JXHyperlink;
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveImports"})
+@SuppressWarnings({
+        "PMD.TooManyFields",
+        "PMD.ExcessiveImports",
+        "PMD.TooManyMethods"
+})
 public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
 
     private static final String LEARN_MORE_URI =
@@ -339,7 +343,6 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
         comingVersionError.setForeground(new Color(252, 119, 83));
 
         validateExecutablePathField();
-        validateComingVersionField((ComboBoxItemData) comingVersion.getSelectedItem());
 
         myScriptName
                 .getComponent()
@@ -399,7 +402,7 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
      * @return ComboBoxItemData
      */
     private ComboBoxItemData getCorrectedSelectedItem(final Object selectedItem) {
-        ComboBoxItemData selectedComingVersion;
+        final ComboBoxItemData selectedComingVersion;
 
         if (selectedItem instanceof ComboBoxItemData) {
             selectedComingVersion = (ComboBoxItemData) selectedItem;
