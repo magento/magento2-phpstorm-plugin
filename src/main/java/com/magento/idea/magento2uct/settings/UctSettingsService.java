@@ -175,7 +175,7 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
     public @NotNull SupportedVersion getCurrentVersionOrDefault() {
         final SupportedVersion currentVersion = getCurrentVersion();
 
-        return currentVersion == null ? SupportedVersion.V230 : currentVersion;
+        return currentVersion == null ? SupportedVersion.valueOf("2.3.0") : currentVersion;
     }
 
     /**

@@ -28,6 +28,7 @@ import com.jetbrains.php.config.PhpProjectConfigurationFacade;
 import com.jetbrains.php.config.commandLine.PhpCommandSettings;
 import com.jetbrains.php.config.commandLine.PhpCommandSettingsBuilder;
 import com.jetbrains.php.config.interpreters.PhpInterpreter;
+import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2uct.execution.filters.UctPhpFileFilter;
 import com.magento.idea.magento2uct.execution.filters.UctResultFileFilter;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
@@ -42,7 +43,8 @@ import org.jetbrains.annotations.Nullable;
         "PMD.NPathComplexity",
         "PMD.CyclomaticComplexity",
         "PMD.ExcessiveImports",
-        "PMD.CognitiveComplexity"
+        "PMD.CognitiveComplexity",
+        "PMD.ExcessiveMethodLength"
 })
 public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfigurationOptions> {
 
@@ -261,6 +263,12 @@ public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfig
 
                 if (!getComingVersion().isEmpty()) {
                     commandSettingsBuilder.addArgument("--coming-version=" + getComingVersion());
+                }
+
+                if (!getComingVersion().isEmpty()) {
+                    commandSettingsBuilder.addArgument(
+                            "--current-version=" + Settings.getInstance(getProject()).magentoVersion
+                    );
                 }
 
                 final GeneralCommandLine commandLine =
