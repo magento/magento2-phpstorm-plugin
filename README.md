@@ -56,12 +56,12 @@ This is a PhpStorm IDE plugin for a better Magento 2 development workflow.
 1. Click `Run "magento-2-php-storm-plugin"` to run the plugin. You should see a new instance of IntelliJ launched with the plugin installed. Make sure the plugin is enabled in IntelliJ settings and indexing is finished. Plugin features should be accessible at this point.
 
 ## How to contribute
-1) Start with looking into [Community Backlog](https://github.com/magento/magento2-phpstorm-plugin/issues?q=is%3Apr+is%3Aopen+label%3A%22good+first+issue). Any ticket in `Ready for Development` and `Good First Issue` columns are a good candidates to start.
+1) Start with looking into [Community Backlog](https://github.com/magento/magento2-phpstorm-plugin/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22good%20first%20issue%22). Any ticket in `Ready for Development` and `Good First Issue` columns are a good candidates to start.
 2) Didn't satisfy your requirements? [Create a new issue](https://github.com/magento/magento2-phpstorm-plugin/issues/new). It can be for example:
     - **Bug report** - Found a bug in the code? Let us know!
     - **Enhancement** - Know how to improve existing functionality? Open an issue describe how to enhance the plugin.
     - **New feature proposal** - Know how to make a killer feature? Do not hesitate to submit your proposal.
-3) The issue will appear in the `Ready for Grooming` column of the [Community Backlog](https://github.com/magento/magento2-phpstorm-plugin/issues?q=is%3Apr+is%3Aopen+label%3A%22good+first+issue). Once it will be discussed and approved the issue will be ready for development.
+3) The issue will appear in the `Ready for Grooming` column of the [Community Backlog](https://github.com/magento/magento2-phpstorm-plugin/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22good%20first%20issue%22). Once it will be discussed and approved the issue will be ready for development.
 4) Refer to the [Contributing Guide](https://github.com/magento/magento2-phpstorm-plugin/blob/5.4.0-develop/.github/CONTRIBUTING.md) for more information on how to contribute.
 
 ## Learn to contribute
