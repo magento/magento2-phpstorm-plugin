@@ -71,7 +71,7 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
 
                 if (!results.isEmpty()) {
                     // Add the property to a collection of line marker info
-                    NavigationGutterIconBuilder<PsiElement> builder =
+                    final NavigationGutterIconBuilder<PsiElement> builder =
                             NavigationGutterIconBuilder.create(AllIcons.Nodes.Plugin)
                                     .setTargets(results)
                                     .setTooltipText(TOOLTIP_TEXT);
