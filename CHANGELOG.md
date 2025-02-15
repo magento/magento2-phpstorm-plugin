@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 5.4.0
 
+### Added
+
+- Clear notifications for the process status of URN generation [#2486](https://github.com/magento/magento2-phpstorm-plugin/pull/2486)
+
 ### Fixed
 
 - Fixed Upgrade Compatibility Tool [#2482](https://github.com/magento/magento2-phpstorm-plugin/pull/2482)
@@ -13,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
   Fixed UI icon references.
   Updated Run command.
 - java.lang.Throwable: Assertion failed: Do not use PsiElement for popup model. See PsiTargetNavigator [#2485](https://github.com/magento/magento2-phpstorm-plugin/pull/2485)
+- Slow operations are prohibited on EDT [#2486](https://github.com/magento/magento2-phpstorm-plugin/pull/2486)
 
 ### Changed
 
