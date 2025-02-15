@@ -72,8 +72,9 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
                 }
 
                 if (!results.isEmpty()) {
-                    final ASTNode node = psiElement.getNode().findChildByType(PhpTokenTypes.IDENTIFIER);
-                    if(node != null) {
+                    final ASTNode node = psiElement.getNode()
+                            .findChildByType(PhpTokenTypes.IDENTIFIER);
+                    if (node != null) {
                         // Add the property to a collection of line marker info
                         final NavigationGutterIconBuilder<PsiElement> builder =
                                 NavigationGutterIconBuilder.create(AllIcons.Nodes.Plugin)
