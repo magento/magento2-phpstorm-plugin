@@ -17,11 +17,15 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleSetupDataPatchGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.magento.files.ModuleSetupDataPatchFile;
-
-import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 
 public class NewSetupDataPatchDialog extends AbstractDialog {
 
@@ -46,7 +50,12 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
     /**
      * Constructor
      */
-    public NewSetupDataPatchDialog(Project project, PsiDirectory directory, String modulePackage, String moduleName) {
+    public NewSetupDataPatchDialog(
+            Project project,
+            PsiDirectory directory,
+            String modulePackage,
+            String moduleName
+    ) {
         super();
 
         this.project = project;
@@ -84,8 +93,18 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
     /**
      * Open dialog
      */
-    public static void open(Project project, PsiDirectory directory, String modulePackage, String moduleName) {
-        NewSetupDataPatchDialog dialog = new NewSetupDataPatchDialog(project, directory, modulePackage, moduleName);
+    public static void open(
+            Project project,
+            PsiDirectory directory,
+            String modulePackage,
+            String moduleName
+    ) {
+        NewSetupDataPatchDialog dialog = new NewSetupDataPatchDialog(
+                project,
+                directory,
+                modulePackage,
+                moduleName
+        );
         dialog.pack();
         dialog.centerDialog(dialog);
         dialog.setVisible(true);
@@ -104,7 +123,9 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
     private void generateFile() {
         PsiDirectory directory = DirectoryGenerator.getInstance().findOrCreateSubdirectories(
                 baseDir,
-                NewSetupDataPatchAction.PATCH_DIRECTORY + "/" + NewSetupDataPatchAction.DATA_DIRECTORY
+                NewSetupDataPatchAction.PATCH_DIRECTORY
+                        + "/"
+                        + NewSetupDataPatchAction.DATA_DIRECTORY
         );
         ModuleSetupDataPatchGenerator generator = new ModuleSetupDataPatchGenerator(
                 new ModuleSetupDataPatchData(
@@ -124,7 +145,8 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
     }
 
     private boolean validateFields() {
-        PsiDirectory patchDirectory = baseDir.findSubdirectory(NewSetupDataPatchAction.PATCH_DIRECTORY);
+        PsiDirectory patchDirectory = baseDir
+                .findSubdirectory(NewSetupDataPatchAction.PATCH_DIRECTORY);
         PsiDirectory directory = null;
 
         if (patchDirectory != null) {
@@ -133,10 +155,14 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
 
         if (directory != null) {
             for (PsiFile file : directory.getFiles()) {
-                String className = ModuleSetupDataPatchFile.resolveClassNameFromInput(getClassName());
+                String className = ModuleSetupDataPatchFile
+                        .resolveClassNameFromInput(getClassName());
 
                 if (file.getName().equals(className + ModuleSetupDataPatchFile.EXTENSION)) {
-                    showErrorMessage(fieldsValidationsList.get(0).getField(), "Class name `" + className + "` already exists.");
+                    showErrorMessage(
+                            fieldsValidationsList.get(0).getField(),
+                            "Class name `" + className + "` already exists."
+                    );
                     return false;
                 }
             }

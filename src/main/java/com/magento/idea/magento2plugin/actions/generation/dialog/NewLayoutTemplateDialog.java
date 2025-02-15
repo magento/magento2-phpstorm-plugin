@@ -18,14 +18,27 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.generator.LayoutXmlTemplateGenerator;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-
-import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 
+@SuppressWarnings({
+        "PMD.TooManyFields",
+        "PMD.TooManyMethods",
+        "PMD.ConstructorCallsOverridableMethod",
+        "PMD.ExcessiveImports",
+        "PMD.SingularField",
+        "PMD.GodClass"
+})
 public class NewLayoutTemplateDialog extends AbstractDialog {
 
     private static final String LAYOUT_NAME = "Layout Name";
@@ -49,7 +62,7 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
     private JLabel areaLabel;
     private JLabel layoutNameErrorMessage;
 
-    public NewLayoutTemplateDialog(Project project, PsiDirectory directory) {
+    public NewLayoutTemplateDialog(final Project project, final PsiDirectory directory) {
         super();
 
         this.project = project;
@@ -83,8 +96,8 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
         autoSelectCurrentArea();
     }
 
-    public static void open(Project project, PsiDirectory directory) {
-        NewLayoutTemplateDialog dialog = new NewLayoutTemplateDialog(project, directory);
+    public static void open(final Project project, final PsiDirectory directory) {
+        final NewLayoutTemplateDialog dialog = new NewLayoutTemplateDialog(project, directory);
         dialog.pack();
         dialog.centerDialog(dialog);
         dialog.setVisible(true);
@@ -92,8 +105,8 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
 
     private void onOK() {
         if (validateFormFields()) {
-            String[] layoutNameParts = getLayoutNameParts();
-            LayoutXmlData layoutXmlData = new LayoutXmlData(
+            final String[] layoutNameParts = getLayoutNameParts();
+            final LayoutXmlData layoutXmlData = new LayoutXmlData(
                     getArea(),
                     layoutNameParts[0],
                     moduleName,
@@ -110,7 +123,7 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
     private void createUIComponents() {
         area = new ComboBox<>();
 
-        for (Areas areaEntry : Areas.values()) {
+        for (final Areas areaEntry : Areas.values()) {
             if (areaEntry.equals(Areas.adminhtml) || areaEntry.equals(Areas.frontend)) {
                 area.addItem(new ComboBoxItemData(areaEntry.toString(), areaEntry.toString()));
             }
@@ -118,22 +131,22 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
     }
 
     private void autoSelectCurrentArea() {
-        String selectedDirName = directory.getName();
-        Map<String, Integer> areaIndexMap = new HashMap<>();
+        final String selectedDirName = directory.getName();
+        final Map<String, Integer> areaIndexMap = new HashMap<>();
 
         for (int i = 0; i < area.getItemCount(); i++) {
-            ComboBoxItemData item = area.getItemAt(i);
+            final ComboBoxItemData item = area.getItemAt(i);
             areaIndexMap.put(item.getKey(), i);
         }
 
-        Integer selectedIndex = areaIndexMap.get(selectedDirName);
+        final Integer selectedIndex = areaIndexMap.get(selectedDirName);
         if (selectedIndex != null) {
             area.setSelectedIndex(selectedIndex);
         }
     }
 
     private String[] getLayoutNameParts() {
-        String[] layoutNameParts = layoutName.getText().trim().split("_");
+        final String[] layoutNameParts = layoutName.getText().trim().split("_");
         String routeName = "";
         String controllerName = "";
         String actionName = "";
