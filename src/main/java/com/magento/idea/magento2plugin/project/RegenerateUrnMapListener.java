@@ -47,7 +47,7 @@ class RegenerateUrnMapListener extends MouseAdapter {
      */
     @Override
     public void mouseClicked(final MouseEvent event) {
-        final ExternalResourceManager externalResourceManager =
+        final ExternalResourceManager manager =
                 ExternalResourceManager.getInstance();
         final PsiManager psiManager = PsiManager.getInstance(project);
         final MagentoComponentManager componentManager =
@@ -57,14 +57,16 @@ class RegenerateUrnMapListener extends MouseAdapter {
                 new Runnable() {
                     @Override
                     public void run() {
-                        final Collection<VirtualFile> xsdFiles = FilenameIndex.getAllFilesByExt(project, "xsd");
-                        final Collection<MagentoComponent> components = componentManager.getAllComponents();
+                        final Collection<VirtualFile> xsdFiles
+                                = FilenameIndex.getAllFilesByExt(project, "xsd");
+                        final Collection<MagentoComponent> components
+                                = componentManager.getAllComponents();
                         int processedFileCount = 0;
 
-                        for (final VirtualFile virtualFile : xsdFiles) {
-                            if (handleXsdFile(virtualFile, components, psiManager, externalResourceManager)) {
+                        for (final VirtualFile file : xsdFiles) {
+                            if (handleXsdFile(file, components, psiManager, manager)) {
                                 continue;
-                            };
+                            }
 
                             processedFileCount++;
                         }
@@ -133,7 +135,7 @@ class RegenerateUrnMapListener extends MouseAdapter {
      * indicating the successful completion of URN map generation. Otherwise, a warning notification
      * is displayed indicating the failure of URN map generation.
      *
-     * @param processedFileCount The number of files successfully processed for URN mapping generation.
+     * @param processedFileCount The number of files successfully processed for URN map generation.
      */
     private void showNotification(final int processedFileCount) {
         if (processedFileCount > 0) {
