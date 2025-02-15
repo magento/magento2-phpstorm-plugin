@@ -137,6 +137,7 @@ class RegenerateUrnMapListener extends MouseAdapter {
      *
      * @param processedFileCount The number of files successfully processed for URN map generation.
      */
+    @SuppressWarnings("PMD.UseNotifyAllInsteadOfNotify")
     private void showNotification(final int processedFileCount) {
         if (processedFileCount > 0) {
             NotificationGroupManager.getInstance()
