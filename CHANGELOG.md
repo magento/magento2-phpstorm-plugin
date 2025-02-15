@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
   Replaced hardcoded Magento versions with dynamic fetching via Packagist API.
   Fixed UI icon references.
   Updated Run command.
+- java.lang.Throwable: Assertion failed: Do not use PsiElement for popup model. See PsiTargetNavigator [#2485](https://github.com/magento/magento2-phpstorm-plugin/pull/2485)
 
 ### Changed
 
