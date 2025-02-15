@@ -4,11 +4,16 @@
     </a>
 </p>
 
+<!-- Plugin description -->
 # PhpStorm Magento 2 Plugin
+
+This is a PhpStorm IDE plugin for a better Magento 2 development workflow.
+<!-- Plugin description end -->
 
 [![Version](http://phpstorm.espend.de/badge/8024/version)](https://plugins.jetbrains.com/plugin/8024)
 [![Downloads](http://phpstorm.espend.de/badge/8024/downloads)](https://plugins.jetbrains.com/plugin/8024)
 [![Made With Love](https://img.shields.io/badge/Made%20With-Love-orange.svg)](https://magento.com)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Support-orange.svg)](https://buymeacoffee.com/vitalii_b)
 
 ## Installation
 
@@ -41,23 +46,28 @@
 ## Setting up development environment
 
 1. Check out this repository
-1. Open a folder with the project in the IntelliJ Ultimate using the `open` action button.
+1. Open a folder with the project in the IntelliJ CE using the `open` action button.
 1. Make sure that you on the latest develop branch (e.g `5.4.0-develop`)
 1. Right-click on the `build.gradle` file, choose "Import Gradle project" (if this is not exist look for "Build module '<root folder name>'") (you need to have Gradle plugin installed)
 1. Check if the right SDK version is used for the project.
-   - Current Java version for the project is **java 11**, so you should additionally download **SDK 11** and choose it in the module settings: `Right click by the project root > Open Module Settings > Project Settings > Project > Project SDK`
-   - Check if right SDK version is used for the Gradle plugin: `Intellij IDEA > Preferences... > Build, Execution, Deployment > Build Tools > Gradle > Gradle JVM` and choose your JDK.
+    - Current Java version for the project is **java 11**, so you should additionally download **SDK 11** and choose it in the module settings: `Right click by the project root > Open Module Settings > Project Settings > Project > Project SDK`
+    - Check if right SDK version is used for the Gradle plugin: `Intellij IDEA > Preferences... > Build, Execution, Deployment > Build Tools > Gradle > Gradle JVM` and choose your JDK.
 1. When the Gradle sections appeared in the right bar, navigate there and right-click `magento-2-php-storm-plugin > Tasks -> Intellij -> runIde`
 1. Click `Run "magento-2-php-storm-plugin"` to run the plugin. You should see a new instance of IntelliJ launched with the plugin installed. Make sure the plugin is enabled in IntelliJ settings and indexing is finished. Plugin features should be accessible at this point.
 
 ## How to contribute
-1) Start with looking into [Community Backlog](https://github.com/magento/magento2-phpstorm-plugin/projects/2). Any ticket in `Ready for Development` and `Good First Issue` columns are a good candidates to start.
+1) Start with looking into [Community Backlog](https://github.com/magento/magento2-phpstorm-plugin/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22good%20first%20issue%22). Any ticket in `Ready for Development` and `Good First Issue` columns are a good candidates to start.
 2) Didn't satisfy your requirements? [Create a new issue](https://github.com/magento/magento2-phpstorm-plugin/issues/new). It can be for example:
-   - **Bug report** - Found a bug in the code? Let us know!
-   - **Enhancement** - Know how to improve existing functionality? Open an issue describe how to enhance the plugin.
-   - **New feature proposal** - Know how to make a killer feature? Do not hesitate to submit your proposal.
-3) The issue will appear in the `Ready for Grooming` column of the [Community Backlog](https://github.com/magento/magento2-phpstorm-plugin/projects/2). Once it will be discussed and approved the issue will be ready for development.
-4) Refer to the [Contributing Guide](https://github.com/magento/magento2-phpstorm-plugin/blob/2.1.0-develop/.github/CONTRIBUTING.md) for more information on how to contribute.
+    - **Bug report** - Found a bug in the code? Let us know!
+    - **Enhancement** - Know how to improve existing functionality? Open an issue describe how to enhance the plugin.
+    - **New feature proposal** - Know how to make a killer feature? Do not hesitate to submit your proposal.
+3) The issue will appear in the `Ready for Grooming` column of the [Community Backlog](https://github.com/magento/magento2-phpstorm-plugin/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22good%20first%20issue%22). Once it will be discussed and approved the issue will be ready for development.
+4) Refer to the [Contributing Guide](https://github.com/magento/magento2-phpstorm-plugin/blob/5.4.0-develop/.github/CONTRIBUTING.md) for more information on how to contribute.
+
+## Learn to contribute
+1) SDK [Developing a Plugin](https://plugins.jetbrains.com/docs/intellij/developing-plugins.html)
+2) Good Presentation about platform [How We Built Comma, the Raku IDE, on the IntelliJ Platform](https://www.youtube.com/watch?v=zDP9uUMYrvs)
+3) Plugin example [idea-php-symfony2-plugin](https://github.com/Haehnchen/idea-php-symfony2-plugin)
 
 ## How to create SandBox for development
 1. Create sandbox folder
@@ -65,7 +75,7 @@
 3. In sandbox folder create `app/code` and `vendor/magento`
 4. Copy any of the magento modules (as for example: `framework`, `module-catalog`, `module-checkout`, `module-customer`, `module-sales`) into the `vendor/magento` folder. It is better to add as few modules as possible to reduce reindexing time during application running
 5. (Nice to have) Open IDE and go to `Preferences > Editor > File and Code Templates > Includes tab` and add default headers for `PHP File Header` and `XML File Header`
-   
+
 **PHP File Header:**
 ```php
 /**
