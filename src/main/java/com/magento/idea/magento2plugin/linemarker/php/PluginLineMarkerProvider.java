@@ -9,9 +9,11 @@ import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.icons.AllIcons;
+import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
+import com.jetbrains.php.lang.lexer.PhpTokenTypes;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.linemarker.php.data.PluginMethodData;
@@ -70,12 +72,15 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
                 }
 
                 if (!results.isEmpty()) {
-                    // Add the property to a collection of line marker info
-                    final NavigationGutterIconBuilder<PsiElement> builder =
-                            NavigationGutterIconBuilder.create(AllIcons.Nodes.Plugin)
-                                    .setTargets(results)
-                                    .setTooltipText(TOOLTIP_TEXT);
-                    collection.add(builder.createLineMarkerInfo(psiElement));
+                    final ASTNode node = psiElement.getNode().findChildByType(PhpTokenTypes.IDENTIFIER);
+                    if(node != null) {
+                        // Add the property to a collection of line marker info
+                        final NavigationGutterIconBuilder<PsiElement> builder =
+                                NavigationGutterIconBuilder.create(AllIcons.Nodes.Plugin)
+                                        .setTargets(results)
+                                        .setTooltipText(TOOLTIP_TEXT);
+                        collection.add(builder.createLineMarkerInfo(node.getPsi()));
+                    }
                 }
             }
         }
