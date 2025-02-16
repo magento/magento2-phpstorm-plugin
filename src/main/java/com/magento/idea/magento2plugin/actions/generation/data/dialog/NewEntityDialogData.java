@@ -30,7 +30,6 @@ public class NewEntityDialogData implements DialogData {
     private final boolean toolbarColumnsControl;
     private final boolean toolbarListingFilters;
     private final boolean toolbarListingPaging;
-    private final boolean toolbarFullTextSearch;
 
     // Acl tab data.
     private final String parentAclId;
@@ -66,7 +65,6 @@ public class NewEntityDialogData implements DialogData {
      * @param hasToolbarColumnsControl boolean
      * @param hasToolbarListingFilters boolean
      * @param hasToolbarListingPaging boolean
-     * @param hasToolbarFullTextSearch boolean
      * @param parentAclId String
      * @param aclId String
      * @param aclTitle String
@@ -94,7 +92,6 @@ public class NewEntityDialogData implements DialogData {
             final boolean hasToolbarColumnsControl,
             final boolean hasToolbarListingFilters,
             final boolean hasToolbarListingPaging,
-            final boolean hasToolbarFullTextSearch,
             final @NotNull String parentAclId,
             final @NotNull String aclId,
             final @NotNull String aclTitle,
@@ -121,7 +118,6 @@ public class NewEntityDialogData implements DialogData {
         this.toolbarColumnsControl = hasToolbarColumnsControl;
         this.toolbarListingFilters = hasToolbarListingFilters;
         this.toolbarListingPaging = hasToolbarListingPaging;
-        this.toolbarFullTextSearch = hasToolbarFullTextSearch;
         this.parentAclId = parentAclId;
         this.aclId = aclId;
         this.aclTitle = aclTitle;
@@ -283,15 +279,6 @@ public class NewEntityDialogData implements DialogData {
      */
     public boolean hasToolbarListingPaging() {
         return toolbarListingPaging;
-    }
-
-    /**
-     * Check if has toolbar fulltext search.
-     *
-     * @return boolean
-     */
-    public boolean hasToolbarFullTextSearch() {
-        return toolbarFullTextSearch;
     }
 
     /**
