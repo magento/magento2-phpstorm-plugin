@@ -59,7 +59,7 @@ If you find this plugin helpful and want to support its development, consider bu
     <change-notes><![CDATA[
         Please, find change notes
         <a
-            href="https://github.com/magento/magento2-phpstorm-plugin/blob/master/CHANGELOG.md"
+            href="https://github.com/magento/magento2-phpstorm-plugin/blob/5.4.0-develop/CHANGELOG.md"
             title="CHANGELOG.md"
         >here</a>
     ]]>
