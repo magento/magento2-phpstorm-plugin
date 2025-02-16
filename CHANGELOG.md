@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 ### Added
 
 - Clear notifications for the process status of URN generation [#2486](https://github.com/magento/magento2-phpstorm-plugin/pull/2486)
-- Added array as a type in Data Model properties [#1295](https://github.com/magento/magento2-phpstorm-plugin/pull/1295)
+- Added array as a type in Data Model properties [#2488](https://github.com/magento/magento2-phpstorm-plugin/pull/2488)
 
 ### Fixed
 
