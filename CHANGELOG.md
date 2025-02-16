@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
   Updated Run command.
 - java.lang.Throwable: Assertion failed: Do not use PsiElement for popup model. See PsiTargetNavigator [#2485](https://github.com/magento/magento2-phpstorm-plugin/pull/2485)
 - Slow operations are prohibited on EDT [#2486](https://github.com/magento/magento2-phpstorm-plugin/pull/2486)
+- When creating a new model with a listing component grid, fulltext search is not working [#2037](https://github.com/magento/magento2-phpstorm-plugin/pull/2037)
 
 ### Changed
 
