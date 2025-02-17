@@ -48,7 +48,7 @@ class ${NAME} #if (${EXTENDS})extends ${EXTENDS} #end #if (${IMPLEMENTS} && $has
              */
             public function get$propertyUpperCamel(): ?$propertyType
             {
-                #if($propertyType == 'string')
+                #if($propertyType == 'string' || $propertyType == 'array')
                 return $this->getData(self::$propertyUpperSnake);
                 #{else}
                 return $this->getData(self::$propertyUpperSnake) === null ? null

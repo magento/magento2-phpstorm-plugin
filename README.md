@@ -8,12 +8,46 @@
 # PhpStorm Magento 2 Plugin
 
 This is a PhpStorm IDE plugin for a better Magento 2 development workflow.
+
+## Version 2025.0.0 - Contributors
+
+<table align="center">
+  <tr>
+    <td align="center">
+      <a href="https://github.com/YevhenZvieriev">
+        <img src="https://avatars.githubusercontent.com/u/43544955?v=4" width="100px;" alt="Contributor 1"/>
+        <br/>
+        <sub><b>Yevhen Zvieriev</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/SilinMykola">
+        <img src="https://avatars.githubusercontent.com/u/15772032?v=4" width="100px;" alt="Contributor 2"/>
+        <br/>
+        <sub><b>Mykola Silin</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/VitaliyBoyko">
+        <img src="https://avatars.githubusercontent.com/u/20116393?v=4" width="100px;" alt="Contributor 3"/>
+        <br/>
+        <sub><b>Vitalii Boiko</b></sub>
+      </a>
+    </td>
+  </tr>
+</table>
+
+### Support the Project
+
+If you find this plugin helpful and want to support its development, consider buying the contributors a coffee:
+
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Donate-orange.svg)](https://buymeacoffee.com/vitalii_b)
+
 <!-- Plugin description end -->
 
 [![Version](http://phpstorm.espend.de/badge/8024/version)](https://plugins.jetbrains.com/plugin/8024)
 [![Downloads](http://phpstorm.espend.de/badge/8024/downloads)](https://plugins.jetbrains.com/plugin/8024)
 [![Made With Love](https://img.shields.io/badge/Made%20With-Love-orange.svg)](https://magento.com)
-[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Support-orange.svg)](https://buymeacoffee.com/vitalii_b)
 
 ## Installation
 

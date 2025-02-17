@@ -14,7 +14,8 @@ public enum PropertiesTypes {
     INT("int"),
     FLOAT("float"),
     STRING("string"),
-    BOOL("bool");
+    BOOL("bool"),
+    ARRAY("array");
 
     private final String propertyType;
 
@@ -66,7 +67,8 @@ public enum PropertiesTypes {
             valueOf(INT.toString()).getPropertyType(),
             valueOf(FLOAT.toString()).getPropertyType(),
             valueOf(STRING.toString()).getPropertyType(),
-            valueOf(BOOL.toString()).getPropertyType()
+            valueOf(BOOL.toString()).getPropertyType(),
+            valueOf(ARRAY.toString()).getPropertyType()
         };
     }
 
