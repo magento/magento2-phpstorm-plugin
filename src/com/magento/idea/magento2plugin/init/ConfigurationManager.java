@@ -184,7 +184,7 @@ public class ConfigurationManager {
     }
 
     private static boolean isInIncludePath(@NotNull VirtualFile fileToCheck, @NotNull Project project) {
-        List<VirtualFile> includePaths = PhpIncludePathManager.getInstance(project).getRoots();
+        List<VirtualFile> includePaths = PhpIncludePathManager.getInstance(project).getAllIncludedRoots();
         Iterator iterator = includePaths.iterator();
 
         VirtualFile file;

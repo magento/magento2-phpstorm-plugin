@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 5.1.0
 
+### Fixed
+
+- Fixed the parsing of plugin sort order value[#1235](https://github.com/magento/magento2-phpstorm-plugin/pull/1235)
+- Fixed compatibility with 2023.1 [#1214](https://github.com/magento/magento2-phpstorm-plugin/pull/1214)
+
 ## 5.0.1
 
 ### Fixed

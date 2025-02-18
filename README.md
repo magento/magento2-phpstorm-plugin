@@ -21,8 +21,8 @@
 
 ## Works with
 
-* PhpStorm >= 2021.2.1
-* JRE >= 11
+* PhpStorm >= 2023.1
+* JRE >= 17
 
 ## Features
 

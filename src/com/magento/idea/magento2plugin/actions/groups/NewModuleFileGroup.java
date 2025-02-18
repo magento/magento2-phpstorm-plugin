@@ -9,7 +9,7 @@ import com.intellij.ide.actions.NonTrivialActionGroup;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.IconLoader.LazyIcon;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.magento.idea.magento2plugin.MagentoIcons;
@@ -18,8 +18,6 @@ import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-import javax.swing.Icon;
-import org.jetbrains.annotations.NotNull;
 
 public class NewModuleFileGroup extends NonTrivialActionGroup {
 
@@ -29,13 +27,9 @@ public class NewModuleFileGroup extends NonTrivialActionGroup {
     public NewModuleFileGroup() {
         super();
 
-        this.getTemplatePresentation().setIcon(new LazyIcon() {
-            @NotNull
-            @Override
-            protected Icon compute() {
-                return MagentoIcons.MODULE;
-            }
-        });
+        this.getTemplatePresentation().setIcon(
+                IconLoader.createLazy(() -> MagentoIcons.MODULE)
+        );
     }
 
     @Override
