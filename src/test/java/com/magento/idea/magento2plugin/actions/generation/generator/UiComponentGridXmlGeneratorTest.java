@@ -85,7 +85,6 @@ public class UiComponentGridXmlGeneratorTest extends BaseGeneratorTestCase {
                 true,
                 true,
                 true,
-                true,
                 true
         );
         final UiComponentGridData uiGridData = new UiComponentGridData(
@@ -119,7 +118,6 @@ public class UiComponentGridXmlGeneratorTest extends BaseGeneratorTestCase {
         final Project project = myFixture.getProject();
         final UiComponentGridToolbarData uiGridToolbarData = new UiComponentGridToolbarData(
                 false,
-                true,
                 true,
                 true,
                 true,

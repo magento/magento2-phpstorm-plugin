@@ -30,13 +30,20 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings({
+        "PMD.TooManyFields",
+        "PMD.TooManyMethods",
+        "PMD.ConstructorCallsOverridableMethod",
+        "PMD.ExcessiveImports",
+        "PMD.SingularField",
+        "PMD.GodClass"
+})
 public class NewLayoutTemplateDialog extends AbstractDialog {
 
     private static final String LAYOUT_NAME = "Layout Name";
 
-    private final @NotNull Project project;
+    private final Project project;
     private final String moduleName;
     private final PsiDirectory directory;
 
@@ -45,27 +52,17 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
     private JButton buttonCancel;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, LAYOUT_NAME})
-    @FieldValidation(rule = RuleRegistry.LAYOUT_NAME,
-            message = {IdentifierRule.MESSAGE, LAYOUT_NAME})
+    @FieldValidation(rule = RuleRegistry.LAYOUT_NAME, message = {IdentifierRule.MESSAGE, LAYOUT_NAME})
     private JTextField layoutName;
 
     private JComboBox<ComboBoxItemData> area;
 
     // labels
-    private JLabel layoutNameLabel; // NOPMD
-    private JLabel areaLabel; // NOPMD
-    private JLabel layoutNameErrorMessage; // NOPMD
+    private JLabel layoutNameLabel;
+    private JLabel areaLabel;
+    private JLabel layoutNameErrorMessage;
 
-    /**
-     * NewLayoutTemplateDialog constructor.
-     *
-     * @param project Project
-     * @param directory PsiDirectory
-     */
-    public NewLayoutTemplateDialog(
-            final @NotNull Project project,
-            final @NotNull PsiDirectory directory
-    ) {
+    public NewLayoutTemplateDialog(final Project project, final PsiDirectory directory) {
         super();
 
         this.project = project;
@@ -84,12 +81,11 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(final WindowEvent event) {
+            public void windowClosing(WindowEvent event) {
                 onCancel();
             }
         });
 
-        // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
                 event -> onCancel(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
@@ -100,54 +96,37 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
         autoSelectCurrentArea();
     }
 
-    /**
-     * Open a new layout template dialog.
-     *
-     * @param project Project
-     * @param directory Directory
-     */
-    public static void open(
-            final @NotNull Project project,
-            final @NotNull PsiDirectory directory
-    ) {
+    public static void open(final Project project, final PsiDirectory directory) {
         final NewLayoutTemplateDialog dialog = new NewLayoutTemplateDialog(project, directory);
         dialog.pack();
         dialog.centerDialog(dialog);
         dialog.setVisible(true);
     }
 
-    /**
-     * Fire generation process if all fields are valid.
-     */
     private void onOK() {
         if (validateFormFields()) {
             final String[] layoutNameParts = getLayoutNameParts();
-            new LayoutXmlTemplateGenerator(
-                    new LayoutXmlData(
-                            getArea(),
-                            layoutNameParts[0],
-                            moduleName,
-                            layoutNameParts[1],
-                            layoutNameParts[2]
-                    ),
-                    project
-            ).generate(NewLayoutXmlAction.ACTION_NAME, true);
+            final LayoutXmlData layoutXmlData = new LayoutXmlData(
+                    getArea(),
+                    layoutNameParts[0],
+                    moduleName,
+                    layoutNameParts[1],
+                    layoutNameParts[2]
+            );
+            new LayoutXmlTemplateGenerator(layoutXmlData, project)
+                    .generate(NewLayoutXmlAction.ACTION_NAME, true);
             exit();
         }
     }
 
-    /**
-     * Create custom components and fill their entries.
-     */
     @SuppressWarnings({"PMD.UnusedPrivateMethod", "PMD.AvoidInstantiatingObjectsInLoops"})
     private void createUIComponents() {
         area = new ComboBox<>();
 
         for (final Areas areaEntry : Areas.values()) {
-            if (!areaEntry.equals(Areas.adminhtml) && !areaEntry.equals(Areas.frontend)) {
-                continue;
+            if (areaEntry.equals(Areas.adminhtml) || areaEntry.equals(Areas.frontend)) {
+                area.addItem(new ComboBoxItemData(areaEntry.toString(), areaEntry.toString()));
             }
-            area.addItem(new ComboBoxItemData(areaEntry.toString(), areaEntry.toString()));
         }
     }
 
@@ -160,44 +139,34 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
             areaIndexMap.put(item.getKey(), i);
         }
 
-        if (areaIndexMap.containsKey(selectedDirName)) {
-            area.setSelectedIndex(areaIndexMap.get(selectedDirName));
+        final Integer selectedIndex = areaIndexMap.get(selectedDirName);
+        if (selectedIndex != null) {
+            area.setSelectedIndex(selectedIndex);
         }
     }
 
-    /**
-     * Get parts of inserted layout name.
-     *
-     * @return String[]
-     */
     private String[] getLayoutNameParts() {
-
         final String[] layoutNameParts = layoutName.getText().trim().split("_");
         String routeName = "";
         String controllerName = "";
         String actionName = "";
 
-        if (layoutNameParts.length >= 1) { // NOPMD
+        if (layoutNameParts.length >= 1) {
             routeName = layoutNameParts[0];
         }
 
-        if (layoutNameParts.length == 3) { // NOPMD
+        if (layoutNameParts.length == 3) {
             controllerName = layoutNameParts[1];
             actionName = layoutNameParts[2];
         }
 
-        if (layoutNameParts.length == 2 || layoutNameParts.length > 3) { // NOPMD
+        if (layoutNameParts.length == 2 || layoutNameParts.length > 3) {
             routeName = layoutName.getText().trim();
         }
 
         return new String[]{routeName, controllerName, actionName};
     }
 
-    /**
-     * Get area.
-     *
-     * @return String
-     */
     private String getArea() {
         return area.getSelectedItem().toString();
     }

@@ -46,9 +46,6 @@
                 <properties>
                   <text value=""/>
                 </properties>
-                <clientProperties>
-                  <promptText class="java.lang.String" value="EntityName"/>
-                </clientProperties>
               </component>
               <component id="5f234" class="javax.swing.JTextField" binding="dbTableName">
                 <constraints>
@@ -59,9 +56,6 @@
                 <properties>
                   <text value=""/>
                 </properties>
-                <clientProperties>
-                  <promptText class="java.lang.String" value="entity_name"/>
-                </clientProperties>
               </component>
               <component id="6e23b" class="javax.swing.JLabel" binding="dbTableNameLabel">
                 <constraints>
@@ -80,9 +74,6 @@
                 <properties>
                   <text value="entity_id"/>
                 </properties>
-                <clientProperties>
-                  <promptText class="java.lang.String" value="entity_id"/>
-                </clientProperties>
               </component>
               <component id="c37c7" class="javax.swing.JLabel" binding="entityIdColumnNameLabel">
                 <constraints>
@@ -203,9 +194,6 @@
                   </grid>
                 </constraints>
                 <properties/>
-                <clientProperties>
-                  <promptText class="java.lang.String" value="entity_name"/>
-                </clientProperties>
               </component>
               <component id="fec21" class="javax.swing.JLabel" binding="routeLabel">
                 <constraints>
@@ -264,9 +252,6 @@
                     <properties>
                       <text value=""/>
                     </properties>
-                    <clientProperties>
-                      <promptText class="java.lang.String" value="entity_form"/>
-                    </clientProperties>
                   </component>
                   <component id="24c0b" class="javax.swing.JLabel" binding="formNameErrorMessage">
                     <constraints>
@@ -294,9 +279,6 @@
                       </grid>
                     </constraints>
                     <properties/>
-                    <clientProperties>
-                      <promptText class="java.lang.String" value="entity_listing"/>
-                    </clientProperties>
                   </component>
                   <component id="774bf" class="javax.swing.JLabel" binding="gridNameErrorMessage">
                     <constraints>
@@ -325,15 +307,6 @@
                 <properties>
                   <selected value="true"/>
                   <text resource-bundle="magento2/common" key="common.addToolbarListingPaging"/>
-                </properties>
-              </component>
-              <component id="a95ed" class="javax.swing.JCheckBox" binding="addFullTextSearchCheckBox" default-binding="true">
-                <constraints>
-                  <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <selected value="true"/>
-                  <text resource-bundle="magento2/common" key="common.addToolbarFullTextSearch"/>
                 </properties>
               </component>
               <component id="de501" class="javax.swing.JCheckBox" binding="addColumnsControlCheckBox" default-binding="true">
@@ -447,9 +420,6 @@
                       <inheritsPopupMenu value="false"/>
                       <margin top="2" left="6" bottom="2" right="6"/>
                     </properties>
-                    <clientProperties>
-                      <promptText class="java.lang.String" value="Vendor_Module::management"/>
-                    </clientProperties>
                   </component>
                   <component id="34ebf" class="javax.swing.JLabel" binding="aclErrorMessage">
                     <constraints>
@@ -548,9 +518,6 @@
                       </grid>
                     </constraints>
                     <properties/>
-                    <clientProperties>
-                      <promptText class="java.lang.String" value="Vendor_Module::management"/>
-                    </clientProperties>
                   </component>
                   <component id="2ecdc" class="javax.swing.JLabel" binding="menuIdentifierErrorMessage">
                     <constraints>

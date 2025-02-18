@@ -4,11 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
-## 5.4.0
+## 2025.0.0
 
 ### Added
 
 - Clear notifications for the process status of URN generation [#2486](https://github.com/magento/magento2-phpstorm-plugin/pull/2486)
+- Added array as a type in Data Model properties [#2488](https://github.com/magento/magento2-phpstorm-plugin/pull/2488)
 
 ### Fixed
 
@@ -18,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
   Updated Run command.
 - java.lang.Throwable: Assertion failed: Do not use PsiElement for popup model. See PsiTargetNavigator [#2485](https://github.com/magento/magento2-phpstorm-plugin/pull/2485)
 - Slow operations are prohibited on EDT [#2486](https://github.com/magento/magento2-phpstorm-plugin/pull/2486)
+- When creating a new model with a listing component grid, fulltext search is not working [#2037](https://github.com/magento/magento2-phpstorm-plugin/pull/2037)
 
 ### Changed
 
