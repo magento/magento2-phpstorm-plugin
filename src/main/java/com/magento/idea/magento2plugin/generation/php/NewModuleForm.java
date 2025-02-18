@@ -79,8 +79,6 @@ public class NewModuleForm implements ListSelectionListener {
                 FileChooserDescriptorFactory.createSingleFolderDescriptor();
         final ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseFolderListener
                 = new ComponentWithBrowseButton.BrowseFolderActionListener<JTextField>(
-                "Magento Root Directory",
-                "Choose Magento root directory",
                 this.magentoPath,
                 null,
                 descriptor,

@@ -12,7 +12,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.util.SlowOperations;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.php.lang.PhpFileType;
 import com.magento.idea.magento2plugin.magento.packages.Package;
@@ -128,18 +127,16 @@ public final class ModuleIndex {
                 .getInstance();
         final Collection<VirtualFile> files = new ArrayList<>();
 
-        SlowOperations.allowSlowOperations(() -> {
-            files.addAll(
-                    index.getContainingFiles(
-                            ModuleNameIndex.KEY,
-                            moduleName,
-                            GlobalSearchScope.getScopeRestrictedByFileTypes(
-                                    GlobalSearchScope.allScope(project),
-                                    PhpFileType.INSTANCE
-                            )
-                    )
-            );
-        });
+        files.addAll(
+                index.getContainingFiles(
+                        ModuleNameIndex.KEY,
+                        moduleName,
+                        GlobalSearchScope.getScopeRestrictedByFileTypes(
+                                GlobalSearchScope.allScope(project),
+                                PhpFileType.INSTANCE
+                        )
+                )
+        );
 
         if (files.isEmpty()) {
             return null;

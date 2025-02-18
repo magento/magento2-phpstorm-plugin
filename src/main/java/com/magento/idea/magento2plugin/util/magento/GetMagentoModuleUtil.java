@@ -10,7 +10,6 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.util.SlowOperations;
 import com.jetbrains.php.lang.psi.elements.ClassConstantReference;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
@@ -140,9 +139,7 @@ public final class GetMagentoModuleUtil {
     private static String parseParameterValue(final PsiElement valueHolder) {
         if (valueHolder instanceof ClassConstantReference) {
             final ClassConstantReference constantReference = (ClassConstantReference) valueHolder;
-            final PsiElement resolved = SlowOperations.allowSlowOperations(
-                    constantReference::resolve
-            );
+            final PsiElement resolved = constantReference.resolve();
 
             if (!(resolved instanceof ClassConstImpl)) {
                 return null;
