@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Fixed
 
-- Fixed compatibility with 2025.*  [#2495](https://github.com/magento/magento2-phpstorm-plugin/pull/2495)
+- Fixed compatibility with PhpStorm/IntelliJ 2025.* [#2495](https://github.com/magento/magento2-phpstorm-plugin/pull/2495)
 
 ## 2025.0.0
 
