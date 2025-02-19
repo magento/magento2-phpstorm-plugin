@@ -5,8 +5,8 @@
 
 package com.magento.idea.magento2plugin.project;
 
-import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;

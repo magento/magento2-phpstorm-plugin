@@ -7,11 +7,18 @@
 <!-- Plugin description -->
 # PhpStorm Magento 2 Plugin
 
-This is a PhpStorm IDE plugin for a better Magento 2 development workflow.
-
-## Version 2025.0.0 - Contributors
-
 <table align="center">
+<caption>
+This is a PhpStorm IDE plugin for a better Magento 2 development workflow.
+  </caption>
+  <thead>
+    <tr>
+      <td colspan="3" align="center">
+            Version 2025.0.0 - Contributors
+      </td>
+    </tr>
+  </thead>
+<tbody>
   <tr>
     <td align="center">
       <a href="https://github.com/YevhenZvieriev">
@@ -35,13 +42,33 @@ This is a PhpStorm IDE plugin for a better Magento 2 development workflow.
       </a>
     </td>
   </tr>
+</tbody>
+  <tfoot>
+    <tr>
+      <td colspan="3" align="center">
+        <h3>Support the Project</h3>
+        <p>If you find this plugin helpful and want to support its development, consider buying the contributors a coffee:</p>
+        <a href="https://buymeacoffee.com/vitalii_b">
+          <img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Donate-orange.svg" alt="Buy Me a Coffee">
+        </a>
+      </td>
+    </tr>
+  </tfoot>
 </table>
 
-### Support the Project
+## Features
 
-If you find this plugin helpful and want to support its development, consider buying the contributors a coffee:
-
-[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Donate-orange.svg)](https://buymeacoffee.com/vitalii_b)
+* Configuration smart completion and references for XML/JavaScript files
+* `Navigate to configuration` reference in scope of class/interface
+* `Go to plugin` reference in scope of class/interface and method
+* `Navigate to Web API configuration` reference in scope of class/interface and method
+* Plugin class methods generation
+* Plugin declaration inspection
+* RequireJS reference navigation and completion
+* MFTF reference navigation and completion
+* GraphQL navigation line markers
+* Code generation
+* Inspections for XML configuration
 
 <!-- Plugin description end -->
 
@@ -62,20 +89,6 @@ If you find this plugin helpful and want to support its development, consider bu
 
 * PhpStorm >= 2023.1
 * JRE >= 17
-
-## Features
-
-* Configuration smart completion and references for XML/JavaScript files
-* `Navigate to configuration` reference in scope of class/interface
-* `Go to plugin` reference in scope of class/interface and method
-* `Navigate to Web API configuration` reference in scope of class/interface and method
-* Plugin class methods generation
-* Plugin declaration inspection
-* RequireJS reference navigation and completion
-* MFTF reference navigation and completion
-* GraphQL navigation line markers
-* Code generation
-* Inspections for XML configuration
 
 ## Setting up development environment
 
