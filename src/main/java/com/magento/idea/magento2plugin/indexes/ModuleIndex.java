@@ -125,18 +125,15 @@ public final class ModuleIndex {
         }
         final FileBasedIndex index = FileBasedIndex
                 .getInstance();
-        final Collection<VirtualFile> files = new ArrayList<>();
 
-        files.addAll(
-                index.getContainingFiles(
-                        ModuleNameIndex.KEY,
-                        moduleName,
-                        GlobalSearchScope.getScopeRestrictedByFileTypes(
-                                GlobalSearchScope.allScope(project),
-                                PhpFileType.INSTANCE
-                        )
+        final Collection<VirtualFile> files = new ArrayList<>(index.getContainingFiles(
+                ModuleNameIndex.KEY,
+                moduleName,
+                GlobalSearchScope.getScopeRestrictedByFileTypes(
+                        GlobalSearchScope.allScope(project),
+                        PhpFileType.INSTANCE
                 )
-        );
+        ));
 
         if (files.isEmpty()) {
             return null;

@@ -10,14 +10,16 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.util.IsClickedDirectoryInsideProject;
-import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.project.Settings;
-import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil;
-import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+import com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex;
+import java.util.Collection;
 
 public class NewModuleFileGroup extends NonTrivialActionGroup {
 
@@ -50,18 +52,29 @@ public class NewModuleFileGroup extends NonTrivialActionGroup {
             return;
         }
 
-        final String moduleName = GetModuleNameByDirectoryUtil
-                .execute((PsiDirectory) psiElement, project);
+        String moduleName = null;
+        VirtualFile psiDirectoryVirtualFile = ((PsiDirectory) psiElement).getVirtualFile();
+
+        for (var entry : FileBasedIndex.getInstance().getAllKeys(ModuleNameIndex.KEY, project)) {
+            Collection<VirtualFile> moduleVfs = FileBasedIndex.getInstance().getContainingFiles(
+                    ModuleNameIndex.KEY, entry, GlobalSearchScope.projectScope(project)
+            );
+
+            for (VirtualFile moduleFile : moduleVfs) {
+                if (moduleFile.getParent().getPath().equals(psiDirectoryVirtualFile.getPath())) {
+                    moduleName = entry;
+                    break;
+                }
+            }
+
+            if (moduleName != null) {
+                break;
+            }
+        }
 
         if (moduleName != null) {
-            final PsiDirectory moduleDirectory = new ModuleIndex(project)
-                    .getModuleDirectoryByModuleName(moduleName);
-
-            if (moduleDirectory != null
-                    && GetMagentoModuleUtil.isDirectoryInEditableModule(moduleDirectory)) {
-                event.getPresentation().setVisible(true);
-                return;
-            }
+            event.getPresentation().setVisible(true);
+            return;
         }
 
         event.getPresentation().setVisible(false);
