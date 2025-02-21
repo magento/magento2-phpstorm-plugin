@@ -48,7 +48,14 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
     private JLabel classNameErrorMessage;
 
     /**
-     * Constructor
+     * Constructs a new instance of the NewSetupDataPatchDialog.
+     * This dialog facilitates the creation of a new Magento 2 Setup Data Patch,
+     * allowing the user to provide necessary module details and interact with a graphical user interface.
+     *
+     * @param project       The current IntelliJ IDEA project context.
+     * @param directory     The base directory where the Setup Data Patch will be created.
+     * @param modulePackage The package name of the target Magento 2 module.
+     * @param moduleName    The name of the target Magento 2 module.
      */
     public NewSetupDataPatchDialog(
             Project project,
@@ -91,7 +98,7 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
     }
 
     /**
-     * Open dialog
+     * Open dialog.
      */
     public static void open(
             Project project,

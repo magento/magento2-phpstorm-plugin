@@ -52,7 +52,10 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
     private JButton buttonCancel;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, LAYOUT_NAME})
-    @FieldValidation(rule = RuleRegistry.LAYOUT_NAME, message = {IdentifierRule.MESSAGE, LAYOUT_NAME})
+    @FieldValidation(
+            rule = RuleRegistry.LAYOUT_NAME,
+            message = {IdentifierRule.MESSAGE, LAYOUT_NAME}
+    )
     private JTextField layoutName;
 
     private JComboBox<ComboBoxItemData> area;
@@ -62,6 +65,13 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
     private JLabel areaLabel;
     private JLabel layoutNameErrorMessage;
 
+    /**
+     * Constructs a new dialog for creating a layout template, initializing its components and setting
+     * default behaviors such as focus and button actions.
+     *
+     * @param project   The current IntelliJ project associated with the dialog.
+     * @param directory The PsiDirectory where the new layout will be created.
+     */
     public NewLayoutTemplateDialog(final Project project, final PsiDirectory directory) {
         super();
 
@@ -103,6 +113,9 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
         dialog.setVisible(true);
     }
 
+    /**
+     * Handles the action performed when the OK button is clicked in the dialog.
+     */
     protected void onWriteActionOK() {
 
         if (validateFormFields()) {
