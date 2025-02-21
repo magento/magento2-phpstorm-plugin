@@ -61,9 +61,9 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
     private JComboBox<ComboBoxItemData> area;
 
     // labels
-    private JLabel layoutNameLabel;
-    private JLabel areaLabel;
-    private JLabel layoutNameErrorMessage;
+    private JLabel layoutNameLabel; //NOPMD
+    private JLabel areaLabel; //NOPMD
+    private JLabel layoutNameErrorMessage; //NOPMD
 
     /**
      * Constructs a new dialog for creating a layout templates.
@@ -90,7 +90,7 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(WindowEvent event) {
+            public void windowClosing(final WindowEvent event) {
                 onCancel();
             }
         });
