@@ -321,7 +321,8 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         dispose();
     }
 
-    private void onOK() {
+    protected void onWriteActionOK() {
+
         if (validateFormFields()) {
             generateViewControllerFile();
             generateLayoutFile();

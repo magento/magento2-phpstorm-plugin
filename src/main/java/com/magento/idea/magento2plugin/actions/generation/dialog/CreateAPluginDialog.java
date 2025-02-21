@@ -170,7 +170,8 @@ public class CreateAPluginDialog extends AbstractDialog {
         }
     }
 
-    protected void onOK() {
+    protected void onWriteActionOK() {
+
         if (targetMethod == null) {
             targetMethod = getSelectedTargetMethod();
         }

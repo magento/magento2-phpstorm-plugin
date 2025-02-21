@@ -129,7 +129,7 @@ public class ConfigurationDialog extends AbstractDialog {
      * Save configuration.
      */
     @SuppressWarnings("PMD.CyclomaticComplexity")
-    private void onOK() {
+    protected void onWriteActionOK() {
         modulePathError.setText("");
         additionalPathError.setText("");
 

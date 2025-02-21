@@ -52,6 +52,12 @@ public class NewModuleFileGroup extends NonTrivialActionGroup {
             return;
         }
 
+        // Skip processing if the IDE is in dumb mode
+        if (com.intellij.openapi.project.DumbService.isDumb(project)) {
+            event.getPresentation().setVisible(false);
+            return;
+        }
+
         String moduleName = null;
         VirtualFile psiDirectoryVirtualFile = ((PsiDirectory) psiElement).getVirtualFile();
 

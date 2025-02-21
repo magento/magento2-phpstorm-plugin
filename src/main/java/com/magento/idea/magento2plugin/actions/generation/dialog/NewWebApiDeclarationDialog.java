@@ -140,7 +140,8 @@ public class NewWebApiDeclarationDialog extends AbstractDialog {
     /**
      * Fire generation process if all fields are valid.
      */
-    private void onOK() {
+    protected void onWriteActionOK() {
+
         if (validateFormFields()) {
             new WebApiDeclarationGenerator(
                     getDialogDataObject(),

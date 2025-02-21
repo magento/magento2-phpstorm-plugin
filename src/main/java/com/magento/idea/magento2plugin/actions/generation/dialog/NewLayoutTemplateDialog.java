@@ -103,7 +103,8 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
         dialog.setVisible(true);
     }
 
-    private void onOK() {
+    protected void onWriteActionOK() {
+
         if (validateFormFields()) {
             final String[] layoutNameParts = getLayoutNameParts();
             final LayoutXmlData layoutXmlData = new LayoutXmlData(

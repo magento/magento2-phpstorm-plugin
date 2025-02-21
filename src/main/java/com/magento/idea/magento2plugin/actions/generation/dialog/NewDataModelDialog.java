@@ -5,9 +5,13 @@
 
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
+import com.intellij.openapi.application.ReadAction;
+import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBoxTableRenderer;
 import com.intellij.psi.PsiDirectory;
+import com.intellij.util.RunnableCallable;
+import com.intellij.util.concurrency.AppExecutorUtil;
 import com.magento.idea.magento2plugin.actions.generation.NewDataModelAction;
 import com.magento.idea.magento2plugin.actions.generation.OverrideClassByAPreferenceAction;
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelData;
@@ -140,7 +144,8 @@ public class NewDataModelDialog extends AbstractDialog {
     /**
      * Proceed with generation.
      */
-    private void onOK() {
+    protected void onWriteActionOK() {
+
         if (propertyTable.isEditing()) {
             propertyTable.getCellEditor().stopCellEditing();
         }

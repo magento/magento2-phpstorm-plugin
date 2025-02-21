@@ -111,7 +111,8 @@ public class NewBlockDialog extends AbstractDialog {
         dialog.setVisible(true);
     }
 
-    protected void onOK() {
+    protected void onWriteActionOK() {
+
         if (validateFormFields()) {
             generateFile();
             exit();

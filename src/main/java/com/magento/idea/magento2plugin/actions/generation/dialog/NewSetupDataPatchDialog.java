@@ -113,7 +113,8 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
     /**
      * Fire generation process if all fields are valid.
      */
-    protected void onOK() {
+    protected void onWriteActionOK() {
+
         if (validateFields()) {
             generateFile();
             exit();

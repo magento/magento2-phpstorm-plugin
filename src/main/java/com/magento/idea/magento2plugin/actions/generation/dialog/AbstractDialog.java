@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
+import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.util.Pair;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.prompt.PlaceholderInitializerUtil;
@@ -73,6 +74,43 @@ public abstract class AbstractDialog extends JDialog {
      */
     protected void exit() {
         dispose();
+    }
+
+    /**
+     * Executes onOK within a WriteAction context.
+     */
+    protected final void executeOnOk() {
+        WriteAction.run(() -> {
+            try {
+                onWriteActionOK();
+            } catch (Exception e) {
+                handleOnOkException(e);
+            }
+        });
+    }
+
+    /**
+     * This method should contain the core logic for onOk.
+     * Subclasses can override to provide their implementation.
+     * Must be invoked via executeOnOk().
+     */
+    protected abstract void onWriteActionOK();
+
+    /**
+     * Handle any exceptions that are thrown during execution of the onOK logic.
+     * Default implementation logs or shows the exception.
+     *
+     * @param e the exception encountered
+     */
+    protected void handleOnOkException(Exception e) {
+        e.printStackTrace();
+    }
+
+    /**
+     * Hook executed when the OK button is pressed.
+     */
+    protected final void onOK() {
+        executeOnOk();
     }
 
     /**

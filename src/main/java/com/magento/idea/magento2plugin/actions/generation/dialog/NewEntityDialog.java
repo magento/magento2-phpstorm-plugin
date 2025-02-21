@@ -393,7 +393,8 @@ public class NewEntityDialog extends AbstractDialog {
     /**
      * Perform code generation using input data.
      */
-    private void onOK() {
+    protected void onWriteActionOK() {
+
         if (!validateFormFields()) {
             onOkActionFired.setInProgress(false);
             return;
