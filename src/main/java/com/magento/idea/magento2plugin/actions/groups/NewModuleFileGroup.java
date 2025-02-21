@@ -19,9 +19,8 @@ import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.util.IsClickedDirectoryInsideProject;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Collection;
+import org.jetbrains.annotations.Nullable;
 
 public class NewModuleFileGroup extends NonTrivialActionGroup {
 
@@ -81,8 +80,9 @@ public class NewModuleFileGroup extends NonTrivialActionGroup {
             final VirtualFile psiDirectoryVirtualFile
     ) {
         String moduleName = null;
-        for (final String entry : FileBasedIndex.getInstance().getAllKeys(ModuleNameIndex.KEY, project)) {
-            final Collection<VirtualFile> moduleVfs = FileBasedIndex.getInstance().getContainingFiles(
+        final FileBasedIndex index = FileBasedIndex.getInstance();
+        for (final String entry : index.getAllKeys(ModuleNameIndex.KEY, project)) {
+            final Collection<VirtualFile> moduleVfs = index.getContainingFiles(
                     ModuleNameIndex.KEY, entry, GlobalSearchScope.projectScope(project)
             );
 
