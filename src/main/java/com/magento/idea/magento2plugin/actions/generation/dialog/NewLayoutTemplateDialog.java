@@ -66,8 +66,7 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
     private JLabel layoutNameErrorMessage;
 
     /**
-     * Constructs a new dialog for creating a layout template, initializing its components and setting
-     * default behaviors such as focus and button actions.
+     * Constructs a new dialog for creating a layout templates.
      *
      * @param project   The current IntelliJ project associated with the dialog.
      * @param directory The PsiDirectory where the new layout will be created.
@@ -106,6 +105,12 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
         autoSelectCurrentArea();
     }
 
+    /**
+     * Opens the New Layout Template Dialog, initializes its components.
+     *
+     * @param project   The current IntelliJ project associated with the dialog.
+     * @param directory The PsiDirectory where the new layout will be created.
+     */
     public static void open(final Project project, final PsiDirectory directory) {
         final NewLayoutTemplateDialog dialog = new NewLayoutTemplateDialog(project, directory);
         dialog.pack();

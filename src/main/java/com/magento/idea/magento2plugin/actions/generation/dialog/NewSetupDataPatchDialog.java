@@ -49,8 +49,6 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
 
     /**
      * Constructs a new instance of the NewSetupDataPatchDialog.
-     * This dialog facilitates the creation of a new Magento 2 Setup Data Patch,
-     * allowing the user to provide necessary module details and interact with a graphical user interface.
      *
      * @param project       The current IntelliJ IDEA project context.
      * @param directory     The base directory where the Setup Data Patch will be created.
