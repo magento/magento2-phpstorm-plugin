@@ -101,7 +101,7 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
 
-        addComponentListener(new FocusOnAFieldListener(() -> area.requestFocusInWindow()));
+        addComponentListener(new FocusOnAFieldListener(this::run));
         autoSelectCurrentArea();
     }
 
@@ -164,6 +164,9 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
         }
     }
 
+    @SuppressWarnings({
+            "PMD.AvoidLiteralsInIfCondition"
+    })
     private String[] getLayoutNameParts() {
         final String[] layoutNameParts = layoutName.getText().trim().split("_");
         String routeName = "";
@@ -188,5 +191,9 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
 
     private String getArea() {
         return area.getSelectedItem().toString();
+    }
+
+    private void run() {
+        area.requestFocusInWindow();
     }
 }
