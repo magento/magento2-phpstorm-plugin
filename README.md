@@ -51,6 +51,9 @@ This is a PhpStorm IDE plugin for a better Magento 2 development workflow.
         <a href="https://buymeacoffee.com/vitalii_b">
           <img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Donate-orange.svg" alt="Buy Me a Coffee">
         </a>
+         <p>Thank you to our sponsors—your support means everything:</p>
+         <p>Lucas van Staden</p>
+         <p>Ivan Chepurnyi</p>
       </td>
     </tr>
   </tfoot>
