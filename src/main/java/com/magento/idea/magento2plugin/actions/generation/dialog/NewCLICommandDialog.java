@@ -190,7 +190,8 @@ public class NewCLICommandDialog extends AbstractDialog {
         return namespaceBuilder.getClassFqn();
     }
 
-    private void onOK() {
+    protected void onWriteActionOK() {
+
         if (validateFormFields() && isPHPClassValid()) {
             this.generate();
             exit();

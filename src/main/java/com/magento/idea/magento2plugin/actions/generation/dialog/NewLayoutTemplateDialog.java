@@ -52,16 +52,25 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
     private JButton buttonCancel;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, LAYOUT_NAME})
-    @FieldValidation(rule = RuleRegistry.LAYOUT_NAME, message = {IdentifierRule.MESSAGE, LAYOUT_NAME})
+    @FieldValidation(
+            rule = RuleRegistry.LAYOUT_NAME,
+            message = {IdentifierRule.MESSAGE, LAYOUT_NAME}
+    )
     private JTextField layoutName;
 
     private JComboBox<ComboBoxItemData> area;
 
     // labels
-    private JLabel layoutNameLabel;
-    private JLabel areaLabel;
-    private JLabel layoutNameErrorMessage;
+    private JLabel layoutNameLabel; //NOPMD
+    private JLabel areaLabel; //NOPMD
+    private JLabel layoutNameErrorMessage; //NOPMD
 
+    /**
+     * Constructs a new dialog for creating a layout templates.
+     *
+     * @param project   The current IntelliJ project associated with the dialog.
+     * @param directory The PsiDirectory where the new layout will be created.
+     */
     public NewLayoutTemplateDialog(final Project project, final PsiDirectory directory) {
         super();
 
@@ -81,7 +90,7 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(WindowEvent event) {
+            public void windowClosing(final WindowEvent event) {
                 onCancel();
             }
         });
@@ -92,10 +101,16 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
 
-        addComponentListener(new FocusOnAFieldListener(() -> area.requestFocusInWindow()));
+        addComponentListener(new FocusOnAFieldListener(this::run));
         autoSelectCurrentArea();
     }
 
+    /**
+     * Opens the New Layout Template Dialog, initializes its components.
+     *
+     * @param project   The current IntelliJ project associated with the dialog.
+     * @param directory The PsiDirectory where the new layout will be created.
+     */
     public static void open(final Project project, final PsiDirectory directory) {
         final NewLayoutTemplateDialog dialog = new NewLayoutTemplateDialog(project, directory);
         dialog.pack();
@@ -103,7 +118,11 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
         dialog.setVisible(true);
     }
 
-    private void onOK() {
+    /**
+     * Handles the action performed when the OK button is clicked in the dialog.
+     */
+    protected void onWriteActionOK() {
+
         if (validateFormFields()) {
             final String[] layoutNameParts = getLayoutNameParts();
             final LayoutXmlData layoutXmlData = new LayoutXmlData(
@@ -145,6 +164,9 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
         }
     }
 
+    @SuppressWarnings({
+            "PMD.AvoidLiteralsInIfCondition"
+    })
     private String[] getLayoutNameParts() {
         final String[] layoutNameParts = layoutName.getText().trim().split("_");
         String routeName = "";
@@ -169,5 +191,9 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
 
     private String getArea() {
         return area.getSelectedItem().toString();
+    }
+
+    private void run() {
+        area.requestFocusInWindow();
     }
 }

@@ -198,7 +198,8 @@ public class NewObserverDialog extends AbstractDialog {
         return directoryStructure.getText().trim();
     }
 
-    protected void onOK() {
+    protected void onWriteActionOK() {
+
         if (validateFields()) {
             PsiDirectory observerDirectory = baseDir;
 

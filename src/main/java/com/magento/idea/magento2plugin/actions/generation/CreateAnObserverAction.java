@@ -17,7 +17,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.util.SlowOperations;
 import com.jetbrains.php.lang.lexer.PhpTokenTypes;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.Method;
@@ -133,7 +132,7 @@ public class CreateAnObserverAction extends DumbAwareAction
         if (elementReference == null) {
             return false;
         }
-        final PsiElement method = SlowOperations.allowSlowOperations(elementReference::resolve);
+        final PsiElement method = elementReference.resolve();
         if (!(method instanceof Method)) {
             return false;
         }

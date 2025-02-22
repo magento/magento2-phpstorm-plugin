@@ -423,7 +423,8 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         dialog.setVisible(true);
     }
 
-    private void onOK() {
+    protected void onWriteActionOK() {
+
         if (formButtons.isEditing()) {
             formButtons.getCellEditor().stopCellEditing();
         }

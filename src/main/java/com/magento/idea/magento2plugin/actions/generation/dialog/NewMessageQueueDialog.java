@@ -255,7 +255,8 @@ public class NewMessageQueueDialog extends AbstractDialog {
         dialog.setVisible(true);
     }
 
-    private void onOK() {
+    protected void onWriteActionOK() {
+
         if (validateFormFields()) {
             generateCommunication();
             generateConsumer();

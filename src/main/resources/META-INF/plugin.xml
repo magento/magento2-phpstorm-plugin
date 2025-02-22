@@ -7,53 +7,11 @@
 <idea-plugin require-restart="true">
     <id>com.magento.idea.magento2plugin</id>
     <name>Magento PhpStorm</name>
-    <version>2025.0.0</version>
+    <version>2025.0.1</version>
     <vendor url="https://github.com/magento/magento2-phpstorm-plugin">Magento Inc.</vendor>
 
     <description><![CDATA[
         This is a PhpStorm IDE plugin for a better Magento 2 development workflow.
-
-<h3>Main Features</h3>
-<ul>
-    <li><strong>Code Generation:</strong> Quickly generate boilerplate Magento code like plugins, observers, XML configurations, and more.</li>
-    <li><strong>Inspections:</strong> Identify and fix potential issues with Magento-specific code quality tools.</li>
-    <li><strong>Reference Navigation:</strong> Easily navigate between Magento files, classes, and references.</li>
-    <li><strong>Code Completion:</strong> Auto-complete Magento-specific code constructs, including XML tags, class names, and methods.</li>
-    <li><strong>Copy Magento Path:</strong> Copy file paths in Magento format.</li>
-    <li><strong>Upgrade Compatibility Tool:</strong> Assist in upgrading Magento modules and code for newer Magento versions.</li>
-    <li><strong>URN Mapping:</strong> Resolve Magento URNs for correct file associations and navigation.</li>
-</ul>
-<h3>Version 2025.0.0 - Contributors</h3>
-<table align="center">
-    <tr>
-        <td align="center">
-            <a href="https://github.com/YevhenZvieriev">
-                <img src="https://avatars.githubusercontent.com/u/43544955?v=4" width="100px;" alt="Contributor 1"/>
-                <br/>
-                <sub><b>Yevhen Zvieriev</b></sub>
-            </a>
-        </td>
-        <td align="center">
-            <a href="https://github.com/SilinMykola">
-                <img src="https://avatars.githubusercontent.com/u/15772032?v=4" width="100px;" alt="Contributor 2"/>
-                <br/>
-                <sub><b>Mykola Silin</b></sub>
-            </a>
-        </td>
-        <td align="center">
-            <a href="https://github.com/VitaliyBoyko">
-                <img src="https://avatars.githubusercontent.com/u/20116393?v=4" width="100px;" alt="Contributor 3"/>
-                <br/>
-                <sub><b>Vitalii Boiko</b></sub>
-            </a>
-        </td>
-    </tr>
-</table>
-
-<h3>Support the Project</h3>
-
-If you find this plugin helpful and want to support its development, consider buying the contributors a coffee:
-<a href="https://buymeacoffee.com/vitalii_b">Buy Me a Coffee</a>
     ]]></description>
 
     <change-notes><![CDATA[

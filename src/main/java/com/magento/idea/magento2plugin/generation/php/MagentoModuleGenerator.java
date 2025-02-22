@@ -15,7 +15,6 @@ import com.intellij.platform.ProjectGeneratorPeer;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.intellij.util.PlatformUtils;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleComposerJsonData;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleRegistrationPhpData;
@@ -55,11 +54,6 @@ public class MagentoModuleGenerator extends WebProjectTemplate<MagentoProjectGen
     @Override
     public ProjectGeneratorPeer<MagentoProjectGeneratorSettings> createPeer() {
         return new MagentoProjectPeer();
-    }
-
-    @Override
-    public boolean isPrimaryGenerator() {
-        return PlatformUtils.isPhpStorm();
     }
 
     /**

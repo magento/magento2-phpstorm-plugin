@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
+## 2025.0.1
+
+### Fixed
+
+- Fixed compatibility with PhpStorm/IntelliJ 2025.* [#2495](https://github.com/magento/magento2-phpstorm-plugin/pull/2495)
+
 ## 2025.0.0
 
 ### Added

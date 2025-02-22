@@ -51,7 +51,8 @@ import javax.swing.table.TableColumn;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({
-        "PMD.ExcessiveImports"
+        "PMD.ExcessiveImports",
+        "PMD.ConstructorCallsOverridableMethod"
 })
 public class NewDataModelDialog extends AbstractDialog {
 
@@ -63,13 +64,13 @@ public class NewDataModelDialog extends AbstractDialog {
 
     private final Project project;
     private final String moduleName;
-    private final ValidatorBundle validatorBundle;
-    private final CommonBundle commonBundle;
+    private final transient ValidatorBundle validatorBundle;
+    private final transient CommonBundle commonBundle;
     private final List<String> properties;
 
-    private JPanel contentPanel;
-    private JButton buttonOK;
-    private JButton buttonCancel;
+    private JPanel contentPanel; //NOPMD
+    private JButton buttonOK; //NOPMD
+    private JButton buttonCancel; //NOPMD
     private JTable propertyTable;
     private JButton addProperty;
     private JCheckBox createInterface;
@@ -121,7 +122,9 @@ public class NewDataModelDialog extends AbstractDialog {
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
 
-        addComponentListener(new FocusOnAFieldListener(() -> modelName.requestFocusInWindow()));
+        addComponentListener(new FocusOnAFieldListener(() -> {
+            modelName.requestFocusInWindow();
+        }));
     }
 
     /**
@@ -140,7 +143,8 @@ public class NewDataModelDialog extends AbstractDialog {
     /**
      * Proceed with generation.
      */
-    private void onOK() {
+    protected void onWriteActionOK() {
+
         if (propertyTable.isEditing()) {
             propertyTable.getCellEditor().stopCellEditing();
         }

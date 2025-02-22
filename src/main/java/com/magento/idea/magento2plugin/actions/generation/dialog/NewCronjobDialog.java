@@ -289,7 +289,8 @@ public class NewCronjobDialog extends AbstractDialog {
     /**
      * When new cronjob dialog is filled, validate the input data and generate a new cronjob.
      */
-    private void onOK() {
+    protected void onWriteActionOK() {
+
         if (!validateFormFields()) {
             return;
         }
