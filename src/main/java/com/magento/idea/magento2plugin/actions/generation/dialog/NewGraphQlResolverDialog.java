@@ -121,7 +121,8 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
         }
     }
 
-    protected void onOK() {
+    protected void onWriteActionOK() {
+
         if (validateFormFields()) {
             generateFile();
             exit();

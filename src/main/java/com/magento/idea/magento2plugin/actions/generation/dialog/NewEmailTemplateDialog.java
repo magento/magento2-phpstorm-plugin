@@ -212,7 +212,8 @@ public class NewEmailTemplateDialog extends AbstractDialog {
         return this.moduleName;
     }
 
-    private void onOK() {
+    protected void onWriteActionOK() {
+
         final boolean emailTemplateCanBeDeclared = !this.validator.validate(this);
 
         if (!validateFormFields() || emailTemplateCanBeDeclared) {

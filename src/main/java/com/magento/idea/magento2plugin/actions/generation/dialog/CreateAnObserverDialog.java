@@ -149,7 +149,7 @@ public class CreateAnObserverDialog extends AbstractDialog {
     /**
      * Perform code generation using input data.
      */
-    private void onOK() {
+    protected void onWriteActionOK() {
         if (validateFormFields()) {
             new ObserverClassGenerator(new ObserverFileData(
                     getObserverDirectory(),

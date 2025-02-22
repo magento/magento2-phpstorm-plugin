@@ -27,6 +27,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
+@SuppressWarnings({
+        "PMD.ConstructorCallsOverridableMethod"
+})
 public class NewSetupDataPatchDialog extends AbstractDialog {
 
     private static final String CLASS_NAME = "Class Name";
@@ -36,25 +39,30 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
     private final String moduleName;
     private final String modulePackage;
 
-    private JPanel contentPanel;
-    private JButton buttonOK;
-    private JButton buttonCancel;
+    private JPanel contentPanel; //NOPMD
+    private JButton buttonOK; //NOPMD
+    private JButton buttonCancel; //NOPMD
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, CLASS_NAME})
     @FieldValidation(rule = RuleRegistry.PHP_CLASS, message = {PhpClassRule.MESSAGE, CLASS_NAME})
     private JTextField className;
 
-    private JLabel classNameLabel;
-    private JLabel classNameErrorMessage;
+    private JLabel classNameLabel; //NOPMD
+    private JLabel classNameErrorMessage; //NOPMD
 
     /**
-     * Constructor
+     * Constructs a new instance of the NewSetupDataPatchDialog.
+     *
+     * @param project       The current IntelliJ IDEA project context.
+     * @param directory     The base directory where the Setup Data Patch will be created.
+     * @param modulePackage The package name of the target Magento 2 module.
+     * @param moduleName    The name of the target Magento 2 module.
      */
     public NewSetupDataPatchDialog(
-            Project project,
-            PsiDirectory directory,
-            String modulePackage,
-            String moduleName
+            final Project project,
+            final PsiDirectory directory,
+            final String modulePackage,
+            final String moduleName
     ) {
         super();
 
@@ -75,7 +83,7 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(WindowEvent event) {
+            public void windowClosing(final WindowEvent event) {
                 onCancel();
             }
         });
@@ -87,19 +95,21 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
 
-        addComponentListener(new FocusOnAFieldListener(() -> className.requestFocusInWindow()));
+        addComponentListener(new FocusOnAFieldListener(() -> {
+            className.requestFocusInWindow();
+        }));
     }
 
     /**
-     * Open dialog
+     * Open dialog.
      */
     public static void open(
-            Project project,
-            PsiDirectory directory,
-            String modulePackage,
-            String moduleName
+            final Project project,
+            final PsiDirectory directory,
+            final String modulePackage,
+            final String moduleName
     ) {
-        NewSetupDataPatchDialog dialog = new NewSetupDataPatchDialog(
+        final NewSetupDataPatchDialog dialog = new NewSetupDataPatchDialog(
                 project,
                 directory,
                 modulePackage,
@@ -113,7 +123,8 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
     /**
      * Fire generation process if all fields are valid.
      */
-    protected void onOK() {
+    protected void onWriteActionOK() {
+
         if (validateFields()) {
             generateFile();
             exit();
@@ -121,13 +132,13 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
     }
 
     private void generateFile() {
-        PsiDirectory directory = DirectoryGenerator.getInstance().findOrCreateSubdirectories(
+        final PsiDirectory directory = DirectoryGenerator.getInstance().findOrCreateSubdirectories(
                 baseDir,
                 NewSetupDataPatchAction.PATCH_DIRECTORY
                         + "/"
                         + NewSetupDataPatchAction.DATA_DIRECTORY
         );
-        ModuleSetupDataPatchGenerator generator = new ModuleSetupDataPatchGenerator(
+        final ModuleSetupDataPatchGenerator generator = new ModuleSetupDataPatchGenerator(
                 new ModuleSetupDataPatchData(
                         modulePackage,
                         moduleName,
@@ -145,7 +156,7 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
     }
 
     private boolean validateFields() {
-        PsiDirectory patchDirectory = baseDir
+        final PsiDirectory patchDirectory = baseDir
                 .findSubdirectory(NewSetupDataPatchAction.PATCH_DIRECTORY);
         PsiDirectory directory = null;
 
@@ -154,8 +165,8 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
         }
 
         if (directory != null) {
-            for (PsiFile file : directory.getFiles()) {
-                String className = ModuleSetupDataPatchFile
+            for (final PsiFile file : directory.getFiles()) {
+                final String className = ModuleSetupDataPatchFile
                         .resolveClassNameFromInput(getClassName());
 
                 if (file.getName().equals(className + ModuleSetupDataPatchFile.EXTENSION)) {

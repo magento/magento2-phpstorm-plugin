@@ -120,7 +120,8 @@ public class NewViewModelDialog extends AbstractDialog {
         dialog.setVisible(true);
     }
 
-    protected void onOK() {
+    protected void onWriteActionOK() {
+
         if (validateFormFields()) {
             generateFile();
             exit();

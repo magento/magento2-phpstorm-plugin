@@ -101,7 +101,7 @@ public class ReindexDialog extends AbstractDialog {
     /**
      * Execute reindexing action.
      */
-    private void onOK() {
+    protected void onWriteActionOK() {
         if (targetVersion.getSelectedItem() == null || targetIndex.getSelectedItem() == null) {
             return;
         }

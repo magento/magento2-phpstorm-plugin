@@ -110,7 +110,8 @@ public class OverrideTemplateInThemeDialog extends AbstractDialog {
         dialog.setVisible(true);
     }
 
-    private void onOK() {
+    protected void onWriteActionOK() {
+
         if (validateFormFields()) {
             final OverrideTemplateInThemeGenerator overrideInThemeGenerator =
                     new OverrideTemplateInThemeGenerator(project);

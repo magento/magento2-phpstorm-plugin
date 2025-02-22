@@ -248,14 +248,15 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
     }
 
     protected void addActionListenersForOkButton(final JButton okButton) {
-        okButton.addActionListener(e -> onOk());
+        okButton.addActionListener(e -> onOK());
     }
 
     protected void addActionListenersForOkCancel(final JButton cancelButton) {
         cancelButton.addActionListener(e -> onCancel());
     }
 
-    protected void onOk() {
+    protected void onWriteActionOK() {
+
         stopOptionsTableEditing(getOptionsTable());
 
         if (!validateFormFields()) {

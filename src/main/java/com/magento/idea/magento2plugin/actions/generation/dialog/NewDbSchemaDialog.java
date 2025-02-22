@@ -133,7 +133,8 @@ public class NewDbSchemaDialog extends AbstractDialog {
     /**
      * On buttonOK action listener.
      */
-    private void onOK() {
+    protected void onWriteActionOK() {
+
         if (columnsTable.isEditing()) {
             columnsTable.getCellEditor().stopCellEditing();
         }

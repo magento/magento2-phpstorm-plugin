@@ -114,7 +114,8 @@ public class GatherArrayValuesDialog extends AbstractDialog {
     /**
      * Fire process if all fields are valid.
      */
-    private void onOK() {
+    protected void onWriteActionOK() {
+
         if (itemsTable.isEditing()) {
             itemsTable.getCellEditor().stopCellEditing();
         }

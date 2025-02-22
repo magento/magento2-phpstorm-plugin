@@ -166,7 +166,8 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
         }
     }
 
-    protected void onOK() {
+    protected void onWriteActionOK() {
+
         if (!validateFormFields()) {
             exit();
             return;

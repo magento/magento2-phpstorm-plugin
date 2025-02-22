@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin.project;
 
 import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
@@ -36,9 +37,13 @@ public class ProjectDetector implements DirectoryProjectConfigurator {
                 if (!MagentoBasePathUtil.isMagentoFolderValid(baseDir.getPath())) {
                     return;
                 }
-                final Notification notification = new Notification("Magento", "Magento",
-                        "<a href='enable'>Enable</a> Magento support for this project?",
-                        NotificationType.INFORMATION, new NotificationListener.Adapter() {
+                final Notification notification = NotificationGroupManager.getInstance()
+                        .getNotificationGroup("Magento Notifications")
+                        .createNotification(
+                                "Magento",
+                                "<a href='enable'>Enable</a> Magento support for this project?",
+                                NotificationType.INFORMATION
+                        ).setListener(new NotificationListener.Adapter() {
                             @Override
                             public void hyperlinkActivated(
                                     final @NotNull Notification notification,

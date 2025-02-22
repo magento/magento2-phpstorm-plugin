@@ -136,7 +136,8 @@ public class InjectAViewModelDialog extends AbstractDialog {
         );
     }
 
-    protected void onOK() {
+    protected void onWriteActionOK() {
+
         if (!validateFormFields()) {
             exit();
             return;

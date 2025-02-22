@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
+import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.util.Pair;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.prompt.PlaceholderInitializerUtil;
@@ -35,10 +36,13 @@ import org.jetbrains.annotations.NotNull;
 /**
  * All code generate dialog should extend this class.
  */
+@SuppressWarnings({
+        "PMD.TooManyMethods"
+})
 public abstract class AbstractDialog extends JDialog {
 
-    protected CommonBundle bundle;
-    protected final ValidatorBundle validatorBundle = new ValidatorBundle();
+    protected transient CommonBundle bundle;
+    protected final transient ValidatorBundle validatorBundle = new ValidatorBundle();
     protected final List<FieldValidationData> fieldsValidationsList;
     private final String errorTitle;
     private JTabbedPane tabbedPane;
@@ -76,11 +80,36 @@ public abstract class AbstractDialog extends JDialog {
     }
 
     /**
+     * Executes onOK within a WriteAction context.
+     */
+    protected final void executeOnOk() {
+        WriteAction.run(this::onWriteActionOK);
+    }
+
+    /**
+     * This method should contain the core logic for onOk.
+     * Subclasses can override to provide their implementation.
+     * Must be invoked via executeOnOk().
+     */
+    protected abstract void onWriteActionOK();
+
+    /**
+     * Hook executed when the OK button is pressed.
+     */
+    protected final void onOK() {
+        executeOnOk();
+    }
+
+    /**
      * Validate all form fields.
      *
      * @return boolean
      */
-    @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.AvoidDeeplyNestedIfStmts"})
+    @SuppressWarnings({
+            "PMD.CyclomaticComplexity",
+            "PMD.AvoidDeeplyNestedIfStmts",
+            "PMD.CognitiveComplexity"
+    })
     protected boolean validateFormFields() {
         boolean dialogHasErrors;
         isValidationErrorShown = dialogHasErrors = false;
