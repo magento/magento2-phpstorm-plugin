@@ -6,8 +6,6 @@
 package com.magento.idea.magento2plugin.actions;
 
 import com.intellij.ide.actions.CopyPathProvider;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -27,8 +25,7 @@ public class CopyMagentoPath extends CopyPathProvider {
     public static final String PHTML_EXTENSION = "phtml";
     public static final String JS_EXTENSION = "js";
     public static final String CSS_EXTENSION = "css";
-    private final List<String> acceptedTypes
-            = Arrays.asList(PHTML_EXTENSION, JS_EXTENSION, CSS_EXTENSION);
+    public static final String HTML_EXTENSION = "html";
     private static final List<String> SUPPORTED_IMAGE_EXTENSIONS
             = new ArrayList<>(Arrays.asList(ImageIO.getReaderFormatNames()));
     public static final String SEPARATOR = "::";
@@ -58,20 +55,6 @@ public class CopyMagentoPath extends CopyPathProvider {
     }
 
     @Override
-    public void update(@NotNull final AnActionEvent event) {
-        final VirtualFile virtualFile = event.getData(PlatformDataKeys.VIRTUAL_FILE);
-        if (isNotValidFile(virtualFile)) {
-            event.getPresentation().setVisible(false);
-        }
-    }
-
-    private boolean isNotValidFile(final VirtualFile virtualFile) {
-        return virtualFile != null && virtualFile.isDirectory()
-                || virtualFile != null && !acceptedTypes.contains(virtualFile.getExtension())
-                && !SUPPORTED_IMAGE_EXTENSIONS.contains(virtualFile.getExtension());
-    }
-
-    @Override
     public @Nullable String getPathToElement(
             final @NotNull Project project,
             final @Nullable VirtualFile virtualFile,
@@ -94,28 +77,59 @@ public class CopyMagentoPath extends CopyPathProvider {
         final StringBuilder fullPath = new StringBuilder(virtualFile.getPath());
 
         index = -1;
-        String[] paths;
+        final String[] paths;
 
         if (PHTML_EXTENSION.equals(virtualFile.getExtension())) {
             paths = templatePaths;
-        } else if (JS_EXTENSION.equals(virtualFile.getExtension())
-                || CSS_EXTENSION.equals(virtualFile.getExtension())
-                || SUPPORTED_IMAGE_EXTENSIONS.contains(virtualFile.getExtension())) {
+        } else if (isMagentoFile(virtualFile)) {
             paths = webPaths;
         } else {
-            return fullPath.toString();
+            return "";
         }
 
         try {
-            final int endIndex = getIndexOf(paths, fullPath, paths[++index]);
-            final int offset = paths[index].length();
-
-            fullPath.replace(0, endIndex + offset, "");
-
-            return moduleName + SEPARATOR + fullPath;
+            return getResultPath(virtualFile, paths, fullPath, moduleName);
         } catch (ArrayIndexOutOfBoundsException exception) {
-            return fullPath.toString();
+            return "";
         }
+    }
+
+    /**
+     * Determines if the provided file is supported by Magento Path.
+     *
+     * @param virtualFile the virtual file to be checked
+     * @return bool
+     */
+    private static boolean isMagentoFile(@NotNull final VirtualFile virtualFile) {
+        return JS_EXTENSION.equals(virtualFile.getExtension())
+                || CSS_EXTENSION.equals(virtualFile.getExtension())
+                || HTML_EXTENSION.equals(virtualFile.getExtension())
+                || SUPPORTED_IMAGE_EXTENSIONS.contains(virtualFile.getExtension());
+    }
+
+    /**
+     * Constructs a result.
+     *
+     * @param virtualFile the virtual file being processed
+     * @param paths an array of potential path segments to be checked
+     * @param fullPath the full path of the virtual file as a mutable string builder
+     * @param moduleName the name of the module associated with the file
+     * @return the constructed result path
+     */
+    private @NotNull String getResultPath(
+            @NotNull final VirtualFile virtualFile,
+            final String[] paths,
+            final StringBuilder fullPath,
+            final String moduleName
+    ) {
+        final int endIndex = getIndexOf(paths, fullPath, paths[++index]);
+        final int offset = paths[index].length();
+
+        fullPath.replace(0, endIndex + offset, "");
+
+        return PHTML_EXTENSION.equals(virtualFile.getExtension())
+                ? moduleName + SEPARATOR + fullPath
+                : moduleName + "/" + fullPath.substring(0, fullPath.lastIndexOf("."));
     }
 
     /**
