@@ -84,13 +84,13 @@ public class CopyMagentoPath extends CopyPathProvider {
         } else if (isMagentoFile(virtualFile)) {
             paths = webPaths;
         } else {
-            return fullPath.toString();
+            return "";
         }
 
         try {
             return getResultPath(virtualFile, paths, fullPath, moduleName);
         } catch (ArrayIndexOutOfBoundsException exception) {
-            return fullPath.toString();
+            return "";
         }
     }
 
