@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - "Copy Path/Reference" does not show the preview value [#2497](https://github.com/magento/magento2-phpstorm-plugin/pull/2497)
 - Must not start write action from within read action in the other thread [#2498](https://github.com/magento/magento2-phpstorm-plugin/pull/2498)
 - URN map generation during indexing [#2499](https://github.com/magento/magento2-phpstorm-plugin/pull/2499)
+- Cannot invoke "com.intellij.psi.PsiDirectory.getName() [#2500](https://github.com/magento/magento2-phpstorm-plugin/pull/2500)
 
 ## 2025.0.0
 

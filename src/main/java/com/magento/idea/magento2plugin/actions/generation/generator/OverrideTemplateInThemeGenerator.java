@@ -76,13 +76,19 @@ public class OverrideTemplateInThemeGenerator extends OverrideInThemeGenerator {
         directory = getTargetDirectory(directory, pathComponents);
 
         if (directory.findFile(baseFile.getName()) != null) {
-            PsiDirectory finalDirectory1 = directory;
+            final PsiDirectory finalDirectory1 = directory;
             ApplicationManager.getApplication().invokeLater(() -> {
                 JBPopupFactory.getInstance()
-                        .createMessage(validatorBundle.message("validator.file.alreadyExists", baseFile.getName()))
-                        .showCenteredInCurrentWindow(project);
+                        .createMessage(
+                                validatorBundle.message(
+                                        "validator.file.alreadyExists",
+                                        baseFile.getName()
+                                )
+                        ).showCenteredInCurrentWindow(project);
                 ApplicationManager.getApplication().invokeLater(() -> {
-                    Objects.requireNonNull(finalDirectory1.findFile(baseFile.getName())).navigate(true);
+                    Objects.requireNonNull(
+                            finalDirectory1.findFile(baseFile.getName())
+                    ).navigate(true);
                 });
             });
             return;
