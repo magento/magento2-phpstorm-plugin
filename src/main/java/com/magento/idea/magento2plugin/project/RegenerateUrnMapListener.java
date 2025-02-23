@@ -59,9 +59,9 @@ class RegenerateUrnMapListener extends MouseAdapter {
                     .getNotificationGroup("Magento Notifications")
                     .createNotification(
                             "URN map generation unavailable",
-                            "Indexing is in progress." +
-                                    " Please wait for it to complete" +
-                                    " before running URN mapping generation.",
+                            "Indexing is in progress."
+                                    + " Please wait for it to complete"
+                                    + " before running URN mapping generation.",
                             NotificationType.WARNING
                     )
                     .notify(project);
