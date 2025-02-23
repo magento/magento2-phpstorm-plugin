@@ -10,6 +10,7 @@ import com.intellij.javaee.ExternalResourceManagerEx;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
@@ -46,17 +47,31 @@ class RegenerateUrnMapListener extends MouseAdapter {
      * @param event MouseEvent
      */
     @Override
+    @SuppressWarnings("PMD.UseNotifyAllInsteadOfNotify")
     public void mouseClicked(final MouseEvent event) {
-        final ExternalResourceManager manager =
-                ExternalResourceManager.getInstance();
-        final PsiManager psiManager = PsiManager.getInstance(project);
-        final MagentoComponentManager componentManager =
-                MagentoComponentManager.getInstance(project);
+        if (DumbService.getInstance(project).isDumb()) {
+            NotificationGroupManager.getInstance()
+                    .getNotificationGroup("Magento Notifications")
+                    .createNotification(
+                            "URN map generation unavailable",
+                            "Indexing is in progress."
+                                    + " Please wait for it to complete"
+                                    + " before running URN mapping generation.",
+                            NotificationType.WARNING
+                    )
+                    .notify(project);
+            return;
+        }
 
         ApplicationManager.getApplication().runWriteAction(
                 new Runnable() {
                     @Override
                     public void run() {
+                        final PsiManager psiManager = PsiManager.getInstance(project);
+                        final MagentoComponentManager componentManager =
+                                MagentoComponentManager.getInstance(project);
+                        final ExternalResourceManager manager =
+                                ExternalResourceManager.getInstance();
                         final Collection<VirtualFile> xsdFiles
                                 = FilenameIndex.getAllFilesByExt(project, "xsd");
                         final Collection<MagentoComponent> components

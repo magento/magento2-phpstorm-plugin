@@ -151,8 +151,8 @@
 
         <action id="CopyMagentoPath"
                 class="com.magento.idea.magento2plugin.actions.CopyMagentoPath"
-                text="Magento Path"
-                description="Copies Magento's path of file depending on file type">
+                text="Magento Asset"
+                description="Copies Magento-formatted file asset path depending on file type">
             <add-to-group group-id="CopyFileReference" anchor="last"/>
         </action>
         <group id="UctReindexMenu">
