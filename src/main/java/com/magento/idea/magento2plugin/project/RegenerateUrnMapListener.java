@@ -48,8 +48,6 @@ class RegenerateUrnMapListener extends MouseAdapter {
      */
     @Override
     public void mouseClicked(final MouseEvent event) {
-        final ExternalResourceManager manager =
-                ExternalResourceManager.getInstance();
         final PsiManager psiManager = PsiManager.getInstance(project);
         final MagentoComponentManager componentManager =
                 MagentoComponentManager.getInstance(project);
@@ -72,6 +70,8 @@ class RegenerateUrnMapListener extends MouseAdapter {
                 new Runnable() {
                     @Override
                     public void run() {
+                        final ExternalResourceManager manager =
+                                ExternalResourceManager.getInstance();
                         final Collection<VirtualFile> xsdFiles
                                 = FilenameIndex.getAllFilesByExt(project, "xsd");
                         final Collection<MagentoComponent> components
