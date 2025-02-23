@@ -19,9 +19,9 @@ import com.magento.idea.magento2plugin.magento.packages.OverridableFileType;
 import com.magento.idea.magento2plugin.util.magento.GetComponentNameByDirectoryUtil;
 import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil;
 import java.util.List;
+import java.util.Objects;
 
 public class OverrideTemplateInThemeGenerator extends OverrideInThemeGenerator {
-
     /**
      * OverrideTemplateInThemeGenerator constructor.
      *
@@ -41,10 +41,13 @@ public class OverrideTemplateInThemeGenerator extends OverrideInThemeGenerator {
 
         final GetMagentoModuleUtil.MagentoModuleData moduleData =
                 GetMagentoModuleUtil.getByContext(baseFile.getContainingDirectory(), project);
-        List<String> pathComponents;
+        List<String> pathComponents; //NOPMD
 
         if (moduleData == null) {
-            if (baseFile.getVirtualFile().getExtension().equals(OverridableFileType.JS.getType())) {
+            if (Objects.equals(
+                    baseFile.getVirtualFile().getExtension(),
+                    OverridableFileType.JS.getType())
+            ) {
                 pathComponents = getLibPathComponets(baseFile);
             } else {
                 return;
@@ -75,12 +78,21 @@ public class OverrideTemplateInThemeGenerator extends OverrideInThemeGenerator {
         directory = getTargetDirectory(directory, pathComponents);
 
         if (directory.findFile(baseFile.getName()) != null) {
-            JBPopupFactory.getInstance()
-                    .createMessage(
-                        validatorBundle.message("validator.file.alreadyExists", baseFile.getName())
-                    )
-                    .showCenteredInCurrentWindow(project);
-            directory.findFile(baseFile.getName()).navigate(true);
+            final PsiDirectory finalDirectory1 = directory;
+            ApplicationManager.getApplication().invokeLater(() -> {
+                JBPopupFactory.getInstance()
+                        .createMessage(
+                                validatorBundle.message(
+                                        "validator.file.alreadyExists",
+                                        baseFile.getName()
+                                )
+                        ).showCenteredInCurrentWindow(project);
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    Objects.requireNonNull(
+                            finalDirectory1.findFile(baseFile.getName())
+                    ).navigate(true);
+                });
+            });
             return;
         }
 
