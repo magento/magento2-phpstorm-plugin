@@ -44,7 +44,10 @@ public class OverrideTemplateInThemeGenerator extends OverrideInThemeGenerator {
         List<String> pathComponents; //NOPMD
 
         if (moduleData == null) {
-            if (Objects.equals(baseFile.getVirtualFile().getExtension(), OverridableFileType.JS.getType())) {
+            if (Objects.equals(
+                    baseFile.getVirtualFile().getExtension(),
+                    OverridableFileType.JS.getType())
+            ) {
                 pathComponents = getLibPathComponets(baseFile);
             } else {
                 return;
