@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Objects;
 
 public class OverrideTemplateInThemeGenerator extends OverrideInThemeGenerator {
-
     /**
      * OverrideTemplateInThemeGenerator constructor.
      *
@@ -93,7 +92,6 @@ public class OverrideTemplateInThemeGenerator extends OverrideInThemeGenerator {
             });
             return;
         }
-
 
         final PsiDirectory finalDirectory = directory;
         ApplicationManager.getApplication().runWriteAction(() -> {
