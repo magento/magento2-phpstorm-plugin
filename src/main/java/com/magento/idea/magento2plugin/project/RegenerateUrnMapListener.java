@@ -47,11 +47,8 @@ class RegenerateUrnMapListener extends MouseAdapter {
      * @param event MouseEvent
      */
     @Override
+    @SuppressWarnings("PMD.UseNotifyAllInsteadOfNotify")
     public void mouseClicked(final MouseEvent event) {
-        final PsiManager psiManager = PsiManager.getInstance(project);
-        final MagentoComponentManager componentManager =
-                MagentoComponentManager.getInstance(project);
-
         if (DumbService.getInstance(project).isDumb()) {
             NotificationGroupManager.getInstance()
                     .getNotificationGroup("Magento Notifications")
@@ -70,6 +67,9 @@ class RegenerateUrnMapListener extends MouseAdapter {
                 new Runnable() {
                     @Override
                     public void run() {
+                        final PsiManager psiManager = PsiManager.getInstance(project);
+                        final MagentoComponentManager componentManager =
+                                MagentoComponentManager.getInstance(project);
                         final ExternalResourceManager manager =
                                 ExternalResourceManager.getInstance();
                         final Collection<VirtualFile> xsdFiles
