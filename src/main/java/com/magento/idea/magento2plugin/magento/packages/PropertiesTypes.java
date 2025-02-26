@@ -81,7 +81,9 @@ public enum PropertiesTypes {
         final List<String> propertyList = new LinkedList<>();
 
         for (final PropertiesTypes property : PropertiesTypes.values()) {
-            propertyList.add(property.getPropertyType());
+            if (!property.getPropertyType().equals(ARRAY.getPropertyType())) {
+                propertyList.add(property.getPropertyType());
+            }
         }
 
         return propertyList;
