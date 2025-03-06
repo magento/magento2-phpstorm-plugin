@@ -122,20 +122,17 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
      * Handles the action performed when the OK button is clicked in the dialog.
      */
     protected void onWriteActionOK() {
-
-        if (validateFormFields()) {
-            final String[] layoutNameParts = getLayoutNameParts();
-            final LayoutXmlData layoutXmlData = new LayoutXmlData(
-                    getArea(),
-                    layoutNameParts[0],
-                    moduleName,
-                    layoutNameParts[1],
-                    layoutNameParts[2]
-            );
-            new LayoutXmlTemplateGenerator(layoutXmlData, project)
-                    .generate(NewLayoutXmlAction.ACTION_NAME, true);
-            exit();
-        }
+        final String[] layoutNameParts = getLayoutNameParts();
+        final LayoutXmlData layoutXmlData = new LayoutXmlData(
+                getArea(),
+                layoutNameParts[0],
+                moduleName,
+                layoutNameParts[1],
+                layoutNameParts[2]
+        );
+        new LayoutXmlTemplateGenerator(layoutXmlData, project)
+                .generate(NewLayoutXmlAction.ACTION_NAME, true);
+        exit();
     }
 
     @SuppressWarnings({"PMD.UnusedPrivateMethod", "PMD.AvoidInstantiatingObjectsInLoops"})

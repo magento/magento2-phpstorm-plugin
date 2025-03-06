@@ -124,11 +124,8 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
      * Fire generation process if all fields are valid.
      */
     protected void onWriteActionOK() {
-
-        if (validateFields()) {
-            generateFile();
-            exit();
-        }
+        generateFile();
+        exit();
     }
 
     private void generateFile() {
@@ -155,7 +152,8 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
         return className.getText().trim();
     }
 
-    private boolean validateFields() {
+    @Override
+    protected boolean validateFormFields() {
         final PsiDirectory patchDirectory = baseDir
                 .findSubdirectory(NewSetupDataPatchAction.PATCH_DIRECTORY);
         PsiDirectory directory = null;
@@ -179,6 +177,6 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
             }
         }
 
-        return validateFormFields();
+        return super.validateFormFields();
     }
 }

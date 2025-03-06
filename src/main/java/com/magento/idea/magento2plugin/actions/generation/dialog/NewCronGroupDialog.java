@@ -142,11 +142,8 @@ public class NewCronGroupDialog extends AbstractDialog {
     }
 
     protected void onWriteActionOK() {
-
-        if (validateFormFields()) {
-            generateFile();
-            exit();
-        }
+        generateFile();
+        exit();
     }
 
     private void generateFile() {

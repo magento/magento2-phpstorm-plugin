@@ -149,16 +149,14 @@ public class NewDataModelDialog extends AbstractDialog {
             propertyTable.getCellEditor().stopCellEditing();
         }
 
-        if (validateFormFields()) {
-            formatProperties();
-            generateDataModelFile();
+        formatProperties();
+        generateDataModelFile();
 
-            if (createInterface.isSelected()) {
-                generateDataModelInterfaceFile();
-                generatePreferenceForInterface();
-            }
-            exit();
+        if (createInterface.isSelected()) {
+            generateDataModelInterfaceFile();
+            generatePreferenceForInterface();
         }
+        exit();
     }
 
     @Override

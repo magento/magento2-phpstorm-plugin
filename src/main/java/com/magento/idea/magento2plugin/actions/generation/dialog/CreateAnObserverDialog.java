@@ -150,24 +150,23 @@ public class CreateAnObserverDialog extends AbstractDialog {
      * Perform code generation using input data.
      */
     protected void onWriteActionOK() {
-        if (validateFormFields()) {
-            new ObserverClassGenerator(new ObserverFileData(
-                    getObserverDirectory(),
-                    getObserverClassName(),
-                    getObserverModule(),
-                    targetEvent,
-                    getObserverClassFqn(),
-                    getNamespace()
-            ), project).generate(CreateAnObserverAction.ACTION_NAME, true);
+        new ObserverClassGenerator(new ObserverFileData(
+                getObserverDirectory(),
+                getObserverClassName(),
+                getObserverModule(),
+                targetEvent,
+                getObserverClassFqn(),
+                getNamespace()
+        ), project).generate(CreateAnObserverAction.ACTION_NAME, true);
 
-            new ObserverEventsXmlGenerator(new ObserverEventsXmlData(
-                    getObserverArea(),
-                    getObserverModule(),
-                    targetEvent,
-                    getObserverName(),
-                    getObserverClassFqn()
-            ), project).generate(CreateAPluginAction.ACTION_NAME);
-        }
+        new ObserverEventsXmlGenerator(new ObserverEventsXmlData(
+                getObserverArea(),
+                getObserverModule(),
+                targetEvent,
+                getObserverName(),
+                getObserverClassFqn()
+        ), project).generate(CreateAPluginAction.ACTION_NAME);
+
         exit();
     }
 

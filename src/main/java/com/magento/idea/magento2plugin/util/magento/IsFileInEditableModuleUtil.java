@@ -5,10 +5,11 @@
 
 package com.magento.idea.magento2plugin.util.magento;
 
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
-import com.magento.idea.magento2plugin.magento.packages.File;
-import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.project.Settings;
+import java.util.List;
 
 public final class IsFileInEditableModuleUtil {
 
@@ -21,13 +22,47 @@ public final class IsFileInEditableModuleUtil {
      * @return boolean
      */
     public static boolean execute(final PsiFile file) {
-        final String magentoPath = Settings.getMagentoPath(file.getProject());
-        if (magentoPath == null) {
+        Project project = file.getProject();
+        VirtualFile virtualFile = file.getVirtualFile();
+
+        return execute(project, virtualFile);
+    }
+
+    /**
+     * Validates if a given virtual file is located within editable paths defined by Magento project structure.
+     *
+     * @param project the current project containing the virtual file
+     * @param virtualFile the file to check against editable module directories
+     * @return true if the file is in an editable module directory, false otherwise
+     */
+    public static boolean execute(Project project, VirtualFile virtualFile) {
+        Settings settings = Settings.getInstance(project);
+        List<String> magentoToFolders = settings.getMagentoFolders();
+        String magentoPathUrl = MagentoPathUrlUtil.execute(project);
+        if (magentoPathUrl != null) {
+            if (magentoToFolders == null) {
+                magentoToFolders = List.of(
+                        magentoPathUrl
+                );
+            } else {
+                magentoToFolders.add(
+                       magentoPathUrl
+                );
+            }
+        }
+
+
+        final String filePath = virtualFile.getUrl();
+
+        if (magentoToFolders == null) {
             return false;
         }
-        final String editablePath = magentoPath + File.separator + Package.packagesRoot;
-        final String filePath = file.getVirtualFile().getPath();
 
-        return filePath.startsWith(editablePath);
+        for (String editablePath : magentoToFolders) {
+            if (filePath.startsWith(editablePath)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

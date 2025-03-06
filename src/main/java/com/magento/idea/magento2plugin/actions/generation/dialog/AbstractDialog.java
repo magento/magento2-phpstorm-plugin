@@ -97,7 +97,9 @@ public abstract class AbstractDialog extends JDialog {
      * Hook executed when the OK button is pressed.
      */
     protected final void onOK() {
-        executeOnOk();
+        if (validateFormFields()) {
+            executeOnOk();
+        }
     }
 
     /**

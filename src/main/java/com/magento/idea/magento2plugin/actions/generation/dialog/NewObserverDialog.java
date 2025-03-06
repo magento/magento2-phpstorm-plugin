@@ -199,48 +199,46 @@ public class NewObserverDialog extends AbstractDialog {
     }
 
     protected void onWriteActionOK() {
+        PsiDirectory observerDirectory = baseDir;
 
-        if (validateFields()) {
-            PsiDirectory observerDirectory = baseDir;
-
-            if (!getDirectoryStructure().isEmpty()) {
-                observerDirectory = DirectoryGenerator.getInstance().findOrCreateSubdirectories(
-                        baseDir,
-                        getDirectoryStructure()
-                );
-            }
-            new ModuleObserverGenerator(
-                    new ModuleObserverData(
-                            modulePackage,
-                            moduleName,
-                            getObserverClassFqn(),
-                            getEventName(),
-                            observerDirectory,
-                            ModuleObserverFile.resolveClassNameFromInput(getClassName())
-                    ),
-                    project
-            ).generate(NewObserverAction.ACTION_NAME, true);
-
-            new ObserverEventsXmlGenerator(
-                    new ObserverEventsXmlData(
-                            getObserverArea(),
-                            getModuleName().replace(
-                                    Package.fqnSeparator,
-                                    Package.vendorModuleNameSeparator
-                            ),
-                            getEventName(),
-                            getObserverName(),
-                            getObserverClassFqn().concat(Package.fqnSeparator).concat(
-                                    ModuleObserverFile.resolveClassNameFromInput(getClassName())
-                            )
-                    ),
-                    project
-            ).generate(NewObserverAction.ACTION_NAME);
-            exit();
+        if (!getDirectoryStructure().isEmpty()) {
+            observerDirectory = DirectoryGenerator.getInstance().findOrCreateSubdirectories(
+                    baseDir,
+                    getDirectoryStructure()
+            );
         }
+        new ModuleObserverGenerator(
+                new ModuleObserverData(
+                        modulePackage,
+                        moduleName,
+                        getObserverClassFqn(),
+                        getEventName(),
+                        observerDirectory,
+                        ModuleObserverFile.resolveClassNameFromInput(getClassName())
+                ),
+                project
+        ).generate(NewObserverAction.ACTION_NAME, true);
+
+        new ObserverEventsXmlGenerator(
+                new ObserverEventsXmlData(
+                        getObserverArea(),
+                        getModuleName().replace(
+                                Package.fqnSeparator,
+                                Package.vendorModuleNameSeparator
+                        ),
+                        getEventName(),
+                        getObserverName(),
+                        getObserverClassFqn().concat(Package.fqnSeparator).concat(
+                                ModuleObserverFile.resolveClassNameFromInput(getClassName())
+                        )
+                ),
+                project
+        ).generate(NewObserverAction.ACTION_NAME);
+        exit();
     }
 
-    private boolean validateFields() {
+    @Override
+    protected boolean validateFormFields() {
         final PsiFile[] directoryFiles = getDirectoryFiles(baseDir);
         final Field classNameField = GetReflectionFieldUtil.getByName("className", this.getClass());
 
@@ -276,7 +274,7 @@ public class NewObserverDialog extends AbstractDialog {
             return false;
         }
 
-        return validateFormFields();
+        return super.validateFormFields();
     }
 
     private PsiFile[] getDirectoryFiles(final PsiDirectory targetDirectory) {

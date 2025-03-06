@@ -213,14 +213,16 @@ public class NewEmailTemplateDialog extends AbstractDialog {
     }
 
     protected void onWriteActionOK() {
-
-        final boolean emailTemplateCanBeDeclared = !this.validator.validate(this);
-
-        if (!validateFormFields() || emailTemplateCanBeDeclared) {
-            return;
-        }
         generateFile();
         exit();
+    }
+
+    @Override
+    protected boolean validateFormFields() {
+        if (!this.validator.validate(this)) {
+            return false;
+        }
+        return super.validateFormFields();
     }
 
     private void generateFile() {

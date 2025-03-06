@@ -256,19 +256,16 @@ public class NewMessageQueueDialog extends AbstractDialog {
     }
 
     protected void onWriteActionOK() {
+        generateCommunication();
+        generateConsumer();
+        generateTopology();
+        generatePublisher();
+        generateHandlerClass();
 
-        if (validateFormFields()) {
-            generateCommunication();
-            generateConsumer();
-            generateTopology();
-            generatePublisher();
-            generateHandlerClass();
-
-            if (getConnectionName().equals(MessageQueueConnections.DB.getType())) {
-                generateConsumerClass();
-            }
-            exit();
+        if (getConnectionName().equals(MessageQueueConnections.DB.getType())) {
+            generateConsumerClass();
         }
+        exit();
     }
 
     private void generateCommunication() {

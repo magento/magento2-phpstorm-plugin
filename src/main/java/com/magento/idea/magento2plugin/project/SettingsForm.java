@@ -121,7 +121,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     @Override
     public boolean isModified() {
         final boolean licenseChanged = !moduleDefaultLicenseName.getText().equals(
-                Settings.defaultLicense
+                getSettings().defaultLicense
         );
         final boolean versionChanged = !magentoVersion.getText().equals(
                 getSettings().magentoVersion

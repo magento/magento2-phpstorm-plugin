@@ -322,18 +322,15 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     }
 
     protected void onWriteActionOK() {
-
-        if (validateFormFields()) {
-            generateViewControllerFile();
-            generateLayoutFile();
-            generateMenuFile();
-            generateAclXmlFile();
-            generateRoutesXmlFile();
-            generateDataProviderClass();
-            generateDataProviderDeclaration();
-            generateUiComponentFile();
-            exit();
-        }
+        generateViewControllerFile();
+        generateLayoutFile();
+        generateMenuFile();
+        generateAclXmlFile();
+        generateRoutesXmlFile();
+        generateDataProviderClass();
+        generateDataProviderDeclaration();
+        generateUiComponentFile();
+        exit();
     }
 
     private void setDefaultValues() {

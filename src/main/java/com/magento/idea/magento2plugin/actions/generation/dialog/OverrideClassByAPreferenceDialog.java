@@ -167,11 +167,6 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
     }
 
     protected void onWriteActionOK() {
-
-        if (!validateFormFields()) {
-            exit();
-            return;
-        }
         final PsiFile diXml = new PreferenceDiXmlGenerator(new PreferenceDiXmFileData(
                 getPreferenceModule(),
                 targetClass.getPresentableFQN(),

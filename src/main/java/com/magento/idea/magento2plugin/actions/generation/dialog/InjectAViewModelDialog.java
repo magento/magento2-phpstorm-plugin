@@ -137,12 +137,6 @@ public class InjectAViewModelDialog extends AbstractDialog {
     }
 
     protected void onWriteActionOK() {
-
-        if (!validateFormFields()) {
-            exit();
-            return;
-        }
-
         if (targetBlockTag.getContainingFile() == null
                 || targetBlockTag.getContainingFile().getParent() == null) {
             return;

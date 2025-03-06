@@ -20,6 +20,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.NewModuleDialog
 import com.magento.idea.magento2plugin.actions.generation.util.IsClickedDirectoryInsideProject;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+import com.magento.idea.magento2plugin.util.magento.IsFileInEditableModuleUtil;
 import com.magento.idea.magento2plugin.util.magento.MagentoBasePathUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -72,45 +73,56 @@ public class NewModuleAction extends com.intellij.openapi.actionSystem.AnAction 
             return;
         }
 
-        if (Settings.isEnabled(project)) {
-            final String magentoPath = Settings.getMagentoPath(project);
-            if (magentoPath == null) {
-                event.getPresentation().setVisible(false);
-                return;
-            }
-            final PsiElement psiElement = event.getData(PlatformDataKeys.PSI_ELEMENT);
-            if (!(psiElement instanceof PsiDirectory)) {
-                event.getPresentation().setVisible(false);
-                return;
-            }
-
-            if (!IsClickedDirectoryInsideProject.getInstance().execute(
-                    project,
-                    (PsiDirectory) psiElement)
-            ) {
-                event.getPresentation().setVisible(false);
-                return;
-            }
-
-            final String moduleName = GetModuleNameByDirectoryUtil
-                    .execute((PsiDirectory) psiElement, project);
-            if (moduleName == null) {
-                final String sourceDirPath = ((PsiDirectory) psiElement).getVirtualFile().getPath();
-                final boolean isCustomCodeSourceDirValid =
-                        MagentoBasePathUtil.isCustomCodeSourceDirValid(sourceDirPath);
-                final boolean isCustomVendorDirValid =
-                        MagentoBasePathUtil.isCustomVendorDirValid(sourceDirPath);
-
-                if (!isCustomCodeSourceDirValid && !isCustomVendorDirValid) { //NOPMD
-                    event.getPresentation().setVisible(false);
-                    return;
-                }
-                event.getPresentation().setVisible(true);
-                return;
-            }
+        if (!Settings.isEnabled(project)) {
+            event.getPresentation().setVisible(false);
+        }
+        final String magentoPath = Settings.getMagentoPath(project);
+        if (magentoPath == null) {
+            event.getPresentation().setVisible(false);
+            return;
+        }
+        final PsiElement psiElement = event.getData(PlatformDataKeys.PSI_ELEMENT);
+        if (!(psiElement instanceof PsiDirectory)) {
+            event.getPresentation().setVisible(false);
+            return;
         }
 
-        event.getPresentation().setVisible(false);
+        if (!IsClickedDirectoryInsideProject.getInstance().execute(
+                project,
+                (PsiDirectory) psiElement)
+        ) {
+            event.getPresentation().setVisible(false);
+            return;
+        }
+
+        final String moduleName = GetModuleNameByDirectoryUtil
+                .execute((PsiDirectory) psiElement, project);
+        if (moduleName == null) {
+            if (showAction(project, (PsiDirectory) psiElement)) {
+                event.getPresentation().setVisible(false);
+                return;
+            }
+            event.getPresentation().setVisible(true);
+        }
+    }
+
+    /**
+     * Determines whether the "Show Action" operation should be displayed
+     *
+     * @param project the current project
+     * @param psiElement the directory
+     * @return true if the action can be displayed; false otherwise
+     */
+    private static boolean showAction(final Project project, final PsiDirectory psiElement) {
+        final String sourceDirPath = psiElement.getVirtualFile().getPath();
+        final boolean isCustomCodeSourceDirValid =
+                MagentoBasePathUtil.isCustomCodeSourceDirValid(sourceDirPath);
+        final boolean isCustomVendorDirValid =
+                MagentoBasePathUtil.isCustomVendorDirValid(sourceDirPath);
+
+        return !isCustomCodeSourceDirValid
+                && !isCustomVendorDirValid
+                && !IsFileInEditableModuleUtil.execute(project, psiElement.getVirtualFile());
     }
 
     @Override

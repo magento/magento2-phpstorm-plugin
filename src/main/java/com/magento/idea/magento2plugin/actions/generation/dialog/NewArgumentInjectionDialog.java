@@ -364,43 +364,40 @@ public class NewArgumentInjectionDialog extends AbstractDialog {
      * Fire generation process if all fields are valid.
      */
     protected void onWriteActionOK() {
+         final DiArgumentData data = getDialogDataObject();
 
-        if (validateFormFields()) {
-            final DiArgumentData data = getDialogDataObject();
-
-            if (data == null) {
-                return;
-            }
-            final ArgumentInjectionGenerator generator = new ArgumentInjectionGenerator(
-                    data,
-                    project
-            );
-
-            final PsiFile generatedFile = generator.generate(
-                    InjectConstructorArgumentAction.ACTION_NAME,
-                    true
-            );
-
-            if (generatedFile == null) {
-                if (generator.getGenerationErrorMessage() == null) {
-                    showErrorMessage(
-                            new ValidatorBundle().message(
-                                    "validator.file.cantBeCreated",
-                                    "DI XML file"
-                            )
-                    );
-                } else {
-                    showErrorMessage(
-                            new ValidatorBundle().message(
-                                    "validator.file.cantBeCreatedWithException",
-                                    "DI XML file",
-                                    generator.getGenerationErrorMessage()
-                            )
-                    );
-                }
-            }
-            exit();
+        if (data == null) {
+            return;
         }
+        final ArgumentInjectionGenerator generator = new ArgumentInjectionGenerator(
+                data,
+                project
+        );
+
+        final PsiFile generatedFile = generator.generate(
+                InjectConstructorArgumentAction.ACTION_NAME,
+                true
+        );
+
+        if (generatedFile == null) {
+            if (generator.getGenerationErrorMessage() == null) {
+                showErrorMessage(
+                        new ValidatorBundle().message(
+                                "validator.file.cantBeCreated",
+                                "DI XML file"
+                        )
+                );
+            } else {
+                showErrorMessage(
+                        new ValidatorBundle().message(
+                                "validator.file.cantBeCreatedWithException",
+                                "DI XML file",
+                                generator.getGenerationErrorMessage()
+                        )
+                );
+            }
+        }
+        exit();
     }
 
     /**

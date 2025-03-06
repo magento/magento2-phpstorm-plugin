@@ -111,14 +111,11 @@ public class OverrideTemplateInThemeDialog extends AbstractDialog {
     }
 
     protected void onWriteActionOK() {
+        final OverrideTemplateInThemeGenerator overrideInThemeGenerator =
+                new OverrideTemplateInThemeGenerator(project);
 
-        if (validateFormFields()) {
-            final OverrideTemplateInThemeGenerator overrideInThemeGenerator =
-                    new OverrideTemplateInThemeGenerator(project);
-
-            overrideInThemeGenerator.execute(psiFile, this.getTheme());
-            exit();
-        }
+        overrideInThemeGenerator.execute(psiFile, this.getTheme());
+        exit();
     }
 
     private String getTheme() {

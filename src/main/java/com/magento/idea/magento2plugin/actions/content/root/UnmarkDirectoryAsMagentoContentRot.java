@@ -1,0 +1,83 @@
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+package com.magento.idea.magento2plugin.actions.content.root;
+
+import com.intellij.ide.projectView.ProjectView;
+import com.intellij.ide.projectView.actions.MarkRootActionBase;
+import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ContentEntry;
+import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
+import com.magento.idea.magento2plugin.project.Settings;
+import com.magento.idea.magento2plugin.util.magento.MagentoPathUrlUtil;
+import org.jetbrains.annotations.NotNull;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+public class UnmarkDirectoryAsMagentoContentRot extends MarkRootActionBase {
+    private Project project;
+
+    public UnmarkDirectoryAsMagentoContentRot() {
+        super();
+    }
+
+    @Override
+    protected void modifyRoots(VirtualFile virtualFile, ContentEntry contentEntry) {
+        if (project != null) {
+            Settings settings = Settings.getInstance(project);
+            Settings.getInstance(project).removeMagentoFolder(virtualFile.getUrl());
+            if (settings.getMagentoFolders() != null) {
+                settings.getMagentoFolders().removeIf(folder -> {
+                    VirtualFile file = null;
+                    try {
+                        file = VfsUtil.findFileByURL(new URL(folder));
+                    } catch (MalformedURLException e) {
+                        return false;
+                    }
+                    return file == null || !file.exists();
+                });
+            }
+            
+            ProjectView.getInstance(project).refresh();
+        }
+    }
+
+    @Override
+    public void update(@NotNull AnActionEvent event) {
+        final DataContext context = event.getDataContext();
+        final PsiElement targetElement = LangDataKeys.PSI_ELEMENT.getData(context);
+        Module module = event.getData(PlatformCoreDataKeys.MODULE);
+        if (module != null) {
+            project = module.getProject();
+        }
+
+        if (targetElement instanceof PsiDirectory) {
+            Settings settings = Settings.getInstance(project);
+            String magentoPathUrl = MagentoPathUrlUtil.execute(project);
+            String directoryUrl = ((PsiDirectory) targetElement).getVirtualFile().getUrl();
+            if (magentoPathUrl != null && magentoPathUrl.equals(directoryUrl)) {
+                event.getPresentation().setEnabledAndVisible(false);
+                return;
+            }
+
+            if (settings.containsMagentoFolder(directoryUrl)) {
+                event.getPresentation().setEnabledAndVisible(true);
+                return;
+            }
+        }
+
+        event.getPresentation().setEnabledAndVisible(false);
+    }
+
+    @Override
+    protected boolean isEnabled(@NotNull RootsSelection rootsSelection, @NotNull Module module) {
+        return false;
+    }
+}

@@ -121,11 +121,8 @@ public class NewViewModelDialog extends AbstractDialog {
     }
 
     protected void onWriteActionOK() {
-
-        if (validateFormFields()) {
-            generateFile();
-            exit();
-        }
+        generateFile();
+        exit();
     }
 
     private void generateFile() {
