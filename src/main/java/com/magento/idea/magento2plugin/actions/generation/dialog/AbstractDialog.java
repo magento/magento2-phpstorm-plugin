@@ -218,7 +218,7 @@ public abstract class AbstractDialog extends JDialog {
             return;
         }
         JOptionPane.showMessageDialog(
-                null,
+                this,
                 errorMessage,
                 errorTitle,
                 JOptionPane.ERROR_MESSAGE
