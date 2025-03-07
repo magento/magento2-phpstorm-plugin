@@ -134,27 +134,24 @@ public class NewDbSchemaDialog extends AbstractDialog {
      * On buttonOK action listener.
      */
     protected void onWriteActionOK() {
-
         if (columnsTable.isEditing()) {
             columnsTable.getCellEditor().stopCellEditing();
         }
 
-        if (validateFormFields()) {
-            final DbSchemaXmlData dbSchemaXmlData = new DbSchemaXmlData(
-                    getTableName(),
-                    getTableResource(),
-                    getTableEngine(),
-                    getTableComment(),
-                    getColumns()
-            );
-            final PsiFile dbSchemaXmlFile = generateDbSchemaXmlFile(dbSchemaXmlData);
+        final DbSchemaXmlData dbSchemaXmlData = new DbSchemaXmlData(
+                getTableName(),
+                getTableResource(),
+                getTableEngine(),
+                getTableComment(),
+                getColumns()
+        );
+        final PsiFile dbSchemaXmlFile = generateDbSchemaXmlFile(dbSchemaXmlData);
 
-            if (dbSchemaXmlFile == null) {
-                return;
-            }
-            generateWhitelistJsonFile(dbSchemaXmlData);
-            exit();
+        if (dbSchemaXmlFile == null) {
+            return;
         }
+        generateWhitelistJsonFile(dbSchemaXmlData);
+        exit();
     }
 
     /**

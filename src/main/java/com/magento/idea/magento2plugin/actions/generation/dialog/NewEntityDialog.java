@@ -394,11 +394,6 @@ public class NewEntityDialog extends AbstractDialog {
      * Perform code generation using input data.
      */
     protected void onWriteActionOK() {
-
-        if (!validateFormFields()) {
-            onOkActionFired.setInProgress(false);
-            return;
-        }
         setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
         formatProperties();
@@ -425,6 +420,15 @@ public class NewEntityDialog extends AbstractDialog {
 
         generatorPoolHandler.run();
         onOkActionFired.setFinished(true);
+    }
+
+    @Override
+    protected boolean validateFormFields() {
+        if (!super.validateFormFields()) {
+            onOkActionFired.setInProgress(false);
+            return false;
+        }
+        return true;
     }
 
     /**

@@ -13,9 +13,12 @@ import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.EventDispatcher;
+import com.intellij.util.SmartList;
 import com.intellij.util.xmlb.annotations.Attribute;
 import com.intellij.util.xmlb.annotations.Tag;
 import java.util.EventListener;
+import java.util.List;
+import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,12 +32,14 @@ public class Settings implements PersistentStateComponent<Settings.State> {
     private final EventDispatcher<MagentoModuleDataListener> myEventDispatcher
             = EventDispatcher.create(MagentoModuleDataListener.class);
     public boolean pluginEnabled;
-    public static String defaultLicense = "Proprietary";
+    public String defaultLicense;
+    public static final String DEFAULT_LICENSE = "Proprietary";
     public String magentoPath;
     public boolean mftfSupportEnabled;
     public boolean myDoNotAskContentConfigAgain;
     public String magentoVersion;
     public String magentoEdition;
+    public List<String> myMagentoFolders;
 
     @Override
     @Nullable
@@ -42,11 +47,12 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         return new State(
                 this.pluginEnabled,
                 this.magentoPath,
-                defaultLicense,
+                this.defaultLicense,
                 this.mftfSupportEnabled,
                 this.myDoNotAskContentConfigAgain,
                 this.magentoVersion,
-                this.magentoEdition
+                this.magentoEdition,
+                this.myMagentoFolders
         );
     }
 
@@ -61,6 +67,55 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         this.notifyListeners(state, oldState);
     }
 
+    /**
+     * Adds a Magento folder to the settings.
+     *
+     * @param folder Magento folder to add.
+     */
+    public void addMagentoFolder(@NotNull final String folder) {
+        if (this.myMagentoFolders == null) {
+            this.myMagentoFolders = new SmartList<>();
+        }
+
+        if (!this.myMagentoFolders.contains(folder)) {
+            final State oldState = this.getState();
+            this.myMagentoFolders.add(folder);
+            this.notifyListeners(Objects.requireNonNull(this.getState()), oldState);
+        }
+    }
+
+    /**
+     * Removes a Magento folder from the settings.
+     *
+     * @param folder Magento folder to remove.
+     */
+    public void removeMagentoFolder(@NotNull final String folder) {
+        if (this.myMagentoFolders != null && this.myMagentoFolders.contains(folder)) {
+            final State oldState = this.getState();
+            this.myMagentoFolders.remove(folder);
+            this.notifyListeners(Objects.requireNonNull(this.getState()), oldState);
+        }
+    }
+
+    /**
+     * Checks if a Magento folder exists in the settings.
+     *
+     * @param folder Magento folder to check.
+     * @return true if the folder exists, false otherwise.
+     */
+    public boolean containsMagentoFolder(@NotNull final String folder) {
+        return this.myMagentoFolders != null && this.myMagentoFolders.contains(folder);
+    }
+
+    /**
+     * Retrieves the list of Magento folders currently configured in the settings.
+     *
+     * @return a list of strings representing the paths of Magento folders.
+     */
+    public @Nullable List<String> getMagentoFolders() {
+        return this.myMagentoFolders;
+    }
+
     @Override
     public void loadState(final @NotNull Settings.State state) {
         this.pluginEnabled = state.isPluginEnabled();
@@ -70,6 +125,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         this.myDoNotAskContentConfigAgain = state.isDoNotAskContentConfigAgain();
         this.magentoVersion = state.getMagentoVersion();
         this.magentoEdition = state.getMagentoEdition();
+        this.myMagentoFolders = state.getMagentoFolders();
     }
 
     public void addListener(final MagentoModuleDataListener listener) {
@@ -132,6 +188,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         public boolean myDoNotAskContentConfigAgain;
         public String magentoVersion;
         public String magentoEdition;
+        public List<String> myMagentoFolders;
 
         public State() {//NOPMD
         }
@@ -146,6 +203,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
          * @param myDoNotAskContentConfigAgain boolean
          * @param magentoVersion String
          * @param magentoEdition String
+         * @param myMagentoFolders List<PsiDirectory>
          */
         public State(
                 final boolean pluginEnabled,
@@ -154,7 +212,8 @@ public class Settings implements PersistentStateComponent<Settings.State> {
                 final boolean mftfSupportEnabled,
                 final boolean myDoNotAskContentConfigAgain,
                 final String magentoVersion,
-                final String magentoEdition
+                final String magentoEdition,
+                final List<String> myMagentoFolders
         ) {
             this.pluginEnabled = pluginEnabled;
             this.magentoPath = magentoPath;
@@ -163,6 +222,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             this.myDoNotAskContentConfigAgain = myDoNotAskContentConfigAgain;
             this.magentoVersion = magentoVersion;
             this.magentoEdition = magentoEdition;
+            this.myMagentoFolders = myMagentoFolders;
         }
 
         @Attribute("enabled")
@@ -201,6 +261,24 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             this.magentoEdition = magentoEdition;
         }
 
+        public List<String> getMagentoFolders() {
+            return this.myMagentoFolders;
+        }
+
+        @Tag("magentoFolders")
+        public void addMagentoFolder(final String magentoFolders) {
+            if (this.myMagentoFolders == null) {
+                this.myMagentoFolders = new SmartList<>();
+            }
+            this.myMagentoFolders.add(magentoFolders);
+        }
+
+        public void removeMagentoFolder(final String magentoFolders) {
+            if (this.myMagentoFolders != null) {
+                this.myMagentoFolders.remove(magentoFolders);
+            }
+        }
+
         /**
          * Last Used Magento Path setter.
          *
@@ -234,7 +312,11 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             this.mftfSupportEnabled = mftfSupportEnabled;
         }
 
-        @SuppressWarnings({"PMD.ConfusingTernary"})
+        @SuppressWarnings({
+                "PMD.ConfusingTernary",
+                "PMD.CognitiveComplexity",
+                "PMD.CyclomaticComplexity"
+        })
         @Override
         public boolean equals(final Object objectToCompare) {
             if (this == objectToCompare) {
@@ -248,6 +330,8 @@ public class Settings implements PersistentStateComponent<Settings.State> {
                 } else if (
                         this.isDoNotAskContentConfigAgain() != state.isDoNotAskContentConfigAgain()
                 ) {
+                    return false;
+                } else if (!Objects.equals(this.myMagentoFolders, state.myMagentoFolders)) {
                     return false;
                 } else {
                     if (this.magentoPath != null) {
@@ -272,8 +356,9 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             result = 31 * result + (this.isMftfSupportEnabled() ? 1 : 0);
             result = 31 * result + (this.isDoNotAskContentConfigAgain() ? 1 : 0);
             result = 31 * result + (
-                        this.defaultLicenseName != null ? this.defaultLicenseName.hashCode() : 0
-                );
+                    this.defaultLicenseName != null ? this.defaultLicenseName.hashCode() : 0
+            );
+            result = 31 * result + (this.myMagentoFolders != null ? this.myMagentoFolders.hashCode() : 0);
             return result;
         }
     }

@@ -175,27 +175,25 @@ public class CreateAPluginDialog extends AbstractDialog {
         if (targetMethod == null) {
             targetMethod = getSelectedTargetMethod();
         }
-        if (validateFormFields()) {
-            new PluginClassGenerator(new PluginFileData(
-                    getPluginDirectory(),
-                    getPluginClassName(),
-                    getPluginType(),
-                    getPluginModule(),
-                    targetClass,
-                    targetMethod,
-                    getPluginClassFqn(),
-                    getNamespace()
-            ), project).generate(CreateAPluginAction.ACTION_NAME, true);
+        new PluginClassGenerator(new PluginFileData(
+                getPluginDirectory(),
+                getPluginClassName(),
+                getPluginType(),
+                getPluginModule(),
+                targetClass,
+                targetMethod,
+                getPluginClassFqn(),
+                getNamespace()
+        ), project).generate(CreateAPluginAction.ACTION_NAME, true);
 
-            new PluginDiXmlGenerator(new PluginDiXmlData(
-                    getPluginArea(),
-                    getPluginModule(),
-                    targetClass,
-                    getPluginSortOrder(),
-                    getPluginName(),
-                    getPluginClassFqn()
-            ), project).generate(CreateAPluginAction.ACTION_NAME);
-        }
+        new PluginDiXmlGenerator(new PluginDiXmlData(
+                getPluginArea(),
+                getPluginModule(),
+                targetClass,
+                getPluginSortOrder(),
+                getPluginName(),
+                getPluginClassFqn()
+        ), project).generate(CreateAPluginAction.ACTION_NAME);
         exit();
     }
 

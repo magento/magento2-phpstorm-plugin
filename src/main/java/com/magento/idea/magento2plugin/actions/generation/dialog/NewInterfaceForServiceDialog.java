@@ -170,15 +170,12 @@ public class NewInterfaceForServiceDialog extends AbstractDialog {
      * Fire generation process if all fields are valid.
      */
     protected void onWriteActionOK() {
+        final WebApiInterfaceData data = getDialogDataObject();
 
-        if (validateFormFields()) {
-            final WebApiInterfaceData data = getDialogDataObject();
-
-            new WebApiInterfaceGenerator(
-                    data,
-                    project
-            ).generate(NewWebApiInterfaceAction.ACTION_NAME, true);
-        }
+        new WebApiInterfaceGenerator(
+                data,
+                project
+        ).generate(NewWebApiInterfaceAction.ACTION_NAME, true);
         exit();
     }
 

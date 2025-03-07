@@ -7,7 +7,7 @@
 <idea-plugin require-restart="true">
     <id>com.magento.idea.magento2plugin</id>
     <name>Magento PhpStorm</name>
-    <version>2025.0.1</version>
+    <version>2025.1.0</version>
     <vendor url="https://github.com/magento/magento2-phpstorm-plugin">Magento Inc.</vendor>
 
     <description><![CDATA[
@@ -36,6 +36,7 @@
     <depends>com.intellij.css</depends>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.platform.images</depends>
+    <depends>com.intellij.modules.json</depends>
     <depends>com.intellij.copyright</depends>
     <depends optional="true" config-file="withJsGraphQl.xml">com.intellij.lang.jsgraphql</depends>
 
@@ -173,6 +174,13 @@
             <separator/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </group>
+
+        <action id="AddMagentoContentRoot" class="com.magento.idea.magento2plugin.actions.content.root.MarkDirectoryAsMagentoContentRot" text="Mark Directory As Magento Code Root" description="Adds Magento code root">
+            <add-to-group group-id="PS.MarkRootGroup" anchor="last"/>
+        </action>
+        <action id="RemoveMagentoContentRoot" class="com.magento.idea.magento2plugin.actions.content.root.UnmarkDirectoryAsMagentoContentRot" text="Unmark Directory As Magento Code Root" description="Removes Magento code root">
+            <add-to-group group-id="PS.MarkRootGroup" anchor="last"/>
+        </action>
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -692,6 +700,8 @@
         <notificationGroup
                 id="Magento Notifications"
                 displayType="BALLOON" />
+
+        <projectViewNodeDecorator implementation="com.magento.idea.magento2plugin.decorator.MagentoFolderDecorator"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.php">

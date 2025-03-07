@@ -191,11 +191,13 @@ public class NewCLICommandDialog extends AbstractDialog {
     }
 
     protected void onWriteActionOK() {
+        this.generate();
+        exit();
+    }
 
-        if (validateFormFields() && isPHPClassValid()) {
-            this.generate();
-            exit();
-        }
+    @Override
+    protected boolean validateFormFields() {
+        return super.validateFormFields() && isPHPClassValid();
     }
 
     private Boolean isPHPClassValid() {

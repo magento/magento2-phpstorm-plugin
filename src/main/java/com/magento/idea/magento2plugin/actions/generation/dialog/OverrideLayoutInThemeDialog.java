@@ -108,13 +108,11 @@ public class OverrideLayoutInThemeDialog extends AbstractDialog {
     }
 
     protected void onWriteActionOK() {
-        if (validateFormFields()) {
-            final OverrideLayoutInThemeGenerator overrideLayoutInThemeGenerator =
-                    new OverrideLayoutInThemeGenerator(project);
+        final OverrideLayoutInThemeGenerator overrideLayoutInThemeGenerator =
+                new OverrideLayoutInThemeGenerator(project);
 
-            overrideLayoutInThemeGenerator.execute(psiFile, getTheme(), isOverride());
-            exit();
-        }
+        overrideLayoutInThemeGenerator.execute(psiFile, getTheme(), isOverride());
+        exit();
     }
 
     private String getTheme() {

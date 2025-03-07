@@ -5,10 +5,11 @@
 
 package com.magento.idea.magento2plugin.util.magento;
 
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
-import com.magento.idea.magento2plugin.magento.packages.File;
-import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.project.Settings;
+import java.util.List;
 
 public final class IsFileInEditableModuleUtil {
 
@@ -21,13 +22,61 @@ public final class IsFileInEditableModuleUtil {
      * @return boolean
      */
     public static boolean execute(final PsiFile file) {
-        final String magentoPath = Settings.getMagentoPath(file.getProject());
-        if (magentoPath == null) {
+        final Project project = file.getProject();
+        final VirtualFile virtualFile = file.getVirtualFile();
+
+        return execute(project, virtualFile);
+    }
+
+    /**
+     * Validates if a given virtual file is located within editable paths defined by Magento project structure.
+     *
+     * @param project the current project containing the virtual file
+     * @param virtualFile the file to check against editable module directories
+     * @return true if the file is in an editable module directory, false otherwise
+     */
+    public static boolean execute(final Project project, final VirtualFile virtualFile) {
+        final Settings settings = Settings.getInstance(project);
+        List<String> magentoToFolders = settings.getMagentoFolders();
+        final String magentoPathUrl = MagentoPathUrlUtil.execute(project);
+        if (magentoPathUrl != null) {
+            if (magentoToFolders == null) {
+                magentoToFolders = List.of(
+                        magentoPathUrl
+                );
+            } else {
+                magentoToFolders.add(
+                       magentoPathUrl
+                );
+            }
+        }
+
+
+
+        if (magentoToFolders == null) {
             return false;
         }
-        final String editablePath = magentoPath + File.separator + Package.packagesRoot;
-        final String filePath = file.getVirtualFile().getPath();
 
-        return filePath.startsWith(editablePath);
+        final String filePath = virtualFile.getUrl();
+        for (final String editablePath : magentoToFolders) {
+            if (normalizeUrl(filePath).startsWith(normalizeUrl(editablePath))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Normalizes a URL by removing the scheme (e.g., temp://, file://) to allow proper comparisons.
+     *
+     * @param url the URL to normalize
+     * @return the normalized URL as a String
+     */
+    private static String normalizeUrl(final String url) {
+        final int schemeSeparatorIndex = url.indexOf("://");
+        if (schemeSeparatorIndex != -1) {
+            return url.substring(schemeSeparatorIndex + 3);
+        }
+        return url;
     }
 }

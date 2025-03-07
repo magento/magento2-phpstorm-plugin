@@ -97,7 +97,9 @@ public abstract class AbstractDialog extends JDialog {
      * Hook executed when the OK button is pressed.
      */
     protected final void onOK() {
-        executeOnOk();
+        if (validateFormFields()) {
+            executeOnOk();
+        }
     }
 
     /**
@@ -216,7 +218,7 @@ public abstract class AbstractDialog extends JDialog {
             return;
         }
         JOptionPane.showMessageDialog(
-                null,
+                this,
                 errorMessage,
                 errorTitle,
                 JOptionPane.ERROR_MESSAGE

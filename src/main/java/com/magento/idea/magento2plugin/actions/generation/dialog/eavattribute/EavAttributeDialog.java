@@ -256,15 +256,8 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
     }
 
     protected void onWriteActionOK() {
-
         stopOptionsTableEditing(getOptionsTable());
-
-        if (!validateFormFields()) {
-            return;
-        }
-
         generateExtraFilesBeforeDataPatchGeneration();
-
         final EavEntityDataInterface eavEntityDataInterface = getEavEntityData();
         generateDataPatchFile(eavEntityDataInterface);
         generateExtraFilesAfterDataPatchGeneration(eavEntityDataInterface);

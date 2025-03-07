@@ -4,7 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
-## 2025.0.1
+## 2025.1.0
+
+### Added
+
+- Possibility to add additional code source directories using content root feature [#2504](https://github.com/magento/magento2-phpstorm-plugin/pull/2504)
 
 ### Fixed
 
