@@ -22,8 +22,8 @@ public final class IsFileInEditableModuleUtil {
      * @return boolean
      */
     public static boolean execute(final PsiFile file) {
-        Project project = file.getProject();
-        VirtualFile virtualFile = file.getVirtualFile();
+        final Project project = file.getProject();
+        final VirtualFile virtualFile = file.getVirtualFile();
 
         return execute(project, virtualFile);
     }
@@ -35,10 +35,10 @@ public final class IsFileInEditableModuleUtil {
      * @param virtualFile the file to check against editable module directories
      * @return true if the file is in an editable module directory, false otherwise
      */
-    public static boolean execute(Project project, VirtualFile virtualFile) {
-        Settings settings = Settings.getInstance(project);
+    public static boolean execute(final Project project, final VirtualFile virtualFile) {
+        final Settings settings = Settings.getInstance(project);
         List<String> magentoToFolders = settings.getMagentoFolders();
-        String magentoPathUrl = MagentoPathUrlUtil.execute(project);
+        final String magentoPathUrl = MagentoPathUrlUtil.execute(project);
         if (magentoPathUrl != null) {
             if (magentoToFolders == null) {
                 magentoToFolders = List.of(
@@ -52,17 +52,31 @@ public final class IsFileInEditableModuleUtil {
         }
 
 
-        final String filePath = virtualFile.getUrl();
 
         if (magentoToFolders == null) {
             return false;
         }
 
-        for (String editablePath : magentoToFolders) {
-            if (filePath.startsWith(editablePath)) {
+        final String filePath = virtualFile.getUrl();
+        for (final String editablePath : magentoToFolders) {
+            if (normalizeUrl(filePath).startsWith(normalizeUrl(editablePath))) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Normalizes a URL by removing the scheme (e.g., temp://, file://) to allow proper comparisons.
+     *
+     * @param url the URL to normalize
+     * @return the normalized URL as a String
+     */
+    private static String normalizeUrl(final String url) {
+        final int schemeSeparatorIndex = url.indexOf("://");
+        if (schemeSeparatorIndex != -1) {
+            return url.substring(schemeSeparatorIndex + 3);
+        }
+        return url;
     }
 }
