@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.project;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
@@ -153,7 +152,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
     }
 
     public static Settings getInstance(final Project project) {
-        return ServiceManager.getService(project, Settings.class);
+        return project.getService(Settings.class);
     }
 
     public static boolean isEnabled(final @NotNull Project project) {

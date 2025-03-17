@@ -61,7 +61,7 @@ public class MarkDirectoryAsMagentoContentRot extends MarkRootActionBase {
             project = module.getProject();
         }
 
-        if (targetElement instanceof PsiDirectory) {
+        if (targetElement instanceof PsiDirectory && project != null) {
             final Settings settings = Settings.getInstance(project);
             final String magentoPathUrl = MagentoPathUrlUtil.execute(project);
             final String directoryUrl = ((PsiDirectory) targetElement).getVirtualFile().getUrl();

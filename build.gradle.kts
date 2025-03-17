@@ -42,6 +42,10 @@ dependencies {
 
     implementation("com.googlecode.json-simple:json-simple:1.1.1")
     implementation("org.codehaus.plexus:plexus-utils:3.4.0")
+    testImplementation("com.automation-remarks:video-recorder-junit5:2.0")
+    testImplementation("com.intellij.remoterobot:remote-robot:0.11.23")
+    testImplementation("com.intellij.remoterobot:remote-fixtures:0.11.23")
+    testImplementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     intellijPlatform {
         create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
