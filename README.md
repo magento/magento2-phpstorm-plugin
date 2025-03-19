@@ -91,7 +91,7 @@
 ## Works with
 
 * PhpStorm >= 2023.1
-* JRE >= 17
+* JRE >= 21
 
 ## Setting up development environment
 
