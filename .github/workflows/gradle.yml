@@ -69,11 +69,12 @@ jobs:
         shell: bash
 
       - name: Upload Test Video Artifact
-        if: failure()
-        uses: actions/upload-artifact@v3
+        if: failure() && matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
         with:
           name: latest-test-video
           path: artifacts/videos/latest-test-video.avi
+          overwrite: true
 
   static-tests:
     runs-on: ubuntu-latest
