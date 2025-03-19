@@ -58,6 +58,23 @@ jobs:
       - name: Tests
         run: ./gradlew test
 
+      - name: Capture Test Artifacts on Failure
+        if: failure()
+        run: |
+          mkdir -p artifacts/videos
+          latest_file=$(ls -Art video | tail -n 1)
+          if [ -n "$latest_file" ]; then
+            cp "video/$latest_file" "artifacts/videos/latest-test-video.mp4"
+          fi
+        shell: bash
+
+      - name: Upload Test Video Artifact
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: latest-test-video
+          path: artifacts/videos/latest-test-video.avi
+
   static-tests:
     runs-on: ubuntu-latest
 
