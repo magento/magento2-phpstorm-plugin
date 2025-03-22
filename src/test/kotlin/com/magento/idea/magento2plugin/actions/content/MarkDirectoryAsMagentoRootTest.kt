@@ -8,13 +8,18 @@ package com.magento.idea.magento2plugin.actions.content
 import com.automation.remarks.junit5.Video
 import org.assertj.swing.core.MouseButton
 import com.intellij.remoterobot.RemoteRobot
+import com.intellij.remoterobot.fixtures.ComponentFixture
 import com.intellij.remoterobot.fixtures.ContainerFixture
+import com.intellij.remoterobot.fixtures.Fixture
+import com.intellij.remoterobot.fixtures.JButtonFixture
 import com.intellij.remoterobot.search.locators.byXpath
 import com.intellij.remoterobot.steps.CommonSteps
 import com.intellij.remoterobot.stepsProcessing.step
+import com.intellij.remoterobot.utils.Keyboard
 import com.intellij.remoterobot.utils.keyboard
 import com.intellij.remoterobot.utils.waitFor
 import com.intellij.remoterobot.utils.waitForIgnoringError
+import com.intellij.ui.components.dialog
 import com.magento.idea.magento2plugin.pages.*
 import com.magento.idea.magento2plugin.utils.RemoteRobotExtension
 import com.magento.idea.magento2plugin.utils.StepsLogger
@@ -62,6 +67,14 @@ class MarkDirectoryAsMagentoRootTest  {
     @Test
     @Video
     fun testMarkDirectoryAsMagentoRoot(remoteRobot: RemoteRobot) = with(remoteRobot) {
+        // temporary workaround until we get license for CI
+        val startTrial = find<ContainerFixture>(byXpath("//div[@visible_text='Start trial']"))
+        startTrial.click()
+        val startTrialFree = find<ContainerFixture>(byXpath("//div[@class='s']"))
+        startTrialFree.click()
+        val dialog = find<DialogFixture>(byXpath("//div[@class='MyDialog']"))
+        dialog.button("Close").click();
+        // end temporary workaround
 
         welcomeFrame {
             createNewProjectFromExistingFilesLink.click()
@@ -85,11 +98,11 @@ class MarkDirectoryAsMagentoRootTest  {
                 enableSupportLink.click(java.awt.Point(1, 1))
                 waitFor(ofMinutes(1)) { isDumbMode().not() }
 
+                keyboard {
+                    hotKey(VK_ALT, VK_1)
+                }
+
                 with(projectViewTree) {
-                    if (hasText("vendor").not()) {
-                        findText(projectName).doubleClick()
-                        waitFor { hasText("src") }
-                    }
                     findText("vendor").doubleClick()
                     findText("module-catalog").doubleClick()
                     findText("Block").doubleClick()
