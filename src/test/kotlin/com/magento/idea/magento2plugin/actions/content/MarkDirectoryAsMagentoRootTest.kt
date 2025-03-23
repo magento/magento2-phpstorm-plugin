@@ -80,23 +80,17 @@ class MarkDirectoryAsMagentoRootTest  {
                     """
             try {
                 const KeyEvent = Java.type("java.awt.event.KeyEvent");
-                const Frames = Java.type("java.awt.Frame");
-                
-              const activeWindow = Array.from(Frames.getFrames()).find(frame => frame.isActive());
-                if (activeWindow && activeWindow.getName().includes("Firefox")) {
                     robot.keyPress(KeyEvent.VK_ALT);
                     robot.keyPress(KeyEvent.VK_TAB);
                     Thread.sleep(100);
                     robot.keyRelease(KeyEvent.VK_TAB);
                     robot.keyRelease(KeyEvent.VK_ALT);
-                }
                 true;
             } catch (error) {
                 false;
             }
             """.trimIndent()
                 )
-
         }
         // end temporary workaround
 
