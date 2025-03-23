@@ -74,19 +74,16 @@ class MarkDirectoryAsMagentoRootTest  {
         startTrialFree.click()
         val dialog = find<DialogFixture>(byXpath("//div[@class='MyDialog']"))
         dialog.button("Close").click()
-
+        Thread.sleep(2_000)
         step("Switch back to PhpStorm IDE window if Firefox overlay detected") {
-            waitFor(ofMinutes(2)) {
-                remoteRobot.callJs(
+                remoteRobot.runJs(
                     """
             try {
-                const Robot = Java.type("java.awt.Robot");
                 const KeyEvent = Java.type("java.awt.event.KeyEvent");
                 const Frames = Java.type("java.awt.Frame");
-                const robot = new Robot();
-                const activeWindow = Array.from(Frames.getFrames()).find(frame => frame.isActive());
+                
+              const activeWindow = Array.from(Frames.getFrames()).find(frame => frame.isActive());
                 if (activeWindow && activeWindow.getName().includes("Firefox")) {
-                    print("Firefox overlay detected, switching to PhpStorm...");
                     robot.keyPress(KeyEvent.VK_ALT);
                     robot.keyPress(KeyEvent.VK_TAB);
                     Thread.sleep(100);
@@ -95,12 +92,11 @@ class MarkDirectoryAsMagentoRootTest  {
                 }
                 true;
             } catch (error) {
-                print("Error during script execution: " + error);
                 false;
             }
             """.trimIndent()
                 )
-            }
+
         }
         // end temporary workaround
 

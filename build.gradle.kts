@@ -40,7 +40,7 @@ dependencies {
 
     testImplementation("org.junit.vintage:junit-vintage-engine:5.10.0")
 
-    implementation("com.googlecode.json-simple:json-simple:1.1.1")
+    implementation ("org.json:json:20171018")
     implementation("org.codehaus.plexus:plexus-utils:3.4.0")
     testImplementation("com.automation-remarks:video-recorder-junit5:2.0")
     testImplementation("com.intellij.remoterobot:remote-robot:0.11.23")
@@ -53,14 +53,11 @@ dependencies {
         bundledPlugins(providers.gradleProperty("platformBundledPlugins").map { it.split(',') })
         plugins(providers.gradleProperty("platformPlugins").map { it.split(',') })
         plugin("com.intellij.lang.jsgraphql", "243.21565.122")
-        instrumentationTools()
         pluginVerifier()
         zipSigner()
         testFramework(TestFrameworkType.Platform)
 
         phpstorm("2024.3")
-        bundledPlugin("com.jetbrains.php")
-        bundledPlugin("com.intellij.copyright")
     }
 }
 
