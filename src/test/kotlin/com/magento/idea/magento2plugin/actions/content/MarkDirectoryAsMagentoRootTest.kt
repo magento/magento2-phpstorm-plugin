@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.awt.event.KeyEvent.*
 import java.io.File
+import java.io.IOException
 import java.time.Duration.ofMinutes
 import kotlin.io.path.createTempDirectory
 
@@ -75,23 +76,7 @@ class MarkDirectoryAsMagentoRootTest  {
         val dialog = find<DialogFixture>(byXpath("//div[@class='MyDialog']"))
         dialog.button("Close").click()
         Thread.sleep(10_000)
-        step("Switch back to PhpStorm IDE window if Firefox overlay detected") {
-                remoteRobot.runJs(
-                    """
-            try {
-                const KeyEvent = Java.type("java.awt.event.KeyEvent");
-                    robot.keyPress(KeyEvent.VK_ALT);
-                    robot.keyPress(KeyEvent.VK_TAB);
-                    Thread.sleep(100);
-                    robot.keyRelease(KeyEvent.VK_TAB);
-                    robot.keyRelease(KeyEvent.VK_ALT);
-                true;
-            } catch (error) {
-                false;
-            }
-            """.trimIndent()
-                )
-        }
+        closeBrowser()
         // end temporary workaround
 
         welcomeFrame {
@@ -191,6 +176,32 @@ class MarkDirectoryAsMagentoRootTest  {
             }
         }
     }
+
+    fun closeBrowser() {
+        val os = System.getProperty("os.name").lowercase()
+
+        try {
+            if (os.contains("win")) {
+                // For Windows: Close common browsers like Chrome, Firefox, etc.
+                Runtime.getRuntime().exec("taskkill /F /IM chrome.exe")
+                Runtime.getRuntime().exec("taskkill /F /IM firefox.exe")
+                Runtime.getRuntime().exec("taskkill /F /IM msedge.exe")
+            } else if (os.contains("mac")) {
+                // For macOS: Kill browsers using `pkill`
+                Runtime.getRuntime().exec("pkill -f 'Google Chrome'")
+                Runtime.getRuntime().exec("pkill -f 'Firefox'")
+                Runtime.getRuntime().exec("pkill -f 'Safari'")
+            } else if (os.contains("nix") || os.contains("nux")) {
+                // For Linux-based systems: Kill typical browser processes
+                Runtime.getRuntime().exec("pkill -f 'chrome'")
+                Runtime.getRuntime().exec("pkill -f 'firefox'")
+                Runtime.getRuntime().exec("pkill -f 'edge'")
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
 
     private fun createAPluginWithoutMagentoRootInVendor(
         ideaFrame: IdeaFrame,
