@@ -74,7 +74,7 @@ class MarkDirectoryAsMagentoRootTest  {
         startTrialFree.click()
         val dialog = find<DialogFixture>(byXpath("//div[@class='MyDialog']"))
         dialog.button("Close").click()
-        Thread.sleep(2_000)
+        Thread.sleep(10_000)
         step("Switch back to PhpStorm IDE window if Firefox overlay detected") {
                 remoteRobot.runJs(
                     """
