@@ -183,19 +183,13 @@ class MarkDirectoryAsMagentoRootTest  {
         try {
             if (os.contains("win")) {
                 // For Windows: Close common browsers like Chrome, Firefox, etc.
-                Runtime.getRuntime().exec("taskkill /F /IM chrome.exe")
                 Runtime.getRuntime().exec("taskkill /F /IM firefox.exe")
-                Runtime.getRuntime().exec("taskkill /F /IM msedge.exe")
             } else if (os.contains("mac")) {
                 // For macOS: Kill browsers using `pkill`
-                Runtime.getRuntime().exec("pkill -f 'Google Chrome'")
-                Runtime.getRuntime().exec("pkill -f 'Firefox'")
-                Runtime.getRuntime().exec("pkill -f 'Safari'")
+                Runtime.getRuntime().exec("killall -9 safari")
             } else if (os.contains("nix") || os.contains("nux")) {
                 // For Linux-based systems: Kill typical browser processes
-                Runtime.getRuntime().exec("pkill -f 'chrome'")
-                Runtime.getRuntime().exec("pkill -f 'firefox'")
-                Runtime.getRuntime().exec("pkill -f 'edge'")
+                Runtime.getRuntime().exec("killall -9 firefox")
             }
         } catch (e: IOException) {
             e.printStackTrace()
