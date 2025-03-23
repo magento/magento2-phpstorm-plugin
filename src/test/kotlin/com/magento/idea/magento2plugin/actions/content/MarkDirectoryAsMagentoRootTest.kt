@@ -184,7 +184,7 @@ class MarkDirectoryAsMagentoRootTest  {
         try {
             if (os.contains("win")) {
                 // For Windows: Close common browsers like Chrome, Firefox, etc.
-                Runtime.getRuntime().exec("taskkill /F /IM firefox.exe")
+                Runtime.getRuntime().exec("taskkill /F /IM edge.exe")
             } else if (os.contains("mac")) {
                 // For macOS: Kill browsers using `pkill`
                 Runtime.getRuntime().exec("killall -9 safari")
