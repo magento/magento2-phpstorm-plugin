@@ -73,21 +73,31 @@ class MarkDirectoryAsMagentoRootTest  {
         val startTrialFree = find<ContainerFixture>(byXpath("//div[@class='s']"))
         startTrialFree.click()
         val dialog = find<DialogFixture>(byXpath("//div[@class='MyDialog']"))
-        dialog.button("Close").click();
+        dialog.button("Close").click()
 
         step("Switch back to PhpStorm IDE window if Firefox overlay detected") {
             waitFor(ofMinutes(2)) {
                 remoteRobot.callJs(
                     """
-            const robot = java.awt.Robot();
-            const activeWindowName = java.awt.Frame.getFrames().find(frame => frame.isActive()).getName();
-            if (activeWindowName.contains("Firefox")) {
-                robot.keyPress(java.awt.event.KeyEvent.VK_ALT);
-                robot.keyPress(java.awt.event.KeyEvent.VK_TAB);
-                robot.keyRelease(java.awt.event.KeyEvent.VK_TAB);
-                robot.keyRelease(java.awt.event.KeyEvent.VK_ALT);
+            try {
+                const Robot = Java.type("java.awt.Robot");
+                const KeyEvent = Java.type("java.awt.event.KeyEvent");
+                const Frames = Java.type("java.awt.Frame");
+                const robot = new Robot();
+                const activeWindow = Array.from(Frames.getFrames()).find(frame => frame.isActive());
+                if (activeWindow && activeWindow.getName().includes("Firefox")) {
+                    print("Firefox overlay detected, switching to PhpStorm...");
+                    robot.keyPress(KeyEvent.VK_ALT);
+                    robot.keyPress(KeyEvent.VK_TAB);
+                    Thread.sleep(100);
+                    robot.keyRelease(KeyEvent.VK_TAB);
+                    robot.keyRelease(KeyEvent.VK_ALT);
+                }
+                true;
+            } catch (error) {
+                print("Error during script execution: " + error);
+                false;
             }
-            true
             """.trimIndent()
                 )
             }
