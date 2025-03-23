@@ -98,6 +98,7 @@ class MarkDirectoryAsMagentoRootTest  {
         idea {
             step("Enable Magento Integration") {
                 waitFor(ofMinutes(1)) { isDumbMode().not() }
+                Thread.sleep(5_000)
                 enableSupportLink.click(java.awt.Point(1, 1))
                 waitFor(ofMinutes(1)) { isDumbMode().not() }
 
