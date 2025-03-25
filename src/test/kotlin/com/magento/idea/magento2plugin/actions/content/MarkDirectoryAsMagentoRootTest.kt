@@ -69,17 +69,22 @@ class MarkDirectoryAsMagentoRootTest  {
     @Video
     fun testMarkDirectoryAsMagentoRoot(remoteRobot: RemoteRobot) = with(remoteRobot) {
         // temporary workaround until we get license for CI
-        val startTrial = find<ContainerFixture>(byXpath("//div[@visible_text='Start trial']"))
-        startTrial.click()
-        val startTrialFree = find<ContainerFixture>(byXpath("//div[@class='s']"))
-        startTrialFree.click()
-        val dialog = find<DialogFixture>(byXpath("//div[@class='MyDialog']"))
-        dialog.button("Close").click()
-        Thread.sleep(10_000)
-        closeBrowser()
+        if (System.getenv("GITHUB_ACTIONS") == "true") {
+            val startTrial = find<ContainerFixture>(byXpath("//div[@visible_text='Start trial']"))
+            startTrial.click()
+            val startTrialFree = find<ContainerFixture>(byXpath("//div[@class='s']"))
+            startTrialFree.click()
+            val dialog = find<DialogFixture>(byXpath("//div[@class='MyDialog']"))
+            dialog.button("Close").click()
+            Thread.sleep(10_000)
+            closeBrowser()
+        }
         // end temporary workaround
 
         welcomeFrame {
+            val launchedFromScript = find<ContainerFixture>(byXpath("//div[@text='Don't show again']"))
+            launchedFromScript.click()
+
             createNewProjectFromExistingFilesLink.click()
             dialog("Open File or Project") {
                 // Set the path for the copied test data
