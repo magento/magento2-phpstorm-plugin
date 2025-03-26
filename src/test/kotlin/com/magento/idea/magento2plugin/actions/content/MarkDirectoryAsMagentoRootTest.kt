@@ -78,11 +78,15 @@ class MarkDirectoryAsMagentoRootTest  {
             dialog.button("Close").click()
             Thread.sleep(10_000)
             closeBrowser()
+        } else {
+            val dialog = find<DialogFixture>(byXpath("//div[@class='MyDialog']"))
+            dialog.button("Activate").click()
+            dialog.button("Close").click()
         }
         // end temporary workaround
 
         welcomeFrame {
-            val launchedFromScript = find<ContainerFixture>(byXpath("//div[@text='Don't show again']"))
+            val launchedFromScript = find<ContainerFixture>(byXpath("//div[@class='LinkLabel']"))
             launchedFromScript.click()
 
             createNewProjectFromExistingFilesLink.click()
