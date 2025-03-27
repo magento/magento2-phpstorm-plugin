@@ -6,20 +6,16 @@
 package com.magento.idea.magento2plugin.actions.content
 
 import com.automation.remarks.junit5.Video
+import com.intellij.openapi.util.io.NioFiles.createDirectories
 import org.assertj.swing.core.MouseButton
 import com.intellij.remoterobot.RemoteRobot
-import com.intellij.remoterobot.fixtures.ComponentFixture
 import com.intellij.remoterobot.fixtures.ContainerFixture
-import com.intellij.remoterobot.fixtures.Fixture
-import com.intellij.remoterobot.fixtures.JButtonFixture
 import com.intellij.remoterobot.search.locators.byXpath
 import com.intellij.remoterobot.steps.CommonSteps
 import com.intellij.remoterobot.stepsProcessing.step
-import com.intellij.remoterobot.utils.Keyboard
 import com.intellij.remoterobot.utils.keyboard
 import com.intellij.remoterobot.utils.waitFor
 import com.intellij.remoterobot.utils.waitForIgnoringError
-import com.intellij.ui.components.dialog
 import com.magento.idea.magento2plugin.pages.*
 import com.magento.idea.magento2plugin.utils.RemoteRobotExtension
 import com.magento.idea.magento2plugin.utils.StepsLogger
@@ -30,8 +26,8 @@ import org.junit.jupiter.api.extension.ExtendWith
 import java.awt.event.KeyEvent.*
 import java.io.File
 import java.io.IOException
+import java.nio.file.Paths
 import java.time.Duration.ofMinutes
-import kotlin.io.path.createTempDirectory
 
 @ExtendWith(RemoteRobotExtension::class)
 class MarkDirectoryAsMagentoRootTest  {
@@ -43,9 +39,21 @@ class MarkDirectoryAsMagentoRootTest  {
 
     @BeforeEach
     fun setup() {
-        // Create a temporary directory
+        // Get the user's home directory in a platform-independent way
+        val userHomeDir = System.getProperty("user.home")
+
+        // Create a temporary directory inside the user's home directory
+        val tempDirPath = Paths.get(userHomeDir, "intellij-test-project")
+        tempProjectDir = createDirectories(tempDirPath).toFile().apply {
+            // Ensure the temporary directory is deleted and recreated
+            if (exists()) {
+                deleteRecursively()
+            }
+            mkdirs()
+        }
+
+        // Define the source directory for the test data
         val sourceDir = File("testData/project/magento2")
-        tempProjectDir = createTempDirectory("intellij-test-project").toFile()
 
         // Copy the test data to the temporary directory
         sourceDir.copyRecursively(
@@ -86,8 +94,12 @@ class MarkDirectoryAsMagentoRootTest  {
         // end temporary workaround
 
         welcomeFrame {
-            val launchedFromScript = find<ContainerFixture>(byXpath("//div[@class='LinkLabel']"))
-            launchedFromScript.click()
+            try {
+                val launchedFromScript = find<ContainerFixture>(byXpath("//div[@class='LinkLabel']"))
+                launchedFromScript.click()
+            } catch (e: Exception) {
+                // Element does not exist, continue without failing the test
+            }
 
             createNewProjectFromExistingFilesLink.click()
             dialog("Open File or Project") {
@@ -111,8 +123,10 @@ class MarkDirectoryAsMagentoRootTest  {
                 enableSupportLink.click(java.awt.Point(1, 1))
                 waitFor(ofMinutes(1)) { isDumbMode().not() }
 
-                keyboard {
-                    hotKey(VK_ALT, VK_1)
+                if (!isProjectViewVisible()) {
+                    keyboard {
+                        hotKey(VK_ALT, VK_1)
+                    }
                 }
 
                 with(projectViewTree) {

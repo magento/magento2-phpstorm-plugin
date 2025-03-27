@@ -23,7 +23,7 @@ class IdeaFrame(remoteRobot: RemoteRobot, remoteComponent: RemoteComponent) :
         get() = actionLink(byXpath("//div[@accessiblename='Enable Magento support for this project?' and @class='JEditorPane']"))
 
     val projectViewTree
-        get() = find<ContainerFixture>(byXpath("ProjectViewTree", "//div[@class='ProjectViewTree']"))
+        get() = find<ContainerFixture>(byXpath("//div[@class='ProjectViewTree']"))
 
     @JvmOverloads
     fun dumbAware(timeout: Duration = Duration.ofMinutes(5), function: () -> Unit) {
@@ -39,6 +39,18 @@ class IdeaFrame(remoteRobot: RemoteRobot, remoteComponent: RemoteComponent) :
             }
         }
     }
+
+    fun isProjectViewVisible(): Boolean {
+        return try {
+            with(projectViewTree) {
+                findText("vendor")
+                true
+            }
+        } catch (e: Exception) {
+            false
+        }
+    }
+
 
     fun isDumbMode(): Boolean {
         return callJs(
