@@ -109,7 +109,7 @@ class MarkDirectoryAsMagentoRootTest  {
                 comboBox.keyboard {
                     hotKey(VK_CONTROL, VK_A) // Select all text
                     key(VK_DELETE) // Delete selected text
-                    enterText(tempProjectDir.absolutePath)
+                    enterText(tempProjectDir.absolutePath.toString().replace("\\", "\\\\"))
                 }
 
                 button("OK").click()
