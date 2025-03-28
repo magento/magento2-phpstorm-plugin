@@ -74,20 +74,20 @@ class MarkDirectoryAsMagentoRootTest  {
     @Video
     fun testMarkDirectoryAsMagentoRoot(remoteRobot: RemoteRobot) = with(remoteRobot) {
         // temporary workaround until we get license for CI
-//        if (System.getenv("GITHUB_ACTIONS") == "true") {
-//            val startTrial = find<ContainerFixture>(byXpath("//div[@visible_text='Start trial']"))
-//            startTrial.click()
-//            val startTrialFree = find<ContainerFixture>(byXpath("//div[@class='s']"))
-//            startTrialFree.click()
-//            val dialog = find<DialogFixture>(byXpath("//div[@class='MyDialog']"))
-//            dialog.button("Close").click()
-//            Thread.sleep(10_000)
-//            closeBrowser()
-//        } else {
-//            val dialog = find<DialogFixture>(byXpath("//div[@class='MyDialog']"))
-//            dialog.button("Activate").click()
-//            dialog.button("Close").click()
-//        }
+        if (System.getenv("GITHUB_ACTIONS") == "true") {
+            val startTrial = find<ContainerFixture>(byXpath("//div[@visible_text='Start trial']"))
+            startTrial.click()
+            val startTrialFree = find<ContainerFixture>(byXpath("//div[@class='s']"))
+            startTrialFree.click()
+            val dialog = find<DialogFixture>(byXpath("//div[@class='MyDialog']"))
+            dialog.button("Close").click()
+            Thread.sleep(10_000)
+            closeBrowser()
+        } else {
+            val dialog = find<DialogFixture>(byXpath("//div[@class='MyDialog']"))
+            dialog.button("Activate").click()
+            dialog.button("Close").click()
+        }
         // end temporary workaround
 
         welcomeFrame {
