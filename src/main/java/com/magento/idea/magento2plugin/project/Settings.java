@@ -21,6 +21,9 @@ import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings({
+        "PMD.ExcessivePublicCount"
+})
 @State(
         name = "Magento2PluginSettings",
         storages = {

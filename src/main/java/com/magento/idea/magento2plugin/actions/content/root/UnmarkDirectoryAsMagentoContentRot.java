@@ -28,7 +28,10 @@ public class UnmarkDirectoryAsMagentoContentRot extends MarkRootActionBase {
     private Project project;
 
     @Override
-    protected void modifyRoots(final VirtualFile virtualFile, ContentEntry contentEntry) {
+    protected void modifyRoots(
+            final VirtualFile virtualFile,
+            final ContentEntry contentEntry
+    ) {
         if (project != null) {
             final Settings settings = Settings.getInstance(project);
             Settings.getInstance(project).removeMagentoFolder(virtualFile.getUrl());
@@ -58,7 +61,6 @@ public class UnmarkDirectoryAsMagentoContentRot extends MarkRootActionBase {
         }
 
         if (targetElement instanceof PsiDirectory && project != null) {
-            final Settings settings = Settings.getInstance(project);
             final String magentoPathUrl = MagentoPathUrlUtil.execute(project);
             final String directoryUrl = ((PsiDirectory) targetElement).getVirtualFile().getUrl();
             if (magentoPathUrl != null && magentoPathUrl.equals(directoryUrl)) {
@@ -66,6 +68,7 @@ public class UnmarkDirectoryAsMagentoContentRot extends MarkRootActionBase {
                 return;
             }
 
+            final Settings settings = Settings.getInstance(project);
             if (settings.containsMagentoFolder(directoryUrl)) {
                 event.getPresentation().setEnabledAndVisible(true);
                 return;
@@ -76,7 +79,10 @@ public class UnmarkDirectoryAsMagentoContentRot extends MarkRootActionBase {
     }
 
     @Override
-    protected boolean isEnabled(@NotNull RootsSelection rootsSelection, @NotNull Module module) {
+    protected boolean isEnabled(
+            @NotNull final RootsSelection rootsSelection,
+            @NotNull final Module module
+    ) {
         return false;
     }
 }
