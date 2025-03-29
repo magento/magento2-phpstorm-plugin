@@ -29,6 +29,10 @@ import org.jetbrains.annotations.NotNull;
 public class MarkDirectoryAsMagentoContentRot extends MarkRootActionBase {
     private Project project;
     
+    /**
+     * This action is used to mark a selected directory as
+     * a Magento content root within the project structure.
+     */
     public MarkDirectoryAsMagentoContentRot() {
         super();
         final Presentation presentation = this.getTemplatePresentation();
