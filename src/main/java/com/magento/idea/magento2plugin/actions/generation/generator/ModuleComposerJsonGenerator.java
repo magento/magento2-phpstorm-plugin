@@ -21,9 +21,8 @@ import com.magento.idea.magento2plugin.magento.files.ComposerJson;
 import java.util.List;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class ModuleComposerJsonGenerator extends FileGenerator {
 
@@ -176,11 +175,7 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
                     if (!(composerJsonFile instanceof JsonFile)) {
                         return Pair.create("", "");
                     }
-                    final JSONParser parser = new JSONParser();
-                    final Object obj = parser.parse(
-                            composerJsonFile.getText()
-                    );
-                    final JSONObject jsonObject = (JSONObject) obj;
+                    final JSONObject jsonObject = new JSONObject(composerJsonFile.getText());
 
                     if (jsonObject.get("name") == null) {
                         return Pair.create("", "");
@@ -199,7 +194,7 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
             } else {
                 return Pair.create("", "");
             }
-        } catch (ParseException exception) { //NOPMD
+        } catch (JSONException exception) { //NOPMD
             // It's fine
         }
 

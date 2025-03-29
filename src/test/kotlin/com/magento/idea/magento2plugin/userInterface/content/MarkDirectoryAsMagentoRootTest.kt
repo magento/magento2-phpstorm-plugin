@@ -1,0 +1,272 @@
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+package com.magento.idea.magento2plugin.userInterface.content
+
+import com.automation.remarks.junit5.Video
+import com.intellij.openapi.util.io.NioFiles.createDirectories
+import com.intellij.remoterobot.RemoteRobot
+import com.intellij.remoterobot.fixtures.ContainerFixture
+import com.intellij.remoterobot.search.locators.byXpath
+import com.intellij.remoterobot.steps.CommonSteps
+import com.intellij.remoterobot.stepsProcessing.step
+import com.intellij.remoterobot.utils.keyboard
+import com.intellij.remoterobot.utils.waitFor
+import com.intellij.remoterobot.utils.waitForIgnoringError
+import com.magento.idea.magento2plugin.pages.*
+import com.magento.idea.magento2plugin.utils.RemoteRobotExtension
+import com.magento.idea.magento2plugin.utils.StepsLogger
+import java.awt.event.KeyEvent.VK_1
+import java.awt.event.KeyEvent.VK_A
+import java.awt.event.KeyEvent.VK_ALT
+import java.awt.event.KeyEvent.VK_CONTROL
+import java.awt.event.KeyEvent.VK_DELETE
+import java.io.File
+import java.io.IOException
+import java.nio.file.Paths
+import java.time.Duration.ofMinutes
+import org.assertj.swing.core.MouseButton
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+
+@ExtendWith(RemoteRobotExtension::class)
+class MarkDirectoryAsMagentoRootTest  {
+    private lateinit var tempProjectDir: File
+
+    init {
+        StepsLogger.init()
+    }
+
+    @BeforeEach
+    fun setup() {
+        // Create a temporary directory inside the user's home directory
+        val projectDir = Paths.get("intellij-test-project")
+        tempProjectDir = createDirectories(projectDir).toFile().apply {
+            // Ensure the temporary directory is deleted and recreated
+            if (exists()) {
+                deleteRecursively()
+            }
+            mkdirs()
+        }
+
+        // Define the source directory for the test data
+        val sourceDir = File("testData/project/magento2")
+
+        // Copy the test data to the temporary directory
+        sourceDir.copyRecursively(
+            target = tempProjectDir,
+            overwrite = true
+        )
+    }
+
+
+    @BeforeEach
+    fun waitForIde(remoteRobot: RemoteRobot) {
+        waitForIgnoringError(ofMinutes(3)) { remoteRobot.callJs("true") }
+    }
+
+    @AfterEach
+    fun closeProject(remoteRobot: RemoteRobot) = with(remoteRobot) {
+        CommonSteps(remoteRobot).closeProject()
+    }
+
+    @Test
+    @Video
+    fun testMarkDirectoryAsMagentoRoot(remoteRobot: RemoteRobot) = with(remoteRobot) {
+        // temporary workaround until we get license for CI
+        if (System.getenv("GITHUB_ACTIONS") == "true") {
+            val startTrial = find<ContainerFixture>(byXpath("//div[@visible_text='Start trial']"))
+            startTrial.click()
+            val startTrialFree = find<ContainerFixture>(byXpath("//div[@class='s']"))
+            startTrialFree.click()
+            val dialog = find<DialogFixture>(byXpath("//div[@class='MyDialog']"))
+            dialog.button("Close").click()
+            Thread.sleep(10_000)
+            closeBrowser()
+        } else {
+            val dialog = find<DialogFixture>(byXpath("//div[@class='MyDialog']"))
+            dialog.button("Activate").click()
+            dialog.button("Close").click()
+        }
+        // end temporary workaround
+
+        welcomeFrame {
+            try {
+                val launchedFromScript = find<ContainerFixture>(byXpath("//div[@class='LinkLabel']"))
+                launchedFromScript.click()
+            } catch (e: Exception) {
+                // Element does not exist, continue without failing the test
+            }
+
+            createNewProjectFromExistingFilesLink.click()
+            dialog("Open File or Project") {
+                // Set the path for the copied test data
+                val comboBox = find<ContainerFixture>(byXpath("//div[@class='BorderlessTextField']"))
+                comboBox.click() // Focus on the comboBox
+                comboBox.keyboard {
+                    hotKey(VK_CONTROL, VK_A) // Select all text
+                    key(VK_DELETE) // Delete selected text
+                    enterText(tempProjectDir.absolutePath.toString().replace("\\", "\\\\"))
+                }
+
+                button("OK").click()
+                trustProjectLink.click()
+            }
+        }
+        idea {
+            step("Enable Magento Integration") {
+                waitFor(ofMinutes(1)) { isDumbMode().not() }
+                Thread.sleep(5_000)
+                enableSupportLink.click(java.awt.Point(1, 1))
+                waitFor(ofMinutes(1)) { isDumbMode().not() }
+
+                if (!isProjectViewVisible()) {
+                    keyboard {
+                        hotKey(VK_ALT, VK_1)
+                    }
+                }
+
+                with(projectViewTree) {
+                    findText("vendor").doubleClick()
+                    findText("module-catalog").doubleClick()
+                    findText("Block").doubleClick()
+                    findText("Navigation.php").doubleClick()
+                }
+
+                createAPluginWithoutMagentoRootInVendor(this@idea, remoteRobot)
+
+                with(projectViewTree) {
+                    //add magento code to project
+                    findText("magento").click(MouseButton.RIGHT_BUTTON)
+                    contextMenu("Mark Directory as").click()
+                    contextMenuItem("Sources Root").click()
+
+                    findText("module-catalog").click(MouseButton.RIGHT_BUTTON)
+                    contextMenu("Mark Directory as").click()
+                    contextMenuItem("Mark Directory As Magento Code Root").click()
+                }
+
+                with(textEditor()) {
+                    step("Create a new Plugin with marking as code root") {
+                        Thread.sleep(1_000)
+                        editor.findText("someMethod").click(MouseButton.RIGHT_BUTTON)
+                        contextMenuItem("Create a new Plugin").click()
+
+                        createAPluginDialog {
+                            step("Ensure target module includes 'Magento_Catalog'") {
+                                pluginName.click()
+                                pluginName.keyboard {
+                                    enterText("test_plugin")
+                                }
+                                className.click()
+                                className.keyboard {
+                                    enterText("TestPlugin")
+                                }
+
+                                targetModule.click()
+                                targetModule.keyboard {
+                                    hotKey(VK_CONTROL, VK_A) // Select all text
+                                    key(VK_DELETE) // Delete selected text
+                                    enterText("Magento_Catalog")
+                                    button("OK").click()
+                                }
+                            }
+                        }
+                    }
+                }
+
+                with(projectViewTree) {
+                    findText("Plugin").doubleClick()
+                    findText("TestPlugin.php").doubleClick()
+                }
+
+                with(textEditor()) {
+                    step("Check created files") {
+                         editor.findText("beforeSomeMethod")
+                    }
+                }
+
+                with(projectViewTree) {
+                    findText("module-catalog").click(MouseButton.RIGHT_BUTTON)
+                    contextMenu("Mark Directory as").click()
+                    contextMenuItem("Unmark Directory As Magento Code Root").click()
+                    findText("Navigation.php").doubleClick()
+                }
+
+                createAPluginWithoutMagentoRootInVendor(this@idea, remoteRobot)
+            }
+        }
+    }
+
+    /**
+     * Closes the browser by terminating its process based on the operating system.
+     */
+    fun closeBrowser() {
+        val os = System.getProperty("os.name").lowercase()
+
+        try {
+            if (os.contains("win")) {
+                // For Windows: Close common browsers like Chrome, Firefox, etc.
+                Runtime.getRuntime().exec("taskkill /F /IM edge.exe")
+            } else if (os.contains("mac")) {
+                // For macOS: Kill browsers using `pkill`
+                Runtime.getRuntime().exec("killall -9 safari")
+            } else if (os.contains("nix") || os.contains("nux")) {
+                // For Linux-based systems: Kill typical browser processes
+                Runtime.getRuntime().exec("killall -9 firefox")
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
+    /**
+     * Creates a new plugin in a project without marking the target module as a Magento code root.
+     *
+     * @param ideaFrame
+     * @param remoteRobot
+     */
+    private fun createAPluginWithoutMagentoRootInVendor(
+        ideaFrame: IdeaFrame,
+        remoteRobot1: RemoteRobot
+    ) {
+        with(ideaFrame.textEditor()) {
+            step("Create a new Plugin without marking as code root") {
+                Thread.sleep(1_000)
+                editor.findText("someMethod").click(MouseButton.RIGHT_BUTTON)
+                remoteRobot1.contextMenuItem("Create a new Plugin").click()
+
+                remoteRobot1.createAPluginDialog {
+                    step("Ensure target module does not include 'Magento_Catalog'") {
+                        pluginName.click()
+                        pluginName.keyboard {
+                            enterText("test_plugin")
+                        }
+                        className.click()
+                        className.keyboard {
+                            enterText("TestPlugin")
+                        }
+
+                        targetModule.click()
+                        targetModule.keyboard {
+                            hotKey(VK_CONTROL, VK_A) // Select all text
+                            key(VK_DELETE) // Delete selected text
+                            enterText("Magento_Catalog")
+                            button("OK").click()
+
+                            errorDialog {
+                                button("OK").click()
+                            }
+
+                            button("Cancel").click()
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

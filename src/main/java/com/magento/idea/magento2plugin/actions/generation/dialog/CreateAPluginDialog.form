@@ -65,7 +65,9 @@
                 <preferred-size width="150" height="-1"/>
               </grid>
             </constraints>
-            <properties/>
+            <properties>
+              <name value="Class Name"/>
+            </properties>
             <clientProperties>
               <html.disable class="java.lang.Boolean" value="true"/>
             </clientProperties>

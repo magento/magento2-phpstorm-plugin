@@ -30,7 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import org.jetbrains.annotations.NotNull;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 
 public class ReportBuilder {
 
@@ -148,9 +148,9 @@ public class ReportBuilder {
                 final JsonObject issueObject = jsonElementGenerator.createObject("\"lineNumber\": "
                         + issue.getLine() + ","
                         + "\"level\": \"" + issue.getLevel() + "\","//NOPMD
-                        + "\"message\": \"" + JSONObject.escape(issue.getMessage()) + "\","
+                        + "\"message\": " + JSONObject.quote(issue.getMessage()) + ","
                         + "\"code\": \"" + issue.getCode() + "\","
-                        + "\"fileName\": \"" + JSONObject.escape(issue.getFilename()) + "\","
+                        + "\"fileName\": " + JSONObject.quote(issue.getFilename()) + ","
                         + "\"validationType\": \"" + issue.getValidationType() + "\""
                 );
                 if (issuesValueBuilder.length() > 0) {

@@ -51,7 +51,13 @@ import javax.swing.event.ListSelectionListener;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings({"PMD.TooManyFields", "PMD.DataClass", "PMD.UnusedPrivateMethod"})
+@SuppressWarnings({
+        "PMD.TooManyFields",
+        "PMD.DataClass",
+        "PMD.UnusedPrivateMethod",
+        "PMD.ConstructorCallsOverridableMethod",
+        "PMD.SingularField"
+})
 public class NewModuleDialog extends AbstractDialog implements ListSelectionListener { //NOPMD
     private static final String MODULE_DESCRIPTION = "module description";
     private static final String MODULE_VERSION = "module version";
@@ -111,8 +117,8 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
     @NotNull
     private final PsiDirectory initialBaseDir;
     private String detectedPackageName;
-    private final ModuleIndex moduleIndex;
-    private final CamelCaseToHyphen camelCaseToHyphen;
+    private final transient ModuleIndex moduleIndex;
+    private final transient CamelCaseToHyphen camelCaseToHyphen;
 
     /**
      * Constructor.
@@ -178,8 +184,10 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         }
     }
 
+    @Override
     protected void onWriteActionOK() {
         generateFiles();
+        exit();
     }
 
     private void generateFiles() {

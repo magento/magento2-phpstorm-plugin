@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.project;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
@@ -22,6 +21,9 @@ import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings({
+        "PMD.ExcessivePublicCount"
+})
 @State(
         name = "Magento2PluginSettings",
         storages = {
@@ -153,7 +155,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
     }
 
     public static Settings getInstance(final Project project) {
-        return ServiceManager.getService(project, Settings.class);
+        return project.getService(Settings.class);
     }
 
     public static boolean isEnabled(final @NotNull Project project) {
@@ -203,7 +205,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
          * @param myDoNotAskContentConfigAgain boolean
          * @param magentoVersion String
          * @param magentoEdition String
-         * @param myMagentoFolders List<PsiDirectory>
+         * @param myMagentoFolders List
          */
         public State(
                 final boolean pluginEnabled,
@@ -265,6 +267,11 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             return this.myMagentoFolders;
         }
 
+        /**
+         * Adds a Magento folder to the list of tracked Magento folders.
+         *
+         * @param magentoFolders the name of the Magento folder to be added
+         */
         @Tag("magentoFolders")
         public void addMagentoFolder(final String magentoFolders) {
             if (this.myMagentoFolders == null) {
@@ -273,6 +280,11 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             this.myMagentoFolders.add(magentoFolders);
         }
 
+        /**
+         * Removes a specified Magento folder from the list of tracked Magento folders.
+         *
+         * @param magentoFolders the name of the Magento folder to be removed
+         */
         public void removeMagentoFolder(final String magentoFolders) {
             if (this.myMagentoFolders != null) {
                 this.myMagentoFolders.remove(magentoFolders);
@@ -357,8 +369,9 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             result = 31 * result + (this.isDoNotAskContentConfigAgain() ? 1 : 0);
             result = 31 * result + (
                     this.defaultLicenseName != null ? this.defaultLicenseName.hashCode() : 0
-            );
-            result = 31 * result + (this.myMagentoFolders != null ? this.myMagentoFolders.hashCode() : 0);
+                );
+            result = 31 * result
+                    + (this.myMagentoFolders != null ? this.myMagentoFolders.hashCode() : 0);
             return result;
         }
     }
