@@ -137,6 +137,7 @@ tasks {
     }
 
     test {
+        exclude("**/userInterface/**")
         useJUnitPlatform()
     }
 
@@ -245,10 +246,6 @@ kover {
             excludedClasses.add("org.apache.velocity.*")
         }
     }
-}
-
-tasks.register<Test>("legacyTests") {
-    exclude("**/userInterface/**")
 }
 
 tasks.register<Test>("uiTests") {

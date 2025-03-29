@@ -32,7 +32,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run automated tests
-        run: ./gradlew legacyTests --no-daemon
+        run: ./gradlew test --no-daemon
 
   build-windows:
     runs-on: windows-latest
@@ -58,7 +58,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run automated tests
-        run: ./gradlew legacyTests --no-daemon
+        run: ./gradlew test --no-daemon
 
   build-macos:
     runs-on: macos-latest
@@ -84,7 +84,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run automated tests
-        run: ./gradlew legacyTests --no-daemon
+        run: ./gradlew test --no-daemon
 
   static-tests:
     runs-on: ubuntu-latest
