@@ -120,6 +120,10 @@ public class SettingsForm implements PhpFrameworkConfigurable {
 
     @Override
     public boolean isModified() {
+        if (moduleDefaultLicenseName == null) {
+            return true;
+        }
+
         final boolean licenseChanged = !moduleDefaultLicenseName.getText().equals(
                 getSettings().defaultLicense
         );

@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2plugin.actions.content
+package com.magento.idea.magento2plugin.userInterface.content
 
 import com.automation.remarks.junit5.Video
 import com.intellij.openapi.util.io.NioFiles.createDirectories
@@ -43,12 +43,9 @@ class MarkDirectoryAsMagentoRootTest  {
 
     @BeforeEach
     fun setup() {
-        // Get the user's home directory in a platform-independent way
-        val userHomeDir = System.getProperty("user.home")
-
         // Create a temporary directory inside the user's home directory
-        val tempDirPath = Paths.get(userHomeDir, "intellij-test-project")
-        tempProjectDir = createDirectories(tempDirPath).toFile().apply {
+        val projectDir = Paths.get("intellij-test-project")
+        tempProjectDir = createDirectories(projectDir).toFile().apply {
             // Ensure the temporary directory is deleted and recreated
             if (exists()) {
                 deleteRecursively()
@@ -113,7 +110,7 @@ class MarkDirectoryAsMagentoRootTest  {
                 comboBox.keyboard {
                     hotKey(VK_CONTROL, VK_A) // Select all text
                     key(VK_DELETE) // Delete selected text
-                    enterText(tempProjectDir.absolutePath)
+                    enterText(tempProjectDir.absolutePath.toString().replace("\\", "\\\\"))
                 }
 
                 button("OK").click()
