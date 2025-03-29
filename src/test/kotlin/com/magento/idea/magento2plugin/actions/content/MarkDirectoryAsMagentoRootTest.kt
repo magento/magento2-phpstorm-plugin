@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.actions.content
 
 import com.automation.remarks.junit5.Video
 import com.intellij.openapi.util.io.NioFiles.createDirectories
-import org.assertj.swing.core.MouseButton
 import com.intellij.remoterobot.RemoteRobot
 import com.intellij.remoterobot.fixtures.ContainerFixture
 import com.intellij.remoterobot.search.locators.byXpath
@@ -19,15 +18,20 @@ import com.intellij.remoterobot.utils.waitForIgnoringError
 import com.magento.idea.magento2plugin.pages.*
 import com.magento.idea.magento2plugin.utils.RemoteRobotExtension
 import com.magento.idea.magento2plugin.utils.StepsLogger
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import java.awt.event.KeyEvent.*
+import java.awt.event.KeyEvent.VK_1
+import java.awt.event.KeyEvent.VK_A
+import java.awt.event.KeyEvent.VK_ALT
+import java.awt.event.KeyEvent.VK_CONTROL
+import java.awt.event.KeyEvent.VK_DELETE
 import java.io.File
 import java.io.IOException
 import java.nio.file.Paths
 import java.time.Duration.ofMinutes
+import org.assertj.swing.core.MouseButton
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(RemoteRobotExtension::class)
 class MarkDirectoryAsMagentoRootTest  {
@@ -201,6 +205,9 @@ class MarkDirectoryAsMagentoRootTest  {
         }
     }
 
+    /**
+     * Closes the browser by terminating its process based on the operating system.
+     */
     fun closeBrowser() {
         val os = System.getProperty("os.name").lowercase()
 
@@ -220,7 +227,12 @@ class MarkDirectoryAsMagentoRootTest  {
         }
     }
 
-
+    /**
+     * Creates a new plugin in a project without marking the target module as a Magento code root.
+     *
+     * @param ideaFrame
+     * @param remoteRobot
+     */
     private fun createAPluginWithoutMagentoRootInVendor(
         ideaFrame: IdeaFrame,
         remoteRobot1: RemoteRobot

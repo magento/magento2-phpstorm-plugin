@@ -7,7 +7,11 @@ package com.magento.idea.magento2plugin.actions.content.root;
 
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.ide.projectView.actions.MarkRootActionBase;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.LangDataKeys;
+import com.intellij.openapi.actionSystem.PlatformCoreDataKeys;
+import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ContentEntry;
@@ -18,9 +22,9 @@ import com.intellij.psi.PsiElement;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.magento.MagentoPathUrlUtil;
-import org.jetbrains.annotations.NotNull;
 import java.net.MalformedURLException;
 import java.net.URL;
+import org.jetbrains.annotations.NotNull;
 
 public class MarkDirectoryAsMagentoContentRot extends MarkRootActionBase {
     private Project project;

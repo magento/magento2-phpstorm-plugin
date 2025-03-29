@@ -202,7 +202,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
          * @param myDoNotAskContentConfigAgain boolean
          * @param magentoVersion String
          * @param magentoEdition String
-         * @param myMagentoFolders List<PsiDirectory>
+         * @param myMagentoFolders List
          */
         public State(
                 final boolean pluginEnabled,
@@ -264,6 +264,11 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             return this.myMagentoFolders;
         }
 
+        /**
+         * Adds a Magento folder to the list of tracked Magento folders.
+         *
+         * @param magentoFolders the name of the Magento folder to be added
+         */
         @Tag("magentoFolders")
         public void addMagentoFolder(final String magentoFolders) {
             if (this.myMagentoFolders == null) {
@@ -272,6 +277,11 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             this.myMagentoFolders.add(magentoFolders);
         }
 
+        /**
+         * Removes a specified Magento folder from the list of tracked Magento folders.
+         *
+         * @param magentoFolders the name of the Magento folder to be removed
+         */
         public void removeMagentoFolder(final String magentoFolders) {
             if (this.myMagentoFolders != null) {
                 this.myMagentoFolders.remove(magentoFolders);
@@ -356,8 +366,9 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             result = 31 * result + (this.isDoNotAskContentConfigAgain() ? 1 : 0);
             result = 31 * result + (
                     this.defaultLicenseName != null ? this.defaultLicenseName.hashCode() : 0
-            );
-            result = 31 * result + (this.myMagentoFolders != null ? this.myMagentoFolders.hashCode() : 0);
+                );
+            result = 31 * result
+                    + (this.myMagentoFolders != null ? this.myMagentoFolders.hashCode() : 0);
             return result;
         }
     }

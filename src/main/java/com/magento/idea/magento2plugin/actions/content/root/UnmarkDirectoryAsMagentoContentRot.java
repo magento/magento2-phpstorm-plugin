@@ -7,7 +7,10 @@ package com.magento.idea.magento2plugin.actions.content.root;
 
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.ide.projectView.actions.MarkRootActionBase;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.LangDataKeys;
+import com.intellij.openapi.actionSystem.PlatformCoreDataKeys;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ContentEntry;
@@ -17,25 +20,21 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.magento.MagentoPathUrlUtil;
-import org.jetbrains.annotations.NotNull;
 import java.net.MalformedURLException;
 import java.net.URL;
+import org.jetbrains.annotations.NotNull;
 
 public class UnmarkDirectoryAsMagentoContentRot extends MarkRootActionBase {
     private Project project;
 
-    public UnmarkDirectoryAsMagentoContentRot() {
-        super();
-    }
-
     @Override
-    protected void modifyRoots(VirtualFile virtualFile, ContentEntry contentEntry) {
+    protected void modifyRoots(final VirtualFile virtualFile, ContentEntry contentEntry) {
         if (project != null) {
-            Settings settings = Settings.getInstance(project);
+            final Settings settings = Settings.getInstance(project);
             Settings.getInstance(project).removeMagentoFolder(virtualFile.getUrl());
             if (settings.getMagentoFolders() != null) {
                 settings.getMagentoFolders().removeIf(folder -> {
-                    VirtualFile file = null;
+                    final VirtualFile file;
                     try {
                         file = VfsUtil.findFileByURL(new URL(folder));
                     } catch (MalformedURLException e) {
@@ -50,18 +49,18 @@ public class UnmarkDirectoryAsMagentoContentRot extends MarkRootActionBase {
     }
 
     @Override
-    public void update(@NotNull AnActionEvent event) {
+    public void update(@NotNull final AnActionEvent event) {
         final DataContext context = event.getDataContext();
         final PsiElement targetElement = LangDataKeys.PSI_ELEMENT.getData(context);
-        Module module = event.getData(PlatformCoreDataKeys.MODULE);
+        final Module module = event.getData(PlatformCoreDataKeys.MODULE);
         if (module != null) {
             project = module.getProject();
         }
 
         if (targetElement instanceof PsiDirectory && project != null) {
-            Settings settings = Settings.getInstance(project);
-            String magentoPathUrl = MagentoPathUrlUtil.execute(project);
-            String directoryUrl = ((PsiDirectory) targetElement).getVirtualFile().getUrl();
+            final Settings settings = Settings.getInstance(project);
+            final String magentoPathUrl = MagentoPathUrlUtil.execute(project);
+            final String directoryUrl = ((PsiDirectory) targetElement).getVirtualFile().getUrl();
             if (magentoPathUrl != null && magentoPathUrl.equals(directoryUrl)) {
                 event.getPresentation().setEnabledAndVisible(false);
                 return;
