@@ -39,8 +39,7 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
 
     testImplementation("org.junit.vintage:junit-vintage-engine:5.10.0")
-
-    implementation ("org.json:json:20171018")
+    implementation("org.json:json:20171018")
     implementation("org.codehaus.plexus:plexus-utils:3.4.0")
     testImplementation("com.automation-remarks:video-recorder-junit5:2.0")
     testImplementation("com.intellij.remoterobot:remote-robot:0.11.23")
@@ -246,4 +245,16 @@ kover {
             excludedClasses.add("org.apache.velocity.*")
         }
     }
+}
+
+tasks.register<Test>("legacyTests") {
+    exclude("**/userInterface/**")
+}
+
+tasks.register<Test>("uiTests") {
+    exclude("**/reference/**")
+    exclude("**/linemarker/**")
+    exclude("**/inspections/**")
+    exclude("**/completion/**")
+    exclude("**/actions/**") // Deprecated, all actions should be reimplemented in the UI tests and this exclude should be removed
 }

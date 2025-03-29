@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-package com.magento.idea.magento2plugin.actions.content
+package com.magento.idea.magento2plugin.userInterface.content
 
 import com.automation.remarks.junit5.Video
 import com.intellij.openapi.util.io.NioFiles.createDirectories
