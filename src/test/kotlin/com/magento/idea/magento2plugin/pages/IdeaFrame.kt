@@ -9,8 +9,6 @@ import com.intellij.remoterobot.RemoteRobot
 import com.intellij.remoterobot.data.RemoteComponent
 import com.intellij.remoterobot.fixtures.*
 import com.intellij.remoterobot.search.locators.byXpath
-import com.intellij.remoterobot.stepsProcessing.step
-import com.intellij.remoterobot.utils.waitFor
 import java.time.Duration
 
 
@@ -28,21 +26,6 @@ class IdeaFrame(remoteRobot: RemoteRobot, remoteComponent: RemoteComponent) :
 
     val projectViewTree
         get() = find<ContainerFixture>(byXpath("//div[@class='ProjectViewTree']"))
-
-    @JvmOverloads
-    fun dumbAware(timeout: Duration = Duration.ofMinutes(5), function: () -> Unit) {
-        step("Wait for smart mode") {
-            waitFor(duration = timeout, interval = Duration.ofSeconds(5)) {
-                runCatching { isDumbMode().not() }.getOrDefault(false)
-            }
-            function()
-            step("..wait for smart mode again") {
-                waitFor(duration = timeout, interval = Duration.ofSeconds(5)) {
-                    isDumbMode().not()
-                }
-            }
-        }
-    }
 
     fun isProjectViewVisible(): Boolean {
         return try {
