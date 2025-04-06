@@ -137,7 +137,15 @@ tasks {
     }
 
     test {
-        exclude("**/userInterface/**")
+        val excludePatterns = project.findProperty("excludeTests") as String?
+
+        if (!excludePatterns.isNullOrEmpty()) {
+            // Split the comma-separated string and apply exclusions
+            excludePatterns.split(",").forEach {
+                exclude(it.trim())
+            }
+        }
+
         useJUnitPlatform()
     }
 
@@ -246,12 +254,4 @@ kover {
             excludedClasses.add("org.apache.velocity.*")
         }
     }
-}
-
-tasks.register<Test>("uiTests") {
-    exclude("**/reference/**")
-    exclude("**/linemarker/**")
-    exclude("**/inspections/**")
-    exclude("**/completion/**")
-    exclude("**/actions/**") // Deprecated, all actions should be reimplemented in the UI tests and this exclude should be removed
 }
