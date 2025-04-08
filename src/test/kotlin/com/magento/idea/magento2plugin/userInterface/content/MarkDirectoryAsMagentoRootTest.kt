@@ -60,7 +60,7 @@ class MarkDirectoryAsMagentoRootTest {
                 with(projectViewTree) {
                     //add magento code to project
                     findText("magento").click(MouseButton.RIGHT_BUTTON)
-                    contextMenu("Mark Directory as").click()
+                    contextMenu("Mark Directory as Not Exist").click()
                     contextMenuItem("Sources Root").click()
 
                     findText("module-catalog").click(MouseButton.RIGHT_BUTTON)
