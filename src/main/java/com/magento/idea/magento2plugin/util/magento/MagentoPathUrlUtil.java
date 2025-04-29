@@ -31,4 +31,24 @@ public class MagentoPathUrlUtil {
 
         return null;
     }
+
+    /**
+     * Constructs a file URL for the Magento packages root, based on the project settings.
+     *
+     * @param project the project instance
+     * @return the constructed file URL
+     */
+    public static String getDesignPath(Project project) {
+        String magentoPath = Settings.getMagentoPath(project);
+        if (magentoPath != null) {
+            return  VirtualFileManager.constructUrl(
+                    "file",
+                    magentoPath
+                            + File.separator
+                            + Package.packagesDesignRoot
+            );
+        }
+
+        return null;
+    }
 }

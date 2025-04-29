@@ -39,10 +39,12 @@ public final class IsFileInEditableModuleUtil {
         final Settings settings = Settings.getInstance(project);
         List<String> magentoToFolders = settings.getMagentoFolders();
         final String magentoPathUrl = MagentoPathUrlUtil.execute(project);
+        final String magentoDesignUrl = MagentoPathUrlUtil.getDesignPath(project);
         if (magentoPathUrl != null) {
             if (magentoToFolders == null) {
                 magentoToFolders = List.of(
-                        magentoPathUrl
+                        magentoPathUrl,
+                        magentoDesignUrl
                 );
             } else {
                 magentoToFolders.add(
