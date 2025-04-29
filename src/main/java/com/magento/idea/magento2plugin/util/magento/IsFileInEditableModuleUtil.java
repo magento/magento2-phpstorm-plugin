@@ -30,7 +30,7 @@ public final class IsFileInEditableModuleUtil {
     }
 
     /**
-     * Validates if a given virtual file is located within editable paths defined by Magento project structure.
+     * Validates if a given virtual file is located within editable paths.
      *
      * @param project the current project containing the virtual file
      * @param virtualFile the file to check against editable module directories
