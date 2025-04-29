@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.project.Settings;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class IsFileInEditableModuleUtil {
@@ -37,31 +38,26 @@ public final class IsFileInEditableModuleUtil {
      */
     public static boolean execute(final Project project, final VirtualFile virtualFile) {
         final Settings settings = Settings.getInstance(project);
-        List<String> magentoToFolders = settings.getMagentoFolders();
-        final String magentoPathUrl = MagentoPathUrlUtil.execute(project);
-        final String magentoDesignUrl = MagentoPathUrlUtil.getDesignPath(project);
-        if (magentoPathUrl != null) {
-            if (magentoToFolders == null) {
-                magentoToFolders = List.of(
-                        magentoPathUrl,
-                        magentoDesignUrl
-                );
-            } else {
-                magentoToFolders.add(
-                       magentoPathUrl
-                );
-            }
-        }
+        List<String> editablePaths = settings.getMagentoFolders();
+        final String magentoRootPath = MagentoPathUrlUtil.execute(project);
+        final String magentoDesignPath = MagentoPathUrlUtil.getDesignPath(project);
 
-
-
-        if (magentoToFolders == null) {
+        if (magentoRootPath == null) {
             return false;
         }
 
-        final String filePath = virtualFile.getUrl();
-        for (final String editablePath : magentoToFolders) {
-            if (normalizeUrl(filePath).startsWith(normalizeUrl(editablePath))) {
+        if (editablePaths == null) {
+            editablePaths = new ArrayList<>();
+        }
+
+        editablePaths.add(magentoRootPath);
+        if (magentoDesignPath != null) {
+            editablePaths.add(magentoDesignPath);
+        }
+
+        final String currentFilePath = virtualFile.getUrl();
+        for (final String editablePath : editablePaths) {
+            if (normalizeUrl(currentFilePath).startsWith(normalizeUrl(editablePath))) {
                 return true;
             }
         }
