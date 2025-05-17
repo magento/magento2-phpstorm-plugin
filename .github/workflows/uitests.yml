@@ -57,13 +57,6 @@ jobs:
           max-attempts: 15
           retry-delay: 30s
 
-      # Kill any running Chrome processes
-      - name: Kill Chrome Processes
-        run: |
-          pkill -f chrome || true
-          pkill -f chromium || true
-          echo "Chrome processes killed"
-
       # Run tests
       - name: Tests
         if: matrix.os != 'ubuntu-latest'
