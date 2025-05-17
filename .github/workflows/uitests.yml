@@ -57,6 +57,13 @@ jobs:
           max-attempts: 15
           retry-delay: 30s
 
+      # Kill any running Chrome processes
+      - name: Kill Chrome Processes
+        run: |
+          pkill -f chrome || true
+          pkill -f chromium || true
+          echo "Chrome processes killed"
+
       # Run tests
       - name: Tests
         if: matrix.os != 'ubuntu-latest'
@@ -66,6 +73,8 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           export DISPLAY=:99.0
+          pkill -f chrome || true
+          pkill -f chromium || true
           ./gradlew test -PexcludeTests="**/reference/**,**/linemarker/**,**/inspections/**,**/completion/**,**/actions/**"
 
 # Uncomment if investigation is needed:
