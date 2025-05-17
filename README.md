@@ -12,36 +12,8 @@
     <strong>PhpStorm IDE Plugin</strong> for a better Magento 2 development workflow.
   </caption>
   <thead>
-    <tr style="background-color: #f4f4f4;">
-      <td colspan="3" style="padding: 10px; font-size: 1.2em;">
-        <strong>Version 2025.0.0 - Contributors</strong>
-      </td>
-    </tr>
   </thead>
   <tbody>
-    <tr>
-      <td align="center" style="padding: 15px;">
-        <a href="https://github.com/YevhenZvieriev" style="text-decoration: none;">
-          <img src="https://avatars.githubusercontent.com/u/43544955?v=4" width="120px" height="120px" style="border-radius: 50%;" alt="Yevhen Zvieriev"/>
-          <br/>
-          <sub style="font-size: 1em;"><b>Yevhen Zvieriev</b></sub>
-        </a>
-      </td>
-      <td align="center" style="padding: 15px;">
-        <a href="https://github.com/SilinMykola" style="text-decoration: none;">
-          <img src="https://avatars.githubusercontent.com/u/15772032?v=4" width="120px" height="120px" style="border-radius: 50%;" alt="Mykola Silin"/>
-          <br/>
-          <sub style="font-size: 1em;"><b>Mykola Silin</b></sub>
-        </a>
-      </td>
-      <td align="center" style="padding: 15px;">
-        <a href="https://github.com/VitaliyBoyko" style="text-decoration: none;">
-          <img src="https://avatars.githubusercontent.com/u/20116393?v=4" width="120px" height="120px" style="border-radius: 50%;" alt="Vitalii Boiko"/>
-          <br/>
-          <sub style="font-size: 1em;"><b>Vitalii Boiko</b></sub>
-        </a>
-      </td>
-    </tr>
   </tbody>
   <tfoot>
     <tr style="background-color: #f9f9f9;">

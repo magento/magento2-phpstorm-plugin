@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.project.Settings;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class IsFileInEditableModuleUtil {
@@ -29,37 +30,33 @@ public final class IsFileInEditableModuleUtil {
     }
 
     /**
-     * Validates if a given virtual file is located within editable paths defined by Magento project structure.
+     * Validates if a given virtual file is located within editable paths.
      *
      * @param project the current project containing the virtual file
      * @param virtualFile the file to check against editable module directories
      * @return true if the file is in an editable module directory, false otherwise
      */
     public static boolean execute(final Project project, final VirtualFile virtualFile) {
-        final Settings settings = Settings.getInstance(project);
-        List<String> magentoToFolders = settings.getMagentoFolders();
-        final String magentoPathUrl = MagentoPathUrlUtil.execute(project);
-        if (magentoPathUrl != null) {
-            if (magentoToFolders == null) {
-                magentoToFolders = List.of(
-                        magentoPathUrl
-                );
-            } else {
-                magentoToFolders.add(
-                       magentoPathUrl
-                );
-            }
-        }
-
-
-
-        if (magentoToFolders == null) {
+        final String magentoRootPath = MagentoPathUrlUtil.execute(project);
+        if (magentoRootPath == null) {
             return false;
         }
 
-        final String filePath = virtualFile.getUrl();
-        for (final String editablePath : magentoToFolders) {
-            if (normalizeUrl(filePath).startsWith(normalizeUrl(editablePath))) {
+        final Settings settings = Settings.getInstance(project);
+        List<String> editablePaths = settings.getMagentoFolders();
+        if (editablePaths == null) {
+            editablePaths = new ArrayList<>();
+        }
+
+        editablePaths.add(magentoRootPath);
+        final String magentoDesignPath = MagentoPathUrlUtil.getDesignPath(project);
+        if (magentoDesignPath != null) {
+            editablePaths.add(magentoDesignPath);
+        }
+
+        final String currentFilePath = virtualFile.getUrl();
+        for (final String editablePath : editablePaths) {
+            if (normalizeUrl(currentFilePath).startsWith(normalizeUrl(editablePath))) {
                 return true;
             }
         }

@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
+## 2025.1.1
+
+### Fixed
+
+- The themes select is empty [#2527](https://github.com/magento/magento2-phpstorm-plugin/pull/2527)
+- PS.MarkRootGroup isn't registered so the action won't be added to it [#2527](https://github.com/magento/magento2-phpstorm-plugin/pull/2527)
+
 ## 2025.1.0
 
 ### Added
