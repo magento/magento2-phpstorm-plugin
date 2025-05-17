@@ -37,20 +37,19 @@ public final class IsFileInEditableModuleUtil {
      * @return true if the file is in an editable module directory, false otherwise
      */
     public static boolean execute(final Project project, final VirtualFile virtualFile) {
-        final Settings settings = Settings.getInstance(project);
-        List<String> editablePaths = settings.getMagentoFolders();
         final String magentoRootPath = MagentoPathUrlUtil.execute(project);
-        final String magentoDesignPath = MagentoPathUrlUtil.getDesignPath(project);
-
         if (magentoRootPath == null) {
             return false;
         }
 
+        final Settings settings = Settings.getInstance(project);
+        List<String> editablePaths = settings.getMagentoFolders();
         if (editablePaths == null) {
             editablePaths = new ArrayList<>();
         }
 
         editablePaths.add(magentoRootPath);
+        final String magentoDesignPath = MagentoPathUrlUtil.getDesignPath(project);
         if (magentoDesignPath != null) {
             editablePaths.add(magentoDesignPath);
         }

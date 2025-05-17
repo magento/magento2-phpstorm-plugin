@@ -176,10 +176,10 @@
         </group>
 
         <action id="AddMagentoContentRoot" class="com.magento.idea.magento2plugin.actions.content.root.MarkDirectoryAsMagentoContentRot" text="Mark Directory As Magento Code Root" description="Adds Magento code root">
-            <add-to-group group-id="PS.MarkRootGroup" anchor="last"/>
+            <add-to-group group-id="MarkRootGroup" anchor="last"/>
         </action>
         <action id="RemoveMagentoContentRoot" class="com.magento.idea.magento2plugin.actions.content.root.UnmarkDirectoryAsMagentoContentRot" text="Unmark Directory As Magento Code Root" description="Removes Magento code root">
-            <add-to-group group-id="PS.MarkRootGroup" anchor="last"/>
+            <add-to-group group-id="MarkRootGroup" anchor="last"/>
         </action>
     </actions>
 

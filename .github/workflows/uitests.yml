@@ -70,16 +70,15 @@ jobs:
 
 # Uncomment if investigation is needed:
 
-#      - name: Capture Test Artifacts on Failure
-#        if: failure() && matrix.os == 'windows-latest'
-#        run: tar -cvzf video.tgz ./video
-#        shell: bash
-#
-#      - name: Upload Test Video Artifact
-#        if: failure() && matrix.os == 'windows-latest'
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: latest-test-video
-#          path: video.tgz
-#          overwrite: true
+      - name: Capture Test Artifacts on Failure
+        if: failure() && matrix.os == 'windows-latest'
+        run: tar -cvzf video.tgz ./video
+        shell: bash
 
+      - name: Upload Test Video Artifact
+        if: failure() && matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: latest-test-video
+          path: video.tgz
+          overwrite: true
