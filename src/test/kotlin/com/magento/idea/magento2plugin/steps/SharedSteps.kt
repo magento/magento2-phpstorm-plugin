@@ -35,7 +35,7 @@ class SharedSteps(private val remoteRobot: RemoteRobot) {
                         ContainerFixture::class.java,
                         byXpath("//div[@visible_text='New Project']")
                     )
-                    newProjectButton.click(Point(15, -15))
+                    newProjectButton.click()
                     Thread.sleep(2_000)
 
                     val jTextFieldFixture = find<JTextFieldFixture>(byXpath("//div[@class='TextFieldWithBrowseButton']"))

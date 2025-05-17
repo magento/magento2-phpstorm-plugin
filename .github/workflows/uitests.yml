@@ -66,8 +66,6 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           export DISPLAY=:99.0
-          pkill -f chrome || true
-          pkill -f chromium || true
           ./gradlew test -PexcludeTests="**/reference/**,**/linemarker/**,**/inspections/**,**/completion/**,**/actions/**"
 
 # Uncomment if investigation is needed:

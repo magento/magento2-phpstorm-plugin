@@ -9,6 +9,9 @@ import com.intellij.remoterobot.RemoteRobot
 import com.intellij.remoterobot.data.RemoteComponent
 import com.intellij.remoterobot.fixtures.*
 import com.intellij.remoterobot.search.locators.byXpath
+import com.intellij.remoterobot.utils.keyboard
+import java.awt.event.KeyEvent.VK_ALT
+import java.awt.event.KeyEvent.VK_1
 import java.time.Duration
 
 
@@ -25,7 +28,14 @@ class IdeaFrame(remoteRobot: RemoteRobot, remoteComponent: RemoteComponent) :
         get() = actionLink(byXpath("//div[@accessiblename='Enable Magento support for this project?' and @class='JEditorPane']"))
 
     val projectViewTree
-        get() = find<ContainerFixture>(byXpath("//div[@class='ProjectViewTree']"))
+        get() = try {
+            find<ContainerFixture>(byXpath("//div[@class='ProjectViewTree']"))
+        } catch (e: Exception) {
+            keyboard {
+                hotKey(VK_ALT, VK_1)
+            }
+            find<ContainerFixture>(byXpath("//div[@class='ProjectViewTree']"))
+        }
 
     fun isProjectViewVisible(): Boolean {
         return try {
