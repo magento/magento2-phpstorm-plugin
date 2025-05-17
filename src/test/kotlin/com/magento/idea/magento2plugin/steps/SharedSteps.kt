@@ -115,6 +115,7 @@ class SharedSteps(private val remoteRobot: RemoteRobot) {
                 DialogFixture::class.java, byXpath("//div[@class='MyDialog']")
             )
             dialog.button("Close").click()
+            closeBrowser()
 
             try {
                 Thread.sleep(10000)
@@ -122,9 +123,8 @@ class SharedSteps(private val remoteRobot: RemoteRobot) {
                 Thread.currentThread().interrupt()
                 throw RuntimeException(e)
             }
-
-            closeBrowser()
         } else {
+            closeBrowser()
             val dialog = remoteRobot.find(
                 DialogFixture::class.java, byXpath("//div[@class='MyDialog']")
             )
@@ -196,6 +196,7 @@ class SharedSteps(private val remoteRobot: RemoteRobot) {
             } else if (os.contains("nix") || os.contains("nux")) {
                 // For Linux-based systems: Kill typical browser processes
                 Runtime.getRuntime().exec("killall -9 firefox")
+                Runtime.getRuntime().exec("killall -9 chrome")
             }
         } catch (e: IOException) {
             e.printStackTrace()
