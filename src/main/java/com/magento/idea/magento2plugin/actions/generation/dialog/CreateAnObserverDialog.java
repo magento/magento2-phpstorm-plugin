@@ -102,14 +102,7 @@ public class CreateAnObserverDialog extends AbstractDialog {
         setTitle(CreateAnObserverAction.ACTION_DESCRIPTION);
         fillTargetAreaOptions();
 
-        buttonOK.addActionListener(e -> onOK());
-        buttonCancel.addActionListener(e -> onCancel());
-
-        contentPane.registerKeyboardAction(
-                e -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
+        // DialogWrapper handles button actions and ESC key automatically
 
         init();
     }

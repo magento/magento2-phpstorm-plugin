@@ -20,8 +20,6 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.lang.reflect.Field;
@@ -29,7 +27,6 @@ import java.util.LinkedList;
 import java.util.List;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;

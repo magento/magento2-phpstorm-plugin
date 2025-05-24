@@ -81,15 +81,7 @@ public class NewViewModelDialog extends AbstractDialog {
         setTitle(NewViewModelAction.ACTION_DESCRIPTION);
         suggestViewModelDirectory();
 
-        buttonOK.addActionListener((final ActionEvent event) -> onOK());
-        buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
-
-        // call onCancel() on ESCAPE
-        contentPanel.registerKeyboardAction(
-                (final ActionEvent event) -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
+        // DialogWrapper handles button actions and ESC key automatically
 
         init();
     }

@@ -138,8 +138,7 @@ public class NewCronjobDialog extends AbstractDialog {
         setTitle(NewCronjobAction.ACTION_DESCRIPTION);
         configPathField.setEditable(false);
 
-        buttonOK.addActionListener(e -> onOK());
-        buttonCancel.addActionListener(e -> onCancel());
+        // DialogWrapper handles button actions automatically
 
         fixedScheduleRadioButton.addActionListener(e -> {
             configurableSchedulePanel.setVisible(false);
@@ -185,12 +184,7 @@ public class NewCronjobDialog extends AbstractDialog {
             }
         });
 
-        // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(
-                (final ActionEvent event) -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
+        // DialogWrapper handles ESC key automatically
 
         init();
     }

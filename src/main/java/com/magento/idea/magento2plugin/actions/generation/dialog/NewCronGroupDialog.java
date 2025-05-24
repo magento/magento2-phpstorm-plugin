@@ -81,17 +81,9 @@ public class NewCronGroupDialog extends AbstractDialog {
 
         setTitle(NewCronGroupAction.ACTION_DESCRIPTION);
 
-        buttonOK.addActionListener(event -> onOK());
-        buttonCancel.addActionListener(event -> onCancel());
+        // DialogWrapper handles button actions and ESC key automatically
         addToggleListenersForCronGroupOptions();
         addDefaultValuesToCronGroupOptions();
-
-        // call onCancel() on ESCAPE
-        contentPanel.registerKeyboardAction(
-                event -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
 
         init();
     }

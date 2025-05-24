@@ -74,15 +74,7 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
 
         setTitle(NewSetupDataPatchAction.ACTION_DESCRIPTION);
 
-        buttonOK.addActionListener(event -> onOK());
-        buttonCancel.addActionListener(event -> onCancel());
-
-        // call onCancel() on ESCAPE
-        contentPanel.registerKeyboardAction(
-                event -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
+        // DialogWrapper handles button actions and ESC key automatically
 
         init();
     }

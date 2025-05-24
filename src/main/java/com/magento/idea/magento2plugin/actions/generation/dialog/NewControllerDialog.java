@@ -92,15 +92,7 @@ public class NewControllerDialog extends AbstractDialog {
         controllerAreaSelect.addActionListener(e -> suggestControllerDirectory());
         controllerAreaSelect.addActionListener(e -> toggleAdminPanel());
         inheritClass.addActionListener(e -> toggleAdminPanel());
-        buttonOK.addActionListener(e -> onOK());
-        buttonCancel.addActionListener(e -> onCancel());
-
-        // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(
-                (final ActionEvent event) -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
+        // DialogWrapper handles button actions and ESC key automatically
 
         init();
     }

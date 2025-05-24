@@ -90,15 +90,7 @@ public class NewWebApiDeclarationDialog extends AbstractDialog {
 
         setTitle(NewWebApiDeclarationAction.ACTION_DESCRIPTION);
 
-        buttonOK.addActionListener(event -> onOK());
-        buttonCancel.addActionListener(event -> onCancel());
-
-        // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(
-                event -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
+        // DialogWrapper handles button actions and ESC key automatically
 
         fillPredefinedValuesAndDisableInputs();
 
