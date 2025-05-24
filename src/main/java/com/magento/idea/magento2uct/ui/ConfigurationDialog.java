@@ -35,6 +35,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveImports"})
 public class ConfigurationDialog extends AbstractDialog {
@@ -70,13 +71,11 @@ public class ConfigurationDialog extends AbstractDialog {
      * @param project Project
      */
     public ConfigurationDialog(final @NotNull Project project) {
-        super();
+        super(project);
 
         this.project = project;
         settingsService = UctSettingsService.getInstance(project);
 
-        setContentPane(contentPanel);
-        setModal(true);
         setTitle(ConfigureUctAction.ACTION_NAME);
         getRootPane().setDefaultButton(buttonOk);
 
@@ -84,15 +83,6 @@ public class ConfigurationDialog extends AbstractDialog {
                 refreshAdditionalFields(hasAdditionalPath.isSelected()));
         buttonOk.addActionListener(event -> onOK());
         buttonCancel.addActionListener(event -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
 
         // call onCancel() on ESCAPE
         contentPanel.registerKeyboardAction(
@@ -122,7 +112,18 @@ public class ConfigurationDialog extends AbstractDialog {
         final ConfigurationDialog dialog = new ConfigurationDialog(project);
         dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPanel;
     }
 
     /**

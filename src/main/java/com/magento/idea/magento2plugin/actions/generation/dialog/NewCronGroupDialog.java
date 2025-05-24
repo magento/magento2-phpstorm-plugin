@@ -31,6 +31,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
@@ -74,27 +75,16 @@ public class NewCronGroupDialog extends AbstractDialog {
      * @param directory Directory
      */
     public NewCronGroupDialog(final Project project, final PsiDirectory directory) {
-        super();
+        super(project);
         this.project = project;
-        setContentPane(contentPanel);
-        setModal(true);
-        setTitle(NewCronGroupAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
+
+        setTitle(NewCronGroupAction.ACTION_DESCRIPTION);
 
         buttonOK.addActionListener(event -> onOK());
         buttonCancel.addActionListener(event -> onCancel());
         addToggleListenersForCronGroupOptions();
         addDefaultValuesToCronGroupOptions();
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
 
         // call onCancel() on ESCAPE
         contentPanel.registerKeyboardAction(
@@ -103,9 +93,7 @@ public class NewCronGroupDialog extends AbstractDialog {
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
 
-        addComponentListener(
-                new FocusOnAFieldListener(() -> cronGroupName.requestFocusInWindow())
-        );
+        init();
     }
 
     /**
@@ -136,9 +124,19 @@ public class NewCronGroupDialog extends AbstractDialog {
      */
     public static void open(final Project project, final PsiDirectory directory) {
         final NewCronGroupDialog dialog = new NewCronGroupDialog(project, directory);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPanel;
     }
 
     protected void onWriteActionOK() {

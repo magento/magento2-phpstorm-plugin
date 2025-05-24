@@ -13,6 +13,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.xml.DiArrayValueD
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.magento.packages.DiArgumentType;
 import com.magento.idea.magento2plugin.ui.table.TableGroupWrapper;
+import org.jetbrains.annotations.Nullable;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -61,27 +62,15 @@ public class GatherArrayValuesDialog extends AbstractDialog {
             final @NotNull Project project,
             final DiArrayValueData arrayValueData
     ) {
-        super();
+        super(project);
 
         this.project = project;
         this.arrayValueData = arrayValueData;
 
-        setContentPane(contentPane);
-        setModal(true);
         setTitle(InjectConstructorArgumentAction.GATHER_ARRAY_VALUES_ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
 
         buttonOK.addActionListener(event -> onOK());
         buttonCancel.addActionListener(event -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
@@ -93,6 +82,8 @@ public class GatherArrayValuesDialog extends AbstractDialog {
         initTable();
         itemsTableErrorMessage.setVisible(false);
         itemsTableErrorMessage.setText("");
+
+        init();
     }
 
     /**
@@ -106,9 +97,19 @@ public class GatherArrayValuesDialog extends AbstractDialog {
             final DiArrayValueData arrayValueData
     ) {
         final GatherArrayValuesDialog dialog = new GatherArrayValuesDialog(project, arrayValueData);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     /**

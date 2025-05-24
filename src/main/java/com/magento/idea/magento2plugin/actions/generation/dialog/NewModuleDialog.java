@@ -50,6 +50,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
@@ -130,17 +131,14 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
             final @NotNull Project project,
             final @NotNull PsiDirectory initialBaseDir
     ) {
-        super();
+        super(project);
 
         this.project = project;
         this.initialBaseDir = initialBaseDir;
         this.camelCaseToHyphen = CamelCaseToHyphen.getInstance();
         this.moduleIndex = new ModuleIndex(project);
         detectPackageName(initialBaseDir);
-        setContentPane(contentPane);
-        setModal(true);
         setTitle(NewModuleAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
         setLicenses();
         setModuleDependencies();
 
@@ -150,27 +148,13 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
         buttonOK.addActionListener((final ActionEvent event) -> onOK());
         buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
 
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
-
         contentPane.registerKeyboardAction(
                 (final ActionEvent event) -> onCancel(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
 
-        addComponentListener(new FocusOnAFieldListener(() -> {
-            if (packageName.isVisible()) {
-                packageName.requestFocusInWindow();
-            } else {
-                moduleName.requestFocusInWindow();
-            }
-        }));
+        init();
     }
 
     private void detectPackageName(final @NotNull PsiDirectory initialBaseDir) {
@@ -361,9 +345,19 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
             final @NotNull PsiDirectory initialBaseDir
     ) {
         final NewModuleDialog dialog = new NewModuleDialog(project, initialBaseDir);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     @NotNull

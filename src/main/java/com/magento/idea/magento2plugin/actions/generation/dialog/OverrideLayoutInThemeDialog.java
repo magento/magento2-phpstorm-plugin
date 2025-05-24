@@ -31,6 +31,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class OverrideLayoutInThemeDialog extends AbstractDialog {
 
@@ -59,15 +60,12 @@ public class OverrideLayoutInThemeDialog extends AbstractDialog {
             final @NotNull Project project,
             final @NotNull PsiFile psiFile
     ) {
-        super();
+        super(project);
 
         this.project = project;
         this.psiFile = psiFile;
 
-        setContentPane(contentPane);
-        setModal(true);
         setTitle(OverrideLayoutInThemeAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
         fillThemeOptions();
 
         buttonOK.addActionListener((final ActionEvent event) -> onOK());
@@ -76,21 +74,13 @@ public class OverrideLayoutInThemeDialog extends AbstractDialog {
         radioButtonOverride.addActionListener((final ActionEvent event) -> onOverride());
         radioButtonExtend.addActionListener((final ActionEvent event) -> onExtend());
 
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
-
         contentPane.registerKeyboardAction(
                 (final ActionEvent event) -> onCancel(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
 
-        addComponentListener(new FocusOnAFieldListener(() -> theme.requestFocusInWindow()));
+        init();
     }
 
     /**
@@ -102,9 +92,19 @@ public class OverrideLayoutInThemeDialog extends AbstractDialog {
     public static void open(final @NotNull Project project, final @NotNull PsiFile psiFile) {
         final OverrideLayoutInThemeDialog dialog =
                 new OverrideLayoutInThemeDialog(project, psiFile);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     protected void onWriteActionOK() {

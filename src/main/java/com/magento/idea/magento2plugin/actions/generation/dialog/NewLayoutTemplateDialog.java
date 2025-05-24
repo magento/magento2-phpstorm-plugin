@@ -30,6 +30,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
@@ -72,37 +73,15 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
      * @param directory The PsiDirectory where the new layout will be created.
      */
     public NewLayoutTemplateDialog(final Project project, final PsiDirectory directory) {
-        super();
+        super(project);
 
         this.project = project;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
         this.directory = directory;
 
-        setContentPane(contentPane);
-        setModal(false);
         setTitle(NewLayoutXmlAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
-
-        buttonOK.addActionListener(event -> onOK());
-        buttonCancel.addActionListener(event -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
-
-        contentPane.registerKeyboardAction(
-                event -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
-
-        addComponentListener(new FocusOnAFieldListener(this::run));
         autoSelectCurrentArea();
+        init();
     }
 
     /**
@@ -113,9 +92,19 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
      */
     public static void open(final Project project, final PsiDirectory directory) {
         final NewLayoutTemplateDialog dialog = new NewLayoutTemplateDialog(project, directory);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     /**

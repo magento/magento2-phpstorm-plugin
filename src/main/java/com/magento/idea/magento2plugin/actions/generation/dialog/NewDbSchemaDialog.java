@@ -43,6 +43,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveImports"})
 public class NewDbSchemaDialog extends AbstractDialog {
@@ -98,36 +99,26 @@ public class NewDbSchemaDialog extends AbstractDialog {
             final @NotNull Project project,
             final @NotNull PsiDirectory directory
     ) {
-        super();
+        super(project);
         this.project = project;
         moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
         setTitle(NewDbSchemaAction.ACTION_DESCRIPTION);
-        setContentPane(contentPanel);
-        setModal(true);
-        getRootPane().setDefaultButton(buttonOK);
-        buttonOK.addActionListener(e -> onOK());
-        buttonCancel.addActionListener(e -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
-
-        // call onCancel() on ESCAPE
-        contentPanel.registerKeyboardAction(
-                event -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
         fillComboBoxes();
         initializeColumnsUiComponentGroup();
 
-        addComponentListener(new FocusOnAFieldListener(() -> tableName.requestFocusInWindow()));
+        init();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPanel;
     }
 
     /**
@@ -165,9 +156,8 @@ public class NewDbSchemaDialog extends AbstractDialog {
             final @NotNull PsiDirectory directory
     ) {
         final NewDbSchemaDialog dialog = new NewDbSchemaDialog(project, directory);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
     }
 
     /**

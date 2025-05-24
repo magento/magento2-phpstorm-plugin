@@ -72,6 +72,7 @@ import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
@@ -218,29 +219,17 @@ public class NewUiComponentFormDialog extends AbstractDialog {
             final @NotNull Project project,
             final @NotNull PsiDirectory directory
     ) {
-        super();
+        super(project);
         this.project = project;
         formButtonsValidator = new FormButtonsValidator(this);
         formFieldsetsValidator = new FormFieldsetsValidator(this);
         formFieldsValidator = new FormFieldsValidator(this);
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
-        setContentPane(contentPane);
-        setModal(false);
         setTitle(NewUiComponentFormAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
 
         buttonOK.addActionListener(e -> onOK());
         buttonCancel.addActionListener(e -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
 
         initButtonsTable();
         initFieldSetsTable();
@@ -248,12 +237,7 @@ public class NewUiComponentFormDialog extends AbstractDialog {
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(final ActionEvent event) {
-                        onCancel();
-                    }
-                },
+                e -> onCancel(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
@@ -262,7 +246,7 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         formAreaSelect.setEnabled(false);
         acl.setText(getModuleName() + "::manage");
 
-        addComponentListener(new FocusOnAFieldListener(() -> formName.requestFocusInWindow()));
+        init();
     }
 
     protected void initButtonsTable() {
@@ -418,9 +402,19 @@ public class NewUiComponentFormDialog extends AbstractDialog {
             final @NotNull PsiDirectory directory
     ) {
         final NewUiComponentFormDialog dialog = new NewUiComponentFormDialog(project, directory);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     protected void onWriteActionOK() {

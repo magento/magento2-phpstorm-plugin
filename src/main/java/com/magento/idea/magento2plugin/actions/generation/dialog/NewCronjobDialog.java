@@ -42,6 +42,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
         "PMD.UncommentedEmptyMethodBody",
@@ -129,14 +130,11 @@ public class NewCronjobDialog extends AbstractDialog {
      * @param directory Directory
      */
     public NewCronjobDialog(final @NotNull Project project, final @NotNull PsiDirectory directory) {
-        super();
+        super(project);
         this.project = project;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
         this.camelCaseToSnakeCase = CamelCaseToSnakeCase.getInstance();
 
-        setContentPane(contentPane);
-        setModal(true);
-        getRootPane().setDefaultButton(buttonOK);
         setTitle(NewCronjobAction.ACTION_DESCRIPTION);
         configPathField.setEditable(false);
 
@@ -187,15 +185,6 @@ public class NewCronjobDialog extends AbstractDialog {
             }
         });
 
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
-
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
                 (final ActionEvent event) -> onCancel(),
@@ -203,9 +192,7 @@ public class NewCronjobDialog extends AbstractDialog {
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
 
-        addComponentListener(
-                new FocusOnAFieldListener(() -> cronjobClassNameField.requestFocusInWindow())
-        );
+        init();
     }
 
     /**
@@ -216,9 +203,19 @@ public class NewCronjobDialog extends AbstractDialog {
      */
     public static void open(final Project project, final PsiDirectory directory) {
         final NewCronjobDialog dialog = new NewCronjobDialog(project, directory);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     public String getCronjobClassName() {

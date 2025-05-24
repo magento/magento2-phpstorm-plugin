@@ -44,6 +44,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
         "PMD.GodClass",
@@ -61,7 +62,7 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
 
     protected abstract EavEntityDataInterface getEavEntityData();
 
-    protected abstract JPanel getContentPanel();
+    protected abstract JPanel getDialogPanel();
 
     protected abstract JButton getButtonOk();
 
@@ -113,12 +114,14 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
             final PsiDirectory directory,
             final String actionName
     ) {
-        super();
+        super(project);
 
         this.project = project;
         this.actionName = actionName;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
         this.sourceModelData = new SourceModelData();
+
+        init();
     }
 
     /**
@@ -126,10 +129,9 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
      */
     public void open() {
         this.initBaseDialogState();
-        pack();
-        centerDialog(this);
         setTitle(actionName);
-        setVisible(true);
+        centerDialog(this);
+        showDialog();
     }
 
     protected void initBaseDialogState() {
@@ -185,9 +187,7 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
     }
 
     protected void setPanelConfiguration() {
-        setContentPane(this.getContentPanel());
-        setModal(this.isModalWindow());
-        getRootPane().setDefaultButton(this.getButtonOk());
+        // DialogWrapper handles panel configuration
     }
 
     protected boolean isModalWindow() {
@@ -305,21 +305,22 @@ public abstract class  EavAttributeDialog extends AbstractDialog {
     ) {}
 
     protected void addCancelActionForWindow() {
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
+        // DialogWrapper handles window close actions
     }
 
     protected void addCancelActionForEsc() {
-        getContentPanel().registerKeyboardAction(
-                event -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
+        // DialogWrapper handles ESC key actions
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return getDialogPanel();
     }
 
     protected void setAttributeInputComboBoxAction(

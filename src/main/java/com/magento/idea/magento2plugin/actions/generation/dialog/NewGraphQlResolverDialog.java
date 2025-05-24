@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class NewGraphQlResolverDialog extends AbstractDialog {
 
@@ -67,29 +68,17 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
             final @NotNull Project project,
             final @NotNull PsiDirectory directory
     ) {
-        super();
+        super(project);
 
         this.project = project;
         this.baseDir = directory;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
-        setContentPane(contentPanel);
-        setModal(true);
         setTitle(NewGraphQlResolverAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
         suggestGraphQlResolverDirectory();
 
         buttonOK.addActionListener((final ActionEvent event) -> onOK());
         buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
 
         // call onCancel() on ESCAPE
         contentPanel.registerKeyboardAction(
@@ -98,9 +87,7 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
 
-        addComponentListener(
-                new FocusOnAFieldListener(() -> graphQlResolverClassName.requestFocusInWindow())
-        );
+        init();
     }
 
     /**
@@ -111,14 +98,24 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
      */
     public static void open(final Project project, final PsiDirectory directory) {
         final NewGraphQlResolverDialog dialog = new NewGraphQlResolverDialog(project, directory);
-        dialog.pack();
         dialog.centerDialog(dialog);
 
         // TODO: It's a workaround. Proper fix should be done as:
         // https://github.com/magento/magento2-phpstorm-plugin/issues/2080
         try (var token = com.intellij.concurrency.ThreadContext.resetThreadContext()) {
-            dialog.setVisible(true);
+            dialog.showDialog();
         }
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPanel;
     }
 
     protected void onWriteActionOK() {

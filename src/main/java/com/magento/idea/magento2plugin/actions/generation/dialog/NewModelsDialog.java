@@ -33,6 +33,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("PMD.TooManyFields")
 public class NewModelsDialog extends AbstractDialog {
@@ -107,25 +108,13 @@ public class NewModelsDialog extends AbstractDialog {
      * @param directory PsiDirectory
      */
     public NewModelsDialog(final Project project, final PsiDirectory directory) {
-        super();
+        super(project);
         this.project = project;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
-        setContentPane(contentPane);
-        setModal(true);
         setTitle(NewModelsAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
         buttonOK.addActionListener(e -> onOK());
         buttonCancel.addActionListener(e -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
@@ -141,7 +130,7 @@ public class NewModelsDialog extends AbstractDialog {
             }
         });
 
-        addComponentListener(new FocusOnAFieldListener(() -> modelName.requestFocusInWindow()));
+        init();
     }
 
     /**
@@ -164,9 +153,19 @@ public class NewModelsDialog extends AbstractDialog {
             final @NotNull PsiDirectory directory
     ) {
         final NewModelsDialog dialog = new NewModelsDialog(project, directory);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     /**

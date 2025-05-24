@@ -46,6 +46,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
@@ -170,15 +171,12 @@ public class NewMessageQueueDialog extends AbstractDialog {
             final @NotNull Project project,
             final @NotNull PsiDirectory directory
     ) {
-        super();
+        super(project);
 
         this.project = project;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
-        setContentPane(contentPanel);
-        setModal(false);
         setTitle(NewMessageQueueAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
 
         for (final String connection : MessageQueueConnections.getList()) {
             connectionName.addItem(connection);
@@ -186,15 +184,6 @@ public class NewMessageQueueDialog extends AbstractDialog {
 
         buttonOK.addActionListener((final ActionEvent event) -> onOK());
         buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
-
-        // call onCancel() on dialog close
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
 
         // call onCancel() on ESCAPE KEY press
         contentPanel.registerKeyboardAction(
@@ -218,7 +207,7 @@ public class NewMessageQueueDialog extends AbstractDialog {
 
         connectionName.addActionListener(e -> toggleConsumer());
 
-        addComponentListener(new FocusOnAFieldListener(() -> topicName.requestFocusInWindow()));
+        init();
     }
 
     private void toggleConsumer() {
@@ -250,9 +239,19 @@ public class NewMessageQueueDialog extends AbstractDialog {
             final @NotNull PsiDirectory directory
     ) {
         final NewMessageQueueDialog dialog = new NewMessageQueueDialog(project, directory);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPanel;
     }
 
     protected void onWriteActionOK() {

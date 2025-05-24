@@ -25,6 +25,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ReindexDialog extends AbstractDialog {
 
@@ -49,27 +50,16 @@ public class ReindexDialog extends AbstractDialog {
             final @NotNull Project project,
             final @NotNull PsiDirectory directory
     ) {
-        super();
+        super(project);
 
         this.project = project;
         this.directory = directory;
 
-        setContentPane(contentPanel);
-        setModal(true);
         setTitle(ReindexVersionedIndexesAction.ACTION_NAME);
         getRootPane().setDefaultButton(buttonOk);
 
         buttonOk.addActionListener(event -> onOK());
         buttonCancel.addActionListener(event -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
 
         // call onCancel() on ESCAPE
         contentPanel.registerKeyboardAction(
@@ -95,7 +85,18 @@ public class ReindexDialog extends AbstractDialog {
         );
         dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPanel;
     }
 
     /**

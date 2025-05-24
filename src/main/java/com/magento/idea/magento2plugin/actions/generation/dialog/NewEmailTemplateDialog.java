@@ -33,6 +33,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import org.jetbrains.annotations.Nullable;
 
 public class NewEmailTemplateDialog extends AbstractDialog {
 
@@ -78,27 +79,15 @@ public class NewEmailTemplateDialog extends AbstractDialog {
      * @param directory Directory
      */
     public NewEmailTemplateDialog(final Project project, final PsiDirectory directory) {
-        super();
-        setContentPane(contentPane);
-        setModal(true);
-        setTitle(NewEmailTemplateAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
+        super(project);
         this.project = project;
         this.validator = new NewEmailTemplateDialogValidator(project);
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
+        setTitle(NewEmailTemplateAction.ACTION_DESCRIPTION);
+
         buttonOK.addActionListener(e -> onOK());
         buttonCancel.addActionListener(e -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-
-            @Override
-            public void windowClosing(final WindowEvent windowEvent) {
-                onCancel();
-            }
-        });
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
@@ -107,7 +96,7 @@ public class NewEmailTemplateDialog extends AbstractDialog {
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
 
-        addComponentListener(new FocusOnAFieldListener(() -> identifier.requestFocusInWindow()));
+        init();
     }
 
     /**
@@ -203,9 +192,19 @@ public class NewEmailTemplateDialog extends AbstractDialog {
      */
     public static void open(final Project project, final PsiDirectory directory) {
         final NewEmailTemplateDialog dialog = new NewEmailTemplateDialog(project, directory);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     private String getModuleName() {

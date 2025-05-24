@@ -42,6 +42,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
         "PMD.UnusedPrivateMethod",
@@ -96,7 +97,7 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
             final @NotNull Project project,
             final PhpClass targetClass
     ) {
-        super();
+        super(project);
 
         this.project = project;
         this.targetClass = targetClass;
@@ -104,10 +105,7 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
         this.commonBundle = new CommonBundle();
         this.isInterface = false;
 
-        setContentPane(contentPane);
-        setModal(true);
         setTitle(OverrideClassByAPreferenceAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
         fillTargetAreaOptions();
         if (targetClass.isFinal()) {
             inheritClass.setVisible(false);
@@ -122,23 +120,13 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
         buttonOK.addActionListener((final ActionEvent event) -> onOK());
         buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
 
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
-
         contentPane.registerKeyboardAction(
                 (final ActionEvent event) -> onCancel(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
 
-        addComponentListener(
-                new FocusOnAFieldListener(() -> preferenceModule.requestFocusInWindow())
-        );
+        init();
     }
 
     private void suggestPreferenceDirectory(final PhpClass targetClass) {
@@ -232,9 +220,19 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
     public static void open(final @NotNull Project project, final PhpClass targetClass) {
         final OverrideClassByAPreferenceDialog dialog =
                 new OverrideClassByAPreferenceDialog(project, targetClass);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     private void createUIComponents() {

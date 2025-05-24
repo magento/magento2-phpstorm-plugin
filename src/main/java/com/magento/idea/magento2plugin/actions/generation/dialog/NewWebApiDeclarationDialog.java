@@ -20,6 +20,7 @@ import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.WebApiResource;
 import com.magento.idea.magento2plugin.util.magento.GetAclResourcesListUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+import org.jetbrains.annotations.Nullable;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -80,29 +81,17 @@ public class NewWebApiDeclarationDialog extends AbstractDialog {
             final @NotNull String classFqn,
             final @NotNull String methodName
     ) {
-        super();
+        super(project);
 
         this.project = project;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
         this.classFqn = classFqn;
         this.methodName = methodName;
 
-        setContentPane(contentPane);
-        setModal(true);
         setTitle(NewWebApiDeclarationAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
 
         buttonOK.addActionListener(event -> onOK());
         buttonCancel.addActionListener(event -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
@@ -113,7 +102,7 @@ public class NewWebApiDeclarationDialog extends AbstractDialog {
 
         fillPredefinedValuesAndDisableInputs();
 
-        addComponentListener(new FocusOnAFieldListener(() -> routeUrl.requestFocusInWindow()));
+        init();
     }
 
     /**
@@ -132,9 +121,19 @@ public class NewWebApiDeclarationDialog extends AbstractDialog {
     ) {
         final NewWebApiDeclarationDialog dialog =
                 new NewWebApiDeclarationDialog(project, directory, classFqn, methodName);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     /**

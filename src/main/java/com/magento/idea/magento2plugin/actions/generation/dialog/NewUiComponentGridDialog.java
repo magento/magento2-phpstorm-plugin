@@ -70,6 +70,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
@@ -212,29 +213,17 @@ public class NewUiComponentGridDialog extends AbstractDialog {
             final @NotNull Project project,
             final @NotNull PsiDirectory directory
     ) {
-        super();
+        super(project);
         this.project = project;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
-        setContentPane(contentPanel);
-        setModal(false);
         setTitle(NewUiComponentGridAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
 
         addActionListeners();
         setDefaultValues();
 
         buttonOK.addActionListener(event -> onOK());
         buttonCancel.addActionListener(event -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
 
         // call onCancel() on ESCAPE
         contentPanel.registerKeyboardAction(
@@ -250,9 +239,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         dataProviderParentDirectory.setVisible(false);
         dataProviderParentDirectoryLabel.setVisible(false);
 
-        addComponentListener(
-                new FocusOnAFieldListener(() -> uiComponentName.requestFocusInWindow())
-        );
+        init();
     }
 
     /**
@@ -266,9 +253,19 @@ public class NewUiComponentGridDialog extends AbstractDialog {
             final @NotNull PsiDirectory directory
     ) {
         final NewUiComponentGridDialog dialog = new NewUiComponentGridDialog(project, directory);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPanel;
     }
 
     /**

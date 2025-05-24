@@ -114,7 +114,7 @@ public class NewCategoryEavAttributeDialog extends EavAttributeDialog {
     }
 
     @Override
-    protected JPanel getContentPanel() {
+    protected JPanel getDialogPanel() {
         return contentPanel;
     }
 

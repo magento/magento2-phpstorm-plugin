@@ -52,6 +52,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
@@ -107,29 +108,17 @@ public class NewObserverDialog extends AbstractDialog {
             final String modulePackage,
             final String moduleName
     ) {
-        super();
+        super(project);
 
         this.project = project;
         this.baseDir = directory;
         this.modulePackage = modulePackage;
         this.moduleName = moduleName;
 
-        setContentPane(contentPanel);
-        setModal(false);
         setTitle(NewObserverAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
 
         buttonOK.addActionListener((final ActionEvent event) -> onOK());
         buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
 
         // call onCancel() on ESCAPE
         contentPanel.registerKeyboardAction(
@@ -146,9 +135,7 @@ public class NewObserverDialog extends AbstractDialog {
             }
         });
 
-        addComponentListener(
-                new FocusOnAFieldListener(() -> className.requestFocusInWindow())
-        );
+        init();
     }
 
     /**
@@ -169,9 +156,19 @@ public class NewObserverDialog extends AbstractDialog {
                 modulePackage,
                 moduleName
         );
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPanel;
     }
 
     private  String getModuleName() {

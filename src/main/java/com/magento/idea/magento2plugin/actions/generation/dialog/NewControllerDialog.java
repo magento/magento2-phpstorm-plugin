@@ -37,6 +37,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
@@ -82,29 +83,17 @@ public class NewControllerDialog extends AbstractDialog {
      * @param directory PsiDirectory
      */
     public NewControllerDialog(final Project project, final PsiDirectory directory) {
-        super();
+        super(project);
         this.project = project;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
-        setContentPane(contentPane);
-        setModal(true);
         setTitle(NewControllerAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
         suggestControllerDirectory();
         controllerAreaSelect.addActionListener(e -> suggestControllerDirectory());
         controllerAreaSelect.addActionListener(e -> toggleAdminPanel());
         inheritClass.addActionListener(e -> toggleAdminPanel());
         buttonOK.addActionListener(e -> onOK());
         buttonCancel.addActionListener(e -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
@@ -113,9 +102,7 @@ public class NewControllerDialog extends AbstractDialog {
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
 
-        addComponentListener(
-                new FocusOnAFieldListener(() -> controllerAreaSelect.requestFocusInWindow())
-        );
+        init();
     }
 
     private String getModuleName() {
@@ -193,9 +180,19 @@ public class NewControllerDialog extends AbstractDialog {
      */
     public static void open(final Project project, final PsiDirectory directory) {
         final NewControllerDialog dialog = new NewControllerDialog(project, directory);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     protected void onWriteActionOK() {

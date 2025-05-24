@@ -85,6 +85,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.table.DefaultTableModel;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
@@ -227,35 +228,17 @@ public class NewEntityDialog extends AbstractDialog {
      * @param directory PsiDirectory
      */
     public NewEntityDialog(final @NotNull Project project, final PsiDirectory directory) {
-        super();
+        super(project);
 
         this.project = project;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
         this.properties = new ArrayList<>();
 
-        setContentPane(contentPane);
-        setModal(false);
         setTitle(NewEntityAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
 
         onOkActionFired = new ProcessWorker.InProgressFlag(false);
         buttonOK.addActionListener(this::generateNewEntityFiles);
         buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-
-            @SuppressWarnings("PMD.AccessorMethodGeneration")
-            @Override
-            public void windowOpened(final WindowEvent event) {
-                entityName.requestFocus();
-            }
-        });
 
         initializeComboboxSources();
         initPropertiesTable();
@@ -289,6 +272,8 @@ public class NewEntityDialog extends AbstractDialog {
         registerTabbedPane(tabbedPane1);
 
         sortOrder.setText(DEFAULT_MENU_SORT_ORDER);
+
+        init();
     }
 
     /**
@@ -299,9 +284,19 @@ public class NewEntityDialog extends AbstractDialog {
      */
     public static void open(final Project project, final PsiDirectory directory) {
         final NewEntityDialog dialog = new NewEntityDialog(project, directory);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     /**
@@ -394,8 +389,6 @@ public class NewEntityDialog extends AbstractDialog {
      * Perform code generation using input data.
      */
     protected void onWriteActionOK() {
-        setCursor(new Cursor(Cursor.WAIT_CURSOR));
-
         formatProperties();
 
         final NewEntityDialogData dialogData = getNewEntityDialogData();
@@ -435,7 +428,6 @@ public class NewEntityDialog extends AbstractDialog {
      * Release dialog buttons and hide.
      */
     private void releaseDialogAfterGeneration() {
-        setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         buttonCancel.setEnabled(true);
         buttonOK.setEnabled(true);
 

@@ -36,6 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
@@ -93,27 +94,16 @@ public class CreateAnObserverDialog extends AbstractDialog {
      * @param targetEvent Action Event
      */
     public CreateAnObserverDialog(@NotNull final Project project, final String targetEvent) {
-        super();
+        super(project);
 
         this.project = project;
         this.targetEvent = targetEvent;
 
-        setContentPane(contentPane);
-        setModal(true);
         setTitle(CreateAnObserverAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
         fillTargetAreaOptions();
 
         buttonOK.addActionListener(e -> onOK());
         buttonCancel.addActionListener(e -> onCancel());
-
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
 
         contentPane.registerKeyboardAction(
                 e -> onCancel(),
@@ -121,7 +111,7 @@ public class CreateAnObserverDialog extends AbstractDialog {
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
 
-        addComponentListener(new FocusOnAFieldListener(() -> observerName.requestFocusInWindow()));
+        init();
     }
 
     /**
@@ -132,9 +122,19 @@ public class CreateAnObserverDialog extends AbstractDialog {
      */
     public static void open(@NotNull final Project project, final String targetEvent) {
         final CreateAnObserverDialog dialog = new CreateAnObserverDialog(project, targetEvent);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     /**
@@ -215,4 +215,3 @@ public class CreateAnObserverDialog extends AbstractDialog {
         return getNamespace().concat(Package.fqnSeparator).concat(getObserverClassName());
     }
 }
-

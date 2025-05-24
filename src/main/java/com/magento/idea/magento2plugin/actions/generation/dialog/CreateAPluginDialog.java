@@ -42,6 +42,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
@@ -122,15 +123,12 @@ public class CreateAPluginDialog extends AbstractDialog {
             final Method targetMethod,
             final PhpClass targetClass
     ) {
-        super();
+        super(project);
         this.project = project;
         this.targetMethod = targetMethod;
         this.targetClass = targetClass;
 
-        setContentPane(contentPane);
-        setModal(true);
         setTitle(CreateAPluginAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
         fillPluginTypeOptions();
         fillTargetAreaOptions();
 
@@ -138,24 +136,18 @@ public class CreateAPluginDialog extends AbstractDialog {
             this.targetMethodLabel.setVisible(false);
         }
 
-        buttonOK.addActionListener((final ActionEvent event) -> onOK());
-        buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
+        init();
+    }
 
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
-
-        contentPane.registerKeyboardAction(
-                (final ActionEvent event) -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
-
-        addComponentListener(new FocusOnAFieldListener(() -> pluginModule.requestFocusInWindow()));
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     private void fillPluginTypeOptions() {
@@ -261,9 +253,8 @@ public class CreateAPluginDialog extends AbstractDialog {
                 targetMethod,
                 targetClass
         );
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
     }
 
     private void createUIComponents() {

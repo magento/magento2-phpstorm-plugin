@@ -31,6 +31,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import org.jetbrains.annotations.Nullable;
 
 public class NewViewModelDialog extends AbstractDialog {
 
@@ -71,29 +72,17 @@ public class NewViewModelDialog extends AbstractDialog {
      * @param directory PsiDirectory
      */
     public NewViewModelDialog(final Project project, final PsiDirectory directory) {
-        super();
+        super(project);
 
         this.project = project;
         this.baseDir = directory;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
-        setContentPane(contentPanel);
-        setModal(true);
         setTitle(NewViewModelAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
         suggestViewModelDirectory();
 
         buttonOK.addActionListener((final ActionEvent event) -> onOK());
         buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
 
         // call onCancel() on ESCAPE
         contentPanel.registerKeyboardAction(
@@ -102,9 +91,7 @@ public class NewViewModelDialog extends AbstractDialog {
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
 
-        addComponentListener(
-                new FocusOnAFieldListener(() -> viewModelName.requestFocusInWindow())
-        );
+        init();
     }
 
     /**
@@ -115,9 +102,19 @@ public class NewViewModelDialog extends AbstractDialog {
      */
     public static void open(final Project project, final PsiDirectory directory) {
         final NewViewModelDialog dialog = new NewViewModelDialog(project, directory);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPanel;
     }
 
     protected void onWriteActionOK() {
