@@ -54,8 +54,6 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
     private final PhpClass targetClass;
     private boolean isInterface;
     private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
     private final CommonBundle commonBundle;
     private final ValidatorBundle validatorBundle;
     private JLabel inheritClassLabel;
@@ -116,9 +114,6 @@ public class OverrideClassByAPreferenceDialog extends AbstractDialog { //NOPMD
         }
         suggestPreferenceClassName(targetClass);
         suggestPreferenceDirectory(targetClass);
-
-        buttonOK.addActionListener((final ActionEvent event) -> onOK());
-        buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
 
         contentPane.registerKeyboardAction(
                 (final ActionEvent event) -> onCancel(),

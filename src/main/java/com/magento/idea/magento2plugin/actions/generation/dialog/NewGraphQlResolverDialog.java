@@ -99,12 +99,7 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
     public static void open(final Project project, final PsiDirectory directory) {
         final NewGraphQlResolverDialog dialog = new NewGraphQlResolverDialog(project, directory);
         dialog.centerDialog(dialog);
-
-        // TODO: It's a workaround. Proper fix should be done as:
-        // https://github.com/magento/magento2-phpstorm-plugin/issues/2080
-        try (var token = com.intellij.concurrency.ThreadContext.resetThreadContext()) {
-            dialog.showDialog();
-        }
+        dialog.showDialog();
     }
 
     /**

@@ -31,7 +31,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class OverrideTemplateInThemeDialog extends AbstractDialog {
 
@@ -71,7 +70,7 @@ public class OverrideTemplateInThemeDialog extends AbstractDialog {
         } else if (OverridableFileType.isFileStyle(fileType)) {
             setTitle(OverrideTemplateInThemeAction.ACTION_STYLES_DESCRIPTION);
         }
-        getRootPane().setDefaultButton(buttonOK);
+
         fillThemeOptions();
 
         buttonOK.addActionListener((final ActionEvent event) -> onOK());
@@ -82,6 +81,18 @@ public class OverrideTemplateInThemeDialog extends AbstractDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
+
+        init();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     /**
@@ -93,22 +104,9 @@ public class OverrideTemplateInThemeDialog extends AbstractDialog {
     public static void open(final @NotNull Project project, final @NotNull PsiFile psiFile) {
         final OverrideTemplateInThemeDialog dialog =
                 new OverrideTemplateInThemeDialog(project, psiFile);
-        dialog.pack();
         dialog.centerDialog(dialog);
         dialog.showDialog();
     }
-
-    /**
-     * Create center panel.
-     *
-     * @return JComponent
-     */
-    @Nullable
-    @Override
-    protected JComponent createCenterPanel() {
-        return contentPane;
-    }
-
 
     protected void onWriteActionOK() {
         final OverrideTemplateInThemeGenerator overrideInThemeGenerator =

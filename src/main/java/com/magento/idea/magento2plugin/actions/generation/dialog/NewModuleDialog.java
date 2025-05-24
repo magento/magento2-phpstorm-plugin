@@ -109,8 +109,6 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
 
     private JPanel contentPane;
 
-    private JButton buttonOK;
-    private JButton buttonCancel;
     private JCheckBox moduleReadmeMdCheckbox;
 
     @NotNull
@@ -144,9 +142,6 @@ public class NewModuleDialog extends AbstractDialog implements ListSelectionList
 
         moduleLicenseCustom.setToolTipText("Custom License Name");
         moduleLicenseCustom.setText(Settings.getDefaultLicenseName(project));
-
-        buttonOK.addActionListener((final ActionEvent event) -> onOK());
-        buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
 
         contentPane.registerKeyboardAction(
                 (final ActionEvent event) -> onCancel(),

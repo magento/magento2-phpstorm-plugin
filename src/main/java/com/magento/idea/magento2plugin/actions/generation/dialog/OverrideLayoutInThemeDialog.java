@@ -40,8 +40,6 @@ public class OverrideLayoutInThemeDialog extends AbstractDialog {
     private final @NotNull Project project;
     private final PsiFile psiFile;
     private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
     private JLabel selectTheme; //NOPMD
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
@@ -67,9 +65,6 @@ public class OverrideLayoutInThemeDialog extends AbstractDialog {
 
         setTitle(OverrideLayoutInThemeAction.ACTION_DESCRIPTION);
         fillThemeOptions();
-
-        buttonOK.addActionListener((final ActionEvent event) -> onOK());
-        buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
 
         radioButtonOverride.addActionListener((final ActionEvent event) -> onOverride());
         radioButtonExtend.addActionListener((final ActionEvent event) -> onExtend());

@@ -35,7 +35,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveImports"})
 public class ConfigurationDialog extends AbstractDialog {
@@ -77,7 +76,6 @@ public class ConfigurationDialog extends AbstractDialog {
         settingsService = UctSettingsService.getInstance(project);
 
         setTitle(ConfigureUctAction.ACTION_NAME);
-        getRootPane().setDefaultButton(buttonOk);
 
         hasAdditionalPath.addActionListener(event ->
                 refreshAdditionalFields(hasAdditionalPath.isSelected()));
@@ -110,7 +108,6 @@ public class ConfigurationDialog extends AbstractDialog {
      */
     public static void open(final @NotNull Project project) {
         final ConfigurationDialog dialog = new ConfigurationDialog(project);
-        dialog.pack();
         dialog.centerDialog(dialog);
         dialog.showDialog();
     }
@@ -120,7 +117,6 @@ public class ConfigurationDialog extends AbstractDialog {
      *
      * @return JComponent
      */
-    @Nullable
     @Override
     protected JComponent createCenterPanel() {
         return contentPanel;

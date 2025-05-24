@@ -101,8 +101,6 @@ public class NewEntityDialog extends AbstractDialog {
     private JPanel propertiesPanel;
     private JTable propertyTable;
     private JButton addProperty;
-    private JButton buttonOK;
-    private JButton buttonCancel;
     private JPanel generalTable;
     private JCheckBox createUiComponent;
     private JLabel entityNameLabel;
@@ -237,8 +235,6 @@ public class NewEntityDialog extends AbstractDialog {
         setTitle(NewEntityAction.ACTION_DESCRIPTION);
 
         onOkActionFired = new ProcessWorker.InProgressFlag(false);
-        buttonOK.addActionListener(this::generateNewEntityFiles);
-        buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
 
         initializeComboboxSources();
         initPropertiesTable();
@@ -370,9 +366,6 @@ public class NewEntityDialog extends AbstractDialog {
     @SuppressWarnings("PMD.UnusedFormalParameter")
     private void generateNewEntityFiles(final @NotNull ActionEvent event) {
         if (!onOkActionFired.isInProgress()) {
-            buttonOK.setEnabled(false);
-            buttonCancel.setEnabled(false);
-
             if (propertyTable.isEditing()) {
                 propertyTable.getCellEditor().stopCellEditing();
             }
@@ -428,9 +421,6 @@ public class NewEntityDialog extends AbstractDialog {
      * Release dialog buttons and hide.
      */
     private void releaseDialogAfterGeneration() {
-        buttonCancel.setEnabled(true);
-        buttonOK.setEnabled(true);
-
         if (onOkActionFired.isFinished()) {
             exit();
         }

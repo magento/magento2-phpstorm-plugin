@@ -45,8 +45,6 @@ public class NewEmailTemplateDialog extends AbstractDialog {
     private final Project project;
     private final NewEmailTemplateDialogValidator validator;
     private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, EMAIL_TEMPLATE_ID})
@@ -85,9 +83,6 @@ public class NewEmailTemplateDialog extends AbstractDialog {
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
         setTitle(NewEmailTemplateAction.ACTION_DESCRIPTION);
-
-        buttonOK.addActionListener(e -> onOK());
-        buttonCancel.addActionListener(e -> onCancel());
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(

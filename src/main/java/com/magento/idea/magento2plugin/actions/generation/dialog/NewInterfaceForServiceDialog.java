@@ -49,8 +49,6 @@ public class NewInterfaceForServiceDialog extends AbstractDialog {
     private final List<Method> serviceClassMethods;
 
     private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
     private JButton chooseMethodsButton;
     private JTextField serviceClassField;
 
@@ -96,8 +94,6 @@ public class NewInterfaceForServiceDialog extends AbstractDialog {
 
         setTitle(NewWebApiInterfaceAction.ACTION_DESCRIPTION);
 
-        buttonOK.addActionListener(event -> onOK());
-        buttonCancel.addActionListener(event -> onCancel());
         chooseMethodsButton.addActionListener(event -> openMethodChooser());
 
         // call onCancel() on ESCAPE

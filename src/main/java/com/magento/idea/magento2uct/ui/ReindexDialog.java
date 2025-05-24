@@ -25,7 +25,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class ReindexDialog extends AbstractDialog {
 
@@ -56,7 +55,6 @@ public class ReindexDialog extends AbstractDialog {
         this.directory = directory;
 
         setTitle(ReindexVersionedIndexesAction.ACTION_NAME);
-        getRootPane().setDefaultButton(buttonOk);
 
         buttonOk.addActionListener(event -> onOK());
         buttonCancel.addActionListener(event -> onCancel());
@@ -67,6 +65,8 @@ public class ReindexDialog extends AbstractDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
+
+        init();
     }
 
     /**
@@ -83,7 +83,6 @@ public class ReindexDialog extends AbstractDialog {
                 project,
                 directory
         );
-        dialog.pack();
         dialog.centerDialog(dialog);
         dialog.showDialog();
     }
@@ -93,7 +92,6 @@ public class ReindexDialog extends AbstractDialog {
      *
      * @return JComponent
      */
-    @Nullable
     @Override
     protected JComponent createCenterPanel() {
         return contentPanel;

@@ -107,8 +107,6 @@ public class NewUiComponentFormDialog extends AbstractDialog {
     private final Project project;
     private final String moduleName;
     private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
     private FilteredComboBox formAreaSelect;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, "Name"})
@@ -227,9 +225,6 @@ public class NewUiComponentFormDialog extends AbstractDialog {
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
         setTitle(NewUiComponentFormAction.ACTION_DESCRIPTION);
-
-        buttonOK.addActionListener(e -> onOK());
-        buttonCancel.addActionListener(e -> onCancel());
 
         initButtonsTable();
         initFieldSetsTable();

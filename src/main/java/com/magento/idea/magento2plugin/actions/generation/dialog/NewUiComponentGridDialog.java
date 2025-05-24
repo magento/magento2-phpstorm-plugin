@@ -90,8 +90,6 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     private final String moduleName;
     private List<String> collectionOptions;
     private JPanel contentPanel;
-    private JButton buttonOK;
-    private JButton buttonCancel;
 
     private JCheckBox addToolBar;
     private JCheckBox addBookmarksCheckBox;
@@ -221,9 +219,6 @@ public class NewUiComponentGridDialog extends AbstractDialog {
 
         addActionListeners();
         setDefaultValues();
-
-        buttonOK.addActionListener(event -> onOK());
-        buttonCancel.addActionListener(event -> onCancel());
 
         // call onCancel() on ESCAPE
         contentPanel.registerKeyboardAction(

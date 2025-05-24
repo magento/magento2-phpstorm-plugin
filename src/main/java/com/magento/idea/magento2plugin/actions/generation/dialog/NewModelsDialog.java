@@ -41,8 +41,6 @@ public class NewModelsDialog extends AbstractDialog {
     private final String moduleName;
     private final Project project;
     private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
 
     private static final String ACTION_NAME = "Create Models";
     private static final String MODEL_NAME = "Model Name";
@@ -113,8 +111,6 @@ public class NewModelsDialog extends AbstractDialog {
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
         setTitle(NewModelsAction.ACTION_DESCRIPTION);
-        buttonOK.addActionListener(e -> onOK());
-        buttonCancel.addActionListener(e -> onCancel());
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
