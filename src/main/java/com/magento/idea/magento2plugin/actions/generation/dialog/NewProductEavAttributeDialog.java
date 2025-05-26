@@ -363,7 +363,10 @@ public class NewProductEavAttributeDialog extends AbstractDialog {
 
         codeTextField.getDocument()
                 .addDocumentListener(
-                        new DataPatchNameAdapter(dataPatchNameTextField, getEntityName())
+                        new DataPatchNameAdapter(
+                                dataPatchNameTextField,
+                                getEntityName()
+                        )
                 );
     }
 

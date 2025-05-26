@@ -70,7 +70,8 @@ public abstract class AbstractDialog extends DialogWrapper {
 
     /**
      * Center the dialog on the screen.
-     * Note: This is handled automatically by DialogWrapper, so this method is kept for compatibility.
+     * Note: This is handled automatically by DialogWrapper, 
+     * so this method is kept for compatibility.
      *
      * @param dialog AbstractDialog
      */

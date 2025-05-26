@@ -339,7 +339,10 @@ public class NewCustomerEavAttributeDialog extends AbstractDialog {
 
         codeTextField.getDocument()
                 .addDocumentListener(
-                        new DataPatchNameAdapter(dataPatchNameTextField, getEntityName())
+                        new DataPatchNameAdapter(
+                                dataPatchNameTextField,
+                                getEntityName()
+                        )
                 );
     }
 
@@ -591,9 +594,15 @@ public class NewCustomerEavAttributeDialog extends AbstractDialog {
         customerEntityData.setOptionsSortOrder(
                 getAttributeOptionsSortOrders(entityPropertiesTableGroupWrapper)
         );
-        customerEntityData.setUserDefined(userDefineCheckBox.isSelected());
-        customerEntityData.setUsedInGrid(useInGridCheckBox.isSelected());
-        customerEntityData.setVisibleInGrid(visibleInGridCheckBox.isSelected());
+        customerEntityData.setUserDefined(
+                userDefineCheckBox.isSelected()
+        );
+        customerEntityData.setUsedInGrid(
+                useInGridCheckBox.isSelected()
+        );
+        customerEntityData.setVisibleInGrid(
+                visibleInGridCheckBox.isSelected()
+        );
         customerEntityData.setFilterableInGrid(filterableInGridCheckBox.isSelected());
         customerEntityData.setSystem(systemAttributeCheckBox.isSelected());
         customerEntityData.setUseInAdminhtmlCustomerForm(

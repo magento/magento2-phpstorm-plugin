@@ -337,7 +337,10 @@ public class NewCategoryEavAttributeDialog extends AbstractDialog {
 
         codeTextField.getDocument()
                 .addDocumentListener(
-                        new DataPatchNameAdapter(dataPatchNameTextField, getEntityName())
+                        new DataPatchNameAdapter(
+                                dataPatchNameTextField,
+                                getEntityName()
+                        )
                 );
     }
 
