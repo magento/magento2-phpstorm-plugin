@@ -131,7 +131,8 @@ jobs:
           fi
 
           # Combine arrays and filter for .java files
-          COMBINED_FILES=$(echo "$MODIFIED_FILES $ADDED_FILES" | jq -s 'add | map(select(endswith(".java")))')
+          # Ensure proper JSON formatting by using jq to process each array separately
+          COMBINED_FILES=$(jq -n --argjson mod "$MODIFIED_FILES" --argjson add "$ADDED_FILES" '$mod + $add | map(select(endswith(".java")))')
           echo "JAVA_FILES=$COMBINED_FILES" >> $GITHUB_ENV
           echo "Filtered Java Files: $COMBINED_FILES"
       - name: Run Code Style Check
