@@ -13,11 +13,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.xml.DiArrayValueD
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.magento.packages.DiArgumentType;
 import com.magento.idea.magento2plugin.ui.table.TableGroupWrapper;
-import org.jetbrains.annotations.Nullable;
 import java.awt.Color;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -30,9 +26,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class GatherArrayValuesDialog extends AbstractDialog {
 

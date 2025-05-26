@@ -219,7 +219,7 @@ public class NewCategoryEavAttributeDialog extends AbstractDialog {
     /**
      * Get default columns values.
      *
-     * @return Map<String, String>
+     * @return Map of String to String
      */
     protected Map<String, String> getDefaultColumnsValues() {
         return new HashMap<>();
@@ -228,7 +228,7 @@ public class NewCategoryEavAttributeDialog extends AbstractDialog {
     /**
      * Get columns sources.
      *
-     * @return Map<String, List<String>>
+     * @return Map of String to List of String
      */
     protected Map<String, List<String>> getColumnsSources() {
         return new HashMap<>();
@@ -336,7 +336,9 @@ public class NewCategoryEavAttributeDialog extends AbstractDialog {
         }
 
         codeTextField.getDocument()
-                .addDocumentListener(new DataPatchNameAdapter(dataPatchNameTextField, getEntityName()));
+                .addDocumentListener(
+                        new DataPatchNameAdapter(dataPatchNameTextField, getEntityName())
+                );
     }
 
     /**
@@ -460,7 +462,7 @@ public class NewCategoryEavAttributeDialog extends AbstractDialog {
      * Get attribute options.
      *
      * @param entityPropertiesTableGroupWrapper TableGroupWrapper
-     * @return Map<Integer, String>
+     * @return Map of Integer to String
      */
     protected Map<Integer, String> getAttributeOptions(
             final TableGroupWrapper entityPropertiesTableGroupWrapper
@@ -474,7 +476,7 @@ public class NewCategoryEavAttributeDialog extends AbstractDialog {
      * Get attribute options sort orders.
      *
      * @param entityPropertiesTableGroupWrapper TableGroupWrapper
-     * @return Map<Integer, String>
+     * @return Map of Integer to String
      */
     protected Map<Integer, String> getAttributeOptionsSortOrders(
             final TableGroupWrapper entityPropertiesTableGroupWrapper
@@ -579,7 +581,9 @@ public class NewCategoryEavAttributeDialog extends AbstractDialog {
      * @param categoryEntityData CategoryEntityData
      * @return CategoryEntityData
      */
-    private CategoryEntityData populateCategoryEntityData(final CategoryEntityData categoryEntityData) {
+    private CategoryEntityData populateCategoryEntityData(
+            final CategoryEntityData categoryEntityData
+    ) {
         categoryEntityData.setModuleName(moduleName);
 
         categoryEntityData.setDataPatchName(getDataPatchName());

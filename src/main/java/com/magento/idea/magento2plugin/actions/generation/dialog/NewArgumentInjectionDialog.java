@@ -36,9 +36,6 @@ import com.magento.idea.magento2plugin.magento.packages.DiArgumentType;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.php.PhpTypeMetadataParserUtil;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -51,7 +48,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -353,7 +349,7 @@ public class NewArgumentInjectionDialog extends AbstractDialog {
      * Fire generation process if all fields are valid.
      */
     protected void onWriteActionOK() {
-         final DiArgumentData data = getDialogDataObject();
+        final DiArgumentData data = getDialogDataObject();
 
         if (data == null) {
             return;

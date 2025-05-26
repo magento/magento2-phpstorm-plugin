@@ -27,7 +27,6 @@ import com.magento.idea.magento2plugin.actions.generation.generator.CustomerEavA
 import com.magento.idea.magento2plugin.actions.generation.generator.SourceModelGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.GetAttributeOptionPropertiesUtil;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeInput;
-import com.magento.idea.magento2plugin.magento.packages.eav.AttributeScope;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeSourceModel;
 import com.magento.idea.magento2plugin.magento.packages.eav.AttributeType;
 import com.magento.idea.magento2plugin.ui.table.TableGroupWrapper;
@@ -222,7 +221,7 @@ public class NewCustomerEavAttributeDialog extends AbstractDialog {
     /**
      * Get default columns values.
      *
-     * @return Map<String, String>
+     * @return Map of String to String
      */
     protected Map<String, String> getDefaultColumnsValues() {
         return new HashMap<>();
@@ -231,7 +230,7 @@ public class NewCustomerEavAttributeDialog extends AbstractDialog {
     /**
      * Get columns sources.
      *
-     * @return Map<String, List<String>>
+     * @return Map of String to List of String
      */
     protected Map<String, List<String>> getColumnsSources() {
         return new HashMap<>();
@@ -339,7 +338,9 @@ public class NewCustomerEavAttributeDialog extends AbstractDialog {
         }
 
         codeTextField.getDocument()
-                .addDocumentListener(new DataPatchNameAdapter(dataPatchNameTextField, getEntityName()));
+                .addDocumentListener(
+                        new DataPatchNameAdapter(dataPatchNameTextField, getEntityName())
+                );
     }
 
     /**
@@ -451,7 +452,7 @@ public class NewCustomerEavAttributeDialog extends AbstractDialog {
      * Get attribute options.
      *
      * @param entityPropertiesTableGroupWrapper TableGroupWrapper
-     * @return Map<Integer, String>
+     * @return Map of Integer to String
      */
     protected Map<Integer, String> getAttributeOptions(
             final TableGroupWrapper entityPropertiesTableGroupWrapper
@@ -465,7 +466,7 @@ public class NewCustomerEavAttributeDialog extends AbstractDialog {
      * Get attribute options sort orders.
      *
      * @param entityPropertiesTableGroupWrapper TableGroupWrapper
-     * @return Map<Integer, String>
+     * @return Map of Integer to String
      */
     protected Map<Integer, String> getAttributeOptionsSortOrders(
             final TableGroupWrapper entityPropertiesTableGroupWrapper
@@ -570,7 +571,9 @@ public class NewCustomerEavAttributeDialog extends AbstractDialog {
      * @param customerEntityData CustomerEntityData
      * @return CustomerEntityData
      */
-    private CustomerEntityData populateCustomerEntityData(final CustomerEntityData customerEntityData) {
+    private CustomerEntityData populateCustomerEntityData(
+            final CustomerEntityData customerEntityData
+    ) {
         customerEntityData.setModuleName(moduleName);
 
         customerEntityData.setDataPatchName(getDataPatchName());
@@ -593,10 +596,18 @@ public class NewCustomerEavAttributeDialog extends AbstractDialog {
         customerEntityData.setVisibleInGrid(visibleInGridCheckBox.isSelected());
         customerEntityData.setFilterableInGrid(filterableInGridCheckBox.isSelected());
         customerEntityData.setSystem(systemAttributeCheckBox.isSelected());
-        customerEntityData.setUseInAdminhtmlCustomerForm(useInAdminhtmlCustomerCheckBox.isSelected());
-        customerEntityData.setUseInAdminhtmlCheckoutForm(useInAdminhtmlCheckoutCheckBox.isSelected());
-        customerEntityData.setUseInCustomerAccountCreateForm(useInCustomerAccountCreateCheckBox.isSelected());
-        customerEntityData.setUseInCustomerAccountEditForm(useInCustomerAccountEditCheckBox.isSelected());
+        customerEntityData.setUseInAdminhtmlCustomerForm(
+                useInAdminhtmlCustomerCheckBox.isSelected()
+        );
+        customerEntityData.setUseInAdminhtmlCheckoutForm(
+                useInAdminhtmlCheckoutCheckBox.isSelected()
+        );
+        customerEntityData.setUseInCustomerAccountCreateForm(
+                useInCustomerAccountCreateCheckBox.isSelected()
+        );
+        customerEntityData.setUseInCustomerAccountEditForm(
+                useInCustomerAccountEditCheckBox.isSelected()
+        );
 
         return customerEntityData;
     }
