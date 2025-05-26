@@ -121,20 +121,34 @@ jobs:
           echo "Modified files: $MODIFIED_FILES"
           echo "Added files: $ADDED_FILES"
 
-          # Combine and filter for .java files
-          # Make sure we handle empty arrays properly
-          if [ "$MODIFIED_FILES" == "[]" ]; then
-            MODIFIED_FILES="[]"
-          fi
-          if [ "$ADDED_FILES" == "[]" ]; then
-            ADDED_FILES="[]"
+          # Simple approach using shell commands to filter Java files
+          # Remove brackets and quotes from the JSON arrays
+          MODIFIED_FILES=$(echo "$MODIFIED_FILES" | sed 's/^\[//;s/\]$//;s/"//g;s/,/ /g')
+          ADDED_FILES=$(echo "$ADDED_FILES" | sed 's/^\[//;s/\]$//;s/"//g;s/,/ /g')
+
+          # Combine the files and filter for .java files
+          ALL_FILES="$MODIFIED_FILES $ADDED_FILES"
+          JAVA_FILES=""
+
+          # If there are files to process
+          if [ ! -z "$ALL_FILES" ]; then
+            # Filter for Java files and format as JSON array
+            for file in $ALL_FILES; do
+              if [[ "$file" == *.java ]]; then
+                if [ -z "$JAVA_FILES" ]; then
+                  JAVA_FILES="\"$file\""
+                else
+                  JAVA_FILES="$JAVA_FILES,\"$file\""
+                fi
+              fi
+            done
           fi
 
-          # Combine arrays and filter for .java files
-          # Use a more robust approach that doesn't rely on --argjson
-          COMBINED_FILES=$(echo '{"files":'"$MODIFIED_FILES"', "added":'"$ADDED_FILES"'}' | jq '.files + .added | map(select(endswith(".java")))')
-          echo "JAVA_FILES=$COMBINED_FILES" >> $GITHUB_ENV
-          echo "Filtered Java Files: $COMBINED_FILES"
+          # Create a proper JSON array
+          JAVA_FILES="[$JAVA_FILES]"
+
+          echo "JAVA_FILES=$JAVA_FILES" >> $GITHUB_ENV
+          echo "Filtered Java Files: $JAVA_FILES"
       - name: Run Code Style Check
         run: ./gradlew checkstyleCI --no-daemon
         env:
