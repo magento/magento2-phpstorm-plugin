@@ -33,17 +33,11 @@ import com.magento.idea.magento2plugin.actions.generation.generator.util.Namespa
 import com.magento.idea.magento2plugin.magento.files.MessageQueueClassPhp;
 import com.magento.idea.magento2plugin.magento.packages.MessageQueueConnections;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -138,8 +132,6 @@ public class NewMessageQueueDialog extends AbstractDialog {
     private JTextField handlerDirectory;
 
     private JPanel contentPanel;
-    private JButton buttonOK;
-    private JButton buttonCancel;
     private JLabel consumerDirectoryLabel;
     private JLabel consumerClassLabel;
     private JLabel maxMessagesLabel;

@@ -53,11 +53,7 @@ import com.magento.idea.magento2plugin.ui.table.DeleteRowButton;
 import com.magento.idea.magento2plugin.ui.table.TableButton;
 import com.magento.idea.magento2plugin.util.magento.GetAclResourcesListUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -79,7 +75,8 @@ import org.jetbrains.annotations.Nullable;
         "PMD.TooManyMethods",
         "PMD.ConstructorCallsOverridableMethod",
         "PMD.ExcessiveImports",
-        "PMD.GodClass"
+        "PMD.GodClass",
+        "PMD.ImmutableField"
 })
 public class NewUiComponentFormDialog extends AbstractDialog {
 
@@ -298,9 +295,7 @@ public class NewUiComponentFormDialog extends AbstractDialog {
             model.addRow(new Object[] {"", "", rowPosition + 10, DELETE_COLUMN});
         });
         model.addTableModelListener(
-                event -> {
-                    initFieldsetsColumn();
-                }
+                event -> initFieldsetsColumn()
         );
     }
 

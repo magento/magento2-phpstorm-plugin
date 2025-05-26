@@ -31,10 +31,6 @@ import com.magento.idea.magento2plugin.ui.table.DeleteRowButton;
 import com.magento.idea.magento2plugin.ui.table.TableButton;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
@@ -45,7 +41,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import org.jetbrains.annotations.NotNull;
@@ -53,7 +48,8 @@ import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
         "PMD.ExcessiveImports",
-        "PMD.ConstructorCallsOverridableMethod"
+        "PMD.ConstructorCallsOverridableMethod",
+        "PMD.ImmutableField"
 })
 public class NewDataModelDialog extends AbstractDialog {
 
@@ -148,10 +144,9 @@ public class NewDataModelDialog extends AbstractDialog {
 
     @Override
     protected boolean validateFormFields() {
-        boolean valid = false;
+        boolean valid = super.validateFormFields();
 
-        if (super.validateFormFields()) {
-            valid = true;
+        if (valid) {
             final String errorTitle = commonBundle.message("common.error");
             final int column = 0;
 

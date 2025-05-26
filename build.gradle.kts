@@ -208,6 +208,7 @@ tasks.withType(Pmd::class).configureEach {
     // Specify all files that should be checked
     classpath = files()
     setSource("${project.rootDir}")
+    maxHeapSize = "12g"
 }
 
 // Execute PMD on all files

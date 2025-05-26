@@ -26,12 +26,8 @@ import com.magento.idea.magento2plugin.indexes.CronGroupIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.CamelCaseToSnakeCase;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -40,7 +36,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -63,8 +58,8 @@ public class NewCronjobDialog extends AbstractDialog {
     private final CamelCaseToSnakeCase camelCaseToSnakeCase;
 
     private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
+    private JButton buttonOK;//NOPMD
+    private JButton buttonCancel;//NOPMD
     private JRadioButton fixedScheduleRadioButton;
     private JRadioButton configurableScheduleRadioButton;
     private JRadioButton everyMinuteRadioButton;
@@ -265,16 +260,15 @@ public class NewCronjobDialog extends AbstractDialog {
         }
 
         if (cronjobClassname == null || cronjobClassname.isEmpty()) {
-            return moduleName.toLowerCase(new java.util.Locale("en","EN"));
+            return moduleName.toLowerCase(java.util.Locale.ENGLISH);
         }
 
         final String cronjobClassnameToSnakeCase = this.camelCaseToSnakeCase.convert(
                 cronjobClassname
         );
 
-        return moduleName.toLowerCase(new java.util.Locale("en","EN"))
-                + "_"
-                + cronjobClassnameToSnakeCase;
+        final String moduleNameLower = moduleName.toLowerCase(java.util.Locale.ENGLISH);
+        return moduleNameLower + "_" + cronjobClassnameToSnakeCase;
     }
 
     /**

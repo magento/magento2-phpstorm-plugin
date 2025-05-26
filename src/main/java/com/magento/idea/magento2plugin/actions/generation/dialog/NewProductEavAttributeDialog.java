@@ -61,15 +61,13 @@ import org.jetbrains.annotations.Nullable;
 public class NewProductEavAttributeDialog extends AbstractDialog {
 
     private static final String ENTITY_NAME = "Product";
-    private String moduleName;
-    private Project project;
-    private String actionName;
+    private final String moduleName;
+    private final Project project;
+    private final String actionName;
     private TableGroupWrapper entityPropertiesTableGroupWrapper;
-    private SourceModelData sourceModelData;
+    private final SourceModelData sourceModelData;
 
     private JPanel contentPanel;
-    private JButton buttonOK;
-    private JButton buttonCancel;
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, "Attribute Code"})
     @FieldValidation(rule = RuleRegistry.LOWERCASE,
@@ -167,12 +165,6 @@ public class NewProductEavAttributeDialog extends AbstractDialog {
         dialog.showDialog();
     }
 
-    /**
-     * Create UI Components.
-     */
-    private void createUIComponents() {
-        // Initialize UI components
-    }
 
     /**
      * Initialize dialog state.
@@ -203,9 +195,9 @@ public class NewProductEavAttributeDialog extends AbstractDialog {
         }
 
         for (final AttributeType typeValue : AttributeType.values()) {
-            typeComboBox.addItem(
-                    new ComboBoxItemData(typeValue.getType(), typeValue.getType())
-            );
+            final String type = typeValue.getType();
+            final ComboBoxItemData item = new ComboBoxItemData(type, type);
+            typeComboBox.addItem(item);
         }
     }
 
@@ -218,9 +210,9 @@ public class NewProductEavAttributeDialog extends AbstractDialog {
         }
 
         for (final AttributeInput inputValue : AttributeInput.values()) {
-            inputComboBox.addItem(
-                    new ComboBoxItemData(inputValue.getInput(), inputValue.getInput())
-            );
+            final String input = inputValue.getInput();
+            final ComboBoxItemData item = new ComboBoxItemData(input, input);
+            inputComboBox.addItem(item);
         }
     }
 
@@ -587,6 +579,9 @@ public class NewProductEavAttributeDialog extends AbstractDialog {
 
     /**
      * Generate extra files after data patch generation.
+     * This method is intentionally left empty as no extra files need to be generated
+     * after the data patch for product EAV attributes. Subclasses may override this
+     * method to provide specific implementation if needed.
      *
      * @param eavEntityDataInterface EavEntityDataInterface
      */

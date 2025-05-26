@@ -111,12 +111,35 @@ jobs:
         run: chmod +x gradlew
       - id: file_changes
         uses: trilom/file-changes-action@v1.2.4
+      - name: Filter Java Files
+        id: filter_java_files
+        run: |
+          # Get modified and added files
+          MODIFIED_FILES=${{ steps.file_changes.outputs.files_modified }}
+          ADDED_FILES=${{ steps.file_changes.outputs.files_added }}
+
+          echo "Modified files: $MODIFIED_FILES"
+          echo "Added files: $ADDED_FILES"
+
+          # Combine and filter for .java files
+          # Make sure we handle empty arrays properly
+          if [ "$MODIFIED_FILES" == "[]" ]; then
+            MODIFIED_FILES="[]"
+          fi
+          if [ "$ADDED_FILES" == "[]" ]; then
+            ADDED_FILES="[]"
+          fi
+
+          # Combine arrays and filter for .java files
+          COMBINED_FILES=$(echo "$MODIFIED_FILES $ADDED_FILES" | jq -s 'add | map(select(endswith(".java")))')
+          echo "JAVA_FILES=$COMBINED_FILES" >> $GITHUB_ENV
+          echo "Filtered Java Files: $COMBINED_FILES"
       - name: Run Code Style Check
         run: ./gradlew checkstyleCI --no-daemon
         env:
-          MODIFIED_FILES: ${{ steps.file_changes.outputs.files}}
+          MODIFIED_FILES: ${{ env.JAVA_FILES }}
           ACTIONS_STEP_DEBUG: true
       - name: Run PMD Quality Check
         run: ./gradlew pmdCI --no-daemon
         env:
-          MODIFIED_FILES: ${{ steps.file_changes.outputs.files}}
+          MODIFIED_FILES: ${{ env.JAVA_FILES }}

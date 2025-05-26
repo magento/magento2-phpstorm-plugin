@@ -55,11 +55,11 @@ import org.jetbrains.annotations.Nullable;
 public class NewCustomerEavAttributeDialog extends AbstractDialog {
 
     private static final String ENTITY_NAME = "Customer";
-    private String moduleName;
-    private Project project;
-    private String actionName;
+    private final String moduleName;
+    private final Project project;
+    private final String actionName;
     private TableGroupWrapper entityPropertiesTableGroupWrapper;
-    private SourceModelData sourceModelData;
+    private final SourceModelData sourceModelData;
 
     private JPanel contentPanel;
     private JButton buttonOK;
@@ -179,9 +179,9 @@ public class NewCustomerEavAttributeDialog extends AbstractDialog {
         }
 
         for (final AttributeType typeValue : AttributeType.values()) {
-            typeComboBox.addItem(
-                    new ComboBoxItemData(typeValue.getType(), typeValue.getType())
-            );
+            final String type = typeValue.getType();
+            final ComboBoxItemData item = new ComboBoxItemData(type, type);
+            typeComboBox.addItem(item);
         }
     }
 
@@ -194,9 +194,9 @@ public class NewCustomerEavAttributeDialog extends AbstractDialog {
         }
 
         for (final AttributeInput inputValue : AttributeInput.values()) {
-            inputComboBox.addItem(
-                    new ComboBoxItemData(inputValue.getInput(), inputValue.getInput())
-            );
+            final String input = inputValue.getInput();
+            final ComboBoxItemData item = new ComboBoxItemData(input, input);
+            inputComboBox.addItem(item);
         }
     }
 
@@ -532,6 +532,9 @@ public class NewCustomerEavAttributeDialog extends AbstractDialog {
 
     /**
      * Generate extra files after data patch generation.
+     * This method is intentionally left empty as no extra files need to be generated
+     * after the data patch for customer EAV attributes. Subclasses may override this
+     * method to provide specific implementation if needed.
      *
      * @param eavEntityDataInterface EavEntityDataInterface
      */

@@ -18,18 +18,13 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.generator.LayoutXmlTemplateGenerator;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
@@ -38,7 +33,8 @@ import org.jetbrains.annotations.Nullable;
         "PMD.ConstructorCallsOverridableMethod",
         "PMD.ExcessiveImports",
         "PMD.SingularField",
-        "PMD.GodClass"
+        "PMD.GodClass",
+        "PMD.ImmutableField"
 })
 public class NewLayoutTemplateDialog extends AbstractDialog {
 
@@ -174,10 +170,7 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
     }
 
     private String getArea() {
-        return area.getSelectedItem().toString();
-    }
-
-    private void run() {
-        area.requestFocusInWindow();
+        final ComboBoxItemData selectedItem = (ComboBoxItemData) area.getSelectedItem();
+        return selectedItem.getKey();
     }
 }

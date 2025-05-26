@@ -21,16 +21,10 @@ import com.magento.idea.magento2plugin.magento.files.ViewModelPhp;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import org.jetbrains.annotations.Nullable;
 
 public class NewViewModelDialog extends AbstractDialog {
@@ -43,8 +37,6 @@ public class NewViewModelDialog extends AbstractDialog {
     private final String moduleName;
 
     private JPanel contentPanel;
-    private JButton buttonOK;
-    private JButton buttonCancel;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, VIEW_MODEL_NAME})

@@ -74,9 +74,18 @@ public abstract class AbstractDialog extends DialogWrapper {
      * so this method is kept for compatibility.
      *
      * @param dialog AbstractDialog
+     * @deprecated This method is no longer needed as DialogWrapper handles centering automatically.
+     *             It is kept for backward compatibility with existing code.
      */
+    @Deprecated
+    @SuppressWarnings({
+            "PMD.UncommentedEmptyMethod",
+            "PMD.EmptyMethodInAbstractClassShouldBeAbstract"
+    })
     protected void centerDialog(final AbstractDialog dialog) {
         // DialogWrapper handles centering automatically
+        // This method is intentionally left with minimal implementation
+        // as it's deprecated and only kept for backward compatibility
     }
 
     /**
@@ -87,9 +96,7 @@ public abstract class AbstractDialog extends DialogWrapper {
      */
     @Nullable
     @Override
-    protected JComponent createCenterPanel() {
-        return null; // Subclasses must override this method
-    }
+    protected abstract JComponent createCenterPanel();
 
     /**
      * Default on cancel action.
@@ -157,8 +164,8 @@ public abstract class AbstractDialog extends DialogWrapper {
             "PMD.CognitiveComplexity"
     })
     protected boolean validateFormFields() {
-        boolean dialogHasErrors;
-        isValidationErrorShown = dialogHasErrors = false;
+        boolean dialogHasErrors = false;
+        isValidationErrorShown = false;
         clearValidationHighlighting();
 
         for (final FieldValidationData fieldValidationData : getFieldsToValidate()) {
