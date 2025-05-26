@@ -19,17 +19,11 @@ import com.magento.idea.magento2plugin.magento.packages.ComponentType;
 import com.magento.idea.magento2plugin.magento.packages.OverridableFileType;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.List;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
 
 public class OverrideTemplateInThemeDialog extends AbstractDialog {
@@ -39,8 +33,6 @@ public class OverrideTemplateInThemeDialog extends AbstractDialog {
     private final @NotNull Project project;
     private final PsiFile psiFile;
     private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
     private JLabel selectTheme; //NOPMD
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,

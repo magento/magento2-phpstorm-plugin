@@ -40,8 +40,6 @@ public class GatherArrayValuesDialog extends AbstractDialog {
     private final DiArrayValueData arrayValueData;
 
     private JPanel contentPane;
-    private JButton buttonCancel;
-    private JButton buttonOK;
     private JPanel itemsPane;// NOPMD
     private JScrollPane itemsScrollPane;// NOPMD
     private JTable itemsTable;

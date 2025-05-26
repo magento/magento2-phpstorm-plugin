@@ -24,8 +24,6 @@ import com.magento.idea.magento2uct.settings.UctSettingsService;
 import com.magento.idea.magento2uct.util.module.UctModulePathValidatorUtil;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.Objects;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;

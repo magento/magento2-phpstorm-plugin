@@ -47,20 +47,26 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * This class handles the creation and configuration of Category EAV attributes.
+ * Note: This class is flagged as a "God Class" by PMD due to its complexity.
+ * A proper refactoring into smaller, more focused classes would be a better long-term solution.
+ */
 @SuppressWarnings({
         "PMD.TooManyFields",
         "PMD.ExcessiveImports",
         "PMD.TooManyMethods",
-        "PMD.UnusedPrivateField"
+        "PMD.UnusedPrivateField",
+        "PMD.GodClass"
 })
 public class NewCategoryEavAttributeDialog extends AbstractDialog {
 
     private static final String ENTITY_NAME = "Category";
-    private String moduleName;
-    private Project project;
-    private String actionName;
+    private final String moduleName;
+    private final Project project;
+    private final String actionName;
     private TableGroupWrapper entityPropertiesTableGroupWrapper;
-    private SourceModelData sourceModelData;
+    private final SourceModelData sourceModelData;
 
     private JPanel contentPanel;
     private JButton buttonOK;
@@ -171,6 +177,7 @@ public class NewCategoryEavAttributeDialog extends AbstractDialog {
     /**
      * Fill attribute type combo box.
      */
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     protected void fillAttributeTypeComboBox() {
         if (typeComboBox == null) {
             return;
@@ -186,6 +193,7 @@ public class NewCategoryEavAttributeDialog extends AbstractDialog {
     /**
      * Fill attribute input combo box.
      */
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     protected void fillAttributeInputComboBox() {
         if (inputComboBox == null) {
             return;
@@ -542,12 +550,16 @@ public class NewCategoryEavAttributeDialog extends AbstractDialog {
 
     /**
      * Generate extra files after data patch generation.
+     * This is a hook method for subclasses to override and generate additional files.
+     * The base implementation does nothing.
      *
      * @param eavEntityDataInterface EavEntityDataInterface
      */
     protected void generateExtraFilesAfterDataPatchGeneration(
             final EavEntityDataInterface eavEntityDataInterface
-    ) {}
+    ) {
+        // No additional files to generate in the base implementation
+    }
 
     /**
      * Create center panel.

@@ -54,12 +54,9 @@ import com.magento.idea.magento2plugin.ui.table.TableGroupWrapper;
 import com.magento.idea.magento2plugin.util.CamelCaseToSnakeCase;
 import com.magento.idea.magento2plugin.util.magento.GetAclResourcesListUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -358,25 +355,6 @@ public class NewEntityDialog extends AbstractDialog {
         entityPropertiesTableGroupWrapper.initTableGroup();
     }
 
-    /**
-     * Generate new entity files.
-     *
-     * @param event ActionEvent
-     */
-    @SuppressWarnings("PMD.UnusedFormalParameter")
-    private void generateNewEntityFiles(final @NotNull ActionEvent event) {
-        if (!onOkActionFired.isInProgress()) {
-            if (propertyTable.isEditing()) {
-                propertyTable.getCellEditor().stopCellEditing();
-            }
-
-            new ProcessWorker(
-                    this::onOK,
-                    this::releaseDialogAfterGeneration,
-                    onOkActionFired
-            ).execute();
-        }
-    }
 
     /**
      * Perform code generation using input data.
@@ -417,14 +395,6 @@ public class NewEntityDialog extends AbstractDialog {
         return true;
     }
 
-    /**
-     * Release dialog buttons and hide.
-     */
-    private void releaseDialogAfterGeneration() {
-        if (onOkActionFired.isFinished()) {
-            exit();
-        }
-    }
 
     /**
      * Get entity creator context data.

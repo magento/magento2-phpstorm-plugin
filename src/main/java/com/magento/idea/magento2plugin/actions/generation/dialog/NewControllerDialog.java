@@ -23,20 +23,14 @@ import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
@@ -49,8 +43,6 @@ public class NewControllerDialog extends AbstractDialog {
     private final String moduleName;
     private final Project project;
     private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
     private FilteredComboBox controllerAreaSelect;
     private FilteredComboBox httpMethodSelect;
     private JCheckBox inheritClass;
