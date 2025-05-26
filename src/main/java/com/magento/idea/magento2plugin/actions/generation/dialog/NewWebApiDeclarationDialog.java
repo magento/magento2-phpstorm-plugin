@@ -21,7 +21,6 @@ import com.magento.idea.magento2plugin.magento.packages.WebApiResource;
 import com.magento.idea.magento2plugin.util.magento.GetAclResourcesListUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.util.List;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -41,8 +40,6 @@ public class NewWebApiDeclarationDialog extends AbstractDialog {
     private final String methodName;
 
     private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, ROUTE_URL})
     @FieldValidation(rule = RuleRegistry.IDENTIFIER_WITH_FORWARD_SLASH,

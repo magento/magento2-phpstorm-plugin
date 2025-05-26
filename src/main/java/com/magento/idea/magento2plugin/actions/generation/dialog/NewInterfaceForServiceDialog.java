@@ -21,8 +21,6 @@ import com.magento.idea.magento2plugin.actions.generation.generator.php.WebApiIn
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import com.magento.idea.magento2plugin.util.php.PhpTypeMetadataParserUtil;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;

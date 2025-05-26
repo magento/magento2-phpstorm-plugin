@@ -25,16 +25,11 @@ import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.magento.packages.XsiTypes;
 import com.magento.idea.magento2plugin.util.FirstLetterToLowercaseUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,8 +42,6 @@ public class InjectAViewModelDialog extends AbstractDialog {
     private final Project project;
     private final XmlTag targetBlockTag;
     private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
     private final CommonBundle commonBundle;
     private final ValidatorBundle validatorBundle;
     private JLabel inheritClassLabel;//NOPMD
