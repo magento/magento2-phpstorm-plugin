@@ -545,7 +545,8 @@ public class NewCustomerEavAttributeDialog extends AbstractDialog {
             final EavEntityDataInterface eavEntityDataInterface
     ) {
         // This method is intentionally left empty.
-        // No additional files need to be generated after the data patch for customer EAV attributes.
+        // No additional files need to be generated after the data patch for customer EAV
+        // attributes.
         // Subclasses may override this method to provide specific implementation if needed.
     }
 
