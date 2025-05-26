@@ -50,7 +50,8 @@ import org.jetbrains.annotations.Nullable;
         "PMD.TooManyFields",
         "PMD.ExcessiveImports",
         "PMD.TooManyMethods",
-        "PMD.UnusedPrivateField"
+        "PMD.UnusedPrivateField",
+        "PMD.GodClass"
 })
 public class NewCustomerEavAttributeDialog extends AbstractDialog {
 
@@ -173,6 +174,7 @@ public class NewCustomerEavAttributeDialog extends AbstractDialog {
     /**
      * Fill attribute type combo box.
      */
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     protected void fillAttributeTypeComboBox() {
         if (typeComboBox == null) {
             return;
@@ -188,6 +190,7 @@ public class NewCustomerEavAttributeDialog extends AbstractDialog {
     /**
      * Fill attribute input combo box.
      */
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
     protected void fillAttributeInputComboBox() {
         if (inputComboBox == null) {
             return;
@@ -540,7 +543,11 @@ public class NewCustomerEavAttributeDialog extends AbstractDialog {
      */
     protected void generateExtraFilesAfterDataPatchGeneration(
             final EavEntityDataInterface eavEntityDataInterface
-    ) {}
+    ) {
+        // This method is intentionally left empty.
+        // No additional files need to be generated after the data patch for customer EAV attributes.
+        // Subclasses may override this method to provide specific implementation if needed.
+    }
 
     /**
      * Create center panel.
