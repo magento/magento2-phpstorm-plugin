@@ -52,12 +52,9 @@ dependencies {
 
         bundledPlugins(providers.gradleProperty("platformBundledPlugins").map { it.split(',') })
         plugins(providers.gradleProperty("platformPlugins").map { it.split(',') })
-        plugin("com.intellij.lang.jsgraphql", "252.18003.27")
         pluginVerifier()
         zipSigner()
         testFramework(TestFrameworkType.Platform)
-
-        phpstorm("252.18003.43")
     }
 }
 
@@ -175,6 +172,8 @@ intellijPlatformTesting {
                         "-Dide.mac.message.dialogs.as.sheets=false",
                         "-Djb.privacy.policy.text=<!--999.999-->",
                         "-Djb.consents.confirmation.enabled=false",
+                        "-Deap.require.license=false",
+                        "-Dide.show.tips.on.startup.default.value=false"
                     )
                 }
             }
@@ -209,7 +208,6 @@ tasks.withType(Pmd::class).configureEach {
     // Specify all files that should be checked
     classpath = files()
     setSource("${project.rootDir}")
-    maxHeapSize = "12g"
 }
 
 // Execute PMD on all files
