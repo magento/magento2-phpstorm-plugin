@@ -31,11 +31,20 @@ class SharedSteps(private val remoteRobot: RemoteRobot) {
         step("Create Or Open Test Project", Runnable {
             try {
                 remoteRobot.welcomeFrame {
-                    val newProjectButton = remoteRobot.find(
-                        ContainerFixture::class.java,
-                        byXpath("//div[@visible_text='New Project']")
-                    )
-                    newProjectButton.click(Point(15, -15))
+                    try {
+                        val newProjectIcon = remoteRobot.find(
+                            ContainerFixture::class.java,
+                            byXpath("//div[@defaulticon='createNewProjectTab.svg']")
+                        );
+                        newProjectIcon.click();
+                    } catch (exception: Exception) {
+                        val newProjectButton = remoteRobot.find(
+                            ContainerFixture::class.java,
+                            byXpath("//div[@visible_text='New Project']")
+                        )
+                        newProjectButton.click();
+                    }
+
                     Thread.sleep(2_000)
 
                     val jTextFieldFixture = find<JTextFieldFixture>(byXpath("//div[@class='TextFieldWithBrowseButton']"))
@@ -54,19 +63,6 @@ class SharedSteps(private val remoteRobot: RemoteRobot) {
                     enableMagentoSupport()
                 }
             } catch (exception: Exception) {
-                // temporary workaround until we get license for CI
-                activateIde()
-                // end temporary workaround
-                try {
-                    val launchedFromScript = remoteRobot.find(
-                        ContainerFixture::class.java,
-                        byXpath("//div[@class='LinkLabel']")
-                    )
-                    launchedFromScript.click()
-                } catch (e: Exception) {
-                    // Element does not exist, continue without failing the test
-                }
-
                 createProjectFromExistingFiles()
                 enableMagentoSupport()
             }
@@ -102,38 +98,18 @@ class SharedSteps(private val remoteRobot: RemoteRobot) {
         )
     }
 
-    private fun activateIde() {
-        if ("true" == System.getenv("GITHUB_ACTIONS")) {
-            val startTrial =
-                remoteRobot.find(ContainerFixture::class.java, byXpath("//div[@visible_text='Start trial']"))
-            startTrial.click()
-
-            val startTrialFree = remoteRobot.find(ContainerFixture::class.java, byXpath("//div[@class='s']"))
-            startTrialFree.click()
-
-            val dialog = remoteRobot.find(
-                DialogFixture::class.java, byXpath("//div[@class='MyDialog']")
-            )
-            dialog.button("Close").click()
-            closeBrowser()
-
-            try {
-                Thread.sleep(10000)
-            } catch (e: InterruptedException) {
-                Thread.currentThread().interrupt()
-                throw RuntimeException(e)
-            }
-        } else {
-            closeBrowser()
-            val dialog = remoteRobot.find(
-                DialogFixture::class.java, byXpath("//div[@class='MyDialog']")
-            )
-            dialog.button("Activate").click()
-            dialog.button("Close").click()
-        }
-    }
-
     private fun enableMagentoSupport() {
+        try {
+            //closing AI adv popup
+            val dialog = remoteRobot.find(
+                DialogFixture::class.java, byXpath("//div[@class='MyDialog']")
+            )
+            dialog.button("Close").click()
+        } catch (e: Exception) {
+            //do nothing
+        }
+
+
         remoteRobot.idea {
             step("Enable Magento Integration") {
                 waitFor(ofMinutes(1)) { isDumbMode().not() }
@@ -152,13 +128,6 @@ class SharedSteps(private val remoteRobot: RemoteRobot) {
 
     private fun createProjectFromExistingFiles() {
         remoteRobot.welcomeFrame {
-            try {
-                val launchedFromScript = find<ContainerFixture>(byXpath("//div[@class='LinkLabel']"))
-                launchedFromScript.click()
-            } catch (e: Exception) {
-                // Element does not exist, continue without failing the test
-            }
-
             createNewProjectFromExistingFilesLink.click()
             selectProjectPath()
         }
