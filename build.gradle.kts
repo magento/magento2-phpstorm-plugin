@@ -31,6 +31,7 @@ repositories {
 
     intellijPlatform {
         defaultRepositories()
+        maven("https://www.jetbrains.com/intellij-repository/snapshots")
     }
 }
 
@@ -51,12 +52,12 @@ dependencies {
 
         bundledPlugins(providers.gradleProperty("platformBundledPlugins").map { it.split(',') })
         plugins(providers.gradleProperty("platformPlugins").map { it.split(',') })
-        plugin("com.intellij.lang.jsgraphql", "243.21565.122")
+        plugin("com.intellij.lang.jsgraphql", "252.18003.27")
         pluginVerifier()
         zipSigner()
         testFramework(TestFrameworkType.Platform)
 
-        phpstorm("2024.3")
+        phpstorm("252.18003.43")
     }
 }
 
