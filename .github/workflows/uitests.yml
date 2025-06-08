@@ -68,17 +68,11 @@ jobs:
           export DISPLAY=:99.0
           ./gradlew test -PexcludeTests="**/reference/**,**/linemarker/**,**/inspections/**,**/completion/**,**/actions/**"
 
-# Uncomment if investigation is needed:
-#
-#      - name: Capture Test Artifacts on Failure
-#        if: failure() && matrix.os == 'ubuntu-latest'
-#        run: tar -cvzf video.tgz ./video
-#        shell: bash
-#
-#      - name: Upload Test Video Artifact
-#        if: failure() && matrix.os == 'ubuntu-latest'
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: latest-test-video
-#          path: video.tgz
-#          overwrite: true
+ #Uncomment if investigation is needed:
+      - name: Upload Test Video Artifact
+        if: failure() && matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: latest-test-video
+          path: ./video
+          overwrite: true
