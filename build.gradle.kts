@@ -172,7 +172,7 @@ intellijPlatformTesting {
                         "-Dide.mac.message.dialogs.as.sheets=false",
                         "-Djb.privacy.policy.text=<!--999.999-->",
                         "-Djb.consents.confirmation.enabled=false",
-                        "-Deap.require.license=false",
+                        "-Deap.require.license=true",
                         "-Dide.show.tips.on.startup.default.value=false"
                     )
                 }
