@@ -29,12 +29,12 @@ class IdeaFrame(remoteRobot: RemoteRobot, remoteComponent: RemoteComponent) :
 
     val projectViewTree
         get() = try {
-            find<ContainerFixture>(byXpath("//div[@class='ProjectViewTree']"))
+            find<ContainerFixture>(byXpath("//div[@class='MyProjectViewTree']"))
         } catch (e: Exception) {
             keyboard {
                 hotKey(VK_ALT, VK_1)
             }
-            find<ContainerFixture>(byXpath("//div[@class='ProjectViewTree']"))
+            find<ContainerFixture>(byXpath("//div[@class='MyProjectViewTree']"))
         }
 
     fun isProjectViewVisible(): Boolean {

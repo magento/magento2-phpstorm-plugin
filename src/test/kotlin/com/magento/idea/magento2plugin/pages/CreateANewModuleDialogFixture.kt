@@ -19,7 +19,7 @@ fun RemoteRobot.createAModuleDialog(function: CreateAModuleDialogFixture.() -> U
 }
 
 @FixtureName("CreateAModuleDialog")
-@DefaultXpath("CreateAModuleDialog type", "//div[@class='NewModuleDialog']")
+@DefaultXpath("CreateAModuleDialog type", "//div[@class='MyDialog']")
 class CreateAModuleDialogFixture(
         remoteRobot: RemoteRobot,
         remoteComponent: RemoteComponent) : CommonContainerFixture(remoteRobot, remoteComponent) {

@@ -17,7 +17,6 @@ import com.magento.idea.magento2plugin.pages.*
 import java.awt.Point
 import java.awt.event.KeyEvent.*
 import java.io.File
-import java.io.IOException
 import java.nio.file.Paths
 import java.time.Duration.ofMinutes
 import java.util.*
@@ -99,16 +98,18 @@ class SharedSteps(private val remoteRobot: RemoteRobot) {
     }
 
     private fun enableMagentoSupport() {
+        Thread.sleep(7_000)
+
         try {
             //closing AI adv popup
             val dialog = remoteRobot.find(
-                DialogFixture::class.java, byXpath("//div[@class='MyDialog']")
+                DialogFixture::class.java, byXpath("//div[@name='dialog2']")
             )
-            dialog.button("Close").click()
+            dialog.click()
+            dialog.keyboard { key(VK_ESCAPE) }
         } catch (e: Exception) {
             //do nothing
         }
-
 
         remoteRobot.idea {
             step("Enable Magento Integration") {
@@ -146,29 +147,6 @@ class SharedSteps(private val remoteRobot: RemoteRobot) {
 
             button("OK").click()
             trustProjectLink.click()
-        }
-    }
-
-    /**
-     * Closes the browser by terminating its process based on the operating system.
-     */
-    fun closeBrowser() {
-        val os = System.getProperty("os.name").lowercase(Locale.getDefault())
-
-        try {
-            if (os.contains("win")) {
-                // For Windows: Close common browsers like Chrome, Firefox, etc.
-                Runtime.getRuntime().exec("taskkill /F /IM edge.exe")
-            } else if (os.contains("mac")) {
-                // For macOS: Kill browsers using `pkill`
-                Runtime.getRuntime().exec("killall -9 safari")
-            } else if (os.contains("nix") || os.contains("nux")) {
-                // For Linux-based systems: Kill typical browser processes
-                Runtime.getRuntime().exec("killall -9 firefox")
-                Runtime.getRuntime().exec("killall -9 chrome")
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
         }
     }
 }

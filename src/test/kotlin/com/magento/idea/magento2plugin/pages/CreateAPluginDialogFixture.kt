@@ -19,7 +19,7 @@ fun RemoteRobot.createAPluginDialog(function: CreateAPluginDialogFixture.() -> U
 }
 
 @FixtureName("CreateAPluginDialog")
-@DefaultXpath("CreateAPluginDialog type", "//div[@class='CreateAPluginDialog']")
+@DefaultXpath("CreateAPluginDialog type", "//div[@class='MyDialog']")
 class CreateAPluginDialogFixture(
         remoteRobot: RemoteRobot,
         remoteComponent: RemoteComponent) : CommonContainerFixture(remoteRobot, remoteComponent) {

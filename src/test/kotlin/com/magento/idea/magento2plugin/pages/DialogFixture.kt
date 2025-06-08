@@ -37,6 +37,6 @@ class DialogFixture(
         fun byTitle(title: String) = byXpath("title $title", "//div[@title='$title' and @class='MyDialog']")
 
         @JvmStatic
-        fun getJDialog(title: String) = byXpath("title $title", "//div[@title='$title' and @class='JDialog']")
+        fun getJDialog(title: String) = byXpath("title $title", "//div[@title='$title']")
     }
 }
