@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Utility class for mocking the PhpBundle in tests.
- * 
+ * <p>
  * This class provides methods to set up a mock for the PhpBundle,
  * which will return a fixed value for any key, avoiding the need for actual message keys in tests.
  */
@@ -88,7 +88,8 @@ public final class PhpBundleMocker {
             // If cacheList field is not found, try the newer implementation (Java 9+)
             try {
                 // Get the clearCache method
-                final Method clearCacheMethod = ResourceBundle.class.getDeclaredMethod("clearCache");
+                final Method clearCacheMethod = 
+                        ResourceBundle.class.getDeclaredMethod("clearCache");
                 clearCacheMethod.setAccessible(true);
                 
                 // Call the method to clear the cache
