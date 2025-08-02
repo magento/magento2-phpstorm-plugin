@@ -20,6 +20,7 @@ import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.util.IncorrectOperationException;
 import com.magento.idea.magento2plugin.magento.files.ModuleFileInterface;
+import com.magento.idea.magento2plugin.magento.files.ModuleReadmeMdFile;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import java.io.IOException;
 import java.util.List;
@@ -161,7 +162,7 @@ public class FileFromTemplateGenerator {
                 false
         );
 
-        if (fileTemplate.isReformatCode()) {
+        if (fileTemplate.isReformatCode() && !fileName.endsWith(ModuleReadmeMdFile.EXTENSION)) {
             CodeStyleManager.getInstance(project).reformat(file);
         }
 
