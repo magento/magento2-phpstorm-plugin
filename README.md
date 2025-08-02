@@ -26,6 +26,7 @@
         <p style="margin: 10px 0;">Thank you to our sponsors—your support means everything:</p>
         <p><strong>Lucas van Staden</strong></p>
         <p><strong>Ivan Chepurnyi</strong></p>
+        <p><strong>Michael Ryvlin</strong></p>
       </td>
     </tr>
   </tfoot>
