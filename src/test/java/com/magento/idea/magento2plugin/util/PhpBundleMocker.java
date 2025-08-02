@@ -15,8 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Utility class for mocking the PhpBundle in tests.
- * <p>
- * This class provides methods to set up a mock for the PhpBundle,
+ *
+ * <p>This class provides methods to set up a mock for the PhpBundle,
  * which will return a fixed value for any key, avoiding the need for actual message keys in tests.
  */
 public final class PhpBundleMocker {
