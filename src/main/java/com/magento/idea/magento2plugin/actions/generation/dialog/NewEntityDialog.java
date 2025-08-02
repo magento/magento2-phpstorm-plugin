@@ -384,6 +384,7 @@ public class NewEntityDialog extends AbstractDialog {
 
         generatorPoolHandler.run();
         onOkActionFired.setFinished(true);
+        exit();
     }
 
     @Override

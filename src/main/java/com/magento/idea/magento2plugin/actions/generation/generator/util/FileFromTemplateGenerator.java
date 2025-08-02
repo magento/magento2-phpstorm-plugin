@@ -150,7 +150,7 @@ public class FileFromTemplateGenerator {
             fileTemplate = templateManager.getInstance(project).getCodeTemplate(templateName);
         }
 
-        Properties mergedProperties = new Properties();
+        final Properties mergedProperties = new Properties();
         mergedProperties.putAll(FileTemplateManager.getInstance(project).getDefaultProperties());
         mergedProperties.putAll(properties);
         final String fileTemplateText = fileTemplate.getText(mergedProperties);
