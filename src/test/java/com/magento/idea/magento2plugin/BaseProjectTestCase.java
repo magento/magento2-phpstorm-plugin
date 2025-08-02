@@ -12,6 +12,7 @@ import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.project.Settings;
+import com.magento.idea.magento2plugin.util.PhpBundleMocker;
 
 /**
  * Configure test environment with Magento 2 project.
@@ -28,6 +29,15 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
         super.setUp();
         copyMagento2ToTestProject();
         enablePluginAndReindex();
+        
+        // Mock the PhpBundle to avoid issues with missing message keys
+        try {
+            PhpBundleMocker.mockPhpBundle();
+        } catch (Exception e) {
+            // Log the exception but continue with the test
+            System.err.println("Failed to mock PhpBundle: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void copyMagento2ToTestProject() {
