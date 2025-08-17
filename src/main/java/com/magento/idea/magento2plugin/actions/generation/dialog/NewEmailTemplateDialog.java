@@ -22,17 +22,15 @@ import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import org.jetbrains.annotations.Nullable;
 
 public class NewEmailTemplateDialog extends AbstractDialog {
 
@@ -44,8 +42,6 @@ public class NewEmailTemplateDialog extends AbstractDialog {
     private final Project project;
     private final NewEmailTemplateDialogValidator validator;
     private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
             message = {NotEmptyRule.MESSAGE, EMAIL_TEMPLATE_ID})
@@ -78,27 +74,12 @@ public class NewEmailTemplateDialog extends AbstractDialog {
      * @param directory Directory
      */
     public NewEmailTemplateDialog(final Project project, final PsiDirectory directory) {
-        super();
-        setContentPane(contentPane);
-        setModal(true);
-        setTitle(NewEmailTemplateAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
+        super(project);
         this.project = project;
         this.validator = new NewEmailTemplateDialogValidator(project);
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
-        buttonOK.addActionListener(e -> onOK());
-        buttonCancel.addActionListener(e -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-
-            @Override
-            public void windowClosing(final WindowEvent windowEvent) {
-                onCancel();
-            }
-        });
+        setTitle(NewEmailTemplateAction.ACTION_DESCRIPTION);
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
@@ -107,7 +88,7 @@ public class NewEmailTemplateDialog extends AbstractDialog {
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
 
-        addComponentListener(new FocusOnAFieldListener(() -> identifier.requestFocusInWindow()));
+        init();
     }
 
     /**
@@ -203,9 +184,19 @@ public class NewEmailTemplateDialog extends AbstractDialog {
      */
     public static void open(final Project project, final PsiDirectory directory) {
         final NewEmailTemplateDialog dialog = new NewEmailTemplateDialog(project, directory);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     private String getModuleName() {

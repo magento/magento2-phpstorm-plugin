@@ -6,6 +6,9 @@
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
 import com.intellij.openapi.application.WriteAction;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Pair;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.prompt.PlaceholderInitializerUtil;
@@ -17,8 +20,6 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.lang.reflect.Field;
@@ -26,12 +27,11 @@ import java.util.LinkedList;
 import java.util.List;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * All code generate dialog should extend this class.
@@ -39,7 +39,7 @@ import org.jetbrains.annotations.NotNull;
 @SuppressWarnings({
         "PMD.TooManyMethods"
 })
-public abstract class AbstractDialog extends JDialog {
+public abstract class AbstractDialog extends DialogWrapper {
 
     protected transient CommonBundle bundle;
     protected final transient ValidatorBundle validatorBundle = new ValidatorBundle();
@@ -50,20 +50,53 @@ public abstract class AbstractDialog extends JDialog {
 
     /**
      * Abstract Dialog Constructor.
+     *
+     * @param project Project
      */
-    public AbstractDialog() {
-        super();
+    public AbstractDialog(final @Nullable Project project) {
+        super(project, true);
         bundle = new CommonBundle();
         errorTitle = bundle.message("common.error");
         fieldsValidationsList = new TypeFieldsRulesParser(this).parseValidationRules();
+        init();
     }
 
-    protected void centerDialog(final AbstractDialog dialog) {
-        final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        final int coordinateX = screenSize.width / 2  - dialog.getSize().width / 2;
-        final int coordinateY = screenSize.height / 2 - dialog.getSize().height / 2;
-        dialog.setLocation(coordinateX, coordinateY);
+    /**
+     * Abstract Dialog Constructor without project.
+     */
+    public AbstractDialog() {
+        this(null);
     }
+
+    /**
+     * Center the dialog on the screen.
+     * Note: This is handled automatically by DialogWrapper, 
+     * so this method is kept for compatibility.
+     *
+     * @param dialog AbstractDialog
+     * @deprecated This method is no longer needed as DialogWrapper handles centering automatically.
+     *             It is kept for backward compatibility with existing code.
+     */
+    @Deprecated
+    @SuppressWarnings({
+            "PMD.UncommentedEmptyMethod",
+            "PMD.EmptyMethodInAbstractClassShouldBeAbstract"
+    })
+    protected void centerDialog(final AbstractDialog dialog) {
+        // DialogWrapper handles centering automatically
+        // This method is intentionally left with minimal implementation
+        // as it's deprecated and only kept for backward compatibility
+    }
+
+    /**
+     * Create the center panel for the dialog.
+     * This method must be implemented by subclasses to provide the content panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected abstract JComponent createCenterPanel();
 
     /**
      * Default on cancel action.
@@ -76,7 +109,7 @@ public abstract class AbstractDialog extends JDialog {
      * Right way to hide dialog window.
      */
     protected void exit() {
-        dispose();
+        close(CANCEL_EXIT_CODE);
     }
 
     /**
@@ -103,6 +136,24 @@ public abstract class AbstractDialog extends JDialog {
     }
 
     /**
+     * Called when the OK button is pressed.
+     * This method is called by DialogWrapper.
+     */
+    @Override
+    public void doOKAction() {
+        onOK();
+    }
+
+    /**
+     * Called when the Cancel button is pressed.
+     * This method is called by DialogWrapper.
+     */
+    @Override
+    public void doCancelAction() {
+        onCancel();
+    }
+
+    /**
      * Validate all form fields.
      *
      * @return boolean
@@ -113,8 +164,8 @@ public abstract class AbstractDialog extends JDialog {
             "PMD.CognitiveComplexity"
     })
     protected boolean validateFormFields() {
-        boolean dialogHasErrors;
-        isValidationErrorShown = dialogHasErrors = false;
+        boolean dialogHasErrors = false;
+        isValidationErrorShown = false;
         clearValidationHighlighting();
 
         for (final FieldValidationData fieldValidationData : getFieldsToValidate()) {
@@ -217,11 +268,10 @@ public abstract class AbstractDialog extends JDialog {
         if (isValidationErrorShown) {
             return;
         }
-        JOptionPane.showMessageDialog(
-                this,
+        Messages.showErrorDialog(
+                getContentPanel(),
                 errorMessage,
-                errorTitle,
-                JOptionPane.ERROR_MESSAGE
+                errorTitle
         );
         isValidationErrorShown = true;
     }
@@ -302,10 +352,13 @@ public abstract class AbstractDialog extends JDialog {
         return getParentTabPaneForComponent(parent);
     }
 
-    @Override
-    public void setVisible(final boolean status) {
+    /**
+     * Show the dialog.
+     * This method should be used instead of setVisible(true).
+     */
+    public void showDialog() {
         new PlaceholderInitializerUtil(this).initialize();
-        super.setVisible(status);
+        show();
     }
 
     /**
@@ -317,7 +370,7 @@ public abstract class AbstractDialog extends JDialog {
      * <p>1) specify method in which desired field is focused:</p><br/>
      * <pre>
      *     public void focusOnTheSampleField() {
-     *             sampleField.requestFocusInWindow();
+     *             sampleField.requestFocus();
      *     }
      * </pre>
      *
@@ -327,8 +380,6 @@ public abstract class AbstractDialog extends JDialog {
      *             new FocusOnAFieldListener(this::focusOnTheSampleField)
      *     )
      * </pre>
-     *
-     * @see #requestFocusInWindow()
      */
     public static final class FocusOnAFieldListener implements ComponentListener {
 

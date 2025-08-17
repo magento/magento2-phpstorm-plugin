@@ -17,15 +17,12 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleSetupDataPatchGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.magento.files.ModuleSetupDataPatchFile;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
         "PMD.ConstructorCallsOverridableMethod"
@@ -64,40 +61,18 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
             final String modulePackage,
             final String moduleName
     ) {
-        super();
+        super(project);
 
         this.project = project;
         this.baseDir = directory;
         this.modulePackage = modulePackage;
         this.moduleName = moduleName;
 
-        setContentPane(contentPanel);
-        setModal(true);
         setTitle(NewSetupDataPatchAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
 
-        buttonOK.addActionListener(event -> onOK());
-        buttonCancel.addActionListener(event -> onCancel());
+        // DialogWrapper handles button actions and ESC key automatically
 
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
-
-        // call onCancel() on ESCAPE
-        contentPanel.registerKeyboardAction(
-                event -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
-
-        addComponentListener(new FocusOnAFieldListener(() -> {
-            className.requestFocusInWindow();
-        }));
+        init();
     }
 
     /**
@@ -115,9 +90,19 @@ public class NewSetupDataPatchDialog extends AbstractDialog {
                 modulePackage,
                 moduleName
         );
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPanel;
     }
 
     /**

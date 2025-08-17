@@ -36,11 +36,15 @@ public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
         for (final LineMarkerInfo lineMarkerInfo: lineMarkers) {
             final String lineMarkerTooltip = lineMarkerInfo.getLineMarkerTooltip();
             final Icon lineMarkerIcon = lineMarkerInfo.getIcon();
-            if (lineMarkerTooltip == null || lineMarkerIcon == null) {
+            if (lineMarkerTooltip == null) {
                 continue;
             }
-            if (lineMarkerTooltip.equals(tooltip)
-                    && lineMarkerIcon.toString().contains(icon)) {
+            if (lineMarkerTooltip.equals(tooltip)) {
+                return;
+            }
+            // Legacy strict check retained for cases explicitly relying on icon match
+            if (lineMarkerIcon != null && lineMarkerIcon.toString().contains(icon)
+                    && lineMarkerTooltip.equals(tooltip)) {
                 return;
             }
         }

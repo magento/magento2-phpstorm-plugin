@@ -23,20 +23,15 @@ import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
@@ -48,8 +43,6 @@ public class NewControllerDialog extends AbstractDialog {
     private final String moduleName;
     private final Project project;
     private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
     private FilteredComboBox controllerAreaSelect;
     private FilteredComboBox httpMethodSelect;
     private JCheckBox inheritClass;
@@ -82,40 +75,18 @@ public class NewControllerDialog extends AbstractDialog {
      * @param directory PsiDirectory
      */
     public NewControllerDialog(final Project project, final PsiDirectory directory) {
-        super();
+        super(project);
         this.project = project;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
-        setContentPane(contentPane);
-        setModal(true);
         setTitle(NewControllerAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
         suggestControllerDirectory();
         controllerAreaSelect.addActionListener(e -> suggestControllerDirectory());
         controllerAreaSelect.addActionListener(e -> toggleAdminPanel());
         inheritClass.addActionListener(e -> toggleAdminPanel());
-        buttonOK.addActionListener(e -> onOK());
-        buttonCancel.addActionListener(e -> onCancel());
+        // DialogWrapper handles button actions and ESC key automatically
 
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
-
-        // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(
-                (final ActionEvent event) -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
-
-        addComponentListener(
-                new FocusOnAFieldListener(() -> controllerAreaSelect.requestFocusInWindow())
-        );
+        init();
     }
 
     private String getModuleName() {
@@ -193,9 +164,19 @@ public class NewControllerDialog extends AbstractDialog {
      */
     public static void open(final Project project, final PsiDirectory directory) {
         final NewControllerDialog dialog = new NewControllerDialog(project, directory);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     protected void onWriteActionOK() {

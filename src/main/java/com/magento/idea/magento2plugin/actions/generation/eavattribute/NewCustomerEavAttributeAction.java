@@ -6,7 +6,6 @@
 package com.magento.idea.magento2plugin.actions.generation.eavattribute;
 
 import com.intellij.ide.IdeView;
-import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -14,17 +13,17 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
-import com.magento.idea.magento2plugin.actions.generation.dialog.eavattribute.EavAttributeDialog;
-import javax.swing.Icon;
+import com.magento.idea.magento2plugin.MagentoIcons;
+import com.magento.idea.magento2plugin.actions.generation.dialog.NewCustomerEavAttributeDialog;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class NewEavAttributeAction extends AnAction {
-    public NewEavAttributeAction(
-            final String actionName,
-            final String actionDescription,
-            final Icon icon
-    ) {
-        super(actionName, actionDescription, icon);
+public class NewCustomerEavAttributeAction extends AnAction {
+
+    public static final String ACTION_NAME = "Customer Attribute";
+    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 EAV Customer Attribute";
+
+    public NewCustomerEavAttributeAction() {
+        super(ACTION_NAME, ACTION_DESCRIPTION, MagentoIcons.MODULE);
     }
 
     @Override
@@ -45,22 +44,10 @@ public abstract class NewEavAttributeAction extends AnAction {
             return;
         }
 
-        final EavAttributeDialog eavAttributeDialog = getDialogWindow(project, directory);
-        eavAttributeDialog.open();
+        NewCustomerEavAttributeDialog.open(
+                project,
+                directory,
+                ACTION_NAME
+        );
     }
-
-    @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.BGT;
-    }
-
-    @Override
-    public boolean isDumbAware() {
-        return false;
-    }
-
-    protected abstract EavAttributeDialog getDialogWindow(
-            Project project,
-            PsiDirectory directory
-    );
 }

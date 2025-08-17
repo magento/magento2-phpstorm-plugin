@@ -20,18 +20,14 @@ import com.magento.idea.magento2plugin.magento.packages.HttpMethod;
 import com.magento.idea.magento2plugin.magento.packages.WebApiResource;
 import com.magento.idea.magento2plugin.util.magento.GetAclResourcesListUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.List;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("PMD.TooManyFields")
 public class NewWebApiDeclarationDialog extends AbstractDialog {
@@ -44,8 +40,6 @@ public class NewWebApiDeclarationDialog extends AbstractDialog {
     private final String methodName;
 
     private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, ROUTE_URL})
     @FieldValidation(rule = RuleRegistry.IDENTIFIER_WITH_FORWARD_SLASH,
@@ -80,40 +74,20 @@ public class NewWebApiDeclarationDialog extends AbstractDialog {
             final @NotNull String classFqn,
             final @NotNull String methodName
     ) {
-        super();
+        super(project);
 
         this.project = project;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
         this.classFqn = classFqn;
         this.methodName = methodName;
 
-        setContentPane(contentPane);
-        setModal(true);
         setTitle(NewWebApiDeclarationAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
 
-        buttonOK.addActionListener(event -> onOK());
-        buttonCancel.addActionListener(event -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
-
-        // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(
-                event -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
+        // DialogWrapper handles button actions and ESC key automatically
 
         fillPredefinedValuesAndDisableInputs();
 
-        addComponentListener(new FocusOnAFieldListener(() -> routeUrl.requestFocusInWindow()));
+        init();
     }
 
     /**
@@ -132,9 +106,19 @@ public class NewWebApiDeclarationDialog extends AbstractDialog {
     ) {
         final NewWebApiDeclarationDialog dialog =
                 new NewWebApiDeclarationDialog(project, directory, classFqn, methodName);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     /**

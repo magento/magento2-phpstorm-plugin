@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
+## 2025.2.0
+
+### Fixed
+
+- Thread context was already set [#2550](https://github.com/magento/magento2-phpstorm-plugin/pull/2550)
+- Argument for @NotNull parameter 'psiDirectory' [#2553](https://github.com/magento/magento2-phpstorm-plugin/pull/2553)
+
 ## 2025.1.1
 
 ### Fixed

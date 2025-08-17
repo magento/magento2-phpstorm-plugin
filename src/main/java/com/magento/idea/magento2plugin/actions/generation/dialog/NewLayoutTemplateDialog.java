@@ -18,18 +18,14 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.
 import com.magento.idea.magento2plugin.actions.generation.generator.LayoutXmlTemplateGenerator;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
@@ -37,7 +33,8 @@ import javax.swing.KeyStroke;
         "PMD.ConstructorCallsOverridableMethod",
         "PMD.ExcessiveImports",
         "PMD.SingularField",
-        "PMD.GodClass"
+        "PMD.GodClass",
+        "PMD.ImmutableField"
 })
 public class NewLayoutTemplateDialog extends AbstractDialog {
 
@@ -48,8 +45,6 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
     private final PsiDirectory directory;
 
     private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY, message = {NotEmptyRule.MESSAGE, LAYOUT_NAME})
     @FieldValidation(
@@ -72,37 +67,15 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
      * @param directory The PsiDirectory where the new layout will be created.
      */
     public NewLayoutTemplateDialog(final Project project, final PsiDirectory directory) {
-        super();
+        super(project);
 
         this.project = project;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
         this.directory = directory;
 
-        setContentPane(contentPane);
-        setModal(false);
         setTitle(NewLayoutXmlAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
-
-        buttonOK.addActionListener(event -> onOK());
-        buttonCancel.addActionListener(event -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
-
-        contentPane.registerKeyboardAction(
-                event -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
-
-        addComponentListener(new FocusOnAFieldListener(this::run));
         autoSelectCurrentArea();
+        init();
     }
 
     /**
@@ -113,9 +86,19 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
      */
     public static void open(final Project project, final PsiDirectory directory) {
         final NewLayoutTemplateDialog dialog = new NewLayoutTemplateDialog(project, directory);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     /**
@@ -187,10 +170,7 @@ public class NewLayoutTemplateDialog extends AbstractDialog {
     }
 
     private String getArea() {
-        return area.getSelectedItem().toString();
-    }
-
-    private void run() {
-        area.requestFocusInWindow();
+        final ComboBoxItemData selectedItem = (ComboBoxItemData) area.getSelectedItem();
+        return selectedItem.getKey();
     }
 }

@@ -19,25 +19,18 @@ import com.magento.idea.magento2plugin.magento.files.GraphQlResolverPhp;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class NewGraphQlResolverDialog extends AbstractDialog {
 
     private final PsiDirectory baseDir;
     private final String moduleName;
     private JPanel contentPanel;
-    private JButton buttonOK;
-    private JButton buttonCancel;
     private final Project project;
     private static final String CLASS_NAME = "class name";
     private static final String PARENT_DIRECTORY = "directory";
@@ -67,40 +60,18 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
             final @NotNull Project project,
             final @NotNull PsiDirectory directory
     ) {
-        super();
+        super(project);
 
         this.project = project;
         this.baseDir = directory;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
-        setContentPane(contentPanel);
-        setModal(true);
         setTitle(NewGraphQlResolverAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
         suggestGraphQlResolverDirectory();
 
-        buttonOK.addActionListener((final ActionEvent event) -> onOK());
-        buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
+        // DialogWrapper handles button actions and ESC key automatically
 
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
-
-        // call onCancel() on ESCAPE
-        contentPanel.registerKeyboardAction(
-                (final ActionEvent event) -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
-
-        addComponentListener(
-                new FocusOnAFieldListener(() -> graphQlResolverClassName.requestFocusInWindow())
-        );
+        init();
     }
 
     /**
@@ -111,14 +82,19 @@ public class NewGraphQlResolverDialog extends AbstractDialog {
      */
     public static void open(final Project project, final PsiDirectory directory) {
         final NewGraphQlResolverDialog dialog = new NewGraphQlResolverDialog(project, directory);
-        dialog.pack();
         dialog.centerDialog(dialog);
+        dialog.showDialog();
+    }
 
-        // TODO: It's a workaround. Proper fix should be done as:
-        // https://github.com/magento/magento2-phpstorm-plugin/issues/2080
-        try (var token = com.intellij.concurrency.ThreadContext.resetThreadContext()) {
-            dialog.setVisible(true);
-        }
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPanel;
     }
 
     protected void onWriteActionOK() {

@@ -19,17 +19,11 @@ import com.magento.idea.magento2plugin.magento.packages.ComponentType;
 import com.magento.idea.magento2plugin.magento.packages.OverridableFileType;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.List;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
 
 public class OverrideTemplateInThemeDialog extends AbstractDialog {
@@ -39,8 +33,6 @@ public class OverrideTemplateInThemeDialog extends AbstractDialog {
     private final @NotNull Project project;
     private final PsiFile psiFile;
     private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
     private JLabel selectTheme; //NOPMD
 
     @FieldValidation(rule = RuleRegistry.NOT_EMPTY,
@@ -57,13 +49,10 @@ public class OverrideTemplateInThemeDialog extends AbstractDialog {
             final @NotNull Project project,
             final @NotNull PsiFile psiFile
     ) {
-        super();
+        super(project);
 
         this.project = project;
         this.psiFile = psiFile;
-
-        setContentPane(contentPane);
-        setModal(true);
 
         final String fileType = psiFile.getVirtualFile().getExtension();
         if (OverridableFileType.isFilePhtml(fileType)) {
@@ -73,27 +62,22 @@ public class OverrideTemplateInThemeDialog extends AbstractDialog {
         } else if (OverridableFileType.isFileStyle(fileType)) {
             setTitle(OverrideTemplateInThemeAction.ACTION_STYLES_DESCRIPTION);
         }
-        getRootPane().setDefaultButton(buttonOK);
+
         fillThemeOptions();
 
-        buttonOK.addActionListener((final ActionEvent event) -> onOK());
-        buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
+        // DialogWrapper handles button actions and ESC key automatically
 
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
+        init();
+    }
 
-        contentPane.registerKeyboardAction(
-                (final ActionEvent event) -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
-
-        addComponentListener(new FocusOnAFieldListener(() -> theme.requestFocusInWindow()));
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     /**
@@ -105,9 +89,8 @@ public class OverrideTemplateInThemeDialog extends AbstractDialog {
     public static void open(final @NotNull Project project, final @NotNull PsiFile psiFile) {
         final OverrideTemplateInThemeDialog dialog =
                 new OverrideTemplateInThemeDialog(project, psiFile);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
     }
 
     protected void onWriteActionOK() {
