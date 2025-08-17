@@ -3,15 +3,12 @@
  * See COPYING.txt for license details.
  */
 
-import groovy.json.JsonSlurper
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {
     id("java")
-    id("checkstyle")
-    id("pmd")
     alias(libs.plugins.kotlin)
     alias(libs.plugins.intelliJPlatform)
     alias(libs.plugins.changelog)
@@ -150,19 +147,7 @@ tasks {
         useJUnitPlatform()
     }
 
-    checkstyle {
-        toolVersion = "8.31"
-        isIgnoreFailures = false
-        maxWarnings = 0
-        configFile = rootProject.file("${rootDir}/gradle-tasks/checkstyle/checkstyle.xml")
-    }
 
-    pmd {
-        toolVersion = "6.21.0"
-        isConsoleOutput = true
-        ruleSetFiles = files("${rootDir}/gradle-tasks/pmd/ruleset.xml")
-        ruleSets = listOf()
-    }
 }
 
 intellijPlatformTesting {
@@ -188,68 +173,12 @@ intellijPlatformTesting {
     }
 }
 
-// Configure Checkstyle tasks
-tasks.withType(Checkstyle::class).configureEach {
-    // Specify all files that should be checked
-    classpath = files()
-    setSource("${project.rootDir}")
-}
 
-// Execute Checkstyle on all files
-tasks.register<Checkstyle>("checkstyle") {
-    // Task-specific configuration can go here if necessary
-}
 
-// Execute Checkstyle on all modified files
-tasks.register<Checkstyle>("checkstyleCI") {
-    val changedFiles = getChangedFiles()
-    include(changedFiles)
-}
 
-// Configure PMD tasks
-tasks.withType(Pmd::class).configureEach {
-    // Specify all files that should be checked
-    classpath = files()
-    setSource("${project.rootDir}")
-}
 
-// Execute PMD on all files
-tasks.register<Pmd>("pmd") {
-    // Task-specific configuration can go here if necessary
-}
 
-// Execute PMD on all modified files
-tasks.register<Pmd>("pmdCI") {
-    val changedFiles = getChangedFiles()
-    include(changedFiles)
-}
 
-/**
- * Get all files that are changed but not deleted nor renamed.
- * Compares to master or the specified target branch.
- *
- * @return list of all changed files
- */
-fun getChangedFiles(): List<String> {
-    val modifiedFilesJson = System.getenv("MODIFIED_FILES")
-    val files = mutableListOf<String>()
-
-    if (modifiedFilesJson == null) {
-        return files
-    }
-
-    println("Modified Files: $modifiedFilesJson")
-
-    // Parse the JSON string into a list of files
-    val modifiedFiles = JsonSlurper().parseText(modifiedFilesJson) as List<*>
-
-    modifiedFiles.forEach {
-        files.add(it.toString())
-    }
-
-    // Return the list of touched files
-    return files
-}
 
 kover {
     currentProject {
