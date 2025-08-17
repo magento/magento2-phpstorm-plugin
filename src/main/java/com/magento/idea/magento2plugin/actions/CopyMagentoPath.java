@@ -69,6 +69,9 @@ public class CopyMagentoPath extends CopyPathProvider {
             return null;
         }
         final PsiDirectory directory = file.getContainingDirectory();
+        if (directory == null) {
+            return null;
+        }
         final String moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
         if (moduleName == null) {
