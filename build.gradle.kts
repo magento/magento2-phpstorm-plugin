@@ -143,6 +143,10 @@ tasks {
             }
         }
 
+        // Workaround for kernel-related crashes in tests (Fleet/Platform Kernel background tasks)
+        systemProperty("intellij.platform.kernel.disable", "true")
+        systemProperty("ide.fleet.launch", "false")
+
         useJUnitPlatform()
     }
 
