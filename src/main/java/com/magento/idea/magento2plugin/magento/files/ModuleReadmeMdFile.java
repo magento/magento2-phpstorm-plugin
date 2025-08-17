@@ -12,6 +12,7 @@ public class ModuleReadmeMdFile implements ModuleFileInterface {
 
     public static final String FILE_NAME = "README.md";
     public static final String TEMPLATE = "Magento Module Readme File MD";
+    public static final String EXTENSION = ".md";
 
     @Override
     public String getFileName() {

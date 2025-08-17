@@ -55,14 +55,11 @@ import com.magento.idea.magento2plugin.util.magento.GetAclResourcesListUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import com.magento.idea.magento2plugin.util.magento.GetResourceCollections;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -70,6 +67,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
@@ -89,8 +87,6 @@ public class NewUiComponentGridDialog extends AbstractDialog {
     private final String moduleName;
     private List<String> collectionOptions;
     private JPanel contentPanel;
-    private JButton buttonOK;
-    private JButton buttonCancel;
 
     private JCheckBox addToolBar;
     private JCheckBox addBookmarksCheckBox;
@@ -212,29 +208,14 @@ public class NewUiComponentGridDialog extends AbstractDialog {
             final @NotNull Project project,
             final @NotNull PsiDirectory directory
     ) {
-        super();
+        super(project);
         this.project = project;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
-        setContentPane(contentPanel);
-        setModal(false);
         setTitle(NewUiComponentGridAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
 
         addActionListeners();
         setDefaultValues();
-
-        buttonOK.addActionListener(event -> onOK());
-        buttonCancel.addActionListener(event -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
 
         // call onCancel() on ESCAPE
         contentPanel.registerKeyboardAction(
@@ -250,9 +231,7 @@ public class NewUiComponentGridDialog extends AbstractDialog {
         dataProviderParentDirectory.setVisible(false);
         dataProviderParentDirectoryLabel.setVisible(false);
 
-        addComponentListener(
-                new FocusOnAFieldListener(() -> uiComponentName.requestFocusInWindow())
-        );
+        init();
     }
 
     /**
@@ -266,9 +245,19 @@ public class NewUiComponentGridDialog extends AbstractDialog {
             final @NotNull PsiDirectory directory
     ) {
         final NewUiComponentGridDialog dialog = new NewUiComponentGridDialog(project, directory);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPanel;
     }
 
     /**

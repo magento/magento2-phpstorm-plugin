@@ -26,12 +26,8 @@ import com.magento.idea.magento2plugin.indexes.CronGroupIndex;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.CamelCaseToSnakeCase;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -40,8 +36,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
         "PMD.UncommentedEmptyMethodBody",
@@ -62,8 +58,8 @@ public class NewCronjobDialog extends AbstractDialog {
     private final CamelCaseToSnakeCase camelCaseToSnakeCase;
 
     private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
+    private JButton buttonOK;//NOPMD
+    private JButton buttonCancel;//NOPMD
     private JRadioButton fixedScheduleRadioButton;
     private JRadioButton configurableScheduleRadioButton;
     private JRadioButton everyMinuteRadioButton;
@@ -129,19 +125,15 @@ public class NewCronjobDialog extends AbstractDialog {
      * @param directory Directory
      */
     public NewCronjobDialog(final @NotNull Project project, final @NotNull PsiDirectory directory) {
-        super();
+        super(project);
         this.project = project;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
         this.camelCaseToSnakeCase = CamelCaseToSnakeCase.getInstance();
 
-        setContentPane(contentPane);
-        setModal(true);
-        getRootPane().setDefaultButton(buttonOK);
         setTitle(NewCronjobAction.ACTION_DESCRIPTION);
         configPathField.setEditable(false);
 
-        buttonOK.addActionListener(e -> onOK());
-        buttonCancel.addActionListener(e -> onCancel());
+        // DialogWrapper handles button actions automatically
 
         fixedScheduleRadioButton.addActionListener(e -> {
             configurableSchedulePanel.setVisible(false);
@@ -187,25 +179,9 @@ public class NewCronjobDialog extends AbstractDialog {
             }
         });
 
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
+        // DialogWrapper handles ESC key automatically
 
-        // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(
-                (final ActionEvent event) -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
-
-        addComponentListener(
-                new FocusOnAFieldListener(() -> cronjobClassNameField.requestFocusInWindow())
-        );
+        init();
     }
 
     /**
@@ -216,9 +192,19 @@ public class NewCronjobDialog extends AbstractDialog {
      */
     public static void open(final Project project, final PsiDirectory directory) {
         final NewCronjobDialog dialog = new NewCronjobDialog(project, directory);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     public String getCronjobClassName() {
@@ -274,16 +260,15 @@ public class NewCronjobDialog extends AbstractDialog {
         }
 
         if (cronjobClassname == null || cronjobClassname.isEmpty()) {
-            return moduleName.toLowerCase(new java.util.Locale("en","EN"));
+            return moduleName.toLowerCase(java.util.Locale.ENGLISH);
         }
 
         final String cronjobClassnameToSnakeCase = this.camelCaseToSnakeCase.convert(
                 cronjobClassname
         );
 
-        return moduleName.toLowerCase(new java.util.Locale("en","EN"))
-                + "_"
-                + cronjobClassnameToSnakeCase;
+        final String moduleNameLower = moduleName.toLowerCase(java.util.Locale.ENGLISH);
+        return moduleNameLower + "_" + cronjobClassnameToSnakeCase;
     }
 
     /**

@@ -21,8 +21,6 @@ import com.magento.idea.magento2plugin.actions.generation.generator.php.WebApiIn
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import com.magento.idea.magento2plugin.util.php.PhpTypeMetadataParserUtil;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +32,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({"PMD.TooManyFields", "PMD.ExcessiveImports"})
 public class NewInterfaceForServiceDialog extends AbstractDialog {
@@ -48,8 +47,6 @@ public class NewInterfaceForServiceDialog extends AbstractDialog {
     private final List<Method> serviceClassMethods;
 
     private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
     private JButton chooseMethodsButton;
     private JTextField serviceClassField;
 
@@ -86,30 +83,16 @@ public class NewInterfaceForServiceDialog extends AbstractDialog {
             final @NotNull PsiDirectory directory,
             final @NotNull PhpClass phpClass
     ) {
-        super();
+        super(project);
 
         this.project = project;
         this.phpClass = phpClass;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
         serviceClassMethods = PhpTypeMetadataParserUtil.getPublicMethods(phpClass);
 
-        setContentPane(contentPane);
-        setModal(true);
         setTitle(NewWebApiInterfaceAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
 
-        buttonOK.addActionListener(event -> onOK());
-        buttonCancel.addActionListener(event -> onCancel());
         chooseMethodsButton.addActionListener(event -> openMethodChooser());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
@@ -120,7 +103,7 @@ public class NewInterfaceForServiceDialog extends AbstractDialog {
 
         fillPredefinedValuesAndDisableInputs();
 
-        addComponentListener(new FocusOnAFieldListener(() -> nameField.requestFocusInWindow()));
+        init();
     }
 
     /**
@@ -137,9 +120,19 @@ public class NewInterfaceForServiceDialog extends AbstractDialog {
     ) {
         final NewInterfaceForServiceDialog dialog =
                 new NewInterfaceForServiceDialog(project, directory, phpClass);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     /**

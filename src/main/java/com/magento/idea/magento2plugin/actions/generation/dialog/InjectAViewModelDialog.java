@@ -25,19 +25,14 @@ import com.magento.idea.magento2plugin.bundles.ValidatorBundle;
 import com.magento.idea.magento2plugin.magento.packages.XsiTypes;
 import com.magento.idea.magento2plugin.util.FirstLetterToLowercaseUtil;
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
         "PMD.ExcessiveImports"
@@ -47,8 +42,6 @@ public class InjectAViewModelDialog extends AbstractDialog {
     private final Project project;
     private final XmlTag targetBlockTag;
     private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
     private final CommonBundle commonBundle;
     private final ValidatorBundle validatorBundle;
     private JLabel inheritClassLabel;//NOPMD
@@ -87,7 +80,7 @@ public class InjectAViewModelDialog extends AbstractDialog {
             final @NotNull Project project,
             final XmlTag targetBlockTag
     ) {
-        super();
+        super(project);
 
         this.project = project;
         this.targetBlockTag = targetBlockTag;
@@ -102,31 +95,11 @@ public class InjectAViewModelDialog extends AbstractDialog {
         });
         this.viewModelDirectory.setText("ViewModel");
 
-        setContentPane(contentPane);
-        setModal(true);
         setTitle(InjectAViewModelAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
 
-        buttonOK.addActionListener((final ActionEvent event) -> onOK());
-        buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
+        // DialogWrapper handles button actions and ESC key automatically
 
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
-
-        contentPane.registerKeyboardAction(
-                (final ActionEvent event) -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
-
-        addComponentListener(
-                new FocusOnAFieldListener(() -> viewModelClassName.requestFocusInWindow())
-        );
+        init();
     }
 
     protected void updateArgumentText() {
@@ -205,8 +178,18 @@ public class InjectAViewModelDialog extends AbstractDialog {
     public static void open(final @NotNull Project project, final XmlTag targetXmlTag) {
         final InjectAViewModelDialog dialog =
                 new InjectAViewModelDialog(project, targetXmlTag);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 }

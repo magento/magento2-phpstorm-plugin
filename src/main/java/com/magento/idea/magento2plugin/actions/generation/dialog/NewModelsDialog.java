@@ -23,9 +23,6 @@ import com.magento.idea.magento2plugin.actions.generation.generator.ModuleResour
 import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -33,6 +30,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("PMD.TooManyFields")
 public class NewModelsDialog extends AbstractDialog {
@@ -40,8 +38,6 @@ public class NewModelsDialog extends AbstractDialog {
     private final String moduleName;
     private final Project project;
     private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
 
     private static final String ACTION_NAME = "Create Models";
     private static final String MODEL_NAME = "Model Name";
@@ -107,25 +103,11 @@ public class NewModelsDialog extends AbstractDialog {
      * @param directory PsiDirectory
      */
     public NewModelsDialog(final Project project, final PsiDirectory directory) {
-        super();
+        super(project);
         this.project = project;
         this.moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
 
-        setContentPane(contentPane);
-        setModal(true);
         setTitle(NewModelsAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
-        buttonOK.addActionListener(e -> onOK());
-        buttonCancel.addActionListener(e -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
@@ -141,7 +123,7 @@ public class NewModelsDialog extends AbstractDialog {
             }
         });
 
-        addComponentListener(new FocusOnAFieldListener(() -> modelName.requestFocusInWindow()));
+        init();
     }
 
     /**
@@ -164,9 +146,19 @@ public class NewModelsDialog extends AbstractDialog {
             final @NotNull PsiDirectory directory
     ) {
         final NewModelsDialog dialog = new NewModelsDialog(project, directory);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     /**

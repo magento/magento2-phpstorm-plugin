@@ -28,20 +28,15 @@ import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.php.PhpTypeMetadataParserUtil;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
@@ -55,8 +50,6 @@ public class CreateAPluginDialog extends AbstractDialog {
     private Method targetMethod;
     private final PhpClass targetClass;
     private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
     private JComboBox pluginType;
     private JComboBox pluginArea;
 
@@ -122,15 +115,12 @@ public class CreateAPluginDialog extends AbstractDialog {
             final Method targetMethod,
             final PhpClass targetClass
     ) {
-        super();
+        super(project);
         this.project = project;
         this.targetMethod = targetMethod;
         this.targetClass = targetClass;
 
-        setContentPane(contentPane);
-        setModal(true);
         setTitle(CreateAPluginAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
         fillPluginTypeOptions();
         fillTargetAreaOptions();
 
@@ -138,24 +128,18 @@ public class CreateAPluginDialog extends AbstractDialog {
             this.targetMethodLabel.setVisible(false);
         }
 
-        buttonOK.addActionListener((final ActionEvent event) -> onOK());
-        buttonCancel.addActionListener((final ActionEvent event) -> onCancel());
+        init();
+    }
 
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
-
-        contentPane.registerKeyboardAction(
-                (final ActionEvent event) -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
-
-        addComponentListener(new FocusOnAFieldListener(() -> pluginModule.requestFocusInWindow()));
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     private void fillPluginTypeOptions() {
@@ -261,9 +245,8 @@ public class CreateAPluginDialog extends AbstractDialog {
                 targetMethod,
                 targetClass
         );
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
     }
 
     private void createUIComponents() {

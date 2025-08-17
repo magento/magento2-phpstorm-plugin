@@ -36,9 +36,6 @@ import com.magento.idea.magento2plugin.magento.packages.DiArgumentType;
 import com.magento.idea.magento2plugin.ui.FilteredComboBox;
 import com.magento.idea.magento2plugin.util.php.PhpTypeMetadataParserUtil;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -51,9 +48,9 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({
         "PMD.TooManyFields",
@@ -172,38 +169,16 @@ public class NewArgumentInjectionDialog extends AbstractDialog {
             final @NotNull PhpClass targetClass,
             final @NotNull Parameter parameter
     ) {
-        super();
+        super(project);
 
         this.project = project;
         this.targetClass = targetClass;
         targetParameter = parameter;
         arrayValues = new DiArrayValueData();
 
-        setContentPane(contentPane);
-        setModal(true);
         setTitle(InjectConstructorArgumentAction.ACTION_DESCRIPTION);
-        getRootPane().setDefaultButton(buttonOK);
 
-        buttonOK.addActionListener(event -> onOK());
-        buttonCancel.addActionListener(event -> onCancel());
-
-        // call onCancel() when cross is clicked
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent event) {
-                onCancel();
-            }
-        });
-
-        // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(
-                event -> onCancel(),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
-        );
-
-        addComponentListener(new FocusOnAFieldListener(() -> targetModule.requestFocusInWindow()));
+        init();
 
         targetClassField.setText(targetClass.getPresentableFQN());
         targetArgument.setText(parameter.getName());
@@ -355,16 +330,26 @@ public class NewArgumentInjectionDialog extends AbstractDialog {
     ) {
         final NewArgumentInjectionDialog dialog =
                 new NewArgumentInjectionDialog(project, targetClass, parameter);
-        dialog.pack();
         dialog.centerDialog(dialog);
-        dialog.setVisible(true);
+        dialog.showDialog();
+    }
+
+    /**
+     * Create center panel.
+     *
+     * @return JComponent
+     */
+    @Nullable
+    @Override
+    protected JComponent createCenterPanel() {
+        return contentPane;
     }
 
     /**
      * Fire generation process if all fields are valid.
      */
     protected void onWriteActionOK() {
-         final DiArgumentData data = getDialogDataObject();
+        final DiArgumentData data = getDialogDataObject();
 
         if (data == null) {
             return;

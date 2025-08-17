@@ -11,7 +11,6 @@ import com.intellij.openapi.util.text.Strings;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.codeInsight.PhpCodeInsightUtil;
 import com.jetbrains.php.config.PhpLanguageFeature;
-import com.jetbrains.php.lang.PhpCodeUtil;
 import com.jetbrains.php.lang.PhpLangUtil;
 import com.jetbrains.php.lang.documentation.phpdoc.PhpDocUtil;
 import com.jetbrains.php.lang.psi.elements.Method;
@@ -74,7 +73,7 @@ public final class ConvertPluginParamsToString {
                 buf.append(',');
             }
             if (element instanceof Parameter) {
-                String parameterText = PhpCodeUtil.paramToString(element);
+                String parameterText = ((Parameter) element).getText();
 
                 // Parameter has default value.
                 if (parameterText.contains("=")) {
