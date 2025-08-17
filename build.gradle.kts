@@ -31,7 +31,6 @@ repositories {
 
     intellijPlatform {
         defaultRepositories()
-        maven("https://www.jetbrains.com/intellij-repository/snapshots")
     }
 }
 
