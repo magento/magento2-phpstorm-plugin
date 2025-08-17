@@ -103,5 +103,5 @@ jobs:
         uses: JetBrains/qodana-action@v2024.2
         with:
           cache-default-branch-only: true
-          use-caches: 'gradle'
+          use-caches: true
           args: '--baseline,qodana.sarif.json'
