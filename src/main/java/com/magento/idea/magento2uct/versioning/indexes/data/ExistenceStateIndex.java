@@ -196,7 +196,7 @@ public class ExistenceStateIndex implements VersionStateIndex {
                     VersioningDataOperationsUtil.unionVersionDataWithChangelog(
                             versioningData,
                             new ArrayList<>(Collections.singletonList(
-                                    SupportedVersion.valueOf("2.3.0").getVersion()
+                                    SupportedVersion.getSupportedVersions().get(0).getVersion()
                             )),
                             false
                     );

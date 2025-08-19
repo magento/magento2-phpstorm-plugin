@@ -267,14 +267,14 @@ public class ConfigurationDialog extends AbstractDialog {
     private void createUIComponents() {
         targetVersion = new ComboBox<>();
 
-        for (final String version : SupportedVersion.getSupportedVersions()) {
-            targetVersion.addItem(new ComboBoxItemData(version, version));
+        for (final SupportedVersion version : SupportedVersion.getSupportedVersions()) {
+            targetVersion.addItem(new ComboBoxItemData(version.getVersion(), version.getVersion()));
         }
         currentVersion = new ComboBox<>();
         currentVersion.addItem(new ComboBoxItemData("", "Less than 2.3.0"));
 
-        for (final String version : SupportedVersion.getSupportedVersions()) {
-            currentVersion.addItem(new ComboBoxItemData(version, version));
+        for (final SupportedVersion version : SupportedVersion.getSupportedVersions()) {
+            currentVersion.addItem(new ComboBoxItemData(version.getVersion(), version.getVersion()));
         }
         issueSeverityLevel = new ComboBox<>();
 

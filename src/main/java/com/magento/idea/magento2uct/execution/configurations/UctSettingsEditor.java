@@ -320,8 +320,8 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
     private void initializeComboboxSources() {
         comingVersion.setToolTipText("Choose a target version");
 
-        for (final String version : SupportedVersion.getSupportedVersions()) {
-            comingVersion.addItem(new ComboBoxItemData(version, version));
+        for (final SupportedVersion version : SupportedVersion.getSupportedVersions()) {
+            comingVersion.addItem(new ComboBoxItemData(version.getVersion(), version.getVersion()));
         }
 
         for (final IssueSeverityLevel level : IssueSeverityLevel.getSeverityLabels()) {

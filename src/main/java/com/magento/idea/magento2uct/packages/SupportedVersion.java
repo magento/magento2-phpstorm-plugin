@@ -5,6 +5,10 @@
 
 package com.magento.idea.magento2uct.packages;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,57 +16,68 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import java.util.concurrent.atomic.AtomicReference;
 
-public enum SupportedVersion {
-    ;
+public final class SupportedVersion {
+
     private final String version;
-    private static final Integer SUCCESS_CODE = 200;
 
-    SupportedVersion(final String version) {
+    private SupportedVersion(final String version) {
         this.version = version;
     }
 
-    /**
-     * Get version.
-     *
-     * @return String
-     */
-    public String getVersion() {
+    public @NotNull String getVersion() {
         return version;
     }
 
-    /**
-     * Get version ENUM by version code.
-     *
-     * @param versionCandidate String
-     *
-     * @return SupportedVersion
-     */
-    public @Nullable static SupportedVersion getVersion(final @NotNull String versionCandidate) {
-        for (final SupportedVersion version : SupportedVersion.values()) {
+    private static final AtomicReference<List<SupportedVersion>> cachedVersions = new AtomicReference<>();
+
+    public static @NotNull List<SupportedVersion> getSupportedVersions() {
+        List<SupportedVersion> versions = cachedVersions.get();
+
+        if (versions == null) {
+            versions = new ArrayList<>();
+
+            try {
+                for (final String versionStr : fetchRemoteSupportedVersions()) {
+                    versions.add(new SupportedVersion(versionStr));
+                }
+            } catch (Exception ignored) {
+            }
+
+            cachedVersions.set(versions);
+        }
+
+        return versions;
+    }
+
+    public static String[] getSupportedVersionStrings() {
+        return getSupportedVersions()
+                .stream()
+                .map(SupportedVersion::toString)
+                .toArray(String[]::new);
+    }
+
+    public static @Nullable SupportedVersion getVersion(final @NotNull String versionCandidate) {
+        for (final SupportedVersion version : getSupportedVersions()) {
             if (version.getVersion().equals(versionCandidate)) {
                 return version;
             }
         }
+
         return null;
     }
 
-    /**
-     * Get supported versions.
-     *
-     * @return List[String]
-     */
-    public static List<String> getSupportedVersions() {
-        try {
-            return fetchSupportedVersions();
-        } catch (Exception e) { //NOPMD - suppressed AvoidCatchingGenericException
-            // Return an empty list or log the exception
-            return List.of();
+    public static List<SupportedVersion> getPriorVersions(final SupportedVersion version) {
+        final List<SupportedVersion> previousVersions = new ArrayList<>();
+
+        for (final SupportedVersion supportedVersion : getSupportedVersions()) {
+            if (supportedVersion.getVersion().compareTo(version.toString()) < 0) {
+                previousVersions.add(supportedVersion);
+            }
         }
+
+        return previousVersions;
     }
 
     /**
@@ -71,22 +86,22 @@ public enum SupportedVersion {
      * from a predefined URL and parses it into a list of version strings.
      *
      * @return List[String] containing supported version strings
-     * @throws IOException if an error occurs during HTTP connection or JSON parsing
      */
-    public static List<String> fetchSupportedVersions() throws IOException {
+    private static List<String> fetchRemoteSupportedVersions() {
         final String url = "https://repo.packagist.org/p2/magento/community-edition.json";
         final List<String> versions = new ArrayList<>();
 
         HttpURLConnection connection = null;
+
         try {
             // Establish HTTP connection
             connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Accept", "application/json");
 
-            if (connection.getResponseCode() != SUCCESS_CODE) {
+            if (connection.getResponseCode() != 200) {
                 throw new IOException(//NOPMD - suppressed AvoidThrowingRawExceptionTypes
-                    "Failed to fetch data, HTTP response code: " + connection.getResponseCode()
+                        "Failed to fetch data, HTTP response code: " + connection.getResponseCode()
                 );
             }
 
@@ -122,6 +137,7 @@ public enum SupportedVersion {
                     versions.add(versionstring);
                 }
             }
+        } catch (IOException ignored) {
         } finally {
             if (connection != null) {
                 connection.disconnect();
@@ -131,22 +147,4 @@ public enum SupportedVersion {
         return versions;
     }
 
-    /**
-     * Get previous versions.
-     *
-     * @param version SupportedVersion
-     *
-     * @return List[SupportedVersion]
-     */
-    public static List<SupportedVersion> getPriorVersions(final SupportedVersion version) {
-        final List<SupportedVersion> previousVersions = new ArrayList<>();
-
-        for (final SupportedVersion supportedVersion : SupportedVersion.values()) {
-            if (supportedVersion.compareTo(version) < 0) {
-                previousVersions.add(supportedVersion);
-            }
-        }
-
-        return previousVersions;
-    }
 }

@@ -132,8 +132,8 @@ public class ReindexDialog extends AbstractDialog {
     private void createUIComponents() {
         targetVersion = new ComboBox<>();
 
-        for (final String version : SupportedVersion.getSupportedVersions()) {
-            targetVersion.addItem(new ComboBoxItemData(version, version));
+        for (final SupportedVersion version : SupportedVersion.getSupportedVersions()) {
+            targetVersion.addItem(new ComboBoxItemData(version.getVersion(), version.getVersion()));
         }
         targetIndex = new ComboBox<>();
         targetIndex.addItem(new ComboBoxItemData("", " --- Choose Target Index --- "));

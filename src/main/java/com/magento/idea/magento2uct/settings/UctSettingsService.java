@@ -15,6 +15,7 @@ import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedVersion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import java.util.List;
 
 @State(name = "Magento2UctSettings", storages = @Storage(UctSettingsService.M2_UCT_SETTINGS_XML))
 public class UctSettingsService implements PersistentStateComponent<UctSettingsService> {
@@ -164,6 +165,7 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
         if (currentVersion == null) {
             return null;
         }
+
         return SupportedVersion.getVersion(currentVersion);
     }
 
@@ -174,8 +176,9 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
      */
     public @NotNull SupportedVersion getCurrentVersionOrDefault() {
         final SupportedVersion currentVersion = getCurrentVersion();
+        final @NotNull List<SupportedVersion> supportedVersions = SupportedVersion.getSupportedVersions();
 
-        return currentVersion == null ? SupportedVersion.valueOf("2.3.0") : currentVersion;
+        return currentVersion == null ? supportedVersions.get(0) : currentVersion;
     }
 
     /**
@@ -196,6 +199,7 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
         if (targetVersion == null) {
             return null;
         }
+
         return SupportedVersion.getVersion(targetVersion);
     }
 

@@ -89,8 +89,8 @@ public final class DeprecationIndexProcessor implements IndexProcessor {
     ) {
         final List<SupportedVersion> previousVersions = new ArrayList<>();
 
-        for (final SupportedVersion supportedVersion : SupportedVersion.values()) {
-            if (supportedVersion.compareTo(indexedVersion) < 0) {
+        for (final SupportedVersion supportedVersion : SupportedVersion.getSupportedVersions()) {
+            if (supportedVersion.getVersion().compareTo(indexedVersion.getVersion()) < 0) {
                 previousVersions.add(supportedVersion);
             }
         }

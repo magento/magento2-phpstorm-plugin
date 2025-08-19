@@ -22,17 +22,17 @@ public enum IndexRegistry {
     DEPRECATION(
             DeprecationStateIndex.class,
             new DeprecationIndexProcessor(),
-            SupportedVersion.getSupportedVersions().toArray(new String[0])
+            SupportedVersion.getSupportedVersionStrings()
     ),
     EXISTENCE(
             ExistenceStateIndex.class,
             new ExistenceIndexProcessor(),
-            SupportedVersion.getSupportedVersions().toArray(new String[0])
+            SupportedVersion.getSupportedVersionStrings()
     ),
     API_COVERAGE(
             ApiCoverageStateIndex.class,
             new ApiCoverageIndexProcessor(),
-            SupportedVersion.getSupportedVersions().toArray(new String[0])
+            SupportedVersion.getSupportedVersionStrings()
     );
 
     private final String key;

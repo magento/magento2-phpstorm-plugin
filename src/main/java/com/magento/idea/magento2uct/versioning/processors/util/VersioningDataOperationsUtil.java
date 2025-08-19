@@ -83,7 +83,7 @@ public final class VersioningDataOperationsUtil {
                 return 0;
             }
 
-            return version1.compareTo(version2);
+            return version1.getVersion().compareTo(version2.getVersion());
         });
 
         for (final String version : versions) {
