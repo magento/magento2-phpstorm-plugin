@@ -114,7 +114,7 @@
             <properties>
               <enabled value="true"/>
               <font size="12"/>
-              <icon value="general/information.png"/>
+              <icon value="icons/information.png"/>
               <text value="To enable inspections in the real time, also enable inspections by path:"/>
             </properties>
           </component>
