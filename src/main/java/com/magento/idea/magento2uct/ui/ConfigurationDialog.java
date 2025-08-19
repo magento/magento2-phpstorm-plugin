@@ -25,7 +25,6 @@ import com.magento.idea.magento2uct.util.module.UctModulePathValidatorUtil;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.util.Objects;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -50,8 +49,6 @@ public class ConfigurationDialog extends AbstractDialog {
     private JComboBox<ComboBoxItemData> issueSeverityLevel;
 
     private JPanel contentPanel;
-    private JButton buttonCancel;
-    private JButton buttonOk;
     private JLabel currentVersionLabel;//NOPMD
     private JLabel modulePathLabel;//NOPMD
     private JLabel targetVersionLabel;//NOPMD
@@ -77,8 +74,6 @@ public class ConfigurationDialog extends AbstractDialog {
 
         hasAdditionalPath.addActionListener(event ->
                 refreshAdditionalFields(hasAdditionalPath.isSelected()));
-        buttonOk.addActionListener(event -> onOK());
-        buttonCancel.addActionListener(event -> onCancel());
 
         // call onCancel() on ESCAPE
         contentPanel.registerKeyboardAction(
