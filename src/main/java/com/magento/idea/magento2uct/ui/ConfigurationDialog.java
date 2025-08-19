@@ -92,6 +92,8 @@ public class ConfigurationDialog extends AbstractDialog {
         enableCommentPath.setForeground(JBColor.blue);
         setDefaultValues();
         refreshAdditionalFields(hasAdditionalPath.isSelected());
+
+        init();
     }
 
     /**
