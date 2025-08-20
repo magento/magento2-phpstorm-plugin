@@ -38,16 +38,16 @@ public enum IndexRegistry {
     private final String key;
     private final Class<?> type;
     private final IndexProcessor processor;
-    private final String[] versions;
+    private final List<String> versions;
 
     IndexRegistry(
             final Class<?> type,
             final IndexProcessor processor,
-            final String... versions
+            final List<String> versions
     ) {
         this.type = type;
         this.processor = processor;
-        this.versions = Arrays.copyOf(versions, versions.length);
+        this.versions = versions;
         key = this.toString();
     }
 
@@ -84,7 +84,7 @@ public enum IndexRegistry {
      * @return List[String]
      */
     public List<String> getVersions() {
-        return Arrays.asList(versions);
+        return versions;
     }
 
     /**

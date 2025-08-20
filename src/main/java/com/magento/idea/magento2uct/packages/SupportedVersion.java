@@ -51,11 +51,14 @@ public final class SupportedVersion {
         return versions;
     }
 
-    public static String[] getSupportedVersionStrings() {
-        return getSupportedVersions()
-                .stream()
-                .map(SupportedVersion::toString)
-                .toArray(String[]::new);
+    public static List<String> getSupportedVersionStrings() {
+        final List<String> versions = new ArrayList<>();
+
+        for (final SupportedVersion version : getSupportedVersions()) {
+            versions.add(version.getVersion());
+        }
+
+        return versions;
     }
 
     public static @Nullable SupportedVersion getVersion(final @NotNull String versionCandidate) {
