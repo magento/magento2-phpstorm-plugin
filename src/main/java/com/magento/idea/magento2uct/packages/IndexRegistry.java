@@ -13,7 +13,6 @@ import com.magento.idea.magento2uct.versioning.processors.DeprecationIndexProces
 import com.magento.idea.magento2uct.versioning.processors.ExistenceIndexProcessor;
 import com.magento.idea.magento2uct.versioning.processors.IndexProcessor;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
