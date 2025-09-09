@@ -16,7 +16,6 @@ import com.magento.idea.magento2uct.execution.process.ReindexHandler;
 import com.magento.idea.magento2uct.packages.IndexRegistry;
 import com.magento.idea.magento2uct.packages.SupportedVersion;
 import java.awt.event.KeyEvent;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -32,15 +31,13 @@ public class ReindexDialog extends AbstractDialog {
     private JPanel contentPanel;
     private JComboBox<ComboBoxItemData> targetVersion;
     private JComboBox<ComboBoxItemData> targetIndex;
-    private JButton buttonOk;
-    private JButton buttonCancel;
     private JLabel targetVersionLabel;//NOPMD
     private JLabel targetIndexLabel;//NOPMD
 
     /**
      * Reindexing dialog.
      *
-     * @param project Project
+     * @param project   Project
      * @param directory PsiDirectory
      */
     public ReindexDialog(
@@ -53,9 +50,6 @@ public class ReindexDialog extends AbstractDialog {
         this.directory = directory;
 
         setTitle(ReindexVersionedIndexesAction.ACTION_NAME);
-
-        buttonOk.addActionListener(event -> onOK());
-        buttonCancel.addActionListener(event -> onCancel());
 
         // call onCancel() on ESCAPE
         contentPanel.registerKeyboardAction(
@@ -70,7 +64,7 @@ public class ReindexDialog extends AbstractDialog {
     /**
      * Open reindexing dialog window.
      *
-     * @param project Project
+     * @param project   Project
      * @param directory PsiDirectory
      */
     public static void open(
@@ -132,8 +126,8 @@ public class ReindexDialog extends AbstractDialog {
     private void createUIComponents() {
         targetVersion = new ComboBox<>();
 
-        for (final String version : SupportedVersion.getSupportedVersions()) {
-            targetVersion.addItem(new ComboBoxItemData(version, version));
+        for (final SupportedVersion version : SupportedVersion.getSupportedVersions()) {
+            targetVersion.addItem(new ComboBoxItemData(version.getVersion(), version.getVersion()));
         }
         targetIndex = new ComboBox<>();
         targetIndex.addItem(new ComboBoxItemData("", " --- Choose Target Index --- "));

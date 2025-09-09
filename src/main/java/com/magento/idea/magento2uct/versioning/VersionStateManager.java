@@ -148,22 +148,16 @@ public final class VersionStateManager {
     @SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
     private synchronized void correctSettings(final @NotNull Project project) {
         final UctSettingsService settingsService = UctSettingsService.getInstance(project);
-        final List<String> allVersions = SupportedVersion.getSupportedVersions();
+        final List<SupportedVersion> allVersions = SupportedVersion.getSupportedVersions();
 
-        if (currentVersion == null
-                || SupportedVersion.getVersion(currentVersion.getVersion()) == null) {
-            final SupportedVersion correctCurrentVersion = SupportedVersion.getVersion(
-                    allVersions.get(0)
-            );
+        if (currentVersion == null) {
+            final SupportedVersion correctCurrentVersion = allVersions.get(0);
             settingsService.setCurrentVersion(correctCurrentVersion);
             currentVersion = correctCurrentVersion;
         }
 
-        if (targetVersion == null
-                || SupportedVersion.getVersion(targetVersion.getVersion()) == null) {
-            final SupportedVersion correctTargetVersion = SupportedVersion.getVersion(
-                    allVersions.get(allVersions.size() - 1)
-            );
+        if (targetVersion == null) {
+            final SupportedVersion correctTargetVersion = allVersions.get(allVersions.size() - 1);
             settingsService.setTargetVersion(correctTargetVersion);
             targetVersion = correctTargetVersion;
         }
@@ -201,11 +195,11 @@ public final class VersionStateManager {
         }
 
         if (versionsToLoad.isEmpty()) {
-            for (final SupportedVersion version : SupportedVersion.values()) {
-                if (version.compareTo(targetVersion) <= 0) {
+            for (final SupportedVersion version : SupportedVersion.getSupportedVersions()) {
+                if (version.getVersion().compareTo(targetVersion.getVersion()) <= 0) {
                     if (isSetIgnoreFlag != null && isSetIgnoreFlag) {
                         // If current version is NULL, it is less than minimum supported version.
-                        if (currentVersion == null || version.compareTo(currentVersion) > 0) {
+                        if (currentVersion == null || version.getVersion().compareTo(currentVersion.getVersion()) > 0) {
                             versionsToLoad.add(version);
                         }
                     } else {

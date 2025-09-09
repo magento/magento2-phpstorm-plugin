@@ -13,7 +13,6 @@ import com.magento.idea.magento2uct.versioning.processors.DeprecationIndexProces
 import com.magento.idea.magento2uct.versioning.processors.ExistenceIndexProcessor;
 import com.magento.idea.magento2uct.versioning.processors.IndexProcessor;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,32 +21,32 @@ public enum IndexRegistry {
     DEPRECATION(
             DeprecationStateIndex.class,
             new DeprecationIndexProcessor(),
-            SupportedVersion.getSupportedVersions().toArray(new String[0])
+            SupportedVersion.getSupportedVersionStrings()
     ),
     EXISTENCE(
             ExistenceStateIndex.class,
             new ExistenceIndexProcessor(),
-            SupportedVersion.getSupportedVersions().toArray(new String[0])
+            SupportedVersion.getSupportedVersionStrings()
     ),
     API_COVERAGE(
             ApiCoverageStateIndex.class,
             new ApiCoverageIndexProcessor(),
-            SupportedVersion.getSupportedVersions().toArray(new String[0])
+            SupportedVersion.getSupportedVersionStrings()
     );
 
     private final String key;
     private final Class<?> type;
     private final IndexProcessor processor;
-    private final String[] versions;
+    private final List<String> versions;
 
     IndexRegistry(
             final Class<?> type,
             final IndexProcessor processor,
-            final String... versions
+            final List<String> versions
     ) {
         this.type = type;
         this.processor = processor;
-        this.versions = Arrays.copyOf(versions, versions.length);
+        this.versions = versions;
         key = this.toString();
     }
 
@@ -84,7 +83,7 @@ public enum IndexRegistry {
      * @return List[String]
      */
     public List<String> getVersions() {
-        return Arrays.asList(versions);
+        return versions;
     }
 
     /**
