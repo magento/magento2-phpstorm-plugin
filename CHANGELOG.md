@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
+## 2025.2.2
+
+### Fixed
+
+- Null PsiDirectory input in GetModuleNameByDirectoryUtil [#2606](https://github.com/magento/magento2-phpstorm-plugin/pull/2606)
+
 ## 2025.2.1
 
 ### Fixed

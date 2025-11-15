@@ -32,9 +32,13 @@ public final class GetModuleNameByDirectoryUtil {
      * @return String
      */
     public static @Nullable String execute(
-            final @NotNull PsiDirectory psiDirectory,
+            final @Nullable PsiDirectory psiDirectory,
             final @NotNull Project project
     ) {
+        // Gracefully handle null directory inputs from callers
+        if (psiDirectory == null) {
+            return null;
+        }
         // Check if directory is theme directory and return module name from directory path if yes
         final String path = psiDirectory.getVirtualFile().getPath();
         final Pattern pattern = Pattern.compile(RegExUtil.CustomTheme.MODULE_NAME);
