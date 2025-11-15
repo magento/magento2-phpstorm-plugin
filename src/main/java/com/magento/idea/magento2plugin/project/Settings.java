@@ -10,6 +10,7 @@ import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.components.StoragePathMacros;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.EventDispatcher;
 import com.intellij.util.SmartList;
@@ -27,7 +28,8 @@ import org.jetbrains.annotations.Nullable;
 @State(
         name = "Magento2PluginSettings",
         storages = {
-            @Storage("magento2plugin.xml")
+            @Storage(StoragePathMacros.WORKSPACE_FILE),
+            @Storage(value = "magento2plugin.xml", deprecated = true)
         }
 )
 public class Settings implements PersistentStateComponent<Settings.State> {
