@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 ### Fixed
 
 - Null PsiDirectory input in GetModuleNameByDirectoryUtil [#2606](https://github.com/magento/magento2-phpstorm-plugin/pull/2606)
+- Migrated settings storage to workspace.xm [#2607](https://github.com/magento/magento2-phpstorm-plugin/pull/2607)
 
 ## 2025.2.1
 
