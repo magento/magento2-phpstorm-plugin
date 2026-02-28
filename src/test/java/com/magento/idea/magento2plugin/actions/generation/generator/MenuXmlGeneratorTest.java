@@ -21,7 +21,7 @@ public class MenuXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test checks whether menu.xml file generated correctly.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateMenuXmlFile() {
         final String filePath = this.getFixturePath(ModuleMenuXml.fileName);
 

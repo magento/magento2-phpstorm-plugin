@@ -17,7 +17,7 @@ public class DataModelGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tests for generation of a Magento 2 Data Model.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateDataModel() {
         final Project project = myFixture.getProject();
         final DataModelData modelData = new DataModelData(
@@ -45,7 +45,7 @@ public class DataModelGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tests for generation of a Magento 2 Data Model without interface.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateDataModelWithoutInterface() {
         final Project project = myFixture.getProject();
         final DataModelData modelData = new DataModelData(

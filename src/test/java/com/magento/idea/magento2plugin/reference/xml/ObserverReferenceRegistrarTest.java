@@ -12,7 +12,7 @@ public class ObserverReferenceRegistrarTest extends ReferenceXmlFixtureTestCase 
     /**
      * Tests for observer instance reference in events.xml.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testObserverInstanceMustHaveReference() {
         myFixture.configureByFile(this.getFixturePath(ModuleEventsXml.FILE_NAME));
 
@@ -22,7 +22,7 @@ public class ObserverReferenceRegistrarTest extends ReferenceXmlFixtureTestCase 
     /**
      * Tests for observer instance with snake case reference in events.xml.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testObserverInstanceDirectorySnakeCaseMustHaveReference() {
         myFixture.configureByFile(this.getFixturePath(ModuleEventsXml.FILE_NAME));
 
@@ -32,7 +32,7 @@ public class ObserverReferenceRegistrarTest extends ReferenceXmlFixtureTestCase 
     /**
      * Tests for observer name reference in events.xml.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testObserverNameMustHaveReference() {
         myFixture.configureByFile(this.getFixturePath(ModuleEventsXml.FILE_NAME));
 
@@ -42,7 +42,7 @@ public class ObserverReferenceRegistrarTest extends ReferenceXmlFixtureTestCase 
     /**
      * Tests for event name reference in events.xml.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testEventNameMustHaveReference() {
         myFixture.configureByFile(this.getFixturePath(ModuleEventsXml.FILE_NAME));
 
@@ -52,7 +52,7 @@ public class ObserverReferenceRegistrarTest extends ReferenceXmlFixtureTestCase 
     /**
      * Tests for no event name reference in events.xml.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testEventNameMustNotHaveReference() {
         myFixture.configureByFile(this.getFixturePath(ModuleEventsXml.FILE_NAME));
 

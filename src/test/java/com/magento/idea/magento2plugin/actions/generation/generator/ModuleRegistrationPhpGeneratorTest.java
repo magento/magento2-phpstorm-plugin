@@ -16,7 +16,7 @@ public class ModuleRegistrationPhpGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test for generation of registration.php file.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateRegistrationPhpFile() {
         final String filePath = this.getFixturePath(RegistrationPhp.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -44,7 +44,7 @@ public class ModuleRegistrationPhpGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test for generation of registration.php file for a module project.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateRegistrationPhpFileInRoot() {
         final String filePath = this.getFixturePath(RegistrationPhp.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

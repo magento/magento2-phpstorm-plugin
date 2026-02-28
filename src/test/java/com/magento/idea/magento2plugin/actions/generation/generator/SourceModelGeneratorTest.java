@@ -15,7 +15,7 @@ public class SourceModelGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test source model generation.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateFile() {
         final Project project = myFixture.getProject();
 
@@ -39,7 +39,7 @@ public class SourceModelGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test source model in custom directory generation.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateFileInCustomDirectory() {
         final Project project = myFixture.getProject();
 

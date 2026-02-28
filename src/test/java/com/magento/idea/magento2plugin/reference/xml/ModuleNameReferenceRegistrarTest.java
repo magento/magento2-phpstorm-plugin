@@ -10,7 +10,7 @@ public class ModuleNameReferenceRegistrarTest extends ReferenceXmlFixtureTestCas
     /**
      * Tests for module name reference in module.xml
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testModuleNameMustHaveReference() {
         myFixture.configureByFile(this.getFixturePath("module.xml"));
 
@@ -20,7 +20,7 @@ public class ModuleNameReferenceRegistrarTest extends ReferenceXmlFixtureTestCas
     /**
      * Tests for module name reference under sequence node in module.xml
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testSequenceModuleNameMustHaveReference() {
         myFixture.configureByFile(this.getFixturePath("module.xml"));
 

@@ -13,7 +13,7 @@ public class MenuCompletionRegistrarTest extends CompletionXmlFixtureTestCase {
      * The `parent` attribute of the `add` tag in the men XML must
      * have completion based on the index.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testAddTagMustHaveCompletion() {
         final String filePath = this.getFixturePath(ModuleMenuXml.fileName);
         myFixture.configureByFile(filePath);

@@ -26,7 +26,7 @@ public class SchemaResolverInspectionTest extends InspectionGraphqlsFixtureTestC
     /**
      * Inspection with valid schema resolver.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testWithValidSchemaResolverInterface() throws Exception {
         myFixture.configureByFile(getFixturePath(SchemaGraphQLsFile.FILE_NAME));
         assertHasNoHighlighting(errorMessage);
@@ -35,7 +35,7 @@ public class SchemaResolverInspectionTest extends InspectionGraphqlsFixtureTestC
     /**
      * Inspection with invalid schema resolver.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testWithInvalidSchemaResolverInterface() throws Exception {
         myFixture.configureByFile(getFixturePath(SchemaGraphQLsFile.FILE_NAME));
         assertHasHighlighting(errorMessage);
@@ -44,7 +44,7 @@ public class SchemaResolverInspectionTest extends InspectionGraphqlsFixtureTestC
     /**
      * Inspection with valid batch resolver.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testWithValidBatchResolverInterface() throws Exception {
         myFixture.configureByFile(getFixturePath(SchemaGraphQLsFile.FILE_NAME));
 
@@ -54,7 +54,7 @@ public class SchemaResolverInspectionTest extends InspectionGraphqlsFixtureTestC
     /**
      * Inspection with valid batch service contract resolver.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testWithValidBatchServiceContractResolverInterface() throws Exception {
         myFixture.configureByFile(getFixturePath(SchemaGraphQLsFile.FILE_NAME));
 

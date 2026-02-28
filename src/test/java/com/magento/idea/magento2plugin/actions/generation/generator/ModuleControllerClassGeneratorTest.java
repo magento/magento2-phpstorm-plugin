@@ -13,7 +13,7 @@ public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of frontend controller file.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateFrontendControllerFile() {
         final Project project = myFixture.getProject();
         final ControllerFileData controllerFileData = new ControllerFileData(
@@ -44,7 +44,7 @@ public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of frontend controller file with action class inheritance.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateFrontendInheritActionControllerFile() {
         final Project project = myFixture.getProject();
         final ControllerFileData controllerFileData = new ControllerFileData(
@@ -75,7 +75,7 @@ public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of backend controller file.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateBackendControllerFile() {
         final Project project = myFixture.getProject();
         final ControllerFileData controllerFileData = new ControllerFileData(

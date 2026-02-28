@@ -25,7 +25,7 @@ public class CrontabXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generating crontab with schedule.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateCronTabXmlFileWithSchedule() {
         final String filePath = this.getFixturePath(CrontabXmlTemplate.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -43,7 +43,7 @@ public class CrontabXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generating crontab with schedule config path.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateCronTabXmlFileWithScheduleConfig() {
         final String filePath = this.getFixturePath(CrontabXmlTemplate.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -61,7 +61,7 @@ public class CrontabXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test adding two cronjobs to the crontab.xml with one cron groups.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testAddTwoCronJobsToOneCronTab() {
         final String filePath = this.getFixturePath(CrontabXmlTemplate.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -86,7 +86,7 @@ public class CrontabXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test adding two cronjobs to the crontab.xml with different cron groups.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testAddTwoCronJobsToDifferentCronTabs() {
         final String filePath = this.getFixturePath(CrontabXmlTemplate.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

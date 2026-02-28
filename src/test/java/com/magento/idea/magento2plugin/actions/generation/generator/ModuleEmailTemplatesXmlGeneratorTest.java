@@ -25,7 +25,7 @@ public class ModuleEmailTemplatesXmlGeneratorTest extends BaseGeneratorTestCase 
     /**
      * Test generating email template configuration with HTML type.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateEmailTemplateHtmlXml() {
         final String filePath = this.getFixturePath(EmailTemplatesXml.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -43,7 +43,7 @@ public class ModuleEmailTemplatesXmlGeneratorTest extends BaseGeneratorTestCase 
     /**
      * Test generating email template configuration with TEXT type.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateEmailTemplateTextXml() {
         final String filePath = this.getFixturePath(EmailTemplatesXml.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -61,7 +61,7 @@ public class ModuleEmailTemplatesXmlGeneratorTest extends BaseGeneratorTestCase 
     /**
      * Test adding two email templates to email_templates.xml.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testAddTwoEmailTemplatesToEmailTemplatesXmlFile() {
         final String filePath = this.getFixturePath(EmailTemplatesXml.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

@@ -19,7 +19,7 @@ public class AclXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test checks whether acl.xml file generated correctly.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateAclXmlFile() {
         final String filePath = this.getFixturePath(ModuleAclXml.FILE_NAME);
 
@@ -38,7 +38,7 @@ public class AclXmlGeneratorTest extends BaseGeneratorTestCase {
      * Test checks whether acl.xml file generated correctly
      * for non existed parent.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateAclXmlFileForNonExistedParent() {
         final String filePath = this.getFixturePath(ModuleAclXml.FILE_NAME);
 
@@ -56,7 +56,7 @@ public class AclXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test adding new acl rule to existing acl.xml file.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGetAclXmlFileAndGenerateNewAcl() {
         final String filePath = this.getFixturePath(ModuleAclXml.FILE_NAME);
         generateAclXmlFile(CONFIG_ACL_ID, FOO_BAR_MANAGE_ACL_ID, FOO_BAR_MANAGE_ACL_TITLE);

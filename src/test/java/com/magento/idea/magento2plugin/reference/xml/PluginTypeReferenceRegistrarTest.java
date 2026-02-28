@@ -13,7 +13,7 @@ public class PluginTypeReferenceRegistrarTest extends ReferenceXmlFixtureTestCas
      * The `type` attribute of the `plugin` tag in di.xml must
      * have reference to the PHP class
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testPluginTypeMustHaveReference() {
         final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
         myFixture.configureByFile(filePath);

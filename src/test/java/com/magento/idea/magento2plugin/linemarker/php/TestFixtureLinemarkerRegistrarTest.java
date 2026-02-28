@@ -12,7 +12,7 @@ public class TestFixtureLinemarkerRegistrarTest extends LinemarkerFixtureTestCas
     /**
      * Tests linemarkers for @magentoDataFixture tag.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testMagentoDataFixtureHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("Test.php", "php"));
 
@@ -22,7 +22,7 @@ public class TestFixtureLinemarkerRegistrarTest extends LinemarkerFixtureTestCas
     /**
      * Tests linemarkers for @magentoApiDataFixture tag.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testMagentoApiDataFixtureHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("Test.php", "php"));
 

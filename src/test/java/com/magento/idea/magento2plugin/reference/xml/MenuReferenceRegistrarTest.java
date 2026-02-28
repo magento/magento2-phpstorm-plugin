@@ -13,7 +13,7 @@ public class MenuReferenceRegistrarTest extends ReferenceXmlFixtureTestCase {
      * The `parent` attribute of the `add` tag in a menu XML must
      * have reference to the `id` attribute of the another `add` tag.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testAddTagMustHaveCompletion() {
         final String filePath = this.getFixturePath(ModuleMenuXml.fileName);
         myFixture.configureByFile(filePath);

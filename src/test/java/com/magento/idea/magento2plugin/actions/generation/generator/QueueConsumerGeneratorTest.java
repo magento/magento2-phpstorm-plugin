@@ -25,7 +25,7 @@ public class QueueConsumerGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tests for generation of queue_consumer.xml file for the DB connection type.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateConsumerDbXmlFile() {
         final String filePath = this.getFixturePath(QueueConsumerXml.fileName);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -51,7 +51,7 @@ public class QueueConsumerGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tests for generation of queue_consumer.xml file for the AMPQ connection type.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateConsumerAmpqXmlFile() {
         final String filePath = this.getFixturePath(QueueConsumerXml.fileName);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

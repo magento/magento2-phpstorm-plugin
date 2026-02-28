@@ -37,7 +37,7 @@ public class UiComponentGridDataProviderGeneratorTest extends BaseGeneratorTestC
     /**
      * Test data provider class file generation with custom type.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateCustomDataProvider() {
         final PsiFile dataProviderFile = generateDataProvider(new UiComponentDataProviderData(
                 PROVIDER_CLASS_NAME,
@@ -56,7 +56,7 @@ public class UiComponentGridDataProviderGeneratorTest extends BaseGeneratorTestC
     /**
      * Test data provider class file generation when get list query model exists.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateDataProviderWithInjectedGetListQuery() {
         generateGetListQuery();
         final PsiFile dataProviderFile = generateDataProvider(new UiComponentDataProviderData(

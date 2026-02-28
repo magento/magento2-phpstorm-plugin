@@ -21,28 +21,28 @@ public class GraphQlResolverInspectionTest extends InspectionPhpFixtureTestCase 
         return false;
     }
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testWithInvalidResolverInterface() throws Exception {
         myFixture.configureByFile(getFixturePath("ResolverTest.php"));
 
         assertHasHighlighting(errorMessage);
     }
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testWithValidResolverInterface() throws Exception {
         myFixture.configureByFile(getFixturePath("ResolverTest.php"));
 
         assertHasNoHighlighting(errorMessage);
     }
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testWithValidBatchResolverInterface() throws Exception {
         myFixture.configureByFile(getFixturePath("ResolverTest.php"));
 
         assertHasNoHighlighting(errorMessage);
     }
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testWithValidBatchServiceContractResolverInterface() throws Exception {
         myFixture.configureByFile(getFixturePath("ResolverTest.php"));
 

@@ -10,7 +10,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.ViewModelFileData
 
 public class ModuleViewModelClassGeneratorTest extends BaseGeneratorTestCase {
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateViewModelFile() {
         Project project = myFixture.getProject();
 

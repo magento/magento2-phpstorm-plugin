@@ -19,7 +19,7 @@ public class NewEntityLayoutGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test new entity layout file generation.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateNewEntityLayoutFile() {
         final NewEntityLayoutData data = new NewEntityLayoutData(
                 MODULE_NAME,

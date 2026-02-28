@@ -14,7 +14,7 @@ public final class ModuleReadmeMdGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test module README.md file generation.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateModuleReadmeMdFile() {
         final PsiFile expectedFile = myFixture.configureByFile(
                 getFixturePath(ModuleReadmeMdFile.FILE_NAME)

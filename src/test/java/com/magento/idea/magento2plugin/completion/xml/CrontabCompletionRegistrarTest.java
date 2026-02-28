@@ -16,7 +16,7 @@ public class CrontabCompletionRegistrarTest extends CompletionXmlFixtureTestCase
      * The `instance` attribute of the `job` tag in crontab.xml must
      * have completion based on PHP classes index.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testCronJobInstanceMustHaveCompletion() {
         final String filePath = this.getFixturePath(CrontabXmlTemplate.FILE_NAME);
         assertCompletionContains(filePath, EXPECTED_INSTANCE);
@@ -26,7 +26,7 @@ public class CrontabCompletionRegistrarTest extends CompletionXmlFixtureTestCase
      * The `instance` attribute of the `job` tag in the
      * non crontab.xml file must not have completion.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testNotCrontabXmlMustHaveNotCompletion() {
         final String filePath = this.getFixturePath(WRONG_FILE_NAME);
         assertFileNotContainsCompletions(filePath, EXPECTED_INSTANCE);
@@ -36,7 +36,7 @@ public class CrontabCompletionRegistrarTest extends CompletionXmlFixtureTestCase
      * The non `instance` attribute of the `job` tag in crontab.xml must
      * not have completion.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testNotInstanceAttrMustHaveNotCompletion() {
         final String filePath = this.getFixturePath(CrontabXmlTemplate.FILE_NAME);
         assertFileNotContainsCompletions(filePath, EXPECTED_INSTANCE);
@@ -46,7 +46,7 @@ public class CrontabCompletionRegistrarTest extends CompletionXmlFixtureTestCase
      * The `instance` attribute that isn't in the `job` tag in crontab.xml must
      * not have completion.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testNotJobTagMustHaveNotCompletion() {
         final String filePath = this.getFixturePath(CrontabXmlTemplate.FILE_NAME);
         assertFileNotContainsCompletions(filePath, EXPECTED_INSTANCE);
@@ -56,7 +56,7 @@ public class CrontabCompletionRegistrarTest extends CompletionXmlFixtureTestCase
      * The `method` attribute of the `job` tag in crontab.xml must
      * have completion based on PHP Job method completion provider.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testCronJobMethodMustHaveCompletion() {
         final String filePath = this.getFixturePath(CrontabXmlTemplate.FILE_NAME);
         assertCompletionContains(filePath, EXPECTED_METHOD);
@@ -66,7 +66,7 @@ public class CrontabCompletionRegistrarTest extends CompletionXmlFixtureTestCase
      * The `method` attribute must not have completion
      * if it isn`t in the crontab.xml file.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testNotCrontabXmlMethodMustHaveNotCompletion() {
         final String filePath = this.getFixturePath(WRONG_FILE_NAME);
         assertFileNotContainsCompletions(filePath, EXPECTED_METHOD);

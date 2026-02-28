@@ -22,8 +22,8 @@ public abstract class BaseGeneratorTestCase extends BaseProjectTestCase {
     private static final String FIXTURES_FOLDER_PATH = "generation" + File.separator
             + "generator" + File.separator;
 
+    @org.junit.jupiter.api.BeforeEach
     @Override
-    public void setUp() throws Exception
     public void setUp() throws Exception {
         super.setUp();
         myFixture.setTestDataPath(TEST_DATA_FOLDER_PATH);
@@ -31,9 +31,8 @@ public abstract class BaseGeneratorTestCase extends BaseProjectTestCase {
         DefaultCodeStyleSettingsAdjustmentsUtil.execute(myFixture.getProject());
     }
 
+    @org.junit.jupiter.api.AfterEach
     @Override
-    @Override
-    public void tearDown() throws Exception
     public void tearDown() throws Exception {
         super.tearDown();
         LightPlatformTestCase.closeAndDeleteProject();
@@ -49,10 +48,10 @@ public abstract class BaseGeneratorTestCase extends BaseProjectTestCase {
             final String expectedDirectory,
             final PsiFile resultFile
     ) {
-        assertTrue(resultFile.getContainingDirectory().getVirtualFile().getPath()
+        org.junit.jupiter.api.Assertions.assertTrue(resultFile.getContainingDirectory().getVirtualFile().getPath()
                 .endsWith(expectedDirectory));
-        assertEquals(expectedFile.getText(), resultFile.getText());
-        assertEquals(expectedFile.getName(), resultFile.getName());
+        org.junit.jupiter.api.Assertions.assertEquals(expectedFile.getText(), resultFile.getText());
+        org.junit.jupiter.api.Assertions.assertEquals(expectedFile.getName(), resultFile.getName());
     }
 
     @SuppressWarnings({"PMD.JUnitAssertionsShouldIncludeMessage"})
@@ -60,8 +59,8 @@ public abstract class BaseGeneratorTestCase extends BaseProjectTestCase {
             final PsiFile expectedFile,
             final PsiFile resultFile
     ) {
-        assertEquals(expectedFile.getText(), resultFile.getText());
-        assertEquals(expectedFile.getName(), resultFile.getName());
+        org.junit.jupiter.api.Assertions.assertEquals(expectedFile.getText(), resultFile.getText());
+        org.junit.jupiter.api.Assertions.assertEquals(expectedFile.getName(), resultFile.getName());
     }
 
     protected PsiDirectory getProjectDirectory() {

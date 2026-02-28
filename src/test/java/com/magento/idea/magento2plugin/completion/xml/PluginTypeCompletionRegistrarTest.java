@@ -13,7 +13,7 @@ public class PluginTypeCompletionRegistrarTest extends CompletionXmlFixtureTestC
      * The `type` attribute of the `plugin` tag in di.xml must
      * have completion based on PHP classes index
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testPluginTypeMustHaveCompletion() {
         final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
         myFixture.configureByFile(filePath);

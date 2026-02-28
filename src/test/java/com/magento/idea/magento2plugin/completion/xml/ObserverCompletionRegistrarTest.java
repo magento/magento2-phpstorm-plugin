@@ -15,7 +15,7 @@ public class ObserverCompletionRegistrarTest extends CompletionXmlFixtureTestCas
         "test_event_in_block"
       };
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testEventsXmlMustHaveCompletion() {
         String filePath = this.getFixturePath(ModuleEventsXml.FILE_NAME);
         myFixture.copyFileToProject(filePath);
@@ -23,7 +23,7 @@ public class ObserverCompletionRegistrarTest extends CompletionXmlFixtureTestCas
         assertFileContainsCompletions(filePath, lookupStringsEntities);
     }
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testNotEventsXmlMustBeEmpty() {
         String filePath = this.getFixturePath("notevents.xml");
         myFixture.copyFileToProject(filePath);
@@ -31,7 +31,7 @@ public class ObserverCompletionRegistrarTest extends CompletionXmlFixtureTestCas
         assertCompletionNotShowing(filePath);
     }
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testEventsXmlEventNameMustHaveCompletion() {
         String filePath = this.getFixturePath(ModuleEventsXml.FILE_NAME);
         myFixture.copyFileToProject(filePath);

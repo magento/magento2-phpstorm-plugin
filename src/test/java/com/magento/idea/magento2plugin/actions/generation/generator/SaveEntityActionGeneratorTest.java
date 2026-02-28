@@ -23,7 +23,7 @@ public class SaveEntityActionGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of Save controller for entity without interface.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateSaveEntityActionWithoutInterfaceFile() {
         final SaveEntityControllerFileData saveEntityControllerFileData =
                 new SaveEntityControllerFileData(
@@ -58,7 +58,7 @@ public class SaveEntityActionGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of Save controller for entity with interface.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateSaveEntityActionWithInterfaceFile() {
         final SaveEntityControllerFileData saveEntityControllerFileData =
                 new SaveEntityControllerFileData(

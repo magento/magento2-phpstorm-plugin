@@ -16,7 +16,7 @@ public class ModuleModelGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of model file.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateFile() {
         final Project project = myFixture.getProject();
         final ModelData modelData = new ModelData(
@@ -43,7 +43,7 @@ public class ModuleModelGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of model file where resource model name equal to the model name.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateWithTheSameNameForResourceModel() {
         final PsiFile modelFile = new ModuleModelGenerator(
                 new ModelData(

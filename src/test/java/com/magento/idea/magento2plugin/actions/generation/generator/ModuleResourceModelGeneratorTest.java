@@ -29,7 +29,7 @@ public class ModuleResourceModelGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of resource model file.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateFile() {
         GenerationContextRegistry.getInstance().setContext(null);
         final Project project = myFixture.getProject();
@@ -57,7 +57,7 @@ public class ModuleResourceModelGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of resource model file with reference to entity id column.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateFileWithDtoReference() {
         final Project project = myFixture.getProject();
         final ResourceModelData resourceModelData = new ResourceModelData(

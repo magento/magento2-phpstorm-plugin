@@ -31,7 +31,7 @@ public class FormGenericButtonBlockGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of form ui component generic button block.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateFormGenericButtonBlockFile() {
         final FormGenericButtonBlockData data = new FormGenericButtonBlockData(
                 MODULE_NAME,

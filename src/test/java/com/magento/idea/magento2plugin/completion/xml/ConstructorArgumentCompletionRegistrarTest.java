@@ -12,7 +12,7 @@ public class ConstructorArgumentCompletionRegistrarTest extends CompletionXmlFix
     /**
      * Tests for completion of constructor argument in di.xml.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testDiXmlMustHaveCompletion() {
         final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
         myFixture.copyFileToProject(filePath);

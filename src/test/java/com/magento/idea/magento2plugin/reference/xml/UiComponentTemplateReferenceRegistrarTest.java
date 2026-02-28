@@ -6,7 +6,7 @@ package com.magento.idea.magento2plugin.reference.xml;
 
 public class UiComponentTemplateReferenceRegistrarTest extends ReferenceXmlFixtureTestCase {
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testFileTemplateAttributeMustHaveReference() {
         String filePath = this.getFixturePath("test_form.xml");
         myFixture.configureByFile(filePath);

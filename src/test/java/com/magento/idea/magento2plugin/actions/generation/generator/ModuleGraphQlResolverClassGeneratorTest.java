@@ -10,7 +10,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.GraphQlResolverFi
 
 public class ModuleGraphQlResolverClassGeneratorTest extends BaseGeneratorTestCase {
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateModuleGraphQlResolverClassFile()
     {
         Project project = myFixture.getProject();

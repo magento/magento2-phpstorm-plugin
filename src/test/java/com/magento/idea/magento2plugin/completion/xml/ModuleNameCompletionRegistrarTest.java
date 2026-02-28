@@ -14,7 +14,7 @@ public class ModuleNameCompletionRegistrarTest extends CompletionXmlFixtureTestC
     /**
      * Tests for module name completion in module.xml
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testModuleNameMustHaveCompletion() {
         final String filePath = this.getFixturePath("module.xml");
         myFixture.copyFileToProject(filePath);
@@ -25,7 +25,7 @@ public class ModuleNameCompletionRegistrarTest extends CompletionXmlFixtureTestC
     /**
      * Tests for module name completion under the sequence node in module.xml
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testSequenceModuleNameMustHaveCompletion() {
         final String filePath = this.getFixturePath("module.xml");
         myFixture.copyFileToProject(filePath);

@@ -35,7 +35,6 @@ dependencies {
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.jupiter.engine)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation(libs.junit)
 
     implementation("org.json:json:20171018")
     implementation("org.codehaus.plexus:plexus-utils:3.4.0")
@@ -52,6 +51,7 @@ dependencies {
         pluginVerifier()
         zipSigner()
         testFramework(TestFrameworkType.Platform)
+        testFramework(TestFrameworkType.JUnit5)
     }
 }
 

@@ -12,7 +12,7 @@ public class ConfigurationTypeCompletionRegistrarTest extends CompletionXmlFixtu
         "Magento\\Backend\\Model\\Source\\YesNo"
       };
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testDiXmlTypeNameMustHaveCompletion() {
         String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
         myFixture.copyFileToProject(filePath);

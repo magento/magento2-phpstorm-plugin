@@ -8,7 +8,7 @@ import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 
 public class ConfigurationTypeReferenceRegistrarTest extends ReferenceXmlFixtureTestCase {
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testDiXmlTypeNameMustHaveReference() {
         String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
         myFixture.configureByFile(filePath);

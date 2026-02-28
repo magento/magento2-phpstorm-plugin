@@ -24,7 +24,7 @@ public class ProductAttributePropertySetupPatchGeneratorTest extends BaseGenerat
     /**
      * Test Data patch for product's eav attribute generator.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateFile() {
         final Project project = myFixture.getProject();
 
@@ -60,7 +60,7 @@ public class ProductAttributePropertySetupPatchGeneratorTest extends BaseGenerat
     /**
      * Tests the generated file with the boolean source model.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateFileWithBooleanSourceModel() {
         final Project project = myFixture.getProject();
 
@@ -99,7 +99,7 @@ public class ProductAttributePropertySetupPatchGeneratorTest extends BaseGenerat
     /**
      * Tests the generated file with the source model.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateFileWithGeneratedSourceModel() {
         final Project project = myFixture.getProject();
 
@@ -138,7 +138,7 @@ public class ProductAttributePropertySetupPatchGeneratorTest extends BaseGenerat
     /**
      * Tests file with the `apply to` attribute.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateFileWithApplyToAttribute() {
         final Project project = myFixture.getProject();
 
@@ -177,7 +177,7 @@ public class ProductAttributePropertySetupPatchGeneratorTest extends BaseGenerat
     /**
      * Tests file with options.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateFileWithOptions() {
         final Project project = myFixture.getProject();
 

@@ -17,6 +17,7 @@ public abstract class InspectionXmlFixtureTestCase extends BaseInspectionsTestCa
 
     private static final String fixturesFolderPath = "xml" + File.separator; //NOPMD
 
+    @org.junit.jupiter.api.BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

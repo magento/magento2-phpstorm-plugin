@@ -23,7 +23,7 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test preference DI XML file generation.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGeneratePreferenceDiXml() {
         final String area = Areas.base.toString();
         final PsiFile preferenceDiXmlFile = addPreferenceDiXml(
@@ -45,7 +45,7 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test preference DI XML file generation for adminhtml area.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGeneratePreferenceDiXmlForAdminhtmlArea() {
         final String area = Areas.adminhtml.toString();
         final PsiFile preferenceDiXmlFile = addPreferenceDiXml(
@@ -67,7 +67,7 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test the adding of two preferences to one DI XML file.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testAddTwoPreferencesToOneDiXmlFile() {
         final String area = Areas.frontend.toString();
         addPreferenceDiXml(

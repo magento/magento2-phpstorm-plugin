@@ -24,7 +24,7 @@ public class DbSchemaWhitelistGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test whether db_schema_whitelist.json file generated correctly.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateDbSchemaWhitelistJsonFile() {
         final DbSchemaXmlData dbSchemaXmlData = new DbSchemaXmlData(
                 TABLE_NAME,
@@ -53,7 +53,7 @@ public class DbSchemaWhitelistGeneratorTest extends BaseGeneratorTestCase {
      * Test whether db_schema_whitelist.json file generated correctly
      * when columns provided as short entity properties.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateDbSchemaWhitelistJsonFileForShortProperties() {
         final List<Map<String, String>> properties =
                 DbSchemaGeneratorDataProviderUtil.generateEntityPropertiesForTest();

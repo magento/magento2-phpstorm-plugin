@@ -19,7 +19,7 @@ public class ModuleScopeInspectionTest extends InspectionXmlFixtureTestCase {
     /**
      * Inspection highlights warning if the area of a config file is wrong.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testIncorrectArea() {
         configureFixture("app/code/Test/TestModule/etc/adminhtmltypo/di.xml");
 
@@ -33,7 +33,7 @@ public class ModuleScopeInspectionTest extends InspectionXmlFixtureTestCase {
     /**
      * Inspection skips warning if the area is correct.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testCorrectArea() {
         configureFixture("app/code/Test/TestModule/etc/adminhtml/di.xml");
 

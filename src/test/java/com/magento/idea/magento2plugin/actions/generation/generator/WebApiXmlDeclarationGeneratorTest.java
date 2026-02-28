@@ -25,7 +25,7 @@ public class WebApiXmlDeclarationGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of Web API xml declaration for a service.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateWebApiXmlDeclarationForService() {
         final WebApiXmlRouteData data = new WebApiXmlRouteData(
                 MODULE_NAME,
@@ -42,7 +42,7 @@ public class WebApiXmlDeclarationGeneratorTest extends BaseGeneratorTestCase {
         final PsiFile result = generator.generate("test");
 
         if (result == null) {
-            failTest(COULD_NOT_GENERATE_MESSAGE);
+            org.junit.jupiter.api.Assertions.fail(COULD_NOT_GENERATE_MESSAGE);
         }
 
         assertGeneratedFileIsCorrect(

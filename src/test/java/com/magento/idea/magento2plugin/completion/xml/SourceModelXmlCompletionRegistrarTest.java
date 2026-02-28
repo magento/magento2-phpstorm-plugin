@@ -17,7 +17,7 @@ public class SourceModelXmlCompletionRegistrarTest extends CompletionXmlFixtureT
     /**
      * Test source model xml element completion.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testSourceModelXmlElementMustProvideCompletion() {
         final String filePath = this.getFixturePath(ModuleSystemXmlFile.FILE_NAME);
         myFixture.copyFileToProject(filePath);
@@ -28,7 +28,7 @@ public class SourceModelXmlCompletionRegistrarTest extends CompletionXmlFixtureT
     /**
      * Test source model xml element completion match with the file false positive.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testSourceModelXmlElementMatchWithFilePositiveCase() {
         final String filePath = this.getFixturePath(ModuleSystemXmlFile.FILE_NAME);
         myFixture.copyFileToProject(filePath);
@@ -39,7 +39,7 @@ public class SourceModelXmlCompletionRegistrarTest extends CompletionXmlFixtureT
     /**
      * Test source model xml element completion match with the file negative case.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testSourceModelXmlElementMatchWithFileNegativeCase() {
         final String filePath = this.getFixturePath("not-system.xml");
         myFixture.copyFileToProject(filePath);
@@ -53,7 +53,7 @@ public class SourceModelXmlCompletionRegistrarTest extends CompletionXmlFixtureT
     /**
      * Test source model attribute must provide completion.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testSourceModelXmlAttributeMustProvideCompletion() {
         final String filePath = this.getFixturePath(ModuleWidgetXml.FILE_NAME);
         myFixture.copyFileToProject(filePath);
@@ -64,7 +64,7 @@ public class SourceModelXmlCompletionRegistrarTest extends CompletionXmlFixtureT
     /**
      * Test source model attribute match with the file positive case.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testSourceModelXmlAttributeMatchWithFilePositiveCase() {
         final String filePath = this.getFixturePath(ModuleWidgetXml.FILE_NAME);
         myFixture.copyFileToProject(filePath);
@@ -75,7 +75,7 @@ public class SourceModelXmlCompletionRegistrarTest extends CompletionXmlFixtureT
     /**
      * Test source model attribute match with the file negative case.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testSourceModelXmlAttributeMatchWithFileNegativeCase() {
         final String filePath = this.getFixturePath("not-widget.xml");
         myFixture.copyFileToProject(filePath);

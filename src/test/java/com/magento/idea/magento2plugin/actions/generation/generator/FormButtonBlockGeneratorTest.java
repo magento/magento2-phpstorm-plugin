@@ -26,8 +26,6 @@ public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
             = "src/app/code/Foo/Bar/Block/Form/" + ENTITY_NAME;
 
     @Override
-    @Override
-    public void setUp() throws Exception
     public void setUp() throws Exception {
         super.setUp();
         final EntityCreatorContext context = new EntityCreatorContext();
@@ -39,7 +37,7 @@ public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test creation Block type Save.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateSaveButtonBlock() {
         final String filePath = this.getFixturePath("SaveBlock.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -78,7 +76,7 @@ public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test creation Block type Back.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateBackButtonBlock() {
         final String filePath = this.getFixturePath("MyBackButton.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -117,7 +115,7 @@ public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test creation Block type Delete.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateDeleteButtonBlock() {
         final String filePath = this.getFixturePath("DeleteBlock.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -156,7 +154,7 @@ public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test creation Block custom type.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateCustomButtonBlock() {
         final String filePath = this.getFixturePath("MyCustom.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

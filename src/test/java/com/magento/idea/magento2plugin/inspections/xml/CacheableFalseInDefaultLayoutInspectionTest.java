@@ -16,19 +16,19 @@ public class CacheableFalseInDefaultLayoutInspectionTest extends InspectionXmlFi
         myFixture.enableInspections(CacheableFalseInDefaultLayoutInspection.class);
     }
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testWithCacheableFalseBlock() throws Exception {
         myFixture.configureByFile(getFixturePath(LayoutXml.DEFAULT_FILENAME));
         myFixture.testHighlighting(true, false, false);
     }
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testWithoutCacheableFalseBlock() throws Exception {
         myFixture.configureByFile(getFixturePath(LayoutXml.DEFAULT_FILENAME));
         myFixture.testHighlighting(true, true, true);
     }
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testWithCacheableFalseBlockNotDefaultLayout() throws Exception {
         myFixture.configureByFile(getFixturePath("some_layout_index.xml"));
         myFixture.testHighlighting(true, true, true);

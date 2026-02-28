@@ -11,7 +11,7 @@ public class MftfNameCompletionRegistrarTest extends CompletionXmlFixtureTestCas
         "TestVerifyTinyMCEv4IsNativeWYSIWYGOnProductTest"
       };
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testExtendsMustProvideCompletion() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.copyFileToProject(filePath);
@@ -19,7 +19,7 @@ public class MftfNameCompletionRegistrarTest extends CompletionXmlFixtureTestCas
         assertFileContainsCompletions(filePath, lookupStringsEntities);
     }
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testExtendsInActionGroupMustBeEmpty() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.copyFileToProject(filePath);
@@ -27,7 +27,7 @@ public class MftfNameCompletionRegistrarTest extends CompletionXmlFixtureTestCas
         assertCompletionNotShowing(filePath);
     }
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testExtendsSameNameMustBeEmpty() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.copyFileToProject(filePath);
@@ -35,7 +35,7 @@ public class MftfNameCompletionRegistrarTest extends CompletionXmlFixtureTestCas
         assertCompletionNotShowing(filePath);
     }
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testExtendsSameNameMustBeEmptyForActionGroup() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.copyFileToProject(filePath);

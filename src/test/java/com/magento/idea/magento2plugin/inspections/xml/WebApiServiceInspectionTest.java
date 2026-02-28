@@ -37,7 +37,7 @@ public class WebApiServiceInspectionTest extends InspectionXmlFixtureTestCase {
      * Inspection highlights warning if the class attribute in the service tag contains
      * name of the not existent class.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testNotExistentClass() {
         configureFixture();
 
@@ -52,7 +52,7 @@ public class WebApiServiceInspectionTest extends InspectionXmlFixtureTestCase {
     /**
      * Inspection skips warning if the service class exists.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testExistentClass() {
         configureFixture();
 
@@ -68,7 +68,7 @@ public class WebApiServiceInspectionTest extends InspectionXmlFixtureTestCase {
      * Inspection highlights warning if the method attribute in the service tag contains
      * name of the not existent method.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testNotExistentMethod() {
         configureFixture();
 
@@ -83,7 +83,7 @@ public class WebApiServiceInspectionTest extends InspectionXmlFixtureTestCase {
     /**
      * Inspection skips warning if the service method exists.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testExistentMethod() {
         configureFixture();
 
@@ -99,7 +99,7 @@ public class WebApiServiceInspectionTest extends InspectionXmlFixtureTestCase {
      * Inspection highlights warning if the method attribute in the service tag contains
      * name of the method with not public access.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testNotPublicMethod() {
         configureFixture();
 
@@ -114,7 +114,7 @@ public class WebApiServiceInspectionTest extends InspectionXmlFixtureTestCase {
     /**
      * Inspection skips warning if the service method has public access.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testPublicMethod() {
         configureFixture();
 

@@ -19,7 +19,7 @@ public class ModuleComposerJsonGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test for the module composer.json generation with dependencies.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateModuleFile() {
         final String filePath = this.getFixturePath(ComposerJson.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -43,7 +43,7 @@ public class ModuleComposerJsonGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test for generation the composer.json with dependencies in the root directory.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateFileInRoot() {
         final String filePath = this.getFixturePath(ComposerJson.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -62,7 +62,7 @@ public class ModuleComposerJsonGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test case for the composer.json generation without dependencies.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateModuleFileWithoutDependencies() {
         final String filePath = this.getFixturePath(ComposerJson.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

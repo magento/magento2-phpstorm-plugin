@@ -29,7 +29,7 @@ public class ModuleDeclarationInModuleXmlInspectionTest
     /**
      * Inspection highlights warning in editable module.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testWrongDeclarationInEditableModule() {
         final Settings settings = Settings.getInstance(myFixture.getProject());
         settings.magentoPath =
@@ -51,7 +51,7 @@ public class ModuleDeclarationInModuleXmlInspectionTest
     /**
      * Inspection do not highlight wrong module name warning for setup version attribute.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testSetupVersionNotErrorMessageInEditableModule() {
         final Settings settings = Settings.getInstance(myFixture.getProject());
         settings.magentoPath =
@@ -73,7 +73,7 @@ public class ModuleDeclarationInModuleXmlInspectionTest
     /**
      * Inspection skips sub tags.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testSubTagShouldNotBeHighlightedInEditableModule() {
         final Settings settings = Settings.getInstance(myFixture.getProject());
         settings.magentoPath =
@@ -95,7 +95,7 @@ public class ModuleDeclarationInModuleXmlInspectionTest
     /**
      * Inspection skips warning in root.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testWrongDeclarationInRoot() {
         final Settings settings = Settings.getInstance(myFixture.getProject());
         settings.magentoPath =
@@ -116,7 +116,7 @@ public class ModuleDeclarationInModuleXmlInspectionTest
     /**
      * Inspection skips warning in vendor.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testWrongDeclarationInVendor() {
         final Settings settings = Settings.getInstance(myFixture.getProject());
         settings.magentoPath =

@@ -26,7 +26,7 @@ public class ModuleCronGroupXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generating CRON group with no options.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateEmptyCronGroup() {
         final String filePath = this.getFixturePath(CronGroupXmlTemplate.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -47,7 +47,7 @@ public class ModuleCronGroupXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generating CRON group with all options.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateCronGroupWithAllOptions() {
         final String filePath = this.getFixturePath(CronGroupXmlTemplate.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -68,7 +68,7 @@ public class ModuleCronGroupXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test adding two CRON groups to the cron_groups.xml.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testAddTwoCronGroupsToCronGroupsXmlFile() {
         final String filePath = this.getFixturePath(CronGroupXmlTemplate.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

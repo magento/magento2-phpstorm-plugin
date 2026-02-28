@@ -11,7 +11,6 @@ import com.intellij.testFramework.IndexingTestUtil;
 import com.intellij.testFramework.PlatformTestUtil;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
-import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.project.Settings;
 import org.jetbrains.annotations.NotNull;
 import java.util.EnumSet;
@@ -23,14 +22,38 @@ import java.util.Set;
 public abstract class BaseProjectTestCase extends BasePlatformTestCase {
     private Thread.UncaughtExceptionHandler previousUncaughtHandler;
     private static final String testDataProjectPath = "testData" //NOPMD
-            + File.separator
+            + java.io.File.separator
             + "project";
 
     private static final String testDataProjectDirectory = "magento2"; //NOPMD
 
+    private String myTestName;
+
+    @org.junit.jupiter.api.BeforeEach
+    public void setTestName(org.junit.jupiter.api.TestInfo testInfo) {
+        myTestName = testInfo.getTestMethod().map(java.lang.reflect.Method::getName).orElse("");
+    }
+
+    @Override
+    public String getTestName(boolean lowercaseFirstLetter) {
+        if (myTestName != null && !myTestName.isEmpty()) {
+            String name = myTestName;
+            if (name.startsWith("test") && name.length() > 4 && Character.isUpperCase(name.charAt(4))) {
+                name = name.substring(4);
+            }
+            return lowercaseFirstLetter ? com.intellij.openapi.util.text.StringUtil.decapitalize(name) : com.intellij.openapi.util.text.StringUtil.capitalize(name);
+        }
+        return super.getTestName(lowercaseFirstLetter);
+    }
+
+    @org.junit.jupiter.api.BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        // Register Settings service if missing in test environment
+        if (myFixture.getProject().getService(Settings.class) == null) {
+            com.intellij.testFramework.ServiceContainerUtil.registerServiceInstance(myFixture.getProject(), Settings.class, new Settings());
+        }
         // Install a guard uncaught exception handler to ignore known kernel-related background crashes in tests
         previousUncaughtHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
@@ -79,8 +102,10 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
                 return super.processError(category, message, details, t);
             }
         }, () -> {
-            copyMagento2ToTestProject();
-            enablePluginAndReindex();
+            com.intellij.testFramework.EdtTestUtil.runInEdtAndWait(() -> {
+                copyMagento2ToTestProject();
+                enablePluginAndReindex();
+            });
         });
     }
 
@@ -94,12 +119,15 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
 
     @Override
     protected String getTestDataPath() {
-        //configure specific test data in your test.
-        return "testData";
+        return new java.io.File("testData").getAbsolutePath();
     }
 
     protected void enablePluginAndReindex() {
-        final Settings settings = Settings.getInstance(myFixture.getProject());
+        final Settings settings = myFixture.getProject().getService(Settings.class);
+        if (settings == null) {
+            System.err.println("[DEBUG_LOG] myFixture.getProject().getService(Settings.class) returned null");
+            return;
+        }
         settings.magentoPath = "/src";
         settings.pluginEnabled = true;
         settings.mftfSupportEnabled = true;
@@ -109,13 +137,14 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
     }
 
     protected void disablePluginAndReindex() {
-        final Settings settings = Settings.getInstance(myFixture.getProject());
+        final Settings settings = myFixture.getProject().getService(Settings.class);
         settings.pluginEnabled = false;
         IndexManager.manualReindex();
         PlatformTestUtil.dispatchAllEventsInIdeEventQueue();
         IndexingTestUtil.waitUntilIndexesAreReady(myFixture.getProject());
     }
 
+    @org.junit.jupiter.api.AfterEach
     @Override
     public void tearDown() throws Exception {
         try {
@@ -127,7 +156,7 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
     }
 
     protected void disableMftfSupportAndReindex() {
-        final Settings settings = Settings.getInstance(myFixture.getProject());
+        final Settings settings = myFixture.getProject().getService(Settings.class);
         settings.mftfSupportEnabled = false;
         IndexManager.manualReindex();
         PlatformTestUtil.dispatchAllEventsInIdeEventQueue();
@@ -138,14 +167,36 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
             final String fileName,
             final String fixturesFolderPath
     ) {
-        return fixturesFolderPath + getClass().getSimpleName().replace("Test", "")
-                + File.separator
-                + getTestName(true)
-                + File.separator
-                + fileName;
+        String testName = getTestName(false);
+        String className = getClass().getSimpleName().replace("Test", "");
+
+        // Try with test name: fixturesFolderPath/ClassName/testName/fileName
+        // We try several case variations for the test name directory
+        String[] testNameVariations = {
+                testName,
+                com.intellij.openapi.util.text.StringUtil.decapitalize(testName),
+                com.intellij.openapi.util.text.StringUtil.capitalize(testName)
+        };
+
+        for (String variation : testNameVariations) {
+            if (variation == null || variation.isEmpty()) continue;
+            String path = fixturesFolderPath + className + java.io.File.separator + variation + java.io.File.separator + fileName;
+            String normalizedPath = path.replace(java.io.File.separator + java.io.File.separator, java.io.File.separator);
+            if (new java.io.File(myFixture.getTestDataPath(), normalizedPath).exists()) {
+                return normalizedPath;
+            }
+        }
+
+        // Try without test name: fixturesFolderPath/ClassName/fileName
+        String pathWithoutTestName = fixturesFolderPath + className + java.io.File.separator + fileName;
+        String normalizedPathWithoutTestName = pathWithoutTestName.replace(java.io.File.separator + java.io.File.separator, java.io.File.separator);
+        if (new java.io.File(myFixture.getTestDataPath(), normalizedPathWithoutTestName).exists()) {
+            return normalizedPathWithoutTestName;
+        }
+
+        // Fallback to the first variation (original behavior)
+        String fallbackPath = fixturesFolderPath + className + java.io.File.separator + testName + java.io.File.separator + fileName;
+        return fallbackPath.replace(java.io.File.separator + java.io.File.separator, java.io.File.separator);
     }
 
-    protected void failTest(String message) {
-        fail(message);
-    }
 }

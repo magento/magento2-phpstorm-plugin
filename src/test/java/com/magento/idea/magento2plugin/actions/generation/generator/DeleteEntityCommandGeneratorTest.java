@@ -34,7 +34,7 @@ public class DeleteEntityCommandGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of DeleteByIdCommand model for entity.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateDeleteEntityByIdCommandFile() {
         final DeleteEntityByIdCommandData deleteEntityByIdCommandData =
                 new DeleteEntityByIdCommandData(

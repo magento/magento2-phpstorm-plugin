@@ -12,7 +12,7 @@ public class ObserverClassLinemarkerRegistrarTest extends LinemarkerFixtureTestC
     /**
      * Tests linemarkers in the Observer class.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testObserverClassShouldHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("TestObserver.php", "php"));
 
@@ -22,7 +22,7 @@ public class ObserverClassLinemarkerRegistrarTest extends LinemarkerFixtureTestC
     /**
      * Tests linemarkers in the regular class.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testRegularPhpClassShouldNotHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("TestNotObserver.php", "php"));
 

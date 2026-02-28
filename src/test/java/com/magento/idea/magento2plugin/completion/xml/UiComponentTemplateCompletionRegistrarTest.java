@@ -6,7 +6,7 @@ package com.magento.idea.magento2plugin.completion.xml;
 
 public class UiComponentTemplateCompletionRegistrarTest extends CompletionXmlFixtureTestCase {
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testFileTemplateAttributeMustHaveCompletion() {
         String filePath = this.getFixturePath("test_form.xml");
         myFixture.configureByFile(filePath);
@@ -17,7 +17,7 @@ public class UiComponentTemplateCompletionRegistrarTest extends CompletionXmlFix
         });
     }
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testFileTemplateItemAttributeMustHaveCompletion() {
         String filePath = this.getFixturePath("test_form.xml");
         myFixture.configureByFile(filePath);

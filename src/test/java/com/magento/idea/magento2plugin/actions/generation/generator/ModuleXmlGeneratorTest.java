@@ -19,7 +19,7 @@ public class ModuleXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test checks whether module.xml is generated correctly.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateModuleFile() {
         final String filePath = this.getFixturePath(ModuleXml.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -52,7 +52,7 @@ public class ModuleXmlGeneratorTest extends BaseGeneratorTestCase {
      * Test checks whether module.xml is generated
      * correctly for module as a separate project.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateFileInRoot() {
         final String filePath = this.getFixturePath(ModuleXml.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

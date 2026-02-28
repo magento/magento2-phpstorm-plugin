@@ -25,7 +25,7 @@ public class TypeConfigurationTagTypesInspectionTest extends InspectionXmlFixtur
     /**
      * Test type doesn't exists highlighting: <type name="TestingType"/>.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testNameAttributeValueTypeDoesNotExist() {
         configureFixture();
 
@@ -40,7 +40,7 @@ public class TypeConfigurationTagTypesInspectionTest extends InspectionXmlFixtur
     /**
      * Test type exists: <type name="TestingType"/>.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testNameAttributeValueTypeExists() {
         configureFixture();
 
@@ -55,7 +55,7 @@ public class TypeConfigurationTagTypesInspectionTest extends InspectionXmlFixtur
     /**
      * Test argument factory type exists: <argument xsi:type="object">TestingTypeFactory</argument>.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testArgumentFactoryTypeExists() {
         configureFixture();
 
@@ -71,7 +71,7 @@ public class TypeConfigurationTagTypesInspectionTest extends InspectionXmlFixtur
      * Test proxy type doesn't exist highlighting:
      * <item name="element2" xsi:type="object">TestType\Proxy</item>.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testRecursivelyArgumentProxyTypeDoesNotExist() {
         configureFixture();
 
@@ -87,7 +87,7 @@ public class TypeConfigurationTagTypesInspectionTest extends InspectionXmlFixtur
      * Test proxy type exists.
      * <item name="element2" xsi:type="object">TestType\Proxy</item>
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testRecursivelyArgumentProxyTypeExists() {
         configureFixture();
 
@@ -103,7 +103,7 @@ public class TypeConfigurationTagTypesInspectionTest extends InspectionXmlFixtur
      * Test proxy type doesn't exist highlighting:
      * <item name="element2" xsi:type="object">TestType\Proxy</item>.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testRecursivelyArgumentVirtualTypeDoesNotExist() {
         configureFixture();
 
@@ -119,7 +119,7 @@ public class TypeConfigurationTagTypesInspectionTest extends InspectionXmlFixtur
      * Test virtual type exists.
      * <item name="element2" xsi:type="object">TestVirtualType</item>
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testRecursivelyArgumentVirtualTypeExists() {
         configureFixture();
 

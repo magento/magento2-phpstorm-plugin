@@ -14,7 +14,7 @@ public class CrontabReferenceRegistrarTest extends ReferenceXmlFixtureTestCase {
     /**
      * Test instance attribute of the crontab.xml file must have reference.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testCrontabInstanceMustHaveReference() {
         myFixture.configureByFile(this.getFixturePath(CrontabXmlTemplate.FILE_NAME));
 
@@ -24,7 +24,7 @@ public class CrontabReferenceRegistrarTest extends ReferenceXmlFixtureTestCase {
     /**
      * Tests for reference to valid PHP method in crontab.xml.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testCrontabMethodMustHaveReference() {
         myFixture.configureByFile(this.getFixturePath(CrontabXmlTemplate.FILE_NAME));
 
@@ -37,7 +37,7 @@ public class CrontabReferenceRegistrarTest extends ReferenceXmlFixtureTestCase {
     /**
      * Tests for no reference to invalid PHP method in crontab.xml.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testCrontabMethodMustNotHaveReference() {
         myFixture.configureByFile(this.getFixturePath(CrontabXmlTemplate.FILE_NAME));
 

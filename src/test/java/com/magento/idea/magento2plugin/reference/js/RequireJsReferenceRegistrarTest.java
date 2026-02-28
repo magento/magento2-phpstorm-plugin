@@ -15,7 +15,7 @@ public class RequireJsReferenceRegistrarTest extends ReferenceJsFixtureTestCase 
     /**
      * Mapped parameters should have reference to file.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testMappedInjectionParameterMustHaveReference() {
         myFixture.configureByFile(getFixturePath(FIXTURE_PATH));
 
@@ -25,7 +25,7 @@ public class RequireJsReferenceRegistrarTest extends ReferenceJsFixtureTestCase 
     /**
      * Path parameters should have reference to file.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testPathInjectionParameterMustHaveReference() {
         myFixture.configureByFile(getFixturePath(FIXTURE_PATH));
 
@@ -35,7 +35,7 @@ public class RequireJsReferenceRegistrarTest extends ReferenceJsFixtureTestCase 
     /**
      * The Magento resource file path parameters should have reference to file.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testFileInjectionParameterMustHaveReference() {
         myFixture.configureByFile(getFixturePath(FIXTURE_PATH));
 
@@ -45,7 +45,7 @@ public class RequireJsReferenceRegistrarTest extends ReferenceJsFixtureTestCase 
     /**
      * Lib resource parameters should have reference to file.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testLibInjectionParameterMustHaveReference() {
         myFixture.configureByFile(getFixturePath(FIXTURE_PATH));
 
@@ -55,7 +55,7 @@ public class RequireJsReferenceRegistrarTest extends ReferenceJsFixtureTestCase 
     /**
      * Mixin declaration parameters should have reference to file.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testFilePathInMixinDeclarationMustHaveReference() {
         myFixture.configureByFile(getFixturePath(MIXIN_FIXTURE_PATH));
 

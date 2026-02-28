@@ -11,14 +11,14 @@ public class MftfPageUrlCompletionRegistrarTest extends CompletionXmlFixtureTest
         "TestPage2.url"
       };
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testPageUrlInActionGroupMustProvideCompletion() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.copyFileToProject(filePath);
 
         assertFileContainsCompletions(filePath, lookupStrings);
     }
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testPageUrlInActionGroupMustBeEmptyForSection() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.copyFileToProject(filePath);
@@ -26,7 +26,7 @@ public class MftfPageUrlCompletionRegistrarTest extends CompletionXmlFixtureTest
         assertCompletionNotShowing(filePath);
     }
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testPageUrlInActionGroupMustBeEmptyForTestDocument() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.copyFileToProject(filePath);
@@ -34,7 +34,7 @@ public class MftfPageUrlCompletionRegistrarTest extends CompletionXmlFixtureTest
         assertCompletionNotShowing(filePath);
     }
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testPageUrlInActionGroupMustBeEmptyForEntity() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.copyFileToProject(filePath);
@@ -42,7 +42,7 @@ public class MftfPageUrlCompletionRegistrarTest extends CompletionXmlFixtureTest
         assertCompletionNotShowing(filePath);
     }
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testPageUrlInTestMustProvideCompletion() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.copyFileToProject(filePath);
@@ -50,7 +50,7 @@ public class MftfPageUrlCompletionRegistrarTest extends CompletionXmlFixtureTest
         assertFileContainsCompletions(filePath, lookupStrings);
     }
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testPageUrlBeforeInTestMustProvideCompletion() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.copyFileToProject(filePath);
@@ -58,7 +58,7 @@ public class MftfPageUrlCompletionRegistrarTest extends CompletionXmlFixtureTest
         assertFileContainsCompletions(filePath, lookupStrings);
     }
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testPageUrlInTestMustBeEmptyForSection() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.copyFileToProject(filePath);
@@ -66,7 +66,7 @@ public class MftfPageUrlCompletionRegistrarTest extends CompletionXmlFixtureTest
         assertCompletionNotShowing(filePath);
     }
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testPageUrlInTestMustBeEmptyForActionGroup() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.copyFileToProject(filePath);

@@ -23,7 +23,7 @@ public class AclResourceXmlInspectionTest extends InspectionXmlFixtureTestCase {
     /**
      * ACL resource should have a title.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testAclResourceWithNoTitleShouldHaveWarning() {
         myFixture.configureByFile(getFixturePath(ModuleAclXml.FILE_NAME));
 
@@ -38,7 +38,7 @@ public class AclResourceXmlInspectionTest extends InspectionXmlFixtureTestCase {
     /**
      * Override/Reference for ACL resource may not have a title.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testOverrideAclResourceWithNoTitleShouldNotHaveWarning() {
         myFixture.configureByFile(getFixturePath(ModuleAclXml.FILE_NAME));
 
@@ -53,7 +53,7 @@ public class AclResourceXmlInspectionTest extends InspectionXmlFixtureTestCase {
     /**
      * ID attribute of ACL resource should have a value.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testAclResourceWithEmptyIdShouldHaveWarning() {
         myFixture.configureByFile(getFixturePath(ModuleAclXml.FILE_NAME));
 

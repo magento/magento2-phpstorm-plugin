@@ -21,7 +21,7 @@ public class QueuePublisherGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tests for generation of queue_publisher.xml file.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGeneratePublisherXmlFile() {
         final String filePath = this.getFixturePath(QueuePublisherXml.fileName);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

@@ -23,7 +23,7 @@ public class SaveEntityCommandGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of SaveCommand model for entity.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testGenerateSaveEntityCommandFile() {
         final SaveEntityCommandData saveEntityCommandData = new SaveEntityCommandData(
                 MODULE_NAME,

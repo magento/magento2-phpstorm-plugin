@@ -15,10 +15,11 @@ public abstract class BaseCompletionTestCase extends BaseProjectTestCase {
     private final String testDataFolderPath
             = "testData" + File.separator + "completion" + File.separator;
 
+    @org.junit.jupiter.api.BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        myFixture.setTestDataPath(testDataFolderPath);
+        myFixture.setTestDataPath(new java.io.File(testDataFolderPath).getAbsolutePath());
     }
 
     private void configureFixture(final String filePath) {
@@ -75,7 +76,7 @@ public abstract class BaseCompletionTestCase extends BaseProjectTestCase {
             final String messageCompletionDoesNotShow
                     = "Failed asserting that completion does not show up";
 
-            failTest(messageCompletionDoesNotShow);
+            org.junit.jupiter.api.Assertions.fail(messageCompletionDoesNotShow);
         }
     }
 
@@ -85,18 +86,18 @@ public abstract class BaseCompletionTestCase extends BaseProjectTestCase {
             final String completionContainsError
     ) {
         if (lookupStrings.length == 0) {
-            failTest(MESSAGE_NO_LOOKUP);
+            org.junit.jupiter.api.Assertions.fail(MESSAGE_NO_LOOKUP);
         }
 
         final List<String> lookupElements = myFixture.getLookupElementStrings();
 
         if (lookupElements == null || lookupElements.isEmpty()) {
-            failTest(String.format(emptyLookupError, Arrays.toString(lookupStrings)));
+            org.junit.jupiter.api.Assertions.fail(String.format(emptyLookupError, Arrays.toString(lookupStrings)));
         }
 
         for (final String lookupString : lookupStrings) {
             if (!lookupElements.contains(lookupString)) {
-                failTest(String.format(
+                org.junit.jupiter.api.Assertions.fail(String.format(
                         completionContainsError, lookupString, lookupElements.toString())
                 );
             }
@@ -108,7 +109,7 @@ public abstract class BaseCompletionTestCase extends BaseProjectTestCase {
             final String completionDoesNotContainError
     ) {
         if (lookupStrings.length == 0) {
-            failTest(MESSAGE_NO_LOOKUP);
+            org.junit.jupiter.api.Assertions.fail(MESSAGE_NO_LOOKUP);
         }
 
         final List<String> lookupElements = myFixture.getLookupElementStrings();
@@ -116,7 +117,7 @@ public abstract class BaseCompletionTestCase extends BaseProjectTestCase {
         if (lookupElements != null) {
             for (final String lookupString : lookupStrings) {
                 if (lookupElements.contains(lookupString)) {
-                    failTest(String.format(
+                    org.junit.jupiter.api.Assertions.fail(String.format(
                             completionDoesNotContainError, lookupString, lookupElements.toString())
                     );
                 }

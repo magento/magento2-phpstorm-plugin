@@ -30,7 +30,7 @@ public class PluginDeclarationInspectionTest extends InspectionXmlFixtureTestCas
     /**
      * Tests the plugin name duplication warning won't show in the di.xml file
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testPluginNameDuplicationWarningWontShow() {
         myFixture.configureByFile(getFixturePath(ModuleDiXml.FILE_NAME));
         myFixture.testHighlighting(true, false, false);
@@ -39,7 +39,7 @@ public class PluginDeclarationInspectionTest extends InspectionXmlFixtureTestCas
     /**
      * Tests warning for disabling of non-existing plugin.
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testDisabledNonExistingPlugin() {
         myFixture.configureByFile(getFixturePath(ModuleDiXml.FILE_NAME));
         myFixture.testHighlighting(true, false, false);
@@ -49,7 +49,7 @@ public class PluginDeclarationInspectionTest extends InspectionXmlFixtureTestCas
      * Tests whenever the duplication warning shows when the plugin name already
      * defined in the same di.xml file
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testPluginNameUsedInSameFile() {
         myFixture.configureByFile(getFixturePath(ModuleDiXml.FILE_NAME));
         myFixture.testHighlighting(true, false, false);
@@ -61,7 +61,7 @@ public class PluginDeclarationInspectionTest extends InspectionXmlFixtureTestCas
      * that is already defined in the frontend module
      * area (Vendor/Module/etc/frontend/di.xml)
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testPluginNameAlreadyUsedInFrontendArea() {
         myFixture.configureByFile(getFixturePath(getAreaPath("frontend")));
         myFixture.testHighlighting(true, false, false);
@@ -73,7 +73,7 @@ public class PluginDeclarationInspectionTest extends InspectionXmlFixtureTestCas
      * that is already defined in the adminhtml module area
      * (Vendor/Module/etc/adminhtml/di.xml)
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testPluginNameAlreadyUsedInAdminhtmlArea() {
         myFixture.configureByFile(getFixturePath(getAreaPath("adminhtml")));
         myFixture.testHighlighting(true, false, false);
@@ -83,7 +83,7 @@ public class PluginDeclarationInspectionTest extends InspectionXmlFixtureTestCas
      * Tests whenever the duplication warning occurs for a plugin name
      * that is already defined in the global module area (Vendor/Module/etc/di.xml)
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testPluginNameAlreadyUsedInGlobalArea() {
         myFixture.configureByFile(getFixturePath(ModuleDiXml.FILE_NAME));
         myFixture.testHighlighting(true, false, false);
@@ -95,7 +95,7 @@ public class PluginDeclarationInspectionTest extends InspectionXmlFixtureTestCas
      * that is already defined in the webapi_rest module
      * area (Vendor/Module/etc/webapi_rest/di.xml)
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testPluginNameAlreadyUsedInWebApiRestArea() {
         myFixture.configureByFile(getFixturePath(this.getAreaPath("webapi_rest")));
         myFixture.testHighlighting(true, false, false);
@@ -107,7 +107,7 @@ public class PluginDeclarationInspectionTest extends InspectionXmlFixtureTestCas
      * that is already defined in the webapi_soap
      * module area (Vendor/Module/etc/webapi_soap/di.xml)
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testPluginNameAlreadyUsedInWebApiSoapArea() {
         myFixture.configureByFile(getFixturePath(getAreaPath("webapi_soap")));
         myFixture.testHighlighting(true, false, false);
@@ -119,7 +119,7 @@ public class PluginDeclarationInspectionTest extends InspectionXmlFixtureTestCas
      * that is already defined in the graphql module
      * area (Vendor/Module/etc/graphql/di.xml)
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testPluginNameAlreadyUsedInGraphqlArea() {
         myFixture.configureByFile(getFixturePath(getAreaPath("graphql")));
         myFixture.testHighlighting(true, false, false);
@@ -131,7 +131,7 @@ public class PluginDeclarationInspectionTest extends InspectionXmlFixtureTestCas
      * that is already defined in the crontab module
      * area (Vendor/Module/etc/crontab/di.xml)
      */
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testPluginNameAlreadyUsedInCrontabArea() {
         myFixture.configureByFile(getFixturePath(getAreaPath("crontab")));
         myFixture.testHighlighting(true, false, false);
