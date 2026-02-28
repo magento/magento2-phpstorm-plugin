@@ -10,6 +10,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.CronjobClassData;
 
 public class CronjobClassGeneratorTest extends BaseGeneratorTestCase {
 
+    @org.junit.Test
     public void testGenerateFile() {
         String filePath = this.getFixturePath("CleanTableCronjob.php");
         PsiFile expectedFile = myFixture.configureByFile(filePath);

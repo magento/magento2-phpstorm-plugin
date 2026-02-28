@@ -22,6 +22,7 @@ public class LayoutXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generating layout XML file.
      */
+    @org.junit.Test
     public void testGenerateLayoutXmlFile() {
         final String filePath = this.getFixturePath(FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

@@ -16,6 +16,7 @@ public class TableNameAndColumnReferenceRegistrarTest extends ReferenceXmlFixtur
      * The `name` attribute of the `table` tag in a `db_schema.xml` must
      * have reference to the `name` attribute of the another `table` tag.
      */
+    @org.junit.Test
     public void testTableTagMustHaveReference() {
         final String filePath = this.getFixturePath(ModuleDbSchemaXml.FILE_NAME);
         myFixture.configureByFile(filePath);
@@ -27,6 +28,7 @@ public class TableNameAndColumnReferenceRegistrarTest extends ReferenceXmlFixtur
      * The `table` attribute of the `constraint` tag in a `db_schema.xml` must
      * have reference to the `name` attribute of the another `table` tag.
      */
+    @org.junit.Test
     public void testConstraintTableTagMustHaveReference() {
         final String filePath = this.getFixturePath(ModuleDbSchemaXml.FILE_NAME);
         myFixture.configureByFile(filePath);
@@ -38,6 +40,7 @@ public class TableNameAndColumnReferenceRegistrarTest extends ReferenceXmlFixtur
      * The `referenceTable` attribute of the `constraint` tag in a `db_schema.xml` must
      * have reference to the `name` attribute of the another `table` tag.
      */
+    @org.junit.Test
     public void testConstraintReferenceTableTagMustHaveReference() {
         final String filePath = this.getFixturePath(ModuleDbSchemaXml.FILE_NAME);
         myFixture.configureByFile(filePath);
@@ -49,6 +52,7 @@ public class TableNameAndColumnReferenceRegistrarTest extends ReferenceXmlFixtur
      * The `column` attribute of the `constraint` tag in a `db_schema.xml` must
      * have reference to the `name` attribute of the `column` tag.
      */
+    @org.junit.Test
     public void testConstraintColumnTagMustHaveReference() {
         final String filePath = this.getFixturePath(ModuleDbSchemaXml.FILE_NAME);
         myFixture.configureByFile(filePath);
@@ -60,6 +64,7 @@ public class TableNameAndColumnReferenceRegistrarTest extends ReferenceXmlFixtur
      * The `referenceColumn` attribute of the `constraint` tag in a `db_schema.xml` must
      * have reference to the `name` attribute of the `column` tag.
      */
+    @org.junit.Test
     public void testConstraintReferenceColumnTagMustHaveReference() {
         final String filePath = this.getFixturePath(ModuleDbSchemaXml.FILE_NAME);
         myFixture.configureByFile(filePath);

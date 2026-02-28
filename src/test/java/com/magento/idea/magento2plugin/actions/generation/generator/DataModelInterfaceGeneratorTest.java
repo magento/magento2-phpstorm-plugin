@@ -16,6 +16,7 @@ public class DataModelInterfaceGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tests for generation of a Magento 2 Data Model Interface.
      */
+    @org.junit.Test
     public void testGenerateDataModelInterface() {
         final DataModelInterfaceGenerator generator = new DataModelInterfaceGenerator(
                 new DataModelInterfaceData(

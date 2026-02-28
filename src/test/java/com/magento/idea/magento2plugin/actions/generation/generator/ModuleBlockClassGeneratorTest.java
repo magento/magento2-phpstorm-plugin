@@ -13,6 +13,7 @@ public class ModuleBlockClassGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test Block generator
      */
+    @org.junit.Test
     public void testGenerateFile() {
         Project project = myFixture.getProject();
 

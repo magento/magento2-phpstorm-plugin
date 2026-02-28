@@ -28,6 +28,7 @@ public class MessageQueueClassGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test handler class file generation.
      */
+    @org.junit.Test
     public void testGenerateHandler() {
         final Project project = myFixture.getProject();
         final MessageQueueClassData messageQueueClassData = new MessageQueueClassData(
@@ -58,6 +59,7 @@ public class MessageQueueClassGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test consumer class file generation.
      */
+    @org.junit.Test
     public void testGenerateConsumer() {
         final Project project = myFixture.getProject();
         final MessageQueueClassData messageQueueClassData = new MessageQueueClassData(

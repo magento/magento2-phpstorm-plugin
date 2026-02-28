@@ -16,6 +16,7 @@ public final class ModuleObserverGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test module README.md file generation.
      */
+    @org.junit.Test
     public void testGenerateModuleObserverFile() {
         final PsiFile expectedFile = myFixture.configureByFile(
                 getFixturePath(CLASS_NAME + ModuleObserverFile.EXTENSION)

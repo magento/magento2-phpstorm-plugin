@@ -12,6 +12,7 @@ public class PhpClassMemberCompletionRegistrarTest extends CompletionXmlFixtureT
     /**
      * Tests for completion of init_parameter argument value in di.xml.
      */
+    @org.junit.Test
     public void testDiXmlMustHaveCompletion() {
         final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
         myFixture.configureByFile(filePath);

@@ -16,6 +16,7 @@ public final class ModuleSetupDataPatchGeneratorTest extends BaseGeneratorTestCa
     /**
      * Test module README.md file generation.
      */
+    @org.junit.Test
     public void testGenerateModuleSetupDataPatchFile() {
         final PsiFile expectedFile = myFixture.configureByFile(
                 getFixturePath(CLASS_NAME + ModuleSetupDataPatchFile.EXTENSION)

@@ -13,6 +13,7 @@ public class SystemConfigurationPathsCompletionTest extends CompletionXmlFixture
     /**
      * Test system xml section element completion.
      */
+    @org.junit.Test
     public void testSystemXmlSectionMustProvideCompletion() {
         final String filePath = this.getFixturePath(ModuleSystemXmlFile.FILE_NAME);
         myFixture.copyFileToProject(filePath);
@@ -22,6 +23,7 @@ public class SystemConfigurationPathsCompletionTest extends CompletionXmlFixture
     /**
      * Test system xml group element completion.
      */
+    @org.junit.Test
     public void testSystemXmlGroupMustProvideCompletion() {
         final String filePath = this.getFixturePath(ModuleSystemXmlFile.FILE_NAME);
         myFixture.copyFileToProject(filePath);
@@ -31,6 +33,7 @@ public class SystemConfigurationPathsCompletionTest extends CompletionXmlFixture
     /**
      * Test system xml field element completion.
      */
+    @org.junit.Test
     public void testSystemXmlFieldMustProvideCompletion() {
         final String filePath = this.getFixturePath(ModuleSystemXmlFile.FILE_NAME);
         myFixture.copyFileToProject(filePath);
@@ -40,6 +43,7 @@ public class SystemConfigurationPathsCompletionTest extends CompletionXmlFixture
     /**
      * Test config xml section element completion.
      */
+    @org.junit.Test
     public void testConfigXmlSectionMustProvideCompletion() {
         final String filePath = this.getFixturePath(ModuleConfigXmlFile.FILE_NAME);
         myFixture.copyFileToProject(filePath);
@@ -49,6 +53,7 @@ public class SystemConfigurationPathsCompletionTest extends CompletionXmlFixture
     /**
      * Test config xml group element completion.
      */
+    @org.junit.Test
     public void testConfigXmlGroupMustProvideCompletion() {
         final String filePath = this.getFixturePath(ModuleConfigXmlFile.FILE_NAME);
         myFixture.copyFileToProject(filePath);
@@ -58,6 +63,7 @@ public class SystemConfigurationPathsCompletionTest extends CompletionXmlFixture
     /**
      * Test config xml field element completion.
      */
+    @org.junit.Test
     public void testConfigXmlFieldMustProvideCompletion() {
         final String filePath = this.getFixturePath(ModuleConfigXmlFile.FILE_NAME);
         myFixture.copyFileToProject(filePath);

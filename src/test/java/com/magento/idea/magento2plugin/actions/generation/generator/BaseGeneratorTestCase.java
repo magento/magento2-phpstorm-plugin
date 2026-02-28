@@ -12,8 +12,9 @@ import com.magento.idea.magento2plugin.BaseProjectTestCase;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DefaultCodeStyleSettingsAdjustmentsUtil;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.project.util.GetProjectBasePath;
-import org.junit.After;
-import org.junit.Before;
+
+
+
 
 public abstract class BaseGeneratorTestCase extends BaseProjectTestCase {
     private static final String TEST_DATA_FOLDER_PATH = "testData" + File.separator
@@ -22,7 +23,7 @@ public abstract class BaseGeneratorTestCase extends BaseProjectTestCase {
             + "generator" + File.separator;
 
     @Override
-    @Before
+    public void setUp() throws Exception
     public void setUp() throws Exception {
         super.setUp();
         myFixture.setTestDataPath(TEST_DATA_FOLDER_PATH);
@@ -31,7 +32,8 @@ public abstract class BaseGeneratorTestCase extends BaseProjectTestCase {
     }
 
     @Override
-    @After
+    @Override
+    public void tearDown() throws Exception
     public void tearDown() throws Exception {
         super.tearDown();
         LightPlatformTestCase.closeAndDeleteProject();

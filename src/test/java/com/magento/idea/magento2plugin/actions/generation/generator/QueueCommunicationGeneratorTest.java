@@ -22,6 +22,7 @@ public class QueueCommunicationGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tests for generation of communication.xml file.
      */
+    @org.junit.Test
     public void testGenerateCommunicationXmlFile() {
         final String filePath = this.getFixturePath(QueueCommunicationXml.fileName);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

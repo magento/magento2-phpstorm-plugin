@@ -28,6 +28,7 @@ public class UiComponentGridXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test UI component listing file generation for specific area.
      */
+    @org.junit.Test
     public void testGenerateUiGridForBaseArea() {
         final String area = Areas.base.toString();
         final PsiFile cronGroupsXmlFile = generateComponentGridXml(
@@ -43,6 +44,7 @@ public class UiComponentGridXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test UI component listing file generation without toolbar.
      */
+    @org.junit.Test
     public void testGenerateUiGridWithoutToolbar() {
         final String area = Areas.adminhtml.toString();
         final PsiFile cronGroupsXmlFile = generateComponentGridXml(
@@ -58,6 +60,7 @@ public class UiComponentGridXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test UI component listing file generation with actions column.
      */
+    @org.junit.Test
     public void testGenerateUiGridForBaseAreaWithActionsColumnColumn() {
         final String area = Areas.base.toString();
         final PsiFile cronGroupsXmlFile = generateComponentGridXmlWithActionsColumn(area);

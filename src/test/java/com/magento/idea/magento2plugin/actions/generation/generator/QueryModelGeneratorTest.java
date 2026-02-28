@@ -19,6 +19,7 @@ public class QueryModelGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of GetListQuery model for entity.
      */
+    @org.junit.Test
     public void testGenerateGetListQueryModelFile() {
         final GetListQueryFile file = new GetListQueryFile(MODULE_NAME, ENTITY_NAME);
         final GetListQueryModelData getListQueryModelData = new GetListQueryModelData(

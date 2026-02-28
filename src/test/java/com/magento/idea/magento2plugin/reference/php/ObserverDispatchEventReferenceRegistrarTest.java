@@ -6,6 +6,7 @@ package com.magento.idea.magento2plugin.reference.php;
 
 public class ObserverDispatchEventReferenceRegistrarTest extends ReferencePhpFixtureTestCase {
 
+    @org.junit.Test
     public void testDispatchCallParamMustHaveReference() {
         String filePath = this.getFixturePath("TestBlock.php");
         myFixture.configureByFile(filePath);

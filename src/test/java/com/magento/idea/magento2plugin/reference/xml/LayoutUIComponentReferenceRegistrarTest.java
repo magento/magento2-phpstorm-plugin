@@ -9,6 +9,7 @@ import com.magento.idea.magento2plugin.magento.files.LayoutXml;
 
 public class LayoutUIComponentReferenceRegistrarTest extends ReferenceXmlFixtureTestCase {
 
+    @org.junit.Test
     public void testUIComponentMustHaveReference() {
         final String filePath = this.getFixturePath(LayoutXml.DEFAULT_FILENAME);
         myFixture.configureByFile(filePath);

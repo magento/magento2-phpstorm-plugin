@@ -10,6 +10,7 @@ public class WebApiMethodReferenceRegistrarTest extends ReferenceXmlFixtureTestC
     /**
      * Tests for reference to valid PHP method in webapi.xml.
      */
+    @org.junit.Test
     public void testWebApiMethodMustHaveReference() {
         myFixture.configureByFile(this.getFixturePath("webapi.xml"));
 
@@ -22,6 +23,7 @@ public class WebApiMethodReferenceRegistrarTest extends ReferenceXmlFixtureTestC
     /**
      * Tests for no reference to invalid PHP method in webapi.xml.
      */
+    @org.junit.Test
     public void testWebApiMethodMustNotHaveReference() {
         myFixture.configureByFile(this.getFixturePath("webapi.xml"));
 

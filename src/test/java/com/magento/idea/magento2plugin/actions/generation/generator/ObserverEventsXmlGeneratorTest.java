@@ -20,6 +20,7 @@ public class ObserverEventsXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test checks whether 2 events.xml is generated correctly for the base area.
      */
+    @org.junit.Test
     public void testGenerateEventsXmlInBaseAreaFile() {
         final String filePath = this.getFixturePath(ModuleEventsXml.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -43,6 +44,7 @@ public class ObserverEventsXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test checks whether 2 events.xml is generated correctly for the adminhtml area.
      */
+    @org.junit.Test
     public void testGenerateEventsXmlInAdminhtmlAreaFile() {
         final String filePath = this.getFixturePath(ModuleEventsXml.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -66,6 +68,7 @@ public class ObserverEventsXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test checks whether 2 events.xml is generated correctly with 2 observers.
      */
+    @org.junit.Test
     public void testAddTwoObserversToOneEventsXml() {
         final String filePath = this.getFixturePath(ModuleEventsXml.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

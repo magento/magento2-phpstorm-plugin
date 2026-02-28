@@ -11,6 +11,7 @@ public class LayoutUpdateHandleCompletionRegistrarTest extends CompletionXmlFixt
      * The `handle` attribute of the `update` tag in the layout XML must
      * have completion based on layout index.
      */
+    @org.junit.Test
     public void testUpdateHandleMustHaveCompletion() {
         final String filePath = this.getFixturePath("test_test_test.xml");
         myFixture.configureByFile(filePath);

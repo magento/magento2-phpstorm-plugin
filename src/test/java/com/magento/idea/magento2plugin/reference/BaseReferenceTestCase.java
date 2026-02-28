@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
+
 @SuppressWarnings({
         "PMD.TooManyMethods",
 })
@@ -74,7 +75,7 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
         final String referenceNotFound =
                 "Failed that element contains reference to the attribute value `%s`";
 
-        fail(String.format(referenceNotFound, reference));
+        failTest(String.format(referenceNotFound, reference));
     }
 
     @SuppressWarnings("PMD.CognitiveComplexity")
@@ -109,7 +110,7 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
         final String referenceNotFound
                 = "Failed that element contains reference to the XML tag `%s`";
 
-        fail(String.format(referenceNotFound, tagName));
+        failTest(String.format(referenceNotFound, tagName));
     }
 
     protected void assertHasReferenceToFile(final String reference) {
@@ -158,7 +159,7 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
         }
         final String referenceNotFound = "Failed that element contains reference to the file `%s`";
 
-        fail(String.format(referenceNotFound, reference));
+        failTest(String.format(referenceNotFound, reference));
     }
 
     protected void assertHasReferenceToXmlFile(final String fileName) {
@@ -176,7 +177,7 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
         final String referenceNotFound
                 = "Failed that element contains reference to the XML tag `%s`";
 
-        fail(String.format(referenceNotFound, fileName));
+        failTest(String.format(referenceNotFound, fileName));
     }
 
     protected void assertHasReferenceToDirectory(final String directoryName) {
@@ -190,7 +191,7 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
 
         final String referenceNotFound
                 = "Failed that element contains reference to the directory `%s`";
-        fail(String.format(referenceNotFound, directoryName));
+        failTest(String.format(referenceNotFound, directoryName));
     }
 
     protected void assertHasNoReferenceToDirectory(final String directoryName) {
@@ -200,7 +201,7 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
                     && ((PsiDirectoryImpl) resolvedElement).getName().equals(directoryName)) {
                 final String referenceNotFound
                         = "Failed that element does not contain reference to the directory `%s`";
-                fail(String.format(referenceNotFound, directoryName));
+                failTest(String.format(referenceNotFound, directoryName));
             }
         }
     }
@@ -228,7 +229,7 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
         if (reference == null) {
             final String referenceNotFound
                     = "Failed that element does not contain and reference";
-            fail(referenceNotFound);
+            failTest(referenceNotFound);
         }
 
         final String parameterClassFqn = ((Parameter) reference.resolve())
@@ -273,7 +274,7 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
         final PsiElement parameterList = references[0].resolve().getParent();
 
         if (!(parameterList instanceof ParameterList)) {
-            fail("Element doesn't have a reference to a method parameter");
+            failTest("Element doesn't have a reference to a method parameter");
         }
 
         assertEquals(

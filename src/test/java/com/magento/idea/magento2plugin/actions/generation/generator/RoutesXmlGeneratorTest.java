@@ -20,6 +20,7 @@ public class RoutesXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generating routes XML file.
      */
+    @org.junit.Test
     public void testGenerateRoutesXmlFile() {
         final String filePath = this.getFixturePath(RoutesXml.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

@@ -23,6 +23,7 @@ public class QueueTopologyGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tests for generation of queue_topology.xml file.
      */
+    @org.junit.Test
     public void testGenerateTopologyXmlFile() {
         final String filePath = this.getFixturePath(QueueTopologyXml.fileName);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

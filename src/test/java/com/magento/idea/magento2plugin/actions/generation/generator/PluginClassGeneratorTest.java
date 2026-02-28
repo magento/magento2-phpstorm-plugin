@@ -27,6 +27,7 @@ public class PluginClassGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test of plugin generation.
      */
+    @org.junit.Test
     public void testGeneratePluginClassFile() {
         PsiFile pluginClassFile;
         addPluginToTargetClass(Plugin.PluginType.before.toString());

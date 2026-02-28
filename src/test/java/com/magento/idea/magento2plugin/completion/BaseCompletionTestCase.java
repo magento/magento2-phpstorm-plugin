@@ -75,7 +75,7 @@ public abstract class BaseCompletionTestCase extends BaseProjectTestCase {
             final String messageCompletionDoesNotShow
                     = "Failed asserting that completion does not show up";
 
-            fail(messageCompletionDoesNotShow);
+            failTest(messageCompletionDoesNotShow);
         }
     }
 
@@ -85,18 +85,18 @@ public abstract class BaseCompletionTestCase extends BaseProjectTestCase {
             final String completionContainsError
     ) {
         if (lookupStrings.length == 0) {
-            fail(MESSAGE_NO_LOOKUP);
+            failTest(MESSAGE_NO_LOOKUP);
         }
 
         final List<String> lookupElements = myFixture.getLookupElementStrings();
 
         if (lookupElements == null || lookupElements.isEmpty()) {
-            fail(String.format(emptyLookupError, Arrays.toString(lookupStrings)));
+            failTest(String.format(emptyLookupError, Arrays.toString(lookupStrings)));
         }
 
         for (final String lookupString : lookupStrings) {
             if (!lookupElements.contains(lookupString)) {
-                fail(String.format(
+                failTest(String.format(
                         completionContainsError, lookupString, lookupElements.toString())
                 );
             }
@@ -108,7 +108,7 @@ public abstract class BaseCompletionTestCase extends BaseProjectTestCase {
             final String completionDoesNotContainError
     ) {
         if (lookupStrings.length == 0) {
-            fail(MESSAGE_NO_LOOKUP);
+            failTest(MESSAGE_NO_LOOKUP);
         }
 
         final List<String> lookupElements = myFixture.getLookupElementStrings();
@@ -116,7 +116,7 @@ public abstract class BaseCompletionTestCase extends BaseProjectTestCase {
         if (lookupElements != null) {
             for (final String lookupString : lookupStrings) {
                 if (lookupElements.contains(lookupString)) {
-                    fail(String.format(
+                    failTest(String.format(
                             completionDoesNotContainError, lookupString, lookupElements.toString())
                     );
                 }

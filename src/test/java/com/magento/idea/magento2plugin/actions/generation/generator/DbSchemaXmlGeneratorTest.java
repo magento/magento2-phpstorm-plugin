@@ -32,6 +32,7 @@ public class DbSchemaXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test whether db_schema.xml file generated correctly.
      */
+    @org.junit.Test
     public void testGenerateDbSchemaXmlFile() {
         final DbSchemaXmlData dbSchemaXmlData = new DbSchemaXmlData(
                 TABLE_NAME,
@@ -58,6 +59,7 @@ public class DbSchemaXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test db_schema.xml file generation when columns provided as short entity properties.
      */
+    @org.junit.Test
     public void testGenerateDbSchemaXmlFileForShortProperties() {
         final List<Map<String, String>> properties =
                 DbSchemaGeneratorDataProviderUtil.generateEntityPropertiesForTest();

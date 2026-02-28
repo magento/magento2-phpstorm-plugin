@@ -64,6 +64,7 @@ public class WebApiInterfaceGeneratorTest extends BaseGeneratorTestCase {
      * Test generation of Web API interface for a service with primitive types.
      */
     @SuppressWarnings({"PMD.JUnitTestContainsTooManyAsserts"})
+    @org.junit.Test
     public void testWithPrimitiveTypes() {
         final PhpClass service = extractServiceByFqn(FIRST_SERVICE_FQN);
         final List<Method> publicMethods = PhpTypeMetadataParserUtil.getPublicMethods(service);
@@ -81,7 +82,7 @@ public class WebApiInterfaceGeneratorTest extends BaseGeneratorTestCase {
         );
 
         if (result == null) {
-            fail(COULD_NOT_GENERATE_MESSAGE);
+            failTest(COULD_NOT_GENERATE_MESSAGE);
         }
 
         assertGeneratedFileIsCorrect(
@@ -105,6 +106,7 @@ public class WebApiInterfaceGeneratorTest extends BaseGeneratorTestCase {
      * Test generation of Web API interface for a service with Object types.
      */
     @SuppressWarnings({"PMD.JUnitTestContainsTooManyAsserts"})
+    @org.junit.Test
     public void testWithObjectTypesAndPhpDocComments() {
         final PhpClass service = extractServiceByFqn(SECOND_SERVICE_FQN);
         final List<Method> publicMethods = PhpTypeMetadataParserUtil.getPublicMethods(service);
@@ -122,7 +124,7 @@ public class WebApiInterfaceGeneratorTest extends BaseGeneratorTestCase {
         );
 
         if (result == null) {
-            fail(COULD_NOT_GENERATE_MESSAGE);
+            failTest(COULD_NOT_GENERATE_MESSAGE);
         }
 
         assertGeneratedFileIsCorrect(
@@ -159,7 +161,7 @@ public class WebApiInterfaceGeneratorTest extends BaseGeneratorTestCase {
                 final PhpDocComment methodDoc = method.getDocComment();
 
                 if (methodDoc == null || !methodDoc.getText().contains(PhpDocUtil.INHERITDOC_TAG)) {
-                    fail(METHOD_DOES_NOT_HAVE_INHERIT_DOC);
+                    failTest(METHOD_DOES_NOT_HAVE_INHERIT_DOC);
                 }
             }
         }
@@ -186,14 +188,14 @@ public class WebApiInterfaceGeneratorTest extends BaseGeneratorTestCase {
         }
 
         if (!implementFound) {
-            fail(SERVICE_SHOULD_IMPLEMENT_INTERFACE);
+            failTest(SERVICE_SHOULD_IMPLEMENT_INTERFACE);
         }
 
         final PhpPsiElement scopeForUseOperator =
                 PhpCodeInsightUtil.findScopeForUseOperator(service);
 
         if (scopeForUseOperator == null) {
-            fail(SERVICE_SHOULD_IMPLEMENT_INTERFACE);
+            failTest(SERVICE_SHOULD_IMPLEMENT_INTERFACE);
         }
         final List<PhpUseList> imports = PhpCodeInsightUtil.collectImports(scopeForUseOperator);
         boolean importFound = false;
@@ -210,7 +212,7 @@ public class WebApiInterfaceGeneratorTest extends BaseGeneratorTestCase {
         }
 
         if (!importFound) {
-            fail(SERVICE_SHOULD_HAVE_INTERFACE_IMPORTED);
+            failTest(SERVICE_SHOULD_HAVE_INTERFACE_IMPORTED);
         }
     }
 
@@ -226,7 +228,7 @@ public class WebApiInterfaceGeneratorTest extends BaseGeneratorTestCase {
                 .getInstance(myFixture.getProject()).execute(classFqn);
 
         if (service == null) {
-            fail(COULD_NOT_FIND_SERVICE_MESSAGE);
+            failTest(COULD_NOT_FIND_SERVICE_MESSAGE);
         }
 
         return service;

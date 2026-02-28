@@ -28,6 +28,7 @@ public class CLICommandDiXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of the di.xml file with the CLI command initialization.
      */
+    @org.junit.Test
     public void testInitializeCLICommand() {
         final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -44,6 +45,7 @@ public class CLICommandDiXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test adding one more CLI command to the di.xml with already initialized CLI command.
      */
+    @org.junit.Test
     public void testAddingTwoCLICommandToDiXml() {
         final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

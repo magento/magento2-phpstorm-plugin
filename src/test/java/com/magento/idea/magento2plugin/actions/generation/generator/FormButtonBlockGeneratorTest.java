@@ -11,7 +11,7 @@ import com.magento.idea.magento2plugin.actions.generation.context.EntityCreatorC
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormButtonData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.actions.generation.util.GenerationContextRegistry;
-import org.junit.Before;
+
 
 public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
 
@@ -26,7 +26,8 @@ public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
             = "src/app/code/Foo/Bar/Block/Form/" + ENTITY_NAME;
 
     @Override
-    @Before
+    @Override
+    public void setUp() throws Exception
     public void setUp() throws Exception {
         super.setUp();
         final EntityCreatorContext context = new EntityCreatorContext();
@@ -38,6 +39,7 @@ public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test creation Block type Save.
      */
+    @org.junit.Test
     public void testGenerateSaveButtonBlock() {
         final String filePath = this.getFixturePath("SaveBlock.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -76,6 +78,7 @@ public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test creation Block type Back.
      */
+    @org.junit.Test
     public void testGenerateBackButtonBlock() {
         final String filePath = this.getFixturePath("MyBackButton.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -114,6 +117,7 @@ public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test creation Block type Delete.
      */
+    @org.junit.Test
     public void testGenerateDeleteButtonBlock() {
         final String filePath = this.getFixturePath("DeleteBlock.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -152,6 +156,7 @@ public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test creation Block custom type.
      */
+    @org.junit.Test
     public void testGenerateCustomButtonBlock() {
         final String filePath = this.getFixturePath("MyCustom.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

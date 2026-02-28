@@ -55,6 +55,7 @@ public class SearchResultsFilesGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of search results interface for entity.
      */
+    @org.junit.Test
     public void testGenerateSearchResultsInterfaceFile() {
         Objects.requireNonNull(interfaceFile);
 
@@ -72,6 +73,7 @@ public class SearchResultsFilesGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of search results class for entity.
      */
+    @org.junit.Test
     public void testGenerateSearchResultsFile() {
         Objects.requireNonNull(classFile);
 
@@ -89,6 +91,7 @@ public class SearchResultsFilesGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of search results preference for entity.
      */
+    @org.junit.Test
     public void testGenerateSearchResultsDiPreference() {
         Objects.requireNonNull(interfaceFile);
         Objects.requireNonNull(preferenceFile);

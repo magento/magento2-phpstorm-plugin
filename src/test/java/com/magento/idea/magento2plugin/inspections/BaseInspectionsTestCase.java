@@ -20,7 +20,7 @@ abstract public class BaseInspectionsTestCase extends BaseProjectTestCase {
 
         List<HighlightInfo> highlightingList = myFixture.doHighlighting();
         if (highlightingList.isEmpty()) {
-            fail(String.format(highlightingNotFound, message));
+            failTest(String.format(highlightingNotFound, message));
         }
 
         for (HighlightInfo highlighting :
@@ -30,7 +30,7 @@ abstract public class BaseInspectionsTestCase extends BaseProjectTestCase {
                 return;
             }
         }
-        fail(String.format(highlightingNotFound, message));
+        failTest(String.format(highlightingNotFound, message));
     }
 
     protected void assertHasNoHighlighting(String message) {
@@ -45,7 +45,7 @@ abstract public class BaseInspectionsTestCase extends BaseProjectTestCase {
                 highlightingList) {
             if (highlighting.getDescription() == null) continue;
             if (highlighting.getDescription().equals(message)) {
-                fail(String.format(highlightingNotFound, message));
+                failTest(String.format(highlightingNotFound, message));
             }
         }
     }

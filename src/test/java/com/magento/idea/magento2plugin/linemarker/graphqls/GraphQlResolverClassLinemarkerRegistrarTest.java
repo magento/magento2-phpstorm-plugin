@@ -12,6 +12,7 @@ public class GraphQlResolverClassLinemarkerRegistrarTest extends LinemarkerFixtu
     /**
      * Tests linemarkers in the schema.graphqls file for PHP resolver classes.
      */
+    @org.junit.Test
     public void testWithValidSchemaResolver() {
         myFixture.configureByFile(this.getFixturePath("schema.graphqls", "graphqls"));
 

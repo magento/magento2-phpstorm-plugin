@@ -10,6 +10,7 @@ public class PhpServiceMethodCompletionRegistrarTest extends CompletionXmlFixtur
     /**
      * Tests for the completion in `method` attribute of the `service` tag in webapi.xml.
      */
+    @org.junit.Test
     public void testWebApiXmlMustHaveCompletion() {
         final String filePath = this.getFixturePath("webapi.xml");
         myFixture.configureByFile(filePath);

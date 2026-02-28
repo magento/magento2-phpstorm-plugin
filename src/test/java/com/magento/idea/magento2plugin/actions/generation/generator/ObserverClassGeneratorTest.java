@@ -10,6 +10,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.ObserverFileData;
 
 public class ObserverClassGeneratorTest extends BaseGeneratorTestCase {
 
+    @org.junit.Test
     public void testGenerateObserverClass()
     {
         Project project = myFixture.getProject();

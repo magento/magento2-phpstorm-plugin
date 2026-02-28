@@ -14,6 +14,7 @@ public class ConfigPhpModuleCompletionRegistrarTest extends CompletionPhpFixture
     /**
      * Tests for module name completion under array key 'modules' in config.php
      */
+    @org.junit.Test
     public void testModuleNameMustHaveCompletion() {
         final String filePath = this.getFixturePath("config.php");
         myFixture.copyFileToProject(filePath);
@@ -24,6 +25,7 @@ public class ConfigPhpModuleCompletionRegistrarTest extends CompletionPhpFixture
     /**
      * Tests for no module name completion under a different array key in config.php
      */
+    @org.junit.Test
     public void testModuleNameMustNotHaveCompletion() {
         final String filePath = this.getFixturePath("config.php");
         myFixture.copyFileToProject(filePath);

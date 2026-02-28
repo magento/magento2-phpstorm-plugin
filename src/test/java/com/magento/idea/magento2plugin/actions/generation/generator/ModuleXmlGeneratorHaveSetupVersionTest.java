@@ -14,6 +14,7 @@ public class ModuleXmlGeneratorHaveSetupVersionTest extends BaseGeneratorTestCas
     /**
      * Test checks whether module.xml is generated correctly.
      */
+    @org.junit.Test
     public void testGenerateModuleFile() {
         final String filePath = this.getFixturePath(ModuleXml.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

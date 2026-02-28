@@ -21,6 +21,7 @@ public class EditEntityActionGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of edit entity controller file.
      */
+    @org.junit.Test
     public void testGenerateEditEntityActionFile() {
         final EditActionFile file = new EditActionFile(MODULE_NAME, ENTITY_NAME);
         final EditEntityActionGenerator generator =

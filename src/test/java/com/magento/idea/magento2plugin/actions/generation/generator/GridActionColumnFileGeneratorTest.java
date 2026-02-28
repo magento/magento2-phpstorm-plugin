@@ -31,6 +31,7 @@ public class GridActionColumnFileGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of grid actions column file.
      */
+    @org.junit.Test
     public void testGenerateGridActionColumnFile() {
         final GridActionColumnFile file = new GridActionColumnFile(MODULE_NAME, ENTITY_NAME);
         final GridActionColumnData data = new GridActionColumnData(

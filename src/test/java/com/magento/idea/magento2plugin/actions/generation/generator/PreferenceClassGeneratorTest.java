@@ -19,6 +19,7 @@ public class PreferenceClassGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test preference class file generation.
      */
+    @org.junit.Test
     public void testGeneratePreferenceClassFile() {
         final PsiFile preferenceClassFile = createPreferenceClassFile(
                 TARGET_MODEL_ONE_CLASS_FQN,
@@ -42,6 +43,7 @@ public class PreferenceClassGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test preference class file generation.
      */
+    @org.junit.Test
     public void testGeneratePreferenceInterfaceFile() {
         final PsiFile preferenceClassFile = createPreferenceClassFile(
                 TARGET_MODEL_ONE_CLASS_FQN,
@@ -65,6 +67,7 @@ public class PreferenceClassGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test preference class file generation with inheritance.
      */
+    @org.junit.Test
     public void testGeneratePreferenceClassFileWithInheritance() {
         final PsiFile preferenceClassFile = createPreferenceClassFile(
                 TARGET_MODEL_TWO_CLASS_FQN,

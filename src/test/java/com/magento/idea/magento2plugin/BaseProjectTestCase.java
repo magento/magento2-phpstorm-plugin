@@ -30,6 +30,7 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
 
     @Override
     public void setUp() throws Exception {
+        super.setUp();
         // Install a guard uncaught exception handler to ignore known kernel-related background crashes in tests
         previousUncaughtHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
@@ -78,7 +79,6 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
                 return super.processError(category, message, details, t);
             }
         }, () -> {
-            BaseProjectTestCase.super.setUp();
             copyMagento2ToTestProject();
             enablePluginAndReindex();
         });
@@ -140,13 +140,12 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
     ) {
         return fixturesFolderPath + getClass().getSimpleName().replace("Test", "")
                 + File.separator
-                + name()
+                + getTestName(true)
                 + File.separator
                 + fileName;
     }
 
-    private String name() {
-        return StringUtil.trimEnd(getTestName(true), "Test");
+    protected void failTest(String message) {
+        fail(message);
     }
-
 }

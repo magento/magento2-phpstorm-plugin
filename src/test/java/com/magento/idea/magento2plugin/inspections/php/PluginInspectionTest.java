@@ -24,6 +24,7 @@ public class PluginInspectionTest extends InspectionPhpFixtureTestCase {
     /**
      * Inspection highlights error in parameter type.
      */
+    @org.junit.Test
     public void testWithWrongParameterType() {
         myFixture.configureByFile(getFixturePath("Plugin.php"));
 
@@ -39,6 +40,7 @@ public class PluginInspectionTest extends InspectionPhpFixtureTestCase {
     /**
      * Inspection highlights error in callable parameter type.
      */
+    @org.junit.Test
     public void testWithWrongCallableType() {
         myFixture.configureByFile(getFixturePath("Plugin.php"));
 
@@ -54,6 +56,7 @@ public class PluginInspectionTest extends InspectionPhpFixtureTestCase {
     /**
      * Inspection highlights error in callable parameter type.
      */
+    @org.junit.Test
     public void testWithNoninterceptableTargetClass() {
         myFixture.configureByFile(getFixturePath("Plugin.php"));
 

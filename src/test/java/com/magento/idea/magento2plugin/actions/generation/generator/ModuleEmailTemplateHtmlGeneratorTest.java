@@ -22,6 +22,7 @@ public class ModuleEmailTemplateHtmlGeneratorTest extends BaseGeneratorTestCase 
     /**
      * Test generating email template with HTML type.
      */
+    @org.junit.Test
     public void testGenerateEmailTemplateHtml() {
         final String filePath = this.getFixturePath(
                 String.format(
@@ -49,6 +50,7 @@ public class ModuleEmailTemplateHtmlGeneratorTest extends BaseGeneratorTestCase 
     /**
      * Test generating email template with TEXT type.
      */
+    @org.junit.Test
     public void testGenerateEmailTemplateText() {
         final String filePath = this.getFixturePath(
                 String.format(

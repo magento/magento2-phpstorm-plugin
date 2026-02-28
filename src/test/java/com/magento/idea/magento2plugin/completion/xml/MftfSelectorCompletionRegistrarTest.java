@@ -22,6 +22,7 @@ public class MftfSelectorCompletionRegistrarTest extends CompletionXmlFixtureTes
         "TestAdminProductsSection.testfilters"
       };
 
+    @org.junit.Test
     public void testSelectorInActionGroupMustProvideCompletion() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.copyFileToProject(filePath);
@@ -29,6 +30,7 @@ public class MftfSelectorCompletionRegistrarTest extends CompletionXmlFixtureTes
         assertFileContainsCompletions(filePath, lookupStringsEntities);
     }
 
+    @org.junit.Test
     public void testSelectorInTestMustProvideCompletion() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.copyFileToProject(filePath);
@@ -36,6 +38,7 @@ public class MftfSelectorCompletionRegistrarTest extends CompletionXmlFixtureTes
         assertFileContainsCompletions(filePath, lookupStringsEntities);
     }
 
+    @org.junit.Test
     public void testSelectorInActionGroupMustBeEmpty() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.copyFileToProject(filePath);
@@ -43,6 +46,7 @@ public class MftfSelectorCompletionRegistrarTest extends CompletionXmlFixtureTes
         assertCompletionNotShowing(filePath);
     }
 
+    @org.junit.Test
     public void testSelectorInTestMustBeEmpty() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.copyFileToProject(filePath);

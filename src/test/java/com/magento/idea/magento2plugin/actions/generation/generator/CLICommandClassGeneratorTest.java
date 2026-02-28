@@ -20,6 +20,7 @@ public class CLICommandClassGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of the new CLI command class.
      */
+    @org.junit.Test
     public void testGenerateCLICommandClass() {
         final Project project = myFixture.getProject();
         final CLICommandClassData classData = new CLICommandClassData(

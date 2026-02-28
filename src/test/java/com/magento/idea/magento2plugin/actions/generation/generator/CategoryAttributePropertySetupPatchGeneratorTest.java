@@ -19,6 +19,7 @@ public class CategoryAttributePropertySetupPatchGeneratorTest extends BaseGenera
     /**
      * Tests the generated patch file.
      */
+    @org.junit.Test
     public void testGenerateFile() {
         final Project project = myFixture.getProject();
 
@@ -54,6 +55,7 @@ public class CategoryAttributePropertySetupPatchGeneratorTest extends BaseGenera
     /**
      * Tests the generated form file.
      */
+    @org.junit.Test
     public void testGenerateFormFile() {
         final Project project = myFixture.getProject();
 

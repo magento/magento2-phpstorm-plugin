@@ -12,6 +12,7 @@ public class LayoutUIComponentCompletionRegistrarTest extends CompletionXmlFixtu
     /**
      * Test ui component must have completion.
      */
+    @org.junit.Test
     public void testUIComponentMustHaveCompletion() {
         final String filePath = this.getFixturePath(LayoutXml.DEFAULT_FILENAME);
         myFixture.configureByFile(filePath);

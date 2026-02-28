@@ -21,6 +21,7 @@ public class DataProviderDeclarationGeneratorTest extends BaseGeneratorTestCase 
     /**
      * Test checks whether menu.xml file generated correctly.
      */
+    @org.junit.Test
     public void testGenerateDataProviderDeclarationFile() {
         final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
 

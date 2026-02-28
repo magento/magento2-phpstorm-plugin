@@ -28,6 +28,7 @@ public class WebApiLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
     /**
      * Class configured as WEB API service in web_api.xml should have WEB API line markers.
      */
+    @org.junit.Test
     public void testWebApiServiceShouldHaveLinemarker() {
         // work around for issue caused by
         // com.magento.idea.magento2plugin.linemarker.xml.LineMarkerXmlTagDecorator
@@ -60,6 +61,7 @@ public class WebApiLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
     /**
      * Regular class should not have WEB API line markers.
      */
+    @org.junit.Test
     public void testRegularPhpClassShouldNotHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("ClassNotConfiguredInWebApiXml.php", "php"));
 

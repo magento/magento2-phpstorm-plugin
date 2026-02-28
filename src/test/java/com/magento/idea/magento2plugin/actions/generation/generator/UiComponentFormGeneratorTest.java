@@ -29,6 +29,7 @@ public class UiComponentFormGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generating layout XML file.
      */
+    @org.junit.Test
     public void testGenerateFormXmlFile() {
         final String filePath = this.getFixturePath(FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

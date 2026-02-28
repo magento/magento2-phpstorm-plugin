@@ -23,6 +23,7 @@ public class NewActionEntityGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of NewAction controller.
      */
+    @org.junit.Test
     public void testGenerateNewActionEntityFile() {
         final NewActionEntityControllerFileData newActionEntityControllerFileData =
                 new NewActionEntityControllerFileData(

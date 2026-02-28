@@ -21,6 +21,7 @@ public class CustomerAttributeSetupPatchGeneratorTest extends BaseGeneratorTestC
     /**
      * Test generating the customer attribute data patch.
      */
+    @org.junit.Test
     public void testGenerateMultiselectAttributeDataPatch() {
         final Project project = myFixture.getProject();
 

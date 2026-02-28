@@ -12,6 +12,7 @@ public class DisabledPluginReferenceRegistrarTest extends ReferenceXmlFixtureTes
     /**
      * Tests for disabled plugin name reference to original definition.
      */
+    @org.junit.Test
     public void testDisabledPluginNameMustHaveReference() {
         myFixture.configureByFile(this.getFixturePath(ModuleDiXml.FILE_NAME));
 

@@ -51,7 +51,7 @@ public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
 
         final String lineMarkerNotFound
                 = "Failed that documents contains linemarker with the tooltip `%s`";
-        fail(String.format(lineMarkerNotFound, tooltip));
+        failTest(String.format(lineMarkerNotFound, tooltip));
     }
 
     protected void assertHasNoLinemarkerWithTooltipAndIcon(
@@ -71,7 +71,7 @@ public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
             }
             if (lineMarkerTooltip.equals(tooltip)
                     && lineMarkerIcon.toString().equals(icon)) {
-                fail(String.format(lineMarkerExist, tooltip));
+                failTest(String.format(lineMarkerExist, tooltip));
             }
         }
     }

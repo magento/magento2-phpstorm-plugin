@@ -28,6 +28,7 @@ public class PluginAttributeTypeInspectionTest extends InspectionXmlFixtureTestC
      * Test for an error for the "type" attribute because it is empty.
      * <plugin name="unique_plugin_name" type=""/>
      */
+    @org.junit.Test
     public void testAttrArgTypeValueIsEmpty() {
         configureFixture();
 
@@ -43,6 +44,7 @@ public class PluginAttributeTypeInspectionTest extends InspectionXmlFixtureTestC
      * Test for no error for the "type" attribute because this class exists.
      * <plugin name="unique_plugin_name" type="Magento\Catalog\Plugin\PluginClass" />
      */
+    @org.junit.Test
     public void testAttrTypeClassExists() {
         configureFixture();
 
@@ -57,6 +59,7 @@ public class PluginAttributeTypeInspectionTest extends InspectionXmlFixtureTestC
     /**
      * Test for throwing an error for a class that does not exist for the "type" attribute.
      */
+    @org.junit.Test
     public void testClassAttrTypeDoesNotExists() {
         configureFixture();
 
@@ -72,6 +75,7 @@ public class PluginAttributeTypeInspectionTest extends InspectionXmlFixtureTestC
      * Test for the absence of an error in the presence of
      * classes or interfaces specified for plugins.
      */
+    @org.junit.Test
     public void testClassAttrTypeIsExist() {
         configureFixture();
 

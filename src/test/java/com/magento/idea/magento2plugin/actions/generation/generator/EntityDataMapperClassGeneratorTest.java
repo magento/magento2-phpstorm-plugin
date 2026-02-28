@@ -21,6 +21,7 @@ public class EntityDataMapperClassGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of entity data mapper class.
      */
+    @org.junit.Test
     public void testGenerateEntityDataMapperFile() {
         final EntityDataMapperData entityDataMapperData = new EntityDataMapperData(
                 MODULE_NAME,

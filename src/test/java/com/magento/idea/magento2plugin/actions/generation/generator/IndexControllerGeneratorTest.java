@@ -18,6 +18,7 @@ public class IndexControllerGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of list view entity controller (adminhtml).
      */
+    @org.junit.Test
     public void testGenerateIndexControllerFile() {
         final IndexActionFile file = new IndexActionFile(MODULE_NAME, ENTITY_NAME);
         final IndexActionData data = new IndexActionData(

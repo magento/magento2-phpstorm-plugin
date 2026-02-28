@@ -14,6 +14,7 @@ public class ModuleCollectionGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of collection file.
      */
+    @org.junit.Test
     public void testGenerateFile() {
         final Project project = myFixture.getProject();
         final CollectionData collectionFileData = new CollectionData(
@@ -42,6 +43,7 @@ public class ModuleCollectionGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of collection file where resource model name equal to the model name.
      */
+    @org.junit.Test
     public void testGenerateWithTheSameNamesForResourceModelAndModel() {
         final PsiFile collectionFile = new ModuleCollectionGenerator(
                 new CollectionData(

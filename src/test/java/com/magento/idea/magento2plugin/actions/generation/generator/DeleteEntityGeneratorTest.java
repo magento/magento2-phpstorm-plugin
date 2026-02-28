@@ -33,6 +33,7 @@ public class DeleteEntityGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of Delete controller.
      */
+    @org.junit.Test
     public void testGenerateDeleteEntityFile() {
         final DeleteEntityControllerFileData deleteEntityControllerFileData =
                 new DeleteEntityControllerFileData(

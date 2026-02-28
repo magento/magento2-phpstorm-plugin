@@ -24,6 +24,7 @@ public class NewEntityGeneratorPoolTest extends BaseGeneratorTestCase {
     /**
      * Test if generator pool handler instantiated without any error.
      */
+    @org.junit.Test
     public void testGeneratorsInPoolInstantiating() {
         final NewEntityDialogData dialogData = getMockNewEntityDialogData();
         final EntityCreatorContextData contextData = getMockContext();
@@ -36,14 +37,15 @@ public class NewEntityGeneratorPoolTest extends BaseGeneratorTestCase {
         );
 
         assertFalse(
-                "There are errors during generators instantiating.",
-                generatorPoolHandler.hasErrorMessages()
+                generatorPoolHandler.hasErrorMessages(),
+                "There are errors during generators instantiating."
         );
     }
 
     /**
      * Test if generators handlers doesn't have any DTO converter type errors.
      */
+    @org.junit.Test
     public void testGeneratorsInPoolOnCorrectDtoConverterTypes() {
         final NewEntityDialogData dialogData = getMockNewEntityDialogData();
         final EntityCreatorContextData contextData = getMockContext();
@@ -58,7 +60,7 @@ public class NewEntityGeneratorPoolTest extends BaseGeneratorTestCase {
         try {
             generatorPoolHandler.instantiateAllGenerators();
         } catch (ClassCastException exception) {
-            fail("Wrong type provided for generator: " + exception.getMessage());
+            failTest("Wrong type provided for generator: " + exception.getMessage());
         }
     }
 

@@ -11,6 +11,7 @@ public class LayoutUpdateHandleReferenceRegistrarTest extends ReferenceXmlFixtur
      * The `handle` attribute of the `update` tag in the layout XML must
      * have reference to the layout.
      */
+    @org.junit.Test
     public void testLayoutUpdateHandleMustHaveReference() {
         final String filePath = this.getFixturePath("test_test_test.xml");
         myFixture.configureByFile(filePath);
