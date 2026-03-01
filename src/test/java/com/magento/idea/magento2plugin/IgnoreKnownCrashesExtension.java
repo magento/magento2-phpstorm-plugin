@@ -8,6 +8,8 @@ package com.magento.idea.magento2plugin;
 import com.intellij.testFramework.LoggedErrorProcessor;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.extension.*;
+import org.junit.jupiter.api.extension.InvocationInterceptor;
+import org.junit.jupiter.api.extension.ReflectiveInvocationContext;
 
 import java.util.EnumSet;
 import java.util.Set;
