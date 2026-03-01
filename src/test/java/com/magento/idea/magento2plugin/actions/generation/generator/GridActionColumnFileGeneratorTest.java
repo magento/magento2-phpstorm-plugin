@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.magento.idea.magento2plugin.actions.generation.context.EntityCreatorContext;
@@ -21,6 +22,7 @@ public class GridActionColumnFileGeneratorTest extends BaseGeneratorTestCase {
     private static final String DELETE_URL_PATH = "book_book_delete";
     private static final String ENTITY_DTO_TYPE = "Foo\\Bar\\Model\\Data\\BookData";
 
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

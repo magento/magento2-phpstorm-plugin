@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.inspections.xml;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
@@ -22,6 +23,7 @@ public class PreferenceDeclarationInspectionTest extends InspectionXmlFixtureTes
     private static final String NOT_EXISTENT_CLASS =
             "Not\\Existent\\Class";
 
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

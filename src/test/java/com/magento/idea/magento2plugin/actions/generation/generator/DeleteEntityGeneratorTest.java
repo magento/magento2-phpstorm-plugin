@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.intellij.psi.PsiFile;
@@ -23,6 +24,7 @@ public class DeleteEntityGeneratorTest extends BaseGeneratorTestCase {
     private static final String EXPECTED_DIRECTORY =
             "/src/app/code/Foo/Bar/Controller/Adminhtml/" + ENTITY_NAME;
 
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

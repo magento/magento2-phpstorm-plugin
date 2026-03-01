@@ -4,6 +4,7 @@
  */
 package com.magento.idea.magento2plugin.inspections.xml;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.magento.idea.magento2plugin.magento.files.LayoutXml;
@@ -12,6 +13,7 @@ import com.magento.idea.magento2plugin.magento.files.LayoutXml;
 //@see https://www.jetbrains.org/intellij/sdk/docs/basics/testing_plugins/test_project_and_testdata_directories.html
 public class CacheableFalseInDefaultLayoutInspectionTest extends InspectionXmlFixtureTestCase {
 
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

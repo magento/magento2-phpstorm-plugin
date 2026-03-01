@@ -4,6 +4,7 @@
  */
 package com.magento.idea.magento2plugin.inspections.php;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class GraphQlResolverInspectionTest extends InspectionPhpFixtureTestCase {
@@ -12,6 +13,7 @@ public class GraphQlResolverInspectionTest extends InspectionPhpFixtureTestCase 
         "inspection.graphql.resolver.mustImplement"
     );
 
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.intellij.psi.PsiFile;
@@ -24,6 +25,7 @@ public class DeleteEntityCommandGeneratorTest extends BaseGeneratorTestCase {
     private static final String ENTITY_ID = "book_id";
     private static final String ACL = "Foo_Bar::book_management";
 
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

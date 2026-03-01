@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.inspections.xml;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
@@ -18,6 +19,7 @@ public class TypeConfigurationTagTypesInspectionTest extends InspectionXmlFixtur
     // it is in the ./testData/project/magento2/app/code/Foo/Bar/etc/di.xml file.
     private static final String EXISTENT_VIRTUAL_TYPE = "VirtualProductRepository";
 
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

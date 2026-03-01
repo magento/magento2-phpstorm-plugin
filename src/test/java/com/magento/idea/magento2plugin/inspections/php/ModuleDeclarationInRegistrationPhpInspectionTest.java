@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.inspections.php;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.magento.idea.magento2plugin.magento.files.RegistrationPhp;
@@ -13,6 +14,7 @@ import com.magento.idea.magento2plugin.project.Settings;
 public class ModuleDeclarationInRegistrationPhpInspectionTest
         extends InspectionPhpFixtureTestCase {
 
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

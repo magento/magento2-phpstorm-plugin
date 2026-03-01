@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.inspections.xml;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.magento.idea.magento2plugin.magento.files.ModuleXml;
@@ -17,6 +18,7 @@ public class ModuleDeclarationInModuleXmlInspectionTest
     private static final String WRONG_MODULE_NAME = "Wrong_ModuleName";
     private static final String SETUP_VERSION_ATTRIBUTE_VALUE = "1.0.0";
 
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

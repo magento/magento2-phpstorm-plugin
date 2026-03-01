@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.inspections.graphqls;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.magento.idea.magento2plugin.magento.files.SchemaGraphQLsFile;
@@ -15,6 +16,7 @@ public class SchemaResolverInspectionTest extends InspectionGraphqlsFixtureTestC
             "inspection.graphql.resolver.mustImplement"
     );
 
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();

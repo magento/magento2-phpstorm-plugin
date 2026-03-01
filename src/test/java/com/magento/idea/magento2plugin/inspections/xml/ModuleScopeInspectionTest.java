@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.inspections.xml;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class ModuleScopeInspectionTest extends InspectionXmlFixtureTestCase {
@@ -12,6 +13,7 @@ public class ModuleScopeInspectionTest extends InspectionXmlFixtureTestCase {
     private static final String WRONG_AREA =
             "inspection.config.wrong.area";
 
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         super.setUp();
