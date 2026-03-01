@@ -117,9 +117,10 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
     }
 
     protected void assertHasReferenceToFile(final String reference) {
-        final PsiElement element = getElementFromCaret();
-
-        assertHasReferenceToFile(reference, Arrays.asList(element.getReferences()));
+        final List<PsiReference> refs = com.intellij.openapi.application.ReadAction.compute(
+                () -> Arrays.asList(getElementFromCaret().getReferences())
+        );
+        assertHasReferenceToFile(reference, refs);
     }
 
     protected void assertHasReferenceToFile(
@@ -132,8 +133,8 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
         try {
             final PsiReferenceProvider provider = providerClass.getConstructor().newInstance();
             references.addAll(
-                    Arrays.asList(
-                            provider.getReferencesByElement(element, new ProcessingContext())
+                    com.intellij.openapi.application.ReadAction.compute(
+                            () -> Arrays.asList(provider.getReferencesByElement(element, new ProcessingContext()))
                     )
             );
         } catch (NoSuchMethodException
@@ -141,7 +142,11 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
                 | InvocationTargetException
                 | InstantiationException exception
         ) {
-            references.addAll(Arrays.asList(element.getReferences()));
+            references.addAll(
+                    com.intellij.openapi.application.ReadAction.compute(
+                            () -> Arrays.asList(element.getReferences())
+                    )
+            );
         }
 
         assertHasReferenceToFile(reference, references);
@@ -151,15 +156,20 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
             final String reference,
             final List<PsiReference> references
     ) {
-        for (final PsiReference psiReference : references) {
-            final PsiElement resolved = psiReference.resolve();
-            if (!(resolved instanceof PsiFile)) {
-                continue;
+        final boolean found = com.intellij.openapi.application.ReadAction.compute(() -> {
+            for (final PsiReference psiReference : references) {
+                final PsiElement resolved = psiReference.resolve();
+                if (!(resolved instanceof PsiFile)) {
+                    continue;
+                }
+                if (((PsiFile) resolved).getVirtualFile().getPath().endsWith(reference)) {
+                    return true;
+                }
             }
-            if (((PsiFile) resolved).getVirtualFile().getPath().endsWith(reference)) {
-                return;
-            }
-        }
+            return false;
+        });
+
+        if (found) return;
         final String referenceNotFound = "Failed that element contains reference to the file `%s`";
 
         Assertions.fail(String.format(referenceNotFound, reference));
