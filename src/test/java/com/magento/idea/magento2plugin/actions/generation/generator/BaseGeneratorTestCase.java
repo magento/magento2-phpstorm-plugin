@@ -28,7 +28,6 @@ public abstract class BaseGeneratorTestCase extends BaseProjectTestCase {
 
     @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         myFixture.setTestDataPath(TEST_DATA_FOLDER_PATH);
         // Reset changed default code style settings to the previous default settings.
         DefaultCodeStyleSettingsAdjustmentsUtil.execute(myFixture.getProject());
@@ -36,7 +35,6 @@ public abstract class BaseGeneratorTestCase extends BaseProjectTestCase {
 
     @AfterEach
     public void tearDown() throws Exception {
-        super.tearDown();
     }
 
     protected String getFixturePath(final String fileName) {

@@ -43,7 +43,6 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
 
     @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         myFixture.setTestDataPath(testDataFolderPath);
     }
 

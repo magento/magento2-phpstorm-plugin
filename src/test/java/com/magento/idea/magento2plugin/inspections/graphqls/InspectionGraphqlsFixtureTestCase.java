@@ -22,7 +22,6 @@ public abstract class InspectionGraphqlsFixtureTestCase extends BaseInspectionsT
 
     @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         myFixture.setTestDataPath(testDataFolderPath);
     }
 

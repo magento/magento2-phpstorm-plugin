@@ -51,7 +51,6 @@ dependencies {
         pluginVerifier()
         zipSigner()
         testFramework(TestFrameworkType.Platform)
-        testFramework(TestFrameworkType.JUnit5)
     }
 
 }

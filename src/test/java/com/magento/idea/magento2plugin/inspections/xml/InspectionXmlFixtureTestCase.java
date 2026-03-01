@@ -21,7 +21,6 @@ public abstract class InspectionXmlFixtureTestCase extends BaseInspectionsTestCa
 
     @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         myFixture.setTestDataPath(testDataFolderPath);
     }
 

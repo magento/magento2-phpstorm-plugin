@@ -22,7 +22,6 @@ public abstract class InspectionPhpFixtureTestCase extends BaseInspectionsTestCa
 
     @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         myFixture.setTestDataPath(testDataFolderPath);
     }
 

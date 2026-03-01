@@ -24,7 +24,6 @@ public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
 
     @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         myFixture.setTestDataPath(TEST_DATA_PATH);
     }
 

@@ -21,7 +21,6 @@ public abstract class BaseCompletionTestCase extends BaseProjectTestCase {
 
     @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
         myFixture.setTestDataPath(new java.io.File(testDataFolderPath).getAbsolutePath());
     }
 
