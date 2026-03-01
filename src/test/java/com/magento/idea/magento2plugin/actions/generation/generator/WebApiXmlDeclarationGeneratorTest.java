@@ -5,6 +5,10 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Assertions;
+
+import org.junit.jupiter.api.Test;
+
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.xml.WebApiXmlRouteData;
 import com.magento.idea.magento2plugin.actions.generation.generator.xml.WebApiDeclarationGenerator;
@@ -25,7 +29,7 @@ public class WebApiXmlDeclarationGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of Web API xml declaration for a service.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateWebApiXmlDeclarationForService() {
         final WebApiXmlRouteData data = new WebApiXmlRouteData(
                 MODULE_NAME,
@@ -42,7 +46,7 @@ public class WebApiXmlDeclarationGeneratorTest extends BaseGeneratorTestCase {
         final PsiFile result = generator.generate("test");
 
         if (result == null) {
-            org.junit.jupiter.api.Assertions.fail(COULD_NOT_GENERATE_MESSAGE);
+            Assertions.fail(COULD_NOT_GENERATE_MESSAGE);
         }
 
         assertGeneratedFileIsCorrect(

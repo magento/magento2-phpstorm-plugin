@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
@@ -16,7 +18,7 @@ public class ModuleRegistrationPhpGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test for generation of registration.php file.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateRegistrationPhpFile() {
         final String filePath = this.getFixturePath(RegistrationPhp.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -44,7 +46,7 @@ public class ModuleRegistrationPhpGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test for generation of registration.php file for a module project.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateRegistrationPhpFileInRoot() {
         final String filePath = this.getFixturePath(RegistrationPhp.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

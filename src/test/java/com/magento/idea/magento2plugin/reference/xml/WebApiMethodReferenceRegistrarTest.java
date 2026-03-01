@@ -5,12 +5,14 @@
 
 package com.magento.idea.magento2plugin.reference.xml;
 
+import org.junit.jupiter.api.Test;
+
 public class WebApiMethodReferenceRegistrarTest extends ReferenceXmlFixtureTestCase {
 
     /**
      * Tests for reference to valid PHP method in webapi.xml.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testWebApiMethodMustHaveReference() {
         myFixture.configureByFile(this.getFixturePath("webapi.xml"));
 
@@ -23,7 +25,7 @@ public class WebApiMethodReferenceRegistrarTest extends ReferenceXmlFixtureTestC
     /**
      * Tests for no reference to invalid PHP method in webapi.xml.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testWebApiMethodMustNotHaveReference() {
         myFixture.configureByFile(this.getFixturePath("webapi.xml"));
 

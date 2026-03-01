@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.actions.generation.context.EntityCreatorContext;
 import com.magento.idea.magento2plugin.actions.generation.data.FormGenericButtonBlockData;
 import com.magento.idea.magento2plugin.actions.generation.util.GenerationContextRegistry;
@@ -31,7 +33,7 @@ public class FormGenericButtonBlockGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of form ui component generic button block.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateFormGenericButtonBlockFile() {
         final FormGenericButtonBlockData data = new FormGenericButtonBlockData(
                 MODULE_NAME,

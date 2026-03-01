@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.completion.xml;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 
 public class PluginTypeCompletionRegistrarTest extends CompletionXmlFixtureTestCase {
@@ -13,7 +15,7 @@ public class PluginTypeCompletionRegistrarTest extends CompletionXmlFixtureTestC
      * The `type` attribute of the `plugin` tag in di.xml must
      * have completion based on PHP classes index
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testPluginTypeMustHaveCompletion() {
         final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
         myFixture.configureByFile(filePath);

@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.linemarker.php;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.application.ex.ApplicationManagerEx;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.linemarker.LinemarkerFixtureTestCase;
@@ -28,7 +30,7 @@ public class WebApiLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
     /**
      * Class configured as WEB API service in web_api.xml should have WEB API line markers.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testWebApiServiceShouldHaveLinemarker() {
         // work around for issue caused by
         // com.magento.idea.magento2plugin.linemarker.xml.LineMarkerXmlTagDecorator
@@ -61,7 +63,7 @@ public class WebApiLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
     /**
      * Regular class should not have WEB API line markers.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testRegularPhpClassShouldNotHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("ClassNotConfiguredInWebApiXml.php", "php"));
 

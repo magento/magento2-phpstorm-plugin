@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.actions.generation.context.EntityCreatorContext;
 import com.magento.idea.magento2plugin.actions.generation.data.GridActionColumnData;
 import com.magento.idea.magento2plugin.actions.generation.util.GenerationContextRegistry;
@@ -31,7 +33,7 @@ public class GridActionColumnFileGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of grid actions column file.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateGridActionColumnFile() {
         final GridActionColumnFile file = new GridActionColumnFile(MODULE_NAME, ENTITY_NAME);
         final GridActionColumnData data = new GridActionColumnData(

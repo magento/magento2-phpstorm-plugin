@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.EmailTemplateHtmlData;
@@ -22,7 +24,7 @@ public class ModuleEmailTemplateHtmlGeneratorTest extends BaseGeneratorTestCase 
     /**
      * Test generating email template with HTML type.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateEmailTemplateHtml() {
         final String filePath = this.getFixturePath(
                 String.format(
@@ -50,7 +52,7 @@ public class ModuleEmailTemplateHtmlGeneratorTest extends BaseGeneratorTestCase 
     /**
      * Test generating email template with TEXT type.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateEmailTemplateText() {
         final String filePath = this.getFixturePath(
                 String.format(

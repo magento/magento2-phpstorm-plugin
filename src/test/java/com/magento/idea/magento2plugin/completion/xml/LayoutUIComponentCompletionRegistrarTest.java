@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.completion.xml;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.magento.files.LayoutXml;
 
 public class LayoutUIComponentCompletionRegistrarTest extends CompletionXmlFixtureTestCase {
@@ -12,7 +14,7 @@ public class LayoutUIComponentCompletionRegistrarTest extends CompletionXmlFixtu
     /**
      * Test ui component must have completion.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testUIComponentMustHaveCompletion() {
         final String filePath = this.getFixturePath(LayoutXml.DEFAULT_FILENAME);
         myFixture.configureByFile(filePath);

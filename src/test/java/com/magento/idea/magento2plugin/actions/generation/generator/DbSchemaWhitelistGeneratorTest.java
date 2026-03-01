@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.actions.generation.data.DbSchemaXmlData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DbSchemaGeneratorDataProviderUtil;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DbSchemaGeneratorUtil;
@@ -24,7 +26,7 @@ public class DbSchemaWhitelistGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test whether db_schema_whitelist.json file generated correctly.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateDbSchemaWhitelistJsonFile() {
         final DbSchemaXmlData dbSchemaXmlData = new DbSchemaXmlData(
                 TABLE_NAME,
@@ -53,7 +55,7 @@ public class DbSchemaWhitelistGeneratorTest extends BaseGeneratorTestCase {
      * Test whether db_schema_whitelist.json file generated correctly
      * when columns provided as short entity properties.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateDbSchemaWhitelistJsonFileForShortProperties() {
         final List<Map<String, String>> properties =
                 DbSchemaGeneratorDataProviderUtil.generateEntityPropertiesForTest();

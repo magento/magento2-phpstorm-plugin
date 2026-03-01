@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.CustomerEntityData;
@@ -21,7 +23,7 @@ public class CustomerAttributeSetupPatchGeneratorTest extends BaseGeneratorTestC
     /**
      * Test generating the customer attribute data patch.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateMultiselectAttributeDataPatch() {
         final Project project = myFixture.getProject();
 

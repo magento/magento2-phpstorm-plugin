@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.PreferenceDiXmFileData;
@@ -23,7 +25,7 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test preference DI XML file generation.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGeneratePreferenceDiXml() {
         final String area = Areas.base.toString();
         final PsiFile preferenceDiXmlFile = addPreferenceDiXml(
@@ -45,7 +47,7 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test preference DI XML file generation for adminhtml area.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGeneratePreferenceDiXmlForAdminhtmlArea() {
         final String area = Areas.adminhtml.toString();
         final PsiFile preferenceDiXmlFile = addPreferenceDiXml(
@@ -67,7 +69,7 @@ public class PreferenceDiXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test the adding of two preferences to one DI XML file.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testAddTwoPreferencesToOneDiXmlFile() {
         final String area = Areas.frontend.toString();
         addPreferenceDiXml(

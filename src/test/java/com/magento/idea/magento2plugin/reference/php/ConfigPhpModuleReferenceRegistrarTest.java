@@ -5,12 +5,14 @@
 
 package com.magento.idea.magento2plugin.reference.php;
 
+import org.junit.jupiter.api.Test;
+
 public class ConfigPhpModuleReferenceRegistrarTest extends ReferencePhpFixtureTestCase {
 
     /**
      * Tests for module name reference under array key 'modules' in config.php
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testModuleNameMustHaveReference() {
         myFixture.configureByFile(this.getFixturePath("config.php"));
 
@@ -20,7 +22,7 @@ public class ConfigPhpModuleReferenceRegistrarTest extends ReferencePhpFixtureTe
     /**
      * Tests for no module name reference under a different array key in config.php
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testModuleNameMustNotHaveReference() {
         myFixture.configureByFile(this.getFixturePath("config.php"));
 

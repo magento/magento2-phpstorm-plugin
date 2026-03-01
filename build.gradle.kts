@@ -53,6 +53,7 @@ dependencies {
         testFramework(TestFrameworkType.Platform)
         testFramework(TestFrameworkType.JUnit5)
     }
+
 }
 
 intellijPlatform {

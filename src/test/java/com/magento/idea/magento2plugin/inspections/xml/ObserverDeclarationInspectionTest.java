@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin.inspections.xml;
 
 import com.magento.idea.magento2plugin.magento.files.ModuleEventsXml;
+import org.junit.jupiter.api.Test;
 
 @SuppressWarnings({"PMD.JUnitTestsShouldIncludeAssert"})
 public class ObserverDeclarationInspectionTest extends InspectionXmlFixtureTestCase {
@@ -19,7 +20,7 @@ public class ObserverDeclarationInspectionTest extends InspectionXmlFixtureTestC
     /**
      * Tests for duplicate observer name inspection warning in the same events.xml
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testObserverNameUsedInSameFile() {
         myFixture.configureByFile(getFixturePath(ModuleEventsXml.FILE_NAME));
         myFixture.testHighlighting(true, false, false);
@@ -28,7 +29,7 @@ public class ObserverDeclarationInspectionTest extends InspectionXmlFixtureTestC
     /**
      * Tests for duplicate observer name inspection warning in a different events.xml
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testObserverNameUsedInDifferentFile() {
         myFixture.configureByFile(getFixturePath(ModuleEventsXml.FILE_NAME));
         myFixture.testHighlighting(true, false, false);
@@ -37,7 +38,7 @@ public class ObserverDeclarationInspectionTest extends InspectionXmlFixtureTestC
     /**
      * Tests warning for disabling of non-existing observer.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testDisablingNonExistingObserver() {
         myFixture.configureByFile(getFixturePath(ModuleEventsXml.FILE_NAME));
         myFixture.testHighlighting(true, false, false);

@@ -4,9 +4,11 @@
  */
 package com.magento.idea.magento2plugin.reference.xml;
 
+import org.junit.jupiter.api.Test;
+
 public class UiComponentTemplateReferenceRegistrarTest extends ReferenceXmlFixtureTestCase {
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testFileTemplateAttributeMustHaveReference() {
         String filePath = this.getFixturePath("test_form.xml");
         myFixture.configureByFile(filePath);

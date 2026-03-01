@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleReadmeMdData;
 import com.magento.idea.magento2plugin.magento.files.ModuleReadmeMdFile;
@@ -14,7 +16,7 @@ public final class ModuleReadmeMdGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test module README.md file generation.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateModuleReadmeMdFile() {
         final PsiFile expectedFile = myFixture.configureByFile(
                 getFixturePath(ModuleReadmeMdFile.FILE_NAME)

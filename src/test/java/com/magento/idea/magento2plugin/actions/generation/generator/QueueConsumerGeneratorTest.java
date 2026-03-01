@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.NewMessageQueueAction;
@@ -25,7 +27,7 @@ public class QueueConsumerGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tests for generation of queue_consumer.xml file for the DB connection type.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateConsumerDbXmlFile() {
         final String filePath = this.getFixturePath(QueueConsumerXml.fileName);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -51,7 +53,7 @@ public class QueueConsumerGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tests for generation of queue_consumer.xml file for the AMPQ connection type.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateConsumerAmpqXmlFile() {
         final String filePath = this.getFixturePath(QueueConsumerXml.fileName);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

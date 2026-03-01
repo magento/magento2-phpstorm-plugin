@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.reference.xml;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.magento.files.LayoutXml;
 
 public class LayoutContainerReferenceRegistrarTest extends ReferenceXmlFixtureTestCase {
@@ -13,7 +15,7 @@ public class LayoutContainerReferenceRegistrarTest extends ReferenceXmlFixtureTe
      * The `name` attribute of the `referenceContainer` tag in layout XML must
      * have reference to the `name` attribute of `container` tag.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testReferenceContainerMustHaveReference() {
         final String filePath = this.getFixturePath(LayoutXml.DEFAULT_FILENAME);
         myFixture.configureByFile(filePath);

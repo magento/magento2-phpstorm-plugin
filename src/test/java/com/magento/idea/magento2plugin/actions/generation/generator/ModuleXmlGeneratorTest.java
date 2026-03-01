@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
@@ -19,7 +21,7 @@ public class ModuleXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test checks whether module.xml is generated correctly.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateModuleFile() {
         final String filePath = this.getFixturePath(ModuleXml.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -52,7 +54,7 @@ public class ModuleXmlGeneratorTest extends BaseGeneratorTestCase {
      * Test checks whether module.xml is generated
      * correctly for module as a separate project.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateFileInRoot() {
         final String filePath = this.getFixturePath(ModuleXml.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

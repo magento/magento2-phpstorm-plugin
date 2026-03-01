@@ -4,6 +4,8 @@
  */
 package com.magento.idea.magento2plugin.completion.xml;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.magento.files.ModuleEventsXml;
 
 public class ObserverCompletionRegistrarTest extends CompletionXmlFixtureTestCase {
@@ -15,7 +17,7 @@ public class ObserverCompletionRegistrarTest extends CompletionXmlFixtureTestCas
         "test_event_in_block"
       };
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testEventsXmlMustHaveCompletion() {
         String filePath = this.getFixturePath(ModuleEventsXml.FILE_NAME);
         myFixture.copyFileToProject(filePath);
@@ -23,7 +25,7 @@ public class ObserverCompletionRegistrarTest extends CompletionXmlFixtureTestCas
         assertFileContainsCompletions(filePath, lookupStringsEntities);
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testNotEventsXmlMustBeEmpty() {
         String filePath = this.getFixturePath("notevents.xml");
         myFixture.copyFileToProject(filePath);
@@ -31,7 +33,7 @@ public class ObserverCompletionRegistrarTest extends CompletionXmlFixtureTestCas
         assertCompletionNotShowing(filePath);
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testEventsXmlEventNameMustHaveCompletion() {
         String filePath = this.getFixturePath(ModuleEventsXml.FILE_NAME);
         myFixture.copyFileToProject(filePath);

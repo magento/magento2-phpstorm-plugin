@@ -5,6 +5,10 @@
 
 package com.magento.idea.magento2plugin.reference;
 
+import org.junit.jupiter.api.Assertions;
+
+import org.junit.jupiter.api.BeforeEach;
+
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -37,7 +41,7 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
     private static final String testDataFolderPath = "testData" + File.separator//NOPMD
             + "reference" + File.separator;
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         myFixture.setTestDataPath(testDataFolderPath);
@@ -75,7 +79,7 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
         final String referenceNotFound =
                 "Failed that element contains reference to the attribute value `%s`";
 
-        org.junit.jupiter.api.Assertions.fail(String.format(referenceNotFound, reference));
+        Assertions.fail(String.format(referenceNotFound, reference));
     }
 
     @SuppressWarnings("PMD.CognitiveComplexity")
@@ -110,7 +114,7 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
         final String referenceNotFound
                 = "Failed that element contains reference to the XML tag `%s`";
 
-        org.junit.jupiter.api.Assertions.fail(String.format(referenceNotFound, tagName));
+        Assertions.fail(String.format(referenceNotFound, tagName));
     }
 
     protected void assertHasReferenceToFile(final String reference) {
@@ -159,7 +163,7 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
         }
         final String referenceNotFound = "Failed that element contains reference to the file `%s`";
 
-        org.junit.jupiter.api.Assertions.fail(String.format(referenceNotFound, reference));
+        Assertions.fail(String.format(referenceNotFound, reference));
     }
 
     protected void assertHasReferenceToXmlFile(final String fileName) {
@@ -177,7 +181,7 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
         final String referenceNotFound
                 = "Failed that element contains reference to the XML tag `%s`";
 
-        org.junit.jupiter.api.Assertions.fail(String.format(referenceNotFound, fileName));
+        Assertions.fail(String.format(referenceNotFound, fileName));
     }
 
     protected void assertHasReferenceToDirectory(final String directoryName) {
@@ -191,7 +195,7 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
 
         final String referenceNotFound
                 = "Failed that element contains reference to the directory `%s`";
-        org.junit.jupiter.api.Assertions.fail(String.format(referenceNotFound, directoryName));
+        Assertions.fail(String.format(referenceNotFound, directoryName));
     }
 
     protected void assertHasNoReferenceToDirectory(final String directoryName) {
@@ -201,7 +205,7 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
                     && ((PsiDirectoryImpl) resolvedElement).getName().equals(directoryName)) {
                 final String referenceNotFound
                         = "Failed that element does not contain reference to the directory `%s`";
-                org.junit.jupiter.api.Assertions.fail(String.format(referenceNotFound, directoryName));
+                Assertions.fail(String.format(referenceNotFound, directoryName));
             }
         }
     }
@@ -213,7 +217,7 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
         String result = ((PhpClass) references[references.length - 1]
                 .resolve())
                 .getPresentableFQN();
-        org.junit.jupiter.api.Assertions.assertEquals(
+        Assertions.assertEquals(
                 phpClassFqn,
                 result
         );
@@ -229,19 +233,15 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
         if (reference == null) {
             final String referenceNotFound
                     = "Failed that element does not contain and reference";
-            org.junit.jupiter.api.Assertions.fail(referenceNotFound);
+            Assertions.fail(referenceNotFound);
         }
 
         final String parameterClassFqn = ((Parameter) reference.resolve())
                 .getLocalType().toStringResolved();
         final String parameterName = ((Parameter) reference.resolve()).getName();
 
-        org.junit.jupiter.api.Assertions.assertEquals("Class name in argument equals class name in parameter",
-                parameterClassFqn,
-                argumentClassFqn);
-        org.junit.jupiter.api.Assertions.assertEquals("Variable name in argument equals variable name in parameter",
-                parameterName,
-                argumentName);
+        Assertions.assertEquals(parameterClassFqn, argumentClassFqn, "Class name in argument equals class name in parameter");
+        Assertions.assertEquals(parameterName, argumentName, "Variable name in argument equals variable name in parameter");
     }
 
     protected void assertHasReferenceToClassMethod(
@@ -255,16 +255,8 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
         final String actualMethodName = ((Method) references[references.length - 1].resolve())
                 .getName();
 
-        org.junit.jupiter.api.Assertions.assertEquals(
-                "Class name",
-                className,
-                actualClassName
-        );
-        org.junit.jupiter.api.Assertions.assertEquals(
-                "Method name",
-                methodName,
-                actualMethodName
-        );
+        Assertions.assertEquals(className, actualClassName, "Class name");
+        Assertions.assertEquals(methodName, actualMethodName, "Method name");
     }
 
     protected void assertHasReferenceToMethodArgument(final String argument) {
@@ -274,19 +266,15 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
         final PsiElement parameterList = references[0].resolve().getParent();
 
         if (!(parameterList instanceof ParameterList)) {
-            org.junit.jupiter.api.Assertions.fail("Element doesn't have a reference to a method parameter");
+            Assertions.fail("Element doesn't have a reference to a method parameter");
         }
 
-        org.junit.jupiter.api.Assertions.assertEquals(
-                "Event dispatch argument",
-                argument,
-                actualArgument
-        );
+        Assertions.assertEquals(argument, actualArgument, "Event dispatch argument");
     }
 
     protected void assertEmptyReference() {
         final PsiElement element = getElementFromCaret();
-        assertEmpty(element.getReferences());
+        Assertions.assertTrue(element.getReferences().length == 0);
     }
 
     private PsiElement getElementFromCaret() {

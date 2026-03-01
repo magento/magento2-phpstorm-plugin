@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.NewDataModelAction;
 import com.magento.idea.magento2plugin.actions.generation.data.DataModelInterfaceData;
@@ -16,7 +18,7 @@ public class DataModelInterfaceGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tests for generation of a Magento 2 Data Model Interface.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateDataModelInterface() {
         final DataModelInterfaceGenerator generator = new DataModelInterfaceGenerator(
                 new DataModelInterfaceData(

@@ -5,13 +5,15 @@
 
 package com.magento.idea.magento2plugin.reference.xml;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 
 public class ConstructorArgumentReferenceRegistrarTest extends ReferenceXmlFixtureTestCase {
     /**
      * Tests for valid reference in di.xml constructor argument
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testDiXmlConstructorArgumentMustHaveReference() {
         myFixture.configureByFile(this.getFixturePath(ModuleDiXml.FILE_NAME));
 
@@ -24,7 +26,7 @@ public class ConstructorArgumentReferenceRegistrarTest extends ReferenceXmlFixtu
     /**
      * Tests for no reference in di.xml constructor argument
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testDiXmlConstructorArgumentMustNotHaveReference() {
         myFixture.configureByFile(this.getFixturePath(ModuleDiXml.FILE_NAME));
 

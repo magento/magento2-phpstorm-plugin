@@ -4,9 +4,11 @@
  */
 package com.magento.idea.magento2plugin.completion.xml;
 
+import org.junit.jupiter.api.Test;
+
 public class RequireJsCompletionRegistrarTest extends CompletionXmlFixtureTestCase {
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testMappedComponentAttributeMustHaveCompletion() {
         String filePath = this.getFixturePath("test_form.xml");
         myFixture.copyFileToProject(filePath);
@@ -17,7 +19,7 @@ public class RequireJsCompletionRegistrarTest extends CompletionXmlFixtureTestCa
         });
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testMappedComponentItemAttributeMustHaveCompletion() {
         String filePath = this.getFixturePath("test_form.xml");
         myFixture.copyFileToProject(filePath);
@@ -28,7 +30,7 @@ public class RequireJsCompletionRegistrarTest extends CompletionXmlFixtureTestCa
         });
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testFileComponentAttributeMustHaveCompletion() {
         String filePath = this.getFixturePath("test_form.xml");
         myFixture.copyFileToProject(filePath);
@@ -38,7 +40,7 @@ public class RequireJsCompletionRegistrarTest extends CompletionXmlFixtureTestCa
         });
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testFileComponentItemAttributeMustHaveCompletion() {
         String filePath = this.getFixturePath("test_form.xml");
         myFixture.copyFileToProject(filePath);

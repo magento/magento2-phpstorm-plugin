@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.SourceModelData;
@@ -15,7 +17,7 @@ public class SourceModelGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test source model generation.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateFile() {
         final Project project = myFixture.getProject();
 
@@ -39,7 +41,7 @@ public class SourceModelGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test source model in custom directory generation.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateFileInCustomDirectory() {
         final Project project = myFixture.getProject();
 

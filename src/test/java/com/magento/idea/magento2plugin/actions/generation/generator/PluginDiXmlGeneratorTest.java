@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -29,7 +31,7 @@ public class PluginDiXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test checks whether di.xml is generated correctly for the base area
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGeneratePluginDiXmlFileWithoutSortOrder() {
         final PsiFile expectedFile = myFixture.configureByFile(
                 this.getFixturePath(ModuleDiXml.FILE_NAME)
@@ -54,7 +56,7 @@ public class PluginDiXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test checks whether di.xml is generated correctly for the base area
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGeneratePluginDiXmlFileForBaseArea() {
         final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -78,7 +80,7 @@ public class PluginDiXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test checks whether di.xml is generated correctly for the adminhtml area
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGeneratePluginDiXmlFileForAdminhtmlArea() {
         final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -102,7 +104,7 @@ public class PluginDiXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test checks whether 2 di.xml is generated correctly
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testAddTwoPluginsToOneDiXml() {
         final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -132,7 +134,7 @@ public class PluginDiXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test checks whether 2 di.xml is generated correctly for one target clas
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testAddTwoPluginsToOneTargetClass() {
         final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

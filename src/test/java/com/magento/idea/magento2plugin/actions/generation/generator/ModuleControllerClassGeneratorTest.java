@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.ControllerFileData;
@@ -13,7 +15,7 @@ public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of frontend controller file.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateFrontendControllerFile() {
         final Project project = myFixture.getProject();
         final ControllerFileData controllerFileData = new ControllerFileData(
@@ -44,7 +46,7 @@ public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of frontend controller file with action class inheritance.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateFrontendInheritActionControllerFile() {
         final Project project = myFixture.getProject();
         final ControllerFileData controllerFileData = new ControllerFileData(
@@ -75,7 +77,7 @@ public class ModuleControllerClassGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of backend controller file.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateBackendControllerFile() {
         final Project project = myFixture.getProject();
         final ControllerFileData controllerFileData = new ControllerFileData(

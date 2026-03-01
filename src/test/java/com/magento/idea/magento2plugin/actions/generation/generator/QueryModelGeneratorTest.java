@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.actions.generation.data.GetListQueryModelData;
 import com.magento.idea.magento2plugin.magento.files.queries.GetListQueryFile;
 
@@ -19,7 +21,7 @@ public class QueryModelGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of GetListQuery model for entity.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateGetListQueryModelFile() {
         final GetListQueryFile file = new GetListQueryFile(MODULE_NAME, ENTITY_NAME);
         final GetListQueryModelData getListQueryModelData = new GetListQueryModelData(

@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.reference.xml;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 
 public class PluginTypeReferenceRegistrarTest extends ReferenceXmlFixtureTestCase {
@@ -13,7 +15,7 @@ public class PluginTypeReferenceRegistrarTest extends ReferenceXmlFixtureTestCas
      * The `type` attribute of the `plugin` tag in di.xml must
      * have reference to the PHP class
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testPluginTypeMustHaveReference() {
         final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
         myFixture.configureByFile(filePath);

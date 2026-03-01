@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.completion.xml;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.magento.files.ModuleConfigXml;
 import com.magento.idea.magento2plugin.magento.files.ModuleSystemXmlFile;
 
@@ -20,7 +22,7 @@ public class BackendModelXmlCompletionRegistrarTest extends CompletionXmlFixture
     /**
      * Test system.xml file element completion.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testSystemXmlElementProvideCompletion() {
         final String filePath = this.getFixturePath(ModuleSystemXmlFile.FILE_NAME);
         myFixture.configureByFile(filePath);
@@ -31,7 +33,7 @@ public class BackendModelXmlCompletionRegistrarTest extends CompletionXmlFixture
     /**
      * Test system.xml file element completion won't show.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testSystemXmlElementCompletionWontShow() {
         final String filePath = this.getFixturePath(
                 ModuleSystemXmlFile.FILE_NAME
@@ -44,7 +46,7 @@ public class BackendModelXmlCompletionRegistrarTest extends CompletionXmlFixture
     /**
      * Test system.xml backend model attribute match with the file.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testSystemXmlBackendModelAttributeMatchWithFile() {
         final String filePath = this.getFixturePath(
                 ModuleSystemXmlFile.FILE_NAME
@@ -56,7 +58,7 @@ public class BackendModelXmlCompletionRegistrarTest extends CompletionXmlFixture
     /**
      * Test system.xml backend model attribute doesn't match with the file.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testSystemXmlBackendModelAttributeDontMatchWithFile() {
         final String filePath = this.getFixturePath(
                 "other-file-than-system.xml"
@@ -71,7 +73,7 @@ public class BackendModelXmlCompletionRegistrarTest extends CompletionXmlFixture
     /**
      * Test config.xml file element completion.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testConfigXmlElementProvideCompletion() {
         final String filePath = this.getFixturePath(
                 ModuleConfigXml.FILE_NAME
@@ -84,7 +86,7 @@ public class BackendModelXmlCompletionRegistrarTest extends CompletionXmlFixture
     /**
      * Test config.xml file element completion won't show.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testConfigXmlElementCompletionWontShow() {
         final String filePath = this.getFixturePath(
                 ModuleConfigXml.FILE_NAME
@@ -97,7 +99,7 @@ public class BackendModelXmlCompletionRegistrarTest extends CompletionXmlFixture
     /**
      * Test config.xml backend model attribute match with the file.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testConfigXmlBackendModelAttributeMatchWithFile() {
         final String filePath = this.getFixturePath(
                 ModuleConfigXml.FILE_NAME
@@ -109,7 +111,7 @@ public class BackendModelXmlCompletionRegistrarTest extends CompletionXmlFixture
     /**
      * Test config.xml backend model attribute doesn't match with the file.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testConfigXmlBackendModelAttributeDontMatchWithFile() {
         final String filePath = this.getFixturePath(
                 "other-file-than-config.xml"

@@ -4,9 +4,11 @@
  */
 package com.magento.idea.magento2plugin.reference.xml;
 
+import org.junit.jupiter.api.Test;
+
 public class MftfEntityNameReferenceRegistrarTest extends ReferenceXmlFixtureTestCase {
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testCreateDataActionGroupMustHaveReference() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.configureByFile(filePath);
@@ -14,7 +16,7 @@ public class MftfEntityNameReferenceRegistrarTest extends ReferenceXmlFixtureTes
         assertHasReferenceToXmlAttributeValue("TestAdminMenuCatalog");
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testCreateDataInTestMustHaveReference() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.configureByFile(filePath);
@@ -22,7 +24,7 @@ public class MftfEntityNameReferenceRegistrarTest extends ReferenceXmlFixtureTes
         assertHasReferenceToXmlAttributeValue("TestAdminMenuCatalog");
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testUpdateDataActionGroupMustHaveReference() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.configureByFile(filePath);
@@ -30,7 +32,7 @@ public class MftfEntityNameReferenceRegistrarTest extends ReferenceXmlFixtureTes
         assertHasReferenceToXmlAttributeValue("TestAdminMenuCatalog");
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testUpdateDataInTestMustHaveReference() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.configureByFile(filePath);
@@ -38,7 +40,7 @@ public class MftfEntityNameReferenceRegistrarTest extends ReferenceXmlFixtureTes
         assertHasReferenceToXmlAttributeValue("TestAdminMenuCatalog");
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testUserInputInActionGroupMustHaveReference() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.configureByFile(filePath);
@@ -46,7 +48,7 @@ public class MftfEntityNameReferenceRegistrarTest extends ReferenceXmlFixtureTes
         assertHasReferenceToXmlAttributeValue("TestAdminMenuCatalog");
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testUserInputInTestMustHaveReference() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.configureByFile(filePath);
@@ -54,7 +56,7 @@ public class MftfEntityNameReferenceRegistrarTest extends ReferenceXmlFixtureTes
         assertHasReferenceToXmlAttributeValue("TestAdminMenuCatalog");
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testEntityExtendsInDataMustHaveReference() {
         String filePath = this.getFixturePath("TestData.xml");
         myFixture.configureByFile(filePath);
@@ -62,7 +64,7 @@ public class MftfEntityNameReferenceRegistrarTest extends ReferenceXmlFixtureTes
         assertHasReferenceToXmlAttributeValue("TestAdminMenuCatalog");
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testCreateDataActionGroupPluginDisabled() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.configureByFile(filePath);
@@ -71,7 +73,7 @@ public class MftfEntityNameReferenceRegistrarTest extends ReferenceXmlFixtureTes
         assertEmptyReference();
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testCreateDataActionGroupMftfSupportDisabled() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.configureByFile(filePath);
@@ -80,7 +82,7 @@ public class MftfEntityNameReferenceRegistrarTest extends ReferenceXmlFixtureTes
         assertEmptyReference();
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testCreateDataInTestWithSectionMustBeEmpty() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.configureByFile(filePath);
@@ -88,7 +90,7 @@ public class MftfEntityNameReferenceRegistrarTest extends ReferenceXmlFixtureTes
         assertEmptyReference();
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testUpdateDataInTestWithSectionMustBeEmpty() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.configureByFile(filePath);
@@ -96,7 +98,7 @@ public class MftfEntityNameReferenceRegistrarTest extends ReferenceXmlFixtureTes
         assertEmptyReference();
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testUserInputInTestMustBeEmpty() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.configureByFile(filePath);
@@ -104,7 +106,7 @@ public class MftfEntityNameReferenceRegistrarTest extends ReferenceXmlFixtureTes
         assertEmptyReference();
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testEntityExtendsInDataMustBeEmpty() {
         String filePath = this.getFixturePath("TestData.xml");
         myFixture.configureByFile(filePath);

@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.linemarker.php;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.linemarker.LinemarkerFixtureTestCase;
 
 public class GraphQlResolverUsageLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
@@ -12,7 +14,7 @@ public class GraphQlResolverUsageLinemarkerRegistrarTest extends LinemarkerFixtu
     /**
      * Tests linemarkers in the resolver class.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testResolverClassShouldHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("Resolver.php", "php"));
 
@@ -22,7 +24,7 @@ public class GraphQlResolverUsageLinemarkerRegistrarTest extends LinemarkerFixtu
     /**
      * Tests linemarkers in the regular class.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testRegularClassShouldNotHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("ClassNotConfiguredInSchema.php", "php"));
 

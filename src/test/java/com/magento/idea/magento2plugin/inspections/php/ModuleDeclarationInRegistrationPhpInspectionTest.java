@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.inspections.php;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.magento.files.RegistrationPhp;
 import com.magento.idea.magento2plugin.project.Settings;
 
@@ -25,7 +27,7 @@ public class ModuleDeclarationInRegistrationPhpInspectionTest
     /**
      * Inspection highlights warning in editable module.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testWrongDeclarationInEditableModule() {
         final Settings settings = Settings.getInstance(myFixture.getProject());
         settings.magentoPath =
@@ -47,7 +49,7 @@ public class ModuleDeclarationInRegistrationPhpInspectionTest
     /**
      * Inspection skips warning in root.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testWrongDeclarationInRoot() {
         final Settings settings = Settings.getInstance(myFixture.getProject());
         settings.magentoPath =
@@ -68,7 +70,7 @@ public class ModuleDeclarationInRegistrationPhpInspectionTest
     /**
      * Inspection skips warning in vendor.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testWrongDeclarationInVendor() {
         final Settings settings = Settings.getInstance(myFixture.getProject());
         settings.magentoPath =

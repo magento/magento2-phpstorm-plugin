@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.xml.DiArgumentData;
 import com.magento.idea.magento2plugin.actions.generation.data.xml.DiArrayValueData;
@@ -42,7 +44,7 @@ public class ArgumentInjectionGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tested string value injection.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testInjectStringValue() {
         assertGeneratedFileIsCorrect(
                 myFixture.configureByFile(getFixturePath(ModuleDiXml.FILE_NAME)),
@@ -63,7 +65,7 @@ public class ArgumentInjectionGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tested boolean value injection.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testInjectBooleanValue() {
         assertGeneratedFileIsCorrect(
                 myFixture.configureByFile(getFixturePath(ModuleDiXml.FILE_NAME)),
@@ -84,7 +86,7 @@ public class ArgumentInjectionGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tested number value injection.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testInjectNumberValue() {
         assertGeneratedFileIsCorrect(
                 myFixture.configureByFile(getFixturePath(ModuleDiXml.FILE_NAME)),
@@ -105,7 +107,7 @@ public class ArgumentInjectionGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tested init_parameter value injection.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testInjectInitParameterValue() {
         assertGeneratedFileIsCorrect(
                 myFixture.configureByFile(getFixturePath(ModuleDiXml.FILE_NAME)),
@@ -126,7 +128,7 @@ public class ArgumentInjectionGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tested constant value injection.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testInjectConstValue() {
         assertGeneratedFileIsCorrect(
                 myFixture.configureByFile(getFixturePath(ModuleDiXml.FILE_NAME)),
@@ -147,7 +149,7 @@ public class ArgumentInjectionGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tested null value injection.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testInjectNullValue() {
         assertGeneratedFileIsCorrect(
                 myFixture.configureByFile(getFixturePath(ModuleDiXml.FILE_NAME)),
@@ -168,7 +170,7 @@ public class ArgumentInjectionGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tested object value injection.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testInjectObjectValue() {
         assertGeneratedFileIsCorrect(
                 myFixture.configureByFile(getFixturePath(ModuleDiXml.FILE_NAME)),
@@ -189,7 +191,7 @@ public class ArgumentInjectionGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tested array value injection.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testInjectArrayValue() {
         assertGeneratedFileIsCorrect(
                 myFixture.configureByFile(getFixturePath(ModuleDiXml.FILE_NAME)),
@@ -210,7 +212,7 @@ public class ArgumentInjectionGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tested nested array value injection.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testInjectNestedArrayValue() {
         assertGeneratedFileIsCorrect(
                 myFixture.configureByFile(getFixturePath(ModuleDiXml.FILE_NAME)),
@@ -231,7 +233,7 @@ public class ArgumentInjectionGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tested object value replacing with the null value injection.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testReplaceObjectValueWithNullValue() {
         assertGeneratedFileIsCorrect(
                 myFixture.configureByFile(getFixturePath(ModuleDiXml.FILE_NAME)),
@@ -252,7 +254,7 @@ public class ArgumentInjectionGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tested object value replacing with the object proxy value injection.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testReplaceObjectValueWithProxyValue() {
         assertGeneratedFileIsCorrect(
                 myFixture.configureByFile(getFixturePath(ModuleDiXml.FILE_NAME)),
@@ -273,7 +275,7 @@ public class ArgumentInjectionGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tested object value replacing with the object factory value injection.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testReplaceObjectValueWithFactoryValue() {
         assertGeneratedFileIsCorrect(
                 myFixture.configureByFile(getFixturePath(ModuleDiXml.FILE_NAME)),

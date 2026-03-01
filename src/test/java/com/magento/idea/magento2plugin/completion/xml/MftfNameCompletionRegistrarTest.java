@@ -4,6 +4,8 @@
  */
 package com.magento.idea.magento2plugin.completion.xml;
 
+import org.junit.jupiter.api.Test;
+
 public class MftfNameCompletionRegistrarTest extends CompletionXmlFixtureTestCase {
 
     private static final String[] lookupStringsEntities = new String[] {
@@ -11,7 +13,7 @@ public class MftfNameCompletionRegistrarTest extends CompletionXmlFixtureTestCas
         "TestVerifyTinyMCEv4IsNativeWYSIWYGOnProductTest"
       };
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testExtendsMustProvideCompletion() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.copyFileToProject(filePath);
@@ -19,7 +21,7 @@ public class MftfNameCompletionRegistrarTest extends CompletionXmlFixtureTestCas
         assertFileContainsCompletions(filePath, lookupStringsEntities);
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testExtendsInActionGroupMustBeEmpty() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.copyFileToProject(filePath);
@@ -27,7 +29,7 @@ public class MftfNameCompletionRegistrarTest extends CompletionXmlFixtureTestCas
         assertCompletionNotShowing(filePath);
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testExtendsSameNameMustBeEmpty() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.copyFileToProject(filePath);
@@ -35,7 +37,7 @@ public class MftfNameCompletionRegistrarTest extends CompletionXmlFixtureTestCas
         assertCompletionNotShowing(filePath);
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testExtendsSameNameMustBeEmptyForActionGroup() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.copyFileToProject(filePath);

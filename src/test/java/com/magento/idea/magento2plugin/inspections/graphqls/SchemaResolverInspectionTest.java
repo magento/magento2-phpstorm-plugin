@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.inspections.graphqls;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.magento.files.SchemaGraphQLsFile;
 
 public class SchemaResolverInspectionTest extends InspectionGraphqlsFixtureTestCase {
@@ -26,7 +28,7 @@ public class SchemaResolverInspectionTest extends InspectionGraphqlsFixtureTestC
     /**
      * Inspection with valid schema resolver.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testWithValidSchemaResolverInterface() throws Exception {
         myFixture.configureByFile(getFixturePath(SchemaGraphQLsFile.FILE_NAME));
         assertHasNoHighlighting(errorMessage);
@@ -35,7 +37,7 @@ public class SchemaResolverInspectionTest extends InspectionGraphqlsFixtureTestC
     /**
      * Inspection with invalid schema resolver.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testWithInvalidSchemaResolverInterface() throws Exception {
         myFixture.configureByFile(getFixturePath(SchemaGraphQLsFile.FILE_NAME));
         assertHasHighlighting(errorMessage);
@@ -44,7 +46,7 @@ public class SchemaResolverInspectionTest extends InspectionGraphqlsFixtureTestC
     /**
      * Inspection with valid batch resolver.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testWithValidBatchResolverInterface() throws Exception {
         myFixture.configureByFile(getFixturePath(SchemaGraphQLsFile.FILE_NAME));
 
@@ -54,7 +56,7 @@ public class SchemaResolverInspectionTest extends InspectionGraphqlsFixtureTestC
     /**
      * Inspection with valid batch service contract resolver.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testWithValidBatchServiceContractResolverInterface() throws Exception {
         myFixture.configureByFile(getFixturePath(SchemaGraphQLsFile.FILE_NAME));
 

@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.completion.xml;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaXml;
 
 /**
@@ -17,7 +19,7 @@ public class TableAndColumnNameCompletionRegistrarTest extends CompletionXmlFixt
      * The `name` attribute of the `table` tag in `db_schema.xml` file must
      * have completion based on table and column names index.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testTableNameMustHaveCompletion() {
         final String filePath = this.getFixturePath(ModuleDbSchemaXml.FILE_NAME);
         assertCompletionContains(filePath, "catalog_category_entity");
@@ -27,7 +29,7 @@ public class TableAndColumnNameCompletionRegistrarTest extends CompletionXmlFixt
      * The `table` attribute of the `constraint` tag in `db_schema.xml` file must
      * have completion based on table and column names index.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testConstraintTagTableMustHaveCompletion() {
         final String filePath = this.getFixturePath(ModuleDbSchemaXml.FILE_NAME);
         assertCompletionContains(filePath, CATALOG_PRODUCT_ENTITY_TABLE_NAME);
@@ -37,7 +39,7 @@ public class TableAndColumnNameCompletionRegistrarTest extends CompletionXmlFixt
      * The `referenceTable` attribute of the `constraint` tag in `db_schema.xml` file must
      * have completion based on table and column names index.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testConstraintTagReferenceTableMustHaveCompletion() {
         final String filePath = this.getFixturePath(ModuleDbSchemaXml.FILE_NAME);
         assertCompletionContains(filePath, CATALOG_PRODUCT_ENTITY_TABLE_NAME);
@@ -47,7 +49,7 @@ public class TableAndColumnNameCompletionRegistrarTest extends CompletionXmlFixt
      * The `column` attribute of the `constraint` tag in `db_schema.xml` file must
      * have completion based on table and column names index.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testConstraintColumnNameMustHaveCompletion() {
         final String filePath = this.getFixturePath(ModuleDbSchemaXml.FILE_NAME);
         assertCompletionContains(filePath, "children_count");
@@ -57,7 +59,7 @@ public class TableAndColumnNameCompletionRegistrarTest extends CompletionXmlFixt
      * The `referenceColumn` attribute of the `constraint` tag in `db_schema.xml` file must
      * have completion based on table and column names index.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testConstraintReferenceColumnNameMustHaveCompletion() {
         final String filePath = this.getFixturePath(ModuleDbSchemaXml.FILE_NAME);
         assertCompletionContains(filePath, "attribute_set_id");

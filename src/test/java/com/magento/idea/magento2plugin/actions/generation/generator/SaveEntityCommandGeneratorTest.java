@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.actions.generation.data.SaveEntityCommandData;
 import com.magento.idea.magento2plugin.magento.files.commands.SaveEntityCommandFile;
 
@@ -23,7 +25,7 @@ public class SaveEntityCommandGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of SaveCommand model for entity.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateSaveEntityCommandFile() {
         final SaveEntityCommandData saveEntityCommandData = new SaveEntityCommandData(
                 MODULE_NAME,

@@ -4,6 +4,8 @@
  */
 package com.magento.idea.magento2plugin.completion.xml;
 
+import org.junit.jupiter.api.Test;
+
 public class MftfSelectorCompletionRegistrarTest extends CompletionXmlFixtureTestCase {
 
     private static final String[] lookupStringsEntities = new String[] {
@@ -22,7 +24,7 @@ public class MftfSelectorCompletionRegistrarTest extends CompletionXmlFixtureTes
         "TestAdminProductsSection.testfilters"
       };
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testSelectorInActionGroupMustProvideCompletion() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.copyFileToProject(filePath);
@@ -30,7 +32,7 @@ public class MftfSelectorCompletionRegistrarTest extends CompletionXmlFixtureTes
         assertFileContainsCompletions(filePath, lookupStringsEntities);
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testSelectorInTestMustProvideCompletion() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.copyFileToProject(filePath);
@@ -38,7 +40,7 @@ public class MftfSelectorCompletionRegistrarTest extends CompletionXmlFixtureTes
         assertFileContainsCompletions(filePath, lookupStringsEntities);
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testSelectorInActionGroupMustBeEmpty() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.copyFileToProject(filePath);
@@ -46,7 +48,7 @@ public class MftfSelectorCompletionRegistrarTest extends CompletionXmlFixtureTes
         assertCompletionNotShowing(filePath);
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testSelectorInTestMustBeEmpty() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.copyFileToProject(filePath);

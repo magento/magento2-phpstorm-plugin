@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.CrontabXmlData;
@@ -25,7 +27,7 @@ public class CrontabXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generating crontab with schedule.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateCronTabXmlFileWithSchedule() {
         final String filePath = this.getFixturePath(CrontabXmlTemplate.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -43,7 +45,7 @@ public class CrontabXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generating crontab with schedule config path.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateCronTabXmlFileWithScheduleConfig() {
         final String filePath = this.getFixturePath(CrontabXmlTemplate.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -61,7 +63,7 @@ public class CrontabXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test adding two cronjobs to the crontab.xml with one cron groups.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testAddTwoCronJobsToOneCronTab() {
         final String filePath = this.getFixturePath(CrontabXmlTemplate.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -86,7 +88,7 @@ public class CrontabXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test adding two cronjobs to the crontab.xml with different cron groups.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testAddTwoCronJobsToDifferentCronTabs() {
         final String filePath = this.getFixturePath(CrontabXmlTemplate.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

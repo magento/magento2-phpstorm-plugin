@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.psi.elements.Method;
@@ -27,7 +29,7 @@ public class PluginClassGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test of plugin generation.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGeneratePluginClassFile() {
         PsiFile pluginClassFile;
         addPluginToTargetClass(Plugin.PluginType.before.toString());

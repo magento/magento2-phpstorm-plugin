@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -19,7 +21,7 @@ public class PreferenceClassGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test preference class file generation.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGeneratePreferenceClassFile() {
         final PsiFile preferenceClassFile = createPreferenceClassFile(
                 TARGET_MODEL_ONE_CLASS_FQN,
@@ -43,7 +45,7 @@ public class PreferenceClassGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test preference class file generation.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGeneratePreferenceInterfaceFile() {
         final PsiFile preferenceClassFile = createPreferenceClassFile(
                 TARGET_MODEL_ONE_CLASS_FQN,
@@ -67,7 +69,7 @@ public class PreferenceClassGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test preference class file generation with inheritance.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGeneratePreferenceClassFileWithInheritance() {
         final PsiFile preferenceClassFile = createPreferenceClassFile(
                 TARGET_MODEL_TWO_CLASS_FQN,

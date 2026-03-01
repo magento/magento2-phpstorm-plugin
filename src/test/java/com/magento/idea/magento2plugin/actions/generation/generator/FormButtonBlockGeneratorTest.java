@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.context.EntityCreatorContext;
@@ -37,7 +39,7 @@ public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test creation Block type Save.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateSaveButtonBlock() {
         final String filePath = this.getFixturePath("SaveBlock.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -76,7 +78,7 @@ public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test creation Block type Back.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateBackButtonBlock() {
         final String filePath = this.getFixturePath("MyBackButton.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -115,7 +117,7 @@ public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test creation Block type Delete.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateDeleteButtonBlock() {
         final String filePath = this.getFixturePath("DeleteBlock.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -154,7 +156,7 @@ public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test creation Block custom type.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateCustomButtonBlock() {
         final String filePath = this.getFixturePath("MyCustom.php");
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

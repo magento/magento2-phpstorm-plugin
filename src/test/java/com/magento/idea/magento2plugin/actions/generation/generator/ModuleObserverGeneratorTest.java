@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.ModuleObserverData;
 import com.magento.idea.magento2plugin.magento.files.ModuleObserverFile;
@@ -16,7 +18,7 @@ public final class ModuleObserverGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test module README.md file generation.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateModuleObserverFile() {
         final PsiFile expectedFile = myFixture.configureByFile(
                 getFixturePath(CLASS_NAME + ModuleObserverFile.EXTENSION)

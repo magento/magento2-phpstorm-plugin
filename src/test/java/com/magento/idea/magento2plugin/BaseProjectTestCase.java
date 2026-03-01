@@ -5,21 +5,31 @@
 
 package com.magento.idea.magento2plugin;
 
+import org.junit.jupiter.api.TestInfo;
+
+
 import com.intellij.testFramework.LoggedErrorProcessor;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.testFramework.IndexingTestUtil;
 import com.intellij.testFramework.PlatformTestUtil;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
+import com.intellij.testFramework.fixtures.TestFixtureBuilder;
+import com.intellij.testFramework.fixtures.CodeInsightTestFixture;
+import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory;
+import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
 import com.magento.idea.magento2plugin.project.Settings;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import java.util.EnumSet;
 import java.util.Set;
 
 /**
  * Configure test environment with Magento 2 project.
  */
-public abstract class BaseProjectTestCase extends BasePlatformTestCase {
+public abstract class BaseProjectTestCase {
+    protected CodeInsightTestFixture myFixture;
     private Thread.UncaughtExceptionHandler previousUncaughtHandler;
     private static final String testDataProjectPath = "testData" //NOPMD
             + java.io.File.separator
@@ -29,12 +39,11 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
 
     private String myTestName;
 
-    @org.junit.jupiter.api.BeforeEach
-    public void setTestName(org.junit.jupiter.api.TestInfo testInfo) {
+    @BeforeEach
+    public void setTestName(TestInfo testInfo) {
         myTestName = testInfo.getTestMethod().map(java.lang.reflect.Method::getName).orElse("");
     }
 
-    @Override
     public String getTestName(boolean lowercaseFirstLetter) {
         if (myTestName != null && !myTestName.isEmpty()) {
             String name = myTestName;
@@ -43,13 +52,18 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
             }
             return lowercaseFirstLetter ? com.intellij.openapi.util.text.StringUtil.decapitalize(name) : com.intellij.openapi.util.text.StringUtil.capitalize(name);
         }
-        return super.getTestName(lowercaseFirstLetter);
+        return "";
     }
 
-    @org.junit.jupiter.api.BeforeEach
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
+        final IdeaTestFixtureFactory factory = IdeaTestFixtureFactory.getFixtureFactory();
+        final TestFixtureBuilder<IdeaProjectTestFixture> fixtureBuilder =
+                factory.createLightFixtureBuilder(null, "");
+        final IdeaProjectTestFixture fixture = fixtureBuilder.getFixture();
+        myFixture = factory.createCodeInsightFixture(fixture, new LightTempDirTestFixtureImpl(true));
+
+        myFixture.setUp();
         // Register Settings service if missing in test environment
         if (myFixture.getProject().getService(Settings.class) == null) {
             com.intellij.testFramework.ServiceContainerUtil.registerServiceInstance(myFixture.getProject(), Settings.class, new Settings());
@@ -117,7 +131,6 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
         );
     }
 
-    @Override
     protected String getTestDataPath() {
         return new java.io.File("testData").getAbsolutePath();
     }
@@ -144,11 +157,12 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
         IndexingTestUtil.waitUntilIndexesAreReady(myFixture.getProject());
     }
 
-    @org.junit.jupiter.api.AfterEach
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
         try {
-            super.tearDown();
+            if (myFixture != null) {
+                myFixture.tearDown();
+            }
         } finally {
             // Restore previous default handler
             Thread.setDefaultUncaughtExceptionHandler(previousUncaughtHandler);
@@ -167,36 +181,11 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
             final String fileName,
             final String fixturesFolderPath
     ) {
-        String testName = getTestName(false);
+        String testName = getTestName(true);
         String className = getClass().getSimpleName().replace("Test", "");
 
-        // Try with test name: fixturesFolderPath/ClassName/testName/fileName
-        // We try several case variations for the test name directory
-        String[] testNameVariations = {
-                testName,
-                com.intellij.openapi.util.text.StringUtil.decapitalize(testName),
-                com.intellij.openapi.util.text.StringUtil.capitalize(testName)
-        };
-
-        for (String variation : testNameVariations) {
-            if (variation == null || variation.isEmpty()) continue;
-            String path = fixturesFolderPath + className + java.io.File.separator + variation + java.io.File.separator + fileName;
-            String normalizedPath = path.replace(java.io.File.separator + java.io.File.separator, java.io.File.separator);
-            if (new java.io.File(myFixture.getTestDataPath(), normalizedPath).exists()) {
-                return normalizedPath;
-            }
-        }
-
-        // Try without test name: fixturesFolderPath/ClassName/fileName
-        String pathWithoutTestName = fixturesFolderPath + className + java.io.File.separator + fileName;
-        String normalizedPathWithoutTestName = pathWithoutTestName.replace(java.io.File.separator + java.io.File.separator, java.io.File.separator);
-        if (new java.io.File(myFixture.getTestDataPath(), normalizedPathWithoutTestName).exists()) {
-            return normalizedPathWithoutTestName;
-        }
-
-        // Fallback to the first variation (original behavior)
-        String fallbackPath = fixturesFolderPath + className + java.io.File.separator + testName + java.io.File.separator + fileName;
-        return fallbackPath.replace(java.io.File.separator + java.io.File.separator, java.io.File.separator);
+        String path = fixturesFolderPath + className + java.io.File.separator + testName + java.io.File.separator + fileName;
+        return path.replace(java.io.File.separator + java.io.File.separator, java.io.File.separator);
     }
 
 }

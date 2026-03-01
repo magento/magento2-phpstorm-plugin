@@ -4,9 +4,11 @@
  */
 package com.magento.idea.magento2plugin.reference.xml;
 
+import org.junit.jupiter.api.Test;
+
 public class MftfSelectorReferenceRegistrarTest extends ReferenceXmlFixtureTestCase {
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testSelectorInActionGroupMustHaveReference() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.configureByFile(filePath);
@@ -14,7 +16,7 @@ public class MftfSelectorReferenceRegistrarTest extends ReferenceXmlFixtureTestC
         assertHasReferenceToXmlAttributeValue("testaddSelectedProducts");
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testSelectorInTestMustHaveReference() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.configureByFile(filePath);
@@ -22,7 +24,7 @@ public class MftfSelectorReferenceRegistrarTest extends ReferenceXmlFixtureTestC
         assertHasReferenceToXmlAttributeValue("testaddSelectedProducts");
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testSelectorInActionGroupMustBeEmpty() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.configureByFile(filePath);
@@ -30,7 +32,7 @@ public class MftfSelectorReferenceRegistrarTest extends ReferenceXmlFixtureTestC
         assertEmptyReference();
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testSelectorInTestMustBeEmpty() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.configureByFile(filePath);

@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.actions.generation.data.EntityDataMapperData;
 import com.magento.idea.magento2plugin.magento.files.EntityDataMapperFile;
 
@@ -21,7 +23,7 @@ public class EntityDataMapperClassGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of entity data mapper class.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateEntityDataMapperFile() {
         final EntityDataMapperData entityDataMapperData = new EntityDataMapperData(
                 MODULE_NAME,

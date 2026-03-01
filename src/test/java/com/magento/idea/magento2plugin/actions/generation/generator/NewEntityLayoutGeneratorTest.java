@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.NewEntityLayoutData;
 import com.magento.idea.magento2plugin.magento.files.NewEntityLayoutFile;
@@ -19,7 +21,7 @@ public class NewEntityLayoutGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test new entity layout file generation.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateNewEntityLayoutFile() {
         final NewEntityLayoutData data = new NewEntityLayoutData(
                 MODULE_NAME,

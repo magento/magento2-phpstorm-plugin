@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.CollectionData;
@@ -14,7 +16,7 @@ public class ModuleCollectionGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of collection file.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateFile() {
         final Project project = myFixture.getProject();
         final CollectionData collectionFileData = new CollectionData(
@@ -43,7 +45,7 @@ public class ModuleCollectionGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of collection file where resource model name equal to the model name.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateWithTheSameNamesForResourceModelAndModel() {
         final PsiFile collectionFile = new ModuleCollectionGenerator(
                 new CollectionData(

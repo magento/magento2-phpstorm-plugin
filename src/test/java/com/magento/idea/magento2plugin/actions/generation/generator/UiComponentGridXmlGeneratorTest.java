@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentGridData;
@@ -28,7 +30,7 @@ public class UiComponentGridXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test UI component listing file generation for specific area.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateUiGridForBaseArea() {
         final String area = Areas.base.toString();
         final PsiFile cronGroupsXmlFile = generateComponentGridXml(
@@ -44,7 +46,7 @@ public class UiComponentGridXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test UI component listing file generation without toolbar.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateUiGridWithoutToolbar() {
         final String area = Areas.adminhtml.toString();
         final PsiFile cronGroupsXmlFile = generateComponentGridXml(
@@ -60,7 +62,7 @@ public class UiComponentGridXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test UI component listing file generation with actions column.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateUiGridForBaseAreaWithActionsColumnColumn() {
         final String area = Areas.base.toString();
         final PsiFile cronGroupsXmlFile = generateComponentGridXmlWithActionsColumn(area);

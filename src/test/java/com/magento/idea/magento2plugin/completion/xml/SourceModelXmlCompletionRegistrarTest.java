@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.completion.xml;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.magento.files.ModuleSystemXmlFile;
 import com.magento.idea.magento2plugin.magento.files.ModuleWidgetXml;
 
@@ -17,7 +19,7 @@ public class SourceModelXmlCompletionRegistrarTest extends CompletionXmlFixtureT
     /**
      * Test source model xml element completion.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testSourceModelXmlElementMustProvideCompletion() {
         final String filePath = this.getFixturePath(ModuleSystemXmlFile.FILE_NAME);
         myFixture.copyFileToProject(filePath);
@@ -28,7 +30,7 @@ public class SourceModelXmlCompletionRegistrarTest extends CompletionXmlFixtureT
     /**
      * Test source model xml element completion match with the file false positive.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testSourceModelXmlElementMatchWithFilePositiveCase() {
         final String filePath = this.getFixturePath(ModuleSystemXmlFile.FILE_NAME);
         myFixture.copyFileToProject(filePath);
@@ -39,7 +41,7 @@ public class SourceModelXmlCompletionRegistrarTest extends CompletionXmlFixtureT
     /**
      * Test source model xml element completion match with the file negative case.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testSourceModelXmlElementMatchWithFileNegativeCase() {
         final String filePath = this.getFixturePath("not-system.xml");
         myFixture.copyFileToProject(filePath);
@@ -53,7 +55,7 @@ public class SourceModelXmlCompletionRegistrarTest extends CompletionXmlFixtureT
     /**
      * Test source model attribute must provide completion.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testSourceModelXmlAttributeMustProvideCompletion() {
         final String filePath = this.getFixturePath(ModuleWidgetXml.FILE_NAME);
         myFixture.copyFileToProject(filePath);
@@ -64,7 +66,7 @@ public class SourceModelXmlCompletionRegistrarTest extends CompletionXmlFixtureT
     /**
      * Test source model attribute match with the file positive case.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testSourceModelXmlAttributeMatchWithFilePositiveCase() {
         final String filePath = this.getFixturePath(ModuleWidgetXml.FILE_NAME);
         myFixture.copyFileToProject(filePath);
@@ -75,7 +77,7 @@ public class SourceModelXmlCompletionRegistrarTest extends CompletionXmlFixtureT
     /**
      * Test source model attribute match with the file negative case.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testSourceModelXmlAttributeMatchWithFileNegativeCase() {
         final String filePath = this.getFixturePath("not-widget.xml");
         myFixture.copyFileToProject(filePath);

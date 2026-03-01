@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.inspections.xml;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.magento.files.ModuleAclXml;
 
 public class AclResourceXmlInspectionTest extends InspectionXmlFixtureTestCase {
@@ -23,7 +25,7 @@ public class AclResourceXmlInspectionTest extends InspectionXmlFixtureTestCase {
     /**
      * ACL resource should have a title.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testAclResourceWithNoTitleShouldHaveWarning() {
         myFixture.configureByFile(getFixturePath(ModuleAclXml.FILE_NAME));
 
@@ -38,7 +40,7 @@ public class AclResourceXmlInspectionTest extends InspectionXmlFixtureTestCase {
     /**
      * Override/Reference for ACL resource may not have a title.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testOverrideAclResourceWithNoTitleShouldNotHaveWarning() {
         myFixture.configureByFile(getFixturePath(ModuleAclXml.FILE_NAME));
 
@@ -53,7 +55,7 @@ public class AclResourceXmlInspectionTest extends InspectionXmlFixtureTestCase {
     /**
      * ID attribute of ACL resource should have a value.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testAclResourceWithEmptyIdShouldHaveWarning() {
         myFixture.configureByFile(getFixturePath(ModuleAclXml.FILE_NAME));
 

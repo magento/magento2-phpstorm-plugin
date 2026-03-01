@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.ModuleSetupDataPatchData;
 import com.magento.idea.magento2plugin.magento.files.ModuleSetupDataPatchFile;
@@ -16,7 +18,7 @@ public final class ModuleSetupDataPatchGeneratorTest extends BaseGeneratorTestCa
     /**
      * Test module README.md file generation.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateModuleSetupDataPatchFile() {
         final PsiFile expectedFile = myFixture.configureByFile(
                 getFixturePath(CLASS_NAME + ModuleSetupDataPatchFile.EXTENSION)

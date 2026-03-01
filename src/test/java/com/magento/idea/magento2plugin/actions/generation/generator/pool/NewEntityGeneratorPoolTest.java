@@ -5,6 +5,10 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator.pool;
 
+import org.junit.jupiter.api.Assertions;
+
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.EntityCreatorContextData;
 import com.magento.idea.magento2plugin.actions.generation.data.dialog.NewEntityDialogData;
 import com.magento.idea.magento2plugin.actions.generation.generator.BaseGeneratorTestCase;
@@ -24,7 +28,7 @@ public class NewEntityGeneratorPoolTest extends BaseGeneratorTestCase {
     /**
      * Test if generator pool handler instantiated without any error.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGeneratorsInPoolInstantiating() {
         final NewEntityDialogData dialogData = getMockNewEntityDialogData();
         final EntityCreatorContextData contextData = getMockContext();
@@ -36,7 +40,7 @@ public class NewEntityGeneratorPoolTest extends BaseGeneratorTestCase {
                 dialogData
         );
 
-        org.junit.jupiter.api.Assertions.assertFalse(
+        Assertions.assertFalse(
                 generatorPoolHandler.hasErrorMessages(),
                 "There are errors during generators instantiating."
         );
@@ -45,7 +49,7 @@ public class NewEntityGeneratorPoolTest extends BaseGeneratorTestCase {
     /**
      * Test if generators handlers doesn't have any DTO converter type errors.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGeneratorsInPoolOnCorrectDtoConverterTypes() {
         final NewEntityDialogData dialogData = getMockNewEntityDialogData();
         final EntityCreatorContextData contextData = getMockContext();
@@ -60,7 +64,7 @@ public class NewEntityGeneratorPoolTest extends BaseGeneratorTestCase {
         try {
             generatorPoolHandler.instantiateAllGenerators();
         } catch (ClassCastException exception) {
-            org.junit.jupiter.api.Assertions.fail("Wrong type provided for generator: " + exception.getMessage());
+            Assertions.fail("Wrong type provided for generator: " + exception.getMessage());
         }
     }
 

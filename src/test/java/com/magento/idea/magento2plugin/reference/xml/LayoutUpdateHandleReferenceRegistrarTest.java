@@ -5,13 +5,15 @@
 
 package com.magento.idea.magento2plugin.reference.xml;
 
+import org.junit.jupiter.api.Test;
+
 public class LayoutUpdateHandleReferenceRegistrarTest extends ReferenceXmlFixtureTestCase {
 
     /**
      * The `handle` attribute of the `update` tag in the layout XML must
      * have reference to the layout.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testLayoutUpdateHandleMustHaveReference() {
         final String filePath = this.getFixturePath("test_test_test.xml");
         myFixture.configureByFile(filePath);

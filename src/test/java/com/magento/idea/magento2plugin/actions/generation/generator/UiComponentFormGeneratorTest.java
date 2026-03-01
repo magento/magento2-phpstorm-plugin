@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormButtonData;
@@ -29,7 +31,7 @@ public class UiComponentFormGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generating layout XML file.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateFormXmlFile() {
         final String filePath = this.getFixturePath(FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

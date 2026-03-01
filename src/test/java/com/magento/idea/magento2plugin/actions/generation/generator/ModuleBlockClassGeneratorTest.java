@@ -4,6 +4,8 @@
  */
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.BlockFileData;
@@ -13,7 +15,7 @@ public class ModuleBlockClassGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test Block generator
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateFile() {
         Project project = myFixture.getProject();
 

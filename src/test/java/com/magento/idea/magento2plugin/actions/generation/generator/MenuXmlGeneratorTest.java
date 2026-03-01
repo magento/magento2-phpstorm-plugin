@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.MenuXmlData;
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
@@ -21,7 +23,7 @@ public class MenuXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test checks whether menu.xml file generated correctly.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateMenuXmlFile() {
         final String filePath = this.getFixturePath(ModuleMenuXml.fileName);
 

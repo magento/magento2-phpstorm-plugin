@@ -4,13 +4,15 @@
  */
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.GraphQlResolverFileData;
 
 public class ModuleGraphQlResolverClassGeneratorTest extends BaseGeneratorTestCase {
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateModuleGraphQlResolverClassFile()
     {
         Project project = myFixture.getProject();

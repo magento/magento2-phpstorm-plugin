@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.RoutesXmlData;
@@ -20,7 +22,7 @@ public class RoutesXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generating routes XML file.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateRoutesXmlFile() {
         final String filePath = this.getFixturePath(RoutesXml.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

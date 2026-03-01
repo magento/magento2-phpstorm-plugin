@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.context.EntityCreatorContext;
@@ -29,7 +31,7 @@ public class ModuleResourceModelGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of resource model file.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateFile() {
         GenerationContextRegistry.getInstance().setContext(null);
         final Project project = myFixture.getProject();
@@ -57,7 +59,7 @@ public class ModuleResourceModelGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of resource model file with reference to entity id column.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateFileWithDtoReference() {
         final Project project = myFixture.getProject();
         final ResourceModelData resourceModelData = new ResourceModelData(

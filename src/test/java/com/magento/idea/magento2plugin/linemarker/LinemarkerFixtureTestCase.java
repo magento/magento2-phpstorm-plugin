@@ -5,6 +5,10 @@
 
 package com.magento.idea.magento2plugin.linemarker;
 
+import org.junit.jupiter.api.Assertions;
+
+import org.junit.jupiter.api.BeforeEach;
+
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerImpl;
 import com.magento.idea.magento2plugin.BaseProjectTestCase;
@@ -18,7 +22,7 @@ public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
     private static final String TEST_DATA_PATH
             = "testData" + File.separator + "linemarker" + File.separator;
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         myFixture.setTestDataPath(TEST_DATA_PATH);
@@ -32,7 +36,7 @@ public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
         myFixture.doHighlighting();
 
         final List<LineMarkerInfo<?>> lineMarkers = getDocumentLineMarkers();
-        assertNotEmpty(lineMarkers);
+        Assertions.assertFalse(lineMarkers.isEmpty());
         for (final LineMarkerInfo lineMarkerInfo: lineMarkers) {
             final String lineMarkerTooltip = lineMarkerInfo.getLineMarkerTooltip();
             final Icon lineMarkerIcon = lineMarkerInfo.getIcon();
@@ -51,7 +55,7 @@ public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
 
         final String lineMarkerNotFound
                 = "Failed that documents contains linemarker with the tooltip `%s`";
-        org.junit.jupiter.api.Assertions.fail(String.format(lineMarkerNotFound, tooltip));
+        Assertions.fail(String.format(lineMarkerNotFound, tooltip));
     }
 
     protected void assertHasNoLinemarkerWithTooltipAndIcon(
@@ -71,7 +75,7 @@ public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
             }
             if (lineMarkerTooltip.equals(tooltip)
                     && lineMarkerIcon.toString().equals(icon)) {
-                org.junit.jupiter.api.Assertions.fail(String.format(lineMarkerExist, tooltip));
+                Assertions.fail(String.format(lineMarkerExist, tooltip));
             }
         }
     }
@@ -80,7 +84,7 @@ public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
     private List<LineMarkerInfo<?>> getDocumentLineMarkers() {
         return DaemonCodeAnalyzerImpl.getLineMarkers(
                 myFixture.getEditor().getDocument(),
-                getProject()
+                myFixture.getProject()
         );
     }
 }

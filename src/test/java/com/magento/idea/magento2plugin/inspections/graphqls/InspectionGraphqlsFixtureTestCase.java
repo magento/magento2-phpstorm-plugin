@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.inspections.graphqls;
 
+import org.junit.jupiter.api.BeforeEach;
+
 import com.magento.idea.magento2plugin.inspections.BaseInspectionsTestCase;
 import com.magento.idea.magento2plugin.magento.packages.File;
 
@@ -18,13 +20,12 @@ public abstract class InspectionGraphqlsFixtureTestCase extends BaseInspectionsT
     private static final String fixturesFolderPath = "graphqls" //NOPMD
             + File.separator;
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         myFixture.setTestDataPath(testDataFolderPath);
     }
 
-    @Override
     protected boolean isWriteActionRequired() {
         return false;
     }

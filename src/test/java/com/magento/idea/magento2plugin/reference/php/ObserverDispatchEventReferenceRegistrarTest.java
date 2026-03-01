@@ -4,9 +4,11 @@
  */
 package com.magento.idea.magento2plugin.reference.php;
 
+import org.junit.jupiter.api.Test;
+
 public class ObserverDispatchEventReferenceRegistrarTest extends ReferencePhpFixtureTestCase {
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testDispatchCallParamMustHaveReference() {
         String filePath = this.getFixturePath("TestBlock.php");
         myFixture.configureByFile(filePath);

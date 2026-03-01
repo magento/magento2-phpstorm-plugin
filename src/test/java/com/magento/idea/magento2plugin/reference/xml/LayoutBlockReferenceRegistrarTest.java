@@ -4,11 +4,13 @@
  */
 package com.magento.idea.magento2plugin.reference.xml;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.magento.files.LayoutXml;
 
 public class LayoutBlockReferenceRegistrarTest extends ReferenceXmlFixtureTestCase {
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testReferenceBlockMustHaveReference() {
         String filePath = this.getFixturePath(LayoutXml.DEFAULT_FILENAME);
         myFixture.configureByFile(filePath);

@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.inspections.php;
 
+import org.junit.jupiter.api.Test;
+
 import com.jetbrains.php.PhpBundle;
 import com.magento.idea.magento2plugin.bundles.InspectionBundle;
 
@@ -24,7 +26,7 @@ public class PluginInspectionTest extends InspectionPhpFixtureTestCase {
     /**
      * Inspection highlights error in parameter type.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testWithWrongParameterType() {
         myFixture.configureByFile(getFixturePath("Plugin.php"));
 
@@ -40,7 +42,7 @@ public class PluginInspectionTest extends InspectionPhpFixtureTestCase {
     /**
      * Inspection highlights error in callable parameter type.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testWithWrongCallableType() {
         myFixture.configureByFile(getFixturePath("Plugin.php"));
 
@@ -56,7 +58,7 @@ public class PluginInspectionTest extends InspectionPhpFixtureTestCase {
     /**
      * Inspection highlights error in callable parameter type.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testWithNoninterceptableTargetClass() {
         myFixture.configureByFile(getFixturePath("Plugin.php"));
 

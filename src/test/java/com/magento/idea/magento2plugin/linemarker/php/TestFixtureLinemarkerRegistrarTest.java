@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.linemarker.php;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.linemarker.LinemarkerFixtureTestCase;
 
 public class TestFixtureLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
@@ -12,7 +14,7 @@ public class TestFixtureLinemarkerRegistrarTest extends LinemarkerFixtureTestCas
     /**
      * Tests linemarkers for @magentoDataFixture tag.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testMagentoDataFixtureHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("Test.php", "php"));
 
@@ -22,7 +24,7 @@ public class TestFixtureLinemarkerRegistrarTest extends LinemarkerFixtureTestCas
     /**
      * Tests linemarkers for @magentoApiDataFixture tag.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testMagentoApiDataFixtureHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("Test.php", "php"));
 

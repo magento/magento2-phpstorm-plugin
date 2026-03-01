@@ -4,9 +4,11 @@
  */
 package com.magento.idea.magento2plugin.reference.xml;
 
+import org.junit.jupiter.api.Test;
+
 public class MftfNameReferenceRegistrarTest extends ReferenceXmlFixtureTestCase {
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testExtendsMustHaveReference() {
         String filePath = this.getFixturePath("TestMftfTest.xml");
         myFixture.configureByFile(filePath);
@@ -14,7 +16,7 @@ public class MftfNameReferenceRegistrarTest extends ReferenceXmlFixtureTestCase 
         assertHasReferenceToXmlAttributeValue("TestVerifyTinyMCEv4IsNativeWYSIWYGOnProductTest");
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testExtendsInActionGroupMustBeEmpty() {
         String filePath = this.getFixturePath("TestActionGroup.xml");
         myFixture.configureByFile(filePath);

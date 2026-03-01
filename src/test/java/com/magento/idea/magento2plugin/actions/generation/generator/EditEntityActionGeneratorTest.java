@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.EditEntityActionData;
 import com.magento.idea.magento2plugin.magento.files.actions.EditActionFile;
@@ -21,7 +23,7 @@ public class EditEntityActionGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of edit entity controller file.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateEditEntityActionFile() {
         final EditActionFile file = new EditActionFile(MODULE_NAME, ENTITY_NAME);
         final EditEntityActionGenerator generator =

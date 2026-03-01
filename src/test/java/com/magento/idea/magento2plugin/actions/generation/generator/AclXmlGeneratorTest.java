@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.AclXmlData;
 import com.magento.idea.magento2plugin.magento.files.ModuleAclXml;
@@ -19,7 +21,7 @@ public class AclXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test checks whether acl.xml file generated correctly.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateAclXmlFile() {
         final String filePath = this.getFixturePath(ModuleAclXml.FILE_NAME);
 
@@ -38,7 +40,7 @@ public class AclXmlGeneratorTest extends BaseGeneratorTestCase {
      * Test checks whether acl.xml file generated correctly
      * for non existed parent.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateAclXmlFileForNonExistedParent() {
         final String filePath = this.getFixturePath(ModuleAclXml.FILE_NAME);
 
@@ -56,7 +58,7 @@ public class AclXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test adding new acl rule to existing acl.xml file.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGetAclXmlFileAndGenerateNewAcl() {
         final String filePath = this.getFixturePath(ModuleAclXml.FILE_NAME);
         generateAclXmlFile(CONFIG_ACL_ID, FOO_BAR_MANAGE_ACL_ID, FOO_BAR_MANAGE_ACL_TITLE);

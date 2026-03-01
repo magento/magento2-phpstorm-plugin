@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.reference.xml;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 
 public class MenuReferenceRegistrarTest extends ReferenceXmlFixtureTestCase {
@@ -13,7 +15,7 @@ public class MenuReferenceRegistrarTest extends ReferenceXmlFixtureTestCase {
      * The `parent` attribute of the `add` tag in a menu XML must
      * have reference to the `id` attribute of the another `add` tag.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testAddTagMustHaveCompletion() {
         final String filePath = this.getFixturePath(ModuleMenuXml.fileName);
         myFixture.configureByFile(filePath);

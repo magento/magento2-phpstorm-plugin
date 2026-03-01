@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.context.EntityCreatorContext;
 import com.magento.idea.magento2plugin.actions.generation.data.DeleteEntityByIdCommandData;
@@ -34,7 +36,7 @@ public class DeleteEntityCommandGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of DeleteByIdCommand model for entity.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateDeleteEntityByIdCommandFile() {
         final DeleteEntityByIdCommandData deleteEntityByIdCommandData =
                 new DeleteEntityByIdCommandData(

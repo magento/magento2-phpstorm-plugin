@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.linemarker.php;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.linemarker.LinemarkerFixtureTestCase;
 
 public class ConfigurationTypeClassLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
@@ -12,7 +14,7 @@ public class ConfigurationTypeClassLinemarkerRegistrarTest extends LinemarkerFix
     /**
      * Tests linemarkers in the configured class.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testTypeNameClassShouldHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("Topmenu.php", "php"));
 
@@ -22,7 +24,7 @@ public class ConfigurationTypeClassLinemarkerRegistrarTest extends LinemarkerFix
     /**
      * Tests linemarkers in the non-configured class.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testRegularPhpClassShouldNotHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("ClassNotConfiguredInDiXml.php", "php"));
 

@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.SaveEntityControllerFileData;
 import com.magento.idea.magento2plugin.magento.files.actions.SaveActionFile;
@@ -23,7 +25,7 @@ public class SaveEntityActionGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of Save controller for entity without interface.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateSaveEntityActionWithoutInterfaceFile() {
         final SaveEntityControllerFileData saveEntityControllerFileData =
                 new SaveEntityControllerFileData(
@@ -58,7 +60,7 @@ public class SaveEntityActionGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of Save controller for entity with interface.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateSaveEntityActionWithInterfaceFile() {
         final SaveEntityControllerFileData saveEntityControllerFileData =
                 new SaveEntityControllerFileData(

@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.php.SearchResultsData;
 import com.magento.idea.magento2plugin.actions.generation.generator.php.SearchResultsGenerator;
@@ -55,7 +57,7 @@ public class SearchResultsFilesGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of search results interface for entity.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateSearchResultsInterfaceFile() {
         Objects.requireNonNull(interfaceFile);
 
@@ -73,7 +75,7 @@ public class SearchResultsFilesGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of search results class for entity.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateSearchResultsFile() {
         Objects.requireNonNull(classFile);
 
@@ -91,7 +93,7 @@ public class SearchResultsFilesGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of search results preference for entity.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateSearchResultsDiPreference() {
         Objects.requireNonNull(interfaceFile);
         Objects.requireNonNull(preferenceFile);

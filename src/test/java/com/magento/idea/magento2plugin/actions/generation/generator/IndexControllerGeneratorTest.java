@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.actions.generation.data.IndexActionData;
 import com.magento.idea.magento2plugin.magento.files.actions.IndexActionFile;
 
@@ -18,7 +20,7 @@ public class IndexControllerGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of list view entity controller (adminhtml).
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateIndexControllerFile() {
         final IndexActionFile file = new IndexActionFile(MODULE_NAME, ENTITY_NAME);
         final IndexActionData data = new IndexActionData(

@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.completion.xml;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 
 public class MenuCompletionRegistrarTest extends CompletionXmlFixtureTestCase {
@@ -13,7 +15,7 @@ public class MenuCompletionRegistrarTest extends CompletionXmlFixtureTestCase {
      * The `parent` attribute of the `add` tag in the men XML must
      * have completion based on the index.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testAddTagMustHaveCompletion() {
         final String filePath = this.getFixturePath(ModuleMenuXml.fileName);
         myFixture.configureByFile(filePath);

@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.NewDataModelAction;
@@ -17,7 +19,7 @@ public class DataModelGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tests for generation of a Magento 2 Data Model.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateDataModel() {
         final Project project = myFixture.getProject();
         final DataModelData modelData = new DataModelData(
@@ -45,7 +47,7 @@ public class DataModelGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Tests for generation of a Magento 2 Data Model without interface.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateDataModelWithoutInterface() {
         final Project project = myFixture.getProject();
         final DataModelData modelData = new DataModelData(

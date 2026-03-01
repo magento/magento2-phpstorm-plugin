@@ -4,6 +4,8 @@
  */
 package com.magento.idea.magento2plugin.inspections.php;
 
+import org.junit.jupiter.api.Test;
+
 public class GraphQlResolverInspectionTest extends InspectionPhpFixtureTestCase {
 
     private final String errorMessage =  inspectionBundle.message(
@@ -21,28 +23,28 @@ public class GraphQlResolverInspectionTest extends InspectionPhpFixtureTestCase 
         return false;
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testWithInvalidResolverInterface() throws Exception {
         myFixture.configureByFile(getFixturePath("ResolverTest.php"));
 
         assertHasHighlighting(errorMessage);
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testWithValidResolverInterface() throws Exception {
         myFixture.configureByFile(getFixturePath("ResolverTest.php"));
 
         assertHasNoHighlighting(errorMessage);
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testWithValidBatchResolverInterface() throws Exception {
         myFixture.configureByFile(getFixturePath("ResolverTest.php"));
 
         assertHasNoHighlighting(errorMessage);
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     public void testWithValidBatchServiceContractResolverInterface() throws Exception {
         myFixture.configureByFile(getFixturePath("ResolverTest.php"));
 

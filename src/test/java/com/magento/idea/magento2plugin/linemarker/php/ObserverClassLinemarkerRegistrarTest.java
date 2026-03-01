@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.linemarker.php;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.linemarker.LinemarkerFixtureTestCase;
 
 public class ObserverClassLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
@@ -12,7 +14,7 @@ public class ObserverClassLinemarkerRegistrarTest extends LinemarkerFixtureTestC
     /**
      * Tests linemarkers in the Observer class.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testObserverClassShouldHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("TestObserver.php", "php"));
 
@@ -22,7 +24,7 @@ public class ObserverClassLinemarkerRegistrarTest extends LinemarkerFixtureTestC
     /**
      * Tests linemarkers in the regular class.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testRegularPhpClassShouldNotHaveLinemarker() {
         myFixture.configureByFile(this.getFixturePath("TestNotObserver.php", "php"));
 

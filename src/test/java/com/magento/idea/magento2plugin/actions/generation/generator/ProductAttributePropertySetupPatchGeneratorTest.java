@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.ProductEntityData;
@@ -24,7 +26,7 @@ public class ProductAttributePropertySetupPatchGeneratorTest extends BaseGenerat
     /**
      * Test Data patch for product's eav attribute generator.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateFile() {
         final Project project = myFixture.getProject();
 
@@ -60,7 +62,7 @@ public class ProductAttributePropertySetupPatchGeneratorTest extends BaseGenerat
     /**
      * Tests the generated file with the boolean source model.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateFileWithBooleanSourceModel() {
         final Project project = myFixture.getProject();
 
@@ -99,7 +101,7 @@ public class ProductAttributePropertySetupPatchGeneratorTest extends BaseGenerat
     /**
      * Tests the generated file with the source model.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateFileWithGeneratedSourceModel() {
         final Project project = myFixture.getProject();
 
@@ -138,7 +140,7 @@ public class ProductAttributePropertySetupPatchGeneratorTest extends BaseGenerat
     /**
      * Tests file with the `apply to` attribute.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateFileWithApplyToAttribute() {
         final Project project = myFixture.getProject();
 
@@ -177,7 +179,7 @@ public class ProductAttributePropertySetupPatchGeneratorTest extends BaseGenerat
     /**
      * Tests file with options.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateFileWithOptions() {
         final Project project = myFixture.getProject();
 

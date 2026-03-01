@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.completion.xml;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 
 public class PhpClassMemberCompletionRegistrarTest extends CompletionXmlFixtureTestCase {
@@ -12,7 +14,7 @@ public class PhpClassMemberCompletionRegistrarTest extends CompletionXmlFixtureT
     /**
      * Tests for completion of init_parameter argument value in di.xml.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testDiXmlMustHaveCompletion() {
         final String filePath = this.getFixturePath(ModuleDiXml.FILE_NAME);
         myFixture.configureByFile(filePath);

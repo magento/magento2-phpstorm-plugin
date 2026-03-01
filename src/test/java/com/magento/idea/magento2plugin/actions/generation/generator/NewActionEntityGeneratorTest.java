@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.NewActionEntityControllerFileData;
 import com.magento.idea.magento2plugin.magento.files.actions.NewActionFile;
@@ -23,7 +25,7 @@ public class NewActionEntityGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of NewAction controller.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateNewActionEntityFile() {
         final NewActionEntityControllerFileData newActionEntityControllerFileData =
                 new NewActionEntityControllerFileData(

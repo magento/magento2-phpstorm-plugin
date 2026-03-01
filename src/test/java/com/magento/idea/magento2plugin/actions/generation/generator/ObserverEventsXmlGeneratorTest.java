@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.ObserverEventsXmlData;
@@ -20,7 +22,7 @@ public class ObserverEventsXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test checks whether 2 events.xml is generated correctly for the base area.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateEventsXmlInBaseAreaFile() {
         final String filePath = this.getFixturePath(ModuleEventsXml.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -44,7 +46,7 @@ public class ObserverEventsXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test checks whether 2 events.xml is generated correctly for the adminhtml area.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateEventsXmlInAdminhtmlAreaFile() {
         final String filePath = this.getFixturePath(ModuleEventsXml.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -68,7 +70,7 @@ public class ObserverEventsXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test checks whether 2 events.xml is generated correctly with 2 observers.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testAddTwoObserversToOneEventsXml() {
         final String filePath = this.getFixturePath(ModuleEventsXml.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

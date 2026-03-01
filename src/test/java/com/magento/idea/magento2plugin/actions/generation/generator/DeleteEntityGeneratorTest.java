@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.context.EntityCreatorContext;
 import com.magento.idea.magento2plugin.actions.generation.data.DeleteEntityControllerFileData;
@@ -33,7 +35,7 @@ public class DeleteEntityGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of Delete controller.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateDeleteEntityFile() {
         final DeleteEntityControllerFileData deleteEntityControllerFileData =
                 new DeleteEntityControllerFileData(

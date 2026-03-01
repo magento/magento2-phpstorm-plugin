@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.CLICommandClassData;
@@ -20,7 +22,7 @@ public class CLICommandClassGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of the new CLI command class.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateCLICommandClass() {
         final Project project = myFixture.getProject();
         final CLICommandClassData classData = new CLICommandClassData(

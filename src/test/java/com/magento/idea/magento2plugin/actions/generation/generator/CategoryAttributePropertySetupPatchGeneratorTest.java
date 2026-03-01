@@ -6,6 +6,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.CategoryEntityData;
@@ -19,7 +21,7 @@ public class CategoryAttributePropertySetupPatchGeneratorTest extends BaseGenera
     /**
      * Tests the generated patch file.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateFile() {
         final Project project = myFixture.getProject();
 
@@ -55,7 +57,7 @@ public class CategoryAttributePropertySetupPatchGeneratorTest extends BaseGenera
     /**
      * Tests the generated form file.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateFormFile() {
         final Project project = myFixture.getProject();
 

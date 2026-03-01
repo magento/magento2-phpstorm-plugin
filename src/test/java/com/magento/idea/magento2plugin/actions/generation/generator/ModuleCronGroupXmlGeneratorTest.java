@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Test;
+
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.data.CronGroupXmlData;
@@ -26,7 +28,7 @@ public class ModuleCronGroupXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generating CRON group with no options.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateEmptyCronGroup() {
         final String filePath = this.getFixturePath(CronGroupXmlTemplate.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -47,7 +49,7 @@ public class ModuleCronGroupXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generating CRON group with all options.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testGenerateCronGroupWithAllOptions() {
         final String filePath = this.getFixturePath(CronGroupXmlTemplate.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);
@@ -68,7 +70,7 @@ public class ModuleCronGroupXmlGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test adding two CRON groups to the cron_groups.xml.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testAddTwoCronGroupsToCronGroupsXmlFile() {
         final String filePath = this.getFixturePath(CronGroupXmlTemplate.FILE_NAME);
         final PsiFile expectedFile = myFixture.configureByFile(filePath);

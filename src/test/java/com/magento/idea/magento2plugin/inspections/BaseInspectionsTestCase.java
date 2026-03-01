@@ -4,6 +4,9 @@
  */
 package com.magento.idea.magento2plugin.inspections;
 
+import org.junit.jupiter.api.Assertions;
+
+
 import com.intellij.codeInsight.daemon.impl.HighlightInfo;
 import com.magento.idea.magento2plugin.BaseProjectTestCase;
 import com.magento.idea.magento2plugin.bundles.InspectionBundle;
@@ -20,7 +23,7 @@ abstract public class BaseInspectionsTestCase extends BaseProjectTestCase {
 
         List<HighlightInfo> highlightingList = myFixture.doHighlighting();
         if (highlightingList.isEmpty()) {
-            org.junit.jupiter.api.Assertions.fail(String.format(highlightingNotFound, message));
+            Assertions.fail(String.format(highlightingNotFound, message));
         }
 
         for (HighlightInfo highlighting :
@@ -30,7 +33,7 @@ abstract public class BaseInspectionsTestCase extends BaseProjectTestCase {
                 return;
             }
         }
-        org.junit.jupiter.api.Assertions.fail(String.format(highlightingNotFound, message));
+        Assertions.fail(String.format(highlightingNotFound, message));
     }
 
     protected void assertHasNoHighlighting(String message) {
@@ -45,7 +48,7 @@ abstract public class BaseInspectionsTestCase extends BaseProjectTestCase {
                 highlightingList) {
             if (highlighting.getDescription() == null) continue;
             if (highlighting.getDescription().equals(message)) {
-                org.junit.jupiter.api.Assertions.fail(String.format(highlightingNotFound, message));
+                Assertions.fail(String.format(highlightingNotFound, message));
             }
         }
     }

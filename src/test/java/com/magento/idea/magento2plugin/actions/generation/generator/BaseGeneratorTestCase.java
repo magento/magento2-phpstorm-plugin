@@ -5,9 +5,13 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import org.junit.jupiter.api.Assertions;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
+
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
-import com.intellij.testFramework.LightPlatformTestCase;
 import com.magento.idea.magento2plugin.BaseProjectTestCase;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DefaultCodeStyleSettingsAdjustmentsUtil;
 import com.magento.idea.magento2plugin.magento.packages.File;
@@ -22,8 +26,7 @@ public abstract class BaseGeneratorTestCase extends BaseProjectTestCase {
     private static final String FIXTURES_FOLDER_PATH = "generation" + File.separator
             + "generator" + File.separator;
 
-    @org.junit.jupiter.api.BeforeEach
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
         myFixture.setTestDataPath(TEST_DATA_FOLDER_PATH);
@@ -31,11 +34,9 @@ public abstract class BaseGeneratorTestCase extends BaseProjectTestCase {
         DefaultCodeStyleSettingsAdjustmentsUtil.execute(myFixture.getProject());
     }
 
-    @org.junit.jupiter.api.AfterEach
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
         super.tearDown();
-        LightPlatformTestCase.closeAndDeleteProject();
     }
 
     protected String getFixturePath(final String fileName) {
@@ -48,10 +49,10 @@ public abstract class BaseGeneratorTestCase extends BaseProjectTestCase {
             final String expectedDirectory,
             final PsiFile resultFile
     ) {
-        org.junit.jupiter.api.Assertions.assertTrue(resultFile.getContainingDirectory().getVirtualFile().getPath()
+        Assertions.assertTrue(resultFile.getContainingDirectory().getVirtualFile().getPath()
                 .endsWith(expectedDirectory));
-        org.junit.jupiter.api.Assertions.assertEquals(expectedFile.getText(), resultFile.getText());
-        org.junit.jupiter.api.Assertions.assertEquals(expectedFile.getName(), resultFile.getName());
+        Assertions.assertEquals(expectedFile.getText(), resultFile.getText());
+        Assertions.assertEquals(expectedFile.getName(), resultFile.getName());
     }
 
     @SuppressWarnings({"PMD.JUnitAssertionsShouldIncludeMessage"})
@@ -59,8 +60,8 @@ public abstract class BaseGeneratorTestCase extends BaseProjectTestCase {
             final PsiFile expectedFile,
             final PsiFile resultFile
     ) {
-        org.junit.jupiter.api.Assertions.assertEquals(expectedFile.getText(), resultFile.getText());
-        org.junit.jupiter.api.Assertions.assertEquals(expectedFile.getName(), resultFile.getName());
+        Assertions.assertEquals(expectedFile.getText(), resultFile.getText());
+        Assertions.assertEquals(expectedFile.getName(), resultFile.getName());
     }
 
     protected PsiDirectory getProjectDirectory() {

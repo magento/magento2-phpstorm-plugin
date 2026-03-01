@@ -5,13 +5,15 @@
 
 package com.magento.idea.magento2plugin.completion.xml;
 
+import org.junit.jupiter.api.Test;
+
 public class LayoutUpdateHandleCompletionRegistrarTest extends CompletionXmlFixtureTestCase {
 
     /**
      * The `handle` attribute of the `update` tag in the layout XML must
      * have completion based on layout index.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testUpdateHandleMustHaveCompletion() {
         final String filePath = this.getFixturePath("test_test_test.xml");
         myFixture.configureByFile(filePath);

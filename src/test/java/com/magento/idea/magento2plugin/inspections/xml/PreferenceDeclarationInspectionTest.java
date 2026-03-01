@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.inspections.xml;
 
+import org.junit.jupiter.api.Test;
+
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 
 public class PreferenceDeclarationInspectionTest extends InspectionXmlFixtureTestCase {
@@ -30,7 +32,7 @@ public class PreferenceDeclarationInspectionTest extends InspectionXmlFixtureTes
      * Test for an error for the "for" attribute because it is empty.
      * <preference for="" type="Foo\Bar\Model\Logger"/>
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testAttrArgForValueIsEmpty() {
         configureFixture();
 
@@ -46,7 +48,7 @@ public class PreferenceDeclarationInspectionTest extends InspectionXmlFixtureTes
      * Test for an error for the "type" attribute because it is empty.
      * <preference for="Foo\Bar\Model\Logger" type="Foo\Bar\Model\Logger"/>
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testAttrArgTypeValueIsEmpty() {
         configureFixture();
 
@@ -62,7 +64,7 @@ public class PreferenceDeclarationInspectionTest extends InspectionXmlFixtureTes
      * Test for an no error for the "for" attribute because this class exists.
      * <preference for="Foo\Bar\Model\Logger" type=""/>
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testAttrForClassExists() {
         configureFixture();
 
@@ -78,7 +80,7 @@ public class PreferenceDeclarationInspectionTest extends InspectionXmlFixtureTes
      * Test for an no error for the "type" attribute because this class exists.
      * <preference for="" type="Foo\Bar\Model\Logger"/>
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testAttrTypeClassExists() {
         configureFixture();
 
@@ -93,7 +95,7 @@ public class PreferenceDeclarationInspectionTest extends InspectionXmlFixtureTes
     /**
      * Test for throwing an error for a class that does not exist for the "for" attribute.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testClassAttrForDoesNotExists() {
         configureFixture();
 
@@ -109,7 +111,7 @@ public class PreferenceDeclarationInspectionTest extends InspectionXmlFixtureTes
      * Test for the absence of an error in the presence of
      * classes or interfaces specified for preferences.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testClassAttrForIsExist() {
         configureFixture();
 
@@ -124,7 +126,7 @@ public class PreferenceDeclarationInspectionTest extends InspectionXmlFixtureTes
     /**
      * Test for throwing an error for a class that does not exist for the "type" attribute.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testClassAttrTypeDoesNotExists() {
         configureFixture();
 
@@ -140,7 +142,7 @@ public class PreferenceDeclarationInspectionTest extends InspectionXmlFixtureTes
      * Test for the absence of an error in the presence of
      * classes or interfaces specified for preferences.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testClassAttrTypeIsExist() {
         configureFixture();
 

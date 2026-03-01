@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.inspections.xml;
 
+import org.junit.jupiter.api.Test;
+
 public class ModuleScopeInspectionTest extends InspectionXmlFixtureTestCase {
 
     private static final String WRONG_AREA =
@@ -19,7 +21,7 @@ public class ModuleScopeInspectionTest extends InspectionXmlFixtureTestCase {
     /**
      * Inspection highlights warning if the area of a config file is wrong.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testIncorrectArea() {
         configureFixture("app/code/Test/TestModule/etc/adminhtmltypo/di.xml");
 
@@ -33,7 +35,7 @@ public class ModuleScopeInspectionTest extends InspectionXmlFixtureTestCase {
     /**
      * Inspection skips warning if the area is correct.
      */
-    @org.junit.jupiter.api.Test
+    @Test
     public void testCorrectArea() {
         configureFixture("app/code/Test/TestModule/etc/adminhtml/di.xml");
 
