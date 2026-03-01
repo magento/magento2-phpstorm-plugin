@@ -63,7 +63,9 @@ public abstract class BaseProjectTestCase {
         settings.pluginEnabled = true;
         settings.mftfSupportEnabled = true;
         IndexManager.manualReindex();
-        PlatformTestUtil.dispatchAllEventsInIdeEventQueue();
+        com.intellij.testFramework.EdtTestUtil.runInEdtAndWait(() -> {
+            PlatformTestUtil.dispatchAllEventsInIdeEventQueue();
+        });
         IndexingTestUtil.waitUntilIndexesAreReady(myFixture.getProject());
     }
 
@@ -71,7 +73,7 @@ public abstract class BaseProjectTestCase {
         final Settings settings = myFixture.getProject().getService(Settings.class);
         settings.pluginEnabled = false;
         IndexManager.manualReindex();
-        PlatformTestUtil.dispatchAllEventsInIdeEventQueue();
+        com.intellij.testFramework.EdtTestUtil.runInEdtAndWait(PlatformTestUtil::dispatchAllEventsInIdeEventQueue);
         IndexingTestUtil.waitUntilIndexesAreReady(myFixture.getProject());
     }
 
@@ -79,7 +81,7 @@ public abstract class BaseProjectTestCase {
         final Settings settings = myFixture.getProject().getService(Settings.class);
         settings.mftfSupportEnabled = false;
         IndexManager.manualReindex();
-        PlatformTestUtil.dispatchAllEventsInIdeEventQueue();
+        com.intellij.testFramework.EdtTestUtil.runInEdtAndWait(PlatformTestUtil::dispatchAllEventsInIdeEventQueue);
         IndexingTestUtil.waitUntilIndexesAreReady(myFixture.getProject());
     }
 

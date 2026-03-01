@@ -277,10 +277,14 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
     }
 
     private PsiElement getElementFromCaret() {
-        return myFixture.getFile().findElementAt(myFixture.getCaretOffset()).getParent();
+        return com.intellij.openapi.application.ReadAction.compute(
+                () -> myFixture.getFile().findElementAt(myFixture.getCaretOffset()).getParent()
+        );
     }
 
     private PsiElement getLeafElementFromCaret() {
-        return myFixture.getFile().findElementAt(myFixture.getCaretOffset());
+        return com.intellij.openapi.application.ReadAction.compute(
+                () -> myFixture.getFile().findElementAt(myFixture.getCaretOffset())
+        );
     }
 }

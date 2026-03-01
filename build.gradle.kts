@@ -32,9 +32,8 @@ repositories {
 }
 
 dependencies {
-    testImplementation(libs.junit.jupiter)
-    testRuntimeOnly(libs.junit.jupiter.engine)
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("junit:junit:4.13.2")
+    testCompileOnly("org.junit.jupiter:junit-jupiter-api:5.10.2")
 
     intellijPlatform {
         create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
@@ -47,14 +46,8 @@ dependencies {
         testFramework(TestFrameworkType.JUnit5)
     }
 
-    testImplementation("org.opentest4j:opentest4j:1.3.0")
-
     implementation("org.json:json:20171018")
-    implementation("org.codehaus.plexus:plexus-utils:3.4.0")
-    testImplementation("com.automation-remarks:video-recorder-junit5:2.0")
-    testImplementation("com.intellij.remoterobot:remote-robot:0.11.23")
-    testImplementation("com.intellij.remoterobot:remote-fixtures:0.11.23")
-    testImplementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation("org.codehaus.plexus:plexus-utils:3.5.1")
 }
 
 intellijPlatform {

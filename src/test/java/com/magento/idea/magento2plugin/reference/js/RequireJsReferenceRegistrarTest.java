@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.reference.js;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.magento.idea.magento2plugin.reference.provider.FilePathReferenceProvider;
@@ -13,6 +14,15 @@ public class RequireJsReferenceRegistrarTest extends ReferenceJsFixtureTestCase 
 
     private static final String FIXTURE_PATH = "test.js";
     private static final String MIXIN_FIXTURE_PATH = "requirejs-config.js";
+
+    /**
+     * Mapped parameters should have reference to file.
+     */
+    @BeforeEach
+    public void prepare() {
+        // Ensure the plugin is enabled and indices are built before each test
+        enablePluginAndReindex();
+    }
 
     /**
      * Mapped parameters should have reference to file.
