@@ -21,7 +21,7 @@ import com.magento.idea.magento2plugin.project.util.GetProjectBasePath;
 
 
 public abstract class BaseGeneratorTestCase extends BaseProjectTestCase {
-    private static final String TEST_DATA_FOLDER_PATH = "testData" + File.separator
+    private static final String TEST_DATA_FOLDER_PATH =  "src/test/resources/testData" + File.separator
             + "actions" + File.separator;
     private static final String FIXTURES_FOLDER_PATH = "generation" + File.separator
             + "generator" + File.separator;

@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 @ExtendWith({IgnoreKnownCrashesExtension.class, MagentoProjectExtension.class})
 public abstract class BaseProjectTestCase {
     protected CodeInsightTestFixture myFixture;
-    private static final String testDataProjectPath = "testData" //NOPMD
+    private static final String testDataProjectPath =  "src/test/resources/testData" //NOPMD
             + java.io.File.separator
             + "project";
 
@@ -50,7 +50,7 @@ public abstract class BaseProjectTestCase {
     }
 
     protected String getTestDataPath() {
-        return new java.io.File("testData").getAbsolutePath();
+        return new java.io.File( "src/test/resources/testData").getAbsolutePath();
     }
 
     protected void enablePluginAndReindex() {

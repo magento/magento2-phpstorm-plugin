@@ -27,7 +27,7 @@ public class MagentoProjectExtension implements BeforeEachCallback, AfterEachCal
     private static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(MagentoProjectExtension.class);
     private static final String FIXTURE = "myFixture";
 
-    private static final String testDataProjectPath = "testData/project";
+    private static final String testDataProjectPath = "src/test/resources/testData/project";
     private static final String testDataProjectDirectory = "magento2";
 
     @Override

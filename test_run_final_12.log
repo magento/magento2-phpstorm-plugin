@@ -1,0 +1,235 @@
+Initialized native services in: /home/vitaliy/.gradle/native
+Initialized jansi services in: /home/vitaliy/.gradle/native
+The client will now receive all logging from the daemon (pid: 118809). The daemon log file: /home/vitaliy/.gradle/daemon/9.3.1/daemon-118809.out.log
+Starting 26th build in daemon [uptime: 44 mins 44.391 secs, performance: 98%, GC rate: 0.01/s, heap usage: 49% of 512 MiB, non-heap usage: 64% of 384 MiB]
+Using 8 worker leases.
+Operational build model parameters: {requiresToolingModels=false, parallelProjectExecution=false, configureOnDemand=false, configurationCache=true, configurationCacheParallelStore=false, configurationCacheParallelLoad=true, isolatedProjects=false, parallelProjectConfiguration=false, intermediateModelCache=false, parallelToolingApiActions=false, invalidateCoupledProjects=false, modelAsProjectDependency=false, resilientModelBuilding=false}
+Encryption key source: default Gradle keystore (pkcs12)
+Now considering [/home/vitaliy/IdeaProjects/magento2-phpstorm-plugin] as hierarchies to watch
+Starting process 'command '/home/vitaliy/.gradle/caches/9.3.1/transforms/04de4f026ffc1583ad6cbcaf8ce20863/transformed/PhpStorm-261.21525.38/jbr/bin/java''. Working directory: /home/vitaliy/IdeaProjects/magento2-phpstorm-plugin Command: /home/vitaliy/.gradle/caches/9.3.1/transforms/04de4f026ffc1583ad6cbcaf8ce20863/transformed/PhpStorm-261.21525.38/jbr/bin/java -XshowSettings:properties -version
+Successfully started process 'command '/home/vitaliy/.gradle/caches/9.3.1/transforms/04de4f026ffc1583ad6cbcaf8ce20863/transformed/PhpStorm-261.21525.38/jbr/bin/java''
+Reusing configuration cache.
+Now considering [/home/vitaliy/IdeaProjects/magento2-phpstorm-plugin] as hierarchies to watch
+Watching the file system is configured to be enabled if available
+File system watching is active
+Using local directory build cache for the root build (location = /home/vitaliy/.gradle/caches/build-cache-1, remove unused entries = after 7 days).
+Tasks to be executed: [task ':checkKotlinGradlePluginConfigurationErrors', task ':compileKotlin', task ':compileJava', task ':initializeIntellijPlatformPlugin', task ':patchPluginXml', task ':processResources', task ':classes', task ':generateManifest', task ':instrumentCode', task ':jar', task ':compileTestKotlin', task ':compileTestJava', task ':processTestResources', task ':testClasses', task ':instrumentTestCode', task ':koverFindJar', task ':instrumentedJar', task ':composedJar', task ':prepareTestSandbox', task ':prepareTest', task ':test']
+Tasks that were excluded: []
+Resolve mutations for :checkKotlinGradlePluginConfigurationErrors (Thread[#1659,Execution worker,5,main]) started.
+Resolve mutations for :initializeIntellijPlatformPlugin (Thread[#1660,Execution worker Thread 2,5,main]) started.
+Resolve mutations for :koverFindJar (Thread[#1661,Execution worker Thread 3,5,main]) started.
+:checkKotlinGradlePluginConfigurationErrors (Thread[#1660,Execution worker Thread 2,5,main]) started.
+:initializeIntellijPlatformPlugin (Thread[#1664,Execution worker Thread 6,5,main]) started.
+:koverFindJar (Thread[#1661,Execution worker Thread 3,5,main]) started.
+
+> Task :checkKotlinGradlePluginConfigurationErrors SKIPPED
+Skipping task ':checkKotlinGradlePluginConfigurationErrors' as task onlyIf 'errorDiagnostics are present' is false.
+Resolve mutations for :compileKotlin (Thread[#1660,Execution worker Thread 2,5,main]) started.
+Build d64e300b-f5d9-4813-bac2-07cc3e2c7cdc is started
+:compileKotlin (Thread[#1660,Execution worker Thread 2,5,main]) started.
+
+> Task :koverFindJar UP-TO-DATE
+Caching disabled for task ':koverFindJar' because:
+  Local file operations are faster then using build cache
+Skipping task ':koverFindJar' as it is up-to-date.
+
+> Task :initializeIntellijPlatformPlugin
+Caching disabled for task ':initializeIntellijPlatformPlugin' because:
+  Task is untracked because: Should always run
+Task ':initializeIntellijPlatformPlugin' is not up-to-date because:
+  Task is untracked because: Should always run
+Resolve mutations for :patchPluginXml (Thread[#1664,Execution worker Thread 6,5,main]) started.
+Resolve mutations for :generateManifest (Thread[#1661,Execution worker Thread 3,5,main]) started.
+:patchPluginXml (Thread[#1664,Execution worker Thread 6,5,main]) started.
+:generateManifest (Thread[#1661,Execution worker Thread 3,5,main]) started.
+
+> Task :generateManifest UP-TO-DATE
+Build cache key for task ':generateManifest' is 6ce9e0090ee084d158f40b2093ee927d
+Skipping task ':generateManifest' as it is up-to-date.
+
+> Task :patchPluginXml UP-TO-DATE
+Build cache key for task ':patchPluginXml' is 696335858417a6855231c95e0780d218
+Skipping task ':patchPluginXml' as it is up-to-date.
+Resolve mutations for :processResources (Thread[#1664,Execution worker Thread 6,5,main]) started.
+:processResources (Thread[#1664,Execution worker Thread 6,5,main]) started.
+
+> Task :processResources UP-TO-DATE
+Caching disabled for task ':processResources' because:
+  Not worth caching
+Skipping task ':processResources' as it is up-to-date.
+Resolve mutations for :processTestResources (Thread[#1664,Execution worker Thread 6,5,main]) started.
+:processTestResources (Thread[#1664,Execution worker Thread 6,5,main]) started.
+
+> Task :compileKotlin NO-SOURCE
+Skipping task ':compileKotlin' as it has no source files and no previous output files.
+Resolve mutations for :compileJava (Thread[#1660,Execution worker Thread 2,5,main]) started.
+:compileJava (Thread[#1660,Execution worker Thread 2,5,main]) started.
+
+> Task :processTestResources UP-TO-DATE
+Caching disabled for task ':processTestResources' because:
+  Not worth caching
+Skipping task ':processTestResources' as it is up-to-date.
+
+> Task :compileJava UP-TO-DATE
+Build cache key for task ':compileJava' is cfb8cc71e5f0a447d1bfce44e9a038e8
+Skipping task ':compileJava' as it is up-to-date.
+No compile result for :compileJava
+No compile result for :compileJava
+Resolve mutations for :classes (Thread[#1660,Execution worker Thread 2,5,main]) started.
+:classes (Thread[#1660,Execution worker Thread 2,5,main]) started.
+
+> Task :classes UP-TO-DATE
+Skipping task ':classes' as it has no actions.
+Resolve mutations for :instrumentCode (Thread[#1660,Execution worker Thread 2,5,main]) started.
+:instrumentCode (Thread[#1660,Execution worker Thread 2,5,main]) started.
+
+> Task :instrumentCode UP-TO-DATE
+file or directory '/home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/src/main/kotlin', not found
+Build cache key for task ':instrumentCode' is 0b9236386144322b0aff5f6b77bfc3a6
+Skipping task ':instrumentCode' as it is up-to-date.
+Resolve mutations for :jar (Thread[#1660,Execution worker Thread 2,5,main]) started.
+:jar (Thread[#1660,Execution worker Thread 2,5,main]) started.
+
+> Task :jar UP-TO-DATE
+Caching disabled for task ':jar' because:
+  Not worth caching
+Skipping task ':jar' as it is up-to-date.
+Resolve mutations for :compileTestKotlin (Thread[#1660,Execution worker Thread 2,5,main]) started.
+Resolve mutations for :instrumentedJar (Thread[#1662,Execution worker Thread 4,5,main]) started.
+:instrumentedJar (Thread[#1662,Execution worker Thread 4,5,main]) started.
+:compileTestKotlin (Thread[#1660,Execution worker Thread 2,5,main]) started.
+
+> Task :instrumentedJar UP-TO-DATE
+Build cache key for task ':instrumentedJar' is 9cbfcb8470fe2b50cf17905863dd70cc
+Skipping task ':instrumentedJar' as it is up-to-date.
+Resolve mutations for :composedJar (Thread[#1662,Execution worker Thread 4,5,main]) started.
+:composedJar (Thread[#1662,Execution worker Thread 4,5,main]) started.
+
+> Task :compileTestKotlin NO-SOURCE
+Skipping task ':compileTestKotlin' as it has no source files and no previous output files.
+Resolve mutations for :compileTestJava (Thread[#1660,Execution worker Thread 2,5,main]) started.
+:compileTestJava (Thread[#1660,Execution worker Thread 2,5,main]) started.
+
+> Task :composedJar UP-TO-DATE
+Build cache key for task ':composedJar' is c7a81d9b0e439447dd29b737a69fb9a9
+Skipping task ':composedJar' as it is up-to-date.
+Resolve mutations for :prepareTestSandbox (Thread[#1662,Execution worker Thread 4,5,main]) started.
+:prepareTestSandbox (Thread[#1662,Execution worker Thread 4,5,main]) started.
+
+> Task :prepareTestSandbox UP-TO-DATE
+Caching disabled for task ':prepareTestSandbox' because:
+  Not worth caching
+Skipping task ':prepareTestSandbox' as it is up-to-date.
+Resolve mutations for :prepareTest (Thread[#1662,Execution worker Thread 4,5,main]) started.
+:prepareTest (Thread[#1662,Execution worker Thread 4,5,main]) started.
+
+> Task :prepareTest
+Skipping task ':prepareTest' as it has no actions.
+
+> Task :compileTestJava
+Build cache key for task ':compileTestJava' is 716a1dd70ca91a4a6f895ef7f3c0f810
+Task ':compileTestJava' is not up-to-date because:
+  Input property 'stableSources' file /home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/src/test/java/com/magento/idea/magento2plugin/BaseProjectTestCase.java has changed.
+Compilation mode: in-process compilation
+Created classpath snapshot for incremental compilation in 0.254 secs.
+Compiling with toolchain '/usr/lib/jvm/java-21-openjdk-amd64'.
+Compiling with JDK Java compiler API.
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+Incremental compilation of 150 classes completed in 1.897 secs.
+Class dependency analysis for incremental compilation took 0.012 secs.
+Stored cache entry for task ':compileTestJava' with cache key 716a1dd70ca91a4a6f895ef7f3c0f810
+Resolve mutations for :testClasses (Thread[#1660,Execution worker Thread 2,5,main]) started.
+:testClasses (Thread[#1660,Execution worker Thread 2,5,main]) started.
+
+> Task :testClasses
+Skipping task ':testClasses' as it has no actions.
+Resolve mutations for :instrumentTestCode (Thread[#1660,Execution worker Thread 2,5,main]) started.
+:instrumentTestCode (Thread[#1660,Execution worker Thread 2,5,main]) started.
+
+> Task :instrumentTestCode
+file or directory '/home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/src/test/kotlin', not found
+Build cache key for task ':instrumentTestCode' is aee728cb17e33936eb9e08e268048e8b
+Task ':instrumentTestCode' is not up-to-date because:
+  Input property 'classesDirs' file /home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/build/classes/java/test/com/magento/idea/magento2plugin/BaseProjectTestCase.class has changed.
+[org.jetbrains.intellij.platform] Compiling forms and instrumenting code with nullability preconditions
+[ant:instrumentIdeaExtensions] Added @NotNull assertions to 0 files
+Stored cache entry for task ':instrumentTestCode' with cache key aee728cb17e33936eb9e08e268048e8b
+Resolve mutations for :test (Thread[#1660,Execution worker Thread 2,5,main]) started.
+:test (Thread[#1660,Execution worker Thread 2,5,main]) started.
+Gradle Test Executor 9 started executing tests.
+
+> Task :test
+Build cache key for task ':test' is d1384c518c3f5a30130098462c7d114d
+Task ':test' is not up-to-date because:
+  Task has failed previously.
+file or directory '/home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/build/classes/kotlin/test', not found
+Starting process 'Gradle Test Executor 9'. Working directory: /home/vitaliy/IdeaProjects/magento2-phpstorm-plugin Command: /home/vitaliy/.gradle/caches/9.3.1/transforms/04de4f026ffc1583ad6cbcaf8ce20863/transformed/PhpStorm-261.21525.38/jbr/bin/java -Daether.connector.resumeDownloads=false -Dawt.lock.fair=true -Dawt.toolkit.name=auto -Dcompose.swing.render.on.graphics=true -Dide.fleet.launch=false -Dide.show.tips.on.startup.default.value=true -Didea.classpath.index.enabled=false -Didea.config.path=/home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/build/idea-sandbox/PS-2026.1/config-test -Didea.force.use.core.classloader=true -Didea.log.path=/home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/build/idea-sandbox/PS-2026.1/log-test -Didea.paths.selector=PhpStorm2026.1 -Didea.platform.prefix=PhpStorm -Didea.plugins.path=/home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/build/idea-sandbox/PS-2026.1/plugins-test -Didea.system.path=/home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/build/idea-sandbox/PS-2026.1/system-test -Didea.use.core.classloader.for.plugin.path=true -Didea.vendor.name=JetBrains -Dintellij.platform.kernel.disable=true -Dintellij.platform.runtime.repository.path=/home/vitaliy/.gradle/caches/9.3.1/transforms/04de4f026ffc1583ad6cbcaf8ce20863/transformed/PhpStorm-261.21525.38/modules/module-descriptors.dat -Dintellij.testFramework.rethrow.logged.errors=true -Dio.netty.allocator.type=pooled -Djava.nio.file.spi.DefaultFileSystemProvider=com.intellij.platform.core.nio.fs.MultiRoutingFileSystemProvider -Djava.system.class.loader=com.intellij.util.lang.PathClassLoader -Djava.util.zip.use.nio.for.zip.file.access=true -Djbr.catch.SIGABRT=true -Djdk.attach.allowAttachSelf=true -Djdk.http.auth.tunneling.disabledSchemes="" -Djdk.module.illegalAccess.silent=true -Djdk.nio.maxCachedBufferSize=2097152 -Djna.boot.library.path=/home/vitaliy/.gradle/caches/9.3.1/transforms/04de4f026ffc1583ad6cbcaf8ce20863/transformed/PhpStorm-261.21525.38/lib/jna/amd64 -Djna.noclasspath=true -Djna.nosys=true -Dorg.gradle.internal.worker.tmpdir=/home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/build/tmp/test/work -Dplugin.path=/home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/build/idea-sandbox/PS-2026.1/plugins-test/graphql:,/home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/build/idea-sandbox/PS-2026.1/plugins-test/PhpStorm Magento 2 Plugin -Dpty4j.preferred.native.folder=/home/vitaliy/.gradle/caches/9.3.1/transforms/04de4f026ffc1583ad6cbcaf8ce20863/transformed/PhpStorm-261.21525.38/lib/pty4j -Dskiko.library.path=/home/vitaliy/.gradle/caches/9.3.1/transforms/04de4f026ffc1583ad6cbcaf8ce20863/transformed/PhpStorm-261.21525.38/lib/skiko-awt-runtime-all -Dskiko.rendering.useScreenMenuBar=false -Dsplash=true -Dsun.io.useCanonCaches=false -Dsun.java2d.metal=true -Dsun.tools.attach.tmp.only=true -XX:JbrShrinkingGcMaxHeapFreeRatio=40 -XX:ReservedCodeCacheSize=512m -XX:+HeapDumpOnOutOfMemoryError -XX:-OmitStackTraceInFastThrow -XX:CICompilerCount=2 -XX:+IgnoreUnrecognizedVMOptions -XX:+UnlockDiagnosticVMOptions -XX:TieredOldPercentage=100000 -XX:MaxJavaStackTraceDepth=10000 -Xbootclasspath/a:/home/vitaliy/.gradle/caches/9.3.1/transforms/04de4f026ffc1583ad6cbcaf8ce20863/transformed/PhpStorm-261.21525.38/lib/nio-fs.jar --enable-native-access=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.ref=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED --add-opens=java.base/java.nio.charset=ALL-UNNAMED --add-opens=java.base/java.text=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.locks=ALL-UNNAMED --add-opens=java.base/jdk.internal.ref=ALL-UNNAMED --add-opens=java.base/jdk.internal.vm=ALL-UNNAMED --add-opens=java.base/sun.net.dns=ALL-UNNAMED --add-opens=java.base/sun.nio=ALL-UNNAMED --add-opens=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/sun.nio.fs=ALL-UNNAMED --add-opens=java.base/sun.security.ssl=ALL-UNNAMED --add-opens=java.base/sun.security.util=ALL-UNNAMED --add-opens=java.desktop/com.sun.java.swing=ALL-UNNAMED --add-opens=java.desktop/com.sun.java.swing.plaf.gtk=ALL-UNNAMED --add-opens=java.desktop/java.awt=ALL-UNNAMED --add-opens=java.desktop/java.awt.dnd.peer=ALL-UNNAMED --add-opens=java.desktop/java.awt.event=ALL-UNNAMED --add-opens=java.desktop/java.awt.font=ALL-UNNAMED --add-opens=java.desktop/java.awt.image=ALL-UNNAMED --add-opens=java.desktop/java.awt.peer=ALL-UNNAMED --add-opens=java.desktop/javax.swing=ALL-UNNAMED --add-opens=java.desktop/javax.swing.plaf.basic=ALL-UNNAMED --add-opens=java.desktop/javax.swing.text=ALL-UNNAMED --add-opens=java.desktop/javax.swing.text.html=ALL-UNNAMED --add-opens=java.desktop/javax.swing.text.html.parser=ALL-UNNAMED --add-opens=java.desktop/sun.awt=ALL-UNNAMED --add-opens=java.desktop/sun.awt.X11=ALL-UNNAMED --add-opens=java.desktop/sun.awt.datatransfer=ALL-UNNAMED --add-opens=java.desktop/sun.awt.image=ALL-UNNAMED --add-opens=java.desktop/sun.font=ALL-UNNAMED --add-opens=java.desktop/sun.java2d=ALL-UNNAMED --add-opens=java.desktop/sun.swing=ALL-UNNAMED --add-opens=java.management/sun.management=ALL-UNNAMED --add-opens=jdk.attach/sun.tools.attach=ALL-UNNAMED --add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-opens=jdk.internal.jvmstat/sun.jvmstat.monitor=ALL-UNNAMED --add-opens=jdk.jdi/com.sun.tools.jdi=ALL-UNNAMED -javaagent:/home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/build/kover/kover-jvm-agent-0.9.5.jar=file:/home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/build/tmp/test/kover-agent.args @/home/vitaliy/.gradle/.tmp/gradle-worker-classpath1376831043158224256txt -Xms128m -Xmx2048m -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant -ea worker.org.gradle.process.internal.worker.GradleWorkerMain 'Gradle Test Executor 9'
+Successfully started process 'Gradle Test Executor 9'
+[0.008s][warning][cds] Archived non-system classes are disabled because the java.system.class.loader property is specified (value = "com.intellij.util.lang.PathClassLoader"). To use archived non-system classes, this property must not be set
+
+Gradle Test Executor 9 STANDARD_ERROR
+    Configuration file for j.u.l.LogManager does not exist: /home/vitaliy/.gradle/caches/9.3.1/transforms/04de4f026ffc1583ad6cbcaf8ce20863/transformed/PhpStorm-261.21525.38/test-log.properties
+
+Gradle Test Executor 9 STANDARD_OUT
+    Test log file: file:///home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/build/idea-sandbox/PS-2026.1/log-test/idea.log
+
+ObserverDeclarationInspectionTest > testObserverNameUsedInDifferentFile STANDARD_ERROR
+    [DEBUG_LOG] Settings.getInstance(myFixture.getProject()) returned null
+
+ObserverDeclarationInspectionTest > testObserverNameUsedInDifferentFile FAILED
+    java.lang.RuntimeException: Unregistered inspections requested: [com.magento.idea.magento2plugin.inspections.xml.ObserverDeclarationInspection]
+        at com.intellij.testFramework.InspectionTestUtil.instantiateTools(InspectionTestUtil.java:206)
+        at com.intellij.testFramework.InspectionTestUtil.instantiateTools(InspectionTestUtil.java:189)
+        at com.intellij.testFramework.fixtures.impl.CodeInsightTestFixtureImpl.enableInspections(CodeInsightTestFixtureImpl.java:656)
+        at com.intellij.testFramework.fixtures.impl.CodeInsightTestFixtureImpl.enableInspections(CodeInsightTestFixtureImpl.java:651)
+        at com.magento.idea.magento2plugin.inspections.xml.ObserverDeclarationInspectionTest.setUp(ObserverDeclarationInspectionTest.java:16)
+
+ObserverDeclarationInspectionTest > testObserverNameUsedInSameFile STANDARD_ERROR
+    [DEBUG_LOG] Settings.getInstance(myFixture.getProject()) returned null
+
+ObserverDeclarationInspectionTest > testObserverNameUsedInSameFile FAILED
+    java.lang.RuntimeException: Unregistered inspections requested: [com.magento.idea.magento2plugin.inspections.xml.ObserverDeclarationInspection]
+        at com.intellij.testFramework.InspectionTestUtil.instantiateTools(InspectionTestUtil.java:206)
+        at com.intellij.testFramework.InspectionTestUtil.instantiateTools(InspectionTestUtil.java:189)
+        at com.intellij.testFramework.fixtures.impl.CodeInsightTestFixtureImpl.enableInspections(CodeInsightTestFixtureImpl.java:656)
+        at com.intellij.testFramework.fixtures.impl.CodeInsightTestFixtureImpl.enableInspections(CodeInsightTestFixtureImpl.java:651)
+        at com.magento.idea.magento2plugin.inspections.xml.ObserverDeclarationInspectionTest.setUp(ObserverDeclarationInspectionTest.java:16)
+
+ObserverDeclarationInspectionTest > testDisablingNonExistingObserver STANDARD_ERROR
+    [DEBUG_LOG] Settings.getInstance(myFixture.getProject()) returned null
+
+ObserverDeclarationInspectionTest > testDisablingNonExistingObserver FAILED
+    java.lang.RuntimeException: Unregistered inspections requested: [com.magento.idea.magento2plugin.inspections.xml.ObserverDeclarationInspection]
+        at com.intellij.testFramework.InspectionTestUtil.instantiateTools(InspectionTestUtil.java:206)
+        at com.intellij.testFramework.InspectionTestUtil.instantiateTools(InspectionTestUtil.java:189)
+        at com.intellij.testFramework.fixtures.impl.CodeInsightTestFixtureImpl.enableInspections(CodeInsightTestFixtureImpl.java:656)
+        at com.intellij.testFramework.fixtures.impl.CodeInsightTestFixtureImpl.enableInspections(CodeInsightTestFixtureImpl.java:651)
+        at com.magento.idea.magento2plugin.inspections.xml.ObserverDeclarationInspectionTest.setUp(ObserverDeclarationInspectionTest.java:16)
+
+Gradle Test Executor 9 finished executing tests.
+
+> Task :test FAILED
+
+3 tests completed, 3 failed
+Generating HTML test report...
+Finished generating test html results (0.004 secs) into: /home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/build/reports/tests/test
+Finished generating test XML results (0.001 secs) into: /home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/build/test-results/test
+Build d64e300b-f5d9-4813-bac2-07cc3e2c7cdc is closed
+
+[Incubating] Problems report is available at: file:///home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':test'.
+> There were failing tests. See the report at: file:///home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 27s
+15 actionable tasks: 4 executed, 11 up-to-date
+Configuration cache entry reused.

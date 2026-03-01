@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
 
     private static final String TEST_DATA_PATH
-            = "testData" + File.separator + "linemarker" + File.separator;
+            =  "src/test/resources/testData" + File.separator + "linemarker" + File.separator;
 
     @BeforeEach
     public void setUp() throws Exception {

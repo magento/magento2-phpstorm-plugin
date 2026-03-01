@@ -1,0 +1,175 @@
+Initialized native services in: /home/vitaliy/.gradle/native
+Initialized jansi services in: /home/vitaliy/.gradle/native
+The client will now receive all logging from the daemon (pid: 118809). The daemon log file: /home/vitaliy/.gradle/daemon/9.3.1/daemon-118809.out.log
+Starting 24th build in daemon [uptime: 42 mins 4.404 secs, performance: 98%, GC rate: 0.01/s, heap usage: 48% of 512 MiB, non-heap usage: 63% of 384 MiB]
+Using 8 worker leases.
+Operational build model parameters: {requiresToolingModels=false, parallelProjectExecution=false, configureOnDemand=false, configurationCache=true, configurationCacheParallelStore=false, configurationCacheParallelLoad=true, isolatedProjects=false, parallelProjectConfiguration=false, intermediateModelCache=false, parallelToolingApiActions=false, invalidateCoupledProjects=false, modelAsProjectDependency=false, resilientModelBuilding=false}
+Encryption key source: default Gradle keystore (pkcs12)
+Now considering [/home/vitaliy/IdeaProjects/magento2-phpstorm-plugin] as hierarchies to watch
+Starting process 'command '/home/vitaliy/.gradle/caches/9.3.1/transforms/04de4f026ffc1583ad6cbcaf8ce20863/transformed/PhpStorm-261.21525.38/jbr/bin/java''. Working directory: /home/vitaliy/IdeaProjects/magento2-phpstorm-plugin Command: /home/vitaliy/.gradle/caches/9.3.1/transforms/04de4f026ffc1583ad6cbcaf8ce20863/transformed/PhpStorm-261.21525.38/jbr/bin/java -XshowSettings:properties -version
+Successfully started process 'command '/home/vitaliy/.gradle/caches/9.3.1/transforms/04de4f026ffc1583ad6cbcaf8ce20863/transformed/PhpStorm-261.21525.38/jbr/bin/java''
+Reusing configuration cache.
+Now considering [/home/vitaliy/IdeaProjects/magento2-phpstorm-plugin] as hierarchies to watch
+Watching the file system is configured to be enabled if available
+File system watching is active
+Using local directory build cache for the root build (location = /home/vitaliy/.gradle/caches/build-cache-1, remove unused entries = after 7 days).
+Tasks to be executed: [task ':checkKotlinGradlePluginConfigurationErrors', task ':compileKotlin', task ':compileJava', task ':initializeIntellijPlatformPlugin', task ':patchPluginXml', task ':processResources', task ':classes', task ':generateManifest', task ':instrumentCode', task ':jar', task ':compileTestKotlin', task ':compileTestJava', task ':processTestResources', task ':testClasses', task ':instrumentTestCode', task ':koverFindJar', task ':instrumentedJar', task ':composedJar', task ':prepareTestSandbox', task ':prepareTest', task ':test']
+Tasks that were excluded: []
+Resolve mutations for :checkKotlinGradlePluginConfigurationErrors (Thread[#1571,Execution worker,5,main]) started.
+:checkKotlinGradlePluginConfigurationErrors (Thread[#1571,Execution worker,5,main]) started.
+Resolve mutations for :initializeIntellijPlatformPlugin (Thread[#1572,Execution worker Thread 2,5,main]) started.
+:initializeIntellijPlatformPlugin (Thread[#1572,Execution worker Thread 2,5,main]) started.
+Resolve mutations for :koverFindJar (Thread[#1574,Execution worker Thread 3,5,main]) started.
+:koverFindJar (Thread[#1574,Execution worker Thread 3,5,main]) started.
+
+> Task :checkKotlinGradlePluginConfigurationErrors SKIPPED
+Skipping task ':checkKotlinGradlePluginConfigurationErrors' as task onlyIf 'errorDiagnostics are present' is false.
+Resolve mutations for :compileKotlin (Thread[#1571,Execution worker,5,main]) started.
+:compileKotlin (Thread[#1571,Execution worker,5,main]) started.
+Build ed0496cd-55cf-4384-b29c-15e2c9095040 is started
+
+> Task :initializeIntellijPlatformPlugin
+Caching disabled for task ':initializeIntellijPlatformPlugin' because:
+  Task is untracked because: Should always run
+Task ':initializeIntellijPlatformPlugin' is not up-to-date because:
+  Task is untracked because: Should always run
+Resolve mutations for :patchPluginXml (Thread[#1572,Execution worker Thread 2,5,main]) started.
+Resolve mutations for :generateManifest (Thread[#1570,included builds,5,main]) started.
+:patchPluginXml (Thread[#1572,Execution worker Thread 2,5,main]) started.
+:generateManifest (Thread[#1570,included builds,5,main]) started.
+
+> Task :koverFindJar UP-TO-DATE
+Caching disabled for task ':koverFindJar' because:
+  Local file operations are faster then using build cache
+Skipping task ':koverFindJar' as it is up-to-date.
+
+> Task :generateManifest UP-TO-DATE
+Build cache key for task ':generateManifest' is 6ce9e0090ee084d158f40b2093ee927d
+Skipping task ':generateManifest' as it is up-to-date.
+
+> Task :patchPluginXml UP-TO-DATE
+Build cache key for task ':patchPluginXml' is 696335858417a6855231c95e0780d218
+Skipping task ':patchPluginXml' as it is up-to-date.
+Resolve mutations for :processResources (Thread[#1572,Execution worker Thread 2,5,main]) started.
+Resolve mutations for :processTestResources (Thread[#1570,included builds,5,main]) started.
+:processTestResources (Thread[#1576,Execution worker Thread 5,5,main]) started.
+:processResources (Thread[#1572,Execution worker Thread 2,5,main]) started.
+
+> Task :processTestResources UP-TO-DATE
+Caching disabled for task ':processTestResources' because:
+  Not worth caching
+Skipping task ':processTestResources' as it is up-to-date.
+
+> Task :compileKotlin NO-SOURCE
+Skipping task ':compileKotlin' as it has no source files and no previous output files.
+Resolve mutations for :compileJava (Thread[#1571,Execution worker,5,main]) started.
+:compileJava (Thread[#1571,Execution worker,5,main]) started.
+
+> Task :processResources UP-TO-DATE
+Caching disabled for task ':processResources' because:
+  Not worth caching
+Skipping task ':processResources' as it is up-to-date.
+
+> Task :compileJava UP-TO-DATE
+Build cache key for task ':compileJava' is cfb8cc71e5f0a447d1bfce44e9a038e8
+Skipping task ':compileJava' as it is up-to-date.
+No compile result for :compileJava
+No compile result for :compileJava
+Resolve mutations for :classes (Thread[#1571,Execution worker,5,main]) started.
+:classes (Thread[#1571,Execution worker,5,main]) started.
+
+> Task :classes UP-TO-DATE
+Skipping task ':classes' as it has no actions.
+Resolve mutations for :instrumentCode (Thread[#1571,Execution worker,5,main]) started.
+:instrumentCode (Thread[#1571,Execution worker,5,main]) started.
+
+> Task :instrumentCode UP-TO-DATE
+file or directory '/home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/src/main/kotlin', not found
+Build cache key for task ':instrumentCode' is 0b9236386144322b0aff5f6b77bfc3a6
+Skipping task ':instrumentCode' as it is up-to-date.
+Resolve mutations for :jar (Thread[#1571,Execution worker,5,main]) started.
+:jar (Thread[#1571,Execution worker,5,main]) started.
+
+> Task :jar UP-TO-DATE
+Caching disabled for task ':jar' because:
+  Not worth caching
+Skipping task ':jar' as it is up-to-date.
+Resolve mutations for :compileTestKotlin (Thread[#1571,Execution worker,5,main]) started.
+Resolve mutations for :instrumentedJar (Thread[#1572,Execution worker Thread 2,5,main]) started.
+:instrumentedJar (Thread[#1572,Execution worker Thread 2,5,main]) started.
+:compileTestKotlin (Thread[#1571,Execution worker,5,main]) started.
+
+> Task :instrumentedJar UP-TO-DATE
+Build cache key for task ':instrumentedJar' is 9cbfcb8470fe2b50cf17905863dd70cc
+Skipping task ':instrumentedJar' as it is up-to-date.
+Resolve mutations for :composedJar (Thread[#1572,Execution worker Thread 2,5,main]) started.
+:composedJar (Thread[#1572,Execution worker Thread 2,5,main]) started.
+
+> Task :composedJar UP-TO-DATE
+Build cache key for task ':composedJar' is c7a81d9b0e439447dd29b737a69fb9a9
+Skipping task ':composedJar' as it is up-to-date.
+Resolve mutations for :prepareTestSandbox (Thread[#1576,Execution worker Thread 5,5,main]) started.
+
+> Task :compileTestKotlin NO-SOURCE
+Skipping task ':compileTestKotlin' as it has no source files and no previous output files.
+:prepareTestSandbox (Thread[#1576,Execution worker Thread 5,5,main]) started.
+Resolve mutations for :compileTestJava (Thread[#1571,Execution worker,5,main]) started.
+
+> Task :prepareTestSandbox UP-TO-DATE
+Caching disabled for task ':prepareTestSandbox' because:
+  Not worth caching
+Skipping task ':prepareTestSandbox' as it is up-to-date.
+Resolve mutations for :prepareTest (Thread[#1572,Execution worker Thread 2,5,main]) started.
+:prepareTest (Thread[#1576,Execution worker Thread 5,5,main]) started.
+
+> Task :prepareTest
+Skipping task ':prepareTest' as it has no actions.
+:compileTestJava (Thread[#1571,Execution worker,5,main]) started.
+
+> Task :compileTestJava FAILED
+Build cache key for task ':compileTestJava' is 11cd1530815df3f12e86640f5bb5be25
+Task ':compileTestJava' is not up-to-date because:
+  Input property 'stableSources' file /home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/src/test/java/com/magento/idea/magento2plugin/BaseProjectTestCase.java has changed.
+  Input property 'stableSources' file /home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/src/test/java/com/magento/idea/magento2plugin/actions/generation/generator/AclXmlGeneratorTest.java has changed.
+  Input property 'stableSources' file /home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/src/test/java/com/magento/idea/magento2plugin/actions/generation/generator/ArgumentInjectionGeneratorTest.java has changed.
+  and more...
+Compilation mode: in-process compilation
+Created classpath snapshot for incremental compilation in 0.251 secs.
+Compiling with toolchain '/usr/lib/jvm/java-21-openjdk-amd64'.
+Compiling with JDK Java compiler API.
+/home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/src/test/java/com/magento/idea/magento2plugin/actions/generation/generator/pool/NewEntityGeneratorPoolTest.java:40: error: incompatible types: boolean cannot be converted to String
+                generatorPoolHandler.hasErrorMessages(),
+                                                     ^
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+1 error
+Incremental compilation of 150 classes completed in 1.799 secs.
+Build ed0496cd-55cf-4384-b29c-15e2c9095040 is closed
+
+[Incubating] Problems report is available at: file:///home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileTestJava'.
+> Compilation failed; see the compiler output below.
+  Note: Recompile with -Xlint:deprecation for details.
+  /home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/src/test/java/com/magento/idea/magento2plugin/actions/generation/generator/pool/NewEntityGeneratorPoolTest.java:40: error: incompatible types: boolean cannot be converted to String
+                  generatorPoolHandler.hasErrorMessages(),
+                                                       ^
+  Note: Recompile with -Xlint:unchecked for details.
+  Note: Some input files use or override a deprecated API.
+  Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+  Note: Some input files use unchecked or unsafe operations.
+  1 error
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 3s
+13 actionable tasks: 2 executed, 11 up-to-date
+Configuration cache entry reused.

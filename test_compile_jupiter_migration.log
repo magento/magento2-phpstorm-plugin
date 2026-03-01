@@ -1,0 +1,173 @@
+Initialized native services in: /home/vitaliy/.gradle/native
+Initialized jansi services in: /home/vitaliy/.gradle/native
+The client will now receive all logging from the daemon (pid: 118809). The daemon log file: /home/vitaliy/.gradle/daemon/9.3.1/daemon-118809.out.log
+Starting 38th build in daemon [uptime: 1 hrs 9 mins 16.237 secs, performance: 98%, GC rate: 0.01/s, heap usage: 53% of 512 MiB, non-heap usage: 71% of 384 MiB]
+Using 8 worker leases.
+Operational build model parameters: {requiresToolingModels=false, parallelProjectExecution=false, configureOnDemand=false, configurationCache=true, configurationCacheParallelStore=false, configurationCacheParallelLoad=true, isolatedProjects=false, parallelProjectConfiguration=false, intermediateModelCache=false, parallelToolingApiActions=false, invalidateCoupledProjects=false, modelAsProjectDependency=false, resilientModelBuilding=false}
+Encryption key source: default Gradle keystore (pkcs12)
+Now considering [/home/vitaliy/IdeaProjects/magento2-phpstorm-plugin] as hierarchies to watch
+Reusing configuration cache.
+Now considering [/home/vitaliy/IdeaProjects/magento2-phpstorm-plugin] as hierarchies to watch
+Watching the file system is configured to be enabled if available
+File system watching is active
+Using local directory build cache for the root build (location = /home/vitaliy/.gradle/caches/build-cache-1, remove unused entries = after 7 days).
+Tasks to be executed: [task ':checkKotlinGradlePluginConfigurationErrors', task ':compileKotlin', task ':compileJava', task ':initializeIntellijPlatformPlugin', task ':patchPluginXml', task ':processResources', task ':classes', task ':instrumentCode', task ':generateManifest', task ':jar', task ':compileTestKotlin', task ':compileTestJava', task ':processTestResources', task ':testClasses']
+Tasks that were excluded: []
+Resolve mutations for :checkKotlinGradlePluginConfigurationErrors (Thread[#2249,Execution worker,5,main]) started.
+Resolve mutations for :initializeIntellijPlatformPlugin (Thread[#2250,Execution worker Thread 2,5,main]) started.
+:checkKotlinGradlePluginConfigurationErrors (Thread[#2250,Execution worker Thread 2,5,main]) started.
+:initializeIntellijPlatformPlugin (Thread[#2251,Execution worker Thread 3,5,main]) started.
+
+> Task :checkKotlinGradlePluginConfigurationErrors SKIPPED
+Skipping task ':checkKotlinGradlePluginConfigurationErrors' as task onlyIf 'errorDiagnostics are present' is false.
+Build c9369f09-32b2-489e-bf74-d48f355c2d98 is started
+Resolve mutations for :compileKotlin (Thread[#2250,Execution worker Thread 2,5,main]) started.
+:compileKotlin (Thread[#2250,Execution worker Thread 2,5,main]) started.
+
+> Task :initializeIntellijPlatformPlugin
+Caching disabled for task ':initializeIntellijPlatformPlugin' because:
+  Task is untracked because: Should always run
+Task ':initializeIntellijPlatformPlugin' is not up-to-date because:
+  Task is untracked because: Should always run
+Resolve mutations for :patchPluginXml (Thread[#2251,Execution worker Thread 3,5,main]) started.
+:patchPluginXml (Thread[#2251,Execution worker Thread 3,5,main]) started.
+Resolve mutations for :generateManifest (Thread[#2249,Execution worker,5,main]) started.
+:generateManifest (Thread[#2249,Execution worker,5,main]) started.
+
+> Task :patchPluginXml UP-TO-DATE
+Build cache key for task ':patchPluginXml' is 8be45fa45978ed7253fc8be793e1f6d2
+Skipping task ':patchPluginXml' as it is up-to-date.
+Resolve mutations for :processResources (Thread[#2251,Execution worker Thread 3,5,main]) started.
+Resolve mutations for :processTestResources (Thread[#2248,included builds,5,main]) started.
+:processResources (Thread[#2251,Execution worker Thread 3,5,main]) started.
+:processTestResources (Thread[#2248,included builds,5,main]) started.
+
+> Task :processResources UP-TO-DATE
+Caching disabled for task ':processResources' because:
+  Not worth caching
+Skipping task ':processResources' as it is up-to-date.
+
+> Task :processTestResources UP-TO-DATE
+Caching disabled for task ':processTestResources' because:
+  Not worth caching
+Skipping task ':processTestResources' as it is up-to-date.
+
+> Task :generateManifest UP-TO-DATE
+Build cache key for task ':generateManifest' is 3bd15d90e2703f0ecba062dbd2bb14b2
+Skipping task ':generateManifest' as it is up-to-date.
+
+> Task :compileKotlin NO-SOURCE
+Skipping task ':compileKotlin' as it has no source files and no previous output files.
+Resolve mutations for :compileJava (Thread[#2250,Execution worker Thread 2,5,main]) started.
+:compileJava (Thread[#2250,Execution worker Thread 2,5,main]) started.
+
+> Task :compileJava UP-TO-DATE
+Build cache key for task ':compileJava' is cfb8cc71e5f0a447d1bfce44e9a038e8
+Skipping task ':compileJava' as it is up-to-date.
+No compile result for :compileJava
+No compile result for :compileJava
+Resolve mutations for :classes (Thread[#2250,Execution worker Thread 2,5,main]) started.
+:classes (Thread[#2250,Execution worker Thread 2,5,main]) started.
+
+> Task :classes UP-TO-DATE
+Skipping task ':classes' as it has no actions.
+Resolve mutations for :instrumentCode (Thread[#2250,Execution worker Thread 2,5,main]) started.
+:instrumentCode (Thread[#2250,Execution worker Thread 2,5,main]) started.
+
+> Task :instrumentCode UP-TO-DATE
+file or directory '/home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/src/main/kotlin', not found
+Build cache key for task ':instrumentCode' is aa7601b0ba0482fad81fceb141888857
+Skipping task ':instrumentCode' as it is up-to-date.
+Resolve mutations for :jar (Thread[#2250,Execution worker Thread 2,5,main]) started.
+:jar (Thread[#2250,Execution worker Thread 2,5,main]) started.
+
+> Task :jar UP-TO-DATE
+Caching disabled for task ':jar' because:
+  Not worth caching
+Skipping task ':jar' as it is up-to-date.
+Resolve mutations for :compileTestKotlin (Thread[#2250,Execution worker Thread 2,5,main]) started.
+:compileTestKotlin (Thread[#2250,Execution worker Thread 2,5,main]) started.
+
+> Task :compileTestKotlin NO-SOURCE
+Skipping task ':compileTestKotlin' as it has no source files and no previous output files.
+Resolve mutations for :compileTestJava (Thread[#2250,Execution worker Thread 2,5,main]) started.
+:compileTestJava (Thread[#2250,Execution worker Thread 2,5,main]) started.
+
+> Task :compileTestJava FAILED
+Build cache key for task ':compileTestJava' is 15be19997236f4a6cbb4b6509d2756d7
+Task ':compileTestJava' is not up-to-date because:
+  Task has failed previously.
+The input changes require a full rebuild for incremental task ':compileTestJava'.
+Compilation mode: in-process compilation
+Full recompilation is required because no incremental change information is available. This is usually caused by clean builds or changing compiler arguments.
+Compiling with toolchain '/usr/lib/jvm/java-21-openjdk-amd64'.
+Compiling with JDK Java compiler API.
+/home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/src/test/java/com/magento/idea/magento2plugin/BaseProjectTestCase.java:23: error: cannot access TestCase
+public abstract class BaseProjectTestCase extends BasePlatformTestCase {
+                                                  ^
+  class file for junit.framework.TestCase not found
+/home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/src/test/java/com/magento/idea/magento2plugin/BaseProjectTestCase.java:147: error: cannot find symbol
+        return fixturesFolderPath + getClass().getSimpleName().replace("Test", "")
+                                    ^
+  symbol:   method getClass()
+  location: class BaseProjectTestCase
+/home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/src/test/java/com/magento/idea/magento2plugin/actions/generation/generator/pool/NewEntityGeneratorPoolTest.java:39: error: no suitable method found for assertFalse(String,boolean)
+        org.junit.jupiter.api.Assertions.assertFalse(
+                                        ^
+    method Assertions.assertFalse(boolean,String) is not applicable
+      (argument mismatch; String cannot be converted to boolean)
+    method Assertions.assertFalse(boolean,Supplier<String>) is not applicable
+      (argument mismatch; String cannot be converted to boolean)
+    method Assertions.assertFalse(BooleanSupplier,String) is not applicable
+      (argument mismatch; String cannot be converted to BooleanSupplier)
+    method Assertions.assertFalse(BooleanSupplier,Supplier<String>) is not applicable
+      (argument mismatch; String cannot be converted to BooleanSupplier)
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+3 errors
+Build c9369f09-32b2-489e-bf74-d48f355c2d98 is closed
+
+[Incubating] Problems report is available at: file:///home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileTestJava'.
+> Compilation failed; see the compiler output below.
+  /home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/src/test/java/com/magento/idea/magento2plugin/actions/generation/generator/pool/NewEntityGeneratorPoolTest.java:39: error: no suitable method found for assertFalse(String,boolean)
+          org.junit.jupiter.api.Assertions.assertFalse(
+                                          ^
+      method Assertions.assertFalse(boolean,String) is not applicable
+        (argument mismatch; String cannot be converted to boolean)
+      method Assertions.assertFalse(boolean,Supplier<String>) is not applicable
+        (argument mismatch; String cannot be converted to boolean)
+      method Assertions.assertFalse(BooleanSupplier,String) is not applicable
+        (argument mismatch; String cannot be converted to BooleanSupplier)
+      method Assertions.assertFalse(BooleanSupplier,Supplier<String>) is not applicable
+        (argument mismatch; String cannot be converted to BooleanSupplier)
+  Note: Recompile with -Xlint:deprecation for details.
+  /home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/src/test/java/com/magento/idea/magento2plugin/BaseProjectTestCase.java:23: error: cannot access TestCase
+  public abstract class BaseProjectTestCase extends BasePlatformTestCase {
+                                                    ^
+    class file for junit.framework.TestCase not found
+  Note: Recompile with -Xlint:unchecked for details.
+  Note: Some input files use or override a deprecated API.
+  Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+  Note: Some input files use unchecked or unsafe operations.
+  /home/vitaliy/IdeaProjects/magento2-phpstorm-plugin/src/test/java/com/magento/idea/magento2plugin/BaseProjectTestCase.java:147: error: cannot find symbol
+          return fixturesFolderPath + getClass().getSimpleName().replace("Test", "")
+                                      ^
+    symbol:   method getClass()
+    location: class BaseProjectTestCase
+  3 errors
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 2s
+9 actionable tasks: 2 executed, 7 up-to-date
+Configuration cache entry reused.

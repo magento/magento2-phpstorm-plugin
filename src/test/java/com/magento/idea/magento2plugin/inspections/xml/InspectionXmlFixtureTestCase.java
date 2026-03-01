@@ -12,7 +12,7 @@ import com.magento.idea.magento2plugin.magento.packages.File;
 
 public abstract class InspectionXmlFixtureTestCase extends BaseInspectionsTestCase {
 
-    private static final String testDataFolderPath = "testData" //NOPMD
+    private static final String testDataFolderPath =  "src/test/resources/testData" //NOPMD
             + File.separator
             + "inspections"
             + File.separator;
