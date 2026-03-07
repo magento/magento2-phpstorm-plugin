@@ -6,19 +6,14 @@
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import org.junit.jupiter.api.Assertions;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
-
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.BaseProjectTestCase;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DefaultCodeStyleSettingsAdjustmentsUtil;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.project.util.GetProjectBasePath;
-
-
-
 
 public abstract class BaseGeneratorTestCase extends BaseProjectTestCase {
     private static final String TEST_DATA_FOLDER_PATH =  "src/test/resources/testData" + File.separator
@@ -47,10 +42,12 @@ public abstract class BaseGeneratorTestCase extends BaseProjectTestCase {
             final String expectedDirectory,
             final PsiFile resultFile
     ) {
-        Assertions.assertTrue(resultFile.getContainingDirectory().getVirtualFile().getPath()
-                .endsWith(expectedDirectory));
-        Assertions.assertEquals(expectedFile.getText(), resultFile.getText());
-        Assertions.assertEquals(expectedFile.getName(), resultFile.getName());
+        com.intellij.openapi.application.ApplicationManager.getApplication().runReadAction(() -> {
+            Assertions.assertTrue(resultFile.getContainingDirectory().getVirtualFile().getPath()
+                    .endsWith(expectedDirectory));
+            Assertions.assertEquals(expectedFile.getText(), resultFile.getText());
+            Assertions.assertEquals(expectedFile.getName(), resultFile.getName());
+        });
     }
 
     @SuppressWarnings({"PMD.JUnitAssertionsShouldIncludeMessage"})

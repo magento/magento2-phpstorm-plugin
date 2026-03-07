@@ -43,7 +43,7 @@ public class ModuleReadmeMdGenerator extends FileGenerator {
      * @return PsiFile
      */
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         final PsiDirectory moduleDir = resolveModuleRoot(moduleReadmeMdData);
 
         return fileFromTemplateGenerator.generate(

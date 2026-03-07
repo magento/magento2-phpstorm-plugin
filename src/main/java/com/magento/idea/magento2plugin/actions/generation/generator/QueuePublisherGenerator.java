@@ -39,7 +39,7 @@ public class QueuePublisherGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         final XmlFile publisherXml = (XmlFile) findOrCreateQueuePublisherXml.execute(
                 actionName,
                 publisherData.getModuleName()

@@ -27,7 +27,11 @@ public abstract class FileGenerator {
      *
      * @return PsiFile
      */
-    public abstract PsiFile generate(final String actionName);
+    public final PsiFile generate(final String actionName) {
+        return generate(actionName, false);
+    }
+
+    public abstract PsiFile doGenerate(final String actionName);
 
     /**
      * Generate file.
@@ -37,14 +41,17 @@ public abstract class FileGenerator {
      *
      * @return PsiFile
      */
-    public PsiFile generate(final String actionName, final boolean openFile) {
-        final PsiFile file = this.generate(actionName);
+    public final PsiFile generate(final String actionName, final boolean openFile) {
+        final PsiFile[] file = new PsiFile[1];
+        com.intellij.openapi.command.WriteCommandAction.runWriteCommandAction(project, () -> {
+            file[0] = this.doGenerate(actionName);
+        });
 
-        if (file != null && openFile) {
-            navigateToCreatedFile.navigate(project, file);
+        if (file[0] != null && openFile) {
+            navigateToCreatedFile.navigate(project, file[0]);
         }
 
-        return file;
+        return file[0];
     }
 
     /**

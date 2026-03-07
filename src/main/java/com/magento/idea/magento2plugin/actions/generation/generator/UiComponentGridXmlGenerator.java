@@ -62,7 +62,7 @@ public class UiComponentGridXmlGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         final String moduleName = data.getModuleName();
         final PsiDirectory parentDirectory = moduleIndex.getModuleDirectoryByModuleName(
                 moduleName

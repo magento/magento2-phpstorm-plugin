@@ -112,7 +112,7 @@ public class UiComponentFormButtonBlockGenerator extends FileGenerator {
      * @return PsiFile
      */
     @Override
-    public PsiFile generate(final @NotNull String actionName) {
+    public PsiFile doGenerate(final @NotNull String actionName) {
         final PhpClass buttonClass = GetPhpClassByFQN.getInstance(project).execute(
                 buttonData.getFqn()
         );

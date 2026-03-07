@@ -66,7 +66,7 @@ public final class ArgumentInjectionGenerator extends FileGenerator {
      * @return PsiFile
      */
     @Override
-    public PsiFile generate(final @NotNull String actionName) {
+    public PsiFile doGenerate(final @NotNull String actionName) {
         final PsiDirectory moduleDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(data.getModuleName());
 
@@ -125,9 +125,7 @@ public final class ArgumentInjectionGenerator extends FileGenerator {
         }
         final PsiFile diXmlFileToReformat = diXmlFile;
 
-        WriteCommandAction.runWriteCommandAction(project, () -> {
-            CodeStyleManager.getInstance(project).reformat(diXmlFileToReformat);
-        });
+        CodeStyleManager.getInstance(project).reformat(diXmlFileToReformat);
 
         return diXmlFileToReformat;
     }

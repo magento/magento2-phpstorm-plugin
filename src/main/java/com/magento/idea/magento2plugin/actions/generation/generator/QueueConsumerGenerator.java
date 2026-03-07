@@ -34,7 +34,7 @@ public class QueueConsumerGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         final XmlFile consumerXml = (XmlFile) findOrCreateQueueConsumerXml.execute(
                 actionName,
                 consumerData.getModuleName()

@@ -63,7 +63,7 @@ public class ModuleGraphQlResolverClassGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
 
         final PhpClass[] graphQlResolverClass = {GetPhpClassByFQN.getInstance(project)
                 .execute(graphQlResolverFileData.getGraphQlResolverClassFqn())};

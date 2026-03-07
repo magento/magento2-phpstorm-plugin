@@ -91,7 +91,7 @@ public class PluginClassGenerator extends FileGenerator {
      */
     @SuppressWarnings({"PMD.CognitiveComplexity", "PMD.ExcessiveMethodLength"})
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         final PsiFile[] pluginFile = {null};
         WriteCommandAction.runWriteCommandAction(project, () -> {
             PhpClass pluginClass = GetPhpClassByFQN.getInstance(project)

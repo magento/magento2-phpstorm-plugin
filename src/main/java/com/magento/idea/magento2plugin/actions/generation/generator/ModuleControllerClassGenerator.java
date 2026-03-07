@@ -72,7 +72,7 @@ public class ModuleControllerClassGenerator extends FileGenerator {
      * @return PsiFile
      */
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         final PsiFile[] controllerFiles = new PsiFile[1];
         final AtomicBoolean isControllerExists = new AtomicBoolean(false);
         final AtomicBoolean isControllerCanNotBeCreated = new AtomicBoolean(false);

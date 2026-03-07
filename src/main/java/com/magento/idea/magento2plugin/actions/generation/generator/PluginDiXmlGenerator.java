@@ -61,7 +61,7 @@ public class PluginDiXmlGenerator extends FileGenerator {
      * @return PsiFile
      */
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         final PsiFile diXmlFile = findOrCreateDiXml.execute(
                 actionName,
                 pluginFileData.getPluginModule(),

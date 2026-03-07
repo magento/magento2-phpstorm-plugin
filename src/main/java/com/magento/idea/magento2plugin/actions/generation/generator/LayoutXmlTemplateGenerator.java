@@ -47,7 +47,7 @@ public class LayoutXmlTemplateGenerator extends FileGenerator {
      * @return PsiFile
      */
     @Override
-    public PsiFile generate(final @NotNull String actionName) {
+    public PsiFile doGenerate(final @NotNull String actionName) {
         final XmlFile layoutXml = (XmlFile) findOrCreateLayoutXml.execute(
                 actionName,
                 layoutXmlData.getRoute(),

@@ -72,7 +72,7 @@ public class NewEntityLayoutGenerator extends FileGenerator {
      * @return PsiFile
      */
     @Override
-    public PsiFile generate(final @NotNull String actionName) {
+    public PsiFile doGenerate(final @NotNull String actionName) {
         final PsiFile layout = FileBasedIndexUtil.findModuleViewFile(
                 file.getFileName(),
                 Areas.adminhtml,

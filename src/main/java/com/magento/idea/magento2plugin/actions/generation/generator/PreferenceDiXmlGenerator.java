@@ -52,7 +52,7 @@ public class PreferenceDiXmlGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(final @NotNull String actionName) {
+    public PsiFile doGenerate(final @NotNull String actionName) {
         final PsiFile diXmlFile = findOrCreateDiXml.execute(
                 actionName,
                 data.getPreferenceModule(),

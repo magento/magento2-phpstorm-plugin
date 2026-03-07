@@ -56,7 +56,7 @@ public class UiComponentFormGenerator extends FileGenerator {
      * @return PsiFile
      */
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         final PsiFile formFile = createForm(
                 actionName
         );

@@ -69,7 +69,7 @@ public class ModuleCronGroupXmlGenerator extends FileGenerator {
      * @param actionName Action name
      * @return PsiFile
      */
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         final String moduleName = this.cronGroupXmlData.getModule();
         final XmlFile cronGroupXmlFile = (XmlFile) this.findOrCreateCronGroupsXml.execute(
                 actionName,

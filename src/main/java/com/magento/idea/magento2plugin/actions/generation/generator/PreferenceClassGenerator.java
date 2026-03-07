@@ -52,7 +52,7 @@ public class PreferenceClassGenerator extends FileGenerator {
 
 
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         PhpClass pluginClass = GetPhpClassByFQN.getInstance(project).execute(
                 preferenceFileData.getPreferenceFqn()
         );

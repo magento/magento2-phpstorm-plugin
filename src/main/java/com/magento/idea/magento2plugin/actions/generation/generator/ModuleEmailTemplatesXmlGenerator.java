@@ -64,7 +64,7 @@ public class ModuleEmailTemplatesXmlGenerator extends FileGenerator {
      * @param actionName Action name
      * @return PsiFile
      */
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         final String moduleName = this.emailTemplatesData.getModule();
         final XmlFile emailTemplateXmlFile = (XmlFile) this.findOrCreateEmailTemplatesXml.execute(
                 actionName,

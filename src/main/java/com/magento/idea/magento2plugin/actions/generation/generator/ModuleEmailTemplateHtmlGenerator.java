@@ -52,7 +52,7 @@ public class ModuleEmailTemplateHtmlGenerator extends FileGenerator {
      * @return PsiFile
      */
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         final PsiFile templateFile = FileBasedIndexUtil.findModuleViewFile(
                 this.emailTemplateData.getFileName(),
                 getArea(this.emailTemplateData.getArea()),

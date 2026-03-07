@@ -28,7 +28,7 @@ public class RequireJsConfigGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(final @NotNull String actionName) {
+    public PsiFile doGenerate(final @NotNull String actionName) {
         final RequireConfigJsFile file = new RequireConfigJsFile();
         PsiFile configFile = directory.findFile(file.getFileName());
 

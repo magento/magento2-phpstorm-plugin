@@ -41,7 +41,7 @@ public class ModuleSetupDataPatchGenerator extends FileGenerator {
      * @return PsiFile
      */
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         return fileFromTemplateGenerator.generate(
                 new ModuleSetupDataPatchFile(moduleSetupPatchData.getClassName()),
                 getAttributes(),

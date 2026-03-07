@@ -52,7 +52,7 @@ public class ObserverEventsXmlGenerator extends FileGenerator {
      * @return PsiFile
      */
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         final PsiFile eventsXmlFile =
                 findOrCreateEventsXml.execute(
                         actionName,

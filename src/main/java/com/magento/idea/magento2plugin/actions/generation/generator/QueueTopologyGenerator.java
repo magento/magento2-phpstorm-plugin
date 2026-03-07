@@ -36,7 +36,7 @@ public class QueueTopologyGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         final XmlFile topologyXml = (XmlFile) findOrCreateQueueTopologyXml.execute(
                 actionName,
                 topologyData.getModuleName()

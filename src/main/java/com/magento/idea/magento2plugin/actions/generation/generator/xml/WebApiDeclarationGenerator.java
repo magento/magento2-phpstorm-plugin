@@ -72,7 +72,7 @@ public final class WebApiDeclarationGenerator extends FileGenerator {
      * @return PsiFile
      */
     @Override
-    public PsiFile generate(final @NotNull String actionName) {
+    public PsiFile doGenerate(final @NotNull String actionName) {
         final PsiDirectory moduleDirectory =
                 new ModuleIndex(project).getModuleDirectoryByModuleName(data.getModuleName());
 

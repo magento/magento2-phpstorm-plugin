@@ -73,7 +73,7 @@ public class CategoryFormXmlGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         final PsiDirectory directory = getFileDirectory();
 
         PsiFile categoryAdminFormXmlFile = FileBasedIndexUtil.findModuleViewFile(

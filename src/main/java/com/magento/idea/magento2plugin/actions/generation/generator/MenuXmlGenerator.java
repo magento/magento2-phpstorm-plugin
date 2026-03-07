@@ -48,7 +48,7 @@ public class MenuXmlGenerator extends FileGenerator {
      * @return PsiFile
      */
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         final XmlFile routesXml = (XmlFile) findOrCreateMenuXml.execute(
                 actionName,
                 menuXmlData.getModuleName()

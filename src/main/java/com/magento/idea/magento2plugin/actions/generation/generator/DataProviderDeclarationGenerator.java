@@ -49,7 +49,7 @@ public class DataProviderDeclarationGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         final XmlFile diXml = (XmlFile) findOrCreateDiXml.execute(
                 actionName,
                 dataProviderDeclarationData.getModuleName(),

@@ -59,7 +59,7 @@ public class ModuleViewModelClassGenerator extends FileGenerator {
      * @return PsiFile
      */
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         final PhpClass block = GetPhpClassByFQN.getInstance(project).execute(getViewModelFqn());
         final String errorTitle = commonBundle.message("common.error");
 

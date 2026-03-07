@@ -73,7 +73,7 @@ public class DbSchemaXmlGenerator extends FileGenerator {
             "PMD.ExcessiveImports",
             "PMD.AvoidInstantiatingObjectsInLoops"
     })
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         final XmlFile dbSchemaXmlFile = (XmlFile) findOrCreateDbSchemaXmlUtil.execute(
                 actionName,
                 moduleName

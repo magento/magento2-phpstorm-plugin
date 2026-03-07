@@ -61,7 +61,7 @@ public class QueryGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(final @NotNull String actionName) {
+    public PsiFile doGenerate(final @NotNull String actionName) {
         final PsiFile[] dataProviderFiles = new PsiFile[1];
 
         WriteCommandAction.runWriteCommandAction(project, () -> {

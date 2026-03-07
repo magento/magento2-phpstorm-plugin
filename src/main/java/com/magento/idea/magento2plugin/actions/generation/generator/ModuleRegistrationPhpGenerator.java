@@ -44,7 +44,7 @@ public class ModuleRegistrationPhpGenerator extends FileGenerator {
      * @return PsiFile
      */
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         if (moduleRegistrationPhpData.getCreateModuleDirs()) {
             final ModuleDirectoriesData moduleDirectoriesData = directoryGenerator
                     .createOrFindModuleDirectories(

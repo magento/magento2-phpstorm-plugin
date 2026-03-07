@@ -55,7 +55,7 @@ public class CLICommandClassGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(final String actionName) throws RuntimeException {
+    public PsiFile doGenerate(final String actionName) throws RuntimeException {
         final PhpFile cliCommandFile = createCLICommandClass(actionName);
 
         if (cliCommandFile == null) {

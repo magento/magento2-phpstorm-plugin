@@ -56,7 +56,7 @@ public class CLICommandDiXmlGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         final Areas areas = Areas.getAreaByString("base");
         final PsiFile diXmlFile = findOrCreateDiXml.execute(
                 actionName,

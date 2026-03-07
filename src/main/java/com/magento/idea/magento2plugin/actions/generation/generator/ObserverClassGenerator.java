@@ -63,7 +63,7 @@ public class ObserverClassGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         WriteCommandAction.runWriteCommandAction(project, () -> {
             PhpClass observerClass = GetPhpClassByFQN.getInstance(project).execute(
                     observerFileData.getObserverClassFqn()

@@ -63,7 +63,7 @@ public class MessageQueueClassGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         final PsiFile[] handlerFiles = new PsiFile[1];
 
         WriteCommandAction.runWriteCommandAction(project, () -> {

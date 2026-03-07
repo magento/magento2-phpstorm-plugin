@@ -40,7 +40,7 @@ public class QueueCommunicationGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         final XmlFile communicationXml = (XmlFile) findOrCreateCommunicationXml.execute(
                 actionName,
                 communicationData.getModuleName()

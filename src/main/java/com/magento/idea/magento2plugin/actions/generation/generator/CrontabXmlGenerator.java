@@ -69,7 +69,7 @@ public class CrontabXmlGenerator extends FileGenerator {
      * @return PsiFile
      */
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         final String moduleName = this.crontabXmlData.getModuleName();
 
         final XmlFile crontabXmlFile = (XmlFile) this.findOrCreateCrontabXml.execute(

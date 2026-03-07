@@ -301,7 +301,7 @@ public class ArgumentInjectionGeneratorTest extends BaseGeneratorTestCase {
                 myFixture.getProject()
         );
 
-        return generator.generate("test");
+        return generator.generate("test", false);
     }
 
     private String getArrayValue() {

@@ -64,7 +64,7 @@ public abstract class PhpFileGenerator extends FileGenerator {
      * @return PsiFile
      */
     @Override
-    public PsiFile generate(final @NotNull String actionName) {
+    public PsiFile doGenerate(final @NotNull String actionName) {
         file = getFile();
 
         final PhpClass phpClass = GetPhpClassByFQN.getInstance(project).execute(

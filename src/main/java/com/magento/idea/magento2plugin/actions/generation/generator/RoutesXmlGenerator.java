@@ -50,7 +50,7 @@ public class RoutesXmlGenerator extends FileGenerator {
      */
     @Override
     @SuppressWarnings("PMD.CognitiveComplexity")
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         final XmlFile routesXml = (XmlFile) findOrCreateRoutesXml.execute(
                 actionName,
                 routesXmlData.getModuleName(),

@@ -52,7 +52,7 @@ public class CronjobClassGenerator extends FileGenerator {
      * @return void
      */
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         final PhpFile cronjobFile = createCronjobClass(actionName);
 
         if (cronjobFile == null) {

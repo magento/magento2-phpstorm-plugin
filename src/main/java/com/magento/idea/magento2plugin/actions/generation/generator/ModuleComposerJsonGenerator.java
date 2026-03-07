@@ -50,7 +50,7 @@ public class ModuleComposerJsonGenerator extends FileGenerator {
     }
 
     @Override
-    public PsiFile generate(final String actionName) {
+    public PsiFile doGenerate(final String actionName) {
         if (moduleComposerJsonData.getCreateModuleDirs()) {
             final ModuleDirectoriesData moduleDirectoriesData =
                     directoryGenerator.createOrFindModuleDirectories(
