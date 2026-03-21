@@ -33,6 +33,7 @@ import java.util.Map;
  */
 public class EventNameIndex extends ScalarIndexExtension<String> {
     public static final ID<String, Void> KEY = ID.create("com.magento.idea.magento2plugin.stubs.indexes.event_name");
+    private static final String GENERATED_METADATA_PATH_SEGMENT = "/generated/metadata/";
     private final KeyDescriptor<String> myKeyDescriptor = new EnumeratorStringDescriptor();
 
     @NotNull
@@ -121,6 +122,7 @@ public class EventNameIndex extends ScalarIndexExtension<String> {
     public FileBasedIndex.InputFilter getInputFilter() {
         return file -> (
                 file.getFileType() == PhpFileType.INSTANCE
+                    && !file.getPath().contains(GENERATED_METADATA_PATH_SEGMENT)
                     || (file.getFileType() == XmlFileType.INSTANCE && file.getName().equals("events.xml"))
         );
     }
@@ -132,6 +134,6 @@ public class EventNameIndex extends ScalarIndexExtension<String> {
 
     @Override
     public int getVersion() {
-        return 1;
+        return 2;
     }
 }
