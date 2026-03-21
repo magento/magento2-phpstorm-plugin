@@ -32,7 +32,7 @@ public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
         myFixture.doHighlighting();
 
         final List<LineMarkerInfo<?>> lineMarkers = getDocumentLineMarkers();
-        assertNotEmpty(lineMarkers);
+        assertFalse("No line markers found in document", lineMarkers.isEmpty());
         for (final LineMarkerInfo lineMarkerInfo: lineMarkers) {
             final String lineMarkerTooltip = lineMarkerInfo.getLineMarkerTooltip();
             final Icon lineMarkerIcon = lineMarkerInfo.getIcon();
@@ -50,8 +50,8 @@ public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
         }
 
         final String lineMarkerNotFound
-                = "Failed that documents contains linemarker with the tooltip `%s`";
-        fail(String.format(lineMarkerNotFound, tooltip));
+                = "Failed that documents contains linemarker with the tooltip `%s`. Found: %s";
+        fail(String.format(lineMarkerNotFound, tooltip, describeLineMarkers(lineMarkers)));
     }
 
     protected void assertHasNoLinemarkerWithTooltipAndIcon(
@@ -82,5 +82,19 @@ public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
                 myFixture.getEditor().getDocument(),
                 getProject()
         );
+    }
+
+    private String describeLineMarkers(final @NotNull List<LineMarkerInfo<?>> lineMarkers) {
+        final StringBuilder description = new StringBuilder();
+        for (final LineMarkerInfo<?> lineMarkerInfo : lineMarkers) {
+            if (!description.isEmpty()) {
+                description.append("; ");
+            }
+            description.append("tooltip=")
+                    .append(lineMarkerInfo.getLineMarkerTooltip())
+                    .append(", icon=")
+                    .append(lineMarkerInfo.getIcon());
+        }
+        return description.toString();
     }
 }
