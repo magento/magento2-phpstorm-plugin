@@ -63,20 +63,19 @@
 
 ## Works with
 
-* PhpStorm >= 2023.1
-* JRE >= 17
+* PhpStorm 2026+
 
 ## Setting up development environment
 
-1. Check out this repository
-1. Open a folder with the project in the IntelliJ CE using the `open` action button.
-1. Make sure that you on the latest develop branch (e.g `5.4.0-develop`)
-1. Right-click on the `build.gradle` file, choose "Import Gradle project" (if this is not exist look for "Build module '<root folder name>'") (you need to have Gradle plugin installed)
-1. Check if the right SDK version is used for the project.
-    - Current Java version for the project is **java 11**, so you should additionally download **SDK 11** and choose it in the module settings: `Right click by the project root > Open Module Settings > Project Settings > Project > Project SDK`
-    - Check if right SDK version is used for the Gradle plugin: `Intellij IDEA > Preferences... > Build, Execution, Deployment > Build Tools > Gradle > Gradle JVM` and choose your JDK.
-1. When the Gradle sections appeared in the right bar, navigate there and right-click `magento-2-php-storm-plugin > Tasks -> Intellij -> runIde`
-1. Click `Run "magento-2-php-storm-plugin"` to run the plugin. You should see a new instance of IntelliJ launched with the plugin installed. Make sure the plugin is enabled in IntelliJ settings and indexing is finished. Plugin features should be accessible at this point.
+1. Check out this repository.
+1. Open the project in IntelliJ IDEA.
+1. Make sure that you are on the latest develop branch (for example `5.4.0-develop`).
+1. Import the Gradle project from `build.gradle.kts`.
+1. Use **JDK 21** for both the project SDK and the Gradle JVM:
+    - `Right click on the project root > Open Module Settings > Project > Project SDK`
+    - `IntelliJ IDEA > Preferences > Build, Execution, Deployment > Build Tools > Gradle > Gradle JVM`
+1. In the Gradle tool window, run `Tasks > Intellij platform > runIde`.
+1. The task launches a PhpStorm sandbox with the plugin installed. Make sure the plugin is enabled and indexing is finished before testing features.
 
 ## How to contribute
 1) Start with looking into [Community Backlog](https://github.com/magento/magento2-phpstorm-plugin/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22good%20first%20issue%22). Any ticket in `Ready for Development` and `Good First Issue` columns are a good candidates to start.
@@ -124,4 +123,4 @@ declare(strict_types=1);
 
 Each Magento source file included in this distribution is licensed under OSL-3.0 license.
 
-Please read the [LICENSE.txt](https://github.com/magento/magento2-phpstorm-plugin/blob/master/LICENSE.txt) for the full text of the [Open Software License v. 3.0 (OSL-3.0)](http://opensource.org/licenses/osl-3.0.php).
+Please read the [LICENSE.txt](https://github.com/magento/magento2-phpstorm-plugin/blob/5.4.0-develop/LICENSE.txt) for the full text of the [Open Software License v. 3.0 (OSL-3.0)](http://opensource.org/licenses/osl-3.0.php).

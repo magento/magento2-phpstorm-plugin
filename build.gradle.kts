@@ -20,7 +20,7 @@ group = providers.gradleProperty("pluginGroup").get()
 version = providers.gradleProperty("pluginVersion").get()
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
 repositories {
@@ -32,16 +32,8 @@ repositories {
 }
 
 dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
-
-    testImplementation("org.junit.vintage:junit-vintage-engine:5.10.0")
-    implementation("org.json:json:20171018")
-    implementation("org.codehaus.plexus:plexus-utils:3.4.0")
-    testImplementation("com.automation-remarks:video-recorder-junit5:2.0")
-    testImplementation("com.intellij.remoterobot:remote-robot:0.11.23")
-    testImplementation("com.intellij.remoterobot:remote-fixtures:0.11.23")
-    testImplementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    testImplementation("junit:junit:4.13.2")
+    testCompileOnly("org.junit.jupiter:junit-jupiter-api:5.10.2")
 
     intellijPlatform {
         create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
@@ -51,7 +43,11 @@ dependencies {
         pluginVerifier()
         zipSigner()
         testFramework(TestFrameworkType.Platform)
+        testFramework(TestFrameworkType.JUnit5)
     }
+
+    implementation("org.json:json:20171018")
+    implementation("org.codehaus.plexus:plexus-utils:3.5.1")
 }
 
 intellijPlatform {
@@ -172,13 +168,6 @@ intellijPlatformTesting {
         }
     }
 }
-
-
-
-
-
-
-
 
 kover {
     currentProject {

@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
+## 2026.1.0
+
+### Added
+
+-  2026.* IDE's support [#2639](https://github.com/magento/magento2-phpstorm-plugin/pull/2639)
+
 ## 2025.2.2
 
 ### Fixed

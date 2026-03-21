@@ -11,19 +11,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 21
           distribution: 'temurin'
           cache: gradle
-      - name: Gradle wrapper
-        run: gradle wrapper
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Build Plugin
-        run: ./gradlew buildPlugin
+        run: ./gradlew buildPlugin --no-daemon
 
       - name: Upload Plugin to Release Assets
         uses: actions/upload-release-asset@v1
