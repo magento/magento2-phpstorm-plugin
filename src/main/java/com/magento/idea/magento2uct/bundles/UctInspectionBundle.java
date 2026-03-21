@@ -11,8 +11,7 @@ public class UctInspectionBundle extends AbstractBundle {
 
     private static final String BUNDLE_NAME = "uct.bundle.inspection";
 
-    @Override
-    public String getBundleName() {
-        return BUNDLE_NAME;
+    public UctInspectionBundle() {
+        super(BUNDLE_NAME);
     }
 }
