@@ -24,7 +24,6 @@ public class NewWebApiDeclarationAction extends AnAction {
     public static final String ACTION_NAME = "Create a new Web API declaration for this method";
     public static final String ACTION_DESCRIPTION =
             "Create a new Magento 2 Web API XML declaration";
-    private Method currentPhpMethod;
 
     /**
      * New WebApi declaration action constructor.
@@ -36,32 +35,24 @@ public class NewWebApiDeclarationAction extends AnAction {
     @Override
     public void update(final @NotNull AnActionEvent event) {
         setIsAvailableForEvent(event, false);
-        final Project project = event.getProject();
-        final Method method = PhpPsiElementsUtil.getPhpMethod(event);
-
-        if (project == null || !Settings.isEnabled(project) || method == null) {
+        if (getActionMethod(event) == null) {
             return;
         }
 
-        if (method.getContainingClass() == null) {
-            return;
-        }
-
-        if (!method.getAccess().isPublic()
-                || method.getName().equals(MagentoPhpClass.CONSTRUCT_METHOD_NAME)) {
-            return;
-        }
-
-        currentPhpMethod = method;
         setIsAvailableForEvent(event, true);
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent event) {
+        final Method currentPhpMethod = getActionMethod(event);
+
+        if (event.getProject() == null || currentPhpMethod == null) {
+            return;
+        }
         final PsiDirectory directory =
                 currentPhpMethod.getContainingFile().getContainingDirectory();
 
-        if (event.getProject() == null || directory == null) {
+        if (directory == null) {
             return;
         }
 
@@ -94,5 +85,22 @@ public class NewWebApiDeclarationAction extends AnAction {
     ) {
         event.getPresentation().setVisible(isAvailable);
         event.getPresentation().setEnabled(isAvailable);
+    }
+
+    private Method getActionMethod(final @NotNull AnActionEvent event) {
+        final Project project = event.getProject();
+        final Method method = PhpPsiElementsUtil.getPhpMethod(event);
+
+        if (project == null
+                || !Settings.isEnabled(project)
+                || method == null
+                || method.getContainingClass() == null) {
+            return null;
+        }
+
+        return !method.getAccess().isPublic()
+                || method.getName().equals(MagentoPhpClass.CONSTRUCT_METHOD_NAME)
+                ? null
+                : method;
     }
 }

@@ -18,10 +18,9 @@ import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil;
 import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class OverrideFileInThemeAction extends AnAction {
-
-    protected PsiFile psiFile;
 
     /**
      * Override file in theme action constructor.
@@ -55,7 +54,6 @@ public abstract class OverrideFileInThemeAction extends AnAction {
 
         if (Settings.isEnabled(project) && isOverrideAllowed(targetFile, project)) {
             setStatus(event, true);
-            psiFile = targetFile;
         }
     }
 
@@ -102,6 +100,17 @@ public abstract class OverrideFileInThemeAction extends AnAction {
         } else {
             return moduleData.getType().equals(ComponentType.theme);
         }
+    }
+
+    protected @Nullable PsiFile getTargetFile(final @NotNull AnActionEvent event) {
+        final Project project = event.getData(PlatformDataKeys.PROJECT);
+        final PsiFile targetFile = event.getData(PlatformDataKeys.PSI_FILE);
+
+        if (project == null || targetFile == null || !Settings.isEnabled(project)) {
+            return null;
+        }
+
+        return isOverrideAllowed(targetFile, project) ? targetFile : null;
     }
 
     private void setStatus(final AnActionEvent event, final boolean status) {

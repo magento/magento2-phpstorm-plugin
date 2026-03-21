@@ -31,6 +31,7 @@ public class OverrideTemplateInThemeAction extends OverrideFileInThemeAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent event) {
         final Project project = event.getProject();
+        final PsiFile psiFile = getTargetFile(event);
 
         if (project == null || psiFile == null) {
             return;

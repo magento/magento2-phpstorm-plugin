@@ -12,6 +12,7 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -35,8 +36,6 @@ public class CompareTemplateAction extends AnAction {
     public static final String ACTION_DESCRIPTION = "The Magento 2 overridden template comparing";
 
     private static final String PHTML_EXTENSION = "phtml";
-    protected VirtualFile selectedFile;
-    protected VirtualFile originalFile;
 
     /**
      * Compare template action constructor.
@@ -54,71 +53,23 @@ public class CompareTemplateAction extends AnAction {
     @SuppressWarnings({"PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
     public void update(final @NotNull AnActionEvent event) {
         setStatus(event, false);
-        final Project project = event.getData(PlatformDataKeys.PROJECT);
-
-        if (project == null) {
-            return;
+        if (resolveComparisonFiles(event) != null) {
+            this.setStatus(event, true);
         }
-
-        if (!Settings.isEnabled(project)) {
-            return;
-        }
-        final PsiFile psiFile = event.getData(PlatformDataKeys.PSI_FILE);
-
-        if (psiFile == null) {
-            return;
-        }
-        final VirtualFile targetFileCandidate = psiFile.getVirtualFile();
-
-        if (targetFileCandidate == null) {
-            return;
-        }
-
-        if (!PHTML_EXTENSION.equals(targetFileCandidate.getExtension())) {
-            return;
-        }
-        final Areas area = AreaResolverUtil.getForFileInCustomTheme(targetFileCandidate);
-
-        if (area == null) {
-            return;
-        }
-        final String originalModuleName = getOriginalModuleName(project, psiFile);
-
-        if (originalModuleName == null) {
-            return;
-        }
-        final PsiDirectory originalModuleDirectory =
-                new ModuleIndex(project).getModuleDirectoryByModuleName(originalModuleName);
-
-        if (originalModuleDirectory == null) {
-            return;
-        }
-        final String originalFilePath = originalModuleDirectory.getVirtualFile().getPath()
-                + "/view/"
-                + area
-                + StringUtils.substringAfter(targetFileCandidate.getPath(), originalModuleName);
-
-        final VirtualFile origFileCandidate = VfsUtil.findFile(Path.of(originalFilePath), false);
-
-        if (origFileCandidate == null) {
-            return;
-        }
-        selectedFile = targetFileCandidate;
-        originalFile = origFileCandidate;
-        this.setStatus(event, true);
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent event) {
         final Project project = event.getProject();
+        final Pair<VirtualFile, VirtualFile> comparisonFiles = resolveComparisonFiles(event);
 
-        if (project == null || selectedFile == null || originalFile == null) {
+        if (project == null || comparisonFiles == null) {
             return;
         }
         final DiffRequestChain chain = DiffRequestChainUtil.createMutableChain(
                 project,
-                selectedFile,
-                originalFile
+                comparisonFiles.getFirst(),
+                comparisonFiles.getSecond()
         );
 
         if (chain == null) {
@@ -138,6 +89,53 @@ public class CompareTemplateAction extends AnAction {
         final PsiDirectory directory = psiFile.getContainingDirectory();
 
         return GetModuleNameByDirectoryUtil.execute(directory, project);
+    }
+
+    private @Nullable Pair<VirtualFile, VirtualFile> resolveComparisonFiles(
+            final @NotNull AnActionEvent event
+    ) {
+        final Project project = event.getData(PlatformDataKeys.PROJECT);
+
+        if (project == null || !Settings.isEnabled(project)) {
+            return null;
+        }
+        final PsiFile psiFile = event.getData(PlatformDataKeys.PSI_FILE);
+
+        if (psiFile == null) {
+            return null;
+        }
+        final VirtualFile targetFileCandidate = psiFile.getVirtualFile();
+
+        if (targetFileCandidate == null || !PHTML_EXTENSION.equals(targetFileCandidate.getExtension())) {
+            return null;
+        }
+        final Areas area = AreaResolverUtil.getForFileInCustomTheme(targetFileCandidate);
+
+        if (area == null) {
+            return null;
+        }
+        final String originalModuleName = getOriginalModuleName(project, psiFile);
+
+        if (originalModuleName == null) {
+            return null;
+        }
+        final PsiDirectory originalModuleDirectory =
+                new ModuleIndex(project).getModuleDirectoryByModuleName(originalModuleName);
+
+        if (originalModuleDirectory == null) {
+            return null;
+        }
+        final String originalFilePath = originalModuleDirectory.getVirtualFile().getPath()
+                + "/view/"
+                + area
+                + StringUtils.substringAfter(targetFileCandidate.getPath(), originalModuleName);
+        final VirtualFile originalFile = VfsUtil.findFile(Path.of(originalFilePath), false);
+
+        if (originalFile == null) {
+            return null;
+        }
+
+        return Pair.create(targetFileCandidate, originalFile);
     }
 
     private void setStatus(final AnActionEvent event, final boolean status) {

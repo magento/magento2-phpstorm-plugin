@@ -30,11 +30,12 @@ public class NewReadmeMdAction extends CustomGeneratorContextAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent event) {
-        final GetMagentoModuleUtil.MagentoModuleData moduleData = getModuleData();
+        final ActionContext context = resolveActionContext(event);
 
-        if (event.getProject() == null || moduleData == null || getDirectory() == null) {
+        if (event.getProject() == null || context == null) {
             return;
         }
+        final GetMagentoModuleUtil.MagentoModuleData moduleData = context.getModuleData();
         final String[] templateData = moduleData.getName().split(Package.vendorModuleNameSeparator);
 
         if (templateData.length != 2) { //NOPMD
@@ -44,7 +45,7 @@ public class NewReadmeMdAction extends CustomGeneratorContextAction {
                 new ModuleReadmeMdData(
                         templateData[0],
                         templateData[1],
-                        getDirectory()
+                        context.getDirectory()
                 ),
                 event.getProject()
         );
