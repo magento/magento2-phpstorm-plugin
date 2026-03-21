@@ -18,9 +18,9 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpNamespace;
 import com.magento.idea.magento2plugin.util.RegExUtil;
-import gnu.trove.THashSet;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -62,7 +62,7 @@ public class PhpClassCompletionProvider extends CompletionProvider<CompletionPar
                 parameters.getPosition().getProject()
         );
 
-        final Collection<PhpClass> phpClasses = new THashSet<>();
+        final Collection<PhpClass> phpClasses = new HashSet<>();
         Collection<String> namespaceNames = new ArrayList<>();
 
         if (className.isEmpty()) {

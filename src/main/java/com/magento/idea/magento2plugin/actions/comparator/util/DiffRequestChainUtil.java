@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.actions.comparator.util;
 
 import com.intellij.diff.DiffContentFactory;
 import com.intellij.diff.DiffRequestFactory;
-import com.intellij.diff.actions.BlankDiffWindowUtil;
 import com.intellij.diff.actions.impl.MutableDiffRequestChain;
 import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.contents.DocumentContent;
@@ -43,12 +42,12 @@ public final class DiffRequestChainUtil {
             return null;
         }
 
-        final MutableDiffRequestChain chain = BlankDiffWindowUtil.createBlankDiffRequestChain(
+        final MutableDiffRequestChain chain = new MutableDiffRequestChain(
                 (DocumentContent) targetContent,
                 (DocumentContent) baseContent,
-                null
+                project
         );
-        chain.setWindowTitle(DiffRequestFactory.getInstance().getTitle(targetFile, baseFile));
+        chain.setWindowTitle(DiffRequestFactory.getInstance().getTitleForComparison(targetFile, baseFile));
 
         return chain;
     }

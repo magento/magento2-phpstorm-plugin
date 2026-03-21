@@ -6,9 +6,9 @@
 package com.magento.idea.magento2plugin.bundles;
 
 public class ValidatorBundle extends AbstractBundle {
-    protected final String BUNDLE_NAME = "magento2.validation";
+    private static final String BUNDLE_NAME = "magento2.validation";
 
-    public String getBundleName() {
-        return BUNDLE_NAME;
+    public ValidatorBundle() {
+        super(BUNDLE_NAME);
     }
 }

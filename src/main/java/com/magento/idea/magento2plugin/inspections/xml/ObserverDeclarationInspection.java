@@ -30,8 +30,8 @@ import com.magento.idea.magento2plugin.magento.files.ModuleXml;
 import com.magento.idea.magento2plugin.magento.files.Observer;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.Package;
+import java.net.URI;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -330,8 +330,8 @@ public class ObserverDeclarationInspection extends PhpInspection {
                 }
                 VirtualFile virtualFile;
                 try {
-                    virtualFile = VfsUtil.findFileByURL(new URL(moduleXmlFilePath));
-                } catch (MalformedURLException e) {
+                    virtualFile = VfsUtil.findFileByURL(URI.create(moduleXmlFilePath).toURL());
+                } catch (IllegalArgumentException | MalformedURLException e) {
                     return null;
                 }
                 if (virtualFile == null) {

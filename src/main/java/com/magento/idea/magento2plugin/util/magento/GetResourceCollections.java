@@ -45,7 +45,11 @@ public class GetResourceCollections {
      */
     public List<PhpClass> execute() {
         final PhpIndex phpIndex = PhpIndex.getInstance(project);
-        final Collection<PhpClass> collections = phpIndex.getAllSubclasses(ABSTRACT_COLLECTION_FQN);
+        final Collection<PhpClass> collections = new ArrayList<>();
+        phpIndex.processAllSubclasses(ABSTRACT_COLLECTION_FQN, phpClass -> {
+            collections.add(phpClass);
+            return true;
+        });
 
         if (collections.isEmpty()) {
             return null;

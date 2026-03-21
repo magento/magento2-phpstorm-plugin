@@ -21,7 +21,7 @@ import com.intellij.util.io.KeyDescriptor;
 import com.intellij.util.xml.impl.DomApplicationComponent;
 import com.magento.idea.magento2plugin.magento.files.ModuleAclXml;
 import com.magento.idea.magento2plugin.project.Settings;
-import gnu.trove.THashMap;
+import java.util.HashMap;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,7 +34,7 @@ public class AclResourceIndex extends FileBasedIndexExtension<String, String> {
     @Override
     public DataIndexer<String, String, FileContent> getIndexer() {
         return inputData -> {
-            final Map<String, String> map = new THashMap<>();//NOPMD
+            final Map<String, String> map = new HashMap<>();//NOPMD
             final PsiFile psiFile = inputData.getPsiFile();
             if (!Settings.isEnabled(psiFile.getProject())) {
                 return map;

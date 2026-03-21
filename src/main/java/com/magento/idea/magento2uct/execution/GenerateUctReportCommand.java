@@ -6,9 +6,9 @@
 package com.magento.idea.magento2uct.execution;
 
 import com.intellij.codeInspection.ProblemDescriptor;
-import com.intellij.execution.process.ProcessAdapter;
 import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.process.ProcessHandler;
+import com.intellij.execution.process.ProcessListener;
 import com.intellij.json.psi.JsonFile;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
@@ -68,11 +68,10 @@ public class GenerateUctReportCommand {
         this.process = process;
         settingsService = UctSettingsService.getInstance(project);
 
-        this.process.addProcessListener(new ProcessAdapter() {
+        this.process.addProcessListener(new ProcessListener() {
 
             @Override
             public void processTerminated(final @NotNull ProcessEvent event) {
-                super.processTerminated(event);
                 output.write("\nProcess finished with exit code " + event.getExitCode() + "\n");
             }
         });

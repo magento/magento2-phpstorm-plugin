@@ -5,43 +5,21 @@
 
 package com.magento.idea.magento2plugin.bundles;
 
-import com.intellij.CommonBundle;
-import java.util.ResourceBundle;
+public abstract class AbstractBundle extends com.intellij.AbstractBundle {
 
-public abstract class AbstractBundle {
-
-    public abstract String getBundleName();
-
-    /**
-     * Get bundle message.
-     *
-     * @param key String
-     * @param params Object[]
-     *
-     * @return String
-     */
-    public String message(final String key, final Object... params) {
-        final ResourceBundle bundle = ResourceBundle.getBundle(getBundleName());
-
-        return CommonBundle.message(bundle, key, params);
+    protected AbstractBundle(final String bundleName) {
+        super(bundleName);
     }
 
-    /**
-     * Get message or default value.
-     *
-     * @param key String
-     * @param defaultValue String
-     * @param params Object[]
-     *
-     * @return String
-     */
+    public String message(final String key, final Object... params) {
+        return getMessage(key, params);
+    }
+
     public String messageOrDefault(
             final String key,
             final String defaultValue,
             final Object... params
     ) {
-        final ResourceBundle bundle = ResourceBundle.getBundle(getBundleName());
-
-        return CommonBundle.messageOrDefault(bundle, key, defaultValue, params);
+        return super.messageOrDefault(key, defaultValue, params);
     }
 }

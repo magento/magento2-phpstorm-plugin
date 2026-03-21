@@ -41,7 +41,7 @@ public class CamelCaseToHyphen {
         final Pattern pattern = Pattern.compile(regex);
         final Matcher matcher = pattern.matcher(string);
         final String result =
-                matcher.replaceAll(subst).toLowerCase(new Locale("en","EN"));
+                matcher.replaceAll(subst).toLowerCase(Locale.ROOT);
         final char hyphenSeparator = '-';
         if (result.charAt(0) == hyphenSeparator) {
             return result.substring(1);

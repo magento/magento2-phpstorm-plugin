@@ -39,3 +39,4 @@ build
 .intellijPlatform/*
 video/*
 intellij-test-project
+.ai

@@ -145,7 +145,7 @@ public class NewCLICommandDialog extends AbstractDialog {
     public String getDIXmlItemName() {
         final String diItemName = this.toSnakeCase.convert(this.getCLICommandClassName());
 
-        return this.moduleName.toLowerCase(new Locale("en","EN"))
+        return this.moduleName.toLowerCase(Locale.ROOT)
                 + "_"
                 + diItemName;
     }

@@ -21,7 +21,7 @@ import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.magento.idea.magento2plugin.magento.files.MftfTest;
 import com.magento.idea.magento2plugin.project.Settings;
-import gnu.trove.THashMap;
+import java.util.HashMap;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,7 +38,7 @@ public class TestExtendsIndex extends ScalarIndexExtension<String> {
     @SuppressWarnings("PMD.CognitiveComplexity")
     public DataIndexer<String, Void, FileContent> getIndexer() {
         return inputData -> {
-            final Map<String, Void> map = new THashMap<>();
+            final Map<String, Void> map = new HashMap<>();
             final PsiFile psiFile = inputData.getPsiFile();
             final Project project = psiFile.getProject();
 

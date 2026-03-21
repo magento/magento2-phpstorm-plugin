@@ -7,9 +7,9 @@ package com.magento.idea.magento2plugin.lang.psi.search;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.TestSourcesFilter;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.magento.idea.magento2plugin.lang.roots.MagentoTestSourceFilter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,7 +37,7 @@ public final class AllFilesExceptTestsScope extends GlobalSearchScope {
     public boolean contains(final @NotNull VirtualFile file) {
         assert project != null;
         return GlobalSearchScope.allScope(project).contains(file)
-                && !(new MagentoTestSourceFilter().isTestSource(file, project));
+                && !TestSourcesFilter.isTestSources(file, project);
     }
 
     @Override

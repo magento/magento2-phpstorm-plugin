@@ -23,7 +23,6 @@ public class NewWebApiInterfaceAction extends AnAction {
 
     public static final String ACTION_NAME = "Create a new Web API interface for this class";
     public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Web API interface";
-    private PhpClass currentPhpClass;
 
     /**
      * New Web API interface action constructor.
@@ -35,37 +34,24 @@ public class NewWebApiInterfaceAction extends AnAction {
     @Override
     public void update(final @NotNull AnActionEvent event) {
         setIsAvailableForEvent(event, false);
-        final Project project = event.getProject();
-
-        if (project == null || !Settings.isEnabled(project)) {
-            return;
-        }
-        final PhpClass phpClass = PhpPsiElementsUtil.getPhpClass(event);
-
-        if (phpClass == null
-                || phpClass.isAbstract()
-                || !IsFileInEditableModuleUtil.execute(phpClass.getContainingFile())) {
-            return;
-        }
-        // Excluding API generators for Test/ and *Test.php files
-        // in order to not overload the context menu.
-        final String filename = phpClass.getContainingFile().getName();
-
-        if (filename.matches(RegExUtil.Magento.TEST_FILE_NAME)
-                || phpClass.getPresentableFQN().matches(RegExUtil.Magento.TEST_CLASS_FQN)) {
+        if (getActionPhpClass(event) == null) {
             return;
         }
 
-        currentPhpClass = phpClass;
         setIsAvailableForEvent(event, true);
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent event) {
+        final PhpClass currentPhpClass = getActionPhpClass(event);
+
+        if (event.getProject() == null || currentPhpClass == null) {
+            return;
+        }
         final PsiDirectory directory =
                 currentPhpClass.getContainingFile().getContainingDirectory();
 
-        if (event.getProject() == null || currentPhpClass == null || directory == null) {
+        if (directory == null) {
             return;
         }
 
@@ -93,5 +79,28 @@ public class NewWebApiInterfaceAction extends AnAction {
     ) {
         event.getPresentation().setVisible(isAvailable);
         event.getPresentation().setEnabled(isAvailable);
+    }
+
+    private PhpClass getActionPhpClass(final @NotNull AnActionEvent event) {
+        final Project project = event.getProject();
+
+        if (project == null || !Settings.isEnabled(project)) {
+            return null;
+        }
+        final PhpClass phpClass = PhpPsiElementsUtil.getPhpClass(event);
+
+        if (phpClass == null
+                || phpClass.isAbstract()
+                || !IsFileInEditableModuleUtil.execute(phpClass.getContainingFile())) {
+            return null;
+        }
+        final String filename = phpClass.getContainingFile().getName();
+
+        if (filename.matches(RegExUtil.Magento.TEST_FILE_NAME)
+                || phpClass.getPresentableFQN().matches(RegExUtil.Magento.TEST_CLASS_FQN)) {
+            return null;
+        }
+
+        return phpClass;
     }
 }

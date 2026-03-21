@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.util.php;
 
+import com.intellij.psi.PsiElement;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.php.PhpIndex;
@@ -16,7 +17,6 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpPsiElement;
 import com.jetbrains.php.refactoring.PhpAliasImporter;
-import com.jetbrains.php.refactoring.extract.extractInterface.PhpExtractInterfaceProcessor;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
 import java.util.Collection;
 import java.util.List;
@@ -66,12 +66,36 @@ public final class PhpTypeModifierUtil {
                             : "\\" + phpInterface.getPresentableFQN(),
                     phpClassScopeHolder
             );
-            PhpExtractInterfaceProcessor.addImplementClause(
+            addImplementClause(
                     project,
                     phpClass,
                     PhpClassGeneratorUtil.getNameFromFqn(phpInterface.getPresentableFQN())
             );
         });
+    }
+
+    public static void addImplementClause(
+            final @NotNull Project project,
+            final @NotNull PhpClass phpClass,
+            final @NotNull String interfaceName
+    ) {
+        final PsiElement implementsList = PhpPsiElementFactory.createImplementsList(
+                project,
+                interfaceName
+        );
+
+        if (phpClass.getImplementsList() != null) {
+            phpClass.getImplementsList().replace(implementsList);
+            return;
+        }
+
+        PsiElement anchor = phpClass.getExtendsList();
+        if (anchor == null) {
+            anchor = phpClass.getNameIdentifier();
+        }
+        if (anchor != null) {
+            phpClass.addAfter(implementsList, anchor);
+        }
     }
 
     /**

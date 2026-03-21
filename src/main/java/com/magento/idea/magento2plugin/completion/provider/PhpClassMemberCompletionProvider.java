@@ -14,10 +14,9 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpClassMember;
-import gnu.trove.THashSet;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Collection;
+import java.util.HashSet;
+import org.jetbrains.annotations.NotNull;
 
 public class PhpClassMemberCompletionProvider extends CompletionProvider<CompletionParameters> {
 
@@ -30,7 +29,7 @@ public class PhpClassMemberCompletionProvider extends CompletionProvider<Complet
             return;
         }
 
-        final Collection<PhpClassMember> members = new THashSet<>();
+        final Collection<PhpClassMember> members = new HashSet<>();
         String prefix = result.getPrefixMatcher().getPrefix();
 
         if (!(prefix.lastIndexOf("::") > 0 && prefix.lastIndexOf("\\") > 0

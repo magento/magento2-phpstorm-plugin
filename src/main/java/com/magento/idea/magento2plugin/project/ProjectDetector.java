@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.project;
 
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationGroupManager;
-import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.module.Module;
@@ -32,7 +31,7 @@ public class ProjectDetector implements DirectoryProjectConfigurator {
             final @NotNull Ref<Module> moduleRef,
             final boolean newProject
     ) {
-        StartupManager.getInstance(project).runWhenProjectIsInitialized(() -> {
+        StartupManager.getInstance(project).runAfterOpened(() -> {
             DumbService.getInstance(project).smartInvokeLater(() -> {
                 if (!MagentoBasePathUtil.isMagentoFolderValid(baseDir.getPath())) {
                     return;
@@ -42,26 +41,24 @@ public class ProjectDetector implements DirectoryProjectConfigurator {
                         .createNotification(
                                 "Magento",
                                 "<a href='enable'>Enable</a> Magento support for this project?",
-                                NotificationType.INFORMATION
-                        ).setListener(new NotificationListener.Adapter() {
-                            @Override
-                            public void hyperlinkActivated(
-                                    final @NotNull Notification notification,
-                                    final @NotNull HyperlinkEvent event
-                            ) {
-                                Settings settings = Settings.getInstance(project);
-                                settings.pluginEnabled = true;
-                                settings.mftfSupportEnabled = true;
-                                settings.magentoPath = project.getBasePath();
-                                settings.magentoVersion = MagentoVersionUtil.get(
-                                        project,
-                                        project.getBasePath()
-                                );
-                                IndexManager.manualReindex();
-                                MagentoComponentManager.getInstance(project).flushModules();
-                                notification.expire();
-                            }
-                        });
+                                NotificationType.INFORMATION,
+                                (currentNotification, event) -> {
+                                    if (event.getEventType() != HyperlinkEvent.EventType.ACTIVATED) {
+                                        return;
+                                    }
+                                    Settings settings = Settings.getInstance(project);
+                                    settings.pluginEnabled = true;
+                                    settings.mftfSupportEnabled = true;
+                                    settings.magentoPath = project.getBasePath();
+                                    settings.magentoVersion = MagentoVersionUtil.get(
+                                            project,
+                                            project.getBasePath()
+                                    );
+                                    IndexManager.manualReindex();
+                                    MagentoComponentManager.getInstance(project).flushModules();
+                                    currentNotification.expire();
+                                }
+                        );
                 Notifications.Bus.notify(notification, project);
             });
         });

@@ -16,9 +16,9 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpClassMember;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 import com.magento.idea.magento2plugin.util.RegExUtil;
-import gnu.trove.THashSet;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,7 +41,7 @@ public class PhpClassMemberReferenceProvider extends PsiReferenceProvider {
         }
 
         final List<PsiReference> psiReferences = new ArrayList<>();
-        final Collection<PhpClassMember> members = new THashSet<>();
+        final Collection<PhpClassMember> members = new HashSet<>();
         final String elementName = matcher.group(1);
         final String classFQN = value.substring(0, value.lastIndexOf("::"));
         final PhpIndex phpIndex = PhpIndex.getInstance(element.getProject());

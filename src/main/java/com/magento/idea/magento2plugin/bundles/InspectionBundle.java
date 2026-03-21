@@ -6,9 +6,9 @@
 package com.magento.idea.magento2plugin.bundles;
 
 public class InspectionBundle extends AbstractBundle {
-    protected final String BUNDLE_NAME = "magento2.inspection";
+    private static final String BUNDLE_NAME = "magento2.inspection";
 
-    public String getBundleName() {
-        return BUNDLE_NAME;
+    public InspectionBundle() {
+        super(BUNDLE_NAME);
     }
 }

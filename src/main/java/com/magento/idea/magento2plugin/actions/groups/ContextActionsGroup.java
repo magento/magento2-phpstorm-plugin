@@ -20,7 +20,7 @@ public class ContextActionsGroup extends NonEmptyActionGroup {
     @Override
     public void update(final @NotNull AnActionEvent event) {
         if (getChildrenCount() > 0) {
-            final AnAction[] actions = getChildren(event);
+            final AnAction[] actions = getChildActionsOrStubs();
             final List<AnAction> originalActionList = new LinkedList<>(Arrays.asList(actions));
             final List<AnAction> sortedActionList = new LinkedList<>(Arrays.asList(actions));
             sortedActionList.sort(new ContextActionsComparator());

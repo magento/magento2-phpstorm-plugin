@@ -21,8 +21,12 @@ import java.util.Set;
  * Configure test environment with Magento 2 project.
  */
 public abstract class BaseProjectTestCase extends BasePlatformTestCase {
+    protected static final String TEST_DATA_ROOT = "src" + File.separator
+            + "test" + File.separator
+            + "testData";
+
     private Thread.UncaughtExceptionHandler previousUncaughtHandler;
-    private static final String testDataProjectPath = "testData" //NOPMD
+    private static final String testDataProjectPath = TEST_DATA_ROOT //NOPMD
             + File.separator
             + "project";
 
@@ -95,7 +99,7 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
     @Override
     protected String getTestDataPath() {
         //configure specific test data in your test.
-        return "testData";
+        return TEST_DATA_ROOT;
     }
 
     protected void enablePluginAndReindex() {

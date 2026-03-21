@@ -91,7 +91,7 @@ public class MagentoModuleGenerator extends WebProjectTemplate<MagentoProjectGen
                         .refreshIncludePaths(dataService.getState(), project);
             });
         };
-        StartupManager.getInstance(project).runWhenProjectIsInitialized(generate);
+        StartupManager.getInstance(project).runAfterOpened(generate);
     }
 
     /**

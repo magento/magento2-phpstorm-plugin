@@ -5,7 +5,7 @@
 
 package com.magento.idea.magento2plugin.indexes;
 
-import com.intellij.util.indexing.FileBasedIndexImpl;
+import com.intellij.util.indexing.FileBasedIndex;
 import com.intellij.util.indexing.ID;
 import com.magento.idea.magento2plugin.stubs.indexes.BlockNameIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.ContainerNameIndex;
@@ -85,8 +85,7 @@ public class IndexManager {
 
         for (final ID<?, ?> id : indexIds) {
             try {
-                FileBasedIndexImpl.getInstance().requestRebuild(id);
-                FileBasedIndexImpl.getInstance().scheduleRebuild(id, new Throwable());//NOPMD
+                FileBasedIndex.getInstance().requestRebuild(id);
             } catch (NullPointerException exception) { //NOPMD
                 //that's fine, indexer is not present in map java.util.Map.get
             }

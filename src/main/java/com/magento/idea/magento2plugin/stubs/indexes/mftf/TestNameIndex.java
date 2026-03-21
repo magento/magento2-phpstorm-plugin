@@ -12,9 +12,9 @@ import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.magento.idea.magento2plugin.magento.files.MftfTest;
 import com.magento.idea.magento2plugin.project.Settings;
-import gnu.trove.THashMap;
-import org.jetbrains.annotations.NotNull;
+import java.util.HashMap;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
 
 public class TestNameIndex extends ScalarIndexExtension<String> {
     public static final ID<String, Void> KEY = ID.create(
@@ -27,7 +27,7 @@ public class TestNameIndex extends ScalarIndexExtension<String> {
     @Override
     public DataIndexer<String, Void, FileContent> getIndexer() {
         return inputData -> {
-            Map<String, Void> map = new THashMap<>();
+            Map<String, Void> map = new HashMap<>();
             PsiFile psiFile = inputData.getPsiFile();
             Project project = psiFile.getProject();
 

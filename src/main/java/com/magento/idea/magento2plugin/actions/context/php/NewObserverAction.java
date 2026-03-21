@@ -27,11 +27,12 @@ public class NewObserverAction extends CustomGeneratorContextAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent event) {
-        final GetMagentoModuleUtil.MagentoModuleData moduleData = getModuleData();
+        final ActionContext context = resolveActionContext(event);
 
-        if (event.getProject() == null || moduleData == null || getDirectory() == null) {
+        if (event.getProject() == null || context == null) {
             return;
         }
+        final GetMagentoModuleUtil.MagentoModuleData moduleData = context.getModuleData();
         final String[] templateData = moduleData.getName().split(Package.vendorModuleNameSeparator);
 
         if (templateData.length != 2) { //NOPMD
@@ -40,7 +41,7 @@ public class NewObserverAction extends CustomGeneratorContextAction {
 
         NewObserverDialog.open(
                 event.getProject(),
-                getDirectory(),
+                context.getDirectory(),
                 templateData[0],
                 templateData[1]
         );

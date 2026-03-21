@@ -25,8 +25,6 @@ public class InjectConstructorArgumentAction extends AnAction {
     public static final String ACTION_NAME = "Inject argument";
     public static final String ACTION_DESCRIPTION = "Inject argument through the DI";
     public static final String GATHER_ARRAY_VALUES_ACTION_DESCRIPTION = "Specify array values";
-    private PhpClass currentPhpClass;
-    private Parameter currentParameter;
 
     /**
      * Inject constructor argument action constructor.
@@ -41,53 +39,27 @@ public class InjectConstructorArgumentAction extends AnAction {
         setIsAvailableForEvent(event, false);
         final Project project = event.getProject();
 
-        if (project == null || !Settings.isEnabled(project)) {
+        if (project == null
+                || !Settings.isEnabled(project)
+                || getActionPhpClass(event) == null
+                || getConstructorParameter(event) == null) {
             return;
         }
-        final PhpClass phpClass = PhpPsiElementsUtil.getPhpClass(event);
-
-        if (phpClass == null) {
-            return;
-        }
-        // Excluding argument injection generators for Test/ and *Test.php files
-        // in order to not overload the context menu.
-        final String filename = phpClass.getContainingFile().getName();
-
-        if (filename.matches(RegExUtil.Magento.TEST_FILE_NAME)
-                || phpClass.getPresentableFQN().matches(RegExUtil.Magento.TEST_CLASS_FQN)) {
-            return;
-        }
-        final Parameter parameter = PhpPsiElementsUtil.getMethodArgument(event);
-
-        if (parameter == null) {
-            return;
-        }
-        final Method method = parameter.getParent().getParent() instanceof Method
-                ? (Method) parameter.getParent().getParent() : null;
-
-        if (method == null) {
-            return;
-        }
-
-        if (!method.getAccess().isPublic()
-                || !MagentoPhpClass.CONSTRUCT_METHOD_NAME.equals(method.getName())) {
-            return;
-        }
-        currentPhpClass = phpClass;
-        currentParameter = parameter;
         setIsAvailableForEvent(event, true);
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent event) {
-        if (event.getProject() == null
-                || currentPhpClass == null
-                || currentParameter == null) {
+        final Project project = event.getProject();
+        final PhpClass currentPhpClass = getActionPhpClass(event);
+        final Parameter currentParameter = getConstructorParameter(event);
+
+        if (project == null || currentPhpClass == null || currentParameter == null) {
             return;
         }
 
         NewArgumentInjectionDialog.open(
-                event.getProject(),
+                project,
                 currentPhpClass,
                 currentParameter
         );
@@ -110,5 +82,37 @@ public class InjectConstructorArgumentAction extends AnAction {
     ) {
         event.getPresentation().setVisible(isAvailable);
         event.getPresentation().setEnabled(isAvailable);
+    }
+
+    private Parameter getConstructorParameter(final @NotNull AnActionEvent event) {
+        final Parameter parameter = PhpPsiElementsUtil.getMethodArgument(event);
+
+        if (parameter == null) {
+            return null;
+        }
+        final Method method = parameter.getParent().getParent() instanceof Method
+                ? (Method) parameter.getParent().getParent() : null;
+
+        if (method == null
+                || !method.getAccess().isPublic()
+                || !MagentoPhpClass.CONSTRUCT_METHOD_NAME.equals(method.getName())) {
+            return null;
+        }
+
+        return parameter;
+    }
+
+    private PhpClass getActionPhpClass(final @NotNull AnActionEvent event) {
+        final PhpClass phpClass = PhpPsiElementsUtil.getPhpClass(event);
+
+        if (phpClass == null) {
+            return null;
+        }
+        final String filename = phpClass.getContainingFile().getName();
+
+        return filename.matches(RegExUtil.Magento.TEST_FILE_NAME)
+                || phpClass.getPresentableFQN().matches(RegExUtil.Magento.TEST_CLASS_FQN)
+                ? null
+                : phpClass;
     }
 }

@@ -5,9 +5,9 @@
 
 package com.magento.idea.magento2uct.execution.process;
 
-import com.intellij.execution.process.ProcessAdapter;
 import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.process.ProcessHandler;
+import com.intellij.execution.process.ProcessListener;
 import com.intellij.openapi.project.Project;
 import com.magento.idea.magento2uct.execution.GenerateUctReportCommand;
 import java.io.OutputStream;
@@ -27,7 +27,7 @@ public class DefaultAnalysisHandler extends ProcessHandler {
         super();
         this.project = project;
         this.addProcessListener(
-                new ProcessAdapter() {
+                new ProcessListener() {
                     @Override
                     public void startNotified(final @NotNull ProcessEvent event) {
                         DefaultAnalysisHandler.this.execute();

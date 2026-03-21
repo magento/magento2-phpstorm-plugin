@@ -163,9 +163,9 @@ public class UiComponentFormGenerator extends FileGenerator {
                 .appendProperty("BUTTONS", data.getButtons().isEmpty() ? "" : "true")
                 .appendProperty("ROUTE", data.getRoute())
                 .appendProperty("SUBMIT_CONTROLLER",
-                        data.getSubmitControllerName().toLowerCase(new Locale("en","EN")))
+                        data.getSubmitControllerName().toLowerCase(Locale.ROOT))
                 .appendProperty("SUBMIT_ACTION",
-                        data.getSubmitActionName().toLowerCase(new Locale("en","EN")))
+                        data.getSubmitActionName().toLowerCase(Locale.ROOT))
                 .appendProperty("DATA_PROVIDER",
                         new UiComponentDataProviderFile(
                                 data.getModuleName(),

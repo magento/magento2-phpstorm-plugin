@@ -21,10 +21,6 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class CustomGeneratorContextAction extends AnAction {
 
-    private @Nullable GetMagentoModuleUtil.MagentoModuleData moduleData;
-    private @Nullable PsiDirectory directory;
-    private @Nullable PsiFile file;
-
     /**
      * Abstract context action with custom generation constructor.
      *
@@ -41,46 +37,12 @@ public abstract class CustomGeneratorContextAction extends AnAction {
     @Override
     public void update(final @NotNull AnActionEvent event) {
         setIsAvailableForEvent(event, false);
-        final Project project = event.getProject();
+        final ActionContext context = resolveActionContext(event);
 
-        if (project == null || !Settings.isEnabled(project)) {
+        if (context == null || context.moduleData.getName() == null) {
             return;
         }
-        final PsiDirectory targetDirectory = GetTargetElementUtil.getDirFromEvent(event);
-
-        if (targetDirectory == null) {
-            return;
-        }
-        final GetMagentoModuleUtil.MagentoModuleData magentoModuleData = GetMagentoModuleUtil
-                .getByContext(targetDirectory, project);
-        final PsiFile targetFile = GetTargetElementUtil.getFileFromEvent(event);
-
-        if (magentoModuleData == null
-                || magentoModuleData.getName() == null
-                || !isVisible(magentoModuleData, targetDirectory, targetFile)) {
-            return;
-        }
-        directory = targetDirectory;
-        file = targetFile;
-        moduleData = magentoModuleData;
         setIsAvailableForEvent(event, true);
-    }
-
-    /**
-     * Get clicked on module data object.
-     *
-     * @return GetMagentoModuleUtil.MagentoModuleData
-     */
-    public @Nullable GetMagentoModuleUtil.MagentoModuleData getModuleData() {
-        return moduleData;
-    }
-
-    public @Nullable PsiDirectory getDirectory() {
-        return directory;
-    }
-
-    public @Nullable PsiFile getFile() {
-        return file;
     }
 
     @Override
@@ -104,6 +66,28 @@ public abstract class CustomGeneratorContextAction extends AnAction {
             final PsiFile targetFile
     );
 
+    protected @Nullable ActionContext resolveActionContext(final @NotNull AnActionEvent event) {
+        final Project project = event.getProject();
+
+        if (project == null || !Settings.isEnabled(project)) {
+            return null;
+        }
+        final PsiDirectory targetDirectory = GetTargetElementUtil.getDirFromEvent(event);
+
+        if (targetDirectory == null) {
+            return null;
+        }
+        final GetMagentoModuleUtil.MagentoModuleData moduleData = GetMagentoModuleUtil
+                .getByContext(targetDirectory, project);
+        final PsiFile targetFile = GetTargetElementUtil.getFileFromEvent(event);
+
+        if (moduleData == null || !isVisible(moduleData, targetDirectory, targetFile)) {
+            return null;
+        }
+
+        return new ActionContext(moduleData, targetDirectory, targetFile);
+    }
+
     /**
      * Set is action available for event.
      *
@@ -116,5 +100,33 @@ public abstract class CustomGeneratorContextAction extends AnAction {
     ) {
         event.getPresentation().setVisible(isAvailable);
         event.getPresentation().setEnabled(isAvailable);
+    }
+
+    protected static final class ActionContext {
+        private final GetMagentoModuleUtil.MagentoModuleData moduleData;
+        private final PsiDirectory directory;
+        private final PsiFile file;
+
+        private ActionContext(
+                final @NotNull GetMagentoModuleUtil.MagentoModuleData moduleData,
+                final @NotNull PsiDirectory directory,
+                final @Nullable PsiFile file
+        ) {
+            this.moduleData = moduleData;
+            this.directory = directory;
+            this.file = file;
+        }
+
+        public @NotNull GetMagentoModuleUtil.MagentoModuleData getModuleData() {
+            return moduleData;
+        }
+
+        public @NotNull PsiDirectory getDirectory() {
+            return directory;
+        }
+
+        public @Nullable PsiFile getFile() {
+            return file;
+        }
     }
 }
