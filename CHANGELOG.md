@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 -  2026.* IDE's support [#2639](https://github.com/magento/magento2-phpstorm-plugin/pull/2639)
 
+### Fixed
+
+- java.lang.runtime exception java.util.concurrent.execution exception java.nio.file.invalid path exception [#2640](https://github.com/magento/magento2-phpstorm-plugin/pull/2640)
+
 ## 2025.2.2
 
 ### Fixed
