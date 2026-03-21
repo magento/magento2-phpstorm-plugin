@@ -1,0 +1,3 @@
+type Query {
+    test(input: test!): test @resolver(class: "\\Magento\\Test\\ResolverTest") @doc(description: "Test")
+}

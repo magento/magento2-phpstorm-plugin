@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config>
+    <type name="Magento\Backend\App\AbstractAction">
+        <plugin name="adminAuthentication" type="Magento\Backend\App\Action\Plugin\Authentication" sortOrder="100"/>
+    </type>
+</config>

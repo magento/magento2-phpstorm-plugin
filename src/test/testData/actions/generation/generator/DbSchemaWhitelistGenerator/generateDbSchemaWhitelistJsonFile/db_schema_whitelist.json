@@ -1,0 +1,19 @@
+{
+  "test_table": {
+    "column": {
+      "entity_id": true,
+      "name": true,
+      "age": true,
+      "salary": true,
+      "dob": true,
+      "created_at": true,
+      "updated_at": true
+    },
+    "index": {
+      "TEST_TABLE_ENTITY_ID": true
+    },
+    "constraint": {
+      "PRIMARY": true
+    }
+  }
+}

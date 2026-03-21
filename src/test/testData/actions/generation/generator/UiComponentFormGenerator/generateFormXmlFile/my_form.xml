@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">my_form.my_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">My Form</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <namespace>my_form</namespace>
+        <dataScope>data.general</dataScope>
+        <deps>
+            <dep>my_form.my_form_data_source</dep>
+        </deps>
+        <buttons>
+            <button name="saveEntity" class="Foo\Bar\Block\Form\Save"/>
+            <button name="backToEntity" class="Foo\Bar\Block\Form\Back"/>
+            <button name="deleteEntity" class="Foo\Bar\Block\Form\Delete"/>
+            <button name="customController" class="Foo\Bar\Block\Form\Custom"/>
+        </buttons>
+    </settings>
+    <dataSource name="my_form_data_source" component="Magento_Ui/js/form/provider">
+        <settings>
+            <submitUrl path="customroute/myentity/save"/>
+        </settings>
+        <dataProvider class="Foo\Bar\Ui\MyEntity\DataProvider" name="my_form_data_source">
+            <settings>
+                <requestFieldName>my_field</requestFieldName>
+                <primaryFieldName>my_field</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <fieldset name="general" sortOrder="10">
+        <settings>
+            <label translate="true">General</label>
+        </settings>
+    </fieldset>
+    <fieldset name="test_fieldset" sortOrder="20">
+        <settings>
+            <label translate="true">Test Fieldset</label>
+        </settings>
+    </fieldset>
+</form>

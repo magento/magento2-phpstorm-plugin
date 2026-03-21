@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="test_table" resource="default" engine="innodb" comment="Test Table">
+        <column xsi:type="int" name="entity_id" padding="11" unsigned="true" nullable="false" identity="true"
+                comment="Entity Id Column"/>
+        <column xsi:type="varchar" name="name" nullable="false" length="255" default="John Smith"
+                comment="Name Column"/>
+        <column xsi:type="int" name="age" padding="5" unsigned="true" nullable="true" identity="false"
+                comment="Age Column"/>
+        <column xsi:type="decimal" name="salary" unsigned="true" nullable="false" precision="10" scale="2" default="0.0"
+                comment="Salary Column"/>
+        <column xsi:type="date" name="dob" nullable="true" comment="Date Of The Birth Column"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" on_update="false" default="CURRENT_TIMESTAMP"
+                comment="Created At Column"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" on_update="true" default="CURRENT_TIMESTAMP"
+                comment="Updated At Column"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <index referenceId="TEST_TABLE_ENTITY_ID" indexType="btree">
+            <column name="entity_id"/>
+        </index>
+    </table>
+</schema>

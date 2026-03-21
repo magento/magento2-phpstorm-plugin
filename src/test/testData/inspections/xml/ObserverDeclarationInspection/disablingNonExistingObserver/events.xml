@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config>
+    <event name="test_event_in_test_class">
+        <observer name=<warning descr="This observer does not exist to be disabled. For more details, see Inspection Description.">"test_non_existing_observer"</warning>
+                  instance="Magento\Catalog\Observer\TestObserver"
+                  disabled="true"/>
+    </event>
+</config>

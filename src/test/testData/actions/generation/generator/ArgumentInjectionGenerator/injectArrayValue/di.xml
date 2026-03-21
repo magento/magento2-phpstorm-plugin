@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Foo\Bar\Model\Test">
+        <arguments>
+            <argument name="methods" xsi:type="array">
+                <item name="method1" xsi:type="string">QW1</item>
+                <item name="method2" xsi:type="string">QW2</item>
+                <item name="method3" xsi:type="string">QW3</item>
+                <item name="method4" xsi:type="string">QW4</item>
+                <item name="method5" xsi:type="string">QW5</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

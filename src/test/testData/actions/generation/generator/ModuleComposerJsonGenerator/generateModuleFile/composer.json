@@ -1,0 +1,23 @@
+{
+  "name": "test/module-test",
+  "version": "1.0.0-dev",
+  "description": "test-description",
+  "type": "magento2-module",
+  "require": {
+    "magento/framework": "*",
+    "foo/bar": "1.0.*",
+    "magento/module-backend": "103.0.*"
+  },
+  "license": [
+    "Test License 1",
+    "Test License 2"
+  ],
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "TestWithDependencies\\Test\\": ""
+    }
+  }
+}

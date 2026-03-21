@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config>
+    <type name="Magento\Framework\App\ResourceConnection">
+        <plugin name=<warning descr="The plugin name \"get_catalog_category_product_index_table_name_soap_api\" for targeted \"Magento\Framework\App\ResourceConnection\" class is already used in the module \"Magento_Catalog\" (webapi_soap scope). For more details see Inspection Description.">"get_catalog_category_product_index_table_name_soap_api"</warning> type="Vendor\Module\Plugin\Resource" />
+    </type>
+</config>

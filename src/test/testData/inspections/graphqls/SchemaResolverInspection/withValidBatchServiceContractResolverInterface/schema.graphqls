@@ -1,0 +1,6 @@
+# Copyright © Magento, Inc. All rights reserved.
+# See COPYING.txt for license details.
+
+type Query {
+    test(input: test!): test @resolver(class: "\\Magento\\CatalogGraphQl\\Model\\Resolver\\ImplementsBatchServiceContractResolverInterface") @doc(description: "Test")
+}

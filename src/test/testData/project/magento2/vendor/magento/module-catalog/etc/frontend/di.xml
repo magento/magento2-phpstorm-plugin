@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<config>
+    <type name="Magento\Framework\View\Layout">
+        <plugin name="catalog-session-depersonalize"
+                type="Magento\Catalog\Model\Layout\DepersonalizePlugin" sortOrder="10"/>
+    </type>
+</config>

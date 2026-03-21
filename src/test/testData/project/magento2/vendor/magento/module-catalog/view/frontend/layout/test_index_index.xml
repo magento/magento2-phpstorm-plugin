@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <container name="test_index_index_container">
+            <block name="test_index_index_block" />
+        </container>
+        <container name="test_index_index_container2">
+            <block name="test_index_index_block2" />
+        </container>
+    </body>
+</page>

@@ -1,0 +1,21 @@
+{
+  "name": "test/module",
+  "version": "1.0.0-dev",
+  "description": "test-description",
+  "type": "magento2-module",
+  "require": {
+    "magento/framework": "*"
+  },
+  "license": [
+    "Test License 1",
+    "Test License 2"
+  ],
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Test\\Module\\": ""
+    }
+  }
+}

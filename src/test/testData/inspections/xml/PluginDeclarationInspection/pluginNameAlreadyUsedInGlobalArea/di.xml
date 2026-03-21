@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config>
+    <type name="Magento\Theme\Block\Html\Topmenu">
+        <plugin name=<warning descr="The plugin name \"catalogTopmenu\" for targeted \"Magento\Theme\Block\Html\Topmenu\" class is already used in the module \"Magento_Catalog\" (base scope). For more details see Inspection Description.">"catalogTopmenu"</warning> type="Vendor\Module\Plugin\Block\Topmenu" />
+    </type>
+</config>

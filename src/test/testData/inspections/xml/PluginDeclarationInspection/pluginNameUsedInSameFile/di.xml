@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<config>
+    <type name="Magento\CatalogSearch\Helper\Data">
+        <plugin name="plugin_name" type="Vendor\Module\Plugin" />
+        <plugin name=<warning descr="The plugin name already used in this file. For more details see Inspection Description.">"plugin_name"</warning> type="Vendor\Module\Plugin" />
+    </type>
+</config>
