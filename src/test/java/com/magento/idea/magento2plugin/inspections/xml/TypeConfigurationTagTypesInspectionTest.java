@@ -13,7 +13,7 @@ public class TypeConfigurationTagTypesInspectionTest extends InspectionXmlFixtur
     private static final String NOT_EXISTENT_CLASS = "Not\\Existent\\Class";
     private static final String NOT_EXISTENT_VIRTUAL_TYPE = "NotExistentVirtualType";
     // This virtual type is created in the scope of this inspection and
-    // it is in the ./testData/project/magento2/app/code/Foo/Bar/etc/di.xml file.
+    // it is in the ./src/test/testData/project/magento2/app/code/Foo/Bar/etc/di.xml file.
     private static final String EXISTENT_VIRTUAL_TYPE = "VirtualProductRepository";
 
     @Override

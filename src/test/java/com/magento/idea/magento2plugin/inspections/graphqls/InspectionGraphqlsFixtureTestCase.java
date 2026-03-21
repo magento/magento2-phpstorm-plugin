@@ -10,7 +10,7 @@ import com.magento.idea.magento2plugin.magento.packages.File;
 
 public abstract class InspectionGraphqlsFixtureTestCase extends BaseInspectionsTestCase {
 
-    private static final String testDataFolderPath = "testData" //NOPMD
+    private static final String testDataFolderPath = TEST_DATA_ROOT //NOPMD
             + File.separator
             + "inspections"
             + File.separator;

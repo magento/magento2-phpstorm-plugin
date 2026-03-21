@@ -16,7 +16,7 @@ import org.junit.After;
 import org.junit.Before;
 
 public abstract class BaseGeneratorTestCase extends BaseProjectTestCase {
-    private static final String TEST_DATA_FOLDER_PATH = "testData" + File.separator
+    private static final String TEST_DATA_FOLDER_PATH = TEST_DATA_ROOT + File.separator
             + "actions" + File.separator;
     private static final String FIXTURES_FOLDER_PATH = "generation" + File.separator
             + "generator" + File.separator;

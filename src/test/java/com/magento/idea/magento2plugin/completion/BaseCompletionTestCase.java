@@ -13,7 +13,7 @@ import java.util.List;
 public abstract class BaseCompletionTestCase extends BaseProjectTestCase {
     private static final String MESSAGE_NO_LOOKUP = "No lookup element was provided";
     private final String testDataFolderPath
-            = "testData" + File.separator + "completion" + File.separator;
+            = TEST_DATA_ROOT + File.separator + "completion" + File.separator;
 
     @Override
     public void setUp() throws Exception {

@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
 
     private static final String TEST_DATA_PATH
-            = "testData" + File.separator + "linemarker" + File.separator;
+            = TEST_DATA_ROOT + File.separator + "linemarker" + File.separator;
 
     @Override
     public void setUp() throws Exception {

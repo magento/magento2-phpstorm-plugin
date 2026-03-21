@@ -33,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
         "PMD.TooManyMethods",
 })
 public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
-    private static final String testDataFolderPath = "testData" + File.separator//NOPMD
+    private static final String testDataFolderPath = TEST_DATA_ROOT + File.separator//NOPMD
             + "reference" + File.separator;
 
     @Override
