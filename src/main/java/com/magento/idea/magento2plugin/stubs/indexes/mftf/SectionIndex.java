@@ -12,10 +12,9 @@ import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.magento.idea.magento2plugin.project.Settings;
-import gnu.trove.THashMap;
-import org.jetbrains.annotations.NotNull;
-
+import java.util.HashMap;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
 
 public class SectionIndex extends FileBasedIndexExtension<String, String> {
     public static final ID<String, String> KEY = ID.create(
@@ -28,7 +27,7 @@ public class SectionIndex extends FileBasedIndexExtension<String, String> {
     @Override
     public DataIndexer<String, String, FileContent> getIndexer() {
         return inputData -> {
-            Map<String, String> map = new THashMap<>();
+            Map<String, String> map = new HashMap<>();
             PsiFile psiFile = inputData.getPsiFile();
             Project project = psiFile.getProject();
 

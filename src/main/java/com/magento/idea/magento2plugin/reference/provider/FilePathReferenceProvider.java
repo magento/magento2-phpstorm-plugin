@@ -20,9 +20,9 @@ import com.magento.idea.magento2plugin.reference.provider.util.GetFilePathUtil;
 import com.magento.idea.magento2plugin.reference.provider.util.GetModuleNameUtil;
 import com.magento.idea.magento2plugin.reference.provider.util.GetModuleSourceFilesUtil;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
-import gnu.trove.THashMap;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
@@ -65,7 +65,7 @@ public class FilePathReferenceProvider extends PsiReferenceProvider {
             final String pathPart = pathParts[i];
             Boolean currentPathIsBuilt = false;
 
-            final Map<TextRange, List<PsiElement>> psiPathElements = new THashMap<>();
+            final Map<TextRange, List<PsiElement>> psiPathElements = new HashMap<>();
 
             for (final VirtualFile file : files) {
                 final String fileUrl = file.getUrl();

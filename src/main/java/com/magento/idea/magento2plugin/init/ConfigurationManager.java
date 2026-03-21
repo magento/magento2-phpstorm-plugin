@@ -15,6 +15,7 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.roots.ContentEntry;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ModuleRootModificationUtil;
@@ -22,7 +23,6 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.util.PlatformUtils;
 import com.jetbrains.php.config.PhpProjectConfigurable;
 import com.jetbrains.php.config.library.PhpIncludePathManager;
 import com.jetbrains.php.ui.PhpUiUtil;
@@ -47,22 +47,26 @@ public class ConfigurationManager {
     public void refreshIncludePaths(Settings.State newState, Project project) {
         if (!project.isDefault() && newState.isPluginEnabled() && !newState.isDoNotAskContentConfigAgain()) {
             VirtualFile magentoFile = getMagentoFile(newState);
+            final VirtualFile projectDir = ProjectUtil.guessProjectDir(project);
             if (magentoFile == null) {
                 return;
             }
-
-            if (VfsUtilCore.isAncestor(project.getBaseDir(), magentoFile, false)) {
+            if (projectDir == null) {
                 return;
             }
 
-            boolean isModuleInsideMagento = VfsUtilCore.isAncestor(magentoFile, project.getBaseDir(), false);
+            if (VfsUtilCore.isAncestor(projectDir, magentoFile, false)) {
+                return;
+            }
+
+            boolean isModuleInsideMagento = VfsUtilCore.isAncestor(magentoFile, projectDir, false);
             if (isModuleInsideMagento) {
                 Module[] modules = ModuleManager.getInstance(project).getModules();
                 if (modules.length == 1) {
                     Module module = modules[0];
                     boolean isMagentoIncluded = isFileInsideModule(magentoFile, module);
                     if (!isMagentoIncluded) {
-                        suggestToChangeContentRoots(magentoFile, project, module);
+                        suggestToChangeContentRoots(magentoFile, projectDir, project, module);
                     }
                 }
             } else {
@@ -75,7 +79,12 @@ public class ConfigurationManager {
 
     }
 
-    private static void suggestToChangeContentRoots(@NotNull VirtualFile magentoFile, @NotNull Project project, @NotNull Module module) {
+    private static void suggestToChangeContentRoots(
+            @NotNull VirtualFile magentoFile,
+            @NotNull VirtualFile projectDir,
+            @NotNull Project project,
+            @NotNull Module module
+    ) {
         String message = "For Magento 2 containing plugins inside it's better to add whole Magento 2 to project.";
         Function<Notification, AnAction> fixAction = (notification) -> {
             return new DumbAwareAction("Fix") {
@@ -90,7 +99,7 @@ public class ConfigurationManager {
                         for (int i = 0; i < length; ++i) {
                             ContentEntry entry = entries[i];
                             VirtualFile entryFile = entry.getFile();
-                            if (entryFile != null && VfsUtilCore.isAncestor(entryFile, project.getBaseDir(), false)) {
+                            if (entryFile != null && VfsUtilCore.isAncestor(entryFile, projectDir, false)) {
                                 rootEntry = entry;
                                 break;
                             }
@@ -107,12 +116,13 @@ public class ConfigurationManager {
                         }
 
                     });
-                    if (PlatformUtils.isPhpStorm()) {
-                        Runnable runnable = () -> {
-                            ShowSettingsUtil.getInstance().showSettingsDialog(project, "Directories");
-                        };
-                        ApplicationManager.getApplication().invokeLater(runnable, ModalityState.NON_MODAL);
-                    }
+                    Runnable runnable = () -> {
+                        ShowSettingsUtil.getInstance().showSettingsDialog(project, "Directories");
+                    };
+                    ApplicationManager.getApplication().invokeLater(
+                            runnable,
+                            ModalityState.nonModal()
+                    );
                 }
             };
         };
@@ -229,7 +239,7 @@ public class ConfigurationManager {
         Runnable runnable = () -> {
             notifyGlobally(project, "Magento 2 Support", message, NotificationType.INFORMATION, actions);
         };
-        ApplicationManager.getApplication().invokeLater(runnable, ModalityState.NON_MODAL);
+        ApplicationManager.getApplication().invokeLater(runnable, ModalityState.nonModal());
     }
 
     public static void notifyGlobally(@Nullable Project project, String title, String message, NotificationType notificationType, Function<Notification, AnAction>... actions) {

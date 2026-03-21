@@ -15,7 +15,7 @@ public class PhpNamespaceNameRule implements ValidationRule {
 
     @Override
     public boolean check(final @NotNull String value) {
-        return PhpNameUtil.isValidNamespaceName(value);
+        return PhpNameUtil.isValidNamespaceFullName(value);
     }
 
     public static ValidationRule getInstance() {

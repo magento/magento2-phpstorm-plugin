@@ -58,7 +58,7 @@ public class PhpClassReferenceProvider extends PsiReferenceProvider {
 
             final String namespaceId = namespace
                     .toString()
-                    .toLowerCase(new Locale("en","EN"));
+                    .toLowerCase(Locale.ROOT);
 
             final Collection<PhpNamespace> references = hasNamespaceInIndex(
                     namespaceId,

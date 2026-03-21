@@ -5,7 +5,7 @@
 
 package com.magento.idea.magento2plugin.actions.generation.references;
 
-import gnu.trove.THashMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class PhpClassReferenceStorage {
 
-    private final Map<String, String> myReferences = new THashMap<>();
+    private final Map<String, String> myReferences = new HashMap<>();
 
     /**
      * Process reference.

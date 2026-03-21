@@ -19,7 +19,7 @@ import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.magento.idea.magento2plugin.magento.files.ProductTypeXml;
 import com.magento.idea.magento2plugin.project.Settings;
-import gnu.trove.THashMap;
+import java.util.HashMap;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,7 +39,7 @@ public class ProductTypeIndex extends ScalarIndexExtension<String> {
     public @NotNull
     DataIndexer<String, Void, FileContent> getIndexer() {
         return inputData -> {
-            final Map<String, Void> map = new THashMap<>();
+            final Map<String, Void> map = new HashMap<>();
             final String filePath = inputData.getFile().getPath();
 
             if (filePath.matches(TEST_DIRECTORY_PATTERN)) {

@@ -12,9 +12,9 @@ import com.intellij.psi.xml.XmlElement;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
-import gnu.trove.THashSet;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -62,7 +62,7 @@ public class XmlPsiTreeUtil {
             final String eventName,
             final String observerName
     ) {
-        Collection<XmlAttributeValue> psiElements = new THashSet<>();
+        Collection<XmlAttributeValue> psiElements = new HashSet<>();
         final XmlTag configTag = xmlFile.getRootTag();
 
         if (configTag == null) {
@@ -109,7 +109,7 @@ public class XmlPsiTreeUtil {
             final XmlFile xmlFile,
             final String tagName,
             final String attributeName) {
-        final Collection<XmlAttributeValue> psiElements = new THashSet<>();
+        final Collection<XmlAttributeValue> psiElements = new HashSet<>();
         XmlTag rootTag = xmlFile.getRootTag();
         if (rootTag == null) {
             return psiElements;
@@ -168,7 +168,7 @@ public class XmlPsiTreeUtil {
             final String parentTagAttributeName,
             final String parentTagAttributeNameValue,
             final String argumentTagAttributeName) {
-        Collection<XmlAttributeValue> psiElements = new THashSet<>();
+        Collection<XmlAttributeValue> psiElements = new HashSet<>();
 
         XmlTag rootTag = xmlFile.getRootTag();
         if (rootTag == null) {

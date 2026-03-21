@@ -40,9 +40,9 @@ public class LayoutXml implements ModuleFileInterface {
         this.setFileName(
                 routeId
                 + "_"
-                + controllerName.toLowerCase(new Locale("en","EN"))
+                + controllerName.toLowerCase(Locale.ROOT)
                 + "_"
-                + actionName.toLowerCase(new Locale("en","EN"))
+                + actionName.toLowerCase(Locale.ROOT)
                 + ".xml"
         );
     }

@@ -6,7 +6,7 @@
 package com.magento.idea.magento2plugin.indexes;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.jetbrains.php.lang.psi.PhpFile;
@@ -33,13 +33,17 @@ public final class FixtureIndex {
         final String fixtureName = fixturePathParts[fixturePathParts.length - 1];
         final String exactFilePath = TestFixture.FIXTURES_LOCATION.concat(fixtureIdentifier);
 
-        @NotNull final PsiFile[] psiFiles = FilenameIndex.getFilesByName(
+        @NotNull final PsiFileSystemItem[] psiFiles = FilenameIndex.getFilesByName(
                 project,
                 fixtureName,
-                GlobalSearchScope.allScope(project)
+                GlobalSearchScope.allScope(project),
+                true
         );
 
-        for (final PsiFile psiFile: psiFiles) {
+        for (final PsiFileSystemItem psiFile: psiFiles) {
+            if (!(psiFile instanceof PhpFile)) {
+                continue;
+            }
             @NotNull final String filePath = psiFile.getVirtualFile().getPath();
             if (!filePath.contains(TestFixture.FIXTURES_EXCLUDE_PATH)
                     && filePath.contains(exactFilePath)) {

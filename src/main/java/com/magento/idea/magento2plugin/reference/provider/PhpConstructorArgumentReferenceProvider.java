@@ -16,10 +16,10 @@ import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.indexes.DiIndex;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
-import gnu.trove.THashSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,7 +40,7 @@ public class PhpConstructorArgumentReferenceProvider extends PsiReferenceProvide
             if (phpClass != null && phpClass.getConstructor() != null) {
                 final Method constructor = phpClass.getConstructor();
                 final Collection<Parameter> parameterList
-                        = new THashSet<>(Arrays.asList(constructor.getParameters()));
+                        = new HashSet<>(Arrays.asList(constructor.getParameters()));
                 parameterList.removeIf(p -> !p.getName().contains(parameterName));
                 if (!parameterList.isEmpty()) { // NOPMD
                     psiReferences.add(new PolyVariantReferenceBase(element, parameterList));

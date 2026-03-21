@@ -12,17 +12,13 @@ import com.intellij.execution.filters.TextConsoleBuilderFactory;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.process.ProcessHandlerFactory;
 import com.intellij.execution.process.ProcessTerminatedListener;
+import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.execution.ui.ConsoleView;
-import com.intellij.icons.AllIcons;
+import com.intellij.execution.ui.RunContentDescriptor;
+import com.intellij.execution.ui.RunContentManager;
+import com.intellij.execution.Executor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.SystemInfo;
-import com.intellij.openapi.wm.RegisterToolWindowTask;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowAnchor;
-import com.intellij.openapi.wm.ToolWindowId;
-import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.ui.content.Content;
-import com.magento.idea.magento2plugin.MagentoIcons;
 import org.jetbrains.annotations.NotNull;
 
 public final class DownloadUctCommand {
@@ -43,8 +39,8 @@ public final class DownloadUctCommand {
      * Start UCT downloading process.
      */
     public void execute() throws ExecutionException {
-        final ConsoleView consoleView = createConsole();
         final OSProcessHandler processHandler = createProcessHandler();
+        final ConsoleView consoleView = createConsole(processHandler);
         consoleView.attachToProcess(processHandler);
         processHandler.startNotify();
     }
@@ -105,38 +101,22 @@ public final class DownloadUctCommand {
      *
      * @return ConsoleView
      */
-    private ConsoleView createConsole() {
-        ToolWindow toolWindow = ToolWindowManager
-                .getInstance(project)
-                .getToolWindow(ToolWindowId.RUN);
-
-        if (toolWindow == null) {
-            toolWindow = ToolWindowManager.getInstance(project).registerToolWindow(
-                    new RegisterToolWindowTask(
-                            ToolWindowId.RUN,
-                            ToolWindowAnchor.BOTTOM,
-                            null,
-                            false,
-                            true,
-                            true,
-                            true,
-                            null,
-                            AllIcons.Actions.Execute,
-                            null
-                    )
-            );
-        }
+    private ConsoleView createConsole(final @NotNull OSProcessHandler processHandler) {
         final ConsoleView consoleView = TextConsoleBuilderFactory.getInstance()
                 .createBuilder(project)
                 .getConsole();
-        final Content content = toolWindow
-                .getContentManager()
-                .getFactory()
-                .createContent(consoleView.getComponent(), TAB_TITLE, true);
-        content.putUserData(ToolWindow.SHOW_CONTENT_ICON, Boolean.TRUE);
-        content.setIcon(MagentoIcons.PLUGIN_ICON_SMALL);
-        toolWindow.getContentManager().addContent(content);
-        toolWindow.show();
+        final RunContentDescriptor descriptor = new RunContentDescriptor(
+                consoleView,
+                processHandler,
+                consoleView.getComponent(),
+                TAB_TITLE
+        );
+        final Executor runExecutorInstance = DefaultRunExecutor.getRunExecutorInstance();
+
+        descriptor.setActivateToolWindowWhenAdded(true);
+        descriptor.setAutoFocusContent(true);
+
+        RunContentManager.getInstance(project).showRunContent(runExecutorInstance, descriptor);
 
         return consoleView;
     }

@@ -39,7 +39,7 @@ public class UctReportOutputUtil {
         final String componentType = componentData.getType().toString();
         final String componentTypeFormatted = componentType
                 .substring(0, 1)
-                .toUpperCase(new Locale("en","EN"))
+                .toUpperCase(Locale.ROOT)
                 .concat(componentType.substring(1));
 
         final String moduleNameLine = componentTypeFormatted

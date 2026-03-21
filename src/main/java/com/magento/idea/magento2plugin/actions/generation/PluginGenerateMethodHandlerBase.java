@@ -17,7 +17,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.util.containers.ContainerUtil;
 import com.jetbrains.php.codeInsight.PhpCodeInsightUtil;
 import com.jetbrains.php.lang.actions.PhpNamedElementNode;
 import com.jetbrains.php.lang.lexer.PhpTokenTypes;
@@ -41,8 +40,9 @@ import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import com.magento.idea.magento2plugin.util.magento.plugin.GetTargetClassNamesByPluginClassName;
 import com.magento.idea.magento2plugin.util.magento.plugin.IsPluginAllowedForMethodUtil;
-import gnu.trove.THashSet;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -126,7 +126,7 @@ public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeIns
         final CodeStyleSettings codeStyleSettings = new CodeStyleSettings(pluginPhpFile);
         codeStyleSettings.adjustBeforeWrite();
         ApplicationManager.getApplication().runWriteAction(() -> {
-            final Set<CharSequence> insertedMethodsNames = new THashSet();
+            final Set<CharSequence> insertedMethodsNames = new HashSet<>();
             final PhpClassReferenceResolver resolver = new PhpClassReferenceResolver();
             final StringBuffer textBuf = new StringBuffer();
             final PhpPsiElement scope = PhpCodeInsightUtil.findScopeForUseOperator(pluginClass);
@@ -315,7 +315,7 @@ public abstract class PluginGenerateMethodHandlerBase implements LanguageCodeIns
     public static Collection<PhpNamedElementNode> fixOrderToBeAsOriginalFiles(
             final PhpNamedElementNode... selected
     ) {
-        final List<PhpNamedElementNode> newSelected = ContainerUtil.newArrayList(selected);
+        final List<PhpNamedElementNode> newSelected = new ArrayList<>(List.of(selected));
         newSelected.sort((o1, o2) -> {
             final PsiElement psiElement = o1.getPsiElement();
             final PsiElement psiElement2 = o2.getPsiElement();

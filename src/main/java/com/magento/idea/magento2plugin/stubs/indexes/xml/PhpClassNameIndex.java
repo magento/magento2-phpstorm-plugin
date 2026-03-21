@@ -24,7 +24,7 @@ import com.jetbrains.php.lang.PhpLangUtil;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
-import gnu.trove.THashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +41,7 @@ public class PhpClassNameIndex extends ScalarIndexExtension<String> {
     @Override
     public DataIndexer<String, Void, FileContent> getIndexer() {
         return inputData -> {
-            final THashMap<String, Void> map = new THashMap<>();
+            final Map<String, Void> map = new HashMap<>();
             final PsiFile psiFile = inputData.getPsiFile();
             if (!Settings.isEnabled(psiFile.getProject())) {
                 return map;

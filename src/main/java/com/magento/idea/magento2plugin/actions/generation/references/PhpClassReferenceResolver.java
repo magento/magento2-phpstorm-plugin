@@ -20,7 +20,7 @@ import com.jetbrains.php.lang.psi.elements.PhpPsiElement;
 import com.jetbrains.php.lang.psi.elements.Statement;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.refactoring.PhpAliasImporter;
-import gnu.trove.THashMap;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -125,7 +125,7 @@ public class PhpClassReferenceResolver extends PhpClassReferenceExtractor {
             final @NotNull PhpPsiElement scopeHolder
     ) {
         final Map<String, String> aliases = PhpCodeInsightUtil.getAliasesInScope(scopeHolder);
-        final Map<String, String> referencesToReplace = new THashMap<>();
+        final Map<String, String> referencesToReplace = new HashMap<>();
         final boolean autoImport = PhpCodeInsightUtil.isAutoImportEnabled(scopeHolder);
 
         for (final String name : this.myCandidatesToImportStorage.getNames()) {

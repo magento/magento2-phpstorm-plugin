@@ -39,8 +39,8 @@ import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
-import gnu.trove.THashSet;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -157,7 +157,7 @@ public class PluginClassGenerator extends FileGenerator {
                 return;
             }
 
-            final Set<CharSequence> insertedMethodsNames = new THashSet();
+            final Set<CharSequence> insertedMethodsNames = new HashSet<>();
             final PhpClassReferenceResolver resolver = new PhpClassReferenceResolver();
             final StringBuffer textBuf = new StringBuffer();
 

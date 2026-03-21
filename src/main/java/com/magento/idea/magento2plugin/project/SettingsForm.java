@@ -5,14 +5,15 @@
 
 package com.magento.idea.magento2plugin.project;
 
+import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.ComponentWithBrowseButton;
-import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.php.frameworks.PhpFrameworkConfigurable;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
@@ -197,29 +198,30 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     private void addPathListener() {
         final FileChooserDescriptor descriptor =
                 FileChooserDescriptorFactory.createSingleFolderDescriptor();
-        final ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseFolderListener
-                = new ComponentWithBrowseButton.BrowseFolderActionListener<JTextField>(
-                this.magentoPath,
-                project,
-                descriptor,
-                TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
-            ) {
-                    @Nullable
-                    @Override
-                    protected VirtualFile getInitialFile() {
+        this.magentoPath.addActionListener(event -> {
+            final VirtualFile chosenFile = FileChooser.chooseFile(
+                    descriptor,
+                    project,
+                    getInitialMagentoPath()
+            );
 
-                        final String text = getComponentText();
-                        if (text.length() == 0) {
-                            final VirtualFile file = GetProjectBasePath.execute(project);
-                            if (file != null) {
-                                return file;
-                            }
-                        }
+            if (chosenFile != null) {
+                this.magentoPath.setText(chosenFile.getPath());
+            }
+        });
+    }
 
-                        return super.getInitialFile();
-                    }
-                };
-        this.magentoPath.addActionListener(browseFolderListener);
+    @Nullable
+    private VirtualFile getInitialMagentoPath() {
+        final String text = getMagentoPath();
+        if (!StringUtil.isEmptyOrSpaces(text)) {
+            final VirtualFile currentFile = LocalFileSystem.getInstance().findFileByPath(text);
+            if (currentFile != null) {
+                return currentFile;
+            }
+        }
+
+        return GetProjectBasePath.execute(project);
     }
 
     private void addMagentoVersionListener() {
@@ -273,4 +275,3 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         return "Magento2.SettingsForm";
     }
 }
-

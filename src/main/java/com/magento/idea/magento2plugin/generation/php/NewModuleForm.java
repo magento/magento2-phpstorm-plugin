@@ -5,10 +5,9 @@
 
 package com.magento.idea.magento2plugin.generation.php;//NOPMD
 
+import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
-import com.intellij.openapi.ui.ComponentWithBrowseButton;
-import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.openapi.util.io.FileUtil;
@@ -77,28 +76,33 @@ public class NewModuleForm implements ListSelectionListener {
     private void addPathListener() {
         final FileChooserDescriptor descriptor =
                 FileChooserDescriptorFactory.createSingleFolderDescriptor();
-        final ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseFolderListener
-                = new ComponentWithBrowseButton.BrowseFolderActionListener<JTextField>(
-                this.magentoPath,
-                null,
-                descriptor,
-                TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
-        ) {
-                    @Override
-                    protected VirtualFile getInitialFile() {
-                        String directoryName = this.getComponentText();
-                        if (!StringUtil.isEmptyOrSpaces(directoryName)) {
-                            String lastSavedPath = Settings.getLastMagentoPath();
-                            if (!StringUtil.isEmptyOrSpaces(lastSavedPath)) {
-                                lastSavedPath = FileUtil.toSystemIndependentName(lastSavedPath);
-                                return LocalFileSystem.getInstance().findFileByPath(lastSavedPath);
-                            }
-                        }
+        this.magentoPath.addActionListener(event -> {
+            final VirtualFile initialFile = getInitialMagentoPath();
+            final VirtualFile chosenFile = FileChooser.chooseFile(descriptor, null, initialFile);
 
-                        return super.getInitialFile();
-                    }
-                };
-        this.magentoPath.addActionListener(browseFolderListener);
+            if (chosenFile != null) {
+                this.magentoPath.setText(chosenFile.getPath());
+            }
+        });
+    }
+
+    private VirtualFile getInitialMagentoPath() {
+        final String currentPath = this.magentoPath.getText();
+        if (!StringUtil.isEmptyOrSpaces(currentPath)) {
+            final VirtualFile currentFile = LocalFileSystem.getInstance()
+                    .findFileByPath(FileUtil.toSystemIndependentName(currentPath));
+            if (currentFile != null) {
+                return currentFile;
+            }
+        }
+
+        String lastSavedPath = Settings.getLastMagentoPath();
+        if (!StringUtil.isEmptyOrSpaces(lastSavedPath)) {
+            lastSavedPath = FileUtil.toSystemIndependentName(lastSavedPath);
+            return LocalFileSystem.getInstance().findFileByPath(lastSavedPath);
+        }
+
+        return null;
     }
 
     public JComponent getContentPane() {
@@ -179,7 +183,7 @@ public class NewModuleForm implements ListSelectionListener {
         return selectedLicenses;
     }
 
-    public void addSettingsStateListener(final ProjectGeneratorPeer.SettingsListener listener) {
+    public void addSettingsListener(final ProjectGeneratorPeer.SettingsListener listener) {
         this.myStateListeners.add(listener);
     }
 

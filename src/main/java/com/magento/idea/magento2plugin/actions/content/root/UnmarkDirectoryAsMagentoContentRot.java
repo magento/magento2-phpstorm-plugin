@@ -20,8 +20,8 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.magento.MagentoPathUrlUtil;
+import java.net.URI;
 import java.net.MalformedURLException;
-import java.net.URL;
 import org.jetbrains.annotations.NotNull;
 
 public class UnmarkDirectoryAsMagentoContentRot extends MarkRootActionBase {
@@ -39,8 +39,8 @@ public class UnmarkDirectoryAsMagentoContentRot extends MarkRootActionBase {
                 settings.getMagentoFolders().removeIf(folder -> {
                     final VirtualFile file;
                     try {
-                        file = VfsUtil.findFileByURL(new URL(folder));
-                    } catch (MalformedURLException e) {
+                        file = VfsUtil.findFileByURL(URI.create(folder).toURL());
+                    } catch (IllegalArgumentException | MalformedURLException e) {
                         return false;
                     }
                     return file == null || !file.exists();

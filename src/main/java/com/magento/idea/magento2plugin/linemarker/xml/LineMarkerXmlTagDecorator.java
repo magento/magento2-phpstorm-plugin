@@ -18,7 +18,6 @@ import com.intellij.psi.PsiInvalidElementAccessException;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
-import com.intellij.psi.impl.source.xml.XmlTagImpl;
 import com.intellij.psi.meta.PsiMetaData;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -462,9 +461,6 @@ public abstract class LineMarkerXmlTagDecorator implements XmlTag {
 
     @Override
     public void checkAdd(final @NotNull PsiElement psiElement) throws IncorrectOperationException {
-        if (xmlTag instanceof XmlTagImpl) {
-            ((XmlTagImpl) xmlTag).checkAdd(psiElement);
-        }
         throw new IncorrectOperationException(getClass().getName());
     }
 
@@ -501,9 +497,6 @@ public abstract class LineMarkerXmlTagDecorator implements XmlTag {
 
     @Override
     public void checkDelete() throws IncorrectOperationException {
-        if (xmlTag instanceof XmlTagImpl) {
-            ((XmlTagImpl) xmlTag).checkDelete();
-        }
         throw new IncorrectOperationException(getClass().getName());
     }
 

@@ -5,9 +5,9 @@
 
 package com.magento.idea.magento2uct.execution;
 
-import com.intellij.execution.process.ProcessAdapter;
 import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.process.ProcessHandler;
+import com.intellij.execution.process.ProcessListener;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
@@ -45,11 +45,10 @@ public class ReindexUctCommand {
         this.output = output;
         this.process = process;
 
-        this.process.addProcessListener(new ProcessAdapter() {
+        this.process.addProcessListener(new ProcessListener() {
 
             @Override
             public void processTerminated(final @NotNull ProcessEvent event) {
-                super.processTerminated(event);
                 output.write("\nProcess finished with exit code " + event.getExitCode() + "\n");
             }
         });
