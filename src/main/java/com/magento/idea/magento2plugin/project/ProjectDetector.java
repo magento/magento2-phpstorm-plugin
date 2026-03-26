@@ -12,12 +12,12 @@ import com.intellij.notification.Notifications;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.startup.StartupManager;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.platform.DirectoryProjectConfigurator;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
 import com.magento.idea.magento2plugin.magento.packages.MagentoComponentManager;
+import com.magento.idea.magento2plugin.project.startup.DeferredProjectOpenActions;
 import com.magento.idea.magento2plugin.util.magento.MagentoBasePathUtil;
 import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
 import javax.swing.event.HyperlinkEvent;
@@ -31,7 +31,7 @@ public class ProjectDetector implements DirectoryProjectConfigurator {
             final @NotNull Ref<Module> moduleRef,
             final boolean newProject
     ) {
-        StartupManager.getInstance(project).runAfterOpened(() -> {
+        DeferredProjectOpenActions.getInstance(project).runAfterProjectOpened(() -> {
             DumbService.getInstance(project).smartInvokeLater(() -> {
                 if (!MagentoBasePathUtil.isMagentoFolderValid(baseDir.getPath())) {
                     return;

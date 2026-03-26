@@ -37,10 +37,11 @@ public class CheckIfMagentoPathIsValidActivity implements StartupActivity, Proje
         if (settings.pluginEnabled && (path == null || path.isEmpty())) {
             if (MagentoBasePathUtil.isMagentoFolderValid(project.getBasePath())) {
                 settings.setMagentoPath(project.getBasePath());
-                return;
+            } else {
+                settings.pluginEnabled = false;
+                ConfigurationManager.suggestToConfigureMagentoPath(project);
             }
-            settings.pluginEnabled = false;
-            ConfigurationManager.suggestToConfigureMagentoPath(project);
         }
+        DeferredProjectOpenActions.getInstance(project).runPendingActions();
     }
 }

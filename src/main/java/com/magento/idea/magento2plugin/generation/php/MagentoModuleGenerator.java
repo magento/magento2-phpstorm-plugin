@@ -9,7 +9,6 @@ import com.intellij.ide.util.projectWizard.WebProjectTemplate;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.startup.StartupManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.platform.ProjectGeneratorPeer;
 import com.intellij.psi.PsiDirectory;
@@ -24,6 +23,7 @@ import com.magento.idea.magento2plugin.actions.generation.generator.ModuleRegist
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleXmlGenerator;
 import com.magento.idea.magento2plugin.init.ConfigurationManager;
 import com.magento.idea.magento2plugin.project.Settings;
+import com.magento.idea.magento2plugin.project.startup.DeferredProjectOpenActions;
 import java.util.ArrayList;
 import javax.swing.Icon;
 import org.jetbrains.annotations.Nls;
@@ -91,7 +91,7 @@ public class MagentoModuleGenerator extends WebProjectTemplate<MagentoProjectGen
                         .refreshIncludePaths(dataService.getState(), project);
             });
         };
-        StartupManager.getInstance(project).runAfterOpened(generate);
+        DeferredProjectOpenActions.getInstance(project).runAfterProjectOpened(generate);
     }
 
     /**
