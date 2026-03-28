@@ -172,8 +172,12 @@ class MagentoMcpToolset : McpToolset {
         validateProject: Boolean = true,
         query: (Project) -> String
     ): String = withProjectAction(toolName, arguments, validateProject) { project ->
-        ReadAction.compute<String, RuntimeException> {
-            query(project)
+        try {
+            ReadAction.computeCancellable<String, RuntimeException> {
+                query(project)
+            }
+        } catch (_: ReadAction.CannotReadException) {
+            "The request was cancelled by a pending write action. Retry."
         }
     }
 

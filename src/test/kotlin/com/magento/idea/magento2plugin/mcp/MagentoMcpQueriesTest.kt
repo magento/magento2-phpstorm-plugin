@@ -70,8 +70,61 @@ class MagentoMcpQueriesTest : BaseProjectTestCase() {
         assertContains(result, "target: Magento\\Theme\\Block\\PluginClass::someMethod()")
         assertContains(result, "pluginClass: Magento\\Catalog\\Plugin\\PluginClass")
         assertContains(result, "pluginMethod: beforeSomeMethod()")
+        assertContains(result, "scope: global")
         assertContains(result, "file:")
         assertContainsPath(result, "vendor/magento/module-catalog/Plugin/PluginClass.php")
+    }
+
+    @Test
+    fun testFindPluginsForMethodSkipsDisabledPlugins() {
+        myFixture.addFileToProject(
+            "vendor/magento/module-theme/Block/PluginClass.php",
+            """
+            <?php
+            
+            namespace Magento\Theme\Block;
+            
+            class PluginClass
+            {
+                public function someMethod()
+                {
+                }
+            }
+            """.trimIndent()
+        )
+        myFixture.addFileToProject(
+            "app/code/Foo/Bar/Plugin/DisabledPluginClass.php",
+            """
+            <?php
+            
+            namespace Foo\Bar\Plugin;
+            
+            class DisabledPluginClass
+            {
+                public function beforeSomeMethod()
+                {
+                }
+            }
+            """.trimIndent()
+        )
+        myFixture.addFileToProject(
+            "app/code/Foo/Bar/etc/frontend/di.xml",
+            """
+            <?xml version="1.0"?>
+            <config>
+                <type name="Magento\Theme\Block\PluginClass">
+                    <plugin name="disabledPluginClass" type="Foo\Bar\Plugin\DisabledPluginClass" disabled="true"/>
+                </type>
+            </config>
+            """.trimIndent()
+        )
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+        val result = MagentoDiQueries.findPluginsForMethod(project, "Magento\\Theme\\Block\\PluginClass", "someMethod")
+
+        assertFalse("Disabled plugin should not be returned:\n$result", result.contains("Foo\\Bar\\Plugin\\DisabledPluginClass"))
+        assertContains(result, "pluginClass: Magento\\Catalog\\Plugin\\PluginClass")
     }
 
     @Test
@@ -122,6 +175,27 @@ class MagentoMcpQueriesTest : BaseProjectTestCase() {
         assertContains(result, "file:")
         assertContainsPath(result, "vendor/magento/module-catalog/view/frontend/ui_component/recently_viewed_2.xml")
         assertContains(result, "rootTag: listing")
+    }
+
+    @Test
+    fun testFindUiComponentReflectsFilesAddedAfterInitialSnapshot() {
+        val initial = MagentoViewQueries.findUiComponent(project, "mcp_dynamic_component")
+        assertContains(initial, "No UI components matched \"mcp_dynamic_component\".")
+
+        myFixture.addFileToProject(
+            "vendor/magento/module-catalog/view/frontend/ui_component/mcp_dynamic_component.xml",
+            """
+            <?xml version="1.0"?>
+            <listing/>
+            """.trimIndent()
+        )
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+        val result = MagentoViewQueries.findUiComponent(project, "mcp_dynamic_component")
+
+        assertContains(result, "Found 1 UI component match(es) for \"mcp_dynamic_component\".")
+        assertContainsPath(result, "vendor/magento/module-catalog/view/frontend/ui_component/mcp_dynamic_component.xml")
     }
 
     @Test

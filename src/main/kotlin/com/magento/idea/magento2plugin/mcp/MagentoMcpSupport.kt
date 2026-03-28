@@ -12,13 +12,11 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.xml.XmlFile
-import com.intellij.util.indexing.FileBasedIndex
 import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.PhpLangUtil
 import com.jetbrains.php.lang.psi.elements.Method
 import com.jetbrains.php.lang.psi.elements.PhpClass
 import com.magento.idea.magento2plugin.project.Settings
-import com.magento.idea.magento2plugin.stubs.indexes.data.PluginData
 import java.io.File
 import java.nio.file.Paths
 
@@ -118,6 +116,13 @@ internal object MagentoMcpSupport {
         else -> 3
     }
 
+    fun configScopeOrder(scope: String): Int = when (scope) {
+        "global" -> 0
+        "frontend" -> 1
+        "adminhtml" -> 2
+        else -> 3
+    }
+
     fun relativePath(project: Project, virtualFile: VirtualFile): String {
         val basePath = project.basePath
         if (basePath == null) {
@@ -144,12 +149,15 @@ internal object MagentoMcpSupport {
 
     data class PluginMethodMatch(
         val targetFqn: String,
-        val data: PluginData,
+        val data: PluginDeclarationRecord,
         val pluginClass: PhpClass,
         val method: Method,
         val kind: String
     ) {
         val sortOrder: Int
             get() = data.sortOrder
+
+        val scope: String
+            get() = data.scope
     }
 }

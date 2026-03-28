@@ -6,11 +6,7 @@
 package com.magento.idea.magento2plugin.mcp
 
 import com.intellij.openapi.project.Project
-import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.util.indexing.FileBasedIndex
 import com.jetbrains.php.PhpIndex
-import com.magento.idea.magento2plugin.magento.files.ModuleDiXml
-import com.magento.idea.magento2plugin.stubs.indexes.PluginIndex
 
 internal object MagentoDiQueries {
     /**
@@ -22,69 +18,29 @@ internal object MagentoDiQueries {
             return "Provide a PHP class or virtual type name."
         }
 
-        val preferencesFor = mutableListOf<String>()
-        val preferencesType = mutableListOf<String>()
-        val typeDeclarations = mutableListOf<String>()
-        val virtualTypeDeclarations = mutableListOf<String>()
-        val pluginDeclarations = mutableListOf<String>()
-
-        for (xmlFile in MagentoMcpSupport.findXmlFilesByName(project, ModuleDiXml.FILE_NAME)) {
-            val rootTag = xmlFile.rootTag ?: continue
-
-            for (preferenceTag in rootTag.findSubTags(ModuleDiXml.PREFERENCE_TAG_NAME)) {
-                val preferenceFor = MagentoMcpSupport.presentableFqn(
-                    preferenceTag.getAttributeValue(ModuleDiXml.PREFERENCE_ATTR_FOR)
-                )
-                val preferenceType = MagentoMcpSupport.presentableFqn(
-                    preferenceTag.getAttributeValue(ModuleDiXml.TYPE_ATTR)
-                )
-                val filePath = MagentoMcpSupport.relativePath(project, xmlFile.virtualFile)
-
-                if (preferenceFor == query) {
-                    preferencesFor += "$filePath -> preference for=$preferenceFor type=${preferenceType ?: "-"}"
-                }
-                if (preferenceType == query) {
-                    preferencesType += "$filePath -> preference for=${preferenceFor ?: "-"} type=$preferenceType"
-                }
+        val snapshot = MagentoMcpSnapshots.diSnapshot(project)
+        val preferencesFor = snapshot.preferencesFor[query].orEmpty().map { record ->
+            "${record.filePath} -> preference for=${record.preferenceFor ?: "-"} type=${record.preferenceType ?: "-"}"
+        }
+        val preferencesType = snapshot.preferencesType[query].orEmpty().map { record ->
+            "${record.filePath} -> preference for=${record.preferenceFor ?: "-"} type=${record.preferenceType ?: "-"}"
+        }
+        val typeDeclarations = snapshot.typeDeclarations[query].orEmpty().map { record ->
+            val argumentSuffix = if (record.argumentNames.isEmpty()) {
+                ""
+            } else {
+                " arguments=${record.argumentNames.joinToString(", ")}"
             }
-
-            for (typeTag in rootTag.findSubTags(ModuleDiXml.TYPE_TAG)) {
-                val typeName = MagentoMcpSupport.presentableFqn(typeTag.getAttributeValue(ModuleDiXml.NAME_ATTR))
-                if (typeName != query) {
-                    continue
-                }
-
-                val filePath = MagentoMcpSupport.relativePath(project, xmlFile.virtualFile)
-                val argumentNames = typeTag.findFirstSubTag(ModuleDiXml.ARGUMENTS_TAG)
-                    ?.findSubTags(ModuleDiXml.ARGUMENT_TAG)
-                    ?.mapNotNull { it.getAttributeValue(ModuleDiXml.NAME_ATTR) }
-                    .orEmpty()
-                val argumentSuffix = if (argumentNames.isEmpty()) "" else " arguments=${argumentNames.joinToString(", ")}"
-                typeDeclarations += "$filePath -> type name=$typeName$argumentSuffix"
-
-                for (pluginTag in typeTag.findSubTags(ModuleDiXml.PLUGIN_TAG_NAME)) {
-                    val pluginType = MagentoMcpSupport.presentableFqn(pluginTag.getAttributeValue(ModuleDiXml.TYPE_ATTR))
-                    val pluginName = pluginTag.getAttributeValue(ModuleDiXml.NAME_ATTR) ?: "-"
-                    val sortOrder = pluginTag.getAttributeValue(ModuleDiXml.SORT_ORDER_ATTR) ?: "0"
-                    val disabled = pluginTag.getAttributeValue(ModuleDiXml.DISABLED_ATTR_NAME) ?: "false"
-                    pluginDeclarations += "$filePath -> plugin name=$pluginName type=${pluginType ?: "-"} sortOrder=$sortOrder disabled=$disabled"
-                }
-            }
-
-            for (virtualTypeTag in rootTag.findSubTags(ModuleDiXml.VIRTUAL_TYPE_TAG)) {
-                val virtualTypeName = MagentoMcpSupport.presentableFqn(
-                    virtualTypeTag.getAttributeValue(ModuleDiXml.NAME_ATTR)
-                )
-                val virtualTypeTarget = MagentoMcpSupport.presentableFqn(
-                    virtualTypeTag.getAttributeValue(ModuleDiXml.TYPE_ATTR)
-                )
-                if (virtualTypeName != query && virtualTypeTarget != query) {
-                    continue
-                }
-
-                val filePath = MagentoMcpSupport.relativePath(project, xmlFile.virtualFile)
-                virtualTypeDeclarations += "$filePath -> virtualType name=${virtualTypeName ?: "-"} type=${virtualTypeTarget ?: "-"}"
-            }
+            "${record.filePath} -> type name=${record.typeName}$argumentSuffix"
+        }
+        val virtualTypeDeclarations = (
+            snapshot.virtualTypesByName[query].orEmpty() + snapshot.virtualTypesByTarget[query].orEmpty()
+        ).distinct().map { record ->
+            "${record.filePath} -> virtualType name=${record.name ?: "-"} type=${record.targetType ?: "-"}"
+        }
+        val pluginDeclarations = snapshot.pluginDeclarations[query].orEmpty().map { record ->
+            "${record.filePath} -> plugin name=${record.pluginName} type=${record.pluginType ?: "-"} " +
+                "sortOrder=${record.sortOrder} disabled=${record.disabled} scope=${record.scope}"
         }
 
         val lines = mutableListOf<String>()
@@ -119,27 +75,28 @@ internal object MagentoDiQueries {
 
         val allTargetFqns = linkedSetOf(targetClassName)
         targetClasses.forEach { MagentoMcpSupport.collectClassHierarchy(it, allTargetFqns) }
+        val diSnapshot = MagentoMcpSnapshots.diSnapshot(project)
         val pluginCandidates = mutableListOf<MagentoMcpSupport.PluginMethodMatch>()
 
         for (targetFqn in allTargetFqns) {
-            val pluginSets = FileBasedIndex.getInstance()
-                .getValues(PluginIndex.KEY, targetFqn, GlobalSearchScope.allScope(project))
-            for (pluginSet in pluginSets) {
-                for (pluginData in pluginSet) {
-                    for (pluginClass in phpIndex.getClassesByFQN(pluginData.type)) {
-                        for (method in pluginClass.methods) {
-                            val pluginKind = MagentoMcpSupport.getPluginKind(method.name, targetMethodName) ?: continue
-                            if (!method.access.isPublic) {
-                                continue
-                            }
-                            pluginCandidates += MagentoMcpSupport.PluginMethodMatch(
-                                targetFqn,
-                                pluginData,
-                                pluginClass,
-                                method,
-                                pluginKind
-                            )
+            for (pluginDeclaration in diSnapshot.pluginDeclarations[targetFqn].orEmpty()) {
+                if (pluginDeclaration.disabled) {
+                    continue
+                }
+                val pluginType = pluginDeclaration.pluginType ?: continue
+                for (pluginClass in phpIndex.getClassesByFQN(pluginType)) {
+                    for (method in pluginClass.methods) {
+                        val pluginKind = MagentoMcpSupport.getPluginKind(method.name, targetMethodName) ?: continue
+                        if (!method.access.isPublic) {
+                            continue
                         }
+                        pluginCandidates += MagentoMcpSupport.PluginMethodMatch(
+                            targetFqn,
+                            pluginDeclaration,
+                            pluginClass,
+                            method,
+                            pluginKind
+                        )
                     }
                 }
             }
@@ -150,10 +107,11 @@ internal object MagentoDiQueries {
         }
 
         val sorted = pluginCandidates
-            .distinctBy { "${it.targetFqn}:${it.pluginClass.fqn}:${it.method.name}:${it.sortOrder}" }
+            .distinctBy { "${it.targetFqn}:${it.pluginClass.fqn}:${it.method.name}:${it.scope}:${it.sortOrder}" }
             .sortedWith(
                 compareBy<MagentoMcpSupport.PluginMethodMatch>(
                     { MagentoMcpSupport.pluginKindOrder(it.kind) },
+                    { MagentoMcpSupport.configScopeOrder(it.scope) },
                     { it.sortOrder },
                     { it.pluginClass.presentableFQN },
                     { it.method.name }
@@ -169,6 +127,7 @@ internal object MagentoDiQueries {
             lines += "target: ${match.targetFqn}::${targetMethodName}()"
             lines += "pluginClass: ${match.pluginClass.presentableFQN}"
             lines += "pluginMethod: ${match.method.name}()"
+            lines += "scope: ${match.scope}"
             lines += "sortOrder: ${match.sortOrder}"
             lines += "file: ${MagentoMcpSupport.relativePath(project, match.method.containingFile.virtualFile)}"
         }

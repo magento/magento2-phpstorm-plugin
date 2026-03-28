@@ -6,19 +6,6 @@
 package com.magento.idea.magento2plugin.mcp
 
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiManager
-import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.psi.xml.XmlFile
-import com.intellij.util.indexing.FileBasedIndex
-import com.magento.idea.magento2plugin.indexes.LayoutIndex
-import com.magento.idea.magento2plugin.indexes.UIComponentIndex
-import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml
-import com.magento.idea.magento2plugin.stubs.indexes.BlockNameIndex
-import com.magento.idea.magento2plugin.stubs.indexes.ContainerNameIndex
-import com.magento.idea.magento2plugin.stubs.indexes.xml.AclResourceIndex
-import com.magento.idea.magento2plugin.stubs.indexes.xml.MenuIndex
-import com.magento.idea.magento2plugin.util.magento.GetAclResourcesListUtil
-import com.magento.idea.magento2plugin.util.magento.GetAclResourcesTreeUtil
 
 internal object MagentoViewQueries {
     /**
@@ -30,23 +17,24 @@ internal object MagentoViewQueries {
             return "Provide a layout handle, block name, or container name."
         }
 
+        val snapshot = MagentoMcpSnapshots.viewSnapshot(project)
         val blockMatches = MagentoMcpSupport.prioritizeMatches(
-            LayoutIndex.getAllKeys(BlockNameIndex.KEY, project),
+            snapshot.blocks.keys,
             query
         )
         val containerMatches = MagentoMcpSupport.prioritizeMatches(
-            LayoutIndex.getAllKeys(ContainerNameIndex.KEY, project),
+            snapshot.containers.keys,
             query
         )
-        val handleMatches = LayoutIndex.getLayoutFiles(project)
-            .filter { MagentoMcpSupport.fuzzyMatch(it.virtualFile.nameWithoutExtension, query) }
-            .sortedBy { it.virtualFile.nameWithoutExtension }
+        val handleMatches = snapshot.handles
+            .filter { MagentoMcpSupport.fuzzyMatch(it.name, query) }
+            .sortedBy(LayoutHandleRecord::name)
 
         val lines = mutableListOf<String>()
         if (handleMatches.isNotEmpty()) {
             lines += "layout handles"
-            for (file in handleMatches.take(MagentoMcpSupport.MAX_MATCHES)) {
-                lines += "${file.virtualFile.nameWithoutExtension} -> ${MagentoMcpSupport.relativePath(project, file.virtualFile)}"
+            for (handle in handleMatches.take(MagentoMcpSupport.MAX_MATCHES)) {
+                lines += "${handle.name} -> ${handle.filePath}"
             }
         }
 
@@ -56,11 +44,8 @@ internal object MagentoViewQueries {
             }
             lines += "blocks"
             for (blockName in blockMatches.take(MagentoMcpSupport.MAX_MATCHES)) {
-                for (tag in LayoutIndex.getBlockDeclarations(blockName, project).take(MagentoMcpSupport.MAX_FILE_MATCHES)) {
-                    val file = tag.containingFile?.virtualFile ?: continue
-                    val blockClass = tag.getAttributeValue("class") ?: "-"
-                    val template = tag.getAttributeValue("template") ?: "-"
-                    lines += "$blockName -> ${MagentoMcpSupport.relativePath(project, file)} class=$blockClass template=$template"
+                for (record in snapshot.blocks[blockName].orEmpty().take(MagentoMcpSupport.MAX_FILE_MATCHES)) {
+                    lines += "$blockName -> ${record.filePath} class=${record.blockClass ?: "-"} template=${record.template ?: "-"}"
                 }
             }
         }
@@ -71,11 +56,8 @@ internal object MagentoViewQueries {
             }
             lines += "containers"
             for (containerName in containerMatches.take(MagentoMcpSupport.MAX_MATCHES)) {
-                for (tag in LayoutIndex.getContainerDeclarations(containerName, project).take(MagentoMcpSupport.MAX_FILE_MATCHES)) {
-                    val file = tag.containingFile?.virtualFile ?: continue
-                    val htmlTag = tag.getAttributeValue("htmlTag") ?: "-"
-                    val htmlClass = tag.getAttributeValue("htmlClass") ?: "-"
-                    lines += "$containerName -> ${MagentoMcpSupport.relativePath(project, file)} htmlTag=$htmlTag htmlClass=$htmlClass"
+                for (record in snapshot.containers[containerName].orEmpty().take(MagentoMcpSupport.MAX_FILE_MATCHES)) {
+                    lines += "$containerName -> ${record.filePath} htmlTag=${record.htmlTag ?: "-"} htmlClass=${record.htmlClass ?: "-"}"
                 }
             }
         }
@@ -96,9 +78,9 @@ internal object MagentoViewQueries {
             return "Provide a UI component name."
         }
 
-        val files = UIComponentIndex.getUiComponentFiles(project)
-            .filter { MagentoMcpSupport.fuzzyMatch(it.virtualFile.nameWithoutExtension, query) }
-            .sortedBy { it.virtualFile.nameWithoutExtension }
+        val files = MagentoMcpSnapshots.viewSnapshot(project).uiComponents
+            .filter { MagentoMcpSupport.fuzzyMatch(it.name, query) }
+            .sortedBy(UiComponentRecord::name)
 
         if (files.isEmpty()) {
             return "No UI components matched \"$query\"."
@@ -107,9 +89,9 @@ internal object MagentoViewQueries {
         val lines = mutableListOf("Found ${files.size} UI component match(es) for \"$query\".")
         for (file in files.take(MagentoMcpSupport.MAX_MATCHES)) {
             lines += ""
-            lines += file.virtualFile.nameWithoutExtension
-            lines += "file: ${MagentoMcpSupport.relativePath(project, file.virtualFile)}"
-            lines += "rootTag: ${file.rootTag?.name ?: "-"}"
+            lines += file.name
+            lines += "file: ${file.filePath}"
+            lines += "rootTag: ${file.rootTag}"
         }
         return lines.joinToString("\n")
     }
@@ -123,9 +105,10 @@ internal object MagentoViewQueries {
             return "Provide an ACL resource ID or admin menu ID."
         }
 
-        val aclMatches = MagentoMcpSupport.prioritizeMatches(GetAclResourcesListUtil.execute(project), query)
+        val snapshot = MagentoMcpSnapshots.viewSnapshot(project)
+        val aclMatches = MagentoMcpSupport.prioritizeMatches(snapshot.aclResources.keys, query)
         val menuMatches = MagentoMcpSupport.prioritizeMatches(
-            FileBasedIndex.getInstance().getAllKeys(MenuIndex.KEY, project),
+            snapshot.menuEntries.keys,
             query
         )
         val lines = mutableListOf<String>()
@@ -133,19 +116,17 @@ internal object MagentoViewQueries {
         if (aclMatches.isNotEmpty()) {
             lines += "acl resources"
             for (aclResource in aclMatches.take(MagentoMcpSupport.MAX_MATCHES)) {
-                val titles = FileBasedIndex.getInstance()
-                    .getValues(AclResourceIndex.KEY, aclResource, GlobalSearchScope.allScope(project))
-                    .distinct()
-                val files = FileBasedIndex.getInstance()
-                    .getContainingFiles(AclResourceIndex.KEY, aclResource, GlobalSearchScope.allScope(project))
-                val tree = GetAclResourcesTreeUtil.execute(project, aclResource)
-                    ?.joinToString(" > ") { "${it.resourceId}(${it.resourceTitle})" }
+                val records = snapshot.aclResources[aclResource].orEmpty()
+                val titles = records.mapNotNull(AclResourceRecord::title).distinct()
+                val tree = records.firstOrNull()
+                    ?.tree
+                    ?.joinToString(" > ") { "${it.resourceId}(${it.resourceTitle ?: "-"})" }
                     ?: "-"
 
                 lines += "$aclResource -> title=${titles.joinToString(", ").ifEmpty { "-" }}"
                 lines += "tree: $tree"
-                for (file in files.take(MagentoMcpSupport.MAX_FILE_MATCHES)) {
-                    lines += "file: ${MagentoMcpSupport.relativePath(project, file)}"
+                for (record in records.take(MagentoMcpSupport.MAX_FILE_MATCHES)) {
+                    lines += "file: ${record.filePath}"
                 }
             }
         }
@@ -156,23 +137,9 @@ internal object MagentoViewQueries {
             }
             lines += "menu entries"
             for (menuId in menuMatches.take(MagentoMcpSupport.MAX_MATCHES)) {
-                val files = FileBasedIndex.getInstance()
-                    .getContainingFiles(MenuIndex.KEY, menuId, GlobalSearchScope.allScope(project))
-                for (file in files.take(MagentoMcpSupport.MAX_FILE_MATCHES)) {
-                    val xmlFile = PsiManager.getInstance(project).findFile(file) as? XmlFile ?: continue
-                    val rootTag = xmlFile.rootTag ?: continue
-                    val menuTag = rootTag.findFirstSubTag(ModuleMenuXml.menuTag) ?: continue
-                    for (addTag in menuTag.findSubTags(ModuleMenuXml.addTag)) {
-                        if (addTag.getAttributeValue(ModuleMenuXml.idTagAttribute) != menuId) {
-                            continue
-                        }
-                        val title = addTag.getAttributeValue(ModuleMenuXml.titleTagAttribute) ?: "-"
-                        val resource = addTag.getAttributeValue(ModuleMenuXml.resourceTagAttribute) ?: "-"
-                        val action = addTag.getAttributeValue(ModuleMenuXml.actionTagAttribute) ?: "-"
-                        val parent = addTag.getAttributeValue(ModuleMenuXml.parentTagAttribute) ?: "-"
-                        lines += "$menuId -> title=$title resource=$resource parent=$parent action=$action"
-                        lines += "file: ${MagentoMcpSupport.relativePath(project, file)}"
-                    }
+                for (record in snapshot.menuEntries[menuId].orEmpty().take(MagentoMcpSupport.MAX_FILE_MATCHES)) {
+                    lines += "$menuId -> title=${record.title} resource=${record.resource} parent=${record.parent} action=${record.action}"
+                    lines += "file: ${record.filePath}"
                 }
             }
         }

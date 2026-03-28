@@ -1,6 +1,8 @@
 package com.magento.idea.magento2plugin.mcp
 
 import com.intellij.psi.PsiDirectory
+import com.magento.idea.magento2plugin.actions.generation.data.ModuleComposerJsonData
+import com.magento.idea.magento2plugin.actions.generation.generator.ModuleComposerJsonGenerator
 import com.magento.idea.magento2plugin.BaseProjectTestCase
 import com.magento.idea.magento2plugin.indexes.ModuleIndex
 import com.magento.idea.magento2plugin.project.Settings
@@ -33,6 +35,33 @@ class MagentoModuleCommandsTest : BaseProjectTestCase() {
         )
     }
 
+    @Test
+    fun testCreateMagentoModuleRollsBackPartialWrites() {
+        Settings.getInstance(project).magentoPath = getMagentoRootPathFromFixture()
+
+        val result = MagentoModuleCommands.createMagentoModule(project, "Mcp", "Broken") { context ->
+            listOfNotNull(
+                ModuleComposerJsonGenerator(
+                    ModuleComposerJsonData(
+                        context.packageName,
+                        context.moduleName,
+                        context.moduleDirectory,
+                        context.moduleDescription,
+                        context.composerPackageName,
+                        "1.0.0",
+                        context.moduleLicense,
+                        emptyList<String>(),
+                        false
+                    ),
+                    project
+                ).generate("test")
+            )
+        }
+
+        assertContains(result, "rolled back")
+        assertDirectoryMissing("app/code/Mcp/Broken")
+    }
+
     private fun assertContains(text: String, expected: String) {
         assertTrue("Expected to find <$expected> in:\n$text", text.contains(expected))
     }
@@ -53,6 +82,17 @@ class MagentoModuleCommandsTest : BaseProjectTestCase() {
             ?: error("Expected file to exist: $relativePath")
 
         assertContains(psiFile.text, expected)
+    }
+
+    private fun assertDirectoryMissing(relativePath: String) {
+        val pathParts = relativePath.split('/')
+        var directory = getMagentoRootDirectoryFromFixture()
+        for (part in pathParts.dropLast(1)) {
+            directory = directory.findSubdirectory(part)
+                ?: return
+        }
+
+        assertNull("Expected directory to be absent: $relativePath", directory.findSubdirectory(pathParts.last()))
     }
 
     private fun getMagentoRootPathFromFixture(): String {

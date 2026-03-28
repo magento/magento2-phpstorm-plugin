@@ -6,12 +6,6 @@
 package com.magento.idea.magento2plugin.mcp
 
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiManager
-import com.intellij.psi.search.GlobalSearchScope
-import com.intellij.psi.xml.XmlFile
-import com.intellij.util.indexing.FileBasedIndex
-import com.magento.idea.magento2plugin.stubs.indexes.EventNameIndex
-import com.magento.idea.magento2plugin.stubs.indexes.EventObserverIndex
 
 internal object MagentoEventQueries {
     /**
@@ -23,8 +17,9 @@ internal object MagentoEventQueries {
             return "Provide an event name."
         }
 
+        val snapshot = MagentoMcpSnapshots.eventSnapshot(project)
         val matchedEvents = MagentoMcpSupport.prioritizeMatches(
-            FileBasedIndex.getInstance().getAllKeys(EventNameIndex.KEY, project),
+            snapshot.observersByEvent.keys,
             query
         )
 
@@ -37,29 +32,14 @@ internal object MagentoEventQueries {
             lines += ""
             lines += matchedEvent
 
-            val files = FileBasedIndex.getInstance()
-                .getContainingFiles(EventObserverIndex.KEY, matchedEvent, GlobalSearchScope.allScope(project))
-            if (files.isEmpty()) {
+            val observers = snapshot.observersByEvent[matchedEvent].orEmpty()
+            if (observers.isEmpty()) {
                 lines += "observers: none declared in events.xml"
                 continue
             }
 
-            for (virtualFile in files.take(MagentoMcpSupport.MAX_FILE_MATCHES)) {
-                val xmlFile = PsiManager.getInstance(project).findFile(virtualFile) as? XmlFile ?: continue
-                val rootTag = xmlFile.rootTag ?: continue
-                for (eventTag in rootTag.findSubTags("event")) {
-                    if (eventTag.getAttributeValue("name") != matchedEvent) {
-                        continue
-                    }
-                    for (observerTag in eventTag.findSubTags("observer")) {
-                        val observerName = observerTag.getAttributeValue("name") ?: "-"
-                        val observerInstance = MagentoMcpSupport.presentableFqn(
-                            observerTag.getAttributeValue("instance")
-                        ) ?: "-"
-                        val disabled = observerTag.getAttributeValue("disabled") ?: "false"
-                        lines += "file: ${MagentoMcpSupport.relativePath(project, virtualFile)} observer=$observerName instance=$observerInstance disabled=$disabled"
-                    }
-                }
+            for (observer in observers.take(MagentoMcpSupport.MAX_FILE_MATCHES)) {
+                lines += "file: ${observer.filePath} observer=${observer.observerName} instance=${observer.observerInstance} disabled=${observer.disabled}"
             }
         }
 
