@@ -15,6 +15,7 @@ class MagentoMcpToolsetTest {
         assertEquals(
             setOf(
                 "get_magento_root_path",
+                "create_magento_module",
                 "find_magento_module",
                 "find_di_config_for_class",
                 "find_plugins_for_method",

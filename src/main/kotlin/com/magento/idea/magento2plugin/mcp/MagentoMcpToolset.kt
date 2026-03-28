@@ -28,12 +28,24 @@ class MagentoMcpToolset : McpToolset {
      */
     @McpTool(name = "get_magento_root_path")
     @McpDescription("Return the Magento root path configured for the current project.")
-    suspend fun getMagentoRootPath(): String = withProjectReadAction(
+    suspend fun getMagentoRootPath(): String = withProjectAction(
         toolName = "get_magento_root_path",
         arguments = emptyMap(),
         validateProject = false
     ) {
         MagentoProjectQueries.getMagentoRootPath(it)
+    }
+
+    /**
+     * Creates a minimal Magento module under the configured Magento root path.
+     */
+    @McpTool(name = "create_magento_module")
+    @McpDescription("Create a Magento module with composer.json, registration.php, and etc/module.xml.")
+    suspend fun createMagentoModule(packageName: String, moduleName: String): String = withProjectAction(
+        toolName = "create_magento_module",
+        arguments = mapOf("packageName" to packageName, "moduleName" to moduleName)
+    ) {
+        MagentoModuleCommands.createMagentoModule(it, packageName, moduleName)
     }
 
     /**
@@ -121,9 +133,9 @@ class MagentoMcpToolset : McpToolset {
     }
 
     /**
-     * Resolves the active IDE project from MCP call context and executes the query inside a read action.
+     * Resolves the active IDE project from MCP call context, validates it, and executes the tool body.
      */
-    private suspend fun withProjectReadAction(
+    private suspend fun withProjectAction(
         toolName: String,
         arguments: Map<String, String>,
         validateProject: Boolean = true,
@@ -135,20 +147,33 @@ class MagentoMcpToolset : McpToolset {
                 LOG.info("Magento MCP end: $toolName -> project context unavailable")
             }
 
-        return ReadAction.compute<String, RuntimeException> {
-            if (validateProject) {
-                val validationMessage = MagentoMcpSupport.validateProject(project)
-                if (validationMessage != null) {
-                    LOG.info("Magento MCP end: $toolName -> validation failed: ${singleLine(validationMessage)}")
-                    return@compute validationMessage
-                }
+        if (validateProject) {
+            val validationMessage = MagentoMcpSupport.validateProject(project)
+            if (validationMessage != null) {
+                LOG.info("Magento MCP end: $toolName -> validation failed: ${singleLine(validationMessage)}")
+                return validationMessage
             }
+        }
 
-            query(project).also { result ->
+        return query(project)
+            .also { result ->
                 LOG.info(
                     "Magento MCP end: $toolName -> ${result.length} chars, preview=\"${singleLine(result)}\""
                 )
             }
+    }
+
+    /**
+     * Executes a tool body inside a read action after project validation succeeds.
+     */
+    private suspend fun withProjectReadAction(
+        toolName: String,
+        arguments: Map<String, String>,
+        validateProject: Boolean = true,
+        query: (Project) -> String
+    ): String = withProjectAction(toolName, arguments, validateProject) { project ->
+        ReadAction.compute<String, RuntimeException> {
+            query(project)
         }
     }
 

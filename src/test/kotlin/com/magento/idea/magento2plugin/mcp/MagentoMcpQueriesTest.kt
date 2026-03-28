@@ -3,7 +3,6 @@ package com.magento.idea.magento2plugin.mcp
 import com.intellij.testFramework.IndexingTestUtil
 import com.intellij.testFramework.PlatformTestUtil
 import com.magento.idea.magento2plugin.BaseProjectTestCase
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class MagentoMcpQueriesTest : BaseProjectTestCase() {
