@@ -7,6 +7,12 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class MagentoMcpQueriesTest : BaseProjectTestCase() {
+    @Test
+    fun testGetMagentoRootPathReturnsConfiguredSetting() {
+        val result = MagentoProjectQueries.getMagentoRootPath(project)
+
+        assertContains(result, "Configured Magento root path: /src")
+    }
 
     @Test
     fun testFindMagentoModuleReturnsModuleDetails() {

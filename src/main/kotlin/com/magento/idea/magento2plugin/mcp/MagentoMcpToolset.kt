@@ -24,6 +24,19 @@ class MagentoMcpToolset : McpToolset {
     }
 
     /**
+     * Returns the Magento root path configured for the current project.
+     */
+    @McpTool(name = "get_magento_root_path")
+    @McpDescription("Return the Magento root path configured for the current project.")
+    suspend fun getMagentoRootPath(): String = withProjectReadAction(
+        toolName = "get_magento_root_path",
+        arguments = emptyMap(),
+        validateProject = false
+    ) {
+        MagentoProjectQueries.getMagentoRootPath(it)
+    }
+
+    /**
      * Resolves Magento modules by exact or fuzzy module name and returns a compact summary.
      */
     @McpTool(name = "find_magento_module")
@@ -113,6 +126,7 @@ class MagentoMcpToolset : McpToolset {
     private suspend fun withProjectReadAction(
         toolName: String,
         arguments: Map<String, String>,
+        validateProject: Boolean = true,
         query: (Project) -> String
     ): String {
         LOG.info("Magento MCP start: $toolName(${formatArguments(arguments)})")
@@ -122,10 +136,12 @@ class MagentoMcpToolset : McpToolset {
             }
 
         return ReadAction.compute<String, RuntimeException> {
-            val validationMessage = MagentoMcpSupport.validateProject(project)
-            if (validationMessage != null) {
-                LOG.info("Magento MCP end: $toolName -> validation failed: ${singleLine(validationMessage)}")
-                return@compute validationMessage
+            if (validateProject) {
+                val validationMessage = MagentoMcpSupport.validateProject(project)
+                if (validationMessage != null) {
+                    LOG.info("Magento MCP end: $toolName -> validation failed: ${singleLine(validationMessage)}")
+                    return@compute validationMessage
+                }
             }
 
             query(project).also { result ->
