@@ -32,6 +32,7 @@ public class ModuleBlockClassGenerator extends FileGenerator {
     private final CommonBundle commonBundle;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
+    private final boolean interactive;
 
     /**
      * Constructor.
@@ -43,6 +44,21 @@ public class ModuleBlockClassGenerator extends FileGenerator {
             final @NotNull BlockFileData blockFileData,
             final Project project
     ) {
+        this(blockFileData, project, true);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param blockFileData BlockFileData
+     * @param project Project
+     * @param interactive whether UI error reporting should be shown
+     */
+    public ModuleBlockClassGenerator(
+            final @NotNull BlockFileData blockFileData,
+            final Project project,
+            final boolean interactive
+    ) {
         super(project);
         this.directoryGenerator = DirectoryGenerator.getInstance();
         this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
@@ -50,6 +66,7 @@ public class ModuleBlockClassGenerator extends FileGenerator {
         this.project = project;
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
+        this.interactive = interactive;
     }
 
     /**
@@ -68,12 +85,7 @@ public class ModuleBlockClassGenerator extends FileGenerator {
                     "validator.file.alreadyExists",
                     "Block Class"
             );
-            JOptionPane.showMessageDialog(
-                    null,
-                    errorMessage,
-                    errorTitle,
-                    JOptionPane.ERROR_MESSAGE
-            );
+            showError(errorMessage, errorTitle);
 
             return null;
         }
@@ -84,12 +96,7 @@ public class ModuleBlockClassGenerator extends FileGenerator {
                     "validator.file.cantBeCreated",
                     "Block Class"
             );
-            JOptionPane.showMessageDialog(
-                    null,
-                    errorMessage,
-                    errorTitle,
-                    JOptionPane.ERROR_MESSAGE
-            );
+            showError(errorMessage, errorTitle);
 
             return null;
         }
@@ -148,5 +155,18 @@ public class ModuleBlockClassGenerator extends FileGenerator {
 
     public String getBlockModule() {
         return blockFileData.getBlockModule();
+    }
+
+    private void showError(final String errorMessage, final String errorTitle) {
+        if (!interactive) {
+            return;
+        }
+
+        JOptionPane.showMessageDialog(
+                null,
+                errorMessage,
+                errorTitle,
+                JOptionPane.ERROR_MESSAGE
+        );
     }
 }

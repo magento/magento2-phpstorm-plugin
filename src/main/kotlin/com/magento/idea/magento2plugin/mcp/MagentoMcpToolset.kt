@@ -88,6 +88,32 @@ class MagentoMcpToolset : McpToolset {
     }
 
     /**
+     * Creates a Magento block class inside an editable module.
+     */
+    @McpTool(name = "create_magento_block")
+    @McpDescription("Create a Magento block class inside an editable module.")
+    suspend fun createMagentoBlock(moduleName: String, blockClassFqn: String): String = withProjectAction {
+        MagentoBlockCommands.createMagentoBlock(
+            project = it,
+            moduleName = moduleName,
+            blockClassFqn = blockClassFqn
+        )
+    }
+
+    /**
+     * Creates a Magento view model class inside an editable module.
+     */
+    @McpTool(name = "create_magento_view_model")
+    @McpDescription("Create a Magento view model class inside an editable module.")
+    suspend fun createMagentoViewModel(moduleName: String, viewModelClassFqn: String): String = withProjectAction {
+        MagentoViewModelCommands.createMagentoViewModel(
+            project = it,
+            moduleName = moduleName,
+            viewModelClassFqn = viewModelClassFqn
+        )
+    }
+
+    /**
      * Creates a Magento product EAV attribute data patch and optional source model inside an editable module.
      */
     @McpTool(name = "create_magento_product_eav_attribute")

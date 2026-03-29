@@ -31,6 +31,7 @@ public class ModuleViewModelClassGenerator extends FileGenerator {
     private final CommonBundle commonBundle;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
+    private final boolean interactive;
 
     /**
      * Constructor.
@@ -42,6 +43,21 @@ public class ModuleViewModelClassGenerator extends FileGenerator {
             final @NotNull ViewModelFileData viewModelFileData,
             final Project project
     ) {
+        this(viewModelFileData, project, true);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param viewModelFileData ViewModelFileData
+     * @param project Project
+     * @param interactive whether UI error reporting should be shown
+     */
+    public ModuleViewModelClassGenerator(
+            final @NotNull ViewModelFileData viewModelFileData,
+            final Project project,
+            final boolean interactive
+    ) {
         super(project);
 
         this.directoryGenerator = DirectoryGenerator.getInstance();
@@ -50,6 +66,7 @@ public class ModuleViewModelClassGenerator extends FileGenerator {
         this.project = project;
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
+        this.interactive = interactive;
     }
 
     /**
@@ -68,12 +85,7 @@ public class ModuleViewModelClassGenerator extends FileGenerator {
                     "validator.file.alreadyExists",
                     "View Model"
             );
-            JOptionPane.showMessageDialog(
-                    null,
-                    errorMessage,
-                    errorTitle,
-                    JOptionPane.ERROR_MESSAGE
-            );
+            showError(errorMessage, errorTitle);
 
             return null;
         }
@@ -84,12 +96,7 @@ public class ModuleViewModelClassGenerator extends FileGenerator {
                     "validator.file.cantBeCreated",
                     "View Model"
             );
-            JOptionPane.showMessageDialog(
-                    null,
-                    errorMessage,
-                    errorTitle,
-                    JOptionPane.ERROR_MESSAGE
-            );
+            showError(errorMessage, errorTitle);
 
             return null;
         }
@@ -144,5 +151,18 @@ public class ModuleViewModelClassGenerator extends FileGenerator {
 
     public String getViewModelModule() {
         return viewModelFileData.getViewModelModule();
+    }
+
+    private void showError(final String errorMessage, final String errorTitle) {
+        if (!interactive) {
+            return;
+        }
+
+        JOptionPane.showMessageDialog(
+                null,
+                errorMessage,
+                errorTitle,
+                JOptionPane.ERROR_MESSAGE
+        );
     }
 }
