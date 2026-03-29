@@ -20,10 +20,19 @@
       <td colspan="3" style="padding: 20px;">
         <h3 style="margin: 10px 0;">Support the Project</h3>
         <p>If you find this plugin helpful and want to support its development, consider buying the contributors a coffee:</p>
-        <a href="https://buymeacoffee.com/vitalii_b" style="text-decoration: none;">
-          <img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Donate-orange.svg" alt="Buy Me a Coffee" style="margin: 10px 0;">
+        <a href="https://buymeacoffee.com/vitalii_b" style="text-decoration: none; color: inherit;">
+<pre style="display: inline-block; margin: 10px 0; font-family: monospace;">
+    ( (
+     ) )
+  ........
+  |      |]
+  \      /
+   `----'
+ Buy Me a Coffee
+</pre>
         </a>
-        <p style="margin: 10px 0;">Thank you to our sponsors—your support means everything:</p>
+        <h3 style="margin: 10px 0;">Sponsors</h3>
+        <p style="margin: 10px 0;">Thank you to our sponsors for supporting the plugin:</p>
         <p><strong>Lucas van Staden</strong></p>
         <p><strong>Ivan Chepurnyi</strong></p>
         <p><strong>Michael Ryvlin</strong></p>
@@ -40,6 +49,7 @@
 * `Navigate to Web API configuration` reference in scope of class/interface and method
 * Plugin class methods generation
 * Plugin declaration inspection
+* Magento-specific MCP tools for AI agents
 * RequireJS reference navigation and completion
 * MFTF reference navigation and completion
 * GraphQL navigation line markers
@@ -64,6 +74,39 @@
 ## Works with
 
 * PhpStorm 2026+
+
+## MCP tools
+
+The plugin exposes a Magento-specific MCP toolset for AI agents inside JetBrains IDEs with MCP support enabled.
+
+Available creation tools:
+
+* `get_magento_root_path`
+* `create_magento_module`
+* `create_magento_plugin`
+* `create_magento_observer`
+* `create_magento_product_eav_attribute`
+* `create_magento_category_eav_attribute`
+* `create_magento_customer_eav_attribute`
+
+Available query tools:
+
+* `find_magento_module`
+* `find_di_config_for_class`
+* `find_plugins_for_method`
+* `find_observers_for_event`
+* `find_layout_entities`
+* `find_ui_component`
+* `find_acl_or_menu`
+
+Notes:
+
+* The IDE MCP server must be enabled in the JetBrains IDE.
+* The IDE MCP server entry must be added to the agent MCP configuration.
+* MCP tools work against the currently opened IDE project.
+* Magento plugin support must be enabled for the project.
+* Indexing must be finished before MCP queries and generators can run.
+* Category EAV attribute generation creates both the data patch and `view/adminhtml/ui_component/category_form.xml`.
 
 ## Setting up development environment
 

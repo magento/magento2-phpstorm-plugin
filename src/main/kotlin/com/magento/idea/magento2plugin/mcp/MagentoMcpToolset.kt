@@ -14,7 +14,7 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlin.coroutines.CoroutineContext
 
 /**
- * Exposes Magento-specific read-only MCP tools backed by the plugin's existing indexes.
+ * Exposes Magento-specific MCP tools backed by the plugin's existing indexes and generators.
  */
 class MagentoMcpToolset : McpToolset {
     /**
@@ -35,6 +35,196 @@ class MagentoMcpToolset : McpToolset {
     @McpDescription("Create a Magento module with composer.json, registration.php, and etc/module.xml.")
     suspend fun createMagentoModule(packageName: String, moduleName: String): String = withProjectAction {
         MagentoModuleCommands.createMagentoModule(it, packageName, moduleName)
+    }
+
+    /**
+     * Creates a Magento plugin class and matching di.xml declaration inside an editable module.
+     */
+    @McpTool(name = "create_magento_plugin")
+    @McpDescription("Create a Magento plugin class and corresponding di.xml declaration.")
+    suspend fun createMagentoPlugin(
+        moduleName: String,
+        targetClassName: String,
+        targetMethodName: String,
+        pluginType: String,
+        pluginName: String,
+        pluginClassFqn: String,
+        area: String,
+        sortOrder: Int
+    ): String = withProjectAction {
+        MagentoPluginCommands.createMagentoPlugin(
+            project = it,
+            moduleName = moduleName,
+            targetClassName = targetClassName,
+            targetMethodName = targetMethodName,
+            pluginType = pluginType,
+            pluginName = pluginName,
+            pluginClassFqn = pluginClassFqn,
+            area = area,
+            sortOrder = sortOrder
+        )
+    }
+
+    /**
+     * Creates a Magento observer class and matching events.xml declaration inside an editable module.
+     */
+    @McpTool(name = "create_magento_observer")
+    @McpDescription("Create a Magento observer class and corresponding events.xml declaration.")
+    suspend fun createMagentoObserver(
+        moduleName: String,
+        eventName: String,
+        observerName: String,
+        observerClassFqn: String,
+        area: String
+    ): String = withProjectAction {
+        MagentoObserverCommands.createMagentoObserver(
+            project = it,
+            moduleName = moduleName,
+            eventName = eventName,
+            observerName = observerName,
+            observerClassFqn = observerClassFqn,
+            area = area
+        )
+    }
+
+    /**
+     * Creates a Magento product EAV attribute data patch and optional source model inside an editable module.
+     */
+    @McpTool(name = "create_magento_product_eav_attribute")
+    @McpDescription("Create a Magento product EAV attribute data patch and optional source model.")
+    suspend fun createMagentoProductEavAttribute(
+        moduleName: String,
+        attributeCode: String,
+        attributeLabel: String,
+        backendType: String,
+        frontendInput: String,
+        dataPatchName: String,
+        attributeGroup: String,
+        sortOrder: Int,
+        scope: String,
+        sourceModelClassFqn: String,
+        applyTo: String,
+        required: Boolean,
+        visible: Boolean,
+        usedInGrid: Boolean,
+        visibleInGrid: Boolean,
+        filterableInGrid: Boolean,
+        htmlAllowedOnFront: Boolean,
+        visibleOnFront: Boolean,
+        options: List<String>
+    ): String = withProjectAction {
+        MagentoEavAttributeCommands.createMagentoProductEavAttribute(
+            project = it,
+            moduleName = moduleName,
+            attributeCode = attributeCode,
+            attributeLabel = attributeLabel,
+            backendType = backendType,
+            frontendInput = frontendInput,
+            dataPatchName = dataPatchName,
+            attributeGroup = attributeGroup,
+            sortOrder = sortOrder,
+            scope = scope,
+            sourceModelClassFqn = sourceModelClassFqn,
+            applyTo = applyTo,
+            required = required,
+            visible = visible,
+            usedInGrid = usedInGrid,
+            visibleInGrid = visibleInGrid,
+            filterableInGrid = filterableInGrid,
+            htmlAllowedOnFront = htmlAllowedOnFront,
+            visibleOnFront = visibleOnFront,
+            options = options
+        )
+    }
+
+    /**
+     * Creates a Magento category EAV attribute data patch, admin form field, and optional source model.
+     */
+    @McpTool(name = "create_magento_category_eav_attribute")
+    @McpDescription("Create a Magento category EAV attribute data patch, category_form.xml field, and optional source model.")
+    suspend fun createMagentoCategoryEavAttribute(
+        moduleName: String,
+        attributeCode: String,
+        attributeLabel: String,
+        backendType: String,
+        frontendInput: String,
+        dataPatchName: String,
+        attributeGroup: String,
+        sortOrder: Int,
+        scope: String,
+        sourceModelClassFqn: String,
+        required: Boolean,
+        visible: Boolean,
+        options: List<String>
+    ): String = withProjectAction {
+        MagentoEavAttributeCommands.createMagentoCategoryEavAttribute(
+            project = it,
+            moduleName = moduleName,
+            attributeCode = attributeCode,
+            attributeLabel = attributeLabel,
+            backendType = backendType,
+            frontendInput = frontendInput,
+            dataPatchName = dataPatchName,
+            attributeGroup = attributeGroup,
+            sortOrder = sortOrder,
+            scope = scope,
+            sourceModelClassFqn = sourceModelClassFqn,
+            required = required,
+            visible = visible,
+            options = options
+        )
+    }
+
+    /**
+     * Creates a Magento customer EAV attribute data patch and optional source model inside an editable module.
+     */
+    @McpTool(name = "create_magento_customer_eav_attribute")
+    @McpDescription("Create a Magento customer EAV attribute data patch and optional source model.")
+    suspend fun createMagentoCustomerEavAttribute(
+        moduleName: String,
+        attributeCode: String,
+        attributeLabel: String,
+        backendType: String,
+        frontendInput: String,
+        dataPatchName: String,
+        sortOrder: Int,
+        sourceModelClassFqn: String,
+        required: Boolean,
+        visible: Boolean,
+        userDefined: Boolean,
+        usedInGrid: Boolean,
+        visibleInGrid: Boolean,
+        filterableInGrid: Boolean,
+        system: Boolean,
+        useInAdminhtmlCustomerForm: Boolean,
+        useInAdminhtmlCheckoutForm: Boolean,
+        useInCustomerAccountCreateForm: Boolean,
+        useInCustomerAccountEditForm: Boolean,
+        options: List<String>
+    ): String = withProjectAction {
+        MagentoEavAttributeCommands.createMagentoCustomerEavAttribute(
+            project = it,
+            moduleName = moduleName,
+            attributeCode = attributeCode,
+            attributeLabel = attributeLabel,
+            backendType = backendType,
+            frontendInput = frontendInput,
+            dataPatchName = dataPatchName,
+            sortOrder = sortOrder,
+            sourceModelClassFqn = sourceModelClassFqn,
+            required = required,
+            visible = visible,
+            userDefined = userDefined,
+            usedInGrid = usedInGrid,
+            visibleInGrid = visibleInGrid,
+            filterableInGrid = filterableInGrid,
+            system = system,
+            useInAdminhtmlCustomerForm = useInAdminhtmlCustomerForm,
+            useInAdminhtmlCheckoutForm = useInAdminhtmlCheckoutForm,
+            useInCustomerAccountCreateForm = useInCustomerAccountCreateForm,
+            useInCustomerAccountEditForm = useInCustomerAccountEditForm,
+            options = options
+        )
     }
 
     /**

@@ -47,6 +47,7 @@ public class CategoryFormXmlGenerator extends FileGenerator {
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
     private boolean allowedFieldsetNodeInclude = true;
+    private final boolean interactive;
 
     /**
      * Category form XML Generator.
@@ -60,6 +61,23 @@ public class CategoryFormXmlGenerator extends FileGenerator {
             final @NotNull Project project,
             final @NotNull String moduleName
     ) {
+        this(categoryFormXmlData, project, moduleName, true);
+    }
+
+    /**
+     * Category form XML Generator.
+     *
+     * @param categoryFormXmlData Category form data class
+     * @param project Project
+     * @param moduleName module name
+     * @param interactive whether UI error reporting should be shown
+     */
+    public CategoryFormXmlGenerator(
+            final @NotNull CategoryFormXmlData categoryFormXmlData,
+            final @NotNull Project project,
+            final @NotNull String moduleName,
+            final boolean interactive
+    ) {
         super(project);
 
         this.categoryFormXmlData = categoryFormXmlData;
@@ -70,6 +88,7 @@ public class CategoryFormXmlGenerator extends FileGenerator {
         this.getCodeTemplateUtil = new GetCodeTemplateUtil(project);
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
+        this.interactive = interactive;
     }
 
     @Override
@@ -94,14 +113,14 @@ public class CategoryFormXmlGenerator extends FileGenerator {
         }
 
         if (categoryAdminFormXmlFile == null) {
-            showDeclarationCannotBeCreatedDialog();
+            onDeclarationCannotBeCreated();
             return null;
         }
 
         final XmlTag rootTag = ((XmlFile) categoryAdminFormXmlFile).getRootTag();
 
         if (rootTag == null) {
-            showDeclarationCannotBeCreatedDialog();
+            onDeclarationCannotBeCreated();
             return null;
         }
 
@@ -110,7 +129,7 @@ public class CategoryFormXmlGenerator extends FileGenerator {
 
 
         if (document == null) {
-            showDeclarationCannotBeCreatedDialog();
+            onDeclarationCannotBeCreated();
             return null;
         }
 
@@ -128,13 +147,17 @@ public class CategoryFormXmlGenerator extends FileGenerator {
                     document
             );
         } catch (IOException e) {
-            showDeclarationCannotBeCreatedDialog();
+            onDeclarationCannotBeCreated();
         }
 
         return reformatFile(categoryAdminFormXmlFile);
     }
 
-    private void showDeclarationCannotBeCreatedDialog() {
+    protected void onDeclarationCannotBeCreated() {
+        if (!interactive) {
+            return;
+        }
+
         JOptionPane.showMessageDialog(
                 null,
                 validatorBundle.message(

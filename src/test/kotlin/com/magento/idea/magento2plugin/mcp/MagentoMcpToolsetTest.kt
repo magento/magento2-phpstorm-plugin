@@ -16,6 +16,11 @@ class MagentoMcpToolsetTest {
             setOf(
                 "get_magento_root_path",
                 "create_magento_module",
+                "create_magento_plugin",
+                "create_magento_observer",
+                "create_magento_product_eav_attribute",
+                "create_magento_category_eav_attribute",
+                "create_magento_customer_eav_attribute",
                 "find_magento_module",
                 "find_di_config_for_class",
                 "find_plugins_for_method",

@@ -8,7 +8,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Added
 
-- Magento-specific MCP toolbox for AI agents
+- MCP project and code-generation tools:
+  `get_magento_root_path`,
+  `create_magento_module`,
+  `create_magento_plugin`,
+  `create_magento_observer`,
+  `create_magento_product_eav_attribute`,
+  `create_magento_category_eav_attribute`,
+  `create_magento_customer_eav_attribute`
+- MCP Magento lookup tools:
+  `find_magento_module`,
+  `find_di_config_for_class`,
+  `find_plugins_for_method`,
+  `find_observers_for_event`,
+  `find_layout_entities`,
+  `find_ui_component`,
+  `find_acl_or_menu`
 
 ## 2026.1.1
 
