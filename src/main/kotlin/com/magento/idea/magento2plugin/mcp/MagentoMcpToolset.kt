@@ -116,6 +116,48 @@ class MagentoMcpToolset : McpToolset {
     }
 
     /**
+     * Creates a Magento controller class inside an editable module.
+     */
+    @McpTool(name = "create_magento_controller")
+    @McpDescription("Create a Magento controller class inside an editable module. `controllerClassFqn` must be inside the module `Controller` namespace, for example `Foo\\Bar\\Controller\\Index\\Index` or `Foo\\Bar\\Controller\\Adminhtml\\Order\\Index`; the target area is inferred from the namespace, with `Controller\\Adminhtml\\...` meaning `adminhtml` and all other controller namespaces meaning `frontend`. `httpMethod` must be one of `GET`, `POST`, `PUT`, or `DELETE`. `aclResource` is only used when creating an adminhtml controller with `inheritClass=true`.")
+    suspend fun createMagentoController(
+        moduleName: String,
+        controllerClassFqn: String,
+        httpMethod: String,
+        inheritClass: Boolean,
+        aclResource: String
+    ): String = withProjectAction {
+        MagentoControllerCommands.createMagentoController(
+            project = it,
+            moduleName = moduleName,
+            controllerClassFqn = controllerClassFqn,
+            httpMethod = httpMethod,
+            inheritClass = inheritClass,
+            aclResource = aclResource
+        )
+    }
+
+    /**
+     * Creates a Magento CLI command class and di.xml registration inside an editable module.
+     */
+    @McpTool(name = "create_magento_cli_command")
+    @McpDescription("Create a Magento CLI command class and register it in `etc/di.xml`. `commandClassFqn` must be inside the module namespace and should usually live under `Console\\Command`, for example `Foo\\Bar\\Console\\Command\\SyncData`. `commandName` is the executable CLI name such as `foo:bar:sync-data`, and `commandDescription` becomes the Symfony command description shown in `bin/magento list`.")
+    suspend fun createMagentoCliCommand(
+        moduleName: String,
+        commandClassFqn: String,
+        commandName: String,
+        commandDescription: String
+    ): String = withProjectAction {
+        MagentoCliCommandCommands.createMagentoCliCommand(
+            project = it,
+            moduleName = moduleName,
+            commandClassFqn = commandClassFqn,
+            commandName = commandName,
+            commandDescription = commandDescription
+        )
+    }
+
+    /**
      * Creates a Magento block class inside an editable module.
      */
     @McpTool(name = "create_magento_block")

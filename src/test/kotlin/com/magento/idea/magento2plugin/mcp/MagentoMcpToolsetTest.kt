@@ -22,6 +22,8 @@ class MagentoMcpToolsetTest {
                 "create_magento_plugin",
                 "create_magento_observer",
                 "create_magento_entity_crud",
+                "create_magento_controller",
+                "create_magento_cli_command",
                 "create_magento_block",
                 "create_magento_view_model",
                 "create_magento_product_eav_attribute",
