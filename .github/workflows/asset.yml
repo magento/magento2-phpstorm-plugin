@@ -8,6 +8,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      GITHUB_RELEASE_PRERELEASE: ${{ github.event.release.prerelease }}
+      GITHUB_RELEASE_ID: ${{ github.event.release.id }}
+      PLUGIN_VERSION: ${{ github.event.release.prerelease && format('{0}-alpha.{1}', github.event.release.tag_name, github.event.release.id) || github.event.release.tag_name }}
 
     steps:
       - uses: actions/checkout@v3
@@ -27,8 +31,8 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./build/distributions/PhpStorm Magento 2 Plugin-${{ github.event.release.tag_name }}.zip
-          asset_name: PhpStorm Magento 2 Plugin-${{ github.event.release.tag_name }}.zip
+          asset_path: ./build/distributions/PhpStorm Magento 2 Plugin-${{ env.PLUGIN_VERSION }}.zip
+          asset_name: PhpStorm Magento 2 Plugin-${{ env.PLUGIN_VERSION }}.zip
           asset_content_type: application/zip-archive
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

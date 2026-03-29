@@ -10,6 +10,9 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      GITHUB_RELEASE_PRERELEASE: ${{ github.event.release.prerelease }}
+      GITHUB_RELEASE_ID: ${{ github.event.release.id }}
 
     steps:
       - uses: actions/checkout@v3
@@ -25,4 +28,3 @@ jobs:
         run: ./gradlew publishPlugin -i --no-daemon
         env:
           MAGENTO_PHPSTORM_intellijPublishToken: ${{ secrets.JET_BRAINS_TOKEN }}
-          MAGENTO_PHPSTORM_isAlpha: false

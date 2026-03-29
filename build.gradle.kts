@@ -17,7 +17,24 @@ plugins {
 }
 
 group = providers.gradleProperty("pluginGroup").get()
-version = providers.gradleProperty("pluginVersion").get()
+val basePluginVersion = providers.gradleProperty("pluginVersion")
+val isGithubPrerelease = providers.environmentVariable("GITHUB_RELEASE_PRERELEASE")
+    .map(String::toBoolean)
+    .orElse(false)
+val effectivePluginVersion = providers.provider {
+    val pluginVersion = basePluginVersion.get()
+
+    if (!isGithubPrerelease.get()) {
+        pluginVersion
+    } else {
+        val releaseId = providers.environmentVariable("GITHUB_RELEASE_ID").orNull
+            ?: throw GradleException("GITHUB_RELEASE_ID is required when publishing a GitHub prerelease.")
+
+        "$pluginVersion-alpha.$releaseId"
+    }
+}
+
+version = effectivePluginVersion.get()
 
 kotlin {
     jvmToolchain(21)
@@ -52,7 +69,7 @@ dependencies {
 
 intellijPlatform {
     pluginConfiguration {
-        version = providers.gradleProperty("pluginVersion")
+        version = effectivePluginVersion
 
         description = providers.fileContents(layout.projectDirectory.file("README.md")).asText.map {
             val start = "<!-- Plugin description -->"
@@ -67,7 +84,7 @@ intellijPlatform {
         }
 
         val changelog = project.changelog // local variable for configuration cache compatibility
-        changeNotes = providers.gradleProperty("pluginVersion").map { pluginVersion ->
+        changeNotes = basePluginVersion.map { pluginVersion ->
             with(changelog) {
                 renderItem(
                     (getOrNull(pluginVersion) ?: getUnreleased())
@@ -92,7 +109,9 @@ intellijPlatform {
 
     publishing {
         token = providers.environmentVariable("MAGENTO_PHPSTORM_intellijPublishToken")
-        channels = providers.gradleProperty("pluginVersion").map { listOf(it.substringAfter('-', "").substringBefore('.').ifEmpty { "default" }) }
+        channels = effectivePluginVersion.map {
+            listOf(it.substringAfter('-', "").substringBefore('.').ifEmpty { "default" })
+        }
     }
 
     pluginVerification {
