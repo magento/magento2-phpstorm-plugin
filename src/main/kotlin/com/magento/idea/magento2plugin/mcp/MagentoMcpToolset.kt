@@ -88,6 +88,34 @@ class MagentoMcpToolset : McpToolset {
     }
 
     /**
+     * Creates a Magento Entity CRUD scaffold with sensible defaults for database, ACL, menu, and optional UI/API layers.
+     */
+    @McpTool(name = "create_magento_entity_crud")
+    @McpDescription("Create a Magento Entity CRUD scaffold for a module. Generates the db schema, model/resource model/collection, data and command classes, ACL and menu entries, optional admin UI components, and optional Web API contracts. `properties` must be a list of `field_name:type` strings where `field_name` is lower_snake_case starting with a letter and `type` is one of `int`, `float`, `string`, or `bool`; for example `[\"title:string\", \"is_active:bool\", \"price:float\"]`. The primary ID column is generated automatically, so do not include it in `properties`. Leave `tableName` or `idFieldName` blank to derive defaults such as `mcp_crud` and `mcp_crud_id` from `entityName`.")
+    suspend fun createMagentoEntityCrud(
+        moduleName: String,
+        entityName: String,
+        tableName: String,
+        idFieldName: String,
+        properties: List<String>,
+        createAdminUiComponents: Boolean,
+        createDataInterface: Boolean,
+        createWebApi: Boolean
+    ): String = withProjectAction {
+        MagentoEntityCrudCommands.createMagentoEntityCrud(
+            project = it,
+            moduleName = moduleName,
+            entityName = entityName,
+            tableName = tableName,
+            idFieldName = idFieldName,
+            properties = properties,
+            createAdminUiComponents = createAdminUiComponents,
+            createDataInterface = createDataInterface,
+            createWebApi = createWebApi
+        )
+    }
+
+    /**
      * Creates a Magento block class inside an editable module.
      */
     @McpTool(name = "create_magento_block")

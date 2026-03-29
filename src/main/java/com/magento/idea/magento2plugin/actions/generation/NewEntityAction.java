@@ -19,8 +19,8 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.NewEntityDialog
 import org.jetbrains.annotations.NotNull;
 
 public class NewEntityAction extends AnAction {
-    public static final String ACTION_NAME = "Magento 2 Entity";
-    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Entity";
+    public static final String ACTION_NAME = "Magento 2 Entity CRUD";
+    public static final String ACTION_DESCRIPTION = "Create a new Magento 2 Entity CRUD scaffold";
 
     /**
      * Constructor.

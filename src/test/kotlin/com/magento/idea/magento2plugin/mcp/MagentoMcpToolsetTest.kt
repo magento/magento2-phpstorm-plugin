@@ -1,7 +1,10 @@
 package com.magento.idea.magento2plugin.mcp
 
+import com.intellij.mcpserver.annotations.McpDescription
 import com.intellij.mcpserver.annotations.McpTool
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class MagentoMcpToolsetTest {
@@ -18,6 +21,7 @@ class MagentoMcpToolsetTest {
                 "create_magento_module",
                 "create_magento_plugin",
                 "create_magento_observer",
+                "create_magento_entity_crud",
                 "create_magento_block",
                 "create_magento_view_model",
                 "create_magento_product_eav_attribute",
@@ -33,5 +37,18 @@ class MagentoMcpToolsetTest {
             ),
             toolNames
         )
+    }
+
+    @Test
+    fun testEntityCrudToolDescriptionExplainsPropertiesFormat() {
+        val method = MagentoMcpToolset::class.java.declaredMethods.first { method ->
+            method.name == "createMagentoEntityCrud" && method.getAnnotation(McpDescription::class.java) != null
+        }
+
+        val description = method.getAnnotation(McpDescription::class.java)?.description
+        assertNotNull(description)
+        assertTrue(description!!.contains("field_name:type"))
+        assertTrue(description.contains("[\"title:string\", \"is_active:bool\", \"price:float\"]"))
+        assertTrue(description.contains("do not include it in `properties`"))
     }
 }

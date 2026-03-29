@@ -129,7 +129,7 @@ public class NewEntityDialog extends AbstractDialog {
     private final List<String> properties;
     private TableGroupWrapper entityPropertiesTableGroupWrapper;
 
-    private static final String ACTION_NAME = "Create Entity";
+    private static final String ACTION_NAME = "Create Entity CRUD";
     private static final String PROPERTY_NAME = "Name";
     private static final String PROPERTY_TYPE = "Type";
     private static final String ACL_ID = "ACL ID";
