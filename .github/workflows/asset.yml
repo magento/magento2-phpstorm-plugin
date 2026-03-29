@@ -31,8 +31,8 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./build/distributions/PhpStorm Magento 2 Plugin-${{ env.PLUGIN_VERSION }}.zip
-          asset_name: PhpStorm Magento 2 Plugin-${{ env.PLUGIN_VERSION }}.zip
+          asset_path: ./build/distributions/Magento 2 and Adobe Commerce Support-${{ env.PLUGIN_VERSION }}.zip
+          asset_name: Magento 2 and Adobe Commerce Support-${{ env.PLUGIN_VERSION }}.zip
           asset_content_type: application/zip-archive
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

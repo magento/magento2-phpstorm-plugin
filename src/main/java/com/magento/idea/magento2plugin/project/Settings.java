@@ -17,8 +17,10 @@ import com.intellij.util.SmartList;
 import com.intellij.util.xmlb.annotations.Attribute;
 import com.intellij.util.xmlb.annotations.Tag;
 import java.util.EventListener;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,12 +37,16 @@ import org.jetbrains.annotations.Nullable;
 public class Settings implements PersistentStateComponent<Settings.State> {
     private final EventDispatcher<MagentoModuleDataListener> myEventDispatcher
             = EventDispatcher.create(MagentoModuleDataListener.class);
+    public static final String DEFAULT_MCP_CLI_TOOL_CANDIDATES =
+            "bin/magento, bin/n98-magerun2, bin/n98-magerun, bin/magerun, "
+                    + "bin/cli, bin/console, bin/composer, bin/php";
     public boolean pluginEnabled;
     public String defaultLicense;
     public static final String DEFAULT_LICENSE = "Proprietary";
     public String magentoPath;
     public boolean mftfSupportEnabled;
     public boolean myDoNotAskContentConfigAgain;
+    public String mcpCliToolCandidates;
     public String magentoVersion;
     public String magentoEdition;
     public List<String> myMagentoFolders;
@@ -54,6 +60,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
                 this.defaultLicense,
                 this.mftfSupportEnabled,
                 this.myDoNotAskContentConfigAgain,
+                this.mcpCliToolCandidates,
                 this.magentoVersion,
                 this.magentoEdition,
                 this.myMagentoFolders
@@ -127,6 +134,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         this.defaultLicense = state.getDefaultLicenseName();
         this.mftfSupportEnabled = state.isMftfSupportEnabled();
         this.myDoNotAskContentConfigAgain = state.isDoNotAskContentConfigAgain();
+        this.mcpCliToolCandidates = state.getMcpCliToolCandidates();
         this.magentoVersion = state.getMagentoVersion();
         this.magentoEdition = state.getMagentoEdition();
         this.myMagentoFolders = state.getMagentoFolders();
@@ -182,6 +190,49 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         return getInstance(project).magentoPath;
     }
 
+    public static @NotNull List<String> getMcpCliToolCandidates(final @NotNull Project project) {
+        return parseMcpCliToolCandidates(getInstance(project).mcpCliToolCandidates);
+    }
+
+    public static @NotNull String getNormalizedMcpCliToolCandidates(
+            final @Nullable String value
+    ) {
+        return String.join(", ", parseMcpCliToolCandidates(value));
+    }
+
+    public static @NotNull List<String> parseMcpCliToolCandidates(final @Nullable String value) {
+        final String rawValue = StringUtil.isEmptyOrSpaces(value)
+                ? DEFAULT_MCP_CLI_TOOL_CANDIDATES
+                : value;
+        final Set<String> result = new LinkedHashSet<>();
+
+        for (final String part : rawValue.split("[,;\\n\\r]+")) {
+            final String normalizedPart = normalizeCliToolCandidate(part);
+            if (!normalizedPart.isEmpty()) {
+                result.add(normalizedPart);
+            }
+        }
+
+        if (result.isEmpty()) {
+            return List.of();
+        }
+
+        return List.copyOf(result);
+    }
+
+    private static @NotNull String normalizeCliToolCandidate(final @Nullable String value) {
+        if (StringUtil.isEmptyOrSpaces(value)) {
+            return "";
+        }
+
+        String normalizedValue = value.trim().replace('\\', '/');
+        while (normalizedValue.startsWith("./")) {
+            normalizedValue = normalizedValue.substring(2);
+        }
+
+        return normalizedValue;
+    }
+
     @SuppressWarnings({"PMD.DataClass"})
     @Tag
     public static class State {
@@ -190,6 +241,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         public String magentoPath;
         public boolean mftfSupportEnabled;
         public boolean myDoNotAskContentConfigAgain;
+        public String mcpCliToolCandidates;
         public String magentoVersion;
         public String magentoEdition;
         public List<String> myMagentoFolders;
@@ -205,6 +257,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
          * @param defaultLicenseName String
          * @param mftfSupportEnabled boolean
          * @param myDoNotAskContentConfigAgain boolean
+         * @param mcpCliToolCandidates String
          * @param magentoVersion String
          * @param magentoEdition String
          * @param myMagentoFolders List
@@ -215,6 +268,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
                 final String defaultLicenseName,
                 final boolean mftfSupportEnabled,
                 final boolean myDoNotAskContentConfigAgain,
+                final String mcpCliToolCandidates,
                 final String magentoVersion,
                 final String magentoEdition,
                 final List<String> myMagentoFolders
@@ -224,6 +278,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             this.defaultLicenseName = defaultLicenseName;
             this.mftfSupportEnabled = mftfSupportEnabled;
             this.myDoNotAskContentConfigAgain = myDoNotAskContentConfigAgain;
+            this.mcpCliToolCandidates = mcpCliToolCandidates;
             this.magentoVersion = magentoVersion;
             this.magentoEdition = magentoEdition;
             this.myMagentoFolders = myMagentoFolders;
@@ -326,6 +381,15 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             this.mftfSupportEnabled = mftfSupportEnabled;
         }
 
+        public String getMcpCliToolCandidates() {
+            return this.mcpCliToolCandidates;
+        }
+
+        @Tag("mcpCliToolCandidates")
+        public void setMcpCliToolCandidates(final String mcpCliToolCandidates) {
+            this.mcpCliToolCandidates = mcpCliToolCandidates;
+        }
+
         @SuppressWarnings({
                 "PMD.ConfusingTernary",
                 "PMD.CognitiveComplexity",
@@ -343,6 +407,10 @@ public class Settings implements PersistentStateComponent<Settings.State> {
                     return false;
                 } else if (
                         this.isDoNotAskContentConfigAgain() != state.isDoNotAskContentConfigAgain()
+                ) {
+                    return false;
+                } else if (
+                        !Objects.equals(this.mcpCliToolCandidates, state.mcpCliToolCandidates)
                 ) {
                     return false;
                 } else if (!Objects.equals(this.myMagentoFolders, state.myMagentoFolders)) {
@@ -371,6 +439,9 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             result = 31 * result + (this.isDoNotAskContentConfigAgain() ? 1 : 0);
             result = 31 * result + (
                     this.defaultLicenseName != null ? this.defaultLicenseName.hashCode() : 0
+                );
+            result = 31 * result + (
+                    this.mcpCliToolCandidates != null ? this.mcpCliToolCandidates.hashCode() : 0
                 );
             result = 31 * result
                     + (this.myMagentoFolders != null ? this.myMagentoFolders.hashCode() : 0);

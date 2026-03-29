@@ -5,7 +5,7 @@
 </p>
 
 <!-- Plugin description -->
-# PhpStorm Magento 2 Plugin
+# Magento 2 and Adobe Commerce Support
 
 <table align="center" style="border-collapse: collapse; width: 100%; text-align: center;">
   <caption style="font-size: 1.2em; margin-bottom: 10px;">
@@ -103,6 +103,7 @@ Available query tools:
 * `find_layout_entities`
 * `find_ui_component`
 * `find_acl_or_menu`
+* `describe_magento_cli_environment`
 
 Notes:
 
@@ -112,6 +113,23 @@ Notes:
 * Magento plugin support must be enabled for the project.
 * Indexing must be finished before MCP queries and generators can run.
 * Category EAV attribute generation creates both the data patch and `view/adminhtml/ui_component/category_form.xml`.
+* `describe_magento_cli_environment` detects project-local wrappers such as Mark Shust Docker scripts under `bin/` and returns the exact command paths an agent should use.
+
+### MCP CLI wrapper configuration
+
+If your Magento project uses local wrapper scripts such as Mark Shust Docker commands, configure them in:
+
+`Settings > Languages & Frameworks > PHP > Frameworks > Magento > MCP CLI wrapper candidates`
+
+Use a comma-separated list of relative paths, for example:
+
+`bin/magento, bin/n98-magerun2, bin/cli`
+
+Agent usage pattern:
+
+1. Call `describe_magento_cli_environment`.
+2. Use the returned wrapper path exactly, for example `./bin/magento cache:flush` or `./bin/n98-magerun2 sys:info`.
+3. Prefer the wrapper over global binaries because these scripts often enter Docker containers or a project-specific runtime.
 
 ## Setting up development environment
 

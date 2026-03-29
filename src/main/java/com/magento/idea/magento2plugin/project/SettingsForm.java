@@ -53,6 +53,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     private JTextField moduleDefaultLicenseName;
     private JCheckBox mftfSupportEnabled;
     private TextFieldWithBrowseButton magentoPath;
+    private JTextField mcpCliToolCandidates;
     private final SettingsFormValidator validator = new SettingsFormValidator(this);
     private JLabel magentoVersionLabel;//NOPMD
     private JLabel magentoPathLabel;//NOPMD
@@ -96,6 +97,9 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         moduleDefaultLicenseName.setText(getSettings().defaultLicense);
         mftfSupportEnabled.setSelected(getSettings().mftfSupportEnabled);
         magentoPath.getTextField().setText(getSettings().magentoPath);
+        mcpCliToolCandidates.setText(
+                Settings.getNormalizedMcpCliToolCandidates(getSettings().mcpCliToolCandidates)
+        );
         resolveMagentoVersion();
 
         addPathListener();
@@ -111,6 +115,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         magentoVersion.setEnabled(isEnabled);
         mftfSupportEnabled.setEnabled(isEnabled);
         magentoPath.setEnabled(isEnabled);
+        mcpCliToolCandidates.setEnabled(isEnabled);
         moduleDefaultLicenseName.setEnabled(isEnabled);
     }
 
@@ -135,9 +140,12 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         final boolean mftfSupportChanged = mftfSupportEnabled.isSelected()
                 != getSettings().mftfSupportEnabled;
         final boolean magentoPathChanged = isMagentoPathChanged();
+        final boolean mcpCliToolCandidatesChanged = !Settings
+                .getNormalizedMcpCliToolCandidates(mcpCliToolCandidates.getText())
+                .equals(Settings.getNormalizedMcpCliToolCandidates(getSettings().mcpCliToolCandidates));
 
         return statusChanged || licenseChanged || mftfSupportChanged
-                || magentoPathChanged || versionChanged;
+                || magentoPathChanged || versionChanged || mcpCliToolCandidatesChanged;
     }
 
     private void resolveMagentoVersion() {
@@ -167,6 +175,9 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         getSettings().defaultLicense = moduleDefaultLicenseName.getText();
         getSettings().mftfSupportEnabled = mftfSupportEnabled.isSelected();
         getSettings().magentoPath = getMagentoPath();
+        getSettings().mcpCliToolCandidates = Settings.getNormalizedMcpCliToolCandidates(
+                mcpCliToolCandidates.getText()
+        );
         buttonReindex.setEnabled(getSettings().pluginEnabled);
         regenerateUrnMapButton.setEnabled(getSettings().pluginEnabled);
     }
@@ -184,6 +195,13 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     @Override
     public void reset() {
         pluginEnabled.setSelected(getSettings().pluginEnabled);
+        moduleDefaultLicenseName.setText(getSettings().defaultLicense);
+        mftfSupportEnabled.setSelected(getSettings().mftfSupportEnabled);
+        magentoPath.getTextField().setText(getSettings().magentoPath);
+        mcpCliToolCandidates.setText(
+                Settings.getNormalizedMcpCliToolCandidates(getSettings().mcpCliToolCandidates)
+        );
+        refreshFormStatus(pluginEnabled.isSelected());
     }
 
     @Override

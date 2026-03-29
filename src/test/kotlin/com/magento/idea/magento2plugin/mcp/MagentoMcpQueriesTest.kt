@@ -3,6 +3,7 @@ package com.magento.idea.magento2plugin.mcp
 import com.intellij.testFramework.IndexingTestUtil
 import com.intellij.testFramework.PlatformTestUtil
 import com.magento.idea.magento2plugin.BaseProjectTestCase
+import com.magento.idea.magento2plugin.project.Settings
 import org.junit.Test
 
 class MagentoMcpQueriesTest : BaseProjectTestCase() {
@@ -221,6 +222,39 @@ class MagentoMcpQueriesTest : BaseProjectTestCase() {
         )
         assertContains(result, "file:")
         assertContainsPath(result, "vendor/magento/module-catalog/etc/adminhtml/menu.xml")
+    }
+
+    @Test
+    fun testDescribeCliEnvironmentDetectsMagentoAndMagerunWrappers() {
+        myFixture.addFileToProject("bin/magento", "#!/usr/bin/env bash\n")
+        myFixture.addFileToProject("bin/n98-magerun2", "#!/usr/bin/env bash\n")
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+        val result = MagentoCliToolQueries.describeCliEnvironment(project)
+
+        assertContains(result, "Magento CLI environment")
+        assertContains(result, "Configured wrapper candidates:")
+        assertContains(result, "./bin/magento")
+        assertContains(result, "example: ./bin/magento cache:flush")
+        assertContains(result, "./bin/n98-magerun2")
+        assertContains(result, "example: ./bin/n98-magerun2 sys:info")
+        assertContains(result, "Mark Shust Docker projects usually route these wrappers into containers")
+    }
+
+    @Test
+    fun testDescribeCliEnvironmentUsesConfiguredCandidateOrder() {
+        Settings.getInstance(project).mcpCliToolCandidates = "bin/n98-magerun2, bin/magento"
+        myFixture.addFileToProject("bin/magento", "#!/usr/bin/env bash\n")
+        myFixture.addFileToProject("bin/n98-magerun2", "#!/usr/bin/env bash\n")
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+        val result = MagentoCliToolQueries.describeCliEnvironment(project)
+        val magerunIndex = result.indexOf("./bin/n98-magerun2")
+        val magentoIndex = result.indexOf("./bin/magento")
+
+        assertTrue("Expected n98-magerun2 wrapper to be listed before magento:\n$result", magerunIndex in 0 until magentoIndex)
     }
 
     private fun assertContains(text: String, expected: String) {

@@ -35,7 +35,8 @@ class MagentoMcpToolsetTest {
                 "find_observers_for_event",
                 "find_layout_entities",
                 "find_ui_component",
-                "find_acl_or_menu"
+                "find_acl_or_menu",
+                "describe_magento_cli_environment"
             ),
             toolNames
         )
@@ -52,5 +53,19 @@ class MagentoMcpToolsetTest {
         assertTrue(description!!.contains("field_name:type"))
         assertTrue(description.contains("[\"title:string\", \"is_active:bool\", \"price:float\"]"))
         assertTrue(description.contains("do not include it in `properties`"))
+    }
+
+    @Test
+    fun testCliEnvironmentToolDescriptionExplainsWhenToUseIt() {
+        val method = MagentoMcpToolset::class.java.declaredMethods.first { toolMethod ->
+            toolMethod.name == "describeMagentoCliEnvironment"
+                    && toolMethod.getAnnotation(McpDescription::class.java) != null
+        }
+
+        val description = method.getAnnotation(McpDescription::class.java)?.description
+        assertNotNull(description)
+        assertTrue(description!!.contains("Mark Shust"))
+        assertTrue(description.contains("before running shell commands"))
+        assertTrue(description.contains("prefer the returned wrapper paths"))
     }
 }

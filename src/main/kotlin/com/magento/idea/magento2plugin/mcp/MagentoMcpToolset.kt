@@ -387,6 +387,15 @@ class MagentoMcpToolset : McpToolset {
     }
 
     /**
+     * Detects project-local CLI wrappers such as Mark Shust Docker scripts and explains how to invoke them.
+     */
+    @McpTool(name = "describe_magento_cli_environment")
+    @McpDescription("Inspect the current Magento project for local CLI wrappers under `bin/`, including Mark Shust Docker scripts such as `bin/magento` and `bin/n98-magerun2`. Call this before running shell commands that would normally use Magento CLI, PHP, Composer, or n98-magerun, and prefer the returned wrapper paths over global binaries.")
+    suspend fun describeMagentoCliEnvironment(): String = withProjectReadAction {
+        MagentoCliToolQueries.describeCliEnvironment(it)
+    }
+
+    /**
      * Resolves the active IDE project from MCP call context, validates it, and executes the tool body.
      */
     private suspend fun withProjectAction(
