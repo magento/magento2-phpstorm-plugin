@@ -56,6 +56,57 @@ class MagentoMcpToolsetTest {
     }
 
     @Test
+    fun testCreationToolDescriptionsExplainAcceptedFormats() {
+        val expectedSnippets = mapOf(
+            "createMagentoModule" to listOf("Foo_Bar", "foo/module-bar", "do not pass `foo/module-bar`"),
+            "createMagentoPlugin" to listOf("Vendor_Module", "before`, `around`, or `after`", "`base`, `adminhtml`, `frontend`"),
+            "createMagentoObserver" to listOf("must not contain whitespace", "Foo\\Bar\\Observer\\CatalogProductSaveAfter", "`base`, `adminhtml`, `frontend`"),
+            "createMagentoCliCommand" to listOf("foo:bar:sync-data", "underscores, hyphens, and colons", "Vendor_Module"),
+            "createMagentoBlock" to listOf("Vendor_Module", "Foo\\Bar\\Block\\Product\\BadgeBlock"),
+            "createMagentoViewModel" to listOf("Vendor_Module", "Foo\\Bar\\ViewModel\\Product\\BadgeViewModel"),
+            "createMagentoProductEavAttribute" to listOf("lower_snake_case", "`static`, `varchar`, `int`, `text`, `datetime`, or `decimal`", "`select` or `multiselect`"),
+            "createMagentoCategoryEavAttribute" to listOf("lower_snake_case", "`global`, `store`, or `website`", "`select` or `multiselect`"),
+            "createMagentoCustomerEavAttribute" to listOf("lower_snake_case", "`static`, `varchar`, `int`, `text`, `datetime`, or `decimal`", "`select` or `multiselect`")
+        )
+
+        for ((methodName, snippets) in expectedSnippets) {
+            val method = MagentoMcpToolset::class.java.declaredMethods.first { toolMethod ->
+                toolMethod.name == methodName && toolMethod.getAnnotation(McpDescription::class.java) != null
+            }
+            val description = method.getAnnotation(McpDescription::class.java)?.description
+            assertNotNull(description)
+            for (snippet in snippets) {
+                assertTrue("Expected <$snippet> in description for $methodName: $description", description!!.contains(snippet))
+            }
+        }
+    }
+
+    @Test
+    fun testLookupToolDescriptionsExplainAcceptedFormats() {
+        val expectedSnippets = mapOf(
+            "getMagentoRootPath" to listOf("absolute project path", "resolved Magento root directory"),
+            "findMagentoModule" to listOf("`Vendor_Module`", "`Magento_Catalog`", "`Catalog`"),
+            "findDiConfigForClass" to listOf("PHP FQN", "virtual type", "Magento\\Catalog\\Model\\Product"),
+            "findPluginsForMethod" to listOf("target PHP FQN", "`save` or `getById`", "without `before`/`after`/`around` prefixes"),
+            "findObserversForEvent" to listOf("`catalog_product_save_after`", "`product_save`", "`events.xml`"),
+            "findLayoutEntities" to listOf("`catalog_product_view`", "`product.info.main`", "layout XML file or insertion point"),
+            "findUiComponent" to listOf("`product_form`", "without the `.xml` extension", "admin forms, listings, or data providers"),
+            "findAclOrMenu" to listOf("`Magento_Catalog::catalog`", "`Foo_Bar::manage_items`", "ACL and menu XML so you can reuse the correct resource ID")
+        )
+
+        for ((methodName, snippets) in expectedSnippets) {
+            val method = MagentoMcpToolset::class.java.declaredMethods.first { toolMethod ->
+                toolMethod.name == methodName && toolMethod.getAnnotation(McpDescription::class.java) != null
+            }
+            val description = method.getAnnotation(McpDescription::class.java)?.description
+            assertNotNull(description)
+            for (snippet in snippets) {
+                assertTrue("Expected <$snippet> in description for $methodName: $description", description!!.contains(snippet))
+            }
+        }
+    }
+
+    @Test
     fun testCliEnvironmentToolDescriptionExplainsWhenToUseIt() {
         val method = MagentoMcpToolset::class.java.declaredMethods.first { toolMethod ->
             toolMethod.name == "describeMagentoCliEnvironment"
@@ -65,7 +116,8 @@ class MagentoMcpToolsetTest {
         val description = method.getAnnotation(McpDescription::class.java)?.description
         assertNotNull(description)
         assertTrue(description!!.contains("Mark Shust"))
-        assertTrue(description.contains("before running shell commands"))
-        assertTrue(description.contains("prefer the returned wrapper paths"))
+        assertTrue(description.contains("before running shell commands") || description.contains("Call this before running shell commands"))
+        assertTrue(description.contains("use the returned project-local wrapper path exactly"))
+        assertTrue(description.contains("`./bin/magento cache:flush`"))
     }
 }

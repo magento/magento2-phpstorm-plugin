@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.mcp
 
+import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
@@ -23,6 +25,7 @@ import com.magento.idea.magento2plugin.magento.packages.Package
 import com.magento.idea.magento2plugin.project.Settings
 import com.magento.idea.magento2plugin.util.CamelCaseToHyphen
 import java.nio.file.Paths
+import java.util.concurrent.atomic.AtomicReference
 
 internal object MagentoModuleCommands {
     private const val ACTION_NAME = "Magento MCP Create Module"
@@ -72,10 +75,12 @@ internal object MagentoModuleCommands {
             return "Magento module \"$moduleFullName\" already exists."
         }
 
-        val appDirectory = magentoRootDirectory.findSubdirectory("app")
-        val codeDirectory = appDirectory?.findSubdirectory("code")
-        val existingModuleDirectory = codeDirectory?.findSubdirectory(normalizedPackage)
-            ?.findSubdirectory(normalizedModule)
+        val existingModuleDirectory = ReadAction.compute<PsiDirectory?, RuntimeException> {
+            magentoRootDirectory.findSubdirectory("app")
+                ?.findSubdirectory("code")
+                ?.findSubdirectory(normalizedPackage)
+                ?.findSubdirectory(normalizedModule)
+        }
         if (existingModuleDirectory != null) {
             return "Target directory already exists: ${MagentoMcpSupport.relativePath(project, existingModuleDirectory.virtualFile)}"
         }
@@ -183,7 +188,7 @@ internal object MagentoModuleCommands {
     }
 
     private fun rollbackModuleTree(vararg directoryResults: DirectoryCreationResult) {
-        WriteAction.run<RuntimeException> {
+        val rollbackAction = {
             directoryResults.forEach { result ->
                 if (!result.created || !result.directory.isValid) {
                     return@forEach
@@ -201,6 +206,22 @@ internal object MagentoModuleCommands {
                 result.directory.delete()
             }
         }
+
+        val application = ApplicationManager.getApplication()
+        if (application.isDispatchThread) {
+            WriteAction.run<RuntimeException>(rollbackAction)
+            return
+        }
+
+        val failure = AtomicReference<RuntimeException?>()
+        application.invokeAndWait {
+            try {
+                WriteAction.run<RuntimeException>(rollbackAction)
+            } catch (exception: RuntimeException) {
+                failure.set(exception)
+            }
+        }
+        failure.get()?.let { throw it }
     }
 
     private fun findOrCreateDirectory(
@@ -208,7 +229,9 @@ internal object MagentoModuleCommands {
         name: String,
         directoryGenerator: DirectoryGenerator
     ): DirectoryCreationResult {
-        val existing = parent.findSubdirectory(name)
+        val existing = ReadAction.compute<PsiDirectory?, RuntimeException> {
+            parent.findSubdirectory(name)
+        }
         if (existing != null) {
             return DirectoryCreationResult(existing, created = false, name = name)
         }
@@ -239,34 +262,36 @@ internal object MagentoModuleCommands {
     }
 
     private fun resolveMagentoRootDirectory(project: Project, configuredRoot: String): PsiDirectory? {
-        val fileSystem = LocalFileSystem.getInstance()
-        val candidates = linkedSetOf(configuredRoot)
-        val basePath = project.basePath
-        if (basePath != null) {
-            candidates += Paths.get(basePath, configuredRoot.removePrefix("/")).normalize().toString()
-            candidates += Paths.get(basePath, configuredRoot).normalize().toString()
-        }
-
-        val virtualFile = candidates.asSequence()
-            .mapNotNull { path -> fileSystem.refreshAndFindFileByPath(path) ?: fileSystem.findFileByPath(path) }
-            .firstOrNull { it.isDirectory }
-        if (virtualFile != null) {
-            return PsiManager.getInstance(project).findDirectory(virtualFile)
-        }
-
-        val configuredPrefix = configuredRoot.trimEnd('/') + "/" + Package.packagesRoot + "/"
-        val moduleIndex = ModuleIndex(project)
-        for (moduleName in moduleIndex.moduleNames) {
-            val moduleDirectory = moduleIndex.getModuleDirectoryByModuleName(moduleName) ?: continue
-            val modulePath = moduleDirectory.virtualFile.path.replace('\\', '/')
-            if (!modulePath.startsWith(configuredPrefix)) {
-                continue
+        return ReadAction.compute<PsiDirectory?, RuntimeException> {
+            val fileSystem = LocalFileSystem.getInstance()
+            val candidates = linkedSetOf(configuredRoot)
+            val basePath = project.basePath
+            if (basePath != null) {
+                candidates += Paths.get(basePath, configuredRoot.removePrefix("/")).normalize().toString()
+                candidates += Paths.get(basePath, configuredRoot).normalize().toString()
             }
 
-            return moduleDirectory.parentDirectory(levels = 4)
-        }
+            val virtualFile = candidates.asSequence()
+                .mapNotNull { path -> fileSystem.refreshAndFindFileByPath(path) ?: fileSystem.findFileByPath(path) }
+                .firstOrNull { it.isDirectory }
+            if (virtualFile != null) {
+                return@compute PsiManager.getInstance(project).findDirectory(virtualFile)
+            }
 
-        return null
+            val configuredPrefix = configuredRoot.trimEnd('/') + "/" + Package.packagesRoot + "/"
+            val moduleIndex = ModuleIndex(project)
+            for (moduleName in moduleIndex.moduleNames) {
+                val moduleDirectory = moduleIndex.getModuleDirectoryByModuleName(moduleName) ?: continue
+                val modulePath = moduleDirectory.virtualFile.path.replace('\\', '/')
+                if (!modulePath.startsWith(configuredPrefix)) {
+                    continue
+                }
+
+                return@compute moduleDirectory.parentDirectory(levels = 4)
+            }
+
+            null
+        }
     }
 
     private fun PsiDirectory.parentDirectory(levels: Int): PsiDirectory? {

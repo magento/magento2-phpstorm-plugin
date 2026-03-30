@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Added
 
-- MCP project and code-generation tools:
+- Magento MCP project and generation tools for AI agents. These tools can return the configured Magento root path and generate common Magento scaffolding directly in the opened project, including modules, plugins, observers, CRUD entities, controllers, CLI commands, blocks, view models, and product/category/customer EAV attributes:
   `get_magento_root_path`,
   `create_magento_module`,
   `create_magento_plugin`,
@@ -21,7 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
   `create_magento_product_eav_attribute`,
   `create_magento_category_eav_attribute`,
   `create_magento_customer_eav_attribute`
-- MCP Magento lookup tools:
+- Magento MCP lookup tools for AI agents. These tools help an agent inspect the current project and answer Magento-specific questions by locating modules, DI configuration, plugin interceptions, event observers, layout entities, UI components, and ACL or admin menu declarations:
   `find_magento_module`,
   `find_di_config_for_class`,
   `find_plugins_for_method`,
@@ -29,6 +29,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
   `find_layout_entities`,
   `find_ui_component`,
   `find_acl_or_menu`
+- Magento MCP CLI environment discovery for AI agents. The `describe_magento_cli_environment` tool exposes project-local wrapper commands, including Mark Shust Docker-style `bin/*` scripts such as `bin/magento` and `bin/n98-magerun2`, so agents can prefer those wrappers over global binaries.
 
 ## 2026.1.1
 

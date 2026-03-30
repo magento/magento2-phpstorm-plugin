@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.indexes;
 
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -71,34 +72,35 @@ public final class ModuleIndex {
             final boolean withinProject,
             final String pattern
     ) {
-        final FileBasedIndex index = FileBasedIndex
-                .getInstance();
-        final List<String> allModulesList = new ArrayList<>();
-        final Collection<String> allModules = index.getAllKeys(ModuleNameIndex.KEY, project);
-        for (final String moduleName : allModules) {
-            if (!moduleName.matches(pattern)) {
-                continue;
-            }
-            final Collection<VirtualFile> files = index.getContainingFiles(
-                        ModuleNameIndex.KEY, moduleName,
-                        GlobalSearchScope.getScopeRestrictedByFileTypes(
-                    GlobalSearchScope.allScope(project),
-                    PhpFileType.INSTANCE
-            ));
-            if (files.isEmpty()) {
-                continue;
-            }
-            for (final VirtualFile virtualFile : files) {
-                if (withinProject && !IsFileInEditableModuleUtil.execute(project, virtualFile)) {
+        return ReadAction.compute(() -> {
+            final FileBasedIndex index = FileBasedIndex.getInstance();
+            final List<String> allModulesList = new ArrayList<>();
+            final Collection<String> allModules = index.getAllKeys(ModuleNameIndex.KEY, project);
+            for (final String moduleName : allModules) {
+                if (!moduleName.matches(pattern)) {
                     continue;
                 }
+                final Collection<VirtualFile> files = index.getContainingFiles(
+                            ModuleNameIndex.KEY, moduleName,
+                            GlobalSearchScope.getScopeRestrictedByFileTypes(
+                        GlobalSearchScope.allScope(project),
+                        PhpFileType.INSTANCE
+                ));
+                if (files.isEmpty()) {
+                    continue;
+                }
+                for (final VirtualFile virtualFile : files) {
+                    if (withinProject && !IsFileInEditableModuleUtil.execute(project, virtualFile)) {
+                        continue;
+                    }
 
-                allModulesList.add(moduleName);
-                break;
+                    allModulesList.add(moduleName);
+                    break;
+                }
             }
-        }
-        Collections.sort(allModulesList);
-        return allModulesList;
+            Collections.sort(allModulesList);
+            return allModulesList;
+        });
     }
 
     /**
@@ -109,26 +111,27 @@ public final class ModuleIndex {
      * @return PsiDirectory
      */
     public @Nullable PsiDirectory getModuleDirectoryByModuleName(final String moduleName) {
-        if (DumbService.getInstance(project).isDumb() || moduleName == null) {
-            return null;
-        }
-        final FileBasedIndex index = FileBasedIndex
-                .getInstance();
+        return ReadAction.compute(() -> {
+            if (DumbService.getInstance(project).isDumb() || moduleName == null) {
+                return null;
+            }
+            final FileBasedIndex index = FileBasedIndex.getInstance();
 
-        final Collection<VirtualFile> files = new ArrayList<>(index.getContainingFiles(
-                ModuleNameIndex.KEY,
-                moduleName,
-                GlobalSearchScope.getScopeRestrictedByFileTypes(
-                        GlobalSearchScope.allScope(project),
-                        PhpFileType.INSTANCE
-                )
-        ));
+            final Collection<VirtualFile> files = new ArrayList<>(index.getContainingFiles(
+                    ModuleNameIndex.KEY,
+                    moduleName,
+                    GlobalSearchScope.getScopeRestrictedByFileTypes(
+                            GlobalSearchScope.allScope(project),
+                            PhpFileType.INSTANCE
+                    )
+            ));
 
-        if (files.isEmpty()) {
-            return null;
-        }
-        final VirtualFile virtualFile = files.iterator().next();
+            if (files.isEmpty()) {
+                return null;
+            }
+            final VirtualFile virtualFile = files.iterator().next();
 
-        return PsiManager.getInstance(project).findDirectory(virtualFile.getParent());
+            return PsiManager.getInstance(project).findDirectory(virtualFile.getParent());
+        });
     }
 }
