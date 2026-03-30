@@ -138,7 +138,9 @@ internal object MagentoModuleCommands {
 
         val lines = mutableListOf(
             "Created Magento module \"$moduleFullName\".",
+            "moduleName: $moduleFullName",
             "root: $configuredRoot",
+            "modulePath: ${MagentoMcpSupport.relativePath(project, moduleDirectoryResult.directory.virtualFile)}",
             "composerPackage: $composerPackageName",
             "files:"
         )

@@ -1,5 +1,7 @@
 package com.magento.idea.magento2plugin.mcp
 
+import com.intellij.testFramework.IndexingTestUtil
+import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.psi.PsiDirectory
 import com.magento.idea.magento2plugin.actions.generation.data.ModuleComposerJsonData
 import com.magento.idea.magento2plugin.actions.generation.generator.ModuleComposerJsonGenerator
@@ -16,6 +18,8 @@ class MagentoModuleCommandsTest : BaseProjectTestCase() {
         val result = MagentoModuleCommands.createMagentoModule(project, "Mcp", "Generated")
 
         assertContains(result, "Created Magento module \"Mcp_Generated\".")
+        assertContains(result, "moduleName: Mcp_Generated")
+        assertContainsPath(result, "app/code/Mcp/Generated")
         assertContains(result, "composerPackage: mcp/module-generated")
         assertContainsPath(result, "app/code/Mcp/Generated/composer.json")
         assertContainsPath(result, "app/code/Mcp/Generated/registration.php")
@@ -60,6 +64,65 @@ class MagentoModuleCommandsTest : BaseProjectTestCase() {
 
         assertContains(result, "rolled back")
         assertDirectoryMissing("app/code/Mcp/Broken")
+    }
+
+    @Test
+    fun testFindMagentoModuleSeesNewModuleBeforeIndexesCatchUp() {
+        Settings.getInstance(project).magentoPath = getMagentoRootPathFromFixture()
+
+        MagentoModuleCommands.createMagentoModule(project, "Mcp", "Lookup")
+
+        val result = MagentoModuleQueries.findMagentoModule(project, "Mcp_Lookup")
+
+        assertContains(result, "Found 1 Magento module match(es) for \"Mcp_Lookup\".")
+        assertContains(result, "\nMcp_Lookup\n")
+        assertContainsPath(result, "app/code/Mcp/Lookup")
+        assertContains(result, "editable: yes")
+    }
+
+    @Test
+    fun testCreateMagentoBlockWorksImmediatelyAfterModuleCreation() {
+        Settings.getInstance(project).magentoPath = getMagentoRootPathFromFixture()
+
+        MagentoModuleCommands.createMagentoModule(project, "Mcp", "BlockTarget")
+
+        val result = MagentoBlockCommands.createMagentoBlock(
+            project = project,
+            moduleName = "Mcp_BlockTarget",
+            blockClassFqn = "Mcp\\BlockTarget\\Block\\ImmediateBlock"
+        )
+
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+        assertContains(result, "Created Magento block class \"Mcp\\BlockTarget\\Block\\ImmediateBlock\".")
+        assertContainsPath(result, "app/code/Mcp/BlockTarget/Block/ImmediateBlock.php")
+    }
+
+    @Test
+    fun testCreateMagentoEntityCrudWorksImmediatelyAfterModuleCreation() {
+        Settings.getInstance(project).magentoPath = getMagentoRootPathFromFixture()
+
+        MagentoModuleCommands.createMagentoModule(project, "Mcp", "CrudTarget")
+
+        val result = MagentoEntityCrudCommands.createMagentoEntityCrud(
+            project = project,
+            moduleName = "Mcp_CrudTarget",
+            entityName = "ImmediateCrud",
+            tableName = "",
+            idFieldName = "",
+            properties = listOf("title:string"),
+            createAdminUiComponents = false,
+            createDataInterface = true,
+            createWebApi = false
+        )
+
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+        assertContains(result, "Created Magento entity CRUD scaffold \"ImmediateCrud\".")
+        assertContainsPath(result, "app/code/Mcp/CrudTarget/Model/ImmediateCrudModel.php")
+        assertContainsPath(result, "app/code/Mcp/CrudTarget/etc/db_schema.xml")
     }
 
     private fun assertContains(text: String, expected: String) {

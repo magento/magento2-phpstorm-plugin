@@ -34,7 +34,7 @@ class MagentoMcpToolset : McpToolset {
      * Creates a minimal Magento module under the configured Magento root path.
      */
     @McpTool(name = "create_magento_module")
-    @McpDescription("Create a Magento module with composer.json, registration.php, and etc/module.xml. `packageName` and `moduleName` are Magento module parts, not a Composer package string: pass `Foo` and `Bar` to create the Magento module `Foo_Bar`. Each value must be non-empty, contain only letters and numbers, and start with an uppercase letter or digit. The Composer package name is derived automatically as `foo/module-bar`, so do not pass `foo/module-bar` as `packageName`.")
+    @McpDescription("Create a Magento module with composer.json, registration.php, and etc/module.xml. `packageName` and `moduleName` are Magento module parts, not a Composer package string: pass `Foo` and `Bar` to create the Magento module `Foo_Bar`. Each value must be non-empty, contain only letters and numbers, and start with an uppercase letter or digit. The Composer package name is derived automatically as `foo/module-bar`, so do not pass `foo/module-bar` as `packageName`. The result includes `moduleName: Foo_Bar`; pass that exact combined value to follow-up generator tools that accept a `moduleName` parameter.")
     suspend fun createMagentoModule(packageName: String, moduleName: String): String = withProjectEdtAction {
         MagentoModuleCommands.createMagentoModule(it, packageName, moduleName)
     }

@@ -17,6 +17,7 @@ import com.magento.idea.magento2plugin.indexes.ModuleIndex
 import com.magento.idea.magento2plugin.magento.files.AbstractPhpFile
 import com.magento.idea.magento2plugin.magento.packages.Package
 import com.magento.idea.magento2plugin.util.RegExUtil
+import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil
 
 internal object MagentoMcpCreateSupport {
     private val MODULE_NAME_PATTERN = Regex(RegExUtil.Magento.MODULE_NAME)
@@ -47,7 +48,7 @@ internal object MagentoMcpCreateSupport {
         val moduleIndex = ModuleIndex(project)
         val moduleDirectory = moduleIndex.getModuleDirectoryByModuleName(normalizedModuleName)
             ?: onError("Magento module \"$normalizedModuleName\" was not found.")
-        if (normalizedModuleName !in moduleIndex.getEditableModuleNames()) {
+        if (!GetMagentoModuleUtil.isDirectoryInEditableModule(moduleDirectory)) {
             onError("Magento module \"$normalizedModuleName\" is not editable.")
         }
 
