@@ -9,7 +9,9 @@ import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
@@ -135,6 +137,8 @@ internal object MagentoModuleCommands {
             )
             return "Magento module \"$moduleFullName\" could not be created completely. Partial changes were rolled back."
         }
+
+        refreshCreatedModuleTree(magentoRootDirectory, moduleDirectoryResult.directory)
 
         val lines = mutableListOf(
             "Created Magento module \"$moduleFullName\".",
@@ -263,6 +267,11 @@ internal object MagentoModuleCommands {
         return "${camelCaseToHyphen.convert(packageName)}/module-${camelCaseToHyphen.convert(moduleName)}"
     }
 
+    private fun refreshCreatedModuleTree(vararg directories: PsiDirectory) {
+        val virtualFiles = directories.map { it.virtualFile }.toTypedArray()
+        VfsUtil.markDirtyAndRefresh(false, true, true, *virtualFiles)
+    }
+
     private fun resolveMagentoRootDirectory(project: Project, configuredRoot: String): PsiDirectory? {
         return ReadAction.compute<PsiDirectory?, RuntimeException> {
             val fileSystem = LocalFileSystem.getInstance()
@@ -274,6 +283,7 @@ internal object MagentoModuleCommands {
             }
 
             val virtualFile = candidates.asSequence()
+                .map(FileUtil::toSystemIndependentName)
                 .mapNotNull { path -> fileSystem.refreshAndFindFileByPath(path) ?: fileSystem.findFileByPath(path) }
                 .firstOrNull { it.isDirectory }
             if (virtualFile != null) {

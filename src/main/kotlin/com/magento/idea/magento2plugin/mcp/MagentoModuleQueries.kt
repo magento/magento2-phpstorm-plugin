@@ -20,7 +20,12 @@ internal object MagentoModuleQueries {
         }
 
         val moduleIndex = ModuleIndex(project)
-        val matches = MagentoMcpSupport.prioritizeMatches(moduleIndex.moduleNames, query)
+        val candidateNames = linkedSetOf<String>()
+        candidateNames += moduleIndex.moduleNames
+        if (moduleIndex.getModuleDirectoryByModuleName(query) != null) {
+            candidateNames += query
+        }
+        val matches = MagentoMcpSupport.prioritizeMatches(candidateNames, query)
         if (matches.isEmpty()) {
             return "No Magento modules matched \"$query\"."
         }

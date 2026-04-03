@@ -8,6 +8,7 @@ package com.magento.idea.magento2plugin.indexes;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.DumbService;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
@@ -187,13 +188,12 @@ public final class ModuleIndex {
             return null;
         }
 
-        for (final VirtualFile packagesRoot : getEditablePackagesRoots()) {
-            final VirtualFile vendorDirectory = packagesRoot.findChild(nameParts[0]);
-            if (vendorDirectory == null || !vendorDirectory.isDirectory()) {
-                continue;
-            }
-
-            final VirtualFile moduleDirectory = vendorDirectory.findChild(nameParts[1]);
+        final LocalFileSystem fileSystem = LocalFileSystem.getInstance();
+        for (final String rootPath : getMagentoRootCandidates()) {
+            final String modulePath = FileUtil.toSystemIndependentName(
+                    Paths.get(rootPath, Package.packagesRoot, nameParts[0], nameParts[1]).normalize().toString()
+            );
+            final VirtualFile moduleDirectory = fileSystem.refreshAndFindFileByPath(modulePath);
             if (moduleDirectory == null || !moduleDirectory.isDirectory()) {
                 continue;
             }
@@ -213,7 +213,9 @@ public final class ModuleIndex {
 
         for (final String rootPath : getMagentoRootCandidates()) {
             final VirtualFile packagesRoot = fileSystem.refreshAndFindFileByPath(
-                    Paths.get(rootPath, Package.packagesRoot).normalize().toString()
+                    FileUtil.toSystemIndependentName(
+                            Paths.get(rootPath, Package.packagesRoot).normalize().toString()
+                    )
             );
             if (packagesRoot != null && packagesRoot.isDirectory()) {
                 packagesRoots.add(packagesRoot);
@@ -230,15 +232,19 @@ public final class ModuleIndex {
             return candidates;
         }
 
-        candidates.add(configuredRoot);
+        candidates.add(FileUtil.toSystemIndependentName(configuredRoot));
 
         final String basePath = project.getBasePath();
         if (basePath != null) {
             final String rootWithoutLeadingSlash = configuredRoot.startsWith("/")
                     ? configuredRoot.substring(1)
                     : configuredRoot;
-            candidates.add(Paths.get(basePath, rootWithoutLeadingSlash).normalize().toString());
-            candidates.add(Paths.get(basePath, configuredRoot).normalize().toString());
+            candidates.add(FileUtil.toSystemIndependentName(
+                    Paths.get(basePath, rootWithoutLeadingSlash).normalize().toString()
+            ));
+            candidates.add(FileUtil.toSystemIndependentName(
+                    Paths.get(basePath, configuredRoot).normalize().toString()
+            ));
         }
 
         return candidates;
