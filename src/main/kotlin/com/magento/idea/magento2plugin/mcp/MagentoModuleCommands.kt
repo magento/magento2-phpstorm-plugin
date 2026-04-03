@@ -27,6 +27,7 @@ import com.magento.idea.magento2plugin.magento.packages.Package
 import com.magento.idea.magento2plugin.project.Settings
 import com.magento.idea.magento2plugin.util.CamelCaseToHyphen
 import java.nio.file.Paths
+import java.nio.file.InvalidPathException
 import java.util.concurrent.atomic.AtomicReference
 
 internal object MagentoModuleCommands {
@@ -73,9 +74,6 @@ internal object MagentoModuleCommands {
             ?: return "Configured Magento root path \"$configuredRoot\" could not be resolved."
 
         val moduleFullName = "${normalizedPackage}_${normalizedModule}"
-        if (ModuleIndex(project).getModuleDirectoryByModuleName(moduleFullName) != null) {
-            return "Magento module \"$moduleFullName\" already exists."
-        }
 
         val existingModuleDirectory = ReadAction.compute<PsiDirectory?, RuntimeException> {
             magentoRootDirectory.findSubdirectory("app")
@@ -268,18 +266,52 @@ internal object MagentoModuleCommands {
     }
 
     private fun refreshCreatedModuleTree(vararg directories: PsiDirectory) {
-        val virtualFiles = directories.map { it.virtualFile }.toTypedArray()
+        val virtualFiles = directories.map { it.virtualFile }
+            .filter { it.isValid }
+            .toTypedArray()
         VfsUtil.markDirtyAndRefresh(false, true, true, *virtualFiles)
+        virtualFiles.forEach { it.refresh(false, true) }
     }
 
     private fun resolveMagentoRootDirectory(project: Project, configuredRoot: String): PsiDirectory? {
         return ReadAction.compute<PsiDirectory?, RuntimeException> {
             val fileSystem = LocalFileSystem.getInstance()
-            val candidates = linkedSetOf(configuredRoot)
+            val normalizedConfiguredRoot = FileUtil.toSystemIndependentName(configuredRoot.trim())
+
+            if (isAbsolutePath(normalizedConfiguredRoot)) {
+                val absoluteVirtualFile = fileSystem.refreshAndFindFileByPath(normalizedConfiguredRoot)
+                    ?: fileSystem.findFileByPath(normalizedConfiguredRoot)
+                if (absoluteVirtualFile != null && absoluteVirtualFile.isDirectory) {
+                    return@compute PsiManager.getInstance(project).findDirectory(absoluteVirtualFile)
+                }
+            }
+
+            val moduleIndex = ModuleIndex(project)
+            val configuredRootTrimmed = normalizedConfiguredRoot.trim('/').replace('\\', '/')
+            val configuredPrefix = normalizedConfiguredRoot.trimEnd('/') + "/" + Package.packagesRoot + "/"
+            for (moduleName in moduleIndex.moduleNames) {
+                val moduleDirectory = moduleIndex.getModuleDirectoryByModuleName(moduleName) ?: continue
+                val modulePath = moduleDirectory.virtualFile.path.replace('\\', '/')
+
+                val resolvedRoot = moduleDirectory.parentDirectory(levels = 4) ?: continue
+                val resolvedRootPath = resolvedRoot.virtualFile.path.replace('\\', '/')
+                if (modulePath.startsWith(configuredPrefix)) {
+                    return@compute resolvedRoot
+                }
+
+                if (!isAbsolutePath(normalizedConfiguredRoot) &&
+                    configuredRootTrimmed.isNotEmpty() &&
+                    resolvedRootPath.endsWith("/$configuredRootTrimmed")
+                ) {
+                    return@compute resolvedRoot
+                }
+            }
+
+            val candidates = linkedSetOf(normalizedConfiguredRoot)
             val basePath = project.basePath
             if (basePath != null) {
-                candidates += Paths.get(basePath, configuredRoot.removePrefix("/")).normalize().toString()
-                candidates += Paths.get(basePath, configuredRoot).normalize().toString()
+                candidates += Paths.get(basePath, normalizedConfiguredRoot.removePrefix("/")).normalize().toString()
+                candidates += Paths.get(basePath, normalizedConfiguredRoot).normalize().toString()
             }
 
             val virtualFile = candidates.asSequence()
@@ -290,19 +322,15 @@ internal object MagentoModuleCommands {
                 return@compute PsiManager.getInstance(project).findDirectory(virtualFile)
             }
 
-            val configuredPrefix = configuredRoot.trimEnd('/') + "/" + Package.packagesRoot + "/"
-            val moduleIndex = ModuleIndex(project)
-            for (moduleName in moduleIndex.moduleNames) {
-                val moduleDirectory = moduleIndex.getModuleDirectoryByModuleName(moduleName) ?: continue
-                val modulePath = moduleDirectory.virtualFile.path.replace('\\', '/')
-                if (!modulePath.startsWith(configuredPrefix)) {
-                    continue
-                }
-
-                return@compute moduleDirectory.parentDirectory(levels = 4)
-            }
-
             null
+        }
+    }
+
+    private fun isAbsolutePath(path: String): Boolean {
+        return try {
+            Paths.get(path).isAbsolute
+        } catch (_: InvalidPathException) {
+            false
         }
     }
 

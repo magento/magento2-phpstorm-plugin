@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin.mcp
 
 import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.jetbrains.php.lang.psi.PhpFile
@@ -37,7 +38,6 @@ import com.magento.idea.magento2plugin.magento.packages.PropertiesTypes
 import com.magento.idea.magento2plugin.magento.packages.uicomponent.FormElementType
 import com.magento.idea.magento2plugin.util.CamelCaseToSnakeCase
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile
-import com.magento.idea.magento2plugin.util.GetPhpClassByFQN
 import com.magento.idea.magento2plugin.util.RegExUtil
 import com.magento.idea.magento2plugin.util.php.PhpTypeMetadataParserUtil
 import java.util.Locale
@@ -67,6 +67,10 @@ internal object MagentoEntityCrudCommands {
         createDataInterface: Boolean,
         createWebApi: Boolean
     ): String {
+        if (DumbService.getInstance(project).isDumb) {
+            DumbService.getInstance(project).waitForSmartMode()
+        }
+
         val request = try {
             MagentoMcpCreateSupport.runReadAction {
                 resolveRequest(
@@ -263,7 +267,8 @@ internal object MagentoEntityCrudCommands {
             createWebApi = createWebApi
         )
         val duplicatePhpFile = expectedPhpFiles.firstOrNull { file ->
-            GetPhpClassByFQN.getInstance(project).execute(file.classFqn) != null
+            val relativePath = MagentoMcpCreateSupport.phpFileRelativePath(file)
+            moduleContext.moduleDirectory.virtualFile.findFileByRelativePath(relativePath) != null
         }
         if (duplicatePhpFile != null) {
             throw EntityCrudValidationException("PHP class \"${duplicatePhpFile.classFqn}\" already exists.")
