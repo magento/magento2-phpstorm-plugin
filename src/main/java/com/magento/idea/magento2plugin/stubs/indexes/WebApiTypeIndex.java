@@ -24,14 +24,12 @@ import com.intellij.util.io.KeyDescriptor;
 import com.jetbrains.php.lang.PhpLangUtil;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
-import com.magento.idea.magento2plugin.linemarker.xml.LineMarkerXmlTagDecorator;
 import com.magento.idea.magento2plugin.project.Settings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -191,36 +189,20 @@ public class WebApiTypeIndex extends ScalarIndexExtension<String> {
                 if (typeName != null && typeName.equals(classFqn)
                         && methodName != null && methodName.equals(methodFqn)
                 ) {
-                    tagsReferences.add(new WebApiLineMarkerXmlTagDecorator(routeNode));
+                    tagsReferences.add(routeNode);
                 }
             }
         }
     }
 
-    /**
-     * Decorator for XmlTag, which allows to render REST routes in web API line marker.
-     */
-    private static class WebApiLineMarkerXmlTagDecorator extends LineMarkerXmlTagDecorator {
+    public static @NotNull String getRouteDisplayName(final @NotNull XmlTag routeTag) {
+        final String httpMethod = routeTag.getAttributeValue("method");
+        final String route = routeTag.getAttributeValue("url");
 
-        public WebApiLineMarkerXmlTagDecorator(final XmlTag xmlTag) {
-            super(xmlTag);
+        if (httpMethod != null && route != null) {
+            return String.format("  %-7s %s", httpMethod, route);
         }
 
-        @Override
-        public @NotNull String getDescription() {
-            return "";
-        }
-
-        @Override
-        public @NonNls @NotNull String getName() {
-            final String httpMethod = this.xmlTag.getAttributeValue("method");
-            final String route = this.xmlTag.getAttributeValue("url");
-
-            if (httpMethod != null && route != null) {
-                return String.format("  %-7s %s", httpMethod, route);
-            }
-
-            return xmlTag.getName();
-        }
+        return routeTag.getName();
     }
 }

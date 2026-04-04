@@ -70,12 +70,15 @@ public class WebApiLineMarkerProvider implements LineMarkerProvider {
                     "Navigate to Web API configuration:<pre>"
             );
             for (final XmlTag routeTag : results) {
-                tooltipText.append(routeTag.getName()).append('\n');
+                tooltipText.append(WebApiTypeIndex.getRouteDisplayName(routeTag)).append('\n');
             }
             tooltipText.append("</pre>");
             final NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder
                     .create(MagentoIcons.WEB_API)
                     .setTargets(results)
+                    .setNamer(target -> target instanceof XmlTag
+                            ? WebApiTypeIndex.getRouteDisplayName((XmlTag) target)
+                            : null)
                     .setTooltipText(tooltipText.toString());
             collection.add(builder.createLineMarkerInfo(PsiTreeUtil.getDeepestFirst(psiElement)));
         }

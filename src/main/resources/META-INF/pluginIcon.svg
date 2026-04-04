@@ -1,9 +1,44 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright © Magento, Inc. All rights reserved.
+-->
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="tileClip">
+      <rect x="1" y="1" width="30" height="30" rx="7"/>
+    </clipPath>
+    <linearGradient id="bgGradient" x1="0" y1="1" x2="0" y2="32" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1B6FF5"/>
+      <stop offset="0.32" stop-color="#2B7BFF"/>
+      <stop offset="0.5" stop-color="#9ADCA9"/>
+      <stop offset="0.68" stop-color="#FFE56A"/>
+      <stop offset="1" stop-color="#FFD84D"/>
+    </linearGradient>
+    <filter id="orbBlur" x="-45%" y="-45%" width="190%" height="190%">
+      <feGaussianBlur stdDeviation="4.6"/>
+    </filter>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#0A214B" flood-opacity="0.24"/>
+    </filter>
+  </defs>
 
-<svg viewBox="0 0 240 234" xmlns="http://www.w3.org/2000/svg">
-    <rect fill="#fa0f00" height="234" rx="42.5" width="240"/>
-    <path d="m186.617 175.95037h-28.50642a6.24325 6.24325 0 0 1 -5.84652-3.76911l-30.94691-72.35915a1.36371 1.36371 0 0 0 -2.61145-.034l-19.286 45.94252a1.63479 1.63479 0 0 0 1.50656 2.26937h21.1992a3.26957 3.26957 0 0 1 3.01052 1.99409l9.2814 20.65452a3.81249 3.81249 0 0 1 -3.5078 5.30176h-77.17558a3.51828 3.51828 0 0 1 -3.2129-4.90437l49.08958-116.90224a6.639 6.639 0 0 1 6.23232-4.14376h28.31354a6.6281 6.6281 0 0 1 6.23289 4.14376l49.42942 116.90224a3.51717 3.51717 0 0 1 -3.20185 4.90437z"
-          fill="#fff"/>
-    <rect fill="#ffd700"  height="60"  width="80"/>
-    <rect fill="#0057b8" height="30"  width="80"/>
+  <rect x="1" y="1" width="30" height="30" rx="7" fill="url(#bgGradient)"/>
+  <g clip-path="url(#tileClip)">
+    <circle cx="8" cy="10" r="7.6" fill="#2B7BFF" opacity="0.8" filter="url(#orbBlur)"/>
+    <circle cx="24.2" cy="24.2" r="8.6" fill="#FFE56A" opacity="0.72" filter="url(#orbBlur)"/>
+    <circle cx="16" cy="16" r="8.8" fill="#BFE09B" opacity="0.32" filter="url(#orbBlur)"/>
+    <rect x="1" y="1" width="30" height="30" fill="none" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="1"/>
+  </g>
+
+  <g fill="#F26322" filter="url(#shadow)" transform="translate(3.7 9.35) scale(0.255)">
+    <polygon points="21.43 0 0 12.37 0 37.09 6.12 40.62 6.08 15.91 21.39 7.06 36.7 15.91 36.7 40.61 42.82 37.09 42.82 12.35 21.43 0"/>
+    <polygon points="24.47 40.62 21.41 42.39 18.34 40.63 18.34 15.91 12.22 19.44 12.23 44.15 21.41 49.45 30.59 44.15 30.59 19.44 24.47 15.91 24.47 40.62"/>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="17.7" y="10.7" width="10.6" height="10.6" rx="2.75" fill="#FA0F00"/>
+    <path d="M24.882812 23.308594L21.082031 23.308594C20.742188 23.316406 20.4375 23.117188 20.300781 22.808594L16.175781 13.222656C16.152344 13.148438 16.082031 13.09375 16.003906 13.09375C15.921875 13.09375 15.851562 13.144531 15.828125 13.21875L13.257812 19.304688C13.226562 19.375 13.234375 19.449219 13.273438 19.511719C13.316406 19.570312 13.382812 19.605469 13.457031 19.605469L16.285156 19.605469C16.457031 19.605469 16.617188 19.710938 16.683594 19.871094L17.921875 22.605469C17.988281 22.761719 17.972656 22.941406 17.878906 23.082031C17.785156 23.222656 17.625 23.308594 17.453125 23.308594L7.164062 23.308594C7.007812 23.308594 6.859375 23.230469 6.773438 23.097656C6.6875 22.96875 6.675781 22.804688 6.734375 22.660156L13.28125 7.171875C13.417969 6.835938 13.75 6.621094 14.113281 6.625L17.886719 6.625C18.253906 6.617188 18.582031 6.835938 18.71875 7.171875L25.308594 22.660156C25.371094 22.804688 25.355469 22.96875 25.269531 23.097656C25.183594 23.230469 25.039062 23.308594 24.882812 23.308594Z"
+          fill="#FFFFFF"
+          transform="translate(17.08 10.46) scale(0.37)"/>
+  </g>
 </svg>

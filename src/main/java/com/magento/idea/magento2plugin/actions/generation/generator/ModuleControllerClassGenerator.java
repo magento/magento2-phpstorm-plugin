@@ -43,6 +43,7 @@ public class ModuleControllerClassGenerator extends FileGenerator {
     private final GetFirstClassOfFile getFirstClassOfFile;
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
+    private final boolean interactive;
 
     /**
      * Generates new Controller PHP Class based on provided data.
@@ -54,6 +55,21 @@ public class ModuleControllerClassGenerator extends FileGenerator {
             final ControllerFileData data,
             final Project project
     ) {
+        this(data, project, true);
+    }
+
+    /**
+     * Generates new Controller PHP Class based on provided data.
+     *
+     * @param data ControllerFileData
+     * @param project Project
+     * @param interactive whether UI error reporting should be shown
+     */
+    public ModuleControllerClassGenerator(
+            final ControllerFileData data,
+            final Project project,
+            final boolean interactive
+    ) {
         super(project);
         this.project = project;
         this.data = data;
@@ -62,6 +78,7 @@ public class ModuleControllerClassGenerator extends FileGenerator {
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
+        this.interactive = interactive;
     }
 
     /**
@@ -96,24 +113,20 @@ public class ModuleControllerClassGenerator extends FileGenerator {
         });
 
         if (isControllerExists.get()) {
-            JOptionPane.showMessageDialog(
-                    null,
+            showError(
                     validatorBundle.message(
                             "validator.file.alreadyExists",
                             "Controller Class"
                     ),
-                    commonBundle.message("common.error"),
-                    JOptionPane.ERROR_MESSAGE
+                    commonBundle.message("common.error")
             );
         } else if (isControllerCanNotBeCreated.get()) {
-            JOptionPane.showMessageDialog(
-                    null,
+            showError(
                     validatorBundle.message(
                             "validator.file.cantBeCreated",
                             "Controller Class"
                     ),
-                    commonBundle.message("common.error"),
-                    JOptionPane.ERROR_MESSAGE
+                    commonBundle.message("common.error")
             );
         }
 
@@ -240,5 +253,18 @@ public class ModuleControllerClassGenerator extends FileGenerator {
                 Controller.RESULT_INTERFACE_FQN,
                 Controller.EXCEPTION_CLASS_FQN
         ));
+    }
+
+    private void showError(final String errorMessage, final String errorTitle) {
+        if (!interactive) {
+            return;
+        }
+
+        JOptionPane.showMessageDialog(
+                null,
+                errorMessage,
+                errorTitle,
+                JOptionPane.ERROR_MESSAGE
+        );
     }
 }

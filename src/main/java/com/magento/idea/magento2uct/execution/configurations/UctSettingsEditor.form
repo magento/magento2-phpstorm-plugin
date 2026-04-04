@@ -198,7 +198,6 @@
               <icon value="icons/install.png"/>
               <iconTextGap value="5"/>
               <inheritsPopupMenu value="false"/>
-              <label value="Download"/>
               <margin top="0" left="2" bottom="0" right="2"/>
               <overrulesActionOnClick value="false"/>
               <text value="Download"/>
@@ -271,7 +270,6 @@
               <horizontalAlignment value="2"/>
               <horizontalTextPosition value="11"/>
               <inheritsPopupMenu value="false"/>
-              <label value="Learn more."/>
               <margin top="0" left="0" bottom="0" right="0"/>
               <text value="Learn more."/>
             </properties>

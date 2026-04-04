@@ -40,6 +40,7 @@ public class ObserverClassGenerator extends FileGenerator {
     private final Project project;
     private final ValidatorBundle validatorBundle;
     private final CommonBundle commonBundle;
+    private final boolean interactive;
 
     /**
      * Constructor.
@@ -51,6 +52,21 @@ public class ObserverClassGenerator extends FileGenerator {
             final ObserverFileData observerFileData,
             final Project project
     ) {
+        this(observerFileData, project, true);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param observerFileData ObserverFileData
+     * @param project Project
+     * @param interactive whether UI error reporting should be shown
+     */
+    public ObserverClassGenerator(
+            final ObserverFileData observerFileData,
+            final Project project,
+            final boolean interactive
+    ) {
         super(project);
         this.observerFileData = observerFileData;
         this.project = project;
@@ -60,6 +76,7 @@ public class ObserverClassGenerator extends FileGenerator {
         this.getFirstClassOfFile = GetFirstClassOfFile.getInstance();
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
+        this.interactive = interactive;
     }
 
     @Override
@@ -78,12 +95,7 @@ public class ObserverClassGenerator extends FileGenerator {
                         "validator.file.cantBeCreated",
                         "Observer Class"
                 );
-                JOptionPane.showMessageDialog(
-                        null,
-                        errorMessage,
-                        commonBundle.message("common.error"),
-                        JOptionPane.ERROR_MESSAGE
-                );
+                showError(errorMessage);
 
                 return;
             }
@@ -157,6 +169,19 @@ public class ObserverClassGenerator extends FileGenerator {
             return null;
         }
         return getFirstClassOfFile.execute((PhpFile) observerFile);
+    }
+
+    private void showError(final String errorMessage) {
+        if (!interactive) {
+            return;
+        }
+
+        JOptionPane.showMessageDialog(
+                null,
+                errorMessage,
+                commonBundle.message("common.error"),
+                JOptionPane.ERROR_MESSAGE
+        );
     }
 
     @Override

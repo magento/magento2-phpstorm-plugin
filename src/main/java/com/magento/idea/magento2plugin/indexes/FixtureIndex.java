@@ -9,7 +9,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiFileSystemItem;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -51,23 +50,23 @@ public final class FixtureIndex {
             return result;
         }
 
-        @NotNull final PsiFileSystemItem[] psiFiles = FilenameIndex.getFilesByName(
-                project,
+        FilenameIndex.processFilesByName(
                 fixtureName,
+                true,
                 GlobalSearchScope.allScope(project),
-                true
+                virtualFile -> {
+                    final PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
+                    if (psiFile == null) {
+                        return true;
+                    }
+                    @NotNull final String filePath = virtualFile.getPath().replace('\\', '/');
+                    if (!filePath.contains(TestFixture.FIXTURES_EXCLUDE_PATH)
+                            && expectedFilePaths.stream().anyMatch(filePath::endsWith)) {
+                        result.add(psiFile);
+                    }
+                    return true;
+                }
         );
-
-        for (final PsiFileSystemItem psiFile: psiFiles) {
-            if (!(psiFile instanceof PsiFile)) {
-                continue;
-            }
-            @NotNull final String filePath = psiFile.getVirtualFile().getPath().replace('\\', '/');
-            if (!filePath.contains(TestFixture.FIXTURES_EXCLUDE_PATH)
-                    && expectedFilePaths.stream().anyMatch(filePath::endsWith)) {
-                result.add((PsiFile) psiFile);
-            }
-        }
 
         return result;
     }

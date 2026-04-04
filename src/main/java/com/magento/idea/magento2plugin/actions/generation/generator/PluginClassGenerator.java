@@ -59,6 +59,7 @@ public class PluginClassGenerator extends FileGenerator {
     private final DirectoryGenerator directoryGenerator;
     private final FileFromTemplateGenerator fileFromTemplateGenerator;
     private final GetFirstClassOfFile getFirstClassOfFile;
+    private final boolean interactive;
 
     /**
      * Plugin class generator.
@@ -70,6 +71,21 @@ public class PluginClassGenerator extends FileGenerator {
             final @NotNull PluginFileData pluginFileData,
             final Project project
     ) {
+        this(pluginFileData, project, true);
+    }
+
+    /**
+     * Plugin class generator.
+     *
+     * @param pluginFileData PluginFileData
+     * @param project Project
+     * @param interactive whether UI error reporting should be shown
+     */
+    public PluginClassGenerator(
+            final @NotNull PluginFileData pluginFileData,
+            final Project project,
+            final boolean interactive
+    ) {
         super(project);
         this.directoryGenerator = DirectoryGenerator.getInstance();
         this.fileFromTemplateGenerator = new FileFromTemplateGenerator(project);
@@ -80,6 +96,7 @@ public class PluginClassGenerator extends FileGenerator {
         this.project = project;
         this.validatorBundle = new ValidatorBundle();
         this.commonBundle = new CommonBundle();
+        this.interactive = interactive;
     }
 
     /**
@@ -115,14 +132,7 @@ public class PluginClassGenerator extends FileGenerator {
                             fileFromTemplateGenerator.getLastExceptionMessage()
                     );
                 }
-                ApplicationManager.getApplication().invokeLater(
-                        () -> JOptionPane.showMessageDialog(
-                                null,
-                                errorMessage,
-                                errorTitle,
-                                JOptionPane.ERROR_MESSAGE
-                        )
-                );
+                showError(errorMessage, errorTitle);
 
                 return;
             }
@@ -145,14 +155,7 @@ public class PluginClassGenerator extends FileGenerator {
                                 "validator.file.alreadyExists",
                                 "Plugin Class"
                         );
-                ApplicationManager.getApplication().invokeLater(
-                        () -> JOptionPane.showMessageDialog(
-                                null,
-                                errorMessage,
-                                errorTitle,
-                                JOptionPane.ERROR_MESSAGE
-                        )
-                );
+                showError(errorMessage, errorTitle);
 
                 return;
             }
@@ -246,6 +249,21 @@ public class PluginClassGenerator extends FileGenerator {
             return null;
         }
         return getFirstClassOfFile.execute((PhpFile) pluginFile);
+    }
+
+    private void showError(final String errorMessage, final String errorTitle) {
+        if (!interactive) {
+            return;
+        }
+
+        ApplicationManager.getApplication().invokeLater(
+                () -> JOptionPane.showMessageDialog(
+                        null,
+                        errorMessage,
+                        errorTitle,
+                        JOptionPane.ERROR_MESSAGE
+                )
+        );
     }
 
     @Override

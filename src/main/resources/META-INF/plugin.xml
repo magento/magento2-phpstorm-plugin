@@ -6,7 +6,7 @@
 -->
 <idea-plugin require-restart="true">
     <id>com.magento.idea.magento2plugin</id>
-    <name>Magento PhpStorm</name>
+    <name>Magento 2 and Adobe Commerce Support</name>
     <version>2025.2.2</version>
     <vendor url="https://github.com/magento/magento2-phpstorm-plugin">Magento Inc.</vendor>
 
@@ -38,6 +38,7 @@
     <depends>com.intellij.platform.images</depends>
     <depends>com.intellij.modules.json</depends>
     <depends>com.intellij.copyright</depends>
+    <depends>com.intellij.mcpServer</depends>
     <depends optional="true" config-file="withJsGraphQl.xml">com.intellij.lang.jsgraphql</depends>
 
     <actions>
@@ -190,6 +191,7 @@
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.Settings"/>
         <projectService serviceImplementation="com.magento.idea.magento2uct.settings.UctSettingsService"/>
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.startup.DeferredProjectOpenActions"/>
+        <mcpServer.mcpToolset implementation="com.magento.idea.magento2plugin.mcp.MagentoMcpToolset"/>
 
         <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.completion.xml.XmlCompletionContributor" id="xml"/>
         <completion.contributor language="PHP" implementationClass="com.magento.idea.magento2plugin.completion.php.PhpCompletionContributor" id="php"/>

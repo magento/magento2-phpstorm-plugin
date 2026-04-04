@@ -237,13 +237,24 @@ public class ConfigurationManager {
 
     private static void showPopup(Project project, String message, Function<Notification, AnAction>... actions) {
         Runnable runnable = () -> {
-            notifyGlobally(project, "Magento 2 Support", message, NotificationType.INFORMATION, actions);
+            notifyGlobally(
+                    project,
+                    "Magento 2 and Adobe Commerce Support",
+                    message,
+                    NotificationType.INFORMATION,
+                    actions
+            );
         };
         ApplicationManager.getApplication().invokeLater(runnable, ModalityState.nonModal());
     }
 
     public static void notifyGlobally(@Nullable Project project, String title, String message, NotificationType notificationType, Function<Notification, AnAction>... actions) {
-        Notification notification = new Notification("Magento 2 Support", title, message, notificationType);
+        Notification notification = new Notification(
+                "Magento 2 and Adobe Commerce Support",
+                title,
+                message,
+                notificationType
+        );
         Function[] functions = actions;
         int length = actions.length;
 

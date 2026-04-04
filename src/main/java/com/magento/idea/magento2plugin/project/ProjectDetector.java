@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin.project;
 
 import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationAction;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
@@ -20,7 +21,6 @@ import com.magento.idea.magento2plugin.magento.packages.MagentoComponentManager;
 import com.magento.idea.magento2plugin.project.startup.DeferredProjectOpenActions;
 import com.magento.idea.magento2plugin.util.magento.MagentoBasePathUtil;
 import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
-import javax.swing.event.HyperlinkEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class ProjectDetector implements DirectoryProjectConfigurator {
@@ -40,25 +40,21 @@ public class ProjectDetector implements DirectoryProjectConfigurator {
                         .getNotificationGroup("Magento Notifications")
                         .createNotification(
                                 "Magento",
-                                "<a href='enable'>Enable</a> Magento support for this project?",
-                                NotificationType.INFORMATION,
-                                (currentNotification, event) -> {
-                                    if (event.getEventType() != HyperlinkEvent.EventType.ACTIVATED) {
-                                        return;
-                                    }
-                                    Settings settings = Settings.getInstance(project);
-                                    settings.pluginEnabled = true;
-                                    settings.mftfSupportEnabled = true;
-                                    settings.magentoPath = project.getBasePath();
-                                    settings.magentoVersion = MagentoVersionUtil.get(
-                                            project,
-                                            project.getBasePath()
-                                    );
-                                    IndexManager.manualReindex();
-                                    MagentoComponentManager.getInstance(project).flushModules();
-                                    currentNotification.expire();
-                                }
+                                "Enable Magento support for this project?",
+                                NotificationType.INFORMATION
                         );
+                notification.addAction(NotificationAction.createSimpleExpiring("Enable", () -> {
+                            Settings settings = Settings.getInstance(project);
+                            settings.pluginEnabled = true;
+                            settings.mftfSupportEnabled = true;
+                            settings.magentoPath = project.getBasePath();
+                            settings.magentoVersion = MagentoVersionUtil.get(
+                                    project,
+                                    project.getBasePath()
+                            );
+                            IndexManager.manualReindex();
+                            MagentoComponentManager.getInstance(project).flushModules();
+                        }));
                 Notifications.Bus.notify(notification, project);
             });
         });

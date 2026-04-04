@@ -5,12 +5,15 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator.util;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.actions.generation.generator.data.ModuleDirectoriesData;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicReference;
 import org.jetbrains.annotations.NotNull;
 
 public class DirectoryGenerator {
@@ -61,8 +64,8 @@ public class DirectoryGenerator {
             final @NotNull PsiDirectory parent,
             final @NotNull String subdirName
     ) {
-        final PsiDirectory sub = parent.findSubdirectory(subdirName);
-        return sub == null ? WriteAction.compute(() -> parent.createSubdirectory(subdirName)) : sub;
+        final PsiDirectory sub = ReadAction.compute(() -> parent.findSubdirectory(subdirName));
+        return sub == null ? createSubdirectoryOnEdt(parent, subdirName) : sub;
     }
 
     /**
@@ -82,20 +85,21 @@ public class DirectoryGenerator {
 
         for (final String directory : Arrays.asList(directories)) {
             if (lastDirectory == null) {
-                final PsiDirectory subDir = parent.findSubdirectory(directory);
+                final PsiDirectory subDir = ReadAction.compute(() -> parent.findSubdirectory(directory));
 
                 if (subDir == null) {
-                    lastDirectory = WriteAction.compute(() -> parent.createSubdirectory(directory));
+                    lastDirectory = createSubdirectoryOnEdt(parent, directory);
                 } else {
                     lastDirectory = subDir;
                 }
             } else {
-                final PsiDirectory subDir = lastDirectory.findSubdirectory(directory);
+                final PsiDirectory currentDirectory = lastDirectory;
+                final PsiDirectory subDir = ReadAction.compute(() ->
+                        currentDirectory.findSubdirectory(directory));
 
                 if (subDir == null) {
                     final PsiDirectory finalLastDirectory = lastDirectory;
-                    lastDirectory = WriteAction.compute(() ->
-                            finalLastDirectory.createSubdirectory(directory));
+                    lastDirectory = createSubdirectoryOnEdt(finalLastDirectory, directory);
                 } else {
                     lastDirectory = subDir;
                 }
@@ -103,5 +107,29 @@ public class DirectoryGenerator {
         }
 
         return lastDirectory;
+    }
+
+    private PsiDirectory createSubdirectoryOnEdt(
+            final @NotNull PsiDirectory parent,
+            final @NotNull String subdirName
+    ) {
+        if (ApplicationManager.getApplication().isDispatchThread()) {
+            return WriteAction.compute(() -> parent.createSubdirectory(subdirName));
+        }
+
+        final AtomicReference<PsiDirectory> result = new AtomicReference<>();
+        final AtomicReference<RuntimeException> error = new AtomicReference<>();
+        ApplicationManager.getApplication().invokeAndWait(() -> {
+            try {
+                result.set(WriteAction.compute(() -> parent.createSubdirectory(subdirName)));
+            } catch (final RuntimeException exception) {
+                error.set(exception);
+            }
+        });
+
+        if (error.get() != null) {
+            throw error.get();
+        }
+        return result.get();
     }
 }
