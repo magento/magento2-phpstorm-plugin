@@ -11,7 +11,6 @@ jobs:
     env:
       GITHUB_RELEASE_PRERELEASE: ${{ github.event.release.prerelease }}
       GITHUB_RELEASE_ID: ${{ github.event.release.id }}
-      PLUGIN_VERSION: ${{ github.event.release.prerelease && format('{0}-alpha.{1}', github.event.release.tag_name, github.event.release.id) || github.event.release.tag_name }}
 
     steps:
       - uses: actions/checkout@v3
@@ -25,14 +24,28 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build Plugin
-        run: ./gradlew buildPlugin --no-daemon
+        run: ./gradlew clean buildPlugin --no-daemon
+
+      - name: Resolve built asset
+        run: |
+          shopt -s nullglob
+          assets=(build/distributions/*.zip)
+
+          if [ "${#assets[@]}" -ne 1 ]; then
+            echo "Expected exactly one built plugin archive, found ${#assets[@]}."
+            printf '%s\n' "${assets[@]}"
+            exit 1
+          fi
+
+          echo "ASSET_PATH=${assets[0]}" >> "$GITHUB_ENV"
+          echo "ASSET_NAME=$(basename "${assets[0]}")" >> "$GITHUB_ENV"
 
       - name: Upload Plugin to Release Assets
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./build/distributions/Magento 2 and Adobe Commerce Support-${{ env.PLUGIN_VERSION }}.zip
-          asset_name: Magento 2 and Adobe Commerce Support-${{ env.PLUGIN_VERSION }}.zip
+          asset_path: ${{ env.ASSET_PATH }}
+          asset_name: ${{ env.ASSET_NAME }}
           asset_content_type: application/zip-archive
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
