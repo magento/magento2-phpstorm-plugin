@@ -279,6 +279,44 @@ class MagentoMcpQueriesTest : BaseProjectTestCase() {
         assertTrue("Expected n98-magerun2 wrapper to be listed before magento:\n$result", magerunIndex in 0 until magentoIndex)
     }
 
+    @Test
+    fun testDescribeCliEnvironmentIncludesStartWrapperWhenManyProjectWrappersExist() {
+        val wrappers = listOf(
+            "magento",
+            "n98-magerun2",
+            "cli",
+            "composer",
+            "restart",
+            "analyse",
+            "bash",
+            "blackfire",
+            "cache-clean",
+            "check-dependencies",
+            "clinotty",
+            "cliq",
+            "configure-linux",
+            "copyfromcontainer",
+            "copytocontainer",
+            "create-user",
+            "cron",
+            "cy",
+            "cy-run-all.sh",
+            "debug-cli",
+            "start"
+        )
+        Settings.getInstance(project).mcpCliToolCandidates = wrappers.joinToString(", ") { "bin/$it" }
+
+        val result = MagentoCliToolQueries.describeCliEnvironment(project)
+
+        assertContains(result, "Configured wrappers:")
+        assertContains(result, "./bin/start")
+        assertContains(result, "use: Use this to start the local project environment or stack when needed.")
+        assertContains(
+            result,
+            "Call this tool before running shell commands that normally use Magento, n98-magerun, or project environment wrappers such as `./bin/start`, `./bin/stop`, or `./bin/restart`."
+        )
+    }
+
     private fun assertContains(text: String, expected: String) {
         assertTrue("Expected to find <$expected> in:\n$text", text.contains(expected))
     }

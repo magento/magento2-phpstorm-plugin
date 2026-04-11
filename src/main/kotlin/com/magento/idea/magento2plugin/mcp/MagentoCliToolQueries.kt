@@ -10,6 +10,8 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.magento.idea.magento2plugin.project.Settings
 
 internal object MagentoCliToolQueries {
+    private const val MAX_CLI_TOOLS_TO_REPORT = 100
+
     private val knownToolTypes = linkedMapOf(
         "magento" to ToolKind(
             description = "Magento CLI wrapper",
@@ -55,6 +57,31 @@ internal object MagentoCliToolQueries {
             description = "environment wrapper",
             usage = "Use this to restart the local project environment when needed.",
             exampleSuffix = ""
+        ),
+        "start" to ToolKind(
+            description = "environment wrapper",
+            usage = "Use this to start the local project environment or stack when needed.",
+            exampleSuffix = ""
+        ),
+        "stop" to ToolKind(
+            description = "environment wrapper",
+            usage = "Use this to stop the local project environment or stack when needed.",
+            exampleSuffix = ""
+        ),
+        "up" to ToolKind(
+            description = "environment wrapper",
+            usage = "Use this to bring the local project environment up when needed.",
+            exampleSuffix = ""
+        ),
+        "down" to ToolKind(
+            description = "environment wrapper",
+            usage = "Use this to bring the local project environment down when needed.",
+            exampleSuffix = ""
+        ),
+        "status" to ToolKind(
+            description = "environment wrapper",
+            usage = "Use this to inspect local project environment status when needed.",
+            exampleSuffix = ""
         )
     )
 
@@ -76,7 +103,7 @@ internal object MagentoCliToolQueries {
         val lines = mutableListOf<String>()
 
         lines += "Magento CLI environment"
-        lines += "Prefer project-local wrappers over global binaries for Magento, Docker, PHP, Composer, and n98-magerun commands."
+        lines += "Prefer project-local wrappers over global binaries for Magento, Docker, PHP, Composer, n98-magerun, and stack lifecycle commands."
         lines += "Configured wrapper candidates: ${configuredCandidates.joinToString(", ")}"
 
         if (searchRoots.isNotEmpty()) {
@@ -99,7 +126,7 @@ internal object MagentoCliToolQueries {
         } else {
             "Detected wrappers:"
         }
-        for (tool in toolsToReport.take(MagentoMcpSupport.MAX_MATCHES)) {
+        for (tool in toolsToReport.take(MAX_CLI_TOOLS_TO_REPORT)) {
             lines += tool.command
             lines += "  type: ${tool.kind.description}"
             lines += "  use: ${tool.kind.usage}"
@@ -116,7 +143,7 @@ internal object MagentoCliToolQueries {
         lines += ""
         lines += "Agent guidance:"
         val guidance = mutableListOf<String>()
-        guidance += "Call this tool before running shell commands that normally use Magento or n98-magerun."
+        guidance += "Call this tool before running shell commands that normally use Magento, n98-magerun, or project environment wrappers such as `./bin/start`, `./bin/stop`, or `./bin/restart`."
         guidance += "Use the returned wrapper path exactly instead of a global binary or `php bin/...` fallback."
         if (configuredMagentoRootRelative != null) {
             guidance += "Create and edit Magento files under `./$configuredMagentoRootRelative`; that is the configured Magento root."
