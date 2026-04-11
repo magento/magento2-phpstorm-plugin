@@ -392,7 +392,7 @@ class MagentoMcpToolset : McpToolset {
      * Detects project-local CLI wrappers such as Mark Shust Docker scripts and explains how to invoke them.
      */
     @McpTool(name = "describe_magento_cli_environment")
-    @McpDescription("Inspect the current Magento project for local CLI wrappers under `bin/`, including Mark Shust Docker scripts such as `bin/magento`, `bin/n98-magerun2`, `bin/php`, or `bin/composer`. Call this before running shell commands that would normally use Magento CLI, PHP, Composer, or n98-magerun. The result lists detected wrapper commands, configured wrapper candidates, and example invocations; agents should use the returned project-local wrapper path exactly, for example `./bin/magento cache:flush`, instead of global binaries.")
+    @McpDescription("Inspect the current Magento project for local CLI wrappers under the project root or configured Magento root `bin/`, including Mark Shust Docker scripts such as `bin/magento`, `bin/n98-magerun2`, `bin/php`, or `bin/composer`. Call this before running shell commands that would normally use Magento CLI, PHP, Composer, or n98-magerun. The result lists detected wrapper commands, configured wrapper candidates, and example invocations; agents should use the returned project-local wrapper path exactly, for example `./bin/magento cache:flush`, instead of global binaries. When the Magento root is nested deeper in the project, edits still belong under the configured Magento root, but wrappers detected outside that root are still valid and should be run from the returned path.")
     suspend fun describeMagentoCliEnvironment(): String = withProjectReadAction {
         MagentoCliToolQueries.describeCliEnvironment(it)
     }

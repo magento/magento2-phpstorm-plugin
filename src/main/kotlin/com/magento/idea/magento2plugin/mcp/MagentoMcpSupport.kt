@@ -8,6 +8,7 @@ package com.magento.idea.magento2plugin.mcp
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
@@ -124,6 +125,11 @@ internal object MagentoMcpSupport {
     }
 
     fun relativePath(project: Project, virtualFile: VirtualFile): String {
+        val projectRoot = project.baseDir ?: project.projectFile?.parent
+        if (projectRoot != null) {
+            VfsUtilCore.getRelativePath(virtualFile, projectRoot, '/')?.let { return it }
+        }
+
         val basePath = project.basePath
         if (basePath == null) {
             return virtualFile.path

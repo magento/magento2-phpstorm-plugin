@@ -103,7 +103,7 @@ Available query and inspection tools:
 * `find_layout_entities`: finds layout handles, block names, and container names by exact or partial value such as `catalog_product_view`, `product.info.main`, or `checkout`.
 * `find_ui_component`: finds UI component XML definitions by exact or partial component file name such as `product_form`, `sales_order_grid`, or `category_form` without the `.xml` extension.
 * `find_acl_or_menu`: finds ACL resource IDs and admin menu entries by exact or partial identifier such as `Magento_Catalog::catalog` or `Foo_Bar::manage_items`.
-* `describe_magento_cli_environment`: detects project-local CLI wrappers such as Mark Shust Docker scripts under `bin/`, returns the exact command paths an agent should use, and includes example invocations for Magento CLI, PHP, Composer, and `n98-magerun`.
+* `describe_magento_cli_environment`: detects project-local CLI wrappers such as Mark Shust Docker scripts under project-level or Magento-root `bin/`, returns the exact command paths an agent should use, and includes example invocations for Magento CLI, PHP, Composer, and `n98-magerun`.
 
 Notes:
 
@@ -113,7 +113,7 @@ Notes:
 * Magento plugin support must be enabled for the project.
 * Indexing must be finished before MCP queries and generators can run.
 * Category EAV attribute generation creates both the data patch and `view/adminhtml/ui_component/category_form.xml`.
-* `describe_magento_cli_environment` detects project-local wrappers such as Mark Shust Docker scripts under `bin/` and returns the exact command paths an agent should use.
+* `describe_magento_cli_environment` detects project-local wrappers such as Mark Shust Docker scripts under project-level or Magento-root `bin/` and returns the exact command paths an agent should use.
 
 ### MCP CLI wrapper configuration
 
@@ -129,7 +129,9 @@ Agent usage pattern:
 
 1. Call `describe_magento_cli_environment`.
 2. Use the returned wrapper path exactly, for example `./bin/magento cache:flush` or `./bin/n98-magerun2 sys:info`.
-3. Prefer the wrapper over global binaries because these scripts often enter Docker containers or a project-specific runtime.
+3. Keep Magento code edits and generators under the configured Magento root.
+4. If the tool reports a wrapper outside that root, still run it from the returned project-relative path; that is valid for nested Magento roots.
+5. Prefer the wrapper over global binaries because these scripts often enter Docker containers or a project-specific runtime.
 
 ## Setting up development environment
 

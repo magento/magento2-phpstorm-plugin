@@ -226,6 +226,8 @@ class MagentoMcpQueriesTest : BaseProjectTestCase() {
 
     @Test
     fun testDescribeCliEnvironmentDetectsMagentoAndMagerunWrappers() {
+        val nestedMagentoRoot = configureNestedMagentoRoot()
+        Settings.getInstance(project).mcpCliToolCandidates = "bin/magento, bin/n98-magerun2"
         myFixture.addFileToProject("bin/magento", "#!/usr/bin/env bash\n")
         myFixture.addFileToProject("bin/n98-magerun2", "#!/usr/bin/env bash\n")
         PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
@@ -235,11 +237,31 @@ class MagentoMcpQueriesTest : BaseProjectTestCase() {
 
         assertContains(result, "Magento CLI environment")
         assertContains(result, "Configured wrapper candidates:")
+        assertContains(result, "Configured Magento root: ./$nestedMagentoRoot")
         assertContains(result, "./bin/magento")
+        assertContains(result, "location: outside configured Magento root `./$nestedMagentoRoot`")
         assertContains(result, "example: ./bin/magento cache:flush")
         assertContains(result, "./bin/n98-magerun2")
         assertContains(result, "example: ./bin/n98-magerun2 sys:info")
+        assertContains(result, "Create and edit Magento files under `./$nestedMagentoRoot`; that is the configured Magento root.")
+        assertContains(result, "If these configured wrapper paths exist outside `./$nestedMagentoRoot`, that is valid for a nested Magento root.")
         assertContains(result, "Mark Shust Docker projects usually route these wrappers into containers")
+    }
+
+    @Test
+    fun testDescribeCliEnvironmentDoesNotAddOutsideRootGuidanceForWrapperInsideMagentoRoot() {
+        val nestedMagentoRoot = configureNestedMagentoRoot()
+        Settings.getInstance(project).mcpCliToolCandidates = "$nestedMagentoRoot/bin/magento"
+        myFixture.addFileToProject("$nestedMagentoRoot/bin/magento", "#!/usr/bin/env bash\n")
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+        val result = MagentoCliToolQueries.describeCliEnvironment(project)
+
+        assertContains(result, "Configured Magento root: ./$nestedMagentoRoot")
+        assertContains(result, "./$nestedMagentoRoot/bin/magento")
+        assertDoesNotContain(result, "location: outside configured Magento root `./$nestedMagentoRoot`")
+        assertDoesNotContain(result, "If these configured wrapper paths exist outside `./$nestedMagentoRoot`, that is valid for a nested Magento root.")
     }
 
     @Test
@@ -264,5 +286,16 @@ class MagentoMcpQueriesTest : BaseProjectTestCase() {
     private fun assertContainsPath(text: String, expectedPathSuffix: String) {
         val normalized = text.replace('\\', '/')
         assertTrue("Expected to find path suffix <$expectedPathSuffix> in:\n$text", normalized.contains(expectedPathSuffix))
+    }
+
+    private fun assertDoesNotContain(text: String, unexpected: String) {
+        assertTrue("Did not expect to find <$unexpected> in:\n$text", !text.contains(unexpected))
+    }
+
+    private fun configureNestedMagentoRoot(): String {
+        val nestedMagentoRoot = "nested"
+        myFixture.addFileToProject("$nestedMagentoRoot/app/etc/di.xml", "<config/>\n")
+        Settings.getInstance(project).magentoPath = nestedMagentoRoot
+        return nestedMagentoRoot
     }
 }
