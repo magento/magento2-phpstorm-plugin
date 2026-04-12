@@ -108,6 +108,7 @@ Available query and inspection tools:
 Notes:
 
 * The IDE MCP server must be enabled in the JetBrains IDE.
+* Only one JetBrains IDE instance should have the MCP server enabled at a time so the configured MCP port stays free; if another IDE is already using that port, the MCP server will not start correctly.
 * The IDE MCP server entry must be added to the agent MCP configuration.
 * MCP tools work against the currently opened IDE project.
 * Magento plugin support must be enabled for the project.
