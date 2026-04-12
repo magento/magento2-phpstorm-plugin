@@ -22,7 +22,7 @@ internal object MagentoBlockCommands {
                 resolveRequest(project, moduleName, blockClassFqn)
             }
         } catch (_: ReadAction.CannotReadException) {
-            return "The request was cancelled by a pending write action. Retry."
+            return MagentoMcpReadActionSupport.cancellationMessage()
         } catch (exception: BlockValidationException) {
             return exception.message ?: "Block creation request is invalid."
         }

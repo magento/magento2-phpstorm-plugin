@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.mcp
 
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.psi.PsiManager
@@ -25,11 +26,11 @@ internal object MagentoMcpSupport {
     const val MAX_MATCHES = 20
     const val MAX_FILE_MATCHES = 10
 
-    fun validateProject(project: Project): String? {
+    fun validateProject(project: Project, requireSmartMode: Boolean = true): String? {
         if (!Settings.isEnabled(project)) {
             return "Magento plugin support is disabled for this project."
         }
-        if (DumbService.getInstance(project).isDumb) {
+        if (requireSmartMode && DumbService.getInstance(project).isDumb) {
             return "Indexes are not ready yet. Wait for indexing to finish and retry."
         }
         return null
@@ -125,7 +126,7 @@ internal object MagentoMcpSupport {
     }
 
     fun relativePath(project: Project, virtualFile: VirtualFile): String {
-        val projectRoot = project.baseDir ?: project.projectFile?.parent
+        val projectRoot = projectRoot(project)
         if (projectRoot != null) {
             VfsUtilCore.getRelativePath(virtualFile, projectRoot, '/')?.let { return it }
         }
@@ -141,6 +142,10 @@ internal object MagentoMcpSupport {
         } catch (_: Throwable) {
             virtualFile.path
         }
+    }
+
+    fun projectRoot(project: Project): VirtualFile? {
+        return ProjectRootManager.getInstance(project).contentRoots.firstOrNull() ?: project.projectFile?.parent
     }
 
     private fun matchRank(candidate: String, query: String): Int {

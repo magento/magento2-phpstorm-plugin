@@ -56,7 +56,7 @@ internal object MagentoPluginCommands {
                 )
             }
         } catch (_: ReadAction.CannotReadException) {
-            return "The request was cancelled by a pending write action. Retry."
+            return MagentoMcpReadActionSupport.cancellationMessage()
         } catch (exception: PluginValidationException) {
             return exception.message ?: "Plugin creation request is invalid."
         }

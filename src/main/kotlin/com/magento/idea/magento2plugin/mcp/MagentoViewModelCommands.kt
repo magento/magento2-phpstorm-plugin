@@ -22,7 +22,7 @@ internal object MagentoViewModelCommands {
                 resolveRequest(project, moduleName, viewModelClassFqn)
             }
         } catch (_: ReadAction.CannotReadException) {
-            return "The request was cancelled by a pending write action. Retry."
+            return MagentoMcpReadActionSupport.cancellationMessage()
         } catch (exception: ViewModelValidationException) {
             return exception.message ?: "View model creation request is invalid."
         }

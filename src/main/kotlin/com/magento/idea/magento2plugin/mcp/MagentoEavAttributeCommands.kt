@@ -92,7 +92,7 @@ internal object MagentoEavAttributeCommands {
                 )
             }
         } catch (_: ReadAction.CannotReadException) {
-            return "The request was cancelled by a pending write action. Retry."
+            return MagentoMcpReadActionSupport.cancellationMessage()
         } catch (exception: EavAttributeValidationException) {
             return exception.message ?: "Product EAV attribute creation request is invalid."
         }
@@ -153,7 +153,7 @@ internal object MagentoEavAttributeCommands {
                 )
             }
         } catch (_: ReadAction.CannotReadException) {
-            return "The request was cancelled by a pending write action. Retry."
+            return MagentoMcpReadActionSupport.cancellationMessage()
         } catch (exception: EavAttributeValidationException) {
             return exception.message ?: "Category EAV attribute creation request is invalid."
         }
@@ -243,7 +243,7 @@ internal object MagentoEavAttributeCommands {
                 )
             }
         } catch (_: ReadAction.CannotReadException) {
-            return "The request was cancelled by a pending write action. Retry."
+            return MagentoMcpReadActionSupport.cancellationMessage()
         } catch (exception: EavAttributeValidationException) {
             return exception.message ?: "Customer EAV attribute creation request is invalid."
         }

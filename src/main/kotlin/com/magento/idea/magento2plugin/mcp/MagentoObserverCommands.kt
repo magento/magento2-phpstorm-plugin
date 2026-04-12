@@ -45,7 +45,7 @@ internal object MagentoObserverCommands {
                 )
             }
         } catch (_: ReadAction.CannotReadException) {
-            return "The request was cancelled by a pending write action. Retry."
+            return MagentoMcpReadActionSupport.cancellationMessage()
         } catch (exception: ObserverValidationException) {
             return exception.message ?: "Observer creation request is invalid."
         }

@@ -243,8 +243,14 @@ class MagentoMcpQueriesTest : BaseProjectTestCase() {
         assertContains(result, "example: ./bin/magento cache:flush")
         assertContains(result, "./bin/n98-magerun2")
         assertContains(result, "example: ./bin/n98-magerun2 sys:info")
+        assertContains(result, "Known n98-magerun capability groups:")
+        assertContains(result, "admin: Commands for managing Magento admin user accounts and related settings.")
+        assertContains(result, "examples: admin:user:list, admin:user:create, admin:user:change-password, admin:notifications")
+        assertContains(result, "sys: Commands for system-level information, checks, and maintenance tasks.")
+        assertContains(result, "This is a built-in capability snapshot.")
         assertContains(result, "Create and edit Magento files under `./$nestedMagentoRoot`; that is the configured Magento root.")
-        assertContains(result, "If these configured wrapper paths exist outside `./$nestedMagentoRoot`, that is valid for a nested Magento root.")
+        assertContains(result, "If a detected wrapper is outside `./$nestedMagentoRoot`, that is valid for a nested Magento root.")
+        assertContains(result, "For exact n98 command discovery, follow up with the detected wrapper and `list` or a targeted `--help` call such as `sys:info --help`.")
         assertContains(result, "Mark Shust Docker projects usually route these wrappers into containers")
     }
 
@@ -277,6 +283,38 @@ class MagentoMcpQueriesTest : BaseProjectTestCase() {
         val magentoIndex = result.indexOf("./bin/magento")
 
         assertTrue("Expected n98-magerun2 wrapper to be listed before magento:\n$result", magerunIndex in 0 until magentoIndex)
+    }
+
+    @Test
+    fun testDescribeCliEnvironmentDetectsDirectBinChildrenOutsideConfiguredCandidates() {
+        Settings.getInstance(project).mcpCliToolCandidates = "bin/magento"
+        myFixture.addFileToProject("bin/start", "#!/usr/bin/env bash\n")
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+        val result = MagentoCliToolQueries.describeCliEnvironment(project)
+
+        assertContains(result, "Detected wrappers:")
+        assertContains(result, "./bin/start")
+        assertContains(result, "type: environment wrapper")
+        assertContains(result, "example: ./bin/start")
+        assertDoesNotContain(result, "Known n98-magerun capability groups:")
+    }
+
+    @Test
+    fun testDescribeCliEnvironmentIncludesGruntStyleRebuildGuidance() {
+        Settings.getInstance(project).mcpCliToolCandidates = "bin/grunt"
+        myFixture.addFileToProject("bin/grunt", "#!/usr/bin/env bash\n")
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+        val result = MagentoCliToolQueries.describeCliEnvironment(project)
+
+        assertContains(result, "./bin/grunt")
+        assertContains(result, "type: frontend build wrapper")
+        assertContains(result, "use: Use this to compile frontend styles and assets in the project runtime.")
+        assertContains(result, "example: ./bin/grunt less:THEMENAME")
+        assertContains(result, "After editing styles, run the detected grunt wrapper right away to rebuild theme assets, usually `./bin/grunt exec:THEMENAME` and `./bin/grunt less:THEMENAME`.")
     }
 
     @Test

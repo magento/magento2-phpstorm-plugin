@@ -393,7 +393,9 @@ class MagentoMcpToolset : McpToolset {
      */
     @McpTool(name = "describe_magento_cli_environment")
     @McpDescription("Inspect the current Magento project for local CLI wrappers under the project root or configured Magento root `bin/`, including Mark Shust Docker scripts such as `bin/magento`, `bin/n98-magerun2`, `bin/php`, `bin/composer`, or stack lifecycle wrappers like `bin/start`, `bin/stop`, and `bin/restart`. Call this before running shell commands that would normally use Magento CLI, PHP, Composer, n98-magerun, or project environment wrappers. The result lists detected wrapper commands, configured wrapper candidates, and example invocations; agents should use the returned project-local wrapper path exactly, for example `./bin/magento cache:flush` or `./bin/start`, instead of global binaries. When the Magento root is nested deeper in the project, edits still belong under the configured Magento root, but wrappers detected outside that root are still valid and should be run from the returned path.")
-    suspend fun describeMagentoCliEnvironment(): String = withProjectReadAction {
+    suspend fun describeMagentoCliEnvironment(): String = withProjectAction(
+        requireSmartMode = false
+    ) {
         MagentoCliToolQueries.describeCliEnvironment(it)
     }
 
@@ -402,12 +404,16 @@ class MagentoMcpToolset : McpToolset {
      */
     private suspend fun withProjectAction(
         validateProject: Boolean = true,
+        requireSmartMode: Boolean = true,
         query: (Project) -> String
     ): String {
         val project = resolveProject(currentCoroutineContext()) ?: return "MCP project context is unavailable."
 
         if (validateProject) {
-            val validationMessage = MagentoMcpSupport.validateProject(project)
+            val validationMessage = MagentoMcpSupport.validateProject(
+                project,
+                requireSmartMode = requireSmartMode
+            )
             if (validationMessage != null) {
                 return validationMessage
             }
@@ -428,7 +434,7 @@ class MagentoMcpToolset : McpToolset {
                 query(project)
             }
         } catch (_: ReadAction.CannotReadException) {
-            "The request was cancelled by a pending write action. Retry."
+            MagentoMcpReadActionSupport.cancellationMessage()
         }
     }
 
