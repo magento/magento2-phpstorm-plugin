@@ -5,8 +5,14 @@
 
 package com.magento.idea.magento2plugin.mcp
 
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiManager
+import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.xml.XmlFile
+import com.intellij.util.indexing.FileBasedIndex
 import com.jetbrains.php.PhpIndex
+import com.magento.idea.magento2plugin.magento.files.ModuleDiXml
 
 internal object MagentoDiQueries {
     /**
@@ -75,11 +81,11 @@ internal object MagentoDiQueries {
 
         val allTargetFqns = linkedSetOf(targetClassName)
         targetClasses.forEach { MagentoMcpSupport.collectClassHierarchy(it, allTargetFqns) }
-        val diSnapshot = MagentoMcpSnapshots.diSnapshot(project)
+        val pluginDeclarations = findPluginDeclarations(project, allTargetFqns)
         val pluginCandidates = mutableListOf<MagentoMcpSupport.PluginMethodMatch>()
 
         for (targetFqn in allTargetFqns) {
-            for (pluginDeclaration in diSnapshot.pluginDeclarations[targetFqn].orEmpty()) {
+            for (pluginDeclaration in pluginDeclarations[targetFqn].orEmpty()) {
                 if (pluginDeclaration.disabled) {
                     continue
                 }
@@ -133,5 +139,76 @@ internal object MagentoDiQueries {
         }
 
         return lines.joinToString("\n")
+    }
+
+    private fun findPluginDeclarations(
+        project: Project,
+        targetFqns: Set<String>
+    ): Map<String, List<PluginDeclarationRecord>> {
+        val declarationsByTarget = linkedMapOf<String, MutableList<PluginDeclarationRecord>>()
+        val fileBasedIndex = FileBasedIndex.getInstance()
+        val psiManager = PsiManager.getInstance(project)
+        val searchScope = GlobalSearchScope.allScope(project)
+
+        for (targetFqn in targetFqns) {
+            ProgressManager.checkCanceled()
+
+            val virtualFiles = fileBasedIndex.getContainingFiles(
+                com.magento.idea.magento2plugin.stubs.indexes.PluginIndex.KEY,
+                targetFqn,
+                searchScope
+            )
+            for (virtualFile in virtualFiles) {
+                ProgressManager.checkCanceled()
+
+                val xmlFile = psiManager.findFile(virtualFile) as? XmlFile ?: continue
+                val filePath = MagentoMcpSupport.relativePath(project, virtualFile)
+                val scope = MagentoMcpSupport.determineConfigScope(filePath, ModuleDiXml.FILE_NAME)
+                collectPluginDeclarationsForTarget(
+                    xmlFile = xmlFile,
+                    targetFqn = targetFqn,
+                    filePath = filePath,
+                    scope = scope,
+                    declarations = declarationsByTarget
+                )
+            }
+        }
+
+        return declarationsByTarget.mapValues { (_, records) ->
+            records
+                .distinct()
+                .sortedWith(compareBy<PluginDeclarationRecord>({ it.scope }, { it.sortOrder }, { it.filePath }))
+        }
+    }
+
+    private fun collectPluginDeclarationsForTarget(
+        xmlFile: XmlFile,
+        targetFqn: String,
+        filePath: String,
+        scope: String,
+        declarations: MutableMap<String, MutableList<PluginDeclarationRecord>>
+    ) {
+        val rootTag = xmlFile.rootTag ?: return
+        for (typeTag in rootTag.findSubTags(ModuleDiXml.TYPE_TAG)) {
+            val typeName = MagentoMcpSupport.presentableFqn(typeTag.getAttributeValue(ModuleDiXml.NAME_ATTR)) ?: continue
+            if (typeName != targetFqn) {
+                continue
+            }
+
+            for (pluginTag in typeTag.findSubTags(ModuleDiXml.PLUGIN_TAG_NAME)) {
+                declarations.getOrPut(typeName, ::mutableListOf) += PluginDeclarationRecord(
+                    filePath = filePath,
+                    targetFqn = typeName,
+                    pluginName = pluginTag.getAttributeValue(ModuleDiXml.NAME_ATTR) ?: "-",
+                    pluginType = MagentoMcpSupport.presentableFqn(
+                        pluginTag.getAttributeValue(ModuleDiXml.TYPE_ATTR)
+                    ),
+                    sortOrder = pluginTag.getAttributeValue(ModuleDiXml.SORT_ORDER_ATTR)?.toIntOrNull() ?: 0,
+                    disabled = pluginTag.getAttributeValue(ModuleDiXml.DISABLED_ATTR_NAME)
+                        .equals("true", ignoreCase = true),
+                    scope = scope
+                )
+            }
+        }
     }
 }

@@ -144,6 +144,22 @@ internal object MagentoMcpSupport {
         }
     }
 
+    fun determineConfigScope(filePath: String, fileName: String): String {
+        val normalized = filePath.replace('\\', '/')
+        val suffix = "/$fileName"
+        val etcIndex = normalized.lastIndexOf("/etc/")
+        if (etcIndex == -1) {
+            return "global"
+        }
+
+        val tail = normalized.substring(etcIndex + "/etc/".length)
+        return when {
+            tail == fileName -> "global"
+            tail.endsWith(suffix) -> tail.removeSuffix(suffix)
+            else -> "global"
+        }
+    }
+
     fun projectRoot(project: Project): VirtualFile? {
         return ProjectRootManager.getInstance(project).contentRoots.firstOrNull() ?: project.projectFile?.parent
     }

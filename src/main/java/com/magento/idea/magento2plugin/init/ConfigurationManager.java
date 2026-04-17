@@ -239,7 +239,7 @@ public class ConfigurationManager {
         Runnable runnable = () -> {
             notifyGlobally(
                     project,
-                    "Magento 2 and Adobe Commerce Support",
+                    "Magento 2 and Adobe Commerce",
                     message,
                     NotificationType.INFORMATION,
                     actions
@@ -250,7 +250,7 @@ public class ConfigurationManager {
 
     public static void notifyGlobally(@Nullable Project project, String title, String message, NotificationType notificationType, Function<Notification, AnAction>... actions) {
         Notification notification = new Notification(
-                "Magento 2 and Adobe Commerce Support",
+                "Magento 2 and Adobe Commerce",
                 title,
                 message,
                 notificationType

@@ -5,7 +5,7 @@
 </p>
 
 <!-- Plugin description -->
-# Magento 2 and Adobe Commerce Support
+# Magento 2 and Adobe Commerce
 
 <table align="center" style="border-collapse: collapse; width: 100%; text-align: center;">
   <caption style="font-size: 1.2em; margin-bottom: 10px;">
@@ -66,7 +66,7 @@
 
 1. Go to `Settings > Preferences` in the PhpStorm IDE
 2. Navigate to `Plugins`
-3. Click the `Browse repositories...` button and search for "Magento 2 and Adobe Commerce Support"
+3. Click the `Browse repositories...` button and search for "Magento 2 and Adobe Commerce"
 4. Install the plugin and restart PhpStorm
 5. Go to `Settings > Preferences > Languages & Frameworks > PHP > Frameworks > Magento` in the PhpStorm IDE
 6. Check `Enable` and click the `OK` button

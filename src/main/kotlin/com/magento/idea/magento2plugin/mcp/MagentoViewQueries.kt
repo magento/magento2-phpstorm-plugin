@@ -5,7 +5,15 @@
 
 package com.magento.idea.magento2plugin.mcp
 
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
+import com.intellij.psi.search.FilenameIndex
+import com.intellij.psi.xml.XmlFile
+import com.intellij.psi.xml.XmlTag
+import com.magento.idea.magento2plugin.indexes.LayoutIndex
+import com.magento.idea.magento2plugin.indexes.UIComponentIndex
+import com.magento.idea.magento2plugin.stubs.indexes.BlockNameIndex
+import com.magento.idea.magento2plugin.stubs.indexes.ContainerNameIndex
 
 internal object MagentoViewQueries {
     /**
@@ -17,18 +25,9 @@ internal object MagentoViewQueries {
             return "Provide a layout handle, block name, or container name."
         }
 
-        val snapshot = MagentoMcpSnapshots.viewSnapshot(project)
-        val blockMatches = MagentoMcpSupport.prioritizeMatches(
-            snapshot.blocks.keys,
-            query
-        )
-        val containerMatches = MagentoMcpSupport.prioritizeMatches(
-            snapshot.containers.keys,
-            query
-        )
-        val handleMatches = snapshot.handles
-            .filter { MagentoMcpSupport.fuzzyMatch(it.name, query) }
-            .sortedBy(LayoutHandleRecord::name)
+        val handleMatches = findLayoutHandles(project, query)
+        val blockMatches = findBlockMatches(project, query)
+        val containerMatches = findContainerMatches(project, query)
 
         val lines = mutableListOf<String>()
         if (handleMatches.isNotEmpty()) {
@@ -43,8 +42,8 @@ internal object MagentoViewQueries {
                 lines += ""
             }
             lines += "blocks"
-            for (blockName in blockMatches.take(MagentoMcpSupport.MAX_MATCHES)) {
-                for (record in snapshot.blocks[blockName].orEmpty().take(MagentoMcpSupport.MAX_FILE_MATCHES)) {
+            for ((blockName, records) in blockMatches.take(MagentoMcpSupport.MAX_MATCHES)) {
+                for (record in records.take(MagentoMcpSupport.MAX_FILE_MATCHES)) {
                     lines += "$blockName -> ${record.filePath} class=${record.blockClass ?: "-"} template=${record.template ?: "-"}"
                 }
             }
@@ -55,8 +54,8 @@ internal object MagentoViewQueries {
                 lines += ""
             }
             lines += "containers"
-            for (containerName in containerMatches.take(MagentoMcpSupport.MAX_MATCHES)) {
-                for (record in snapshot.containers[containerName].orEmpty().take(MagentoMcpSupport.MAX_FILE_MATCHES)) {
+            for ((containerName, records) in containerMatches.take(MagentoMcpSupport.MAX_MATCHES)) {
+                for (record in records.take(MagentoMcpSupport.MAX_FILE_MATCHES)) {
                     lines += "$containerName -> ${record.filePath} htmlTag=${record.htmlTag ?: "-"} htmlClass=${record.htmlClass ?: "-"}"
                 }
             }
@@ -78,9 +77,24 @@ internal object MagentoViewQueries {
             return "Provide a UI component name."
         }
 
-        val files = MagentoMcpSnapshots.viewSnapshot(project).uiComponents
-            .filter { MagentoMcpSupport.fuzzyMatch(it.name, query) }
-            .sortedBy(UiComponentRecord::name)
+        val files = UIComponentIndex.getUiComponentFiles(project)
+            .asSequence()
+            .mapNotNull { xmlFile ->
+                ProgressManager.checkCanceled()
+                val virtualFile = xmlFile.virtualFile ?: return@mapNotNull null
+                val componentName = virtualFile.nameWithoutExtension
+                if (!MagentoMcpSupport.fuzzyMatch(componentName, query)) {
+                    return@mapNotNull null
+                }
+
+                UiComponentRecord(
+                    name = componentName,
+                    filePath = MagentoMcpSupport.relativePath(project, virtualFile),
+                    rootTag = xmlFile.rootTag?.name ?: "-"
+                )
+            }
+            .sortedWith(compareBy<UiComponentRecord>({ it.name }, { it.filePath }))
+            .toList()
 
         if (files.isEmpty()) {
             return "No UI components matched \"$query\"."
@@ -149,5 +163,80 @@ internal object MagentoViewQueries {
         }
 
         return "ACL and menu matches for \"$query\"\n\n${lines.joinToString("\n")}"
+    }
+
+    private fun findLayoutHandles(project: Project, query: String): List<LayoutHandleRecord> {
+        return FilenameIndex.getAllFilesByExt(project, "xml")
+            .asSequence()
+            .mapNotNull { virtualFile ->
+                ProgressManager.checkCanceled()
+                if (!LayoutIndex.isLayoutFile(virtualFile)) {
+                    return@mapNotNull null
+                }
+
+                val handleName = virtualFile.nameWithoutExtension
+                if (!MagentoMcpSupport.fuzzyMatch(handleName, query)) {
+                    return@mapNotNull null
+                }
+
+                LayoutHandleRecord(
+                    name = handleName,
+                    filePath = MagentoMcpSupport.relativePath(project, virtualFile)
+                )
+            }
+            .sortedBy(LayoutHandleRecord::name)
+            .toList()
+    }
+
+    private fun findBlockMatches(project: Project, query: String): List<Pair<String, List<BlockRecord>>> {
+        val blockNames = MagentoMcpSupport.prioritizeMatches(
+            LayoutIndex.getAllKeys(BlockNameIndex.KEY, project),
+            query
+        )
+
+        return blockNames.map { blockName ->
+            blockName to LayoutIndex.getBlockDeclarations(blockName, project)
+                .mapNotNull { tag -> tag.toBlockRecord(project) }
+                .distinct()
+                .sortedWith(compareBy<BlockRecord>({ it.filePath }, { it.blockClass ?: "" }, { it.template ?: "" }))
+        }
+    }
+
+    private fun findContainerMatches(project: Project, query: String): List<Pair<String, List<ContainerRecord>>> {
+        val containerNames = MagentoMcpSupport.prioritizeMatches(
+            LayoutIndex.getAllKeys(ContainerNameIndex.KEY, project),
+            query
+        )
+
+        return containerNames.map { containerName ->
+            containerName to LayoutIndex.getContainerDeclarations(containerName, project)
+                .mapNotNull { tag -> tag.toContainerRecord(project) }
+                .distinct()
+                .sortedWith(compareBy<ContainerRecord>({ it.filePath }, { it.htmlTag ?: "" }, { it.htmlClass ?: "" }))
+        }
+    }
+
+    private fun XmlTag.toBlockRecord(project: Project): BlockRecord? {
+        val filePath = containingXmlFilePath(project) ?: return null
+        return BlockRecord(
+            filePath = filePath,
+            blockClass = getAttributeValue("class"),
+            template = getAttributeValue("template")
+        )
+    }
+
+    private fun XmlTag.toContainerRecord(project: Project): ContainerRecord? {
+        val filePath = containingXmlFilePath(project) ?: return null
+        return ContainerRecord(
+            filePath = filePath,
+            htmlTag = getAttributeValue("htmlTag"),
+            htmlClass = getAttributeValue("htmlClass")
+        )
+    }
+
+    private fun XmlTag.containingXmlFilePath(project: Project): String? {
+        val xmlFile = containingFile as? XmlFile ?: return null
+        val virtualFile = xmlFile.virtualFile ?: return null
+        return MagentoMcpSupport.relativePath(project, virtualFile)
     }
 }

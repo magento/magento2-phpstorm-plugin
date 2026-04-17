@@ -62,7 +62,7 @@ internal object MagentoMcpSnapshots {
 
             val rootTag = xmlFile.rootTag ?: continue
             val filePath = MagentoMcpSupport.relativePath(project, xmlFile.virtualFile)
-            val scope = determineConfigScope(filePath, ModuleDiXml.FILE_NAME)
+            val scope = MagentoMcpSupport.determineConfigScope(filePath, ModuleDiXml.FILE_NAME)
 
             for (preferenceTag in rootTag.findSubTags(ModuleDiXml.PREFERENCE_TAG_NAME)) {
                 val record = PreferenceRecord(
@@ -286,22 +286,6 @@ internal object MagentoMcpSnapshots {
                 tree = tree
             )
             collectAclResources(resourceTag, tree, filePath, records)
-        }
-    }
-
-    private fun determineConfigScope(filePath: String, fileName: String): String {
-        val normalized = filePath.replace('\\', '/')
-        val suffix = "/$fileName"
-        val etcIndex = normalized.lastIndexOf("/etc/")
-        if (etcIndex == -1) {
-            return "global"
-        }
-
-        val tail = normalized.substring(etcIndex + "/etc/".length)
-        return when {
-            tail == fileName -> "global"
-            tail.endsWith(suffix) -> tail.removeSuffix(suffix)
-            else -> "global"
         }
     }
 

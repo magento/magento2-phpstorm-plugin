@@ -366,7 +366,9 @@ class MagentoMcpToolset : McpToolset {
      */
     @McpTool(name = "find_layout_entities")
     @McpDescription("Find Magento layout handles, block names, and container names by exact or partial name. `name` may be a layout handle such as `catalog_product_view`, a block name such as `product.info.main`, a container name, or a partial fragment such as `checkout` or `product.info`. Use this when locating the correct layout XML file or insertion point before editing blocks, containers, or template references.")
-    suspend fun findLayoutEntities(name: String): String = withProjectReadAction {
+    suspend fun findLayoutEntities(name: String): String = withProjectReadAction(
+        requireSmartMode = false
+    ) {
         MagentoViewQueries.findLayoutEntities(it, name)
     }
 
@@ -375,7 +377,9 @@ class MagentoMcpToolset : McpToolset {
      */
     @McpTool(name = "find_ui_component")
     @McpDescription("Find Magento UI component XML files by exact or partial component name. `name` should usually be the UI component XML base name such as `product_form`, `sales_order_grid`, or `category_form`, without the `.xml` extension, but partial searches are also accepted. Use this to locate the defining file and owning module before changing admin forms, listings, or data providers.")
-    suspend fun findUiComponent(name: String): String = withProjectReadAction {
+    suspend fun findUiComponent(name: String): String = withProjectReadAction(
+        requireSmartMode = false
+    ) {
         MagentoViewQueries.findUiComponent(it, name)
     }
 
@@ -427,14 +431,21 @@ class MagentoMcpToolset : McpToolset {
      */
     private suspend fun withProjectReadAction(
         validateProject: Boolean = true,
+        requireSmartMode: Boolean = true,
         query: (Project) -> String
-    ): String = withProjectAction(validateProject) { project ->
+    ): String = withProjectAction(validateProject, requireSmartMode) { project ->
         try {
-            ReadAction.computeCancellable<String, RuntimeException> {
-                query(project)
+            MagentoMcpReadActionSupport.retryOnCancellation {
+                ReadAction.computeCancellable<String, RuntimeException> {
+                    query(project)
+                }
             }
-        } catch (_: ReadAction.CannotReadException) {
-            MagentoMcpReadActionSupport.cancellationMessage()
+        } catch (throwable: Throwable) {
+            if (MagentoMcpReadActionSupport.isCancellation(throwable)) {
+                MagentoMcpReadActionSupport.cancellationMessage()
+            } else {
+                throw throwable
+            }
         }
     }
 
