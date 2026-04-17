@@ -119,7 +119,7 @@ internal object MagentoViewQueries {
             return "Provide an ACL resource ID or admin menu ID."
         }
 
-        val snapshot = MagentoMcpSnapshots.viewSnapshot(project)
+        val snapshot = MagentoMcpSnapshots.aclMenuSnapshot(project)
         val aclMatches = MagentoMcpSupport.prioritizeMatches(snapshot.aclResources.keys, query)
         val menuMatches = MagentoMcpSupport.prioritizeMatches(
             snapshot.menuEntries.keys,
