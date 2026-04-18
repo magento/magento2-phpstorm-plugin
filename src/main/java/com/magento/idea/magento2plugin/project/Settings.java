@@ -11,6 +11,7 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.components.StoragePathMacros;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.EventDispatcher;
 import com.intellij.util.SmartList;
@@ -56,7 +57,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
     public Settings.State getState() {
         return new State(
                 this.pluginEnabled,
-                this.magentoPath,
+                normalizeMagentoPath(this.magentoPath),
                 this.defaultLicense,
                 this.mftfSupportEnabled,
                 this.myDoNotAskContentConfigAgain,
@@ -75,7 +76,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
     public void setState(final State state) {
         final State oldState = this.getState();
         this.loadState(state);
-        this.notifyListeners(state, oldState);
+        this.notifyListeners(Objects.requireNonNull(this.getState()), oldState);
     }
 
     /**
@@ -130,7 +131,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
     @Override
     public void loadState(final @NotNull Settings.State state) {
         this.pluginEnabled = state.isPluginEnabled();
-        this.magentoPath = state.getMagentoPath();
+        this.magentoPath = normalizeMagentoPath(state.getMagentoPath());
         this.defaultLicense = state.getDefaultLicenseName();
         this.mftfSupportEnabled = state.isMftfSupportEnabled();
         this.myDoNotAskContentConfigAgain = state.isDoNotAskContentConfigAgain();
@@ -157,7 +158,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
     }
 
     public void setMagentoPath(final String magentoPath) {
-        this.magentoPath = magentoPath;
+        this.magentoPath = normalizeMagentoPath(magentoPath);
     }
 
     public interface MagentoModuleDataListener extends EventListener {
@@ -182,12 +183,28 @@ public class Settings implements PersistentStateComponent<Settings.State> {
 
     @Nullable
     public static String getLastMagentoPath() {
-        return PropertiesComponent.getInstance().getValue("magento.support.magentoPath");
+        return normalizeMagentoPath(
+                PropertiesComponent.getInstance().getValue("magento.support.magentoPath")
+        );
     }
 
     @Nullable
     public static String getMagentoPath(final @NotNull Project project) {
-        return getInstance(project).magentoPath;
+        return normalizeMagentoPath(getInstance(project).magentoPath);
+    }
+
+    @Nullable
+    public static String normalizeMagentoPath(final @Nullable String magentoPath) {
+        if (StringUtil.isEmptyOrSpaces(magentoPath)) {
+            return null;
+        }
+
+        String normalizedPath = FileUtil.toSystemIndependentName(magentoPath.trim());
+        if (normalizedPath.length() > 1 && normalizedPath.endsWith("/")) {
+            normalizedPath = StringUtil.trimEnd(normalizedPath, "/");
+        }
+
+        return normalizedPath;
     }
 
     public static @NotNull List<String> getMcpCliToolCandidates(final @NotNull Project project) {
@@ -274,7 +291,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
                 final List<String> myMagentoFolders
         ) {
             this.pluginEnabled = pluginEnabled;
-            this.magentoPath = magentoPath;
+            this.magentoPath = normalizeMagentoPath(magentoPath);
             this.defaultLicenseName = defaultLicenseName;
             this.mftfSupportEnabled = mftfSupportEnabled;
             this.myDoNotAskContentConfigAgain = myDoNotAskContentConfigAgain;
@@ -294,12 +311,12 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         }
 
         public String getMagentoPath() {
-            return this.magentoPath;
+            return normalizeMagentoPath(this.magentoPath);
         }
 
         @Tag("magentoPath")
         public void setMagentoPath(final String magentoPath) {
-            this.magentoPath = magentoPath;
+            this.magentoPath = normalizeMagentoPath(magentoPath);
         }
 
         public String getMagentoVersion() {
@@ -354,10 +371,11 @@ public class Settings implements PersistentStateComponent<Settings.State> {
          * @param magentoPath String
          */
         public void setMagentoPathAndUpdateLastUsed(final String magentoPath) {
-            this.setMagentoPath(magentoPath);
-            if (!StringUtil.isEmptyOrSpaces(magentoPath)) {
+            final String normalizedMagentoPath = normalizeMagentoPath(magentoPath);
+            this.setMagentoPath(normalizedMagentoPath);
+            if (!StringUtil.isEmptyOrSpaces(normalizedMagentoPath)) {
                 PropertiesComponent.getInstance()
-                        .setValue("magento.support.magentoPath", magentoPath);
+                        .setValue("magento.support.magentoPath", normalizedMagentoPath);
             }
         }
 

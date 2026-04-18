@@ -96,7 +96,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
 
         moduleDefaultLicenseName.setText(getSettings().defaultLicense);
         mftfSupportEnabled.setSelected(getSettings().mftfSupportEnabled);
-        magentoPath.getTextField().setText(getSettings().magentoPath);
+        magentoPath.getTextField().setText(StringUtil.notNullize(Settings.getMagentoPath(project)));
         mcpCliToolCandidates.setText(
                 Settings.getNormalizedMcpCliToolCandidates(getSettings().mcpCliToolCandidates)
         );
@@ -155,7 +155,9 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     }
 
     private boolean isMagentoPathChanged() {
-        return !magentoPath.getTextField().getText().equals(getSettings().magentoPath);
+        return !getMagentoPath().equals(
+                StringUtil.notNullize(Settings.getMagentoPath(project))
+        );
     }
 
     @Override
@@ -174,7 +176,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         getSettings().pluginEnabled = pluginEnabled.isSelected();
         getSettings().defaultLicense = moduleDefaultLicenseName.getText();
         getSettings().mftfSupportEnabled = mftfSupportEnabled.isSelected();
-        getSettings().magentoPath = getMagentoPath();
+        getSettings().setMagentoPath(getMagentoPath());
         getSettings().mcpCliToolCandidates = Settings.getNormalizedMcpCliToolCandidates(
                 mcpCliToolCandidates.getText()
         );
@@ -189,7 +191,9 @@ public class SettingsForm implements PhpFrameworkConfigurable {
 
     @NotNull
     public String getMagentoPath() {
-        return magentoPath.getTextField().getText().trim();
+        return StringUtil.notNullize(
+                Settings.normalizeMagentoPath(magentoPath.getTextField().getText())
+        );
     }
 
     @Override
@@ -197,7 +201,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         pluginEnabled.setSelected(getSettings().pluginEnabled);
         moduleDefaultLicenseName.setText(getSettings().defaultLicense);
         mftfSupportEnabled.setSelected(getSettings().mftfSupportEnabled);
-        magentoPath.getTextField().setText(getSettings().magentoPath);
+        magentoPath.getTextField().setText(StringUtil.notNullize(Settings.getMagentoPath(project)));
         mcpCliToolCandidates.setText(
                 Settings.getNormalizedMcpCliToolCandidates(getSettings().mcpCliToolCandidates)
         );
