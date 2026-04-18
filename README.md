@@ -5,7 +5,7 @@
 </p>
 
 <!-- Plugin description -->
-# Magento 2 and Adobe Commerce Support
+# Magento 2 and Adobe Commerce
 
 <table align="center" style="border-collapse: collapse; width: 100%; text-align: center;">
   <caption style="font-size: 1.2em; margin-bottom: 10px;">
@@ -66,7 +66,7 @@
 
 1. Go to `Settings > Preferences` in the PhpStorm IDE
 2. Navigate to `Plugins`
-3. Click the `Browse repositories...` button and search for "Magento 2 and Adobe Commerce Support"
+3. Click the `Browse repositories...` button and search for "Magento 2 and Adobe Commerce"
 4. Install the plugin and restart PhpStorm
 5. Go to `Settings > Preferences > Languages & Frameworks > PHP > Frameworks > Magento` in the PhpStorm IDE
 6. Check `Enable` and click the `OK` button
@@ -103,17 +103,18 @@ Available query and inspection tools:
 * `find_layout_entities`: finds layout handles, block names, and container names by exact or partial value such as `catalog_product_view`, `product.info.main`, or `checkout`.
 * `find_ui_component`: finds UI component XML definitions by exact or partial component file name such as `product_form`, `sales_order_grid`, or `category_form` without the `.xml` extension.
 * `find_acl_or_menu`: finds ACL resource IDs and admin menu entries by exact or partial identifier such as `Magento_Catalog::catalog` or `Foo_Bar::manage_items`.
-* `describe_magento_cli_environment`: detects project-local CLI wrappers such as Mark Shust Docker scripts under `bin/`, returns the exact command paths an agent should use, and includes example invocations for Magento CLI, PHP, Composer, and `n98-magerun`.
+* `describe_magento_cli_environment`: detects project-local CLI wrappers such as Mark Shust Docker scripts under project-level or Magento-root `bin/`, returns the exact command paths an agent should use, and includes example invocations for Magento CLI, PHP, Composer, `n98-magerun`, and stack lifecycle commands such as `./bin/start`.
 
 Notes:
 
 * The IDE MCP server must be enabled in the JetBrains IDE.
+* Only one JetBrains IDE instance should have the MCP server enabled at a time so the configured MCP port stays free; if another IDE is already using that port, the MCP server will not start correctly.
 * The IDE MCP server entry must be added to the agent MCP configuration.
 * MCP tools work against the currently opened IDE project.
 * Magento plugin support must be enabled for the project.
 * Indexing must be finished before MCP queries and generators can run.
 * Category EAV attribute generation creates both the data patch and `view/adminhtml/ui_component/category_form.xml`.
-* `describe_magento_cli_environment` detects project-local wrappers such as Mark Shust Docker scripts under `bin/` and returns the exact command paths an agent should use.
+* `describe_magento_cli_environment` detects project-local wrappers such as Mark Shust Docker scripts under project-level or Magento-root `bin/` and returns the exact command paths an agent should use, including stack lifecycle wrappers such as `bin/start`, `bin/stop`, and `bin/restart`.
 
 ### MCP CLI wrapper configuration
 
@@ -123,13 +124,15 @@ If your Magento project uses local wrapper scripts such as Mark Shust Docker com
 
 Use a comma-separated list of relative paths, for example:
 
-`bin/magento, bin/n98-magerun2, bin/cli`
+`bin/magento, bin/n98-magerun2, bin/cli, bin/start`
 
 Agent usage pattern:
 
 1. Call `describe_magento_cli_environment`.
-2. Use the returned wrapper path exactly, for example `./bin/magento cache:flush` or `./bin/n98-magerun2 sys:info`.
-3. Prefer the wrapper over global binaries because these scripts often enter Docker containers or a project-specific runtime.
+2. Use the returned wrapper path exactly, for example `./bin/magento cache:flush`, `./bin/n98-magerun2 sys:info`, or `./bin/start`.
+3. Keep Magento code edits and generators under the configured Magento root.
+4. If the tool reports a wrapper outside that root, still run it from the returned project-relative path; that is valid for nested Magento roots.
+5. Prefer the wrapper over global binaries because these scripts often enter Docker containers or a project-specific runtime.
 
 ## Setting up development environment
 

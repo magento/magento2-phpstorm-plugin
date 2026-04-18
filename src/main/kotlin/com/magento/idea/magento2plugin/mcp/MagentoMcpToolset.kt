@@ -366,7 +366,9 @@ class MagentoMcpToolset : McpToolset {
      */
     @McpTool(name = "find_layout_entities")
     @McpDescription("Find Magento layout handles, block names, and container names by exact or partial name. `name` may be a layout handle such as `catalog_product_view`, a block name such as `product.info.main`, a container name, or a partial fragment such as `checkout` or `product.info`. Use this when locating the correct layout XML file or insertion point before editing blocks, containers, or template references.")
-    suspend fun findLayoutEntities(name: String): String = withProjectReadAction {
+    suspend fun findLayoutEntities(name: String): String = withProjectReadAction(
+        requireSmartMode = false
+    ) {
         MagentoViewQueries.findLayoutEntities(it, name)
     }
 
@@ -375,7 +377,9 @@ class MagentoMcpToolset : McpToolset {
      */
     @McpTool(name = "find_ui_component")
     @McpDescription("Find Magento UI component XML files by exact or partial component name. `name` should usually be the UI component XML base name such as `product_form`, `sales_order_grid`, or `category_form`, without the `.xml` extension, but partial searches are also accepted. Use this to locate the defining file and owning module before changing admin forms, listings, or data providers.")
-    suspend fun findUiComponent(name: String): String = withProjectReadAction {
+    suspend fun findUiComponent(name: String): String = withProjectReadAction(
+        requireSmartMode = false
+    ) {
         MagentoViewQueries.findUiComponent(it, name)
     }
 
@@ -392,8 +396,10 @@ class MagentoMcpToolset : McpToolset {
      * Detects project-local CLI wrappers such as Mark Shust Docker scripts and explains how to invoke them.
      */
     @McpTool(name = "describe_magento_cli_environment")
-    @McpDescription("Inspect the current Magento project for local CLI wrappers under `bin/`, including Mark Shust Docker scripts such as `bin/magento`, `bin/n98-magerun2`, `bin/php`, or `bin/composer`. Call this before running shell commands that would normally use Magento CLI, PHP, Composer, or n98-magerun. The result lists detected wrapper commands, configured wrapper candidates, and example invocations; agents should use the returned project-local wrapper path exactly, for example `./bin/magento cache:flush`, instead of global binaries.")
-    suspend fun describeMagentoCliEnvironment(): String = withProjectReadAction {
+    @McpDescription("Inspect the current Magento project for local CLI wrappers under the project root or configured Magento root `bin/`, including Mark Shust Docker scripts such as `bin/magento`, `bin/n98-magerun2`, `bin/php`, `bin/composer`, or stack lifecycle wrappers like `bin/start`, `bin/stop`, and `bin/restart`. Call this before running shell commands that would normally use Magento CLI, PHP, Composer, n98-magerun, or project environment wrappers. The result lists detected wrapper commands, configured wrapper candidates, and example invocations; agents should use the returned project-local wrapper path exactly, for example `./bin/magento cache:flush` or `./bin/start`, instead of global binaries. When the Magento root is nested deeper in the project, edits still belong under the configured Magento root, but wrappers detected outside that root are still valid and should be run from the returned path.")
+    suspend fun describeMagentoCliEnvironment(): String = withProjectAction(
+        requireSmartMode = false
+    ) {
         MagentoCliToolQueries.describeCliEnvironment(it)
     }
 
@@ -402,12 +408,16 @@ class MagentoMcpToolset : McpToolset {
      */
     private suspend fun withProjectAction(
         validateProject: Boolean = true,
+        requireSmartMode: Boolean = true,
         query: (Project) -> String
     ): String {
         val project = resolveProject(currentCoroutineContext()) ?: return "MCP project context is unavailable."
 
         if (validateProject) {
-            val validationMessage = MagentoMcpSupport.validateProject(project)
+            val validationMessage = MagentoMcpSupport.validateProject(
+                project,
+                requireSmartMode = requireSmartMode
+            )
             if (validationMessage != null) {
                 return validationMessage
             }
@@ -421,14 +431,21 @@ class MagentoMcpToolset : McpToolset {
      */
     private suspend fun withProjectReadAction(
         validateProject: Boolean = true,
+        requireSmartMode: Boolean = true,
         query: (Project) -> String
-    ): String = withProjectAction(validateProject) { project ->
+    ): String = withProjectAction(validateProject, requireSmartMode) { project ->
         try {
-            ReadAction.computeCancellable<String, RuntimeException> {
-                query(project)
+            MagentoMcpReadActionSupport.retryOnCancellation {
+                ReadAction.computeCancellable<String, RuntimeException> {
+                    query(project)
+                }
             }
-        } catch (_: ReadAction.CannotReadException) {
-            "The request was cancelled by a pending write action. Retry."
+        } catch (throwable: Throwable) {
+            if (MagentoMcpReadActionSupport.isCancellation(throwable)) {
+                MagentoMcpReadActionSupport.cancellationMessage()
+            } else {
+                throw throwable
+            }
         }
     }
 

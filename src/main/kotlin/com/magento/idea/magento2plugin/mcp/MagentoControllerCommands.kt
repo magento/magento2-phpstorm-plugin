@@ -41,7 +41,7 @@ internal object MagentoControllerCommands {
                 )
             }
         } catch (_: ReadAction.CannotReadException) {
-            return "The request was cancelled by a pending write action. Retry."
+            return MagentoMcpReadActionSupport.cancellationMessage()
         } catch (exception: ControllerValidationException) {
             return exception.message ?: "Controller creation request is invalid."
         }

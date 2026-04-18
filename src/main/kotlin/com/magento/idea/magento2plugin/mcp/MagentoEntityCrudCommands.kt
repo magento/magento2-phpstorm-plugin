@@ -86,7 +86,7 @@ internal object MagentoEntityCrudCommands {
                 )
             }
         } catch (_: ReadAction.CannotReadException) {
-            return "The request was cancelled by a pending write action. Retry."
+            return MagentoMcpReadActionSupport.cancellationMessage()
         } catch (exception: EntityCrudValidationException) {
             return exception.message ?: "Entity CRUD creation request is invalid."
         }

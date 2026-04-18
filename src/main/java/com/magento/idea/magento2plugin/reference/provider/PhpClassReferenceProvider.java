@@ -20,6 +20,7 @@ import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -51,33 +52,33 @@ public class PhpClassReferenceProvider extends PsiReferenceProvider {
         String namespacePart;
         final List<PsiReference> psiReferences = new ArrayList<>();
 
-        for (int i = 0; i < fqnParts.length - 1; i++) {
-            namespacePart = fqnParts[i];
-            namespace.append('\\');
-            namespace.append(namespacePart);
-
-            final String namespaceId = namespace
-                    .toString()
-                    .toLowerCase(Locale.ROOT);
-
-            final Collection<PhpNamespace> references = hasNamespaceInIndex(
-                    namespaceId,
-                    element.getProject()
-            ) ? phpIndex.getNamespacesByName(namespaceId) : new ArrayList<>();
-
-            if (!references.isEmpty()) {
-                final TextRange range = new TextRange(
-                        origValue.indexOf(classFQN) + namespace.toString().lastIndexOf(92),
-                        origValue.indexOf(classFQN) + namespace.toString().lastIndexOf(92)
-                                + namespacePart.length()
-                );
-                psiReferences.add(new PolyVariantReferenceBase(element, range, references));
-            }
-        }
-        final String className = classFQN.substring(classFQN.lastIndexOf(92) + 1);
-
         try {
-            final Collection<PhpClass> classes = phpIndex.getAnyByFQN(classFQN);
+            for (int i = 0; i < fqnParts.length - 1; i++) {
+                namespacePart = fqnParts[i];
+                namespace.append('\\');
+                namespace.append(namespacePart);
+
+                final String namespaceId = namespace
+                        .toString()
+                        .toLowerCase(Locale.ROOT);
+
+                final Collection<PhpNamespace> references = hasNamespaceInIndex(
+                        namespaceId,
+                        element.getProject()
+                ) ? getNamespacesByName(phpIndex, namespaceId) : Collections.emptyList();
+
+                if (!references.isEmpty()) {
+                    final TextRange range = new TextRange(
+                            origValue.indexOf(classFQN) + namespace.toString().lastIndexOf(92),
+                            origValue.indexOf(classFQN) + namespace.toString().lastIndexOf(92)
+                                    + namespacePart.length()
+                    );
+                    psiReferences.add(new PolyVariantReferenceBase(element, range, references));
+                }
+            }
+
+            final String className = classFQN.substring(classFQN.lastIndexOf(92) + 1);
+            final Collection<PhpClass> classes = getClassesByFqn(phpIndex, classFQN);
 
             if (!classes.isEmpty()) {
                 final TextRange range = new TextRange(
@@ -93,6 +94,20 @@ public class PhpClassReferenceProvider extends PsiReferenceProvider {
         return psiReferences.toArray(new PsiReference[0]);
     }
 
+    protected Collection<PhpNamespace> getNamespacesByName(
+            final @NotNull PhpIndex phpIndex,
+            final @NotNull String namespaceId
+    ) {
+        return phpIndex.getNamespacesByName(namespaceId);
+    }
+
+    protected Collection<PhpClass> getClassesByFqn(
+            final @NotNull PhpIndex phpIndex,
+            final @NotNull String classFqn
+    ) {
+        return phpIndex.getAnyByFQN(classFqn);
+    }
+
     /**
      * Check if php namespace index has specified identifier.
      *
@@ -101,7 +116,7 @@ public class PhpClassReferenceProvider extends PsiReferenceProvider {
      *
      * @return boolean
      */
-    private boolean hasNamespaceInIndex(
+    protected boolean hasNamespaceInIndex(
             final @NotNull String namespaceIdentifier,
             final @NotNull Project project
     ) {

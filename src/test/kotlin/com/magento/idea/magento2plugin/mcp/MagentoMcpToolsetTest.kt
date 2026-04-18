@@ -119,5 +119,7 @@ class MagentoMcpToolsetTest {
         assertTrue(description.contains("before running shell commands") || description.contains("Call this before running shell commands"))
         assertTrue(description.contains("use the returned project-local wrapper path exactly"))
         assertTrue(description.contains("`./bin/magento cache:flush`"))
+        assertTrue(description.contains("`bin/start`"))
+        assertTrue(description.contains("`./bin/start`"))
     }
 }
