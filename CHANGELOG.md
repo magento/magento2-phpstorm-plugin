@@ -31,6 +31,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
   `find_acl_or_menu`
 - Magento MCP CLI environment discovery for AI agents. The `describe_magento_cli_environment` tool exposes project-local wrapper commands, including Mark Shust Docker-style `bin/*` scripts such as `bin/magento` and `bin/n98-magerun2`, so agents can prefer those wrappers over global binaries.
 
+### Fixed
+
+- Illegal char <|> [#2669](https://github.com/magento/magento2-phpstorm-plugin/issues/2669)
+
 ## 2026.1.1
 
 ### Added
