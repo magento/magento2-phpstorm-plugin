@@ -33,7 +33,7 @@ public class CheckIfMagentoPathIsValidActivity implements StartupActivity, Proje
 
     private void registerSettings(final @NotNull Project project) {
         final Settings settings = Settings.getInstance(project);
-        final String path = settings.magentoPath;
+        final String path = Settings.getMagentoPath(project);
         if (settings.pluginEnabled && (path == null || path.isEmpty())) {
             if (MagentoBasePathUtil.isMagentoFolderValid(project.getBasePath())) {
                 settings.setMagentoPath(project.getBasePath());

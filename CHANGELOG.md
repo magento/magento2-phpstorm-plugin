@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
+## 2026.2.1
+
+### Fixed
+
+- Override this file in a project theme is not working [#2549](https://github.com/magento/magento2-phpstorm-plugin/issues/2549)
+
 ## 2026.2.0
 
 ### Added

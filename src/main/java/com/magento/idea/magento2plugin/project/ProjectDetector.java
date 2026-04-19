@@ -47,7 +47,7 @@ public class ProjectDetector implements DirectoryProjectConfigurator {
                             Settings settings = Settings.getInstance(project);
                             settings.pluginEnabled = true;
                             settings.mftfSupportEnabled = true;
-                            settings.magentoPath = project.getBasePath();
+                            settings.setMagentoPath(project.getBasePath());
                             settings.magentoVersion = MagentoVersionUtil.get(
                                     project,
                                     project.getBasePath()
