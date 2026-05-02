@@ -36,8 +36,11 @@ val effectivePluginVersion = providers.provider {
 
 version = effectivePluginVersion.get()
 
+val skipFoojayResolver = System.getenv("QODANA_SKIP_FOOJAY_RESOLVER") == "true"
 kotlin {
-    jvmToolchain(21)
+    if (!skipFoojayResolver) {
+        jvmToolchain(21)
+    }
 }
 
 repositories {
