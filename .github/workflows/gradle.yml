@@ -95,10 +95,10 @@ jobs:
           cache: gradle
       - name: Qodana - Code Quality
         uses: JetBrains/qodana-action@v2026.1
-        env:
-          QODANA_SKIP_FOOJAY_RESOLVER: 'true'
         with:
           cache-default-branch-only: true
           use-caches: true
           upload-result: true
-          args: '--baseline qodana.sarif.json'
+          args: |
+            --config qodana.yaml
+            --baseline qodana.sarif.json
