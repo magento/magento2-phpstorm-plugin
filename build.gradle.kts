@@ -51,6 +51,7 @@ repositories {
 dependencies {
     testImplementation("junit:junit:4.13.2")
     testCompileOnly("org.junit.jupiter:junit-jupiter-api:5.10.2")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.10.2")
 
     intellijPlatform {
         create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
