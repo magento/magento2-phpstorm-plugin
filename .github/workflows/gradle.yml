@@ -94,7 +94,7 @@ jobs:
           distribution: 'temurin'
           cache: gradle
       - name: Qodana - Code Quality
-        uses: JetBrains/qodana-action@v2026.1
+        uses: JetBrains/qodana-action@v2025.3
         with:
           cache-default-branch-only: true
           use-caches: true
