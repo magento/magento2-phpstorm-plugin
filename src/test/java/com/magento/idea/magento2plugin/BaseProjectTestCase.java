@@ -84,6 +84,7 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
         }, () -> {
             BaseProjectTestCase.super.setUp();
             copyMagento2ToTestProject();
+            waitForIndexes();
             enablePluginAndReindex();
         });
     }
@@ -108,16 +109,14 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
         settings.pluginEnabled = true;
         settings.mftfSupportEnabled = true;
         IndexManager.manualReindex();
-        PlatformTestUtil.dispatchAllEventsInIdeEventQueue();
-        IndexingTestUtil.waitUntilIndexesAreReady(myFixture.getProject());
+        waitForIndexes();
     }
 
     protected void disablePluginAndReindex() {
         final Settings settings = Settings.getInstance(myFixture.getProject());
         settings.pluginEnabled = false;
         IndexManager.manualReindex();
-        PlatformTestUtil.dispatchAllEventsInIdeEventQueue();
-        IndexingTestUtil.waitUntilIndexesAreReady(myFixture.getProject());
+        waitForIndexes();
     }
 
     @Override
@@ -134,8 +133,13 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
         final Settings settings = Settings.getInstance(myFixture.getProject());
         settings.mftfSupportEnabled = false;
         IndexManager.manualReindex();
+        waitForIndexes();
+    }
+
+    private void waitForIndexes() {
         PlatformTestUtil.dispatchAllEventsInIdeEventQueue();
         IndexingTestUtil.waitUntilIndexesAreReady(myFixture.getProject());
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue();
     }
 
     protected String prepareFixturePath(
