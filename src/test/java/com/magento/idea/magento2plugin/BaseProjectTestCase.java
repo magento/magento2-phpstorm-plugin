@@ -37,6 +37,11 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
 
     @Override
     public void setUp() throws Exception {
+        VfsRootAccess.allowRootAccess(
+                getTestRootDisposable(),
+                getAbsoluteProjectPath(".intellijPlatform")
+        );
+
         // Install a guard uncaught exception handler to ignore known kernel-related background crashes in tests
         previousUncaughtHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
@@ -167,8 +172,12 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
     }
 
     protected String getAbsoluteTestDataPath(final String testDataPath) {
+        return getAbsoluteProjectPath(testDataPath);
+    }
+
+    protected String getAbsoluteProjectPath(final String path) {
         return FileUtil.toSystemIndependentName(
-                Paths.get(testDataPath).toAbsolutePath().normalize().toString()
+                Paths.get(path).toAbsolutePath().normalize().toString()
         );
     }
 
