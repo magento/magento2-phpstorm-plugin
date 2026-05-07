@@ -30,7 +30,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run automated tests
-        run: ./gradlew test --no-daemon
+        run: ./gradlew clean test --no-daemon --no-build-cache --no-configuration-cache
 
   build-windows:
     runs-on: windows-latest
@@ -54,7 +54,21 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run automated tests
-        run: ./gradlew test --no-daemon
+        run: ./gradlew clean test --fail-fast --no-daemon --no-build-cache --no-configuration-cache
+      - name: Upload Windows test failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-test-failure-artifacts
+          if-no-files-found: ignore
+          retention-days: 14
+          path: |
+            build/test-results/test/**
+            build/reports/tests/test/**
+            build/reports/problems/**
+            build/tmp/test/**
+            .intellijPlatform/sandbox/**/log-test/**
+            .intellijPlatform/sandbox/**/system/log/**
 
   build-macos:
     runs-on: macos-latest
@@ -78,7 +92,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run automated tests
-        run: ./gradlew test --no-daemon
+        run: ./gradlew clean test --no-daemon --no-build-cache --no-configuration-cache
 
   static-tests:
     runs-on: ubuntu-latest
@@ -94,8 +108,8 @@ jobs:
           distribution: 'temurin'
           cache: gradle
       - name: Qodana - Code Quality
-        uses: JetBrains/qodana-action@v2024.2
+        uses: JetBrains/qodana-action@v2025.3
         with:
           cache-default-branch-only: true
           use-caches: true
-          args: '--baseline,qodana.sarif.json'
+          args: '--baseline qodana.sarif.json'

@@ -25,7 +25,7 @@ public abstract class BaseGeneratorTestCase extends BaseProjectTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        myFixture.setTestDataPath(TEST_DATA_FOLDER_PATH);
+        setFixtureTestDataPath(TEST_DATA_FOLDER_PATH);
         // Reset changed default code style settings to the previous default settings.
         DefaultCodeStyleSettingsAdjustmentsUtil.execute(myFixture.getProject());
     }

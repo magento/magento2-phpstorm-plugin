@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Fixed
 
+- Read access assertion when enabling Magento support or resolving Magento version from plugin settings [#2692](https://github.com/magento/magento2-phpstorm-plugin/issues/2692)
 - Override this file in a project theme is not working [#2549](https://github.com/magento/magento2-phpstorm-plugin/issues/2549)
 
 ## 2026.2.0

@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.util.magento;
 
 import com.intellij.json.psi.JsonFile;
 import com.intellij.json.psi.JsonObject;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -52,33 +53,35 @@ public final class MagentoVersionUtil {
             final Project project,
             final String magentoPath
     ) {
-        final VirtualFile file = LocalFileSystem.getInstance().findFileByPath(
-                getFilePath(magentoPath)
-        );
-        final Pair<String, String> versionData = new Pair<>(DEFAULT_VERSION, null);
-
-        if (file == null) {
-            return versionData;
-        }
-        final PsiManager psiManager = PsiManager.getInstance(project);
-        final PsiFile composerFile = psiManager.findFile(file);
-
-        if (composerFile instanceof JsonFile) {
-            final JsonFile composerJsonFile = (JsonFile) composerFile;
-            final JsonObject jsonObject = PsiTreeUtil.getChildOfType(
-                    composerJsonFile,
-                    JsonObject.class
+        return ReadAction.compute(() -> {
+            final VirtualFile file = LocalFileSystem.getInstance().findFileByPath(
+                    getFilePath(magentoPath)
             );
+            final Pair<String, String> versionData = new Pair<>(DEFAULT_VERSION, null);
 
-            if (jsonObject == null) {
+            if (file == null) {
                 return versionData;
             }
-            final Pair<String, String> version = GetMagentoVersionUtil.getVersion(jsonObject);
+            final PsiManager psiManager = PsiManager.getInstance(project);
+            final PsiFile composerFile = psiManager.findFile(file);
 
-            return version == null ? versionData : version;
-        }
+            if (composerFile instanceof JsonFile) {
+                final JsonFile composerJsonFile = (JsonFile) composerFile;
+                final JsonObject jsonObject = PsiTreeUtil.getChildOfType(
+                        composerJsonFile,
+                        JsonObject.class
+                );
 
-        return versionData;
+                if (jsonObject == null) {
+                    return versionData;
+                }
+                final Pair<String, String> version = GetMagentoVersionUtil.getVersion(jsonObject);
+
+                return version == null ? versionData : version;
+            }
+
+            return versionData;
+        });
     }
 
     private static String getFilePath(final String magentoPath) {

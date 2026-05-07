@@ -6,7 +6,9 @@
 package com.magento.idea.magento2plugin;
 
 import com.intellij.testFramework.LoggedErrorProcessor;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess;
 import com.intellij.testFramework.IndexingTestUtil;
 import com.intellij.testFramework.PlatformTestUtil;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
@@ -14,6 +16,7 @@ import com.magento.idea.magento2plugin.indexes.IndexManager;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.project.Settings;
 import org.jetbrains.annotations.NotNull;
+import java.nio.file.Paths;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -34,6 +37,11 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
 
     @Override
     public void setUp() throws Exception {
+        VfsRootAccess.allowRootAccess(
+                getTestRootDisposable(),
+                getAbsoluteProjectPath(".intellijPlatform")
+        );
+
         // Install a guard uncaught exception handler to ignore known kernel-related background crashes in tests
         previousUncaughtHandler = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
@@ -84,12 +92,13 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
         }, () -> {
             BaseProjectTestCase.super.setUp();
             copyMagento2ToTestProject();
+            waitForIndexes();
             enablePluginAndReindex();
         });
     }
 
     private void copyMagento2ToTestProject() {
-        myFixture.setTestDataPath(testDataProjectPath);
+        setFixtureTestDataPath(testDataProjectPath);
         myFixture.copyDirectoryToProject(
                 testDataProjectDirectory,
                 ""
@@ -99,7 +108,7 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
     @Override
     protected String getTestDataPath() {
         //configure specific test data in your test.
-        return TEST_DATA_ROOT;
+        return getAbsoluteTestDataPath(TEST_DATA_ROOT);
     }
 
     protected void enablePluginAndReindex() {
@@ -108,16 +117,14 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
         settings.pluginEnabled = true;
         settings.mftfSupportEnabled = true;
         IndexManager.manualReindex();
-        PlatformTestUtil.dispatchAllEventsInIdeEventQueue();
-        IndexingTestUtil.waitUntilIndexesAreReady(myFixture.getProject());
+        waitForIndexes();
     }
 
     protected void disablePluginAndReindex() {
         final Settings settings = Settings.getInstance(myFixture.getProject());
         settings.pluginEnabled = false;
         IndexManager.manualReindex();
-        PlatformTestUtil.dispatchAllEventsInIdeEventQueue();
-        IndexingTestUtil.waitUntilIndexesAreReady(myFixture.getProject());
+        waitForIndexes();
     }
 
     @Override
@@ -134,8 +141,13 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
         final Settings settings = Settings.getInstance(myFixture.getProject());
         settings.mftfSupportEnabled = false;
         IndexManager.manualReindex();
+        waitForIndexes();
+    }
+
+    private void waitForIndexes() {
         PlatformTestUtil.dispatchAllEventsInIdeEventQueue();
         IndexingTestUtil.waitUntilIndexesAreReady(myFixture.getProject());
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue();
     }
 
     protected String prepareFixturePath(
@@ -151,6 +163,22 @@ public abstract class BaseProjectTestCase extends BasePlatformTestCase {
 
     private String name() {
         return StringUtil.trimEnd(getTestName(true), "Test");
+    }
+
+    protected void setFixtureTestDataPath(final String testDataPath) {
+        final String absoluteTestDataPath = getAbsoluteTestDataPath(testDataPath);
+        VfsRootAccess.allowRootAccess(getTestRootDisposable(), absoluteTestDataPath);
+        myFixture.setTestDataPath(absoluteTestDataPath);
+    }
+
+    protected String getAbsoluteTestDataPath(final String testDataPath) {
+        return getAbsoluteProjectPath(testDataPath);
+    }
+
+    protected String getAbsoluteProjectPath(final String path) {
+        return FileUtil.toSystemIndependentName(
+                Paths.get(path).toAbsolutePath().normalize().toString()
+        );
     }
 
 }

@@ -39,7 +39,7 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        myFixture.setTestDataPath(testDataFolderPath);
+        setFixtureTestDataPath(testDataFolderPath);
     }
 
     @SuppressWarnings("PMD.CognitiveComplexity")

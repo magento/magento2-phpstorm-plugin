@@ -21,7 +21,7 @@ public abstract class InspectionPhpFixtureTestCase extends BaseInspectionsTestCa
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        myFixture.setTestDataPath(testDataFolderPath);
+        setFixtureTestDataPath(testDataFolderPath);
     }
 
     @Override
