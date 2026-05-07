@@ -25,6 +25,12 @@ class ModuleIndexTest : BaseProjectTestCase() {
             "Expected editable module names to contain Foo_Bar, got: $moduleNames",
             moduleNames.contains("Foo_Bar")
         )
+
+        val rootCandidates = getMagentoRootCandidates(ModuleIndex(project))
+        assertTrue(
+            "Expected /src to resolve to project-local candidates only, got: $rootCandidates",
+            rootCandidates.none { it == "/src" }
+        )
     }
 
     @Test
@@ -67,5 +73,12 @@ class ModuleIndexTest : BaseProjectTestCase() {
             "Expected editable theme names to contain frontend/Foo/bar, got: $themeNames",
             themeNames.contains("frontend/Foo/bar")
         )
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun getMagentoRootCandidates(moduleIndex: ModuleIndex): Collection<String> {
+        val method = ModuleIndex::class.java.getDeclaredMethod("getMagentoRootCandidates")
+        method.isAccessible = true
+        return method.invoke(moduleIndex) as Collection<String>
     }
 }

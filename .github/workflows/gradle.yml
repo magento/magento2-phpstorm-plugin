@@ -54,7 +54,21 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run automated tests
-        run: ./gradlew clean test --no-daemon --no-build-cache --no-configuration-cache
+        run: ./gradlew clean test --fail-fast --no-daemon --no-build-cache --no-configuration-cache
+      - name: Upload Windows test failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-test-failure-artifacts
+          if-no-files-found: ignore
+          retention-days: 14
+          path: |
+            build/test-results/test/**
+            build/reports/tests/test/**
+            build/reports/problems/**
+            build/tmp/test/**
+            .intellijPlatform/sandbox/**/log-test/**
+            .intellijPlatform/sandbox/**/system/log/**
 
   build-macos:
     runs-on: macos-latest

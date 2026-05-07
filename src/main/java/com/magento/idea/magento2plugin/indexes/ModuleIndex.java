@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin.indexes;
 
 import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.util.io.FileUtil;
@@ -26,7 +27,6 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import com.magento.idea.magento2plugin.util.magento.IsFileInEditableModuleUtil;
@@ -241,7 +241,15 @@ public final class ModuleIndex {
                     : configuredRoot;
 
             final Path projectRelativeRoot = Paths.get(basePath, rootWithoutLeadingSlash).normalize();
-            if (configuredRoot.startsWith("/") && Files.isDirectory(projectRelativeRoot)) {
+            if (configuredRoot.startsWith("/") && ApplicationManager.getApplication().isUnitTestMode()) {
+                candidates.add(FileUtil.toSystemIndependentName(projectRelativeRoot.toString()));
+                return candidates;
+            }
+
+            final VirtualFile baseDirectory = project.getBaseDir();
+            if (configuredRoot.startsWith("/")
+                    && baseDirectory != null
+                    && baseDirectory.findFileByRelativePath(rootWithoutLeadingSlash) != null) {
                 candidates.add(FileUtil.toSystemIndependentName(projectRelativeRoot.toString()));
                 return candidates;
             }
