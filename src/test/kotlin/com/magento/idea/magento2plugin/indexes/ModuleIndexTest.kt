@@ -13,6 +13,21 @@ import org.junit.Test
 
 class ModuleIndexTest : BaseProjectTestCase() {
     @Test
+    fun testGetEditableModuleNamesSupportsRootRelativeMagentoPathFromStoredSettings() {
+        val settings = Settings.getInstance(project)
+        val state = settings.state ?: error("Expected settings state to be available")
+        state.magentoPath = "/src"
+        settings.loadState(state)
+
+        val moduleNames = ModuleIndex(project).editableModuleNames
+
+        assertTrue(
+            "Expected editable module names to contain Foo_Bar, got: $moduleNames",
+            moduleNames.contains("Foo_Bar")
+        )
+    }
+
+    @Test
     fun testGetEditableThemeNamesSupportsWindowsStyleMagentoRootFromStoredSettings() {
         myFixture.addFileToProject(
             "app/design/frontend/Foo/bar/registration.php",

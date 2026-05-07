@@ -26,6 +26,8 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import com.magento.idea.magento2plugin.util.magento.IsFileInEditableModuleUtil;
 import org.jetbrains.annotations.Nullable;
@@ -232,20 +234,24 @@ public final class ModuleIndex {
             return candidates;
         }
 
-        candidates.add(FileUtil.toSystemIndependentName(configuredRoot));
-
         final String basePath = project.getBasePath();
         if (basePath != null) {
             final String rootWithoutLeadingSlash = configuredRoot.startsWith("/")
                     ? configuredRoot.substring(1)
                     : configuredRoot;
+
+            final Path projectRelativeRoot = Paths.get(basePath, rootWithoutLeadingSlash).normalize();
+            if (configuredRoot.startsWith("/") && Files.isDirectory(projectRelativeRoot)) {
+                candidates.add(FileUtil.toSystemIndependentName(projectRelativeRoot.toString()));
+                return candidates;
+            }
+
             candidates.add(FileUtil.toSystemIndependentName(
-                    Paths.get(basePath, rootWithoutLeadingSlash).normalize().toString()
-            ));
-            candidates.add(FileUtil.toSystemIndependentName(
-                    Paths.get(basePath, configuredRoot).normalize().toString()
+                    projectRelativeRoot.toString()
             ));
         }
+
+        candidates.add(FileUtil.toSystemIndependentName(configuredRoot));
 
         return candidates;
     }
