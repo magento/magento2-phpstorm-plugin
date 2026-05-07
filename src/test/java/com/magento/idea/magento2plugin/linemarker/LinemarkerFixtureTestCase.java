@@ -21,7 +21,7 @@ public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        myFixture.setTestDataPath(TEST_DATA_PATH);
+        setFixtureTestDataPath(TEST_DATA_PATH);
     }
 
     protected String getFixturePath(final String fileName, final String folder) {

@@ -20,7 +20,7 @@ public abstract class InspectionXmlFixtureTestCase extends BaseInspectionsTestCa
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        myFixture.setTestDataPath(testDataFolderPath);
+        setFixtureTestDataPath(testDataFolderPath);
     }
 
     @Override

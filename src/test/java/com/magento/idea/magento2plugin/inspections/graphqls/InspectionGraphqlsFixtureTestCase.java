@@ -21,7 +21,7 @@ public abstract class InspectionGraphqlsFixtureTestCase extends BaseInspectionsT
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        myFixture.setTestDataPath(testDataFolderPath);
+        setFixtureTestDataPath(testDataFolderPath);
     }
 
     @Override

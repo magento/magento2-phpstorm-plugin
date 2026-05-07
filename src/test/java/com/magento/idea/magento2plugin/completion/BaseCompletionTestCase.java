@@ -18,7 +18,7 @@ public abstract class BaseCompletionTestCase extends BaseProjectTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        myFixture.setTestDataPath(testDataFolderPath);
+        setFixtureTestDataPath(testDataFolderPath);
     }
 
     private void configureFixture(final String filePath) {
