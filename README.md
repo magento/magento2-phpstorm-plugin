@@ -86,13 +86,7 @@ Available project and creation tools:
 
 Available query and inspection tools:
 
-* `find_magento_module`: finds modules by exact or partial Magento module name such as `Magento_Catalog`, `Foo_Bar`, `Catalog`, or `Magento_`. Use this to confirm the canonical module name and path before generating code.
-* `find_di_config_for_class`: finds `di.xml` declarations related to a PHP FQN or virtual type name such as `Magento\\Catalog\\Model\\Product` or `catalogProductRepository`. Use this to inspect preferences, virtual types, arguments, and related DI wiring before making changes.
-* `find_plugins_for_method`: finds plugins for a target class or interface method. Pass a PHP FQN such as `Magento\\Catalog\\Api\\ProductRepositoryInterface` and a bare method name such as `save` or `getById`.
-* `find_observers_for_event`: finds observers by full or partial event name such as `catalog_product_save_after` or `product_save` and returns matching `events.xml` declarations.
-* `find_layout_entities`: finds layout handles, block names, and container names by exact or partial value such as `catalog_product_view`, `product.info.main`, or `checkout`.
-* `find_ui_component`: finds UI component XML definitions by exact or partial component file name such as `product_form`, `sales_order_grid`, or `category_form` without the `.xml` extension.
-* `find_acl_or_menu`: finds ACL resource IDs and admin menu entries by exact or partial identifier such as `Magento_Catalog::catalog` or `Foo_Bar::manage_items`.
+* `magento_inspect`: a three-step Magento inspection library designed to keep agent context small. First call it with `mode=help` to get only query names and short descriptions. Then call it with `mode=detailed_schema` and one `queryType` to load detailed parameters and example JSON only for that inspection. Finally call it with `mode=query`, the selected `queryType`, and `parametersJson` as a JSON object to inspect the project. Supported query types are `module`, `di_config`, `plugins_for_method`, `observers_for_event`, `layout_entities`, `ui_component`, and `acl_or_menu`.
 * `describe_magento_cli_environment`: detects project-local CLI wrappers such as Mark Shust Docker scripts under project-level or Magento-root `bin/`, returns the exact command paths an agent should use, and includes example invocations for Magento CLI, PHP, Composer, `n98-magerun`, and stack lifecycle commands such as `./bin/start`.
 
 Notes:

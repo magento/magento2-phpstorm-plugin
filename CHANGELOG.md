@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 ### Added
 
 - A single `magento_scaffold` MCP tool now replaces the separate `create_magento_*` creation tools with a context-conscious three-step scaffold flow: `help` mode lists scaffold types with short descriptions, `detailed_schema` mode returns detailed parameters for one scaffold type, and `render` mode creates modules, plugins, observers, CRUD entities, controllers, CLI commands, blocks, view models, and product/category/customer EAV attributes.
+- A single `magento_inspect` MCP tool now replaces the separate `find_*` inspection tools with a context-conscious three-step flow: `help` lists query types, `detailed_schema` describes one query type, and `query` runs module, DI, plugin, observer, layout, UI component, ACL, and menu lookups.
 
 ### Fixed
 

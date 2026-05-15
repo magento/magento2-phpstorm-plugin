@@ -9,18 +9,12 @@ Use this skill when the user asks to create Magento or Adobe Commerce code scaff
 
 ## Preferred Flow
 
-1. Inspect before generating when context matters:
-   - Use `find_magento_module` to confirm an existing editable module and canonical `Vendor_Module` name.
-   - Use `find_di_config_for_class` or `find_plugins_for_method` before adding plugins.
-   - Use `find_observers_for_event` before adding observers.
-   - Use `find_layout_entities`, `find_ui_component`, or `find_acl_or_menu` when the scaffold depends on layout, UI component, ACL, or menu wiring.
-
-2. Use `magento_scaffold` as the creation entry point:
+1. Use `magento_scaffold` as the creation entry point:
    - First call with `mode: "help"` to get only scaffold names and short descriptions.
    - Then call with `mode: "detailed_schema"` and one `scaffoldType` to load only that scaffold's parameters, defaults, constraints, and example JSON.
    - Then call with `mode: "render"`, the chosen `scaffoldType`, and `parametersJson` as a JSON object string.
 
-3. Use the generated result:
+2. Use the generated result:
    - Read the returned paths and module name.
    - For a newly created module, pass the returned combined `moduleName` such as `Foo_Bar` to follow-up scaffolds.
    - If CLI validation is needed, call `describe_magento_cli_environment` before running shell commands and use returned project-local wrappers.
