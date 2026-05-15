@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
+## 2026.2.3
+
+### Fixed
+
+- Magento MCP CLI environment discovery now checks project-local wrapper scripts directly from the filesystem on demand and no longer reports configured candidates such as `bin/php` unless the files actually exist.
+
 ## 2026.2.1
 
 ### Fixed

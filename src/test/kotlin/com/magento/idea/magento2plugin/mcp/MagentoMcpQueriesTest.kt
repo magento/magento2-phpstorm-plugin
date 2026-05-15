@@ -4,6 +4,9 @@ import com.intellij.testFramework.IndexingTestUtil
 import com.intellij.testFramework.PlatformTestUtil
 import com.magento.idea.magento2plugin.BaseProjectTestCase
 import com.magento.idea.magento2plugin.project.Settings
+import java.nio.file.Files
+import java.nio.file.Path
+import java.util.Comparator
 import org.junit.Test
 
 class MagentoMcpQueriesTest : BaseProjectTestCase() {
@@ -226,12 +229,11 @@ class MagentoMcpQueriesTest : BaseProjectTestCase() {
 
     @Test
     fun testDescribeCliEnvironmentDetectsMagentoAndMagerunWrappers() {
+        resetCliEnvironment()
         val nestedMagentoRoot = configureNestedMagentoRoot()
         Settings.getInstance(project).mcpCliToolCandidates = "bin/magento, bin/n98-magerun2"
-        myFixture.addFileToProject("bin/magento", "#!/usr/bin/env bash\n")
-        myFixture.addFileToProject("bin/n98-magerun2", "#!/usr/bin/env bash\n")
-        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
-        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        writeProjectFile("bin/magento", "#!/usr/bin/env bash\n")
+        writeProjectFile("bin/n98-magerun2", "#!/usr/bin/env bash\n")
 
         val result = MagentoCliToolQueries.describeCliEnvironment(project)
 
@@ -256,11 +258,10 @@ class MagentoMcpQueriesTest : BaseProjectTestCase() {
 
     @Test
     fun testDescribeCliEnvironmentDoesNotAddOutsideRootGuidanceForWrapperInsideMagentoRoot() {
+        resetCliEnvironment()
         val nestedMagentoRoot = configureNestedMagentoRoot()
         Settings.getInstance(project).mcpCliToolCandidates = "$nestedMagentoRoot/bin/magento"
-        myFixture.addFileToProject("$nestedMagentoRoot/bin/magento", "#!/usr/bin/env bash\n")
-        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
-        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        writeProjectFile("$nestedMagentoRoot/bin/magento", "#!/usr/bin/env bash\n")
 
         val result = MagentoCliToolQueries.describeCliEnvironment(project)
 
@@ -272,11 +273,10 @@ class MagentoMcpQueriesTest : BaseProjectTestCase() {
 
     @Test
     fun testDescribeCliEnvironmentUsesConfiguredCandidateOrder() {
+        resetCliEnvironment()
         Settings.getInstance(project).mcpCliToolCandidates = "bin/n98-magerun2, bin/magento"
-        myFixture.addFileToProject("bin/magento", "#!/usr/bin/env bash\n")
-        myFixture.addFileToProject("bin/n98-magerun2", "#!/usr/bin/env bash\n")
-        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
-        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        writeProjectFile("bin/magento", "#!/usr/bin/env bash\n")
+        writeProjectFile("bin/n98-magerun2", "#!/usr/bin/env bash\n")
 
         val result = MagentoCliToolQueries.describeCliEnvironment(project)
         val magerunIndex = result.indexOf("./bin/n98-magerun2")
@@ -287,10 +287,9 @@ class MagentoMcpQueriesTest : BaseProjectTestCase() {
 
     @Test
     fun testDescribeCliEnvironmentDetectsDirectBinChildrenOutsideConfiguredCandidates() {
+        resetCliEnvironment()
         Settings.getInstance(project).mcpCliToolCandidates = "bin/magento"
-        myFixture.addFileToProject("bin/start", "#!/usr/bin/env bash\n")
-        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
-        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        writeProjectFile("bin/start", "#!/usr/bin/env bash\n")
 
         val result = MagentoCliToolQueries.describeCliEnvironment(project)
 
@@ -303,10 +302,9 @@ class MagentoMcpQueriesTest : BaseProjectTestCase() {
 
     @Test
     fun testDescribeCliEnvironmentIncludesGruntStyleRebuildGuidance() {
+        resetCliEnvironment()
         Settings.getInstance(project).mcpCliToolCandidates = "bin/grunt"
-        myFixture.addFileToProject("bin/grunt", "#!/usr/bin/env bash\n")
-        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
-        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        writeProjectFile("bin/grunt", "#!/usr/bin/env bash\n")
 
         val result = MagentoCliToolQueries.describeCliEnvironment(project)
 
@@ -319,6 +317,7 @@ class MagentoMcpQueriesTest : BaseProjectTestCase() {
 
     @Test
     fun testDescribeCliEnvironmentIncludesStartWrapperWhenManyProjectWrappersExist() {
+        resetCliEnvironment()
         val wrappers = listOf(
             "magento",
             "n98-magerun2",
@@ -343,16 +342,32 @@ class MagentoMcpQueriesTest : BaseProjectTestCase() {
             "start"
         )
         Settings.getInstance(project).mcpCliToolCandidates = wrappers.joinToString(", ") { "bin/$it" }
+        writeProjectFile("bin/start", "#!/usr/bin/env bash\n")
 
         val result = MagentoCliToolQueries.describeCliEnvironment(project)
 
-        assertContains(result, "Configured wrappers:")
+        assertContains(result, "Detected wrappers:")
         assertContains(result, "./bin/start")
         assertContains(result, "use: Use this to start the local project environment or stack when needed.")
         assertContains(
             result,
             "Call this tool before running shell commands that normally use Magento, n98-magerun, or project environment wrappers such as `./bin/start`, `./bin/stop`, or `./bin/restart`."
         )
+    }
+
+    @Test
+    fun testDescribeCliEnvironmentDoesNotReportNonexistentConfiguredCandidates() {
+        resetCliEnvironment()
+        Settings.getInstance(project).mcpCliToolCandidates = "bin/magento, bin/php"
+        writeProjectFile("bin/magento", "#!/usr/bin/env bash\n")
+
+        val result = MagentoCliToolQueries.describeCliEnvironment(project)
+
+        assertContains(result, "Detected wrappers:")
+        assertContains(result, "./bin/magento")
+        assertDoesNotContain(result, "./bin/php")
+        assertDoesNotContain(result, "Configured wrappers:")
+        assertDoesNotContain(result, "existence could not be verified")
     }
 
     private fun assertContains(text: String, expected: String) {
@@ -370,8 +385,37 @@ class MagentoMcpQueriesTest : BaseProjectTestCase() {
 
     private fun configureNestedMagentoRoot(): String {
         val nestedMagentoRoot = "nested"
-        myFixture.addFileToProject("$nestedMagentoRoot/app/etc/di.xml", "<config/>\n")
+        writeProjectFile("$nestedMagentoRoot/app/etc/di.xml", "<config/>\n")
         Settings.getInstance(project).magentoPath = nestedMagentoRoot
         return nestedMagentoRoot
+    }
+
+    private fun resetCliEnvironment() {
+        deleteProjectPath("bin")
+        deleteProjectPath("nested")
+        Settings.getInstance(project).magentoPath = "/src"
+    }
+
+    private fun deleteProjectPath(relativePath: String) {
+        val projectRoot = projectRootPath()
+        val path = projectRoot.resolve(relativePath).normalize()
+        if (!path.startsWith(projectRoot) || !Files.exists(path)) {
+            return
+        }
+
+        Files.walk(path).use { paths ->
+            paths.sorted(Comparator.reverseOrder()).forEach { Files.deleteIfExists(it) }
+        }
+    }
+
+    private fun writeProjectFile(relativePath: String, content: String) {
+        val file = projectRootPath().resolve(relativePath).normalize()
+        Files.createDirectories(file.parent)
+        Files.writeString(file, content)
+    }
+
+    private fun projectRootPath(): Path {
+        val projectBasePath = project.basePath ?: error("Project base path is not available.")
+        return Path.of(projectBasePath).toAbsolutePath().normalize()
     }
 }

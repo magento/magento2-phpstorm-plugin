@@ -6,8 +6,9 @@
 package com.magento.idea.magento2plugin.mcp
 
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.VirtualFile
 import com.magento.idea.magento2plugin.project.Settings
+import java.nio.file.Files
+import java.nio.file.Path
 
 internal object MagentoCliToolQueries {
     private const val MAX_CLI_TOOLS_TO_REPORT = 100
@@ -234,19 +235,17 @@ internal object MagentoCliToolQueries {
         val configuredMagentoRootRelative = resolveConfiguredMagentoRootRelativePath(project)
         val searchRoots = buildSearchRoots(configuredMagentoRootRelative)
         val detectedTools = discoverTools(project, searchRoots, configuredCandidates)
-        val fallbackTools = buildConfiguredFallbackTools(project, searchRoots, configuredCandidates)
-        val toolsToReport = if (detectedTools.isEmpty()) fallbackTools else detectedTools
         val wrappersOutsideMagentoRoot = if (configuredMagentoRootRelative == null) {
             emptyList()
         } else {
-            toolsToReport.filter { tool ->
+            detectedTools.filter { tool ->
                 !isUnderRoot(tool.command.removePrefix("./"), configuredMagentoRootRelative)
             }
         }
         val wrapperCommandsOutsideMagentoRoot = wrappersOutsideMagentoRoot.map { it.command }.toSet()
         val lines = mutableListOf<String>()
-        val hasN98MagerunWrapper = toolsToReport.any { it.kind.capabilityGroups.isNotEmpty() }
-        val hasGruntWrapper = toolsToReport.any { it.kind == GRUNT_TOOL_KIND }
+        val hasN98MagerunWrapper = detectedTools.any { it.kind.capabilityGroups.isNotEmpty() }
+        val hasGruntWrapper = detectedTools.any { it.kind == GRUNT_TOOL_KIND }
 
         lines += "Magento CLI environment"
         lines += "Prefer project-local wrappers over global binaries for Magento, Docker, PHP, Composer, n98-magerun, and stack lifecycle commands."
@@ -259,7 +258,7 @@ internal object MagentoCliToolQueries {
             lines += "Configured Magento root: ./$configuredMagentoRootRelative"
         }
 
-        if (toolsToReport.isEmpty()) {
+        if (detectedTools.isEmpty()) {
             lines += ""
             lines += "No project-local CLI wrappers were detected."
             lines += "If this project uses custom wrappers, update `MCP CLI wrapper candidates` in Magento settings."
@@ -267,12 +266,8 @@ internal object MagentoCliToolQueries {
         }
 
         lines += ""
-        lines += if (detectedTools.isEmpty()) {
-            "Configured wrappers:"
-        } else {
-            "Detected wrappers:"
-        }
-        for (tool in toolsToReport.take(MAX_CLI_TOOLS_TO_REPORT)) {
+        lines += "Detected wrappers:"
+        for (tool in detectedTools.take(MAX_CLI_TOOLS_TO_REPORT)) {
             lines += tool.command
             lines += "  type: ${tool.kind.description}"
             lines += "  use: ${tool.kind.usage}"
@@ -280,10 +275,6 @@ internal object MagentoCliToolQueries {
                 lines += "  location: outside configured Magento root `./$configuredMagentoRootRelative`"
             }
             lines += "  example: ${exampleCommand(tool)}"
-        }
-
-        if (detectedTools.isEmpty()) {
-            lines += "  note: existence could not be verified through the current project index; these commands come from the configured wrapper candidates."
         }
 
         if (hasN98MagerunWrapper) {
@@ -305,11 +296,7 @@ internal object MagentoCliToolQueries {
             guidance += "Create and edit Magento files under `./$configuredMagentoRootRelative`; that is the configured Magento root."
         }
         if (configuredMagentoRootRelative != null && wrappersOutsideMagentoRoot.isNotEmpty()) {
-            guidance += if (detectedTools.isEmpty()) {
-                "If these configured wrapper paths exist outside `./$configuredMagentoRootRelative`, that is valid for a nested Magento root. Run the wrapper from the returned project-relative path and do not rewrite it under the Magento root."
-            } else {
-                "If a detected wrapper is outside `./$configuredMagentoRootRelative`, that is valid for a nested Magento root. Run the wrapper from the returned project-relative path and do not rewrite it under the Magento root."
-            }
+            guidance += "If a detected wrapper is outside `./$configuredMagentoRootRelative`, that is valid for a nested Magento root. Run the wrapper from the returned project-relative path and do not rewrite it under the Magento root."
         }
         if (hasN98MagerunWrapper) {
             guidance += "For exact n98 command discovery, follow up with the detected wrapper and `list` or a targeted `--help` call such as `sys:info --help`."
@@ -331,42 +318,44 @@ internal object MagentoCliToolQueries {
         configuredCandidates: List<String>
     ): List<DetectedTool> {
         val detected = LinkedHashMap<String, DetectedTool>()
-        val projectRoot = MagentoMcpSupport.projectRoot(project) ?: return emptyList()
+        val projectRoot = projectRootPath(project) ?: return emptyList()
 
         for (root in searchRoots) {
             for (candidate in configuredCandidates) {
                 val expectedRelativePath = normalizePath(
                     expectedProjectRelativePath(root, candidate)
                 )
-                val candidateFile = findRelativeFile(projectRoot, expectedRelativePath)
-                if (candidateFile != null && !candidateFile.isDirectory) {
-                    val relativePath = MagentoMcpSupport.relativePath(project, candidateFile)
+                val candidatePath = resolveProjectPath(projectRoot, expectedRelativePath)
+                if (candidatePath != null && Files.exists(candidatePath) && !Files.isDirectory(candidatePath)) {
+                    val relativePath = relativeProjectPath(projectRoot, candidatePath)
                     detected.putIfAbsent(
                         relativePath,
-                        buildDetectedTool(relativePath, candidateFile.name)
+                        buildDetectedTool(relativePath, candidatePath.fileName.toString())
                     )
                 }
             }
 
-            val binDirectory = findRelativeFile(
+            val binDirectory = resolveProjectPath(
                 projectRoot,
                 expectedProjectRelativePath(root, "bin")
             )
-            binDirectory
-                ?.children
-                ?.asSequence()
-                ?.filter { !it.isDirectory }
-                ?.sortedWith(
-                    compareBy<VirtualFile> { toolSortOrder(it.name, configuredCandidates) }
-                        .thenBy { it.name.lowercase() }
-                )
-                ?.forEach { file ->
-                    val relativePath = MagentoMcpSupport.relativePath(project, file)
-                    detected.putIfAbsent(
-                        relativePath,
-                        buildDetectedTool(relativePath, file.name)
-                    )
+            if (binDirectory != null && Files.isDirectory(binDirectory)) {
+                Files.list(binDirectory).use { children ->
+                    children
+                        .filter { !Files.isDirectory(it) }
+                        .sorted(
+                            compareBy<Path> { toolSortOrder(it.fileName.toString(), configuredCandidates) }
+                                .thenBy { it.fileName.toString().lowercase() }
+                        )
+                        .forEach { file ->
+                            val relativePath = relativeProjectPath(projectRoot, file)
+                            detected.putIfAbsent(
+                                relativePath,
+                                buildDetectedTool(relativePath, file.fileName.toString())
+                            )
+                        }
                 }
+            }
         }
 
         return detected.values.toList()
@@ -473,41 +462,33 @@ internal object MagentoCliToolQueries {
         }
     }
 
-    private fun buildConfiguredFallbackTools(
-        project: Project,
-        searchRoots: List<String>,
-        configuredCandidates: List<String>
-    ): List<DetectedTool> {
-        val primaryRoot = searchRoots.firstOrNull()
-
-        return configuredCandidates.map { candidate ->
-            val relativePath = if (primaryRoot == null) {
-                normalizePath(candidate)
-            } else {
-                expectedProjectRelativePath(primaryRoot, candidate)
-            }
-            buildDetectedTool(relativePath, candidate.substringAfterLast('/'))
-        }
-    }
-
     private fun isUnderRoot(relativePath: String, rootRelativePath: String): Boolean {
         val normalizedPath = normalizePath(relativePath)
         val normalizedRoot = normalizePath(rootRelativePath)
         return normalizedPath == normalizedRoot || normalizedPath.startsWith("$normalizedRoot/")
     }
 
-    private fun findRelativeFile(root: VirtualFile, relativePath: String): VirtualFile? {
-        var current: VirtualFile = root
-        val segments = relativePath
-            .replace('\\', '/')
-            .split('/')
-            .filter { it.isNotBlank() && it != "." }
+    private fun projectRootPath(project: Project): Path? {
+        val projectBasePath = project.basePath ?: project.baseDir?.path ?: return null
+        return Path.of(projectBasePath).toAbsolutePath().normalize()
+    }
 
-        for (segment in segments) {
-            current = current.findChild(segment) ?: return null
+    private fun resolveProjectPath(projectRoot: Path, relativePath: String): Path? {
+        val normalizedRelativePath = normalizePath(relativePath)
+        if (normalizedRelativePath.isEmpty()) {
+            return projectRoot
         }
 
-        return current
+        val resolvedPath = projectRoot.resolve(normalizedRelativePath).toAbsolutePath().normalize()
+        return if (resolvedPath.startsWith(projectRoot)) {
+            resolvedPath
+        } else {
+            null
+        }
+    }
+
+    private fun relativeProjectPath(projectRoot: Path, path: Path): String {
+        return projectRoot.relativize(path.toAbsolutePath().normalize()).toString().replace('\\', '/')
     }
 
     private data class DetectedTool(
