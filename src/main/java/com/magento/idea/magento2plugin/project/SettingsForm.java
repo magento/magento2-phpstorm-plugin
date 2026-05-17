@@ -5,11 +5,13 @@
 
 package com.magento.idea.magento2plugin.project;
 
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.text.StringUtil;
@@ -19,11 +21,13 @@ import com.jetbrains.php.frameworks.PhpFrameworkConfigurable;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
 import com.magento.idea.magento2plugin.init.ConfigurationManager;
 import com.magento.idea.magento2plugin.magento.packages.MagentoComponentManager;
+import com.magento.idea.magento2plugin.project.MagentoSkillInstaller.Skill;
 import com.magento.idea.magento2plugin.project.util.GetProjectBasePath;
 import com.magento.idea.magento2plugin.project.validator.SettingsFormValidator;
 import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -54,6 +58,8 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     private JCheckBox mftfSupportEnabled;
     private TextFieldWithBrowseButton magentoPath;
     private JTextField mcpCliToolCandidates;
+    private JButton installMagentoScaffoldSkillButton;
+    private JButton installMagentoInspectSkillButton;
     private final SettingsFormValidator validator = new SettingsFormValidator(this);
     private JLabel magentoVersionLabel;//NOPMD
     private JLabel magentoPathLabel;//NOPMD
@@ -90,6 +96,12 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         regenerateUrnMapButton.addMouseListener(
                 new RegenerateUrnMapListener(project)
         );
+        installMagentoScaffoldSkillButton.addActionListener(
+                event -> installMagentoSkill(Skill.MAGENTO_SCAFFOLD)
+        );
+        installMagentoInspectSkillButton.addActionListener(
+                event -> installMagentoSkill(Skill.MAGENTO_INSPECT)
+        );
 
         refreshFormStatus(getSettings().pluginEnabled);
         pluginEnabled.addActionListener(e -> refreshFormStatus(pluginEnabled.isSelected()));
@@ -117,11 +129,54 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         magentoPath.setEnabled(isEnabled);
         mcpCliToolCandidates.setEnabled(isEnabled);
         moduleDefaultLicenseName.setEnabled(isEnabled);
+        installMagentoScaffoldSkillButton.setEnabled(isEnabled);
+        installMagentoInspectSkillButton.setEnabled(isEnabled);
     }
 
     protected void reindex() {
         IndexManager.manualReindex();
         MagentoComponentManager.getInstance(project).flushModules();
+    }
+
+    @SuppressWarnings("unchecked")
+    private void installMagentoSkill(final Skill skill) {
+        try {
+            if (MagentoSkillInstaller.hasDifferentExistingSkill(project, skill)
+                    && !confirmSkillReplacement(skill)) {
+                return;
+            }
+
+            final String installedPath = MagentoSkillInstaller.install(project, skill);
+            ConfigurationManager.notifyGlobally(
+                    project,
+                    "Magento 2 and Adobe Commerce",
+                    skill.getDisplayName() + " skill was added to " + installedPath,
+                    NotificationType.INFORMATION
+            );
+        } catch (final IOException | IllegalStateException exception) {
+            final String errorMessage = StringUtil.notNullize(
+                    exception.getMessage(),
+                    exception.getClass().getSimpleName()
+            );
+            ConfigurationManager.notifyGlobally(
+                    project,
+                    "Magento 2 and Adobe Commerce",
+                    "Unable to add " + skill.getDisplayName() + " skill: "
+                            + StringUtil.escapeXmlEntities(errorMessage),
+                    NotificationType.WARNING
+            );
+        }
+    }
+
+    private boolean confirmSkillReplacement(final Skill skill) {
+        return Messages.showYesNoDialog(
+                project,
+                skill.getDisplayName()
+                        + " skill already exists in this project and has different content. "
+                        + "Replace it with the bundled Magento skill?",
+                "Replace Magento Skill",
+                Messages.getQuestionIcon()
+        ) == Messages.YES;
     }
 
     @Override

@@ -141,6 +141,12 @@ kover {
 }
 
 tasks {
+    processResources {
+        from(layout.projectDirectory.dir("skills")) {
+            into("skills")
+        }
+    }
+
     wrapper {
         gradleVersion = providers.gradleProperty("gradleVersion").get()
     }
