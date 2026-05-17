@@ -7,7 +7,8 @@ package com.magento.idea.magento2plugin.indexes;
 
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.application.ReadAction;
-import com.intellij.openapi.project.DumbService;
+import com.intellij.openapi.project.IndexNotReadyException;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -124,33 +125,102 @@ public final class ModuleIndex {
      */
     public @Nullable PsiDirectory getModuleDirectoryByModuleName(final String moduleName) {
         return ReadAction.compute(() -> {
+            final VirtualFile moduleDirectory = getModuleDirectoryVirtualFileByModuleName(moduleName);
+            if (moduleDirectory == null) {
+                return null;
+            }
+
+            return PsiManager.getInstance(project).findDirectory(moduleDirectory);
+        });
+    }
+
+    /**
+     * Returns VirtualFile directory of the certain module.
+     *
+     * @param moduleName String
+     *
+     * @return VirtualFile
+     */
+    public @Nullable VirtualFile getModuleDirectoryVirtualFileByModuleName(final String moduleName) {
+        return ReadAction.compute(() -> {
             if (moduleName == null) {
                 return null;
             }
 
-            if (!DumbService.getInstance(project).isDumb()) {
-                final FileBasedIndex index = FileBasedIndex.getInstance();
-                final Collection<VirtualFile> files = new ArrayList<>(index.getContainingFiles(
-                        ModuleNameIndex.KEY,
-                        moduleName,
-                        GlobalSearchScope.getScopeRestrictedByFileTypes(
-                                GlobalSearchScope.allScope(project),
-                                PhpFileType.INSTANCE
-                        )
-                ));
-
-                if (!files.isEmpty()) {
-                    final VirtualFile virtualFile = files.iterator().next();
-                    final PsiDirectory indexedDirectory = PsiManager.getInstance(project)
-                            .findDirectory(virtualFile.getParent());
-                    if (indexedDirectory != null) {
-                        return indexedDirectory;
-                    }
-                }
+            final VirtualFile indexedDirectory = findIndexedModuleDirectory(moduleName);
+            if (indexedDirectory != null) {
+                return indexedDirectory;
             }
 
-            return findEditableModuleDirectoryFromFilesystem(moduleName);
+            final VirtualFile projectRootDirectory = findEditableModuleDirectoryFromProjectRoots(moduleName);
+            if (projectRootDirectory != null) {
+                return projectRootDirectory;
+            }
+
+            final PsiDirectory editableDirectory = findEditableModuleDirectoryFromFilesystem(moduleName);
+            return editableDirectory == null ? null : editableDirectory.getVirtualFile();
         });
+    }
+
+    private @Nullable VirtualFile findIndexedModuleDirectory(final String moduleName) {
+        final Collection<VirtualFile> files;
+        try {
+            final FileBasedIndex index = FileBasedIndex.getInstance();
+            files = new ArrayList<>(index.getContainingFiles(
+                    ModuleNameIndex.KEY,
+                    moduleName,
+                    GlobalSearchScope.getScopeRestrictedByFileTypes(
+                            GlobalSearchScope.allScope(project),
+                            PhpFileType.INSTANCE
+                    )
+            ));
+        } catch (IndexNotReadyException exception) {
+            return null;
+        }
+
+        for (final VirtualFile virtualFile : files) {
+            final VirtualFile moduleDirectory = virtualFile.getParent();
+            if (moduleDirectory != null && moduleDirectory.isValid() && moduleDirectory.isDirectory()) {
+                return moduleDirectory;
+            }
+        }
+
+        return null;
+    }
+
+    private @Nullable VirtualFile findEditableModuleDirectoryFromProjectRoots(final String moduleName) {
+        final String[] nameParts = moduleName.split(Package.vendorModuleNameSeparator, 2);
+        if (nameParts.length != 2) {
+            return null;
+        }
+
+        final String configuredRoot = Settings.getMagentoPath(project);
+        if (configuredRoot == null || configuredRoot.isBlank()) {
+            return null;
+        }
+
+        final String rootWithoutLeadingSlash = configuredRoot.startsWith("/")
+                ? configuredRoot.substring(1)
+                : configuredRoot;
+        final String moduleRelativePath = Package.packagesRoot + "/"
+                + nameParts[0] + "/" + nameParts[1];
+        final List<String> relativePathCandidates = new ArrayList<>();
+        relativePathCandidates.add(rootWithoutLeadingSlash + "/" + moduleRelativePath);
+        relativePathCandidates.add(moduleRelativePath);
+
+        for (final VirtualFile contentRoot : ProjectRootManager.getInstance(project).getContentRoots()) {
+            for (final String relativePath : relativePathCandidates) {
+                final VirtualFile moduleDirectory = contentRoot.findFileByRelativePath(relativePath);
+                if (moduleDirectory != null
+                        && moduleDirectory.isValid()
+                        && moduleDirectory.isDirectory()
+                        && moduleDirectory.findChild("registration.php") != null) {
+                    return moduleDirectory;
+                }
+            }
+        }
+
+        return null;
     }
 
     private void collectEditableFilesystemModuleNames(
@@ -244,6 +314,18 @@ public final class ModuleIndex {
             ));
             candidates.add(FileUtil.toSystemIndependentName(
                     Paths.get(basePath, configuredRoot).normalize().toString()
+            ));
+        }
+
+        for (final VirtualFile contentRoot : ProjectRootManager.getInstance(project).getContentRoots()) {
+            final String rootWithoutLeadingSlash = configuredRoot.startsWith("/")
+                    ? configuredRoot.substring(1)
+                    : configuredRoot;
+            candidates.add(FileUtil.toSystemIndependentName(
+                    Paths.get(contentRoot.getPath(), rootWithoutLeadingSlash).normalize().toString()
+            ));
+            candidates.add(FileUtil.toSystemIndependentName(
+                    Paths.get(contentRoot.getPath(), configuredRoot).normalize().toString()
             ));
         }
 
