@@ -6,11 +6,11 @@
 package com.magento.idea.magento2plugin.indexes;
 
 import com.intellij.codeInsight.completion.PrefixMatcher;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 // CHECKSTYLE IGNORE check FOR NEXT 1 LINES
@@ -92,31 +92,7 @@ public class DiIndex {
      */
     @Nullable
     public static PhpClass getPhpClassOfServiceMethod(XmlElement psiMethodValueElement) {
-        XmlTag serviceTag = PsiTreeUtil.getParentOfType(psiMethodValueElement, XmlTag.class);
-        if (serviceTag == null) {
-            return null;
-        }
-
-        XmlAttribute attribute = serviceTag.getAttribute("class");
-        if (attribute == null) {
-            return null;
-        }
-
-        XmlAttributeValue valueElement = attribute.getValueElement();
-        if (valueElement == null) {
-            return null;
-        }
-
-        for (PsiReference reference : valueElement.getReferences()) {
-            if (reference != null) {
-                PsiElement element = reference.resolve();
-                if (element instanceof PhpClass) {
-                    return (PhpClass) element;
-                }
-            }
-        }
-
-        return null;
+        return getPhpClassFromParentTagAttribute(psiMethodValueElement, "class");
     }
 
     /**
@@ -127,28 +103,41 @@ public class DiIndex {
      */
     @Nullable
     public static PhpClass getPhpClassOfJobMethod(XmlElement psiMethodValueElement) {
-        XmlTag serviceTag = PsiTreeUtil.getParentOfType(psiMethodValueElement, XmlTag.class);
+        return getPhpClassFromParentTagAttribute(psiMethodValueElement, "instance");
+    }
+
+    @Nullable
+    private static PhpClass getPhpClassFromParentTagAttribute(
+            @NotNull XmlElement psiElement,
+            @NotNull String attributeName
+    ) {
+        XmlTag serviceTag = PsiTreeUtil.getParentOfType(psiElement, XmlTag.class);
         if (serviceTag == null) {
             return null;
         }
 
-        XmlAttribute attribute = serviceTag.getAttribute("instance");
+        XmlAttribute attribute = serviceTag.getAttribute(attributeName);
         if (attribute == null) {
             return null;
         }
 
-        XmlAttributeValue valueElement = attribute.getValueElement();
-        if (valueElement == null) {
+        String className = attribute.getValue();
+        if (className == null || className.isEmpty()) {
             return null;
         }
 
-        for (PsiReference reference : valueElement.getReferences()) {
-            if (reference != null) {
-                PsiElement element = reference.resolve();
-                if (element instanceof PhpClass) {
-                    return (PhpClass) element;
-                }
+        try {
+            Collection<PhpClass> phpClasses = PhpIndex
+                    .getInstance(psiElement.getProject())
+                    .getAnyByFQN(className);
+
+            if (!phpClasses.isEmpty()) {
+                return phpClasses.iterator().next();
             }
+        } catch (ProcessCanceledException exception) {
+            throw exception;
+        } catch (Exception exception) {
+            return null;
         }
 
         return null;
