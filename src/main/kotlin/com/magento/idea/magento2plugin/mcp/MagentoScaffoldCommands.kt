@@ -29,7 +29,7 @@ internal object MagentoScaffoldCommands {
         "module" to "Create composer.json, registration.php, and etc/module.xml.",
         "plugin" to "Create a plugin class and matching di.xml declaration.",
         "observer" to "Create an observer class and matching events.xml declaration.",
-        "entity_crud" to "Create DB schema, models, repository support, ACL/menu, and optional admin UI/API files.",
+        "entity_crud" to "Create DB schema, models, CQRS-style query/command classes, ACL/menu, and optional admin UI/API files.",
         "controller" to "Create a frontend or adminhtml controller class.",
         "cli_command" to "Create a Symfony console command class and register it in etc/di.xml.",
         "block" to "Create a block class under the module Block namespace.",
@@ -277,9 +277,10 @@ internal object MagentoScaffoldCommands {
 
         "entity_crud" -> """
             scaffoldType: entity_crud
-            Creates DB schema, model/resource model/collection, command classes, ACL/menu entries, and optional admin UI/API files.
+            Creates DB schema, model/resource model/collection, CQRS-style query and command classes, ACL/menu entries, and optional admin UI/API files.
             Required: moduleName, entityName, properties.
             Optional: tableName and idFieldName default from entityName; createAdminUiComponents true; createDataInterface true; createWebApi false.
+            Structure note: this scaffold keeps read and write concerns separate. It generates classes such as `GetListQuery`, `Save<Entity>Command`, and `Delete<Entity>ByIdCommand` instead of a standard Magento repository-only layout.
             properties must be strings in `field_name:type` format. Types: int, float, string, bool. Do not include the primary ID field.
             Example parametersJson:
             {"moduleName":"Foo_Bar","entityName":"ReviewQueue","properties":["title:string","is_active:bool"],"createAdminUiComponents":true,"createDataInterface":true,"createWebApi":false}
