@@ -38,11 +38,13 @@ Supported `scaffoldType` values:
 ## Rules
 
 - Prefer `magento_scaffold` over any generator-specific creation tool. Its staged modes exist to avoid loading the whole scaffold library into context.
+- Do not change the generated scaffold structure unless the user explicitly asks for that refactor or architectural rewrite.
 - Most scaffold types require `moduleName` in Magento `Vendor_Module` format.
 - PHP class parameters must be fully qualified names under the target module namespace, for example `Foo\\Bar\\Block\\Product\\BadgeBlock`.
 - JSON backslashes must be escaped in `parametersJson`.
 - EAV `options` are only valid for `select` or `multiselect` frontend inputs.
 - For CRUD properties, use `field_name:type` strings and do not include the primary ID field.
+- `entity_crud` intentionally generates CQRS-style read/write separation, such as query and command classes, instead of the standard Magento repository-only structure.
 
 ## Examples
 

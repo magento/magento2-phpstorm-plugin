@@ -39,13 +39,32 @@ public final class MagentoSkillInstaller {
         public String getDisplayName() {
             return displayName;
         }
+    }
 
-        private String getResourcePath() {
-            return "/skills/" + directoryName + "/SKILL.md";
+    public enum AgentTarget {
+        PROJECT_SKILLS("Project", "skills"),
+        CODEX("Codex", ".codex/skills"),
+        CLAUDE_CODE("Claude", ".claude/skills");
+
+        private final String displayName;
+        private final String skillRoot;
+
+        AgentTarget(final String displayName, final String skillRoot) {
+            this.displayName = displayName;
+            this.skillRoot = skillRoot;
         }
 
-        private String getProjectRelativePath() {
-            return "skills/" + directoryName + "/SKILL.md";
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        private String getProjectRelativePath(@NotNull final Skill skill) {
+            return skillRoot + "/" + skill.directoryName + "/SKILL.md";
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
         }
     }
 
@@ -59,9 +78,10 @@ public final class MagentoSkillInstaller {
      */
     public static boolean hasDifferentExistingSkill(
             @NotNull final Project project,
-            @NotNull final Skill skill
+            @NotNull final Skill skill,
+            @NotNull final AgentTarget agentTarget
     ) throws IOException {
-        final Path targetPath = getTargetPath(project, skill);
+        final Path targetPath = getTargetPath(project, skill, agentTarget);
 
         return Files.exists(targetPath)
                 && !Objects.equals(Files.readString(targetPath), readBundledSkill(skill));
@@ -77,9 +97,10 @@ public final class MagentoSkillInstaller {
      */
     public static @NotNull String install(
             @NotNull final Project project,
-            @NotNull final Skill skill
+            @NotNull final Skill skill,
+            @NotNull final AgentTarget agentTarget
     ) throws IOException {
-        final Path targetPath = getTargetPath(project, skill);
+        final Path targetPath = getTargetPath(project, skill, agentTarget);
         final String skillContent = readBundledSkill(skill);
 
         try {
@@ -101,7 +122,8 @@ public final class MagentoSkillInstaller {
 
     private static @NotNull Path getTargetPath(
             @NotNull final Project project,
-            @NotNull final Skill skill
+            @NotNull final Skill skill,
+            @NotNull final AgentTarget agentTarget
     ) {
         final VirtualFile projectDir = ProjectUtil.guessProjectDir(project);
         final String basePath = projectDir == null ? project.getBasePath() : projectDir.getPath();
@@ -110,16 +132,16 @@ public final class MagentoSkillInstaller {
             throw new IllegalStateException("Unable to resolve project directory.");
         }
 
-        return Path.of(basePath).resolve(skill.getProjectRelativePath());
+        return Path.of(basePath).resolve(agentTarget.getProjectRelativePath(skill));
     }
 
     private static @NotNull String readBundledSkill(@NotNull final Skill skill) throws IOException {
         try (InputStream stream = MagentoSkillInstaller.class.getResourceAsStream(
-                skill.getResourcePath()
+                "/skills/" + skill.directoryName + "/SKILL.md"
         )) {
             if (stream == null) {
                 throw new IOException("Bundled skill resource was not found: "
-                        + skill.getResourcePath());
+                        + "/skills/" + skill.directoryName + "/SKILL.md");
             }
 
             return new String(stream.readAllBytes(), StandardCharsets.UTF_8);

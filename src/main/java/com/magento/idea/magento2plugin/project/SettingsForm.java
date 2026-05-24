@@ -20,6 +20,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.php.frameworks.PhpFrameworkConfigurable;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
 import com.magento.idea.magento2plugin.init.ConfigurationManager;
+import com.magento.idea.magento2plugin.project.MagentoSkillInstaller.AgentTarget;
 import com.magento.idea.magento2plugin.magento.packages.MagentoComponentManager;
 import com.magento.idea.magento2plugin.project.MagentoSkillInstaller.Skill;
 import com.magento.idea.magento2plugin.project.util.GetProjectBasePath;
@@ -30,6 +31,7 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -60,6 +62,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
     private JTextField mcpCliToolCandidates;
     private JButton installMagentoScaffoldSkillButton;
     private JButton installMagentoInspectSkillButton;
+    private JComboBox<AgentTarget> skillAgentTargetSelect;
     private final SettingsFormValidator validator = new SettingsFormValidator(this);
     private JLabel magentoVersionLabel;//NOPMD
     private JLabel magentoPathLabel;//NOPMD
@@ -102,6 +105,11 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         installMagentoInspectSkillButton.addActionListener(
                 event -> installMagentoSkill(Skill.MAGENTO_INSPECT)
         );
+        skillAgentTargetSelect.removeAllItems();
+        for (final AgentTarget target : AgentTarget.values()) {
+            skillAgentTargetSelect.addItem(target);
+        }
+        skillAgentTargetSelect.setSelectedItem(AgentTarget.PROJECT_SKILLS);
 
         refreshFormStatus(getSettings().pluginEnabled);
         pluginEnabled.addActionListener(e -> refreshFormStatus(pluginEnabled.isSelected()));
@@ -131,6 +139,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         moduleDefaultLicenseName.setEnabled(isEnabled);
         installMagentoScaffoldSkillButton.setEnabled(isEnabled);
         installMagentoInspectSkillButton.setEnabled(isEnabled);
+        skillAgentTargetSelect.setEnabled(isEnabled);
     }
 
     protected void reindex() {
@@ -140,17 +149,20 @@ public class SettingsForm implements PhpFrameworkConfigurable {
 
     @SuppressWarnings("unchecked")
     private void installMagentoSkill(final Skill skill) {
+        final AgentTarget agentTarget = getSelectedSkillAgentTarget();
+
         try {
-            if (MagentoSkillInstaller.hasDifferentExistingSkill(project, skill)
-                    && !confirmSkillReplacement(skill)) {
+            if (MagentoSkillInstaller.hasDifferentExistingSkill(project, skill, agentTarget)
+                    && !confirmSkillReplacement(skill, agentTarget)) {
                 return;
             }
 
-            final String installedPath = MagentoSkillInstaller.install(project, skill);
+            final String installedPath = MagentoSkillInstaller.install(project, skill, agentTarget);
             ConfigurationManager.notifyGlobally(
                     project,
                     "Magento 2 and Adobe Commerce",
-                    skill.getDisplayName() + " skill was added to " + installedPath,
+                    skill.getDisplayName() + " skill was added for "
+                            + agentTarget.getDisplayName() + " at " + installedPath,
                     NotificationType.INFORMATION
             );
         } catch (final IOException | IllegalStateException exception) {
@@ -161,18 +173,29 @@ public class SettingsForm implements PhpFrameworkConfigurable {
             ConfigurationManager.notifyGlobally(
                     project,
                     "Magento 2 and Adobe Commerce",
-                    "Unable to add " + skill.getDisplayName() + " skill: "
+                    "Unable to add " + skill.getDisplayName() + " skill for "
+                            + agentTarget.getDisplayName() + ": "
                             + StringUtil.escapeXmlEntities(errorMessage),
                     NotificationType.WARNING
             );
         }
     }
 
-    private boolean confirmSkillReplacement(final Skill skill) {
+    private AgentTarget getSelectedSkillAgentTarget() {
+        final Object selectedItem = skillAgentTargetSelect.getSelectedItem();
+        if (selectedItem instanceof AgentTarget) {
+            return (AgentTarget) selectedItem;
+        }
+
+        return AgentTarget.PROJECT_SKILLS;
+    }
+
+    private boolean confirmSkillReplacement(final Skill skill, final AgentTarget agentTarget) {
         return Messages.showYesNoDialog(
                 project,
                 skill.getDisplayName()
-                        + " skill already exists in this project and has different content. "
+                        + " skill already exists for " + agentTarget.getDisplayName()
+                        + " in this project and has different content. "
                         + "Replace it with the bundled Magento skill?",
                 "Replace Magento Skill",
                 Messages.getQuestionIcon()
