@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.reference.provider;
 
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
@@ -33,10 +34,16 @@ public class PhpServiceMethodReferenceProvider  extends PsiReferenceProvider {
         final PhpClass phpClass = DiIndex.getPhpClassOfServiceMethod((XmlElement) element);
 
         if (phpClass != null) {
-            final Collection<Method> methods = phpClass.getMethods();
-            methods.removeIf(m -> !m.getName().equalsIgnoreCase(methodName));
-            if (!methods.isEmpty()) {
-                psiReferences.add(new PolyVariantReferenceBase(element, methods));
+            try {
+                final Collection<Method> methods = phpClass.getMethods();
+                methods.removeIf(m -> !m.getName().equalsIgnoreCase(methodName));
+                if (!methods.isEmpty()) {
+                    psiReferences.add(new PolyVariantReferenceBase(element, methods));
+                }
+            } catch (ProcessCanceledException exception) {
+                throw exception;
+            } catch (RuntimeException exception) {
+                return PsiReference.EMPTY_ARRAY;
             }
         }
 

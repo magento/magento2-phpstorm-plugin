@@ -8,6 +8,7 @@ import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.xml.XmlElement;
 import com.intellij.util.ProcessingContext;
@@ -29,12 +30,18 @@ public class PhpServiceMethodCompletionContributor extends CompletionProvider<Co
 
         PhpClass phpClass = DiIndex.getPhpClassOfServiceMethod((XmlElement) position);
         if (phpClass != null) {
-            for (Method method : phpClass.getMethods()) {
-                result.addElement(
-                        LookupElementBuilder
-                                .create(method.getName())
-                                .withIcon(method.getIcon())
-                );
+            try {
+                for (Method method : phpClass.getMethods()) {
+                    result.addElement(
+                            LookupElementBuilder
+                                    .create(method.getName())
+                                    .withIcon(method.getIcon())
+                    );
+                }
+            } catch (ProcessCanceledException exception) {
+                throw exception;
+            } catch (RuntimeException exception) {
+                return;
             }
         }
     }

@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.reference.provider;
 
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
@@ -87,6 +88,8 @@ public class PhpClassReferenceProvider extends PsiReferenceProvider {
                 );
                 psiReferences.add(new PolyVariantReferenceBase(element, range, classes));
             }
+        } catch (ProcessCanceledException exception) {
+            throw exception;
         } catch (Exception exception) { //NOPMD
             return psiReferences.toArray(new PsiReference[0]);
         }
