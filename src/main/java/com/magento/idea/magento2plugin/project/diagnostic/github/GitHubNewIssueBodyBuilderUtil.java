@@ -7,22 +7,23 @@ package com.magento.idea.magento2plugin.project.diagnostic.github;
 
 import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
-import com.intellij.ide.plugins.IdeaPluginDescriptor;
-import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.application.ApplicationInfo;
-import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.SystemInfo;
 import java.io.IOException;
+import java.net.JarURLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
+import java.util.jar.Manifest;
 import org.jetbrains.annotations.NotNull;
 
 public final class GitHubNewIssueBodyBuilderUtil {
 
     private static final String BUR_REPORT_TEMPLATE = "GitHub New Bug Issue Body Template";
+    private static final String CLASS_FILE_NAME = "GitHubNewIssueBodyBuilderUtil.class";
+    private static final String VERSION_MANIFEST_ATTRIBUTE = "Version";
 
     private GitHubNewIssueBodyBuilderUtil() {}
 
@@ -169,10 +170,29 @@ public final class GitHubNewIssueBodyBuilderUtil {
      * @return String
      */
     private static String getPluginVersion() {
-        final IdeaPluginDescriptor magento2pluginDescriptor =
-                PluginManager.getInstance()
-                        .findEnabledPlugin(PluginId.getId("com.magento.idea.magento2plugin"));
+        final java.net.URL classUrl = GitHubNewIssueBodyBuilderUtil.class.getResource(
+                CLASS_FILE_NAME
+        );
 
-        return magento2pluginDescriptor == null ? null : magento2pluginDescriptor.getVersion();
+        if (classUrl == null || !"jar".equals(classUrl.getProtocol())) {
+            return "";
+        }
+
+        try {
+            final JarURLConnection connection = (JarURLConnection) classUrl.openConnection();
+            final Manifest manifest = connection.getManifest();
+
+            if (manifest == null) {
+                return "";
+            }
+
+            final String version = manifest.getMainAttributes().getValue(
+                    VERSION_MANIFEST_ATTRIBUTE
+            );
+
+            return version == null ? "" : version;
+        } catch (IOException exception) {
+            return "";
+        }
     }
 }
