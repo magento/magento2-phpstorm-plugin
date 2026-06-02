@@ -16,7 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 - Magento MCP CLI environment discovery now checks project-local wrapper scripts directly from the filesystem on demand and no longer reports configured candidates such as `bin/php` unless the files actually exist.
 - Magento settings form layout for agent skill controls so the buttons stay separate from MCP CLI wrapper candidates without forcing an oversized settings panel.
-- Internal API usage in GitHub bug report body generation.
+- Internal API usage in GitHub bug report body generation by reading the plugin version from the plugin jar manifest instead of the IntelliJ Platform plugin manager.
 
 ## 2026.2.1
 
