@@ -8,7 +8,7 @@ package com.magento.idea.magento2plugin.project.diagnostic.github;
 import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
-import com.intellij.ide.plugins.PluginManagerCore;
+import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
@@ -170,7 +170,8 @@ public final class GitHubNewIssueBodyBuilderUtil {
      */
     private static String getPluginVersion() {
         final IdeaPluginDescriptor magento2pluginDescriptor =
-                PluginManagerCore.getPlugin(PluginId.getId("com.magento.idea.magento2plugin"));
+                PluginManager.getInstance()
+                        .findEnabledPlugin(PluginId.getId("com.magento.idea.magento2plugin"));
 
         return magento2pluginDescriptor == null ? null : magento2pluginDescriptor.getVersion();
     }
