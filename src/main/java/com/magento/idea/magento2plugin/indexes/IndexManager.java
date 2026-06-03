@@ -9,6 +9,7 @@ import com.intellij.util.indexing.FileBasedIndex;
 import com.intellij.util.indexing.ID;
 import com.magento.idea.magento2plugin.stubs.indexes.ModulePackageIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.js.JsMixinIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.js.KnockoutTemplateIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex;
@@ -42,7 +43,9 @@ public class IndexManager {
             "com.magento.idea.magento2plugin.stubs.indexes.mftf.TestNameIndex",
             "com.magento.idea.magento2plugin.stubs.indexes.mftf.TestExtendsIndex",
             "com.magento.idea.magento2plugin.stubs.indexes.graphql.GraphQlResolverIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.xml.ProductTypeIndex"
+            "com.magento.idea.magento2plugin.stubs.indexes.xml.ProductTypeIndex",
+            "com.magento.idea.magento2plugin.stubs.indexes.xml.LayoutBlockTemplateIndex",
+            "com.magento.idea.magento2plugin.stubs.indexes.xml.LayoutTemplateBlockIndex"
     };
 
     /**
@@ -54,6 +57,7 @@ public class IndexManager {
                 ModuleXmlIndex.KEY,
                 RequireJsIndex.KEY,
                 JsMixinIndex.KEY,
+                KnockoutTemplateIndex.KEY,
                 MagentoLibJsIndex.KEY
         ));
         indexIds.addAll(getOptionalIndexIds());
