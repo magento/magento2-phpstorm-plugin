@@ -59,4 +59,16 @@ public class RequireJsReferenceRegistrarTest extends ReferenceJsFixtureTestCase 
                 FilePathReferenceProvider.class
         );
     }
+
+    /**
+     * Mixin target declaration parameters should have reference to file.
+     */
+    public void testTargetPathInMixinDeclarationMustHaveReference() {
+        myFixture.configureByFile(getFixturePath(MIXIN_FIXTURE_PATH));
+
+        assertHasReferenceToFile(
+                "app/code/Foo/Bar/view/frontend/web/js/file.js",
+                FilePathReferenceProvider.class
+        );
+    }
 }

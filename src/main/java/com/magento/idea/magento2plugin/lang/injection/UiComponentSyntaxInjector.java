@@ -13,6 +13,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiLanguageInjectionHost;
 import com.intellij.psi.html.HtmlTag;
 import com.intellij.psi.templateLanguages.OuterLanguageElement;
+import com.intellij.psi.xml.XmlAttribute;
+import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlText;
 import com.magento.idea.magento2plugin.project.Settings;
 import java.util.List;
@@ -30,9 +32,15 @@ public class UiComponentSyntaxInjector implements MultiHostInjector {
             return;
         }
 
+        if (host instanceof XmlAttributeValue && isMageInitAttributeValue((XmlAttributeValue) host)) {
+            injectAttributeValue(registrar, (XmlAttributeValue) host);
+            return;
+        }
+
         if (!isUiComponentTag(host)) {
             return;
         }
+
         PsiElement targetXmlText = null;
 
         for (final PsiElement element : host.getChildren()) {
@@ -72,7 +80,7 @@ public class UiComponentSyntaxInjector implements MultiHostInjector {
 
     @Override
     public @NotNull List<? extends Class<? extends PsiElement>> elementsToInjectIn() {
-        return List.of(HtmlTag.class);
+        return List.of(HtmlTag.class, XmlAttributeValue.class);
     }
 
     private boolean isUiComponentTag(final @NotNull PsiElement host) {
@@ -83,5 +91,32 @@ public class UiComponentSyntaxInjector implements MultiHostInjector {
         final String typeAttributeValue = tag.getAttributeValue("type");
 
         return typeAttributeValue != null && typeAttributeValue.equals("text/x-magento-init");
+    }
+
+    private boolean isMageInitAttributeValue(final @NotNull XmlAttributeValue host) {
+        final PsiElement parent = host.getParent();
+
+        return parent instanceof XmlAttribute
+                && "data-mage-init".equals(((XmlAttribute) parent).getName());
+    }
+
+    private void injectAttributeValue(
+            final @NotNull MultiHostRegistrar registrar,
+            final @NotNull XmlAttributeValue host
+    ) {
+        final int textLength = host.getTextLength();
+
+        if (textLength < 2 || !(host instanceof PsiLanguageInjectionHost)) {
+            return;
+        }
+
+        registrar.startInjecting(JsonLanguage.INSTANCE);
+        registrar.addPlace(
+                null,
+                null,
+                (PsiLanguageInjectionHost) host,
+                new TextRange(1, textLength - 1)
+        );
+        registrar.doneInjecting();
     }
 }

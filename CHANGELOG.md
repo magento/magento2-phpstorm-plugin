@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
+
+## 2026.3.0
+
+### Added
+
+- JavaScript mixin navigation between `requirejs-config.js` mixin declarations, target JavaScript modules, and mixin JavaScript modules.
+- JavaScript component navigation from Magento templates in `text/x-magento-init` scripts and `data-mage-init` attributes.
+- PHP-free Magento module root indexing from `etc/module.xml` for JavaScript-aware IDEs such as WebStorm.
+
 ## 2026.2.2
 
 ### Added

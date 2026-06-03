@@ -73,7 +73,14 @@ dependencies {
 
 intellijPlatform {
     pluginConfiguration {
+        id = providers.gradleProperty("pluginGroup")
+        name = providers.gradleProperty("pluginName")
         version = effectivePluginVersion
+
+        vendor {
+            name = "Magento Inc."
+            url = providers.gradleProperty("pluginRepositoryUrl")
+        }
 
         description = providers.fileContents(layout.projectDirectory.file("README.md")).asText.map {
             val start = "<!-- Plugin description -->"
