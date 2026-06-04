@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.reference.js;
 
+import com.magento.idea.magento2plugin.reference.provider.KnockoutRegionReferenceProvider;
 import com.magento.idea.magento2plugin.reference.provider.KnockoutTemplateReferenceProvider;
 
 public class KnockoutTemplateReferenceRegistrarTest extends ReferenceJsFixtureTestCase {
@@ -31,6 +32,30 @@ public class KnockoutTemplateReferenceRegistrarTest extends ReferenceJsFixtureTe
         assertHasReferenceToFile(
                 "app/code/Foo/Bar/view/frontend/web/template/template2.html",
                 KnockoutTemplateReferenceProvider.class
+        );
+    }
+
+    /**
+     * Parent template region declarations should reference matching child components.
+     */
+    public void testGetRegionMustHaveReference() {
+        myFixture.configureByFile(getFixturePath("component.html"));
+
+        assertHasReferenceToFile(
+                "app/code/Foo/Bar/view/frontend/web/js/knockout-child.js",
+                KnockoutRegionReferenceProvider.class
+        );
+    }
+
+    /**
+     * Child component display areas should reference matching parent template regions.
+     */
+    public void testDisplayAreaMustHaveReference() {
+        myFixture.configureByFile(getFixturePath(FIXTURE_PATH));
+
+        assertHasReferenceToFile(
+                "app/code/Foo/Bar/view/frontend/web/template/parent.html",
+                KnockoutRegionReferenceProvider.class
         );
     }
 }

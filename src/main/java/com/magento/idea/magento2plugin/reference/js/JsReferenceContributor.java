@@ -15,6 +15,7 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiReferenceContributor;
 import com.intellij.psi.PsiReferenceRegistrar;
 import com.magento.idea.magento2plugin.reference.provider.FilePathReferenceProvider;
+import com.magento.idea.magento2plugin.reference.provider.KnockoutRegionReferenceProvider;
 import com.magento.idea.magento2plugin.reference.provider.KnockoutTemplateReferenceProvider;
 import com.magento.idea.magento2plugin.reference.provider.ModuleNameReferenceProvider;
 import com.magento.idea.magento2plugin.reference.provider.RequireJsPreferenceReferenceProvider;
@@ -55,6 +56,11 @@ public class JsReferenceContributor extends PsiReferenceContributor {
         registrar.registerReferenceProvider(
                 JSPatterns.jsLiteralExpression(),
                 new KnockoutTemplateReferenceProvider()
+        );
+
+        registrar.registerReferenceProvider(
+                JSPatterns.jsLiteralExpression(),
+                new KnockoutRegionReferenceProvider()
         );
     }
 }

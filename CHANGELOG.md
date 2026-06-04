@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - JavaScript mixin navigation between `requirejs-config.js` mixin declarations, target JavaScript modules, and mixin JavaScript modules.
 - JavaScript component navigation from Magento templates in `text/x-magento-init` scripts and `data-mage-init` attributes.
 - Knockout component navigation between JavaScript template declarations and matching HTML template files.
+- Knockout parent-child component navigation between `getRegion()` template calls and matching JavaScript `displayArea` declarations.
 - Regular template navigation between `.phtml` files and layout-declared PHP block classes.
 - PHP-free Magento module root indexing from `etc/module.xml` for JavaScript-aware IDEs such as WebStorm.
 
