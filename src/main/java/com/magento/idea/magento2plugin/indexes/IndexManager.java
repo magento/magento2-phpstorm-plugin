@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.indexes;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.intellij.util.indexing.ID;
 import com.magento.idea.magento2plugin.stubs.indexes.ModulePackageIndex;
@@ -13,12 +14,15 @@ import com.magento.idea.magento2plugin.stubs.indexes.js.KnockoutTemplateIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.xml.ThemeXmlIndex;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings({"PMD.ClassNamingConventions", "PMD.UseUtilityClass"})
 public class IndexManager {
+    private static final Logger LOGGER = Logger.getInstance(IndexManager.class);
+
     private static final String[] OPTIONAL_INDEX_CLASSES = {
             "com.magento.idea.magento2plugin.stubs.indexes.PluginIndex",
             "com.magento.idea.magento2plugin.stubs.indexes.VirtualTypeIndex",
@@ -32,7 +36,6 @@ public class IndexManager {
             "com.magento.idea.magento2plugin.stubs.indexes.EventNameIndex",
             "com.magento.idea.magento2plugin.stubs.indexes.EventObserverIndex",
             "com.magento.idea.magento2plugin.stubs.indexes.WebApiTypeIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex",
             "com.magento.idea.magento2plugin.stubs.indexes.xml.PhpClassNameIndex",
             "com.magento.idea.magento2plugin.stubs.indexes.xml.AclResourceIndex",
             "com.magento.idea.magento2plugin.stubs.indexes.xml.MenuIndex",
@@ -52,9 +55,11 @@ public class IndexManager {
      * Refresh Magento 2 indexes.
      */
     public static void manualReindex() {
+        LOGGER.info("Magento manual reindex requested");
         final List<ID<?, ?>> indexIds = new ArrayList<>(List.of(
                 ModulePackageIndex.KEY,
                 ModuleXmlIndex.KEY,
+                ThemeXmlIndex.KEY,
                 RequireJsIndex.KEY,
                 JsMixinIndex.KEY,
                 KnockoutTemplateIndex.KEY,
@@ -65,10 +70,14 @@ public class IndexManager {
         for (final ID<?, ?> id : indexIds) {
             try {
                 FileBasedIndex.getInstance().requestRebuild(id);
+                LOGGER.info("Magento index rebuild requested: " + id.getName());
             } catch (NullPointerException exception) { //NOPMD
-                //that's fine, indexer is not present in map java.util.Map.get
+                LOGGER.info("Magento index is not registered in this IDE, skipping rebuild: " + id.getName());
+            } catch (RuntimeException exception) { //NOPMD
+                LOGGER.warn("Unable to request Magento index rebuild: " + id.getName(), exception);
             }
         }
+        LOGGER.info("Magento manual reindex request completed");
     }
 
     @SuppressWarnings({"PMD.AvoidCatchingThrowable", "unchecked"})

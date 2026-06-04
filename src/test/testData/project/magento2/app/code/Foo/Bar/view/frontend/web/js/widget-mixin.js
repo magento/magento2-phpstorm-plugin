@@ -1,7 +1,15 @@
-define(function () {
+define(['jquery'], function ($) {
     'use strict';
 
-    return function (target) {
-        return target;
+    var widgetMixin = {
+        closeModal: function () {
+            return this._super();
+        }
+    };
+
+    return function (targetWidget) {
+        $.widget('mage.testWidget', targetWidget, widgetMixin);
+
+        return $.mage.testWidget;
     };
 });

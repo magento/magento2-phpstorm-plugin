@@ -46,6 +46,17 @@ public class MagentoInitReferenceContributorTest extends BaseReferenceTestCase {
         assertInjectedJsonReferenceToFile("app/code/Foo/Bar/view/frontend/web/js/file.js");
     }
 
+    /**
+     * RequireJS aliases in text/x-magento-init scripts should reference mapped JS files.
+     */
+    public void testXMagentoInitAliasMustHaveReference() {
+        myFixture.configureFromTempProjectFile(
+                "app/code/Foo/Bar/view/frontend/templates/x-magento-init-alias.phtml"
+        );
+
+        assertInjectedJsonReferenceToFile("app/code/Foo/Bar/view/frontend/web/js/file.js");
+    }
+
     private void assertInjectedJsonReferenceToFile(final String reference) {
         PsiElement element = myFixture.getFile().findElementAt(myFixture.getCaretOffset());
 

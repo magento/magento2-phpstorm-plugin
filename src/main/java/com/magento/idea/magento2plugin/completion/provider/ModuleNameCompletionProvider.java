@@ -12,7 +12,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.MagentoIcons;
-import com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex;
 import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 
@@ -29,7 +29,7 @@ public class ModuleNameCompletionProvider extends CompletionProvider<CompletionP
         String prefix = result.getPrefixMatcher().getPrefix();
 
         Collection<String> moduleNames
-                = FileBasedIndex.getInstance().getAllKeys(ModuleNameIndex.KEY, position.getProject());
+                = FileBasedIndex.getInstance().getAllKeys(ModuleXmlIndex.KEY, position.getProject());
 
         moduleNames.removeIf(m -> !m.startsWith(prefix));
         for (String moduleName : moduleNames) {

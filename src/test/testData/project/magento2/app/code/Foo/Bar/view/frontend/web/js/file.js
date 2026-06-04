@@ -4,5 +4,7 @@ define([
     'use strict';
 
     return {
-    }
+        saveShippingInformation: function () {
+        }
+    };
 });

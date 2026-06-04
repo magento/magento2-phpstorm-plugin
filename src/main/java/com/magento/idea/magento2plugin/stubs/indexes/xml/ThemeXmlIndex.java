@@ -19,13 +19,15 @@ import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.magento.idea.magento2plugin.project.Settings;
-import java.util.HashMap;
-import java.util.Map;
+import com.magento.idea.magento2plugin.util.RegExUtil;
 import org.jetbrains.annotations.NotNull;
 
-public class ModuleXmlIndex extends FileBasedIndexExtension<String, String> {
+import java.util.HashMap;
+import java.util.Map;
+
+public class ThemeXmlIndex extends FileBasedIndexExtension<String, String> {
     public static final ID<String, String> KEY = ID.create(
-            "com.magento.idea.magento2plugin.stubs.indexes.module_xml"
+            "com.magento.idea.magento2plugin.stubs.indexes.theme_xml"
     );
 
     @Override
@@ -44,31 +46,28 @@ public class ModuleXmlIndex extends FileBasedIndexExtension<String, String> {
             }
 
             final XmlTag rootTag = ((XmlFile) psiFile).getRootTag();
-
-            if (rootTag == null || !"config".equals(rootTag.getName())) {
+            if (rootTag == null || !"theme".equals(rootTag.getName())) {
                 return map;
             }
 
-            for (final XmlTag moduleTag : rootTag.findSubTags("module")) {
-                final String moduleName = moduleTag.getAttributeValue("name");
-                final VirtualFile moduleRoot = getModuleRoot(inputData.getFile());
-
-                if (moduleName != null && moduleRoot != null) {
-                    map.put(moduleName, moduleRoot.getPath());
-                }
+            final VirtualFile themeRoot = inputData.getFile().getParent();
+            final String themeName = getThemeName(themeRoot);
+            if (themeName != null && themeName.matches(RegExUtil.Magento.THEME_NAME)) {
+                map.put(themeName, themeRoot.getPath());
             }
 
             return map;
         };
     }
 
-    private VirtualFile getModuleRoot(final @NotNull VirtualFile moduleXmlFile) {
-        final VirtualFile etcDirectory = moduleXmlFile.getParent();
-        if (etcDirectory == null || !"etc".equals(etcDirectory.getName())) {
+    private String getThemeName(final VirtualFile themeRoot) {
+        if (themeRoot == null || themeRoot.getParent() == null || themeRoot.getParent().getParent() == null) {
             return null;
         }
 
-        return etcDirectory.getParent();
+        final VirtualFile vendorDirectory = themeRoot.getParent();
+        final VirtualFile areaDirectory = vendorDirectory.getParent();
+        return areaDirectory.getName() + "/" + vendorDirectory.getName() + "/" + themeRoot.getName();
     }
 
     @Override
@@ -84,7 +83,7 @@ public class ModuleXmlIndex extends FileBasedIndexExtension<String, String> {
     @Override
     public @NotNull FileBasedIndex.InputFilter getInputFilter() {
         return virtualFile -> virtualFile.getFileType().equals(XmlFileType.INSTANCE)
-                && "module.xml".equals(virtualFile.getName());
+                && "theme.xml".equals(virtualFile.getName());
     }
 
     @Override
@@ -94,6 +93,6 @@ public class ModuleXmlIndex extends FileBasedIndexExtension<String, String> {
 
     @Override
     public int getVersion() {
-        return 2;
+        return 1;
     }
 }

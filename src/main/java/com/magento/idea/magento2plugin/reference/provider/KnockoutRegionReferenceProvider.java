@@ -12,6 +12,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceProvider;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
+import com.magento.idea.magento2plugin.project.diagnostic.NavigationInstrumentation;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 import com.magento.idea.magento2plugin.util.magento.js.KnockoutRegionResolver;
@@ -26,6 +27,11 @@ public class KnockoutRegionReferenceProvider extends PsiReferenceProvider {
             final @NotNull ProcessingContext context
     ) {
         if (!Settings.isEnabled(element.getProject())) {
+            NavigationInstrumentation.infoOnce(
+                    "ko-region-reference-disabled-" + element.getProject().getLocationHash(),
+                    () -> "Knockout region references skipped: Magento support disabled; "
+                            + NavigationInstrumentation.describeSettings(element.getProject())
+            );
             return PsiReference.EMPTY_ARRAY;
         }
         final List<PsiReference> references = new ArrayList<>();
@@ -45,10 +51,19 @@ public class KnockoutRegionReferenceProvider extends PsiReferenceProvider {
         if (displayArea == null) {
             return;
         }
+        NavigationInstrumentation.infoOnce(
+                "ko-display-area-reference-seen-" + displayArea,
+                () -> "displayArea reference candidate '" + displayArea + "' in "
+                        + NavigationInstrumentation.describeElement(element)
+        );
         final List<PsiElement> targets = KnockoutRegionResolver.getInstance()
                 .resolveGetRegionTemplateFiles(element.getProject(), displayArea);
 
         if (targets.isEmpty()) {
+            NavigationInstrumentation.infoOnce(
+                    "ko-display-area-reference-empty-" + displayArea,
+                    () -> "displayArea reference has no getRegion template targets for '" + displayArea + "'"
+            );
             return;
         }
         final int startOffset = element.getText().indexOf(displayArea);
@@ -63,27 +78,61 @@ public class KnockoutRegionReferenceProvider extends PsiReferenceProvider {
                         targets
                 )
         );
+        NavigationInstrumentation.infoOnce(
+                "ko-display-area-reference-created-" + displayArea,
+                () -> "displayArea reference created for '" + displayArea + "' targets=" + targets.size()
+        );
     }
 
     private void addGetRegionReferences(
             final @NotNull PsiElement element,
             final @NotNull List<PsiReference> references
     ) {
+        final PsiElement referenceHost = getGetRegionReferenceHost(element);
+
+        if (referenceHost == null) {
+            return;
+        }
         for (final KnockoutRegionResolver.RegionMatch regionMatch
-                : KnockoutRegionResolver.getInstance().collectGetRegionMatches(element.getText())) {
+                : KnockoutRegionResolver.getInstance().collectGetRegionMatches(referenceHost.getText())) {
             final List<PsiElement> targets = KnockoutRegionResolver.getInstance()
                     .resolveDisplayAreaComponentFiles(element.getProject(), regionMatch.getRegionName());
 
             if (targets.isEmpty()) {
+                NavigationInstrumentation.infoOnce(
+                        "ko-get-region-reference-empty-" + regionMatch.getRegionName(),
+                        () -> "getRegion reference has no displayArea component targets for '"
+                                + regionMatch.getRegionName() + "' in "
+                                + NavigationInstrumentation.describeElement(referenceHost)
+                );
                 continue;
             }
             references.add(
                     new PolyVariantReferenceBase(
-                            element,
+                            referenceHost,
                             new TextRange(regionMatch.getStartOffset(), regionMatch.getEndOffset()),
                             targets
                     )
             );
+            NavigationInstrumentation.infoOnce(
+                    "ko-get-region-reference-created-" + regionMatch.getRegionName(),
+                    () -> "getRegion reference created for '" + regionMatch.getRegionName()
+                            + "' targets=" + targets.size()
+            );
         }
+    }
+
+    private PsiElement getGetRegionReferenceHost(final @NotNull PsiElement element) {
+        PsiElement current = element;
+        final PsiElement containingFile = element.getContainingFile();
+
+        while (current != null && current != containingFile) {
+            if (current.getText().contains("getRegion")) {
+                return current;
+            }
+            current = current.getParent();
+        }
+
+        return null;
     }
 }

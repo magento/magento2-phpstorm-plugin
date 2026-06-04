@@ -50,34 +50,41 @@ public class JsMixinIndex extends FileBasedIndexExtension<String, Set<String>> {
             }
 
             final JSFile jsFile = (JSFile) inputData.getPsiFile();
-            final JSVarStatement jsVarStatement = PsiTreeUtil.getChildOfType(
-                    jsFile,
-                    JSVarStatement.class
-            );
-
-            if (jsVarStatement == null) {
-                return map;
-            }
-
-            for (final JSVariable jsVariable : jsVarStatement.getVariables()) {
-                if (!"config".equals(jsVariable.getName())) {
-                    continue;
-                }
-                final JSObjectLiteralExpression config = PsiTreeUtil.getChildOfType(
-                        jsVariable,
-                        JSObjectLiteralExpression.class
-                );
-
-                if (config != null) {
-                    parseMixins(map, config);
-                }
-            }
+            map.putAll(getMixinMap(jsFile));
 
             return map;
         };
     }
 
-    private void parseMixins(
+    public static @NotNull Map<String, Set<String>> getMixinMap(final @NotNull JSFile jsFile) {
+        final Map<String, Set<String>> map = new HashMap<>();
+        final JSVarStatement jsVarStatement = PsiTreeUtil.getChildOfType(
+                jsFile,
+                JSVarStatement.class
+        );
+
+        if (jsVarStatement == null) {
+            return map;
+        }
+
+        for (final JSVariable jsVariable : jsVarStatement.getVariables()) {
+            if (!"config".equals(jsVariable.getName())) {
+                continue;
+            }
+            final JSObjectLiteralExpression config = PsiTreeUtil.getChildOfType(
+                    jsVariable,
+                    JSObjectLiteralExpression.class
+            );
+
+            if (config != null) {
+                parseMixins(map, config);
+            }
+        }
+
+        return map;
+    }
+
+    private static void parseMixins(
             final @NotNull Map<String, Set<String>> map,
             final @NotNull JSObjectLiteralExpression rootConfig
     ) {
@@ -111,7 +118,7 @@ public class JsMixinIndex extends FileBasedIndexExtension<String, Set<String>> {
         }
     }
 
-    private @Nullable JSObjectLiteralExpression getObjectValue(final @Nullable JSProperty property) {
+    private static @Nullable JSObjectLiteralExpression getObjectValue(final @Nullable JSProperty property) {
         if (property == null) {
             return null;
         }
@@ -120,7 +127,7 @@ public class JsMixinIndex extends FileBasedIndexExtension<String, Set<String>> {
         return value instanceof JSObjectLiteralExpression ? (JSObjectLiteralExpression) value : null;
     }
 
-    private @Nullable String normalizePath(final @Nullable String path) {
+    private static @Nullable String normalizePath(final @Nullable String path) {
         if (path == null || path.isBlank()) {
             return null;
         }

@@ -15,10 +15,10 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiReferenceContributor;
 import com.intellij.psi.PsiReferenceRegistrar;
 import com.magento.idea.magento2plugin.reference.provider.FilePathReferenceProvider;
-import com.magento.idea.magento2plugin.reference.provider.KnockoutRegionReferenceProvider;
 import com.magento.idea.magento2plugin.reference.provider.KnockoutTemplateReferenceProvider;
 import com.magento.idea.magento2plugin.reference.provider.ModuleNameReferenceProvider;
 import com.magento.idea.magento2plugin.reference.provider.RequireJsPreferenceReferenceProvider;
+import com.magento.idea.magento2plugin.project.diagnostic.NavigationInstrumentation;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,6 +26,11 @@ public class JsReferenceContributor extends PsiReferenceContributor {
 
     @Override
     public void registerReferenceProviders(final @NotNull PsiReferenceRegistrar registrar) {
+        NavigationInstrumentation.infoOnce(
+                "js-reference-contributor-registered",
+                () -> "registered JavaScript reference providers"
+        );
+
         registrar.registerReferenceProvider(
                 JSPatterns.jsLiteralExpression()
                         .withText(string().matches(".*" + RegExUtil.Magento.MODULE_NAME + ".*")),
@@ -58,9 +63,5 @@ public class JsReferenceContributor extends PsiReferenceContributor {
                 new KnockoutTemplateReferenceProvider()
         );
 
-        registrar.registerReferenceProvider(
-                JSPatterns.jsLiteralExpression(),
-                new KnockoutRegionReferenceProvider()
-        );
     }
 }

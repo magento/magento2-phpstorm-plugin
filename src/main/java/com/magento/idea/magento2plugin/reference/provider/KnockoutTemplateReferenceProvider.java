@@ -12,6 +12,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceProvider;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
+import com.magento.idea.magento2plugin.project.diagnostic.NavigationInstrumentation;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 import com.magento.idea.magento2plugin.util.magento.js.KnockoutTemplatePathResolver;
@@ -25,6 +26,11 @@ public class KnockoutTemplateReferenceProvider extends PsiReferenceProvider {
             final @NotNull ProcessingContext context
     ) {
         if (!Settings.isEnabled(element.getProject())) {
+            NavigationInstrumentation.infoOnce(
+                    "ko-template-reference-disabled-" + element.getProject().getLocationHash(),
+                    () -> "Knockout template references skipped: Magento support disabled; "
+                            + NavigationInstrumentation.describeSettings(element.getProject())
+            );
             return PsiReference.EMPTY_ARRAY;
         }
         final JSProperty property = PsiTreeUtil.getParentOfType(element, JSProperty.class);
@@ -33,10 +39,19 @@ public class KnockoutTemplateReferenceProvider extends PsiReferenceProvider {
         if (templatePath == null) {
             return PsiReference.EMPTY_ARRAY;
         }
+        NavigationInstrumentation.infoOnce(
+                "ko-template-reference-seen-" + templatePath,
+                () -> "Knockout template reference candidate '" + templatePath + "' in "
+                        + NavigationInstrumentation.describeElement(element)
+        );
         final List<PsiElement> targets = KnockoutTemplatePathResolver.getInstance()
                 .resolveTemplateFiles(element.getProject(), templatePath);
 
         if (targets.isEmpty()) {
+            NavigationInstrumentation.infoOnce(
+                    "ko-template-reference-empty-" + templatePath,
+                    () -> "Knockout template reference has no targets for '" + templatePath + "'"
+            );
             return PsiReference.EMPTY_ARRAY;
         }
         final int startOffset = element.getText().indexOf(templatePath);
@@ -44,6 +59,11 @@ public class KnockoutTemplateReferenceProvider extends PsiReferenceProvider {
         if (startOffset < 0) {
             return PsiReference.EMPTY_ARRAY;
         }
+        NavigationInstrumentation.infoOnce(
+                "ko-template-reference-created-" + templatePath,
+                () -> "Knockout template reference created for '" + templatePath
+                        + "' targets=" + targets.size()
+        );
 
         return new PsiReference[] {
                 new PolyVariantReferenceBase(

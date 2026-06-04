@@ -18,7 +18,7 @@ import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.util.IsClickedDirectoryInsideProject;
 import com.magento.idea.magento2plugin.project.Settings;
-import com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex;
 import java.util.Collection;
 import org.jetbrains.annotations.Nullable;
 
@@ -81,13 +81,14 @@ public class NewModuleFileGroup extends NonTrivialActionGroup {
     ) {
         String moduleName = null;
         final FileBasedIndex index = FileBasedIndex.getInstance();
-        for (final String entry : index.getAllKeys(ModuleNameIndex.KEY, project)) {
-            final Collection<VirtualFile> moduleVfs = index.getContainingFiles(
-                    ModuleNameIndex.KEY, entry, GlobalSearchScope.projectScope(project)
+        for (final String entry : index.getAllKeys(ModuleXmlIndex.KEY, project)) {
+            final Collection<VirtualFile> moduleXmlFiles = index.getContainingFiles(
+                    ModuleXmlIndex.KEY, entry, GlobalSearchScope.projectScope(project)
             );
 
-            for (final VirtualFile moduleFile : moduleVfs) {
-                if (moduleFile.getParent().getPath().equals(psiDirectoryVirtualFile.getPath())) {
+            for (final VirtualFile moduleXmlFile : moduleXmlFiles) {
+                final VirtualFile moduleRoot = getModuleRoot(moduleXmlFile);
+                if (moduleRoot != null && moduleRoot.getPath().equals(psiDirectoryVirtualFile.getPath())) {
                     moduleName = entry;
                     break;
                 }
@@ -98,5 +99,13 @@ public class NewModuleFileGroup extends NonTrivialActionGroup {
             }
         }
         return moduleName;
+    }
+
+    private static @Nullable VirtualFile getModuleRoot(final VirtualFile moduleXmlFile) {
+        if (moduleXmlFile == null || moduleXmlFile.getParent() == null) {
+            return null;
+        }
+
+        return moduleXmlFile.getParent().getParent();
     }
 }

@@ -5,7 +5,9 @@
 
 package com.magento.idea.magento2plugin.reference.provider;
 
+import com.intellij.json.psi.JsonStringLiteral;
 import com.intellij.lang.injection.InjectedLanguageManager;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiLanguageInjectionHost;
 import com.intellij.psi.PsiReference;
@@ -15,6 +17,10 @@ import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlText;
 import com.intellij.util.ProcessingContext;
+import com.magento.idea.magento2plugin.project.Settings;
+import com.magento.idea.magento2plugin.project.diagnostic.NavigationInstrumentation;
+import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
+import com.magento.idea.magento2plugin.util.magento.js.RequireJsPathResolver;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,8 +40,24 @@ public class MagentoInitRequireJsReferenceProvider extends PsiReferenceProvider 
             final @NotNull PsiElement element,
             final @NotNull ProcessingContext context
     ) {
-        if (!isMagentoInitJson(element)) {
+        if (!Settings.isEnabled(element.getProject()) || !isMagentoInitJson(element)) {
             return PsiReference.EMPTY_ARRAY;
+        }
+
+        final String requireJsPath = getStringValue(element);
+        final List<PsiElement> targets = requireJsPath == null
+                ? List.of()
+                : RequireJsPathResolver.getInstance().resolveJsFilesOrAlias(element.getProject(), requireJsPath);
+
+        if (!targets.isEmpty()) {
+            NavigationInstrumentation.infoOnce(
+                    "magento-init-json-reference-created-" + requireJsPath,
+                    () -> "Magento init injected JSON reference created for '" + requireJsPath
+                            + "' targets=" + targets.size()
+            );
+            return new PsiReference[] {
+                    new PolyVariantReferenceBase(element, getStringValueRange(element), targets)
+            };
         }
 
         final List<PsiReference> result = new ArrayList<>();
@@ -45,6 +67,39 @@ public class MagentoInitRequireJsReferenceProvider extends PsiReferenceProvider 
         }
 
         return result.toArray(PsiReference.EMPTY_ARRAY);
+    }
+
+    private String getStringValue(final @NotNull PsiElement element) {
+        if (element instanceof JsonStringLiteral) {
+            return ((JsonStringLiteral) element).getValue();
+        }
+        final String text = element.getText();
+
+        if (text.length() >= 2) {
+            final char first = text.charAt(0);
+            final char last = text.charAt(text.length() - 1);
+
+            if ((first == '\"' && last == '\"') || (first == '\'' && last == '\'')) {
+                return text.substring(1, text.length() - 1);
+            }
+        }
+
+        return text;
+    }
+
+    private @NotNull TextRange getStringValueRange(final @NotNull PsiElement element) {
+        final String text = element.getText();
+
+        if (text.length() >= 2) {
+            final char first = text.charAt(0);
+            final char last = text.charAt(text.length() - 1);
+
+            if ((first == '\"' && last == '\"') || (first == '\'' && last == '\'')) {
+                return new TextRange(1, text.length() - 1);
+            }
+        }
+
+        return new TextRange(0, text.length());
     }
 
     private boolean isMagentoInitJson(final @NotNull PsiElement element) {

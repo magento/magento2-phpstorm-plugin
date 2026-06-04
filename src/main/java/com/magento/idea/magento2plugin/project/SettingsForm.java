@@ -25,8 +25,6 @@ import com.magento.idea.magento2plugin.project.MagentoSkillInstaller.Skill;
 import com.magento.idea.magento2plugin.project.util.GetProjectBasePath;
 import com.magento.idea.magento2plugin.project.validator.SettingsFormValidator;
 import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.IOException;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -85,15 +83,7 @@ public class SettingsForm implements SearchableConfigurable {
     @Nullable
     @Override
     public JComponent createComponent() {
-        buttonReindex.addMouseListener(
-                new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(final MouseEvent event) {
-                        reindex();
-                        super.mouseClicked(event);
-                    }
-                }
-        );
+        buttonReindex.addActionListener(event -> reindexFromForm());
 
         regenerateUrnMapButton.addMouseListener(
                 new RegenerateUrnMapListener(project)
@@ -144,6 +134,22 @@ public class SettingsForm implements SearchableConfigurable {
     protected void reindex() {
         IndexManager.manualReindex();
         MagentoComponentManager.getInstance(project).flushModules();
+    }
+
+    private void reindexFromForm() {
+        try {
+            this.validator.validate();
+            saveSettings();
+            reindex();
+            MagentoNotificationUtil.notifyGlobally(
+                    project,
+                    "Magento 2 and Adobe Commerce",
+                    "Magento indexes rebuild was requested.",
+                    NotificationType.INFORMATION
+            );
+        } catch (final ConfigurationException exception) {
+            Messages.showErrorDialog(project, exception.getMessage(), "Magento Reindex");
+        }
     }
 
     @SuppressWarnings("unchecked")

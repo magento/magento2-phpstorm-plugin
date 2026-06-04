@@ -173,7 +173,6 @@
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.BlockNameIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ContainerNameIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.WebApiTypeIndex" />
-        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.PhpClassNameIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.SectionIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.ActionGroupIndex" />
@@ -647,7 +646,6 @@
         <internalFileTemplate name="Magento Page Types XML"/>
         <internalFileTemplate name="Magento Module Readme File MD"/>
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
-        <postStartupActivity implementation="com.magento.idea.magento2plugin.project.startup.CheckIfMagentoPathIsValidActivity"/>
         <configurationType implementation="com.magento.idea.magento2uct.execution.configurations.UctRunConfigurationType"/>
 
         <testSourcesFilter implementation="com.magento.idea.magento2plugin.lang.roots.MagentoTestSourceFilter"/>

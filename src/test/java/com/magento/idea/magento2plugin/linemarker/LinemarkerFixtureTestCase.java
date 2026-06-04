@@ -69,8 +69,10 @@ public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
             if (lineMarkerTooltip == null || lineMarkerIcon == null) {
                 continue;
             }
-            if (lineMarkerTooltip.equals(tooltip)
-                    && lineMarkerIcon.toString().equals(icon)) {
+            if (!lineMarkerTooltip.equals(tooltip)) {
+                continue;
+            }
+            if (icon.isEmpty() || lineMarkerIcon.toString().equals(icon)) {
                 fail(String.format(lineMarkerExist, tooltip));
             }
         }

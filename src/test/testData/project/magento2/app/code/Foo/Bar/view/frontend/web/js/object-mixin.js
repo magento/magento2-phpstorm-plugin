@@ -1,8 +1,13 @@
 define(function () {
     'use strict';
 
+    var mixin = {
+        isDisabled: function () {
+            return this._super();
+        }
+    };
+
     return function (target) {
-        target.mixed = true;
-        return target;
+        return target.extend(mixin);
     };
 });

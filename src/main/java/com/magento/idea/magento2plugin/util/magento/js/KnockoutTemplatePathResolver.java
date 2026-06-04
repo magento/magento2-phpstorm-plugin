@@ -19,6 +19,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.project.Settings;
+import com.magento.idea.magento2plugin.project.diagnostic.NavigationInstrumentation;
 import com.magento.idea.magento2plugin.reference.provider.util.GetModuleFileUtil;
 import com.magento.idea.magento2plugin.reference.provider.util.GetModuleNameUtil;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex;
@@ -160,6 +161,12 @@ public class KnockoutTemplatePathResolver {
                 addIfFound(project, result, webRoot + TEMPLATES_DIRECTORY + "/" + toHtmlPath(relativePath));
             }
         }
+        NavigationInstrumentation.infoOnce(
+                "ko-template-resolve-module-" + templatePath,
+                () -> "Resolved Knockout template path '" + templatePath
+                        + "' module=" + moduleName
+                        + " targets=" + result.size()
+        );
 
         return result;
     }
@@ -175,6 +182,11 @@ public class KnockoutTemplatePathResolver {
         final Project project = psiFile.getProject();
         final Collection<String> moduleNames = FileBasedIndex.getInstance()
                 .getAllKeys(ModuleXmlIndex.KEY, project);
+        NavigationInstrumentation.infoOnce(
+                "ko-template-requirejs-paths-module-key-count-" + project.getLocationHash(),
+                () -> "Knockout template path resolver sees module_xml keys=" + moduleNames.size()
+                        + "; " + NavigationInstrumentation.describeSettings(project)
+        );
 
         for (final String moduleName : moduleNames) {
             for (final String moduleRootPath : getModuleRootPaths(project, moduleName)) {
@@ -192,6 +204,12 @@ public class KnockoutTemplatePathResolver {
                 }
             }
         }
+        NavigationInstrumentation.infoOnce(
+                "ko-template-requirejs-paths-result-" + filePath,
+                () -> "Computed Knockout template RequireJS paths for "
+                        + NavigationInstrumentation.describeFile(psiFile)
+                        + " count=" + result.size()
+        );
 
         return result;
     }
@@ -222,6 +240,11 @@ public class KnockoutTemplatePathResolver {
         addFilenameMatches(project, result, toHtmlPath(templatePath));
         addFilenameMatches(project, result, TEMPLATE_DIRECTORY + "/" + toHtmlPath(templatePath));
         addFilenameMatches(project, result, TEMPLATES_DIRECTORY + "/" + toHtmlPath(templatePath));
+        NavigationInstrumentation.infoOnce(
+                "ko-template-resolve-non-module-" + templatePath,
+                () -> "Resolved non-module Knockout template path '" + templatePath
+                        + "' targets=" + result.size()
+        );
     }
 
     private @NotNull Collection<String> getModuleRootPaths(
@@ -232,6 +255,11 @@ public class KnockoutTemplatePathResolver {
                 .getValues(ModuleXmlIndex.KEY, moduleName, GlobalSearchScope.allScope(project)));
 
         if (!moduleRootPaths.isEmpty()) {
+            NavigationInstrumentation.infoOnce(
+                    "ko-template-module-roots-index-" + moduleName,
+                    () -> "Knockout template module roots from module_xml for '" + moduleName
+                            + "' count=" + moduleRootPaths.size()
+            );
             return moduleRootPaths;
         }
         final Collection<VirtualFile> moduleFiles = GetModuleFileUtil.getInstance().execute(
@@ -254,6 +282,11 @@ public class KnockoutTemplatePathResolver {
                 moduleRootPaths.add(moduleRoot.getPath());
             }
         }
+        NavigationInstrumentation.infoOnce(
+                "ko-template-module-roots-fallback-" + moduleName,
+                () -> "Knockout template module roots from fallback for '" + moduleName
+                        + "' count=" + moduleRootPaths.size()
+        );
 
         return moduleRootPaths;
     }

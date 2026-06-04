@@ -10,9 +10,8 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
-import com.jetbrains.php.lang.PhpFileType;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
-import com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -38,32 +37,19 @@ public class ModuleNameReferenceProvider extends PsiReferenceProvider {
 
         String moduleName = matcher.group(1);
 
-        Collection<VirtualFile> moduleFiles = FileBasedIndex.getInstance()
-                .getContainingFiles(ModuleNameIndex.KEY, moduleName,
-                        GlobalSearchScope.getScopeRestrictedByFileTypes(
-                                GlobalSearchScope.allScope(element.getProject()),
-                                PhpFileType.INSTANCE
-                        )
-                );
+        Collection<VirtualFile> moduleXmlFiles = FileBasedIndex.getInstance()
+                .getContainingFiles(ModuleXmlIndex.KEY, moduleName, GlobalSearchScope.allScope(element.getProject()));
 
         PsiManager psiManager = PsiManager.getInstance(element.getProject());
         List<PsiElement> psiElements = new ArrayList<>();
 
-        for (VirtualFile moduleVf : moduleFiles) {
-            if (moduleVf.getParent() == null) {
-                continue;
-            }
-            VirtualFile moduleSourceVf = moduleVf.getParent();
-            if (!moduleSourceVf.isDirectory()) {
+        for (VirtualFile moduleXmlFile : moduleXmlFiles) {
+            VirtualFile moduleSourceVf = getModuleRoot(moduleXmlFile);
+            if (moduleSourceVf == null || !moduleSourceVf.isDirectory()) {
                 continue;
             }
 
-            PsiDirectory moduleSourceDirectory = psiManager.findDirectory(moduleSourceVf);
-            if (null == moduleSourceDirectory) {
-                continue;
-            }
-
-            psiElements.add(moduleSourceDirectory);
+            addDirectoryReference(psiManager, psiElements, moduleSourceVf);
         }
 
         if (psiElements.size() > 0) {
@@ -74,5 +60,24 @@ public class ModuleNameReferenceProvider extends PsiReferenceProvider {
         }
 
         return psiReferences.toArray(new PsiReference[psiReferences.size()]);
+    }
+
+    private VirtualFile getModuleRoot(final VirtualFile moduleXmlFile) {
+        if (moduleXmlFile == null || moduleXmlFile.getParent() == null) {
+            return null;
+        }
+
+        return moduleXmlFile.getParent().getParent();
+    }
+
+    private void addDirectoryReference(
+            final PsiManager psiManager,
+            final List<PsiElement> psiElements,
+            final VirtualFile moduleRoot
+    ) {
+        PsiDirectory moduleSourceDirectory = psiManager.findDirectory(moduleRoot);
+        if (moduleSourceDirectory != null) {
+            psiElements.add(moduleSourceDirectory);
+        }
     }
 }

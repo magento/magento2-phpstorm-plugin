@@ -9,8 +9,10 @@ import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.ide.highlighter.HtmlFileType;
+import com.intellij.lang.ASTNode;
 import com.intellij.lang.javascript.JavaScriptFileType;
 import com.intellij.lang.javascript.psi.JSFile;
+import com.intellij.lang.javascript.psi.JSProperty;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
@@ -20,8 +22,11 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.indexing.FileBasedIndex;
+import com.magento.idea.magento2plugin.project.diagnostic.NavigationInstrumentation;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.stubs.indexes.js.KnockoutTemplateIndex;
+import com.magento.idea.magento2plugin.util.magento.MagentoVfsUtil;
+import com.magento.idea.magento2plugin.util.magento.js.KnockoutRegionResolver;
 import com.magento.idea.magento2plugin.util.magento.js.KnockoutTemplatePathResolver;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,12 +39,29 @@ import org.jetbrains.annotations.Nullable;
 public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
     private static final String TEMPLATE_TOOLTIP_TEXT = "Navigate to Knockout template";
     private static final String COMPONENT_TOOLTIP_TEXT = "Navigate to Knockout component";
+    private static final String REGION_COMPONENT_TOOLTIP_TEXT = "Navigate to region components";
+    private static final String REGION_TEMPLATE_TOOLTIP_TEXT = "Navigate to region templates";
+
+    public KnockoutTemplateLineMarkerProvider() {
+        NavigationInstrumentation.infoOnce(
+                "ko-template-linemarker-instantiated",
+                () -> "Knockout template line marker provider instantiated"
+        );
+    }
 
     @Override
     public @Nullable LineMarkerInfo<?> getLineMarkerInfo(final @NotNull PsiElement psiElement) {
         final PsiFile psiFile = psiElement.getContainingFile();
 
-        if (!Settings.isEnabled(psiElement.getProject()) || !isSupportedFile(psiFile)) {
+        if (!isSupportedFile(psiFile)) {
+            return null;
+        }
+        if (!Settings.isEnabled(psiElement.getProject())) {
+            NavigationInstrumentation.infoOnce(
+                    "ko-template-linemarker-disabled-" + psiElement.getProject().getLocationHash(),
+                    () -> "Knockout template line markers skipped: Magento support disabled; "
+                            + NavigationInstrumentation.describeSettings(psiElement.getProject())
+            );
             return null;
         }
         final PsiElement anchor = PsiTreeUtil.getDeepestFirst(psiFile);
@@ -57,6 +79,14 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
             final @NotNull Collection<? super LineMarkerInfo<?>> collection
     ) {
         if (psiElements.isEmpty() || !Settings.isEnabled(psiElements.get(0).getProject())) {
+            if (!psiElements.isEmpty()) {
+                NavigationInstrumentation.infoOnce(
+                        "ko-template-slow-linemarker-disabled-"
+                                + psiElements.get(0).getProject().getLocationHash(),
+                        () -> "Knockout template slow line markers skipped: "
+                                + NavigationInstrumentation.describeSettings(psiElements.get(0).getProject())
+                );
+            }
             return;
         }
         final Set<PsiFile> processedFiles = new HashSet<>();
@@ -74,7 +104,85 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
 
             if (lineMarker != null) {
                 collection.add(lineMarker);
+                NavigationInstrumentation.infoOnce(
+                        "ko-template-slow-linemarker-added-"
+                                + NavigationInstrumentation.describeFile(psiFile),
+                        () -> "Knockout template slow line marker added for "
+                                + NavigationInstrumentation.describeFile(psiFile)
+                );
             }
+            addRegionLineMarkers(psiFile, collection);
+        }
+    }
+
+    private void addRegionLineMarkers(
+            final @NotNull PsiFile psiFile,
+            final @NotNull Collection<? super LineMarkerInfo<?>> collection
+    ) {
+        if (psiFile instanceof JSFile) {
+            addDisplayAreaLineMarkers((JSFile) psiFile, collection);
+            return;
+        }
+        addGetRegionLineMarkers(psiFile, collection);
+    }
+
+    private void addGetRegionLineMarkers(
+            final @NotNull PsiFile psiFile,
+            final @NotNull Collection<? super LineMarkerInfo<?>> collection
+    ) {
+        for (final KnockoutRegionResolver.RegionMatch regionMatch : KnockoutRegionResolver.getInstance()
+                .collectGetRegionMatches(psiFile.getText())) {
+            final List<PsiElement> targets = KnockoutRegionResolver.getInstance()
+                    .resolveDisplayAreaComponentFiles(psiFile.getProject(), regionMatch.getRegionName());
+
+            if (targets.isEmpty()) {
+                continue;
+            }
+            final PsiElement anchor = psiFile.findElementAt(regionMatch.getStartOffset());
+
+            if (anchor == null) {
+                continue;
+            }
+            collection.add(NavigationGutterIconBuilder
+                    .create(JavaScriptFileType.INSTANCE.getIcon())
+                    .setTargets(LineMarkerTargetPresentationUtil.prepareTargets(targets))
+                    .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
+                    .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
+                    .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
+                    .setTooltipText(REGION_COMPONENT_TOOLTIP_TEXT)
+                    .createLineMarkerInfo(anchor));
+        }
+    }
+
+    private void addDisplayAreaLineMarkers(
+            final @NotNull JSFile jsFile,
+            final @NotNull Collection<? super LineMarkerInfo<?>> collection
+    ) {
+        final Collection<JSProperty> properties = PsiTreeUtil.findChildrenOfType(jsFile, JSProperty.class);
+
+        for (final JSProperty property : properties) {
+            final String displayArea = KnockoutRegionResolver.getInstance().getDisplayArea(property);
+
+            if (displayArea == null) {
+                continue;
+            }
+            final List<PsiElement> targets = KnockoutRegionResolver.getInstance()
+                    .resolveGetRegionTemplateFiles(jsFile.getProject(), displayArea);
+
+            if (targets.isEmpty()) {
+                continue;
+            }
+            final ASTNode nameIdentifier = property.findNameIdentifier();
+            final PsiElement anchor = nameIdentifier == null ? property : nameIdentifier.getPsi();
+
+            collection.add(NavigationGutterIconBuilder
+                    .create(HtmlFileType.INSTANCE.getIcon())
+                    .setTargets(LineMarkerTargetPresentationUtil.prepareTargets(targets))
+                    .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
+                    .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
+                    .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
+                    .setTooltipText(REGION_TEMPLATE_TOOLTIP_TEXT)
+                    .createLineMarkerInfo(anchor));
         }
     }
 
@@ -86,24 +194,52 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
             final List<PsiElement> templates = collectTemplates((JSFile) psiFile);
 
             if (templates.isEmpty()) {
+                NavigationInstrumentation.infoOnce(
+                        "ko-template-linemarker-empty-" + NavigationInstrumentation.describeFile(psiFile),
+                        () -> "Knockout component line marker has no template targets for "
+                                + NavigationInstrumentation.describeFile(psiFile)
+                );
                 return null;
             }
+            NavigationInstrumentation.infoOnce(
+                    "ko-template-linemarker-created-" + NavigationInstrumentation.describeFile(psiFile),
+                    () -> "Knockout component line marker created for "
+                            + NavigationInstrumentation.describeFile(psiFile)
+                            + " templates=" + templates.size()
+            );
 
             return NavigationGutterIconBuilder
                     .create(HtmlFileType.INSTANCE.getIcon())
-                    .setTargets(templates)
+                    .setTargets(LineMarkerTargetPresentationUtil.prepareTargets(templates))
+                    .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
+                    .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
+                    .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
                     .setTooltipText(TEMPLATE_TOOLTIP_TEXT)
                     .createLineMarkerInfo(anchor);
         }
         final List<PsiElement> components = collectComponents(psiFile);
 
         if (components.isEmpty()) {
+            NavigationInstrumentation.infoOnce(
+                    "ko-component-linemarker-empty-" + NavigationInstrumentation.describeFile(psiFile),
+                    () -> "Knockout template line marker has no component targets for "
+                            + NavigationInstrumentation.describeFile(psiFile)
+            );
             return null;
         }
+        NavigationInstrumentation.infoOnce(
+                "ko-component-linemarker-created-" + NavigationInstrumentation.describeFile(psiFile),
+                () -> "Knockout template line marker created for "
+                        + NavigationInstrumentation.describeFile(psiFile)
+                        + " components=" + components.size()
+        );
 
         return NavigationGutterIconBuilder
                 .create(JavaScriptFileType.INSTANCE.getIcon())
-                .setTargets(components)
+                .setTargets(LineMarkerTargetPresentationUtil.prepareTargets(components))
+                .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
+                .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
+                    .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
                 .setTooltipText(COMPONENT_TOOLTIP_TEXT)
                 .createLineMarkerInfo(anchor);
     }
@@ -116,6 +252,12 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
             results.addAll(KnockoutTemplatePathResolver.getInstance()
                     .resolveTemplateFiles(jsFile.getProject(), templatePath));
         }
+        NavigationInstrumentation.infoOnce(
+                "ko-template-linemarker-collected-" + NavigationInstrumentation.describeFile(jsFile),
+                () -> "Knockout component templates collected for "
+                        + NavigationInstrumentation.describeFile(jsFile)
+                        + " targets=" + results.size()
+        );
 
         return results;
     }
@@ -139,6 +281,14 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
                 }
             }
         }
+        addComponentsFromMagentoVfs(project, results, KnockoutTemplatePathResolver.getInstance()
+                .getTemplateRequireJsPaths(psiFile));
+        NavigationInstrumentation.infoOnce(
+                "ko-component-linemarker-collected-" + NavigationInstrumentation.describeFile(psiFile),
+                () -> "Knockout template components collected for "
+                        + NavigationInstrumentation.describeFile(psiFile)
+                        + " targets=" + results.size()
+        );
 
         return results;
     }
@@ -159,6 +309,46 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
         if (psiFile != null) {
             results.add(psiFile);
         }
+    }
+
+    private void addComponentsFromMagentoVfs(
+            final @NotNull Project project,
+            final @NotNull Collection<PsiElement> results,
+            final @NotNull Set<String> templatePaths
+    ) {
+        if (templatePaths.isEmpty()) {
+            return;
+        }
+        final PsiManager psiManager = PsiManager.getInstance(project);
+        int scannedFiles = 0;
+
+        for (final VirtualFile file : MagentoVfsUtil.findMagentoFiles(
+                project,
+                virtualFile -> "js".equals(virtualFile.getExtension())
+        )) {
+            scannedFiles++;
+            final PsiFile psiFile = psiManager.findFile(file);
+
+            if (!(psiFile instanceof JSFile)) {
+                continue;
+            }
+            final Set<String> componentTemplatePaths = KnockoutTemplatePathResolver.getInstance()
+                    .collectTemplatePaths((JSFile) psiFile);
+
+            for (final String templatePath : templatePaths) {
+                if (componentTemplatePaths.contains(templatePath)) {
+                    results.add(psiFile);
+                    break;
+                }
+            }
+        }
+        final int finalScannedFiles = scannedFiles;
+        NavigationInstrumentation.infoOnce(
+                "ko-component-linemarker-vfs-" + project.getLocationHash() + "-" + templatePaths.hashCode(),
+                () -> "Magento VFS Knockout component scan scannedJsFiles=" + finalScannedFiles
+                        + " templatePathAliases=" + templatePaths.size()
+                        + " totalTargets=" + results.size()
+        );
     }
 
     private boolean isSupportedFile(final @NotNull PsiFile psiFile) {
