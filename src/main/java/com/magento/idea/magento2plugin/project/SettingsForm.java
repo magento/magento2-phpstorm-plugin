@@ -10,6 +10,7 @@ import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
@@ -17,9 +18,7 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.jetbrains.php.frameworks.PhpFrameworkConfigurable;
 import com.magento.idea.magento2plugin.indexes.IndexManager;
-import com.magento.idea.magento2plugin.init.ConfigurationManager;
 import com.magento.idea.magento2plugin.project.MagentoSkillInstaller.AgentTarget;
 import com.magento.idea.magento2plugin.magento.packages.MagentoComponentManager;
 import com.magento.idea.magento2plugin.project.MagentoSkillInstaller.Skill;
@@ -46,7 +45,7 @@ import org.jetbrains.annotations.Nullable;
         "PMD.TooManyFields",
         "PMD.TooManyMethods"
 })
-public class SettingsForm implements PhpFrameworkConfigurable {
+public class SettingsForm implements SearchableConfigurable {
 
     private static final String DEFAULT_MAGENTO_EDITION_LABEL = "Platform Version:";
 
@@ -158,7 +157,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
             }
 
             final String installedPath = MagentoSkillInstaller.install(project, skill, agentTarget);
-            ConfigurationManager.notifyGlobally(
+            MagentoNotificationUtil.notifyGlobally(
                     project,
                     "Magento 2 and Adobe Commerce",
                     skill.getDisplayName() + " skill was added for "
@@ -170,7 +169,7 @@ public class SettingsForm implements PhpFrameworkConfigurable {
                     exception.getMessage(),
                     exception.getClass().getSimpleName()
             );
-            ConfigurationManager.notifyGlobally(
+            MagentoNotificationUtil.notifyGlobally(
                     project,
                     "Magento 2 and Adobe Commerce",
                     "Unable to add " + skill.getDisplayName() + " skill for "
@@ -243,11 +242,15 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         this.validator.validate();
         saveSettings();
 
-        ConfigurationManager.getInstance().refreshIncludePaths(getSettings().getState(), project);
+        afterSettingsApplied(getSettings().getState());
 
         if (buttonReindex.isEnabled()) {
             reindex();
         }
+    }
+
+    protected void afterSettingsApplied(final @NotNull Settings.State state) {
+        // PHP-specific settings integrations are added by PhpFrameworkSettingsForm.
     }
 
     private void saveSettings() {
@@ -364,9 +367,16 @@ public class SettingsForm implements PhpFrameworkConfigurable {
         getSettings().magentoEdition = resolvedEdition;
     }
 
-    @Override
     public boolean isBeingUsed() {
+        return isMagentoSupportEnabled();
+    }
+
+    protected boolean isMagentoSupportEnabled() {
         return this.pluginEnabled.isSelected();
+    }
+
+    protected @NotNull Project getProject() {
+        return project;
     }
 
     @NotNull

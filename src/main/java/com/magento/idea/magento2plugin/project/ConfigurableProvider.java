@@ -22,6 +22,6 @@ public class ConfigurableProvider implements PhpFrameworkConfigurableProvider {
 
     @NotNull
     public PhpFrameworkConfigurable createConfigurable(@NotNull Project project) {
-        return new SettingsForm(project);
+        return new PhpFrameworkSettingsForm(project);
     }
 }

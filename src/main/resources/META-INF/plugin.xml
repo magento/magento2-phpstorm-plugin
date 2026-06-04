@@ -18,6 +18,13 @@
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.Settings"/>
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.startup.DeferredProjectOpenActions"/>
 
+        <projectConfigurable
+                groupId="tools"
+                provider="com.magento.idea.magento2plugin.project.ToolsConfigurableProvider"
+                id="Magento2.SettingsForm"
+                displayName="Magento"
+                nonDefaultProject="true"/>
+
         <psi.referenceContributor language="JavaScript" implementation="com.magento.idea.magento2plugin.reference.js.JsReferenceContributor"/>
         <psi.referenceContributor language="JSON" implementation="com.magento.idea.magento2plugin.reference.json.JsonReferenceContributor"/>
         <psi.referenceContributor language="HTML" implementation="com.magento.idea.magento2plugin.reference.html.HtmlReferenceContributor"/>
