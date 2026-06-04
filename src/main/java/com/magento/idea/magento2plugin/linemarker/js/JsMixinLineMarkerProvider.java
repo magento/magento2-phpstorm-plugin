@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.linemarker.js;
 
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
-import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.javascript.JavaScriptFileType;
@@ -16,27 +15,28 @@ import com.intellij.lang.javascript.psi.JSFile;
 import com.intellij.lang.javascript.psi.JSObjectLiteralExpression;
 import com.intellij.lang.javascript.psi.JSProperty;
 import com.intellij.lang.javascript.psi.JSVariable;
+import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.Function;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.project.diagnostic.NavigationInstrumentation;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.stubs.indexes.js.JsMixinIndex;
-import com.magento.idea.magento2plugin.util.magento.MagentoVfsUtil;
 import com.magento.idea.magento2plugin.util.magento.js.RequireJsPathResolver;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,6 +45,14 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
     private static final String MIXINS_TOOLTIP_TEXT = "Navigate to JS mixins";
     private static final String TARGET_METHOD_TOOLTIP_TEXT = "Navigate to target method";
     private static final String MIXIN_METHOD_TOOLTIP_TEXT = "Navigate to JS mixin override";
+    private static final Function<PsiElement, String> TARGET_TOOLTIP_PROVIDER =
+            ignored -> getTooltipText(TARGET_TOOLTIP_TEXT);
+    private static final Function<PsiElement, String> MIXINS_TOOLTIP_PROVIDER =
+            ignored -> getTooltipText(MIXINS_TOOLTIP_TEXT);
+    private static final Function<PsiElement, String> TARGET_METHOD_TOOLTIP_PROVIDER =
+            ignored -> getTooltipText(TARGET_METHOD_TOOLTIP_TEXT);
+    private static final Function<PsiElement, String> MIXIN_METHOD_TOOLTIP_PROVIDER =
+            ignored -> getTooltipText(MIXIN_METHOD_TOOLTIP_TEXT);
     private static final Pattern WRAPPED_MEMBER_PATTERN = Pattern.compile(
             "\\b([A-Za-z_$][\\w$]*)\\.([A-Za-z_$][\\w$]*)\\s*=\\s*wrapper\\.wrap(?:Super)?\\(\\s*\\1\\.\\2\\b"
     );
@@ -67,87 +75,6 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
 
     @Override
     public @Nullable LineMarkerInfo<?> getLineMarkerInfo(final @NotNull PsiElement psiElement) {
-        final PsiFile psiFile = psiElement.getContainingFile();
-
-        if (!(psiFile instanceof JSFile)) {
-            return null;
-        }
-        if (!Settings.isEnabled(psiElement.getProject())) {
-            NavigationInstrumentation.infoOnce(
-                    "js-mixin-linemarker-disabled-" + psiElement.getProject().getLocationHash(),
-                    () -> "JS mixin line markers skipped: Magento support disabled; "
-                            + NavigationInstrumentation.describeSettings(psiElement.getProject())
-            );
-            return null;
-        }
-
-        final PsiElement anchor = PsiTreeUtil.getDeepestFirst(psiFile);
-
-        if (!psiElement.equals(anchor)) {
-            return null;
-        }
-
-        final String requireJsPath = RequireJsPathResolver.getInstance().getRequireJsPath(psiFile);
-
-        if (requireJsPath == null) {
-            NavigationInstrumentation.infoOnce(
-                    "js-mixin-linemarker-no-path-" + NavigationInstrumentation.describeFile(psiFile),
-                    () -> "JS mixin line marker skipped: no Magento requirejs path for "
-                            + NavigationInstrumentation.describeFile(psiFile)
-            );
-            return null;
-        }
-
-        final List<PsiElement> targets = collectTargetsForMixin(
-                psiElement.getProject(),
-                requireJsPath
-        );
-
-        if (!targets.isEmpty()) {
-            NavigationInstrumentation.infoOnce(
-                    "js-mixin-linemarker-target-created-" + requireJsPath,
-                    () -> "JS mixin line marker created: mixin '" + requireJsPath
-                            + "' targets=" + targets.size()
-            );
-            return NavigationGutterIconBuilder
-                    .create(JavaScriptFileType.INSTANCE.getIcon())
-                    .setTargets(LineMarkerTargetPresentationUtil.prepareTargets(targets))
-                    .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
-                    .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
-                    .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
-                    .setTooltipText(TARGET_TOOLTIP_TEXT)
-                    .createLineMarkerInfo(anchor);
-        }
-
-        final List<PsiElement> mixins = collectMixinsForTarget(
-                psiElement.getProject(),
-                requireJsPath
-        );
-
-        if (!mixins.isEmpty()) {
-            NavigationInstrumentation.infoOnce(
-                    "js-mixin-linemarker-mixins-created-" + requireJsPath,
-                    () -> "JS mixin line marker created: target '" + requireJsPath
-                            + "' mixins=" + mixins.size()
-            );
-            return NavigationGutterIconBuilder
-                    .create(AllIcons.Nodes.Plugin)
-                    .setTargets(LineMarkerTargetPresentationUtil.prepareTargets(mixins))
-                    .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
-                    .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
-                    .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
-                    .setTooltipText(MIXINS_TOOLTIP_TEXT)
-                    .createLineMarkerInfo(
-                            anchor,
-                            LineMarkerTargetPresentationUtil.createPopupNavigationHandler(mixins, MIXINS_TOOLTIP_TEXT)
-                    );
-        }
-
-        NavigationInstrumentation.infoOnce(
-                "js-mixin-linemarker-empty-" + requireJsPath,
-                () -> "JS mixin line marker has no related files for '" + requireJsPath + "'"
-        );
-
         return null;
     }
 
@@ -168,15 +95,19 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
             return;
         }
 
-        final Set<PsiFile> processedFiles = new HashSet<>();
+        final Set<String> processedFiles = new HashSet<>();
 
         for (final PsiElement psiElement : psiElements) {
             final PsiFile psiFile = psiElement.getContainingFile();
 
-            if (!(psiFile instanceof JSFile) || processedFiles.contains(psiFile)) {
+            if (!(psiFile instanceof JSFile)) {
                 continue;
             }
-            processedFiles.add(psiFile);
+            final String fileKey = getFileKey(psiFile);
+
+            if (!processedFiles.add(fileKey)) {
+                continue;
+            }
 
             final String requireJsPath = RequireJsPathResolver.getInstance().getRequireJsPath(psiFile);
 
@@ -189,15 +120,16 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
                 continue;
             }
 
-            addTargetLineMarker(psiElement, requireJsPath, collection);
-            addMixinLineMarker(psiElement, requireJsPath, collection);
-            addMixinMethodLineMarkers((JSFile) psiFile, requireJsPath, collection);
+            addTargetLineMarker(psiElement, requireJsPath, psiElements, collection);
+            addMixinLineMarker(psiElement, requireJsPath, psiElements, collection);
+            addMixinMethodLineMarkers((JSFile) psiFile, requireJsPath, psiElements, collection);
         }
     }
 
     private void addTargetLineMarker(
             final @NotNull PsiElement anchorContext,
             final @NotNull String requireJsPath,
+            final @NotNull List<? extends PsiElement> scopeElements,
             final @NotNull Collection<? super LineMarkerInfo<?>> collection
     ) {
         final List<PsiElement> targets = collectTargetsForMixin(
@@ -205,7 +137,9 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
                 requireJsPath
         );
 
-        if (targets.isEmpty()) {
+        final List<PsiElement> preparedTargets = LineMarkerTargetPresentationUtil.prepareTargets(targets);
+
+        if (preparedTargets.isEmpty()) {
             NavigationInstrumentation.infoOnce(
                     "js-mixin-target-linemarker-empty-" + requireJsPath,
                     () -> "JS mixin target line marker has no targets for mixin '" + requireJsPath + "'"
@@ -213,24 +147,33 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
             return;
         }
 
-        collection.add(NavigationGutterIconBuilder
-                .create(JavaScriptFileType.INSTANCE.getIcon())
-                .setTargets(LineMarkerTargetPresentationUtil.prepareTargets(targets))
-                .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
-                .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
-                    .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
-                .setTooltipText(TARGET_TOOLTIP_TEXT)
-                .createLineMarkerInfo(PsiTreeUtil.getDeepestFirst(anchorContext.getContainingFile())));
+        final PsiElement anchor = getFileLineMarkerAnchor(anchorContext.getContainingFile());
+
+        if (!containsElement(scopeElements, anchor)) {
+            return;
+        }
+        if (hasLineMarker(collection, anchor, TARGET_TOOLTIP_TEXT)) {
+            return;
+        }
+
+        addLineMarker(
+                collection,
+                anchor,
+                JavaScriptFileType.INSTANCE.getIcon(),
+                preparedTargets,
+                TARGET_TOOLTIP_TEXT
+        );
         NavigationInstrumentation.infoOnce(
                 "js-mixin-target-linemarker-added-" + requireJsPath,
                 () -> "JS mixin target line marker added for '" + requireJsPath
-                        + "' targets=" + targets.size()
+                        + "' targets=" + preparedTargets.size()
         );
     }
 
     private void addMixinLineMarker(
             final @NotNull PsiElement anchorContext,
             final @NotNull String requireJsPath,
+            final @NotNull List<? extends PsiElement> scopeElements,
             final @NotNull Collection<? super LineMarkerInfo<?>> collection
     ) {
         final List<PsiElement> mixins = collectMixinsForTarget(
@@ -238,7 +181,9 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
                 requireJsPath
         );
 
-        if (mixins.isEmpty()) {
+        final List<PsiElement> preparedMixins = LineMarkerTargetPresentationUtil.prepareTargets(mixins);
+
+        if (preparedMixins.isEmpty()) {
             NavigationInstrumentation.infoOnce(
                     "js-mixin-mixins-linemarker-empty-" + requireJsPath,
                     () -> "JS mixin mixins line marker has no mixins for target '" + requireJsPath + "'"
@@ -246,36 +191,43 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
             return;
         }
 
-        collection.add(NavigationGutterIconBuilder
-                .create(AllIcons.Nodes.Plugin)
-                .setTargets(LineMarkerTargetPresentationUtil.prepareTargets(mixins))
-                .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
-                .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
-                    .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
-                .setTooltipText(MIXINS_TOOLTIP_TEXT)
-                .createLineMarkerInfo(
-                        PsiTreeUtil.getDeepestFirst(anchorContext.getContainingFile()),
-                        LineMarkerTargetPresentationUtil.createPopupNavigationHandler(mixins, MIXINS_TOOLTIP_TEXT)
-                ));
+        final PsiElement anchor = getFileLineMarkerAnchor(anchorContext.getContainingFile());
+
+        if (!containsElement(scopeElements, anchor)) {
+            return;
+        }
+        if (hasLineMarker(collection, anchor, MIXINS_TOOLTIP_TEXT)) {
+            return;
+        }
+
+        addLineMarker(
+                collection,
+                anchor,
+                AllIcons.Nodes.Plugin,
+                preparedMixins,
+                MIXINS_TOOLTIP_TEXT
+        );
         NavigationInstrumentation.infoOnce(
                 "js-mixin-mixins-linemarker-added-" + requireJsPath,
                 () -> "JS mixin mixins line marker added for '" + requireJsPath
-                        + "' mixins=" + mixins.size()
+                        + "' mixins=" + preparedMixins.size()
         );
     }
 
     private void addMixinMethodLineMarkers(
             final @NotNull JSFile jsFile,
             final @NotNull String requireJsPath,
+            final @NotNull List<? extends PsiElement> scopeElements,
             final @NotNull Collection<? super LineMarkerInfo<?>> collection
     ) {
-        addMixinFileMethodLineMarkers(jsFile, requireJsPath, collection);
-        addTargetFileMethodLineMarkers(jsFile, requireJsPath, collection);
+        addMixinFileMethodLineMarkers(jsFile, requireJsPath, scopeElements, collection);
+        addTargetFileMethodLineMarkers(jsFile, requireJsPath, scopeElements, collection);
     }
 
     private void addMixinFileMethodLineMarkers(
             final @NotNull JSFile mixinFile,
             final @NotNull String mixinPath,
+            final @NotNull List<? extends PsiElement> scopeElements,
             final @NotNull Collection<? super LineMarkerInfo<?>> collection
     ) {
         final List<MixinOverride> overrides = collectDocumentedMixinOverrides(mixinFile);
@@ -286,6 +238,9 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
         final List<PsiElement> targetFiles = collectTargetsForMixin(mixinFile.getProject(), mixinPath);
 
         for (final MixinOverride override : overrides) {
+            if (!containsElement(scopeElements, override.anchor)) {
+                continue;
+            }
             final List<PsiElement> targetMethods = new ArrayList<>();
 
             if (override.name == null) {
@@ -297,23 +252,26 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
                     }
                 }
             }
-            if (targetMethods.isEmpty()) {
+            final List<PsiElement> preparedTargetMethods =
+                    LineMarkerTargetPresentationUtil.prepareTargets(targetMethods);
+
+            if (preparedTargetMethods.isEmpty()) {
                 continue;
             }
-            collection.add(NavigationGutterIconBuilder
-                    .create(AllIcons.Nodes.Method)
-                    .setTargets(LineMarkerTargetPresentationUtil.prepareTargets(targetMethods))
-                    .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
-                    .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
-                    .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
-                    .setTooltipText(TARGET_METHOD_TOOLTIP_TEXT)
-                    .createLineMarkerInfo(override.anchor));
+            addLineMarker(
+                    collection,
+                    override.anchor,
+                    AllIcons.Nodes.Method,
+                    preparedTargetMethods,
+                    TARGET_METHOD_TOOLTIP_TEXT
+            );
         }
     }
 
     private void addTargetFileMethodLineMarkers(
             final @NotNull JSFile targetFile,
             final @NotNull String targetPath,
+            final @NotNull List<? extends PsiElement> scopeElements,
             final @NotNull Collection<? super LineMarkerInfo<?>> collection
     ) {
         final List<PsiElement> mixinFiles = collectMixinsForTarget(targetFile.getProject(), targetPath);
@@ -322,6 +280,9 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
             return;
         }
         for (final PsiElement targetMethod : findObjectMethodAnchors(targetFile)) {
+            if (!containsElement(scopeElements, targetMethod)) {
+                continue;
+            }
             final String methodName = targetMethod.getText();
             final List<PsiElement> mixinOverrides = new ArrayList<>();
 
@@ -335,30 +296,27 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
                     }
                 }
             }
-            if (mixinOverrides.isEmpty()) {
+            final List<PsiElement> preparedMixinOverrides =
+                    LineMarkerTargetPresentationUtil.prepareTargets(mixinOverrides);
+
+            if (preparedMixinOverrides.isEmpty()) {
                 continue;
             }
-            collection.add(NavigationGutterIconBuilder
-                    .create(AllIcons.Nodes.Plugin)
-                    .setTargets(LineMarkerTargetPresentationUtil.prepareTargets(mixinOverrides))
-                    .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
-                    .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
-                    .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
-                    .setTooltipText(MIXIN_METHOD_TOOLTIP_TEXT)
-                    .createLineMarkerInfo(
-                            targetMethod,
-                            LineMarkerTargetPresentationUtil.createPopupNavigationHandler(
-                                    mixinOverrides,
-                                    MIXIN_METHOD_TOOLTIP_TEXT
-                            )
-                    ));
+            addLineMarker(
+                    collection,
+                    targetMethod,
+                    AllIcons.Nodes.Plugin,
+                    preparedMixinOverrides,
+                    MIXIN_METHOD_TOOLTIP_TEXT
+            );
         }
-        addTargetFileFunctionMixinLineMarker(targetFile, mixinFiles, collection);
+        addTargetFileFunctionMixinLineMarker(targetFile, mixinFiles, scopeElements, collection);
     }
 
     private void addTargetFileFunctionMixinLineMarker(
             final @NotNull JSFile targetFile,
             final @NotNull List<PsiElement> mixinFiles,
+            final @NotNull List<? extends PsiElement> scopeElements,
             final @NotNull Collection<? super LineMarkerInfo<?>> collection
     ) {
         final List<PsiElement> mixinOverrides = new ArrayList<>();
@@ -373,23 +331,145 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
                 }
             }
         }
-        if (mixinOverrides.isEmpty()) {
+        final List<PsiElement> preparedMixinOverrides =
+                LineMarkerTargetPresentationUtil.prepareTargets(mixinOverrides);
+
+        if (preparedMixinOverrides.isEmpty()) {
             return;
         }
-        collection.add(NavigationGutterIconBuilder
-                .create(AllIcons.Nodes.Plugin)
-                .setTargets(LineMarkerTargetPresentationUtil.prepareTargets(mixinOverrides))
-                .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
-                .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
-                .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
-                .setTooltipText(MIXIN_METHOD_TOOLTIP_TEXT)
-                .createLineMarkerInfo(
-                        PsiTreeUtil.getDeepestFirst(targetFile),
-                        LineMarkerTargetPresentationUtil.createPopupNavigationHandler(
-                                mixinOverrides,
-                                MIXIN_METHOD_TOOLTIP_TEXT
-                        )
-                ));
+        final PsiElement anchor = getFileLineMarkerAnchor(targetFile);
+
+        if (!containsElement(scopeElements, anchor)) {
+            return;
+        }
+        if (hasLineMarker(collection, anchor, MIXINS_TOOLTIP_TEXT)) {
+            return;
+        }
+        addLineMarker(
+                collection,
+                anchor,
+                AllIcons.Nodes.Plugin,
+                preparedMixinOverrides,
+                MIXIN_METHOD_TOOLTIP_TEXT
+        );
+    }
+
+    private void addLineMarker(
+            final @NotNull Collection<? super LineMarkerInfo<?>> collection,
+            final @NotNull PsiElement anchor,
+            final @NotNull Icon icon,
+            final @NotNull List<PsiElement> targets,
+            final @NotNull String tooltip
+    ) {
+        if (hasLineMarker(collection, anchor, tooltip)) {
+            return;
+        }
+        final TextRange textRange = anchor.getTextRange();
+
+        collection.add(new LineMarkerInfo<>(
+                anchor,
+                textRange,
+                icon,
+                getTooltipProvider(tooltip),
+                LineMarkerTargetPresentationUtil.createNavigationHandler(targets, tooltip),
+                GutterIconRenderer.Alignment.RIGHT,
+                () -> getTooltipText(tooltip)
+        ));
+    }
+
+    private @NotNull Function<PsiElement, String> getTooltipProvider(final @NotNull String tooltip) {
+        return switch (tooltip) {
+            case TARGET_TOOLTIP_TEXT -> TARGET_TOOLTIP_PROVIDER;
+            case MIXINS_TOOLTIP_TEXT -> MIXINS_TOOLTIP_PROVIDER;
+            case TARGET_METHOD_TOOLTIP_TEXT -> TARGET_METHOD_TOOLTIP_PROVIDER;
+            case MIXIN_METHOD_TOOLTIP_TEXT -> MIXIN_METHOD_TOOLTIP_PROVIDER;
+            default -> ignored -> getTooltipText(tooltip);
+        };
+    }
+
+    private static @NotNull String getTooltipText(final @NotNull String tooltip) {
+        return "<html>" + tooltip + "</html>";
+    }
+
+    private boolean hasLineMarker(
+            final @NotNull Collection<? super LineMarkerInfo<?>> collection,
+            final @NotNull PsiElement anchor,
+            final @NotNull String tooltip
+    ) {
+        for (final Object item : collection) {
+            if (!(item instanceof LineMarkerInfo<?> lineMarkerInfo)) {
+                continue;
+            }
+            if (!getTooltipText(tooltip).equals(lineMarkerInfo.getLineMarkerTooltip())) {
+                continue;
+            }
+            if (lineMarkerInfo.startOffset == anchor.getTextRange().getStartOffset()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean containsElement(
+            final @NotNull List<? extends PsiElement> elements,
+            final @NotNull PsiElement anchor
+    ) {
+        final PsiFile anchorFile = anchor.getContainingFile();
+        final TextRange anchorRange = anchor.getTextRange();
+
+        for (final PsiElement element : elements) {
+            if (element.equals(anchor)) {
+                return true;
+            }
+            if (!anchorRange.equals(element.getTextRange())) {
+                continue;
+            }
+            if (anchorFile != null && anchorFile.equals(element.getContainingFile())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private @NotNull PsiElement getFileLineMarkerAnchor(final @NotNull PsiFile psiFile) {
+        final PsiElement anchor = psiFile.findElementAt(getFirstCodeOffset(psiFile.getText()));
+
+        return anchor == null ? PsiTreeUtil.getDeepestFirst(psiFile) : anchor;
+    }
+
+    private int getFirstCodeOffset(final @NotNull String text) {
+        int offset = 0;
+
+        while (offset < text.length()) {
+            if (Character.isWhitespace(text.charAt(offset))) {
+                offset++;
+                continue;
+            }
+            if (text.startsWith("//", offset)) {
+                final int endOfLine = text.indexOf('\n', offset + 2);
+
+                if (endOfLine < 0) {
+                    return 0;
+                }
+                offset = endOfLine + 1;
+                continue;
+            }
+            if (text.startsWith("/*", offset)) {
+                final int commentEnd = text.indexOf("*/", offset + 2);
+
+                if (commentEnd < 0) {
+                    return 0;
+                }
+                offset = commentEnd + 2;
+                continue;
+            }
+
+            return offset;
+        }
+
+        return 0;
     }
 
     private @NotNull List<MixinOverride> collectDocumentedMixinOverrides(final @NotNull JSFile mixinFile) {
@@ -536,17 +616,13 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
             final @NotNull String targetPath
     ) {
         final List<PsiElement> results = new ArrayList<>();
+        final Set<String> seenFiles = new HashSet<>();
         final Collection<Set<String>> mixinSets = FileBasedIndex.getInstance()
                 .getValues(JsMixinIndex.KEY, targetPath, GlobalSearchScope.allScope(project));
 
         for (final Set<String> mixins : mixinSets) {
             for (final String mixin : mixins) {
-                results.addAll(RequireJsPathResolver.getInstance().resolveJsFiles(project, mixin));
-            }
-        }
-        for (final Set<String> mixins : collectMixinDeclarationsFromMagentoVfs(project, targetPath)) {
-            for (final String mixin : mixins) {
-                results.addAll(RequireJsPathResolver.getInstance().resolveJsFiles(project, mixin));
+                addResolvedJsFiles(project, mixin, seenFiles, results);
             }
         }
 
@@ -558,6 +634,7 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
             final @NotNull String mixinPath
     ) {
         final List<PsiElement> results = new ArrayList<>();
+        final Set<String> seenFiles = new HashSet<>();
         final Collection<String> targetPaths = FileBasedIndex.getInstance()
                 .getAllKeys(JsMixinIndex.KEY, project);
 
@@ -567,63 +644,39 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
 
             for (final Set<String> mixins : mixinSets) {
                 if (mixins.contains(mixinPath)) {
-                    results.addAll(RequireJsPathResolver.getInstance().resolveJsFiles(project, targetPath));
+                    addResolvedJsFiles(project, targetPath, seenFiles, results);
                 }
-            }
-        }
-        for (final Map.Entry<String, Set<String>> entry : collectMixinDeclarationsFromMagentoVfs(project).entrySet()) {
-            if (entry.getValue().contains(mixinPath)) {
-                results.addAll(RequireJsPathResolver.getInstance().resolveJsFiles(project, entry.getKey()));
             }
         }
 
         return results;
     }
 
-    private @NotNull Collection<Set<String>> collectMixinDeclarationsFromMagentoVfs(
+    private void addResolvedJsFiles(
             final @NotNull Project project,
-            final @NotNull String targetPath
+            final @NotNull String requireJsPath,
+            final @NotNull Set<String> seenFiles,
+            final @NotNull List<PsiElement> results
     ) {
-        final List<Set<String>> result = new ArrayList<>();
-        final Map<String, Set<String>> declarations = collectMixinDeclarationsFromMagentoVfs(project);
-        final Set<String> mixins = declarations.get(targetPath);
+        for (final PsiElement resolvedFile : RequireJsPathResolver.getInstance().resolveJsFiles(project, requireJsPath)) {
+            final String key = getFileKey(resolvedFile);
 
-        if (mixins != null) {
-            result.add(mixins);
-        }
-
-        return result;
-    }
-
-    private @NotNull Map<String, Set<String>> collectMixinDeclarationsFromMagentoVfs(
-            final @NotNull Project project
-    ) {
-        final Map<String, Set<String>> result = new java.util.HashMap<>();
-        final PsiManager psiManager = PsiManager.getInstance(project);
-        int scannedFiles = 0;
-
-        for (final VirtualFile file : MagentoVfsUtil.findMagentoFiles(
-                project,
-                virtualFile -> "requirejs-config.js".equals(virtualFile.getName())
-        )) {
-            scannedFiles++;
-            final PsiFile psiFile = psiManager.findFile(file);
-
-            if (!(psiFile instanceof JSFile)) {
+            if (key != null && !seenFiles.add(key)) {
                 continue;
             }
-            for (final Map.Entry<String, Set<String>> entry : JsMixinIndex.getMixinMap((JSFile) psiFile).entrySet()) {
-                result.computeIfAbsent(entry.getKey(), ignored -> new HashSet<>()).addAll(entry.getValue());
-            }
+            results.add(resolvedFile);
         }
-        final int finalScannedFiles = scannedFiles;
-        NavigationInstrumentation.infoOnce(
-                "js-mixin-vfs-declarations-" + project.getLocationHash(),
-                () -> "Magento VFS mixin declaration scan scannedRequireJsConfigs=" + finalScannedFiles
-                        + " targets=" + result.size()
-        );
+    }
 
-        return result;
+    private @Nullable String getFileKey(final @NotNull PsiElement psiElement) {
+        final PsiFile containingFile = psiElement.getContainingFile();
+
+        if (containingFile == null) {
+            return null;
+        }
+        final VirtualFile virtualFile = containingFile.getVirtualFile();
+
+        return virtualFile == null ? null : virtualFile.getUrl();
     }
 
     private static final class MixinOverride {

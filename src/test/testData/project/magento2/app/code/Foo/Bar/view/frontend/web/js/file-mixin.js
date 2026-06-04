@@ -1,3 +1,6 @@
+/**
+ * Header comment should not receive Magento JS mixin line markers.
+ */
 define(function () {
     'use strict';
 

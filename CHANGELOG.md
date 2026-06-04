@@ -18,14 +18,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - XML-based Magento theme indexing from `theme.xml` for non-PHP IDEs.
 - Magento settings are available under `Tools > Magento` in IDEs without PHP support while remaining under `PHP > Frameworks > Magento 2` in PHP IDEs.
 
-### Fixed
-
-- Module-name navigation no longer loads PHP file types while resolving JavaScript Magento module references in non-PHP IDEs.
-- Module and theme discovery no longer depends on PHP registration files in non-PHP IDEs.
-- Magento settings Reindex action now saves the current settings form values before requesting index rebuilds in non-PHP IDEs.
-- Knockout `getRegion()` parent-child navigation now resolves components and templates from vendor modules in non-PHP IDEs.
-- JavaScript mixin and Knockout navigation now fall back to scanning configured Magento roots when non-PHP IDEs exclude `vendor` packages from indexes.
-
 ## 2026.2.2
 
 ### Added

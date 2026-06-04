@@ -5,9 +5,6 @@
 
 package com.magento.idea.magento2plugin.linemarker.js;
 
-import com.intellij.codeInsight.daemon.LineMarkerInfo;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.magento.idea.magento2plugin.linemarker.LinemarkerFixtureTestCase;
 
 public class JsMixinLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
@@ -19,7 +16,8 @@ public class JsMixinLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
                 "app/code/Foo/Bar/view/frontend/web/js/file.js"
         );
 
-        assertProviderHasLinemarker("Navigate to JS mixins");
+        assertLinemarkerCountWithTooltip("<html>Navigate to JS mixins</html>", 1);
+        assertFirstAnchorLinemarkerCount(1);
     }
 
     /**
@@ -30,7 +28,10 @@ public class JsMixinLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
                 "app/code/Foo/Bar/view/frontend/web/js/file-mixin.js"
         );
 
-        assertProviderHasLinemarker("Navigate to target JS");
+        assertLinemarkerCountWithTooltip("<html>Navigate to target JS</html>", 1);
+        assertFirstAnchorLinemarkerCount(0);
+        assertLinemarkerCountAtText("define", 1);
+        assertNoMergeableLinemarkersWithTooltip("<html>Navigate to target JS</html>");
     }
 
     /**
@@ -42,6 +43,8 @@ public class JsMixinLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
         );
 
         assertHasLinemarkerWithTooltipAndIcon("<html>Navigate to JS mixin override</html>", "");
+        assertFirstAnchorLinemarkerCount(1);
+        assertNoMergeableLinemarkersWithTooltip("<html>Navigate to JS mixin override</html>");
     }
 
     /**
@@ -53,6 +56,7 @@ public class JsMixinLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
         );
 
         assertHasLinemarkerWithTooltipAndIcon("<html>Navigate to target method</html>", "");
+        assertNoMergeableLinemarkersWithTooltip("<html>Navigate to target method</html>");
     }
 
     /**
@@ -111,12 +115,4 @@ public class JsMixinLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
         assertHasNoLinemarkerWithTooltipAndIcon("<html>Navigate to target JS</html>", "");
     }
 
-    private void assertProviderHasLinemarker(final String tooltip) {
-        final PsiElement anchor = PsiTreeUtil.getDeepestFirst(myFixture.getFile());
-        final LineMarkerInfo<?> lineMarker = new JsMixinLineMarkerProvider()
-                .getLineMarkerInfo(anchor);
-
-        assertNotNull("No line marker returned by provider", lineMarker);
-        assertEquals(tooltip, lineMarker.getLineMarkerTooltip());
-    }
 }

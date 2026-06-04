@@ -7,12 +7,14 @@ package com.magento.idea.magento2plugin.linemarker.js;
 
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.navigation.NavigationUtil;
+import com.intellij.codeInsight.navigation.PsiTargetNavigator;
 import com.intellij.codeInsight.navigation.impl.PsiTargetPresentationRenderer;
 import com.intellij.ide.util.PsiElementListCellRenderer;
 import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.platform.backend.presentation.TargetPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.awt.RelativePoint;
@@ -67,8 +69,7 @@ final class LineMarkerTargetPresentationUtil {
     private LineMarkerTargetPresentationUtil() {
     }
 
-
-    static @NotNull GutterIconNavigationHandler<PsiElement> createPopupNavigationHandler(
+    static @NotNull GutterIconNavigationHandler<PsiElement> createNavigationHandler(
             final @NotNull List<PsiElement> targets,
             final @NotNull String title
     ) {
@@ -78,12 +79,21 @@ final class LineMarkerTargetPresentationUtil {
             if (preparedTargets.isEmpty()) {
                 return;
             }
-            final JBPopup popup = NavigationUtil.getPsiElementPopup(
-                    preparedTargets.toArray(new PsiElement[0]),
-                    CELL_RENDERER,
-                    title
-            );
-            popup.show(new RelativePoint(event));
+            if (preparedTargets.size() == 1) {
+                NavigationUtil.activateFileWithPsiElement(preparedTargets.get(0), true);
+                return;
+            }
+            final Project project = element.getProject();
+            final JBPopup popup = new PsiTargetNavigator<>(preparedTargets)
+                    .presentationProvider(LineMarkerTargetPresentationUtil::getTargetPresentation)
+                    .title(title)
+                    .createPopup(project, title);
+
+            if (event != null && event.getComponent().isShowing()) {
+                popup.show(new RelativePoint(event));
+            } else {
+                popup.showCenteredInCurrentWindow(project);
+            }
         };
     }
 
@@ -100,6 +110,13 @@ final class LineMarkerTargetPresentationUtil {
                 .thenComparing(LineMarkerTargetPresentationUtil::getStableKey));
 
         return sortedTargets;
+    }
+
+    private static @NotNull TargetPresentation getTargetPresentation(final @NotNull PsiElement target) {
+        return TargetPresentation
+                .builder(getPresentableTargetName(target))
+                .icon(target.getIcon(Iconable.ICON_FLAG_VISIBILITY))
+                .presentation();
     }
 
     static @NotNull String getPresentableTargetName(final @NotNull PsiElement target) {
