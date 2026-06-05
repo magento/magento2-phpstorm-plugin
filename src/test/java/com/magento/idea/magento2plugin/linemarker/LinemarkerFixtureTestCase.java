@@ -8,6 +8,7 @@ package com.magento.idea.magento2plugin.linemarker;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.MergeableLineMarkerInfo;
 import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerImpl;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.magento.idea.magento2plugin.BaseProjectTestCase;
@@ -37,7 +38,7 @@ public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
         final List<LineMarkerInfo<?>> lineMarkers = getDocumentLineMarkers();
         assertFalse("No line markers found in document", lineMarkers.isEmpty());
         for (final LineMarkerInfo lineMarkerInfo: lineMarkers) {
-            final String lineMarkerTooltip = lineMarkerInfo.getLineMarkerTooltip();
+            final String lineMarkerTooltip = normalizeTooltip(lineMarkerInfo.getLineMarkerTooltip());
             final Icon lineMarkerIcon = lineMarkerInfo.getIcon();
             if (lineMarkerTooltip == null) {
                 continue;
@@ -67,7 +68,7 @@ public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
 
         final List<LineMarkerInfo<?>> lineMarkers = getDocumentLineMarkers();
         for (final LineMarkerInfo lineMarkerInfo: lineMarkers) {
-            final String lineMarkerTooltip = lineMarkerInfo.getLineMarkerTooltip();
+            final String lineMarkerTooltip = normalizeTooltip(lineMarkerInfo.getLineMarkerTooltip());
             final Icon lineMarkerIcon = lineMarkerInfo.getIcon();
             if (lineMarkerTooltip == null || lineMarkerIcon == null) {
                 continue;
@@ -91,7 +92,7 @@ public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
         final List<LineMarkerInfo<?>> lineMarkers = getDocumentLineMarkers();
 
         for (final LineMarkerInfo lineMarkerInfo: lineMarkers) {
-            if (tooltip.equals(lineMarkerInfo.getLineMarkerTooltip())) {
+            if (tooltip.equals(normalizeTooltip(lineMarkerInfo.getLineMarkerTooltip()))) {
                 actualCount++;
             }
         }
@@ -133,7 +134,7 @@ public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
         final List<LineMarkerInfo<?>> lineMarkers = getDocumentLineMarkers();
 
         for (final LineMarkerInfo<?> lineMarkerInfo : lineMarkers) {
-            if (tooltip.equals(lineMarkerInfo.getLineMarkerTooltip())
+            if (tooltip.equals(normalizeTooltip(lineMarkerInfo.getLineMarkerTooltip()))
                     && lineMarkerInfo instanceof MergeableLineMarkerInfo<?>) {
                 fail(String.format(
                         "Unexpected mergeable linemarker for tooltip `%s`. Found: %s",
@@ -173,6 +174,16 @@ public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
         return DaemonCodeAnalyzerImpl.getLineMarkers(
                 myFixture.getEditor().getDocument(),
                 getProject()
+        );
+    }
+
+    private String normalizeTooltip(final String tooltip) {
+        if (tooltip == null) {
+            return null;
+        }
+        return StringUtil.trimEnd(
+                StringUtil.trimStart(tooltip, "<html>"),
+                "</html>"
         );
     }
 

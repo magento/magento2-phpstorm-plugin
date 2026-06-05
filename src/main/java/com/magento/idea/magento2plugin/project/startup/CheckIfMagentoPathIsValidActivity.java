@@ -7,6 +7,8 @@ package com.magento.idea.magento2plugin.project.startup;
 
 import com.intellij.ide.highlighter.HtmlFileType;
 import com.intellij.ide.plugins.PluginManagerCore;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
@@ -37,7 +39,7 @@ public class CheckIfMagentoPathIsValidActivity implements StartupActivity, Proje
     }
 
     private void registerSettings(final @NotNull Project project) {
-        registerNonPhpPhtmlSupport();
+        registerNonPhpPhtmlSupport(project);
         final Settings settings = Settings.getInstance(project);
         final String path = Settings.getMagentoPath(project);
         if (settings.pluginEnabled && (path == null || path.isEmpty())) {
@@ -51,7 +53,7 @@ public class CheckIfMagentoPathIsValidActivity implements StartupActivity, Proje
         DeferredProjectOpenActions.getInstance(project).runPendingActions();
     }
 
-    private void registerNonPhpPhtmlSupport() {
+    private void registerNonPhpPhtmlSupport(final @NotNull Project project) {
         if (PluginManagerCore.isLoaded(PHP_PLUGIN_ID)) {
             return;
         }
@@ -60,6 +62,12 @@ public class CheckIfMagentoPathIsValidActivity implements StartupActivity, Proje
         if (fileTypeManager.getFileTypeByExtension("phtml") == HtmlFileType.INSTANCE) {
             return;
         }
-        fileTypeManager.associateExtension(HtmlFileType.INSTANCE, "phtml");
+        ApplicationManager.getApplication().invokeLater(() -> {
+            if (project.isDisposed()
+                    || fileTypeManager.getFileTypeByExtension("phtml") == HtmlFileType.INSTANCE) {
+                return;
+            }
+            WriteAction.run(() -> fileTypeManager.associateExtension(HtmlFileType.INSTANCE, "phtml"));
+        });
     }
 }

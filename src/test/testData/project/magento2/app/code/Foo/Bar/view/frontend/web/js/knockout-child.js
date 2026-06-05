@@ -3,6 +3,7 @@ define(['uiComponent'], function (Component) {
 
     return Component.extend({
         defaults: {
+            template: 'Foo_Bar/template/child',
             displayArea: 'childRegion'
         }
     });

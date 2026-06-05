@@ -147,6 +147,20 @@ public class KnockoutRegionResolver {
         return new ArrayList<>(results);
     }
 
+    public @NotNull List<PsiElement> resolveDisplayAreaTemplateFiles(
+            final @NotNull Project project,
+            final @NotNull String displayArea
+    ) {
+        final Set<PsiElement> results = new LinkedHashSet<>();
+
+        addDisplayAreaTemplateFilesFromLayoutXml(project, displayArea, results);
+        NavigationInstrumentation.info(
+                "Resolved displayArea templates for '" + displayArea + "' targets=" + results.size()
+        );
+
+        return new ArrayList<>(results);
+    }
+
     private void addDisplayAreaComponentFilesFromMagentoVfs(
             final @NotNull Project project,
             final @NotNull String displayArea,
@@ -205,6 +219,39 @@ public class KnockoutRegionResolver {
         NavigationInstrumentation.infoOnce(
                 "ko-region-resolve-display-area-xml-" + displayArea,
                 () -> "Magento layout XML displayArea scan for '" + displayArea
+                        + "' scannedXmlFiles=" + finalScannedFiles
+                        + " totalTargets=" + results.size()
+        );
+    }
+
+    private void addDisplayAreaTemplateFilesFromLayoutXml(
+            final @NotNull Project project,
+            final @NotNull String displayArea,
+            final @NotNull Collection<PsiElement> results
+    ) {
+        final PsiManager psiManager = PsiManager.getInstance(project);
+        final Set<VirtualFile> xmlFiles = new LinkedHashSet<>(FileTypeIndex.getFiles(
+                XmlFileType.INSTANCE,
+                GlobalSearchScope.allScope(project)
+        ));
+        xmlFiles.addAll(MagentoVfsUtil.findMagentoFiles(
+                project,
+                virtualFile -> "xml".equals(virtualFile.getExtension())
+        ));
+        int scannedFiles = 0;
+
+        for (final VirtualFile file : xmlFiles) {
+            scannedFiles++;
+            final PsiFile psiFile = psiManager.findFile(file);
+
+            if (!(psiFile instanceof XmlFile) || !psiFile.getText().contains(displayArea)) {
+                continue;
+            }
+            addLayoutXmlDisplayAreaTemplateFiles((XmlFile) psiFile, displayArea, results);
+        }
+        final int finalScannedFiles = scannedFiles;
+        NavigationInstrumentation.info(
+                "Magento layout XML displayArea template scan for '" + displayArea
                         + "' scannedXmlFiles=" + finalScannedFiles
                         + " totalTargets=" + results.size()
         );
@@ -277,6 +324,52 @@ public class KnockoutRegionResolver {
         }
     }
 
+    private void addLayoutXmlDisplayAreaTemplateFiles(
+            final @NotNull XmlFile xmlFile,
+            final @NotNull String displayArea,
+            final @NotNull Collection<PsiElement> results
+    ) {
+        final Collection<XmlTag> tags = PsiTreeUtil.findChildrenOfType(xmlFile, XmlTag.class);
+
+        for (final XmlTag tag : tags) {
+            if (!isDisplayAreaTag(tag, displayArea)) {
+                continue;
+            }
+            final XmlTag componentTag = getComponentNodeTag(tag);
+
+            if (componentTag == null) {
+                continue;
+            }
+            final String xmlTemplatePath = getLayoutXmlTemplatePath(componentTag);
+
+            if (xmlTemplatePath != null) {
+                results.addAll(KnockoutTemplatePathResolver.getInstance().resolveTemplateFiles(
+                        xmlFile.getProject(),
+                        xmlTemplatePath
+                ));
+            }
+            final String componentPath = getLayoutXmlComponentPath(tag, displayArea);
+
+            if (componentPath == null || "uiComponent".equals(componentPath)) {
+                continue;
+            }
+            for (final PsiElement component : RequireJsPathResolver.getInstance().resolveJsFiles(
+                    xmlFile.getProject(),
+                    componentPath
+            )) {
+                if (component instanceof JSFile) {
+                    for (final String templatePath : KnockoutTemplatePathResolver.getInstance()
+                            .collectTemplatePaths((JSFile) component)) {
+                        results.addAll(KnockoutTemplatePathResolver.getInstance().resolveTemplateFiles(
+                                xmlFile.getProject(),
+                                templatePath
+                        ));
+                    }
+                }
+            }
+        }
+    }
+
     private @Nullable String getLayoutXmlComponentPath(
             final @NotNull XmlTag tag,
             final @NotNull String displayArea
@@ -295,6 +388,43 @@ public class KnockoutRegionResolver {
         }
 
         return getDirectChildItemValue(parent, "component");
+    }
+
+    private boolean isDisplayAreaTag(final @NotNull XmlTag tag, final @NotNull String displayArea) {
+        return displayArea.equals(tag.getAttributeValue("displayArea"))
+                || (isNamedItem(tag, "displayArea") && displayArea.equals(getTagValue(tag)));
+    }
+
+    private @Nullable XmlTag getComponentNodeTag(final @NotNull XmlTag displayAreaTag) {
+        if (displayAreaTag.getAttributeValue("displayArea") != null) {
+            return displayAreaTag;
+        }
+
+        return displayAreaTag.getParentTag();
+    }
+
+    private @Nullable String getLayoutXmlTemplatePath(final @NotNull XmlTag componentTag) {
+        final String directTemplate = getDirectChildItemValue(componentTag, "template");
+
+        if (directTemplate != null) {
+            return directTemplate;
+        }
+        final XmlTag configTag = getDirectChildItem(componentTag, "config");
+
+        return configTag == null ? null : getDirectChildItemValue(configTag, "template");
+    }
+
+    private @Nullable XmlTag getDirectChildItem(
+            final @NotNull XmlTag parent,
+            final @NotNull String itemName
+    ) {
+        for (final XmlTag child : parent.getSubTags()) {
+            if (isNamedItem(child, itemName)) {
+                return child;
+            }
+        }
+
+        return null;
     }
 
     private @Nullable String getDirectChildItemValue(
