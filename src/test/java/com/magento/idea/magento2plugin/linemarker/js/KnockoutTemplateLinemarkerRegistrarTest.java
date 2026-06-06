@@ -9,6 +9,9 @@ import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.magento.idea.magento2plugin.linemarker.LinemarkerFixtureTestCase;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class KnockoutTemplateLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
     /**
@@ -35,6 +38,86 @@ public class KnockoutTemplateLinemarkerRegistrarTest extends LinemarkerFixtureTe
         assertLinemarkerCountWithTooltip("Navigate to Knockout component", 1);
         assertHasLinemarkerWithTooltipAndIcon("Navigate to Knockout component", "");
         assertProviderHasLinemarker("Navigate to Knockout component");
+    }
+
+    /**
+     * Knockout templates should navigate back to JS components declared together with templates in layout XML.
+     */
+    public void testTemplateShouldHaveComponentFromLayoutXmlLinemarker() {
+        myFixture.addFileToProject(
+                "app/code/Foo/Bar/view/frontend/web/js/xml-template-component.js",
+                "define(['uiComponent'], function (Component) {\n"
+                        + "    'use strict';\n"
+                        + "    return Component.extend({});\n"
+                        + "});"
+        );
+        myFixture.addFileToProject(
+                "app/code/Foo/Bar/view/frontend/web/template/xml-template-child.html",
+                "<span>xml template child</span>"
+        );
+        addLayoutXmlRegion(
+                "xmlTemplateRegion",
+                "Foo_Bar/js/xml-template-component",
+                "Foo_Bar/template/xml-template-child"
+        );
+        myFixture.configureFromTempProjectFile(
+                "app/code/Foo/Bar/view/frontend/web/template/xml-template-child.html"
+        );
+
+        assertLinemarkerCountWithTooltip("Navigate to Knockout component", 1);
+    }
+
+    /**
+     * Knockout templates should navigate back to JS components declared together with templates in PHP jsLayout.
+     */
+    public void testTemplateShouldHaveComponentFromPhpLayoutLinemarker() {
+        myFixture.addFileToProject(
+                "app/code/Foo/Bar/view/frontend/web/js/php-template-component.js",
+                "define(['uiComponent'], function (Component) {\n"
+                        + "    'use strict';\n"
+                        + "    return Component.extend({});\n"
+                        + "});"
+        );
+        myFixture.addFileToProject(
+                "app/code/Foo/Bar/view/frontend/web/template/php-template-child.html",
+                "<span>php template child</span>"
+        );
+        addPhpLayoutRegion(
+                "phpTemplateRegion",
+                "Foo_Bar/js/php-template-component",
+                "Foo_Bar/template/php-template-child"
+        );
+        myFixture.configureFromTempProjectFile(
+                "app/code/Foo/Bar/view/frontend/web/template/php-template-child.html"
+        );
+
+        assertLinemarkerCountWithTooltip("Navigate to Knockout component", 1);
+    }
+
+    /**
+     * Template files should compute RequireJS aliases from app/code paths even if the module index is missing.
+     */
+    public void testTemplateShouldHaveComponentLinemarkerFromPathFallback() {
+        myFixture.addFileToProject(
+                "app/code/No/Index/view/frontend/web/js/path-fallback-component.js",
+                "define(['uiComponent'], function (Component) {\n"
+                        + "    'use strict';\n"
+                        + "    return Component.extend({\n"
+                        + "        defaults: {\n"
+                        + "            template: 'No_Index/path-fallback-template'\n"
+                        + "        }\n"
+                        + "    });\n"
+                        + "});"
+        );
+        myFixture.addFileToProject(
+                "app/code/No/Index/view/frontend/web/template/path-fallback-template.html",
+                "<span>path fallback template</span>"
+        );
+        myFixture.configureFromTempProjectFile(
+                "app/code/No/Index/view/frontend/web/template/path-fallback-template.html"
+        );
+
+        assertLinemarkerCountWithTooltip("Navigate to Knockout component", 1);
     }
 
     /**
@@ -104,6 +187,28 @@ public class KnockoutTemplateLinemarkerRegistrarTest extends LinemarkerFixtureTe
     }
 
     /**
+     * Parent Knockout template regions should navigate to child templates declared directly in PHP jsLayout.
+     */
+    public void testParentTemplateShouldHaveChildTemplateFromPhpLayoutConfigLinemarker() {
+        myFixture.addFileToProject(
+                "app/code/Foo/Bar/view/frontend/web/template/php-config-child.html",
+                "<span>php config child</span>"
+        );
+        addPhpLayoutRegion(
+                "phpConfigRegion",
+                "uiComponent",
+                "Foo_Bar/template/php-config-child"
+        );
+        myFixture.configureByText(
+                "php-layout-parent.html",
+                "<!-- ko foreach: getRegion('phpConfigRegion') -->\n"
+                        + "<!-- /ko -->"
+        );
+
+        assertLinemarkerCountWithTooltip("Navigate to child Knockout templates", 1);
+    }
+
+    /**
      * Child component display areas should navigate back to parent templates.
      */
     public void testDisplayAreaShouldHaveParentTemplateLinemarker() {
@@ -114,6 +219,88 @@ public class KnockoutTemplateLinemarkerRegistrarTest extends LinemarkerFixtureTe
         assertHasLinemarkerWithTooltipAndIcon("Navigate to region templates", "");
     }
 
+    /**
+     * Layout XML display areas should navigate back to parent templates.
+     */
+    public void testXmlDisplayAreaShouldHaveParentTemplateLinemarker() {
+        myFixture.addFileToProject(
+                "app/code/Foo/Bar/view/frontend/web/template/xml-display-parent.html",
+                "<!-- ko foreach: getRegion('xmlDisplayRegion') -->\n"
+                        + "<!-- /ko -->"
+        );
+        addLayoutXmlRegion(
+                "xmlDisplayRegion",
+                "uiComponent",
+                null
+        );
+        myFixture.configureFromTempProjectFile(
+                "app/code/Foo/Bar/view/frontend/layout/checkout_index_index.xml"
+        );
+
+        assertHasLinemarkerWithTooltipAndIcon("Navigate to region templates", "");
+    }
+
+    /**
+     * PHP jsLayout display areas should navigate back to parent templates.
+     */
+    public void testPhpDisplayAreaShouldHaveParentTemplateLinemarker() {
+        myFixture.addFileToProject(
+                "app/code/Foo/Bar/view/frontend/web/template/php-display-parent.html",
+                "<!-- ko foreach: getRegion('phpDisplayRegion') -->\n"
+                        + "<!-- /ko -->"
+        );
+        addPhpLayoutRegion(
+                "phpDisplayRegion",
+                "uiComponent",
+                null
+        );
+        myFixture.configureFromTempProjectFile(
+                "app/code/Foo/Bar/Block/PhpLayoutProvider.php"
+        );
+
+        assertProviderCollectsSlowLinemarker("Navigate to region templates");
+    }
+
+    /**
+     * Layout XML template declarations should navigate to Knockout template files.
+     */
+    public void testXmlTemplateDeclarationShouldHaveTemplateLinemarker() {
+        myFixture.addFileToProject(
+                "app/code/Foo/Bar/view/frontend/web/template/xml-declared-template.html",
+                "<span>xml declared template</span>"
+        );
+        addLayoutXmlRegion(
+                "xmlDeclaredTemplateRegion",
+                "uiComponent",
+                "Foo_Bar/template/xml-declared-template"
+        );
+        myFixture.configureFromTempProjectFile(
+                "app/code/Foo/Bar/view/frontend/layout/checkout_index_index.xml"
+        );
+
+        assertHasLinemarkerWithTooltipAndIcon("Navigate to Knockout template", "");
+    }
+
+    /**
+     * PHP jsLayout template declarations should navigate to Knockout template files.
+     */
+    public void testPhpTemplateDeclarationShouldHaveTemplateLinemarker() {
+        myFixture.addFileToProject(
+                "app/code/Foo/Bar/view/frontend/web/template/php-declared-template.html",
+                "<span>php declared template</span>"
+        );
+        addPhpLayoutRegion(
+                "phpDeclaredTemplateRegion",
+                "uiComponent",
+                "Foo_Bar/template/php-declared-template"
+        );
+        myFixture.configureFromTempProjectFile(
+                "app/code/Foo/Bar/Block/PhpLayoutProvider.php"
+        );
+
+        assertProviderCollectsSlowLinemarker("Navigate to Knockout template");
+    }
+
     private void assertProviderHasLinemarker(final String tooltip) {
         final PsiElement anchor = PsiTreeUtil.getDeepestFirst(myFixture.getFile());
         final LineMarkerInfo<?> lineMarker = new KnockoutTemplateLineMarkerProvider()
@@ -121,6 +308,22 @@ public class KnockoutTemplateLinemarkerRegistrarTest extends LinemarkerFixtureTe
 
         assertNotNull("No line marker returned by provider", lineMarker);
         assertEquals(tooltip, lineMarker.getLineMarkerTooltip());
+    }
+
+    private void assertProviderCollectsSlowLinemarker(final String tooltip) {
+        final List<LineMarkerInfo<?>> lineMarkers = new ArrayList<>();
+
+        new KnockoutTemplateLineMarkerProvider().collectSlowLineMarkers(
+                Arrays.asList(PsiTreeUtil.collectElements(myFixture.getFile(), ignored -> true)),
+                lineMarkers
+        );
+
+        for (final LineMarkerInfo<?> lineMarker : lineMarkers) {
+            if (tooltip.equals(lineMarker.getLineMarkerTooltip())) {
+                return;
+            }
+        }
+        fail("No slow line marker with tooltip `" + tooltip + "` found");
     }
 
     private void addLayoutXmlRegion(
@@ -162,5 +365,35 @@ public class KnockoutTemplateLinemarkerRegistrarTest extends LinemarkerFixtureTe
                 + "                                <item name=\"template\" xsi:type=\"string\">"
                 + template + "</item>\n"
                 + "                            </item>\n";
+    }
+
+    private void addPhpLayoutRegion(
+            final String displayArea,
+            final String component,
+            final String template
+    ) {
+        myFixture.addFileToProject(
+                "app/code/Foo/Bar/Block/PhpLayoutProvider.php",
+                "<?php\n"
+                        + "$jsLayout = [\n"
+                        + "    'components' => [\n"
+                        + "        'child' => [\n"
+                        + "            'component' => '" + component + "',\n"
+                        + "            'displayArea' => '" + displayArea + "'"
+                        + getTemplatePhp(template)
+                        + "\n"
+                        + "        ],\n"
+                        + "    ],\n"
+                        + "];\n"
+        );
+    }
+
+    private String getTemplatePhp(final String template) {
+        if (template == null) {
+            return "";
+        }
+
+        return ",\n"
+                + "            'template' => '" + template + "'";
     }
 }

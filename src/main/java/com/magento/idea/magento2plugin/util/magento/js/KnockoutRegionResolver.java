@@ -16,6 +16,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -37,6 +38,12 @@ public class KnockoutRegionResolver {
     private static final Pattern GET_REGION_PATTERN = Pattern.compile(
             "getRegion\\s*\\(\\s*(['\\\"])([^'\\\"]+)\\1\\s*\\)"
     );
+    private static final Pattern PHP_LAYOUT_PAIR_PATTERN = Pattern.compile(
+            "(['\\\"])(component|displayArea|template)\\1\\s*=>\\s*(['\\\"])([^'\\\"]+)\\3"
+    );
+    private static final String COMPONENT_KEY = "component";
+    private static final String DISPLAY_AREA_KEY = "displayArea";
+    private static final String TEMPLATE_KEY = "template";
     private static KnockoutRegionResolver INSTANCE;
 
     private KnockoutRegionResolver() {
@@ -104,6 +111,7 @@ public class KnockoutRegionResolver {
         }
         addDisplayAreaComponentFilesFromMagentoVfs(project, displayArea, results);
         addDisplayAreaComponentFilesFromLayoutXml(project, displayArea, results);
+        addDisplayAreaComponentFilesFromLayoutDeclarations(project, displayArea, results);
         NavigationInstrumentation.infoOnce(
                 "ko-region-resolve-display-area-result-" + displayArea,
                 () -> "Resolved displayArea components for '" + displayArea
@@ -154,11 +162,54 @@ public class KnockoutRegionResolver {
         final Set<PsiElement> results = new LinkedHashSet<>();
 
         addDisplayAreaTemplateFilesFromLayoutXml(project, displayArea, results);
+        addDisplayAreaTemplateFilesFromLayoutDeclarations(project, displayArea, results);
         NavigationInstrumentation.info(
                 "Resolved displayArea templates for '" + displayArea + "' targets=" + results.size()
         );
 
         return new ArrayList<>(results);
+    }
+
+    public @NotNull List<LayoutComponentDeclaration> collectLayoutComponentDeclarations(
+            final @NotNull Project project
+    ) {
+        final List<LayoutComponentDeclaration> results = new ArrayList<>();
+        final PsiManager psiManager = PsiManager.getInstance(project);
+        final Set<VirtualFile> files = new LinkedHashSet<>(FileTypeIndex.getFiles(
+                XmlFileType.INSTANCE,
+                GlobalSearchScope.allScope(project)
+        ));
+        files.addAll(FilenameIndex.getAllFilesByExt(project, "php"));
+        files.addAll(MagentoVfsUtil.findMagentoFiles(
+                project,
+                virtualFile -> "xml".equals(virtualFile.getExtension())
+                        || "php".equals(virtualFile.getExtension())
+        ));
+
+        for (final VirtualFile file : files) {
+            final PsiFile psiFile = psiManager.findFile(file);
+
+            if (psiFile != null) {
+                results.addAll(collectLayoutComponentDeclarations(psiFile));
+            }
+        }
+
+        return deduplicateDeclarations(results);
+    }
+
+    public @NotNull List<LayoutComponentDeclaration> collectLayoutComponentDeclarations(
+            final @NotNull PsiFile psiFile
+    ) {
+        final VirtualFile virtualFile = psiFile.getVirtualFile();
+
+        if (psiFile instanceof XmlFile) {
+            return collectXmlLayoutComponentDeclarations((XmlFile) psiFile);
+        }
+        if (virtualFile != null && "php".equals(virtualFile.getExtension())) {
+            return collectPhpLayoutComponentDeclarations(psiFile);
+        }
+
+        return new ArrayList<>();
     }
 
     private void addDisplayAreaComponentFilesFromMagentoVfs(
@@ -188,6 +239,40 @@ public class KnockoutRegionResolver {
                         + "' scannedJsFiles=" + finalScannedFiles
                         + " totalTargets=" + results.size()
         );
+    }
+
+    private void addDisplayAreaComponentFilesFromLayoutDeclarations(
+            final @NotNull Project project,
+            final @NotNull String displayArea,
+            final @NotNull Collection<PsiElement> results
+    ) {
+        for (final LayoutComponentDeclaration declaration : collectLayoutComponentDeclarations(project)) {
+            if (!displayArea.equals(declaration.getDisplayArea())
+                    || declaration.getComponentPath() == null
+                    || "uiComponent".equals(declaration.getComponentPath())) {
+                continue;
+            }
+            results.addAll(RequireJsPathResolver.getInstance().resolveJsFiles(
+                    project,
+                    declaration.getComponentPath()
+            ));
+        }
+    }
+
+    private void addDisplayAreaTemplateFilesFromLayoutDeclarations(
+            final @NotNull Project project,
+            final @NotNull String displayArea,
+            final @NotNull Collection<PsiElement> results
+    ) {
+        for (final LayoutComponentDeclaration declaration : collectLayoutComponentDeclarations(project)) {
+            if (!displayArea.equals(declaration.getDisplayArea()) || declaration.getTemplatePath() == null) {
+                continue;
+            }
+            results.addAll(KnockoutTemplatePathResolver.getInstance().resolveTemplateFiles(
+                    project,
+                    declaration.getTemplatePath()
+            ));
+        }
     }
 
     private void addDisplayAreaComponentFilesFromLayoutXml(
@@ -370,6 +455,181 @@ public class KnockoutRegionResolver {
         }
     }
 
+    private @NotNull List<LayoutComponentDeclaration> collectXmlLayoutComponentDeclarations(
+            final @NotNull XmlFile xmlFile
+    ) {
+        final List<LayoutComponentDeclaration> results = new ArrayList<>();
+        final Collection<XmlTag> tags = PsiTreeUtil.findChildrenOfType(xmlFile, XmlTag.class);
+
+        for (final XmlTag tag : tags) {
+            final String componentPath = getXmlValue(tag, COMPONENT_KEY);
+            final String displayArea = getXmlValue(tag, DISPLAY_AREA_KEY);
+            final String templatePath = getLayoutXmlTemplatePath(tag);
+
+            if (componentPath == null && displayArea == null && templatePath == null) {
+                continue;
+            }
+            results.add(new LayoutComponentDeclaration(
+                    xmlFile,
+                    componentPath,
+                    templatePath,
+                    displayArea,
+                    getXmlValueOffset(tag, TEMPLATE_KEY),
+                    getXmlValueOffset(tag, DISPLAY_AREA_KEY)
+            ));
+        }
+
+        return deduplicateDeclarations(results);
+    }
+
+    private @NotNull List<LayoutComponentDeclaration> collectPhpLayoutComponentDeclarations(
+            final @NotNull PsiFile psiFile
+    ) {
+        final List<LayoutComponentDeclaration> results = new ArrayList<>();
+        final String text = psiFile.getText();
+        final Matcher matcher = PHP_LAYOUT_PAIR_PATTERN.matcher(text);
+        final Set<String> processedRanges = new LinkedHashSet<>();
+
+        while (matcher.find()) {
+            final ContainerRange range = findPhpArrayContainerRange(text, matcher.start());
+
+            if (range == null || !processedRanges.add(range.getStart() + ":" + range.getEnd())) {
+                continue;
+            }
+            final LayoutComponentDeclaration declaration = createPhpLayoutComponentDeclaration(
+                    psiFile,
+                    text.substring(range.getStart(), range.getEnd()),
+                    range.getStart()
+            );
+
+            if (declaration != null) {
+                results.add(declaration);
+            }
+        }
+
+        return deduplicateDeclarations(results);
+    }
+
+    private @Nullable LayoutComponentDeclaration createPhpLayoutComponentDeclaration(
+            final @NotNull PsiFile psiFile,
+            final @NotNull String containerText,
+            final int containerStartOffset
+    ) {
+        String componentPath = null;
+        String displayArea = null;
+        String templatePath = null;
+        int displayAreaOffset = -1;
+        int templateOffset = -1;
+        final Matcher matcher = PHP_LAYOUT_PAIR_PATTERN.matcher(containerText);
+
+        while (matcher.find()) {
+            final String key = matcher.group(2);
+            final String value = matcher.group(4);
+            final int valueOffset = containerStartOffset + matcher.start(4);
+
+            if (COMPONENT_KEY.equals(key)) {
+                componentPath = value;
+            } else if (DISPLAY_AREA_KEY.equals(key)) {
+                displayArea = value;
+                displayAreaOffset = valueOffset;
+            } else if (TEMPLATE_KEY.equals(key)) {
+                templatePath = value;
+                templateOffset = valueOffset;
+            }
+        }
+
+        if (componentPath == null && displayArea == null && templatePath == null) {
+            return null;
+        }
+
+        return new LayoutComponentDeclaration(
+                psiFile,
+                componentPath,
+                templatePath,
+                displayArea,
+                templateOffset,
+                displayAreaOffset
+        );
+    }
+
+    private @Nullable ContainerRange findPhpArrayContainerRange(
+            final @NotNull String text,
+            final int offset
+    ) {
+        final int start = findPhpArrayContainerStart(text, offset);
+
+        if (start < 0) {
+            return null;
+        }
+        final int end = findPhpArrayContainerEnd(text, start);
+
+        if (end <= start) {
+            return null;
+        }
+
+        return new ContainerRange(start, end);
+    }
+
+    private int findPhpArrayContainerStart(final @NotNull String text, final int offset) {
+        int depth = 0;
+
+        for (int i = Math.min(offset, text.length() - 1); i >= 0; i--) {
+            final char currentChar = text.charAt(i);
+
+            if (currentChar == ')' || currentChar == ']') {
+                depth++;
+            } else if (currentChar == '(' || currentChar == '[') {
+                if (depth == 0) {
+                    return i;
+                }
+                depth--;
+            }
+        }
+
+        return -1;
+    }
+
+    private int findPhpArrayContainerEnd(final @NotNull String text, final int start) {
+        int depth = 0;
+
+        for (int i = start; i < text.length(); i++) {
+            final char currentChar = text.charAt(i);
+
+            if (currentChar == '(' || currentChar == '[') {
+                depth++;
+            } else if (currentChar == ')' || currentChar == ']') {
+                depth--;
+                if (depth == 0) {
+                    return i + 1;
+                }
+            }
+        }
+
+        return text.length();
+    }
+
+    private @NotNull List<LayoutComponentDeclaration> deduplicateDeclarations(
+            final @NotNull List<LayoutComponentDeclaration> declarations
+    ) {
+        final List<LayoutComponentDeclaration> results = new ArrayList<>();
+        final Set<String> keys = new LinkedHashSet<>();
+
+        for (final LayoutComponentDeclaration declaration : declarations) {
+            final String key = declaration.getSourceFile().getVirtualFile() + "|"
+                    + declaration.getComponentPath() + "|"
+                    + declaration.getTemplatePath() + "|"
+                    + declaration.getDisplayArea() + "|"
+                    + declaration.getTemplateOffset() + "|"
+                    + declaration.getDisplayAreaOffset();
+
+            if (keys.add(key)) {
+                results.add(declaration);
+            }
+        }
+
+        return results;
+    }
+
     private @Nullable String getLayoutXmlComponentPath(
             final @NotNull XmlTag tag,
             final @NotNull String displayArea
@@ -388,6 +648,35 @@ public class KnockoutRegionResolver {
         }
 
         return getDirectChildItemValue(parent, "component");
+    }
+
+    private @Nullable String getXmlValue(
+            final @NotNull XmlTag tag,
+            final @NotNull String key
+    ) {
+        final String attributeValue = tag.getAttributeValue(key);
+
+        return attributeValue != null ? attributeValue : getDirectChildItemValue(tag, key);
+    }
+
+    private int getXmlValueOffset(
+            final @NotNull XmlTag tag,
+            final @NotNull String key
+    ) {
+        if (tag.getAttribute(key) != null && tag.getAttribute(key).getValueElement() != null) {
+            return tag.getAttribute(key).getValueElement().getTextRange().getStartOffset() + 1;
+        }
+        final XmlTag child = getDirectChildItem(tag, key);
+
+        if (child == null || getTagValue(child) == null) {
+            return -1;
+        }
+        final String valueText = child.getValue().getText();
+        final String trimmedValue = child.getValue().getTrimmedText();
+        final int valueStartOffset = child.getValue().getTextRange().getStartOffset();
+        final int trimOffset = valueText.indexOf(trimmedValue);
+
+        return valueStartOffset + Math.max(trimOffset, 0);
     }
 
     private boolean isDisplayAreaTag(final @NotNull XmlTag tag, final @NotNull String displayArea) {
@@ -481,6 +770,73 @@ public class KnockoutRegionResolver {
         }
 
         return value.substring(1, value.length() - 1);
+    }
+
+    private static class ContainerRange {
+        private final int start;
+        private final int end;
+
+        ContainerRange(final int start, final int end) {
+            this.start = start;
+            this.end = end;
+        }
+
+        int getStart() {
+            return start;
+        }
+
+        int getEnd() {
+            return end;
+        }
+    }
+
+    public static class LayoutComponentDeclaration {
+        private final PsiFile sourceFile;
+        private final String componentPath;
+        private final String templatePath;
+        private final String displayArea;
+        private final int templateOffset;
+        private final int displayAreaOffset;
+
+        LayoutComponentDeclaration(
+                final @NotNull PsiFile sourceFile,
+                final @Nullable String componentPath,
+                final @Nullable String templatePath,
+                final @Nullable String displayArea,
+                final int templateOffset,
+                final int displayAreaOffset
+        ) {
+            this.sourceFile = sourceFile;
+            this.componentPath = componentPath;
+            this.templatePath = templatePath;
+            this.displayArea = displayArea;
+            this.templateOffset = templateOffset;
+            this.displayAreaOffset = displayAreaOffset;
+        }
+
+        public @NotNull PsiFile getSourceFile() {
+            return sourceFile;
+        }
+
+        public @Nullable String getComponentPath() {
+            return componentPath;
+        }
+
+        public @Nullable String getTemplatePath() {
+            return templatePath;
+        }
+
+        public @Nullable String getDisplayArea() {
+            return displayArea;
+        }
+
+        public int getTemplateOffset() {
+            return templateOffset;
+        }
+
+        public int getDisplayAreaOffset() {
+            return displayAreaOffset;
+        }
     }
 
     public static class RegionMatch {

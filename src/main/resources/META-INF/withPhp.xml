@@ -197,6 +197,7 @@
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.WebApiLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.TestFixtureLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.BlockTemplateLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.js.KnockoutTemplateLineMarkerProvider"/>
 
         <localInspection language="PHP" groupPath="PHP"
                          shortName="PluginInspection"

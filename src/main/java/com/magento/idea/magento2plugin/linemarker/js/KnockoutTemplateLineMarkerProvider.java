@@ -28,6 +28,7 @@ import com.magento.idea.magento2plugin.stubs.indexes.js.KnockoutTemplateIndex;
 import com.magento.idea.magento2plugin.util.magento.MagentoVfsUtil;
 import com.magento.idea.magento2plugin.util.magento.js.KnockoutRegionResolver;
 import com.magento.idea.magento2plugin.util.magento.js.KnockoutTemplatePathResolver;
+import com.magento.idea.magento2plugin.util.magento.js.RequireJsPathResolver;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -112,7 +113,84 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
             addDisplayAreaLineMarkers((JSFile) psiFile, collection);
             return;
         }
-        addGetRegionLineMarkers(psiFile, collection);
+        final VirtualFile virtualFile = psiFile.getVirtualFile();
+
+        if (virtualFile != null && "html".equals(virtualFile.getExtension())) {
+            addGetRegionLineMarkers(psiFile, collection);
+            return;
+        }
+        addLayoutDeclarationLineMarkers(psiFile, collection);
+    }
+
+    private void addLayoutDeclarationLineMarkers(
+            final @NotNull PsiFile psiFile,
+            final @NotNull Collection<? super LineMarkerInfo<?>> collection
+    ) {
+        for (final KnockoutRegionResolver.LayoutComponentDeclaration declaration
+                : KnockoutRegionResolver.getInstance().collectLayoutComponentDeclarations(psiFile)) {
+            addLayoutTemplateLineMarker(declaration, collection);
+            addLayoutDisplayAreaLineMarker(declaration, collection);
+        }
+    }
+
+    private void addLayoutTemplateLineMarker(
+            final @NotNull KnockoutRegionResolver.LayoutComponentDeclaration declaration,
+            final @NotNull Collection<? super LineMarkerInfo<?>> collection
+    ) {
+        if (declaration.getTemplatePath() == null || declaration.getTemplateOffset() < 0) {
+            return;
+        }
+        final List<PsiElement> targets = KnockoutTemplatePathResolver.getInstance().resolveTemplateFiles(
+                declaration.getSourceFile().getProject(),
+                declaration.getTemplatePath()
+        );
+
+        if (targets.isEmpty()) {
+            return;
+        }
+        final PsiElement anchor = declaration.getSourceFile().findElementAt(declaration.getTemplateOffset());
+
+        if (anchor == null) {
+            return;
+        }
+        collection.add(NavigationGutterIconBuilder
+                .create(HtmlFileType.INSTANCE.getIcon())
+                .setTargets(LineMarkerTargetPresentationUtil.prepareTargets(targets))
+                .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
+                .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
+                .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
+                .setTooltipText(TEMPLATE_TOOLTIP_TEXT)
+                .createLineMarkerInfo(anchor));
+    }
+
+    private void addLayoutDisplayAreaLineMarker(
+            final @NotNull KnockoutRegionResolver.LayoutComponentDeclaration declaration,
+            final @NotNull Collection<? super LineMarkerInfo<?>> collection
+    ) {
+        if (declaration.getDisplayArea() == null || declaration.getDisplayAreaOffset() < 0) {
+            return;
+        }
+        final List<PsiElement> targets = KnockoutRegionResolver.getInstance().resolveGetRegionTemplateFiles(
+                declaration.getSourceFile().getProject(),
+                declaration.getDisplayArea()
+        );
+
+        if (targets.isEmpty()) {
+            return;
+        }
+        final PsiElement anchor = declaration.getSourceFile().findElementAt(declaration.getDisplayAreaOffset());
+
+        if (anchor == null) {
+            return;
+        }
+        collection.add(NavigationGutterIconBuilder
+                .create(HtmlFileType.INSTANCE.getIcon())
+                .setTargets(LineMarkerTargetPresentationUtil.prepareTargets(targets))
+                .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
+                .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
+                .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
+                .setTooltipText(REGION_TEMPLATE_TOOLTIP_TEXT)
+                .createLineMarkerInfo(anchor));
     }
 
     private void addGetRegionLineMarkers(
@@ -286,6 +364,11 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
                     .setTooltipText(TEMPLATE_TOOLTIP_TEXT)
                     .createLineMarkerInfo(anchor);
         }
+        final VirtualFile virtualFile = psiFile.getVirtualFile();
+
+        if (virtualFile == null || !"html".equals(virtualFile.getExtension())) {
+            return null;
+        }
         final List<PsiElement> components = collectComponents(psiFile);
 
         if (components.isEmpty()) {
@@ -351,6 +434,8 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
             }
         }
         addComponentsFromMagentoVfs(project, results, KnockoutTemplatePathResolver.getInstance()
+                .getTemplateRequireJsPaths(psiFile));
+        addComponentsFromLayoutDeclarations(project, results, KnockoutTemplatePathResolver.getInstance()
                 .getTemplateRequireJsPaths(psiFile));
         NavigationInstrumentation.infoOnce(
                 "ko-component-linemarker-collected-" + NavigationInstrumentation.describeFile(psiFile),
@@ -420,11 +505,41 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
         );
     }
 
+    private void addComponentsFromLayoutDeclarations(
+            final @NotNull Project project,
+            final @NotNull Collection<PsiElement> results,
+            final @NotNull Set<String> templatePaths
+    ) {
+        if (templatePaths.isEmpty()) {
+            return;
+        }
+        for (final KnockoutRegionResolver.LayoutComponentDeclaration declaration
+                : KnockoutRegionResolver.getInstance().collectLayoutComponentDeclarations(project)) {
+            final String templatePath = KnockoutTemplatePathResolver.getInstance()
+                    .normalizeTemplatePath(declaration.getTemplatePath());
+
+            if (templatePath == null
+                    || !templatePaths.contains(templatePath)
+                    || declaration.getComponentPath() == null
+                    || "uiComponent".equals(declaration.getComponentPath())) {
+                continue;
+            }
+            results.addAll(RequireJsPathResolver.getInstance().resolveJsFiles(
+                    project,
+                    declaration.getComponentPath()
+            ));
+        }
+    }
+
     private boolean isSupportedFile(final @NotNull PsiFile psiFile) {
         final VirtualFile virtualFile = psiFile.getVirtualFile();
 
         return psiFile instanceof JSFile
-                || (virtualFile != null && "html".equals(virtualFile.getExtension()));
+                || (virtualFile != null && (
+                        "html".equals(virtualFile.getExtension())
+                                || "xml".equals(virtualFile.getExtension())
+                                || "php".equals(virtualFile.getExtension())
+                ));
     }
 
     private @NotNull List<PsiElement> prepareFileTargets(final @NotNull List<PsiElement> targets) {

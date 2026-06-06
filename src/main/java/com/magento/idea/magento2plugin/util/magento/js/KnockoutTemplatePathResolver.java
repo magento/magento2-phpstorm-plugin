@@ -196,14 +196,15 @@ public class KnockoutTemplatePathResolver {
                     if (!filePath.startsWith(webRoot)) {
                         continue;
                     }
-                    final String relativePath = stripHtmlExtension(filePath.substring(webRoot.length()));
-
-                    result.add(moduleName + "/" + relativePath);
-                    addDirectoryAlias(result, moduleName, relativePath, TEMPLATE_DIRECTORY);
-                    addDirectoryAlias(result, moduleName, relativePath, TEMPLATES_DIRECTORY);
+                    addTemplateRequireJsPathAliases(
+                            result,
+                            moduleName,
+                            stripHtmlExtension(filePath.substring(webRoot.length()))
+                    );
                 }
             }
         }
+        addTemplateRequireJsPathsFromFilePath(result, filePath);
         NavigationInstrumentation.infoOnce(
                 "ko-template-requirejs-paths-result-" + filePath,
                 () -> "Computed Knockout template RequireJS paths for "
@@ -212,6 +213,47 @@ public class KnockoutTemplatePathResolver {
         );
 
         return result;
+    }
+
+    private void addTemplateRequireJsPathsFromFilePath(
+            final @NotNull Set<String> result,
+            final @NotNull String filePath
+    ) {
+        final String appCodeMarker = "/app/code/";
+        final int appCodeIndex = filePath.indexOf(appCodeMarker);
+
+        if (appCodeIndex < 0) {
+            return;
+        }
+        final String moduleRelativePath = filePath.substring(appCodeIndex + appCodeMarker.length());
+        final String[] pathParts = moduleRelativePath.split("/");
+
+        if (pathParts.length < 7 || !"view".equals(pathParts[2]) || !"web".equals(pathParts[4])) {
+            return;
+        }
+        final String moduleName = pathParts[0] + "_" + pathParts[1];
+        final String webRoot = appCodeMarker + pathParts[0] + "/" + pathParts[1] + "/view/"
+                + pathParts[3] + "/web/";
+        final int webRootIndex = filePath.indexOf(webRoot);
+
+        if (webRootIndex < 0) {
+            return;
+        }
+        addTemplateRequireJsPathAliases(
+                result,
+                moduleName,
+                stripHtmlExtension(filePath.substring(webRootIndex + webRoot.length()))
+        );
+    }
+
+    private void addTemplateRequireJsPathAliases(
+            final @NotNull Set<String> result,
+            final @NotNull String moduleName,
+            final @NotNull String relativePath
+    ) {
+        result.add(moduleName + "/" + relativePath);
+        addDirectoryAlias(result, moduleName, relativePath, TEMPLATE_DIRECTORY);
+        addDirectoryAlias(result, moduleName, relativePath, TEMPLATES_DIRECTORY);
     }
 
     private void addDirectoryAlias(
