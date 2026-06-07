@@ -16,7 +16,7 @@ public class JsMixinLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
                 "app/code/Foo/Bar/view/frontend/web/js/file.js"
         );
 
-        assertLinemarkerCountWithTooltip("<html>Navigate to JS mixins</html>", 1);
+        assertLinemarkerCountWithTooltip("Navigate to JS mixins", 1);
         assertFirstAnchorLinemarkerCount(1);
     }
 
@@ -28,10 +28,10 @@ public class JsMixinLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
                 "app/code/Foo/Bar/view/frontend/web/js/file-mixin.js"
         );
 
-        assertLinemarkerCountWithTooltip("<html>Navigate to target JS</html>", 1);
+        assertLinemarkerCountWithTooltip("Navigate to target JS", 1);
         assertFirstAnchorLinemarkerCount(0);
         assertLinemarkerCountAtText("define", 1);
-        assertNoMergeableLinemarkersWithTooltip("<html>Navigate to target JS</html>");
+        assertNoMergeableLinemarkersWithTooltip("Navigate to target JS");
     }
 
     /**
@@ -42,9 +42,9 @@ public class JsMixinLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
                 "app/code/Foo/Bar/view/frontend/web/js/file.js"
         );
 
-        assertHasLinemarkerWithTooltipAndIcon("<html>Navigate to JS mixin override</html>", "");
+        assertHasLinemarkerWithTooltipAndIcon("Navigate to JS mixin override", "");
         assertFirstAnchorLinemarkerCount(1);
-        assertNoMergeableLinemarkersWithTooltip("<html>Navigate to JS mixin override</html>");
+        assertNoMergeableLinemarkersWithTooltip("Navigate to JS mixin override");
     }
 
     /**
@@ -55,8 +55,8 @@ public class JsMixinLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
                 "app/code/Foo/Bar/view/frontend/web/js/file-mixin.js"
         );
 
-        assertHasLinemarkerWithTooltipAndIcon("<html>Navigate to target method</html>", "");
-        assertNoMergeableLinemarkersWithTooltip("<html>Navigate to target method</html>");
+        assertHasLinemarkerWithTooltipAndIcon("Navigate to target method", "");
+        assertNoMergeableLinemarkersWithTooltip("Navigate to target method");
     }
 
     /**
@@ -67,7 +67,7 @@ public class JsMixinLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
                 "app/code/Foo/Bar/view/frontend/web/js/object-mixin.js"
         );
 
-        assertHasLinemarkerWithTooltipAndIcon("<html>Navigate to target method</html>", "");
+        assertHasLinemarkerWithTooltipAndIcon("Navigate to target method", "");
     }
 
     /**
@@ -78,7 +78,7 @@ public class JsMixinLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
                 "app/code/Foo/Bar/view/frontend/web/js/widget-mixin.js"
         );
 
-        assertHasLinemarkerWithTooltipAndIcon("<html>Navigate to target method</html>", "");
+        assertHasLinemarkerWithTooltipAndIcon("Navigate to target method", "");
     }
 
     /**
@@ -89,7 +89,7 @@ public class JsMixinLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
                 "app/code/Foo/Bar/view/frontend/web/js/function-mixin.js"
         );
 
-        assertHasLinemarkerWithTooltipAndIcon("<html>Navigate to target method</html>", "");
+        assertHasLinemarkerWithTooltipAndIcon("Navigate to target method", "");
     }
 
     /**
@@ -100,7 +100,7 @@ public class JsMixinLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
                 "app/code/Foo/Bar/view/frontend/web/js/file2.js"
         );
 
-        assertHasLinemarkerWithTooltipAndIcon("<html>Navigate to JS mixin override</html>", "");
+        assertHasLinemarkerWithTooltipAndIcon("Navigate to JS mixin override", "");
     }
 
     /**
@@ -111,8 +111,8 @@ public class JsMixinLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
                 "app/code/Foo/Bar/view/frontend/requirejs-config.js"
         );
 
-        assertHasNoLinemarkerWithTooltipAndIcon("<html>Navigate to JS mixins</html>", "");
-        assertHasNoLinemarkerWithTooltipAndIcon("<html>Navigate to target JS</html>", "");
+        assertHasNoLinemarkerWithTooltipAndIcon("Navigate to JS mixins", "");
+        assertHasNoLinemarkerWithTooltipAndIcon("Navigate to target JS", "");
     }
 
 }
