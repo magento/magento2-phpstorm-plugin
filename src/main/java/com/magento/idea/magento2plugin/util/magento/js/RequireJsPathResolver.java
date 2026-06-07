@@ -106,6 +106,9 @@ public class RequireJsPathResolver {
                 addIfFound(project, result, moduleRootPath + "/view/" + area + "/web/" + toJsPath(relativePath));
             }
         }
+        if (result.isEmpty()) {
+            addModuleJsCandidatesByPath(project, result, moduleName, relativePath);
+        }
         NavigationInstrumentation.infoOnce(
                 "requirejs-resolve-module-" + requireJsPath,
                 () -> "Resolved RequireJS module path '" + requireJsPath
@@ -115,6 +118,21 @@ public class RequireJsPathResolver {
         );
 
         return result;
+    }
+
+    private void addModuleJsCandidatesByPath(
+            final @NotNull Project project,
+            final @NotNull Collection<VirtualFile> result,
+            final @NotNull String moduleName,
+            final @NotNull String relativePath
+    ) {
+        final String appCodeModulePath = "/app/code/" + moduleName.replace('_', '/') + "/";
+        final String vendorModulePath = "/vendor/" + toComposerPackagePath(moduleName) + "/";
+
+        for (final String area : VIEW_AREAS) {
+            addFilenameMatches(project, result, appCodeModulePath + "view/" + area + "/web/" + toJsPath(relativePath));
+            addFilenameMatches(project, result, vendorModulePath + "view/" + area + "/web/" + toJsPath(relativePath));
+        }
     }
 
     public @Nullable String getRequireJsPath(final @NotNull PsiFile psiFile) {
@@ -277,7 +295,14 @@ public class RequireJsPathResolver {
             result.add(file);
             return;
         }
+        addFilenameMatches(project, result, filePath);
+    }
 
+    private void addFilenameMatches(
+            final @NotNull Project project,
+            final @NotNull Collection<VirtualFile> result,
+            final @NotNull String filePath
+    ) {
         final String fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
         final Collection<VirtualFile> files = FilenameIndex.getVirtualFilesByName(
                 fileName,
@@ -291,8 +316,24 @@ public class RequireJsPathResolver {
         }
     }
 
+    private @NotNull String toComposerPackagePath(final @NotNull String moduleName) {
+        final String[] parts = moduleName.split("_", 2);
+        final String vendor = parts[0].toLowerCase();
+        final String packageName = parts.length > 1 ? "module-" + camelToKebab(parts[1]) : camelToKebab(parts[0]);
+
+        return vendor + "/" + packageName;
+    }
+
+    private @NotNull String camelToKebab(final @NotNull String value) {
+        return value
+                .replaceAll("([a-z0-9])([A-Z])", "$1-$2")
+                .replaceAll("([A-Z]+)([A-Z][a-z])", "$1-$2")
+                .replace('_', '-')
+                .toLowerCase();
+    }
+
     private @NotNull String normalizeRequireJsPath(final @NotNull String path) {
-        return path.replace("\"", "").replace("'", "");
+        return path.replace("\"", "").replace("'", "").trim();
     }
 
     private @NotNull String toJsPath(final @NotNull String path) {

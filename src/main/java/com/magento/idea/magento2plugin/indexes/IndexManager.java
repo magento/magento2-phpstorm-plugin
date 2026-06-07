@@ -13,6 +13,10 @@ import com.magento.idea.magento2plugin.stubs.indexes.js.JsMixinIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.js.KnockoutTemplateIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.ui.DisplayAreaIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.ui.GetRegionUsageIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.ui.UiComponentComponentDeclarationIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.ui.UiComponentTemplateDeclarationIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.ThemeXmlIndex;
 import java.lang.reflect.Field;
@@ -63,6 +67,10 @@ public class IndexManager {
                 RequireJsIndex.KEY,
                 JsMixinIndex.KEY,
                 KnockoutTemplateIndex.KEY,
+                DisplayAreaIndex.KEY,
+                GetRegionUsageIndex.KEY,
+                UiComponentComponentDeclarationIndex.KEY,
+                UiComponentTemplateDeclarationIndex.KEY,
                 MagentoLibJsIndex.KEY
         ));
         indexIds.addAll(getOptionalIndexIds());

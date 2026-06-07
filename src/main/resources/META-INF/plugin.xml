@@ -29,6 +29,7 @@
         <psi.referenceContributor language="JSON" implementation="com.magento.idea.magento2plugin.reference.json.JsonReferenceContributor"/>
         <psi.referenceContributor language="HTML" implementation="com.magento.idea.magento2plugin.reference.html.HtmlReferenceContributor"/>
         <psi.referenceContributor language="TEXT" implementation="com.magento.idea.magento2plugin.reference.text.TextReferenceContributor"/>
+        <psi.referenceContributor language="XML" implementation="com.magento.idea.magento2plugin.reference.xml.XmlJsReferenceContributor"/>
 
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ModulePackageIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex" />
@@ -36,6 +37,10 @@
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.JsMixinIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.KnockoutTemplateIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ui.DisplayAreaIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ui.GetRegionUsageIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ui.UiComponentComponentDeclarationIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ui.UiComponentTemplateDeclarationIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex" />
 
         <additionalLibraryRootsProvider implementation="com.magento.idea.magento2plugin.project.indexing.MagentoAdditionalLibraryRootsProvider"/>
@@ -43,7 +48,6 @@
         <codeInsight.lineMarkerProvider language="JavaScript" implementationClass="com.magento.idea.magento2plugin.linemarker.js.JsMixinLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="JavaScript" implementationClass="com.magento.idea.magento2plugin.linemarker.js.KnockoutTemplateLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="HTML" implementationClass="com.magento.idea.magento2plugin.linemarker.js.KnockoutTemplateLineMarkerProvider"/>
-        <codeInsight.lineMarkerProvider language="XML" implementationClass="com.magento.idea.magento2plugin.linemarker.js.KnockoutTemplateLineMarkerProvider"/>
 
         <directoryProjectConfigurator implementation="com.magento.idea.magento2plugin.project.ProjectDetector"/>
         <postStartupActivity implementation="com.magento.idea.magento2plugin.project.startup.CheckIfMagentoPathIsValidActivity"/>

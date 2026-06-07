@@ -16,6 +16,7 @@ import com.magento.idea.magento2plugin.project.diagnostic.NavigationInstrumentat
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 import com.magento.idea.magento2plugin.util.magento.js.KnockoutRegionResolver;
+import com.magento.idea.magento2plugin.util.magento.ui.UiComponentScopeResolver;
 import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -46,18 +47,23 @@ public class KnockoutRegionReferenceProvider extends PsiReferenceProvider {
             final @NotNull List<PsiReference> references
     ) {
         final JSProperty property = PsiTreeUtil.getParentOfType(element, JSProperty.class);
-        final String displayArea = KnockoutRegionResolver.getInstance().getDisplayArea(property);
+        String resolvedDisplayArea = property == null ? null : KnockoutRegionResolver.getInstance().getDisplayArea(property);
 
-        if (displayArea == null) {
+        if (resolvedDisplayArea == null) {
+            resolvedDisplayArea = UiComponentScopeResolver.getInstance().getDisplayAreaValue(element);
+        }
+
+        if (resolvedDisplayArea == null) {
             return;
         }
+        final String displayArea = resolvedDisplayArea;
         NavigationInstrumentation.infoOnce(
                 "ko-display-area-reference-seen-" + displayArea,
                 () -> "displayArea reference candidate '" + displayArea + "' in "
                         + NavigationInstrumentation.describeElement(element)
         );
-        final List<PsiElement> targets = KnockoutRegionResolver.getInstance()
-                .resolveGetRegionTemplateFiles(element.getProject(), displayArea);
+        final List<PsiElement> targets = UiComponentScopeResolver.getInstance()
+                .resolveGetRegionTargetsForDisplayArea(element, displayArea);
 
         if (targets.isEmpty()) {
             NavigationInstrumentation.infoOnce(
@@ -95,8 +101,11 @@ public class KnockoutRegionReferenceProvider extends PsiReferenceProvider {
         }
         for (final KnockoutRegionResolver.RegionMatch regionMatch
                 : KnockoutRegionResolver.getInstance().collectGetRegionMatches(referenceHost.getText())) {
-            final List<PsiElement> targets = KnockoutRegionResolver.getInstance()
-                    .resolveDisplayAreaComponentFiles(element.getProject(), regionMatch.getRegionName());
+            final List<PsiElement> targets = UiComponentScopeResolver.getInstance()
+                    .resolveDisplayAreaTargetsForGetRegion(
+                            referenceHost.getContainingFile(),
+                            regionMatch.getRegionName()
+                    );
 
             if (targets.isEmpty()) {
                 NavigationInstrumentation.infoOnce(

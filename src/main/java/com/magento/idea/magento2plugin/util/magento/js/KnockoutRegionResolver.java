@@ -38,6 +38,9 @@ public class KnockoutRegionResolver {
     private static final Pattern GET_REGION_PATTERN = Pattern.compile(
             "getRegion\\s*\\(\\s*(['\\\"])([^'\\\"]+)\\1\\s*\\)"
     );
+    private static final Pattern GET_REGION_ENTITY_QUOTE_PATTERN = Pattern.compile(
+            "getRegion\\s*\\(\\s*&(?:quot|apos|#39);([^&]+)&(?:quot|apos|#39);\\s*\\)"
+    );
     private static final Pattern PHP_LAYOUT_PAIR_PATTERN = Pattern.compile(
             "(['\\\"])(component|displayArea|template)\\1\\s*=>\\s*(['\\\"])([^'\\\"]+)\\3"
     );
@@ -79,6 +82,15 @@ public class KnockoutRegionResolver {
                     matcher.group(2),
                     matcher.start(2),
                     matcher.end(2)
+            ));
+        }
+        final Matcher entityQuoteMatcher = GET_REGION_ENTITY_QUOTE_PATTERN.matcher(text);
+
+        while (entityQuoteMatcher.find()) {
+            matches.add(new RegionMatch(
+                    entityQuoteMatcher.group(1),
+                    entityQuoteMatcher.start(1),
+                    entityQuoteMatcher.end(1)
             ));
         }
 

@@ -19,6 +19,7 @@ import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.indexing.FileBasedIndex;
@@ -435,6 +436,8 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
         }
         addComponentsFromMagentoVfs(project, results, KnockoutTemplatePathResolver.getInstance()
                 .getTemplateRequireJsPaths(psiFile));
+        addComponentsFromProjectJsFiles(project, results, KnockoutTemplatePathResolver.getInstance()
+                .getTemplateRequireJsPaths(psiFile));
         addComponentsFromLayoutDeclarations(project, results, KnockoutTemplatePathResolver.getInstance()
                 .getTemplateRequireJsPaths(psiFile));
         NavigationInstrumentation.infoOnce(
@@ -505,6 +508,37 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
         );
     }
 
+    private void addComponentsFromProjectJsFiles(
+            final @NotNull Project project,
+            final @NotNull Collection<PsiElement> results,
+            final @NotNull Set<String> templatePaths
+    ) {
+        if (templatePaths.isEmpty()) {
+            return;
+        }
+        final PsiManager psiManager = PsiManager.getInstance(project);
+
+        for (final VirtualFile file : FileTypeIndex.getFiles(
+                JavaScriptFileType.INSTANCE,
+                GlobalSearchScope.allScope(project)
+        )) {
+            final PsiFile psiFile = psiManager.findFile(file);
+
+            if (!(psiFile instanceof JSFile)) {
+                continue;
+            }
+            final Set<String> componentTemplatePaths = KnockoutTemplatePathResolver.getInstance()
+                    .collectTemplatePaths((JSFile) psiFile);
+
+            for (final String templatePath : templatePaths) {
+                if (componentTemplatePaths.contains(templatePath)) {
+                    results.add(psiFile);
+                    break;
+                }
+            }
+        }
+    }
+
     private void addComponentsFromLayoutDeclarations(
             final @NotNull Project project,
             final @NotNull Collection<PsiElement> results,
@@ -535,11 +569,7 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
         final VirtualFile virtualFile = psiFile.getVirtualFile();
 
         return psiFile instanceof JSFile
-                || (virtualFile != null && (
-                        "html".equals(virtualFile.getExtension())
-                                || "xml".equals(virtualFile.getExtension())
-                                || "php".equals(virtualFile.getExtension())
-                ));
+                || (virtualFile != null && "html".equals(virtualFile.getExtension()));
     }
 
     private @NotNull List<PsiElement> prepareFileTargets(final @NotNull List<PsiElement> targets) {

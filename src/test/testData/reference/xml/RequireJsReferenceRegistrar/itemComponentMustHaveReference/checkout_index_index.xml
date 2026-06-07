@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <body>
+        <referenceBlock name="checkout.root">
+            <arguments>
+                <argument name="jsLayout" xsi:type="array">
+                    <item name="components" xsi:type="array">
+                        <item name="checkout" xsi:type="array">
+                            <item name="children" xsi:type="array">
+                                <item name="shipping-step" xsi:type="array">
+                                    <item name="children" xsi:type="array">
+                                        <item name="shippingAddress" xsi:type="array">
+                                            <item name="children" xsi:type="array">
+                                                <item name="shipping-methods" xsi:type="array">
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="shipment" xsi:type="array">
+                                                            <item name="component" xsi:type="string">
+                                                                Foo_Bar/js/fi<caret>le
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

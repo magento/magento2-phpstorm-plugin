@@ -67,7 +67,7 @@ public class KnockoutTemplatePathResolver {
     }
 
     public @Nullable String getTemplatePath(final @Nullable JSProperty property) {
-        if (property == null || !isTemplatePropertyName(property.getName())) {
+        if (property == null || !isTemplateProperty(property)) {
             return null;
         }
         final JSExpression value = property.getValue();
@@ -77,6 +77,20 @@ public class KnockoutTemplatePathResolver {
         }
 
         return normalizeTemplatePath(value.getText());
+    }
+
+    private boolean isTemplateProperty(final @NotNull JSProperty property) {
+        if (isTemplatePropertyName(property.getName())) {
+            return true;
+        }
+        final PsiElement parent = property.getParent();
+
+        if (parent == null) {
+            return false;
+        }
+        final JSProperty parentProperty = PsiTreeUtil.getParentOfType(parent, JSProperty.class);
+
+        return parentProperty != null && "templates".equals(parentProperty.getName());
     }
 
     public boolean isTemplatePropertyName(final @Nullable String propertyName) {
@@ -161,6 +175,9 @@ public class KnockoutTemplatePathResolver {
                 addIfFound(project, result, webRoot + TEMPLATES_DIRECTORY + "/" + toHtmlPath(relativePath));
             }
         }
+        if (result.isEmpty()) {
+            addModuleTemplateCandidatesByPath(project, result, moduleName, relativePath);
+        }
         NavigationInstrumentation.infoOnce(
                 "ko-template-resolve-module-" + templatePath,
                 () -> "Resolved Knockout template path '" + templatePath
@@ -169,6 +186,51 @@ public class KnockoutTemplatePathResolver {
         );
 
         return result;
+    }
+
+    private void addModuleTemplateCandidatesByPath(
+            final @NotNull Project project,
+            final @NotNull Set<VirtualFile> result,
+            final @NotNull String moduleName,
+            final @NotNull String relativePath
+    ) {
+        final String appCodeModulePath = "/app/code/" + moduleName.replace('_', '/') + "/";
+        final String vendorModulePath = "/vendor/" + toComposerPackagePath(moduleName) + "/";
+
+        for (final String area : VIEW_AREAS) {
+            addFilenameMatchesByModulePath(project, result, appCodeModulePath, area, relativePath);
+            addFilenameMatchesByModulePath(project, result, vendorModulePath, area, relativePath);
+        }
+    }
+
+    private void addFilenameMatchesByModulePath(
+            final @NotNull Project project,
+            final @NotNull Set<VirtualFile> result,
+            final @NotNull String modulePath,
+            final @NotNull String area,
+            final @NotNull String relativePath
+    ) {
+        final String webRoot = modulePath + "view/" + area + "/web/";
+
+        addFilenameMatches(project, result, webRoot + toHtmlPath(relativePath));
+        addFilenameMatches(project, result, webRoot + TEMPLATE_DIRECTORY + "/" + toHtmlPath(relativePath));
+        addFilenameMatches(project, result, webRoot + TEMPLATES_DIRECTORY + "/" + toHtmlPath(relativePath));
+    }
+
+    private @NotNull String toComposerPackagePath(final @NotNull String moduleName) {
+        final String[] parts = moduleName.split("_", 2);
+        final String vendor = parts[0].toLowerCase();
+        final String packageName = parts.length > 1 ? "module-" + camelToKebab(parts[1]) : camelToKebab(parts[0]);
+
+        return vendor + "/" + packageName;
+    }
+
+    private @NotNull String camelToKebab(final @NotNull String value) {
+        return value
+                .replaceAll("([a-z0-9])([A-Z])", "$1-$2")
+                .replaceAll("([A-Z]+)([A-Z][a-z])", "$1-$2")
+                .replace('_', '-')
+                .toLowerCase();
     }
 
     public @NotNull Set<String> getTemplateRequireJsPaths(final @NotNull PsiFile psiFile) {

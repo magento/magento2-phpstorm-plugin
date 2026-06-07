@@ -33,4 +33,11 @@ public class RequireJsReferenceRegistrarTest extends ReferenceXmlFixtureTestCase
 
         assertHasReferenceToFile("/lib/web/testjs.js");
     }
+
+    public void testItemComponentMustHaveReference() {
+        String filePath = this.getFixturePath("checkout_index_index.xml");
+        myFixture.configureByFile(filePath);
+
+        assertHasReferenceToFile("app/code/Foo/Bar/view/frontend/web/js/file.js");
+    }
 }
