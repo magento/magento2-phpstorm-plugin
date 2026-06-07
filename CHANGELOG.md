@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - PHP-free Magento module root indexing from `etc/module.xml` for non-PHP IDEs.
 - XML-based Magento theme indexing from `theme.xml` for non-PHP IDEs.
 - Magento settings are available under `Tools > Magento` in IDEs without PHP support while remaining under `PHP > Frameworks > Magento 2` in PHP IDEs.
+- PHP-independent MCP tools are available in non-PHP IDEs: `get_magento_root_path` and `describe_magento_cli_environment` are registered separately from PHP-backed scaffold and inspection tools.
 
 ## 2026.2.2
 

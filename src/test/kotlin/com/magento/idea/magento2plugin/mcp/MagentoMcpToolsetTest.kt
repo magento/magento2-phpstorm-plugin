@@ -10,16 +10,29 @@ import org.junit.Test
 class MagentoMcpToolsetTest {
 
     @Test
-    fun testToolsetExposesExpectedToolNames() {
+    fun testPhpToolsetExposesExpectedToolNames() {
         val toolNames = MagentoMcpToolset::class.java.declaredMethods
             .mapNotNull { it.getAnnotation(McpTool::class.java)?.name }
             .toSet()
 
         assertEquals(
             setOf(
-                "get_magento_root_path",
                 "magento_scaffold",
-                "magento_inspect",
+                "magento_inspect"
+            ),
+            toolNames
+        )
+    }
+
+    @Test
+    fun testProjectToolsetExposesExpectedToolNames() {
+        val toolNames = MagentoMcpProjectToolset::class.java.declaredMethods
+            .mapNotNull { it.getAnnotation(McpTool::class.java)?.name }
+            .toSet()
+
+        assertEquals(
+            setOf(
+                "get_magento_root_path",
                 "describe_magento_cli_environment"
             ),
             toolNames
@@ -62,7 +75,7 @@ class MagentoMcpToolsetTest {
 
     @Test
     fun testRootPathToolDescriptionExplainsAcceptedFormats() {
-        val method = MagentoMcpToolset::class.java.declaredMethods.first { toolMethod ->
+        val method = MagentoMcpProjectToolset::class.java.declaredMethods.first { toolMethod ->
             toolMethod.name == "getMagentoRootPath" && toolMethod.getAnnotation(McpDescription::class.java) != null
         }
         val description = method.getAnnotation(McpDescription::class.java)?.description
@@ -73,7 +86,7 @@ class MagentoMcpToolsetTest {
 
     @Test
     fun testCliEnvironmentToolDescriptionExplainsWhenToUseIt() {
-        val method = MagentoMcpToolset::class.java.declaredMethods.first { toolMethod ->
+        val method = MagentoMcpProjectToolset::class.java.declaredMethods.first { toolMethod ->
             toolMethod.name == "describeMagentoCliEnvironment"
                     && toolMethod.getAnnotation(McpDescription::class.java) != null
         }

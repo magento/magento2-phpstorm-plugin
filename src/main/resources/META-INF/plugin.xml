@@ -17,6 +17,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.Settings"/>
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.startup.DeferredProjectOpenActions"/>
+        <mcpServer.mcpToolset implementation="com.magento.idea.magento2plugin.mcp.MagentoMcpProjectToolset"/>
 
         <projectConfigurable
                 groupId="tools"
