@@ -35,6 +35,13 @@ public class JsReferenceContributor extends PsiReferenceContributor {
         registrar.registerReferenceProvider(
                 JSPatterns.jsLiteralExpression()
                         .withText(string().matches(".*" + RegExUtil.Magento.MODULE_NAME + ".*")),
+                new KnockoutTemplateReferenceProvider(),
+                PsiReferenceRegistrar.HIGHER_PRIORITY
+        );
+
+        registrar.registerReferenceProvider(
+                JSPatterns.jsLiteralExpression()
+                        .withText(string().matches(".*" + RegExUtil.Magento.MODULE_NAME + ".*")),
                 new ModuleNameReferenceProvider()
         );
 
@@ -57,11 +64,6 @@ public class JsReferenceContributor extends PsiReferenceContributor {
                 JSPatterns.jsLiteralExpression()
                         .withText(string().matches(".*\\W" + RegExUtil.FILE_PATH + ".*")),
                 new RequireJsPreferenceReferenceProvider()
-        );
-
-        registrar.registerReferenceProvider(
-                JSPatterns.jsLiteralExpression(),
-                new KnockoutTemplateReferenceProvider()
         );
 
         registrar.registerReferenceProvider(

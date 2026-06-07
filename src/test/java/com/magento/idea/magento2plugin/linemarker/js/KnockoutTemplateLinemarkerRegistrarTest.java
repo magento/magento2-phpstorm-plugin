@@ -7,6 +7,8 @@ package com.magento.idea.magento2plugin.linemarker.js;
 
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiManager;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.magento.idea.magento2plugin.linemarker.LinemarkerFixtureTestCase;
 import com.magento.idea.magento2plugin.project.Settings;
@@ -39,6 +41,159 @@ public class KnockoutTemplateLinemarkerRegistrarTest extends LinemarkerFixtureTe
         assertLinemarkerCountWithTooltip("Navigate to Knockout component", 1);
         assertHasLinemarkerWithTooltipAndIcon("Navigate to Knockout component", "");
         assertProviderHasLinemarker("Navigate to Knockout component");
+    }
+
+    /**
+     * Template backlink popups should show the JS file once, not a copyright/header PSI fragment.
+     */
+    public void testTemplateComponentTargetShouldBeNamedJsFileWhenComponentHasHeaderComment() {
+        myFixture.addFileToProject(
+                "app/code/Foo/Bar/view/frontend/web/js/header-comment-component.js",
+                "/*\n"
+                        + " * @category Foo\n"
+                        + " * @copyright Copyright Foo\n"
+                        + " */\n"
+                        + "define(['uiComponent'], function (Component) {\n"
+                        + "    'use strict';\n"
+                        + "    return Component.extend({\n"
+                        + "        defaults: {\n"
+                        + "            template: 'Foo_Bar/template/header-comment-template'\n"
+                        + "        }\n"
+                        + "    });\n"
+                        + "});"
+        );
+        myFixture.addFileToProject(
+                "app/code/Foo/Bar/view/frontend/web/template/header-comment-template.html",
+                "<span>header comment template</span>"
+        );
+        myFixture.configureFromTempProjectFile(
+                "app/code/Foo/Bar/view/frontend/web/template/header-comment-template.html"
+        );
+        final PsiElement componentFile = getHeaderCommentComponentFile();
+        final PsiElement headerComment = PsiTreeUtil.getDeepestFirst(componentFile);
+        final List<PsiElement> normalizedTargets = new KnockoutTemplateLineMarkerProvider()
+                .normalizeJsFileTargets(Arrays.asList(componentFile, headerComment));
+        final List<PsiElement> preparedTargets = LineMarkerTargetPresentationUtil.prepareJsFileTargets(
+                Arrays.asList(componentFile, headerComment)
+        );
+
+        assertLinemarkerCountWithTooltip("Navigate to Knockout component", 1);
+        assertEquals(1, normalizedTargets.size());
+        assertEquals(1, preparedTargets.size());
+        assertEquals(
+                "header-comment-component.js (/src/app/code/Foo/Bar/view/frontend/web/js/header-comment-component.js)",
+                LineMarkerTargetPresentationUtil.getPresentableTargetName(preparedTargets.get(0))
+        );
+    }
+
+    /**
+     * XML component declarations should navigate to their RequireJS component files.
+     */
+    public void testXmlComponentDeclarationShouldHaveComponentLinemarker() {
+        addXmlOnlyComponentFixture(
+                "xml-component-marker",
+                "Foo_Bar/js/view/xml-component-marker",
+                "Foo_Bar/template/xml-component-marker"
+        );
+        myFixture.configureFromTempProjectFile(
+                "app/code/Foo/Bar/view/frontend/layout/xml-component-marker.xml"
+        );
+
+        assertHasLinemarkerWithTooltipAndIcon("Navigate to Magento UI component", "");
+    }
+
+    /**
+     * XML template declarations should navigate to their Knockout template files.
+     */
+    public void testXmlTemplateDeclarationShouldHaveTemplateLinemarker() {
+        addXmlOnlyComponentFixture(
+                "xml-template-marker",
+                "Foo_Bar/js/view/xml-template-marker",
+                "Foo_Bar/template/xml-template-marker"
+        );
+        myFixture.configureFromTempProjectFile(
+                "app/code/Foo/Bar/view/frontend/layout/xml-template-marker.xml"
+        );
+
+        assertHasLinemarkerWithTooltipAndIcon("Navigate to Magento template", "");
+    }
+
+    /**
+     * JS components without defaults.template should still navigate to XML-declared templates.
+     */
+    public void testComponentJsShouldHaveXmlDeclaredTemplateLinemarker() {
+        addXmlOnlyComponentFixture(
+                "xml-pair-component",
+                "Foo_Bar/js/view/xml-pair-component",
+                "Foo_Bar/template/xml-pair-component"
+        );
+        myFixture.configureFromTempProjectFile(
+                "app/code/Foo/Bar/view/frontend/web/js/view/xml-pair-component.js"
+        );
+
+        assertProviderHasLinemarker("Navigate to Knockout template");
+    }
+
+    /**
+     * Templates should navigate to JS components paired through XML component configuration.
+     */
+    public void testTemplateShouldHaveXmlPairedComponentLinemarker() {
+        addXmlOnlyComponentFixture(
+                "xml-paired-template",
+                "Foo_Bar/js/view/xml-paired-template",
+                "Foo_Bar/template/xml-paired-template"
+        );
+        myFixture.configureFromTempProjectFile(
+                "app/code/Foo/Bar/view/frontend/web/template/xml-paired-template.html"
+        );
+
+        assertProviderHasLinemarker("Navigate to Knockout component");
+    }
+
+    /**
+     * XML sibling scopes must not be paired as one component-template relationship.
+     */
+    public void testSiblingXmlScopesMustNotCreateComponentTemplatePair() {
+        myFixture.addFileToProject(
+                "app/code/Foo/Bar/view/frontend/web/js/view/xml-sibling-component.js",
+                "define(['uiComponent'], function (Component) {\n"
+                        + "    'use strict';\n"
+                        + "    return Component.extend({});\n"
+                        + "});"
+        );
+        myFixture.addFileToProject(
+                "app/code/Foo/Bar/view/frontend/web/template/xml-sibling-template.html",
+                "<span>sibling template</span>"
+        );
+        myFixture.addFileToProject(
+                "app/code/Foo/Bar/view/frontend/layout/xml-sibling.xml",
+                "<?xml version=\"1.0\"?>\n"
+                        + "<page xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"
+                        + "    <body>\n"
+                        + "        <referenceBlock name=\"checkout.root\">\n"
+                        + "            <arguments>\n"
+                        + "                <argument name=\"jsLayout\" xsi:type=\"array\">\n"
+                        + "                    <item name=\"components\" xsi:type=\"array\">\n"
+                        + "                        <item name=\"component_scope\" xsi:type=\"array\">\n"
+                        + "                            <item name=\"component\" xsi:type=\"string\">"
+                        + "Foo_Bar/js/view/xml-sibling-component</item>\n"
+                        + "                        </item>\n"
+                        + "                        <item name=\"template_scope\" xsi:type=\"array\">\n"
+                        + "                            <item name=\"template\" xsi:type=\"string\">"
+                        + "Foo_Bar/template/xml-sibling-template</item>\n"
+                        + "                        </item>\n"
+                        + "                    </item>\n"
+                        + "                </argument>\n"
+                        + "            </arguments>\n"
+                        + "        </referenceBlock>\n"
+                        + "    </body>\n"
+                        + "</page>"
+        );
+        myFixture.configureFromTempProjectFile(
+                "app/code/Foo/Bar/view/frontend/web/js/view/xml-sibling-component.js"
+        );
+
+        assertProviderHasLinemarker("Navigate to XML UI component usage");
     }
 
     /**
@@ -537,6 +692,19 @@ public class KnockoutTemplateLinemarkerRegistrarTest extends LinemarkerFixtureTe
         assertNull("Unexpected line marker returned by provider", lineMarker);
     }
 
+    private PsiElement getHeaderCommentComponentFile() {
+        final VirtualFile componentVirtualFile = myFixture.findFileInTempDir(
+                "app/code/Foo/Bar/view/frontend/web/js/header-comment-component.js"
+        );
+
+        assertNotNull("Header comment component fixture was not found", componentVirtualFile);
+        final PsiElement componentFile = PsiManager.getInstance(getProject()).findFile(componentVirtualFile);
+
+        assertNotNull("Header comment component PSI fixture was not found", componentFile);
+
+        return componentFile;
+    }
+
     private void addLayoutXmlRegion(
             final String displayArea,
             final String component,
@@ -557,6 +725,48 @@ public class KnockoutTemplateLinemarkerRegistrarTest extends LinemarkerFixtureTe
                         + "                            <item name=\"displayArea\" xsi:type=\"string\">"
                         + displayArea + "</item>\n"
                         + getTemplateXml(template)
+                        + "                        </item>\n"
+                        + "                    </item>\n"
+                        + "                </argument>\n"
+                        + "            </arguments>\n"
+                        + "        </referenceBlock>\n"
+                        + "    </body>\n"
+                        + "</page>"
+        );
+    }
+
+    private void addXmlOnlyComponentFixture(
+            final String name,
+            final String component,
+            final String template
+    ) {
+        myFixture.addFileToProject(
+                "app/code/Foo/Bar/view/frontend/web/js/view/" + name + ".js",
+                "define(['uiComponent'], function (Component) {\n"
+                        + "    'use strict';\n"
+                        + "    return Component.extend({});\n"
+                        + "});"
+        );
+        myFixture.addFileToProject(
+                "app/code/Foo/Bar/view/frontend/web/template/" + name + ".html",
+                "<span>" + name + "</span>"
+        );
+        myFixture.addFileToProject(
+                "app/code/Foo/Bar/view/frontend/layout/" + name + ".xml",
+                "<?xml version=\"1.0\"?>\n"
+                        + "<page xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"
+                        + "    <body>\n"
+                        + "        <referenceBlock name=\"checkout.root\">\n"
+                        + "            <arguments>\n"
+                        + "                <argument name=\"jsLayout\" xsi:type=\"array\">\n"
+                        + "                    <item name=\"components\" xsi:type=\"array\">\n"
+                        + "                        <item name=\"" + name + "\" xsi:type=\"array\">\n"
+                        + "                            <item name=\"component\" xsi:type=\"string\">"
+                        + component + "</item>\n"
+                        + "                            <item name=\"config\" xsi:type=\"array\">\n"
+                        + "                                <item name=\"template\" xsi:type=\"string\">"
+                        + template + "</item>\n"
+                        + "                            </item>\n"
                         + "                        </item>\n"
                         + "                    </item>\n"
                         + "                </argument>\n"

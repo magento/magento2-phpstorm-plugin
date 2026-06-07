@@ -201,6 +201,7 @@ public class KnockoutTemplatePathResolver {
             addFilenameMatchesByModulePath(project, result, appCodeModulePath, area, relativePath);
             addFilenameMatchesByModulePath(project, result, vendorModulePath, area, relativePath);
         }
+        addThemeFilenameMatches(project, result, moduleName, relativePath);
     }
 
     private void addFilenameMatchesByModulePath(
@@ -215,6 +216,37 @@ public class KnockoutTemplatePathResolver {
         addFilenameMatches(project, result, webRoot + toHtmlPath(relativePath));
         addFilenameMatches(project, result, webRoot + TEMPLATE_DIRECTORY + "/" + toHtmlPath(relativePath));
         addFilenameMatches(project, result, webRoot + TEMPLATES_DIRECTORY + "/" + toHtmlPath(relativePath));
+    }
+
+    private void addThemeFilenameMatches(
+            final @NotNull Project project,
+            final @NotNull Set<VirtualFile> result,
+            final @NotNull String moduleName,
+            final @NotNull String relativePath
+    ) {
+        addThemeFilenameMatches(project, result, moduleName + "/web/" + toHtmlPath(relativePath));
+        addThemeFilenameMatches(project, result, moduleName + "/web/" + TEMPLATE_DIRECTORY + "/" + toHtmlPath(relativePath));
+        addThemeFilenameMatches(project, result, moduleName + "/web/" + TEMPLATES_DIRECTORY + "/" + toHtmlPath(relativePath));
+    }
+
+    private void addThemeFilenameMatches(
+            final @NotNull Project project,
+            final @NotNull Set<VirtualFile> result,
+            final @NotNull String themePathSuffix
+    ) {
+        final String fileName = themePathSuffix.substring(themePathSuffix.lastIndexOf('/') + 1);
+        final Collection<VirtualFile> files = FilenameIndex.getVirtualFilesByName(
+                fileName,
+                GlobalSearchScope.allScope(project)
+        );
+
+        for (final VirtualFile matchingFile : files) {
+            if (!matchingFile.isDirectory()
+                    && matchingFile.getPath().contains("/app/design/")
+                    && matchingFile.getPath().endsWith("/" + themePathSuffix)) {
+                result.add(matchingFile);
+            }
+        }
     }
 
     private @NotNull String toComposerPackagePath(final @NotNull String moduleName) {
@@ -267,6 +299,7 @@ public class KnockoutTemplatePathResolver {
             }
         }
         addTemplateRequireJsPathsFromFilePath(result, filePath);
+        addThemeTemplateRequireJsPathsFromFilePath(result, filePath);
         NavigationInstrumentation.infoOnce(
                 "ko-template-requirejs-paths-result-" + filePath,
                 () -> "Computed Knockout template RequireJS paths for "
@@ -305,6 +338,29 @@ public class KnockoutTemplatePathResolver {
                 result,
                 moduleName,
                 stripHtmlExtension(filePath.substring(webRootIndex + webRoot.length()))
+        );
+    }
+
+    private void addThemeTemplateRequireJsPathsFromFilePath(
+            final @NotNull Set<String> result,
+            final @NotNull String filePath
+    ) {
+        final String marker = "/app/design/";
+        final int markerIndex = filePath.indexOf(marker);
+
+        if (markerIndex < 0) {
+            return;
+        }
+        final String relativePath = filePath.substring(markerIndex + marker.length());
+        final String[] parts = relativePath.split("/");
+
+        if (parts.length < 7 || !"web".equals(parts[4])) {
+            return;
+        }
+        addTemplateRequireJsPathAliases(
+                result,
+                parts[3],
+                stripHtmlExtension(joinParts(parts, 5))
         );
     }
 
@@ -435,5 +491,18 @@ public class KnockoutTemplatePathResolver {
         return path.endsWith(".html")
                 ? path.substring(0, path.length() - ".html".length())
                 : path;
+    }
+
+    private @NotNull String joinParts(
+            final @NotNull String[] parts,
+            final int startIndex
+    ) {
+        final List<String> result = new ArrayList<>();
+
+        for (int index = startIndex; index < parts.length; index++) {
+            result.add(parts[index]);
+        }
+
+        return String.join("/", result);
     }
 }

@@ -31,6 +31,31 @@ public class KnockoutTemplateReferenceRegistrarTest extends ReferenceJsFixtureTe
     }
 
     /**
+     * Go to Declaration from a JS template value should prefer the Knockout template file over generic module refs.
+     */
+    public void testTemplatePropertyEditorReferenceMustResolveTemplateFileFromModulePrefix() {
+        addTemplate("quote-form/item", "<span>item</span>");
+        myFixture.configureByText(
+                "item.js",
+                "define(['uiComponent'], function (Component) {\n"
+                        + "    return Component.extend({\n"
+                        + "        defaults: {\n"
+                        + "            template: 'Foo<caret>_Bar/quote-form/item'\n"
+                        + "        }\n"
+                        + "    });\n"
+                        + "});"
+        );
+
+        final PsiReference reference = myFixture.getFile().findReferenceAt(myFixture.getCaretOffset());
+
+        assertNotNull("Expected editor offset reference for template property", reference);
+        assertReferenceResolvesToFile(
+                reference,
+                "app/code/Foo/Bar/view/frontend/web/template/quote-form/item.html"
+        );
+    }
+
+    /**
      * Template shorthand properties should reference Knockout template files.
      */
     public void testTmplPropertyMustHaveReference() {

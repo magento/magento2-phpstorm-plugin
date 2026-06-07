@@ -115,7 +115,8 @@ public class UiComponentTemplateDeclarationIndex
     @Override
     public @NotNull FileBasedIndex.InputFilter getInputFilter() {
         return virtualFile -> virtualFile.getFileType().equals(JavaScriptFileType.INSTANCE)
-                || virtualFile.getFileType().equals(XmlFileType.INSTANCE);
+                || virtualFile.getFileType().equals(XmlFileType.INSTANCE)
+                || "php".equals(virtualFile.getExtension());
     }
 
     @Override
@@ -125,7 +126,7 @@ public class UiComponentTemplateDeclarationIndex
 
     @Override
     public int getVersion() {
-        return 3;
+        return 5;
     }
 
     private interface KeyBuilder {

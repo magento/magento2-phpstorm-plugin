@@ -112,6 +112,29 @@ public final class LineMarkerTargetPresentationUtil {
         return sortedTargets;
     }
 
+    public static @NotNull List<PsiElement> prepareJsFileTargets(final @NotNull List<PsiElement> targets) {
+        final List<PsiElement> normalizedTargets = new ArrayList<>();
+
+        for (final PsiElement target : targets) {
+            normalizedTargets.add(normalizeJsFileTarget(target));
+        }
+
+        return prepareTargets(normalizedTargets);
+    }
+
+    private static @NotNull PsiElement normalizeJsFileTarget(final @NotNull PsiElement target) {
+        final PsiFile psiFile = target instanceof PsiFile
+                ? (PsiFile) target
+                : target.getContainingFile();
+        final VirtualFile virtualFile = psiFile == null ? null : psiFile.getVirtualFile();
+
+        if (virtualFile != null && "js".equals(virtualFile.getExtension())) {
+            return psiFile;
+        }
+
+        return target;
+    }
+
     private static @NotNull TargetPresentation getTargetPresentation(final @NotNull PsiElement target) {
         return TargetPresentation
                 .builder(getPresentableTargetName(target))
@@ -151,7 +174,7 @@ public final class LineMarkerTargetPresentationUtil {
                 .replace('\r', ' ')
                 .trim();
 
-        if (text.isEmpty() || text.startsWith("/*") || text.startsWith("//")) {
+        if (text.isEmpty() || text.startsWith("/*") || text.startsWith("//") || text.startsWith("<!--")) {
             return null;
         }
 

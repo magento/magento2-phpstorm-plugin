@@ -133,6 +133,27 @@ public class RequireJsPathResolver {
             addFilenameMatches(project, result, appCodeModulePath + "view/" + area + "/web/" + toJsPath(relativePath));
             addFilenameMatches(project, result, vendorModulePath + "view/" + area + "/web/" + toJsPath(relativePath));
         }
+        addThemeFilenameMatches(project, result, moduleName + "/web/" + toJsPath(relativePath));
+    }
+
+    private void addThemeFilenameMatches(
+            final @NotNull Project project,
+            final @NotNull Collection<VirtualFile> result,
+            final @NotNull String themePathSuffix
+    ) {
+        final String fileName = themePathSuffix.substring(themePathSuffix.lastIndexOf('/') + 1);
+        final Collection<VirtualFile> files = FilenameIndex.getVirtualFilesByName(
+                fileName,
+                GlobalSearchScope.allScope(project)
+        );
+
+        for (final VirtualFile matchingFile : files) {
+            if (!matchingFile.isDirectory()
+                    && matchingFile.getPath().contains("/app/design/")
+                    && matchingFile.getPath().endsWith("/" + themePathSuffix)) {
+                result.add(matchingFile);
+            }
+        }
     }
 
     public @Nullable String getRequireJsPath(final @NotNull PsiFile psiFile) {
@@ -152,6 +173,17 @@ public class RequireJsPathResolver {
                             + NavigationInstrumentation.describeFile(psiFile)
             );
             return modulePath;
+        }
+
+        final String themePath = getThemeRequireJsPath(filePath);
+
+        if (themePath != null) {
+            NavigationInstrumentation.infoOnce(
+                    "requirejs-path-for-file-theme-" + filePath,
+                    () -> "Computed Magento theme RequireJS path '" + themePath + "' for "
+                            + NavigationInstrumentation.describeFile(psiFile)
+            );
+            return themePath;
         }
 
         final String libPath = getLibRequireJsPath(psiFile.getProject(), filePath);
@@ -201,6 +233,23 @@ public class RequireJsPathResolver {
         }
 
         return null;
+    }
+
+    private @Nullable String getThemeRequireJsPath(final @NotNull String filePath) {
+        final String marker = "/app/design/";
+        final int markerIndex = filePath.indexOf(marker);
+
+        if (markerIndex < 0) {
+            return null;
+        }
+        final String relativePath = filePath.substring(markerIndex + marker.length());
+        final String[] parts = relativePath.split("/");
+
+        if (parts.length < 7 || !"web".equals(parts[4]) || !filePath.endsWith(".js")) {
+            return null;
+        }
+
+        return parts[3] + "/" + stripJsExtension(joinParts(parts, 5));
     }
 
     private @NotNull Collection<String> getModuleRootPaths(
@@ -342,5 +391,18 @@ public class RequireJsPathResolver {
 
     private @NotNull String stripJsExtension(final @NotNull String path) {
         return path.substring(0, path.length() - ".js".length());
+    }
+
+    private @NotNull String joinParts(
+            final @NotNull String[] parts,
+            final int startIndex
+    ) {
+        final List<String> result = new ArrayList<>();
+
+        for (int index = startIndex; index < parts.length; index++) {
+            result.add(parts[index]);
+        }
+
+        return String.join("/", result);
     }
 }

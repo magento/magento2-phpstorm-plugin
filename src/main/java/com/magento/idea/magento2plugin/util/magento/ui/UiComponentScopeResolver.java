@@ -112,6 +112,11 @@ public class UiComponentScopeResolver {
         if (psiFile instanceof XmlFile) {
             return collectXmlComponentDeclarations((XmlFile) psiFile);
         }
+        final VirtualFile virtualFile = psiFile.getVirtualFile();
+
+        if (virtualFile != null && "php".equals(virtualFile.getExtension())) {
+            return collectPhpComponentDeclarations(psiFile);
+        }
 
         return Collections.emptyList();
     }
@@ -308,6 +313,44 @@ public class UiComponentScopeResolver {
         }
 
         return new ArrayList<>(targets);
+    }
+
+    public @NotNull List<PsiElement> resolveNavigationTargets(
+            final @NotNull Project project,
+            final @NotNull Collection<UiComponentNavigationData> declarations
+    ) {
+        final Set<PsiElement> targets = new LinkedHashSet<>();
+
+        for (final UiComponentNavigationData declaration : declarations) {
+            addTargetElement(project, targets, declaration);
+        }
+
+        return new ArrayList<>(targets);
+    }
+
+    public @NotNull List<UiComponentNavigationData> componentDeclarationsByJsPath(
+            final @NotNull Project project,
+            final @NotNull String componentJsPath
+    ) {
+        final List<UiComponentNavigationData> results = new ArrayList<>();
+
+        for (final Set<UiComponentNavigationData> declarations : FileBasedIndex.getInstance().getValues(
+                UiComponentComponentDeclarationIndex.KEY,
+                UiComponentComponentDeclarationIndex.componentJsPathKey(componentJsPath),
+                GlobalSearchScope.allScope(project)
+        )) {
+            results.addAll(declarations);
+        }
+
+        return results;
+    }
+
+    public @Nullable String getRequireJsPath(final @NotNull PsiFile psiFile) {
+        if (!(psiFile instanceof JSFile)) {
+            return null;
+        }
+
+        return getRequireJsPathFromFilePath((JSFile) psiFile);
     }
 
     public @NotNull List<UiComponentNavigationData> getRegionUsages(
@@ -533,23 +576,6 @@ public class UiComponentScopeResolver {
         }
 
         return new ArrayList<>(results);
-    }
-
-    private @NotNull List<UiComponentNavigationData> componentDeclarationsByJsPath(
-            final @NotNull Project project,
-            final @NotNull String componentJsPath
-    ) {
-        final List<UiComponentNavigationData> results = new ArrayList<>();
-
-        for (final Set<UiComponentNavigationData> declarations : FileBasedIndex.getInstance().getValues(
-                UiComponentComponentDeclarationIndex.KEY,
-                UiComponentComponentDeclarationIndex.componentJsPathKey(componentJsPath),
-                GlobalSearchScope.allScope(project)
-        )) {
-            results.addAll(declarations);
-        }
-
-        return results;
     }
 
     private @NotNull Set<String> resolveTemplateFileUrls(
@@ -1474,6 +1500,37 @@ public class UiComponentScopeResolver {
         return new ArrayList<>(results);
     }
 
+    private @NotNull List<UiComponentNavigationData> collectPhpComponentDeclarations(
+            final @NotNull PsiFile psiFile
+    ) {
+        final Set<UiComponentNavigationData> results = new LinkedHashSet<>();
+        final String fileUrl = getFileUrl(psiFile);
+
+        for (final KnockoutRegionResolver.LayoutComponentDeclaration declaration
+                : KnockoutRegionResolver.getInstance().collectLayoutComponentDeclarations(psiFile)) {
+            final String componentPath = declaration.getComponentPath();
+            final String templatePath = KnockoutTemplatePathResolver.getInstance()
+                    .normalizeTemplatePath(declaration.getTemplatePath());
+
+            if (templatePath == null || declaration.getTemplateOffset() < 0) {
+                continue;
+            }
+            results.add(new UiComponentNavigationData(
+                    fileUrl,
+                    UiComponentNavigationData.KIND_TEMPLATE,
+                    templatePath,
+                    componentPath,
+                    null,
+                    componentPath,
+                    null,
+                    null,
+                    declaration.getTemplateOffset()
+            ));
+        }
+
+        return new ArrayList<>(results);
+    }
+
     private boolean isXmlNavigationCandidate(final @NotNull XmlFile xmlFile) {
         final VirtualFile virtualFile = xmlFile.getVirtualFile();
 
@@ -1521,13 +1578,15 @@ public class UiComponentScopeResolver {
         results.add(new UiComponentNavigationData(
                 fileUrl,
                 UiComponentNavigationData.KIND_COMPONENT,
-                node.getComponentName(),
+                node.getComponentJsPath() == null ? node.getComponentName() : node.getComponentJsPath(),
                 node.getComponentName(),
                 node.getParentComponentName(),
                 node.getComponentJsPath(),
                 parentComponentJsPath,
                 null,
-                node.getTag().getTextRange().getStartOffset()
+                node.getComponentJsPath() == null
+                        ? node.getTag().getTextRange().getStartOffset()
+                        : getXmlValueOffset(node.getTag(), "component")
         ));
         addXmlValueDeclaration(
                 results,
@@ -1722,6 +1781,11 @@ public class UiComponentScopeResolver {
             final @NotNull XmlTag tag,
             final @NotNull String itemName
     ) {
+        final XmlTag directValueTag = getDirectChildTag(tag, itemName);
+
+        if (directValueTag != null) {
+            return directValueTag;
+        }
         final XmlTag directTag = getDirectChildItem(tag, itemName);
 
         if (directTag != null) {
@@ -1729,7 +1793,21 @@ public class UiComponentScopeResolver {
         }
         final XmlTag configTag = getDirectChildItem(tag, "config");
 
-        return configTag == null ? null : getDirectChildItem(configTag, itemName);
+        if (configTag != null) {
+            final XmlTag configItemTag = getDirectChildItem(configTag, itemName);
+
+            if (configItemTag != null) {
+                return configItemTag;
+            }
+            final XmlTag configValueTag = getDirectChildTag(configTag, itemName);
+
+            if (configValueTag != null) {
+                return configValueTag;
+            }
+        }
+        final XmlTag settingsTag = getDirectChildTag(tag, "settings");
+
+        return settingsTag == null ? null : getDirectChildTag(settingsTag, itemName);
     }
 
     private @Nullable String getXmlValue(
@@ -1738,7 +1816,44 @@ public class UiComponentScopeResolver {
     ) {
         final String attributeValue = tag.getAttributeValue(key);
 
-        return attributeValue != null ? attributeValue : getDirectChildItemValue(tag, key);
+        if (attributeValue != null) {
+            return attributeValue;
+        }
+        final String directItemValue = getDirectChildItemValue(tag, key);
+
+        if (directItemValue != null) {
+            return directItemValue;
+        }
+        final XmlTag directValueTag = getDirectChildTag(tag, key);
+
+        if (directValueTag != null) {
+            return getTagValue(directValueTag);
+        }
+        final XmlTag configTag = getDirectChildItem(tag, "config");
+
+        if (configTag != null) {
+            final String configItemValue = getDirectChildItemValue(configTag, key);
+
+            if (configItemValue != null) {
+                return configItemValue;
+            }
+            final XmlTag configValueTag = getDirectChildTag(configTag, key);
+
+            if (configValueTag != null) {
+                return getTagValue(configValueTag);
+            }
+        }
+        final XmlTag settingsTag = getDirectChildTag(tag, "settings");
+
+        if (settingsTag != null) {
+            final XmlTag settingsValueTag = getDirectChildTag(settingsTag, key);
+
+            if (settingsValueTag != null) {
+                return getTagValue(settingsValueTag);
+            }
+        }
+
+        return null;
     }
 
     private int getXmlValueOffset(
@@ -1752,7 +1867,52 @@ public class UiComponentScopeResolver {
         }
         final XmlTag child = getDirectChildItem(tag, key);
 
-        return child == null ? -1 : getTagValueOffset(child);
+        if (child != null) {
+            return getTagValueOffset(child);
+        }
+        final XmlTag directValueTag = getDirectChildTag(tag, key);
+
+        if (directValueTag != null) {
+            return getTagValueOffset(directValueTag);
+        }
+        final XmlTag configTag = getDirectChildItem(tag, "config");
+
+        if (configTag != null) {
+            final XmlTag configItemTag = getDirectChildItem(configTag, key);
+
+            if (configItemTag != null) {
+                return getTagValueOffset(configItemTag);
+            }
+            final XmlTag configValueTag = getDirectChildTag(configTag, key);
+
+            if (configValueTag != null) {
+                return getTagValueOffset(configValueTag);
+            }
+        }
+        final XmlTag settingsTag = getDirectChildTag(tag, "settings");
+
+        if (settingsTag != null) {
+            final XmlTag settingsValueTag = getDirectChildTag(settingsTag, key);
+
+            if (settingsValueTag != null) {
+                return getTagValueOffset(settingsValueTag);
+            }
+        }
+
+        return -1;
+    }
+
+    private @Nullable XmlTag getDirectChildTag(
+            final @NotNull XmlTag parent,
+            final @NotNull String tagName
+    ) {
+        for (final XmlTag child : parent.getSubTags()) {
+            if (tagName.equals(child.getName())) {
+                return child;
+            }
+        }
+
+        return null;
     }
 
     private @Nullable XmlTag getDirectChildItem(
@@ -1832,6 +1992,11 @@ public class UiComponentScopeResolver {
         if (appCodePath != null) {
             return appCodePath;
         }
+        final String themePath = getThemeRequireJsPath(filePath);
+
+        if (themePath != null) {
+            return themePath;
+        }
 
         return getVendorRequireJsPath(filePath);
     }
@@ -1869,6 +2034,23 @@ public class UiComponentScopeResolver {
         final String moduleName = composerPackageToModuleName(parts[0], parts[1]);
 
         return moduleName + "/" + stripJsExtension(joinParts(parts, 5));
+    }
+
+    private @Nullable String getThemeRequireJsPath(final @NotNull String filePath) {
+        final String marker = "/app/design/";
+        final int markerIndex = filePath.indexOf(marker);
+
+        if (markerIndex < 0) {
+            return null;
+        }
+        final String relativePath = filePath.substring(markerIndex + marker.length());
+        final String[] parts = relativePath.split("/");
+
+        if (parts.length < 7 || !"web".equals(parts[4])) {
+            return null;
+        }
+
+        return parts[3] + "/" + stripJsExtension(joinParts(parts, 5));
     }
 
     private @NotNull String composerPackageToModuleName(

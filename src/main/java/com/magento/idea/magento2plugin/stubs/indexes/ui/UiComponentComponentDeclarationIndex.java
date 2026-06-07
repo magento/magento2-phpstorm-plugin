@@ -104,7 +104,7 @@ public class UiComponentComponentDeclarationIndex
 
     @Override
     public int getVersion() {
-        return 3;
+        return 4;
     }
 
     private interface KeyBuilder {

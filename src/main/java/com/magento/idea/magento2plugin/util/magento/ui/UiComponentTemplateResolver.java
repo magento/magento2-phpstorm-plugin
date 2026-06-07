@@ -90,6 +90,20 @@ public class UiComponentTemplateResolver {
         return new ArrayList<>(results);
     }
 
+    public @NotNull List<UiComponentNavigationData> resolveTemplateDeclarationsForComponentJsPath(
+            final @NotNull Project project,
+            final @NotNull String componentJsPath
+    ) {
+        return resolveByIndexKey(project, UiComponentTemplateDeclarationIndex.componentJsPathKey(componentJsPath));
+    }
+
+    public @NotNull List<UiComponentNavigationData> resolveTemplateDeclarationsForTemplatePath(
+            final @NotNull Project project,
+            final @NotNull String templatePath
+    ) {
+        return resolveByIndexKey(project, UiComponentTemplateDeclarationIndex.templatePathKey(templatePath));
+    }
+
     private void addTemplateDeclarationsByComponent(
             final @NotNull Project project,
             final @NotNull Set<UiComponentNavigationData> results,
