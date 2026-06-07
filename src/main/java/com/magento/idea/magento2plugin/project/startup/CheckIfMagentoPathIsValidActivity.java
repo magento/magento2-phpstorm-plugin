@@ -15,7 +15,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.ProjectActivity;
 import com.intellij.openapi.startup.StartupActivity;
 import com.magento.idea.magento2plugin.init.ConfigurationManager;
-import com.magento.idea.magento2plugin.project.diagnostic.NavigationInstrumentation;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.magento.MagentoBasePathUtil;
 import kotlin.Unit;
@@ -25,8 +24,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class CheckIfMagentoPathIsValidActivity implements StartupActivity, ProjectActivity {
     private static final PluginId PHP_PLUGIN_ID = PluginId.getId("com.jetbrains.php");
-    private static final PluginId MAGENTO_PLUGIN_ID = PluginId.getId("com.magento.idea.magento2plugin");
-    private static final String NAVIGATION_DEBUG_MARKER = "ui-region-navigation-debug-2026-06-07-1755";
 
     @Override
     public void runActivity(final @NotNull Project project) {
@@ -43,7 +40,6 @@ public class CheckIfMagentoPathIsValidActivity implements StartupActivity, Proje
 
     private void registerSettings(final @NotNull Project project) {
         registerNonPhpPhtmlSupport(project);
-        logNavigationDebugBuild(project);
         final Settings settings = Settings.getInstance(project);
         final String path = Settings.getMagentoPath(project);
         if (settings.pluginEnabled && (path == null || path.isEmpty())) {
@@ -55,23 +51,6 @@ public class CheckIfMagentoPathIsValidActivity implements StartupActivity, Proje
             }
         }
         DeferredProjectOpenActions.getInstance(project).runPendingActions();
-    }
-
-    private void logNavigationDebugBuild(final @NotNull Project project) {
-        NavigationInstrumentation.infoOnce(
-                "magento-plugin-startup-" + project.getLocationHash(),
-                () -> "plugin startup marker=" + NAVIGATION_DEBUG_MARKER
-                        + ", version=" + getPluginVersion()
-                        + ", project=" + project.getName()
-                        + ", " + NavigationInstrumentation.describeSettings(project)
-                        + ", phpLoaded=" + PluginManagerCore.isLoaded(PHP_PLUGIN_ID)
-        );
-    }
-
-    private @NotNull String getPluginVersion() {
-        final var plugin = PluginManagerCore.getPlugin(MAGENTO_PLUGIN_ID);
-
-        return plugin == null ? "<not found>" : plugin.getVersion();
     }
 
     private void registerNonPhpPhtmlSupport(final @NotNull Project project) {

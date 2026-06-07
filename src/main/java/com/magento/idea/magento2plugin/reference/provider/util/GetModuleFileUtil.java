@@ -10,7 +10,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.project.Settings;
-import com.magento.idea.magento2plugin.project.diagnostic.NavigationInstrumentation;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -89,11 +88,6 @@ public class GetModuleFileUtil {
             }
         }
 
-        NavigationInstrumentation.infoOnce(
-                "module-root-vfs-fallback-" + moduleName,
-                () -> "Module roots from Magento VFS fallback for '" + moduleName
-                        + "' count=" + moduleRoots.size()
-        );
 
         return moduleRoots;
     }

@@ -11,7 +11,6 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceProvider;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.util.ProcessingContext;
-import com.magento.idea.magento2plugin.project.diagnostic.NavigationInstrumentation;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 import com.magento.idea.magento2plugin.util.magento.js.KnockoutTemplatePathResolver;
 import java.util.List;
@@ -33,17 +32,8 @@ public class KnockoutTemplatePathReferenceProvider extends PsiReferenceProvider 
                 .resolveTemplateFiles(element.getProject(), templatePath);
 
         if (targets.isEmpty()) {
-            NavigationInstrumentation.info(
-                    "Knockout XML template reference has no targets for '" + templatePath + "' in "
-                            + NavigationInstrumentation.describeElement(element)
-            );
             return PsiReference.EMPTY_ARRAY;
         }
-        NavigationInstrumentation.info(
-                "Knockout XML template reference created for '" + templatePath
-                        + "' targets=" + targets.size() + " in "
-                        + NavigationInstrumentation.describeElement(element)
-        );
 
         return new PsiReference[] {
                 new PolyVariantReferenceBase(element, getValueRange(element, templatePath), targets)

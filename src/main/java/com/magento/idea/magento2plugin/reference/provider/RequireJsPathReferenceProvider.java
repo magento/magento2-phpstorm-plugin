@@ -11,7 +11,6 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceProvider;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.util.ProcessingContext;
-import com.magento.idea.magento2plugin.project.diagnostic.NavigationInstrumentation;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 import com.magento.idea.magento2plugin.util.magento.js.RequireJsPathResolver;
 import java.util.List;
@@ -33,17 +32,8 @@ public class RequireJsPathReferenceProvider extends PsiReferenceProvider {
                 .resolveJsFilesOrAlias(element.getProject(), requireJsPath);
 
         if (targets.isEmpty()) {
-            NavigationInstrumentation.info(
-                    "RequireJS path reference has no targets for '" + requireJsPath + "' in "
-                            + NavigationInstrumentation.describeElement(element)
-            );
             return PsiReference.EMPTY_ARRAY;
         }
-        NavigationInstrumentation.info(
-                "RequireJS path reference created for '" + requireJsPath
-                        + "' targets=" + targets.size() + " in "
-                        + NavigationInstrumentation.describeElement(element)
-        );
 
         return new PsiReference[] {
                 new PolyVariantReferenceBase(element, getValueRange(element, requireJsPath), targets)

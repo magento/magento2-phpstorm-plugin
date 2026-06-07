@@ -18,7 +18,6 @@ import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlText;
 import com.intellij.util.ProcessingContext;
 import com.magento.idea.magento2plugin.project.Settings;
-import com.magento.idea.magento2plugin.project.diagnostic.NavigationInstrumentation;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 import com.magento.idea.magento2plugin.util.magento.js.RequireJsPathResolver;
 import java.util.ArrayList;
@@ -50,11 +49,6 @@ public class MagentoInitRequireJsReferenceProvider extends PsiReferenceProvider 
                 : RequireJsPathResolver.getInstance().resolveJsFilesOrAlias(element.getProject(), requireJsPath);
 
         if (!targets.isEmpty()) {
-            NavigationInstrumentation.infoOnce(
-                    "magento-init-json-reference-created-" + requireJsPath,
-                    () -> "Magento init injected JSON reference created for '" + requireJsPath
-                            + "' targets=" + targets.size()
-            );
             return new PsiReference[] {
                     new PolyVariantReferenceBase(element, getStringValueRange(element), targets)
             };

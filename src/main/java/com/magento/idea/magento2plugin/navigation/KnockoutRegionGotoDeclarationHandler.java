@@ -12,7 +12,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.linemarker.js.LineMarkerTargetPresentationUtil;
 import com.magento.idea.magento2plugin.project.Settings;
-import com.magento.idea.magento2plugin.project.diagnostic.NavigationInstrumentation;
 import com.magento.idea.magento2plugin.util.magento.js.KnockoutRegionResolver;
 import com.magento.idea.magento2plugin.util.magento.ui.UiComponentScopeResolver;
 import java.util.ArrayList;
@@ -41,12 +40,6 @@ public class KnockoutRegionGotoDeclarationHandler implements GotoDeclarationHand
         if (targets.isEmpty()) {
             return null;
         }
-        NavigationInstrumentation.info(
-                "ko-region-debug goto-declaration targets=" + targets.size()
-                        + ", element=" + NavigationInstrumentation.describeElement(sourceElement)
-                        + ", targetLabels=" + describeTargetLabels(targets)
-                        + ", files=" + describeTargetFiles(targets)
-        );
 
         return targets.toArray(PsiElement.EMPTY_ARRAY);
     }
@@ -107,34 +100,5 @@ public class KnockoutRegionGotoDeclarationHandler implements GotoDeclarationHand
         final int callEndOffset = hostStartOffset + regionMatch.getCallEndOffset();
 
         return offset >= callStartOffset && offset <= callEndOffset;
-    }
-
-    private String describeTargetFiles(final List<PsiElement> targets) {
-        final List<String> result = new ArrayList<>();
-
-        for (final PsiElement target : targets) {
-            if (target == null || target.getContainingFile() == null
-                    || target.getContainingFile().getVirtualFile() == null) {
-                result.add("<unknown>");
-                continue;
-            }
-            result.add(target.getContainingFile().getVirtualFile().getPath());
-        }
-
-        return result.toString();
-    }
-
-    private String describeTargetLabels(final List<PsiElement> targets) {
-        final List<String> result = new ArrayList<>();
-
-        for (final PsiElement target : targets) {
-            result.add(
-                    target.getClass().getSimpleName()
-                            + ": "
-                            + LineMarkerTargetPresentationUtil.getPresentableTargetName(target)
-            );
-        }
-
-        return result.toString();
     }
 }

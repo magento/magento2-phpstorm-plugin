@@ -12,7 +12,6 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
-import com.magento.idea.magento2plugin.project.diagnostic.NavigationInstrumentation;
 import com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex;
 import com.magento.idea.magento2plugin.reference.provider.util.GetAllSubFilesOfVirtualFileUtil;
 import com.magento.idea.magento2plugin.reference.provider.util.GetFilePathUtil;
@@ -46,12 +45,6 @@ public class JsIndex {
         Collection<String> values =
                 FileBasedIndex.getInstance().getValues(RequireJsIndex.KEY, jsKey, scope);
         PsiManager psiManager = PsiManager.getInstance(element.getProject());
-        NavigationInstrumentation.infoOnce(
-                "requirejs-index-values-" + jsKey,
-                () -> "RequireJS index lookup for '" + jsKey
-                        + "' indexValues=" + values.size()
-                        + " scope=" + scope
-        );
 
         List<PsiElement> targets = new ArrayList<>();
         if (values.isEmpty()) {
@@ -70,17 +63,8 @@ public class JsIndex {
         }
 
         if (targets.isEmpty()) {
-            NavigationInstrumentation.infoOnce(
-                    "requirejs-index-targets-empty-" + jsKey,
-                    () -> "RequireJS index resolved no PSI targets for '" + jsKey + "'"
-            );
             return PsiReference.EMPTY_ARRAY;
         }
-        NavigationInstrumentation.infoOnce(
-                "requirejs-index-targets-created-" + jsKey,
-                () -> "RequireJS index resolved PSI targets for '" + jsKey
-                        + "' count=" + targets.size()
-        );
 
         return new PsiReference[] {
                 new PolyVariantReferenceBase(element, targets)

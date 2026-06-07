@@ -29,7 +29,6 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.magento.files.UiComponentXml;
-import com.magento.idea.magento2plugin.project.diagnostic.NavigationInstrumentation;
 import com.magento.idea.magento2plugin.stubs.indexes.ui.DisplayAreaIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.ui.GetRegionUsageIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.ui.UiComponentComponentDeclarationIndex;
@@ -213,12 +212,6 @@ public class UiComponentScopeResolver {
             final List<PsiElement> fallbackTargets = resolveDisplayAreaTargetsFromProjectFilesInDumbMode(
                     templateFile,
                     regionName
-            );
-            NavigationInstrumentation.info(
-                    "ko-region-debug resolver stage=dumb-mode-fallback"
-                            + ", region=" + regionName
-                            + ", file=" + NavigationInstrumentation.describeFile(templateFile)
-                            + ", targets=" + fallbackTargets.size()
             );
             return fallbackTargets;
         }

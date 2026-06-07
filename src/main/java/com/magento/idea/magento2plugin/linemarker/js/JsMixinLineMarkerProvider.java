@@ -25,7 +25,6 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Function;
 import com.intellij.util.indexing.FileBasedIndex;
-import com.magento.idea.magento2plugin.project.diagnostic.NavigationInstrumentation;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.stubs.indexes.js.JsMixinIndex;
 import com.magento.idea.magento2plugin.util.magento.js.RequireJsPathResolver;
@@ -66,13 +65,6 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
             "\\$\\.widget\\([^;]*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)"
     );
 
-    public JsMixinLineMarkerProvider() {
-        NavigationInstrumentation.infoOnce(
-                "js-mixin-linemarker-instantiated",
-                () -> "JS mixin line marker provider instantiated"
-        );
-    }
-
     @Override
     public @Nullable LineMarkerInfo<?> getLineMarkerInfo(final @NotNull PsiElement psiElement) {
         return null;
@@ -84,14 +76,6 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
             final @NotNull Collection<? super LineMarkerInfo<?>> collection
     ) {
         if (psiElements.isEmpty() || !Settings.isEnabled(psiElements.get(0).getProject())) {
-            if (!psiElements.isEmpty()) {
-                NavigationInstrumentation.infoOnce(
-                        "js-mixin-slow-linemarker-disabled-"
-                                + psiElements.get(0).getProject().getLocationHash(),
-                        () -> "JS mixin slow line markers skipped: "
-                                + NavigationInstrumentation.describeSettings(psiElements.get(0).getProject())
-                );
-            }
             return;
         }
 
@@ -112,11 +96,6 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
             final String requireJsPath = RequireJsPathResolver.getInstance().getRequireJsPath(psiFile);
 
             if (requireJsPath == null) {
-                NavigationInstrumentation.infoOnce(
-                        "js-mixin-slow-linemarker-no-path-" + NavigationInstrumentation.describeFile(psiFile),
-                        () -> "JS mixin slow line marker skipped: no Magento requirejs path for "
-                                + NavigationInstrumentation.describeFile(psiFile)
-                );
                 continue;
             }
 
@@ -140,10 +119,6 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
         final List<PsiElement> preparedTargets = LineMarkerTargetPresentationUtil.prepareTargets(targets);
 
         if (preparedTargets.isEmpty()) {
-            NavigationInstrumentation.infoOnce(
-                    "js-mixin-target-linemarker-empty-" + requireJsPath,
-                    () -> "JS mixin target line marker has no targets for mixin '" + requireJsPath + "'"
-            );
             return;
         }
 
@@ -163,11 +138,6 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
                 preparedTargets,
                 TARGET_TOOLTIP_TEXT
         );
-        NavigationInstrumentation.infoOnce(
-                "js-mixin-target-linemarker-added-" + requireJsPath,
-                () -> "JS mixin target line marker added for '" + requireJsPath
-                        + "' targets=" + preparedTargets.size()
-        );
     }
 
     private void addMixinLineMarker(
@@ -184,10 +154,6 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
         final List<PsiElement> preparedMixins = LineMarkerTargetPresentationUtil.prepareTargets(mixins);
 
         if (preparedMixins.isEmpty()) {
-            NavigationInstrumentation.infoOnce(
-                    "js-mixin-mixins-linemarker-empty-" + requireJsPath,
-                    () -> "JS mixin mixins line marker has no mixins for target '" + requireJsPath + "'"
-            );
             return;
         }
 
@@ -206,11 +172,6 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
                 AllIcons.Nodes.Plugin,
                 preparedMixins,
                 MIXINS_TOOLTIP_TEXT
-        );
-        NavigationInstrumentation.infoOnce(
-                "js-mixin-mixins-linemarker-added-" + requireJsPath,
-                () -> "JS mixin mixins line marker added for '" + requireJsPath
-                        + "' mixins=" + preparedMixins.size()
         );
     }
 

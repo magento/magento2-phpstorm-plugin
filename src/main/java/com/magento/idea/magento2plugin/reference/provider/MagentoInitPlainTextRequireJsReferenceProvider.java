@@ -12,7 +12,6 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceProvider;
 import com.intellij.util.ProcessingContext;
 import com.magento.idea.magento2plugin.project.Settings;
-import com.magento.idea.magento2plugin.project.diagnostic.NavigationInstrumentation;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 import com.magento.idea.magento2plugin.util.magento.js.RequireJsPathResolver;
 import java.util.ArrayList;
@@ -80,11 +79,6 @@ public class MagentoInitPlainTextRequireJsReferenceProvider extends PsiReference
                                 ),
                                 targets
                         )
-                );
-                NavigationInstrumentation.infoOnce(
-                        "magento-init-plain-text-reference-created-" + requireJsPath,
-                        () -> "Magento init plain-text reference created for '" + requireJsPath
-                                + "' targets=" + targets.size()
                 );
             }
         }

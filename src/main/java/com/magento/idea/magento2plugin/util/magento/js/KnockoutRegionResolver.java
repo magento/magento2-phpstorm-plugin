@@ -22,7 +22,6 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
-import com.magento.idea.magento2plugin.project.diagnostic.NavigationInstrumentation;
 import com.magento.idea.magento2plugin.util.magento.MagentoVfsUtil;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -111,11 +110,6 @@ public class KnockoutRegionResolver {
                 JavaScriptFileType.INSTANCE,
                 GlobalSearchScope.allScope(project)
         );
-        NavigationInstrumentation.infoOnce(
-                "ko-region-resolve-display-area-scan-" + displayArea,
-                () -> "Resolving displayArea components for '" + displayArea
-                        + "' scannedJsFiles=" + files.size()
-        );
 
         for (final VirtualFile file : files) {
             final PsiFile psiFile = psiManager.findFile(file);
@@ -128,11 +122,6 @@ public class KnockoutRegionResolver {
         addDisplayAreaComponentFilesFromMagentoVfs(project, displayArea, results);
         addDisplayAreaComponentFilesFromLayoutXml(project, displayArea, results);
         addDisplayAreaComponentFilesFromLayoutDeclarations(project, displayArea, results);
-        NavigationInstrumentation.infoOnce(
-                "ko-region-resolve-display-area-result-" + displayArea,
-                () -> "Resolved displayArea components for '" + displayArea
-                        + "' targets=" + results.size()
-        );
 
         return new ArrayList<>(results);
     }
@@ -147,11 +136,6 @@ public class KnockoutRegionResolver {
                 HtmlFileType.INSTANCE,
                 GlobalSearchScope.allScope(project)
         );
-        NavigationInstrumentation.infoOnce(
-                "ko-region-resolve-get-region-scan-" + regionName,
-                () -> "Resolving getRegion templates for '" + regionName
-                        + "' scannedHtmlFiles=" + files.size()
-        );
 
         for (final VirtualFile file : files) {
             final PsiFile psiFile = psiManager.findFile(file);
@@ -162,11 +146,6 @@ public class KnockoutRegionResolver {
             results.add(psiFile);
         }
         addGetRegionTemplateFilesFromMagentoVfs(project, regionName, results);
-        NavigationInstrumentation.infoOnce(
-                "ko-region-resolve-get-region-result-" + regionName,
-                () -> "Resolved getRegion templates for '" + regionName
-                        + "' targets=" + results.size()
-        );
 
         return new ArrayList<>(results);
     }
@@ -179,9 +158,6 @@ public class KnockoutRegionResolver {
 
         addDisplayAreaTemplateFilesFromLayoutXml(project, displayArea, results);
         addDisplayAreaTemplateFilesFromLayoutDeclarations(project, displayArea, results);
-        NavigationInstrumentation.info(
-                "Resolved displayArea templates for '" + displayArea + "' targets=" + results.size()
-        );
 
         return new ArrayList<>(results);
     }
@@ -234,13 +210,11 @@ public class KnockoutRegionResolver {
             final @NotNull Collection<PsiElement> results
     ) {
         final PsiManager psiManager = PsiManager.getInstance(project);
-        int scannedFiles = 0;
 
         for (final VirtualFile file : MagentoVfsUtil.findMagentoFiles(
                 project,
                 virtualFile -> "js".equals(virtualFile.getExtension())
         )) {
-            scannedFiles++;
             final PsiFile psiFile = psiManager.findFile(file);
 
             if (!(psiFile instanceof JSFile) || !containsDisplayArea((JSFile) psiFile, displayArea)) {
@@ -248,13 +222,6 @@ public class KnockoutRegionResolver {
             }
             results.add(psiFile);
         }
-        final int finalScannedFiles = scannedFiles;
-        NavigationInstrumentation.infoOnce(
-                "ko-region-resolve-display-area-vfs-" + displayArea,
-                () -> "Magento VFS displayArea scan for '" + displayArea
-                        + "' scannedJsFiles=" + finalScannedFiles
-                        + " totalTargets=" + results.size()
-        );
     }
 
     private void addDisplayAreaComponentFilesFromLayoutDeclarations(
@@ -305,10 +272,8 @@ public class KnockoutRegionResolver {
                 project,
                 virtualFile -> "xml".equals(virtualFile.getExtension())
         ));
-        int scannedFiles = 0;
 
         for (final VirtualFile file : xmlFiles) {
-            scannedFiles++;
             final PsiFile psiFile = psiManager.findFile(file);
 
             if (!(psiFile instanceof XmlFile) || !psiFile.getText().contains(displayArea)) {
@@ -316,13 +281,6 @@ public class KnockoutRegionResolver {
             }
             addLayoutXmlDisplayAreaComponentFiles((XmlFile) psiFile, displayArea, results);
         }
-        final int finalScannedFiles = scannedFiles;
-        NavigationInstrumentation.infoOnce(
-                "ko-region-resolve-display-area-xml-" + displayArea,
-                () -> "Magento layout XML displayArea scan for '" + displayArea
-                        + "' scannedXmlFiles=" + finalScannedFiles
-                        + " totalTargets=" + results.size()
-        );
     }
 
     private void addDisplayAreaTemplateFilesFromLayoutXml(
@@ -339,10 +297,8 @@ public class KnockoutRegionResolver {
                 project,
                 virtualFile -> "xml".equals(virtualFile.getExtension())
         ));
-        int scannedFiles = 0;
 
         for (final VirtualFile file : xmlFiles) {
-            scannedFiles++;
             final PsiFile psiFile = psiManager.findFile(file);
 
             if (!(psiFile instanceof XmlFile) || !psiFile.getText().contains(displayArea)) {
@@ -350,12 +306,6 @@ public class KnockoutRegionResolver {
             }
             addLayoutXmlDisplayAreaTemplateFiles((XmlFile) psiFile, displayArea, results);
         }
-        final int finalScannedFiles = scannedFiles;
-        NavigationInstrumentation.info(
-                "Magento layout XML displayArea template scan for '" + displayArea
-                        + "' scannedXmlFiles=" + finalScannedFiles
-                        + " totalTargets=" + results.size()
-        );
     }
 
     private void addGetRegionTemplateFilesFromMagentoVfs(
@@ -364,13 +314,11 @@ public class KnockoutRegionResolver {
             final @NotNull Collection<PsiElement> results
     ) {
         final PsiManager psiManager = PsiManager.getInstance(project);
-        int scannedFiles = 0;
 
         for (final VirtualFile file : MagentoVfsUtil.findMagentoFiles(
                 project,
                 virtualFile -> "html".equals(virtualFile.getExtension())
         )) {
-            scannedFiles++;
             final PsiFile psiFile = psiManager.findFile(file);
 
             if (psiFile == null || !containsGetRegion(psiFile, regionName)) {
@@ -378,13 +326,6 @@ public class KnockoutRegionResolver {
             }
             results.add(psiFile);
         }
-        final int finalScannedFiles = scannedFiles;
-        NavigationInstrumentation.infoOnce(
-                "ko-region-resolve-get-region-vfs-" + regionName,
-                () -> "Magento VFS getRegion scan for '" + regionName
-                        + "' scannedHtmlFiles=" + finalScannedFiles
-                        + " totalTargets=" + results.size()
-        );
     }
 
     private boolean containsDisplayArea(

@@ -16,7 +16,6 @@ import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlText;
 import com.intellij.util.ProcessingContext;
 import com.magento.idea.magento2plugin.project.Settings;
-import com.magento.idea.magento2plugin.project.diagnostic.NavigationInstrumentation;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 import com.magento.idea.magento2plugin.util.magento.js.RequireJsPathResolver;
 import java.util.ArrayList;
@@ -61,11 +60,6 @@ public class MagentoInitHostRequireJsReferenceProvider extends PsiReferenceProvi
                             new TextRange(matcher.start(2), matcher.end(2)),
                             targets
                     )
-            );
-            NavigationInstrumentation.infoOnce(
-                    "magento-init-host-reference-created-" + requireJsPath,
-                    () -> "Magento init host reference created for '" + requireJsPath
-                            + "' targets=" + targets.size()
             );
         }
 

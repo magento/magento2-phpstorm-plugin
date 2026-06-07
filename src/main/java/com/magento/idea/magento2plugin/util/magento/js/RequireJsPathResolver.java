@@ -15,7 +15,6 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.project.Settings;
-import com.magento.idea.magento2plugin.project.diagnostic.NavigationInstrumentation;
 import com.magento.idea.magento2plugin.reference.provider.util.GetModuleFileUtil;
 import com.magento.idea.magento2plugin.reference.provider.util.GetModuleNameUtil;
 import com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex;
@@ -90,11 +89,6 @@ public class RequireJsPathResolver {
 
         if (moduleName == null) {
             result.addAll(findLibJsFiles(project, requireJsPath));
-            NavigationInstrumentation.infoOnce(
-                    "requirejs-resolve-lib-" + requireJsPath,
-                    () -> "Resolved RequireJS lib path '" + requireJsPath
-                            + "' targets=" + result.size()
-            );
             return result;
         }
 
@@ -109,13 +103,6 @@ public class RequireJsPathResolver {
         if (result.isEmpty()) {
             addModuleJsCandidatesByPath(project, result, moduleName, relativePath);
         }
-        NavigationInstrumentation.infoOnce(
-                "requirejs-resolve-module-" + requireJsPath,
-                () -> "Resolved RequireJS module path '" + requireJsPath
-                        + "' module=" + moduleName
-                        + " moduleRoots=" + moduleRootPaths.size()
-                        + " targets=" + result.size()
-        );
 
         return result;
     }
@@ -167,40 +154,19 @@ public class RequireJsPathResolver {
         final String modulePath = getModuleRequireJsPath(psiFile.getProject(), filePath);
 
         if (modulePath != null) {
-            NavigationInstrumentation.infoOnce(
-                    "requirejs-path-for-file-module-" + filePath,
-                    () -> "Computed Magento RequireJS path '" + modulePath + "' for "
-                            + NavigationInstrumentation.describeFile(psiFile)
-            );
             return modulePath;
         }
 
         final String themePath = getThemeRequireJsPath(filePath);
 
         if (themePath != null) {
-            NavigationInstrumentation.infoOnce(
-                    "requirejs-path-for-file-theme-" + filePath,
-                    () -> "Computed Magento theme RequireJS path '" + themePath + "' for "
-                            + NavigationInstrumentation.describeFile(psiFile)
-            );
             return themePath;
         }
 
         final String libPath = getLibRequireJsPath(psiFile.getProject(), filePath);
 
         if (libPath != null) {
-            NavigationInstrumentation.infoOnce(
-                    "requirejs-path-for-file-lib-" + filePath,
-                    () -> "Computed Magento lib RequireJS path '" + libPath + "' for "
-                            + NavigationInstrumentation.describeFile(psiFile)
-            );
         } else {
-            NavigationInstrumentation.infoOnce(
-                    "requirejs-path-for-file-empty-" + filePath,
-                    () -> "Could not compute Magento RequireJS path for "
-                            + NavigationInstrumentation.describeFile(psiFile)
-                            + "; " + NavigationInstrumentation.describeSettings(psiFile.getProject())
-            );
         }
 
         return libPath;
@@ -212,11 +178,6 @@ public class RequireJsPathResolver {
     ) {
         final Collection<String> moduleNames = FileBasedIndex.getInstance()
                 .getAllKeys(ModuleXmlIndex.KEY, project);
-        NavigationInstrumentation.infoOnce(
-                "requirejs-module-path-module-key-count-" + project.getLocationHash(),
-                () -> "RequireJS path resolver sees module_xml keys=" + moduleNames.size()
-                        + "; " + NavigationInstrumentation.describeSettings(project)
-        );
 
         for (final String moduleName : moduleNames) {
             final Collection<String> moduleRootPaths = getModuleRootPaths(project, moduleName);
@@ -260,11 +221,6 @@ public class RequireJsPathResolver {
                 .getValues(ModuleXmlIndex.KEY, moduleName, GlobalSearchScope.allScope(project)));
 
         if (!moduleRootPaths.isEmpty()) {
-            NavigationInstrumentation.infoOnce(
-                    "requirejs-module-roots-index-" + moduleName,
-                    () -> "RequireJS module roots from module_xml for '" + moduleName
-                            + "' count=" + moduleRootPaths.size()
-            );
             return moduleRootPaths;
         }
 
@@ -289,11 +245,6 @@ public class RequireJsPathResolver {
                 moduleRootPaths.add(moduleRoot.getPath());
             }
         }
-        NavigationInstrumentation.infoOnce(
-                "requirejs-module-roots-fallback-" + moduleName,
-                () -> "RequireJS module roots from fallback for '" + moduleName
-                        + "' count=" + moduleRootPaths.size()
-        );
 
         return moduleRootPaths;
     }
