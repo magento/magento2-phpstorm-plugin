@@ -183,7 +183,7 @@ public class KnockoutTemplateLinemarkerRegistrarTest extends LinemarkerFixtureTe
                 "app/code/Foo/Bar/view/frontend/web/template/parent.html"
         );
 
-        assertHasLinemarkerWithTooltipAndIcon("Navigate to child Knockout templates", "");
+        assertHasLinemarkerWithTooltipAndIcon("Navigate to displayArea declaration", "");
     }
 
     /**
@@ -216,7 +216,7 @@ public class KnockoutTemplateLinemarkerRegistrarTest extends LinemarkerFixtureTe
                         + "<!-- /ko -->"
         );
 
-        assertLinemarkerCountWithTooltip("Navigate to child Knockout templates", 1);
+        assertLinemarkerCountWithTooltip("Navigate to displayArea declaration", 1);
     }
 
     /**
@@ -238,7 +238,7 @@ public class KnockoutTemplateLinemarkerRegistrarTest extends LinemarkerFixtureTe
                         + "<!-- /ko -->"
         );
 
-        assertLinemarkerCountWithTooltip("Navigate to child Knockout templates", 1);
+        assertLinemarkerCountWithTooltip("Navigate to displayArea declaration", 1);
     }
 
     /**
@@ -259,7 +259,7 @@ public class KnockoutTemplateLinemarkerRegistrarTest extends LinemarkerFixtureTe
                 "<each args=\"getRegion('eachRegion')\" render=\"\" />"
         );
 
-        assertLinemarkerCountWithTooltip("Navigate to child Knockout templates", 1);
+        assertLinemarkerCountWithTooltip("Navigate to displayArea declaration", 1);
     }
 
     /**
@@ -281,7 +281,7 @@ public class KnockoutTemplateLinemarkerRegistrarTest extends LinemarkerFixtureTe
                         + "<!-- /ko -->"
         );
 
-        assertLinemarkerCountWithTooltip("Navigate to child Knockout templates", 1);
+        assertLinemarkerCountWithTooltip("Navigate to displayArea declaration", 1);
     }
 
     /**
@@ -303,7 +303,7 @@ public class KnockoutTemplateLinemarkerRegistrarTest extends LinemarkerFixtureTe
                         + "<!-- /ko -->"
         );
 
-        assertLinemarkerCountWithTooltip("Navigate to child Knockout templates", 1);
+        assertLinemarkerCountWithTooltip("Navigate to displayArea declaration", 1);
     }
 
     /**
@@ -325,7 +325,7 @@ public class KnockoutTemplateLinemarkerRegistrarTest extends LinemarkerFixtureTe
                         + "<!-- /ko -->"
         );
 
-        assertLinemarkerCountWithTooltip("Navigate to child Knockout templates", 1);
+        assertLinemarkerCountWithTooltip("Navigate to displayArea declaration", 1);
     }
 
     /**
@@ -346,7 +346,7 @@ public class KnockoutTemplateLinemarkerRegistrarTest extends LinemarkerFixtureTe
                 "<each args=\"getRegion(&quot;encodedEachRegion&quot;)\" render=\"\" />"
         );
 
-        assertLinemarkerCountWithTooltip("Navigate to child Knockout templates", 1);
+        assertLinemarkerCountWithTooltip("Navigate to displayArea declaration", 1);
     }
 
     /**

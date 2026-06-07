@@ -78,6 +78,6 @@ public class DisplayAreaIndex extends FileBasedIndexExtension<String, Set<UiComp
 
     @Override
     public int getVersion() {
-        return 1;
+        return 3;
     }
 }

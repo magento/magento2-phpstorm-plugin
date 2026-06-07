@@ -5,9 +5,15 @@
 
 package com.magento.idea.magento2plugin.reference.js;
 
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
+import com.intellij.psi.ResolveResult;
+import com.magento.idea.magento2plugin.navigation.KnockoutRegionGotoDeclarationHandler;
 import com.magento.idea.magento2plugin.reference.provider.KnockoutRegionReferenceProvider;
 import com.magento.idea.magento2plugin.reference.provider.KnockoutTemplateReferenceProvider;
 import com.magento.idea.magento2plugin.reference.provider.KnockoutTemplateUsageReferenceProvider;
+import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
+import com.magento.idea.magento2plugin.util.magento.ui.UiComponentScopeResolver;
 
 public class KnockoutTemplateReferenceRegistrarTest extends ReferenceJsFixtureTestCase {
     private static final String FIXTURE_PATH = "component.js";
@@ -218,6 +224,347 @@ public class KnockoutTemplateReferenceRegistrarTest extends ReferenceJsFixtureTe
     }
 
     /**
+     * Nested jsLayout component templates should resolve child display areas declared under their owning component.
+     */
+    public void testNestedShipmentTemplateRegionsMustResolveXmlDisplayAreas() {
+        addCaryShipmentFixture(
+                "<!-- ko foreach: { data: $parent.getRegion('ship<caret>ments'), as: 'shipmentRenderer' } -->\n"
+                        + "<!-- /ko -->",
+                "<!-- ko foreach: { data: renderer.getRegion('items'), as: 'itemsRenderer' } -->\n"
+                        + "<!-- /ko -->\n"
+                        + "<!-- ko foreach: { data: renderer.getRegion('met<caret>hods'), as: 'methodsRenderer' } -->\n"
+                        + "<!-- /ko -->"
+        );
+        myFixture.configureFromTempProjectFile(
+                "app/code/Cary/ShipperHQ/view/frontend/web/template/shipping-methods.html"
+        );
+
+        assertHasReferenceToFile(
+                "app/code/Cary/ShipperHQ/view/frontend/layout/checkout_index_index.xml",
+                KnockoutRegionReferenceProvider.class
+        );
+        assertHasReferenceToFile("app/code/Cary/ShipperHQ/view/frontend/layout/checkout_index_index.xml");
+        assertHasReferenceToFile(
+                "app/code/Cary/ShipperHQ/view/frontend/web/template/shipping-methods/shipment.html",
+                KnockoutRegionReferenceProvider.class
+        );
+        myFixture.configureFromTempProjectFile(
+                "app/code/Cary/ShipperHQ/view/frontend/web/template/shipping-methods/shipment.html"
+        );
+        assertHasReferenceToFile(
+                "app/code/Cary/ShipperHQ/view/frontend/layout/checkout_index_index.xml",
+                KnockoutRegionReferenceProvider.class
+        );
+        assertHasReferenceToFile("app/code/Cary/ShipperHQ/view/frontend/layout/checkout_index_index.xml");
+        assertHasReferenceToFile(
+                "app/code/Cary/ShipperHQ/view/frontend/web/template/shipping-methods/shipment/methods.html",
+                KnockoutRegionReferenceProvider.class
+        );
+        assertHasNoReferenceToFile(
+                "app/code/Cary/ShipperHQ/view/frontend/web/js/view/shipping-methods/shipment/items.js",
+                KnockoutRegionReferenceProvider.class
+        );
+    }
+
+    /**
+     * Go to declaration from the getRegion call itself should use the same scoped displayArea target.
+     */
+    public void testNestedShipmentTemplateRegionCallMustResolveXmlDisplayAreas() {
+        addCaryShipmentFixture(
+                "<!-- ko foreach: { data: $parent.getRegion('shipments'), as: 'shipmentRenderer' } -->\n"
+                        + "<!-- /ko -->",
+                "<!-- ko foreach: { data: renderer.getRegion('items'), as: 'itemsRenderer' } -->\n"
+                        + "<!-- /ko -->\n"
+                        + "<!-- ko foreach: { data: renderer.get<caret>Region('methods'), as: 'methodsRenderer' } -->\n"
+                        + "<!-- /ko -->"
+        );
+        myFixture.configureFromTempProjectFile(
+                "app/code/Cary/ShipperHQ/view/frontend/web/template/shipping-methods/shipment.html"
+        );
+
+        assertHasReferenceToFile(
+                "app/code/Cary/ShipperHQ/view/frontend/layout/checkout_index_index.xml",
+                KnockoutRegionReferenceProvider.class
+        );
+        assertHasReferenceToFile(
+                "app/code/Cary/ShipperHQ/view/frontend/web/template/shipping-methods/shipment/methods.html",
+                KnockoutRegionReferenceProvider.class
+        );
+        assertHasNoReferenceToFile(
+                "app/code/Cary/ShipperHQ/view/frontend/web/js/view/shipping-methods/shipment/items.js",
+                KnockoutRegionReferenceProvider.class
+        );
+    }
+
+    /**
+     * Go to declaration should expose both the scoped XML displayArea declaration and child template target.
+     */
+    public void testGetRegionGotoDeclarationMustIncludeXmlDeclarationAndChildTemplate() {
+        addCaryShipmentFixture(
+                "<!-- ko foreach: { data: $parent.getRegion('shipments'), as: 'shipmentRenderer' } -->\n"
+                        + "<!-- /ko -->",
+                "<!-- ko foreach: { data: renderer.getRegion('items'), as: 'itemsRenderer' } -->\n"
+                        + "<!-- /ko -->\n"
+                        + "<!-- ko foreach: { data: renderer.get<caret>Region('methods'), as: 'methodsRenderer' } -->\n"
+                        + "<!-- /ko -->"
+        );
+        myFixture.configureFromTempProjectFile(
+                "app/code/Cary/ShipperHQ/view/frontend/web/template/shipping-methods/shipment.html"
+        );
+
+        assertGotoDeclarationTargetsFile(
+                "app/code/Cary/ShipperHQ/view/frontend/layout/checkout_index_index.xml"
+        );
+        assertGotoDeclarationTargetsFile(
+                "app/code/Cary/ShipperHQ/view/frontend/web/template/shipping-methods/shipment/methods.html"
+        );
+    }
+
+    /**
+     * Collection wrappers rendered through getRegion should expose templates from descendant child components.
+     */
+    public void testGetRegionGotoDeclarationMustIncludeDescendantCollectionChildTemplates() {
+        addTemplate("collection-parent", "<!-- ko foreach: get<caret>Region('collectionRegion') -->\n<!-- /ko -->");
+        addTemplate("field", "<span>field</span>");
+        myFixture.addFileToProject(
+                "app/code/Foo/Bar/view/frontend/web/template/element/select.html",
+                "<select></select>"
+        );
+        myFixture.addFileToProject(
+                "app/code/Foo/Bar/view/frontend/web/template/element/input.html",
+                "<input />"
+        );
+        myFixture.addFileToProject(
+                "app/code/Foo/Bar/view/frontend/layout/checkout_index_index.xml",
+                "<?xml version=\"1.0\"?>\n"
+                        + "<page xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"
+                        + "    <body>\n"
+                        + "        <referenceBlock name=\"checkout.root\">\n"
+                        + "            <arguments>\n"
+                        + "                <argument name=\"jsLayout\" xsi:type=\"array\">\n"
+                        + "                    <item name=\"components\" xsi:type=\"array\">\n"
+                        + "                        <item name=\"checkout\" xsi:type=\"array\">\n"
+                        + "                            <item name=\"template\" xsi:type=\"string\">"
+                        + "Foo_Bar/collection-parent</item>\n"
+                        + "                            <item name=\"children\" xsi:type=\"array\">\n"
+                        + "                                <item name=\"collection\" xsi:type=\"array\">\n"
+                        + "                                    <item name=\"component\" xsi:type=\"string\">uiCollection</item>\n"
+                        + "                                    <item name=\"displayArea\" xsi:type=\"string\">"
+                        + "collectionRegion</item>\n"
+                        + "                                    <item name=\"children\" xsi:type=\"array\">\n"
+                        + "                                        <item name=\"select-field\" xsi:type=\"array\">\n"
+                        + "                                            <item name=\"component\" xsi:type=\"string\">"
+                        + "Magento_Ui/js/form/element/select</item>\n"
+                        + "                                            <item name=\"config\" xsi:type=\"array\">\n"
+                        + "                                                <item name=\"template\" xsi:type=\"string\">"
+                        + "Foo_Bar/template/field</item>\n"
+                        + "                                                <item name=\"elementTmpl\" xsi:type=\"string\">"
+                        + "Foo_Bar/element/select</item>\n"
+                        + "                                            </item>\n"
+                        + "                                        </item>\n"
+                        + "                                        <item name=\"input-field\" xsi:type=\"array\">\n"
+                        + "                                            <item name=\"component\" xsi:type=\"string\">"
+                        + "Magento_Ui/js/form/element/abstract</item>\n"
+                        + "                                            <item name=\"config\" xsi:type=\"array\">\n"
+                        + "                                                <item name=\"template\" xsi:type=\"string\">"
+                        + "Foo_Bar/template/field</item>\n"
+                        + "                                                <item name=\"elementTmpl\" xsi:type=\"string\">"
+                        + "Foo_Bar/element/input</item>\n"
+                        + "                                            </item>\n"
+                        + "                                        </item>\n"
+                        + "                                    </item>\n"
+                        + "                                </item>\n"
+                        + "                            </item>\n"
+                        + "                        </item>\n"
+                        + "                    </item>\n"
+                        + "                </argument>\n"
+                        + "            </arguments>\n"
+                        + "        </referenceBlock>\n"
+                        + "    </body>\n"
+                        + "</page>"
+        );
+        myFixture.configureFromTempProjectFile(
+                "app/code/Foo/Bar/view/frontend/web/template/collection-parent.html"
+        );
+
+        assertGotoDeclarationTargetsFile("app/code/Foo/Bar/view/frontend/layout/checkout_index_index.xml");
+        assertGotoDeclarationTargetsFile("app/code/Foo/Bar/view/frontend/web/template/field.html");
+        assertGotoDeclarationTargetsFile("app/code/Foo/Bar/view/frontend/web/template/element/select.html");
+        assertGotoDeclarationTargetsFile("app/code/Foo/Bar/view/frontend/web/template/element/input.html");
+    }
+
+    /**
+     * Go to declaration should expose scoped JavaScript displayArea declarations.
+     */
+    public void testGetRegionGotoDeclarationMustIncludeJsDisplayArea() {
+        addTemplate("js-config-parent-one", "<!-- ko foreach: get<caret>Region('jsConfigRegion') -->\n<!-- /ko -->");
+        addTemplate("js-config-parent-two", "<!-- ko foreach: getRegion('jsConfigRegion') -->\n<!-- /ko -->");
+        myFixture.addFileToProject(
+                "app/code/Foo/Bar/view/frontend/web/js/scoped-config.js",
+                "var config = {\n"
+                        + "    components: {\n"
+                        + "        parentOne: {\n"
+                        + "            template: 'Foo_Bar/template/js-config-parent-one',\n"
+                        + "            children: { childOne: { displayArea: 'jsConfigRegion' } }\n"
+                        + "        },\n"
+                        + "        parentTwo: {\n"
+                        + "            template: 'Foo_Bar/template/js-config-parent-two',\n"
+                        + "            children: { childTwo: { displayArea: 'jsConfigRegion' } }\n"
+                        + "        }\n"
+                        + "    }\n"
+                        + "};"
+        );
+        myFixture.configureFromTempProjectFile(
+                "app/code/Foo/Bar/view/frontend/web/template/js-config-parent-one.html"
+        );
+
+        assertGotoDeclarationTargetsFile("app/code/Foo/Bar/view/frontend/web/js/scoped-config.js");
+        assertGotoDeclarationDoesNotTargetFile("app/code/Foo/Bar/view/frontend/web/template/js-config-parent-two.html");
+    }
+
+    /**
+     * Editor offset lookup inside nested HTML must resolve the clicked getRegion call, not the whole wrapping tag.
+     */
+    public void testNestedShipmentTemplateRegionCallMustResolveFromEditorOffset() {
+        addCaryShipmentFixture(
+                "<!-- ko foreach: { data: $parent.getRegion('shipments'), as: 'shipmentRenderer' } -->\n"
+                        + "<!-- /ko -->",
+                "<div class=\"cary-shq-shipment__content\">\n"
+                        + "    <!-- ko foreach: { data: renderer.get<caret>Region('methods'), as: 'methodsRenderer' } -->\n"
+                        + "    <!-- /ko -->\n"
+                        + "</div>"
+        );
+        myFixture.configureFromTempProjectFile(
+                "app/code/Cary/ShipperHQ/view/frontend/web/template/shipping-methods/shipment.html"
+        );
+
+        final PsiReference reference = myFixture.getFile().findReferenceAt(myFixture.getCaretOffset());
+
+        assertNotNull("Expected editor offset reference for getRegion", reference);
+        assertReferenceResolvesToFile(
+                reference,
+                "app/code/Cary/ShipperHQ/view/frontend/layout/checkout_index_index.xml"
+        );
+    }
+
+    /**
+     * The Cary shipment template structure should resolve from editor offset with multiple getRegion calls.
+     */
+    public void testRealShipmentTemplateRegionCallMustResolveFromEditorOffset() {
+        addCaryShipmentFixture(
+                "<!-- ko foreach: { data: $parent.getRegion('shipments'), as: 'shipmentRenderer' } -->\n"
+                        + "<!-- /ko -->",
+                "<!--\n"
+                        + "/**\n"
+                        + " * @category Cary\n"
+                        + " */\n"
+                        + "-->\n"
+                        + "<section class=\"cary-shq-shipment\"\n"
+                        + "         data-bind=\"attr: {\n"
+                        + "            'data-test-shipment-id': shipment.shipment_id || shipment.name || '',\n"
+                        + "            'data-test-item-ids': renderer.getShipmentItemIds(shipment),\n"
+                        + "            'data-test-skus': renderer.getShipmentSkus(shipment)\n"
+                        + "         }\">\n"
+                        + "    <header class=\"cary-shq-shipment__header\">\n"
+                        + "        <strong class=\"cary-shq-shipment__title\">\n"
+                        + "            <span data-bind=\"text: renderer.getShipmentTitle(shipment)\"></span>\n"
+                        + "            <span class=\"cary-shq-shipment__identity\"\n"
+                        + "                  data-bind=\"text: renderer.getShipmentItemIdentityText(shipment)\"></span>\n"
+                        + "        </strong>\n"
+                        + "    </header>\n"
+                        + "\n"
+                        + "    <div class=\"cary-shq-shipment__content\">\n"
+                        + "        <!-- ko foreach: { data: renderer.getRegion('items'), as: 'itemsRenderer' } -->\n"
+                        + "        <!-- /ko -->\n"
+                        + "        <!-- ko foreach: { data: renderer.get<caret>Region('methods'), as: 'methodsRenderer' } -->\n"
+                        + "        <!-- /ko -->\n"
+                        + "    </div>\n"
+                        + "</section>"
+        );
+        myFixture.configureFromTempProjectFile(
+                "app/code/Cary/ShipperHQ/view/frontend/web/template/shipping-methods/shipment.html"
+        );
+
+        final PsiReference reference = myFixture.getFile().findReferenceAt(myFixture.getCaretOffset());
+
+        assertNotNull("Expected editor offset reference for getRegion", reference);
+        assertReferenceResolvesToFile(
+                reference,
+                "app/code/Cary/ShipperHQ/view/frontend/layout/checkout_index_index.xml"
+        );
+    }
+
+    /**
+     * Nested child templates should prefer their owning component scope over duplicate global region names.
+     */
+    public void testNestedShipmentItemsTemplateMustNotResolveDuplicateGlobalDisplayArea() {
+        addCaryShipmentFixture(
+                "<!-- ko foreach: { data: $parent.getRegion('shipments'), as: 'shipmentRenderer' } -->\n"
+                        + "<!-- /ko -->",
+                "<!-- ko foreach: { data: renderer.getRegion('items'), as: 'itemsRenderer' } -->\n"
+                        + "<!-- /ko -->"
+        );
+        myFixture.addFileToProject(
+                "app/code/Cary/ShipperHQ/view/frontend/web/template/shipping-methods/shipment/items.html",
+                "<!-- ko foreach: { data: $parent.renderer.get<caret>Region('item'), as: 'itemRenderer' } -->\n"
+                        + "<!-- /ko -->"
+        );
+        myFixture.addFileToProject(
+                "app/code/Cary/QuoteForm/view/frontend/layout/catalog_product_view.xml",
+                "<?xml version=\"1.0\"?>\n"
+                        + "<page xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"
+                        + "    <body>\n"
+                        + "        <referenceBlock name=\"content\">\n"
+                        + "            <arguments>\n"
+                        + "                <argument name=\"jsLayout\" xsi:type=\"array\">\n"
+                        + "                    <item name=\"components\" xsi:type=\"array\">\n"
+                        + "                        <item name=\"cary\" xsi:type=\"array\">\n"
+                        + "                            <item name=\"children\" xsi:type=\"array\">\n"
+                        + "                                <item name=\"request\" xsi:type=\"array\">\n"
+                        + "                                    <item name=\"children\" xsi:type=\"array\">\n"
+                        + "                                        <item name=\"quote\" xsi:type=\"array\">\n"
+                        + "                                            <item name=\"children\" xsi:type=\"array\">\n"
+                        + "                                                <item name=\"popup\" xsi:type=\"array\">\n"
+                        + "                                                    <item name=\"template\" xsi:type=\"string\">"
+                        + "Cary_QuoteForm/quote-form/main</item>\n"
+                        + "                                                    <item name=\"children\" xsi:type=\"array\">\n"
+                        + "                                                        <item name=\"item\" xsi:type=\"array\">\n"
+                        + "                                                            <item name=\"displayArea\" xsi:type=\"string\">"
+                        + "item</item>\n"
+                        + "                                                        </item>\n"
+                        + "                                                    </item>\n"
+                        + "                                                </item>\n"
+                        + "                                            </item>\n"
+                        + "                                        </item>\n"
+                        + "                                    </item>\n"
+                        + "                                </item>\n"
+                        + "                            </item>\n"
+                        + "                        </item>\n"
+                        + "                    </item>\n"
+                        + "                </argument>\n"
+                        + "            </arguments>\n"
+                        + "        </referenceBlock>\n"
+                        + "    </body>\n"
+                        + "</page>"
+        );
+        myFixture.configureFromTempProjectFile(
+                "app/code/Cary/ShipperHQ/view/frontend/web/template/shipping-methods/shipment/items.html"
+        );
+
+        final PsiReference reference = myFixture.getFile().findReferenceAt(myFixture.getCaretOffset());
+
+        assertNotNull("Expected editor offset reference for nested getRegion", reference);
+        assertReferenceResolvesToFile(
+                reference,
+                "app/code/Cary/ShipperHQ/view/frontend/layout/checkout_index_index.xml"
+        );
+        assertReferenceDoesNotResolveToFile(
+                reference,
+                "app/code/Cary/QuoteForm/view/frontend/layout/catalog_product_view.xml"
+        );
+    }
+
+    /**
      * JavaScript configuration displayArea declarations should resolve parent template regions.
      */
     public void testJsConfigDisplayAreaMustHaveScopedReferenceToGetRegion() {
@@ -283,6 +630,56 @@ public class KnockoutTemplateReferenceRegistrarTest extends ReferenceJsFixtureTe
                 "app/code/Foo/Bar/view/frontend/web/js/scoped-config.js",
                 KnockoutRegionReferenceProvider.class
         );
+    }
+
+    /**
+     * Dynamic uiLayout child configs with parent: this.name should resolve from the owner template.
+     */
+    public void testGetRegionMustResolveDynamicJsLayoutDisplayArea() {
+        myFixture.addFileToProject(
+                "app/code/Cary/QuoteForm/view/frontend/web/template/quote-form/items.html",
+                "<!-- ko foreach: get<caret>Region('items-area') -->\n"
+                        + "    <!-- ko template: getTemplate() --><!-- /ko -->\n"
+                        + "<!-- /ko -->"
+        );
+        myFixture.addFileToProject(
+                "app/code/Cary/QuoteForm/view/frontend/web/template/quote-form/item.html",
+                "<tr><td>item</td></tr>"
+        );
+        myFixture.addFileToProject(
+                "app/code/Cary/QuoteForm/view/frontend/web/js/quote-form/item.js",
+                "define(['uiComponent'], function (Component) {\n"
+                        + "    return Component.extend({\n"
+                        + "        defaults: { template: 'Cary_QuoteForm/quote-form/item' }\n"
+                        + "    });\n"
+                        + "});"
+        );
+        myFixture.addFileToProject(
+                "app/code/Cary/QuoteForm/view/frontend/web/js/quote-form/items.js",
+                "define(['uiComponent', 'uiLayout'], function (Component, layout) {\n"
+                        + "    return Component.extend({\n"
+                        + "        defaults: { template: 'Cary_QuoteForm/quote-form/items' },\n"
+                        + "        initialize: function () {\n"
+                        + "            layout([{ parent: this.name, name: 'options', displayArea: "
+                        + "'new-item-options-area', component: 'Cary_QuoteForm/js/quote-form/item' }]);\n"
+                        + "        },\n"
+                        + "        getItemConfig: function (item) {\n"
+                        + "            return {\n"
+                        + "                parent: this.name,\n"
+                        + "                name: item.sku + '_' + Date.now(),\n"
+                        + "                displayArea: 'items-area',\n"
+                        + "                component: 'Cary_QuoteForm/js/quote-form/item'\n"
+                        + "            };\n"
+                        + "        }\n"
+                        + "    });\n"
+                        + "});"
+        );
+        myFixture.configureFromTempProjectFile(
+                "app/code/Cary/QuoteForm/view/frontend/web/template/quote-form/items.html"
+        );
+
+        assertGotoDeclarationTargetsFile("app/code/Cary/QuoteForm/view/frontend/web/js/quote-form/items.js");
+        assertGotoDeclarationTargetsFile("app/code/Cary/QuoteForm/view/frontend/web/template/quote-form/item.html");
     }
 
     /**
@@ -377,11 +774,221 @@ public class KnockoutTemplateReferenceRegistrarTest extends ReferenceJsFixtureTe
         );
     }
 
+    /**
+     * Non-UI jQuery widgets may have template option keys that are not Magento UI component templates.
+     */
+    public void testNonUiWidgetTemplateOptionsMustNotBeCollectedAsUiComponentDeclarations() {
+        myFixture.configureByText(
+                "dynamic-rows.js",
+                "define(['jquery', 'mage/template'], function ($, mageTemplate) {\n"
+                        + "    'use strict';\n"
+                        + "    $.widget('mage.amFaqWidgetDynamicRows', {\n"
+                        + "        tableBody: $(),\n"
+                        + "        template: {},\n"
+                        + "        options: {\n"
+                        + "            templateSelector: '#dynamic-rows-template',\n"
+                        + "            template: '',\n"
+                        + "            rowsData: []\n"
+                        + "        },\n"
+                        + "        _create: function () {\n"
+                        + "            this.template = this.options.template.empty() ? mageTemplate(this.options.templateSelector)\n"
+                        + "                : mageTemplate(this.options.template);\n"
+                        + "        }\n"
+                        + "    });\n"
+                        + "});"
+        );
+
+        assertTrue(UiComponentScopeResolver.getInstance()
+                .collectComponentDeclarations(myFixture.getFile())
+                .isEmpty());
+    }
+
     private void addTemplate(final String name, final String content) {
         myFixture.addFileToProject(
                 "app/code/Foo/Bar/view/frontend/web/template/" + name + ".html",
                 content
         );
+    }
+
+    private void addCaryShipmentFixture(
+            final String shippingMethodsTemplateContent,
+            final String shipmentTemplateContent
+    ) {
+        myFixture.addFileToProject(
+                "app/code/Cary/ShipperHQ/view/frontend/web/template/shipping-methods.html",
+                shippingMethodsTemplateContent
+        );
+        myFixture.addFileToProject(
+                "app/code/Cary/ShipperHQ/view/frontend/web/template/shipping-methods/shipment.html",
+                shipmentTemplateContent
+        );
+        myFixture.addFileToProject(
+                "app/code/Cary/ShipperHQ/view/frontend/web/js/view/shipping-methods/shipment/methods.js",
+                "define(['uiComponent'], function (Component) {\n"
+                        + "    'use strict';\n"
+                        + "    return Component.extend({\n"
+                        + "        defaults: {\n"
+                        + "            template: 'Cary_ShipperHQ/shipping-methods/shipment/methods'\n"
+                        + "        }\n"
+                        + "    });\n"
+                        + "});"
+        );
+        myFixture.addFileToProject(
+                "app/code/Cary/ShipperHQ/view/frontend/web/template/shipping-methods/shipment/methods.html",
+                "<span>methods</span>"
+        );
+        myFixture.addFileToProject(
+                "app/code/Cary/ShipperHQ/view/frontend/layout/checkout_index_index.xml",
+                "<?xml version=\"1.0\"?>\n"
+                        + "<page xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"
+                        + "    <body>\n"
+                        + "        <referenceBlock name=\"checkout.root\">\n"
+                        + "            <arguments>\n"
+                        + "                <argument name=\"jsLayout\" xsi:type=\"array\">\n"
+                        + "                    <item name=\"components\" xsi:type=\"array\">\n"
+                        + "                        <item name=\"checkout\" xsi:type=\"array\">\n"
+                        + "                            <item name=\"children\" xsi:type=\"array\">\n"
+                        + "                                <item name=\"shipping-methods\" xsi:type=\"array\">\n"
+                        + "                                    <item name=\"component\" xsi:type=\"string\">"
+                        + "Cary_ShipperHQ/js/view/shipping-methods</item>\n"
+                        + "                                    <item name=\"template\" xsi:type=\"string\">"
+                        + "Cary_ShipperHQ/shipping-methods</item>\n"
+                        + "                                    <item name=\"children\" xsi:type=\"array\">\n"
+                        + "                                        <item name=\"shipment\" xsi:type=\"array\">\n"
+                        + "                                            <item name=\"component\" xsi:type=\"string\">"
+                        + "Cary_ShipperHQ/js/view/shipping-methods/shipment</item>\n"
+                        + "                                            <item name=\"displayArea\" xsi:type=\"string\">"
+                        + "shipments</item>\n"
+                        + "                                            <item name=\"template\" xsi:type=\"string\">"
+                        + "Cary_ShipperHQ/shipping-methods/shipment</item>\n"
+                        + "                                            <item name=\"children\" xsi:type=\"array\">\n"
+                        + "                                                <item name=\"items\" xsi:type=\"array\">\n"
+                        + "                                                    <item name=\"component\" xsi:type=\"string\">"
+                        + "Cary_ShipperHQ/js/view/shipping-methods/shipment/items</item>\n"
+                        + "                                                    <item name=\"displayArea\" xsi:type=\"string\">"
+                        + "items</item>\n"
+                        + "                                                    <item name=\"template\" xsi:type=\"string\">"
+                        + "Cary_ShipperHQ/shipping-methods/shipment/items</item>\n"
+                        + "                                                    <item name=\"children\" xsi:type=\"array\">\n"
+                        + "                                                        <item name=\"item\" xsi:type=\"array\">\n"
+                        + "                                                            <item name=\"displayArea\" xsi:type=\"string\">"
+                        + "item</item>\n"
+                        + "                                                        </item>\n"
+                        + "                                                    </item>\n"
+                        + "                                                </item>\n"
+                        + "                                                <item name=\"methods\" xsi:type=\"array\">\n"
+                        + "                                                    <item name=\"component\" xsi:type=\"string\">"
+                        + "Cary_ShipperHQ/js/view/shipping-methods/shipment/methods</item>\n"
+                        + "                                                    <item name=\"displayArea\" xsi:type=\"string\">"
+                        + "methods</item>\n"
+                        + "                                                </item>\n"
+                        + "                                            </item>\n"
+                        + "                                        </item>\n"
+                        + "                                    </item>\n"
+                        + "                                </item>\n"
+                        + "                            </item>\n"
+                        + "                        </item>\n"
+                        + "                    </item>\n"
+                        + "                </argument>\n"
+                        + "            </arguments>\n"
+                        + "        </referenceBlock>\n"
+                        + "    </body>\n"
+                        + "</page>"
+        );
+    }
+
+    private void assertReferenceResolvesToFile(
+            final PsiReference reference,
+            final String expectedFilePath
+    ) {
+        if (reference instanceof PolyVariantReferenceBase) {
+            for (final ResolveResult resolveResult : ((PolyVariantReferenceBase) reference).multiResolve(true)) {
+                final PsiElement resolved = resolveResult.getElement();
+
+                if (resolved != null
+                        && resolved.getContainingFile() != null
+                        && resolved.getContainingFile().getVirtualFile() != null
+                        && resolved.getContainingFile().getVirtualFile().getPath().endsWith(expectedFilePath)) {
+                    return;
+                }
+            }
+        } else {
+            final PsiElement resolved = reference.resolve();
+
+            if (resolved != null
+                    && resolved.getContainingFile() != null
+                    && resolved.getContainingFile().getVirtualFile() != null
+                    && resolved.getContainingFile().getVirtualFile().getPath().endsWith(expectedFilePath)) {
+                return;
+            }
+        }
+        fail("Expected reference to resolve to " + expectedFilePath);
+    }
+
+    private void assertReferenceDoesNotResolveToFile(
+            final PsiReference reference,
+            final String unexpectedFilePath
+    ) {
+        if (reference instanceof PolyVariantReferenceBase) {
+            for (final ResolveResult resolveResult : ((PolyVariantReferenceBase) reference).multiResolve(true)) {
+                final PsiElement resolved = resolveResult.getElement();
+
+                if (resolved != null
+                        && resolved.getContainingFile() != null
+                        && resolved.getContainingFile().getVirtualFile() != null
+                        && resolved.getContainingFile().getVirtualFile().getPath().endsWith(unexpectedFilePath)) {
+                    fail("Expected reference not to resolve to " + unexpectedFilePath);
+                }
+            }
+            return;
+        }
+        final PsiElement resolved = reference.resolve();
+
+        if (resolved != null
+                && resolved.getContainingFile() != null
+                && resolved.getContainingFile().getVirtualFile() != null
+                && resolved.getContainingFile().getVirtualFile().getPath().endsWith(unexpectedFilePath)) {
+            fail("Expected reference not to resolve to " + unexpectedFilePath);
+        }
+    }
+
+    private void assertGotoDeclarationTargetsFile(final String expectedFilePath) {
+        final PsiElement[] targets = getGotoDeclarationTargets();
+
+        for (final PsiElement target : targets) {
+            if (target != null
+                    && target.getContainingFile() != null
+                    && target.getContainingFile().getVirtualFile() != null
+                    && target.getContainingFile().getVirtualFile().getPath().endsWith(expectedFilePath)) {
+                return;
+            }
+        }
+        fail("Expected Go to Declaration target " + expectedFilePath);
+    }
+
+    private void assertGotoDeclarationDoesNotTargetFile(final String unexpectedFilePath) {
+        final PsiElement[] targets = getGotoDeclarationTargets();
+
+        for (final PsiElement target : targets) {
+            if (target != null
+                    && target.getContainingFile() != null
+                    && target.getContainingFile().getVirtualFile() != null
+                    && target.getContainingFile().getVirtualFile().getPath().endsWith(unexpectedFilePath)) {
+                fail("Unexpected Go to Declaration target " + unexpectedFilePath);
+            }
+        }
+    }
+
+    private PsiElement[] getGotoDeclarationTargets() {
+        final int offset = myFixture.getEditor().getCaretModel().getOffset();
+        final PsiElement sourceElement = myFixture.getFile().findElementAt(offset);
+        final PsiElement[] targets = new KnockoutRegionGotoDeclarationHandler().getGotoDeclarationTargets(
+                sourceElement,
+                offset,
+                myFixture.getEditor()
+        );
+
+        return targets == null ? PsiElement.EMPTY_ARRAY : targets;
     }
 
     private String layoutXml(

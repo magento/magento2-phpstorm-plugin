@@ -9,6 +9,8 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.patterns.StandardPatterns;
 import com.intellij.psi.PsiReferenceContributor;
 import com.intellij.psi.PsiReferenceRegistrar;
+import com.intellij.psi.xml.XmlAttributeValue;
+import com.intellij.psi.xml.XmlComment;
 import com.magento.idea.magento2plugin.project.diagnostic.NavigationInstrumentation;
 import com.magento.idea.magento2plugin.reference.provider.KnockoutRegionReferenceProvider;
 import com.magento.idea.magento2plugin.reference.provider.KnockoutTemplateUsageReferenceProvider;
@@ -29,7 +31,13 @@ public class HtmlReferenceContributor extends PsiReferenceContributor {
         );
 
         registrar.registerReferenceProvider(
-                PlatformPatterns.psiElement().withText(StandardPatterns.string().contains("getRegion")),
+                PlatformPatterns.psiElement(XmlComment.class)
+                        .withText(StandardPatterns.string().contains("getRegion")),
+                new KnockoutRegionReferenceProvider()
+        );
+        registrar.registerReferenceProvider(
+                PlatformPatterns.psiElement(XmlAttributeValue.class)
+                        .withText(StandardPatterns.string().contains("getRegion")),
                 new KnockoutRegionReferenceProvider()
         );
 

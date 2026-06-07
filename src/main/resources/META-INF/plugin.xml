@@ -30,6 +30,7 @@
         <psi.referenceContributor language="HTML" implementation="com.magento.idea.magento2plugin.reference.html.HtmlReferenceContributor"/>
         <psi.referenceContributor language="TEXT" implementation="com.magento.idea.magento2plugin.reference.text.TextReferenceContributor"/>
         <psi.referenceContributor language="XML" implementation="com.magento.idea.magento2plugin.reference.xml.XmlJsReferenceContributor"/>
+        <gotoDeclarationHandler implementation="com.magento.idea.magento2plugin.navigation.KnockoutRegionGotoDeclarationHandler"/>
 
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ModulePackageIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex" />

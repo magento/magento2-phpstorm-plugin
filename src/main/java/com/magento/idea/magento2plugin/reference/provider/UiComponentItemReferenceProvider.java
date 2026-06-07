@@ -52,7 +52,8 @@ public class UiComponentItemReferenceProvider extends PsiReferenceProvider {
             final String itemName
     ) {
         if (UiComponentXml.XML_ATTRIBUTE_TEMPLATE.equals(itemName)
-                || "childTemplate".equals(itemName)) {
+                || "childTemplate".equals(itemName)
+                || "elementTmpl".equals(itemName)) {
             return true;
         }
         final XmlTag parentTag = tag.getParentTag();

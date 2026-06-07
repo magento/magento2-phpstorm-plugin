@@ -27,7 +27,7 @@ import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-final class LineMarkerTargetPresentationUtil {
+public final class LineMarkerTargetPresentationUtil {
     static final Supplier<PsiTargetPresentationRenderer<PsiElement>> TARGET_RENDERER =
             () -> new PsiTargetPresentationRenderer<>() {
                 @Override
@@ -97,7 +97,7 @@ final class LineMarkerTargetPresentationUtil {
         };
     }
 
-    static @NotNull List<PsiElement> prepareTargets(final @NotNull List<PsiElement> targets) {
+    public static @NotNull List<PsiElement> prepareTargets(final @NotNull List<PsiElement> targets) {
         final Map<String, PsiElement> uniqueTargets = new LinkedHashMap<>();
 
         for (final PsiElement target : targets) {
@@ -119,7 +119,7 @@ final class LineMarkerTargetPresentationUtil {
                 .presentation();
     }
 
-    static @NotNull String getPresentableTargetName(final @NotNull PsiElement target) {
+    public static @NotNull String getPresentableTargetName(final @NotNull PsiElement target) {
         final PsiFile psiFile = target instanceof PsiFile
                 ? (PsiFile) target
                 : target.getContainingFile();

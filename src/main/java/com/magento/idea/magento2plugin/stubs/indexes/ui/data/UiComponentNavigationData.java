@@ -14,6 +14,7 @@ public class UiComponentNavigationData {
     public static final String KIND_TEMPLATE = "template";
     public static final String KIND_CHILD_TEMPLATE = "childTemplate";
     public static final String KIND_TEMPLATES = "templates";
+    public static final String KIND_ELEMENT_TEMPLATE = "elementTmpl";
     public static final String KIND_GET_REGION = "getRegion";
     public static final String KIND_COMPONENT = "component";
 

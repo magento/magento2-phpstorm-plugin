@@ -6,16 +6,21 @@
 package com.magento.idea.magento2plugin.util.magento.ui;
 
 import com.intellij.ide.highlighter.XmlFileType;
+import com.intellij.lang.javascript.JavaScriptFileType;
 import com.intellij.lang.javascript.psi.JSExpression;
 import com.intellij.lang.javascript.psi.JSFile;
 import com.intellij.lang.javascript.psi.JSObjectLiteralExpression;
 import com.intellij.lang.javascript.psi.JSProperty;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.openapi.vfs.VfsUtilCore;
+import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlAttribute;
@@ -24,12 +29,15 @@ import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.magento.files.UiComponentXml;
+import com.magento.idea.magento2plugin.project.diagnostic.NavigationInstrumentation;
 import com.magento.idea.magento2plugin.stubs.indexes.ui.DisplayAreaIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.ui.GetRegionUsageIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.ui.UiComponentComponentDeclarationIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.ui.data.UiComponentNavigationData;
 import com.magento.idea.magento2plugin.util.magento.js.KnockoutRegionResolver;
 import com.magento.idea.magento2plugin.util.magento.js.KnockoutTemplatePathResolver;
+import com.magento.idea.magento2plugin.util.magento.MagentoVfsUtil;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -65,7 +73,8 @@ public class UiComponentScopeResolver {
             "component",
             "displayArea",
             "template",
-            "childTemplate"
+            "childTemplate",
+            "elementTmpl"
     );
     private static final Set<String> JS_CONTAINER_NAMES = Set.of(
             "components",
@@ -78,7 +87,8 @@ public class UiComponentScopeResolver {
             "component",
             "displayArea",
             "template",
-            "childTemplate"
+            "childTemplate",
+            "elementTmpl"
     );
     private static UiComponentScopeResolver INSTANCE;
 
@@ -193,22 +203,54 @@ public class UiComponentScopeResolver {
             final @NotNull String regionName
     ) {
         final Project project = templateFile.getProject();
+
+        if (DumbService.isDumb(project)) {
+            final List<PsiElement> fallbackTargets = resolveDisplayAreaTargetsFromProjectFilesInDumbMode(
+                    templateFile,
+                    regionName
+            );
+            NavigationInstrumentation.info(
+                    "ko-region-debug resolver stage=dumb-mode-fallback"
+                            + ", region=" + regionName
+                            + ", file=" + NavigationInstrumentation.describeFile(templateFile)
+                            + ", targets=" + fallbackTargets.size()
+            );
+            return fallbackTargets;
+        }
         final List<UiComponentNavigationData> owners =
                 UiComponentTemplateResolver.getInstance().resolveTemplateOwnerDeclarations(templateFile);
         final Set<PsiElement> targets = new LinkedHashSet<>();
+        final List<UiComponentNavigationData> indexedDisplayAreas = displayAreaDeclarations(project, regionName);
 
         if (!owners.isEmpty()) {
-            for (final UiComponentNavigationData displayArea : displayAreaDeclarations(project, regionName)) {
+            for (final UiComponentNavigationData displayArea : indexedDisplayAreas) {
                 if (!isDisplayAreaOwnedByTemplateOwner(displayArea, owners)) {
                     continue;
                 }
                 addTargetElement(project, targets, displayArea);
             }
 
-            return new ArrayList<>(targets);
+            if (!targets.isEmpty()) {
+                return new ArrayList<>(targets);
+            }
+
+            return resolveDisplayAreaTargetsFromProjectFiles(
+                    project,
+                    regionName,
+                    owners,
+                    templateFile
+            );
         }
-        for (final UiComponentNavigationData displayArea : displayAreaDeclarations(project, regionName)) {
+        for (final UiComponentNavigationData displayArea : indexedDisplayAreas) {
             addTargetElement(project, targets, displayArea);
+        }
+        if (targets.isEmpty()) {
+            return resolveDisplayAreaTargetsFromProjectFiles(
+                    project,
+                    regionName,
+                    owners,
+                    templateFile
+            );
         }
 
         return new ArrayList<>(targets);
@@ -242,6 +284,32 @@ public class UiComponentScopeResolver {
         return new ArrayList<>(targets);
     }
 
+    public @NotNull List<PsiElement> resolveTemplateFilesForDisplayAreaTargets(
+            final @NotNull Project project,
+            final @NotNull Collection<PsiElement> displayAreaTargets
+    ) {
+        final Set<PsiElement> targets = new LinkedHashSet<>();
+
+        for (final PsiElement displayAreaTarget : displayAreaTargets) {
+            final UiComponentNavigationData displayArea = findDisplayAreaDeclarationForTarget(displayAreaTarget);
+
+            if (displayArea == null) {
+                continue;
+            }
+            for (final UiComponentNavigationData declaration : resolveTemplateDeclarationsForComponent(
+                    project,
+                    displayArea
+            )) {
+                targets.addAll(UiComponentTemplateResolver.getInstance().resolveTemplateFiles(
+                        project,
+                        declaration.getValue()
+                ));
+            }
+        }
+
+        return new ArrayList<>(targets);
+    }
+
     public @NotNull List<UiComponentNavigationData> getRegionUsages(
             final @NotNull Project project,
             final @NotNull String regionName
@@ -257,6 +325,96 @@ public class UiComponentScopeResolver {
         }
 
         return results;
+    }
+
+    private @Nullable UiComponentNavigationData findDisplayAreaDeclarationForTarget(
+            final @NotNull PsiElement target
+    ) {
+        final PsiFile psiFile = target.getContainingFile();
+
+        if (psiFile == null || psiFile.getVirtualFile() == null) {
+            return null;
+        }
+        final int targetStartOffset = target.getTextRange().getStartOffset();
+        final int targetEndOffset = target.getTextRange().getEndOffset();
+
+        for (final UiComponentNavigationData declaration : collectComponentDeclarations(psiFile)) {
+            if (!UiComponentNavigationData.KIND_DISPLAY_AREA.equals(declaration.getKind())) {
+                continue;
+            }
+            if (overlapsValue(targetStartOffset, targetEndOffset, declaration)) {
+                return declaration;
+            }
+        }
+
+        return null;
+    }
+
+    private @NotNull List<UiComponentNavigationData> resolveTemplateDeclarationsForComponent(
+            final @NotNull Project project,
+            final @NotNull UiComponentNavigationData componentDeclaration
+    ) {
+        final Set<UiComponentNavigationData> results = new LinkedHashSet<>();
+        final VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(componentDeclaration.getFileUrl());
+
+        if (file != null && !file.isDirectory()) {
+            final PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
+
+            if (psiFile != null) {
+                for (final UiComponentNavigationData declaration : collectComponentDeclarations(psiFile)) {
+                    if (isTemplateDeclaration(declaration)
+                            && (isSameComponent(componentDeclaration, declaration)
+                            || isDescendantComponentDeclaration(componentDeclaration, declaration))) {
+                        results.add(declaration);
+                    }
+                }
+            }
+        }
+        for (final UiComponentNavigationData declaration : UiComponentTemplateResolver.getInstance()
+                .resolveTemplateDeclarationsForOwner(project, componentDeclaration)) {
+            if (isSameComponent(componentDeclaration, declaration)) {
+                results.add(declaration);
+            }
+        }
+
+        return new ArrayList<>(results);
+    }
+
+    private boolean isDescendantComponentDeclaration(
+            final @NotNull UiComponentNavigationData parent,
+            final @NotNull UiComponentNavigationData child
+    ) {
+        return isNestedUnder(child.getComponentName(), parent.getComponentName(), ".")
+                || isNestedUnder(child.getComponentJsPath(), parent.getComponentJsPath(), "/");
+    }
+
+    private boolean isSameComponent(
+            final @NotNull UiComponentNavigationData first,
+            final @NotNull UiComponentNavigationData second
+    ) {
+        if (hasValue(first.getComponentName()) && hasValue(second.getComponentName())) {
+            return first.getComponentName().equals(second.getComponentName())
+                    || matchesJsDefaultDeclaration(first, second);
+        }
+
+        return matchesNonBlank(first.getComponentJsPath(), second.getComponentJsPath());
+    }
+
+    private boolean matchesJsDefaultDeclaration(
+            final @NotNull UiComponentNavigationData first,
+            final @NotNull UiComponentNavigationData second
+    ) {
+        return matchesNonBlank(first.getComponentJsPath(), second.getComponentJsPath())
+                && (isJsDefaultDeclaration(first) || isJsDefaultDeclaration(second));
+    }
+
+    private boolean isJsDefaultDeclaration(final @NotNull UiComponentNavigationData declaration) {
+        return hasValue(declaration.getComponentName())
+                && declaration.getComponentName().equals(declaration.getComponentJsPath());
+    }
+
+    private boolean hasValue(final @Nullable String value) {
+        return value != null && !value.isBlank();
     }
 
     public @NotNull List<UiComponentNavigationData> displayAreaDeclarations(
@@ -340,7 +498,8 @@ public class UiComponentScopeResolver {
     private boolean isTemplateDeclaration(final @NotNull UiComponentNavigationData declaration) {
         return UiComponentNavigationData.KIND_TEMPLATE.equals(declaration.getKind())
                 || UiComponentNavigationData.KIND_CHILD_TEMPLATE.equals(declaration.getKind())
-                || UiComponentNavigationData.KIND_TEMPLATES.equals(declaration.getKind());
+                || UiComponentNavigationData.KIND_TEMPLATES.equals(declaration.getKind())
+                || UiComponentNavigationData.KIND_ELEMENT_TEMPLATE.equals(declaration.getKind());
     }
 
     private @NotNull List<PsiElement> resolveGetRegionTargetsFromComponentDeclarations(
@@ -416,7 +575,9 @@ public class UiComponentScopeResolver {
         for (final UiComponentNavigationData owner : owners) {
             if (matchesNonBlank(displayArea.getParentComponentName(), owner.getComponentName())
                     || matchesNonBlank(displayArea.getParentComponentJsPath(), owner.getComponentJsPath())
-                    || matchesNonBlank(displayArea.getParentComponentJsPath(), owner.getComponentName())) {
+                    || matchesNonBlank(displayArea.getParentComponentJsPath(), owner.getComponentName())
+                    || isNestedUnder(displayArea.getComponentName(), owner.getComponentName(), ".")
+                    || isNestedUnder(displayArea.getComponentJsPath(), owner.getComponentJsPath(), "/")) {
                 return true;
             }
         }
@@ -429,6 +590,305 @@ public class UiComponentScopeResolver {
             final @Nullable String second
     ) {
         return first != null && !first.isBlank() && first.equals(second);
+    }
+
+    private boolean isNestedUnder(
+            final @Nullable String child,
+            final @Nullable String parent,
+            final @NotNull String separator
+    ) {
+        return child != null
+                && parent != null
+                && !child.isBlank()
+                && !parent.isBlank()
+                && child.startsWith(parent + separator);
+    }
+
+    private @NotNull List<PsiElement> resolveDisplayAreaTargetsFromProjectFiles(
+            final @NotNull Project project,
+            final @NotNull String regionName,
+            final @NotNull Collection<UiComponentNavigationData> owners,
+            final @NotNull PsiFile templateFile
+    ) {
+        final Set<PsiElement> targets = new LinkedHashSet<>();
+        final List<UiComponentNavigationData> fallbackDeclarations = collectDisplayAreaDeclarationsFromProjectFiles(
+                project,
+                regionName
+        );
+
+        for (final UiComponentNavigationData displayArea : fallbackDeclarations) {
+            if (!owners.isEmpty() && !isDisplayAreaOwnedByTemplateOwner(displayArea, owners)) {
+                continue;
+            }
+            addTargetElement(project, targets, displayArea);
+        }
+
+        return new ArrayList<>(targets);
+    }
+
+    private @NotNull List<PsiElement> resolveDisplayAreaTargetsFromProjectFilesInDumbMode(
+            final @NotNull PsiFile templateFile,
+            final @NotNull String regionName
+    ) {
+        final Project project = templateFile.getProject();
+        final List<UiComponentNavigationData> owners = collectTemplateOwnerDeclarationsFromProjectFiles(templateFile);
+        final Set<PsiElement> targets = new LinkedHashSet<>();
+
+        for (final UiComponentNavigationData displayArea : collectDisplayAreaDeclarationsFromOwnerFiles(
+                project,
+                regionName,
+                owners
+        )) {
+            if (isDisplayAreaOwnedByTemplateOwner(displayArea, owners)) {
+                addTargetElement(project, targets, displayArea);
+            }
+        }
+
+        return new ArrayList<>(targets);
+    }
+
+    private @NotNull List<UiComponentNavigationData> collectTemplateOwnerDeclarationsFromProjectFiles(
+            final @NotNull PsiFile templateFile
+    ) {
+        final Set<String> templatePaths = getTemplateRequireJsPathsFromFilePath(templateFile);
+
+        if (templatePaths.isEmpty()) {
+            return Collections.emptyList();
+        }
+        final Project project = templateFile.getProject();
+        final PsiManager psiManager = PsiManager.getInstance(project);
+        final List<UiComponentNavigationData> results = new ArrayList<>();
+
+        for (final VirtualFile file : MagentoVfsUtil.findMagentoFiles(
+                project,
+                virtualFile -> "xml".equals(virtualFile.getExtension())
+                        || "js".equals(virtualFile.getExtension())
+        )) {
+            if (file.isDirectory() || !fileContainsAnyText(file, templatePaths)) {
+                continue;
+            }
+            final PsiFile psiFile = psiManager.findFile(file);
+
+            if (psiFile == null) {
+                continue;
+            }
+            for (final UiComponentNavigationData declaration : collectComponentDeclarations(psiFile)) {
+                if (isTemplateDeclaration(declaration) && templatePaths.contains(declaration.getValue())) {
+                    results.add(declaration);
+                }
+            }
+        }
+
+        return results;
+    }
+
+    private @NotNull List<UiComponentNavigationData> collectDisplayAreaDeclarationsFromOwnerFiles(
+            final @NotNull Project project,
+            final @NotNull String regionName,
+            final @NotNull Collection<UiComponentNavigationData> owners
+    ) {
+        if (owners.isEmpty()) {
+            return Collections.emptyList();
+        }
+        final PsiManager psiManager = PsiManager.getInstance(project);
+        final Set<String> scannedFileUrls = new LinkedHashSet<>();
+        final List<UiComponentNavigationData> results = new ArrayList<>();
+
+        for (final UiComponentNavigationData owner : owners) {
+            if (!scannedFileUrls.add(owner.getFileUrl())) {
+                continue;
+            }
+            final VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(owner.getFileUrl());
+
+            if (file == null || file.isDirectory() || !fileContainsText(file, regionName)) {
+                continue;
+            }
+            final PsiFile psiFile = psiManager.findFile(file);
+
+            if (psiFile == null) {
+                continue;
+            }
+            for (final UiComponentNavigationData declaration : collectComponentDeclarations(psiFile)) {
+                if (UiComponentNavigationData.KIND_DISPLAY_AREA.equals(declaration.getKind())
+                        && regionName.equals(declaration.getValue())) {
+                    results.add(declaration);
+                }
+            }
+        }
+
+        return results;
+    }
+
+    private @NotNull List<UiComponentNavigationData> collectDisplayAreaDeclarationsFromProjectFiles(
+            final @NotNull Project project,
+            final @NotNull String regionName
+    ) {
+        final PsiManager psiManager = PsiManager.getInstance(project);
+        final Set<VirtualFile> files = new LinkedHashSet<>();
+        final List<UiComponentNavigationData> results = new ArrayList<>();
+
+        files.addAll(FileTypeIndex.getFiles(XmlFileType.INSTANCE, GlobalSearchScope.allScope(project)));
+        files.addAll(FileTypeIndex.getFiles(JavaScriptFileType.INSTANCE, GlobalSearchScope.allScope(project)));
+        files.addAll(MagentoVfsUtil.findMagentoFiles(
+                project,
+                virtualFile -> "xml".equals(virtualFile.getExtension())
+                        || "js".equals(virtualFile.getExtension())
+        ));
+
+        for (final VirtualFile file : files) {
+            if (file.isDirectory() || !fileContainsText(file, regionName)) {
+                continue;
+            }
+            final PsiFile psiFile = psiManager.findFile(file);
+
+            if (psiFile == null) {
+                continue;
+            }
+            for (final UiComponentNavigationData declaration : collectComponentDeclarations(psiFile)) {
+                if (UiComponentNavigationData.KIND_DISPLAY_AREA.equals(declaration.getKind())
+                        && regionName.equals(declaration.getValue())) {
+                    results.add(declaration);
+                }
+            }
+        }
+
+        return results;
+    }
+
+    private @NotNull Set<String> getTemplateRequireJsPathsFromFilePath(final @NotNull PsiFile psiFile) {
+        final VirtualFile virtualFile = psiFile.getVirtualFile();
+        final Set<String> result = new LinkedHashSet<>();
+
+        if (virtualFile == null || !"html".equals(virtualFile.getExtension())) {
+            return result;
+        }
+        final String filePath = virtualFile.getPath();
+
+        addAppCodeTemplateRequireJsPaths(result, filePath);
+        addVendorTemplateRequireJsPaths(result, filePath);
+
+        return result;
+    }
+
+    private void addAppCodeTemplateRequireJsPaths(
+            final @NotNull Set<String> result,
+            final @NotNull String filePath
+    ) {
+        final String marker = "/app/code/";
+        final int markerIndex = filePath.indexOf(marker);
+
+        if (markerIndex < 0) {
+            return;
+        }
+        final String relativePath = filePath.substring(markerIndex + marker.length());
+        final String[] parts = relativePath.split("/");
+
+        if (parts.length < 7 || !"view".equals(parts[2]) || !"web".equals(parts[4])) {
+            return;
+        }
+        addTemplateRequireJsPathAliases(
+                result,
+                parts[0] + "_" + parts[1],
+                stripHtmlExtension(joinPath(parts, 5))
+        );
+    }
+
+    private void addVendorTemplateRequireJsPaths(
+            final @NotNull Set<String> result,
+            final @NotNull String filePath
+    ) {
+        final String marker = "/vendor/";
+        final int markerIndex = filePath.indexOf(marker);
+
+        if (markerIndex < 0) {
+            return;
+        }
+        final String relativePath = filePath.substring(markerIndex + marker.length());
+        final String[] parts = relativePath.split("/");
+
+        if (parts.length < 7 || !"view".equals(parts[2]) || !"web".equals(parts[4])) {
+            return;
+        }
+        addTemplateRequireJsPathAliases(
+                result,
+                composerPackageToModuleName(parts[0], parts[1]),
+                stripHtmlExtension(joinPath(parts, 5))
+        );
+    }
+
+    private void addTemplateRequireJsPathAliases(
+            final @NotNull Set<String> result,
+            final @NotNull String moduleName,
+            final @NotNull String relativePath
+    ) {
+        result.add(moduleName + "/" + relativePath);
+        addTemplateDirectoryAlias(result, moduleName, relativePath, "template");
+        addTemplateDirectoryAlias(result, moduleName, relativePath, "templates");
+    }
+
+    private void addTemplateDirectoryAlias(
+            final @NotNull Set<String> result,
+            final @NotNull String moduleName,
+            final @NotNull String relativePath,
+            final @NotNull String directory
+    ) {
+        final String prefix = directory + "/";
+
+        if (relativePath.startsWith(prefix)) {
+            result.add(moduleName + "/" + relativePath.substring(prefix.length()));
+        }
+    }
+
+    private @NotNull String joinPath(
+            final @NotNull String[] parts,
+            final int startIndex
+    ) {
+        final StringBuilder result = new StringBuilder();
+
+        for (int index = startIndex; index < parts.length; index++) {
+            if (result.length() > 0) {
+                result.append('/');
+            }
+            result.append(parts[index]);
+        }
+
+        return result.toString();
+    }
+
+    private @NotNull String stripHtmlExtension(final @NotNull String path) {
+        return path.endsWith(".html")
+                ? path.substring(0, path.length() - ".html".length())
+                : path;
+    }
+
+    private boolean fileContainsAnyText(
+            final @NotNull VirtualFile file,
+            final @NotNull Collection<String> texts
+    ) {
+        try {
+            final String fileText = VfsUtilCore.loadText(file);
+
+            for (final String text : texts) {
+                if (fileText.contains(text)) {
+                    return true;
+                }
+            }
+        } catch (IOException exception) {
+            return false;
+        }
+
+        return false;
+    }
+
+    private boolean fileContainsText(
+            final @NotNull VirtualFile file,
+            final @NotNull String text
+    ) {
+        try {
+            return VfsUtilCore.loadText(file).contains(text);
+        } catch (IOException exception) {
+            return false;
+        }
     }
 
     private void addTargetElement(
@@ -450,7 +910,28 @@ public class UiComponentScopeResolver {
                 ? psiFile.findElementAt(declaration.getValueOffset())
                 : psiFile;
 
-        targets.add(target == null ? psiFile : target);
+        targets.add(normalizeNavigationTarget(target == null ? psiFile : target));
+    }
+
+    private @NotNull PsiElement normalizeNavigationTarget(final @NotNull PsiElement target) {
+        final PsiComment comment = PsiTreeUtil.getParentOfType(target, PsiComment.class, false);
+
+        if (comment != null) {
+            return comment;
+        }
+        final JSProperty jsProperty = PsiTreeUtil.getParentOfType(target, JSProperty.class, false);
+
+        if (jsProperty != null) {
+            return jsProperty;
+        }
+        final XmlAttributeValue attributeValue = PsiTreeUtil.getParentOfType(target, XmlAttributeValue.class, false);
+
+        if (attributeValue != null) {
+            return attributeValue;
+        }
+        final XmlTag xmlTag = PsiTreeUtil.getParentOfType(target, XmlTag.class, false);
+
+        return xmlTag == null ? target : xmlTag;
     }
 
     private boolean overlapsValue(
@@ -474,6 +955,7 @@ public class UiComponentScopeResolver {
         final String fileComponentPath = getRequireJsPathFromFilePath(jsFile);
 
         collectJsObjectComponentDeclarations(jsFile, fileUrl, fileComponentPath, results);
+        collectDynamicJsLayoutChildDeclarations(jsFile, fileUrl, fileComponentPath, results);
         collectJsFileDefaultDeclarations(jsFile, fileUrl, fileComponentPath, results);
 
         return new ArrayList<>(results);
@@ -535,6 +1017,9 @@ public class UiComponentScopeResolver {
             if (isInsideJsComponentObject(property)) {
                 continue;
             }
+            if (isInsideDynamicJsLayoutChildObject(property)) {
+                continue;
+            }
             final String propertyName = property.getName();
 
             if ("displayArea".equals(propertyName)) {
@@ -573,6 +1058,18 @@ public class UiComponentScopeResolver {
                         null,
                         null
                 );
+            } else if ("elementTmpl".equals(propertyName)) {
+                addJsStringDeclaration(
+                        results,
+                        property,
+                        fileUrl,
+                        UiComponentNavigationData.KIND_ELEMENT_TEMPLATE,
+                        fileComponentPath,
+                        null,
+                        fileComponentPath,
+                        null,
+                        null
+                );
             } else if ("templates".equals(propertyName)) {
                 addJsTemplatesCollectionDeclarations(
                         results,
@@ -584,6 +1081,48 @@ public class UiComponentScopeResolver {
                         null
                 );
             }
+        }
+    }
+
+    private void collectDynamicJsLayoutChildDeclarations(
+            final @NotNull JSFile jsFile,
+            final @NotNull String fileUrl,
+            final @Nullable String fileComponentPath,
+            final @NotNull Set<UiComponentNavigationData> results
+    ) {
+        if (fileComponentPath == null) {
+            return;
+        }
+        for (final JSObjectLiteralExpression objectLiteral : PsiTreeUtil.findChildrenOfType(
+                jsFile,
+                JSObjectLiteralExpression.class
+        )) {
+            if (!isDynamicJsLayoutChildObject(objectLiteral)) {
+                continue;
+            }
+            final String componentName = buildDynamicJsLayoutComponentName(objectLiteral, fileComponentPath);
+            final String componentJsPath = getDirectJsStringProperty(objectLiteral, "component");
+
+            results.add(new UiComponentNavigationData(
+                    fileUrl,
+                    UiComponentNavigationData.KIND_COMPONENT,
+                    componentName,
+                    componentName,
+                    fileComponentPath,
+                    componentJsPath,
+                    fileComponentPath,
+                    null,
+                    objectLiteral.getTextRange().getStartOffset()
+            ));
+            addJsComponentValueDeclarations(
+                    results,
+                    objectLiteral,
+                    fileUrl,
+                    componentName,
+                    fileComponentPath,
+                    componentJsPath,
+                    fileComponentPath
+            );
         }
     }
 
@@ -599,6 +1138,7 @@ public class UiComponentScopeResolver {
         final JSProperty displayArea = objectLiteral.findProperty("displayArea");
         final JSProperty template = findJsProperty(objectLiteral, "template");
         final JSProperty childTemplate = findJsProperty(objectLiteral, "childTemplate");
+        final JSProperty elementTemplate = findJsProperty(objectLiteral, "elementTmpl");
         final JSProperty templates = findJsProperty(objectLiteral, "templates");
 
         addJsStringDeclaration(
@@ -628,6 +1168,17 @@ public class UiComponentScopeResolver {
                 childTemplate,
                 fileUrl,
                 UiComponentNavigationData.KIND_CHILD_TEMPLATE,
+                componentName,
+                parentComponentName,
+                componentJsPath,
+                parentComponentJsPath,
+                null
+        );
+        addJsStringDeclaration(
+                results,
+                elementTemplate,
+                fileUrl,
+                UiComponentNavigationData.KIND_ELEMENT_TEMPLATE,
                 componentName,
                 parentComponentName,
                 componentJsPath,
@@ -664,10 +1215,15 @@ public class UiComponentScopeResolver {
         if (value == null) {
             return;
         }
+        final String normalizedValue = normalizeTemplateValueIfNeeded(kind, value);
+
+        if (normalizedValue == null || normalizedValue.isBlank()) {
+            return;
+        }
         results.add(new UiComponentNavigationData(
                 fileUrl,
                 kind,
-                normalizeTemplateValueIfNeeded(kind, value),
+                normalizedValue,
                 componentName,
                 parentComponentName,
                 componentJsPath,
@@ -737,6 +1293,19 @@ public class UiComponentScopeResolver {
         return normalizeValue(property.getValue().getText());
     }
 
+    private @Nullable String getDirectJsPropertyText(
+            final @NotNull JSObjectLiteralExpression objectLiteral,
+            final @NotNull String propertyName
+    ) {
+        final JSProperty property = objectLiteral.findProperty(propertyName);
+
+        if (property == null || property.getValue() == null) {
+            return null;
+        }
+
+        return property.getValue().getText().trim();
+    }
+
     private boolean isJsComponentObject(final @NotNull JSProperty property) {
         final String name = property.getName();
 
@@ -745,13 +1314,20 @@ public class UiComponentScopeResolver {
         }
         final JSObjectLiteralExpression objectLiteral = (JSObjectLiteralExpression) property.getValue();
 
-        return objectLiteral != null
-                && (objectLiteral.findProperty("children") != null
+        if (objectLiteral == null) {
+            return false;
+        }
+        if (objectLiteral.findProperty("children") != null
                 || objectLiteral.findProperty("components") != null
                 || objectLiteral.findProperty("component") != null
                 || objectLiteral.findProperty("displayArea") != null
-                || objectLiteral.findProperty("template") != null
                 || objectLiteral.findProperty("childTemplate") != null
+                || objectLiteral.findProperty("elementTmpl") != null) {
+            return true;
+        }
+
+        return isInsideJsUiComponentContainer(property)
+                && (hasStaticJsTemplateDeclaration(objectLiteral)
                 || objectLiteral.findProperty("config") != null);
     }
 
@@ -767,6 +1343,70 @@ public class UiComponentScopeResolver {
         }
 
         return false;
+    }
+
+    private boolean isInsideDynamicJsLayoutChildObject(final @NotNull JSProperty property) {
+        PsiElement current = PsiTreeUtil.getParentOfType(property, JSObjectLiteralExpression.class, false);
+
+        while (current instanceof JSObjectLiteralExpression) {
+            if (isDynamicJsLayoutChildObject((JSObjectLiteralExpression) current)) {
+                return true;
+            }
+            current = PsiTreeUtil.getParentOfType(current.getParent(), JSObjectLiteralExpression.class, false);
+        }
+
+        return false;
+    }
+
+    private boolean isDynamicJsLayoutChildObject(final @NotNull JSObjectLiteralExpression objectLiteral) {
+        return objectLiteral.findProperty("displayArea") != null
+                && objectLiteral.findProperty("parent") != null
+                && "this.name".equals(getDirectJsPropertyText(objectLiteral, "parent"));
+    }
+
+    private @NotNull String buildDynamicJsLayoutComponentName(
+            final @NotNull JSObjectLiteralExpression objectLiteral,
+            final @NotNull String fileComponentPath
+    ) {
+        final String name = getDirectJsStringProperty(objectLiteral, "name");
+
+        if (name != null && !name.isBlank()) {
+            return fileComponentPath + "." + name;
+        }
+
+        return fileComponentPath + ".dynamic." + objectLiteral.getTextRange().getStartOffset();
+    }
+
+    private boolean isInsideJsUiComponentContainer(final @NotNull JSProperty property) {
+        PsiElement current = PsiTreeUtil.getParentOfType(property.getParent(), JSProperty.class);
+
+        while (current instanceof JSProperty) {
+            final String name = ((JSProperty) current).getName();
+
+            if ("components".equals(name) || "children".equals(name)) {
+                return true;
+            }
+            current = PsiTreeUtil.getParentOfType(current.getParent(), JSProperty.class);
+        }
+
+        return false;
+    }
+
+    private boolean hasStaticJsTemplateDeclaration(final @NotNull JSObjectLiteralExpression objectLiteral) {
+        final JSProperty template = findJsProperty(objectLiteral, "template");
+        final JSProperty elementTemplate = findJsProperty(objectLiteral, "elementTmpl");
+
+        return isStaticJsTemplateDeclaration(template, UiComponentNavigationData.KIND_TEMPLATE)
+                || isStaticJsTemplateDeclaration(elementTemplate, UiComponentNavigationData.KIND_ELEMENT_TEMPLATE);
+    }
+
+    private boolean isStaticJsTemplateDeclaration(
+            final @Nullable JSProperty property,
+            final @NotNull String kind
+    ) {
+        return property != null
+                && property.getValue() != null
+                && normalizeTemplateValueIfNeeded(kind, normalizeValue(property.getValue().getText())) != null;
     }
 
     private @Nullable String buildJsComponentName(final @NotNull JSProperty property) {
@@ -919,6 +1559,16 @@ public class UiComponentScopeResolver {
                 getXmlTemplateValue(node.getTag(), "childTemplate"),
                 getXmlTemplateValueOffset(node.getTag(), "childTemplate")
         );
+        addXmlValueDeclaration(
+                results,
+                fileUrl,
+                UiComponentNavigationData.KIND_ELEMENT_TEMPLATE,
+                node,
+                parentComponentJsPath,
+                null,
+                getXmlTemplateValue(node.getTag(), "elementTmpl"),
+                getXmlTemplateValueOffset(node.getTag(), "elementTmpl")
+        );
         addXmlTemplatesCollectionDeclarations(results, fileUrl, node, parentComponentJsPath);
     }
 
@@ -992,6 +1642,7 @@ public class UiComponentScopeResolver {
                 || getXmlValue(tag, "displayArea") != null
                 || getXmlTemplateValue(tag, "template") != null
                 || getXmlTemplateValue(tag, "childTemplate") != null
+                || getXmlTemplateValue(tag, "elementTmpl") != null
                 || getXmlTemplateTag(tag, "templates") != null
                 || getDirectChildItem(tag, "children") != null
                 || getDirectChildItem(tag, "components") != null;
@@ -1287,7 +1938,8 @@ public class UiComponentScopeResolver {
         }
         if (UiComponentNavigationData.KIND_TEMPLATE.equals(kind)
                 || UiComponentNavigationData.KIND_CHILD_TEMPLATE.equals(kind)
-                || UiComponentNavigationData.KIND_TEMPLATES.equals(kind)) {
+                || UiComponentNavigationData.KIND_TEMPLATES.equals(kind)
+                || UiComponentNavigationData.KIND_ELEMENT_TEMPLATE.equals(kind)) {
             return KnockoutTemplatePathResolver.getInstance().normalizeTemplatePath(rawValue);
         }
 

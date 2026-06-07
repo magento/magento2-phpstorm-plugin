@@ -78,7 +78,8 @@ public class UiComponentTemplateDeclarationIndex
     private boolean isTemplateDeclaration(final @NotNull UiComponentNavigationData declaration) {
         return UiComponentNavigationData.KIND_TEMPLATE.equals(declaration.getKind())
                 || UiComponentNavigationData.KIND_CHILD_TEMPLATE.equals(declaration.getKind())
-                || UiComponentNavigationData.KIND_TEMPLATES.equals(declaration.getKind());
+                || UiComponentNavigationData.KIND_TEMPLATES.equals(declaration.getKind())
+                || UiComponentNavigationData.KIND_ELEMENT_TEMPLATE.equals(declaration.getKind());
     }
 
     private void addNullable(
@@ -124,7 +125,7 @@ public class UiComponentTemplateDeclarationIndex
 
     @Override
     public int getVersion() {
-        return 1;
+        return 3;
     }
 
     private interface KeyBuilder {

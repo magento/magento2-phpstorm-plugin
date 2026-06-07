@@ -81,7 +81,9 @@ public class KnockoutRegionResolver {
             matches.add(new RegionMatch(
                     matcher.group(2),
                     matcher.start(2),
-                    matcher.end(2)
+                    matcher.end(2),
+                    matcher.start(),
+                    matcher.end()
             ));
         }
         final Matcher entityQuoteMatcher = GET_REGION_ENTITY_QUOTE_PATTERN.matcher(text);
@@ -90,7 +92,9 @@ public class KnockoutRegionResolver {
             matches.add(new RegionMatch(
                     entityQuoteMatcher.group(1),
                     entityQuoteMatcher.start(1),
-                    entityQuoteMatcher.end(1)
+                    entityQuoteMatcher.end(1),
+                    entityQuoteMatcher.start(),
+                    entityQuoteMatcher.end()
             ));
         }
 
@@ -855,15 +859,29 @@ public class KnockoutRegionResolver {
         private final String regionName;
         private final int startOffset;
         private final int endOffset;
+        private final int callStartOffset;
+        private final int callEndOffset;
 
         RegionMatch(
                 final @NotNull String regionName,
                 final int startOffset,
                 final int endOffset
         ) {
+            this(regionName, startOffset, endOffset, startOffset, endOffset);
+        }
+
+        RegionMatch(
+                final @NotNull String regionName,
+                final int startOffset,
+                final int endOffset,
+                final int callStartOffset,
+                final int callEndOffset
+        ) {
             this.regionName = regionName;
             this.startOffset = startOffset;
             this.endOffset = endOffset;
+            this.callStartOffset = callStartOffset;
+            this.callEndOffset = callEndOffset;
         }
 
         public @NotNull String getRegionName() {
@@ -876,6 +894,14 @@ public class KnockoutRegionResolver {
 
         public int getEndOffset() {
             return endOffset;
+        }
+
+        public int getCallStartOffset() {
+            return callStartOffset;
+        }
+
+        public int getCallEndOffset() {
+            return callEndOffset;
         }
     }
 }

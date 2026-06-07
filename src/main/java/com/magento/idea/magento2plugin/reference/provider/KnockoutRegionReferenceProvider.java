@@ -12,6 +12,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceProvider;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
+import com.magento.idea.magento2plugin.linemarker.js.LineMarkerTargetPresentationUtil;
 import com.magento.idea.magento2plugin.project.diagnostic.NavigationInstrumentation;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
@@ -38,6 +39,10 @@ public class KnockoutRegionReferenceProvider extends PsiReferenceProvider {
         final List<PsiReference> references = new ArrayList<>();
         addDisplayAreaReferences(element, references);
         addGetRegionReferences(element, references);
+
+        if (!references.isEmpty() || element.getText().contains("getRegion")) {
+            debugGetRegionClick("exit", element, "references=" + references.size());
+        }
 
         return references.toArray(PsiReference.EMPTY_ARRAY);
     }
@@ -97,10 +102,34 @@ public class KnockoutRegionReferenceProvider extends PsiReferenceProvider {
         final PsiElement referenceHost = getGetRegionReferenceHost(element);
 
         if (referenceHost == null) {
+            if (element.getText().contains("getRegion")) {
+                debugGetRegionClick("no-host", element, null);
+            }
             return;
         }
-        for (final KnockoutRegionResolver.RegionMatch regionMatch
-                : KnockoutRegionResolver.getInstance().collectGetRegionMatches(referenceHost.getText())) {
+        final List<KnockoutRegionResolver.RegionMatch> regionMatches = KnockoutRegionResolver.getInstance()
+                .collectGetRegionMatches(referenceHost.getText());
+        debugGetRegionClick(
+                "host",
+                element,
+                "host=" + referenceHost.getClass().getSimpleName()
+                        + ", hostRange=" + referenceHost.getTextRange()
+                        + ", matches=" + regionMatches.size()
+        );
+
+        for (final KnockoutRegionResolver.RegionMatch regionMatch : regionMatches) {
+            final TextRange referenceRange = getRegionReferenceRange(element, referenceHost, regionMatch);
+
+            if (referenceRange == null) {
+                debugGetRegionClick(
+                        "range-miss",
+                        element,
+                        "region=" + regionMatch.getRegionName()
+                                + ", callOffsets=" + regionMatch.getCallStartOffset()
+                                + "-" + regionMatch.getCallEndOffset()
+                );
+                continue;
+            }
             final List<PsiElement> targets = UiComponentScopeResolver.getInstance()
                     .resolveDisplayAreaTargetsForGetRegion(
                             referenceHost.getContainingFile(),
@@ -116,17 +145,34 @@ public class KnockoutRegionReferenceProvider extends PsiReferenceProvider {
                 );
                 continue;
             }
+            final List<PsiElement> navigationTargets = new ArrayList<>(targets);
+            navigationTargets.addAll(UiComponentScopeResolver.getInstance()
+                    .resolveTemplateFilesForDisplayAreaTargets(
+                            referenceHost.getProject(),
+                            targets
+                    ));
+            final List<PsiElement> preparedTargets = LineMarkerTargetPresentationUtil.prepareTargets(navigationTargets);
+            debugGetRegionClick(
+                    "create-reference",
+                    element,
+                    "region=" + regionMatch.getRegionName()
+                            + ", range=" + referenceRange
+                            + ", displayAreaTargets=" + targets.size()
+                            + ", targets=" + preparedTargets.size()
+                            + ", targetLabels=" + describeTargetLabels(preparedTargets)
+                            + ", targetFiles=" + describeTargetFiles(preparedTargets)
+            );
             references.add(
                     new PolyVariantReferenceBase(
-                            referenceHost,
-                            new TextRange(regionMatch.getStartOffset(), regionMatch.getEndOffset()),
-                            targets
+                            element,
+                            referenceRange,
+                            preparedTargets
                     )
             );
             NavigationInstrumentation.infoOnce(
                     "ko-get-region-reference-created-" + regionMatch.getRegionName(),
                     () -> "getRegion reference created for '" + regionMatch.getRegionName()
-                            + "' targets=" + targets.size()
+                            + "' targets=" + preparedTargets.size()
             );
         }
     }
@@ -143,5 +189,82 @@ public class KnockoutRegionReferenceProvider extends PsiReferenceProvider {
         }
 
         return null;
+    }
+
+    private TextRange getRegionReferenceRange(
+            final @NotNull PsiElement element,
+            final @NotNull PsiElement referenceHost,
+            final @NotNull KnockoutRegionResolver.RegionMatch regionMatch
+    ) {
+        if (element == referenceHost) {
+            return new TextRange(regionMatch.getCallStartOffset(), regionMatch.getCallEndOffset());
+        }
+        final int absoluteStart = referenceHost.getTextRange().getStartOffset() + regionMatch.getCallStartOffset();
+        final int absoluteEnd = referenceHost.getTextRange().getStartOffset() + regionMatch.getCallEndOffset();
+        final int elementStart = element.getTextRange().getStartOffset();
+        final int elementEnd = element.getTextRange().getEndOffset();
+        final int overlapStart = Math.max(absoluteStart, elementStart);
+        final int overlapEnd = Math.min(absoluteEnd, elementEnd);
+
+        if (overlapStart >= overlapEnd) {
+            return null;
+        }
+
+        return new TextRange(overlapStart - elementStart, overlapEnd - elementStart);
+    }
+
+    private void debugGetRegionClick(
+            final @NotNull String stage,
+            final @NotNull PsiElement element,
+            final String details
+    ) {
+        if (element.getContainingFile() == null
+                || element.getContainingFile().getVirtualFile() == null
+                || !element.getContainingFile().getVirtualFile().getPath().contains("shipping-methods")) {
+            return;
+        }
+        NavigationInstrumentation.info(
+                "ko-region-debug click stage=" + stage
+                        + ", elementClass=" + element.getClass().getName()
+                        + ", elementRange=" + element.getTextRange()
+                        + ", elementText='" + sanitize(element.getText()) + "'"
+                        + ", file=" + NavigationInstrumentation.describeFile(element.getContainingFile())
+                        + (details == null ? "" : ", " + details)
+        );
+    }
+
+    private @NotNull String describeTargetFiles(final @NotNull List<PsiElement> targets) {
+        final List<String> result = new ArrayList<>();
+
+        for (final PsiElement target : targets) {
+            if (target == null || target.getContainingFile() == null
+                    || target.getContainingFile().getVirtualFile() == null) {
+                result.add("<unknown>");
+                continue;
+            }
+            result.add(target.getContainingFile().getVirtualFile().getPath());
+        }
+
+        return result.toString();
+    }
+
+    private @NotNull String describeTargetLabels(final @NotNull List<PsiElement> targets) {
+        final List<String> result = new ArrayList<>();
+
+        for (final PsiElement target : targets) {
+            result.add(
+                    target.getClass().getSimpleName()
+                            + ": "
+                            + LineMarkerTargetPresentationUtil.getPresentableTargetName(target)
+            );
+        }
+
+        return result.toString();
+    }
+
+    private @NotNull String sanitize(final String text) {
+        final String singleLine = text.replace('\n', ' ').replace('\r', ' ');
+
+        return singleLine.length() > 160 ? singleLine.substring(0, 160) + "..." : singleLine;
     }
 }

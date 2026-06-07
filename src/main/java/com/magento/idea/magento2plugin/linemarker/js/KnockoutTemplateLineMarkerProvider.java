@@ -13,6 +13,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.javascript.JavaScriptFileType;
 import com.intellij.lang.javascript.psi.JSFile;
 import com.intellij.lang.javascript.psi.JSProperty;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
@@ -30,6 +31,7 @@ import com.magento.idea.magento2plugin.util.magento.MagentoVfsUtil;
 import com.magento.idea.magento2plugin.util.magento.js.KnockoutRegionResolver;
 import com.magento.idea.magento2plugin.util.magento.js.KnockoutTemplatePathResolver;
 import com.magento.idea.magento2plugin.util.magento.js.RequireJsPathResolver;
+import com.magento.idea.magento2plugin.util.magento.ui.UiComponentScopeResolver;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -44,6 +46,7 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
     private static final String REGION_COMPONENT_TOOLTIP_TEXT = "Navigate to region components";
     private static final String REGION_CHILD_TEMPLATE_TOOLTIP_TEXT = "Navigate to child Knockout templates";
     private static final String REGION_TEMPLATE_TOOLTIP_TEXT = "Navigate to region templates";
+    private static final String REGION_DISPLAY_AREA_TOOLTIP_TEXT = "Navigate to displayArea declaration";
 
     public KnockoutTemplateLineMarkerProvider() {
         NavigationInstrumentation.infoOnce(
@@ -184,38 +187,61 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
         if (anchor == null) {
             return;
         }
+        final List<PsiElement> preparedTargets = LineMarkerTargetPresentationUtil.prepareTargets(targets);
+
         collection.add(NavigationGutterIconBuilder
                 .create(HtmlFileType.INSTANCE.getIcon())
-                .setTargets(LineMarkerTargetPresentationUtil.prepareTargets(targets))
+                .setTargets(preparedTargets)
                 .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
                 .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
                 .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
                 .setTooltipText(REGION_TEMPLATE_TOOLTIP_TEXT)
-                .createLineMarkerInfo(anchor));
+                .createLineMarkerInfo(
+                        anchor,
+                        LineMarkerTargetPresentationUtil.createNavigationHandler(
+                                preparedTargets,
+                                REGION_TEMPLATE_TOOLTIP_TEXT
+                        )
+                ));
     }
 
     private void addGetRegionLineMarkers(
             final @NotNull PsiFile psiFile,
             final @NotNull Collection<? super LineMarkerInfo<?>> collection
     ) {
+        if (DumbService.isDumb(psiFile.getProject())) {
+            NavigationInstrumentation.info(
+                    "Knockout getRegion markers skipped during indexing for "
+                            + NavigationInstrumentation.describeFile(psiFile)
+            );
+            return;
+        }
         for (final KnockoutRegionResolver.RegionMatch regionMatch : KnockoutRegionResolver.getInstance()
                 .collectGetRegionMatches(psiFile.getText())) {
-            final List<PsiElement> targets = KnockoutRegionResolver.getInstance()
-                    .resolveDisplayAreaComponentFiles(psiFile.getProject(), regionMatch.getRegionName());
-            final List<PsiElement> childTemplates = collectDisplayAreaTemplates(
-                    psiFile.getProject(),
-                    regionMatch.getRegionName(),
-                    targets
-            );
+            final List<PsiElement> targets = UiComponentScopeResolver.getInstance()
+                    .resolveDisplayAreaTargetsForGetRegion(psiFile, regionMatch.getRegionName());
 
-            if (targets.isEmpty() && childTemplates.isEmpty()) {
-                NavigationInstrumentation.info(
-                        "Knockout getRegion marker skipped: no component targets for '"
-                                + regionMatch.getRegionName() + "' in "
-                                + NavigationInstrumentation.describeFile(psiFile)
-                );
+            if (targets.isEmpty()) {
+                if (addLegacyGetRegionLineMarker(psiFile, collection, regionMatch)) {
+                    continue;
+                }
                 continue;
             }
+            final List<PsiElement> navigationTargets = new ArrayList<>(targets);
+            List<PsiElement> childTemplateTargets = UiComponentScopeResolver.getInstance()
+                    .resolveTemplateFilesForDisplayAreaTargets(psiFile.getProject(), targets);
+
+            if (childTemplateTargets.isEmpty()) {
+                childTemplateTargets = collectDisplayAreaTemplates(
+                        psiFile.getProject(),
+                        regionMatch.getRegionName(),
+                        KnockoutRegionResolver.getInstance().resolveDisplayAreaComponentFiles(
+                                psiFile.getProject(),
+                                regionMatch.getRegionName()
+                        )
+                );
+            }
+            navigationTargets.addAll(childTemplateTargets);
             final PsiElement anchor = psiFile.findElementAt(regionMatch.getStartOffset());
 
             if (anchor == null) {
@@ -227,41 +253,137 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
                 );
                 continue;
             }
+            final List<PsiElement> preparedTargets =
+                    LineMarkerTargetPresentationUtil.prepareTargets(navigationTargets);
 
-            if (!childTemplates.isEmpty()) {
-                collection.add(NavigationGutterIconBuilder
-                        .create(HtmlFileType.INSTANCE.getIcon())
-                        .setTargets(prepareFileTargets(childTemplates))
-                        .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
-                        .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
-                        .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
-                        .setTooltipText(REGION_CHILD_TEMPLATE_TOOLTIP_TEXT)
-                        .createLineMarkerInfo(anchor));
-                NavigationInstrumentation.info(
-                        "Knockout getRegion marker created for '"
-                                + regionMatch.getRegionName() + "' in "
-                                + NavigationInstrumentation.describeFile(psiFile)
-                                + " childTemplateTargets=" + childTemplates.size()
-                                + " componentTargets=" + targets.size()
-                );
-                continue;
-            }
             collection.add(NavigationGutterIconBuilder
-                    .create(JavaScriptFileType.INSTANCE.getIcon())
-                    .setTargets(LineMarkerTargetPresentationUtil.prepareTargets(targets))
+                    .create(HtmlFileType.INSTANCE.getIcon())
+                    .setTargets(preparedTargets)
                     .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
                     .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
                     .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
-                    .setTooltipText(REGION_COMPONENT_TOOLTIP_TEXT)
-                    .createLineMarkerInfo(anchor));
+                    .setTooltipText(REGION_DISPLAY_AREA_TOOLTIP_TEXT)
+                    .createLineMarkerInfo(
+                            anchor,
+                            LineMarkerTargetPresentationUtil.createNavigationHandler(
+                                    preparedTargets,
+                                    REGION_DISPLAY_AREA_TOOLTIP_TEXT
+                            )
+                    ));
             NavigationInstrumentation.info(
                     "Knockout getRegion marker created for '"
                             + regionMatch.getRegionName() + "' in "
                             + NavigationInstrumentation.describeFile(psiFile)
-                            + " componentTargets=" + targets.size()
-                            + " childTemplateTargets=0"
+                            + " displayAreaTargets=" + targets.size()
+                            + " childTemplateTargets=" + childTemplateTargets.size()
+                            + " preparedTargets=" + preparedTargets.size()
+                            + describeTargetsForDebug(psiFile, preparedTargets)
             );
         }
+    }
+
+    private @NotNull String describeTargetsForDebug(
+            final @NotNull PsiFile sourceFile,
+            final @NotNull List<PsiElement> targets
+    ) {
+        final VirtualFile sourceVirtualFile = sourceFile.getVirtualFile();
+
+        if (sourceVirtualFile == null || !sourceVirtualFile.getPath().contains("shipping-methods")) {
+            return "";
+        }
+        final List<String> labels = new ArrayList<>();
+
+        for (final PsiElement target : targets) {
+            labels.add(LineMarkerTargetPresentationUtil.getPresentableTargetName(target));
+        }
+
+        return " targetLabels=" + labels;
+    }
+
+    private boolean addLegacyGetRegionLineMarker(
+            final @NotNull PsiFile psiFile,
+            final @NotNull Collection<? super LineMarkerInfo<?>> collection,
+            final @NotNull KnockoutRegionResolver.RegionMatch regionMatch
+    ) {
+        final List<PsiElement> componentTargets = KnockoutRegionResolver.getInstance()
+                .resolveDisplayAreaComponentFiles(psiFile.getProject(), regionMatch.getRegionName());
+        final List<PsiElement> childTemplates = collectDisplayAreaTemplates(
+                psiFile.getProject(),
+                regionMatch.getRegionName(),
+                componentTargets
+        );
+
+        if (componentTargets.isEmpty() && childTemplates.isEmpty()) {
+            NavigationInstrumentation.info(
+                    "Knockout getRegion marker skipped: no displayArea targets for '"
+                            + regionMatch.getRegionName() + "' in "
+                            + NavigationInstrumentation.describeFile(psiFile)
+            );
+            return false;
+        }
+        final PsiElement anchor = psiFile.findElementAt(regionMatch.getStartOffset());
+
+        if (anchor == null) {
+            NavigationInstrumentation.info(
+                    "Knockout getRegion marker skipped: no PSI anchor for '"
+                            + regionMatch.getRegionName() + "' at offset "
+                            + regionMatch.getStartOffset() + " in "
+                            + NavigationInstrumentation.describeFile(psiFile)
+            );
+            return false;
+        }
+
+        if (!childTemplates.isEmpty()) {
+            final List<PsiElement> preparedChildTemplates = prepareFileTargets(childTemplates);
+
+            collection.add(NavigationGutterIconBuilder
+                    .create(HtmlFileType.INSTANCE.getIcon())
+                    .setTargets(preparedChildTemplates)
+                    .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
+                    .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
+                    .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
+                    .setTooltipText(REGION_CHILD_TEMPLATE_TOOLTIP_TEXT)
+                    .createLineMarkerInfo(
+                            anchor,
+                            LineMarkerTargetPresentationUtil.createNavigationHandler(
+                                    preparedChildTemplates,
+                                    REGION_CHILD_TEMPLATE_TOOLTIP_TEXT
+                            )
+                    ));
+            NavigationInstrumentation.info(
+                    "Knockout getRegion legacy marker created for '"
+                            + regionMatch.getRegionName() + "' in "
+                            + NavigationInstrumentation.describeFile(psiFile)
+                            + " childTemplateTargets=" + childTemplates.size()
+                            + " componentTargets=" + componentTargets.size()
+            );
+            return true;
+        }
+        final List<PsiElement> preparedComponentTargets = LineMarkerTargetPresentationUtil.prepareTargets(componentTargets);
+
+        collection.add(NavigationGutterIconBuilder
+                .create(JavaScriptFileType.INSTANCE.getIcon())
+                .setTargets(preparedComponentTargets)
+                .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
+                .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
+                .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
+                .setTooltipText(REGION_COMPONENT_TOOLTIP_TEXT)
+                .createLineMarkerInfo(
+                        anchor,
+                        LineMarkerTargetPresentationUtil.createNavigationHandler(
+                                preparedComponentTargets,
+                                REGION_COMPONENT_TOOLTIP_TEXT
+                        )
+                ));
+        NavigationInstrumentation.info(
+                "Knockout getRegion legacy marker created for '"
+                        + regionMatch.getRegionName() + "' in "
+                        + NavigationInstrumentation.describeFile(psiFile)
+                        + " componentTargets=" + componentTargets.size()
+                        + " childTemplateTargets=0"
+        );
+
+        return true;
     }
 
     private void addDisplayAreaLineMarkers(
@@ -289,15 +411,22 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
             }
             final ASTNode nameIdentifier = property.findNameIdentifier();
             final PsiElement anchor = nameIdentifier == null ? property : nameIdentifier.getPsi();
+            final List<PsiElement> preparedTargets = LineMarkerTargetPresentationUtil.prepareTargets(targets);
 
             collection.add(NavigationGutterIconBuilder
                     .create(HtmlFileType.INSTANCE.getIcon())
-                    .setTargets(LineMarkerTargetPresentationUtil.prepareTargets(targets))
+                    .setTargets(preparedTargets)
                     .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
                     .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
                     .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
                     .setTooltipText(REGION_TEMPLATE_TOOLTIP_TEXT)
-                    .createLineMarkerInfo(anchor));
+                    .createLineMarkerInfo(
+                            anchor,
+                            LineMarkerTargetPresentationUtil.createNavigationHandler(
+                                    preparedTargets,
+                                    REGION_TEMPLATE_TOOLTIP_TEXT
+                            )
+                    ));
             NavigationInstrumentation.info(
                     "Knockout displayArea marker created for '"
                             + displayArea + "' in "
