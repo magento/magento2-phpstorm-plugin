@@ -19,6 +19,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.magento.idea.magento2plugin.project.Settings;
+import com.magento.idea.magento2plugin.project.indexing.MagentoAdditionalLibraryRootsProvider;
 import com.magento.idea.magento2plugin.util.magento.MagentoPathUrlUtil;
 import java.net.URI;
 import java.net.MalformedURLException;
@@ -46,7 +47,8 @@ public class UnmarkDirectoryAsMagentoContentRot extends MarkRootActionBase {
                     return file == null || !file.exists();
                 });
             }
-            
+
+            MagentoAdditionalLibraryRootsProvider.refreshRoots(project);
             ProjectView.getInstance(project).refresh();
         }
     }

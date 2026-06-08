@@ -17,6 +17,7 @@ public class RequireJsPreferenceReferenceProvider extends PsiReferenceProvider {
     @Override
     public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
         JsIndex index = JsIndex.getInstance();
+
         return index.getRequireJsPreferences(element, element.getResolveScope());
     }
 }

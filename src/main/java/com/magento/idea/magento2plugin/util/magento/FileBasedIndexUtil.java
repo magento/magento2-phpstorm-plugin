@@ -11,11 +11,10 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
-import com.jetbrains.php.lang.PhpFileType;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
 import com.magento.idea.magento2plugin.magento.packages.Package;
-import com.magento.idea.magento2plugin.stubs.indexes.ModuleNameIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,16 +44,8 @@ public final class FileBasedIndexUtil {
             return viewVfs;
         }
 
-        final Collection<VirtualFile> moduleVfs =
-                FileBasedIndex.getInstance().getContainingFiles(ModuleNameIndex.KEY, moduleName,
-                    GlobalSearchScope.getScopeRestrictedByFileTypes(
-                        GlobalSearchScope.allScope(project),
-                        PhpFileType.INSTANCE
-                )
-        );
-
-        for (final VirtualFile moduleVf : moduleVfs) {
-            viewVfs.addAll(getValues(moduleName, moduleVf, project));
+        for (final VirtualFile moduleRoot : findModuleRoots(moduleName, project)) {
+            addViewDirectory(viewVfs, moduleRoot);
         }
         return viewVfs;
     }
@@ -138,18 +129,12 @@ public final class FileBasedIndexUtil {
             return null;
         }
 
-        final Collection<VirtualFile> moduleVfs =
-                FileBasedIndex.getInstance().getContainingFiles(ModuleNameIndex.KEY, moduleName,
-                    GlobalSearchScope.getScopeRestrictedByFileTypes(
-                        GlobalSearchScope.allScope(project),
-                        PhpFileType.INSTANCE
-                    )
-                );
-        if (moduleVfs.isEmpty()) {
+        final Collection<VirtualFile> moduleRoots = findModuleRoots(moduleName, project);
+        if (moduleRoots.isEmpty()) {
             return null;
         }
 
-        final VirtualFile moduleVf = moduleVfs.iterator().next();
+        final VirtualFile moduleRoot = moduleRoots.iterator().next();
 
         String relativePath = File.separator.concat(directory)
                 .concat(File.separator);
@@ -161,7 +146,7 @@ public final class FileBasedIndexUtil {
         }
         relativePath = relativePath.concat(virtualFieName);
 
-        final VirtualFile configFile = moduleVf.getParent().findFileByRelativePath(relativePath);
+        final VirtualFile configFile = moduleRoot.findFileByRelativePath(relativePath);
         if (configFile == null) {
             return null;
         }
@@ -182,31 +167,52 @@ public final class FileBasedIndexUtil {
         final Collection<VirtualFile> viewVfs = new ArrayList<>();
 
         for (final String moduleName : FileBasedIndex.getInstance()
-                .getAllKeys(ModuleNameIndex.KEY, project)) {
-            viewVfs.addAll(getValues(moduleName, moduleVf, project));
+                .getAllKeys(ModuleXmlIndex.KEY, project)) {
+            for (final VirtualFile moduleRoot : findModuleRoots(moduleName, project)) {
+                if (moduleVf.getPath().startsWith(moduleRoot.getPath())) {
+                    addViewDirectory(viewVfs, moduleRoot);
+                }
+            }
         }
         return viewVfs;
     }
 
-    private static Collection<VirtualFile> getValues(
+    private static Collection<VirtualFile> findModuleRoots(
             final String moduleName,
-            final VirtualFile moduleVf,
             final Project project
     ) {
-        final Collection<VirtualFile> viewVfs = new ArrayList<>();
-        FileBasedIndex.getInstance()
-                .processValues(
-                        ModuleNameIndex.KEY, moduleName, moduleVf,
-                        (file, value) -> {
-                            final VirtualFile viewVf = file.getParent()
-                                    .findFileByRelativePath(value.concat("/view"));
-                            if (viewVf != null) {
-                                viewVfs.add(viewVf);
-                            }
-                            return false;
-                        },
-                        GlobalSearchScope.fileScope(project, moduleVf)
-                );
-        return viewVfs;
+        final Collection<VirtualFile> moduleRoots = new ArrayList<>();
+        final Collection<VirtualFile> moduleXmlFiles = FileBasedIndex.getInstance().getContainingFiles(
+                ModuleXmlIndex.KEY,
+                moduleName,
+                GlobalSearchScope.allScope(project)
+        );
+
+        for (final VirtualFile moduleXmlFile : moduleXmlFiles) {
+            final VirtualFile moduleRoot = getModuleRoot(moduleXmlFile);
+            if (moduleRoot != null) {
+                moduleRoots.add(moduleRoot);
+            }
+        }
+
+        return moduleRoots;
+    }
+
+    private static VirtualFile getModuleRoot(final VirtualFile moduleXmlFile) {
+        if (moduleXmlFile == null || moduleXmlFile.getParent() == null) {
+            return null;
+        }
+
+        return moduleXmlFile.getParent().getParent();
+    }
+
+    private static void addViewDirectory(
+            final Collection<VirtualFile> viewVfs,
+            final VirtualFile moduleRoot
+    ) {
+        final VirtualFile viewVf = moduleRoot.findChild("view");
+        if (viewVf != null) {
+            viewVfs.add(viewVf);
+        }
     }
 }

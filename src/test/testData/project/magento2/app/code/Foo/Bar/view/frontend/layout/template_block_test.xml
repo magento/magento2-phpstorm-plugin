@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <block class="Foo\Bar\Block\Widget\TestMethod" name="foo.bar.template.block" template="Foo_Bar::widget/customer_creations.phtml"/>
+    </body>
+</page>

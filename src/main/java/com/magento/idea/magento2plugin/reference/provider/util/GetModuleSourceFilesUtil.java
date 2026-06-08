@@ -30,10 +30,12 @@ public class GetModuleSourceFilesUtil {
         if (null == virtualFiles) {
             return null;
         }
-        virtualFiles.removeIf(vf -> !(vf != null && vf.getParent() != null));
         Collection<VirtualFile> sourceVfs = new ArrayList<>();
         for (VirtualFile vf : virtualFiles) {
-            sourceVfs.add(vf.getParent());
+            if (vf == null) {
+                continue;
+            }
+            sourceVfs.add(vf.isDirectory() ? vf : vf.getParent());
         }
         return sourceVfs;
     }

@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
+
+## 2026.3.0
+
+### Added
+
+- JavaScript mixin navigation between `requirejs-config.js` mixin declarations, target JavaScript modules, and mixin JavaScript modules.
+- JavaScript component navigation from Magento templates in `text/x-magento-init` scripts and `data-mage-init` attributes.
+- Knockout component navigation between JavaScript template declarations and matching HTML template files.
+- Knockout parent-child component navigation between `getRegion()` template calls and matching JavaScript `displayArea` declarations.
+- Regular template navigation between `.phtml` files and layout-declared PHP block classes.
+- PHP-free Magento module root indexing from `etc/module.xml` for non-PHP IDEs.
+- XML-based Magento theme indexing from `theme.xml` for non-PHP IDEs.
+- Magento settings are available under `Tools > Magento` in IDEs without PHP support while remaining under `PHP > Frameworks > Magento 2` in PHP IDEs.
+- PHP-independent MCP tools are available in non-PHP IDEs: `get_magento_root_path` and `describe_magento_cli_environment` are registered separately from PHP-backed scaffold and inspection tools.
+
 ## 2026.2.2
 
 ### Added

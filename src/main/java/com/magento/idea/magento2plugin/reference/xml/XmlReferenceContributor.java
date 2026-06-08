@@ -14,7 +14,6 @@ import com.magento.idea.magento2plugin.magento.files.MftfTest;
 import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaXml;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
-import com.magento.idea.magento2plugin.magento.files.UiComponentXml;
 // CHECKSTYLE IGNORE check FOR NEXT 5 LINES
 import com.magento.idea.magento2plugin.reference.provider.*;//NOPMD
 import com.magento.idea.magento2plugin.reference.provider.mftf.*;//NOPMD
@@ -275,42 +274,6 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
                 new CompositeReferenceProvider(
                         new TestExtendedByReferenceProvider()
                 )
-        );
-
-        // <someXmlTag component="requireJsMappingKey" />
-        registrar.registerReferenceProvider(
-            XmlPatterns.xmlAttributeValue().withParent(
-                XmlPatterns.xmlAttribute().withName(UiComponentXml.XML_ATTRIBUTE_COMPONENT)
-            ),
-            new RequireJsPreferenceReferenceProvider()
-        );
-
-        // <item name="component">requireJsMappingKey</item>
-        registrar.registerReferenceProvider(
-            XmlPatterns.psiElement(XmlTokenType.XML_DATA_CHARACTERS).withParent(
-                XmlPatterns.xmlText().withParent(
-                    XmlPatterns.xmlTag().withName(UiComponentXml.XML_TAG_ITEM).withChild(
-                        XmlPatterns.xmlAttribute().withValue(string().matches(UiComponentXml.XML_ATTRIBUTE_COMPONENT))
-                    ).withChild(
-                        XmlPatterns.xmlAttribute().withName(UiComponentXml.XML_ATTRIBUTE_NAME)
-                    )
-                )
-            ),
-            new RequireJsPreferenceReferenceProvider()
-        );
-
-        // <item name="template">reference</item>
-        registrar.registerReferenceProvider(
-            XmlPatterns.psiElement(XmlTokenType.XML_DATA_CHARACTERS).withParent(
-                XmlPatterns.xmlText().withParent(
-                    XmlPatterns.xmlTag().withName(UiComponentXml.XML_TAG_ITEM).withChild(
-                        XmlPatterns.xmlAttribute().withValue(string().matches(UiComponentXml.XML_ATTRIBUTE_TEMPLATE))
-                    ).withChild(
-                        XmlPatterns.xmlAttribute().withName(UiComponentXml.XML_ATTRIBUTE_NAME)
-                    )
-                )
-            ),
-            new FilePathReferenceProvider()
         );
 
         // <add parent="reference" />

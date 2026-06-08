@@ -114,8 +114,13 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
 
     protected void assertHasReferenceToFile(final String reference) {
         final PsiElement element = getElementFromCaret();
+        final List<PsiReference> references = new ArrayList<>(Arrays.asList(element.getReferences()));
 
-        assertHasReferenceToFile(reference, Arrays.asList(element.getReferences()));
+        if (references.isEmpty()) {
+            references.addAll(Arrays.asList(getLeafElementFromCaret().getReferences()));
+        }
+
+        assertHasReferenceToFile(reference, references, element);
     }
 
     protected void assertHasReferenceToFile(
@@ -140,25 +145,137 @@ public abstract class BaseReferenceTestCase extends BaseInspectionsTestCase {
             references.addAll(Arrays.asList(element.getReferences()));
         }
 
-        assertHasReferenceToFile(reference, references);
+        assertHasReferenceToFile(reference, references, element);
+    }
+
+    protected void assertHasNoReferenceToFile(
+            final String reference,
+            final Class<? extends PsiReferenceProvider> providerClass
+    ) {
+        final PsiElement element = getLeafElementFromCaret();
+        final List<PsiReference> references = new ArrayList<>();
+
+        try {
+            final PsiReferenceProvider provider = providerClass.getConstructor().newInstance();
+            references.addAll(
+                    Arrays.asList(
+                            provider.getReferencesByElement(element, new ProcessingContext())
+                    )
+            );
+        } catch (NoSuchMethodException
+                | IllegalAccessException
+                | InvocationTargetException
+                | InstantiationException exception
+        ) {
+            references.addAll(Arrays.asList(element.getReferences()));
+        }
+
+        for (final PsiReference psiReference : references) {
+            if (psiReference instanceof PolyVariantReferenceBase) {
+                final ResolveResult[] resolveResults
+                        = ((PolyVariantReferenceBase) psiReference).multiResolve(true);
+
+                for (final ResolveResult resolveResult : resolveResults) {
+                    if (isReferenceToFile(resolveResult.getElement(), reference)) {
+                        fail(String.format(
+                                "Expected no reference to file `%s`. Found references: %s",
+                                reference,
+                                describeReferences(references)
+                        ));
+                    }
+                }
+                continue;
+            }
+            if (isReferenceToFile(psiReference.resolve(), reference)) {
+                fail(String.format(
+                        "Expected no reference to file `%s`. Found references: %s",
+                        reference,
+                        describeReferences(references)
+                ));
+            }
+        }
     }
 
     protected void assertHasReferenceToFile(
             final String reference,
             final List<PsiReference> references
     ) {
+        assertHasReferenceToFile(reference, references, null);
+    }
+
+    protected void assertHasReferenceToFile(
+            final String reference,
+            final List<PsiReference> references,
+            @Nullable final PsiElement sourceElement
+    ) {
         for (final PsiReference psiReference : references) {
-            final PsiElement resolved = psiReference.resolve();
-            if (!(resolved instanceof PsiFile)) {
+            if (psiReference instanceof PolyVariantReferenceBase) {
+                final ResolveResult[] resolveResults
+                        = ((PolyVariantReferenceBase) psiReference).multiResolve(true);
+
+                for (final ResolveResult resolveResult : resolveResults) {
+                    final PsiElement resolved = resolveResult.getElement();
+
+                    if (isReferenceToFile(resolved, reference)) {
+                        return;
+                    }
+                }
                 continue;
             }
-            if (((PsiFile) resolved).getVirtualFile().getPath().endsWith(reference)) {
+            final PsiElement resolved = psiReference.resolve();
+
+            if (isReferenceToFile(resolved, reference)) {
                 return;
             }
         }
-        final String referenceNotFound = "Failed that element contains reference to the file `%s`";
+        final String referenceNotFound = "Failed that element contains reference to the file `%s`. Source: %s. Found references: %s";
 
-        fail(String.format(referenceNotFound, reference));
+        fail(String.format(
+                referenceNotFound,
+                reference,
+                sourceElement == null ? "unknown" : sourceElement.getClass().getName() + ":" + sourceElement.getText(),
+                describeReferences(references)
+        ));
+    }
+
+    private String describeReferences(final List<PsiReference> references) {
+        final List<String> descriptions = new ArrayList<>();
+
+        for (final PsiReference reference : references) {
+            if (reference instanceof PolyVariantReferenceBase) {
+                final ResolveResult[] resolveResults = ((PolyVariantReferenceBase) reference).multiResolve(true);
+                final List<String> targets = new ArrayList<>();
+
+                for (final ResolveResult resolveResult : resolveResults) {
+                    final PsiElement target = resolveResult.getElement();
+
+                    if (target instanceof PsiFile) {
+                        targets.add(((PsiFile) target).getVirtualFile().getPath());
+                    } else if (target != null) {
+                        targets.add(target.getClass().getName() + ":" + target.getText());
+                    }
+                }
+                descriptions.add(reference.getClass().getName() + " -> " + targets);
+                continue;
+            }
+            final PsiElement target = reference.resolve();
+            descriptions.add(reference.getClass().getName() + " -> " + target);
+        }
+
+        return descriptions.toString();
+    }
+
+    private boolean isReferenceToFile(
+            @Nullable final PsiElement resolved,
+            final String reference
+    ) {
+        final PsiFile resolvedFile = resolved instanceof PsiFile
+                ? (PsiFile) resolved
+                : resolved == null ? null : resolved.getContainingFile();
+
+        return resolvedFile != null
+                && resolvedFile.getVirtualFile() != null
+                && resolvedFile.getVirtualFile().getPath().endsWith(reference);
     }
 
     protected void assertHasReferenceToXmlFile(final String fileName) {

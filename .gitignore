@@ -40,3 +40,4 @@ build
 video/*
 intellij-test-project
 .ai
+.kotlin

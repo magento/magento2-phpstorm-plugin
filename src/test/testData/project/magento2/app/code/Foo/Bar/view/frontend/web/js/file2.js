@@ -4,5 +4,10 @@ define([
     'use strict';
 
     return {
-    }
+        isDisabled: function () {
+        },
+
+        closeModal: function () {
+        }
+    };
 });

@@ -107,14 +107,9 @@ public class FilePathCompletionProvider extends CompletionProvider<CompletionPar
         } else {
             VirtualFile tf = parameters.getOriginalFile().getVirtualFile();
             if (tf != null) {
-                VirtualFile moduleVf =
-                        VfsUtil.findVfUp(tf, "registration.php");
-
-                if (moduleVf != null) {
-                    viewVfs.addAll(
-                            FileBasedIndexUtil.findViewVfsByModuleVf(moduleVf, parameters.getPosition().getProject())
-                    );
-                }
+                viewVfs.addAll(
+                        FileBasedIndexUtil.findViewVfsByModuleVf(tf, parameters.getPosition().getProject())
+                );
             }
         }
 
