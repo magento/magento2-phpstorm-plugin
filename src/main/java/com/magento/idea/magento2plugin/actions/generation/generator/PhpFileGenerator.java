@@ -68,7 +68,7 @@ public abstract class PhpFileGenerator extends FileGenerator {
     public PsiFile generate(final @NotNull String actionName) {
         file = getFile();
 
-        final PhpClass phpClass = ReadAction.compute(() ->
+        final PhpClass phpClass = ReadAction.computeBlocking(() ->
                 GetPhpClassByFQN.getInstance(project).execute(file.getClassFqn())
         );
 
@@ -78,7 +78,7 @@ public abstract class PhpFileGenerator extends FileGenerator {
             return phpClass.getContainingFile();
         }
 
-        final PsiDirectory moduleDirectory = ReadAction.compute(() ->
+        final PsiDirectory moduleDirectory = ReadAction.computeBlocking(() ->
                 moduleIndex.getModuleDirectoryByModuleName(file.getModuleName())
         );
 

@@ -381,7 +381,7 @@ internal object MagentoCliToolQueries {
             }
         }
 
-        val projectRootName = (project.baseDir ?: project.projectFile?.parent)?.name
+        val projectRootName = project.projectFile?.parent?.name
         val configuredSegments = normalizedConfiguredPath
             .removePrefix("/")
             .removePrefix("./")
@@ -469,7 +469,7 @@ internal object MagentoCliToolQueries {
     }
 
     private fun projectRootPath(project: Project): Path? {
-        val projectBasePath = project.basePath ?: project.baseDir?.path ?: return null
+        val projectBasePath = project.basePath ?: project.projectFile?.parent?.path ?: return null
         return Path.of(projectBasePath).toAbsolutePath().normalize()
     }
 

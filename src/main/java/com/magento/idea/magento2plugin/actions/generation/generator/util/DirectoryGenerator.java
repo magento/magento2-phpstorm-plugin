@@ -64,7 +64,7 @@ public class DirectoryGenerator {
             final @NotNull PsiDirectory parent,
             final @NotNull String subdirName
     ) {
-        final PsiDirectory sub = ReadAction.compute(() -> parent.findSubdirectory(subdirName));
+        final PsiDirectory sub = ReadAction.computeBlocking(() -> parent.findSubdirectory(subdirName));
         return sub == null ? createSubdirectoryOnEdt(parent, subdirName) : sub;
     }
 
@@ -85,7 +85,7 @@ public class DirectoryGenerator {
 
         for (final String directory : Arrays.asList(directories)) {
             if (lastDirectory == null) {
-                final PsiDirectory subDir = ReadAction.compute(() -> parent.findSubdirectory(directory));
+                final PsiDirectory subDir = ReadAction.computeBlocking(() -> parent.findSubdirectory(directory));
 
                 if (subDir == null) {
                     lastDirectory = createSubdirectoryOnEdt(parent, directory);
@@ -94,7 +94,7 @@ public class DirectoryGenerator {
                 }
             } else {
                 final PsiDirectory currentDirectory = lastDirectory;
-                final PsiDirectory subDir = ReadAction.compute(() ->
+                final PsiDirectory subDir = ReadAction.computeBlocking(() ->
                         currentDirectory.findSubdirectory(directory));
 
                 if (subDir == null) {

@@ -8,7 +8,6 @@ package com.magento.idea.magento2plugin.linemarker.js;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.icons.AllIcons;
-import com.intellij.lang.ASTNode;
 import com.intellij.lang.javascript.JavaScriptFileType;
 import com.intellij.lang.javascript.psi.JSExpression;
 import com.intellij.lang.javascript.psi.JSFile;
@@ -497,10 +496,10 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
                 if (!isFunctionProperty(property)) {
                     continue;
                 }
-                final ASTNode nameIdentifier = property.findNameIdentifier();
+                final PsiElement nameIdentifier = property.getNameIdentifier();
 
                 if (nameIdentifier != null) {
-                    result.add(new MixinOverride(property.getName(), nameIdentifier.getPsi()));
+                    result.add(new MixinOverride(property.getName(), nameIdentifier));
                 }
             }
         }
@@ -532,10 +531,10 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
             if (!isFunctionProperty(property)) {
                 continue;
             }
-            final ASTNode nameIdentifier = property.findNameIdentifier();
+            final PsiElement nameIdentifier = property.getNameIdentifier();
 
             if (nameIdentifier != null) {
-                result.add(nameIdentifier.getPsi());
+                result.add(nameIdentifier);
             }
         }
 
@@ -556,10 +555,10 @@ public class JsMixinLineMarkerProvider implements LineMarkerProvider {
             if (!isFunctionProperty(property)) {
                 continue;
             }
-            final ASTNode nameIdentifier = property.findNameIdentifier();
+            final PsiElement nameIdentifier = property.getNameIdentifier();
 
             if (nameIdentifier != null) {
-                result.add(nameIdentifier.getPsi());
+                result.add(nameIdentifier);
             }
         }
 

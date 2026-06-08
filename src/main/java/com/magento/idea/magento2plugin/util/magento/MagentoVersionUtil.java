@@ -53,7 +53,7 @@ public final class MagentoVersionUtil {
             final Project project,
             final String magentoPath
     ) {
-        return ReadAction.compute(() -> {
+        return ReadAction.computeBlocking(() -> {
             final VirtualFile file = LocalFileSystem.getInstance().findFileByPath(
                     getFilePath(magentoPath)
             );

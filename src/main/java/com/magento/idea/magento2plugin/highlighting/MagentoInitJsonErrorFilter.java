@@ -42,7 +42,7 @@ public class MagentoInitJsonErrorFilter extends HighlightErrorFilter implements 
 
     @Override
     public boolean accept(final @NotNull HighlightInfo highlightInfo, final PsiFile file) {
-        if (!highlightInfo.isFromInjection() || !HighlightSeverity.ERROR.equals(highlightInfo.getSeverity())) {
+        if (!HighlightSeverity.ERROR.equals(highlightInfo.getSeverity())) {
             return true;
         }
         final PsiLanguageInjectionHost host = findInjectedJsonHost(file, highlightInfo.getStartOffset());

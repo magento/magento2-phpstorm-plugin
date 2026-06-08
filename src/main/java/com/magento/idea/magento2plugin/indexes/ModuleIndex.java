@@ -81,7 +81,7 @@ public final class ModuleIndex {
             final ID<String, String> indexKey,
             final boolean withinProject
     ) {
-        return ReadAction.compute(() -> {
+        return ReadAction.computeBlocking(() -> {
             final Set<String> names = new LinkedHashSet<>();
             final FileBasedIndex index = FileBasedIndex.getInstance();
             final Collection<String> allNames = index.getAllKeys(indexKey, project);
@@ -122,7 +122,7 @@ public final class ModuleIndex {
      * @return PsiDirectory
      */
     public @Nullable PsiDirectory getModuleDirectoryByModuleName(final String moduleName) {
-        return ReadAction.compute(() -> {
+        return ReadAction.computeBlocking(() -> {
             final VirtualFile moduleDirectory = getModuleDirectoryVirtualFileByModuleName(moduleName);
             if (moduleDirectory == null) {
                 return null;
@@ -140,7 +140,7 @@ public final class ModuleIndex {
      * @return VirtualFile
      */
     public @Nullable VirtualFile getModuleDirectoryVirtualFileByModuleName(final String moduleName) {
-        return ReadAction.compute(() -> {
+        return ReadAction.computeBlocking(() -> {
             if (moduleName == null) {
                 return null;
             }

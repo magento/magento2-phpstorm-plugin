@@ -24,7 +24,7 @@ public class GetPhpClassByFQN {
     }
 
     public PhpClass execute(String targetClassName) {
-        return ReadAction.compute(() -> {
+        return ReadAction.computeBlocking(() -> {
             final PhpIndex phpIndex = PhpIndex.getInstance(project);
             final Collection<PhpClass> interfaces = phpIndex.getInterfacesByFQN(targetClassName);
             if (!interfaces.isEmpty()) {

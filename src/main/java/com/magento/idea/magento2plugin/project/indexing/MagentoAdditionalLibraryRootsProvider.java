@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.project.indexing;
 
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.RootsChangeRescanningInfo;
 import com.intellij.openapi.roots.AdditionalLibraryRootsProvider;
 import com.intellij.openapi.roots.SyntheticLibrary;
 import com.intellij.openapi.roots.ex.ProjectRootManagerEx;
@@ -51,8 +52,7 @@ public class MagentoAdditionalLibraryRootsProvider extends AdditionalLibraryRoot
     public static void refreshRoots(final @NotNull Project project) {
         WriteAction.run(() -> ProjectRootManagerEx.getInstanceEx(project).makeRootsChange(
                 () -> { },
-                false,
-                true
+                RootsChangeRescanningInfo.TOTAL_RESCAN
         ));
     }
 
