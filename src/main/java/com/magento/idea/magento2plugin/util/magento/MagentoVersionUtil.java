@@ -7,8 +7,9 @@ package com.magento.idea.magento2plugin.util.magento;
 
 import com.intellij.json.psi.JsonFile;
 import com.intellij.json.psi.JsonObject;
-import com.intellij.openapi.application.ReadAction;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -53,7 +54,7 @@ public final class MagentoVersionUtil {
             final Project project,
             final String magentoPath
     ) {
-        return ReadAction.compute(() -> {
+        return ApplicationManager.getApplication().runReadAction((Computable<Pair<String, String>>) () -> {
             final VirtualFile file = LocalFileSystem.getInstance().findFileByPath(
                     getFilePath(magentoPath)
             );

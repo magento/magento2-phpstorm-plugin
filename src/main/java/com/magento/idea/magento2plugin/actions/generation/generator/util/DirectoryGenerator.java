@@ -6,8 +6,8 @@
 package com.magento.idea.magento2plugin.actions.generation.generator.util;
 
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.application.WriteAction;
+import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiDirectory;
 import com.magento.idea.magento2plugin.actions.generation.generator.data.ModuleDirectoriesData;
 import com.magento.idea.magento2plugin.magento.packages.File;
@@ -64,7 +64,9 @@ public class DirectoryGenerator {
             final @NotNull PsiDirectory parent,
             final @NotNull String subdirName
     ) {
-        final PsiDirectory sub = ReadAction.compute(() -> parent.findSubdirectory(subdirName));
+        final PsiDirectory sub = ApplicationManager.getApplication().runReadAction(
+                (Computable<PsiDirectory>) () -> parent.findSubdirectory(subdirName)
+        );
         return sub == null ? createSubdirectoryOnEdt(parent, subdirName) : sub;
     }
 
@@ -85,7 +87,9 @@ public class DirectoryGenerator {
 
         for (final String directory : Arrays.asList(directories)) {
             if (lastDirectory == null) {
-                final PsiDirectory subDir = ReadAction.compute(() -> parent.findSubdirectory(directory));
+                final PsiDirectory subDir = ApplicationManager.getApplication().runReadAction(
+                        (Computable<PsiDirectory>) () -> parent.findSubdirectory(directory)
+                );
 
                 if (subDir == null) {
                     lastDirectory = createSubdirectoryOnEdt(parent, directory);
@@ -94,8 +98,9 @@ public class DirectoryGenerator {
                 }
             } else {
                 final PsiDirectory currentDirectory = lastDirectory;
-                final PsiDirectory subDir = ReadAction.compute(() ->
-                        currentDirectory.findSubdirectory(directory));
+                final PsiDirectory subDir = ApplicationManager.getApplication().runReadAction(
+                        (Computable<PsiDirectory>) () -> currentDirectory.findSubdirectory(directory)
+                );
 
                 if (subDir == null) {
                     final PsiDirectory finalLastDirectory = lastDirectory;

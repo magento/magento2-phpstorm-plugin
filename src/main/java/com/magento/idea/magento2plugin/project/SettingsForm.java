@@ -150,7 +150,12 @@ public class SettingsForm implements SearchableConfigurable {
                     NotificationType.INFORMATION
             );
         } catch (final ConfigurationException exception) {
-            Messages.showErrorDialog(project, exception.getMessage(), "Magento Reindex");
+            final String message = exception.getLocalizedMessage();
+            Messages.showErrorDialog(
+                    project,
+                    message == null ? "Invalid Magento settings." : message,
+                    "Magento Reindex"
+            );
         }
     }
 
@@ -174,7 +179,7 @@ public class SettingsForm implements SearchableConfigurable {
             );
         } catch (final IOException | IllegalStateException exception) {
             final String errorMessage = StringUtil.notNullize(
-                    exception.getMessage(),
+                    exception.getLocalizedMessage(),
                     exception.getClass().getSimpleName()
             );
             MagentoNotificationUtil.notifyGlobally(

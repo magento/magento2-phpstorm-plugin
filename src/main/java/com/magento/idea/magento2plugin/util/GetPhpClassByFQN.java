@@ -4,8 +4,9 @@
  */
 package com.magento.idea.magento2plugin.util;
 
-import com.intellij.openapi.application.ReadAction;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Computable;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 
@@ -24,7 +25,7 @@ public class GetPhpClassByFQN {
     }
 
     public PhpClass execute(String targetClassName) {
-        return ReadAction.compute(() -> {
+        return ApplicationManager.getApplication().runReadAction((Computable<PhpClass>) () -> {
             final PhpIndex phpIndex = PhpIndex.getInstance(project);
             final Collection<PhpClass> interfaces = phpIndex.getInterfacesByFQN(targetClassName);
             if (!interfaces.isEmpty()) {

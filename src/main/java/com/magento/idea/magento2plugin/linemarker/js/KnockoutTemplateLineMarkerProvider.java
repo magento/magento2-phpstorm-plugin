@@ -10,7 +10,6 @@ import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.ide.highlighter.HtmlFileType;
 import com.intellij.ide.highlighter.XmlFileType;
-import com.intellij.lang.ASTNode;
 import com.intellij.lang.javascript.JavaScriptFileType;
 import com.intellij.lang.javascript.psi.JSFile;
 import com.intellij.lang.javascript.psi.JSProperty;
@@ -160,8 +159,6 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
                 .create(JavaScriptFileType.INSTANCE.getIcon())
                 .setTargets(preparedTargets)
                 .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
-                .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
-                .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
                 .setTooltipText(MAGENTO_UI_COMPONENT_TOOLTIP_TEXT)
                 .createLineMarkerInfo(
                         anchor,
@@ -197,8 +194,6 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
                 .create(HtmlFileType.INSTANCE.getIcon())
                 .setTargets(preparedTargets)
                 .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
-                .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
-                .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
                 .setTooltipText(MAGENTO_TEMPLATE_TOOLTIP_TEXT)
                 .createLineMarkerInfo(
                         anchor,
@@ -244,8 +239,6 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
                 .create(HtmlFileType.INSTANCE.getIcon())
                 .setTargets(LineMarkerTargetPresentationUtil.prepareTargets(targets))
                 .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
-                .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
-                .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
                 .setTooltipText(TEMPLATE_TOOLTIP_TEXT)
                 .createLineMarkerInfo(anchor));
     }
@@ -276,8 +269,6 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
                 .create(HtmlFileType.INSTANCE.getIcon())
                 .setTargets(preparedTargets)
                 .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
-                .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
-                .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
                 .setTooltipText(REGION_TEMPLATE_TOOLTIP_TEXT)
                 .createLineMarkerInfo(
                         anchor,
@@ -333,8 +324,6 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
                     .create(HtmlFileType.INSTANCE.getIcon())
                     .setTargets(preparedTargets)
                     .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
-                    .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
-                    .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
                     .setTooltipText(REGION_DISPLAY_AREA_TOOLTIP_TEXT)
                     .createLineMarkerInfo(
                             anchor,
@@ -375,8 +364,6 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
                     .create(HtmlFileType.INSTANCE.getIcon())
                     .setTargets(preparedChildTemplates)
                     .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
-                    .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
-                    .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
                     .setTooltipText(REGION_CHILD_TEMPLATE_TOOLTIP_TEXT)
                     .createLineMarkerInfo(
                             anchor,
@@ -393,8 +380,6 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
                 .create(JavaScriptFileType.INSTANCE.getIcon())
                 .setTargets(preparedComponentTargets)
                 .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
-                .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
-                .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
                 .setTooltipText(REGION_COMPONENT_TOOLTIP_TEXT)
                 .createLineMarkerInfo(
                         anchor,
@@ -425,16 +410,14 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
             if (targets.isEmpty()) {
                 continue;
             }
-            final ASTNode nameIdentifier = property.findNameIdentifier();
-            final PsiElement anchor = nameIdentifier == null ? property : nameIdentifier.getPsi();
+            final PsiElement nameIdentifier = property.getNameIdentifier();
+            final PsiElement anchor = nameIdentifier == null ? property : nameIdentifier;
             final List<PsiElement> preparedTargets = LineMarkerTargetPresentationUtil.prepareTargets(targets);
 
             collection.add(NavigationGutterIconBuilder
                     .create(HtmlFileType.INSTANCE.getIcon())
                     .setTargets(preparedTargets)
                     .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
-                    .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
-                    .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
                     .setTooltipText(REGION_TEMPLATE_TOOLTIP_TEXT)
                     .createLineMarkerInfo(
                             anchor,
@@ -495,8 +478,6 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
                             : XmlFileType.INSTANCE.getIcon())
                     .setTargets(preparedTargets)
                     .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
-                    .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
-                    .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
                     .setTooltipText(tooltip)
                     .createLineMarkerInfo(
                             anchor,
@@ -525,8 +506,6 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
                         : XmlFileType.INSTANCE.getIcon())
                 .setTargets(preparedTargets)
                 .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
-                .setTargetRenderer(LineMarkerTargetPresentationUtil.TARGET_RENDERER)
-                    .setCellRenderer(LineMarkerTargetPresentationUtil.CELL_RENDERER)
                 .setTooltipText(tooltip)
                 .createLineMarkerInfo(
                         anchor,

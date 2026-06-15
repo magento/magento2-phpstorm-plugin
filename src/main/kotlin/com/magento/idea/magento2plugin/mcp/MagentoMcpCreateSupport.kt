@@ -6,7 +6,6 @@
 package com.magento.idea.magento2plugin.mcp
 
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
@@ -25,11 +24,7 @@ internal object MagentoMcpCreateSupport {
     private val DIRECTORY_PATTERN = Regex(RegExUtil.DIRECTORY)
 
     fun <T> runReadAction(action: () -> T): T {
-        return if (ApplicationManager.getApplication().isDispatchThread) {
-            ApplicationManager.getApplication().runReadAction<T> { action() }
-        } else {
-            ReadAction.computeCancellable<T, RuntimeException>(action)
-        }
+        return ApplicationManager.getApplication().runReadAction<T> { action() }
     }
 
     fun requireEditableModule(
