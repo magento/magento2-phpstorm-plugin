@@ -179,7 +179,7 @@ public class SettingsForm implements SearchableConfigurable {
             );
         } catch (final IOException | IllegalStateException exception) {
             final String errorMessage = StringUtil.notNullize(
-                    exception.getMessage(),
+                    exception.getLocalizedMessage(),
                     exception.getClass().getSimpleName()
             );
             MagentoNotificationUtil.notifyGlobally(

@@ -6,7 +6,6 @@
 package com.magento.idea.magento2plugin.mcp
 
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.magento.idea.magento2plugin.project.Settings
@@ -48,7 +47,7 @@ internal object MagentoMcpToolsetSupport {
     ): String = withProjectAction(validateProject, requireSmartMode) { project ->
         try {
             MagentoMcpReadActionSupport.retryOnCancellation {
-                ReadAction.computeCancellable<String, RuntimeException> {
+                ApplicationManager.getApplication().runReadAction<String> {
                     query(project)
                 }
             }

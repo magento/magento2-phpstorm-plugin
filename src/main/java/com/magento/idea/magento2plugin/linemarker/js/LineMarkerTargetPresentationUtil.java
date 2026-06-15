@@ -8,7 +8,6 @@ package com.magento.idea.magento2plugin.linemarker.js;
 import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.navigation.NavigationUtil;
 import com.intellij.codeInsight.navigation.PsiTargetNavigator;
-import com.intellij.codeInsight.navigation.impl.PsiTargetPresentationRenderer;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.ui.popup.JBPopup;
@@ -22,24 +21,10 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class LineMarkerTargetPresentationUtil {
-    static final Supplier<PsiTargetPresentationRenderer<PsiElement>> TARGET_RENDERER =
-            () -> new PsiTargetPresentationRenderer<>() {
-                @Override
-                public String getElementText(final PsiElement element) {
-                    return getPresentableTargetName(element);
-                }
-
-                @Override
-                public String getContainerText(final PsiElement element) {
-                    return null;
-                }
-            };
-
     private LineMarkerTargetPresentationUtil() {
     }
 

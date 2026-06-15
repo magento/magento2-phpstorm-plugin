@@ -5,7 +5,6 @@
 
 package com.magento.idea.magento2plugin.mcp
 
-import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.project.Project
@@ -75,7 +74,7 @@ internal object MagentoModuleCommands {
 
         val moduleFullName = "${normalizedPackage}_${normalizedModule}"
 
-        val existingModuleDirectory = ReadAction.computeBlocking<PsiDirectory?, RuntimeException> {
+        val existingModuleDirectory = ApplicationManager.getApplication().runReadAction<PsiDirectory?> {
             magentoRootDirectory.findSubdirectory("app")
                 ?.findSubdirectory("code")
                 ?.findSubdirectory(normalizedPackage)
@@ -233,7 +232,7 @@ internal object MagentoModuleCommands {
         name: String,
         directoryGenerator: DirectoryGenerator
     ): DirectoryCreationResult {
-        val existing = ReadAction.computeBlocking<PsiDirectory?, RuntimeException> {
+        val existing = ApplicationManager.getApplication().runReadAction<PsiDirectory?> {
             parent.findSubdirectory(name)
         }
         if (existing != null) {
@@ -274,7 +273,7 @@ internal object MagentoModuleCommands {
     }
 
     private fun resolveMagentoRootDirectory(project: Project, configuredRoot: String): PsiDirectory? {
-        return ReadAction.computeBlocking<PsiDirectory?, RuntimeException> {
+        return ApplicationManager.getApplication().runReadAction<PsiDirectory?> {
             val fileSystem = LocalFileSystem.getInstance()
             val normalizedConfiguredRoot = FileUtil.toSystemIndependentName(configuredRoot.trim())
 
@@ -282,7 +281,7 @@ internal object MagentoModuleCommands {
                 val absoluteVirtualFile = fileSystem.refreshAndFindFileByPath(normalizedConfiguredRoot)
                     ?: fileSystem.findFileByPath(normalizedConfiguredRoot)
                 if (absoluteVirtualFile != null && absoluteVirtualFile.isDirectory) {
-                    return@computeBlocking PsiManager.getInstance(project).findDirectory(absoluteVirtualFile)
+                    return@runReadAction PsiManager.getInstance(project).findDirectory(absoluteVirtualFile)
                 }
             }
 
@@ -296,14 +295,14 @@ internal object MagentoModuleCommands {
                 val resolvedRoot = moduleDirectory.parentDirectory(levels = 4) ?: continue
                 val resolvedRootPath = resolvedRoot.virtualFile.path.replace('\\', '/')
                 if (modulePath.startsWith(configuredPrefix)) {
-                    return@computeBlocking resolvedRoot
+                    return@runReadAction resolvedRoot
                 }
 
                 if (!isAbsolutePath(normalizedConfiguredRoot) &&
                     configuredRootTrimmed.isNotEmpty() &&
                     resolvedRootPath.endsWith("/$configuredRootTrimmed")
                 ) {
-                    return@computeBlocking resolvedRoot
+                    return@runReadAction resolvedRoot
                 }
             }
 
@@ -319,7 +318,7 @@ internal object MagentoModuleCommands {
                 .mapNotNull { path -> fileSystem.refreshAndFindFileByPath(path) ?: fileSystem.findFileByPath(path) }
                 .firstOrNull { it.isDirectory }
             if (virtualFile != null) {
-                return@computeBlocking PsiManager.getInstance(project).findDirectory(virtualFile)
+                return@runReadAction PsiManager.getInstance(project).findDirectory(virtualFile)
             }
 
             null

@@ -5,7 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
-import com.intellij.openapi.application.ReadAction;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
@@ -68,7 +69,7 @@ public abstract class PhpFileGenerator extends FileGenerator {
     public PsiFile generate(final @NotNull String actionName) {
         file = getFile();
 
-        final PhpClass phpClass = ReadAction.computeBlocking(() ->
+        final PhpClass phpClass = ApplicationManager.getApplication().runReadAction((Computable<PhpClass>) () ->
                 GetPhpClassByFQN.getInstance(project).execute(file.getClassFqn())
         );
 
@@ -78,7 +79,7 @@ public abstract class PhpFileGenerator extends FileGenerator {
             return phpClass.getContainingFile();
         }
 
-        final PsiDirectory moduleDirectory = ReadAction.computeBlocking(() ->
+        final PsiDirectory moduleDirectory = ApplicationManager.getApplication().runReadAction((Computable<PsiDirectory>) () ->
                 moduleIndex.getModuleDirectoryByModuleName(file.getModuleName())
         );
 

@@ -5,7 +5,8 @@
 
 package com.magento.idea.magento2plugin.indexes;
 
-import com.intellij.openapi.application.ReadAction;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
@@ -81,7 +82,7 @@ public final class ModuleIndex {
             final ID<String, String> indexKey,
             final boolean withinProject
     ) {
-        return ReadAction.computeBlocking(() -> {
+        return ApplicationManager.getApplication().runReadAction((Computable<List<String>>) () -> {
             final Set<String> names = new LinkedHashSet<>();
             final FileBasedIndex index = FileBasedIndex.getInstance();
             final Collection<String> allNames = index.getAllKeys(indexKey, project);
@@ -122,7 +123,7 @@ public final class ModuleIndex {
      * @return PsiDirectory
      */
     public @Nullable PsiDirectory getModuleDirectoryByModuleName(final String moduleName) {
-        return ReadAction.computeBlocking(() -> {
+        return ApplicationManager.getApplication().runReadAction((Computable<PsiDirectory>) () -> {
             final VirtualFile moduleDirectory = getModuleDirectoryVirtualFileByModuleName(moduleName);
             if (moduleDirectory == null) {
                 return null;
@@ -140,7 +141,7 @@ public final class ModuleIndex {
      * @return VirtualFile
      */
     public @Nullable VirtualFile getModuleDirectoryVirtualFileByModuleName(final String moduleName) {
-        return ReadAction.computeBlocking(() -> {
+        return ApplicationManager.getApplication().runReadAction((Computable<VirtualFile>) () -> {
             if (moduleName == null) {
                 return null;
             }

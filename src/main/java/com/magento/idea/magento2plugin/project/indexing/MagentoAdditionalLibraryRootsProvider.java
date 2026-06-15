@@ -50,10 +50,15 @@ public class MagentoAdditionalLibraryRootsProvider extends AdditionalLibraryRoot
     }
 
     public static void refreshRoots(final @NotNull Project project) {
-        WriteAction.run(() -> ProjectRootManagerEx.getInstanceEx(project).makeRootsChange(
-                () -> { },
-                RootsChangeRescanningInfo.TOTAL_RESCAN
-        ));
+        WriteAction.run(() -> {
+            try (AutoCloseable ignored = ProjectRootManagerEx
+                    .getInstanceEx(project)
+                    .withRootsChange(RootsChangeRescanningInfo.TOTAL_RESCAN)) {
+                // The roots are provided from settings; closing this scope publishes the refresh.
+            } catch (final Exception exception) {
+                throw new IllegalStateException("Unable to refresh Magento index roots.", exception);
+            }
+        });
     }
 
     private @NotNull Collection<VirtualFile> getMagentoIndexRoots(final @NotNull Project project) {
