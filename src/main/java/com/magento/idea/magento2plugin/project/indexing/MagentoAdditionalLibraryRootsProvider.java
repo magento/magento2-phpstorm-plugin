@@ -5,12 +5,10 @@
 
 package com.magento.idea.magento2plugin.project.indexing;
 
-import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.RootsChangeRescanningInfo;
 import com.intellij.openapi.roots.AdditionalLibraryRootsProvider;
+import com.intellij.openapi.roots.AdditionalLibraryRootsListenerHelper;
 import com.intellij.openapi.roots.SyntheticLibrary;
-import com.intellij.openapi.roots.ex.ProjectRootManagerEx;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.magento.idea.magento2plugin.project.Settings;
@@ -50,15 +48,17 @@ public class MagentoAdditionalLibraryRootsProvider extends AdditionalLibraryRoot
     }
 
     public static void refreshRoots(final @NotNull Project project) {
-        WriteAction.run(() -> {
-            try (AutoCloseable ignored = ProjectRootManagerEx
-                    .getInstanceEx(project)
-                    .withRootsChange(RootsChangeRescanningInfo.TOTAL_RESCAN)) {
-                // The roots are provided from settings; closing this scope publishes the refresh.
-            } catch (final Exception exception) {
-                throw new IllegalStateException("Unable to refresh Magento index roots.", exception);
-            }
-        });
+        final Collection<VirtualFile> roots = new MagentoAdditionalLibraryRootsProvider()
+                .getMagentoIndexRoots(project);
+
+        AdditionalLibraryRootsListenerHelper.getInstance()
+                .handleAdditionalLibraryRootsChanged(
+                        project,
+                        null,
+                        List.of(),
+                        roots,
+                        "Magento additional library roots"
+                );
     }
 
     private @NotNull Collection<VirtualFile> getMagentoIndexRoots(final @NotNull Project project) {
