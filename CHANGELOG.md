@@ -19,6 +19,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Magento settings are available under `Tools > Magento` in IDEs without PHP support while remaining under `PHP > Frameworks > Magento 2` in PHP IDEs.
 - PHP-independent MCP tools are available in non-PHP IDEs: `get_magento_root_path` and `describe_magento_cli_environment` are registered separately from PHP-backed scaffold and inspection tools.
 
+### Fixed
+
+- Class cast exception when resolving observer name references outside a valid `event` tag in `events.xml`.
+
 ## 2026.2.2
 
 ### Added

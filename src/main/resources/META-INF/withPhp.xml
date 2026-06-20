@@ -652,6 +652,7 @@
         <searchScopesProvider implementation="com.magento.idea.magento2plugin.lang.psi.search.MagentoSearchScopesProvider"/>
 
         <notificationGroup
+                id="Magento Notifications"
                 displayType="BALLOON" />
     </extensions>
 
