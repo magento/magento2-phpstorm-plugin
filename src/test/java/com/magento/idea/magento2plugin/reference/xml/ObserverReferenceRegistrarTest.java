@@ -37,6 +37,18 @@ public class ObserverReferenceRegistrarTest extends ReferenceXmlFixtureTestCase 
     }
 
     /**
+     * Tests for no exception on observer name outside of event tag.
+     */
+    public void testObserverNameOutsideEventMustNotHaveReference() {
+        myFixture.configureByText(
+                ModuleEventsXml.FILE_NAME,
+                "<observer name=\"test_ob<caret>server\"/>"
+        );
+
+        assertEmptyReference();
+    }
+
+    /**
      * Tests for event name reference in events.xml.
      */
     public void testEventNameMustHaveReference() {

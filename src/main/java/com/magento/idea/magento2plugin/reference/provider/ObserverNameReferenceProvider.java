@@ -3,9 +3,10 @@ package com.magento.idea.magento2plugin.reference.provider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceProvider;
-import com.intellij.psi.impl.source.xml.XmlAttributeValueImpl;
-import com.intellij.psi.impl.source.xml.XmlTagImpl;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.xml.XmlAttribute;
+import com.intellij.psi.xml.XmlAttributeValue;
+import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.ProcessingContext;
 import com.magento.idea.magento2plugin.indexes.EventIndex;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
@@ -22,14 +23,28 @@ public class ObserverNameReferenceProvider extends PsiReferenceProvider {
             @NotNull final ProcessingContext context
     ) {
         final List<PsiReference> psiReferences = new ArrayList<>();
-        final XmlTagImpl eventTag = (XmlTagImpl) element.getParent().getParent().getParent();
+
+        if (!(element instanceof XmlAttributeValue)
+                || !(element.getParent() instanceof XmlAttribute)
+                || !(element.getParent().getParent() instanceof XmlTag)
+                || !(element.getParent().getParent().getParent() instanceof XmlTag)) {
+            return psiReferences.toArray(new PsiReference[0]);
+        }
+
+        final XmlTag observerTag = (XmlTag) element.getParent().getParent();
+        final XmlTag eventTag = (XmlTag) observerTag.getParent();
+
+        if (!"event".equals(eventTag.getName())) {
+            return psiReferences.toArray(new PsiReference[0]);
+        }
+
         final String eventName = eventTag.getAttributeValue("name");
 
         if (eventName == null) {
             return psiReferences.toArray(new PsiReference[0]);
         }
 
-        final String observerName = ((XmlAttributeValueImpl) element).getValue();
+        final String observerName = ((XmlAttributeValue) element).getValue();
         final Collection<PsiElement> observers
                 = new EventIndex(element.getProject()).getObservers(
                         eventName, observerName, GlobalSearchScope.allScope(element.getProject())
