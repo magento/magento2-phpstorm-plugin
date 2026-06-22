@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class LayoutBlockTemplateIndexParser {
     private static final String BLOCK_TAG = "block";
+    private static final String REFERENCE_BLOCK_TAG = "referenceBlock";
     private static final String ARGUMENT_TAG = "argument";
     private static final String CLASS_ATTRIBUTE = "class";
     private static final String TEMPLATE_ATTRIBUTE = "template";
@@ -61,13 +62,17 @@ public class LayoutBlockTemplateIndexParser {
             final @NotNull Map<String, Set<String>> blockTemplates,
             final @NotNull Map<String, Set<String>> templateBlocks
     ) {
-        if (BLOCK_TAG.equals(tag.getName())) {
+        if (isBlockTemplateDeclaration(tag)) {
             collectBlock(tag, blockTemplates, templateBlocks);
         }
 
         for (final XmlTag subTag : tag.getSubTags()) {
             collect(subTag, blockTemplates, templateBlocks);
         }
+    }
+
+    private boolean isBlockTemplateDeclaration(final @NotNull XmlTag tag) {
+        return BLOCK_TAG.equals(tag.getName()) || REFERENCE_BLOCK_TAG.equals(tag.getName());
     }
 
     private void collectBlock(
