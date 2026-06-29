@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 ### Fixed
 
 - Class cast exception when resolving observer name references outside a valid `event` tag in `events.xml`.
+- JetBrains MCP Server is now an optional plugin dependency; Magento MCP tools are registered only when MCP support is available.
 
 ## 2026.2.2
 

@@ -5,6 +5,7 @@
  */
 -->
 <idea-plugin>
+    <depends optional="true" config-file="withPhpMcp.xml">com.intellij.mcpServer</depends>
     <depends optional="true" config-file="withJsGraphQl.xml">com.intellij.lang.jsgraphql</depends>
     <actions>
         <!-- In editor generators -->
@@ -154,7 +155,6 @@
         <projectTemplatesFactory implementation="com.magento.idea.magento2plugin.generation.php.MagentoTemplatesFactory"/>
 
         <projectService serviceImplementation="com.magento.idea.magento2uct.settings.UctSettingsService"/>
-        <mcpServer.mcpToolset implementation="com.magento.idea.magento2plugin.mcp.MagentoMcpToolset"/>
 
         <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.completion.xml.XmlCompletionContributor" id="xml"/>
         <completion.contributor language="PHP" implementationClass="com.magento.idea.magento2plugin.completion.php.PhpCompletionContributor" id="php"/>
