@@ -21,6 +21,11 @@ public class PhpFrameworkSettingsForm extends SettingsForm implements PhpFramewo
     }
 
     @Override
+    protected boolean isPhpDependentControlsVisible() {
+        return true;
+    }
+
+    @Override
     protected void afterSettingsApplied(final @NotNull Settings.State state) {
         ConfigurationManager.getInstance().refreshIncludePaths(state, getProject());
     }

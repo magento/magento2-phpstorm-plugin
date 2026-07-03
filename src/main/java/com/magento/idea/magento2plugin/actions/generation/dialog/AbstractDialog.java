@@ -5,7 +5,6 @@
 
 package com.magento.idea.magento2plugin.actions.generation.dialog;
 
-import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
@@ -113,16 +112,17 @@ public abstract class AbstractDialog extends DialogWrapper {
     }
 
     /**
-     * Executes onOK within a WriteAction context.
+     * Executes onOK after validation.
      */
     protected final void executeOnOk() {
-        WriteAction.run(this::onWriteActionOK);
+        onWriteActionOK();
     }
 
     /**
      * This method should contain the core logic for onOk.
      * Subclasses can override to provide their implementation.
-     * Must be invoked via executeOnOk().
+     * Must be invoked via executeOnOk(). PSI and VFS mutations should be wrapped
+     * by the generator that performs them.
      */
     protected abstract void onWriteActionOK();
 

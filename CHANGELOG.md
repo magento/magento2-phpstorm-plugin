@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 - Class cast exception when resolving observer name references outside a valid `event` tag in `events.xml`.
 - JetBrains MCP Server is now an optional plugin dependency; Magento MCP tools are registered only when MCP support is available.
+- File generation dialogs no longer wrap the whole OK action in a write action, preventing `runBlockingCancellable` write-action errors during PSI file creation.
 
 ## 2026.2.2
 

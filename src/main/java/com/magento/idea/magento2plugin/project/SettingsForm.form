@@ -40,7 +40,7 @@
               <text value="XML configuration:"/>
             </properties>
           </component>
-          <component id="7bde6" class="javax.swing.JLabel">
+          <component id="7bde6" class="javax.swing.JLabel" binding="moduleDefaultLicenseNameLabel">
             <constraints>
               <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
               <forms/>

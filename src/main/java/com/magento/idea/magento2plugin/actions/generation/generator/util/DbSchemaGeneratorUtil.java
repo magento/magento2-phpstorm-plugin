@@ -10,10 +10,12 @@ import com.magento.idea.magento2plugin.magento.packages.PropertiesTypes;
 import com.magento.idea.magento2plugin.magento.packages.database.ColumnAttributes;
 import com.magento.idea.magento2plugin.magento.packages.database.PropertyToDefaultTypeMapperUtil;
 import com.magento.idea.magento2plugin.magento.packages.database.TableColumnTypes;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 
 public final class DbSchemaGeneratorUtil {
@@ -39,7 +41,12 @@ public final class DbSchemaGeneratorUtil {
             final String name = property.get(PROPERTY_NAME);
             final String type = property.get(PROPERTY_TYPE);
 
-            final PropertiesTypes propType = PropertiesTypes.getByValue(type);
+            if (name == null || name.trim().isEmpty() || type == null || type.trim().isEmpty()) {
+                continue;
+            }
+            final String trimmedName = name.trim();
+            final String trimmedType = type.trim();
+            final PropertiesTypes propType = PropertiesTypes.getByValue(trimmedType);
             final TableColumnTypes tableColumnType = PropertyToDefaultTypeMapperUtil.map(propType);
 
             final List<String> allowedAttributes = ModuleDbSchemaXml.getAllowedAttributes(
@@ -48,7 +55,7 @@ public final class DbSchemaGeneratorUtil {
 
             final Map<String, String> columnData = new LinkedHashMap<>();
             columnData.put(ColumnAttributes.TYPE.getName(), tableColumnType.getColumnType());
-            columnData.put(ColumnAttributes.NAME.getName(), name);
+            columnData.put(ColumnAttributes.NAME.getName(), trimmedName);
 
             for (final String columnAttributeName : allowedAttributes) {
                 final ColumnAttributes attribute = ColumnAttributes.getByName(columnAttributeName);
@@ -58,7 +65,7 @@ public final class DbSchemaGeneratorUtil {
                 }
                 columnData.put(columnAttributeName, attribute.getDefault());
             }
-            columnData.put(ColumnAttributes.COMMENT.getName(), getColumnCommentByName(name));
+            columnData.put(ColumnAttributes.COMMENT.getName(), getColumnCommentByName(trimmedName));
 
             complemented.add(columnData);
         }
@@ -96,16 +103,19 @@ public final class DbSchemaGeneratorUtil {
      */
     @SuppressWarnings("PMD.UseLocaleWithCaseConversions")
     private static String getColumnCommentByName(final @NotNull String name) {
-        final StringBuilder commentStringBuilder = new StringBuilder();
-        final String[] nameParts = name.split("_");
+        final String formattedName = Arrays.stream(name.split("_"))
+                .filter(namePart -> !namePart.isEmpty())
+                .map(DbSchemaGeneratorUtil::capitalizeCommentPart)
+                .collect(Collectors.joining(" "));
 
-        for (final String namePart : nameParts) {
-            commentStringBuilder
-                    .append(namePart.substring(0, 1).toUpperCase())
-                    .append(namePart.substring(1))
-                    .append(' ');
+        if (formattedName.isEmpty()) {
+            return "Column";
         }
 
-        return commentStringBuilder.append("Column").toString();
+        return formattedName.concat(" Column");
+    }
+
+    private static String capitalizeCommentPart(final @NotNull String namePart) {
+        return namePart.substring(0, 1).toUpperCase() + namePart.substring(1);
     }
 }

@@ -28,9 +28,12 @@ public final class ClassPropertyFormatterUtil {
         final List<String> properties = new ArrayList<>();
 
         for (int index = 0; index < table.getRowCount(); index++) {
-            final String name = table.getValueAt(index, 0).toString();
-            final String type = table.getValueAt(index, 1).toString();
+            final String name = getTrimmedValue(table, index, 0);
+            final String type = getTrimmedValue(table, index, 1);
 
+            if (name.isEmpty() || type.isEmpty()) {
+                continue;
+            }
             properties.add(ClassPropertyFormatterUtil.formatSingleProperty(name, type));
         }
 
@@ -46,12 +49,14 @@ public final class ClassPropertyFormatterUtil {
      * @return String
      */
     public static String formatSingleProperty(final String name, final String type) {
+        final String propertyName = name.trim();
+
         return new ClassPropertyData(
-                type,
-                CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name),
-                CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name),
-                name,
-                formatNameToConstant(name)
+                type.trim(),
+                CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, propertyName),
+                CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, propertyName),
+                propertyName,
+                formatNameToConstant(propertyName)
         ).string();
     }
 
@@ -87,5 +92,19 @@ public final class ClassPropertyFormatterUtil {
      */
     public static String formatNameToConstant(final String name) {
         return CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_UNDERSCORE, name);
+    }
+
+    private static String getTrimmedValue(
+            final DefaultTableModel table,
+            final int row,
+            final int column
+    ) {
+        final Object value = table.getValueAt(row, column);
+
+        if (value == null) {
+            return StringUtils.EMPTY;
+        }
+
+        return value.toString().trim();
     }
 }

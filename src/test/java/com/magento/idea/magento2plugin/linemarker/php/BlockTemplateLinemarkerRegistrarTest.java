@@ -10,6 +10,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.linemarker.LinemarkerFixtureTestCase;
+import java.util.List;
 
 public class BlockTemplateLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
     /**
@@ -22,6 +23,24 @@ public class BlockTemplateLinemarkerRegistrarTest extends LinemarkerFixtureTestC
         final PhpClass phpClass = PsiTreeUtil.findChildOfType(myFixture.getFile(), PhpClass.class);
 
         assertProviderHasLinemarker(phpClass, "Navigate to block template");
+    }
+
+    /**
+     * Block-to-template navigation popups should show template names, not PHP file content.
+     */
+    public void testBlockTemplateTargetsUseTemplateNames() {
+        myFixture.configureFromTempProjectFile(
+                "app/code/Foo/Bar/Block/Widget/CustomerCreations.php"
+        );
+        final PhpClass phpClass = PsiTreeUtil.findChildOfType(myFixture.getFile(), PhpClass.class);
+        final List<PsiElement> targets = new BlockTemplateLineMarkerProvider()
+                .collectTemplates(phpClass);
+
+        assertEquals(1, targets.size());
+        assertEquals(
+                "Foo_Bar::widget/customer_creations.phtml",
+                BlockTemplateLineMarkerProvider.getPresentableTemplateTargetName(targets.get(0))
+        );
     }
 
     /**
@@ -46,6 +65,23 @@ public class BlockTemplateLinemarkerRegistrarTest extends LinemarkerFixtureTestC
         final PsiElement anchor = PsiTreeUtil.getDeepestFirst(myFixture.getFile());
 
         assertProviderHasLinemarker(anchor, "Navigate to template block");
+    }
+
+    /**
+     * Template-to-block navigation popups should show block class names, not PHP file content.
+     */
+    public void testTemplateBlockTargetsUseBlockClassNames() {
+        myFixture.configureFromTempProjectFile(
+                "app/code/Foo/Bar/view/frontend/templates/widget/customer_creations.phtml"
+        );
+        final List<PsiElement> targets = new BlockTemplateLineMarkerProvider()
+                .collectBlocks(myFixture.getFile());
+
+        assertEquals(1, targets.size());
+        assertEquals(
+                "Foo\\Bar\\Block\\Widget\\TestMethod",
+                BlockTemplateLineMarkerProvider.getPresentableBlockTargetName(targets.get(0))
+        );
     }
 
     /**
