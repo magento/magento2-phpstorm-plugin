@@ -568,22 +568,21 @@ public class NewEntityDialog extends AbstractDialog {
 
         for (int count = 0; count < model.getRowCount(); count++) {
 
-            final String name = model.getValueAt(count, 0).toString();
-            final String dataType = model.getValueAt(count, 1).toString();
+            final String name = getTrimmedTableValue(model, count, 0);
+            final String dataType = getTrimmedTableValue(model, count, 1);
 
-            final String label = Arrays.stream(name.split("_")).map(
-                    string -> string.substring(0, 1).toUpperCase(Locale.getDefault())
-                            + string.substring(1)).collect(Collectors.joining(" ")
-            );
+            if (name.isEmpty() || dataType.isEmpty()) {
+                continue;
+            }
+            final String label = formatSnakeCaseLabel(name);
             final String sortOrder = String.valueOf(count).concat("0");
             final String fieldset = "general";
 
-            final PropertiesTypes property =
-                    PropertiesTypes.getByValue(model.getValueAt(count, 1).toString());
+            final PropertiesTypes property = PropertiesTypes.getByValue(dataType);
             final String formElementType =
                     FormElementType.getDefaultForProperty(property).getType();
 
-            final String source = model.getValueAt(count, 0).toString(); //todo: convert
+            final String source = name; //todo: convert
 
             final UiComponentFormFieldData fieldsetData = new UiComponentFormFieldData(//NOPMD
                     name,
@@ -644,10 +643,7 @@ public class NewEntityDialog extends AbstractDialog {
             return;
         }
         final String entityName = CamelCaseToSnakeCase.getInstance().convert(entityNameValue);
-        final String entityNameLabel = Arrays.stream(entityName.split("_")).map(
-                string -> string.substring(0, 1).toUpperCase(Locale.getDefault())
-                        + string.substring(1)
-        ).collect(Collectors.joining(" "));
+        final String entityNameLabel = formatSnakeCaseLabel(entityName);
 
         dbTableName.setText(entityName);
         entityId.setText(entityName.concat("_id"));
@@ -659,6 +655,31 @@ public class NewEntityDialog extends AbstractDialog {
         aclTitle.setText(entityNameLabel.concat(" Management"));
         menuIdentifier.setText(moduleName.concat("::management"));
         menuTitle.setText(entityNameLabel.concat(" Management"));
+    }
+
+    static String formatSnakeCaseLabel(final String value) {
+        return Arrays.stream(value.split("_"))
+                .filter(string -> !string.isEmpty())
+                .map(NewEntityDialog::capitalizeLabelPart)
+                .collect(Collectors.joining(" "));
+    }
+
+    private static String capitalizeLabelPart(final String value) {
+        return value.substring(0, 1).toUpperCase(Locale.getDefault()) + value.substring(1);
+    }
+
+    private static String getTrimmedTableValue(
+            final DefaultTableModel model,
+            final int row,
+            final int column
+    ) {
+        final Object value = model.getValueAt(row, column);
+
+        if (value == null) {
+            return "";
+        }
+
+        return value.toString().trim();
     }
 
     /**
