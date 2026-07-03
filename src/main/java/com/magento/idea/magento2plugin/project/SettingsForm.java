@@ -64,6 +64,7 @@ public class SettingsForm implements SearchableConfigurable {
     private final SettingsFormValidator validator = new SettingsFormValidator(this);
     private JLabel magentoVersionLabel;//NOPMD
     private JLabel magentoPathLabel;//NOPMD
+    private JLabel moduleDefaultLicenseNameLabel;//NOPMD
 
     public SettingsForm(@NotNull final Project project) {
         this.project = project;
@@ -101,6 +102,7 @@ public class SettingsForm implements SearchableConfigurable {
         }
         skillAgentTargetSelect.setSelectedItem(AgentTarget.PROJECT_SKILLS);
 
+        refreshPhpDependentControlsVisibility();
         refreshFormStatus(getSettings().pluginEnabled);
         pluginEnabled.addActionListener(e -> refreshFormStatus(pluginEnabled.isSelected()));
 
@@ -130,6 +132,18 @@ public class SettingsForm implements SearchableConfigurable {
         installMagentoScaffoldSkillButton.setEnabled(isEnabled);
         installMagentoInspectSkillButton.setEnabled(isEnabled);
         skillAgentTargetSelect.setEnabled(isEnabled);
+    }
+
+    private void refreshPhpDependentControlsVisibility() {
+        final boolean isVisible = isPhpDependentControlsVisible();
+
+        moduleDefaultLicenseNameLabel.setVisible(isVisible);
+        moduleDefaultLicenseName.setVisible(isVisible);
+        mftfSupportEnabled.setVisible(isVisible);
+    }
+
+    protected boolean isPhpDependentControlsVisible() {
+        return false;
     }
 
     protected void reindex() {
