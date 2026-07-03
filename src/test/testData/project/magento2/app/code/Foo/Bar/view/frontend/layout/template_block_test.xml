@@ -2,5 +2,6 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <block class="Foo\Bar\Block\Widget\TestMethod" name="foo.bar.template.block" template="Foo_Bar::widget/customer_creations.phtml"/>
+        <referenceBlock name="category.products.list" class="Foo\Bar\Block\Category\ListProduct" template="Foo_Bar::category/list.phtml"/>
     </body>
 </page>

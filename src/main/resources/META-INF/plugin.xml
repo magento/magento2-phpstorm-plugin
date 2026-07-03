@@ -11,13 +11,12 @@
     <depends>com.intellij.platform.images</depends>
     <depends>com.intellij.modules.json</depends>
     <depends>com.intellij.copyright</depends>
-    <depends>com.intellij.mcpServer</depends>
+    <depends optional="true" config-file="withMcp.xml">com.intellij.mcpServer</depends>
     <depends optional="true" config-file="withPhp.xml">com.jetbrains.php</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.Settings"/>
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.startup.DeferredProjectOpenActions"/>
-        <mcpServer.mcpToolset implementation="com.magento.idea.magento2plugin.mcp.MagentoMcpProjectToolset"/>
 
         <projectConfigurable
                 groupId="tools"

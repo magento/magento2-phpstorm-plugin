@@ -25,11 +25,35 @@ public class BlockTemplateLinemarkerRegistrarTest extends LinemarkerFixtureTestC
     }
 
     /**
+     * Layout referenceBlock classes should navigate to their declared regular templates.
+     */
+    public void testReferenceBlockClassShouldHaveTemplateLinemarker() {
+        myFixture.configureFromTempProjectFile(
+                "app/code/Foo/Bar/Block/Category/ListProduct.php"
+        );
+        final PhpClass phpClass = PsiTreeUtil.findChildOfType(myFixture.getFile(), PhpClass.class);
+
+        assertProviderHasLinemarker(phpClass, "Navigate to block template");
+    }
+
+    /**
      * Regular templates should navigate back to layout block classes that declare them.
      */
     public void testTemplateShouldHaveBlockLinemarker() {
         myFixture.configureFromTempProjectFile(
                 "app/code/Foo/Bar/view/frontend/templates/widget/customer_creations.phtml"
+        );
+        final PsiElement anchor = PsiTreeUtil.getDeepestFirst(myFixture.getFile());
+
+        assertProviderHasLinemarker(anchor, "Navigate to template block");
+    }
+
+    /**
+     * Regular templates should navigate back to layout referenceBlock classes that declare them.
+     */
+    public void testReferenceBlockTemplateShouldHaveBlockLinemarker() {
+        myFixture.configureFromTempProjectFile(
+                "app/code/Foo/Bar/view/frontend/templates/category/list.phtml"
         );
         final PsiElement anchor = PsiTreeUtil.getDeepestFirst(myFixture.getFile());
 
