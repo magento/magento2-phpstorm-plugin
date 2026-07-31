@@ -40,7 +40,7 @@ val effectivePluginVersion = providers.provider {
 version = effectivePluginVersion.get()
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(25)
 }
 
 repositories {
@@ -53,8 +53,8 @@ repositories {
 
 dependencies {
     testImplementation("junit:junit:4.13.2")
-    testCompileOnly("org.junit.jupiter:junit-jupiter-api:5.13.4")
-    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.13.4")
+    testCompileOnly("org.junit.jupiter:junit-jupiter-api:5.14.4")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.14.4")
 
     intellijPlatform {
         create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))

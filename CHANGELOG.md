@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 
+## 2026.3.1
+
+### Fixed
+
+- Write access exception when marking or unmarking Magento content roots in PhpStorm 2026.2 [#2720](https://github.com/magento/magento2-phpstorm-plugin/issues/2720)
+
+### Changed
+
+- Updated the minimum supported IDE and build target to PhpStorm 2026.2, the Java toolchain to 25, the IntelliJ Platform Gradle Plugin to 2.18.1, and the Gradle wrapper to 9.6.1.
+
 ## 2026.3.0
 
 ### Added

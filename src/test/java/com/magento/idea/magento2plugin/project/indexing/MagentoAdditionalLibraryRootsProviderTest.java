@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.project.indexing;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.roots.SyntheticLibrary;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.magento.idea.magento2plugin.BaseProjectTestCase;
@@ -42,5 +43,11 @@ public class MagentoAdditionalLibraryRootsProviderTest extends BaseProjectTestCa
 
         assertTrue(provider.getAdditionalProjectLibraries(getProject()).isEmpty());
         assertTrue(provider.getRootsToWatch(getProject()).isEmpty());
+    }
+
+    public void testRefreshRootsAcquiresWriteAccess() {
+        assertFalse(ApplicationManager.getApplication().isWriteAccessAllowed());
+
+        MagentoAdditionalLibraryRootsProvider.refreshRoots(getProject());
     }
 }

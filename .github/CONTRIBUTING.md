@@ -4,7 +4,7 @@
 1. Open the project in IntelliJ IDEA.
 1. Make sure that you are on the latest develop branch (for example `5.4.0-develop`).
 1. Import the Gradle project from `build.gradle.kts`.
-1. Use **JDK 21** for both the project SDK and the Gradle JVM.
+1. Use **JDK 25** for both the project SDK and the Gradle JVM.
 1. In the Gradle tool window, run `Tasks > Intellij platform > runIde`.
 1. The task launches a PhpStorm sandbox with the plugin installed. Make sure that the plugin is enabled and indexing is finished before testing features.
 
