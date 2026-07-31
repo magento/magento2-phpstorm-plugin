@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.project.indexing;
 
+import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.AdditionalLibraryRootsProvider;
 import com.intellij.openapi.roots.AdditionalLibraryRootsListenerHelper;
@@ -51,14 +52,14 @@ public class MagentoAdditionalLibraryRootsProvider extends AdditionalLibraryRoot
         final Collection<VirtualFile> roots = new MagentoAdditionalLibraryRootsProvider()
                 .getMagentoIndexRoots(project);
 
-        AdditionalLibraryRootsListenerHelper.getInstance()
+        WriteAction.run(() -> AdditionalLibraryRootsListenerHelper.getInstance()
                 .handleAdditionalLibraryRootsChanged(
-                        project,
-                        null,
-                        List.of(),
-                        roots,
-                        "Magento additional library roots"
-                );
+                    project,
+                    null,
+                    List.of(),
+                    roots,
+                    "Magento additional library roots"
+                ));
     }
 
     private @NotNull Collection<VirtualFile> getMagentoIndexRoots(final @NotNull Project project) {
