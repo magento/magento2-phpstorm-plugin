@@ -39,12 +39,14 @@ private const val MAGENTO_SUPPORT_NOTIFICATION = "Enable Magento support for thi
 
 internal fun runWebStormUiTest(
     fixtureName: String,
+    vararg generatedFilesToCleanup: String,
     test: Driver.(projectPath: Path) -> Unit,
 ) {
     WebStormUiTestEnvironment.initialize()
 
     val testName = CurrentTestMethod.hyphenateWithClass()
     val projectPath = UiTestProjectFixture.copy(fixtureName, testName)
+    cleanupGeneratedFiles(projectPath, *generatedFilesToCleanup)
     val pluginPath = Path.of(System.getProperty("path.to.build.plugin"))
 
     Starter.newContext(

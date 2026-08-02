@@ -12,7 +12,10 @@ import org.junit.jupiter.api.Test
 
 class NewAclXmlActionUiTest {
     @Test
-    fun `creates acl xml from module context`() = runWebStormUiTest(FILE_GENERATORS_FIXTURE) { projectPath ->
+    fun `creates acl xml from module context`() = runWebStormUiTest(
+        FILE_GENERATORS_FIXTURE,
+        "app/code/Acme/Shipping/etc/acl.xml",
+    ) { projectPath ->
         invokeProjectViewAction(
             MODULE_XML_PATH,
             "MagentoCreateAclFile",

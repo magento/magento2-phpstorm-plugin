@@ -14,6 +14,7 @@ import com.intellij.driver.sdk.ui.components.common.toolwindows.projectView
 import com.intellij.driver.sdk.ui.components.elements.DialogUiComponent
 import com.intellij.driver.sdk.waitFor
 import java.nio.file.Path
+import kotlin.io.path.deleteIfExists
 import kotlin.io.path.exists
 import kotlin.io.path.readText
 import kotlin.time.Duration.Companion.minutes
@@ -69,6 +70,21 @@ internal fun Driver.assertGeneratedFile(
         check(content.contains(expected)) {
             "$relativePath does not contain expected text: $expected\n$content"
         }
+    }
+}
+
+internal fun cleanupGeneratedFiles(
+    projectPath: Path,
+    vararg relativePaths: String,
+) {
+    val normalizedProjectPath = projectPath.toAbsolutePath().normalize()
+
+    relativePaths.forEach { relativePath ->
+        val generatedFile = normalizedProjectPath.resolve(relativePath).normalize()
+        check(generatedFile.startsWith(normalizedProjectPath)) {
+            "Generated file must stay inside the test project: $relativePath"
+        }
+        generatedFile.deleteIfExists()
     }
 }
 

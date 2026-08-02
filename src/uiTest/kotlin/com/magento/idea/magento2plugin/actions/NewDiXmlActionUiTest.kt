@@ -12,7 +12,10 @@ import org.junit.jupiter.api.Test
 
 class NewDiXmlActionUiTest {
     @Test
-    fun `creates di xml from module context`() = runWebStormUiTest(FILE_GENERATORS_FIXTURE) { projectPath ->
+    fun `creates di xml from module context`() = runWebStormUiTest(
+        FILE_GENERATORS_FIXTURE,
+        "app/code/Acme/Shipping/etc/di.xml",
+    ) { projectPath ->
         invokeProjectViewAction(
             MODULE_XML_PATH,
             "MagentoCreateDiFile",
