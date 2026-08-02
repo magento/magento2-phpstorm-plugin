@@ -5,16 +5,10 @@
 
 package com.magento.idea.magento2plugin.stubs.indexes.data;
 
-import com.jetbrains.php.PhpIndex;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
-import java.util.Collection;
-import org.jetbrains.annotations.NotNull;
-
-public class PluginData {
+public final class PluginData {
 
     private final String type;
     private final int sortOrder;
-    private Collection<PhpClass> phpClassCollection;
 
     /**
      * Plugin data class.
@@ -33,21 +27,6 @@ public class PluginData {
 
     public int getSortOrder() {
         return sortOrder;
-    }
-
-    public Collection<PhpClass> getPhpClassCollection() {
-        return phpClassCollection;
-    }
-
-    /**
-     * Setting PHP plugin class.
-     *
-     * @param phpClass collection PHP plugin class
-     */
-    public void setPhpClass(final @NotNull PhpClass phpClass) {
-        final PhpIndex phpIndex = PhpIndex.getInstance(phpClass.getProject());
-
-        phpClassCollection = phpIndex.getClassesByFQN(getType());
     }
 
     /**
