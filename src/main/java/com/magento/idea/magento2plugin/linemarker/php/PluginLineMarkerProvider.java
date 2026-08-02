@@ -10,9 +10,11 @@ import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.icons.AllIcons;
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
+import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.lexer.PhpTokenTypes;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
@@ -91,6 +93,7 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
     private static class PluginClassCache {
 
         private final Map<String, List<PluginData>> classPluginsMap = new HashMap<>();
+        private final Map<String, List<PhpClass>> pluginClassesMap = new HashMap<>();
 
         public List<PluginData> getPluginsForClass(final @NotNull PhpClass phpClass) {
             final List<PluginData> pluginsForClass = getPluginsForClass(
@@ -132,7 +135,6 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
 
             for (final Set<PluginData> pluginDataList : plugins) {
                 for (final PluginData pluginData: pluginDataList) {
-                    pluginData.setPhpClass(phpClass);
                     results.add(pluginData);
                 }
             }
@@ -141,11 +143,32 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
             return results;
         }
 
-        public List<PluginMethodData> getPluginMethods(final List<PluginData> pluginDataList) {
+        public List<PhpClass> getPluginClasses(
+                final @NotNull PluginData pluginData,
+                final @NotNull Project project
+        ) {
+            final String pluginType = pluginData.getType();
+
+            if (pluginClassesMap.containsKey(pluginType)) {
+                return pluginClassesMap.get(pluginType);
+            }
+
+            final List<PhpClass> pluginClasses = new ArrayList<>(
+                    PhpIndex.getInstance(project).getClassesByFQN(pluginType)
+            );
+            pluginClassesMap.put(pluginType, pluginClasses);
+
+            return pluginClasses;
+        }
+
+        public List<PluginMethodData> getPluginMethods(
+                final List<PluginData> pluginDataList,
+                final Project project
+        ) {
             final List<PluginMethodData> result = new ArrayList<>();
 
             for (final PluginData pluginData: pluginDataList) {
-                for (final PhpClass plugin: pluginData.getPhpClassCollection()) {
+                for (final PhpClass plugin: getPluginClasses(pluginData, project)) {
                     //@todo add module sequence ID if sortOrder equal zero. It should be negative value.
                     result.addAll(getPluginMethods(plugin, pluginData.getSortOrder()));
                 }
@@ -193,7 +216,10 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
             final List<PhpClass> phpClassList =  new ArrayList<>();
 
             for (final PluginData pluginData: pluginDataList) {
-                phpClassList.addAll(pluginData.getPhpClassCollection());
+                phpClassList.addAll(pluginClassCache.getPluginClasses(
+                        pluginData,
+                        psiElement.getProject()
+                ));
             }
 
             return phpClassList;
@@ -227,7 +253,10 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
             }
 
             final List<PluginData> pluginDataList = pluginClassCache.getPluginsForClass(methodClass);
-            final List<PluginMethodData> pluginMethods = pluginClassCache.getPluginMethods(pluginDataList);
+            final List<PluginMethodData> pluginMethods = pluginClassCache.getPluginMethods(
+                    pluginDataList,
+                    methodClass.getProject()
+            );
             final String classMethodName = StringUtils.capitalize(psiElement.getName());
 
             pluginMethods.removeIf(pluginMethod -> !isPluginMethodName(pluginMethod.getMethodName(), classMethodName));
