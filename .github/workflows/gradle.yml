@@ -8,6 +8,42 @@ on:
     branches: [ master, '*-develop', 'mainline*' ]
 
 jobs:
+  ui-test-webstorm:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: 25
+          distribution: 'temurin'
+          cache: gradle
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Cache WebStorm UI test distribution
+        uses: actions/cache@v4
+        with:
+          path: |
+            out/ide-tests/cache
+            out/ide-tests/installers
+          key: ${{ runner.os }}-webstorm-${{ hashFiles('gradle.properties') }}
+      - name: Run WebStorm UI tests
+        run: xvfb-run --auto-servernum ./gradlew uiTest --no-daemon --no-build-cache --no-configuration-cache
+      - name: Upload UI test failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: webstorm-ui-test-failure-artifacts
+          if-no-files-found: ignore
+          retention-days: 14
+          path: |
+            build/reports/tests/uiTest/**
+            build/test-results/uiTest/**
+            build/idea-sandbox/**/log/**
+            build/idea-sandbox/**/system/log/**
+            out/ide-tests/tests/**
+
   build-linux:
     runs-on: ubuntu-latest
 

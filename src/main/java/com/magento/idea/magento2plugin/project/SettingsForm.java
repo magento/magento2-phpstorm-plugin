@@ -87,7 +87,7 @@ public class SettingsForm implements SearchableConfigurable {
     public JComponent createComponent() {
         buttonReindex.addActionListener(event -> reindexFromForm());
 
-        regenerateUrnMapButton.addMouseListener(
+        regenerateUrnMapButton.addActionListener(
                 new RegenerateUrnMapListener(project)
         );
         installMagentoScaffoldSkillButton.addActionListener(

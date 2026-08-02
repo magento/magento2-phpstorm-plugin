@@ -5,6 +5,7 @@
 
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.gradle.api.tasks.testing.TestDescriptor
 import org.gradle.api.tasks.testing.TestResult
@@ -51,6 +52,20 @@ repositories {
     }
 }
 
+sourceSets {
+    create("uiTest") {
+        compileClasspath += sourceSets.main.get().output
+        runtimeClasspath += sourceSets.main.get().output
+    }
+}
+
+val uiTestImplementation by configurations.getting {
+    extendsFrom(configurations.testImplementation.get())
+}
+val uiTestRuntimeOnly by configurations.getting {
+    extendsFrom(configurations.testRuntimeOnly.get())
+}
+
 dependencies {
     testImplementation("junit:junit:4.13.2")
     testCompileOnly("org.junit.jupiter:junit-jupiter-api:5.14.4")
@@ -65,7 +80,20 @@ dependencies {
         zipSigner()
         testFramework(TestFrameworkType.Platform)
         testFramework(TestFrameworkType.JUnit5)
+        testFramework(
+            TestFrameworkType.Starter,
+            configurationName = "uiTestImplementation"
+        )
     }
+
+    uiTestImplementation(platform(libs.junit.bom))
+    uiTestImplementation(libs.junit.jupiter)
+    uiTestImplementation("org.kodein.di:kodein-di-jvm:7.26.1")
+    uiTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.10.2")
+    uiTestRuntimeOnly(libs.junit.jupiter.engine)
+    uiTestRuntimeOnly(kotlin("stdlib"))
+    uiTestRuntimeOnly(kotlin("reflect"))
+    uiTestRuntimeOnly("org.jetbrains.teamcity:serviceMessages:2024.07")
 
     implementation("org.json:json:20171018")
     implementation("org.codehaus.plexus:plexus-utils:3.5.1")
@@ -200,25 +228,22 @@ tasks {
 
 }
 
-intellijPlatformTesting {
-    runIde {
-        register("runIdeForUiTests") {
-            task {
-                jvmArgumentProviders += CommandLineArgumentProvider {
-                    listOf(
-                        "-Drobot-server.port=8082",
-                        "-Dide.mac.message.dialogs.as.sheets=false",
-                        "-Djb.privacy.policy.text=<!--999.999-->",
-                        "-Djb.consents.confirmation.enabled=false",
-                        "-Deap.require.license=true",
-                        "-Dide.show.tips.on.startup.default.value=false"
-                    )
-                }
-            }
+val uiTest by intellijPlatformTesting.testIdeUi.registering {
+    type = IntelliJPlatformType.WebStorm
+    version = providers.gradleProperty("platformVersion")
 
-            plugins {
-                robotServerPlugin()
-            }
+    task {
+        val uiTestSourceSet = sourceSets.getByName("uiTest")
+        testClassesDirs = uiTestSourceSet.output.classesDirs
+        classpath = uiTestSourceSet.runtimeClasspath
+        systemProperty("path.to.build.plugin", tasks.prepareSandbox.get().pluginDirectory.get().asFile)
+        systemProperty("ui.test.ide.version", providers.gradleProperty("platformVersion").get())
+        useJUnitPlatform()
+        dependsOn(tasks.prepareSandbox)
+
+        testLogging {
+            events("passed", "skipped", "failed")
+            showStandardStreams = true
         }
     }
 }

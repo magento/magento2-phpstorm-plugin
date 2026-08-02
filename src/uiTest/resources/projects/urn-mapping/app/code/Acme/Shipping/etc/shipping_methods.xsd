@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:include schemaLocation="urn:magento:framework:Config/etc/config.xsd"/>
+    <xs:element name="shippingMethods" type="xs:string"/>
+</xs:schema>
