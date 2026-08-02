@@ -63,7 +63,11 @@ public final class GetMagentoModuleUtil {
             if (!RegistrationPhp.REGISTER_METHOD_NAME.equals(methodReference.getName())) {
                 continue;
             }
-            final PsiElement[] parameters =  methodReference.getParameters();
+            final PsiElement[] parameters = methodReference.getParameters();
+
+            if (parameters.length < 2) {
+                continue;
+            }
             final PsiElement typeHolder = parameters[0];
             final PsiElement nameHolder = parameters[1];
 
