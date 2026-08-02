@@ -17,7 +17,11 @@ import org.junit.jupiter.api.Test
 class NewEmailTemplateActionUiTest {
     @Test
     fun `creates email template files from module context`() =
-        runWebStormUiTest(FILE_GENERATORS_FIXTURE) { projectPath ->
+        runWebStormUiTest(
+            FILE_GENERATORS_FIXTURE,
+            "app/code/Acme/Shipping/etc/email_templates.xml",
+            "app/code/Acme/Shipping/view/frontend/email/shipping_update.html",
+        ) { projectPath ->
             invokeProjectViewAction(
                 MODULE_PATH,
                 "MagentoCreateEmailTemplate",

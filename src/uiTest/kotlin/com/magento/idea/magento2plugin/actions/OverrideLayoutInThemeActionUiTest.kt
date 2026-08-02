@@ -16,7 +16,11 @@ import org.junit.jupiter.api.Test
 
 class OverrideLayoutInThemeActionUiTest {
     @Test
-    fun `copies module layout into selected theme`() = runWebStormUiTest(FILE_GENERATORS_FIXTURE) { projectPath ->
+    fun `copies module layout into selected theme`() = runWebStormUiTest(
+        FILE_GENERATORS_FIXTURE,
+        "app/design/frontend/Acme/storefront/Acme_Shipping/layout/override/base/" +
+            "shipping_index_index.xml",
+    ) { projectPath ->
         invokeProjectViewAction(
             MODULE_PATH + listOf("view", "frontend", "layout", "shipping_index_index.xml"),
             "OverrideLayoutInTheme.Menu",

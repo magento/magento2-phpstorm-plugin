@@ -15,6 +15,7 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
@@ -22,8 +23,9 @@ import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.comparator.util.DiffRequestChainUtil;
 import com.magento.idea.magento2plugin.indexes.ModuleIndex;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
+import com.magento.idea.magento2plugin.magento.packages.ComponentType;
 import com.magento.idea.magento2plugin.project.Settings;
-import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil;
 import com.magento.idea.magento2plugin.util.magento.area.AreaResolverUtil;
 import java.nio.file.Path;
 import org.apache.commons.lang3.StringUtils;
@@ -87,8 +89,31 @@ public class CompareTemplateAction extends AnAction {
             final @NotNull PsiFile psiFile
     ) {
         final PsiDirectory directory = psiFile.getContainingDirectory();
+        final GetMagentoModuleUtil.MagentoModuleData component = GetMagentoModuleUtil.getByContext(
+                directory,
+                project
+        );
 
-        return GetModuleNameByDirectoryUtil.execute(directory, project);
+        if (component == null) {
+            return null;
+        }
+        if (ComponentType.module.equals(component.getType())) {
+            return component.getName();
+        }
+        if (!ComponentType.theme.equals(component.getType())) {
+            return null;
+        }
+        final String relativePath = VfsUtilCore.getRelativePath(
+                psiFile.getVirtualFile(),
+                component.getModuleDir().getVirtualFile(),
+                '/'
+        );
+
+        if (relativePath == null || !relativePath.contains("/")) {
+            return null;
+        }
+
+        return relativePath.substring(0, relativePath.indexOf('/'));
     }
 
     private @Nullable Pair<VirtualFile, VirtualFile> resolveComparisonFiles(
