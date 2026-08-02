@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 
+## 2026.3.2
+
+### Added
+
+- WebStorm end-to-end coverage for regenerating framework and module URN mappings without a PhpStorm license.
+
+### Fixed
+
+- UI freeze when regenerating URN mappings while Magento component indexes need to be refreshed.
+
 ## 2026.3.1
 
 ### Fixed
