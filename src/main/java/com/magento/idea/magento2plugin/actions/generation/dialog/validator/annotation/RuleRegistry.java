@@ -5,71 +5,45 @@
 
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation;
 
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AclResourceIdRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphaWithDashRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphaWithPeriodRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.AlphanumericWithUnderscoreRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.BoxNotEmptyRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.CliCommandRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.CommaSeparatedStringRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.ConfigPathRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.CronScheduleRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.DirectoryRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.ExtendedNumericRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierWithColonRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.IdentifierWithForwardSlash;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.LayoutNameRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.Lowercase;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.MenuIdentifierRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NumericRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassFqnRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpClassRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpDirectoryRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.PhpNamespaceNameRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.RouteIdRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.StartWithNumberOrCapitalLetterRule;
-import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.TableNameLength;
-
 public enum RuleRegistry {
 
-    NOT_EMPTY(NotEmptyRule.class),
-    BOX_NOT_EMPTY(BoxNotEmptyRule.class),
-    PHP_CLASS(PhpClassRule.class),
-    PHP_CLASS_FQN(PhpClassFqnRule.class),
-    ROUTE_ID(RouteIdRule.class),
-    ALPHANUMERIC(AlphanumericRule.class),
-    ALPHANUMERIC_WITH_UNDERSCORE(AlphanumericWithUnderscoreRule.class),
-    ALPHA_WITH_PERIOD(AlphaWithPeriodRule.class),
-    ALPHA_WITH_DASH(AlphaWithDashRule.class),
-    DIRECTORY(DirectoryRule.class),
-    PHP_DIRECTORY(PhpDirectoryRule.class),
-    IDENTIFIER(IdentifierRule.class),
-    IDENTIFIER_WITH_COLON(IdentifierWithColonRule.class),
-    IDENTIFIER_WITH_FORWARD_SLASH(IdentifierWithForwardSlash.class),
-    PHP_NAMESPACE_NAME(PhpNamespaceNameRule.class),
-    START_WITH_NUMBER_OR_CAPITAL_LETTER(StartWithNumberOrCapitalLetterRule.class),
-    ACL_RESOURCE_ID(AclResourceIdRule.class),
-    LOWERCASE(Lowercase.class),
-    CRON_SCHEDULE(CronScheduleRule.class),
-    CONFIG_PATH(ConfigPathRule.class),
-    CLI_COMMAND(CliCommandRule.class),
-    NUMERIC(NumericRule.class),
-    EXTENDED_NUMERIC(ExtendedNumericRule.class),
-    TABLE_NAME_LENGTH(TableNameLength.class),
-    MENU_IDENTIFIER(MenuIdentifierRule.class),
-    LAYOUT_NAME(LayoutNameRule.class),
-    COMMA_SEPARATED_STRING(CommaSeparatedStringRule.class);
+    NOT_EMPTY("NotEmptyRule"),
+    BOX_NOT_EMPTY("BoxNotEmptyRule"),
+    PHP_CLASS("PhpClassRule"),
+    PHP_CLASS_FQN("PhpClassFqnRule"),
+    ROUTE_ID("RouteIdRule"),
+    ALPHANUMERIC("AlphanumericRule"),
+    ALPHANUMERIC_WITH_UNDERSCORE("AlphanumericWithUnderscoreRule"),
+    ALPHA_WITH_PERIOD("AlphaWithPeriodRule"),
+    ALPHA_WITH_DASH("AlphaWithDashRule"),
+    DIRECTORY("DirectoryRule"),
+    PHP_DIRECTORY("PhpDirectoryRule"),
+    IDENTIFIER("IdentifierRule"),
+    IDENTIFIER_WITH_COLON("IdentifierWithColonRule"),
+    IDENTIFIER_WITH_FORWARD_SLASH("IdentifierWithForwardSlash"),
+    PHP_NAMESPACE_NAME("PhpNamespaceNameRule"),
+    START_WITH_NUMBER_OR_CAPITAL_LETTER("StartWithNumberOrCapitalLetterRule"),
+    ACL_RESOURCE_ID("AclResourceIdRule"),
+    LOWERCASE("Lowercase"),
+    CRON_SCHEDULE("CronScheduleRule"),
+    CONFIG_PATH("ConfigPathRule"),
+    CLI_COMMAND("CliCommandRule"),
+    NUMERIC("NumericRule"),
+    EXTENDED_NUMERIC("ExtendedNumericRule"),
+    TABLE_NAME_LENGTH("TableNameLength"),
+    MENU_IDENTIFIER("MenuIdentifierRule"),
+    LAYOUT_NAME("LayoutNameRule"),
+    COMMA_SEPARATED_STRING("CommaSeparatedStringRule");
 
-    private Class<?> rule;
+    private static final String RULE_PACKAGE =
+            "com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.";
+    private final String ruleClassName;
 
-    RuleRegistry(final Class<?> rule) {
-        this.rule = rule;
+    RuleRegistry(final String ruleClassName) {
+        this.ruleClassName = RULE_PACKAGE + ruleClassName;
     }
 
-    public Class<?> getRule() {
-        return rule;
+    public String getRuleClassName() {
+        return ruleClassName;
     }
 }

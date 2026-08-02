@@ -22,14 +22,16 @@ public final class ValidationRuleExtractorUtil {
      */
     public static ValidationRule extract(final @NotNull FieldValidation annotation) {
         ValidationRule rule;
-        final Class<?> ruleType = annotation.rule().getRule();
 
         try {
+            final Class<?> ruleType = Class.forName(annotation.rule().getRuleClassName());
             rule = (ValidationRule) ruleType.getConstructor().newInstance();
-        } catch (NoSuchMethodException
+        } catch (ClassNotFoundException
+                | NoSuchMethodException
                 | IllegalAccessException
                 | InvocationTargetException
-                | InstantiationException exception
+                | InstantiationException
+                | LinkageError exception
         ) {
             return null;
         }

@@ -79,7 +79,7 @@ public class OverrideLayoutInThemeGenerator extends OverrideInThemeGenerator {
         }
 
         final ModuleIndex moduleIndex = new ModuleIndex(project);
-        PsiDirectory directory = moduleIndex.getModuleDirectoryByModuleName(themeName);
+        PsiDirectory directory = moduleIndex.getThemeDirectoryByThemeName(themeName);
 
         if (directory == null) {
             return;

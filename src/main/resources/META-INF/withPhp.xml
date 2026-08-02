@@ -25,53 +25,50 @@
             <add-to-group group-id="PhpGenerateGroup" anchor="last"/>
         </group>
 
-        <group id="MagentoContextBasedActionsGroup" class="com.magento.idea.magento2plugin.actions.groups.ContextActionsGroup" text="Context Actions" popup="false" compact="true" searchable="true">
-            <separator/>
-            <!-- Context dependent actions -->
-            <action id="MagentoCreateAclFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewAclXmlAction"/>
-            <action id="MagentoCreateConfigFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewConfigXmlAction"/>
-            <action id="MagentoCreateCrontabFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewCrontabXmlAction"/>
-            <action id="MagentoCreateDiFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewDiXmlAction"/>
-            <action id="MagentoCreateEmailTemplatesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewEmailTemplatesXmlAction"/>
-            <action id="MagentoCreateEventsFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewEventsXmlAction"/>
-            <action id="MagentoCreateExtensionAttributesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewExtensionAttributesXmlAction"/>
-            <action id="MagentoCreateFieldsetFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewFieldsetXmlAction"/>
-            <action id="MagentoCreateIndexerFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewIndexerXmlAction"/>
-            <action id="MagentoCreateMviewFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewMviewXmlAction"/>
-            <action id="MagentoCreatePageTypesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewPageTypesXmlAction"/>
-            <action id="MagentoCreateRoutesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewRoutesXmlAction"/>
-            <action id="MagentoCreateSectionsFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewSectionsXmlAction"/>
-            <action id="MagentoCreateSystemFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewSystemXmlAction"/>
-            <action id="MagentoCreateViewFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewViewXmlAction"/>
-            <action id="MagentoCreateWebapiFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewWebapiXmlAction"/>
-            <action id="MagentoCreateWidgetFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewWidgetXmlAction"/>
-            <action id="MagentoCreateLayoutFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewLayoutXmlAction"/>
-            <action id="MagentoCreateReadmeFile" class="com.magento.idea.magento2plugin.actions.context.md.NewReadmeMdAction"/>
-            <action id="MagentoNewObserverFile" class="com.magento.idea.magento2plugin.actions.context.php.NewObserverAction"/>
-            <action id="MagentoNewSetupDataPatchFile" class="com.magento.idea.magento2plugin.actions.context.php.NewSetupDataPatchAction"/>
-            <!-- Context dependent actions -->
-            <separator/>
-            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml"/>
-        </group>
+        <action id="MagentoCreateReadmeFile" class="com.magento.idea.magento2plugin.actions.context.md.NewReadmeMdAction">
+            <add-to-group group-id="MagentoContextBasedActionsGroup" anchor="last"/>
+        </action>
+        <action id="MagentoNewObserverFile" class="com.magento.idea.magento2plugin.actions.context.php.NewObserverAction">
+            <add-to-group group-id="MagentoContextBasedActionsGroup" anchor="last"/>
+        </action>
+        <action id="MagentoNewSetupDataPatchFile" class="com.magento.idea.magento2plugin.actions.context.php.NewSetupDataPatchAction">
+            <add-to-group group-id="MagentoContextBasedActionsGroup" anchor="last"/>
+        </action>
 
         <!-- Module file generators -->
-        <group id="MagentoNewModuleFileGroup" class="com.magento.idea.magento2plugin.actions.groups.NewModuleFileGroup" text="Module File" popup="true">
-            <action id="MagentoCreateEntity" class="com.magento.idea.magento2plugin.actions.generation.NewEntityAction" />
-            <action id="MagentoCreateABlock" class="com.magento.idea.magento2plugin.actions.generation.NewBlockAction" />
-            <action id="MagentoCreateAController" class="com.magento.idea.magento2plugin.actions.generation.NewControllerAction" />
-            <action id="MagentoCreateACronjob" class="com.magento.idea.magento2plugin.actions.generation.NewCronjobAction" />
-            <action id="MagentoCreateACronGroup" class="com.magento.idea.magento2plugin.actions.generation.NewCronGroupAction" />
-            <action id="MagentoCreateAViewModel" class="com.magento.idea.magento2plugin.actions.generation.NewViewModelAction" />
-            <action id="MagentoCreateCLICommand" class="com.magento.idea.magento2plugin.actions.generation.NewCLICommandAction" />
-            <action id="MagentoCreateEmailTemplate" class="com.magento.idea.magento2plugin.actions.generation.NewEmailTemplateAction" />
-            <action id="MagentoCreateUiComponentGrid" class="com.magento.idea.magento2plugin.actions.generation.NewUiComponentGridAction" />
-            <action id="MagentoCreateUiComponentForm" class="com.magento.idea.magento2plugin.actions.generation.NewUiComponentFormAction" />
-            <action id="NewModelsAction" class="com.magento.idea.magento2plugin.actions.generation.NewModelsAction" />
-            <action id="MagentoCreateADataModel" class="com.magento.idea.magento2plugin.actions.generation.NewDataModelAction" />
-            <action id="MagentoMessageQueue" class="com.magento.idea.magento2plugin.actions.generation.NewMessageQueueAction" />
-            <action id="NewDbSchema" class="com.magento.idea.magento2plugin.actions.generation.NewDbSchemaAction" />
-            <add-to-group group-id="NewGroup" anchor="last"/>
-        </group>
+        <action id="MagentoCreateEntity" class="com.magento.idea.magento2plugin.actions.generation.NewEntityAction">
+            <add-to-group group-id="MagentoNewModuleFileGroup" anchor="last"/>
+        </action>
+        <action id="MagentoCreateABlock" class="com.magento.idea.magento2plugin.actions.generation.NewBlockAction">
+            <add-to-group group-id="MagentoNewModuleFileGroup" anchor="last"/>
+        </action>
+        <action id="MagentoCreateAController" class="com.magento.idea.magento2plugin.actions.generation.NewControllerAction">
+            <add-to-group group-id="MagentoNewModuleFileGroup" anchor="last"/>
+        </action>
+        <action id="MagentoCreateACronjob" class="com.magento.idea.magento2plugin.actions.generation.NewCronjobAction">
+            <add-to-group group-id="MagentoNewModuleFileGroup" anchor="last"/>
+        </action>
+        <action id="MagentoCreateAViewModel" class="com.magento.idea.magento2plugin.actions.generation.NewViewModelAction">
+            <add-to-group group-id="MagentoNewModuleFileGroup" anchor="last"/>
+        </action>
+        <action id="MagentoCreateCLICommand" class="com.magento.idea.magento2plugin.actions.generation.NewCLICommandAction">
+            <add-to-group group-id="MagentoNewModuleFileGroup" anchor="last"/>
+        </action>
+        <action id="MagentoCreateUiComponentGrid" class="com.magento.idea.magento2plugin.actions.generation.NewUiComponentGridAction">
+            <add-to-group group-id="MagentoNewModuleFileGroup" anchor="last"/>
+        </action>
+        <action id="MagentoCreateUiComponentForm" class="com.magento.idea.magento2plugin.actions.generation.NewUiComponentFormAction">
+            <add-to-group group-id="MagentoNewModuleFileGroup" anchor="last"/>
+        </action>
+        <action id="NewModelsAction" class="com.magento.idea.magento2plugin.actions.generation.NewModelsAction">
+            <add-to-group group-id="MagentoNewModuleFileGroup" anchor="last"/>
+        </action>
+        <action id="MagentoCreateADataModel" class="com.magento.idea.magento2plugin.actions.generation.NewDataModelAction">
+            <add-to-group group-id="MagentoNewModuleFileGroup" anchor="last"/>
+        </action>
+        <action id="MagentoMessageQueue" class="com.magento.idea.magento2plugin.actions.generation.NewMessageQueueAction">
+            <add-to-group group-id="MagentoNewModuleFileGroup" anchor="last"/>
+        </action>
 
         <!-- Eav Attribute generators -->
         <group id="NewEavAttributeGroup" class="com.magento.idea.magento2plugin.actions.groups.NewEavAttributeGroup" text="Magento 2 EAV Attribute" popup="true">
@@ -99,9 +96,6 @@
             <add-to-group group-id="EditorPopupMenu"/>
         </action>
         <action id="OverrideTemplateInTheme.Menu" class="com.magento.idea.magento2plugin.actions.generation.OverrideTemplateInThemeAction">
-            <add-to-group group-id="ProjectViewPopupMenu"/>
-        </action>
-        <action id="OverrideLayoutInTheme.Menu" class="com.magento.idea.magento2plugin.actions.generation.OverrideLayoutInThemeAction">
             <add-to-group group-id="ProjectViewPopupMenu"/>
         </action>
         <action id="MagentoCreateAWebApiDeclaration.Menu" class="com.magento.idea.magento2plugin.actions.generation.NewWebApiDeclarationAction">
@@ -595,31 +589,22 @@
         <internalFileTemplate name="Magento Composer JSON"/>
         <internalFileTemplate name="Magento Registration PHP"/>
         <internalFileTemplate name="Magento Module XML"/>
-        <internalFileTemplate name="Magento DI XML"/>
         <internalFileTemplate name="Magento Preference Class"/>
         <internalFileTemplate name="Magento Regular Class"/>
         <internalFileTemplate name="Magento Observer Class"/>
-        <internalFileTemplate name="Magento Events XML"/>
         <internalFileTemplate name="Magento Cron Job Class"/>
-        <internalFileTemplate name="Magento Cron Tab XML"/>
         <internalFileTemplate name="Magento CLI Command Class"/>
         <internalFileTemplate name="Magento Backend Controller Class"/>
         <internalFileTemplate name="Magento Frontend Controller Class"/>
-        <internalFileTemplate name="Magento Cron Groups XML"/>
         <internalFileTemplate name="Magento UI Component Grid XML"/>
         <internalFileTemplate name="Magento UI Component Custom Data Provider Class"/>
         <internalFileTemplate name="Magento UI Component Form XML"/>
         <internalFileTemplate name="Magento Form Button Block Class"/>
-        <internalFileTemplate name="Magento Routes XML"/>
-        <internalFileTemplate name="Magento Layout XML"/>
-        <internalFileTemplate name="Magento ACL XML"/>
         <internalFileTemplate name="Magento Collection Class"/>
         <internalFileTemplate name="Magento Model Class"/>
         <internalFileTemplate name="Magento Resource Model Class"/>
         <internalFileTemplate name="Magento Data Model"/>
         <internalFileTemplate name="Magento Data Model Interface"/>
-        <internalFileTemplate name="Magento Module Declarative Schema XML"/>
-        <internalFileTemplate name="Magento Module Declarative Schema Whitelist JSON"/>
         <internalFileTemplate name="Magento Get List Query Model"/>
         <internalFileTemplate name="Magento Entity Save Controller Class"/>
         <internalFileTemplate name="Magento Entity Data Mapper"/>
@@ -632,18 +617,7 @@
         <internalFileTemplate name="Magento Delete Entity By Id Command"/>
         <internalFileTemplate name="Magento Entity Edit Action Controller Class"/>
         <internalFileTemplate name="Magento Entity Delete Controller Class"/>
-        <internalFileTemplate name="Magento Web API XML"/>
         <internalFileTemplate name="Web API Interface"/>
-        <internalFileTemplate name="Magento Config XML"/>
-        <internalFileTemplate name="Magento Extension Attributes XML"/>
-        <internalFileTemplate name="Magento Widget XML"/>
-        <internalFileTemplate name="Magento Mview XML"/>
-        <internalFileTemplate name="Magento Indexer XML"/>
-        <internalFileTemplate name="Magento View XML"/>
-        <internalFileTemplate name="Magento Fieldset XML"/>
-        <internalFileTemplate name="Magento Sections XML"/>
-        <internalFileTemplate name="Magento Module Email Templates Xml"/>
-        <internalFileTemplate name="Magento Page Types XML"/>
         <internalFileTemplate name="Magento Module Readme File MD"/>
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
         <configurationType implementation="com.magento.idea.magento2uct.execution.configurations.UctRunConfigurationType"/>
