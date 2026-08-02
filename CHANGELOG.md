@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 ### Fixed
 
 - UI freeze when regenerating URN mappings while Magento component indexes need to be refreshed.
+- Array index exception when resolving module context from an incomplete registration call [#2563](https://github.com/magento/magento2-phpstorm-plugin/issues/2563)
 
 ## 2026.3.1
 
