@@ -6,25 +6,26 @@
 package com.magento.idea.magento2plugin.util.magento;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.jetbrains.php.lang.psi.elements.ClassConstantReference;
-import com.jetbrains.php.lang.psi.elements.MethodReference;
-import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
-import com.jetbrains.php.lang.psi.elements.impl.ClassConstImpl;
-import com.magento.idea.magento2plugin.magento.files.RegistrationPhp;
+import com.intellij.psi.xml.XmlFile;
+import com.intellij.psi.xml.XmlTag;
+import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.magento.packages.ComponentType;
 import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.stubs.indexes.xml.ThemeXmlIndex;
 import com.magento.idea.magento2plugin.util.RegExUtil;
-import java.util.Collection;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class GetMagentoModuleUtil {
+
+    private static final String MODULE_FILE_NAME = "module.xml";
+    private static final String THEME_FILE_NAME = "theme.xml";
 
     private GetMagentoModuleUtil() {}
 
@@ -46,44 +47,24 @@ public final class GetMagentoModuleUtil {
         if (basePath == null) {
             return null;
         }
-        final PsiFile registrationFile = getModuleRegistrationFile(psiDirectory, basePath);
+        PsiDirectory contextDirectory = psiDirectory;
 
-        if (registrationFile == null) {
-            return null;
-        }
-        final PsiDirectory moduleDir = registrationFile.getContainingDirectory();
-        final PsiDirectory configDir = moduleDir.findSubdirectory(Package.moduleBaseAreaDir);
-        final PsiDirectory viewDir = moduleDir.findSubdirectory(Package.moduleViewDir);
-        final Collection<MethodReference> methodReferences = PsiTreeUtil.findChildrenOfType(
-                registrationFile,
-                MethodReference.class
-        );
+        while (!basePath.equals(contextDirectory.getVirtualFile().getPath())) {
+            final MagentoModuleData moduleData = getModuleData(contextDirectory);
 
-        for (final MethodReference methodReference : methodReferences) {
-            if (!RegistrationPhp.REGISTER_METHOD_NAME.equals(methodReference.getName())) {
-                continue;
+            if (moduleData != null) {
+                return moduleData;
             }
-            final PsiElement[] parameters = methodReference.getParameters();
+            final MagentoModuleData themeData = getThemeData(contextDirectory, project);
 
-            if (parameters.length < 2) {
-                continue;
+            if (themeData != null) {
+                return themeData;
             }
-            final PsiElement typeHolder = parameters[0];
-            final PsiElement nameHolder = parameters[1];
+            contextDirectory = contextDirectory.getParentDirectory();
 
-            final String type = parseParameterValue(typeHolder);
-            final String name = parseParameterValue(nameHolder);
-
-            if (name == null || type == null) {
+            if (contextDirectory == null) {
                 return null;
             }
-            final ComponentType resolvedType = ComponentType.getByValue(type);
-
-            if (resolvedType == null) {
-                return null;
-            }
-
-            return new MagentoModuleData(name, resolvedType, moduleDir, configDir, viewDir);
         }
 
         return null;
@@ -119,48 +100,67 @@ public final class GetMagentoModuleUtil {
         return matcher.find();
     }
 
-    private static PsiFile getModuleRegistrationFile(
-            final @NotNull PsiDirectory directory,
-            final @NotNull String basePath
+    private static @Nullable MagentoModuleData getModuleData(
+            final @NotNull PsiDirectory directory
     ) {
-        if (basePath.equals(directory.getVirtualFile().getPath())) {
+        final PsiDirectory configDirectory = directory.findSubdirectory(
+                Package.moduleBaseAreaDir
+        );
+
+        if (configDirectory == null) {
             return null;
         }
-        final PsiFile registration = directory.findFile(RegistrationPhp.FILE_NAME);
+        final PsiFile moduleFile = configDirectory.findFile(MODULE_FILE_NAME);
 
-        if (registration != null) {
-            return registration;
+        if (!(moduleFile instanceof XmlFile)) {
+            return null;
         }
-        final PsiDirectory parentDirectory = directory.getParentDirectory();
+        final XmlTag rootTag = ((XmlFile) moduleFile).getRootTag();
+        final XmlTag moduleTag = rootTag == null ? null : rootTag.findFirstSubTag("module");
+        final String moduleName = moduleTag == null ? null : moduleTag.getAttributeValue("name");
 
-        if (parentDirectory == null) {
+        if (moduleName == null) {
             return null;
         }
 
-        return getModuleRegistrationFile(parentDirectory, basePath);
+        return new MagentoModuleData(
+                moduleName,
+                ComponentType.module,
+                directory,
+                configDirectory,
+                directory.findSubdirectory(Package.moduleViewDir)
+        );
     }
 
-    private static String parseParameterValue(final PsiElement valueHolder) {
-        if (valueHolder instanceof ClassConstantReference) {
-            final ClassConstantReference constantReference = (ClassConstantReference) valueHolder;
-            final PsiElement resolved = constantReference.resolve();
+    private static @Nullable MagentoModuleData getThemeData(
+            final @NotNull PsiDirectory directory,
+            final @NotNull Project project
+    ) {
+        if (DumbService.isDumb(project)) {
+            return null;
+        }
+        final PsiFile themeFile = directory.findFile(THEME_FILE_NAME);
 
-            if (!(resolved instanceof ClassConstImpl)) {
-                return null;
-            }
-            final ClassConstImpl resolvedConstant = (ClassConstImpl) resolved;
-            final PsiElement value = resolvedConstant.getDefaultValue();
+        if (!(themeFile instanceof XmlFile) || themeFile.getVirtualFile() == null) {
+            return null;
+        }
+        final Map<String, String> themeData = FileBasedIndex.getInstance().getFileData(
+                ThemeXmlIndex.KEY,
+                themeFile.getVirtualFile(),
+                project
+        );
 
-            if (value == null) {
-                return null;
-            }
-
-            return parseParameterValue(value);
-        } else if (valueHolder instanceof StringLiteralExpression) {
-            return ((StringLiteralExpression) valueHolder).getContents();
+        if (themeData.isEmpty()) {
+            return null;
         }
 
-        return null;
+        return new MagentoModuleData(
+                themeData.keySet().iterator().next(),
+                ComponentType.theme,
+                directory,
+                null,
+                null
+        );
     }
 
     public static class MagentoModuleData {

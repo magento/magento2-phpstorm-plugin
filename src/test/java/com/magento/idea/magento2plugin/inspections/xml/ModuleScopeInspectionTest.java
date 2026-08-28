@@ -44,7 +44,7 @@ public class ModuleScopeInspectionTest extends InspectionXmlFixtureTestCase {
     }
 
     private void configureFixture(final String fixturePath) {
-        myFixture.copyFileToProject(getFixturePath("app/code/Test/TestModule/registration.php"));
+        myFixture.copyFileToProject(getFixturePath("app/code/Test/TestModule/etc/module.xml"));
         myFixture.configureByFile(getFixturePath(fixturePath));
     }
 }

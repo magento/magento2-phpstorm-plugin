@@ -1,0 +1,9 @@
+{
+  "name": "magento/framework",
+  "type": "magento2-library",
+  "autoload": {
+    "psr-4": {
+      "Magento\\Framework\\": ""
+    }
+  }
+}

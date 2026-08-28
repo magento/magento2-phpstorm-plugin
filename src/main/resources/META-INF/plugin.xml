@@ -14,6 +14,78 @@
     <depends optional="true" config-file="withMcp.xml">com.intellij.mcpServer</depends>
     <depends optional="true" config-file="withPhp.xml">com.jetbrains.php</depends>
 
+    <actions>
+        <group id="MagentoContextBasedActionsGroup"
+               class="com.magento.idea.magento2plugin.actions.groups.ContextActionsGroup"
+               text="Context Actions"
+               popup="false"
+               compact="true"
+               searchable="true">
+            <separator/>
+            <action id="MagentoCreateAclFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewAclXmlAction"/>
+            <action id="MagentoCreateConfigFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewConfigXmlAction"/>
+            <action id="MagentoCreateCrontabFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewCrontabXmlAction"/>
+            <action id="MagentoCreateDiFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewDiXmlAction"/>
+            <action id="MagentoCreateEmailTemplatesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewEmailTemplatesXmlAction"/>
+            <action id="MagentoCreateEventsFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewEventsXmlAction"/>
+            <action id="MagentoCreateExtensionAttributesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewExtensionAttributesXmlAction"/>
+            <action id="MagentoCreateFieldsetFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewFieldsetXmlAction"/>
+            <action id="MagentoCreateIndexerFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewIndexerXmlAction"/>
+            <action id="MagentoCreateMviewFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewMviewXmlAction"/>
+            <action id="MagentoCreatePageTypesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewPageTypesXmlAction"/>
+            <action id="MagentoCreateRoutesFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewRoutesXmlAction"/>
+            <action id="MagentoCreateSectionsFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewSectionsXmlAction"/>
+            <action id="MagentoCreateSystemFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewSystemXmlAction"/>
+            <action id="MagentoCreateViewFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewViewXmlAction"/>
+            <action id="MagentoCreateWebapiFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewWebapiXmlAction"/>
+            <action id="MagentoCreateWidgetFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewWidgetXmlAction"/>
+            <action id="MagentoCreateLayoutFile" class="com.magento.idea.magento2plugin.actions.context.xml.NewLayoutXmlAction"/>
+            <action id="MagentoCreateReadmeFile" class="com.magento.idea.magento2plugin.actions.context.md.NewReadmeMdAction"/>
+            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml"/>
+        </group>
+
+        <group id="MagentoNewModuleFileGroup"
+               class="com.magento.idea.magento2plugin.actions.groups.NewModuleFileGroup"
+               text="Module File"
+               popup="true">
+            <action id="MagentoCreateACronGroup" class="com.magento.idea.magento2plugin.actions.generation.NewCronGroupAction"/>
+            <action id="MagentoCreateEmailTemplate" class="com.magento.idea.magento2plugin.actions.generation.NewEmailTemplateAction"/>
+            <action id="NewDbSchema" class="com.magento.idea.magento2plugin.actions.generation.NewDbSchemaAction"/>
+            <add-to-group group-id="NewGroup" anchor="last"/>
+        </group>
+
+        <action id="OverrideLayoutInTheme.Menu"
+                class="com.magento.idea.magento2plugin.actions.generation.OverrideLayoutInThemeAction">
+            <add-to-group group-id="ProjectViewPopupMenu"/>
+        </action>
+        <action id="OverrideTemplateInTheme.Menu"
+                class="com.magento.idea.magento2plugin.actions.generation.OverrideTemplateInThemeAction">
+            <add-to-group group-id="ProjectViewPopupMenu"/>
+        </action>
+        <action id="MagentoCompareTemplate.Menu"
+                class="com.magento.idea.magento2plugin.actions.comparator.CompareTemplateAction">
+            <add-to-group group-id="EditorPopupMenu"/>
+        </action>
+        <action id="CopyMagentoPath"
+                class="com.magento.idea.magento2plugin.actions.CopyMagentoPath"
+                text="Magento Asset"
+                description="Copies Magento-formatted file asset path depending on file type">
+            <add-to-group group-id="CopyFileReference" anchor="last"/>
+        </action>
+        <action id="AddMagentoContentRoot"
+                class="com.magento.idea.magento2plugin.actions.content.root.MarkDirectoryAsMagentoContentRot"
+                text="Mark Directory As Magento Code Root"
+                description="Adds Magento code root">
+            <add-to-group group-id="MarkRootGroup" anchor="last"/>
+        </action>
+        <action id="RemoveMagentoContentRoot"
+                class="com.magento.idea.magento2plugin.actions.content.root.UnmarkDirectoryAsMagentoContentRot"
+                text="Unmark Directory As Magento Code Root"
+                description="Removes Magento code root">
+            <add-to-group group-id="MarkRootGroup" anchor="last"/>
+        </action>
+    </actions>
+
     <extensions defaultExtensionNs="com.intellij">
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.Settings"/>
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.startup.DeferredProjectOpenActions"/>
@@ -30,7 +102,12 @@
         <psi.referenceContributor language="HTML" implementation="com.magento.idea.magento2plugin.reference.html.HtmlReferenceContributor"/>
         <psi.referenceContributor language="TEXT" implementation="com.magento.idea.magento2plugin.reference.text.TextReferenceContributor"/>
         <psi.referenceContributor language="XML" implementation="com.magento.idea.magento2plugin.reference.xml.XmlJsReferenceContributor"/>
+        <psi.referenceContributor language="XML" implementation="com.magento.idea.magento2plugin.reference.xml.XmlCoreReferenceContributor"/>
         <gotoDeclarationHandler implementation="com.magento.idea.magento2plugin.navigation.KnockoutRegionGotoDeclarationHandler"/>
+
+        <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.completion.xml.XmlCoreCompletionContributor" id="magentoXmlCore"/>
+        <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.completion.xml.SystemConfigurationContributor" id="magentoSystemConfiguration"/>
+        <xml.tagNameProvider implementation="com.magento.idea.magento2plugin.completion.provider.xml.ConfigXmlTagNameProvider"/>
 
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ModulePackageIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex" />
@@ -43,6 +120,21 @@
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ui.UiComponentComponentDeclarationIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ui.UiComponentTemplateDeclarationIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.BlockNameIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ContainerNameIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.SectionIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.ActionGroupIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.DataIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.PageIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.TestNameIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.TestExtendsIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.AclResourceIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.MenuIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.DeclarativeSchemaElementsIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.UIComponentIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.SystemXmlSectionIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.SystemXmlGroupIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.SystemXmlFieldIndex" />
 
         <additionalLibraryRootsProvider implementation="com.magento.idea.magento2plugin.project.indexing.MagentoAdditionalLibraryRootsProvider"/>
 
@@ -64,5 +156,60 @@
                 displayType="BALLOON" />
 
         <projectViewNodeDecorator implementation="com.magento.idea.magento2plugin.decorator.MagentoFolderDecorator"/>
+
+        <localInspection language="XML" groupPath="XML"
+                         shortName="CacheableFalseInDefaultLayoutInspection"
+                         bundle="magento2.inspection" key="inspection.displayName.CacheableFalseInDefaultLayoutInspection"
+                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
+                         enabledByDefault="true" level="WARNING"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.CacheableFalseInDefaultLayoutInspection"/>
+
+        <localInspection language="XML" groupPath="XML"
+                         shortName="ModuleDeclarationInModuleXmlInspection"
+                         bundle="magento2.inspection" key="inspection.displayName.ModuleDeclarationInModuleXmlInspection"
+                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
+                         enabledByDefault="true" level="ERROR"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.ModuleDeclarationInModuleXmlInspection"/>
+
+        <localInspection language="XML" groupPath="XML"
+                         shortName="AclResourceXmlInspection"
+                         bundle="magento2.inspection" key="inspection.displayName.AclResourceXmlInspection"
+                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
+                         enabledByDefault="true" level="ERROR"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.AclResourceXmlInspection"/>
+
+        <localInspection language="XML" groupPath="XML"
+                         shortName="ModuleScopeInspection"
+                         bundle="magento2.inspection" key="inspection.displayName.ModuleScopeInspection"
+                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
+                         enabledByDefault="true" level="WARNING"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.ModuleScopeInspection"/>
+
+        <searchScopesProvider implementation="com.magento.idea.magento2plugin.lang.psi.search.MagentoSearchScopesProvider"/>
+
+        <internalFileTemplate name="Magento DI XML"/>
+        <internalFileTemplate name="Magento Events XML"/>
+        <internalFileTemplate name="Magento Cron Tab XML"/>
+        <internalFileTemplate name="Magento Cron Groups XML"/>
+        <internalFileTemplate name="Magento Routes XML"/>
+        <internalFileTemplate name="Magento Layout XML"/>
+        <internalFileTemplate name="Magento ACL XML"/>
+        <internalFileTemplate name="Magento Module Declarative Schema XML"/>
+        <internalFileTemplate name="Magento Module Declarative Schema Whitelist JSON"/>
+        <internalFileTemplate name="Magento Web API XML"/>
+        <internalFileTemplate name="Magento Config XML"/>
+        <internalFileTemplate name="Magento Extension Attributes XML"/>
+        <internalFileTemplate name="Magento Widget XML"/>
+        <internalFileTemplate name="Magento Mview XML"/>
+        <internalFileTemplate name="Magento Indexer XML"/>
+        <internalFileTemplate name="Magento View XML"/>
+        <internalFileTemplate name="Magento Fieldset XML"/>
+        <internalFileTemplate name="Magento Sections XML"/>
+        <internalFileTemplate name="Magento Module Email Templates Xml"/>
+        <internalFileTemplate name="Magento Module Email Template Html"/>
+        <internalFileTemplate name="Magento Page Types XML"/>
+        <internalFileTemplate name="Magento System XML"/>
+        <internalFileTemplate name="Magento Module Readme File MD"/>
+        <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
     </extensions>
 </idea-plugin>

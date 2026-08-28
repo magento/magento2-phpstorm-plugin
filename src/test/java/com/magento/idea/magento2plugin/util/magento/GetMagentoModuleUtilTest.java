@@ -11,48 +11,55 @@ import com.magento.idea.magento2plugin.BaseProjectTestCase;
 
 public class GetMagentoModuleUtilTest extends BaseProjectTestCase {
 
-    public void testGetByContextReturnsNullForRegisterWithoutParameters() {
-        final PsiDirectory moduleDirectory = addRegistrationFile("ComponentRegistrar::register();");
-
-        assertNull(GetMagentoModuleUtil.getByContext(moduleDirectory, getProject()));
-    }
-
-    public void testGetByContextReturnsNullForRegisterWithOneParameter() {
-        final PsiDirectory moduleDirectory = addRegistrationFile(
-                "ComponentRegistrar::register(ComponentRegistrar::MODULE);"
-        );
-
-        assertNull(GetMagentoModuleUtil.getByContext(moduleDirectory, getProject()));
-    }
-
-    public void testGetByContextSkipsMalformedRegisterCall() {
-        final PsiDirectory moduleDirectory = addRegistrationFile(
+    public void testGetByContextDoesNotUseRegistrationPhp() {
+        final PsiFile registrationFile = myFixture.addFileToProject(
+                "app/code/Foo/WithoutModuleXml/registration.php",
                 """
-                ComponentRegistrar::register();
+                <?php
                 ComponentRegistrar::register(
                     ComponentRegistrar::MODULE,
-                    'Foo_Malformed',
+                    'Foo_WithoutModuleXml',
                     __DIR__
                 );
                 """
         );
 
-        final GetMagentoModuleUtil.MagentoModuleData moduleData = GetMagentoModuleUtil
-                .getByContext(moduleDirectory, getProject());
-
-        assertNotNull(moduleData);
-        assertEquals("Foo_Malformed", moduleData.getName());
+        assertNull(GetMagentoModuleUtil.getByContext(
+                registrationFile.getContainingDirectory(),
+                getProject()
+        ));
     }
 
-    private PsiDirectory addRegistrationFile(final String registerCalls) {
-        final PsiFile registrationFile = myFixture.addFileToProject(
-                "app/code/Foo/Malformed/registration.php",
-                "<?php\n\n"
-                        + "use Magento\\Framework\\Component\\ComponentRegistrar;\n\n"
-                        + registerCalls
-                        + "\n"
+    public void testGetByContextReturnsNullForModuleXmlWithoutModuleName() {
+        final PsiFile moduleFile = myFixture.addFileToProject(
+                "app/code/Foo/WithoutName/etc/module.xml",
+                "<config><module/></config>"
+        );
+        final PsiDirectory moduleDirectory = moduleFile.getContainingDirectory()
+                .getParentDirectory();
+
+        assertNull(GetMagentoModuleUtil.getByContext(moduleDirectory, getProject()));
+    }
+
+    public void testGetByContextResolvesModuleFromModuleXml() {
+        final PsiFile moduleFile = myFixture.addFileToProject(
+                "app/code/Foo/FromXml/etc/module.xml",
+                "<config><module name=\"Foo_FromXml\"/></config>"
+        );
+        final PsiFile nestedFile = myFixture.addFileToProject(
+                "app/code/Foo/FromXml/view/frontend/layout/example.xml",
+                "<page/>"
         );
 
-        return registrationFile.getContainingDirectory();
+        final GetMagentoModuleUtil.MagentoModuleData moduleData = GetMagentoModuleUtil
+                .getByContext(nestedFile.getContainingDirectory(), getProject());
+
+        assertNotNull(moduleData);
+        assertEquals("Foo_FromXml", moduleData.getName());
+        assertEquals(moduleFile.getContainingDirectory(), moduleData.getConfigDir());
+        assertEquals(
+                nestedFile.getContainingDirectory().getParentDirectory().getParentDirectory(),
+                moduleData.getViewDir()
+        );
     }
 }

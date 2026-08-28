@@ -27,12 +27,14 @@ class ModuleIndexTest : BaseProjectTestCase() {
 
         prepareIndexWithWindowsStyleMagentoRoot()
 
-        val themeNames = ModuleIndex(project).editableThemeNames
+        val moduleIndex = ModuleIndex(project)
+        val themeNames = moduleIndex.editableThemeNames
 
         assertTrue(
             "Expected editable theme names to contain frontend/Foo/bar, got: $themeNames",
             themeNames.contains("frontend/Foo/bar")
         )
+        assertNotNull(moduleIndex.getThemeDirectoryByThemeName("frontend/Foo/bar"))
     }
 
     @Test

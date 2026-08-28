@@ -5,13 +5,9 @@
 
 package com.magento.idea.magento2plugin.project
 
-import com.intellij.driver.client.Remote
 import com.intellij.driver.client.service
-import com.intellij.driver.client.utility
-import com.intellij.driver.model.LockSemantics
 import com.intellij.driver.model.OnDispatcher
-import com.intellij.driver.sdk.AnAction
-import com.intellij.driver.sdk.Notification
+import com.intellij.driver.client.Remote
 import com.intellij.driver.sdk.Project
 import com.intellij.driver.sdk.getNotifications
 import com.intellij.driver.sdk.singleProject
@@ -20,54 +16,14 @@ import com.intellij.driver.sdk.ui.components.common.ideFrame
 import com.intellij.driver.sdk.ui.components.elements.button
 import com.intellij.driver.sdk.ui.components.settings.settingsDialog
 import com.intellij.driver.sdk.waitFor
-import com.intellij.ide.starter.ci.CIServer
-import com.intellij.ide.starter.ci.NoCIServer
-import com.intellij.ide.starter.di.di
-import com.intellij.ide.starter.driver.engine.runIdeWithDriver
-import com.intellij.ide.starter.junit5.hyphenateWithClass
-import com.intellij.ide.starter.models.IdeInfo
-import com.intellij.ide.starter.models.TestCase
-import com.intellij.ide.starter.plugins.PluginConfigurator
-import com.intellij.ide.starter.project.LocalProjectInfo
-import com.intellij.ide.starter.runner.CurrentTestMethod
-import com.intellij.ide.starter.runner.Starter
-import com.intellij.platform.testFramework.teamCity.TeamCityReporter.SyntheticTestKind
-import com.intellij.tools.ide.starter.product.webstorm.WebStorm
+import com.magento.idea.magento2plugin.ui.runWebStormUiTest
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.fail
-import org.kodein.di.DI
-import org.kodein.di.bindSingleton
-import java.nio.file.Path
-import kotlin.io.path.absolute
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class RegenerateUrnMapUiTest {
-    private val pluginPath = Path.of(System.getProperty("path.to.build.plugin"))
-
-    init {
-        di = DI {
-            extend(di)
-            bindSingleton<CIServer>(overrides = true) {
-                object : CIServer by NoCIServer {
-                    override fun reportTestFailure(
-                        testName: String,
-                        message: String,
-                        details: String,
-                        linkToLogs: String?,
-                        kind: SyntheticTestKind,
-                        generifyTestName: Boolean,
-                    ) {
-                        fail("$testName failed in WebStorm: $message\n$details")
-                    }
-                }
-            }
-        }
-    }
-
     @Test
     fun `regenerates framework and module URN mappings in WebStorm`() {
-        val projectPath = prepareProject()
         val expectedMappings = mapOf(
             "urn:magento:framework:App/etc/routes.xsd" to
                 "vendor/magento/framework/App/etc/routes.xsd",
@@ -81,41 +37,8 @@ class RegenerateUrnMapUiTest {
                 "app/code/Acme/Shipping/etc/adminhtml/system_file.xsd",
         )
 
-        Starter.newContext(
-            CurrentTestMethod.hyphenateWithClass(),
-            TestCase(IdeInfo.WebStorm, LocalProjectInfo(projectPath))
-                .withVersion(System.getProperty("ui.test.ide.version")),
-        ).apply {
-            PluginConfigurator(this).installPluginFromPath(pluginPath)
-            applyVMOptionsPatch {
-                addSystemProperty("idea.trust.all.projects", true)
-                addSystemProperty("ide.show.tips.on.startup.default.value", false)
-                addSystemProperty("jb.consents.confirmation.enabled", false)
-            }
-        }.runIdeWithDriver().useDriverAndCloseIde {
+        runWebStormUiTest("urn-mapping") {
             ideFrame {
-                waitForIndicators(5.minutes)
-
-                waitFor("Magento support notification", 2.minutes) {
-                    getNotifications().any { it.getContent() == "Enable Magento support for this project?" }
-                }
-                val supportNotification = getNotifications()
-                    .first { it.getContent() == "Enable Magento support for this project?" }
-                val enableAction = supportNotification
-                    .getActions()
-                    .single { it.getTemplateText() == "Enable" }
-                withContext(
-                    OnDispatcher.EDT,
-                    semantics = LockSemantics.READ_ACTION,
-                ) {
-                    utility<NotificationActions>().fire(
-                        supportNotification,
-                        enableAction,
-                        null,
-                    )
-                }
-                waitForIndicators(5.minutes)
-
                 openSettingsDialog()
                 settingsDialog {
                     searchTextField.text = "Magento"
@@ -157,26 +80,6 @@ class RegenerateUrnMapUiTest {
             }
         }
     }
-
-    private fun prepareProject(): Path {
-        val source = Path.of("src/uiTest/resources/projects/urn-mapping").absolute().toFile()
-        val target = Path.of("build/ui-test-projects/urn-mapping").absolute().toFile()
-
-        check(target.deleteRecursively()) { "Could not clean UI test project at ${target.path}" }
-        check(source.copyRecursively(target, overwrite = true)) {
-            "Could not copy UI test project to ${target.path}"
-        }
-
-        return target.toPath()
-    }
-}
-
-@Remote("com.intellij.openapi.actionSystem.DataContext")
-private interface DataContext
-
-@Remote("com.intellij.notification.Notification")
-private interface NotificationActions {
-    fun fire(notification: Notification, action: AnAction, dataContext: DataContext?)
 }
 
 @Remote("javax.swing.JButton")

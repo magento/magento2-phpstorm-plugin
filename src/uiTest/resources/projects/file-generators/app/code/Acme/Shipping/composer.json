@@ -1,0 +1,10 @@
+{
+  "name": "acme/module-shipping",
+  "version": "1.0.0",
+  "type": "magento2-module",
+  "autoload": {
+    "psr-4": {
+      "Acme\\Shipping\\": ""
+    }
+  }
+}

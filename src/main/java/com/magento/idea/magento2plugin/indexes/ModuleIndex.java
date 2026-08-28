@@ -134,6 +134,23 @@ public final class ModuleIndex {
     }
 
     /**
+     * Returns PSI directory of an indexed Magento theme.
+     *
+     * @param themeName theme name in the area/vendor/theme format
+     * @return theme root directory
+     */
+    public @Nullable PsiDirectory getThemeDirectoryByThemeName(final String themeName) {
+        return ApplicationManager.getApplication().runReadAction((Computable<PsiDirectory>) () -> {
+            final VirtualFile themeDirectory = findIndexedThemeDirectory(themeName);
+            if (themeDirectory == null) {
+                return null;
+            }
+
+            return PsiManager.getInstance(project).findDirectory(themeDirectory);
+        });
+    }
+
+    /**
      * Returns VirtualFile directory of the certain module.
      *
      * @param moduleName String
@@ -177,6 +194,34 @@ public final class ModuleIndex {
             final VirtualFile moduleDirectory = getModuleRoot(virtualFile);
             if (moduleDirectory != null && moduleDirectory.isValid() && moduleDirectory.isDirectory()) {
                 return moduleDirectory;
+            }
+        }
+
+        return null;
+    }
+
+    private @Nullable VirtualFile findIndexedThemeDirectory(final String themeName) {
+        if (themeName == null) {
+            return null;
+        }
+
+        final Collection<VirtualFile> files;
+        try {
+            files = new ArrayList<>(FileBasedIndex.getInstance().getContainingFiles(
+                    ThemeXmlIndex.KEY,
+                    themeName,
+                    GlobalSearchScope.allScope(project)
+            ));
+        } catch (IndexNotReadyException exception) {
+            return null;
+        }
+
+        for (final VirtualFile virtualFile : files) {
+            final VirtualFile themeDirectory = virtualFile.getParent();
+            if (themeDirectory != null
+                    && themeDirectory.isValid()
+                    && themeDirectory.isDirectory()) {
+                return themeDirectory;
             }
         }
 
