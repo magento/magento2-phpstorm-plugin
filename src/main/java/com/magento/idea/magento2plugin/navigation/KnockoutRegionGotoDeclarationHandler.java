@@ -6,10 +6,13 @@
 package com.magento.idea.magento2plugin.navigation;
 
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
+import com.intellij.lang.javascript.JavascriptLanguage;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.xml.XmlAttributeValue;
+import com.intellij.psi.xml.XmlComment;
 import com.magento.idea.magento2plugin.linemarker.js.LineMarkerTargetPresentationUtil;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.magento.js.KnockoutRegionResolver;
@@ -54,13 +57,20 @@ public class KnockoutRegionGotoDeclarationHandler implements GotoDeclarationHand
         final PsiFile containingFile = element.getContainingFile();
 
         while (current != null && current != containingFile) {
-            if (current.getText().contains("getRegion")) {
+            if (isGetRegionReferenceHost(current)
+                    && current.getText().contains("getRegion")) {
                 return current;
             }
             current = current.getParent();
         }
 
         return null;
+    }
+
+    private boolean isGetRegionReferenceHost(final PsiElement element) {
+        return element instanceof XmlComment
+                || element instanceof XmlAttributeValue
+                || element.getLanguage().isKindOf(JavascriptLanguage.INSTANCE);
     }
 
     private List<PsiElement> resolveTargets(

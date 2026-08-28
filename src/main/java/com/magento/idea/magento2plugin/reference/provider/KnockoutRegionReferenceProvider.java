@@ -5,12 +5,15 @@
 
 package com.magento.idea.magento2plugin.reference.provider;
 
+import com.intellij.lang.javascript.JavascriptLanguage;
 import com.intellij.lang.javascript.psi.JSProperty;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceProvider;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.xml.XmlAttributeValue;
+import com.intellij.psi.xml.XmlComment;
 import com.intellij.util.ProcessingContext;
 import com.magento.idea.magento2plugin.linemarker.js.LineMarkerTargetPresentationUtil;
 import com.magento.idea.magento2plugin.project.Settings;
@@ -121,13 +124,20 @@ public class KnockoutRegionReferenceProvider extends PsiReferenceProvider {
         final PsiElement containingFile = element.getContainingFile();
 
         while (current != null && current != containingFile) {
-            if (current.getText().contains("getRegion")) {
+            if (isGetRegionReferenceHost(current)
+                    && current.getText().contains("getRegion")) {
                 return current;
             }
             current = current.getParent();
         }
 
         return null;
+    }
+
+    private boolean isGetRegionReferenceHost(final @NotNull PsiElement element) {
+        return element instanceof XmlComment
+                || element instanceof XmlAttributeValue
+                || element.getLanguage().isKindOf(JavascriptLanguage.INSTANCE);
     }
 
     private TextRange getRegionReferenceRange(

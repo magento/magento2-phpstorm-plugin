@@ -19,6 +19,33 @@ public class KnockoutTemplateReferenceRegistrarTest extends ReferenceJsFixtureTe
     private static final String FIXTURE_PATH = "component.js";
 
     /**
+     * Embedded JavaScript in PHP templates must not make region reference discovery inspect the wrapping HTML tag.
+     */
+    public void testPhpTemplateEmbeddedJavaScriptMustNotFailRegionReferenceDiscovery() {
+        myFixture.configureByText(
+                "old-product_list.phtml",
+                "<div class=\"qty_box\">\n"
+                        + "    <button type=\"button\" class=\"qty_box__minus\"\n"
+                        + "            onclick=\"var result = document.getElementById('qty"
+                        + "<?= /* @noEscape */ $_product->getId() ?>.value; "
+                        + "if (!isNaN(qty) && qty > 1) result.value--;return false;\">\n"
+                        + "        <svg><path d=\"M14 2H0V0H14V2Z\"/></svg>\n"
+                        + "    </button>\n"
+                        + "    <input type=\"number\" id=\"qty"
+                        + "<?= /* @noEscape */ $_product->getId() ?>\" value=\"1\" />\n"
+                        + "    <button type=\"button\" class=\"qty_box__plus\"\n"
+                        + "            onclick=\"var result = document.getElementById('qty"
+                        + "<?= /* @noEscape */ $_product->getId() ?>'); var qty = result.value; "
+                        + "if (!isNaN(qty)) result.value++;return false;\">\n"
+                        + "        <svg><path d=\"M14 8H8V14H6V8H0V6H6V0H8V6H14V8Z\"/></svg>\n"
+                        + "    </button>\n"
+                        + "</div>"
+        );
+
+        myFixture.doHighlighting();
+    }
+
+    /**
      * Component template declarations should reference Knockout template files.
      */
     public void testTemplatePropertyMustHaveReference() {

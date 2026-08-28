@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Fixed
 
+- PSI assertion when resolving Knockout region references and navigation in `.phtml` templates containing PHP-interpolated inline JavaScript.
 - UI freeze when regenerating URN mappings while Magento component indexes need to be refreshed.
 - Array index exception when resolving module context from an incomplete registration call [#2563](https://github.com/magento/magento2-phpstorm-plugin/issues/2563)
 - Cross-project PSI exception when creating Magento plugin navigation line markers [#2513](https://github.com/magento/magento2-phpstorm-plugin/issues/2513)
