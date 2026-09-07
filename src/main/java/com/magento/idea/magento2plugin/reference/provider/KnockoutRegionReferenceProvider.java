@@ -9,6 +9,7 @@ import com.intellij.lang.javascript.JavascriptLanguage;
 import com.intellij.lang.javascript.psi.JSProperty;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceProvider;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -85,7 +86,7 @@ public class KnockoutRegionReferenceProvider extends PsiReferenceProvider {
             return;
         }
         final List<KnockoutRegionResolver.RegionMatch> regionMatches = KnockoutRegionResolver.getInstance()
-                .collectGetRegionMatches(referenceHost.getText());
+                .collectGetRegionMatches(getReferenceHostText(referenceHost));
 
         for (final KnockoutRegionResolver.RegionMatch regionMatch : regionMatches) {
             final TextRange referenceRange = getRegionReferenceRange(element, referenceHost, regionMatch);
@@ -125,13 +126,31 @@ public class KnockoutRegionReferenceProvider extends PsiReferenceProvider {
 
         while (current != null && current != containingFile) {
             if (isGetRegionReferenceHost(current)
-                    && current.getText().contains("getRegion")) {
+                    && getReferenceHostText(current).contains("getRegion")) {
                 return current;
             }
             current = current.getParent();
         }
 
         return null;
+    }
+
+    private @NotNull String getReferenceHostText(final @NotNull PsiElement element) {
+        final PsiFile file = element.getContainingFile();
+
+        if (file == null) {
+            return "";
+        }
+        // Embedded JavaScript PSI in PHP templates may fail when reconstructing composite text.
+        // Read the source using the same offsets that are used to build the reference ranges.
+        final CharSequence contents = file.getViewProvider().getContents();
+        final TextRange range = element.getTextRange();
+
+        if (range == null || range.getStartOffset() < 0 || range.getEndOffset() > contents.length()) {
+            return "";
+        }
+
+        return range.subSequence(contents).toString();
     }
 
     private boolean isGetRegionReferenceHost(final @NotNull PsiElement element) {

@@ -5,9 +5,15 @@
 
 package com.magento.idea.magento2plugin.reference.js;
 
+import com.intellij.lang.Language;
+import com.intellij.lang.javascript.JavascriptLanguage;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveResult;
+import com.intellij.psi.impl.FakePsiElement;
+import com.intellij.util.ProcessingContext;
 import com.magento.idea.magento2plugin.navigation.KnockoutRegionGotoDeclarationHandler;
 import com.magento.idea.magento2plugin.reference.provider.KnockoutRegionReferenceProvider;
 import com.magento.idea.magento2plugin.reference.provider.KnockoutTemplateReferenceProvider;
@@ -43,6 +49,45 @@ public class KnockoutTemplateReferenceRegistrarTest extends ReferenceJsFixtureTe
         );
 
         myFixture.doHighlighting();
+    }
+
+    /**
+     * Region references must use source offsets even when embedded PSI cannot reconstruct its text.
+     */
+    public void testGetRegionReferenceMustNotReconstructHostText() {
+        final String prefix = "var qty = 1;\n";
+        final String call = "getRegion('childRegion')";
+        final PsiFile file = myFixture.configureByText("region.js", prefix + call + ";");
+        final PsiElement host = new FakePsiElement() {
+            @Override
+            public PsiElement getParent() {
+                return file;
+            }
+
+            @Override
+            public Language getLanguage() {
+                return JavascriptLanguage.INSTANCE;
+            }
+
+            @Override
+            public TextRange getTextRange() {
+                return TextRange.from(prefix.length(), call.length());
+            }
+
+            @Override
+            public String getText() {
+                throw new AssertionError("Embedded JavaScript text must not be reconstructed");
+            }
+        };
+        final PsiReference[] references = new KnockoutRegionReferenceProvider()
+                .getReferencesByElement(host, new ProcessingContext());
+
+        assertTrue("Expected a region reference", references.length > 0);
+        assertEquals(TextRange.from(0, call.length()), references[0].getRangeInElement());
+        assertReferenceResolvesToFile(
+                references[0],
+                "app/code/Foo/Bar/view/frontend/web/js/knockout-child.js"
+        );
     }
 
     /**
