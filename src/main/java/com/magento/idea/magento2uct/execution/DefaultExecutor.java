@@ -5,7 +5,6 @@
 
 package com.magento.idea.magento2uct.execution;
 
-import com.intellij.execution.ExecutionBundle;
 import com.intellij.execution.Executor;
 import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.execution.filters.TextConsoleBuilder;
@@ -25,6 +24,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
+import com.magento.idea.magento2plugin.bundles.CommonBundle;
 import com.magento.idea.magento2uct.execution.filters.UctPhpFileFilter;
 import com.magento.idea.magento2uct.execution.filters.UctResultFileFilter;
 import java.awt.BorderLayout;
@@ -34,6 +34,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class DefaultExecutor implements Disposable {
 
+    private static final CommonBundle BUNDLE = new CommonBundle();
     private static final String RUN_CONTENT_TITLE = "UCT analysis";
 
     private final Project myProject;
@@ -152,8 +153,8 @@ public class DefaultExecutor implements Disposable {
 
         public StopAction() {
             super(
-                    ExecutionBundle.messagePointer("action.AnAction.text.stop"),
-                    ExecutionBundle.messagePointer("action.AnAction.description.stop"),
+                    () -> BUNDLE.message("common.uct.stop.text"),
+                    () -> BUNDLE.message("common.uct.stop.description"),
                     AllIcons.Actions.Suspend
             );
         }
