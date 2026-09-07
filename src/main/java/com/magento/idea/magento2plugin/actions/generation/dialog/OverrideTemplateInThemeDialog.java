@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.actions.generation.OverrideTemplateInThemeAction;
+import com.magento.idea.magento2plugin.actions.generation.OverrideEmailTemplateInThemeAction;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.FieldValidation;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.annotation.RuleRegistry;
 import com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule.NotEmptyRule;
@@ -55,7 +56,9 @@ public class OverrideTemplateInThemeDialog extends AbstractDialog {
         this.psiFile = psiFile;
 
         final String fileType = psiFile.getVirtualFile().getExtension();
-        if (OverridableFileType.isFilePhtml(fileType)) {
+        if (OverrideEmailTemplateInThemeAction.HTML.equals(fileType)) {
+            setTitle(OverrideEmailTemplateInThemeAction.ACTION_DESCRIPTION);
+        } else if (OverridableFileType.isFilePhtml(fileType)) {
             setTitle(OverrideTemplateInThemeAction.ACTION_TEMPLATE_DESCRIPTION);
         } else if (OverridableFileType.isFileJS(fileType)) {
             setTitle(OverrideTemplateInThemeAction.ACTION_JS_DESCRIPTION);

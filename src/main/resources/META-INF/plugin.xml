@@ -58,6 +58,10 @@
                 class="com.magento.idea.magento2plugin.actions.generation.OverrideLayoutInThemeAction">
             <add-to-group group-id="ProjectViewPopupMenu"/>
         </action>
+        <action id="OverrideEmailTemplateInTheme.Menu"
+                class="com.magento.idea.magento2plugin.actions.generation.OverrideEmailTemplateInThemeAction">
+            <add-to-group group-id="ProjectViewPopupMenu"/>
+        </action>
         <action id="OverrideTemplateInTheme.Menu"
                 class="com.magento.idea.magento2plugin.actions.generation.OverrideTemplateInThemeAction">
             <add-to-group group-id="ProjectViewPopupMenu"/>
