@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Fixed
 
+- Internal IntelliJ Platform API usage in the UCT console Stop action reported by the IntelliJ IDEA 2026.3 EAP plugin verifier.
 - PSI assertion when resolving Knockout region references and navigation in `.phtml` templates containing PHP-interpolated inline JavaScript.
 - UI freeze when regenerating URN mappings while Magento component indexes need to be refreshed.
 - Array index exception when resolving module context from an incomplete registration call [#2563](https://github.com/magento/magento2-phpstorm-plugin/issues/2563)
