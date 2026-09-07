@@ -21,6 +21,7 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.InjectAViewMode
 import com.magento.idea.magento2plugin.magento.files.CommonXml;
 import com.magento.idea.magento2plugin.magento.files.LayoutXml;
 import com.magento.idea.magento2plugin.project.Settings;
+import com.magento.idea.magento2plugin.util.magento.IsFileInEditableModuleUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class InjectAViewModelAction extends DumbAwareAction implements ActionUpdateThreadAware {
@@ -39,19 +40,23 @@ public class InjectAViewModelAction extends DumbAwareAction implements ActionUpd
     @Override
     public void update(final @NotNull AnActionEvent event) {
         this.setStatus(event, false);
+        targetXmlTag = null;
         final Project project = event.getData(PlatformDataKeys.PROJECT);
 
-        if (project == null) {
+        if (project == null || !Settings.isEnabled(project)) {
             return;
         }
+        final PsiFile psiFile = event.getData(PlatformDataKeys.PSI_FILE);
 
-        if (Settings.isEnabled(project)) {
-            final XmlTag element = getElement(event);
+        if (psiFile == null || psiFile.getVirtualFile() == null
+                || !IsFileInEditableModuleUtil.execute(psiFile)) {
+            return;
+        }
+        final XmlTag element = getElement(event);
 
-            if (element != null) {
-                targetXmlTag = element;
-                this.setStatus(event, true);
-            }
+        if (element != null) {
+            targetXmlTag = element;
+            this.setStatus(event, true);
         }
     }
 
