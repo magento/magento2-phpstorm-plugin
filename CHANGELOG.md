@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 
+## 2026.3.3
+
+### Fixed
+
+- View Model injection is available only in editable Magento directories, including explicitly marked vendor directories [#1204](https://github.com/magento/magento2-phpstorm-plugin/issues/1204).
+
 ## 2026.3.2
 
 ### Added
@@ -15,7 +21,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Fixed
 
-- View Model injection is available only in editable Magento directories, including explicitly marked vendor directories [#1204](https://github.com/magento/magento2-phpstorm-plugin/issues/1204).
 - Internal IntelliJ Platform API usage in the UCT console Stop action reported by the IntelliJ IDEA 2026.3 EAP plugin verifier.
 - PSI assertion when resolving Knockout region references and navigation in `.phtml` templates containing PHP-interpolated inline JavaScript.
 - UI freeze when regenerating URN mappings while Magento component indexes need to be refreshed.
