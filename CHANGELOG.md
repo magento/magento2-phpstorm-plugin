@@ -5,11 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 
-## 2026.3.2
+## 2026.3.3
 
 ### Added
 
 - Override module email templates in a selected project theme, including nested email paths, in PhpStorm and WebStorm [#1205](https://github.com/magento/magento2-phpstorm-plugin/issues/1205).
+
+## 2026.3.2
+
+### Added
+
 - WebStorm end-to-end coverage for regenerating framework and module URN mappings without a PhpStorm license.
 - Magento XML file generators, cron groups, email templates, declarative schemas, and theme layout overrides are available in WebStorm and other IDEs without PHP support; module and theme context is resolved from `etc/module.xml` and `theme.xml`.
 - Magento README generation, theme asset overrides and comparison, asset path copying, content-root actions, PWA live templates, PHP-independent XML completion and navigation, and XML inspections are available in IDEs without PHP support.
