@@ -1,0 +1,421 @@
+package com.magento.idea.magento2plugin.mcp
+
+import com.intellij.testFramework.IndexingTestUtil
+import com.intellij.testFramework.PlatformTestUtil
+import com.magento.idea.magento2plugin.BaseProjectTestCase
+import com.magento.idea.magento2plugin.project.Settings
+import java.nio.file.Files
+import java.nio.file.Path
+import java.util.Comparator
+import org.junit.Test
+
+class MagentoMcpQueriesTest : BaseProjectTestCase() {
+    @Test
+    fun testGetMagentoRootPathReturnsConfiguredSetting() {
+        val result = MagentoProjectQueries.getMagentoRootPath(project)
+
+        assertContains(result, "Configured Magento root path: /src")
+    }
+
+    @Test
+    fun testFindMagentoModuleReturnsModuleDetails() {
+        val result = MagentoModuleQueries.findMagentoModule(project, "Foo_Bar2")
+
+        assertContains(result, "Found 1 Magento module match(es) for \"Foo_Bar2\".")
+        assertContains(result, "\nFoo_Bar2\n")
+        assertContains(result, "path:")
+        assertContainsPath(result, "app/code/Foo/Bar2")
+        assertContains(result, "editable: yes")
+        assertContains(result, "etc:")
+        assertContainsPath(result, "app/code/Foo/Bar2/etc")
+    }
+
+    @Test
+    fun testFindDiConfigForClassReturnsTypeAndPluginDeclarations() {
+        val result = MagentoDiQueries.findDiConfigForClass(project, "Magento\\Theme\\Block\\Html\\Topmenu")
+
+        assertContains(result, "DI configuration for \"Magento\\Theme\\Block\\Html\\Topmenu\"")
+        assertContains(result, "type declarations")
+        assertContains(
+            result,
+            "vendor/magento/module-catalog/etc/di.xml -> type name=Magento\\Theme\\Block\\Html\\Topmenu"
+        )
+        assertContains(result, "plugin declarations")
+        assertContains(
+            result,
+            "plugin name=catalogTopmenu type=Magento\\Catalog\\Plugin\\Block\\Topmenu sortOrder=0 disabled=false"
+        )
+    }
+
+    @Test
+    fun testFindPluginsForMethodReturnsMatchingPluginMethods() {
+        myFixture.addFileToProject(
+            "vendor/magento/module-theme/Block/PluginClass.php",
+            """
+            <?php
+            
+            namespace Magento\Theme\Block;
+            
+            class PluginClass
+            {
+                public function someMethod()
+                {
+                }
+            }
+            """.trimIndent()
+        )
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+        val result = MagentoDiQueries.findPluginsForMethod(project, "Magento\\Theme\\Block\\PluginClass", "someMethod")
+
+        assertContains(result, "Found 1 plugin method match(es) for Magento\\Theme\\Block\\PluginClass::someMethod().")
+        assertContains(result, "before plugin")
+        assertContains(result, "target: Magento\\Theme\\Block\\PluginClass::someMethod()")
+        assertContains(result, "pluginClass: Magento\\Catalog\\Plugin\\PluginClass")
+        assertContains(result, "pluginMethod: beforeSomeMethod()")
+        assertContains(result, "scope: global")
+        assertContains(result, "file:")
+        assertContainsPath(result, "vendor/magento/module-catalog/Plugin/PluginClass.php")
+    }
+
+    @Test
+    fun testFindPluginsForMethodSkipsDisabledPlugins() {
+        myFixture.addFileToProject(
+            "vendor/magento/module-theme/Block/PluginClass.php",
+            """
+            <?php
+            
+            namespace Magento\Theme\Block;
+            
+            class PluginClass
+            {
+                public function someMethod()
+                {
+                }
+            }
+            """.trimIndent()
+        )
+        myFixture.addFileToProject(
+            "app/code/Foo/Bar/Plugin/DisabledPluginClass.php",
+            """
+            <?php
+            
+            namespace Foo\Bar\Plugin;
+            
+            class DisabledPluginClass
+            {
+                public function beforeSomeMethod()
+                {
+                }
+            }
+            """.trimIndent()
+        )
+        myFixture.addFileToProject(
+            "app/code/Foo/Bar/etc/frontend/di.xml",
+            """
+            <?xml version="1.0"?>
+            <config>
+                <type name="Magento\Theme\Block\PluginClass">
+                    <plugin name="disabledPluginClass" type="Foo\Bar\Plugin\DisabledPluginClass" disabled="true"/>
+                </type>
+            </config>
+            """.trimIndent()
+        )
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+        val result = MagentoDiQueries.findPluginsForMethod(project, "Magento\\Theme\\Block\\PluginClass", "someMethod")
+
+        assertFalse("Disabled plugin should not be returned:\n$result", result.contains("Foo\\Bar\\Plugin\\DisabledPluginClass"))
+        assertContains(result, "pluginClass: Magento\\Catalog\\Plugin\\PluginClass")
+    }
+
+    @Test
+    fun testFindObserversForEventReturnsObserverDeclarations() {
+        val result = MagentoEventQueries.findObserversForEvent(project, "test_event_in_test_class")
+
+        assertContains(result, "Found 1 event match(es) for \"test_event_in_test_class\".")
+        assertContains(result, "file:")
+        assertContains(
+            result,
+            "observer=test_observer instance=Magento\\Catalog\\Observer\\TestObserver disabled=false"
+        )
+        assertContainsPath(result, "vendor/magento/module-catalog/etc/events.xml")
+    }
+
+    @Test
+    fun testFindLayoutEntitiesReturnsHandleBlockAndContainerMatches() {
+        val handleResult = MagentoViewQueries.findLayoutEntities(project, "test_index_index2")
+        assertContains(handleResult, "layout handles")
+        assertContains(handleResult, "test_index_index2 ->")
+        assertContainsPath(handleResult, "vendor/magento/module-catalog/view/frontend/layout/test_index_index2.xml")
+
+        val blockResult = MagentoViewQueries.findLayoutEntities(project, "test_index_index_block2")
+        assertContains(blockResult, "blocks")
+        assertContains(
+            blockResult,
+            "test_index_index_block2 ->"
+        )
+        assertContainsPath(blockResult, "vendor/magento/module-catalog/view/frontend/layout/test_index_index.xml")
+        assertContains(blockResult, "class=- template=-")
+
+        val containerResult = MagentoViewQueries.findLayoutEntities(project, "test_index_index_container2")
+        assertContains(containerResult, "containers")
+        assertContains(
+            containerResult,
+            "test_index_index_container2 ->"
+        )
+        assertContainsPath(containerResult, "vendor/magento/module-catalog/view/frontend/layout/test_index_index.xml")
+        assertContains(containerResult, "htmlTag=- htmlClass=-")
+    }
+
+    @Test
+    fun testFindUiComponentReturnsMatchingFile() {
+        val result = MagentoViewQueries.findUiComponent(project, "recently_viewed_2")
+
+        assertContains(result, "Found 1 UI component match(es) for \"recently_viewed_2\".")
+        assertContains(result, "\nrecently_viewed_2\n")
+        assertContains(result, "file:")
+        assertContainsPath(result, "vendor/magento/module-catalog/view/frontend/ui_component/recently_viewed_2.xml")
+        assertContains(result, "rootTag: listing")
+    }
+
+    @Test
+    fun testFindUiComponentReflectsFilesAddedAfterInitialSnapshot() {
+        val initial = MagentoViewQueries.findUiComponent(project, "mcp_dynamic_component")
+        assertContains(initial, "No UI components matched \"mcp_dynamic_component\".")
+
+        myFixture.addFileToProject(
+            "vendor/magento/module-catalog/view/frontend/ui_component/mcp_dynamic_component.xml",
+            """
+            <?xml version="1.0"?>
+            <listing/>
+            """.trimIndent()
+        )
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+        val result = MagentoViewQueries.findUiComponent(project, "mcp_dynamic_component")
+
+        assertContains(result, "Found 1 UI component match(es) for \"mcp_dynamic_component\".")
+        assertContainsPath(result, "vendor/magento/module-catalog/view/frontend/ui_component/mcp_dynamic_component.xml")
+    }
+
+    @Test
+    fun testFindAclOrMenuReturnsAclMatches() {
+        val result = MagentoViewQueries.findAclOrMenu(project, "Magento_Catalog::test")
+
+        assertContains(result, "ACL and menu matches for \"Magento_Catalog::test\"")
+        assertContains(result, "acl resources")
+        assertContains(result, "Magento_Catalog::test -> title=Test Resource")
+        assertContains(result, "file:")
+        assertContainsPath(result, "vendor/magento/module-catalog/etc/acl.xml")
+    }
+
+    @Test
+    fun testFindAclOrMenuReturnsMenuMatches() {
+        val result = MagentoViewQueries.findAclOrMenu(project, "Magento_Catalog::catalog")
+
+        assertContains(result, "ACL and menu matches for \"Magento_Catalog::catalog\"")
+        assertContains(result, "menu entries")
+        assertContains(
+            result,
+            "Magento_Catalog::catalog -> title=Catalog resource=Magento_Catalog::catalog parent=- action=-"
+        )
+        assertContains(result, "file:")
+        assertContainsPath(result, "vendor/magento/module-catalog/etc/adminhtml/menu.xml")
+    }
+
+    @Test
+    fun testDescribeCliEnvironmentDetectsMagentoAndMagerunWrappers() {
+        resetCliEnvironment()
+        val nestedMagentoRoot = configureNestedMagentoRoot()
+        Settings.getInstance(project).mcpCliToolCandidates = "bin/magento, bin/n98-magerun2"
+        writeProjectFile("bin/magento", "#!/usr/bin/env bash\n")
+        writeProjectFile("bin/n98-magerun2", "#!/usr/bin/env bash\n")
+
+        val result = MagentoCliToolQueries.describeCliEnvironment(project)
+
+        assertContains(result, "Magento CLI environment")
+        assertContains(result, "Configured wrapper candidates:")
+        assertContains(result, "Configured Magento root: ./$nestedMagentoRoot")
+        assertContains(result, "./bin/magento")
+        assertContains(result, "location: outside configured Magento root `./$nestedMagentoRoot`")
+        assertContains(result, "example: ./bin/magento cache:flush")
+        assertContains(result, "./bin/n98-magerun2")
+        assertContains(result, "example: ./bin/n98-magerun2 sys:info")
+        assertContains(result, "Known n98-magerun capability groups:")
+        assertContains(result, "admin: Commands for managing Magento admin user accounts and related settings.")
+        assertContains(result, "examples: admin:user:list, admin:user:create, admin:user:change-password, admin:notifications")
+        assertContains(result, "sys: Commands for system-level information, checks, and maintenance tasks.")
+        assertContains(result, "This is a built-in capability snapshot.")
+        assertContains(result, "Create and edit Magento files under `./$nestedMagentoRoot`; that is the configured Magento root.")
+        assertContains(result, "If a detected wrapper is outside `./$nestedMagentoRoot`, that is valid for a nested Magento root.")
+        assertContains(result, "For exact n98 command discovery, follow up with the detected wrapper and `list` or a targeted `--help` call such as `sys:info --help`.")
+        assertContains(result, "Mark Shust Docker projects usually route these wrappers into containers")
+    }
+
+    @Test
+    fun testDescribeCliEnvironmentDoesNotAddOutsideRootGuidanceForWrapperInsideMagentoRoot() {
+        resetCliEnvironment()
+        val nestedMagentoRoot = configureNestedMagentoRoot()
+        Settings.getInstance(project).mcpCliToolCandidates = "$nestedMagentoRoot/bin/magento"
+        writeProjectFile("$nestedMagentoRoot/bin/magento", "#!/usr/bin/env bash\n")
+
+        val result = MagentoCliToolQueries.describeCliEnvironment(project)
+
+        assertContains(result, "Configured Magento root: ./$nestedMagentoRoot")
+        assertContains(result, "./$nestedMagentoRoot/bin/magento")
+        assertDoesNotContain(result, "location: outside configured Magento root `./$nestedMagentoRoot`")
+        assertDoesNotContain(result, "If these configured wrapper paths exist outside `./$nestedMagentoRoot`, that is valid for a nested Magento root.")
+    }
+
+    @Test
+    fun testDescribeCliEnvironmentUsesConfiguredCandidateOrder() {
+        resetCliEnvironment()
+        Settings.getInstance(project).mcpCliToolCandidates = "bin/n98-magerun2, bin/magento"
+        writeProjectFile("bin/magento", "#!/usr/bin/env bash\n")
+        writeProjectFile("bin/n98-magerun2", "#!/usr/bin/env bash\n")
+
+        val result = MagentoCliToolQueries.describeCliEnvironment(project)
+        val magerunIndex = result.indexOf("./bin/n98-magerun2")
+        val magentoIndex = result.indexOf("./bin/magento")
+
+        assertTrue("Expected n98-magerun2 wrapper to be listed before magento:\n$result", magerunIndex in 0 until magentoIndex)
+    }
+
+    @Test
+    fun testDescribeCliEnvironmentDetectsDirectBinChildrenOutsideConfiguredCandidates() {
+        resetCliEnvironment()
+        Settings.getInstance(project).mcpCliToolCandidates = "bin/magento"
+        writeProjectFile("bin/start", "#!/usr/bin/env bash\n")
+
+        val result = MagentoCliToolQueries.describeCliEnvironment(project)
+
+        assertContains(result, "Detected wrappers:")
+        assertContains(result, "./bin/start")
+        assertContains(result, "type: environment wrapper")
+        assertContains(result, "example: ./bin/start")
+        assertDoesNotContain(result, "Known n98-magerun capability groups:")
+    }
+
+    @Test
+    fun testDescribeCliEnvironmentIncludesGruntStyleRebuildGuidance() {
+        resetCliEnvironment()
+        Settings.getInstance(project).mcpCliToolCandidates = "bin/grunt"
+        writeProjectFile("bin/grunt", "#!/usr/bin/env bash\n")
+
+        val result = MagentoCliToolQueries.describeCliEnvironment(project)
+
+        assertContains(result, "./bin/grunt")
+        assertContains(result, "type: frontend build wrapper")
+        assertContains(result, "use: Use this to compile frontend styles and assets in the project runtime.")
+        assertContains(result, "example: ./bin/grunt less:THEMENAME")
+        assertContains(result, "After editing styles, run the detected grunt wrapper right away to rebuild theme assets, usually `./bin/grunt exec:THEMENAME` and `./bin/grunt less:THEMENAME`.")
+    }
+
+    @Test
+    fun testDescribeCliEnvironmentIncludesStartWrapperWhenManyProjectWrappersExist() {
+        resetCliEnvironment()
+        val wrappers = listOf(
+            "magento",
+            "n98-magerun2",
+            "cli",
+            "composer",
+            "restart",
+            "analyse",
+            "bash",
+            "blackfire",
+            "cache-clean",
+            "check-dependencies",
+            "clinotty",
+            "cliq",
+            "configure-linux",
+            "copyfromcontainer",
+            "copytocontainer",
+            "create-user",
+            "cron",
+            "cy",
+            "cy-run-all.sh",
+            "debug-cli",
+            "start"
+        )
+        Settings.getInstance(project).mcpCliToolCandidates = wrappers.joinToString(", ") { "bin/$it" }
+        writeProjectFile("bin/start", "#!/usr/bin/env bash\n")
+
+        val result = MagentoCliToolQueries.describeCliEnvironment(project)
+
+        assertContains(result, "Detected wrappers:")
+        assertContains(result, "./bin/start")
+        assertContains(result, "use: Use this to start the local project environment or stack when needed.")
+        assertContains(
+            result,
+            "Call this tool before running shell commands that normally use Magento, n98-magerun, or project environment wrappers such as `./bin/start`, `./bin/stop`, or `./bin/restart`."
+        )
+    }
+
+    @Test
+    fun testDescribeCliEnvironmentDoesNotReportNonexistentConfiguredCandidates() {
+        resetCliEnvironment()
+        Settings.getInstance(project).mcpCliToolCandidates = "bin/magento, bin/php"
+        writeProjectFile("bin/magento", "#!/usr/bin/env bash\n")
+
+        val result = MagentoCliToolQueries.describeCliEnvironment(project)
+
+        assertContains(result, "Detected wrappers:")
+        assertContains(result, "./bin/magento")
+        assertDoesNotContain(result, "./bin/php")
+        assertDoesNotContain(result, "Configured wrappers:")
+        assertDoesNotContain(result, "existence could not be verified")
+    }
+
+    private fun assertContains(text: String, expected: String) {
+        assertTrue("Expected to find <$expected> in:\n$text", text.contains(expected))
+    }
+
+    private fun assertContainsPath(text: String, expectedPathSuffix: String) {
+        val normalized = text.replace('\\', '/')
+        assertTrue("Expected to find path suffix <$expectedPathSuffix> in:\n$text", normalized.contains(expectedPathSuffix))
+    }
+
+    private fun assertDoesNotContain(text: String, unexpected: String) {
+        assertTrue("Did not expect to find <$unexpected> in:\n$text", !text.contains(unexpected))
+    }
+
+    private fun configureNestedMagentoRoot(): String {
+        val nestedMagentoRoot = "nested"
+        writeProjectFile("$nestedMagentoRoot/app/etc/di.xml", "<config/>\n")
+        Settings.getInstance(project).magentoPath = nestedMagentoRoot
+        return nestedMagentoRoot
+    }
+
+    private fun resetCliEnvironment() {
+        deleteProjectPath("bin")
+        deleteProjectPath("nested")
+        Settings.getInstance(project).magentoPath = "/src"
+    }
+
+    private fun deleteProjectPath(relativePath: String) {
+        val projectRoot = projectRootPath()
+        val path = projectRoot.resolve(relativePath).normalize()
+        if (!path.startsWith(projectRoot) || !Files.exists(path)) {
+            return
+        }
+
+        Files.walk(path).use { paths ->
+            paths.sorted(Comparator.reverseOrder()).forEach { Files.deleteIfExists(it) }
+        }
+    }
+
+    private fun writeProjectFile(relativePath: String, content: String) {
+        val file = projectRootPath().resolve(relativePath).normalize()
+        Files.createDirectories(file.parent)
+        Files.writeString(file, content)
+    }
+
+    private fun projectRootPath(): Path {
+        val projectBasePath = project.basePath ?: error("Project base path is not available.")
+        return Path.of(projectBasePath).toAbsolutePath().normalize()
+    }
+}

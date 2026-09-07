@@ -1,0 +1,52 @@
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+package com.magento.idea.magento2plugin.reference.provider;
+
+import com.intellij.openapi.progress.ProcessCanceledException;
+import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
+import com.intellij.psi.PsiReferenceProvider;
+import com.intellij.psi.xml.XmlElement;
+import com.intellij.util.ProcessingContext;
+import com.jetbrains.php.lang.psi.elements.Method;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.magento.idea.magento2plugin.indexes.DiIndex;
+import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import org.jetbrains.annotations.NotNull;
+
+public class PhpServiceMethodReferenceProvider  extends PsiReferenceProvider {
+
+    @NotNull
+    @Override
+    public PsiReference[] getReferencesByElement(
+            @NotNull final PsiElement element,
+            @NotNull final ProcessingContext context
+    ) {
+        final List<PsiReference> psiReferences = new ArrayList<>();
+        final String methodName = StringUtil.unquoteString(element.getText());
+        final PhpClass phpClass = DiIndex.getPhpClassOfServiceMethod((XmlElement) element);
+
+        if (phpClass != null) {
+            try {
+                final Collection<Method> methods = phpClass.getMethods();
+                methods.removeIf(m -> !m.getName().equalsIgnoreCase(methodName));
+                if (!methods.isEmpty()) {
+                    psiReferences.add(new PolyVariantReferenceBase(element, methods));
+                }
+            } catch (ProcessCanceledException exception) {
+                throw exception;
+            } catch (RuntimeException exception) {
+                return PsiReference.EMPTY_ARRAY;
+            }
+        }
+
+        return psiReferences.toArray(new PsiReference[0]);
+    }
+}
