@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 ### Fixed
 
 - View Model injection is available only in editable Magento directories, including explicitly marked vendor directories [#1204](https://github.com/magento/magento2-phpstorm-plugin/issues/1204).
+- Override module email templates in a selected project theme, including nested email paths, in PhpStorm and WebStorm [#1205](https://github.com/magento/magento2-phpstorm-plugin/issues/1205).
 
 ## 2026.3.2
 
