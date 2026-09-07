@@ -4,6 +4,206 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
+
+## 2026.3.2
+
+### Added
+
+- Override module email templates in a selected project theme, including nested email paths, in PhpStorm and WebStorm [#1205](https://github.com/magento/magento2-phpstorm-plugin/issues/1205).
+- WebStorm end-to-end coverage for regenerating framework and module URN mappings without a PhpStorm license.
+- Magento XML file generators, cron groups, email templates, declarative schemas, and theme layout overrides are available in WebStorm and other IDEs without PHP support; module and theme context is resolved from `etc/module.xml` and `theme.xml`.
+- Magento README generation, theme asset overrides and comparison, asset path copying, content-root actions, PWA live templates, PHP-independent XML completion and navigation, and XML inspections are available in IDEs without PHP support.
+
+### Fixed
+
+- Internal IntelliJ Platform API usage in the UCT console Stop action reported by the IntelliJ IDEA 2026.3 EAP plugin verifier.
+- PSI assertion when resolving Knockout region references and navigation in `.phtml` templates containing PHP-interpolated inline JavaScript.
+- UI freeze when regenerating URN mappings while Magento component indexes need to be refreshed.
+- Array index exception when resolving module context from an incomplete registration call [#2563](https://github.com/magento/magento2-phpstorm-plugin/issues/2563)
+- Cross-project PSI exception when creating Magento plugin navigation line markers [#2513](https://github.com/magento/magento2-phpstorm-plugin/issues/2513)
+
+## 2026.3.1
+
+### Fixed
+
+- Write access exception when marking or unmarking Magento content roots in PhpStorm 2026.2 [#2720](https://github.com/magento/magento2-phpstorm-plugin/issues/2720)
+
+### Changed
+
+- Updated the minimum supported IDE and build target to PhpStorm 2026.2, the Java toolchain to 25, the IntelliJ Platform Gradle Plugin to 2.18.1, and the Gradle wrapper to 9.6.1.
+
+## 2026.3.0
+
+### Added
+
+- JavaScript mixin navigation between `requirejs-config.js` mixin declarations, target JavaScript modules, and mixin JavaScript modules.
+- JavaScript component navigation from Magento templates in `text/x-magento-init` scripts and `data-mage-init` attributes.
+- Knockout component navigation between JavaScript template declarations and matching HTML template files.
+- Knockout parent-child component navigation between `getRegion()` template calls and matching JavaScript `displayArea` declarations.
+- Regular template navigation between `.phtml` files and layout-declared PHP block classes.
+- PHP-free Magento module root indexing from `etc/module.xml` for non-PHP IDEs.
+- XML-based Magento theme indexing from `theme.xml` for non-PHP IDEs.
+- Magento settings are available under `Tools > Magento` in IDEs without PHP support while remaining under `PHP > Frameworks > Magento 2` in PHP IDEs.
+- PHP-independent MCP tools are available in non-PHP IDEs: `get_magento_root_path` and `describe_magento_cli_environment` are registered separately from PHP-backed scaffold and inspection tools.
+
+### Fixed
+
+- Class cast exception when resolving observer name references outside a valid `event` tag in `events.xml`.
+- JetBrains MCP Server is now an optional plugin dependency; Magento MCP tools are registered only when MCP support is available.
+- File generation dialogs no longer wrap the whole OK action in a write action, preventing `runBlockingCancellable` write-action errors during PSI file creation.
+
+## 2026.2.2
+
+### Added
+
+- A single `magento_scaffold` MCP tool now replaces the separate `create_magento_*` creation tools with a context-conscious three-step scaffold flow: `help` mode lists scaffold types with short descriptions, `detailed_schema` mode returns detailed parameters for one scaffold type, and `render` mode creates modules, plugins, observers, CRUD entities, controllers, CLI commands, blocks, view models, and product/category/customer EAV attributes.
+- A single `magento_inspect` MCP tool now replaces the separate `find_*` inspection tools with a context-conscious three-step flow: `help` lists query types, `detailed_schema` describes one query type, and `query` runs module, DI, plugin, observer, layout, UI component, ACL, and menu lookups.
+- Bundled `magento-scaffold` and `magento-inspect` agent skills with compact Magento settings buttons that add or update those skill files in the current project.
+
+### Fixed
+
+- Magento MCP CLI environment discovery now checks project-local wrapper scripts directly from the filesystem on demand and no longer reports configured candidates such as `bin/php` unless the files actually exist.
+- Magento settings form layout for agent skill controls so the buttons stay separate from MCP CLI wrapper candidates without forcing an oversized settings panel.
+- Internal API usage in GitHub bug report body generation by reading the plugin version from the plugin jar manifest instead of the IntelliJ Platform plugin manager.
+
+## 2026.2.1
+
+### Fixed
+
+- Read access assertion when enabling Magento support or resolving Magento version from plugin settings [#2692](https://github.com/magento/magento2-phpstorm-plugin/issues/2692)
+- Override this file in a project theme is not working [#2549](https://github.com/magento/magento2-phpstorm-plugin/issues/2549)
+
+## 2026.2.0
+
+### Added
+
+- Magento MCP project and generation tools for AI agents. These tools can return the configured Magento root path and generate common Magento scaffolding directly in the opened project, including modules, plugins, observers, CRUD entities, controllers, CLI commands, blocks, view models, and product/category/customer EAV attributes:
+  `get_magento_root_path`,
+  `create_magento_module`,
+  `create_magento_plugin`,
+  `create_magento_observer`,
+  `create_magento_entity_crud`,
+  `create_magento_controller`,
+  `create_magento_cli_command`,
+  `create_magento_block`,
+  `create_magento_view_model`,
+  `create_magento_product_eav_attribute`,
+  `create_magento_category_eav_attribute`,
+  `create_magento_customer_eav_attribute`
+- Magento MCP lookup tools for AI agents. These tools help an agent inspect the current project and answer Magento-specific questions by locating modules, DI configuration, plugin interceptions, event observers, layout entities, UI components, and ACL or admin menu declarations:
+  `find_magento_module`,
+  `find_di_config_for_class`,
+  `find_plugins_for_method`,
+  `find_observers_for_event`,
+  `find_layout_entities`,
+  `find_ui_component`,
+  `find_acl_or_menu`
+- Magento MCP CLI environment discovery for AI agents. The `describe_magento_cli_environment` tool exposes project-local wrapper commands, including Mark Shust Docker-style `bin/*` scripts such as `bin/magento` and `bin/n98-magerun2`, so agents can prefer those wrappers over global binaries.
+
+### Fixed
+
+- Illegal char <|> [#2669](https://github.com/magento/magento2-phpstorm-plugin/issues/2669)
+
+## 2026.1.1
+
+### Added
+
+-  2026.* IDE's support [#2639](https://github.com/magento/magento2-phpstorm-plugin/pull/2639)
+
+### Fixed
+
+- java.lang.runtime exception java.util.concurrent.execution exception java.nio.file.invalid path exception [#2640](https://github.com/magento/magento2-phpstorm-plugin/pull/2640)
+- Internal API usages
+
+## 2025.2.2
+
+### Fixed
+
+- Null PsiDirectory input in GetModuleNameByDirectoryUtil [#2606](https://github.com/magento/magento2-phpstorm-plugin/pull/2606)
+- Migrated settings storage to workspace.xm [#2607](https://github.com/magento/magento2-phpstorm-plugin/pull/2607)
+
+## 2025.2.1
+
+### Fixed
+
+- Multiple issues in BCT [#2589](https://github.com/magento/magento2-phpstorm-plugin/pull/2589)
+
+## 2025.2.0
+
+### Fixed
+
+- Thread context was already set [#2550](https://github.com/magento/magento2-phpstorm-plugin/pull/2550)
+- Argument for @NotNull parameter 'psiDirectory' [#2553](https://github.com/magento/magento2-phpstorm-plugin/pull/2553)
+
+## 2025.1.1
+
+### Fixed
+
+- The themes select is empty [#2527](https://github.com/magento/magento2-phpstorm-plugin/pull/2527)
+- PS.MarkRootGroup isn't registered so the action won't be added to it [#2527](https://github.com/magento/magento2-phpstorm-plugin/pull/2527)
+
+## 2025.1.0
+
+### Added
+
+- Possibility to add additional code source directories using content root feature [#2504](https://github.com/magento/magento2-phpstorm-plugin/pull/2504)
+
+### Fixed
+
+- Compatibility with PhpStorm/IntelliJ 2025.* [#2495](https://github.com/magento/magento2-phpstorm-plugin/pull/2495)
+- "Copy Path/Reference" does not show the preview value [#2497](https://github.com/magento/magento2-phpstorm-plugin/pull/2497)
+- Must not start write action from within read action in the other thread [#2498](https://github.com/magento/magento2-phpstorm-plugin/pull/2498)
+- URN map generation during indexing [#2499](https://github.com/magento/magento2-phpstorm-plugin/pull/2499)
+- Cannot invoke "com.intellij.psi.PsiDirectory.getName() [#2500](https://github.com/magento/magento2-phpstorm-plugin/pull/2500)
+
+## 2025.0.0
+
+### Added
+
+- Clear notifications for the process status of URN generation [#2486](https://github.com/magento/magento2-phpstorm-plugin/pull/2486)
+- Added array as a type in Data Model properties [#2488](https://github.com/magento/magento2-phpstorm-plugin/pull/2488)
+
+### Fixed
+
+- Fixed Upgrade Compatibility Tool [#2482](https://github.com/magento/magento2-phpstorm-plugin/pull/2482)
+  Replaced hardcoded Magento versions with dynamic fetching via Packagist API.
+  Fixed UI icon references.
+  Updated Run command.
+- java.lang.Throwable: Assertion failed: Do not use PsiElement for popup model. See PsiTargetNavigator [#2485](https://github.com/magento/magento2-phpstorm-plugin/pull/2485)
+- Slow operations are prohibited on EDT [#2486](https://github.com/magento/magento2-phpstorm-plugin/pull/2486)
+- When creating a new model with a listing component grid, fulltext search is not working [#2037](https://github.com/magento/magento2-phpstorm-plugin/pull/2037)
+
+### Changed
+
+- Updated Gradle Intellij plugin to version 2 [#2473](https://github.com/magento/magento2-phpstorm-plugin/pull/2473)
+The project no longer requires the paid Ultimate edition of IntelliJ IDEA. It can now run seamlessly in the Community edition.
+Enabled code emulation directly within PHPStorm, eliminating the dependency on IntelliJ IDEA for this functionality.
+
+## 5.3.1
+
+### Fixed
+
+- Custom theme couldn't be detected [#2348](https://github.com/magento/magento2-phpstorm-plugin/pull/2348)
+
+## 5.3.0
+
+### Added
+
+- Mage-os support [#2081](https://github.com/magento/magento2-phpstorm-plugin/pull/2081)
+
+### Fixed
+
+- Workaround for "thread context was already set" exception [#2082](https://github.com/magento/magento2-phpstorm-plugin/pull/2082)
+- NewObserverDialog form typo [#2087](https://github.com/magento/magento2-phpstorm-plugin/pull/2087)
+- ActionUpdateThread.OLD_EDT deprecation on DumbAwareActions [#2088](https://github.com/magento/magento2-phpstorm-plugin/pull/2088)
+
+## 5.2.0
+
+### Fixed
+
+- Fixed action update thread deprecation [#2072](https://github.com/magento/magento2-phpstorm-plugin/pull/2072)
+- Fixed compatibility with 2024.1 [#2071](https://github.com/magento/magento2-phpstorm-plugin/pull/2071)
+
 ## 5.1.0
 
 ### Fixed
@@ -404,7 +604,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Added
 
-- PWA pure function Live Template 
+- PWA pure function Live Template
 
 ### Fixed
 
@@ -489,7 +689,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Code Inspection: GraphQL resolver in the scope of a PHP Class
 - Code Inspection: Duplicated Observer Usage in events XML
 - Moved plugin configuration from `Settings > Preferences > Languages & Frameworks > PHP > Magento` to
-        `Settings > Preferences > Languages & Frameworks > PHP > Frameworks > Magento`
+  `Settings > Preferences > Languages & Frameworks > PHP > Frameworks > Magento`
 - Fixed support of 202## 0.* versions of IDE's
 
 ## 0.3.0
@@ -514,7 +714,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Added project detector
 - Move configuration section to "Languages & Frameworks > Php > Magento"
 - Remove deprecated elements
-    
+
 ## 0.2.2
 
 ### Added
@@ -524,13 +724,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 ### Fixed
 
 - Fixed "Project disposed" exception
-   
+
 ## 0.2.1
-   
+
 ### Added
 
 - added module name for "Goto configuration" labels
-    
+
 ## 0.2.0
 
 ### Added
@@ -538,9 +738,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - WebApi routes
 - nicer "Goto configuration" labels
 - plugin settings (manual reindex, URN generation, plugin on/off)
- 
-## 0.1
- 
+
+## 0.1.0
+
 ### Added
 
 - Context type completion for:
@@ -553,9 +753,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - virtualType arguments resolution
 - webapi.xml interface/method completion/references
 - Support for old people using PhpStorm 8 or JDK## 1.7
-    
+
 ## 0.0.9
-   
+
 ### Added
 
 - Added Reference and completion support for layouts
@@ -580,13 +780,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Added reference to configuration and observers (classes or virtualType)
 - Added reference to observers from configuration
 - Added reference to event dispatch from configuration
-    
+
 ## 0.0.6
 
 ### Added
 
 - Added reference and completion support for virtual types/classes/arguments in DI configuration
-    
+
 ## 0.0.5
 
 ### Added

@@ -1,11 +1,12 @@
 # Setting up development environment
 
-1. Check out this repository
-1. Open a folder with the project in the IntelliJ Ultimate using the `open` action button.
-1. Make sure that you on the latest develop branch (e.g 1.0.0-develop)
-1. Right-click on the `build.gradle` file, choose "Import Gradle project"
-1. When the Gradle sections appeared in the right bar, navigate there and right-click `magento-2-php-storm-plguin > Tasks -> Intellij -> runIde`
-1. Click on "Run "magento-2-php-storm-plugin" to run the plugin. You should see a new instance of IntelliJ launched with the plugin installed. Make sure that the plugin is enabled in IntelliJ settings and indexing is finished. Plugin features should be accessible at this point.
+1. Check out this repository.
+1. Open the project in IntelliJ IDEA.
+1. Make sure that you are on the latest develop branch (for example `5.4.0-develop`).
+1. Import the Gradle project from `build.gradle.kts`.
+1. Use **JDK 25** for both the project SDK and the Gradle JVM.
+1. In the Gradle tool window, run `Tasks > Intellij platform > runIde`.
+1. The task launches a PhpStorm sandbox with the plugin installed. Make sure that the plugin is enabled and indexing is finished before testing features.
 
 # Plugin publication
 

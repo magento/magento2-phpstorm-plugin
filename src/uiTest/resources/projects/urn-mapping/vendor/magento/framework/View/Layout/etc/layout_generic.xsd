@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="page">
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="container"/>
+                <xs:element name="block"/>
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

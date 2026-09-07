@@ -1,0 +1,11 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<idea-plugin>
+    <extensions defaultExtensionNs="com.intellij">
+        <mcpServer.mcpToolset implementation="com.magento.idea.magento2plugin.mcp.MagentoMcpToolset"/>
+    </extensions>
+</idea-plugin>

@@ -8,15 +8,51 @@ on:
     branches: [ master, '*-develop', 'mainline*' ]
 
 jobs:
+  ui-test-webstorm:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: 25
+          distribution: 'temurin'
+          cache: gradle
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Cache WebStorm UI test distribution
+        uses: actions/cache@v4
+        with:
+          path: |
+            out/ide-tests/cache
+            out/ide-tests/installers
+          key: ${{ runner.os }}-webstorm-${{ hashFiles('gradle.properties') }}
+      - name: Run WebStorm UI tests
+        run: xvfb-run --auto-servernum ./gradlew uiTest --no-daemon --no-build-cache --no-configuration-cache
+      - name: Upload UI test failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: webstorm-ui-test-failure-artifacts
+          if-no-files-found: ignore
+          retention-days: 14
+          path: |
+            build/reports/tests/uiTest/**
+            build/test-results/uiTest/**
+            build/idea-sandbox/**/log/**
+            build/idea-sandbox/**/system/log/**
+            out/ide-tests/tests/**
+
   build-linux:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
-      - name: Set up JDK 17
+      - name: Set up JDK 25
         uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 25
           distribution: 'temurin'
           cache: gradle
       - uses: actions/cache@v3
@@ -27,22 +63,20 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Gradle wrapper
-        run: gradle wrapper
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run automated tests
-        run: ./gradlew test --no-daemon
+        run: ./gradlew clean test --no-daemon --no-build-cache --no-configuration-cache
 
   build-windows:
     runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v3
-      - name: Set up JDK 17
+      - name: Set up JDK 25
         uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 25
           distribution: 'temurin'
           cache: gradle
       - uses: actions/cache@v3
@@ -53,22 +87,34 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Gradle wrapper
-        run: gradle wrapper
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run automated tests
-        run: ./gradlew test --no-daemon
+        run: ./gradlew clean test --fail-fast --no-daemon --no-build-cache --no-configuration-cache
+      - name: Upload Windows test failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-test-failure-artifacts
+          if-no-files-found: ignore
+          retention-days: 14
+          path: |
+            build/test-results/test/**
+            build/reports/tests/test/**
+            build/reports/problems/**
+            build/tmp/test/**
+            .intellijPlatform/sandbox/**/log-test/**
+            .intellijPlatform/sandbox/**/system/log/**
 
   build-macos:
     runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v3
-      - name: Set up JDK 17
+      - name: Set up JDK 25
         uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 25
           distribution: 'temurin'
           cache: gradle
       - uses: actions/cache@v3
@@ -79,44 +125,27 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Gradle wrapper
-        run: gradle wrapper
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run automated tests
-        run: ./gradlew test --no-daemon
+        run: ./gradlew clean test --no-daemon --no-build-cache --no-configuration-cache
 
   static-tests:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
+      - uses: actions/checkout@v4
         with:
-          java-version: 17
+          fetch-depth: 0
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: 25
           distribution: 'temurin'
           cache: gradle
-      - uses: actions/cache@v3
+      - name: Qodana - Code Quality
+        uses: JetBrains/qodana-action@v2025.3
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-      - name: Gradle wrapper
-        run: gradle wrapper
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - id: file_changes
-        uses: trilom/file-changes-action@v1.2.4
-      - name: Run Code Style Check
-        run: ./gradlew checkstyleCI --no-daemon
-        env:
-          MODIFIED_FILES: ${{ steps.file_changes.outputs.files}}
-          ACTIONS_STEP_DEBUG: true
-      - name: Run PMD Quality Check
-        run: ./gradlew pmdCI --no-daemon
-        env:
-          MODIFIED_FILES: ${{ steps.file_changes.outputs.files}}
+          cache-default-branch-only: true
+          use-caches: true
+          args: '--baseline qodana.sarif.json'
