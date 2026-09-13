@@ -13,6 +13,19 @@ import com.intellij.mcpserver.annotations.McpTool
  * Exposes Magento-specific MCP tools that require the JetBrains PHP plugin.
  */
 class MagentoMcpToolset : McpToolset {
+    @McpTool(name = "magento_compatibility")
+    @McpDescription("Analyze Magento backward / upgrade compatibility with the built-in UCT PHP/XML inspections. Use mode `help` or `detailed_schema` first, then `status` to discover actual bundled index coverage. Use `analyze` with parametersJson containing a path or moduleName and targetVersion to start a background scan. Poll `results` with runId for progress and paginated findings; use `cancel` to stop. Analysis does not save files or change UCT settings. Unsupported target versions are rejected; coverage is limited to the shipped indexes and existing UCT rules.")
+    suspend fun magentoCompatibility(mode: String, parametersJson: String): String {
+        val normalizedMode = mode.trim().lowercase().replace('-', '_')
+        return when (normalizedMode) {
+            "help" -> MagentoCompatibilityCommands.help()
+            "schema", "detailed_schema" -> MagentoCompatibilityCommands.detailedSchema()
+            else -> MagentoMcpToolsetSupport.withProjectAction(validateProject = false) {
+                MagentoCompatibilityCommands.execute(it, normalizedMode, parametersJson)
+            }
+        }
+    }
+
     /**
      * Provides one low-noise entry point for Magento scaffolding.
      */

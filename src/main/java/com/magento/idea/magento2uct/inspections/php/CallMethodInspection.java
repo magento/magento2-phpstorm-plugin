@@ -14,7 +14,7 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
-import com.magento.idea.magento2uct.settings.UctSettingsService;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class CallMethodInspection extends PhpInspection {
@@ -29,10 +29,9 @@ public abstract class CallMethodInspection extends PhpInspection {
             @Override
             public void visitPhpMethodReference(final MethodReference reference) {
                 final Project project = reference.getProject();
-                final UctSettingsService settings = UctSettingsService.getInstance(project);
 
-                if (!settings.isEnabled()
-                        || !settings.isIssueLevelSatisfiable(getSeverityLevel())) {
+                if (!UctAnalysisContext.isEnabled(problemsHolder)
+                        || !UctAnalysisContext.accepts(problemsHolder, getSeverityLevel())) {
                     return;
                 }
                 final PsiElement resolvedElement = reference.resolve();

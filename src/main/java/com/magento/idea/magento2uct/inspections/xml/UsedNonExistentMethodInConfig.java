@@ -13,7 +13,7 @@ import com.intellij.psi.PsiElement;
 import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
 import com.magento.idea.magento2uct.util.php.MagentoReferenceUtil;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,12 +31,10 @@ public class UsedNonExistentMethodInConfig extends ModuleConfigFileInspection {
         if (!MagentoReferenceUtil.isMethodReference(fqn)) {
             return;
         }
-        if (!VersionStateManager.getInstance(manager.getProject()).isExists(fqn)) {
+        if (!UctAnalysisContext.versions(holder).isExists(fqn)) {
             final String message = SupportedIssue.USED_NON_EXISTENT_METHOD_IN_CONFIG.getMessage(
                     fqn,
-                    VersionStateManager.getInstance(
-                            manager.getProject()
-                    ).getRemovedInVersion(fqn)
+                    UctAnalysisContext.versions(holder).getRemovedInVersion(fqn)
             );
 
             if (holder instanceof UctProblemsHolder) {

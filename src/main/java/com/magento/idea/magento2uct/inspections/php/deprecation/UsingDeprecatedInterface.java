@@ -14,7 +14,7 @@ import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.UsedTypeInspection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public class UsingDeprecatedInterface extends UsedTypeInspection {
@@ -27,7 +27,7 @@ public class UsingDeprecatedInterface extends UsedTypeInspection {
             final ClassReference reference
     ) {
         if (!phpClass.isInterface()
-                || !VersionStateManager.getInstance(project).isDeprecated(phpClass.getFQN())) {
+                || !UctAnalysisContext.versions(problemsHolder).isDeprecated(phpClass.getFQN())) {
             return;
         }
 
@@ -36,7 +36,7 @@ public class UsingDeprecatedInterface extends UsedTypeInspection {
                     SupportedIssue.USING_DEPRECATED_INTERFACE
             );
         }
-        final String deprecatedIn = VersionStateManager.getInstance(project)
+        final String deprecatedIn = UctAnalysisContext.versions(problemsHolder)
                 .getDeprecatedInVersion(phpClass.getFQN());
 
         problemsHolder.registerProblem(

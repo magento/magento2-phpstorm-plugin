@@ -10,6 +10,7 @@ import com.magento.idea.magento2uct.bundles.UctInspectionBundle;
 import com.magento.idea.magento2uct.execution.process.OutputWrapper;
 import com.magento.idea.magento2uct.execution.scanner.data.ComponentData;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
+import com.magento.idea.magento2uct.analysis.UctFinding;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -83,6 +84,15 @@ public class UctReportOutputUtil {
                 .concat("\n");
 
         stdout.print(output);
+    }
+
+    /** Prints a detached finding returned by the shared analysis service. */
+    public void printIssue(final UctFinding finding) {
+        stdout.print(ISSUE_FORMAT
+                .replace("{SEVERITY}", finding.getIssue().getLevel().getFormattedLabel())
+                .replace("{code}", Integer.toString(finding.getIssue().getCode()))
+                .replace("{line}", Integer.toString(finding.getLine()))
+                .replace("{message}", finding.getMessage()) + "\n");
     }
 
     /**

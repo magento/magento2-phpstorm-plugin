@@ -17,7 +17,7 @@ import com.jetbrains.php.lang.psi.elements.FieldReference;
 import com.jetbrains.php.lang.psi.elements.impl.ClassConstImpl;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
-import com.magento.idea.magento2uct.settings.UctSettingsService;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class UsedFieldInspection extends PhpInspection {
@@ -32,10 +32,9 @@ public abstract class UsedFieldInspection extends PhpInspection {
             @Override
             public void visitPhpFieldReference(final FieldReference fieldReference) {
                 final Project project = fieldReference.getProject();
-                final UctSettingsService settings = UctSettingsService.getInstance(project);
 
-                if (!settings.isEnabled()
-                        || !settings.isIssueLevelSatisfiable(getSeverityLevel())) {
+                if (!UctAnalysisContext.isEnabled(problemsHolder)
+                        || !UctAnalysisContext.accepts(problemsHolder, getSeverityLevel())) {
                     return;
                 }
                 final PsiElement element = fieldReference.resolve();
@@ -52,10 +51,9 @@ public abstract class UsedFieldInspection extends PhpInspection {
                     final ClassConstantReference constantReference
             ) {
                 final Project project = constantReference.getProject();
-                final UctSettingsService settings = UctSettingsService.getInstance(project);
 
-                if (!settings.isEnabled()
-                        || !settings.isIssueLevelSatisfiable(getSeverityLevel())) {
+                if (!UctAnalysisContext.isEnabled(problemsHolder)
+                        || !UctAnalysisContext.accepts(problemsHolder, getSeverityLevel())) {
                     return;
                 }
                 final PsiElement element = constantReference.resolve();

@@ -16,7 +16,7 @@ import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.UsedFieldInspection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public class UsedNonApiConstant extends UsedFieldInspection {
@@ -38,7 +38,7 @@ public class UsedNonApiConstant extends UsedFieldInspection {
             final ClassConstImpl constant,
             final ClassConstantReference constantReference
     ) {
-        if (VersionStateManager.getInstance(project).isApi(constant.getFQN())) {
+        if (UctAnalysisContext.versions(problemsHolder).isApi(constant.getFQN())) {
             return;
         }
         final String message = SupportedIssue.USED_NON_API_CONSTANT.getMessage(

@@ -7,10 +7,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 2026.3.3
 
+### Added
+
+- `magento_compatibility` MCP tool for built-in UCT backward and upgrade compatibility analysis of PHP and XML files by project path or Magento module name, with supported target version discovery, background scans, paginated findings, and cancellation.
+- Automated coverage for compatibility MCP commands, UCT analysis and version indexes, and bundled skill installation.
+- Override module email templates in a selected project theme, including nested email paths, in PhpStorm and WebStorm [#1205](https://github.com/magento/magento2-phpstorm-plugin/issues/1205).
+
+### Changed
+
+- Extended the bundled `magento-inspect` agent skill with compatibility analysis workflows, including target coverage checks, scan progress, and complete result retrieval.
+
 ### Fixed
 
 - View Model injection is available only in editable Magento directories, including explicitly marked vendor directories [#1204](https://github.com/magento/magento2-phpstorm-plugin/issues/1204).
-- Override module email templates in a selected project theme, including nested email paths, in PhpStorm and WebStorm [#1205](https://github.com/magento/magento2-phpstorm-plugin/issues/1205).
 
 ## 2026.3.2
 

@@ -178,7 +178,7 @@
                     </constraints>
                     <properties>
                       <text value="Inspect"/>
-                      <toolTipText value="Install or update the bundled Magento inspect skill for the selected agent target. Use it as a starting point for project lookup and analysis tasks, then extend the skill with your own instructions, commands, and workflow conventions."/>
+                      <toolTipText value="Install or update the bundled Magento inspect skill for project lookups and backward or upgrade compatibility analysis. Extend the installed skill with your own instructions, commands, and workflow conventions."/>
                     </properties>
                   </component>
                 </children>

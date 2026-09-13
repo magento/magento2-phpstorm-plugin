@@ -15,7 +15,7 @@ import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.OverriddenFieldInspection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public class OverridingDeprecatedConstant extends OverriddenFieldInspection {
@@ -28,7 +28,7 @@ public class OverridingDeprecatedConstant extends OverriddenFieldInspection {
             final Field overriddenField,
             final PhpClass parentClass
     ) {
-        if (!VersionStateManager.getInstance(project).isDeprecated(overriddenField.getFQN())) {
+        if (!UctAnalysisContext.versions(problemsHolder).isDeprecated(overriddenField.getFQN())) {
             return;
         }
 
@@ -37,7 +37,7 @@ public class OverridingDeprecatedConstant extends OverriddenFieldInspection {
                     SupportedIssue.OVERRIDING_DEPRECATED_CONSTANT
             );
         }
-        final String deprecatedIn = VersionStateManager.getInstance(project)
+        final String deprecatedIn = UctAnalysisContext.versions(problemsHolder)
                 .getDeprecatedInVersion(overriddenField.getFQN());
 
         problemsHolder.registerProblem(

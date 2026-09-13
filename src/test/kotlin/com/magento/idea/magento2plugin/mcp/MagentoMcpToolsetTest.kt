@@ -18,7 +18,8 @@ class MagentoMcpToolsetTest {
         assertEquals(
             setOf(
                 "magento_scaffold",
-                "magento_inspect"
+                "magento_inspect",
+                "magento_compatibility"
             ),
             toolNames
         )

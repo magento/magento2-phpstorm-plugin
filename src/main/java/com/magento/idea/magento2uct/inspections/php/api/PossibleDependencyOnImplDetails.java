@@ -14,7 +14,7 @@ import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.UsedTypeInspection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public class PossibleDependencyOnImplDetails extends UsedTypeInspection {
@@ -26,12 +26,12 @@ public class PossibleDependencyOnImplDetails extends UsedTypeInspection {
             final PhpClass phpClass,
             final ClassReference reference
     ) {
-        if (VersionStateManager.getInstance(project).isApi(phpClass.getFQN())) {
+        if (UctAnalysisContext.versions(problemsHolder).isApi(phpClass.getFQN())) {
             return;
         }
 
         for (final PhpClass implementedInterface : phpClass.getImplementedInterfaces()) {
-            if (VersionStateManager.getInstance(project).isApi(implementedInterface.getFQN())) {
+            if (UctAnalysisContext.versions(problemsHolder).isApi(implementedInterface.getFQN())) {
 
                 if (problemsHolder instanceof UctProblemsHolder) {
                     ((UctProblemsHolder) problemsHolder).setIssue(

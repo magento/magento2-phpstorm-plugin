@@ -13,7 +13,7 @@ import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.ImplementInspection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public class ImplementedNonApiInterface extends ImplementInspection {
@@ -25,7 +25,7 @@ public class ImplementedNonApiInterface extends ImplementInspection {
             final ClassReference reference,
             final String interfaceFqn
     ) {
-        if (VersionStateManager.getInstance(project).isApi(interfaceFqn)) {
+        if (UctAnalysisContext.versions(problemsHolder).isApi(interfaceFqn)) {
             return;
         }
         final String message = SupportedIssue.IMPLEMENTED_NON_API_INTERFACE.getMessage(
