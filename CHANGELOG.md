@@ -7,8 +7,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 2026.3.3
 
+### Added
+
+- PhpStorm metadata for Hyvä and Magewire view models, factories, checkout forms, evaluation types, and flash messages [#2735](https://github.com/magento/magento2-phpstorm-plugin/pull/2735).
+- Return-type inference for Magento validator, message, and unit-test object factories, plus argument completion for area codes, filesystem directories, and sort directions.
+
 ### Fixed
 
+- Missing SQL condition operators and plural store and website scopes in PHP argument completion.
 - View Model injection is available only in editable Magento directories, including explicitly marked vendor directories [#1204](https://github.com/magento/magento2-phpstorm-plugin/issues/1204).
 - Override module email templates in a selected project theme, including nested email paths, in PhpStorm and WebStorm [#1205](https://github.com/magento/magento2-phpstorm-plugin/issues/1205).
 

@@ -77,11 +77,6 @@ namespace PHPSTORM_META {
         0,
         argumentsSet('hyva_checkout_evaluation_types')
     );
-    expectedArguments(
-        \Hyva\Checkout\Model\Magewire\Component\EvaluationResultFactory::createCustom(),
-        0,
-        argumentsSet('hyva_checkout_evaluation_types')
-    );
 
     registerArgumentsSet(
         'magewire_message_types',

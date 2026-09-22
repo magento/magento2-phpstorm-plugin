@@ -44,10 +44,10 @@ namespace PHPSTORM_META {
         \Magento\Framework\Message\Factory::create(0),
         map(
             [
-                \Magento\Framework\Message\MessageInterface::TYPE_ERROR => \Magento\Framework\Message\Error::class,
-                \Magento\Framework\Message\MessageInterface::TYPE_WARNING => \Magento\Framework\Message\Warning::class,
-                \Magento\Framework\Message\MessageInterface::TYPE_NOTICE => \Magento\Framework\Message\Notice::class,
-                \Magento\Framework\Message\MessageInterface::TYPE_SUCCESS => \Magento\Framework\Message\Success::class,
+                'error' => \Magento\Framework\Message\Error::class,
+                'warning' => \Magento\Framework\Message\Warning::class,
+                'notice' => \Magento\Framework\Message\Notice::class,
+                'success' => \Magento\Framework\Message\Success::class,
             ]
         )
     );
