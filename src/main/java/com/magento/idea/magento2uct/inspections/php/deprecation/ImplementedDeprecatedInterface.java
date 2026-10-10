@@ -13,7 +13,7 @@ import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.ImplementInspection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public class ImplementedDeprecatedInterface extends ImplementInspection {
@@ -25,13 +25,13 @@ public class ImplementedDeprecatedInterface extends ImplementInspection {
             final ClassReference reference,
             final String interfaceFqn
     ) {
-        if (VersionStateManager.getInstance(project).isDeprecated(interfaceFqn)) {
+        if (UctAnalysisContext.versions(problemsHolder).isDeprecated(interfaceFqn)) {
             if (problemsHolder instanceof UctProblemsHolder) {
                 ((UctProblemsHolder) problemsHolder).setIssue(
                         SupportedIssue.IMPLEMENTED_DEPRECATED_INTERFACE
                 );
             }
-            final String deprecatedIn = VersionStateManager.getInstance(project)
+            final String deprecatedIn = UctAnalysisContext.versions(problemsHolder)
                     .getDeprecatedInVersion(interfaceFqn);
 
             problemsHolder.registerProblem(

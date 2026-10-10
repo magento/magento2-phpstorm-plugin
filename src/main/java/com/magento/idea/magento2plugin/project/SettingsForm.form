@@ -20,6 +20,8 @@
         <rowspec value="center:max(d;4px):noGrow"/>
         <rowspec value="top:3dlu:noGrow"/>
         <rowspec value="center:max(d;4px):noGrow"/>
+        <rowspec value="top:3dlu:noGrow"/>
+        <rowspec value="center:max(d;4px):noGrow"/>
         <colspec value="fill:max(d;4px):noGrow"/>
         <colspec value="left:4dlu:noGrow"/>
         <colspec value="fill:max(d;4px):noGrow"/>
@@ -42,7 +44,7 @@
           </component>
           <component id="7bde6" class="javax.swing.JLabel" binding="moduleDefaultLicenseNameLabel">
             <constraints>
-              <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
               <forms/>
             </constraints>
             <properties>
@@ -51,7 +53,7 @@
           </component>
           <component id="87330" class="javax.swing.JTextField" binding="moduleDefaultLicenseName">
             <constraints>
-              <grid row="8" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+              <grid row="10" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
               </grid>
               <forms defaultalign-horz="false"/>
@@ -125,9 +127,30 @@
               <toolTipText value="Comma-separated relative paths that the MCP CLI discovery tool should prioritize, for example bin/magento, bin/n98-magerun2, bin/cli"/>
             </properties>
           </component>
+          <component id="b51a1" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <forms/>
+            </constraints>
+            <properties>
+              <labelFor value="b51a2"/>
+              <text value="Published releases URL:"/>
+            </properties>
+          </component>
+          <component id="b51a2" class="javax.swing.JTextField" binding="publishedReleasesUrl">
+            <constraints>
+              <grid row="8" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                <preferred-size width="150" height="-1"/>
+              </grid>
+              <forms defaultalign-horz="false"/>
+            </constraints>
+            <properties>
+              <toolTipText value="Release catalog used to find Magento upgrade targets. Use a GitHub-compatible releases API URL, or leave blank for the official Magento GitHub catalog."/>
+            </properties>
+          </component>
           <component id="43433" class="javax.swing.JLabel">
             <constraints>
-              <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
               <forms/>
             </constraints>
             <properties>
@@ -138,7 +161,7 @@
           <grid id="4119d" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="4">
             <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
-              <grid row="10" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="12" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
               <forms/>
             </constraints>
             <properties/>
@@ -178,7 +201,7 @@
                     </constraints>
                     <properties>
                       <text value="Inspect"/>
-                      <toolTipText value="Install or update the bundled Magento inspect skill for the selected agent target. Use it as a starting point for project lookup and analysis tasks, then extend the skill with your own instructions, commands, and workflow conventions."/>
+                      <toolTipText value="Install or update the bundled Magento inspect skill for project lookups and backward or upgrade compatibility analysis. Extend the installed skill with your own instructions, commands, and workflow conventions."/>
                     </properties>
                   </component>
                 </children>

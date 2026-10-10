@@ -14,7 +14,7 @@ import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.CallMethodInspection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public class CalledNonApiMethod extends CallMethodInspection {
@@ -26,7 +26,7 @@ public class CalledNonApiMethod extends CallMethodInspection {
             final MethodReference methodReference,
             final Method method
     ) {
-        if (VersionStateManager.getInstance(project).isApi(method.getFQN())) {
+        if (UctAnalysisContext.versions(problemsHolder).isApi(method.getFQN())) {
             return;
         }
         final String message = SupportedIssue.CALLED_NON_API_METHOD.getMessage(method.getFQN());

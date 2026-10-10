@@ -15,7 +15,7 @@ import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.ExtendInspection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public class ExtendingDeprecatedClass extends ExtendInspection {
@@ -29,10 +29,10 @@ public class ExtendingDeprecatedClass extends ExtendInspection {
     ) {
         final String parentFqn = parentClass.getFQN();
 
-        if (!VersionStateManager.getInstance(project).isDeprecated(parentFqn)) {
+        if (!UctAnalysisContext.versions(problemsHolder).isDeprecated(parentFqn)) {
             return;
         }
-        final String deprecatedIn = VersionStateManager.getInstance(project)
+        final String deprecatedIn = UctAnalysisContext.versions(problemsHolder)
                 .getDeprecatedInVersion(parentFqn);
 
         for (final ClassReference classReference : childExtends.getReferenceElements()) {

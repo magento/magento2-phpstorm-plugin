@@ -25,6 +25,13 @@ class MagentoMcpToolsetTest {
     }
 
     @Test
+    fun testCompatibilityProviderExposesOneTypedTool() {
+        val tools = MagentoCompatibilityToolsProvider().getTools()
+        assertEquals(listOf("magento_compatibility"), tools.map { it.descriptor.name })
+        assertTrue(tools.single().descriptor.description.contains("coverage_required"))
+    }
+
+    @Test
     fun testProjectToolsetExposesExpectedToolNames() {
         val toolNames = MagentoMcpProjectToolset::class.java.declaredMethods
             .mapNotNull { it.getAnnotation(McpTool::class.java)?.name }

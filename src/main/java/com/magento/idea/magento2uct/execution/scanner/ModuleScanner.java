@@ -13,6 +13,7 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.ClassConstantReference;
@@ -120,6 +121,20 @@ public final class ModuleScanner implements Iterable<ComponentData> {
             "PMD.AvoidDeeplyNestedIfStmts"
     })
     private void findModuleComponent(final @NotNull PsiDirectory directory) {
+        findModuleComponent(directory, true);
+    }
+
+    /** Inspects one directory so background callers can release the read lock between directories. */
+    public List<ComponentData> scanDirectory(final @NotNull PsiDirectory directory) {
+        componentDataList.clear();
+        modulesQty = 0;
+        themesQty = 0;
+        findModuleComponent(directory, false);
+        return new ArrayList<>(componentDataList);
+    }
+
+    private void findModuleComponent(final @NotNull PsiDirectory directory, final boolean recursive) {
+        ProgressManager.checkCanceled();
         String name = null;
         String composerBasedName = null;
         ComponentType type = null;
@@ -169,8 +184,10 @@ public final class ModuleScanner implements Iterable<ComponentData> {
             }
         }
 
-        for (final PsiDirectory subDirectory : directory.getSubdirectories()) {
-            findModuleComponent(subDirectory);
+        if (recursive) {
+            for (final PsiDirectory subDirectory : directory.getSubdirectories()) {
+                findModuleComponent(subDirectory);
+            }
         }
     }
 

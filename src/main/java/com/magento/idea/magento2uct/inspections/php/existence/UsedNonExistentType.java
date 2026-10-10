@@ -14,7 +14,7 @@ import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.UsedTypeInspection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public class UsedNonExistentType extends UsedTypeInspection {
@@ -26,12 +26,12 @@ public class UsedNonExistentType extends UsedTypeInspection {
             final PhpClass phpClass,
             final ClassReference reference
     ) {
-        if (VersionStateManager.getInstance(project).isExists(phpClass.getFQN())) {
+        if (UctAnalysisContext.versions(problemsHolder).isExists(phpClass.getFQN())) {
             return;
         }
         final String message = SupportedIssue.USED_NON_EXISTENT_TYPE.getMessage(
                 phpClass.getFQN(),
-                VersionStateManager.getInstance(project).getRemovedInVersion(phpClass.getFQN())
+                UctAnalysisContext.versions(problemsHolder).getRemovedInVersion(phpClass.getFQN())
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {

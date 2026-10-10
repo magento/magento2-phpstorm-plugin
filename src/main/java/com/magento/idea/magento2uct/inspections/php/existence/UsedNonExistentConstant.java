@@ -16,7 +16,7 @@ import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.UsedFieldInspection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public class UsedNonExistentConstant extends UsedFieldInspection {
@@ -38,12 +38,12 @@ public class UsedNonExistentConstant extends UsedFieldInspection {
             final ClassConstImpl constant,
             final ClassConstantReference constantReference
     ) {
-        if (VersionStateManager.getInstance(project).isExists(constant.getFQN())) {
+        if (UctAnalysisContext.versions(problemsHolder).isExists(constant.getFQN())) {
             return;
         }
         final String message = SupportedIssue.USED_NON_EXISTENT_CONSTANT.getMessage(
                 constant.getFQN().replace(".", "::"),
-                VersionStateManager.getInstance(project).getRemovedInVersion(constant.getFQN())
+                UctAnalysisContext.versions(problemsHolder).getRemovedInVersion(constant.getFQN())
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {

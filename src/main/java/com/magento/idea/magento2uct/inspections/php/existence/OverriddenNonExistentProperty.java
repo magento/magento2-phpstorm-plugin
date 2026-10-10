@@ -15,7 +15,7 @@ import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.OverriddenFieldInspection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public class OverriddenNonExistentProperty extends OverriddenFieldInspection {
@@ -28,7 +28,7 @@ public class OverriddenNonExistentProperty extends OverriddenFieldInspection {
             final Field overriddenProperty,
             final PhpClass parentClass
     ) {
-        if (VersionStateManager.getInstance(project).isExists(overriddenProperty.getFQN())) {
+        if (UctAnalysisContext.versions(problemsHolder).isExists(overriddenProperty.getFQN())) {
             return;
         }
         final String messageArg = parentClass
@@ -38,7 +38,7 @@ public class OverriddenNonExistentProperty extends OverriddenFieldInspection {
 
         final String message = SupportedIssue.OVERRIDDEN_NON_EXISTENT_PROPERTY.getMessage(
                 messageArg,
-                VersionStateManager.getInstance(project).getRemovedInVersion(
+                UctAnalysisContext.versions(problemsHolder).getRemovedInVersion(
                         overriddenProperty.getFQN()
                 )
         );

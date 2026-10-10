@@ -16,7 +16,7 @@ import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.UsedFieldInspection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public class UsedNonApiProperty extends UsedFieldInspection {
@@ -28,7 +28,7 @@ public class UsedNonApiProperty extends UsedFieldInspection {
             final Field property,
             final FieldReference propertyReference
     ) {
-        if (VersionStateManager.getInstance(project).isApi(property.getFQN())) {
+        if (UctAnalysisContext.versions(problemsHolder).isApi(property.getFQN())) {
             return;
         }
         final String message = SupportedIssue.USED_NON_API_PROPERTY.getMessage(

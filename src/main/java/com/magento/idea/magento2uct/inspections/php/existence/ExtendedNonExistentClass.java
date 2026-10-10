@@ -15,7 +15,7 @@ import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.ExtendInspection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public class ExtendedNonExistentClass extends ExtendInspection {
@@ -29,12 +29,12 @@ public class ExtendedNonExistentClass extends ExtendInspection {
     ) {
         final String parentFqn = parentClass.getFQN();
 
-        if (VersionStateManager.getInstance(project).isExists(parentFqn)) {
+        if (UctAnalysisContext.versions(problemsHolder).isExists(parentFqn)) {
             return;
         }
         final String message = SupportedIssue.EXTENDED_NON_EXISTENT_CLASS.getMessage(
                 parentFqn,
-                VersionStateManager.getInstance(project).getRemovedInVersion(parentFqn)
+                UctAnalysisContext.versions(problemsHolder).getRemovedInVersion(parentFqn)
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {

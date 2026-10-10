@@ -10,11 +10,8 @@ import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.InputMismatchException;
-import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,6 +19,7 @@ public class UctProblemsHolder extends ProblemsHolder {
 
     private final Map<ProblemDescriptor, SupportedIssue> myProblemCodes = new HashMap<>();
     private SupportedIssue issue;
+    private final UctAnalysisContext analysisContext;
 
     /**
      * UCT problems holder constructor.
@@ -35,7 +33,21 @@ public class UctProblemsHolder extends ProblemsHolder {
             final @NotNull PsiFile file,
             final boolean isOnTheFly
     ) {
+        this(manager, file, isOnTheFly, null);
+    }
+
+    public UctProblemsHolder(
+            final InspectionManager manager,
+            final PsiFile file,
+            final boolean isOnTheFly,
+            final UctAnalysisContext analysisContext
+    ) {
         super(manager, file, isOnTheFly);
+        this.analysisContext = analysisContext;
+    }
+
+    public UctAnalysisContext getAnalysisContext() {
+        return analysisContext;
     }
 
     /**
@@ -68,38 +80,15 @@ public class UctProblemsHolder extends ProblemsHolder {
                             + "UctProblemsHolder.setIssue method"
             );
         }
-        final int problemCount = getMyProblems().size();
+        if (analysisContext != null && issue.getLevel().getLevel() > analysisContext.minimumSeverity().getLevel()) {
+            return;
+        }
+        final int problemCount = getResultCount();
         super.registerProblem(problemDescriptor);
 
         // if problem has been added successfully
-        if (problemCount != getMyProblems().size()) {
+        if (problemCount != getResultCount()) {
             myProblemCodes.put(problemDescriptor, issue);
-        }
-    }
-
-    /**
-     * Get my problems.
-     *
-     * @return List[ProblemDescriptor]
-     */
-    private List<ProblemDescriptor> getMyProblems() {
-        Field myProblemsField = null;
-
-        try {
-            myProblemsField = ProblemsHolder.class.getDeclaredField("myProblems");
-            myProblemsField.setAccessible(true);
-
-            @SuppressWarnings("unchecked") final List<ProblemDescriptor> myProblems =
-                    (List<ProblemDescriptor>) myProblemsField.get(this);
-            myProblemsField.setAccessible(false);
-
-            return myProblems;
-        } catch (NoSuchFieldException | IllegalAccessException | ClassCastException exception) {
-            return new ArrayList<>();
-        } finally {
-            if (myProblemsField != null) {
-                myProblemsField.setAccessible(false);
-            }
         }
     }
 }

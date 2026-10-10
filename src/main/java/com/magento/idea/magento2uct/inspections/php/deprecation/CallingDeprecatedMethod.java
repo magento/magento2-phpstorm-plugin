@@ -14,7 +14,7 @@ import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.CallMethodInspection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public class CallingDeprecatedMethod extends CallMethodInspection {
@@ -28,13 +28,13 @@ public class CallingDeprecatedMethod extends CallMethodInspection {
     ) {
         final String type = method.getFQN();
 
-        if (VersionStateManager.getInstance(project).isDeprecated(type)) {
+        if (UctAnalysisContext.versions(problemsHolder).isDeprecated(type)) {
             if (problemsHolder instanceof UctProblemsHolder) {
                 ((UctProblemsHolder) problemsHolder).setIssue(
                         SupportedIssue.CALLING_DEPRECATED_METHOD
                 );
             }
-            final String deprecatedIn = VersionStateManager.getInstance(project)
+            final String deprecatedIn = UctAnalysisContext.versions(problemsHolder)
                     .getDeprecatedInVersion(type);
 
             problemsHolder.registerProblem(
