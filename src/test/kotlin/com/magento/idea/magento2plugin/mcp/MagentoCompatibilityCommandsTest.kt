@@ -5,9 +5,13 @@
 package com.magento.idea.magento2plugin.mcp
 
 import com.intellij.testFramework.PlatformTestUtil
+import com.intellij.testFramework.IndexingTestUtil
+import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.util.indexing.FileBasedIndex
 import com.intellij.testFramework.DumbModeTestUtils
 import com.magento.idea.magento2plugin.PhysicalMagentoTestCase
 import com.magento.idea.magento2plugin.project.Settings
+import com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex
 import com.magento.idea.magento2uct.analysis.UctAnalysisRequest
 import com.magento.idea.magento2uct.analysis.UctAnalysisResult
 import com.magento.idea.magento2uct.analysis.UctAnalysisRuns
@@ -105,6 +109,38 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
         val result = call("results", "{\"runId\":\"$runId\"}")
         assertEquals(result.toString(), "completed", result.getString("state"))
         assertEquals(1, result.getJSONObject("summary").getInt("modules"))
+    }
+
+    fun testModuleNameAnalysisPrefersConfiguredRootOverIndexedRuntimeDuplicate() {
+        Settings.getInstance(project).pluginEnabled = true
+        for (directory in listOf(".runtime", "src")) {
+            myFixture.addFileToProject("$directory/app/code/Foo/Bar/etc/module.xml", "<config><module name=\"Foo_Bar\"/></config>")
+            myFixture.addFileToProject("$directory/app/code/Foo/Bar/registration.php", """
+                <?php \Magento\Framework\Component\ComponentRegistrar::register('module', 'Foo_Bar', __DIR__);
+            """.trimIndent())
+        }
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        assertEquals(2, FileBasedIndex.getInstance().getContainingFiles(
+            ModuleXmlIndex.KEY, "Foo_Bar", GlobalSearchScope.allScope(project)
+        ).size)
+
+        for ((configuredRoot, expectedDirectory) in listOf(
+            "${project.basePath}/src" to "src",
+            "src" to "src",
+            "\\src" to "src",
+            "${project.basePath}/.runtime" to ".runtime"
+        )) {
+            Settings.getInstance(project).magentoPath = configuredRoot
+            val started = call("analyze", "{\"moduleName\":\"Foo_Bar\",\"targetVersion\":\"2.4.3\"}")
+            assertTrue(started.toString(), started.has("runId"))
+            assertEquals("$expectedDirectory/app/code/Foo/Bar", started.getJSONArray("paths").getString(0))
+            val runId = started.getString("runId")
+            PlatformTestUtil.waitWithEventsDispatching("duplicate module analysis completion", { runs().results(runId).state != "running" }, 20)
+            val result = call("results", "{\"runId\":\"$runId\"}")
+            assertEquals(result.toString(), "completed", result.getString("state"))
+            assertEquals(1, result.getJSONObject("summary").getInt("modules"))
+            assertEquals(2, result.getInt("processedFiles"))
+        }
     }
 
     fun testResultPagesAndTotalsRemainStableAfterCompletion() {

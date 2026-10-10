@@ -190,14 +190,24 @@ public final class ModuleIndex {
             return null;
         }
 
+        final List<VirtualFile> moduleDirectories = new ArrayList<>();
         for (final VirtualFile virtualFile : files) {
             final VirtualFile moduleDirectory = getModuleRoot(virtualFile);
             if (moduleDirectory != null && moduleDirectory.isValid() && moduleDirectory.isDirectory()) {
-                return moduleDirectory;
+                moduleDirectories.add(moduleDirectory);
             }
         }
 
-        return null;
+        // Generated runtime copies may declare the same module name as the configured Magento source.
+        for (final String rootPath : getMagentoRootCandidates()) {
+            for (final VirtualFile moduleDirectory : moduleDirectories) {
+                if (FileUtil.isAncestor(rootPath, moduleDirectory.getPath(), true)) {
+                    return moduleDirectory;
+                }
+            }
+        }
+
+        return moduleDirectories.isEmpty() ? null : moduleDirectories.getFirst();
     }
 
     private @Nullable VirtualFile findIndexedThemeDirectory(final String themeName) {

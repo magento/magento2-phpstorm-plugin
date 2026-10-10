@@ -62,6 +62,24 @@ class ModuleIndexTest : BaseProjectTestCase() {
         assertNotNull(moduleIndex.getModuleDirectoryByModuleName("Foo_XmlOnly"))
     }
 
+    @Test
+    fun testIndexedModuleLookupPrefersConfiguredRootOverDuplicateAndSiblingRoots() {
+        val declarations = listOf(".runtime", "src-copy", "src").associateWith { directory ->
+            myFixture.addFileToProject(
+                "$directory/vendor/foo/indexed/etc/module.xml",
+                "<config><module name=\"Foo_Indexed\"/></config>"
+            ).virtualFile.parent.parent
+        }
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+        val moduleIndex = ModuleIndex(project)
+        for (directory in listOf("src", ".runtime")) {
+            Settings.getInstance(project).magentoPath = myFixture.findFileInTempDir(directory).path
+            assertEquals(declarations.getValue(directory), moduleIndex.getModuleDirectoryVirtualFileByModuleName("Foo_Indexed"))
+        }
+    }
+
     private fun prepareIndexWithWindowsStyleMagentoRoot() {
         PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
         IndexingTestUtil.waitUntilIndexesAreReady(project)
