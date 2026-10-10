@@ -85,10 +85,14 @@ class UctIndexCatalog internal constructor(
         val target = stateAt(targetVersion, baseline?.existence?.keys.orEmpty())
         fun release(version: String, state: State) = JSONObject()
             .put("version", version).put("kind", if (version in releases) "prepared" else "bundled")
+            .put("releaseSnapshotSha256", digest(stateAt(version)))
+            .put("comparisonSnapshotSha256", digest(state))
+            .put("snapshotHashScope", "comparison_state")
             .put("snapshotSha256", digest(state))
             .put("archiveSha256", releases[version]?.archiveSha256 ?: JSONObject.NULL)
         val currentHash = baseline?.let(::digest).orEmpty()
         return JSONObject().put("inspectionEngineVersion", ENGINE_VERSION)
+            .put("hashSemantics", "releaseSnapshotSha256 identifies the release state independently of the baseline. comparisonSnapshotSha256 (legacy snapshotSha256) identifies the inspection state, including baseline symbols needed to detect removals. indexRevision also includes version and suppression options; archiveSha256 identifies downloaded source bytes.")
             .put("indexRevision", sha256(listOf(ENGINE_VERSION, currentVersion.orEmpty(), targetVersion,
                 ignoreCurrentVersion.toString(), currentHash, digest(target))))
             .put("current", if (baseline == null) JSONObject.NULL else release(currentVersion, baseline))
@@ -159,7 +163,7 @@ class UctIndexCatalog internal constructor(
     }
 
     companion object {
-        const val ENGINE_VERSION = "uct-2"
+        const val ENGINE_VERSION = "uct-3"
         private fun sha256(parts: List<String>): String {
             val digest = MessageDigest.getInstance("SHA-256")
             parts.forEach { digest.update(it.toByteArray(Charsets.UTF_8)); digest.update(0.toByte()) }

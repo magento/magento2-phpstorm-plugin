@@ -142,15 +142,23 @@ class UctReleasePreparationTest : PhysicalMagentoTestCase() {
         assertFalse(delta.isDeprecated(deprecated))
     }
 
-    fun testProjectStoresOwnTheirRunsAndEvictOldJobs() {
+    fun testArchivedPreparationsSurviveEvictionAndRestartWithinTheirProjectCache() {
         val ids = arrayListOf<String>()
         repeat(6) { number ->
             val version = "2.4.${number + 5}"
             val started = preparation.start(version) { _, _, _ -> UctReleaseFixture.index(version) }
             await(started.runId!!); ids += started.runId
         }
-        assertThrows(IllegalArgumentException::class.java) { preparation.results(ids.first()) }
-        val other = UctReleasePreparation(project, cache, UctReleaseSource())
+        assertEquals("completed", preparation.results(ids.first()).state)
+        assertTrue(preparation.reportInfo(ids.first()).getBoolean("saved"))
+        val reopened = UctReleasePreparation(project, cache, UctReleaseSource())
+        try {
+            assertTrue(reopened.owns(ids.first()))
+            assertEquals("completed", reopened.results(ids.first()).state)
+            assertEquals(preparation.results(ids.last()).summary.toString(), reopened.results(ids.last()).summary.toString())
+            assertEquals("completed", reopened.cancel(ids.first()).state)
+        } finally { reopened.dispose() }
+        val other = UctReleasePreparation(project, Files.createTempDirectory("other-preparation-reports-"), UctReleaseSource())
         try { assertThrows(IllegalArgumentException::class.java) { other.results(ids.last()) } }
         finally { other.dispose() }
     }

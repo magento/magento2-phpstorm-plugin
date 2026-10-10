@@ -126,4 +126,23 @@ class UctIndexCatalogTest {
         assertEquals(identity, catalog.identity(null, "2.4.3", false).toString())
     }
 
+    @Test
+    fun releaseHashesStayStableWhileComparisonHashesIncludeBaselineSymbols() {
+        val first = UctReleaseFixture.index("2.4.8-p1", setOf("\\Magento\\Test\\FirstBaselineOnly"))
+        val second = UctReleaseFixture.index("2.4.8-p5", setOf("\\Magento\\Test\\SecondBaselineOnly"))
+        val target = UctReleaseFixture.index("2.4.9")
+        val catalog = fixtureCatalog().withReleases(listOf(first, second, target).associateBy { it.version })
+        val firstIdentity = catalog.identity(first.version, target.version, true)
+        val secondIdentity = catalog.identity(second.version, target.version, true)
+        val firstTarget = firstIdentity.getJSONObject("target")
+        val secondTarget = secondIdentity.getJSONObject("target")
+        assertEquals(firstTarget.getString("archiveSha256"), secondTarget.getString("archiveSha256"))
+        assertEquals(firstTarget.getString("releaseSnapshotSha256"), secondTarget.getString("releaseSnapshotSha256"))
+        assertNotEquals(firstTarget.getString("comparisonSnapshotSha256"), secondTarget.getString("comparisonSnapshotSha256"))
+        assertEquals(firstTarget.getString("snapshotSha256"), firstTarget.getString("comparisonSnapshotSha256"))
+        assertEquals("comparison_state", firstTarget.getString("snapshotHashScope"))
+        assertNotEquals(firstIdentity.getString("indexRevision"), secondIdentity.getString("indexRevision"))
+        assertEquals(firstIdentity.toString(), catalog.identity(first.version, target.version, true).toString())
+    }
+
 }

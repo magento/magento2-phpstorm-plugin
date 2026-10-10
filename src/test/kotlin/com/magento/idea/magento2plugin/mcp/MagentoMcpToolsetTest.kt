@@ -18,11 +18,17 @@ class MagentoMcpToolsetTest {
         assertEquals(
             setOf(
                 "magento_scaffold",
-                "magento_inspect",
-                "magento_compatibility"
+                "magento_inspect"
             ),
             toolNames
         )
+    }
+
+    @Test
+    fun testCompatibilityProviderExposesOneTypedTool() {
+        val tools = MagentoCompatibilityToolsProvider().getTools()
+        assertEquals(listOf("magento_compatibility"), tools.map { it.descriptor.name })
+        assertTrue(tools.single().descriptor.description.contains("coverage_required"))
     }
 
     @Test

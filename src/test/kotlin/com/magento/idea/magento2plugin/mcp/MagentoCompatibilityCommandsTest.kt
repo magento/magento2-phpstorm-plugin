@@ -50,19 +50,26 @@ import java.util.concurrent.atomic.AtomicBoolean
 import org.junit.Assert.assertThrows
 
 class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
+    override fun setUp() {
+        super.setUp()
+        // Every case owns its cache; invalid/cancelled preparation never touches an installed IDE cache.
+        val preparation = UctReleasePreparation(project, Files.createTempDirectory("compatibility-test-releases-"), UctReleaseSource())
+        val analyses = UctAnalysisRuns(project, Files.createTempDirectory("compatibility-test-reports-"))
+        Disposer.register(testRootDisposable, preparation)
+        Disposer.register(testRootDisposable, analyses)
+        project.getService(UctReleasePreparation::class.java)
+        project.getService(UctAnalysisRuns::class.java)
+        project.replaceService(UctReleasePreparation::class.java, preparation, testRootDisposable)
+        project.replaceService(UctAnalysisRuns::class.java, analyses, testRootDisposable)
+    }
+
     private fun call(mode: String, json: String = "{}"): JSONObject =
         JSONObject(MagentoCompatibilityCommands.execute(project, mode, JSONObject(json)))
 
     private fun request() = UctAnalysisRequest(listOf(project.basePath!!), null, "2.4.3", IssueSeverityLevel.WARNING, false)
     private fun runs() = project.getService(UctAnalysisRuns::class.java)
 
-    private fun nativeTool(): McpTool {
-        val asTools = Class.forName("com.intellij.mcpserver.impl.util.ToolsetReflection_utilKt")
-            .getMethod("asTools", McpToolset::class.java, Json::class.java)
-        @Suppress("UNCHECKED_CAST")
-        val tools = asTools.invoke(null, MagentoMcpToolset(), Json.Default) as List<McpTool>
-        return tools.single { it.descriptor.name == "magento_compatibility" }
-    }
+    private fun nativeTool(): McpTool = MagentoCompatibilityToolsProvider().getTools().single()
 
     private fun nativeResult(arguments: String = "{}"): McpToolCallResult {
         val tool = nativeTool()
@@ -84,19 +91,21 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
         val result = nativeResult(arguments)
         val text = result.content.filterIsInstance<McpToolCallResultContent.Text>().single().text
         assertEquals(text, expectedError, result.isError)
-        assertEquals(Json.parseToJsonElement(text), result.structuredContent)
-        // Exercise the actual transport adapter: error structuredContent is intentionally omitted by JetBrains.
+        assertNull(result.structuredContent)
+        // Exercise the real transport: successes, errors and documentation all use JSON text.
         val wire = transportResult(result)
         val wireText = wire.content.filterIsInstance<TextContent>().single().text
         assertEquals(text, wireText)
         assertEquals(expectedError, wire.isError)
-        if (wire.structuredContent != null) assertEquals(Json.parseToJsonElement(wireText), wire.structuredContent)
+        assertNull(wire.structuredContent)
+        val envelope = JSONObject(wireText)
+        for (key in listOf("schemaVersion", "operation", "state", "terminal", "successful", "complete", "pollRequired", "error", "nextCall", "nextStep", "retryAfterMs")) assertTrue(key, envelope.has(key))
         return JSONObject(wireText)
     }
 
     private fun followNative(next: JSONObject): JSONObject {
         val arguments = JSONObject(next.getJSONObject("arguments").toString())
-        assertEquals(project.basePath, arguments.remove("projectPath"))
+        assertEquals(project.basePath, arguments.getString("projectPath"))
         assertEquals("magento_compatibility", next.getString("tool"))
         return nativeCall(arguments.toString())
     }
@@ -147,6 +156,9 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
                 val result = followNative(started.getJSONObject("nextCall"))
                 assertEquals(result.toString(), "completed", result.getString("state"))
                 assertTrue(result.getBoolean("releaseDataReady"))
+                assertEquals("call", result.getString("nextStep"))
+                assertTrue(result.getBoolean("terminal"))
+                assertFalse(result.getBoolean("pollRequired"))
                 assertTrue(result.getJSONObject("summary").getInt("existenceSymbols") > 0)
                 val continuation = result.getJSONObject("nextCall").getJSONObject("arguments")
                 assertEquals("2.4.9", continuation.getString("targetVersion"))
@@ -234,6 +246,7 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
             assertTrue(readiness.getBoolean("releaseDataReady"))
             assertFalse(readiness.getBoolean("ready"))
             assertEquals(500, status.getInt("retryAfterMs"))
+            assertEquals("poll", status.getString("nextStep"))
             val next = status.getJSONObject("nextCall").getJSONObject("arguments")
             assertEquals("status", next.getString("mode"))
             assertEquals("2.4.3", next.getString("targetVersion"))
@@ -371,10 +384,24 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
         assertTrue(schema.requiredProperties.isEmpty())
         val properties = JSONObject(schema.propertiesSchema.toString())
         assertFalse(properties.has("parametersJson"))
-        for ((name, type) in listOf("moduleName" to "string", "targetVersion" to "string", "analysisTargetVersion" to "string", "runId" to "string", "limit" to "integer", "ignoreCurrentVersion" to "boolean")) {
+        for ((name, type) in listOf("projectPath" to "string", "moduleName" to "string", "targetVersion" to "string", "analysisTargetVersion" to "string", "runId" to "string", "limit" to "integer", "ignoreCurrentVersion" to "boolean")) {
             assertTrue(name, properties.has(name))
             assertTrue(properties.getJSONObject(name).toString(), properties.getJSONObject(name).toString().contains(type))
         }
+    }
+
+    fun testProjectPathWorksForStatusAndDocumentationAndRejectsWrongProject() {
+        for (mode in listOf("status", "help", "detailed_schema")) {
+            val response = nativeCall(JSONObject().put("mode", mode).put("projectPath", project.basePath).toString())
+            assertTrue(response.getBoolean("successful"))
+            assertEquals(project.basePath, response.getString("projectPath"))
+            val rejected = nativeCall(JSONObject().put("mode", mode).put("projectPath", project.basePath + "/wrong").toString(), expectedError = true)
+            assertEquals("projectPath", rejected.getJSONObject("error").getString("parameter"))
+            val badType = nativeCall(JSONObject().put("mode", mode).put("projectPath", 123).toString(), expectedError = true)
+            assertEquals("projectPath", badType.getJSONObject("error").getString("parameter"))
+        }
+        val rejected = nativeCall(JSONObject().put("mode", "status").put("projectPath", project.basePath + "/wrong").toString(), expectedError = true)
+        assertEquals("projectPath", rejected.getJSONObject("error").getString("parameter"))
     }
 
     fun testNativeMcpCallsUseDefaultStatusAndTypedAnalyzeAndResults() {
@@ -400,7 +427,10 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
     fun testStatusRemainsAvailableWhileIndexingAndAnalysisExplainsWhyItCannotStart() {
         Settings.getInstance(project).pluginEnabled = true
         DumbModeTestUtils.runInDumbModeSynchronously(project) {
-            assertTrue(call("status").getBoolean("indexing"))
+            val status = call("status", """{"targetVersion":"2.4.3"}""")
+            assertTrue(status.getBoolean("indexing"))
+            assertTrue(status.getBoolean("pollRequired"))
+            assertFalse(status.getBoolean("terminal"))
             val result = call("analyze")
             assertFalse(result.getBoolean("complete"))
             assertTrue(result.getJSONObject("error").getString("message").contains("Indexes are not ready"))
@@ -486,6 +516,65 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
         assertTrue(project.getService(UctReleasePreparation::class.java).activeRunIds().isEmpty())
     }
 
+    fun testNextStepDistinguishesStatusSuccessFromAnalysisReadiness() {
+        Settings.getInstance(project).pluginEnabled = true
+        val selection = nativeCall()
+        assertTrue(selection.getBoolean("successful"))
+        assertFalse(selection.getJSONObject("readiness").getBoolean("ready"))
+        assertEquals("select_target", selection.getString("nextStep"))
+
+        val missing = nativeCall("""{"mode":"status","targetVersion":"9.9.9"}""")
+        assertTrue(missing.getBoolean("successful"))
+        assertFalse(missing.getJSONObject("readiness").getBoolean("ready"))
+        assertFalse(missing.getBoolean("pollRequired"))
+        assertEquals("call", missing.getString("nextStep"))
+        assertEquals("prepare", missing.getJSONObject("nextCall").getJSONObject("arguments").getString("mode"))
+
+        val ready = nativeCall("""{"mode":"status","targetVersion":"2.4.3"}""")
+        assertTrue(ready.getJSONObject("readiness").getBoolean("ready"))
+        assertEquals("analyze", ready.getString("nextStep"))
+        assertTrue(ready.isNull("nextCall"))
+
+        Settings.getInstance(project).pluginEnabled = false
+        val disabled = nativeCall("""{"mode":"status","targetVersion":"2.4.3"}""")
+        assertTrue(disabled.getBoolean("successful"))
+        assertFalse(disabled.getJSONObject("readiness").getBoolean("ready"))
+        assertEquals("enable_support", disabled.getString("nextStep"))
+    }
+
+    fun testNestedMagentoRootPathErrorSuggestsAnExplicitProjectRelativeRetry() {
+        Settings.getInstance(project).pluginEnabled = true
+        Settings.getInstance(project).magentoPath = "src"
+        val file = myFixture.addFileToProject("src/app/code/Application/Blog/Example.php", "<?php class Example {}")
+        val rejected = nativeCall("""{"mode":"analyze","path":"app/code/Application/Blog/Example.php","targetVersion":"2.4.3"}""", expectedError = true)
+        assertEquals("resolve_error", rejected.getString("nextStep"))
+        val error = rejected.getJSONObject("error")
+        assertEquals("path", error.getString("parameter"))
+        assertEquals(project.basePath, error.getString("pathBase"))
+        assertEquals("${project.basePath}/src", error.getString("magentoRoot"))
+        assertEquals("src/app/code/Application/Blog/Example.php", error.getString("suggestedPath"))
+        assertTrue(runs().activeRunIds().isEmpty())
+
+        val started = nativeCall(JSONObject().put("mode", "analyze").put("projectPath", project.basePath)
+            .put("path", error.getString("suggestedPath")).put("targetVersion", "2.4.3").toString())
+        val id = started.getString("runId")
+        PlatformTestUtil.waitWithEventsDispatching("nested module path scan", { runs().results(id).state != "running" }, 20)
+        val result = followNative(started.getJSONObject("nextCall"))
+        assertEquals("done", result.getString("nextStep"))
+        assertEquals(1, result.getInt("processedFiles"))
+        assertEquals(listOf("src/app/code/Application/Blog/Example.php"), result.getJSONArray("paths").toList())
+
+        // An existing IDE-project-relative path stays authoritative even if a nested copy exists.
+        myFixture.addFileToProject("app/code/Application/Blog/Example.php", "<?php class OuterExample {}")
+        val direct = MagentoCompatibilityCommands.request(project, JSONObject()
+            .put("path", "app/code/Application/Blog/Example.php").put("targetVersion", "2.4.3"))
+        assertFalse(direct.paths.contains(file.virtualFile.path))
+        assertEquals(listOf("${project.basePath}/app/code/Application/Blog/Example.php"), direct.paths)
+
+        val absent = nativeCall("""{"mode":"analyze","path":"missing.php","targetVersion":"2.4.3"}""", expectedError = true)
+        assertFalse(absent.getJSONObject("error").has("suggestedPath"))
+    }
+
     fun testUnsupportedSingleFilesAreRejectedBeforeStartingJobs() {
         Settings.getInstance(project).pluginEnabled = true
         for ((path, contents) in listOf("README.md" to "# Module", "composer.json" to "{}", "script.js" to "void 0;")) {
@@ -540,6 +629,9 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
         val cached = nativeCall("""{"mode":"prepare","targetVersion":"2.4.9","analysisTargetVersion":"2.4.10","currentVersion":"2.4.3","ignoreCurrentVersion":true}""")
         assertTrue(cached.getBoolean("complete"))
         assertTrue(cached.isNull("runId"))
+        assertEquals("call", cached.getString("nextStep"))
+        assertTrue(cached.getBoolean("terminal"))
+        assertFalse(cached.getBoolean("pollRequired"))
         val status = followNative(cached.getJSONObject("nextCall"))
         assertEquals("2.4.10", status.getJSONObject("readiness").getString("targetVersion"))
         assertEquals("2.4.3", status.getJSONObject("defaults").getString("currentVersion"))
@@ -563,10 +655,10 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
     }
 
     fun testMissingNativeProjectContextReturnsAStructuredMcpError() {
-        val result = runBlocking { MagentoMcpToolset().magentoCompatibility() }
+        val result = runBlocking { nativeTool().call(JsonObject(emptyMap())) }
         assertTrue(result.isError)
         val text = result.content.filterIsInstance<McpToolCallResultContent.Text>().single().text
-        assertEquals(Json.parseToJsonElement(text), result.structuredContent)
+        assertNull(result.structuredContent)
         val error = JSONObject(text).getJSONObject("error")
         assertEquals("unavailable", error.getString("code"))
         assertTrue(error.getString("message").contains("project context"))
@@ -595,7 +687,6 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
         myFixture.addFileToProject("Sample.php", "<?php class Sample {}")
         for (parameters in listOf(
             "{}", "{\"path\":\"Sample.php\",\"moduleName\":\"Foo_Bar\"}",
-            "{\"path\":\"Sample.php\",\"targetVersion\":\"99.0.0\"}",
             "{\"path\":\"Sample.php\",\"targetVersion\":\"2.4.3\",\"ignoreCurrentVersion\":\"true\"}",
             "{\"path\":\"Sample.php\",\"targetVersion\":\"2.4.3\",\"minimumSeverity\":\"info\"}",
             "{\"path\":\"..\",\"targetVersion\":\"2.4.3\"}",
@@ -687,6 +778,9 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
         assertEquals(3, second.getJSONArray("findings").getJSONObject(0).getInt("line"))
         assertFalse(second.getBoolean("hasMore"))
         assertTrue(second.isNull("nextOffset"))
+        assertEquals("call", first.getString("nextStep"))
+        assertTrue(first.getBoolean("terminal"))
+        assertFalse(first.getBoolean("pollRequired"))
         val next = first.getJSONObject("nextCall").getJSONObject("arguments")
         assertEquals(project.basePath, next.getString("projectPath"))
         assertEquals("results", next.getString("mode"))
@@ -694,6 +788,7 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
         next.remove("projectPath")
         assertEquals(second.getJSONArray("findings").toString(), call("results", next.toString()).getJSONArray("findings").toString())
         assertTrue(second.isNull("nextCall"))
+        assertEquals("done", second.getString("nextStep"))
         assertEquals("completed", call("cancel", "{\"runId\":\"${started.runId}\"}").getString("state"))
     }
 
@@ -730,8 +825,8 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
         }
     }
 
-    fun testOldRunsExpireAndDifferentRunStoresCannotAccessThem() {
-        val other = UctAnalysisRuns(project)
+    fun testOldRunsReloadFromReportsAndDifferentRunStoresCannotAccessThem() {
+        val other = UctAnalysisRuns(project, Files.createTempDirectory("other-analysis-history-"))
         val ids = arrayListOf<String>()
         try {
             repeat(6) {
@@ -739,7 +834,10 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
                 ids += started.runId
                 PlatformTestUtil.waitWithEventsDispatching("analysis completion", { runs().results(started.runId).state != "running" }, 10)
             }
-            assertEquals("failed", call("results", "{\"runId\":\"${ids.first()}\"}").getString("state"))
+            val archived = call("results", "{\"runId\":\"${ids.first()}\"}")
+            assertEquals("completed", archived.getString("state"))
+            assertTrue(archived.getJSONObject("report").getBoolean("saved"))
+            assertTrue(Files.isRegularFile(java.nio.file.Path.of(archived.getJSONObject("report").getString("path"))))
             assertEquals("completed", runs().results(ids.last()).state)
             assertThrows(IllegalArgumentException::class.java) { other.results(ids.last()) }
         } finally {
@@ -780,6 +878,9 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
         assertEquals(1, result.getJSONObject("scope").getJSONObject("fileTypeCounts").getInt("php"))
         assertEquals(1, result.getJSONObject("scope").getInt("testFiles"))
         assertEquals(0, result.getJSONObject("suppression").getInt("total"))
+        assertEquals(0, result.getJSONObject("suppression").getInt("suppressedDiagnostics"))
+        assertEquals(result.getJSONObject("summary").getInt("totalIssues"), result.getJSONObject("summary").getInt("displayedFindings"))
+        assertEquals("upgrade_changes", result.getString("findingsScope"))
         assertEquals(identity.toString(), call("status", """{"currentVersion":"2.4.2","targetVersion":"2.4.3","ignoreCurrentVersion":true}""").getJSONObject("analysisIdentity").toString())
         val invalid = nativeCall("""{"mode":"analyze","path":"Test/Sample.php","targetVersion":"2.4.3","explainSuppressed":true}""", expectedError = true)
         assertEquals("explainSuppressed", invalid.getJSONObject("error").getString("parameter"))
@@ -795,6 +896,11 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
         myFixture.addFileToProject("composer.lock", """{"packages":[{"name":"magento/magento2-base","version":"2.4.8-p5"}]}""")
         val result = nativeCall("""{"mode":"releases"}""")
         assertEquals("2.4.9", result.getJSONObject("nextMinorRelease").getString("version"))
+        assertFalse(result.has("releases"))
+        assertEquals(2, result.getInt("releaseCount"))
+        val full = nativeCall("""{"mode":"releases","includeReleases":true}""")
+        assertEquals(2, full.getJSONArray("releases").length())
+        assertTrue(full.getBoolean("cacheHit"))
         assertEquals("2.4.9", result.getJSONObject("nextCall").getJSONObject("arguments").getString("targetVersion"))
         assertEquals("2.4.8-p5", result.getJSONObject("nextCall").getJSONObject("arguments").getString("currentVersion"))
         assertTrue(nativeCall("""{"mode":"releases"}""").getBoolean("cacheHit"))
@@ -843,6 +949,242 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
             settings.publishedReleasesUrl = originalUrl
             server.stop(0)
         }
+    }
+
+    fun testRawNativeArgumentTypesAlwaysReturnJsonValidationErrors() {
+        for ((arguments, parameter) in listOf(
+            "{\"mode\":42}" to "mode",
+            "{\"mode\":\"results\",\"runId\":\"unknown\",\"limit\":1.5}" to "limit",
+            "{\"mode\":\"results\",\"runId\":\"unknown\",\"offset\":2147483648}" to "offset",
+            "{\"mode\":\"results\",\"runId\":true}" to "runId",
+            "{\"mode\":\"status\",\"ignoreCurrentVersion\":\"false\"}" to "ignoreCurrentVersion",
+            "{\"mode\":\"status\",\"targetVersion\":[]}" to "targetVersion",
+            "{\"mode\":\"releases\",\"includeReleases\":1}" to "includeReleases"
+        )) {
+            val result = nativeCall(arguments, expectedError = true)
+            assertEquals(parameter, result.getJSONObject("error").getString("parameter"))
+            assertTrue(result.getBoolean("terminal"))
+            assertFalse(result.getBoolean("successful"))
+            assertFalse(result.getBoolean("pollRequired"))
+            assertFalse(result.getJSONObject("error").getBoolean("recoverable"))
+            assertTrue(result.isNull("nextCall"))
+        }
+    }
+
+    fun testCoverageRequiredIsRecoverableAndNotAValidationFailure() {
+        Settings.getInstance(project).pluginEnabled = true
+        myFixture.addFileToProject("Sample.php", "<?php class Sample {}")
+        val result = nativeCall("""{"mode":"analyze","path":"Sample.php","targetVersion":"9.9.9"}""", expectedError = true)
+        assertEquals("blocked", result.getString("state"))
+        assertEquals("coverage_required", result.getJSONObject("error").getString("code"))
+        assertEquals("call", result.getString("nextStep"))
+        assertTrue(result.getJSONObject("error").getBoolean("recoverable"))
+        assertFalse(result.getBoolean("terminal"))
+        assertFalse(result.getBoolean("pollRequired"))
+        assertEquals("prepare", result.getJSONObject("nextCall").getJSONObject("arguments").getString("mode"))
+        assertFalse(result.has("runId"))
+    }
+
+    fun testTerminalFlagsDistinguishCancellationFailureAndSuccessfulPagination() {
+        val gate = CountDownLatch(1)
+        try {
+            val run = runs().start(request()) { gate.await(10, TimeUnit.SECONDS); UctAnalysisResult(emptyList(), 0, 0, 0) }
+            val running = nativeCall("""{"mode":"results","runId":"${run.runId}"}""")
+            assertFalse(running.getBoolean("terminal"))
+            assertTrue(running.getBoolean("pollRequired"))
+            val cancelled = nativeCall("""{"mode":"cancel","runId":"${run.runId}"}""")
+            assertTrue(cancelled.getBoolean("terminal"))
+            assertEquals("done", cancelled.getString("nextStep"))
+            assertFalse(cancelled.getBoolean("successful"))
+            assertFalse(cancelled.getBoolean("complete"))
+            assertFalse(cancelled.getBoolean("pollRequired"))
+            assertTrue(cancelled.getJSONObject("report").getBoolean("saved"))
+        } finally { gate.countDown() }
+        val failed = runs().start(request()) { throw IllegalStateException("fixture failure") }
+        PlatformTestUtil.waitWithEventsDispatching("failed run", { runs().results(failed.runId).state != "running" }, 10)
+        val failure = nativeCall("""{"mode":"results","runId":"${failed.runId}"}""", expectedError = true)
+        assertTrue(failure.getBoolean("terminal"))
+        assertEquals("resolve_error", failure.getString("nextStep"))
+        assertFalse(failure.getBoolean("pollRequired"))
+        assertFalse(failure.getBoolean("successful"))
+        assertTrue(failure.getJSONObject("report").getBoolean("saved"))
+    }
+
+    fun testReportsPreserveEveryFindingAndReloadAfterServiceRestart() {
+        val cache = Files.createTempDirectory("analysis-restart-reports-")
+        val original = UctAnalysisRuns(project, cache)
+        val findings = (1..201).map { UctFinding("${project.basePath}/Sample.php", it, 1, "finding $it", SupportedIssue.CALLING_DEPRECATED_METHOD) }
+        val request = request().copy(explainSuppressed = true)
+        val result = UctAnalysisResult(findings, 3, 1, 0, "{\"indexRevision\":\"fixture\"}", mapOf("php" to 3), 1, mapOf(1439 to 7), mapOf("warning" to 7))
+        val run = original.start(request) { result }
+        try {
+            PlatformTestUtil.waitWithEventsDispatching("archived analysis", { original.results(run.runId).state != "running" }, 10)
+            val report = JSONObject(Files.readString(java.nio.file.Path.of(original.reportInfo(run.runId).getString("path"))))
+            assertEquals(201, report.getJSONObject("result").getJSONArray("findings").length())
+            original.dispose()
+            val restarted = UctAnalysisRuns(project, cache)
+            try {
+                assertEquals(result, restarted.results(run.runId).result)
+                assertEquals(request, restarted.results(run.runId).request)
+                assertEquals("completed", restarted.cancel(run.runId).state)
+            } finally { restarted.dispose() }
+        } finally { original.dispose() }
+    }
+
+    fun testCompatibilityProviderIsRegisteredOnceAndHelpNeedsNoProject() {
+        val exposed = com.intellij.mcpserver.McpToolsProvider.EP.extensionList.flatMap { it.getTools() }
+            .filter { it.descriptor.name == "magento_compatibility" }
+        assertEquals(1, exposed.size)
+        val result = runBlocking { exposed.single().call(Json.parseToJsonElement("""{"mode":"help"}""").jsonObject) }
+        assertFalse(result.isError)
+        assertNull(result.structuredContent)
+        val body = JSONObject(result.content.filterIsInstance<McpToolCallResultContent.Text>().single().text)
+        assertTrue(body.getBoolean("terminal"))
+        assertTrue(body.getString("documentation").contains("pollRequired"))
+    }
+
+    private fun publishedFixture(vararg versions: String) {
+        val source = com.magento.idea.magento2uct.analysis.UctPublishedReleases(
+            { Settings.DEFAULT_PUBLISHED_RELEASES_URL }, { _ -> JSONArray(versions.map {
+                JSONObject().put("tag_name", it).put("draft", false).put("prerelease", false)
+                    .put("published_at", "2026-05-12T00:00:00Z")
+                    .put("html_url", "https://github.com/magento/magento2/releases/tag/$it")
+            }).toString() }, { java.time.Instant.parse("2026-10-10T00:00:00Z") })
+        project.getService(com.magento.idea.magento2uct.analysis.UctPublishedReleases::class.java)
+        project.replaceService(com.magento.idea.magento2uct.analysis.UctPublishedReleases::class.java, source, testRootDisposable)
+    }
+
+    fun testUpgradePresetFollowsCompleteRequestAcrossPreparationAndServiceRestarts() {
+        Settings.getInstance(project).pluginEnabled = true
+        myFixture.addFileToProject("composer.lock", """{"packages":[{"name":"magento/magento2-base","version":"2.4.8-p5"}]}""")
+        myFixture.addFileToProject("Sample.php", "<?php class Sample {}")
+        publishedFixture("2.4.8-p5", "2.4.9")
+        val server = HttpServer.create(InetSocketAddress("127.0.0.1", 0), 0)
+        val downloads = AtomicInteger()
+        server.createContext("/") { exchange ->
+            downloads.incrementAndGet()
+            val bytes = UctReleaseFixture.archive(exchange.requestURI.path.removePrefix("/"))
+            exchange.sendResponseHeaders(200, bytes.size.toLong())
+            exchange.responseBody.use { it.write(bytes) }
+        }
+        server.start()
+        val cache = Files.createTempDirectory("upgrade-workflow-cache-")
+        fun restartPreparation(): UctReleasePreparation {
+            val service = UctReleasePreparation(project, cache, UctReleaseSource { "http://127.0.0.1:${server.address.port}/$it" })
+            Disposer.register(testRootDisposable, service)
+            project.replaceService(UctReleasePreparation::class.java, service, testRootDisposable)
+            return service
+        }
+        var preparation = restartPreparation()
+        try {
+            var response = nativeCall("""{"mode":"upgrade","path":"Sample.php","minimumSeverity":"error"}""")
+            assertEquals("2.4.9", response.getJSONObject("releaseDiscovery").getJSONObject("nextMinorRelease").getString("version"))
+            for (version in listOf("2.4.8-p5", "2.4.9")) {
+                val next = response.getJSONObject("nextCall").getJSONObject("arguments")
+                assertEquals("prepare", next.getString("mode"))
+                assertEquals(version, next.getString("targetVersion"))
+                assertEquals("Sample.php", next.getString("path"))
+                assertEquals("error", next.getString("minimumSeverity"))
+                assertTrue(next.getBoolean("explainSuppressed"))
+                val started = followNative(response.getJSONObject("nextCall"))
+                val runId = started.getString("runId")
+                PlatformTestUtil.waitWithEventsDispatching("upgrade preparation", { preparation.results(runId).state != "running" }, 20)
+                preparation.dispose()
+                preparation = restartPreparation()
+                val completed = followNative(started.getJSONObject("nextCall"))
+                assertEquals("completed", completed.getString("state"))
+                response = followNative(completed.getJSONObject("nextCall"))
+            }
+            assertEquals(2, downloads.get())
+            assertTrue(response.getJSONObject("readiness").getBoolean("ready"))
+            val next = response.getJSONObject("nextCall").getJSONObject("arguments")
+            assertEquals("analyze", next.getString("mode"))
+            assertEquals("2.4.8-p5", next.getString("currentVersion"))
+            assertEquals("2.4.9", next.getString("targetVersion"))
+            assertTrue(next.getBoolean("ignoreCurrentVersion"))
+            assertTrue(next.getBoolean("explainSuppressed"))
+            val started = followNative(response.getJSONObject("nextCall"))
+            PlatformTestUtil.waitWithEventsDispatching("upgrade analysis", { runs().results(started.getString("runId")).state != "running" }, 20)
+            val result = followNative(started.getJSONObject("nextCall"))
+            assertEquals("done", result.getString("nextStep"))
+            assertEquals("upgrade_changes", result.getString("findingsScope"))
+            assertEquals("error", result.getString("minimumSeverity"))
+            assertEquals(0, result.getJSONObject("summary").getInt("displayedFindings"))
+            assertEquals(0, result.getJSONObject("suppression").getInt("suppressedDiagnostics"))
+        } finally { server.stop(0) }
+    }
+
+    fun testUpgradeExplicitTargetAndOverridesAvoidReleaseDiscovery() {
+        Settings.getInstance(project).pluginEnabled = true
+        myFixture.addFileToProject("Sample.php", "<?php class Sample {}")
+        val result = nativeCall("""{"mode":"upgrade","path":"Sample.php","currentVersion":"2.4.2","targetVersion":"2.4.3","ignoreCurrentVersion":false}""")
+        assertTrue(result.isNull("releaseDiscovery"))
+        val next = result.getJSONObject("nextCall").getJSONObject("arguments")
+        assertEquals("analyze", next.getString("mode"))
+        assertFalse(next.getBoolean("ignoreCurrentVersion"))
+        assertFalse(next.getBoolean("explainSuppressed"))
+        assertEquals("2.4.3", next.getString("targetVersion"))
+    }
+
+    fun testUpgradeWithoutANewerReleaseDoesNotStartAJob() {
+        publishedFixture("2.4.9")
+        val result = nativeCall("""{"mode":"upgrade","path":"Sample.php","currentVersion":"2.4.9"}""")
+        assertEquals("no_newer_release", result.getString("outcome"))
+        assertEquals("done", result.getString("nextStep"))
+        assertTrue(result.isNull("nextCall"))
+        assertTrue(runs().activeRunIds().isEmpty())
+    }
+
+    fun testUpgradeWithDisabledSupportRequiresEnablingItWithoutStartingWork() {
+        Settings.getInstance(project).pluginEnabled = false
+        val result = nativeCall("""{"mode":"upgrade","path":"Sample.php","currentVersion":"2.4.2","targetVersion":"2.4.3"}""")
+        assertEquals("enable_support", result.getString("nextStep"))
+        assertFalse(result.getJSONObject("readiness").getBoolean("ready"))
+        assertTrue(result.isNull("nextCall"))
+        assertTrue(runs().activeRunIds().isEmpty())
+    }
+
+    fun testUpgradeRejectsInvalidScopeAndOptionsBeforeDiscovery() {
+        for ((json, parameter) in listOf(
+            """{"mode":"upgrade","currentVersion":"2.4.8-p5"}""" to "path",
+            """{"mode":"upgrade","path":"Sample.php","moduleName":"Foo_Bar","currentVersion":"2.4.8-p5"}""" to "path",
+            """{"mode":"upgrade","path":"Sample.php","currentVersion":"2.4.8-p5","minimumSeverity":"info"}""" to "minimumSeverity",
+            """{"mode":"upgrade","path":"Sample.php","currentVersion":"2.4.8-p5","ignoreCurrentVersion":false,"explainSuppressed":true}""" to "explainSuppressed"
+        )) {
+            val result = nativeCall(json, expectedError = true)
+            assertEquals(parameter, result.getJSONObject("error").getString("parameter"))
+            assertEquals("resolve_error", result.getString("nextStep"))
+            assertTrue(result.isNull("nextCall"))
+        }
+    }
+
+    fun testScopedStatusPreservesOptionsWhileIndexing() {
+        Settings.getInstance(project).pluginEnabled = true
+        DumbModeTestUtils.runInDumbModeSynchronously(project) {
+            val result = nativeCall("""{"mode":"upgrade","moduleName":"Foo_Bar","currentVersion":"2.4.2","targetVersion":"2.4.3","minimumSeverity":"critical"}""")
+            assertEquals("poll", result.getString("nextStep"))
+            assertFalse(result.getJSONObject("readiness").getBoolean("ready"))
+            val next = result.getJSONObject("nextCall").getJSONObject("arguments")
+            assertEquals("status", next.getString("mode"))
+            assertEquals("Foo_Bar", next.getString("moduleName"))
+            assertEquals("critical", next.getString("minimumSeverity"))
+            assertTrue(next.getBoolean("explainSuppressed"))
+        }
+    }
+
+    fun testCoverageRecoveryPreservesModuleAndAllScanOptions() {
+        Settings.getInstance(project).pluginEnabled = true
+        myFixture.addFileToProject("app/code/Foo/Bar/etc/module.xml", """<config><module name="Foo_Bar"/></config>""")
+        myFixture.addFileToProject("app/code/Foo/Bar/registration.php", "<?php \\Magento\\Framework\\Component\\ComponentRegistrar::register('module', 'Foo_Bar', __DIR__);")
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        val result = nativeCall("""{"mode":"analyze","moduleName":"Foo_Bar","currentVersion":"2.4.8-p5","targetVersion":"2.4.9","minimumSeverity":"critical","ignoreCurrentVersion":true,"explainSuppressed":true}""", expectedError = true)
+        assertEquals("coverage_required", result.getJSONObject("error").getString("code"))
+        val args = result.getJSONObject("nextCall").getJSONObject("arguments")
+        assertEquals("Foo_Bar", args.getString("moduleName"))
+        assertFalse(args.has("path"))
+        assertEquals("critical", args.getString("minimumSeverity"))
+        assertTrue(args.getBoolean("explainSuppressed"))
+        assertEquals("2.4.9", args.getString("analysisTargetVersion"))
     }
 
 }

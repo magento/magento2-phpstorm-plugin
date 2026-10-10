@@ -5,8 +5,7 @@
 package com.magento.idea.magento2plugin.project
 
 import com.magento.idea.magento2plugin.PhysicalMagentoTestCase
-import com.magento.idea.magento2plugin.mcp.MagentoMcpToolset
-import com.intellij.mcpserver.annotations.McpTool
+import com.magento.idea.magento2plugin.mcp.MagentoCompatibilityToolsProvider
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -14,8 +13,7 @@ class MagentoSkillInstallerTest : PhysicalMagentoTestCase() {
     fun testInspectionTemplateInstallsCompatibilityWorkflowForEveryAgentTarget() {
         val bundled = MagentoSkillInstaller::class.java.getResourceAsStream("/skills/magento-inspect/SKILL.md")!!
             .bufferedReader().use { it.readText() }
-        val toolName = MagentoMcpToolset::class.java.declaredMethods
-            .first { it.name == "magentoCompatibility" }.getAnnotation(McpTool::class.java).name
+        val toolName = MagentoCompatibilityToolsProvider().getTools().single().descriptor.name
         assertTrue(bundled.contains("`$toolName`"))
         for (target in MagentoSkillInstaller.AgentTarget.values()) {
             val skill = MagentoSkillInstaller.Skill.MAGENTO_INSPECT

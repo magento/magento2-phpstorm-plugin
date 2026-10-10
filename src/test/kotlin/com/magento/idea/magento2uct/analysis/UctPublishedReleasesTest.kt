@@ -30,7 +30,7 @@ class UctPublishedReleasesTest : PhysicalMagentoTestCase() {
             release("2.4.9-beta1", prerelease = true), release("2.4.8-p6"), release("2.4.8"),
             release("2.4.11").put("published_at", "2099-01-01T00:00:00Z")))
         val service = service({ rows.toString() }, { today })
-        val result = service.discover("2.4.8-p5")
+        val result = service.discover("2.4.8-p5", includeReleases = true)
         assertEquals("2.4.9", result.getJSONObject("nextMinorRelease").getString("version"))
         assertEquals(3, result.getJSONArray("releases").length())
         assertEquals(Settings.DEFAULT_PUBLISHED_RELEASES_URL, result.getString("sourceUrl"))
@@ -47,7 +47,7 @@ class UctPublishedReleasesTest : PhysicalMagentoTestCase() {
             if (page == 1) JSONArray((1..100).map { release("2.4.8-p$it") }).toString()
             else JSONArray(listOf(release("2.4.9"))).toString()
         }, { time })
-        val first = service.discover("2.4.8-p5")
+        val first = service.discover("2.4.8-p5", includeReleases = true)
         assertEquals(101, first.getJSONArray("releases").length())
         assertFalse(first.getBoolean("cacheHit"))
         assertEquals(2, requests)
@@ -84,4 +84,18 @@ class UctPublishedReleasesTest : PhysicalMagentoTestCase() {
             assertThrows(IllegalArgumentException::class.java) { service({ body }, { today }).discover(null) }
         }
     }
+    fun testDefaultDiscoveryIsCompactAndCatalogCanBeRequestedWithoutRefetching() {
+        var requests = 0
+        val service = service({ requests++; JSONArray(listOf(release("2.4.8-p5"), release("2.4.9"))).toString() }, { today })
+        val compact = service.discover("2.4.8-p5")
+        assertFalse(compact.has("releases"))
+        assertFalse(compact.getBoolean("includesReleases"))
+        assertEquals(2, compact.getInt("releaseCount"))
+        assertEquals("2.4.9", compact.getJSONObject("nextMinorRelease").getString("version"))
+        val full = service.discover("2.4.8-p5", includeReleases = true)
+        assertEquals(2, full.getJSONArray("releases").length())
+        assertTrue(full.getBoolean("cacheHit"))
+        assertEquals(1, requests)
+    }
+
 }

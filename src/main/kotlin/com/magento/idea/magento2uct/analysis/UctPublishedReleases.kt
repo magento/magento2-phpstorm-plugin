@@ -32,7 +32,7 @@ internal class UctPublishedReleases internal constructor(
     private var cached: Catalog? = null
 
     @Synchronized
-    fun discover(currentVersion: String?): JSONObject {
+    fun discover(currentVersion: String?, includeReleases: Boolean = false): JSONObject {
         currentVersion?.let { UctVersions.compare(it, it) }
         val sourceUrl = Settings.normalizePublishedReleasesUrl(source())
         require(Settings.isValidPublishedReleasesUrl(sourceUrl)) {
@@ -50,7 +50,8 @@ internal class UctPublishedReleases internal constructor(
             .put("edition", "Magento Open Source").put("sourceUrl", catalog.sourceUrl)
             .put("fetchedAt", catalog.fetchedAt.toString()).put("expiresAt", catalog.fetchedAt.plusSeconds(CACHE_SECONDS).toString())
             .put("cacheHit", existing != null).put("currentVersion", currentVersion ?: JSONObject.NULL)
-            .put("releases", JSONArray(catalog.releases.map { it.json() }))
+            .put("releaseCount", catalog.releases.size).put("includesReleases", includeReleases)
+            .apply { if (includeReleases) put("releases", JSONArray(catalog.releases.map { it.json() })) }
             .put("nextMinorRelease", next?.json() ?: JSONObject.NULL)
             .put("selectionRule", "Next stable x.y.z feature release after the installed release line; excludes prereleases and -p security patches.")
             .put("coverageNote", "Published releases from the configured catalog, not local compatibility coverage. Use status for analysis readiness.")

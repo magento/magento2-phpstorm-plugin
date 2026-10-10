@@ -31,7 +31,9 @@ class UctReleasePreparation internal constructor(
 
     internal data class View(
         val runId: String?, val version: String, val state: String,
-        val progress: UctPreparationProgress, val index: UctReleaseIndex?, val error: String?
+        val progress: UctPreparationProgress, val index: UctReleaseIndex?, val error: String?,
+        val summary: JSONObject? = index?.let { JSONObject().put("existenceSymbols", it.existence.size)
+            .put("apiSymbols", it.api.size).put("deprecationSymbols", it.deprecation.size).put("archiveSha256", it.archiveSha256) }
     )
 
     private class Run(val version: String) {
@@ -46,6 +48,7 @@ class UctReleasePreparation internal constructor(
     }
 
     private val runs = linkedMapOf<String, Run>()
+    private val history = UctRunHistory(cacheRoot.resolve("reports"))
     private val releases = linkedMapOf<String, UctReleaseIndex>()
     private val cacheErrors = linkedMapOf<String, String>()
     private var loaded = false
@@ -77,7 +80,12 @@ class UctReleasePreparation internal constructor(
             UctPreparationProgress("ready", processedFiles = it.processedFiles, totalFiles = it.processedFiles), it, null) }
         runs.values.firstOrNull { it.version == version && it.state == "running" }?.let { return it.view() }
         require(runs.values.none { it.state == "running" }) { "Release preparation is already running. Follow its results or cancel it first." }
-        while (runs.size >= 5) runs.remove(runs.keys.first())
+        while (runs.size >= 5) {
+            val oldest = runs.values.first()
+            if (!history.info(oldest.id).getBoolean("saved")) archive(oldest.view())
+            check(history.info(oldest.id).getBoolean("saved")) { "Cannot archive previous preparation. Resolve report storage before starting another preparation." }
+            runs.remove(oldest.id)
+        }
         val run = Run(version)
         runs[run.id] = run
         run.future = AppExecutorUtil.getAppExecutorService().submit {
@@ -107,14 +115,18 @@ class UctReleasePreparation internal constructor(
                             run.index = index
                             run.progress = run.progress.copy(phase = "ready", processedFiles = index.processedFiles, totalFiles = index.processedFiles)
                             run.state = "completed"
+                            archive(run.view())
                         }
                     }
                 }, run.indicator)
             } catch (_: ProcessCanceledException) {
-                synchronized(this) { run.state = "cancelled" }
+                synchronized(this) {
+                    if (run.state == "running") run.state = "cancelled"
+                    archive(run.view())
+                }
             } catch (exception: Exception) {
                 synchronized(this) {
-                    if (run.state == "running") { run.state = "failed"; run.error = exception.message ?: exception.javaClass.simpleName }
+                    if (run.state == "running") { run.state = "failed"; run.error = exception.message ?: exception.javaClass.simpleName; archive(run.view()) }
                 }
             } finally {
                 archive?.let { Files.deleteIfExists(it) }
@@ -125,15 +137,32 @@ class UctReleasePreparation internal constructor(
     }
 
     @Synchronized
-    internal fun owns(runId: String): Boolean = runId in runs
+    internal fun owns(runId: String): Boolean = runId in runs || (runId.startsWith("prepare-") && history.read(runId) != null)
 
     @Synchronized
-    internal fun results(runId: String): View = requireNotNull(runs[runId]) { "Unknown or expired preparation runId." }.view()
+    internal fun results(runId: String): View = runs[runId]?.view() ?: history.read(runId)?.let { json ->
+        require(json.getString("operation") == "prepare") { "Not a preparation report." }
+        View(runId, json.getString("targetVersion"), json.getString("state"),
+            UctPreparationProgress(json.getString("phase"), json.getLong("downloadedBytes"),
+                if (json.isNull("totalBytes")) null else json.getLong("totalBytes"), json.getInt("processedFiles"), json.getInt("totalFiles")),
+            null, if (json.isNull("error")) null else json.getString("error"), json.optJSONObject("summary"))
+    } ?: throw IllegalArgumentException("Unknown or expired preparation runId. Reports are retained for 30 days / 100 runs per operation.")
+
+    internal fun reportInfo(runId: String): JSONObject = history.info(runId)
+
+    private fun archive(view: View) {
+        history.save(view.runId!!, JSONObject().put("operation", "prepare").put("state", view.state)
+            .put("targetVersion", view.version).put("error", view.error ?: JSONObject.NULL)
+            .put("phase", view.progress.phase).put("downloadedBytes", view.progress.downloadedBytes)
+            .put("totalBytes", view.progress.totalBytes ?: JSONObject.NULL)
+            .put("processedFiles", view.progress.processedFiles).put("totalFiles", view.progress.totalFiles)
+            .put("summary", view.summary ?: JSONObject.NULL))
+    }
 
     @Synchronized
     internal fun cancel(runId: String): View {
-        val run = requireNotNull(runs[runId]) { "Unknown or expired preparation runId." }
-        if (run.state == "running") { run.state = "cancelled"; run.indicator.cancel() }
+        val run = runs[runId] ?: return results(runId)
+        if (run.state == "running") { run.state = "cancelled"; run.indicator.cancel(); archive(run.view()) }
         return run.view()
     }
 

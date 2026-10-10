@@ -187,6 +187,81 @@ class UctAnalysisServiceTest : PhysicalMagentoTestCase() {
         assertEquals(mapOf("php" to 2, "xml" to 1), delta.fileTypeCounts)
     }
 
+    fun testInterfaceLoggerCallsDoNotInspectUnrelatedImplementations() {
+        myFixture.addFileToProject("vendor/psr/log/LoggerInterface.php", """
+            <?php namespace Psr\Log;
+            interface LoggerInterface { public function critical(${'$'}message); }
+        """.trimIndent())
+        myFixture.addFileToProject("vendor/magento/aws-s3/Test/MockTestLogger.php", """
+            <?php namespace Magento\AwsS3\Test;
+            class MockTestLogger implements \Psr\Log\LoggerInterface {
+                public function critical(${'$'}message) {}
+            }
+        """.trimIndent())
+        myFixture.addFileToProject("vendor/magento/framework/Logger/Logger.php", """
+            <?php namespace Magento\Framework\Logger;
+            class Logger implements \Psr\Log\LoggerInterface {
+                public function critical(${'$'}message) {}
+            }
+        """.trimIndent())
+        val file = myFixture.addFileToProject("app/code/Foo/Bar/Logging.php", """
+            <?php namespace Foo\Bar;
+            class Logging {
+                public function __construct(protected \Psr\Log\LoggerInterface ${'$'}logger) {}
+                public function example(\Psr\Log\LoggerInterface ${'$'}argument) {
+                    ${'$'}argument->critical('argument');
+                    ${'$'}this->logger->critical('property');
+                }
+            }
+            class Child extends Logging {
+                public function example(\Psr\Log\LoggerInterface ${'$'}argument) {
+                    ${'$'}this->logger->critical('inherited property');
+                }
+            }
+        """.trimIndent())
+        PsiDocumentManager.getInstance(project).commitAllDocuments()
+        val mock = "\\Magento\\AwsS3\\Test\\MockTestLogger.critical"
+        val concrete = "\\Magento\\Framework\\Logger\\Logger.critical"
+        // Bundled history knew the test helper, but prepared runtime snapshots exclude tests.
+        val catalog = UctIndexCatalog(mapOf("2.4.3" to mapOf(mock to true, concrete to true)),
+            mapOf("2.4.3" to emptyMap()), mapOf("2.4.3" to emptyMap())).withReleases(mapOf(
+            "2.4.8-p5" to UctReleaseFixture.index("2.4.8-p5", setOf(concrete), api = emptySet()),
+            "2.4.9" to UctReleaseFixture.index("2.4.9", setOf(concrete), api = emptySet(), deprecated = setOf(concrete))
+        ))
+        val scan = request().copy(paths = listOf(file.virtualFile.path), currentVersion = "2.4.8-p5", targetVersion = "2.4.9")
+        for (ignore in listOf(false, true)) {
+            val result = analyzeWithCatalog(catalog, scan.copy(ignoreCurrentVersion = ignore))
+            assertTrue(result.findings.toString(), result.findings.isEmpty())
+        }
+    }
+
+    fun testInterfaceContractAndExplicitConcreteUnionMembersAreStillInspected() {
+        myFixture.addFileToProject("vendor/magento/test/Contracts.php", """
+            <?php namespace Magento\Test;
+            interface Contract { public function method(); }
+            class Implementation implements Contract { public function method() {} }
+            class Concrete { public function method() {} }
+        """.trimIndent())
+        val file = myFixture.addFileToProject("app/code/Foo/Bar/Contracts.php", """
+            <?php namespace Foo\Bar;
+            function example(\Magento\Test\Contract|\Magento\Test\Concrete ${'$'}value) { ${'$'}value->method(); }
+        """.trimIndent())
+        PsiDocumentManager.getInstance(project).commitAllDocuments()
+        val contract = "\\Magento\\Test\\Contract.method"
+        val concrete = "\\Magento\\Test\\Concrete.method"
+        val implementation = "\\Magento\\Test\\Implementation.method"
+        val methods = setOf(contract, concrete, implementation)
+        val catalog = UctIndexCatalogTest.fixtureCatalog().withReleases(mapOf(
+            "2.4.8-p5" to UctReleaseFixture.index("2.4.8-p5", methods),
+            "2.4.9" to UctReleaseFixture.index("2.4.9", emptySet())
+        ))
+        val result = analyzeWithCatalog(catalog, request().copy(paths = listOf(file.virtualFile.path), currentVersion = "2.4.8-p5", targetVersion = "2.4.9"))
+        assertEquals(result.findings.toString(), 2, result.findings.size)
+        assertTrue(result.findings.any { it.issue == SupportedIssue.CALLED_NON_EXISTENT_METHOD && it.message.contains(contract) })
+        assertTrue(result.findings.any { it.issue == SupportedIssue.CALLED_NON_EXISTENT_METHOD && it.message.contains(concrete) })
+        assertFalse(result.findings.any { it.message.contains("Implementation") })
+    }
+
     fun testPolyvariantInheritedTemplateMethodsRemainStableAcrossVersionAndCatalogChanges() {
         myFixture.addFileToProject("vendor/magento/test/Block.php", """
             <?php namespace Magento\Test;

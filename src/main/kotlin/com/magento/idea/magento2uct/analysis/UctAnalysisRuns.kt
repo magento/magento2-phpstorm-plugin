@@ -5,19 +5,24 @@
 package com.magento.idea.magento2uct.analysis
 
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.util.concurrency.AppExecutorUtil
+import org.json.JSONObject
+import java.nio.file.Path
 import java.util.UUID
 import java.util.concurrent.CancellationException
 import java.util.concurrent.Future
 
-/** Project-owned, bounded storage for background scans; completed pages remain stable until eviction. */
+/** Project-owned background scans with bounded memory and durable, unpaginated terminal reports. */
 @Service(Service.Level.PROJECT)
-class UctAnalysisRuns(private val project: Project) : Disposable {
+class UctAnalysisRuns internal constructor(private val project: Project, historyRoot: Path) : Disposable {
+    constructor(project: Project) : this(project, Path.of(PathManager.getSystemPath(), "magento-compatibility", "reports", project.locationHash, "analysis"))
+    private val history = UctRunHistory(historyRoot)
     private val runs = linkedMapOf<String, Run>()
 
     data class View(
@@ -55,7 +60,12 @@ class UctAnalysisRuns(private val project: Project) : Disposable {
     ): View {
         check(!project.isDisposed) { "The project is closed." }
         require(runs.values.none { it.state == "running" }) { "An analysis is already running for this project. Retrieve its results or cancel it first." }
-        while (runs.size >= 5) runs.remove(runs.keys.first())
+        while (runs.size >= 5) {
+            val oldest = runs.values.first()
+            if (!history.info(oldest.id).getBoolean("saved")) history.save(oldest.id, UctAnalysisRunReport.write(oldest.view()))
+            check(history.info(oldest.id).getBoolean("saved")) { "Cannot archive previous analysis. Retrieve its findings and resolve report storage before starting another scan." }
+            runs.remove(oldest.id)
+        }
         val run = Run(request)
         runs[run.id] = run
         run.future = AppExecutorUtil.getAppExecutorService().submit {
@@ -70,18 +80,26 @@ class UctAnalysisRuns(private val project: Project) : Disposable {
                             run.result = result
                             run.progress = UctAnalysisProgress(result.processedFiles, result.processedFiles)
                             run.state = "completed"
+                            history.save(run.id, UctAnalysisRunReport.write(run.view()))
                         }
                     }
                 }, run.indicator)
             } catch (_: ProcessCanceledException) {
-                synchronized(this) { run.state = "cancelled" }
+                synchronized(this) {
+                    if (run.state == "running") run.state = "cancelled"
+                    history.save(run.id, UctAnalysisRunReport.write(run.view()))
+                }
             } catch (_: CancellationException) {
-                synchronized(this) { run.state = "cancelled" }
+                synchronized(this) {
+                    if (run.state == "running") run.state = "cancelled"
+                    history.save(run.id, UctAnalysisRunReport.write(run.view()))
+                }
             } catch (exception: Exception) {
                 synchronized(this) {
                     if (run.state == "running") {
                         run.error = exception.message ?: exception.javaClass.simpleName
                         run.state = "failed"
+                        history.save(run.id, UctAnalysisRunReport.write(run.view()))
                     }
                 }
             }
@@ -90,16 +108,18 @@ class UctAnalysisRuns(private val project: Project) : Disposable {
     }
 
     @Synchronized
-    fun results(runId: String): View = requireNotNull(runs[runId]) {
-        "Unknown or expired runId. Runs belong to the current project; only the latest five are retained."
-    }.view()
+    fun results(runId: String): View = runs[runId]?.view() ?: history.read(runId)?.let(UctAnalysisRunReport::read)
+        ?: throw IllegalArgumentException("Unknown or expired runId. Reports belong to this project and are retained for 30 days / 100 runs per operation.")
+
+    internal fun reportInfo(runId: String): JSONObject = history.info(runId)
 
     @Synchronized
     fun cancel(runId: String): View {
-        val run = requireNotNull(runs[runId]) { "Unknown or expired runId." }
+        val run = runs[runId] ?: return results(runId)
         if (run.state == "running") {
             run.state = "cancelled"
             run.indicator.cancel()
+            history.save(run.id, UctAnalysisRunReport.write(run.view()))
         }
         return run.view()
     }

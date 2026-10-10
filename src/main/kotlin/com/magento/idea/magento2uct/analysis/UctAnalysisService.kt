@@ -121,7 +121,7 @@ class UctAnalysisService @JvmOverloads constructor(
                 }
             }
         }
-        require(components.isNotEmpty() || files.isNotEmpty()) { "No custom Magento modules, themes, or files found in the requested scope." }
+        require(components.isNotEmpty() || files.isNotEmpty()) { "No supported PHP, PHTML, XML, or HTML files or custom Magento components found in the requested scope. JavaScript, images, and other unsupported files are not scanned. Select a supported file or a custom module/theme directory." }
 
         val pending = ArrayDeque(components.values.map { it.directory })
         visited.clear()
