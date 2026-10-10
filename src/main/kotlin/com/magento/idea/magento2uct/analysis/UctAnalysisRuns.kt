@@ -41,8 +41,11 @@ class UctAnalysisRuns(private val project: Project) : Disposable {
     }
 
     @Synchronized
-    fun start(request: UctAnalysisRequest): View = start(request) { progress ->
-        UctAnalysisService(project).analyze(request, Runnable { ProgressManager.checkCanceled() }, progress)
+    fun start(request: UctAnalysisRequest): View {
+        val analysis = UctAnalysisService(project)
+        return start(request) { progress ->
+            analysis.analyze(request, Runnable { ProgressManager.checkCanceled() }, progress)
+        }
     }
 
     @Synchronized

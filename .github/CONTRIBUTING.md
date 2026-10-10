@@ -8,6 +8,18 @@
 1. In the Gradle tool window, run `Tasks > Intellij platform > runIde`.
 1. The task launches a PhpStorm sandbox with the plugin installed. Make sure that the plugin is enabled and indexing is finished before testing features.
 
+# Compatibility preparation tests
+
+Repository tests cover native JetBrains MCP discovery/invocation, HTTP download and validation, preparation progress, cancellation, persistence, corrupt caches, version readiness, and PHP/XML findings produced from prepared data. Regular tests use local release fixtures and do not need internet access. Compatibility command tests also pass responses through the JetBrains SDK transport adapter: the host intentionally drops `structuredContent` for errors, so agents must be able to parse the JSON text. Argument-type and project-routing failures occur before the plugin and can remain plain-text host errors.
+
+To additionally test native MCP preparation against the official release archives used by the integration test:
+
+```sh
+MAGENTO_MCP_REAL_RELEASE_TEST=true ./gradlew test --tests 'com.magento.idea.magento2plugin.mcp.MagentoCompatibilityCommandsTest.testNativeMcpWithActualMagentoReleases'
+```
+
+This opt-in repository test downloads release sources into a temporary IDE test cache and does not install Magento or modify the working project.
+
 # Plugin publication
 
 1. [Build a new version of the plugin](https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/deploying_plugin.html)

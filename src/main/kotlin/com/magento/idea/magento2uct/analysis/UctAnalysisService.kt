@@ -46,8 +46,14 @@ data class UctAnalysisResult(val findings: List<UctFinding>, val processedFiles:
 /** Shared scan engine. It does not open windows, save documents, write reports, or change settings. */
 class UctAnalysisService @JvmOverloads constructor(
     private val project: Project,
-    private val catalog: UctIndexCatalog = UctIndexCatalog.bundled()
+    private val catalog: UctIndexCatalog = project.getService(UctReleasePreparation::class.java).catalog()
 ) {
+    companion object {
+        /** Caller holds read access. Keep MCP file validation and scan coverage identical. */
+        internal fun isSupportedFile(project: Project, file: VirtualFile): Boolean =
+            SupportedIssue.getSupportedFileTypes().any { it.isInstance(PsiManager.getInstance(project).findFile(file)) }
+    }
+
     private data class Component(val directory: VirtualFile, val theme: Boolean)
 
     fun analyze(
@@ -114,10 +120,10 @@ class UctAnalysisService @JvmOverloads constructor(
         require(files.size <= 10000) { "Scan exceeds 10000 files. Choose a narrower scope." }
         val supported = files.values.filter { file ->
             read {
-                SupportedIssue.getSupportedFileTypes().any { it.isInstance(PsiManager.getInstance(project).findFile(file)) }
+                isSupportedFile(project, file)
             }
         }.sortedBy { it.path }
-        require(supported.isNotEmpty()) { "No supported PHP or XML files found in the requested scope." }
+        require(supported.isNotEmpty()) { "No supported PHP, PHTML, XML, or HTML files found in the requested scope." }
         val findings = arrayListOf<UctFinding>()
         progress.accept(UctAnalysisProgress(0, supported.size))
         supported.forEachIndexed { index, virtualFile ->

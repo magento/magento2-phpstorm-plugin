@@ -6,10 +6,14 @@
 package com.magento.idea.magento2uct.versioning.processors;
 
 import com.intellij.psi.PsiFile;
+import java.util.Map;
 import com.magento.idea.magento2uct.packages.SupportedVersion;
 import org.jetbrains.annotations.NotNull;
 
 public interface IndexProcessor {
+
+    /** Immutable full state collected so far, before historical delta filtering. */
+    Map<String, Boolean> snapshot();
 
     void clearData();
 

@@ -33,14 +33,23 @@ internal object UctVersions : Comparator<String> {
     }
 }
 
-/** Reads only shipped resources. Packagist release discovery is not evidence of index coverage. */
+/** Immutable catalog of bundled history and verified full release snapshots. */
 class UctIndexCatalog internal constructor(
     private val existence: Map<String, Map<String, Boolean>>,
     private val api: Map<String, Map<String, Boolean>>,
-    private val deprecation: Map<String, Map<String, Boolean>>
+    private val deprecation: Map<String, Map<String, Boolean>>,
+    private val releases: Map<String, UctReleaseIndex> = emptyMap()
 ) {
-    val supportedVersions: List<String> = existence.keys.intersect(api.keys).intersect(deprecation.keys)
+    val supportedVersions: List<String> = (existence.keys.intersect(api.keys).intersect(deprecation.keys) + releases.keys)
         .sortedWith(UctVersions)
+
+    internal fun withReleases(prepared: Map<String, UctReleaseIndex>): UctIndexCatalog =
+        UctIndexCatalog(existence, api, deprecation, prepared.toMap())
+
+    fun isPrepared(version: String): Boolean = version in releases
+
+    fun requiresCurrentCoverage(currentVersion: String?, targetVersion: String, ignoreCurrentVersion: Boolean): Boolean =
+        ignoreCurrentVersion || (currentVersion != null && (isPrepared(targetVersion) || targetVersion !in existence.keys.intersect(api.keys).intersect(deprecation.keys)))
 
     fun validateVersions(currentVersion: String?, targetVersion: String, ignoreCurrentVersion: Boolean) {
         require(targetVersion in supportedVersions) {
@@ -49,8 +58,8 @@ class UctIndexCatalog internal constructor(
         if (currentVersion != null) {
             require(UctVersions.compare(currentVersion, targetVersion) <= 0) { "currentVersion must not exceed targetVersion." }
         }
-        require(!ignoreCurrentVersion || currentVersion in supportedVersions) {
-            "ignoreCurrentVersion requires a currentVersion with complete bundled index coverage."
+        require(!requiresCurrentCoverage(currentVersion, targetVersion, ignoreCurrentVersion) || currentVersion in supportedVersions) {
+            "This analysis requires compatibility data for currentVersion. Use mode `prepare` for the baseline release."
         }
     }
 
@@ -68,9 +77,22 @@ class UctIndexCatalog internal constructor(
         val deprecation: Map<String, Entry>
     )
 
-    private fun stateAt(version: String): State = State(
-        merge(existence, version), merge(api, version), merge(deprecation, version)
-    )
+    private fun stateAt(version: String): State {
+        val release = releases[version] ?: return State(
+            merge(existence, version), merge(api, version), merge(deprecation, version)
+        )
+        // A full snapshot resets all flags. It must not inherit stale @api/@deprecated flags.
+        // Missing releases between snapshots do not establish the first change release.
+        val observed = "$version (observed snapshot; first change release unknown)"
+        val known = (merge(existence, version).keys + releases.values
+            .filter { UctVersions.compare(it.version, version) <= 0 }.flatMap { it.existence.keys })
+            .filter { it.startsWith("\\Magento\\") }
+        fun entries(values: Map<String, Boolean>) = values.mapValues { Entry(it.value, observed) }
+        return State(
+            known.associateWith { Entry(release.existence[it] == true, observed) },
+            entries(release.api), entries(release.deprecation)
+        )
+    }
 
     private fun merge(history: Map<String, Map<String, Boolean>>, target: String): Map<String, Entry> {
         val state = HashMap<String, Entry>()

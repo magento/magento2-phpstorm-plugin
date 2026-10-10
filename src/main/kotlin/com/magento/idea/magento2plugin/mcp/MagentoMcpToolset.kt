@@ -6,24 +6,62 @@
 package com.magento.idea.magento2plugin.mcp
 
 import com.intellij.mcpserver.McpToolset
+import com.intellij.mcpserver.McpToolCallResult
+import com.intellij.mcpserver.McpToolCallResultContent
 import com.intellij.mcpserver.annotations.McpDescription
 import com.intellij.mcpserver.annotations.McpTool
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import org.json.JSONException
+import org.json.JSONObject
 
 /**
  * Exposes Magento-specific MCP tools that require the JetBrains PHP plugin.
  */
 class MagentoMcpToolset : McpToolset {
     @McpTool(name = "magento_compatibility")
-    @McpDescription("Analyze Magento backward / upgrade compatibility with the built-in UCT PHP/XML inspections. Use mode `help` or `detailed_schema` first, then `status` to discover actual bundled index coverage. Use `analyze` with parametersJson containing a path or moduleName and targetVersion to start a background scan. Poll `results` with runId for progress and paginated findings; use `cancel` to stop. Analysis does not save files or change UCT settings. Unsupported target versions are rejected; coverage is limited to the shipped indexes and existing UCT rules.")
-    suspend fun magentoCompatibility(mode: String, parametersJson: String): String {
+    @McpDescription("Analyze Magento upgrade compatibility with built-in PHP/XML inspections, including PHTML and HTML templates. Start with status and the exact targetVersion to verify project identity, the composer.lock baseline, and readiness. supportedVersions describes local index coverage, not published releases; verify the intended release separately. Follow nextCall to prepare missing data from the exact official Magento Open Source tag, which may fail if the tag does not exist. Preserve preparation continuation arguments. Cached preparation has runId=null; follow its status nextCall without polling. Once readiness.ready is true, analyze exactly one path or moduleName with the original targetVersion. Follow nextCall through terminal results and all finding pages; save findings before additional scans because only five runs per operation are retained. Cancel uses the returned runId. Failed requests/jobs set isError=true. Parse JSON text when structuredContent is absent; JetBrains omits structuredContent on errors. Host argument-type and project-routing errors may be plain text. Default findings include baseline issues and component test/fixture files; ignoreCurrentVersion=true suppresses baseline issues. Prepared data excludes proprietary Commerce and third-party dependencies; zero findings does not certify an upgrade. No scripts, Composer installation, or extra IDE instance are needed. Use detailed_schema for constraints.")
+    suspend fun magentoCompatibility(
+        @McpDescription("status (default), prepare, analyze, results, cancel, help, or detailed_schema.") mode: String = "status",
+        @McpDescription("Analyze: project-relative or absolute PHP, PHTML, XML, or HTML file or component directory, as recognized by IDE PHP/XML PSI. Use either path or moduleName.") path: String? = null,
+        @McpDescription("Analyze: exact Vendor_Module name. Use either moduleName or path.") moduleName: String? = null,
+        @McpDescription("Status/prepare/analyze: exact requested Magento release. Prepare obtains missing compatibility data.") targetVersion: String? = null,
+        @McpDescription("Status/analyze: explicit baseline; otherwise Magento composer.lock. Preparation/results/cancel: preserved baseline for the follow-up status call.") currentVersion: String? = null,
+        @McpDescription("Analyze: warning (default), error, or critical.") minimumSeverity: String? = null,
+        @McpDescription("Status/analyze: suppress existing baseline issues; requires covered current and target releases. Default false. Preparation/results/cancel preserve this option for status.") ignoreCurrentVersion: Boolean? = null,
+        @McpDescription("Results/cancel: runId returned by prepare or analyze; belongs to the same project.") runId: String? = null,
+        @McpDescription("Results: JSON integer offset 0..2147483647, default 0; use nextCall or nextOffset.") offset: Int? = null,
+        @McpDescription("Results: JSON integer page size 1..500, default 100. Fractions and strings are rejected by the host before the tool runs.") limit: Int? = null,
+        @McpDescription("Preparation/results/cancel: original upgrade target for the follow-up status call, distinct from the release being prepared. Preserve the value returned in nextCall.") analysisTargetVersion: String? = null
+    ): McpToolCallResult {
         val normalizedMode = mode.trim().lowercase().replace('-', '_')
-        return when (normalizedMode) {
+        val response = when (normalizedMode) {
             "help" -> MagentoCompatibilityCommands.help()
-            "schema", "detailed_schema" -> MagentoCompatibilityCommands.detailedSchema()
+            "detailed_schema" -> MagentoCompatibilityCommands.detailedSchema()
             else -> MagentoMcpToolsetSupport.withProjectAction(validateProject = false) {
-                MagentoCompatibilityCommands.execute(it, normalizedMode, parametersJson)
+                val parameters = JSONObject()
+                mapOf("path" to path, "moduleName" to moduleName, "targetVersion" to targetVersion,
+                    "currentVersion" to currentVersion, "minimumSeverity" to minimumSeverity,
+                    "ignoreCurrentVersion" to ignoreCurrentVersion, "runId" to runId,
+                    "offset" to offset, "limit" to limit,
+                    "analysisTargetVersion" to analysisTargetVersion).forEach { (key, value) ->
+                    if (value != null) parameters.put(key, value)
+                }
+                MagentoCompatibilityCommands.execute(it, normalizedMode, parameters)
             }
         }
+        val structured = if (normalizedMode in setOf("help", "detailed_schema")) null else try {
+            JSONObject(response)
+        } catch (_: JSONException) {
+            JSONObject().put("state", "failed").put("complete", false)
+                .put("error", JSONObject().put("code", "unavailable").put("message", response))
+                .put("nextCall", JSONObject.NULL)
+        }
+        return McpToolCallResult(
+            content = arrayOf(McpToolCallResultContent.Text(structured?.toString() ?: response)),
+            structuredContent = structured?.let { Json.parseToJsonElement(it.toString()).jsonObject },
+            isError = structured?.optString("state") == "failed" || structured?.optJSONObject("error") != null
+        )
     }
 
     /**
