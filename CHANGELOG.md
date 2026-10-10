@@ -9,6 +9,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Added
 
+- PhpStorm metadata for Hyvä and Magewire view models, factories, checkout forms, evaluation types, and flash messages [#2735](https://github.com/magento/magento2-phpstorm-plugin/pull/2735).
+- Return-type inference for Magento validator, message, and unit-test object factories, plus argument completion for area codes, filesystem directories, and sort directions.
 - `magento_compatibility` MCP tool for built-in UCT backward and upgrade compatibility analysis of PHP and XML files by project path or Magento module name, with supported target version discovery, background scans, paginated findings, and cancellation.
 - Automated coverage for compatibility MCP commands, UCT analysis and version indexes, and bundled skill installation.
 - Override module email templates in a selected project theme, including nested email paths, in PhpStorm and WebStorm [#1205](https://github.com/magento/magento2-phpstorm-plugin/issues/1205).
@@ -19,7 +21,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Fixed
 
+- Missing SQL condition operators and plural store and website scopes in PHP argument completion.
 - View Model injection is available only in editable Magento directories, including explicitly marked vendor directories [#1204](https://github.com/magento/magento2-phpstorm-plugin/issues/1204).
+- Override module email templates in a selected project theme, including nested email paths, in PhpStorm and WebStorm [#1205](https://github.com/magento/magento2-phpstorm-plugin/issues/1205).
+- The "Navigate to configuration" popup shows the XML file path next to each node again [#2095](https://github.com/magento/magento2-phpstorm-plugin/issues/2095).
 
 ## 2026.3.2
 

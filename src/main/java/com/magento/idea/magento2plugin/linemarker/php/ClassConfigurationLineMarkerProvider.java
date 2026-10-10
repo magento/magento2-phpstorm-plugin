@@ -54,6 +54,7 @@ public class ClassConfigurationLineMarkerProvider implements LineMarkerProvider 
                 NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder
                         .create(AllIcons.FileTypes.Xml)
                         .setTargets(results)
+                        .setTargetRenderer(FilePathTargetPresentationRenderer::new)
                         .setTooltipText(tooltipText);
 
                 PsiElement className = ((PhpClass) psiElement).getNameIdentifier();
