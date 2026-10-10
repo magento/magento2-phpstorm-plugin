@@ -17,6 +17,8 @@ import com.intellij.util.EventDispatcher;
 import com.intellij.util.SmartList;
 import com.intellij.util.xmlb.annotations.Attribute;
 import com.intellij.util.xmlb.annotations.Tag;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.EventListener;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -41,6 +43,8 @@ public class Settings implements PersistentStateComponent<Settings.State> {
     public static final String DEFAULT_MCP_CLI_TOOL_CANDIDATES =
             "bin/magento, bin/n98-magerun2, bin/n98-magerun, bin/magerun, "
                     + "bin/cli, bin/console, bin/composer, bin/php";
+    public static final String DEFAULT_PUBLISHED_RELEASES_URL =
+            "https://api.github.com/repos/magento/magento2/releases";
     public boolean pluginEnabled;
     public String defaultLicense;
     public static final String DEFAULT_LICENSE = "Proprietary";
@@ -48,6 +52,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
     public boolean mftfSupportEnabled;
     public boolean myDoNotAskContentConfigAgain;
     public String mcpCliToolCandidates;
+    public String publishedReleasesUrl;
     public String magentoVersion;
     public String magentoEdition;
     public List<String> myMagentoFolders;
@@ -62,6 +67,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
                 this.mftfSupportEnabled,
                 this.myDoNotAskContentConfigAgain,
                 this.mcpCliToolCandidates,
+                this.publishedReleasesUrl,
                 this.magentoVersion,
                 this.magentoEdition,
                 this.myMagentoFolders
@@ -136,6 +142,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         this.mftfSupportEnabled = state.isMftfSupportEnabled();
         this.myDoNotAskContentConfigAgain = state.isDoNotAskContentConfigAgain();
         this.mcpCliToolCandidates = state.getMcpCliToolCandidates();
+        this.publishedReleasesUrl = state.getPublishedReleasesUrl();
         this.magentoVersion = state.getMagentoVersion();
         this.magentoEdition = state.getMagentoEdition();
         this.myMagentoFolders = state.getMagentoFolders();
@@ -207,6 +214,25 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         return normalizedPath;
     }
 
+    public @NotNull String getPublishedReleasesUrl() {
+        return normalizePublishedReleasesUrl(this.publishedReleasesUrl);
+    }
+
+    public static @NotNull String normalizePublishedReleasesUrl(final @Nullable String value) {
+        return StringUtil.isEmptyOrSpaces(value) ? DEFAULT_PUBLISHED_RELEASES_URL : value.trim();
+    }
+
+    public static boolean isValidPublishedReleasesUrl(final @Nullable String value) {
+        try {
+            final URI uri = new URI(normalizePublishedReleasesUrl(value));
+            return ("https".equalsIgnoreCase(uri.getScheme())
+                    || "http".equalsIgnoreCase(uri.getScheme()))
+                    && uri.getHost() != null && uri.getRawFragment() == null;
+        } catch (final URISyntaxException exception) {
+            return false;
+        }
+    }
+
     public static @NotNull List<String> getMcpCliToolCandidates(final @NotNull Project project) {
         return parseMcpCliToolCandidates(getInstance(project).mcpCliToolCandidates);
     }
@@ -259,6 +285,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         public boolean mftfSupportEnabled;
         public boolean myDoNotAskContentConfigAgain;
         public String mcpCliToolCandidates;
+        public String publishedReleasesUrl;
         public String magentoVersion;
         public String magentoEdition;
         public List<String> myMagentoFolders;
@@ -275,6 +302,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
          * @param mftfSupportEnabled boolean
          * @param myDoNotAskContentConfigAgain boolean
          * @param mcpCliToolCandidates String
+         * @param publishedReleasesUrl String
          * @param magentoVersion String
          * @param magentoEdition String
          * @param myMagentoFolders List
@@ -286,6 +314,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
                 final boolean mftfSupportEnabled,
                 final boolean myDoNotAskContentConfigAgain,
                 final String mcpCliToolCandidates,
+                final String publishedReleasesUrl,
                 final String magentoVersion,
                 final String magentoEdition,
                 final List<String> myMagentoFolders
@@ -296,6 +325,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             this.mftfSupportEnabled = mftfSupportEnabled;
             this.myDoNotAskContentConfigAgain = myDoNotAskContentConfigAgain;
             this.mcpCliToolCandidates = mcpCliToolCandidates;
+            this.publishedReleasesUrl = publishedReleasesUrl;
             this.magentoVersion = magentoVersion;
             this.magentoEdition = magentoEdition;
             this.myMagentoFolders = myMagentoFolders;
@@ -408,6 +438,15 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             this.mcpCliToolCandidates = mcpCliToolCandidates;
         }
 
+        public String getPublishedReleasesUrl() {
+            return this.publishedReleasesUrl;
+        }
+
+        @Tag("publishedReleasesUrl")
+        public void setPublishedReleasesUrl(final String publishedReleasesUrl) {
+            this.publishedReleasesUrl = publishedReleasesUrl;
+        }
+
         @SuppressWarnings({
                 "PMD.ConfusingTernary",
                 "PMD.CognitiveComplexity",
@@ -430,6 +469,8 @@ public class Settings implements PersistentStateComponent<Settings.State> {
                 } else if (
                         !Objects.equals(this.mcpCliToolCandidates, state.mcpCliToolCandidates)
                 ) {
+                    return false;
+                } else if (!Objects.equals(this.publishedReleasesUrl, state.publishedReleasesUrl)) {
                     return false;
                 } else if (!Objects.equals(this.myMagentoFolders, state.myMagentoFolders)) {
                     return false;
@@ -461,6 +502,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             result = 31 * result + (
                     this.mcpCliToolCandidates != null ? this.mcpCliToolCandidates.hashCode() : 0
                 );
+            result = 31 * result + Objects.hashCode(this.publishedReleasesUrl);
             result = 31 * result
                     + (this.myMagentoFolders != null ? this.myMagentoFolders.hashCode() : 0);
             return result;

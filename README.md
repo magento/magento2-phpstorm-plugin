@@ -77,57 +77,24 @@
 
 ## MCP tools
 
-The plugin exposes a Magento-specific MCP toolset for AI agents inside JetBrains IDEs with MCP support enabled.
+Connect your AI assistant to PhpStorm to inspect Magento configuration, generate modules and other components, and check upgrade compatibility.
 
-Available project and creation tools:
+1. Open your Magento project and enable the plugin in **Settings > Languages & Frameworks > PHP > Frameworks > Magento**. Check the Magento installation path if it differs from the project directory.
+2. Enable the IDE's **MCP Server** and add its connection to your assistant using the configuration shown in the IDE.
+3. Wait for indexing to finish, then ask your assistant to work with the open project. For example:
+   * “Find the plugins and observers used by Application_Blog.”
+   * “Create a Magento module named Acme_Example.”
+   * “Check Application_Blog against the next published Magento minor release and explain the findings.”
 
-* `get_magento_root_path`: returns the resolved Magento root directory for the current IDE project. Use this when an agent or shell command needs an absolute project path.
-* `magento_scaffold`: a three-step Magento scaffold library and renderer designed to keep agent context small. First call it with `mode=help` to get only scaffold names and short descriptions. Then call it with `mode=detailed_schema` and one `scaffoldType` to load detailed parameters, defaults, constraints, and example JSON only for that scaffold. Finally call it with `mode=render`, the selected `scaffoldType`, and `parametersJson` as a JSON object to create files. Supported scaffold types are `module`, `plugin`, `observer`, `entity_crud`, `controller`, `cli_command`, `block`, `view_model`, `product_eav_attribute`, `category_eav_attribute`, and `customer_eav_attribute`.
+Compatibility checks can download release data on first use. Ask for **only new upgrade issues** to exclude issues already present in the installed version. The checks cover Magento Open Source core APIs; review Commerce extensions, third-party code, and runtime behavior separately.
 
-Available query and inspection tools:
+In the Magento settings page, you can also:
 
-* `magento_compatibility`: prepares release compatibility data and runs the built-in UCT PHP/XML inspections, including PHTML and HTML templates, through typed MCP arguments. Call `status` with the requested `targetVersion` to verify project identity, the baseline detected from `composer.lock`, and separate IDE/release-data readiness. Follow `nextCall` to `prepare` missing releases, then poll `results` with the returned `runId`; `cancel` stops preparation or analysis. Preparation downloads the exact official Magento Open Source GitHub tag, verifies its metadata, and reuses the UCT processors to build all three index families in the IDE system cache. Failed or cancelled preparation never publishes ready data. Once `readiness.ready` is true, call `analyze` with exactly one of `path` or `moduleName` and the original `targetVersion`. `currentVersion`, `minimumSeverity`, and `ignoreCurrentVersion` are optional. Follow `nextCall` for progress and findings pages. No client scripts, Composer installation, or additional IDE instance are needed. The bundled **Magento inspect** skill includes this workflow.
-* `magento_inspect`: a three-step Magento inspection library designed to keep agent context small. First call it with `mode=help` to get only query names and short descriptions. Then call it with `mode=detailed_schema` and one `queryType` to load detailed parameters and example JSON only for that inspection. Finally call it with `mode=query`, the selected `queryType`, and `parametersJson` as a JSON object to inspect the project. Supported query types are `module`, `di_config`, `plugins_for_method`, `observers_for_event`, `layout_entities`, `ui_component`, and `acl_or_menu`.
-* `describe_magento_cli_environment`: detects project-local CLI wrappers such as Mark Shust Docker scripts under project-level or Magento-root `bin/`, returns the exact command paths an agent should use, and includes example invocations for Magento CLI, PHP, Composer, `n98-magerun`, and stack lifecycle commands such as `./bin/start`.
+* Install the bundled **Magento inspect** and **Magento scaffold** skills for your assistant.
+* Set **MCP CLI wrapper candidates** when your project uses Docker or other wrapper scripts, for example `bin/magento, bin/cli, bin/composer`.
+* Change **Published releases URL** to use a GitHub-compatible release catalog mirror. Leave it blank to use the official Magento GitHub catalog.
 
-Preparation can run while IDE indexing is in progress. `status.readiness.ideReady` reports IDE readiness; `releaseDataReady` reports whether the requested baseline/target data is available; `ready` also requires Magento project support to be enabled. Preparation `nextCall` arguments carry `analysisTargetVersion`, `currentVersion`, and `ignoreCurrentVersion` through polling and return to `status` with the **original analysis target and baseline options**. Preserve these arguments when following the calls; preparing a baseline does not change the requested upgrade target. Standalone `prepare` defaults its follow-up target to the release being prepared; provide `analysisTargetVersion` when it differs. Cached preparation returns `complete: true` and `runId: null`; follow its status call without polling. Prepared targets require covered baseline data when a current version is detected or provided.
-
-Compatibility responses contain JSON text and, when delivered, matching MCP `structuredContent`. **Parse text when `structuredContent` is absent.** The JetBrains transport omits structured output for `isError: true` responses and may disable it globally. Failed requests and background jobs retain `isError: true`; running and cancelled jobs remain incomplete. Argument deserialization (for example `limit: 1.5`) and project routing occur before the plugin and may produce plain-text host errors. Send pagination as JSON integers. Help and schema responses remain text only. Validation-error recovery preserves valid original version options; its `nextCall` checks readiness and does not retry the rejected analysis. Invalid version options require correction before a follow-up call.
-
-`status` reports local compatibility coverage, not a published-release catalog. `supportedVersions` and `latestSupportedVersion` do not establish the next published Magento release. Verify the intended release separately; preparation verifies the exact official tag and can fail if it does not exist. Effective `targetVersion`, `currentVersion`, and `ignoreCurrentVersion` appear in `defaults`.
-
-Default analysis includes existing baseline issues; set `ignoreCurrentVersion: true` to suppress them when both releases have coverage. Directory scans include test and fixture files inside custom components. File scopes and progress counts follow IDE PHP/XML PSI support, including PHP, PHTML, XML, and HTML files. Unsupported single files are rejected before a job starts; empty directory scopes can fail during background discovery. Retrieve and save completed findings before more scans: only the latest five runs of each operation are retained until the project closes.
-
-Prepared data covers Magento Open Source core classes, methods, and fields. Proprietary Adobe Commerce extensions, third-party dependencies, generated classes, and runtime behavior are outside that coverage. Snapshots describe states observed in the selected release; they do not claim the first release that introduced a change. Bundled historical data remains available offline. Preparation caches verified snapshots across restarts; malformed cache entries are reported and must be prepared again. Analysis uses committed IDE documents without saving files or changing UCT settings.
-
-Notes:
-
-* The IDE MCP server must be enabled in the JetBrains IDE.
-* Only one JetBrains IDE instance should have the MCP server enabled at a time so the configured MCP port stays free; if another IDE is already using that port, the MCP server will not start correctly.
-* The IDE MCP server entry must be added to the agent MCP configuration using the URL and port shown by that running IDE. After changing the connection or updating the plugin, reconnect the agent so it refreshes `tools/list` and the input schemas. A project path mismatch means the connection must be corrected.
-* MCP tools work against the currently opened IDE project. Pass the intended `projectPath` in tool calls and verify `magento_compatibility` status returns that path before analyzing files.
-* Magento plugin support must be enabled for the project.
-* Indexing must be finished before MCP queries and generators can run.
-* Category EAV attribute generation creates both the data patch and `view/adminhtml/ui_component/category_form.xml`.
-* `describe_magento_cli_environment` detects project-local wrappers such as Mark Shust Docker scripts under project-level or Magento-root `bin/` and returns the exact command paths an agent should use, including stack lifecycle wrappers such as `bin/start`, `bin/stop`, and `bin/restart`.
-
-### MCP CLI wrapper configuration
-
-If your Magento project uses local wrapper scripts such as Mark Shust Docker commands, configure them in:
-
-`Settings > Languages & Frameworks > PHP > Frameworks > Magento > MCP CLI wrapper candidates`
-
-Use a comma-separated list of relative paths, for example:
-
-`bin/magento, bin/n98-magerun2, bin/cli, bin/start`
-
-Agent usage pattern:
-
-1. Call `describe_magento_cli_environment`.
-2. Use the returned wrapper path exactly, for example `./bin/magento cache:flush`, `./bin/n98-magerun2 sys:info`, or `./bin/start`.
-3. Keep Magento code edits and generators under the configured Magento root.
-4. If the tool reports a wrapper outside that root, still run it from the returned project-relative path; that is valid for nested Magento roots.
-5. Prefer the wrapper over global binaries because these scripts often enter Docker containers or a project-specific runtime.
+Reconnect your assistant after updating the plugin so it discovers the latest tools. If it connects to the wrong project, check the IDE connection and project path. When running multiple IDEs, ensure their MCP servers use different ports.
 
 ## Setting up development environment
 

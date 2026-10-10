@@ -38,6 +38,7 @@ import com.magento.idea.magento2uct.analysis.UctAnalysisRuns
 import com.magento.idea.magento2uct.analysis.UctFinding
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel
 import com.magento.idea.magento2uct.packages.SupportedIssue
+import org.json.JSONArray
 import org.json.JSONObject
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -171,6 +172,16 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
             val findings = result.getJSONArray("findings").toList().map { it as Map<*, *> }
             assertTrue(findings.toString(), findings.any { it["filePath"] == "app/code/Foo/Bar/Example.php" && it["severity"] == "critical" })
             assertTrue(findings.toString(), findings.any { it["filePath"] == "app/code/Foo/Bar/etc/di.xml" && it["severity"] == "critical" })
+            val unrelated = preparation.start("2.4.8-p4") { _, _, _ ->
+                UctReleaseFixture.index("2.4.8-p4", setOf("\\Magento\\Framework\\Unrelated"))
+            }
+            PlatformTestUtil.waitWithEventsDispatching("unrelated release preparation", { preparation.results(unrelated.runId!!).state != "running" }, 20)
+            assertEquals("completed", preparation.results(unrelated.runId!!).state)
+            val repeated = nativeCall("""{"mode":"analyze","path":"app/code/Foo/Bar","targetVersion":"2.4.9"}""")
+            PlatformTestUtil.waitWithEventsDispatching("repeat after preparation", { runs().results(repeated.getString("runId")).state != "running" }, 20)
+            val stable = followNative(repeated.getJSONObject("nextCall"))
+            assertEquals(result.getJSONArray("findings").toString(), stable.getJSONArray("findings").toString())
+            assertEquals(result.getJSONObject("analysisIdentity").toString(), stable.getJSONObject("analysisIdentity").toString())
             val after = Files.walk(java.nio.file.Path.of(project.basePath!!)).use { it.sorted().toList() }
             assertEquals(before, after)
         } finally { server.stop(0) }
@@ -179,6 +190,10 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
     /** Explicit opt-in: fetches real upstream releases through native MCP, never shell scripts. */
     fun testNativeMcpWithActualMagentoReleases() {
         check(System.getenv("MAGENTO_MCP_REAL_RELEASE_TEST") == "true") { "Enable MAGENTO_MCP_REAL_RELEASE_TEST=true for this network integration test." }
+        val published = nativeCall("""{"mode":"releases","currentVersion":"2.4.8-p5"}""")
+        assertEquals("2.4.9", published.getJSONObject("nextMinorRelease").getString("version"))
+        assertFalse(published.getBoolean("cacheHit"))
+        assertTrue(nativeCall("""{"mode":"releases","currentVersion":"2.4.8-p5"}""").getBoolean("cacheHit"))
         Settings.getInstance(project).pluginEnabled = true
         myFixture.addFileToProject("composer.lock", """{"packages":[{"name":"magento/magento2-base","version":"2.4.8-p5"}]}""")
         myFixture.addFileToProject("Sample.php", "<?php class Sample {}")
@@ -427,24 +442,20 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
         assertEquals("invalid_request", error.getJSONObject("error").getString("code"))
     }
 
-    fun testValidationRecoveryPreservesOriginalVersionOptions() {
+    fun testValidationErrorsIdentifyParametersWithoutUnhelpfulStatusContinuations() {
         Settings.getInstance(project).pluginEnabled = true
         myFixture.addFileToProject("Sample.php", "<?php class Sample {}")
         val rejected = nativeCall("""{"mode":"analyze","path":"Sample.php","targetVersion":"2.4.3","currentVersion":"2.4.2","ignoreCurrentVersion":true,"minimumSeverity":"info"}""", expectedError = true)
-        val next = rejected.getJSONObject("nextCall").getJSONObject("arguments")
-        assertEquals("status", next.getString("mode"))
-        assertEquals("2.4.3", next.getString("targetVersion"))
-        assertEquals("2.4.2", next.getString("currentVersion"))
-        assertTrue(next.getBoolean("ignoreCurrentVersion"))
-        assertFalse(next.has("minimumSeverity"))
-        assertTrue(followNative(rejected.getJSONObject("nextCall")).getJSONObject("readiness").getBoolean("ready"))
+        assertTrue(rejected.isNull("nextCall"))
+        assertEquals("minimumSeverity", rejected.getJSONObject("error").getString("parameter"))
+        assertEquals(listOf("warning", "error", "critical"), rejected.getJSONObject("error").getJSONArray("acceptedValues").toList())
+        val preparation = nativeCall("""{"mode":"prepare","targetVersion":"latest","analysisTargetVersion":"2.4.9"}""", expectedError = true)
+        assertTrue(preparation.isNull("nextCall"))
+        assertEquals("targetVersion", preparation.getJSONObject("error").getString("parameter"))
+        val missing = nativeCall("""{"mode":"results"}""", expectedError = true)
+        assertEquals("runId", missing.getJSONObject("error").getString("parameter"))
+        assertTrue(missing.isNull("nextCall"))
         assertTrue(runs().activeRunIds().isEmpty())
-
-        val preparation = nativeCall("""{"mode":"prepare","targetVersion":"latest","analysisTargetVersion":"2.4.9","currentVersion":"2.4.8-p5","ignoreCurrentVersion":true}""", expectedError = true)
-        val recovery = preparation.getJSONObject("nextCall").getJSONObject("arguments")
-        assertEquals("2.4.9", recovery.getString("targetVersion"))
-        assertEquals("2.4.8-p5", recovery.getString("currentVersion"))
-        assertTrue(recovery.getBoolean("ignoreCurrentVersion"))
     }
 
     fun testInvalidVersionOptionsDoNotCreateARecoveryLoop() {
@@ -745,4 +756,93 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
         assertTrue(result.isNull("summary"))
         assertEquals("Missing test index", result.getJSONObject("error").getString("message"))
     }
+    fun testNativePaginationDocumentsNumericStringCoercion() {
+        val findings = (1..3).map { UctFinding(project.basePath + "/Sample.php", it, 1, "finding $it", SupportedIssue.CALLING_DEPRECATED_METHOD) }
+        val run = runs().start(request()) { UctAnalysisResult(findings, 1, 0, 0) }
+        PlatformTestUtil.waitWithEventsDispatching("pagination fixture", { runs().results(run.runId).state != "running" }, 10)
+        val result = nativeCall("""{"mode":"results","runId":"${run.runId}","offset":"1","limit":"1"}""")
+        assertEquals(1, result.getJSONArray("findings").length())
+        assertEquals(2, result.getJSONArray("findings").getJSONObject(0).getInt("line"))
+        assertEquals(2, result.getInt("nextOffset"))
+        assertTrue(MagentoCompatibilityCommands.detailedSchema().contains("coerces numeric strings"))
+    }
+
+    fun testNativeResultsExposeAnalysisIdentityScopeAndSuppression() {
+        Settings.getInstance(project).pluginEnabled = true
+        myFixture.addFileToProject("Test/Sample.php", "<?php class Sample {}")
+        val started = nativeCall("""{"mode":"analyze","path":"Test/Sample.php","currentVersion":"2.4.2","targetVersion":"2.4.3","ignoreCurrentVersion":true,"explainSuppressed":true}""")
+        PlatformTestUtil.waitWithEventsDispatching("metadata scan", { runs().results(started.getString("runId")).state != "running" }, 10)
+        val result = followNative(started.getJSONObject("nextCall"))
+        assertEquals(project.basePath, result.getString("pathBase"))
+        val identity = result.getJSONObject("analysisIdentity")
+        assertEquals(64, identity.getString("indexRevision").length)
+        assertEquals("2.4.3", identity.getJSONObject("target").getString("version"))
+        assertEquals(1, result.getJSONObject("scope").getJSONObject("fileTypeCounts").getInt("php"))
+        assertEquals(1, result.getJSONObject("scope").getInt("testFiles"))
+        assertEquals(0, result.getJSONObject("suppression").getInt("total"))
+        assertEquals(identity.toString(), call("status", """{"currentVersion":"2.4.2","targetVersion":"2.4.3","ignoreCurrentVersion":true}""").getJSONObject("analysisIdentity").toString())
+        val invalid = nativeCall("""{"mode":"analyze","path":"Test/Sample.php","targetVersion":"2.4.3","explainSuppressed":true}""", expectedError = true)
+        assertEquals("explainSuppressed", invalid.getJSONObject("error").getString("parameter"))
+    }
+
+    fun testNativeReleaseDiscoveryReturnsPublishedNextMinorAndStatusContinuation() {
+        val source = com.magento.idea.magento2uct.analysis.UctPublishedReleases({ Settings.DEFAULT_PUBLISHED_RELEASES_URL }, { _ -> """[
+            {"tag_name":"2.4.8-p5","draft":false,"prerelease":false,"published_at":"2026-05-12T00:00:00Z","html_url":"https://github.com/magento/magento2/releases/tag/2.4.8-p5"},
+            {"tag_name":"2.4.9","draft":false,"prerelease":false,"published_at":"2026-05-12T00:00:00Z","html_url":"https://github.com/magento/magento2/releases/tag/2.4.9"}
+        ]""" }, { java.time.Instant.parse("2026-10-10T00:00:00Z") })
+        project.getService(com.magento.idea.magento2uct.analysis.UctPublishedReleases::class.java)
+        project.replaceService(com.magento.idea.magento2uct.analysis.UctPublishedReleases::class.java, source, testRootDisposable)
+        myFixture.addFileToProject("composer.lock", """{"packages":[{"name":"magento/magento2-base","version":"2.4.8-p5"}]}""")
+        val result = nativeCall("""{"mode":"releases"}""")
+        assertEquals("2.4.9", result.getJSONObject("nextMinorRelease").getString("version"))
+        assertEquals("2.4.9", result.getJSONObject("nextCall").getJSONObject("arguments").getString("targetVersion"))
+        assertEquals("2.4.8-p5", result.getJSONObject("nextCall").getJSONObject("arguments").getString("currentVersion"))
+        assertTrue(nativeCall("""{"mode":"releases"}""").getBoolean("cacheHit"))
+    }
+
+    fun testNativeReleaseDiscoveryUsesConfiguredUrlAndDiscardsOldSourceCache() {
+        val requests = java.util.Collections.synchronizedList(mutableListOf<String>())
+        val server = HttpServer.create(InetSocketAddress("127.0.0.1", 0), 0)
+        val baseUrl = "http://127.0.0.1:${server.address.port}"
+        server.createContext("/") { exchange ->
+            requests.add(exchange.requestURI.toString())
+            val version = if (exchange.requestURI.path == "/first") "2.4.9" else "2.4.10"
+            val body = JSONArray(listOf(JSONObject()
+                .put("tag_name", version).put("draft", false).put("prerelease", false)
+                .put("published_at", "2026-05-12T00:00:00Z")
+                .put("html_url", "$baseUrl/releases/$version"))).toString().toByteArray()
+            exchange.responseHeaders.add("Content-Type", "application/json")
+            exchange.sendResponseHeaders(200, body.size.toLong())
+            exchange.responseBody.use { it.write(body) }
+        }
+        server.start()
+        val settings = Settings.getInstance(project)
+        val originalUrl = settings.publishedReleasesUrl
+        try {
+            settings.publishedReleasesUrl = "$baseUrl/first?channel=stable"
+            val first = nativeCall("""{"mode":"releases","currentVersion":"2.4.8-p5"}""")
+            assertEquals(settings.publishedReleasesUrl, first.getString("sourceUrl"))
+            assertEquals("2.4.9", first.getJSONObject("nextMinorRelease").getString("version"))
+            assertEquals("$baseUrl/releases/2.4.9", first.getJSONObject("nextMinorRelease").getString("url"))
+            assertFalse(first.getBoolean("cacheHit"))
+            assertTrue(nativeCall("""{"mode":"releases","currentVersion":"2.4.8-p5"}""").getBoolean("cacheHit"))
+            assertEquals(listOf("/first?channel=stable&per_page=100&page=1"), requests.toList())
+
+            settings.publishedReleasesUrl = "$baseUrl/second"
+            val second = nativeCall("""{"mode":"releases","currentVersion":"2.4.8-p5"}""")
+            assertFalse(second.getBoolean("cacheHit"))
+            assertEquals(settings.publishedReleasesUrl, second.getString("sourceUrl"))
+            assertEquals("2.4.10", second.getJSONObject("nextMinorRelease").getString("version"))
+            assertEquals(2, requests.size)
+
+            settings.publishedReleasesUrl = "file:///tmp/not-a-release-api"
+            val invalid = nativeCall("""{"mode":"releases"}""", expectedError = true)
+            assertTrue(invalid.getJSONObject("error").getString("message").contains("Magento settings"))
+            assertEquals(2, requests.size)
+        } finally {
+            settings.publishedReleasesUrl = originalUrl
+            server.stop(0)
+        }
+    }
+
 }

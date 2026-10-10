@@ -101,4 +101,29 @@ class UctReleaseSourceTest : PhysicalMagentoTestCase() {
             }
         } finally { server.stop(0); Files.deleteIfExists(archive) }
     }
+    fun testPreparedDeprecationDoesNotDependOnOpenProjectParentClasses() {
+        val bytes = UctReleaseFixture.archive("2.4.9", mapOf(
+            "app/code/Magento/Catalog/Model/ParentBlock.php" to """
+                <?php namespace Magento\Catalog\Model;
+                class ParentBlock { public function escapeHtml() {} }
+            """.trimIndent(),
+            "app/code/Magento/Catalog/Model/ChildBlock.php" to """
+                <?php namespace Magento\Catalog\Model;
+                class ChildBlock extends ParentBlock { public function escapeHtml() {} }
+            """.trimIndent()
+        ))
+        val before = index(bytes)
+        myFixture.addFileToProject("vendor/magento/catalog/Model/ParentBlock.php", """
+            <?php namespace Magento\Catalog\Model;
+            /** @deprecated */ class ParentBlock {
+                /** @deprecated */ public function escapeHtml() {}
+            }
+        """.trimIndent())
+        com.intellij.psi.PsiDocumentManager.getInstance(project).commitAllDocuments()
+        val after = index(bytes)
+        assertEquals(before.existence, after.existence)
+        assertEquals(before.api, after.api)
+        assertEquals(before.deprecation, after.deprecation)
+    }
+
 }

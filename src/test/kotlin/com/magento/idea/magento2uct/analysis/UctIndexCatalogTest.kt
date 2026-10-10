@@ -93,4 +93,37 @@ class UctIndexCatalogTest {
             )
         }
     }
+    @Test
+    fun unrelatedPreparationCannotChangeSnapshotOrIdentity() {
+        val removed = "\\Magento\\Test\\BaselineOnly"
+        val unrelated = "\\Magento\\Test\\Unrelated"
+        val baseline = UctReleaseFixture.index("2.4.8-p5", setOf(removed))
+        val target = UctReleaseFixture.index("2.4.9")
+        val catalog = fixtureCatalog().withReleases(mapOf(baseline.version to baseline, target.version to target))
+        val expanded = catalog.withReleases(mapOf(baseline.version to baseline, target.version to target,
+            "2.4.8-p4" to UctReleaseFixture.index("2.4.8-p4", setOf(unrelated))))
+        val before = catalog.snapshot(baseline.version, target.version, false)
+        val after = expanded.snapshot(baseline.version, target.version, false)
+        assertFalse(before.isExists(removed))
+        assertFalse(after.isExists(removed))
+        assertFalse(before.isPresentInCodebase(unrelated))
+        assertFalse(after.isPresentInCodebase(unrelated))
+        assertEquals(catalog.identity(baseline.version, target.version, false).toString(),
+            expanded.identity(baseline.version, target.version, false).toString())
+        val changed = catalog.withReleases(mapOf(baseline.version to baseline, target.version to UctReleaseFixture.index("2.4.9", setOf(removed))))
+        assertNotEquals(catalog.identity(baseline.version, target.version, false).getString("indexRevision"),
+            changed.identity(baseline.version, target.version, false).getString("indexRevision"))
+    }
+
+    @Test
+    fun catalogDefensivelyCopiesMutableInputs() {
+        val entries = mutableMapOf("\\Magento\\Test\\Stable" to true)
+        val history = mapOf("2.4.3" to entries)
+        val catalog = UctIndexCatalog(history, history, history)
+        val identity = catalog.identity(null, "2.4.3", false).toString()
+        entries.clear()
+        assertTrue(catalog.snapshot(null, "2.4.3", false).isDeprecated("\\Magento\\Test\\Stable"))
+        assertEquals(identity, catalog.identity(null, "2.4.3", false).toString())
+    }
+
 }

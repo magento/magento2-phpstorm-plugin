@@ -18,6 +18,7 @@ import com.magento.idea.magento2uct.analysis.UctIndexCatalog
 import com.magento.idea.magento2uct.analysis.UctReleasePreparation
 import com.magento.idea.magento2uct.analysis.UctReleaseSource
 import com.magento.idea.magento2uct.analysis.UctVersions
+import com.magento.idea.magento2uct.analysis.UctPublishedReleases
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel
 import com.magento.idea.magento2uct.settings.UctSettingsService
 import org.json.JSONArray
@@ -30,7 +31,7 @@ import java.io.IOException
 internal object MagentoCompatibilityCommands {
     fun help(): String = """
         Magento backward / upgrade compatibility analysis using the built-in UCT PHP/XML inspections, including PHTML and HTML templates.
-        Modes: `help`, `detailed_schema`, `status`, `prepare`, `analyze`, `results`, `cancel`.
+        Modes: `help`, `detailed_schema`, `status`, `releases`, `prepare`, `analyze`, `results`, `cancel`.
         Start with `status` and targetVersion to verify the connected project, detected baseline, IDE readiness, and release-data readiness.
         Follow nextCall to prepare missing release data, poll progress, and return to status with the original target and baseline options.
         Pass ordinary typed tool arguments; no scripts, shell commands, or JSON string encoding are needed.
@@ -38,7 +39,7 @@ internal object MagentoCompatibilityCommands {
         Use `detailed_schema` only for additional constraints. Never substitute an older target when the requested release is unsupported.
         Parse JSON from text content when structuredContent is absent. Failed requests/jobs set isError=true; JetBrains omits structuredContent for errors. Host argument-type and project-routing errors can be plain text.
         Running/cancelled jobs are incomplete. Cached preparation has runId=null and needs no polling.
-        supportedVersions describes cached compatibility coverage, not a published-release catalog. Verify the intended published release separately; prepare verifies the exact official tag and can fail if it does not exist.
+        supportedVersions describes cached compatibility coverage, not a published-release catalog. Use releases to verify the intended published release; prepare verifies the exact official tag and can fail if it does not exist.
         Default findings include baseline issues; use ignoreCurrentVersion=true to suppress them when both releases are covered.
         Analysis uses committed IDE documents and does not save files or change UCT settings.
     """.trimIndent()
@@ -50,6 +51,10 @@ internal object MagentoCompatibilityCommands {
           readiness separates ideReady and releaseDataReady, lists missingVersions, and reports ready for the requested analysis.
           Status does not query published releases. supportedVersions/latestSupportedVersion describe local index coverage only; missing coverage does not establish whether a release exists.
           Follow nextCall to prepare a missing release or observe an active job; preparation continuations preserve the original status options.
+        releases: optional currentVersion (otherwise composer.lock). Fetches stable published releases from Published releases URL in Magento settings (default: official magento/magento2 GitHub releases API).
+          The URL can point to a GitHub-compatible catalog mirror; changing it invalidates cached discovery data.
+          Returns edition, sourceUrl, fetchedAt, expiresAt, cacheHit, dated releases and nextMinorRelease (next x.y.z feature release, excluding -p patches).
+          Uses a one-hour cache; failed or partial fetches are errors, never an empty success. Separate from local supportedVersions; status never performs network discovery.
         prepare: targetVersion required. Downloads that exact official Magento Open Source GitHub tag, verifies its metadata,
           and reuses the UCT processors to build existence, API, and deprecation snapshots in the IDE system cache.
           Returns a background runId with operation=prepare and phase/byte/file progress. results and cancel work for both operations.
@@ -65,12 +70,15 @@ internal object MagentoCompatibilityCommands {
           currentVersion: optional; defaults to Magento detected from composer.lock in magentoRoot. No configured-version or composer.json fallback. Must not exceed targetVersion.
           minimumSeverity: warning (default), error, or critical.
           ignoreCurrentVersion: false (default). When true, currentVersion must also have complete index coverage.
+          explainSuppressed: false (default); requires ignoreCurrentVersion=true. Returns baseline suppression totals by rule code and severity, counted before per-element severity filtering.
           Explicit analysis works even when editor UCT inspections are disabled. Magento project support must be enabled and indexing finished.
           Directory scans exclude bundled Magento components and symlink directories, but include test/fixture files inside custom components. processedFiles/totalFiles count supported IDE PHP/XML PSI files, including PHTML/HTML.
+          pathBase is the IDE project directory (not necessarily magentoRoot). Completed results include fileTypeCounts and testFiles, counted by Test/Tests/Fixture/Fixtures/_files path segments.
+          analysisIdentity identifies the exact current/target states by SHA-256, source kind, archive checksum (prepared data) and inspection engine revision.
           Unsupported single files are rejected before a job starts; empty/unsupported directory scopes fail during background discovery. Analyze acceptance is not scan completion.
           Example tool arguments: {"mode":"analyze","moduleName":"Foo_Bar","targetVersion":"<requested-version>","minimumSeverity":"warning"}
           Replace <requested-version> with the user's exact target release. Use status and prepare to obtain missing data for that release.
-        results: runId required; offset is an integer 0..2147483647 (default 0); limit is an integer 1..500 (default 100). Send JSON integers, not fractions or strings. Pages are available after completion.
+        results: runId required; offset is an integer 0..2147483647 (default 0); limit is an integer 1..500 (default 100). Send JSON integers. The JetBrains host also coerces numeric strings to integers; fractions and overflow are rejected before the tool runs. Pages are available after completion.
           Returns state, progress, version options, totals by severity, findings with project-relative filePath, 1-based line/column, code, severity, and message, plus nextOffset and hasMore.
           Follow nextCall.arguments while running or when hasMore is true; retryAfterMs gives the polling interval.
           For preparation runs, preserve analysisTargetVersion, currentVersion, and ignoreCurrentVersion from nextCall; completion returns the original status call.
@@ -78,7 +86,7 @@ internal object MagentoCompatibilityCommands {
         cancel: runId required. Idempotent; cancelled scans never report complete results. Preparation accepts the same status continuation options as results.
         Plugin responses always include JSON text; structuredContent, when delivered, contains the same JSON. Parse text when structuredContent is absent. JetBrains omits structuredContent on isError=true responses and may disable it for all responses.
         Failed requests/jobs return MCP isError=true; successful status, running, completed, and cancelled responses return false. Host argument deserialization and project routing happen before the plugin and may return plain-text errors. Help/detailed_schema are text only.
-        Validation-error nextCall checks readiness with valid original version options; it does not retry the rejected analysis. Correct the rejected request before retrying. Invalid version options have no automatic nextCall.
+        Validation errors include parameter/parameters and acceptedValues where applicable, and nextCall=null. Correct the original request; nextCall is reserved for workflow progress such as preparation, indexing and pagination.
         One running analysis and one running preparation per project; the latest five runs of each operation are retained until project close. Retrieve/save findings before starting more analyses. A scan is limited to 10000 files and 50000 findings; exceeding either fails with a narrower-scope request.
         Coverage uses bundled history and prepared Magento Open Source snapshots with existing PHP/XML rules. Prepared snapshots report observed states, not the first release introducing a change; zero findings does not certify all upgrade behavior.
     """.trimIndent()
@@ -89,10 +97,32 @@ internal object MagentoCompatibilityCommands {
                 validateKeys(parameters, setOf("targetVersion", "currentVersion", "ignoreCurrentVersion"))
                 status(project, parameters)
             }
+            "releases" -> {
+                validateKeys(parameters, setOf("currentVersion"))
+                val current = optionalString(parameters, "currentVersion") ?: detectedVersion(project)
+                current?.let { validateVersion("currentVersion", it) }
+                val releaseData = try {
+                    project.getService(UctPublishedReleases::class.java).discover(current)
+                } catch (exception: com.intellij.openapi.progress.ProcessCanceledException) {
+                    throw exception
+                } catch (exception: Exception) {
+                    throw IOException("Published release discovery failed: ${exception.message}", exception)
+                }
+                MagentoMcpProjectContext.identity(project).apply {
+                    releaseData.keySet().forEach { key -> put(key, releaseData.get(key)) }
+                    put("pathBase", project.basePath ?: JSONObject.NULL)
+                    put("nextCall", releaseData.optJSONObject("nextMinorRelease")?.let {
+                        nextCall(project, "status", JSONObject().put("targetVersion", it.getString("version")).apply {
+                            if (current != null) put("currentVersion", current)
+                        })
+                    } ?: JSONObject.NULL)
+                }
+            }
             "prepare" -> {
                 validateKeys(parameters, setOf("targetVersion", "analysisTargetVersion", "currentVersion", "ignoreCurrentVersion"))
                 require(Settings.isEnabled(project)) { "Magento plugin support is disabled for this project." }
                 val version = requiredString(parameters, "targetVersion")
+                validateVersion("targetVersion", version)
                 val statusParameters = preparationStatusParameters(parameters, version)
                 preparationView(project, project.getService(UctReleasePreparation::class.java).start(version), statusParameters)
             }
@@ -140,17 +170,19 @@ internal object MagentoCompatibilityCommands {
                     view(project, project.getService(UctAnalysisRuns::class.java).cancel(runId), 0, 100)
                 }
             }
-            else -> throw IllegalArgumentException("Unknown mode. Use help, detailed_schema, status, prepare, analyze, results, or cancel.")
+            else -> invalid("mode", "Unknown mode.", listOf("help", "detailed_schema", "status", "releases", "prepare", "analyze", "results", "cancel"))
         }
         result.toString()
+    } catch (exception: ParameterException) {
+        error(project, "invalid_request", exception.message.orEmpty(), exception.details)
     } catch (exception: JSONException) {
-        error(project, "invalid_parameters", "Invalid parameter type. ${exception.message}", mode, parameters)
+        error(project, "invalid_parameters", "Invalid parameter type. ${exception.message}")
     } catch (exception: IllegalArgumentException) {
-        error(project, "invalid_request", exception.message.orEmpty(), mode, parameters)
+        error(project, "invalid_request", exception.message.orEmpty())
     } catch (exception: IllegalStateException) {
-        error(project, "unavailable", exception.message.orEmpty(), mode, parameters)
+        error(project, "unavailable", exception.message.orEmpty())
     } catch (exception: IOException) {
-        error(project, "unavailable", exception.message.orEmpty(), mode, parameters)
+        error(project, "unavailable", exception.message.orEmpty())
     }
 
     private fun status(project: Project, parameters: JSONObject): JSONObject {
@@ -161,11 +193,11 @@ internal object MagentoCompatibilityCommands {
         val versions = catalog.supportedVersions
         val current = optionalString(parameters, "currentVersion") ?: detected
         val target = optionalString(parameters, "targetVersion")
-        current?.let { UctVersions.compare(it, it) }
-        target?.let { UctVersions.compare(it, it) }
-        if (current != null && target != null) require(UctVersions.compare(current, target) <= 0) { "currentVersion must not exceed targetVersion." }
+        current?.let { validateVersion("currentVersion", it) }
+        target?.let { validateVersion("targetVersion", it) }
+        if (current != null && target != null) validate(UctVersions.compare(current, target) <= 0, "currentVersion", "currentVersion must not exceed targetVersion.", listOf("<= $target"))
         val ignore = boolean(parameters, "ignoreCurrentVersion", false)
-        require(!ignore || current != null) { "ignoreCurrentVersion requires a detected or explicit currentVersion." }
+        validate(!ignore || current != null, "ignoreCurrentVersion", "ignoreCurrentVersion requires a detected or explicit currentVersion.", listOf("false", "true with a detected or explicit currentVersion"))
         val missing = if (target == null) emptyList() else missingVersions(catalog, current, target, ignore)
         val active = preparation.activeRunIds()
         val next = when {
@@ -178,6 +210,8 @@ internal object MagentoCompatibilityCommands {
             else -> JSONObject.NULL
         }
         return MagentoMcpProjectContext.identity(project)
+            .put("pathBase", project.basePath ?: JSONObject.NULL)
+            .put("analysisIdentity", if (target != null && missing.isEmpty()) catalog.identity(current, target, ignore) else JSONObject.NULL)
             .put("detectedMagentoVersion", detected ?: JSONObject.NULL)
             .put("magentoVersionSource", if (detected != null) "composer.lock" else JSONObject.NULL)
             .put("versionDetectionWarning", if (detected == null) "Magento version could not be read from composer.lock. Provide currentVersion explicitly when needed." else JSONObject.NULL)
@@ -214,42 +248,47 @@ internal object MagentoCompatibilityCommands {
     }
 
     internal fun request(project: Project, parameters: JSONObject): UctAnalysisRequest {
-        validateKeys(parameters, setOf("path", "moduleName", "currentVersion", "targetVersion", "minimumSeverity", "ignoreCurrentVersion"))
+        validateKeys(parameters, setOf("path", "moduleName", "currentVersion", "targetVersion", "minimumSeverity", "ignoreCurrentVersion", "explainSuppressed"))
         val moduleName = optionalString(parameters, "moduleName")
         val path = optionalString(parameters, "path")
-        require((moduleName == null) != (path == null)) { "Provide exactly one of path or moduleName." }
+        if ((moduleName == null) == (path == null)) throw ParameterException(
+            "Provide exactly one of path or moduleName.", JSONObject().put("parameters", JSONArray(listOf("path", "moduleName")))
+                .put("acceptedValues", JSONArray(listOf("exactly one of path or moduleName"))))
         val root = Path.of(requireNotNull(project.basePath) { "Project directory is unavailable." }).toRealPath()
         val resolved = if (moduleName != null) {
-            require(Regex("[A-Za-z][A-Za-z0-9]*_[A-Za-z][A-Za-z0-9_]*").matches(moduleName)) { "moduleName must use Vendor_Module format." }
+            validate(Regex("[A-Za-z][A-Za-z0-9]*_[A-Za-z][A-Za-z0-9_]*").matches(moduleName), "moduleName", "moduleName must use Vendor_Module format.", listOf("Vendor_Module"))
             ReadAction.computeBlocking<Path, RuntimeException> {
                 val directory = ModuleIndex(project).getModuleDirectoryVirtualFileByModuleName(moduleName)
-                requireNotNull(directory) { "Magento module `$moduleName` was not found." }
+                if (directory == null) invalid("moduleName", "Magento module `$moduleName` was not found.", listOf("an installed Vendor_Module name"))
                 Path.of(directory.path)
             }
         } else root.resolve(path!!)
-        require(Files.exists(resolved)) { "Analysis path does not exist: $resolved" }
+        validate(Files.exists(resolved), "path", "Analysis path does not exist: $resolved", listOf("existing project-relative or absolute path"))
         val canonical = resolved.toRealPath()
-        require(canonical.startsWith(root)) { "Analysis path must stay inside the current project." }
+        validate(canonical.startsWith(root), "path", "Analysis path must stay inside the current project.", listOf("path inside $root"))
         if (!Files.isDirectory(canonical)) {
-            require(Files.isRegularFile(canonical)) { "Analysis path must be a regular file or component directory." }
+            validate(Files.isRegularFile(canonical), "path", "Analysis path must be a regular file or component directory.", listOf("regular file", "component directory"))
             ReadAction.computeBlocking<Unit, RuntimeException> {
                 val file = requireNotNull(LocalFileSystem.getInstance().findFileByNioFile(canonical)) {
                     "Analysis file is unavailable in the IDE: $canonical. Wait for the IDE to refresh files and retry."
                 }
-                require(UctAnalysisService.isSupportedFile(project, file)) {
-                    "Unsupported analysis file: $canonical. Select a PHP, PHTML, XML, or HTML file recognized by IDE PHP/XML PSI. No scan was started."
-                }
+                validate(UctAnalysisService.isSupportedFile(project, file), "path",
+                    "Unsupported analysis file: $canonical. Select a PHP, PHTML, XML, or HTML file recognized by IDE PHP/XML PSI. No scan was started.",
+                    listOf("PHP", "PHTML", "XML", "HTML"))
             }
         }
         val target = requiredString(parameters, "targetVersion")
         val severity = optionalString(parameters, "minimumSeverity") ?: "warning"
-        require(severity in setOf("warning", "error", "critical")) { "minimumSeverity must be warning, error, or critical." }
+        validate(severity in setOf("warning", "error", "critical"), "minimumSeverity", "minimumSeverity must be warning, error, or critical.", listOf("warning", "error", "critical"))
         val ignore = boolean(parameters, "ignoreCurrentVersion", false)
         val current = optionalString(parameters, "currentVersion") ?: detectedVersion(project)
-        UctVersions.compare(target, target)
-        if (current != null) require(UctVersions.compare(current, target) <= 0) { "currentVersion must not exceed targetVersion." }
-        require(!ignore || current != null) { "ignoreCurrentVersion requires a detected or explicit currentVersion." }
-        return UctAnalysisRequest(listOf(canonical.toString()), current, target, IssueSeverityLevel.valueOf(severity.uppercase()), ignore)
+        validateVersion("targetVersion", target)
+        current?.let { validateVersion("currentVersion", it) }
+        if (current != null) validate(UctVersions.compare(current, target) <= 0, "currentVersion", "currentVersion must not exceed targetVersion.", listOf("<= $target"))
+        validate(!ignore || current != null, "ignoreCurrentVersion", "ignoreCurrentVersion requires a detected or explicit currentVersion.", listOf("false", "true with a detected or explicit currentVersion"))
+        val explain = boolean(parameters, "explainSuppressed", false)
+        validate(!explain || ignore, "explainSuppressed", "explainSuppressed requires ignoreCurrentVersion=true.", listOf("false", "true with ignoreCurrentVersion=true"))
+        return UctAnalysisRequest(listOf(canonical.toString()), current, target, IssueSeverityLevel.valueOf(severity.uppercase()), ignore, explain)
     }
 
     private fun view(project: Project, view: UctAnalysisRuns.View, offset: Int, limit: Int): JSONObject {
@@ -265,6 +304,19 @@ internal object MagentoCompatibilityCommands {
             .put("targetVersion", view.request.targetVersion)
             .put("minimumSeverity", view.request.minimumSeverity.name.lowercase())
             .put("ignoreCurrentVersion", view.request.ignoreCurrentVersion)
+            .put("explainSuppressed", view.request.explainSuppressed)
+            .put("pathBase", project.basePath ?: JSONObject.NULL)
+            .put("analysisIdentity", result?.analysisIdentity?.let(::JSONObject) ?: JSONObject.NULL)
+            .put("scope", if (result == null) JSONObject.NULL else JSONObject()
+                .put("fileTypeCounts", JSONObject(result.fileTypeCounts)).put("testFiles", result.testFiles)
+                .put("testFileClassification", "Case-insensitive Test/Tests/Fixture/Fixtures/_files path segments relative to pathBase.")
+                .put("includesTests", true))
+            .put("suppression", result?.suppressedByRule?.let { rules -> JSONObject()
+                .put("reason", "already_present_in_current_version")
+                .put("total", rules.values.sum()).put("byRule", JSONObject(rules.mapKeys { it.key.toString() }))
+                .put("bySeverity", JSONObject(result.suppressedBySeverity.orEmpty()))
+                .put("counting", "Distinct rule diagnostics before per-element severity filtering; totals need not equal the difference between displayed finding counts.")
+            } ?: JSONObject.NULL)
             .put("processedFiles", view.progress.processedFiles).put("totalFiles", view.progress.totalFiles)
             .put("error", if (view.error == null) JSONObject.NULL else JSONObject().put("code", "analysis_failed").put("message", view.error))
             .put("summary", if (result == null) JSONObject.NULL else JSONObject()
@@ -289,24 +341,25 @@ internal object MagentoCompatibilityCommands {
 
     private fun optionalString(parameters: JSONObject, key: String): String? {
         if (!parameters.has(key)) return null
+        validate(parameters.get(key) is String, key, "$key must be a string.", listOf("string"))
         val value = parameters.getString(key).trim()
-        require(value.isNotEmpty()) { "$key must be a non-empty string." }
+        validate(value.isNotEmpty(), key, "$key must be a non-empty string.", listOf("non-empty string"))
         return value
     }
     private fun requiredString(parameters: JSONObject, key: String): String =
-        requireNotNull(optionalString(parameters, key)) { "Missing required parameter `$key`." }
+        optionalString(parameters, key) ?: invalid(key, "Missing required parameter `$key`.", listOf("non-empty string"))
 
     private fun integer(parameters: JSONObject, key: String, default: Int, min: Int, max: Int): Int {
         if (!parameters.has(key)) return default
         val value = parameters.get(key)
-        require((value is Int || value is Long) && (value as Number).toLong() in min.toLong()..max.toLong()) {
-            "$key must be an integer in $min..$max."
-        }
+        validate((value is Int || value is Long) && (value as Number).toLong() in min.toLong()..max.toLong(),
+            key, "$key must be an integer in $min..$max.", listOf("integer $min..$max"))
         return (value as Number).toInt()
     }
     private fun validateKeys(parameters: JSONObject, allowed: Set<String>) {
         val unknown = parameters.keySet() - allowed
-        require(unknown.isEmpty()) { "Unknown parameters: ${unknown.sorted().joinToString()}. Use detailed_schema." }
+        if (unknown.isNotEmpty()) throw ParameterException("Unknown parameters: ${unknown.sorted().joinToString()}. Use detailed_schema.",
+            JSONObject().put("parameters", JSONArray(unknown.sorted())).put("acceptedValues", JSONArray(allowed.sorted())))
     }
     private fun nextCall(project: Project, mode: String, arguments: JSONObject = JSONObject()): JSONObject = JSONObject()
         .put("tool", "magento_compatibility")
@@ -319,9 +372,10 @@ internal object MagentoCompatibilityCommands {
 
     private fun preparationStatusParameters(parameters: JSONObject, preparedVersion: String): JSONObject {
         val target = optionalString(parameters, "analysisTargetVersion") ?: preparedVersion
-        UctVersions.compare(target, target)
+        validateVersion(if (parameters.has("analysisTargetVersion")) "analysisTargetVersion" else "targetVersion", target)
         val current = optionalString(parameters, "currentVersion")
-        if (current != null) require(UctVersions.compare(current, target) <= 0) { "currentVersion must not exceed analysisTargetVersion." }
+        current?.let { validateVersion("currentVersion", it) }
+        if (current != null) validate(UctVersions.compare(current, target) <= 0, "currentVersion", "currentVersion must not exceed analysisTargetVersion.", listOf("<= $target"))
         return statusOptions(current, target, boolean(parameters, "ignoreCurrentVersion", false))
     }
 
@@ -365,7 +419,7 @@ internal object MagentoCompatibilityCommands {
 
     private fun boolean(parameters: JSONObject, key: String, default: Boolean): Boolean {
         if (!parameters.has(key)) return default
-        require(parameters.get(key) is Boolean) { "$key must be a boolean." }
+        validate(parameters.get(key) is Boolean, key, "$key must be a boolean.", listOf("true", "false"))
         return parameters.getBoolean(key)
     }
 
@@ -392,37 +446,32 @@ internal object MagentoCompatibilityCommands {
         MagentoVersionUtil.get(project, it.toString()).takeUnless { version -> version == MagentoVersionUtil.DEFAULT_VERSION }
     }
 
-    /** Preserve valid analysis context without suggesting a status call that repeats invalid version options. */
-    private fun recoveryStatusParameters(project: Project, mode: String, parameters: JSONObject): JSONObject? = try {
-        val targetKey = if (mode in setOf("prepare", "results", "cancel") && parameters.has("analysisTargetVersion"))
-            "analysisTargetVersion" else "targetVersion"
-        val target = optionalString(parameters, targetKey)
-        val current = optionalString(parameters, "currentVersion")
-        val effectiveCurrent = current ?: detectedVersion(project)
-        target?.let { UctVersions.compare(it, it) }
-        effectiveCurrent?.let { UctVersions.compare(it, it) }
-        require(target == null || effectiveCurrent == null || UctVersions.compare(effectiveCurrent, target) <= 0)
-        val ignore = boolean(parameters, "ignoreCurrentVersion", false)
-        require(!ignore || effectiveCurrent != null)
-        JSONObject().apply {
-            if (target != null) put("targetVersion", target)
-            if (current != null) put("currentVersion", current)
-            if (parameters.has("ignoreCurrentVersion")) put("ignoreCurrentVersion", ignore)
-        }
-    } catch (_: IllegalArgumentException) {
-        null
-    } catch (_: JSONException) {
-        null
+    private class ParameterException(message: String, val details: JSONObject) : IllegalArgumentException(message)
+
+    private fun invalid(parameter: String, message: String, accepted: List<String>): Nothing =
+        throw ParameterException(message, JSONObject().put("parameter", parameter).put("acceptedValues", JSONArray(accepted)))
+
+    private fun validate(condition: Boolean, parameter: String, message: String, accepted: List<String>) {
+        if (!condition) invalid(parameter, message, accepted)
     }
 
-    private fun error(project: Project, code: String, message: String, mode: String = "status", parameters: JSONObject = JSONObject()): String {
-        val recovery = recoveryStatusParameters(project, mode, parameters)
+    private fun validateVersion(parameter: String, version: String) {
+        try { UctVersions.compare(version, version) }
+        catch (_: IllegalArgumentException) { invalid(parameter, "Invalid Magento version: $version", listOf("x.y.z", "x.y.z-pN", "x.y.z-alphaN", "x.y.z-betaN", "x.y.z-rcN")) }
+    }
+
+    private fun error(project: Project, code: String, message: String, details: JSONObject? = null): String {
+        val error = JSONObject().put("code", code).put("message", message)
+        details?.keySet()?.forEach { error.put(it, details.get(it)) }
+        // A readiness request cannot correct invalid arguments or recover an expired run.
+        if (details == null && message.contains("runId")) {
+            error.put("parameter", "runId").put("acceptedValues", JSONArray(listOf("a retained runId from this project")))
+        }
         return MagentoMcpProjectContext.identity(project)
-            .put("state", "failed").put("complete", false)
-            .put("error", JSONObject().put("code", code).put("message", message))
-            .put("nextCall", recovery?.let { nextCall(project, "status", it) } ?: JSONObject.NULL)
-            .put("nextAction", if (recovery == null) "Correct the invalid version options and retry the original request."
-                else "Correct the rejected request before retrying. nextCall only checks readiness with the original valid version options; it does not retry the analysis.")
+            .put("state", "failed").put("complete", false).put("pathBase", project.basePath ?: JSONObject.NULL)
+            .put("error", error).put("nextCall", JSONObject.NULL)
+            .put("nextAction", if (code == "unavailable") "Resolve the reported availability error before retrying the original request."
+                else "Correct the rejected parameters and retry the original request. Use detailed_schema for constraints.")
             .toString()
     }
 }

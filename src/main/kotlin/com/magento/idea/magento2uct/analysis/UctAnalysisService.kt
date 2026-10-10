@@ -24,12 +24,13 @@ import com.magento.idea.magento2uct.util.inspection.FilterDescriptorResultsUtil
 import java.util.function.Consumer
 import java.nio.file.Path
 
-data class UctAnalysisRequest(
+data class UctAnalysisRequest @JvmOverloads constructor(
     val paths: List<String>,
     val currentVersion: String?,
     val targetVersion: String,
     val minimumSeverity: IssueSeverityLevel,
-    val ignoreCurrentVersion: Boolean
+    val ignoreCurrentVersion: Boolean,
+    val explainSuppressed: Boolean = false
 )
 
 data class UctFinding(
@@ -41,7 +42,14 @@ data class UctFinding(
 )
 
 data class UctAnalysisProgress(val processedFiles: Int, val totalFiles: Int)
-data class UctAnalysisResult(val findings: List<UctFinding>, val processedFiles: Int, val modules: Int, val themes: Int)
+data class UctAnalysisResult(
+    val findings: List<UctFinding>, val processedFiles: Int, val modules: Int, val themes: Int,
+    val analysisIdentity: String? = null,
+    val fileTypeCounts: Map<String, Int> = emptyMap(),
+    val testFiles: Int = 0,
+    val suppressedByRule: Map<Int, Int>? = null,
+    val suppressedBySeverity: Map<String, Int>? = null
+)
 
 /** Shared scan engine. It does not open windows, save documents, write reports, or change settings. */
 class UctAnalysisService @JvmOverloads constructor(
@@ -65,6 +73,16 @@ class UctAnalysisService @JvmOverloads constructor(
             request.minimumSeverity,
             catalog.snapshot(request.currentVersion, request.targetVersion, request.ignoreCurrentVersion)
         )
+        require(!request.explainSuppressed || request.ignoreCurrentVersion) {
+            "explainSuppressed requires ignoreCurrentVersion=true."
+        }
+        val fullContext = if (request.explainSuppressed) UctAnalysisContext(request.minimumSeverity,
+            catalog.snapshot(request.currentVersion, request.targetVersion, false)) else null
+        val identity = catalog.identity(request.currentVersion, request.targetVersion, request.ignoreCurrentVersion).toString()
+        val suppressedByRule = sortedMapOf<Int, Int>()
+        val suppressedBySeverity = sortedMapOf<String, Int>()
+        val fileTypeCounts = sortedMapOf<String, Int>()
+        var testFiles = 0
         fun check() {
             cancellation.run()
             ProgressManager.checkCanceled()
@@ -137,6 +155,24 @@ class UctAnalysisService @JvmOverloads constructor(
                 }
                 val holder = UctInspectionManager(project).run(psiFile, context)
                     ?: error("Unsupported analysis file: ${virtualFile.path}")
+                val type = virtualFile.extension?.lowercase()?.takeIf { it in setOf("php", "phtml", "xml", "html") }
+                    ?: if (psiFile is com.jetbrains.php.lang.psi.PhpFile) "php" else "xml"
+                fileTypeCounts[type] = (fileTypeCounts[type] ?: 0) + 1
+                val relative = Path.of(project.basePath!!).relativize(Path.of(virtualFile.path))
+                if (relative.any { it.toString().lowercase() in setOf("test", "tests", "fixture", "fixtures", "_files") }) testFiles++
+                if (fullContext != null) {
+                    val full = UctInspectionManager(project).run(psiFile, fullContext)!!
+                    fun key(descriptor: com.intellij.codeInspection.ProblemDescriptor, source: com.magento.idea.magento2uct.inspections.UctProblemsHolder) =
+                        Triple(descriptor.psiElement.textRange.startOffset, source.getIssue(descriptor).code, descriptor.descriptionTemplate)
+                    val retained = holder.results.map { key(it, holder) }.toSet()
+                    full.results.distinctBy { key(it, full) }.filterNot { key(it, full) in retained }.forEach {
+                        val issue = full.getIssue(it)
+                        suppressedByRule[issue.code] = (suppressedByRule[issue.code] ?: 0) + 1
+                        val severity = issue.level.name.lowercase()
+                        suppressedBySeverity[severity] = (suppressedBySeverity[severity] ?: 0) + 1
+                    }
+                    require(suppressedByRule.values.sum() <= 50000) { "Scan exceeds 50000 suppressed findings. Choose a narrower scope." }
+                }
                 FilterDescriptorResultsUtil.filter(holder).map { descriptor ->
                     val offset = descriptor.psiElement.textRange.startOffset
                     val line = document?.getLineNumber(offset) ?: descriptor.lineNumber
@@ -155,7 +191,10 @@ class UctAnalysisService @JvmOverloads constructor(
         check()
         return UctAnalysisResult(
             findings.sortedWith(compareBy({ it.filePath }, { it.line }, { it.column }, { it.issue.code }, { it.message })),
-            supported.size, components.values.count { !it.theme }, components.values.count { it.theme }
+            supported.size, components.values.count { !it.theme }, components.values.count { it.theme },
+            identity, fileTypeCounts.toMap(), testFiles,
+            if (request.explainSuppressed) suppressedByRule.toMap() else null,
+            if (request.explainSuppressed) suppressedBySeverity.toMap() else null
         )
     }
 }

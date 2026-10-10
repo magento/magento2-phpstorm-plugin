@@ -130,6 +130,9 @@ class UctAnalysisServiceTest : PhysicalMagentoTestCase() {
         }
     }
 
+    private fun analyzeWithCatalog(catalog: UctIndexCatalog, request: UctAnalysisRequest) =
+        UctAnalysisService(project, catalog).analyze(request, Runnable {}, {})
+
     private fun cancelled() = Runnable { throw ProcessCanceledException() }
 
     fun testOverlappingPathsDoNotDuplicateFindings() {
@@ -174,4 +177,46 @@ class UctAnalysisServiceTest : PhysicalMagentoTestCase() {
         assertEquals(result.findings.first().line, first.getInt("lineNumber"))
         assertEquals(result.findings.first().message, first.getString("message"))
     }
+    fun testSuppressionExplainsExistingIssuesWithoutSuppressingNewOnes() {
+        val all = analyze()
+        val delta = analyze(request(ignore = true).copy(explainSuppressed = true))
+        assertTrue(delta.suppressedByRule!!.values.sum() > 0)
+        assertTrue(delta.suppressedBySeverity!!.getValue("error") > 0)
+        assertTrue(delta.findings.any { it.issue.level == IssueSeverityLevel.CRITICAL })
+        assertEquals(all.findings, analyze().findings)
+        assertEquals(mapOf("php" to 2, "xml" to 1), delta.fileTypeCounts)
+    }
+
+    fun testPolyvariantInheritedTemplateMethodsRemainStableAcrossVersionAndCatalogChanges() {
+        myFixture.addFileToProject("vendor/magento/test/Block.php", """
+            <?php namespace Magento\Test;
+            class Block { public function escapeHtml(${ '$' }value) { return ${ '$' }value; } }
+            class Other { public function escapeHtml(${ '$' }value) { return ${ '$' }value; } }
+        """.trimIndent())
+        myFixture.addFileToProject("app/code/Foo/Bar/Child.php", "<?php namespace Foo\\Bar; class Child extends \\Magento\\Test\\Block {}")
+        val template = myFixture.addFileToProject("app/code/Foo/Bar/view/adminhtml/templates/edit.phtml", """
+            <?php /** @var \Foo\Bar\Child|\Magento\Test\Other ${ '$' }block */ ?>
+            <h1><?= ${ '$' }block->escapeHtml('title') ?></h1>
+            <?php /** @var \Magento\Test\Other|\Foo\Bar\Child ${ '$' }other */ ?>
+            <h2><?= ${ '$' }other->escapeHtml('subtitle') ?></h2>
+        """.trimIndent())
+        PsiDocumentManager.getInstance(project).commitAllDocuments()
+        val method = "\\Magento\\Test\\Block.escapeHtml"
+        val methods = setOf(method, "\\Magento\\Test\\Other.escapeHtml")
+        val baseline = UctReleaseFixture.index("2.4.8-p5", methods)
+        val target = UctReleaseFixture.index("2.4.9", methods, deprecated = methods)
+        val releases = mapOf(baseline.version to baseline, target.version to target)
+        val catalog = UctIndexCatalogTest.fixtureCatalog().withReleases(releases)
+        val scan = request().copy(paths = listOf(template.virtualFile.path), currentVersion = baseline.version, targetVersion = target.version)
+        fun run(c: UctIndexCatalog = catalog, r: UctAnalysisRequest = scan) = analyzeWithCatalog(c, r)
+        val before = run()
+        assertEquals(before.findings.toString(), 4, before.findings.count { it.issue == SupportedIssue.CALLING_DEPRECATED_METHOD })
+        assertTrue(run(r = scan.copy(targetVersion = baseline.version)).findings.none { it.issue == SupportedIssue.CALLING_DEPRECATED_METHOD })
+        assertEquals(before.findings, run(r = scan.copy(ignoreCurrentVersion = true)).findings)
+        val expanded = catalog.withReleases(releases + ("2.4.8-p4" to UctReleaseFixture.index("2.4.8-p4", setOf("\\Magento\\Test\\Other.escapeHtml"))))
+        assertEquals(before.findings, run(expanded).findings)
+        assertEquals(before.analysisIdentity, run(expanded).analysisIdentity)
+        assertEquals(before.findings, run().findings)
+    }
+
 }

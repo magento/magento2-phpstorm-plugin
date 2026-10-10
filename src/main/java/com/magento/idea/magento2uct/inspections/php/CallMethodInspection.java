@@ -7,7 +7,9 @@ package com.magento.idea.magento2uct.inspections.php;
 
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiElement;
+import com.intellij.psi.ResolveResult;
+import java.util.Map;
+import java.util.TreeMap;
 import com.intellij.psi.PsiElementVisitor;
 import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.jetbrains.php.lang.psi.elements.Method;
@@ -34,12 +36,17 @@ public abstract class CallMethodInspection extends PhpInspection {
                         || !UctAnalysisContext.accepts(problemsHolder, getSeverityLevel())) {
                     return;
                 }
-                final PsiElement resolvedElement = reference.resolve();
-
-                if (!(resolvedElement instanceof Method)) {
-                    return;
+                // resolve() may return null for a polyvariant reference or an arbitrary first
+                // declaration. Inspect every distinct resolved symbol in a stable order instead.
+                final Map<String, Method> methods = new TreeMap<>();
+                for (final ResolveResult result : reference.multiResolve(false)) {
+                    if (result.isValidResult() && result.getElement() instanceof Method method) {
+                        methods.putIfAbsent(method.getFQN(), method);
+                    }
                 }
-                execute(project, problemsHolder, reference, (Method) resolvedElement);
+                for (final Method method : methods.values()) {
+                    execute(project, problemsHolder, reference, method);
+                }
             }
         };
     }
