@@ -49,6 +49,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - name: Set up PHP for process tests
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: none
       - name: Set up JDK 25
         uses: actions/setup-java@v3
         with:
@@ -73,6 +79,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - name: Set up PHP for process tests
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: none
       - name: Set up JDK 25
         uses: actions/setup-java@v3
         with:
@@ -111,6 +123,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - name: Set up PHP for process tests
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: none
       - name: Set up JDK 25
         uses: actions/setup-java@v3
         with:

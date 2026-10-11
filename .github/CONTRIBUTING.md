@@ -8,6 +8,8 @@
 1. In the Gradle tool window, run `Tasks > Intellij platform > runIde`.
 1. The task launches a PhpStorm sandbox with the plugin installed. Make sure that the plugin is enabled and indexing is finished before testing features.
 
+To run `./gradlew test`, also install PHP CLI and add `php` (`php.exe` on Windows) to `PATH`. The run-configuration tests launch PHP to verify interpreter settings and command arguments. CI installs PHP 8.4 on Linux, Windows, and macOS.
+
 # Compatibility preparation tests
 
 Repository tests cover native JetBrains MCP discovery/invocation, HTTP download and validation, preparation progress, cancellation, persistence, corrupt caches, version readiness, and PHP/XML findings produced from prepared data. Regular tests use local release fixtures and do not need internet access. Compatibility command tests also pass responses through the JetBrains SDK transport adapter: the host intentionally drops `structuredContent` for errors, so agents must be able to parse the JSON text. Argument-type and project-routing failures occur before the plugin and can remain plain-text host errors.

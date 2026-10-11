@@ -12,6 +12,7 @@ import com.intellij.execution.process.CapturingProcessHandler
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.SystemInfo
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
 import com.jetbrains.php.config.commandLine.PhpCommandLinePathProcessor
 import com.jetbrains.php.config.commandLine.PhpCommandSettings
@@ -22,7 +23,6 @@ import com.magento.idea.magento2plugin.PhysicalMagentoTestCase
 import com.magento.idea.magento2plugin.project.Settings
 import com.magento.idea.magento2uct.packages.SupportedVersion
 import org.jdom.Element
-import org.junit.Assume.assumeNotNull
 import java.util.concurrent.atomic.AtomicReference
 import javax.swing.JTextField
 
@@ -50,7 +50,8 @@ class UctRunConfigurationTest : PhysicalMagentoTestCase() {
             configuration.memoryLimit = limit
             configuration.checkConfiguration()
             val arguments = configuration.createCommandLine(commandSettings("128M")).parametersList.list
-            val scriptIndex = arguments.indexOf(configuration.scriptName)
+            val scriptIndex = arguments.indexOf(FileUtil.toSystemDependentName(configuration.scriptName))
+            assertTrue("Script path is missing from command arguments: $arguments", scriptIndex >= 0)
             val overrideIndex = arguments.indexOfFirst { it.contains("memory_limit=$limit") }
             val inheritedIndex = arguments.indexOfFirst { it.contains("memory_limit=128M") }
             assertTrue(arguments.toString(), inheritedIndex >= 0 && overrideIndex > inheritedIndex)
@@ -136,7 +137,7 @@ class UctRunConfigurationTest : PhysicalMagentoTestCase() {
 
     fun testPhpProcessReceivesMemoryLimitOverride() {
         val php = PathEnvironmentVariableUtil.findInPath(if (SystemInfo.isWindows) "php.exe" else "php")
-        assumeNotNull(php)
+        assertNotNull("PHP CLI is required for process tests. Install PHP and add it to PATH before running tests.", php)
         VfsRootAccess.allowRootAccess(testRootDisposable, php!!.path)
         val script = myFixture.addFileToProject(
             "tools with spaces/uct",
