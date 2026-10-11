@@ -6,6 +6,7 @@
 package com.magento.idea.magento2uct.execution.configurations;
 
 import com.intellij.execution.ExecutionException;
+import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.options.ConfigurationException;
@@ -28,8 +29,6 @@ import com.magento.idea.magento2uct.util.UctExecutableValidatorUtil;
 import com.magento.idea.magento2uct.util.module.UctModuleLocatorUtil;
 import java.awt.Color;
 import java.awt.Container;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -102,12 +101,8 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
         this.project = project;
         initializeComboboxSources();
         validateSettingsForm();
-        try {
-            learnMoreLink.setURI(new URI(LEARN_MORE_URI));
-            learnMoreLink.setText(LEARN_MORE_TEXT);
-        } catch (URISyntaxException exception) {
-            learnMoreLink.setVisible(false);
-        }
+        learnMoreLink.setText(LEARN_MORE_TEXT);
+        learnMoreLink.addActionListener(event -> BrowserUtil.browse(LEARN_MORE_URI));
         infoLabel.setForeground(JBColor.blue);
         infoLabel2.setForeground(JBColor.blue);
         uctLookupFailedWarning.setForeground(JBColor.orange);
