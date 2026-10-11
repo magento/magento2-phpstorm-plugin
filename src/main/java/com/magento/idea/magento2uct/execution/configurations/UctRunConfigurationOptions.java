@@ -12,6 +12,8 @@ public class UctRunConfigurationOptions extends LocatableRunConfigurationOptions
 
     private final StoredProperty<String> myScriptName = string("")
             .provideDelegate(this, "scriptName");
+    private final StoredProperty<String> memoryLimit = string("")
+            .provideDelegate(this, "memoryLimit");
     private final StoredProperty<String> projectRoot = string("")
             .provideDelegate(this, "projectRoot");
     private final StoredProperty<String> modulePath = string("")
@@ -41,6 +43,24 @@ public class UctRunConfigurationOptions extends LocatableRunConfigurationOptions
      */
     public String getScriptName() {
         return myScriptName.getValue(this) == null ? "" : myScriptName.getValue(this);
+    }
+
+    /**
+     * Set the PHP memory limit override, or empty to use the interpreter settings.
+     *
+     * @param memoryLimit String
+     */
+    public void setMemoryLimit(final String memoryLimit) {
+        this.memoryLimit.setValue(this, memoryLimit.trim());
+    }
+
+    /**
+     * Get the PHP memory limit override.
+     *
+     * @return String
+     */
+    public String getMemoryLimit() {
+        return memoryLimit.getValue(this) == null ? "" : memoryLimit.getValue(this);
     }
 
     /**
