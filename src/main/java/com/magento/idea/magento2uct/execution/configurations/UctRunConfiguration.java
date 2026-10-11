@@ -16,6 +16,8 @@ import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.configurations.LocatableConfigurationBase;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.configurations.RunProfileState;
+import com.intellij.execution.configurations.RuntimeConfigurationError;
+import com.intellij.execution.configurations.RuntimeConfigurationException;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.process.ProcessHandlerFactory;
@@ -28,6 +30,7 @@ import com.jetbrains.php.config.PhpProjectConfigurationFacade;
 import com.jetbrains.php.config.commandLine.PhpCommandSettings;
 import com.jetbrains.php.config.commandLine.PhpCommandSettingsBuilder;
 import com.jetbrains.php.config.interpreters.PhpInterpreter;
+import com.jetbrains.php.run.PhpConfigurationOption;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2uct.execution.filters.UctPhpFileFilter;
 import com.magento.idea.magento2uct.execution.filters.UctResultFileFilter;
@@ -35,7 +38,9 @@ import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.settings.UctSettingsService;
 import com.magento.idea.magento2uct.util.UctExecutableValidatorUtil;
 import com.magento.idea.magento2uct.util.module.UctModulePathValidatorUtil;
+import java.util.List;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,6 +52,8 @@ import org.jetbrains.annotations.Nullable;
         "PMD.ExcessiveMethodLength"
 })
 public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfigurationOptions> {
+
+    private static final Pattern MEMORY_LIMIT_PATTERN = Pattern.compile("-1|[1-9][0-9]*[kKmMgG]?");
 
     /**
      * UCT run configuration constructor.
@@ -84,6 +91,38 @@ public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfig
      */
     public String getScriptName() {
         return getOptions().getScriptName();
+    }
+
+    /**
+     * Set the PHP memory limit override.
+     *
+     * @param memoryLimit String
+     */
+    public void setMemoryLimit(final String memoryLimit) {
+        getOptions().setMemoryLimit(memoryLimit);
+    }
+
+    /**
+     * Get the PHP memory limit override.
+     *
+     * @return String
+     */
+    public String getMemoryLimit() {
+        return getOptions().getMemoryLimit();
+    }
+
+    @Override
+    public void checkConfiguration() throws RuntimeConfigurationException {
+        super.checkConfiguration();
+        validateMemoryLimit(getMemoryLimit());
+    }
+
+    static void validateMemoryLimit(final String memoryLimit) throws RuntimeConfigurationError {
+        if (!memoryLimit.isBlank() && !MEMORY_LIMIT_PATTERN.matcher(memoryLimit.trim()).matches()) {
+            throw new RuntimeConfigurationError(
+                    "PHP memory limit must be empty, -1 (unlimited), or a positive size such as 512M or 2G."
+            );
+        }
     }
 
     /**
@@ -258,44 +297,7 @@ public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfig
                 final PhpCommandSettings commandSettingsBuilder =
                         PhpCommandSettingsBuilder.create(getProject(), interpreter, false);
 
-                commandSettingsBuilder.setScript(getScriptName());
-                commandSettingsBuilder.addArgument("upgrade:check");
-
-                if (!getComingVersion().isEmpty()) {
-                    commandSettingsBuilder.addArgument("--coming-version=" + getComingVersion());
-                }
-
-                if (!getComingVersion().isEmpty()) {
-                    commandSettingsBuilder.addArgument(
-                            "--current-version=" + Settings.getInstance(getProject()).magentoVersion
-                    );
-                }
-
-                final GeneralCommandLine commandLine =
-                        commandSettingsBuilder.createGeneralCommandLine();
-
-                if (!getModulePath().isEmpty()) {
-                    if (UctModulePathValidatorUtil.validate(getModulePath())) {
-                        commandLine.addParameter(getModulePath());
-                    } else {
-                        throw new ExecutionException("The path to analyse is not valid");
-                    }
-                }
-                final IssueSeverityLevel severityLevel =
-                        IssueSeverityLevel.getByLevel(getMinIssueLevel());
-                final IssueSeverityLevel defaultSeverityLevel =
-                        IssueSeverityLevel.getDefaultIssueSeverityLevel();
-
-                if (!severityLevel.equals(defaultSeverityLevel)) {
-                    commandLine
-                            .addParameter("--min-issue-level=".concat(severityLevel.getLabel()));
-                }
-
-                if (hasIgnoreCurrentVersionIssues()) {
-                    commandLine.addParameter("--ignore-current-version-compatibility-issues");
-                }
-                commandLine.addParameter("--context=phpstorm");
-                commandLine.addParameter("--ansi");
+                final GeneralCommandLine commandLine = createCommandLine(commandSettingsBuilder);
 
                 final OSProcessHandler processHandler = ProcessHandlerFactory
                         .getInstance()
@@ -311,5 +313,65 @@ public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfig
                 return processHandler;
             }
         };
+    }
+
+    /**
+     * Build the UCT command with PHP options before the script and UCT arguments after it.
+     *
+     * @param commandSettingsBuilder Settings for the selected PHP interpreter
+     * @return GeneralCommandLine
+     * @throws ExecutionException if the memory limit or module path is invalid
+     */
+    GeneralCommandLine createCommandLine(final PhpCommandSettings commandSettingsBuilder) throws ExecutionException {
+        try {
+            validateMemoryLimit(getMemoryLimit());
+        } catch (RuntimeConfigurationError exception) {
+            throw new ExecutionException(exception.getMessage(), exception);
+        }
+        if (!getMemoryLimit().isBlank()) {
+            commandSettingsBuilder.addConfigurationOptions(
+                    List.of(new PhpConfigurationOption("memory_limit", getMemoryLimit()))
+            );
+        }
+        commandSettingsBuilder.setScript(getScriptName());
+        commandSettingsBuilder.addArgument("upgrade:check");
+
+        if (!getComingVersion().isEmpty()) {
+            commandSettingsBuilder.addArgument("--coming-version=" + getComingVersion());
+        }
+
+        if (!getComingVersion().isEmpty()) {
+            commandSettingsBuilder.addArgument(
+                    "--current-version=" + Settings.getInstance(getProject()).magentoVersion
+            );
+        }
+
+        final GeneralCommandLine commandLine =
+                commandSettingsBuilder.createGeneralCommandLine();
+
+        if (!getModulePath().isEmpty()) {
+            if (UctModulePathValidatorUtil.validate(getModulePath())) {
+                commandLine.addParameter(getModulePath());
+            } else {
+                throw new ExecutionException("The path to analyse is not valid");
+            }
+        }
+        final IssueSeverityLevel severityLevel =
+                IssueSeverityLevel.getByLevel(getMinIssueLevel());
+        final IssueSeverityLevel defaultSeverityLevel =
+                IssueSeverityLevel.getDefaultIssueSeverityLevel();
+
+        if (!severityLevel.equals(defaultSeverityLevel)) {
+            commandLine
+                    .addParameter("--min-issue-level=".concat(severityLevel.getLabel()));
+        }
+
+        if (hasIgnoreCurrentVersionIssues()) {
+            commandLine.addParameter("--ignore-current-version-compatibility-issues");
+        }
+        commandLine.addParameter("--context=phpstorm");
+        commandLine.addParameter("--ansi");
+
+        return commandLine;
     }
 }

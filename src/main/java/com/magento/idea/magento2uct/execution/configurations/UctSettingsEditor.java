@@ -6,8 +6,10 @@
 package com.magento.idea.magento2uct.execution.configurations;
 
 import com.intellij.execution.ExecutionException;
+import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
+import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.LabeledComponent;
@@ -27,8 +29,6 @@ import com.magento.idea.magento2uct.util.UctExecutableValidatorUtil;
 import com.magento.idea.magento2uct.util.module.UctModuleLocatorUtil;
 import java.awt.Color;
 import java.awt.Container;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,6 +38,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import org.jdesktop.swingx.JXHyperlink;
 import org.jetbrains.annotations.NotNull;
@@ -62,6 +63,7 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
 
     private JPanel contentPanel;
     private LabeledComponent<TextFieldWithBrowseButton> myScriptName;
+    private JTextField memoryLimit;
     private LabeledComponent<TextFieldWithBrowseButton> projectRoot;
     private LabeledComponent<TextFieldWithBrowseButton> modulePath;
     private JComboBox<ComboBoxItemData> comingVersion;
@@ -99,12 +101,8 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
         this.project = project;
         initializeComboboxSources();
         validateSettingsForm();
-        try {
-            learnMoreLink.setURI(new URI(LEARN_MORE_URI));
-            learnMoreLink.setText(LEARN_MORE_TEXT);
-        } catch (URISyntaxException exception) {
-            learnMoreLink.setVisible(false);
-        }
+        learnMoreLink.setText(LEARN_MORE_TEXT);
+        learnMoreLink.addActionListener(event -> BrowserUtil.browse(LEARN_MORE_URI));
         infoLabel.setForeground(JBColor.blue);
         infoLabel2.setForeground(JBColor.blue);
         uctLookupFailedWarning.setForeground(JBColor.orange);
@@ -115,6 +113,7 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
 
     @Override
     protected void resetEditorFrom(final @NotNull UctRunConfiguration uctRunConfiguration) {
+        memoryLimit.setText(uctRunConfiguration.getMemoryLimit());
         lookupUctExecutablePath(uctRunConfiguration);
 
         if (uctExecutablePath != null) {
@@ -159,11 +158,14 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
     }
 
     @Override
-    protected void applyEditorTo(final @NotNull UctRunConfiguration uctRunConfiguration) {
+    protected void applyEditorTo(final @NotNull UctRunConfiguration uctRunConfiguration)
+            throws ConfigurationException {
+        UctRunConfiguration.validateMemoryLimit(memoryLimit.getText());
         if (uctRunConfiguration.isNewlyCreated()) {
             uctRunConfiguration.setIsNewlyCreated(false);
         }
         uctRunConfiguration.setScriptName(myScriptName.getComponent().getText());
+        uctRunConfiguration.setMemoryLimit(memoryLimit.getText());
         uctRunConfiguration.setProjectRoot(projectRoot.getComponent().getText());
         uctRunConfiguration.setModulePath(modulePath.getComponent().getText());
 

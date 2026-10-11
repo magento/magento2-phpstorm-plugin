@@ -108,6 +108,8 @@ Reconnect your assistant after updating the plugin so it discovers the latest to
 1. In the Gradle tool window, run `Tasks > Intellij platform > runIde`.
 1. The task launches a PhpStorm sandbox with the plugin installed. Make sure the plugin is enabled and indexing is finished before testing features.
 
+To run `./gradlew test`, also install PHP CLI and add `php` (`php.exe` on Windows) to `PATH`. The run-configuration tests launch PHP to verify interpreter settings and command arguments. CI installs PHP 8.4 on Linux, Windows, and macOS.
+
 ## How to contribute
 1) Start with looking into [Community Backlog](https://github.com/magento/magento2-phpstorm-plugin/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22good%20first%20issue%22). Any ticket in `Ready for Development` and `Good First Issue` columns are a good candidates to start.
 2) Didn't satisfy your requirements? [Create a new issue](https://github.com/magento/magento2-phpstorm-plugin/issues/new). It can be for example:
