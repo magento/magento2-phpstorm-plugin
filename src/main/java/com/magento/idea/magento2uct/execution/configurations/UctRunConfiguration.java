@@ -326,7 +326,7 @@ public class UctRunConfiguration extends LocatableConfigurationBase<UctRunConfig
         try {
             validateMemoryLimit(getMemoryLimit());
         } catch (RuntimeConfigurationError exception) {
-            throw new ExecutionException(exception.getMessage(), exception);
+            throw new ExecutionException(exception.getMessageHtml().toString(), exception);
         }
         if (!getMemoryLimit().isBlank()) {
             commandSettingsBuilder.addConfigurationOptions(

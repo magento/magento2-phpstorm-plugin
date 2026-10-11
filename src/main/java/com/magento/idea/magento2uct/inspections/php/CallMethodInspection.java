@@ -17,7 +17,6 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpExpression;
-import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
@@ -69,8 +68,10 @@ public abstract class CallMethodInspection extends PhpInspection {
             return methods;
         }
         final PhpIndex index = PhpIndex.getInstance(reference.getProject());
-        for (final String type : receiver.getType().global(reference.getProject()).removeParametrisedParts().getTypes()) {
-            for (final String member : PhpType.splitTopLevel(type, '&')) {
+        // getTypes() exposes class names without generic arguments, so '&' only
+        // separates receiver contracts, never types nested inside a generic argument.
+        for (final String type : receiver.getType().global(reference.getProject()).getTypes()) {
+            for (final String member : type.split("&")) {
                 for (final PhpClass phpClass : index.getAnyByFQN(member)) {
                     final Method method = phpClass.findMethodByName(reference.getName());
                     if (method != null) {

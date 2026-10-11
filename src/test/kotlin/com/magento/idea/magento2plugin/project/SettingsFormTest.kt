@@ -76,7 +76,7 @@ class SettingsFormTest : PhysicalMagentoTestCase() {
         for (invalid in listOf("relative/path", "file:///tmp/releases.json", "https://", "https://example.test/#page", "https://bad host/releases")) {
             input.text = invalid
             val error = org.junit.Assert.assertThrows(ConfigurationException::class.java) { form.apply() }
-            assertTrue(error.message!!.contains("Published releases URL"))
+            assertTrue(error.messageHtml.toString().contains("Published releases URL"))
             assertEquals(Settings.DEFAULT_PUBLISHED_RELEASES_URL, settings.getPublishedReleasesUrl())
         }
     }

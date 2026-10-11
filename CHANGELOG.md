@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 
+## 2026.3.4
+
+### Changed
+
+- Updated Gradle to 9.8.1, IntelliJ Platform Gradle Plugin to 2.19.0, and the PhpStorm/WebStorm build and test targets to 2026.3 EAP, along with Kotlin, runtime and test dependencies, and CI tooling.
+- Raised the minimum supported IDE version to 2026.3 (`263`) and removed the upper build limit so future IDE compatibility issues can be reported.
+
+### Fixed
+
+- Replaced internal and deprecated platform API calls in UCT method inspections, run configuration validation, and MCP plugin version reporting.
+- Replaced SwingX hyperlinks and input placeholders with platform UI components for compatibility with 2026.3 IDEs.
+- CLI command generation escapes single quotes and backslashes in descriptions to preserve their text and prevent invalid PHP syntax [#1280](https://github.com/magento/magento2-phpstorm-plugin/issues/1280).
+
 ## 2026.3.3
 
 ### Added

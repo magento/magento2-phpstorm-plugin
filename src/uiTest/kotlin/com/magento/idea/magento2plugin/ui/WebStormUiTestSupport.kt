@@ -27,6 +27,7 @@ import com.intellij.ide.starter.project.LocalProjectInfo
 import com.intellij.ide.starter.runner.CurrentTestMethod
 import com.intellij.ide.starter.runner.Starter
 import com.intellij.platform.testFramework.teamCity.TeamCityReporter.SyntheticTestKind
+import com.intellij.platform.testFramework.teamCity.TeamCityReporter.TestMetadata
 import com.intellij.tools.ide.starter.product.webstorm.WebStorm
 import org.junit.jupiter.api.fail
 import org.kodein.di.DI
@@ -52,7 +53,7 @@ internal fun runWebStormUiTest(
     Starter.newContext(
         testName,
         TestCase(IdeInfo.WebStorm, LocalProjectInfo(projectPath))
-            .withVersion(System.getProperty("ui.test.ide.version")),
+            .useEAP(System.getProperty("ui.test.ide.build")),
     ).apply {
         PluginConfigurator(this).installPluginFromPath(pluginPath)
         applyVMOptionsPatch {
@@ -99,6 +100,7 @@ private object WebStormUiTestEnvironment {
                         linkToLogs: String?,
                         kind: SyntheticTestKind,
                         generifyTestName: Boolean,
+                        additionalMetadata: List<TestMetadata>,
                     ) {
                         fail("$testName failed in WebStorm: $message\n$details")
                     }

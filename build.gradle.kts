@@ -59,17 +59,19 @@ sourceSets {
     }
 }
 
-val uiTestImplementation by configurations.getting {
+val uiTestImplementation = configurations.getByName("uiTestImplementation") {
     extendsFrom(configurations.testImplementation.get())
 }
-val uiTestRuntimeOnly by configurations.getting {
+val uiTestRuntimeOnly = configurations.getByName("uiTestRuntimeOnly") {
     extendsFrom(configurations.testRuntimeOnly.get())
 }
 
 dependencies {
-    testImplementation("junit:junit:4.13.2")
-    testCompileOnly("org.junit.jupiter:junit-jupiter-api:5.14.4")
-    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.14.4")
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.junit4)
+    testCompileOnly(libs.junit.jupiter.api)
+    testRuntimeOnly(libs.junit.vintage.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
 
     intellijPlatform {
         create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
@@ -88,15 +90,15 @@ dependencies {
 
     uiTestImplementation(platform(libs.junit.bom))
     uiTestImplementation(libs.junit.jupiter)
-    uiTestImplementation("org.kodein.di:kodein-di-jvm:7.26.1")
-    uiTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.10.2")
+    uiTestImplementation(libs.kodein.di)
+    uiTestImplementation(libs.kotlinx.coroutines.core)
     uiTestRuntimeOnly(libs.junit.jupiter.engine)
     uiTestRuntimeOnly(kotlin("stdlib"))
     uiTestRuntimeOnly(kotlin("reflect"))
-    uiTestRuntimeOnly("org.jetbrains.teamcity:serviceMessages:2024.07")
+    uiTestRuntimeOnly(libs.teamcity.serviceMessages)
 
-    implementation("org.json:json:20171018")
-    implementation("org.codehaus.plexus:plexus-utils:3.5.1")
+    implementation(libs.json)
+    implementation(libs.plexus.utils)
 }
 
 intellijPlatform {
@@ -136,7 +138,6 @@ intellijPlatform {
 
         ideaVersion {
             sinceBuild = providers.gradleProperty("pluginSinceBuild")
-            untilBuild = providers.gradleProperty("pluginUntilBuild")
         }
     }
 
@@ -232,16 +233,18 @@ tasks {
 
 }
 
-val uiTest by intellijPlatformTesting.testIdeUi.registering {
+intellijPlatformTesting.testIdeUi.register("uiTest") {
     type = IntelliJPlatformType.WebStorm
-    version = providers.gradleProperty("platformVersion")
+    version = providers.gradleProperty("uiTestPlatformVersion")
 
     task {
         val uiTestSourceSet = sourceSets.getByName("uiTest")
         testClassesDirs = uiTestSourceSet.output.classesDirs
         classpath = uiTestSourceSet.runtimeClasspath
+        // The 2026.3 Starter archive extractor uses the platform's NIO filesystem.
+        jvmArgs("--add-exports=java.base/sun.nio.fs=ALL-UNNAMED")
         systemProperty("path.to.build.plugin", tasks.prepareSandbox.get().pluginDirectory.get().asFile)
-        systemProperty("ui.test.ide.version", providers.gradleProperty("platformVersion").get())
+        systemProperty("ui.test.ide.build", providers.gradleProperty("uiTestPlatformVersion").get())
         useJUnitPlatform()
         dependsOn(tasks.prepareSandbox)
 
