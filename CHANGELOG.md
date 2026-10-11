@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Fixed
 
+- Deprecated `ConfigurationException.getMessage()` usage in UCT memory-limit validation and Magento settings error reporting.
 - External UCT run configurations support a PHP memory-limit override for large projects [#2512](https://github.com/magento/magento2-phpstorm-plugin/issues/2512).
 - Missing SQL condition operators and plural store and website scopes in PHP argument completion.
 - View Model injection is available only in editable Magento directories, including explicitly marked vendor directories [#1204](https://github.com/magento/magento2-phpstorm-plugin/issues/1204).

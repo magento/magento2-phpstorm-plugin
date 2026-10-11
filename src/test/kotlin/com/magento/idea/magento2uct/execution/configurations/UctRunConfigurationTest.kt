@@ -81,8 +81,10 @@ class UctRunConfigurationTest : PhysicalMagentoTestCase() {
         for (invalid in listOf("0", "-2", "1.5G", "512MB", "unlimited", "2G -n", "2G\n-d foo=bar")) {
             configuration.memoryLimit = invalid
             val validation = org.junit.Assert.assertThrows(RuntimeConfigurationError::class.java) { configuration.checkConfiguration() }
-            assertTrue(validation.message!!.contains("PHP memory limit"))
-            org.junit.Assert.assertThrows(ExecutionException::class.java) { configuration.createCommandLine(commandSettings()) }
+            assertTrue(validation.messageHtml.toString().contains("PHP memory limit"))
+            val execution = org.junit.Assert.assertThrows(ExecutionException::class.java) { configuration.createCommandLine(commandSettings()) }
+            assertEquals(validation.messageHtml.toString(), execution.message)
+            assertTrue(execution.cause is RuntimeConfigurationError)
         }
     }
 

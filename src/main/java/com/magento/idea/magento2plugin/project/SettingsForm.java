@@ -15,6 +15,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -167,10 +168,10 @@ public class SettingsForm implements SearchableConfigurable {
                     NotificationType.INFORMATION
             );
         } catch (final ConfigurationException exception) {
-            final String message = exception.getLocalizedMessage();
+            final HtmlChunk message = exception.getMessageHtml();
             Messages.showErrorDialog(
                     project,
-                    message == null ? "Invalid Magento settings." : message,
+                    message.isEmpty() ? "Invalid Magento settings." : message.wrapWith("html").toString(),
                     "Magento Reindex"
             );
         }
