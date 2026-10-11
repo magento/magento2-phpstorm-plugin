@@ -10,7 +10,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 ### Changed
 
 - Updated Gradle to 9.8.1, IntelliJ Platform Gradle Plugin to 2.19.0, and the PhpStorm/WebStorm build and test targets to 2026.3 EAP, along with Kotlin, runtime and test dependencies, and CI tooling.
-- Raised the minimum supported IDE version to 2026.3 (`263`) and removed the upper build limit so future IDE compatibility issues can be reported.
 
 ### Fixed
 
