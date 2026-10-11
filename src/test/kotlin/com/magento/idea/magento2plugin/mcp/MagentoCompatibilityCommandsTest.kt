@@ -745,13 +745,14 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
 
         for ((configuredRoot, expectedDirectory) in listOf(
             "${project.basePath}/src" to "src",
+            "${project.basePath}/src".replace('/', '\\') to "src",
             "src" to "src",
             "\\src" to "src",
             "${project.basePath}/.runtime" to ".runtime"
         )) {
             Settings.getInstance(project).magentoPath = configuredRoot
             val started = call("analyze", "{\"moduleName\":\"Foo_Bar\",\"targetVersion\":\"2.4.3\"}")
-            assertTrue(started.toString(), started.has("runId"))
+            assertTrue("Configured root: $configuredRoot; result: $started", started.has("runId"))
             assertEquals("$expectedDirectory/app/code/Foo/Bar", started.getJSONArray("paths").getString(0))
             val runId = started.getString("runId")
             PlatformTestUtil.waitWithEventsDispatching("duplicate module analysis completion", { runs().results(runId).state != "running" }, 20)

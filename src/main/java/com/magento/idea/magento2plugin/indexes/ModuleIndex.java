@@ -323,10 +323,10 @@ public final class ModuleIndex {
                     ? configuredRoot.substring(1)
                     : configuredRoot;
             candidates.add(FileUtil.toSystemIndependentName(
-                    Paths.get(basePath, rootWithoutLeadingSlash).normalize().toString()
+                    Paths.get(basePath).resolve(rootWithoutLeadingSlash).normalize().toString()
             ));
             candidates.add(FileUtil.toSystemIndependentName(
-                    Paths.get(basePath, configuredRoot).normalize().toString()
+                    Paths.get(basePath).resolve(configuredRoot).normalize().toString()
             ));
         }
 
@@ -335,10 +335,10 @@ public final class ModuleIndex {
                     ? configuredRoot.substring(1)
                     : configuredRoot;
             candidates.add(FileUtil.toSystemIndependentName(
-                    Paths.get(contentRoot.getPath(), rootWithoutLeadingSlash).normalize().toString()
+                    Paths.get(contentRoot.getPath()).resolve(rootWithoutLeadingSlash).normalize().toString()
             ));
             candidates.add(FileUtil.toSystemIndependentName(
-                    Paths.get(contentRoot.getPath(), configuredRoot).normalize().toString()
+                    Paths.get(contentRoot.getPath()).resolve(configuredRoot).normalize().toString()
             ));
         }
 
