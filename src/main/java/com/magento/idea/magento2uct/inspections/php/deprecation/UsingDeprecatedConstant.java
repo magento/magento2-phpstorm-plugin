@@ -17,7 +17,7 @@ import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.UsedFieldInspection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public class UsingDeprecatedConstant extends UsedFieldInspection {
@@ -41,7 +41,7 @@ public class UsingDeprecatedConstant extends UsedFieldInspection {
     ) {
         final String constantFqn = constant.getFQN();
 
-        if (!VersionStateManager.getInstance(project).isDeprecated(constantFqn)) {
+        if (!UctAnalysisContext.versions(problemsHolder).isDeprecated(constantFqn)) {
             return;
         }
         final PhpClass containingClass = constant.getContainingClass();
@@ -55,7 +55,7 @@ public class UsingDeprecatedConstant extends UsedFieldInspection {
                     SupportedIssue.USING_DEPRECATED_CONSTANT
             );
         }
-        final String deprecatedIn = VersionStateManager.getInstance(project)
+        final String deprecatedIn = UctAnalysisContext.versions(problemsHolder)
                 .getDeprecatedInVersion(constantFqn);
 
         problemsHolder.registerProblem(

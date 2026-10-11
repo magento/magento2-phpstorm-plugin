@@ -15,7 +15,7 @@ import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.OverriddenFieldInspection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public class OverriddenNonApiProperty extends OverriddenFieldInspection {
@@ -28,7 +28,7 @@ public class OverriddenNonApiProperty extends OverriddenFieldInspection {
             final Field overriddenProperty,
             final PhpClass parentClass
     ) {
-        if (VersionStateManager.getInstance(project).isApi(overriddenProperty.getFQN())) {
+        if (UctAnalysisContext.versions(problemsHolder).isApi(overriddenProperty.getFQN())) {
             return;
         }
         final String message = SupportedIssue.OVERRIDDEN_NON_API_PROPERTY.getMessage(

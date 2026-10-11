@@ -14,7 +14,7 @@ import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.UsedTypeInspection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public class UsedNonApiType extends UsedTypeInspection {
@@ -26,7 +26,7 @@ public class UsedNonApiType extends UsedTypeInspection {
             final PhpClass phpClass,
             final ClassReference reference
     ) {
-        if (VersionStateManager.getInstance(project).isApi(phpClass.getFQN())) {
+        if (UctAnalysisContext.versions(problemsHolder).isApi(phpClass.getFQN())) {
             return;
         }
         final String message = SupportedIssue.USED_NON_API_TYPE.getMessage(phpClass.getFQN());

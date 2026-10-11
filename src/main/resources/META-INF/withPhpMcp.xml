@@ -7,5 +7,6 @@
 <idea-plugin>
     <extensions defaultExtensionNs="com.intellij">
         <mcpServer.mcpToolset implementation="com.magento.idea.magento2plugin.mcp.MagentoMcpToolset"/>
+        <mcpServer.mcpToolsProvider implementation="com.magento.idea.magento2plugin.mcp.MagentoCompatibilityToolsProvider"/>
     </extensions>
 </idea-plugin>

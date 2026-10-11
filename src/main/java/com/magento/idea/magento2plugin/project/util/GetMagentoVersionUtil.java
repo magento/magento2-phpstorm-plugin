@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class GetMagentoVersionUtil {
+    private static final String BASE_PACKAGE_NAME = "magento/magento2-base";
 
     private GetMagentoVersionUtil() {
     }
@@ -45,6 +46,7 @@ public final class GetMagentoVersionUtil {
         );
         final List<MagentoVersion> versions = MagentoVersion.getVersions();
         final List<String> versionNames = MagentoVersion.getVersionsNames();
+        versionNames.add(BASE_PACKAGE_NAME);
         final Map<String, String> foundMagentoPackages = new HashMap<>();
 
         for (final JsonObject packageItem : packages) {
@@ -74,7 +76,8 @@ public final class GetMagentoVersionUtil {
             }
         }
 
-        return null;
+        final String baseVersion = foundMagentoPackages.get(BASE_PACKAGE_NAME);
+        return baseVersion == null ? null : new Pair<>(baseVersion, null);
     }
 
     private static @Nullable ImmutablePair<String, String> findMagentoPackage(

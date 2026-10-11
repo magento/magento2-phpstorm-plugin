@@ -58,6 +58,7 @@ public class SettingsForm implements SearchableConfigurable {
     private JCheckBox mftfSupportEnabled;
     private TextFieldWithBrowseButton magentoPath;
     private JTextField mcpCliToolCandidates;
+    private JTextField publishedReleasesUrl;
     private JButton installMagentoScaffoldSkillButton;
     private JButton installMagentoInspectSkillButton;
     private JComboBox<AgentTarget> skillAgentTargetSelect;
@@ -112,6 +113,7 @@ public class SettingsForm implements SearchableConfigurable {
         mcpCliToolCandidates.setText(
                 Settings.getNormalizedMcpCliToolCandidates(getSettings().mcpCliToolCandidates)
         );
+        publishedReleasesUrl.setText(getSettings().getPublishedReleasesUrl());
         resolveMagentoVersion();
 
         addPathListener();
@@ -128,6 +130,7 @@ public class SettingsForm implements SearchableConfigurable {
         mftfSupportEnabled.setEnabled(isEnabled);
         magentoPath.setEnabled(isEnabled);
         mcpCliToolCandidates.setEnabled(isEnabled);
+        publishedReleasesUrl.setEnabled(isEnabled);
         moduleDefaultLicenseName.setEnabled(isEnabled);
         installMagentoScaffoldSkillButton.setEnabled(isEnabled);
         installMagentoInspectSkillButton.setEnabled(isEnabled);
@@ -248,8 +251,12 @@ public class SettingsForm implements SearchableConfigurable {
                 .getNormalizedMcpCliToolCandidates(mcpCliToolCandidates.getText())
                 .equals(Settings.getNormalizedMcpCliToolCandidates(getSettings().mcpCliToolCandidates));
 
+        final boolean publishedReleasesUrlChanged = !getPublishedReleasesUrl()
+                .equals(getSettings().getPublishedReleasesUrl());
+
         return statusChanged || licenseChanged || mftfSupportChanged
-                || magentoPathChanged || versionChanged || mcpCliToolCandidatesChanged;
+                || magentoPathChanged || versionChanged || mcpCliToolCandidatesChanged
+                || publishedReleasesUrlChanged;
     }
 
     private void resolveMagentoVersion() {
@@ -288,8 +295,14 @@ public class SettingsForm implements SearchableConfigurable {
         getSettings().mcpCliToolCandidates = Settings.getNormalizedMcpCliToolCandidates(
                 mcpCliToolCandidates.getText()
         );
+        getSettings().publishedReleasesUrl = getPublishedReleasesUrl();
         buttonReindex.setEnabled(getSettings().pluginEnabled);
         regenerateUrnMapButton.setEnabled(getSettings().pluginEnabled);
+    }
+
+    @NotNull
+    public String getPublishedReleasesUrl() {
+        return Settings.normalizePublishedReleasesUrl(publishedReleasesUrl.getText());
     }
 
     @NotNull
@@ -313,6 +326,7 @@ public class SettingsForm implements SearchableConfigurable {
         mcpCliToolCandidates.setText(
                 Settings.getNormalizedMcpCliToolCandidates(getSettings().mcpCliToolCandidates)
         );
+        publishedReleasesUrl.setText(getSettings().getPublishedReleasesUrl());
         refreshFormStatus(pluginEnabled.isSelected());
     }
 

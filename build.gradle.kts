@@ -191,6 +191,10 @@ tasks {
     }
 
     test {
+        // Keep routine tests offline; enable the real-release MCP test explicitly.
+        if (providers.environmentVariable("MAGENTO_MCP_REAL_RELEASE_TEST").orNull != "true") {
+            filter.excludeTestsMatching("com.magento.idea.magento2plugin.mcp.MagentoCompatibilityCommandsTest.testNativeMcpWithActualMagentoReleases")
+        }
         val excludePatterns = project.findProperty("excludeTests") as String?
 
         if (!excludePatterns.isNullOrEmpty()) {

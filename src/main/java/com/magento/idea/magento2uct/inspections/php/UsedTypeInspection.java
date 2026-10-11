@@ -19,7 +19,7 @@ import com.jetbrains.php.lang.psi.elements.PhpUse;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeAnalyserVisitor;
 import com.magento.idea.magento2plugin.magento.packages.MagentoPhpClass;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
-import com.magento.idea.magento2uct.settings.UctSettingsService;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import com.magento.idea.magento2uct.util.php.ReferenceResolverUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,10 +40,9 @@ public abstract class UsedTypeInspection extends PhpInspection {
                     return;
                 }
                 final Project project = reference.getProject();
-                final UctSettingsService settings = UctSettingsService.getInstance(project);
 
-                if (!settings.isEnabled()
-                        || !settings.isIssueLevelSatisfiable(getSeverityLevel())) {
+                if (!UctAnalysisContext.isEnabled(problemsHolder)
+                        || !UctAnalysisContext.accepts(problemsHolder, getSeverityLevel())) {
                     return;
                 }
                 PsiElement resolved = ReferenceResolverUtil.resolve(reference);

@@ -15,8 +15,8 @@ public class Summary {
     private static final int ERROR_COMPLEXITY = 2;
     private static final int CRITICAL_COMPLEXITY = 3;
 
-    private final SupportedVersion installedVersion;
-    private final SupportedVersion targetVersion;
+    private final String installedVersion;
+    private final String targetVersion;
     private int processedModules;
     private int processedThemes;
     private long processStartedTime;
@@ -35,8 +35,17 @@ public class Summary {
             final @Nullable SupportedVersion installedVersion,
             final @Nullable SupportedVersion targetVersion
     ) {
+        this(installedVersion == null ? null : installedVersion.getVersion(),
+                targetVersion == null ? null : targetVersion.getVersion());
+    }
+
+    private Summary(final String installedVersion, final String targetVersion) {
         this.installedVersion = installedVersion;
         this.targetVersion = targetVersion;
+    }
+
+    public static Summary forVersions(final String installedVersion, final String targetVersion) {
+        return new Summary(installedVersion, targetVersion);
     }
 
     /**
@@ -45,7 +54,7 @@ public class Summary {
      * @return String
      */
     public String getInstalledVersion() {
-        return installedVersion == null ? "Less than 2.3.0" : installedVersion.getVersion();
+        return installedVersion == null ? "Less than 2.3.0" : installedVersion;
     }
 
     /**
@@ -54,7 +63,7 @@ public class Summary {
      * @return String
      */
     public String getTargetVersion() {
-        return targetVersion == null ? "" : targetVersion.getVersion();
+        return targetVersion == null ? "" : targetVersion;
     }
 
     /**

@@ -16,7 +16,7 @@ import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.UsedFieldInspection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public class UsedNonExistentProperty extends UsedFieldInspection {
@@ -28,12 +28,12 @@ public class UsedNonExistentProperty extends UsedFieldInspection {
             final Field field,
             final FieldReference fieldReference
     ) {
-        if (VersionStateManager.getInstance(project).isExists(field.getFQN())) {
+        if (UctAnalysisContext.versions(problemsHolder).isExists(field.getFQN())) {
             return;
         }
         final String message = SupportedIssue.USED_NON_EXISTENT_PROPERTY.getMessage(
                 field.getFQN().replace(".", "::"),
-                VersionStateManager.getInstance(project).getRemovedInVersion(field.getFQN())
+                UctAnalysisContext.versions(problemsHolder).getRemovedInVersion(field.getFQN())
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {

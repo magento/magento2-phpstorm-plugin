@@ -19,7 +19,7 @@ import com.jetbrains.php.lang.psi.elements.PhpUseList;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
-import com.magento.idea.magento2uct.settings.UctSettingsService;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class ImportInspection extends PhpInspection {
@@ -34,10 +34,9 @@ public abstract class ImportInspection extends PhpInspection {
             @Override
             public void visitPhpUseList(final PhpUseList useList) {
                 final Project project = useList.getProject();
-                final UctSettingsService settings = UctSettingsService.getInstance(project);
 
-                if (!settings.isEnabled()
-                        || !settings.isIssueLevelSatisfiable(getSeverityLevel())) {
+                if (!UctAnalysisContext.isEnabled(problemsHolder)
+                        || !UctAnalysisContext.accepts(problemsHolder, getSeverityLevel())) {
                     return;
                 }
                 final PsiFile file = useList.getContainingFile();

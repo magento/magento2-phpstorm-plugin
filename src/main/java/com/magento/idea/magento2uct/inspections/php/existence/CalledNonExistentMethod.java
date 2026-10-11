@@ -14,7 +14,7 @@ import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.CallMethodInspection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public class CalledNonExistentMethod extends CallMethodInspection {
@@ -28,12 +28,12 @@ public class CalledNonExistentMethod extends CallMethodInspection {
     ) {
         final String type = method.getFQN();
 
-        if (VersionStateManager.getInstance(project).isExists(type)) {
+        if (UctAnalysisContext.versions(problemsHolder).isExists(type)) {
             return;
         }
         final String message = SupportedIssue.CALLED_NON_EXISTENT_METHOD.getMessage(
                 type,
-                VersionStateManager.getInstance(project).getRemovedInVersion(type)
+                UctAnalysisContext.versions(problemsHolder).getRemovedInVersion(type)
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {

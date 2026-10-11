@@ -13,7 +13,7 @@ import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.ImportInspection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public class ImportingNonExistentClass extends ImportInspection {
@@ -25,12 +25,12 @@ public class ImportingNonExistentClass extends ImportInspection {
             final PhpUse use,
             final boolean isInterface
     ) {
-        if (isInterface || VersionStateManager.getInstance(project).isExists(use.getFQN())) {
+        if (isInterface || UctAnalysisContext.versions(problemsHolder).isExists(use.getFQN())) {
             return;
         }
         final String message = SupportedIssue.IMPORTED_NON_EXISTENT_CLASS.getMessage(
                 use.getFQN(),
-                VersionStateManager.getInstance(project).getRemovedInVersion(use.getFQN())
+                UctAnalysisContext.versions(problemsHolder).getRemovedInVersion(use.getFQN())
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {

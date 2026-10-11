@@ -9,7 +9,6 @@ import com.intellij.codeInspection.InspectionManager;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.codeInspection.XmlSuppressableInspectionTool;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
@@ -18,8 +17,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlToken;
 import com.intellij.psi.xml.XmlTokenType;
-import com.magento.idea.magento2uct.settings.UctSettingsService;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -73,11 +71,9 @@ abstract class ModuleConfigFileInspection extends XmlSuppressableInspectionTool 
             final @NotNull InspectionManager manager,
             final boolean isOnTheFly
     ) {
-        final Project project = file.getProject();
-        final UctSettingsService settings = UctSettingsService.getInstance(project);
         final ProblemsHolder holder = getProblemsHolder();
 
-        if (!settings.isEnabled() || holder == null) {
+        if (holder == null || !UctAnalysisContext.isEnabled(holder)) {
             return getEmptyResult();
         }
 
@@ -97,7 +93,7 @@ abstract class ModuleConfigFileInspection extends XmlSuppressableInspectionTool 
             }
             final String fqn = token.getText().trim();
 
-            if (!VersionStateManager.getInstance(project).isPresentInCodebase(fqn)) {
+            if (!UctAnalysisContext.versions(holder).isPresentInCodebase(fqn)) {
                 continue;
             }
             // Inspection logic.

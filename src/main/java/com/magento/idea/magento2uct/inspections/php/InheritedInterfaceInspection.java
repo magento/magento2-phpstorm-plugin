@@ -14,7 +14,7 @@ import com.jetbrains.php.lang.psi.elements.ClassReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
-import com.magento.idea.magento2uct.settings.UctSettingsService;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class InheritedInterfaceInspection extends PhpInspection {
@@ -29,11 +29,10 @@ public abstract class InheritedInterfaceInspection extends PhpInspection {
             @Override
             public void visitPhpClass(final PhpClass clazz) {
                 final Project project = clazz.getProject();
-                final UctSettingsService settings = UctSettingsService.getInstance(project);
 
                 if (!clazz.isInterface()
-                        || !settings.isEnabled()
-                        || !settings.isIssueLevelSatisfiable(getSeverityLevel())
+                        || !UctAnalysisContext.isEnabled(problemsHolder)
+                        || !UctAnalysisContext.accepts(problemsHolder, getSeverityLevel())
                 ) {
                     return;
                 }

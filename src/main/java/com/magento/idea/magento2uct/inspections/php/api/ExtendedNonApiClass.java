@@ -15,7 +15,7 @@ import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.ExtendInspection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public class ExtendedNonApiClass extends ExtendInspection {
@@ -27,7 +27,7 @@ public class ExtendedNonApiClass extends ExtendInspection {
             final PhpClass parentClass,
             final ExtendsList childExtends
     ) {
-        if (VersionStateManager.getInstance(project).isApi(parentClass.getFQN())) {
+        if (UctAnalysisContext.versions(problemsHolder).isApi(parentClass.getFQN())) {
             return;
         }
         final String message = SupportedIssue.EXTENDED_NON_API_CLASS.getMessage(

@@ -29,6 +29,11 @@ public final class ApiCoverageIndexProcessor implements IndexProcessor {
     private final Map<String, Boolean> data = new HashMap<>();
 
     @Override
+    public Map<String, Boolean> snapshot() {
+        return Map.copyOf(data);
+    }
+
+    @Override
     public void clearData() {
         data.clear();
     }

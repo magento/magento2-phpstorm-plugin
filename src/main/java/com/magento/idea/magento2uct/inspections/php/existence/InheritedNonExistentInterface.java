@@ -13,7 +13,7 @@ import com.magento.idea.magento2uct.inspections.UctProblemsHolder;
 import com.magento.idea.magento2uct.inspections.php.InheritedInterfaceInspection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedIssue;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public class InheritedNonExistentInterface extends InheritedInterfaceInspection {
@@ -25,12 +25,12 @@ public class InheritedNonExistentInterface extends InheritedInterfaceInspection 
             final ClassReference reference,
             final String interfaceFqn
     ) {
-        if (VersionStateManager.getInstance(project).isExists(interfaceFqn)) {
+        if (UctAnalysisContext.versions(problemsHolder).isExists(interfaceFqn)) {
             return;
         }
         final String message = SupportedIssue.INHERITED_NON_EXISTENT_INTERFACE.getMessage(
                 interfaceFqn,
-                VersionStateManager.getInstance(project).getRemovedInVersion(interfaceFqn)
+                UctAnalysisContext.versions(problemsHolder).getRemovedInVersion(interfaceFqn)
         );
 
         if (problemsHolder instanceof UctProblemsHolder) {

@@ -13,7 +13,7 @@ import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeAnalyserVisitor;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
-import com.magento.idea.magento2uct.settings.UctSettingsService;
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class OverriddenFieldInspection extends PhpInspection {
@@ -28,13 +28,12 @@ public abstract class OverriddenFieldInspection extends PhpInspection {
             @Override
             public void visitPhpField(final Field field) {
                 final Project project = field.getProject();
-                final UctSettingsService settings = UctSettingsService.getInstance(project);
                 final PhpClass phpClass = field.getContainingClass();
 
-                if (!settings.isEnabled()
+                if (!UctAnalysisContext.isEnabled(problemsHolder)
                         || phpClass == null
                         || !isTypeValid(field)
-                        || !settings.isIssueLevelSatisfiable(getSeverityLevel())) {
+                        || !UctAnalysisContext.accepts(problemsHolder, getSeverityLevel())) {
                     return;
                 }
                 super.visitPhpField(field);

@@ -7,6 +7,7 @@ package com.magento.idea.magento2uct.inspections;
 
 import com.intellij.codeInspection.InspectionManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
@@ -50,6 +51,10 @@ public class UctInspectionManager {
      * @return ProblemsHolder
      */
     public @Nullable UctProblemsHolder run(final PsiFile psiFile) {
+        return run(psiFile, null);
+    }
+
+    public @Nullable UctProblemsHolder run(final PsiFile psiFile, final UctAnalysisContext context) {
         if (SupportedIssue.getSupportedFileTypes().stream().noneMatch(
                 clazz -> clazz.isInstance(psiFile))
         ) {
@@ -58,11 +63,13 @@ public class UctInspectionManager {
         final UctProblemsHolder problemsHolder = new UctProblemsHolder(
                 InspectionManager.getInstance(project),
                 psiFile,
-                false
+                false,
+                context
         );
         final List<PsiElementVisitor> visitors = SupportedIssue.getVisitors(problemsHolder);
 
         for (final PsiElement element : collectElements(psiFile)) {
+            ProgressManager.checkCanceled();
             for (final PsiElementVisitor visitor : visitors) {
                 element.accept(visitor);
             }

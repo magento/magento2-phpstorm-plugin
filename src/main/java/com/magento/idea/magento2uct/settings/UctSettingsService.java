@@ -73,6 +73,16 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
         return project.getService(UctSettingsService.class);
     }
 
+    /** Reads the stored version without triggering remote release discovery. */
+    public @Nullable String getConfiguredCurrentVersion() {
+        return currentVersion;
+    }
+
+    /** Reads the stored version without triggering remote release discovery. */
+    public @Nullable String getConfiguredTargetVersion() {
+        return targetVersion;
+    }
+
     @Override
     public @Nullable UctSettingsService getState() {
         return this;
