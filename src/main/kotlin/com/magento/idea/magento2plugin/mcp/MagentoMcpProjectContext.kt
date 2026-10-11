@@ -8,6 +8,7 @@ import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.application.ApplicationInfo
 import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.io.FileUtil
 import com.magento.idea.magento2plugin.project.Settings
 import org.json.JSONObject
 import java.nio.file.Path
@@ -24,7 +25,7 @@ internal object MagentoMcpProjectContext {
 
     fun identity(project: Project): JSONObject = JSONObject()
         .put("projectPath", project.basePath ?: JSONObject.NULL)
-        .put("magentoRoot", magentoRoot(project)?.toString() ?: JSONObject.NULL)
+        .put("magentoRoot", magentoRoot(project)?.let { FileUtil.toSystemIndependentName(it.toString()) } ?: JSONObject.NULL)
         .put("pluginVersion", PluginManagerCore.getPlugin(PluginId.getId(PLUGIN_ID))?.version ?: JSONObject.NULL)
         .put("ideVersion", ApplicationInfo.getInstance().fullVersion)
 

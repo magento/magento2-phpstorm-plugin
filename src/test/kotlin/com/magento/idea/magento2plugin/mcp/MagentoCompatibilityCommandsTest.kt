@@ -568,8 +568,9 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
         myFixture.addFileToProject("app/code/Application/Blog/Example.php", "<?php class OuterExample {}")
         val direct = MagentoCompatibilityCommands.request(project, JSONObject()
             .put("path", "app/code/Application/Blog/Example.php").put("targetVersion", "2.4.3"))
-        assertFalse(direct.paths.contains(file.virtualFile.path))
-        assertEquals(listOf("${project.basePath}/app/code/Application/Blog/Example.php"), direct.paths)
+        val directPaths = direct.paths.map { java.nio.file.Path.of(it) }
+        assertFalse(directPaths.contains(file.virtualFile.toNioPath()))
+        assertEquals(listOf(java.nio.file.Path.of(project.basePath!!).resolve("app/code/Application/Blog/Example.php").toRealPath()), directPaths)
 
         val absent = nativeCall("""{"mode":"analyze","path":"missing.php","targetVersion":"2.4.3"}""", expectedError = true)
         assertFalse(absent.getJSONObject("error").has("suggestedPath"))

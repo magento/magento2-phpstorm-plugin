@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.mcp
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.magento.idea.magento2plugin.indexes.ModuleIndex
 import com.magento.idea.magento2plugin.project.Settings
@@ -328,8 +329,8 @@ internal object MagentoCompatibilityCommands {
             val suggestion = path?.takeUnless { Path.of(it).isAbsolute }?.let { magentoRoot?.resolve(it)?.normalize() }
                 ?.takeIf { Files.exists(it) && it.toRealPath().startsWith(root) }
                 ?.let { root.relativize(it.toRealPath()).toString().replace('\\', '/') }
-            val details = JSONObject().put("parameter", "path").put("pathBase", root.toString())
-                .put("magentoRoot", magentoRoot?.toString() ?: JSONObject.NULL)
+            val details = JSONObject().put("parameter", "path").put("pathBase", FileUtil.toSystemIndependentName(root.toString()))
+                .put("magentoRoot", magentoRoot?.let { FileUtil.toSystemIndependentName(it.toString()) } ?: JSONObject.NULL)
                 .put("acceptedValues", JSONArray(listOf("existing path relative to pathBase ($root)", "absolute path inside $root")))
             if (suggestion != null) details.put("suggestedPath", suggestion)
             throw ParameterException("Analysis path does not exist: $resolved. Relative paths use pathBase ($root), the IDE project directory." +
