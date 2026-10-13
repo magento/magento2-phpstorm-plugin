@@ -41,6 +41,7 @@ import com.magento.idea.magento2plugin.actions.generation.util.GenerationContext
 import com.magento.idea.magento2plugin.magento.files.ControllerBackendPhp;
 import com.magento.idea.magento2plugin.magento.files.DataModelFile;
 import com.magento.idea.magento2plugin.magento.files.DataModelInterfaceFile;
+import com.magento.idea.magento2plugin.magento.files.FormButtonBlockFile;
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 import com.magento.idea.magento2plugin.magento.files.actions.NewActionFile;
 import com.magento.idea.magento2plugin.magento.packages.File;
@@ -507,6 +508,23 @@ public class NewEntityDialog extends AbstractDialog {
                 "10",
                 getFormName(),
                 namespaceBuilderSave.getClassFqn()
+        ));
+
+        final NamespaceBuilder namespaceBuilderSaveAndContinue = new NamespaceBuilder(
+                moduleName,
+                "SaveAndContinue",
+                directory
+        );
+        buttons.add(new UiComponentFormButtonData(
+                directory,
+                "SaveAndContinue",
+                moduleName,
+                FormButtonBlockFile.TYPE_SAVE_AND_CONTINUE,
+                namespaceBuilderSaveAndContinue.getNamespace(),
+                "Save and Continue Edit",
+                "15",
+                getFormName(),
+                namespaceBuilderSaveAndContinue.getClassFqn()
         ));
 
         final NamespaceBuilder namespaceBuilderBack = new NamespaceBuilder(

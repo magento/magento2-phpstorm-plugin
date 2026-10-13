@@ -74,11 +74,17 @@ class Save extends Action implements HttpPostActionInterface
             /** @var CompanyInterface|DataObject $entityModel */
             $entityModel = $this->entityDataFactory->create();
             $entityModel->addData($params['general']);
-            $this->saveCommand->execute($entityModel);
+            $entityId = $this->saveCommand->execute($entityModel);
             $this->messageManager->addSuccessMessage(
                 __('The Company data was saved successfully')
             );
             $this->dataPersistor->clear('entity');
+
+            if ($this->getRequest()->getParam('back')) {
+                return $resultRedirect->setPath('*/*/edit', [
+                    CompanyInterface::COMPANY_ID => $entityId
+                ]);
+            }
         } catch (CouldNotSaveException $exception) {
             $this->messageManager->addErrorMessage($exception->getMessage());
             $this->dataPersistor->set('entity', $params);

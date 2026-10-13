@@ -11,6 +11,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormBu
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldsetData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFileData;
+import com.magento.idea.magento2plugin.magento.files.FormButtonBlockFile;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import java.util.ArrayList;
 import java.util.List;
@@ -133,6 +134,17 @@ public class UiComponentFormGeneratorTest extends BaseGeneratorTestCase {
                 "10",
                 FORM_NAME,
                 "Foo\\Bar\\Block\\Form\\Save"
+        ));
+        buttons.add(new UiComponentFormButtonData(
+                directory,
+                "SaveAndContinue",
+                MODULE_NAME,
+                FormButtonBlockFile.TYPE_SAVE_AND_CONTINUE,
+                namespace,
+                "Save and Continue Edit",
+                "15",
+                FORM_NAME,
+                "Foo\\Bar\\Block\\Form\\SaveAndContinue"
         ));
         buttons.add(new UiComponentFormButtonData(
                 directory,

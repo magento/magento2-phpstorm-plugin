@@ -15,6 +15,9 @@ public enum UiFormButtonTypeSettings {
             + "                'mage-init' => ['button' => ['event' => 'save']],\n"
             + "                'form-role' => 'save'\n"
             + "            ]", 30, "Save entity button."),
+    SAVE_AND_CONTINUE("Save and Continue Edit", "save", "''", "[\n"
+            + "                'mage-init' => ['button' => ['event' => 'saveAndContinueEdit']]\n"
+            + "            ]", 25, "Save entity and continue edit button."),
     DELETE(
             "Delete",
             "delete",
