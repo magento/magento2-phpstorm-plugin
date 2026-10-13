@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 
+## [Unreleased]
+
+### Fixed
+
+- New Entity suggests ACL resource and menu identifiers that include the entity name, so a second entity in the same module no longer produces a duplicate resource id in `acl.xml` and a missing menu item [#2744](https://github.com/magento/magento2-phpstorm-plugin/issues/2744).
+
 ## 2026.3.3
 
 ### Added

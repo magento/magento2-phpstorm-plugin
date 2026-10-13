@@ -651,10 +651,25 @@ public class NewEntityDialog extends AbstractDialog {
         formLabel.setText(entityNameLabel.concat(" Form"));
         formName.setText(entityName.concat("_form"));
         gridName.setText(entityName.concat("_listing"));
-        acl.setText(moduleName.concat("::management"));
+        acl.setText(formatManagementIdentifier(moduleName, entityName));
         aclTitle.setText(entityNameLabel.concat(" Management"));
-        menuIdentifier.setText(moduleName.concat("::management"));
+        menuIdentifier.setText(formatManagementIdentifier(moduleName, entityName));
         menuTitle.setText(entityNameLabel.concat(" Management"));
+    }
+
+    /**
+     * Format the default ACL resource and menu item identifier for an entity.
+     *
+     * <p>The entity name keeps identifiers unique when a module has several entities,
+     * otherwise acl.xml gets a duplicate resource id and Magento rejects it.</p>
+     *
+     * @param moduleName String
+     * @param entityName String entity name in snake case
+     *
+     * @return String
+     */
+    static String formatManagementIdentifier(final String moduleName, final String entityName) {
+        return moduleName + "::" + entityName + "_management";
     }
 
     static String formatSnakeCaseLabel(final String value) {
