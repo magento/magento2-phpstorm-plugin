@@ -179,7 +179,7 @@ internal object MagentoEntityCrudCommands {
         val derivedFormLabel = "$label Form"
         val derivedFormName = "${snakeCaseName}_form"
         val derivedGridName = "${snakeCaseName}_listing"
-        val derivedAclId = "${moduleContext.moduleName}::management"
+        val derivedAclId = "${moduleContext.moduleName}::${snakeCaseName}_management"
         val derivedAclTitle = "$label Management"
         val derivedMenuId = derivedAclId
         val derivedMenuTitle = derivedAclTitle
