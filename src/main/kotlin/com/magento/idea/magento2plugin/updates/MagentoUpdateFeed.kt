@@ -19,20 +19,23 @@ internal class UpdateFeedUnavailableException(cause: Exception) : Exception("Mag
 class MagentoUpdateFeed internal constructor(private val fetch: (String) -> String, private val now: () -> Instant) {
     constructor() : this(::download, Instant::now)
     private data class CachedFeed(val catalog: String, val security: String, val checkedAt: Instant) {
-        fun assess(installed: InstalledMagento, now: Instant): UpdateAssessment =
-            UpdateEvaluator.evaluate(installed, catalog, security, now).copy(checkedAt = checkedAt)
+        fun assess(installed: InstalledMagento, now: Instant, localPatches: LocalSecurityPatches): UpdateAssessment =
+            UpdateEvaluator.evaluate(installed, catalog, security, now, localPatches).copy(checkedAt = checkedAt)
     }
     private val cache = linkedMapOf<String, CachedFeed>()
 
+    fun check(feedUrl: String, installed: InstalledMagento, force: Boolean = false): UpdateFeedResult =
+        check(feedUrl, installed, force, LocalSecurityPatches.EMPTY)
+
     @Synchronized
-    fun check(feedUrl: String, installed: InstalledMagento, force: Boolean = false): UpdateFeedResult {
+    internal fun check(feedUrl: String, installed: InstalledMagento, force: Boolean, localPatches: LocalSecurityPatches): UpdateFeedResult {
         require(MagentoUpdateSettings.isValidFeedUrl(feedUrl)) { "Updates feed URL must use HTTPS (HTTP is allowed on localhost)." }
         val base = MagentoUpdateSettings.normalizeFeedUrl(feedUrl)
         val key = "$base/${installed.distribution.apiId}/${installed.version}"
         val previous = cache[key]
         val time = now()
         if (!force && previous != null && time.isBefore(previous.checkedAt.plusSeconds(3600))) {
-            return UpdateFeedResult(previous.assess(installed, time))
+            return UpdateFeedResult(previous.assess(installed, time, localPatches))
         }
         try {
             val catalog = fetch("$base/${installed.distribution.apiId}/versions")
@@ -42,7 +45,7 @@ class MagentoUpdateFeed internal constructor(private val fetch: (String) -> Stri
                 rethrowCancellation(exception)
                 null
             }
-            val assessment = UpdateEvaluator.evaluate(installed, catalog, security, time)
+            val assessment = UpdateEvaluator.evaluate(installed, catalog, security, time, localPatches)
             if (security != null) {
                 if (cache.size >= 100) cache.remove(cache.keys.first())
                 cache[key] = CachedFeed(catalog, security, time)
@@ -50,7 +53,7 @@ class MagentoUpdateFeed internal constructor(private val fetch: (String) -> Stri
             return UpdateFeedResult(assessment, retryNeeded = security == null)
         } catch (exception: Exception) {
             rethrowCancellation(exception)
-            if (previous != null) return UpdateFeedResult(previous.assess(installed, time), stale = true, retryNeeded = true)
+            if (previous != null) return UpdateFeedResult(previous.assess(installed, time, localPatches), stale = true, retryNeeded = true)
             throw UpdateFeedUnavailableException(exception)
         }
     }

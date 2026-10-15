@@ -157,6 +157,64 @@ class MagentoUpdateServiceTest : PhysicalMagentoTestCase() {
         assertEquals(NotificationType.INFORMATION, notifications.single().type)
     }
 
+    fun testAppliedComposerPatchIsSilentAutomaticallyAndManualCheckExplainsCoverage() {
+        myFixture.addFileToProject("vendor/composer/installed.json", """{"packages":[{"name":"magento/framework","extra":{
+            "patches_applied":{"Security fix":"https://example.test/PATCH-1.patch"}}}]}""")
+        check()
+        assertTrue(notifications.isEmpty())
+        check(manual = true)
+        assertEquals(NotificationType.INFORMATION, notifications.single().type)
+        assertTrue(notifications.single().content.contains("covered by installed fixes or local patch configuration"))
+    }
+
+    fun testCloudQualityPatchConfigurationSuppressesTheSecurityNotification() {
+        myFixture.addFileToProject(".magento.env.yaml", "stage: {build: {QUALITY_PATCHES: [PATCH-1]}}")
+        check()
+        assertTrue(notifications.isEmpty())
+    }
+
+    fun testComposerConfigurationSuppressesSecurityButKeepsIndependentReleaseUpdates() {
+        catalog = """{"data":{"2.4.9":{"version":"2.4.9","releaseDate":"2026-10-01"}}}"""
+        myFixture.addFileToProject("composer.json", """{"require":{"cweagans/composer-patches":"*"},"extra":{
+            "patches":{"magento/framework":{"Security fix":"https://example.test/PATCH-1.patch"}}}}""")
+        check()
+        assertEquals(NotificationType.INFORMATION, notifications.single().type)
+        assertTrue(notifications.single().content.contains("Newer release available"))
+    }
+
+    fun testAddingAndRemovingAPatchDismissesAndRestoresTheWarningWithTheSameCachedFeed() {
+        check()
+        val original = notifications.single()
+        myFixture.addFileToProject(".magento.env.yaml", "stage: {build: {QUALITY_PATCHES: [PATCH-1]}}")
+        check()
+        assertTrue(original.isExpired)
+        assertEquals(1, notifications.size)
+        assertEquals(2, requests.get())
+        myFixture.addFileToProject(".magento.env.yaml", "stage: {build: {QUALITY_PATCHES: []}}")
+        check()
+        assertEquals(2, requests.get())
+        assertEquals(2, notifications.size)
+        assertEquals(NotificationType.ERROR, notifications.last().type)
+        assertFalse(notifications.last().isExpired)
+    }
+
+    fun testPatchInADifferentMagentoRootCannotSuppressThisProjectWarning() {
+        myFixture.addFileToProject("other-store/.magento.env.yaml", "stage: {build: {QUALITY_PATCHES: [PATCH-1]}}")
+        check()
+        assertEquals(NotificationType.ERROR, notifications.single().type)
+    }
+
+    fun testLocalFixDismissesAnExistingWarningWhileTheFeedIsOffline() {
+        check()
+        val original = notifications.single()
+        myFixture.addFileToProject(".magento.env.yaml", "stage: {build: {QUALITY_PATCHES: [PATCH-1]}}")
+        unavailable = true
+        now = now.plusSeconds(3600)
+        check()
+        assertTrue(original.isExpired)
+        assertEquals(1, notifications.size)
+    }
+
     fun testSnoozingAReleaseDoesNotHideARevisedSecurityFindingOrRepeatTheRelease() {
         catalog = """{"data":{"2.4.9":{"version":"2.4.9","releaseDate":"2026-10-01"}}}"""
         check()

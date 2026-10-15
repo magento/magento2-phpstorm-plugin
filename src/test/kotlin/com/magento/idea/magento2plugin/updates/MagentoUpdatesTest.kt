@@ -99,7 +99,7 @@ class MagentoUpdatesTest {
         assertEquals("2.4.8-p10", result.patchVersion)
         assertEquals("2.4.9", result.latestVersion)
         assertEquals(UpdateSeverity.CRITICAL, result.severity)
-        assertTrue(result.message.contains("not been verified"))
+        assertTrue(result.message.contains("No complete local patch coverage"))
         assertTrue(result.message.contains("APSB-TEST"))
     }
 

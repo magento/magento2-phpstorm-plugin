@@ -52,7 +52,8 @@ data class UpdateAssessment(
 }
 
 internal object UpdateEvaluator {
-    fun evaluate(installed: InstalledMagento, catalogBody: String, securityBody: String?, now: Instant): UpdateAssessment {
+    fun evaluate(installed: InstalledMagento, catalogBody: String, securityBody: String?, now: Instant,
+                 localPatches: LocalSecurityPatches = LocalSecurityPatches.EMPTY): UpdateAssessment {
         val data = JSONObject(catalogBody).getJSONObject("data")
         require(data.length() in 1..10000) { "Invalid release catalog." }
         val current = ReleaseVersion.parse(installed.version) ?: error("Unsupported installed version.")
@@ -83,9 +84,11 @@ internal object UpdateEvaluator {
         val known = status in setOf("secure", "vulnerable", "eol") && security?.optJSONArray("vulnerableTo") != null
         val rows = security?.optJSONArray("vulnerableTo") ?: JSONArray()
         require(rows.length() <= 1000) { "Security report is too large." }
-        val advisories = (0 until rows.length()).map { rows.getJSONObject(it) }
+        val recentAdvisories = (0 until rows.length()).map { rows.getJSONObject(it) }
             .filter { recent(date(it, "publishedDate")) }
             .distinctBy { it.getString("id") }.sortedBy { it.getString("id") }
+        val advisories = recentAdvisories.filterNot { localPatches.covers(it, installed) }
+        val coveredCount = recentAdvisories.size - advisories.size
         val severity = advisories.maxOfOrNull { UpdateSeverity.from(it) } ?: UpdateSeverity.UNKNOWN
         val urgent = advisories.any { it.optInt("priority") == 1 || it.optBoolean("knownExploited") }
         val identity = "${installed.distribution.displayName} ${installed.version}"
@@ -110,7 +113,7 @@ internal object UpdateEvaluator {
                 }) {
                     add("Isolated security patches are available for this version.")
                 }
-                add("Local patch application has not been verified. Review the security report before choosing a fix.")
+                add("No complete local patch coverage was found for these advisories. Review the security report before choosing a fix.")
             }.joinToString("\n").also { finding(UpdateKind.SECURITY, it, advisories.joinToString { canonical(it) }) }
         } else null
         if (eol && recent(eolDate)) finding(UpdateKind.SUPPORT, "This release is past its published end of support.", "$eolDate")
@@ -120,7 +123,8 @@ internal object UpdateEvaluator {
             securityMessage?.let(::add)
             if (eol) add("This release is past its published end of support.")
             if (!known) add("Security coverage is unknown; no verified security assessment is available.")
-            else if (advisories.isEmpty()) add("No security advisories published in the past month were reported for this version. Older advisories may still apply.")
+            else if (advisories.isEmpty() && coveredCount == 0) add("No security advisories published in the past month were reported for this version. Older advisories may still apply.")
+            if (coveredCount > 0) add("Recent security advisories covered by installed fixes or local patch configuration: $coveredCount. Deployment status has not been verified.")
             if (latest == null) add("No newer stable releases published in the past month were found.")
         }.joinToString("\n")
         val fingerprint = digest(findings.joinToString { it.fingerprint })
