@@ -185,8 +185,11 @@ class CloudSecurityPatchesTest {
         fixture.write("packages/magento/magento2-base/Example.php", "context\nsafe-ce\nend\n")
         assertTrue(covered())
         val watched = LocalSecurityPatches.inspect(root).watchedPaths
-        assertTrue(watched.contains(root.resolve(fixture.directory + "/patches.json").toString()))
-        assertTrue(watched.contains(root.resolve("packages/magento/magento2-base/Example.php").toString()))
+        // Watched paths use forward slashes on every platform, matching VFS event paths.
+        for (relative in listOf(fixture.directory + "/patches.json", "packages/magento/magento2-base/Example.php")) {
+            val expected = root.resolve(relative).toString().replace('\\', '/')
+            assertTrue("Missing watched path: $expected", watched.contains(expected))
+        }
     }
 }
 
