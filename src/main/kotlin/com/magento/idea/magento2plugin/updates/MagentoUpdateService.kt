@@ -30,6 +30,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.time.Instant
+import java.nio.file.Path
 import java.util.concurrent.atomic.AtomicLong
 
 @Service(Service.Level.PROJECT)
@@ -41,6 +42,7 @@ class MagentoUpdateService(private val project: Project, private val scope: Coro
     private var retryJob: Job? = null
     private val notifications = mutableMapOf<String, Notification>()
     private var notificationContext: String? = null
+    @Volatile private var patchPaths: Set<String> = emptySet()
 
     /** Called on the EDT; requests also work before the startup activity has run. */
     @JvmOverloads
@@ -72,10 +74,13 @@ class MagentoUpdateService(private val project: Project, private val scope: Coro
                         }
                         return@withLock
                     }
+                    val localPatches = LocalSecurityPatches.inspect(Path.of(root))
+                    patchPaths = localPatches.watchedPaths
                     val result = ApplicationManager.getApplication().getService(MagentoUpdateFeed::class.java)
-                        .check(feedUrl, installed, force = manual)
+                        .check(feedUrl, installed, manual, localPatches)
                     // A checkout or Composer operation during the request invalidates this result.
-                    if (InstalledMagento.detect(project, root) != installed) return@withLock
+                    if (InstalledMagento.detect(project, root) != installed ||
+                        LocalSecurityPatches.inspect(Path.of(root)) != localPatches) return@withLock
                     withContext(Dispatchers.EDT) {
                         if (isCurrent(requestId, root, feedUrl, manual)) {
                             val retryScheduled = result.retryNeeded && allowRetry
@@ -127,7 +132,6 @@ class MagentoUpdateService(private val project: Project, private val scope: Coro
     private fun show(result: UpdateFeedResult, root: String, feed: String, manual: Boolean, retryScheduled: Boolean) {
         val assessment = result.assessment
         val options = project.getService(MagentoUpdateSettings::class.java).state
-        if (!manual && result.stale) return
         // Keep independent cards so publishing a release cannot replace a security warning.
         val context = "$root|$feed|${assessment.installed}"
         if (notificationContext != context) {
@@ -136,9 +140,15 @@ class MagentoUpdateService(private val project: Project, private val scope: Coro
             notificationContext = context
         }
         val activeKinds = assessment.findings.map { it.kind.name }.toSet()
+        if (assessment.securityKnown && UpdateKind.SECURITY.name !in activeKinds) {
+            // Reverting a fix must make the same advisory eligible for notification again.
+            options.lastNotifiedFingerprints.remove(UpdateKind.SECURITY.name)
+        }
         notifications.keys.toList().filter {
             it !in activeKinds && (it != UpdateKind.SECURITY.name || assessment.securityKnown)
         }.forEach { notifications.remove(it)?.expire() }
+        // Local fixes can dismiss an old warning even while the public feed is unavailable.
+        if (!manual && result.stale) return
         val freshness = (if (result.stale) "Cached result; refresh failed. Last successful check: ${assessment.checkedAt}."
             else "Checked: ${assessment.checkedAt}.") +
             if (retryScheduled) " Some update information is unavailable. Will try again in two minutes." else ""
@@ -186,8 +196,12 @@ class MagentoUpdateService(private val project: Project, private val scope: Coro
         project.messageBus.connect(scope).subscribe(VirtualFileManager.VFS_CHANGES, object : BulkFileListener {
             override fun after(events: List<VFileEvent>) {
                 val root = Settings.getMagentoPath(project) ?: return
-                val metadataPaths = setOf("$root/composer.lock", "$root/composer.json").map { it.replace('\\', '/') }
-                if (events.none { it.path.replace('\\', '/') in metadataPaths }) return
+                if (events.none { event ->
+                    val path = event.path.replace('\\', '/')
+                    path.startsWith(root.replace('\\', '/').trimEnd('/') + "/") &&
+                        (LocalSecurityPatches.isPatchPath(root, path) || path in patchPaths)
+                }) return
+                generation.incrementAndGet()
                 debounce?.cancel()
                 debounce = scope.launch {
                     delay(1000)

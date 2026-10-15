@@ -55,9 +55,20 @@ class MagentoUpdatesUiTest {
     fun `handles an unavailable feed gracefully in WebStorm`() =
         checkDistribution("magento-community", "magento/product-community-edition", "2.4.8-p5", "unavailable", unavailableFeed = true)
 
+    @Test
+    fun `suppresses Composer configured patches and warns when the fix is removed`() =
+        checkDistribution("magento-community", "magento/product-community-edition", "2.4.8-p5", "covered by installed fixes or local patch configuration",
+            localPatchFiles = mapOf("composer.json" to """{"require":{"cweagans/composer-patches":"^2.0"},"extra":{
+                "patches":{"magento/framework":{"Security fix":"https://example.test/TEST-PATCH.patch"}}}}"""))
+
+    @Test
+    fun `suppresses Cloud YAML patches and warns when the fix is removed`() =
+        checkDistribution("magento-community", "magento/product-community-edition", "2.4.8-p5", "covered by installed fixes or local patch configuration",
+            localPatchFiles = mapOf(".magento.env.yaml" to "stage: {build: {QUALITY_PATCHES: [TEST-PATCH]}}"))
+
     private fun checkDistribution(distribution: String, packageName: String, version: String, expected: String,
                                   sourceCheckout: Boolean = false, newerVersion: String? = null, oldFindings: Boolean = false,
-                                  unavailableFeed: Boolean = false) {
+                                  unavailableFeed: Boolean = false, localPatchFiles: Map<String, String> = emptyMap()) {
         val requests = CopyOnWriteArrayList<String>()
         val date = LocalDate.now(ZoneOffset.UTC).let { if (oldFindings) it.minusMonths(1).minusDays(1) else it.minusDays(1) }
         val extraRelease = newerVersion?.let { """, "$it":{"version":"$it","releaseDate":"$date"}""" } ?: ""
@@ -97,6 +108,7 @@ class MagentoUpdatesUiTest {
                     Files.createDirectories(root.resolve("app/code/Magento/Store"))
                     Files.createDirectories(root.resolve("lib/internal/Magento/Framework"))
                 }
+                localPatchFiles.forEach { (path, body) -> root.resolve(path).writeText(body) }
                 Files.createDirectories(root.resolve(".idea"))
                 root.resolve(".idea/workspace.xml").writeText("""
                     <project version="4">
@@ -105,9 +117,9 @@ class MagentoUpdatesUiTest {
                       </component>
                     </project>
                 """.trimIndent())
-            }) {
+            }) { root ->
                 // Enabling support triggers automatic checks; unknown coverage is available on demand.
-                if (distribution == "mage-os" || sourceCheckout || oldFindings || unavailableFeed) invokeAction("Magento.CheckUpdates")
+                if (distribution == "mage-os" || sourceCheckout || oldFindings || unavailableFeed || localPatchFiles.isNotEmpty()) invokeAction("Magento.CheckUpdates")
                 waitFor("distribution-specific update notification", 2.minutes) {
                     getNotifications().any {
                         it.getGroupId() == "Magento Updates" && it.getContent().contains(expected) &&
@@ -129,6 +141,21 @@ class MagentoUpdatesUiTest {
                 check(requests.all { it.startsWith("/api/v1/$distribution/") }) {
                     "Notifier queried another distribution: $requests"
                 }
+                if (localPatchFiles.isNotEmpty()) {
+                    check(getNotifications().filter { it.getGroupId() == "Magento Updates" }.all {
+                        !it.getContent().contains("APSB-TEST") &&
+                            cast(it.getType(), UpdateNotificationType::class).name() == "INFORMATION"
+                    }) { "A configured security patch must not produce a security alert" }
+                    localPatchFiles.keys.forEach { Files.delete(root.resolve(it)) }
+                    invokeAction("Magento.CheckUpdates")
+                    waitFor("security warning after removing local patch configuration", 2.minutes) {
+                        getNotifications().any {
+                            it.getGroupId() == "Magento Updates" && it.getContent().contains("APSB-TEST") &&
+                                cast(it.getType(), UpdateNotificationType::class).name() == "ERROR"
+                        }
+                    }
+                    return@runWebStormUiTest
+                }
                 val content = getNotifications().last { it.getGroupId() == "Magento Updates" }.getContent()
                 if (oldFindings) {
                     check(getNotifications().filter { it.getGroupId() == "Magento Updates" }.all {
@@ -137,7 +164,7 @@ class MagentoUpdatesUiTest {
                     })
                 } else if (distribution != "mage-os") {
                     check(content.contains("APSB-TEST"))
-                    check(content.contains("not been verified"))
+                    check(content.contains("No complete local patch coverage"))
                     val security = getNotifications().last { it.getGroupId() == "Magento Updates" && it.getContent().contains("APSB-TEST") }
                     check(cast(security.getType(), UpdateNotificationType::class).name() == "ERROR")
                     check(!security.getContent().contains("Newer release available"))
