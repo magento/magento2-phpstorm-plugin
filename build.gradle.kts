@@ -235,6 +235,7 @@ tasks {
 val uiTest by intellijPlatformTesting.testIdeUi.registering {
     type = IntelliJPlatformType.WebStorm
     version = providers.gradleProperty("platformVersion")
+    useInstaller = true
 
     task {
         val uiTestSourceSet = sourceSets.getByName("uiTest")

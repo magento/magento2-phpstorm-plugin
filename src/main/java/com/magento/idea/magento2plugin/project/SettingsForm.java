@@ -27,6 +27,8 @@ import com.magento.idea.magento2plugin.project.indexing.MagentoAdditionalLibrary
 import com.magento.idea.magento2plugin.project.util.GetProjectBasePath;
 import com.magento.idea.magento2plugin.project.validator.SettingsFormValidator;
 import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
+import com.magento.idea.magento2plugin.updates.MagentoUpdatesPanel;
+import java.awt.BorderLayout;
 import java.io.IOException;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -60,6 +62,8 @@ public class SettingsForm implements SearchableConfigurable {
     private TextFieldWithBrowseButton magentoPath;
     private JTextField mcpCliToolCandidates;
     private JTextField publishedReleasesUrl;
+    private JPanel updatesContainer;
+    private MagentoUpdatesPanel updatesPanel;
     private JButton installMagentoScaffoldSkillButton;
     private JButton installMagentoInspectSkillButton;
     private JComboBox<AgentTarget> skillAgentTargetSelect;
@@ -87,6 +91,10 @@ public class SettingsForm implements SearchableConfigurable {
     @Nullable
     @Override
     public JComponent createComponent() {
+        updatesPanel = new MagentoUpdatesPanel(project);
+        updatesContainer.setLayout(new BorderLayout());
+        updatesContainer.removeAll();
+        updatesContainer.add(updatesPanel, BorderLayout.CENTER);
         buttonReindex.addActionListener(event -> reindexFromForm());
 
         regenerateUrnMapButton.addActionListener(
@@ -125,6 +133,9 @@ public class SettingsForm implements SearchableConfigurable {
     }
 
     private void refreshFormStatus(final boolean isEnabled) {
+        if (updatesPanel != null) {
+            updatesPanel.setIntegrationEnabled(isEnabled);
+        }
         buttonReindex.setEnabled(isEnabled);
         regenerateUrnMapButton.setEnabled(isEnabled);
         magentoVersion.setEnabled(isEnabled);
@@ -257,7 +268,7 @@ public class SettingsForm implements SearchableConfigurable {
 
         return statusChanged || licenseChanged || mftfSupportChanged
                 || magentoPathChanged || versionChanged || mcpCliToolCandidatesChanged
-                || publishedReleasesUrlChanged;
+                || publishedReleasesUrlChanged || (updatesPanel != null && updatesPanel.isModified());
     }
 
     private void resolveMagentoVersion() {
@@ -275,7 +286,13 @@ public class SettingsForm implements SearchableConfigurable {
     @Override
     public void apply() throws ConfigurationException {
         this.validator.validate();
+        if (updatesPanel != null) {
+            updatesPanel.validateSettings();
+        }
         saveSettings();
+        if (updatesPanel != null) {
+            updatesPanel.apply();
+        }
 
         afterSettingsApplied(getSettings().getState());
 
@@ -320,6 +337,9 @@ public class SettingsForm implements SearchableConfigurable {
 
     @Override
     public void reset() {
+        if (updatesPanel != null) {
+            updatesPanel.reset();
+        }
         pluginEnabled.setSelected(getSettings().pluginEnabled);
         moduleDefaultLicenseName.setText(getSettings().defaultLicense);
         mftfSupportEnabled.setSelected(getSettings().mftfSupportEnabled);
