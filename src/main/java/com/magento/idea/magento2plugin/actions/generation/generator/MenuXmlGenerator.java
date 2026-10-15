@@ -91,10 +91,11 @@ public class MenuXmlGenerator extends FileGenerator {
                 );
                 addTag.setAttribute(ModuleMenuXml.titleTagAttribute, menuXmlData.getTitle());
                 addTag.setAttribute(ModuleMenuXml.moduleTagAttribute, menuXmlData.getModuleName());
-                addTag.setAttribute(
-                        ModuleMenuXml.parentTagAttribute,
-                        menuXmlData.getParentMenuItem()
-                );
+                final String parentMenuItem = menuXmlData.getParentMenuItem();
+
+                if (parentMenuItem != null && !parentMenuItem.isEmpty()) {
+                    addTag.setAttribute(ModuleMenuXml.parentTagAttribute, parentMenuItem);
+                }
                 addTag.setAttribute(ModuleMenuXml.resourceTagAttribute, menuXmlData.getAcl());
                 addTag.setAttribute(ModuleMenuXml.translateTagAttribute, "title");
                 addTag.setAttribute(ModuleMenuXml.actionTagAttribute, menuXmlData.getAction());
