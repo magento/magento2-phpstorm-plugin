@@ -18,6 +18,37 @@ import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MagentoVersionUtilTest extends BaseProjectTestCase {
+    private Pair<String, String> detect(final String packages) {
+        final PsiFile lock = myFixture.configureByText("composer.lock", "{\"packages\":[" + packages + "]}");
+        return ApplicationManager.getApplication().runReadAction((Computable<Pair<String, String>>) () ->
+                GetMagentoVersionUtil.getVersion(PsiTreeUtil.getChildOfType(lock, JsonObject.class)));
+    }
+
+    public void testSharedReaderDetectsMageOs() {
+        final Pair<String, String> version = detect("{\"name\":\"mage-os/product-community-edition\",\"version\":\"3.5.0\"}");
+        assertNotNull(version);
+        assertEquals("3.5.0", version.getFirst());
+        assertEquals("Mage-OS Community Edition", version.getSecond());
+    }
+
+    public void testSharedReaderPrefersCommerceRegardlessOfPackageOrder() {
+        final String community = "{\"name\":\"magento/product-community-edition\",\"version\":\"2.4.8-p5\"}";
+        final String commerce = "{\"name\":\"magento/product-enterprise-edition\",\"version\":\"2.4.8-p5\"}";
+        for (final String packages : new String[] {community + "," + commerce, commerce + "," + community}) {
+            assertEquals("Adobe Commerce", detect(packages).getSecond());
+        }
+    }
+
+    public void testSharedReaderDoesNotTreatNestedMetadataAsInstalledPackages() {
+        assertNull(detect("{\"name\":\"vendor/custom\",\"version\":\"1.0.0\","
+                + "\"replace\":{\"name\":\"mage-os/product-community-edition\",\"version\":\"3.5.0\"}}"));
+    }
+
+    public void testSharedReaderDoesNotGuessWhenProductDistributionsConflict() {
+        assertNull(detect("{\"name\":\"mage-os/product-community-edition\",\"version\":\"3.5.0\"},"
+                + "{\"name\":\"magento/product-community-edition\",\"version\":\"2.4.8\"}"));
+    }
+
     public void testSharedReaderDetectsTheBasePackageWithoutAssumingAnEdition() {
         final PsiFile lock = myFixture.addFileToProject("installed/composer.lock",
                 "{\"packages\":[{\"name\":\"magento/magento2-base\",\"version\":\"2.4.8-p5\"}]}");

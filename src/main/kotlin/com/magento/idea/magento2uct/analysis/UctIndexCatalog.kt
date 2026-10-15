@@ -6,6 +6,7 @@ package com.magento.idea.magento2uct.analysis
 
 import com.magento.idea.magento2uct.util.php.MagentoTypeEscapeUtil
 import com.magento.idea.magento2uct.versioning.UctVersionState
+import com.magento.idea.magento2plugin.updates.ReleaseVersion
 import java.io.InputStream
 import java.io.ObjectInputStream
 import java.security.MessageDigest
@@ -13,25 +14,10 @@ import org.json.JSONObject
 
 /** Orders Magento releases numerically, with prereleases before releases and patches after them. */
 internal object UctVersions : Comparator<String> {
-    private val pattern = Regex("(\\d+)\\.(\\d+)\\.(\\d+)(?:-(alpha|beta|rc|p)(\\d+))?", RegexOption.IGNORE_CASE)
-
-    private fun parts(version: String): List<Int> {
-        val match = pattern.matchEntire(version)
-            ?: throw IllegalArgumentException("Invalid Magento version: $version")
-        val rank = when (match.groupValues[4].lowercase()) {
-            "alpha" -> -3
-            "beta" -> -2
-            "rc" -> -1
-            "p" -> 1
-            else -> 0
-        }
-        return (1..3).map { match.groupValues[it].toInt() } + rank + (match.groupValues[5].toIntOrNull() ?: 0)
-    }
-
     override fun compare(first: String, second: String): Int {
-        val left = parts(first)
-        val right = parts(second)
-        return left.indices.firstNotNullOfOrNull { left[it].compareTo(right[it]).takeIf { value -> value != 0 } } ?: 0
+        val left = requireNotNull(ReleaseVersion.parse(first)) { "Invalid Magento version: $first" }
+        val right = requireNotNull(ReleaseVersion.parse(second)) { "Invalid Magento version: $second" }
+        return left.compareTo(right)
     }
 }
 

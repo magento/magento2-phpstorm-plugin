@@ -5,13 +5,14 @@
 
 package com.magento.idea.magento2plugin.project.util;
 
+import com.intellij.json.psi.JsonArray;
 import com.intellij.json.psi.JsonObject;
 import com.intellij.json.psi.JsonProperty;
+import com.intellij.json.psi.JsonStringLiteral;
+import com.intellij.json.psi.JsonValue;
 import com.intellij.openapi.util.Pair;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.magento.idea.magento2plugin.magento.files.ComposerLock;
 import com.magento.idea.magento2plugin.magento.packages.code.MagentoVersion;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,27 @@ public final class GetMagentoVersionUtil {
     private GetMagentoVersionUtil() {
     }
 
+    /** Reads root metadata of a Magento source checkout, not a Composer project template. */
+    public static @Nullable Pair<String, String> getSourceVersion(final @NotNull JsonObject object) {
+        final String name = stringProperty(object, "name");
+        final MagentoVersion edition;
+        if ("magento/magento2ce".equals(name)) {
+            edition = MagentoVersion.COMMUNITY_EDITION;
+        } else if ("magento/magento2ee".equals(name)) {
+            edition = MagentoVersion.ENTERPRISE_EDITION;
+        } else {
+            return null;
+        }
+        final String version = stringProperty(object, "version");
+        return Pair.create(version, edition.getDisplayName());
+    }
+
+    private static @Nullable String stringProperty(final JsonObject object, final String name) {
+        final JsonProperty property = object.findProperty(name);
+        return property != null && property.getValue() instanceof JsonStringLiteral
+                ? ((JsonStringLiteral) property.getValue()).getValue() : null;
+    }
+
     /**
      * Find Magento Package version in composer.lock json object.
      *
@@ -37,34 +59,36 @@ public final class GetMagentoVersionUtil {
     public static @Nullable Pair<String, String> getVersion(final @NotNull JsonObject object) {
         final JsonProperty packagesProperty = object.findProperty(ComposerLock.PACKAGES_PROP);
 
-        if (packagesProperty == null) {
+        if (packagesProperty == null || !(packagesProperty.getValue() instanceof JsonArray)) {
             return null;
         }
-        final Collection<JsonObject> packages = PsiTreeUtil.findChildrenOfType(
-                packagesProperty,
-                JsonObject.class
-        );
+        final List<JsonValue> packages = ((JsonArray) packagesProperty.getValue()).getValueList();
         final List<MagentoVersion> versions = MagentoVersion.getVersions();
         final List<String> versionNames = MagentoVersion.getVersionsNames();
         versionNames.add(BASE_PACKAGE_NAME);
         final Map<String, String> foundMagentoPackages = new HashMap<>();
 
-        for (final JsonObject packageItem : packages) {
+        for (final JsonValue value : packages) {
+            if (!(value instanceof JsonObject)) {
+                continue;
+            }
             final @Nullable ImmutablePair<String, String> magentoPackage = findMagentoPackage(
-                    packageItem,
+                    (JsonObject) value,
                     versionNames);
 
             if (magentoPackage == null) {
                 continue;
             }
 
-            foundMagentoPackages.put(magentoPackage.getLeft(), magentoPackage.getRight());
-
-            if (foundMagentoPackages.containsKey(MagentoVersion.ENTERPRISE_EDITION.getName())
-                    || foundMagentoPackages.containsKey(
-                            MagentoVersion.MAGEOS_COMMUNITY_EDITION.getName())) {
-                break;
+            if (foundMagentoPackages.put(magentoPackage.getLeft(), magentoPackage.getRight()) != null) {
+                return null;
             }
+        }
+
+        if (foundMagentoPackages.containsKey(MagentoVersion.MAGEOS_COMMUNITY_EDITION.getName())
+                && (foundMagentoPackages.containsKey(MagentoVersion.COMMUNITY_EDITION.getName())
+                    || foundMagentoPackages.containsKey(MagentoVersion.ENTERPRISE_EDITION.getName()))) {
+            return null;
         }
 
         for (final MagentoVersion version : versions) {

@@ -9,6 +9,8 @@ import com.intellij.util.xmlb.XmlSerializer
 import com.magento.idea.magento2plugin.PhysicalMagentoTestCase
 import javax.swing.JCheckBox
 import javax.swing.JTextField
+import com.magento.idea.magento2plugin.updates.MagentoUpdateSettings
+import com.magento.idea.magento2plugin.updates.MagentoUpdatesPanel
 
 class SettingsFormTest : PhysicalMagentoTestCase() {
     private fun createForm(): SettingsForm {
@@ -86,5 +88,34 @@ class SettingsFormTest : PhysicalMagentoTestCase() {
         settings.publishedReleasesUrl = "https://previous.example.test/releases"
         settings.loadState(Settings.State())
         assertEquals(Settings.DEFAULT_PUBLISHED_RELEASES_URL, settings.getPublishedReleasesUrl())
+    }
+
+    fun testUpdatePreferencesApplyResetAndPersistIndependentlyOfUctReleaseCatalog() {
+        val form = createForm()
+        val panel = field<MagentoUpdatesPanel>(form, "updatesPanel")
+        val automatic = MagentoUpdatesPanel::class.java.getDeclaredField("automatic").apply { isAccessible = true }.get(panel) as JCheckBox
+        val url = MagentoUpdatesPanel::class.java.getDeclaredField("url").apply { isAccessible = true }.get(panel) as JTextField
+        val settings = project.getService(MagentoUpdateSettings::class.java)
+        automatic.isSelected = false
+        url.text = "https://updates.example.test/api/v1/"
+        assertTrue(form.isModified)
+        form.apply()
+        assertFalse(settings.state.enabled)
+        assertEquals("https://updates.example.test/api/v1", settings.state.feedUrl)
+        assertEquals(Settings.DEFAULT_PUBLISHED_RELEASES_URL, Settings.getInstance(project).getPublishedReleasesUrl())
+        assertFalse(form.isModified)
+        val saved = XmlSerializer.serialize(settings.state)
+        val reloaded = MagentoUpdateSettings()
+        reloaded.loadState(XmlSerializer.deserialize(saved, MagentoUpdateSettings.Options::class.java))
+        assertFalse(reloaded.state.enabled)
+        assertEquals(settings.state.feedUrl, reloaded.state.feedUrl)
+        automatic.isSelected = true
+        url.text = "https://unsaved.example.test"
+        form.reset()
+        assertFalse(automatic.isSelected)
+        assertEquals(settings.state.feedUrl, url.text)
+        url.text = "http://insecure.example.test"
+        org.junit.Assert.assertThrows(ConfigurationException::class.java) { form.apply() }
+        assertEquals("https://updates.example.test/api/v1", settings.state.feedUrl)
     }
 }
