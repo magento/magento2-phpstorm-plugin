@@ -173,6 +173,30 @@ class MagentoUpdateServiceTest : PhysicalMagentoTestCase() {
         assertTrue(notifications.isEmpty())
     }
 
+    fun testCloudMonthlyPatchRecheckExpiresWarningOnlyAfterAllComponentsAreApplied() {
+        val fixture = CloudPatchesFixture { path, body -> myFixture.addFileToProject(path, body) }
+        fixture.install()
+        security = security.replace("magento-community", "magento-commerce")
+            .replace("APSB-TEST", "APSB26-153").replace("PATCH-1", "2026-oct")
+        check()
+        val warning = notifications.single()
+        assertTrue(warning.content.contains("APSB26-153"))
+        fixture.apply("ce")
+        fixture.apply("ee")
+        check()
+        assertFalse(warning.isExpired)
+        fixture.apply("b2b")
+        check(manual = true)
+        assertTrue(warning.isExpired)
+        assertEquals(NotificationType.INFORMATION, notifications.last().type)
+        assertFalse(notifications.last().content.contains("APSB26-153"))
+        assertFalse(project.getService(MagentoUpdateSettings::class.java).state.lastNotifiedFingerprints.containsKey("SECURITY"))
+        fixture.apply("b2b", applied = false)
+        check()
+        assertEquals(NotificationType.ERROR, notifications.last().type)
+        assertTrue(notifications.last().content.contains("APSB26-153"))
+    }
+
     fun testComposerConfigurationSuppressesSecurityButKeepsIndependentReleaseUpdates() {
         catalog = """{"data":{"2.4.9":{"version":"2.4.9","releaseDate":"2026-10-01"}}}"""
         myFixture.addFileToProject("composer.json", """{"require":{"cweagans/composer-patches":"*"},"extra":{
