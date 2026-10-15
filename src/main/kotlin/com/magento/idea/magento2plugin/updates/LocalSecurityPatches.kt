@@ -29,7 +29,8 @@ internal data class LocalSecurityPatches(
     private val entries: List<Entry>,
     val watchedPaths: Set<String>,
     private val packageVersions: Map<String, String> = emptyMap(),
-    private val registry: SecurityPatchRegistry? = null
+    private val registry: SecurityPatchRegistry? = null,
+    private val cloudPatches: CloudSecurityPatches = CloudSecurityPatches.EMPTY
 ) {
     internal data class Entry(val identity: String, val covered: Boolean)
 
@@ -62,10 +63,11 @@ internal data class LocalSecurityPatches(
         val number = listOf("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec")
             .indexOf(month.groupValues[2].lowercase()).takeIf { it >= 0 }?.plus(1) ?: return false
         val date = "${month.groupValues[1]}-${number.toString().padStart(2, '0')}"
+        if (cloudPatches.covers(date, installed, packageVersions)) return true
         registry?.covers(date, installed, packageVersions, ::matches)?.let { return it }
         val versions = mutableMapOf("CE" to installed.version)
         if (installed.distribution == MagentoDistribution.COMMERCE) versions["EE"] = installed.version
-        packageVersions["magento/extension-b2b"]?.let { versions["B2B"] = it }
+        (packageVersions["magento/magento2-b2b-base"] ?: packageVersions["magento/extension-b2b"])?.let { versions["B2B"] = it }
         val pattern = Regex("(?<![a-z0-9])([a-z0-9]+)-$date-\\d+-([a-z0-9]+)(?![a-z0-9])", RegexOption.IGNORE_CASE)
         val matching = entries.filter { pattern.containsMatchIn(it.identity) }
         return versions.all { (component, version) ->
@@ -83,7 +85,8 @@ internal data class LocalSecurityPatches(
         fun isPatchPath(root: String, path: String): Boolean {
             val relative = path.replace('\\', '/').removePrefix(root.replace('\\', '/').trimEnd('/') + "/")
             return relative in setOf("composer.json", "composer.lock", "patches.lock.json", ".magento.env.yaml", ".magento.app.yaml") ||
-                relative.endsWith(".patch") || relative.endsWith(".diff") || relative.endsWith("/composer/installed.json")
+                relative.endsWith(".patch") || relative.endsWith(".diff") || relative.endsWith("/composer/installed.json") ||
+                relative.endsWith("/magento/magento-cloud-patches/patches.json")
         }
     }
 
@@ -101,8 +104,9 @@ internal data class LocalSecurityPatches(
                 parse { if (body.trimStart().startsWith("[")) JSONArray(body) else JSONObject(body).optJSONArray("packages") }
             }.objects()
             val packages = lock?.optJSONArray("packages").objects()
+            val currentPackages = (packages + installed).associateBy { it.optString("name") }
             // installed.json describes the current vendor tree and supersedes historical lock data.
-            (packages + installed).associateBy { it.optString("name") }.values.forEach { pkg ->
+            currentPackages.values.forEach { pkg ->
                 definitions(pkg.optJSONObject("extra")?.opt("patches_applied"), applied = true, grouped = false,
                     target = vendor.resolve(pkg.optString("name")))
             }
@@ -141,12 +145,20 @@ internal data class LocalSecurityPatches(
             // Tool packages ship diff files even when patches were applied outside Composer/Cloud.
             scan(vendor.resolve("magento/quality-patches/patches"))
             scan(vendor.resolve("magento/magento-cloud-patches/patches"))
+            val cloudDirectory = vendor.resolve("magento/magento-cloud-patches")
+            val cloudPatches = json(cloudDirectory.resolve("patches.json"))?.let { mappings ->
+                CloudSecurityPatches.from(mappings) { source, component ->
+                    val path = localPath(source, cloudDirectory.resolve("patches"))
+                    val body = path?.let(::read)
+                    body != null && AppliedPatch.isApplied(body, root, ::read, vendor.resolve(component)) == true
+                }
+            } ?: CloudSecurityPatches.EMPTY
             // CVT caches the exact diffs used by its dry-run detector here. Recheck the code now;
             // its registry/cache files alone never assert that a patch is applied.
             scan(root.resolve("var/patch_metadata/.patch_diffs"))
             val registry = json(root.resolve("var/patch_metadata/.patch_registry_cache.json"))?.let(SecurityPatchRegistry::from)
-            val versions = packages.associate { it.optString("name") to it.optString("version").removePrefix("v") }
-            return LocalSecurityPatches(entries.distinct().sortedWith(compareBy<Entry> { it.identity }.thenBy { it.covered }), watched, versions, registry)
+            val versions = currentPackages.mapValues { it.value.optString("version").removePrefix("v") }
+            return LocalSecurityPatches(entries.distinct().sortedWith(compareBy<Entry> { it.identity }.thenBy { it.covered }), watched, versions, registry, cloudPatches)
         }
 
         private fun composerDefinitions(owner: JSONObject, directory: Path, vaimo: Boolean = false, disabled: List<String> = emptyList()) {

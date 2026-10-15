@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 
+## 2026.3.4-p1
+
+### Fixed
+
+- Recognize monthly security fixes applied through Cloud Patches using package and version mappings, require verified coverage for every applicable CE, EE, and B2B component, and dismiss resolved security notifications after rechecking.
+
 ## 2026.3.4
 
 ### Added
