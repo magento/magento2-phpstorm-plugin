@@ -360,6 +360,10 @@ public class NewEntityDialog extends AbstractDialog {
      * Perform code generation using input data.
      */
     protected void onWriteActionOK() {
+        if (propertyTable.isEditing()) {
+            propertyTable.getCellEditor().stopCellEditing();
+        }
+
         formatProperties();
 
         final NewEntityDialogData dialogData = getNewEntityDialogData();
