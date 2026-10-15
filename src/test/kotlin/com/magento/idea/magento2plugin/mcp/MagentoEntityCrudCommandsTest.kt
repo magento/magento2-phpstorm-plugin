@@ -63,6 +63,18 @@ class MagentoEntityCrudCommandsTest : BaseProjectTestCase() {
             "app/code/Foo/Bar/etc/webapi.xml",
             "url=\"/V1/mcp-crud/get-list\""
         )
+        assertFileContains(
+            "app/code/Foo/Bar/Block/Form/McpCrud/SaveAndContinue.php",
+            "'event' => 'saveAndContinueEdit'"
+        )
+        assertFileContains(
+            "app/code/Foo/Bar/view/adminhtml/ui_component/mcp_crud_form.xml",
+            "<button name=\"save_and_continue\" class=\"Foo\\Bar\\Block\\Form\\McpCrud\\SaveAndContinue\"/>"
+        )
+        assertFileContains(
+            "app/code/Foo/Bar/Controller/Adminhtml/McpCrud/Save.php",
+            "if (\$this->getRequest()->getParam('back'))"
+        )
     }
 
     private fun assertContains(text: String, expected: String) {
