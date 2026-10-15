@@ -56,13 +56,13 @@ class MagentoUpdatesUiTest {
         checkDistribution("magento-community", "magento/product-community-edition", "2.4.8-p5", "unavailable", unavailableFeed = true)
 
     @Test
-    fun `suppresses Composer configured patches and warns when the fix is removed`() =
+    fun suppressesComposerConfiguredPatchesAndWarnsWhenTheFixIsRemoved() =
         checkDistribution("magento-community", "magento/product-community-edition", "2.4.8-p5", "covered by installed fixes or local patch configuration",
             localPatchFiles = mapOf("composer.json" to """{"require":{"cweagans/composer-patches":"^2.0"},"extra":{
                 "patches":{"magento/framework":{"Security fix":"https://example.test/TEST-PATCH.patch"}}}}"""))
 
     @Test
-    fun `suppresses Cloud YAML patches and warns when the fix is removed`() =
+    fun suppressesCloudYamlPatchesAndWarnsWhenTheFixIsRemoved() =
         checkDistribution("magento-community", "magento/product-community-edition", "2.4.8-p5", "covered by installed fixes or local patch configuration",
             localPatchFiles = mapOf(".magento.env.yaml" to "stage: {build: {QUALITY_PATCHES: [TEST-PATCH]}}"))
 

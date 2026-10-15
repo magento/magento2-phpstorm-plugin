@@ -15,7 +15,6 @@ internal object AppliedPatch {
         val lines = body.replace("\r\n", "\n").lines()
         var index = 0
         var files = 0
-        var changed = false
         var applied = true
         while (index < lines.size) {
             if (!lines[index].startsWith("--- ")) { index++; continue }
@@ -61,7 +60,6 @@ internal object AppliedPatch {
                         content.subList(it, it + postImage.size) == postImage
                     }
                 if (position == null) applied = false else previousEnd = position + postImage.size
-                changed = true
                 hunks++
                 if (index < lines.size && lines[index] == "\\ No newline at end of file") index++
             }
@@ -69,6 +67,6 @@ internal object AppliedPatch {
             files++
         }
         if (lines.any { it.startsWith("GIT binary patch") || it.startsWith("Binary files ") }) return null
-        return if (files > 0 && changed) applied else null
+        return if (files > 0) applied else null
     }
 }
