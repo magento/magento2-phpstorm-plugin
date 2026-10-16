@@ -59,7 +59,8 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         assertTrue(first, first.contains("./src/bin/magento\n  type: Magento CLI wrapper\n  selection: fallback"))
         assertTrue(first, first.indexOf("./bin/magento\n  type: Magento CLI wrapper\n  selection: preferred") < first.indexOf("./src/bin/magento\n  type: Magento CLI wrapper\n  selection: fallback"))
         assertFalse(first.contains("./bin/.htaccess"))
-        assertFalse(first.contains("./bin/common"))
+        // Executability of a new helper file depends on the host filesystem.
+        assertEquals(first, Files.isExecutable(root.resolve("bin/common")), first.contains("./bin/common"))
         val status = magerun()
         assertEquals("detected", status.getString("status"))
         assertFalse(status.getBoolean("runtimeProbed"))
