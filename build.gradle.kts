@@ -7,6 +7,7 @@ import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask
 import org.gradle.api.tasks.testing.TestDescriptor
 import org.gradle.api.tasks.testing.TestResult
 import org.gradle.api.tasks.testing.TestListener
@@ -155,8 +156,16 @@ intellijPlatform {
     }
 
     pluginVerification {
+        // Requiring a restart is intentional; every compatibility/API warning must fail verification.
+        failureLevel = VerifyPluginTask.FailureLevel.ALL - VerifyPluginTask.FailureLevel.NOT_DYNAMIC
         ides {
-            recommended()
+            create(IntelliJPlatformType.PhpStorm, "2026.2.0.1")
+            create(IntelliJPlatformType.PhpStorm, "2026.2.3")
+            create(IntelliJPlatformType.PhpStorm, "263.6259.29")
+            if (providers.gradleProperty("verifyWebStorm").map(String::toBoolean).getOrElse(false)) {
+                create(IntelliJPlatformType.WebStorm, "2026.2.0.1")
+                create(IntelliJPlatformType.WebStorm, "263.6259.34")
+            }
         }
     }
 }
