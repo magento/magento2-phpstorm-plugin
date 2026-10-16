@@ -60,12 +60,57 @@ class MagentoUpdatesTest {
     }
 
     @Test fun `publication window includes its boundary and today but not future or undated findings`() {
-        for (date in listOf("2026-09-15", "2026-10-15", "2026-09-14", "2026-10-16", "", "invalid")) {
-            val expected = date in setOf("2026-09-15", "2026-10-15")
+        val included = setOf("2026-09-15", "2026-10-15", "2026-10-15T11:00:00Z", "2026-10-15T14:00:00+03:00")
+        for (date in included + listOf("2026-09-14", "2026-10-16", "2026-10-15T13:00:00Z", "", "invalid")) {
+            val expected = date in included
             val releases = catalog().replace("2026-09-15", date).replace("2026-10-01", date)
             val result = UpdateEvaluator.evaluate(installed, releases, security().replace("2026-10-01", date), now)
             assertEquals(date, expected, result.latestVersion != null)
             assertEquals(date, expected, result.advisoryCount > 0)
+        }
+    }
+
+    @Test fun `each publication window includes its exact cutoff and excludes older timestamps`() {
+        val cutoffs = listOf(
+            UpdateCheckWindow.MONTH to Instant.parse("2026-09-15T12:00:00Z"),
+            UpdateCheckWindow.WEEK to Instant.parse("2026-10-08T12:00:00Z"),
+            UpdateCheckWindow.TWO_DAYS to Instant.parse("2026-10-13T12:00:00Z"),
+            UpdateCheckWindow.TWELVE_HOURS to Instant.parse("2026-10-15T00:00:00Z")
+        )
+        for ((window, cutoff) in cutoffs) {
+            for ((timestamp, expected) in listOf(cutoff.minusSeconds(1) to false, cutoff to true,
+                cutoff.plusSeconds(1) to true, now to true, now.plusSeconds(1) to false)) {
+                val releases = catalog().replace("2026-09-15", timestamp.toString()).replace("2026-10-01", timestamp.toString())
+                val report = security().replace("2026-10-01", timestamp.toString())
+                val result = UpdateEvaluator.evaluate(installed, releases, report, now, window = window)
+                assertEquals("$window: $timestamp", expected, result.latestVersion != null)
+                assertEquals("$window: $timestamp", expected, result.patchVersion != null)
+                assertEquals("$window: $timestamp", expected, result.advisoryCount > 0)
+            }
+        }
+    }
+
+    @Test fun `12 hour window includes date only publications whose UTC day overlaps the cutoff`() {
+        val time = Instant.parse("2026-10-15T06:00:00Z")
+        for (date in listOf("2026-10-13", "2026-10-14", "2026-10-15", "2026-10-16")) {
+            val releases = catalog().replace("2026-09-15", date).replace("2026-10-01", date)
+            val report = security().replace("2026-10-01", date)
+            val result = UpdateEvaluator.evaluate(installed, releases, report, time, window = UpdateCheckWindow.TWELVE_HOURS)
+            val expected = date in setOf("2026-10-14", "2026-10-15")
+            assertEquals(date, expected, result.latestVersion != null)
+            assertEquals(date, expected, result.advisoryCount > 0)
+        }
+    }
+
+    @Test fun `empty results describe the selected publication window`() {
+        val releases = catalog().replace("2026-09-15", "2026-08-01").replace("2026-10-01", "2026-08-01")
+        val report = security().replace("2026-10-01", "2026-08-01")
+        for (window in UpdateCheckWindow.entries) {
+            val result = UpdateEvaluator.evaluate(installed, releases, report, now, window = window)
+            assertFalse(result.actionable)
+            assertTrue(result.message.contains("No security advisories published in ${window.period}"))
+            assertTrue(result.message.contains("No newer stable releases published in ${window.period}"))
+            assertTrue(result.message.contains("Older advisories may still apply"))
         }
     }
 
@@ -101,6 +146,55 @@ class MagentoUpdatesTest {
         assertEquals(UpdateSeverity.CRITICAL, result.severity)
         assertTrue(result.message.contains("No complete local patch coverage"))
         assertTrue(result.message.contains("APSB-TEST"))
+        val releases = result.findings.single { it.kind == UpdateKind.RELEASE }.message
+        assertTrue(releases.startsWith("Published 30 days ago\nPatch release available: 2.4.8-p10."))
+        assertTrue(releases.contains("Published 14 days ago\nNewer release available: 2.4.9."))
+        val security = result.findings.single { it.kind == UpdateKind.SECURITY }.message
+        assertTrue(security.startsWith("Published 14 days ago\nCritical security advisory: APSB-TEST."))
+    }
+
+    @Test fun `date only publications show calendar days without inventing a publication time`() {
+        for ((date, relative) in listOf("2026-10-15" to "today", "2026-10-14" to "1 day ago", "2026-10-13" to "2 days ago")) {
+            val releases = catalog().replace("2026-09-15", date).replace("2026-10-01", date)
+            val report = security().replace("2026-10-01", date)
+            val result = UpdateEvaluator.evaluate(installed, releases, report, now)
+            for (finding in result.findings) {
+                assertTrue(finding.message, finding.message.startsWith("Published $relative\n"))
+                assertFalse(finding.message.contains(date))
+            }
+            assertEquals(setOf(UpdateKind.RELEASE, UpdateKind.SECURITY), result.findings.map { it.kind }.toSet())
+        }
+    }
+
+    @Test fun `timestamp publications show elapsed minutes hours and days without the timestamp`() {
+        for ((timestamp, relative) in listOf(
+            "2026-10-15T11:59:30Z" to "just now",
+            "2026-10-15T11:59:00Z" to "1 minute ago",
+            "2026-10-15T11:58:00Z" to "2 minutes ago",
+            "2026-10-15T11:00:00Z" to "1 hour ago",
+            "2026-10-15T10:00:00Z" to "2 hours ago",
+            "2026-10-14T12:00:00Z" to "1 day ago",
+            "2026-10-13T12:00:00Z" to "2 days ago"
+        )) {
+            val releases = catalog().replace("2026-09-15", timestamp).replace("2026-10-01", timestamp)
+            val report = security().replace("2026-10-01", timestamp)
+            val result = UpdateEvaluator.evaluate(installed, releases, report, now)
+            for (finding in result.findings) {
+                assertTrue(finding.message, finding.message.startsWith("Published $relative\n"))
+                assertFalse(finding.message.contains(timestamp))
+            }
+            assertEquals(setOf(UpdateKind.RELEASE, UpdateKind.SECURITY), result.findings.map { it.kind }.toSet())
+        }
+    }
+
+    @Test fun `each advisory retains its publication date and timestamp offsets are respected`() {
+        val report = JSONObject(security())
+        report.getJSONObject("data").getJSONArray("vulnerableTo").put(JSONObject()
+            .put("id", "APSB-SECOND").put("publishedDate", "2026-10-15T13:00:00+03:00").put("severity", "high"))
+        val result = UpdateEvaluator.evaluate(installed, catalog(), report.toString(), now)
+        val message = result.findings.single { it.kind == UpdateKind.SECURITY }.message
+        assertTrue(message.contains("Published 14 days ago\nCritical security advisory: APSB-TEST."))
+        assertTrue(message.contains("Published 2 hours ago\nHigh security advisory: APSB-SECOND."))
     }
 
     @Test fun `latest supported version can still require an isolated patch`() {
@@ -199,6 +293,57 @@ class MagentoUpdatesTest {
         val cached = client.check(url, installed, force = true)
         assertTrue(cached.stale)
         assertEquals(now, cached.assessment.checkedAt)
+    }
+
+    @Test fun `shared feed cache applies each requested window including stale fallback`() {
+        var calls = 0
+        var offline = false
+        val timestamp = "2026-10-14T00:00:00Z"
+        val client = MagentoUpdateFeed({ url ->
+            calls++
+            if (offline) throw IOException("Offline")
+            if (url.endsWith("/security")) security().replace("2026-10-01", timestamp)
+            else catalog().replace("2026-09-15", timestamp).replace("2026-10-01", timestamp)
+        }, { now })
+        val url = MagentoUpdateSettings.DEFAULT_FEED_URL
+        for (window in UpdateCheckWindow.entries) {
+            val result = client.check(url, installed, window = window)
+            assertEquals(window.label, window != UpdateCheckWindow.TWELVE_HOURS, result.assessment.actionable)
+            assertEquals(2, calls)
+        }
+        offline = true
+        for (window in listOf(UpdateCheckWindow.TWELVE_HOURS, UpdateCheckWindow.WEEK)) {
+            val result = client.check(url, installed, force = true, window = window)
+            assertTrue(result.stale)
+            assertEquals(window != UpdateCheckWindow.TWELVE_HOURS, result.assessment.actionable)
+            assertEquals(now, result.assessment.checkedAt)
+        }
+    }
+
+    @Test fun `cached publication ages advance without changing notification fingerprints or check time`() {
+        var time = now
+        var offline = false
+        val timestamp = "2026-10-15T09:30:00Z"
+        val client = MagentoUpdateFeed({ url ->
+            if (offline) throw IOException("Offline")
+            if (url.endsWith("/security")) security().replace("2026-10-01", timestamp)
+            else catalog().replace("2026-09-15", timestamp).replace("2026-10-01", timestamp)
+        }, { time })
+        val url = MagentoUpdateSettings.DEFAULT_FEED_URL
+        val initial = client.check(url, installed).assessment
+        time = time.plusSeconds(1800)
+        val cached = client.check(url, installed).assessment
+        assertTrue(initial.findings.all { it.message.startsWith("Published 2 hours ago\n") })
+        assertTrue(cached.findings.all { it.message.startsWith("Published 3 hours ago\n") })
+        assertEquals(initial.fingerprint, cached.fingerprint)
+        assertEquals(now, cached.checkedAt)
+        offline = true
+        time = time.plusSeconds(86400)
+        val stale = client.check(url, installed)
+        assertTrue(stale.stale)
+        assertTrue(stale.assessment.findings.all { it.message.startsWith("Published 1 day ago\n") })
+        assertEquals(initial.fingerprint, stale.assessment.fingerprint)
+        assertEquals(now, stale.assessment.checkedAt)
     }
 
     @Test fun `next hourly refresh drops findings that aged out of the publication window`() {
