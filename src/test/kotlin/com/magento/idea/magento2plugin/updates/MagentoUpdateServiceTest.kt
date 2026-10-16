@@ -142,6 +142,8 @@ class MagentoUpdateServiceTest : PhysicalMagentoTestCase() {
         val patch = notifications.single { it.content.contains("APSB-TEST") }
         assertEquals(NotificationType.INFORMATION, release.type)
         assertEquals(NotificationType.ERROR, patch.type)
+        assertTrue(release.content.startsWith("Published 14 days ago<br/>Newer release available: 2.4.9."))
+        assertTrue(patch.content.startsWith("Published 14 days ago<br/>Critical security advisory: APSB-TEST."))
         assertFalse(release.content.contains("APSB-TEST"))
         assertFalse(patch.content.contains("Newer release available"))
         assertFalse(release.isExpired)
@@ -278,6 +280,42 @@ class MagentoUpdateServiceTest : PhysicalMagentoTestCase() {
         assertTrue(notification.content.contains("past month"))
         assertFalse(notification.content.contains("APSB-TEST"))
         assertFalse(notification.content.contains("No open advisories"))
+    }
+
+    fun testSelectedWindowAppliesToAutomaticAndManualChecksAndCanBeWidenedUsingCachedFeed() {
+        val timestamp = "2026-10-14T23:00:00Z"
+        catalog = """{"data":{"2.4.9":{"version":"2.4.9","releaseDate":"$timestamp"}}}"""
+        security = security.replace("2026-10-01", timestamp)
+        val options = project.getService(MagentoUpdateSettings::class.java).state
+        options.checkWindow = UpdateCheckWindow.TWELVE_HOURS
+        check()
+        assertTrue(notifications.isEmpty())
+        check(manual = true)
+        assertTrue(notifications.single().content.contains("past 12 hours"))
+        assertFalse(notifications.single().content.contains("APSB-TEST"))
+        assertEquals(4, requests.get())
+        options.checkWindow = UpdateCheckWindow.WEEK
+        check()
+        val active = notifications.filterNot { it.isExpired }
+        assertEquals(2, active.size)
+        assertTrue(active.any { it.content.contains("Newer release available: 2.4.9") })
+        assertTrue(active.any { it.content.contains("APSB-TEST") })
+        assertEquals(4, requests.get())
+        options.checkWindow = UpdateCheckWindow.TWELVE_HOURS
+        check()
+        assertTrue(active.all { it.isExpired })
+    }
+
+    fun testChangingPublicationWindowInvalidatesAPendingRetry() {
+        val dispatcher = controlRetry()
+        unavailable = true
+        check()
+        project.getService(MagentoUpdateSettings::class.java).state.checkWindow = UpdateCheckWindow.WEEK
+        unavailable = false
+        dispatcher.advance()
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+        assertEquals(1, requests.get())
+        assertTrue(notifications.isEmpty())
     }
 
     fun testAutomaticChecksDeduplicateWhileManualChecksRefresh() {
