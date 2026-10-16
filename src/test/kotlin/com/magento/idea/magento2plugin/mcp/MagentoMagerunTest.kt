@@ -228,7 +228,7 @@ class MagentoMagerunTest {
 
     @Test
     fun testTimeoutOutputLimitAndFailureDoNotUseFallback() = fixture { root ->
-        php(root, "bin/n98-magerun2")
+        php(root, "bin/n98-magerun2", executable = false)
         php(root, "vendor/bin/n98-magerun2")
         for ((failure, expected) in listOf(MagerunProcessResult(-1, timedOut = true) to "timeout",
             MagerunProcessResult(-1, outputLimited = true) to "output_limit", MagerunProcessResult(2, stderr = "failed") to "probe_failed")) {
@@ -236,7 +236,7 @@ class MagentoMagerunTest {
             val runner = MagerunRunner { args, _, _ -> calls.add(args); failure }
             assertEquals(expected, MagentoMagerunService(runner).execute(environment(root), MagerunRequest("commands")).getString("status"))
             assertEquals(1, calls.size)
-            assertEquals(root.resolve("bin/n98-magerun2").toString(), calls.single().first())
+            assertEquals(listOf("php", root.resolve("bin/n98-magerun2").toString()), calls.single().take(2))
         }
     }
 
