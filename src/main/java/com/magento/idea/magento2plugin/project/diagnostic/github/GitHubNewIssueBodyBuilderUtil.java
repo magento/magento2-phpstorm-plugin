@@ -168,6 +168,7 @@ public final class GitHubNewIssueBodyBuilderUtil {
      */
     private static String getPluginVersion() {
         final String version = PluginVersionUtil.getVersion();
+
         return version == null ? "" : version;
     }
 }

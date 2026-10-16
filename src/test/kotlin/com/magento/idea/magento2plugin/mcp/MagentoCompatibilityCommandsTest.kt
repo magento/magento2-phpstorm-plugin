@@ -311,7 +311,8 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
         assertEquals(0, status.getJSONArray("activeRunIds").length())
         assertEquals(project.basePath, status.getString("projectPath"))
         assertEquals(project.basePath, status.getString("magentoRoot"))
-        assertTrue(status.has("pluginVersion"))
+        assertFalse(status.isNull("pluginVersion"))
+        assertTrue(status.getString("pluginVersion").isNotBlank())
         assertTrue(status.getString("ideVersion").isNotBlank())
     }
 

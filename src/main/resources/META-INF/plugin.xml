@@ -15,6 +15,12 @@
     <depends optional="true" config-file="withPhp.xml">com.jetbrains.php</depends>
 
     <actions>
+        <action id="Magento.CheckUpdates"
+                class="com.magento.idea.magento2plugin.updates.CheckMagentoUpdatesAction"
+                text="Check Magento Updates"
+                description="Check releases and security advisories for the installed Magento or Mage-OS distribution">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
         <group id="MagentoContextBasedActionsGroup"
                class="com.magento.idea.magento2plugin.actions.groups.ContextActionsGroup"
                text="Context Actions"
@@ -149,6 +155,7 @@
 
         <directoryProjectConfigurator implementation="com.magento.idea.magento2plugin.project.ProjectDetector"/>
         <postStartupActivity implementation="com.magento.idea.magento2plugin.project.startup.CheckIfMagentoPathIsValidActivity"/>
+        <postStartupActivity implementation="com.magento.idea.magento2plugin.updates.MagentoUpdateActivity"/>
         <multiHostInjector implementation="com.magento.idea.magento2plugin.lang.injection.UiComponentSyntaxInjector"/>
         <highlightErrorFilter implementation="com.magento.idea.magento2plugin.highlighting.MagentoInitJsonErrorFilter"/>
         <daemon.highlightInfoFilter implementation="com.magento.idea.magento2plugin.highlighting.MagentoInitJsonErrorFilter"/>
@@ -158,6 +165,7 @@
         <notificationGroup
                 id="Magento Notifications"
                 displayType="BALLOON" />
+        <notificationGroup id="Magento Updates" displayType="BALLOON" />
 
         <projectViewNodeDecorator implementation="com.magento.idea.magento2plugin.decorator.MagentoFolderDecorator"/>
 

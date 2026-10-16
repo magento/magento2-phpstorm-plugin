@@ -150,7 +150,7 @@ intellijPlatform {
     publishing {
         token = providers.environmentVariable("MAGENTO_PHPSTORM_intellijPublishToken")
         channels = effectivePluginVersion.map {
-            listOf(it.substringAfter('-', "").substringBefore('.').ifEmpty { "default" })
+            listOf(it.replace(Regex("-p\\d+(?=-|$)"), "").substringAfter('-', "").substringBefore('.').ifEmpty { "default" })
         }
     }
 
@@ -236,6 +236,7 @@ tasks {
 intellijPlatformTesting.testIdeUi.register("uiTest") {
     type = IntelliJPlatformType.WebStorm
     version = providers.gradleProperty("uiTestPlatformVersion")
+    useInstaller = true
 
     task {
         val uiTestSourceSet = sourceSets.getByName("uiTest")

@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 
-## 2026.3.4
+## [Unreleased]
 
 ### Changed
 
@@ -16,6 +16,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Replaced internal and deprecated platform API calls in UCT method inspections, run configuration validation, and MCP plugin version reporting.
 - Replaced SwingX hyperlinks and input placeholders with platform UI components for compatibility with 2026.3 IDEs.
 - CLI command generation escapes single quotes and backslashes in descriptions to preserve their text and prevent invalid PHP syntax [#1280](https://github.com/magento/magento2-phpstorm-plugin/issues/1280).
+
+- Generated `menu.xml` no longer gets an empty `parent` attribute, which failed Magento's menu schema, when no parent menu item is set, as in the MCP `entity_crud` scaffold [#2750](https://github.com/magento/magento2-phpstorm-plugin/issues/2750).
+
+## 2026.3.4-p1
+
+### Fixed
+
+- Recognize monthly security fixes applied through Cloud Patches using package and version mappings, require verified coverage for every applicable CE, EE, and B2B component, and dismiss resolved security notifications after rechecking.
+
+## 2026.3.4
+
+### Added
+
+- Hourly and manual update checks for Magento Open Source, Adobe Commerce, and Mage-OS in all supported IDEs, with separate release and security notifications for findings published in the past month.
+
+### Fixed
+
+- New Entity keeps the property name or type that is still being edited when OK is clicked, instead of generating the previous value [#2741](https://github.com/magento/magento2-phpstorm-plugin/issues/2741).
 
 ## 2026.3.3
 
@@ -33,6 +51,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Fixed
 
+- Deprecated `ConfigurationException.getMessage()` usage in UCT memory-limit validation and Magento settings error reporting.
 - External UCT run configurations support a PHP memory-limit override for large projects [#2512](https://github.com/magento/magento2-phpstorm-plugin/issues/2512).
 - Missing SQL condition operators and plural store and website scopes in PHP argument completion.
 - View Model injection is available only in editable Magento directories, including explicitly marked vendor directories [#1204](https://github.com/magento/magento2-phpstorm-plugin/issues/1204).

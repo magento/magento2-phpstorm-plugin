@@ -84,6 +84,7 @@ class UctRunConfigurationTest : PhysicalMagentoTestCase() {
             assertTrue(validation.messageHtml.toString().contains("PHP memory limit"))
             val execution = org.junit.Assert.assertThrows(ExecutionException::class.java) { configuration.createCommandLine(commandSettings()) }
             assertEquals(validation.messageHtml.toString(), execution.message)
+            assertTrue(execution.cause is RuntimeConfigurationError)
         }
     }
 
