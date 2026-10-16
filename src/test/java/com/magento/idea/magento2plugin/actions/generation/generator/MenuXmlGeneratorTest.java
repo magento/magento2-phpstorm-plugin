@@ -27,19 +27,34 @@ public class MenuXmlGeneratorTest extends BaseGeneratorTestCase {
         assertGeneratedFileIsCorrect(
                 myFixture.configureByFile(filePath),
                 EXPECTED_DIRECTORY,
-                generateMenuXmlFile()
+                generateMenuXmlFile(PARENT_MENU)
+        );
+    }
+
+    /**
+     * Test checks that an empty parent menu item is not written to menu.xml.
+     */
+    public void testGenerateMenuXmlFileWithoutParent() {
+        final String filePath = this.getFixturePath(ModuleMenuXml.fileName);
+
+        assertGeneratedFileIsCorrect(
+                myFixture.configureByFile(filePath),
+                EXPECTED_DIRECTORY,
+                generateMenuXmlFile("")
         );
     }
 
     /**
      * Generate Menu XML file.
      *
+     * @param parentMenu String
+     *
      * @return PsiFile
      */
-    private PsiFile generateMenuXmlFile() {
+    private PsiFile generateMenuXmlFile(final String parentMenu) {
         final MenuXmlGenerator menuXmlGenerator = new MenuXmlGenerator(
                 new MenuXmlData(
-                        PARENT_MENU,
+                        parentMenu,
                         "10",
                         MODULE_NAME,
                         MENU_IDENTIFIER,

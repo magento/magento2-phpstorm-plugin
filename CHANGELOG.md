@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 
+## [Unreleased]
+
+### Fixed
+
+- Generated `menu.xml` no longer gets an empty `parent` attribute, which failed Magento's menu schema, when no parent menu item is set, as in the MCP `entity_crud` scaffold [#2750](https://github.com/magento/magento2-phpstorm-plugin/issues/2750).
+
 ## 2026.3.4-p1
 
 ### Fixed
