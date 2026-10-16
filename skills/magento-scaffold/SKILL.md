@@ -17,7 +17,24 @@ Use this skill when the user asks to create Magento or Adobe Commerce code scaff
 2. Use the generated result:
    - Read the returned paths and module name.
    - For a newly created module, pass the returned combined `moduleName` such as `Foo_Bar` to follow-up scaffolds.
-   - If CLI validation is needed, call `describe_magento_cli_environment` before running shell commands and use returned project-local wrappers.
+   - If CLI validation is needed, follow the project-runtime workflow below. Source generation alone does not require runtime probes.
+
+## Validate in the Project Runtime
+
+Call `describe_magento_cli_environment` before shell validation. Use the returned **preferred** script and its working directory. Scripts beside the nearest Docker Compose configuration inside the project take precedence: with Compose at the project root and Magento in `src/`, prefer `./bin/magento`; `./src/bin/magento` is a fallback. Without an in-project Compose directory, use the Magento directory. Do not search outside the project.
+
+Use the returned invocation example from its stated working directory. A fallback displayed as `./src/bin/magento` can be invoked as `./bin/magento` from `src/`; do not combine the two paths. Keep generated files under the configured Magento root. Examples describe syntax; run the validation needed for the task, not an illustrative cache flush or another unrelated operation.
+
+Use a fallback only when fresh discovery shows the preferred script is absent or no longer eligible. A command error or stopped container is a blocker in the selected runtime, not a reason to switch to a host PHP/global binary or another installation. Report what was generated, which validation ran, and any runtime blocker. Creating a scaffold does not by itself request a Magento upgrade, reindex, service start, or tool installation; perform follow-up changes when they are part of the user's task.
+
+### When validation needs n98-magerun2
+
+- Call `magento_magerun` with `mode: "status"` to discover the selected candidate and `invocation` without starting a process. Check project/root identity. `detected` and `cached` do not prove current runtime availability.
+- Use `mode: "commands"` with a focused `search`, then `mode: "command_help"` for an exact returned command or alias. These are typed arguments, not `parametersJson`. Read installed arguments/options instead of guessing commands; a command created by the `cli_command` scaffold belongs to Magento's CLI and is not automatically a magerun command.
+- Keep `search` and `limit` unchanged when following `nextOffset`; stop when it is null or enough information is available. Reuse metadata during validation. It expires after five minutes; set `refresh: true` when runtime contents changed or a fresh check is requested. Refreshing `status` only clears the cache; refreshing `commands` probes again.
+- Inspect the JSON `status` and `message` even if MCP does not set `isError`. Metadata success is `ok`. Missing, unavailable, incompatible, or unsupported installations should be reported without switching runtimes or triggering bootstrap downloads. Correct invalid arguments before retrying.
+- Metadata probes do not execute application commands. If validation calls for an actual magerun command, append the verified command/options to returned `invocation.argv` and preserve its `cwd` and argument boundaries. Use that invocation rather than running `sourceWrapper`, which can contain download steps, or adding a host `--root-dir` to a container command.
+- `mode: "mcp_config"` is for a separate native MCP setup request. It generates settings with optional narrow `include`/`exclude` filters; it neither starts a server nor writes client settings. Preserve returned command, arguments, working directory, and environment if applying the configuration is requested.
 
 ## Scaffold Types
 

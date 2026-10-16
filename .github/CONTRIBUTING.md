@@ -10,17 +10,33 @@
 
 To run `./gradlew test`, also install PHP CLI and add `php` (`php.exe` on Windows) to `PATH`. The run-configuration tests launch PHP to verify interpreter settings and command arguments. CI installs PHP 8.4 on Linux, Windows, and macOS.
 
-# Compatibility preparation tests
-
-Repository tests cover native JetBrains MCP discovery/invocation, HTTP download and validation, preparation progress, cancellation, persistence, corrupt caches, version readiness, and PHP/XML findings produced from prepared data. Regular tests use local release fixtures and do not need internet access. Compatibility command tests also pass responses through the JetBrains SDK transport adapter: the host intentionally drops `structuredContent` for errors, so agents must be able to parse the JSON text. Argument-type and project-routing failures occur before the plugin and can remain plain-text host errors.
-
-To additionally test native MCP preparation against the official release archives used by the integration test:
+# MCP HTTP end-to-end tests
 
 ```sh
-MAGENTO_MCP_REAL_RELEASE_TEST=true ./gradlew test --tests 'com.magento.idea.magento2plugin.mcp.MagentoCompatibilityCommandsTest.testNativeMcpWithActualMagentoReleases'
+./gradlew mcpE2eTest
 ```
 
-This opt-in repository test downloads release sources into a temporary IDE test cache and does not install Magento or modify the working project.
+This starts the real bundled JetBrains MCP server in the headless IDE test application, opens an authenticated localhost HTTP session, and sends `initialize`, `notifications/initialized`, `tools/list`, and `tools/call` requests with the JDK HTTP client. It keeps the server's event stream open and deletes the session during teardown. No AI Assistant, model, API key, manually running IDE, browser, Docker installation, or Magento installation is required. JDK 25 and PHP CLI on `PATH` are required; Gradle downloads the IDE/test dependencies on the first run.
+
+Each test owns a temporary project and an isolated server session. The suite covers published tool names/descriptions and typed schemas, project routing, actual JSON-RPC and tool errors, Docker-directory wrapper priority, Magento-directory fallback, magerun command paging/search/help, caching, and native MCP configuration. Magerun probes use the production process runner and a local PHP metadata fixture that records arguments, working directory, and environment. The Docker wrapper test uses a local `clinotty` shim on POSIX systems; it verifies the adapter and never contacts Docker. These fixtures test the plugin's API and runtime invocation, not a particular installed magerun release or container image.
+
+Compatibility workflows now call `magento_compatibility` through the HTTP endpoint instead of injecting MCP call context or invoking the SDK transport adapter. Local release HTTP fixtures make preparation, progress, cancellation, persistence, and PHP/XML analysis repeatable without external downloads. Pure service tests remain for detailed validation and cache edge cases. Project routing can return plain-text tool errors, while invalid argument types can return JSON-RPC errors before the plugin runs; the tests verify both forms.
+
+The HTTP suites also run with `./gradlew test`, so the existing Linux, Windows, and macOS CI jobs exercise them. To run only the CLI/magerun HTTP scenarios:
+
+```sh
+./gradlew mcpE2eTest --tests '*MagentoMcpHttpTest'
+```
+
+Reports are written to `build/reports/tests/mcpE2eTest/index.html` (or `build/reports/tests/test/index.html` when using `test`). The installed IDE's MCP settings and open projects are not used.
+
+To additionally test compatibility preparation against official release archives:
+
+```sh
+MAGENTO_MCP_REAL_RELEASE_TEST=true ./gradlew mcpE2eTest --tests '*MagentoCompatibilityCommandsTest.testHttpMcpWithActualMagentoReleases'
+```
+
+This opt-in test downloads release sources into a temporary IDE test cache; routine tests need no external network once Gradle dependencies are cached.
 
 # Plugin publication
 
