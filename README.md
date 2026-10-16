@@ -111,6 +111,8 @@ Reconnect your assistant after updating the plugin so it discovers the latest to
 
 To run `./gradlew test`, also install PHP CLI and add `php` (`php.exe` on Windows) to `PATH`. The run-configuration tests launch PHP to verify interpreter settings and command arguments. CI installs PHP 8.4 on Linux, Windows, and macOS.
 
+Run `./gradlew mcpE2eTest` for the MCP HTTP suite. It starts the real JetBrains MCP server in a headless IDE test application and makes deterministic API calls using local PHP/release fixtures. No AI Assistant or Docker is required. See [MCP HTTP end-to-end tests](.github/CONTRIBUTING.md#mcp-http-end-to-end-tests) for coverage and commands.
+
 ## How to contribute
 1) Start with looking into [Community Backlog](https://github.com/magento/magento2-phpstorm-plugin/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22good%20first%20issue%22). Any ticket in `Ready for Development` and `Good First Issue` columns are a good candidates to start.
 2) Didn't satisfy your requirements? [Create a new issue](https://github.com/magento/magento2-phpstorm-plugin/issues/new). It can be for example:

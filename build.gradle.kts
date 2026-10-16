@@ -199,7 +199,7 @@ tasks {
     test {
         // Keep routine tests offline; enable the real-release MCP test explicitly.
         if (providers.environmentVariable("MAGENTO_MCP_REAL_RELEASE_TEST").orNull != "true") {
-            filter.excludeTestsMatching("com.magento.idea.magento2plugin.mcp.MagentoCompatibilityCommandsTest.testNativeMcpWithActualMagentoReleases")
+            filter.excludeTestsMatching("com.magento.idea.magento2plugin.mcp.MagentoCompatibilityCommandsTest.testHttpMcpWithActualMagentoReleases")
         }
         val excludePatterns = project.findProperty("excludeTests") as String?
 
@@ -270,5 +270,28 @@ kover {
         instrumentation {
             excludedClasses.add("org.apache.velocity.*")
         }
+    }
+}
+
+// The same headless IDE runtime as `test`, restricted to the real MCP HTTP contract suites.
+intellijPlatformTesting.testIde.register("mcpE2eTest") {
+    testFramework(TestFrameworkType.Platform)
+    testFramework(TestFrameworkType.JUnit5)
+
+    task {
+        group = "verification"
+        description = "Exercise Magento MCP tools over real localhost HTTP; no AI Assistant or Docker required."
+        classpath += sourceSets.test.get().output
+        useJUnitPlatform()
+        systemProperty("intellij.platform.kernel.disable", "true")
+        systemProperty("ide.fleet.launch", "false")
+        filter {
+            includeTestsMatching("com.magento.idea.magento2plugin.mcp.MagentoMcpHttpTest")
+            includeTestsMatching("com.magento.idea.magento2plugin.mcp.MagentoCompatibilityCommandsTest")
+            if (providers.environmentVariable("MAGENTO_MCP_REAL_RELEASE_TEST").orNull != "true") {
+                excludeTestsMatching("*.testHttpMcpWithActualMagentoReleases")
+            }
+        }
+        testLogging { events("passed", "skipped", "failed") }
     }
 }
