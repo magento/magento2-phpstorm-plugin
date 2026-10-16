@@ -548,7 +548,7 @@ internal object MagentoCompatibilityCommands {
     }
 
     private fun detectedVersion(project: Project): String? = MagentoMcpProjectContext.magentoRoot(project)?.let {
-        MagentoVersionUtil.get(project, it.toString()).takeUnless { version -> version == MagentoVersionUtil.DEFAULT_VERSION }
+        MagentoVersionUtil.getLockedVersionData(project, it.toString()).first.takeUnless { version -> version == MagentoVersionUtil.DEFAULT_VERSION }
     }
 
     private class ParameterException(message: String, val details: JSONObject) : IllegalArgumentException(message)

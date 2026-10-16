@@ -7,6 +7,7 @@ import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask
 import org.gradle.api.tasks.testing.TestDescriptor
 import org.gradle.api.tasks.testing.TestResult
 import org.gradle.api.tasks.testing.TestListener
@@ -59,17 +60,19 @@ sourceSets {
     }
 }
 
-val uiTestImplementation by configurations.getting {
+val uiTestImplementation = configurations.getByName("uiTestImplementation") {
     extendsFrom(configurations.testImplementation.get())
 }
-val uiTestRuntimeOnly by configurations.getting {
+val uiTestRuntimeOnly = configurations.getByName("uiTestRuntimeOnly") {
     extendsFrom(configurations.testRuntimeOnly.get())
 }
 
 dependencies {
-    testImplementation("junit:junit:4.13.2")
-    testCompileOnly("org.junit.jupiter:junit-jupiter-api:5.14.4")
-    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.14.4")
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.junit4)
+    testCompileOnly(libs.junit.jupiter.api)
+    testRuntimeOnly(libs.junit.vintage.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
 
     intellijPlatform {
         create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
@@ -80,23 +83,19 @@ dependencies {
         zipSigner()
         testFramework(TestFrameworkType.Platform)
         testFramework(TestFrameworkType.JUnit5)
-        testFramework(
-            TestFrameworkType.Starter,
-            configurationName = "uiTestImplementation"
-        )
     }
 
     uiTestImplementation(platform(libs.junit.bom))
     uiTestImplementation(libs.junit.jupiter)
-    uiTestImplementation("org.kodein.di:kodein-di-jvm:7.26.1")
-    uiTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.10.2")
+    uiTestImplementation(libs.kodein.di)
+    uiTestImplementation(libs.kotlinx.coroutines.core)
     uiTestRuntimeOnly(libs.junit.jupiter.engine)
     uiTestRuntimeOnly(kotlin("stdlib"))
     uiTestRuntimeOnly(kotlin("reflect"))
-    uiTestRuntimeOnly("org.jetbrains.teamcity:serviceMessages:2024.07")
+    uiTestRuntimeOnly(libs.teamcity.serviceMessages)
 
-    implementation("org.json:json:20171018")
-    implementation("org.codehaus.plexus:plexus-utils:3.5.1")
+    implementation(libs.json)
+    implementation(libs.plexus.utils)
 }
 
 intellijPlatform {
@@ -136,7 +135,6 @@ intellijPlatform {
 
         ideaVersion {
             sinceBuild = providers.gradleProperty("pluginSinceBuild")
-            untilBuild = providers.gradleProperty("pluginUntilBuild")
         }
     }
 
@@ -149,13 +147,21 @@ intellijPlatform {
     publishing {
         token = providers.environmentVariable("MAGENTO_PHPSTORM_intellijPublishToken")
         channels = effectivePluginVersion.map {
-            listOf(it.substringAfter('-', "").substringBefore('.').ifEmpty { "default" })
+            listOf(it.replace(Regex("-p\\d+(?=-|$)"), "").substringAfter('-', "").substringBefore('.').ifEmpty { "default" })
         }
     }
 
     pluginVerification {
+        // Requiring a restart is intentional; every compatibility/API warning must fail verification.
+        failureLevel = VerifyPluginTask.FailureLevel.ALL - VerifyPluginTask.FailureLevel.NOT_DYNAMIC
         ides {
-            recommended()
+            create(IntelliJPlatformType.PhpStorm, "2026.2.0.1")
+            create(IntelliJPlatformType.PhpStorm, "2026.2.3")
+            create(IntelliJPlatformType.PhpStorm, "263.6259.29")
+            if (providers.gradleProperty("verifyWebStorm").map(String::toBoolean).getOrElse(false)) {
+                create(IntelliJPlatformType.WebStorm, "2026.2.0.1")
+                create(IntelliJPlatformType.WebStorm, "263.6259.34")
+            }
         }
     }
 }
@@ -232,16 +238,23 @@ tasks {
 
 }
 
-val uiTest by intellijPlatformTesting.testIdeUi.registering {
+intellijPlatformTesting.testIdeUi.register("uiTest") {
     type = IntelliJPlatformType.WebStorm
-    version = providers.gradleProperty("platformVersion")
+    version = providers.gradleProperty("uiTestPlatformVersion")
+    useInstaller = true
+
+    // Starter and Driver must match the IDE launched by the UI tests.
+    testFramework(TestFrameworkType.Starter)
+    uiTestImplementation.extendsFrom(configurations.getByName("intellijPlatformTestDependencies_uiTest"))
 
     task {
         val uiTestSourceSet = sourceSets.getByName("uiTest")
         testClassesDirs = uiTestSourceSet.output.classesDirs
         classpath = uiTestSourceSet.runtimeClasspath
+        // The 2026.3 Starter archive extractor uses the platform's NIO filesystem.
+        jvmArgs("--add-exports=java.base/sun.nio.fs=ALL-UNNAMED")
         systemProperty("path.to.build.plugin", tasks.prepareSandbox.get().pluginDirectory.get().asFile)
-        systemProperty("ui.test.ide.version", providers.gradleProperty("platformVersion").get())
+        systemProperty("ui.test.ide.build", providers.gradleProperty("uiTestPlatformVersion").get())
         useJUnitPlatform()
         dependsOn(tasks.prepareSandbox)
 

@@ -23,18 +23,20 @@ public final class PluginVersionUtil {
      */
     public static @Nullable String getVersion() {
         final URL classUrl = PluginVersionUtil.class.getResource("PluginVersionUtil.class");
-
         if (classUrl == null || !"jar".equals(classUrl.getProtocol())) {
             return null;
         }
 
-        final String classLocation = classUrl.toExternalForm();
-        final URI manifestLocation = URI.create(
-                classLocation.substring(0, classLocation.lastIndexOf("!/") + 2)
-                        + "META-INF/MANIFEST.MF"
-        );
+        final String resourceUrl = classUrl.toExternalForm();
+        final int entrySeparator = resourceUrl.lastIndexOf("!/");
+        if (entrySeparator < 0) {
+            return null;
+        }
 
-        try (InputStream stream = manifestLocation.toURL().openStream()) {
+        // IntelliJ's resource URLs use their own URLConnection implementation.
+        // Open the manifest entry directly instead of casting that connection.
+        final URI manifestUri = URI.create(resourceUrl.substring(0, entrySeparator + 2) + "META-INF/MANIFEST.MF");
+        try (InputStream stream = manifestUri.toURL().openStream()) {
             return new Manifest(stream).getMainAttributes().getValue("Version");
         } catch (IOException exception) {
             return null;

@@ -15,9 +15,9 @@ jobs:
       GITHUB_RELEASE_ID: ${{ github.event.release.id }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7.0.1
       - name: Set up JDK 25
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v6.0.1
         with:
           java-version: 25
           distribution: 'temurin'

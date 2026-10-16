@@ -27,6 +27,7 @@ import com.intellij.ide.starter.project.LocalProjectInfo
 import com.intellij.ide.starter.runner.CurrentTestMethod
 import com.intellij.ide.starter.runner.Starter
 import com.intellij.platform.testFramework.teamCity.TeamCityReporter.SyntheticTestKind
+import com.intellij.platform.testFramework.teamCity.TeamCityReporter.TestMetadata
 import com.intellij.tools.ide.starter.product.webstorm.WebStorm
 import org.junit.jupiter.api.fail
 import org.kodein.di.DI
@@ -40,6 +41,7 @@ private const val MAGENTO_SUPPORT_NOTIFICATION = "Enable Magento support for thi
 internal fun runWebStormUiTest(
     fixtureName: String,
     vararg generatedFilesToCleanup: String,
+    prepareProject: (Path) -> Unit = {},
     test: Driver.(projectPath: Path) -> Unit,
 ) {
     WebStormUiTestEnvironment.initialize()
@@ -47,12 +49,15 @@ internal fun runWebStormUiTest(
     val testName = CurrentTestMethod.hyphenateWithClass()
     val projectPath = UiTestProjectFixture.copy(fixtureName, testName)
     cleanupGeneratedFiles(projectPath, *generatedFilesToCleanup)
+    prepareProject(projectPath)
     val pluginPath = Path.of(System.getProperty("path.to.build.plugin"))
 
+    // Starter adds the JUnit class and method below this directory.
+    val contextName = "ui-${testName.hashCode().toUInt().toString(16)}"
     Starter.newContext(
-        testName,
+        contextName,
         TestCase(IdeInfo.WebStorm, LocalProjectInfo(projectPath))
-            .withVersion(System.getProperty("ui.test.ide.version")),
+            .useEAP(System.getProperty("ui.test.ide.build")),
     ).apply {
         PluginConfigurator(this).installPluginFromPath(pluginPath)
         applyVMOptionsPatch {
@@ -99,6 +104,7 @@ private object WebStormUiTestEnvironment {
                         linkToLogs: String?,
                         kind: SyntheticTestKind,
                         generifyTestName: Boolean,
+                        additionalMetadata: List<TestMetadata>,
                     ) {
                         fail("$testName failed in WebStorm: $message\n$details")
                     }
