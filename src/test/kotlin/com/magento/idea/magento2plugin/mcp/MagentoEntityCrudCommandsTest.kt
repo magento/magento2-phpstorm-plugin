@@ -63,6 +63,14 @@ class MagentoEntityCrudCommandsTest : BaseProjectTestCase() {
             "app/code/Foo/Bar/etc/webapi.xml",
             "url=\"/V1/mcp-crud/get-list\""
         )
+        assertFileContains(
+            "app/code/Foo/Bar/etc/acl.xml",
+            "<resource id=\"Foo_Bar::mcp_crud_management\""
+        )
+        assertFileContains(
+            "app/code/Foo/Bar/etc/adminhtml/menu.xml",
+            "id=\"Foo_Bar::mcp_crud_management\""
+        )
         assertFileNotContains(
             "app/code/Foo/Bar/etc/adminhtml/menu.xml",
             "parent=\"\""

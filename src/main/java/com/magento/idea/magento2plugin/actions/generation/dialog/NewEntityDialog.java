@@ -655,10 +655,14 @@ public class NewEntityDialog extends AbstractDialog {
         formLabel.setText(entityNameLabel.concat(" Form"));
         formName.setText(entityName.concat("_form"));
         gridName.setText(entityName.concat("_listing"));
-        acl.setText(moduleName.concat("::management"));
+        acl.setText(formatManagementIdentifier(moduleName, entityName));
         aclTitle.setText(entityNameLabel.concat(" Management"));
-        menuIdentifier.setText(moduleName.concat("::management"));
+        menuIdentifier.setText(formatManagementIdentifier(moduleName, entityName));
         menuTitle.setText(entityNameLabel.concat(" Management"));
+    }
+
+    static String formatManagementIdentifier(final String moduleName, final String entityName) {
+        return moduleName + "::" + entityName + "_management";
     }
 
     static String formatSnakeCaseLabel(final String value) {
