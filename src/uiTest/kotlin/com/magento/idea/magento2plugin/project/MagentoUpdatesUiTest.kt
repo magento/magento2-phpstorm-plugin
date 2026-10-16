@@ -5,22 +5,30 @@
 package com.magento.idea.magento2plugin.project
 
 import com.intellij.driver.sdk.getNotifications
+import com.intellij.driver.sdk.expireNotifications
 import com.intellij.driver.sdk.invokeAction
 import com.intellij.driver.sdk.waitFor
+import com.intellij.driver.client.Driver
 import com.intellij.driver.client.Remote
 import com.intellij.driver.model.OnDispatcher
 import com.intellij.driver.sdk.ui.components.UiComponent.Companion.waitFound
 import com.intellij.driver.sdk.ui.components.common.ideFrame
 import com.intellij.driver.sdk.ui.components.elements.button
+import com.intellij.driver.sdk.ui.components.elements.comboBox
+import com.intellij.driver.sdk.ui.components.settings.SettingsDialogUiComponent
 import com.intellij.driver.sdk.ui.components.settings.settingsDialog
 import com.magento.idea.magento2plugin.ui.runWebStormUiTest
 import com.sun.net.httpserver.HttpServer
 import org.junit.jupiter.api.Test
 import java.net.InetSocketAddress
 import java.nio.file.Files
+import java.time.Duration
+import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
+import java.time.temporal.ChronoUnit
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.io.path.writeText
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -65,6 +73,115 @@ class MagentoUpdatesUiTest {
     fun suppressesCloudYamlPatchesAndWarnsWhenTheFixIsRemoved() =
         checkDistribution("magento-community", "magento/product-community-edition", "2.4.8-p5", "covered by installed fixes or local patch configuration",
             localPatchFiles = mapOf(".magento.env.yaml" to "stage: {build: {QUALITY_PATCHES: [TEST-PATCH]}}"))
+
+    @Test
+    fun publicationWindowsCanBeSelectedSavedAndUsedToFilterReleasesAndSecurityAdvisories() {
+        val publishedAt = AtomicReference(Instant.now().minus(Duration.ofDays(20)))
+        val requests = CopyOnWriteArrayList<String>()
+        val server = HttpServer.create(InetSocketAddress("127.0.0.1", 0), 0)
+        server.createContext("/api/v1/magento-community/versions") { exchange ->
+            val timestamp = publishedAt.get()
+            requests.add("$timestamp ${exchange.requestURI.path}")
+            val body = if (exchange.requestURI.path.endsWith("/security")) {
+                """{"data":{"distribution":"magento-community","version":"2.4.8-p5","status":"vulnerable","vulnerableTo":[{"id":"APSB-WINDOW","severity":"critical","publishedDate":"$timestamp","isolatedPatches":[{"id":"WINDOW-PATCH","appliesTo":["2.4.8-p5"]}]}]}}"""
+            } else {
+                """{"data":{"2.4.9":{"version":"2.4.9","releaseDate":"$timestamp"}}}"""
+            }
+            val bytes = body.toByteArray()
+            exchange.responseHeaders.add("Content-Type", "application/json")
+            exchange.sendResponseHeaders(200, bytes.size.toLong())
+            exchange.responseBody.use { it.write(bytes) }
+        }
+        server.start()
+        try {
+            runWebStormUiTest("file-generators", prepareProject = { root ->
+                root.resolve("composer.lock").writeText("""{"packages":[{"name":"magento/product-community-edition","version":"2.4.8-p5"}]}""")
+                Files.createDirectories(root.resolve(".idea"))
+                root.resolve(".idea/workspace.xml").writeText("""
+                    <project version="4">
+                      <component name="MagentoUpdateSettings">
+                        <option name="feedUrl" value="http://127.0.0.1:${server.address.port}/api/v1" />
+                      </component>
+                    </project>
+                """.trimIndent())
+            }) {
+                var savedWindow = "Month"
+                val cases = listOf(
+                    Triple("Month", Duration.ofDays(20), true),
+                    Triple("Week", Duration.ofDays(20), false),
+                    Triple("Week", Duration.ofDays(4), true),
+                    Triple("2 days", Duration.ofDays(4), false),
+                    Triple("2 days", Duration.ofHours(36), true),
+                    Triple("12 hours", Duration.ofHours(36), false),
+                    Triple("12 hours", Duration.ofHours(2), true)
+                )
+                for ((label, age, included) in cases) {
+                    val timestamp = Instant.now().minus(age).truncatedTo(ChronoUnit.SECONDS)
+                    val amount = if (age.toDays() > 0) age.toDays() else age.toHours()
+                    val unit = if (age.toDays() > 0) "day" else "hour"
+                    val publication = "Published $amount $unit${if (amount == 1L) "" else "s"} ago"
+                    publishedAt.set(timestamp)
+                    expireNotifications()
+                    updateSettings {
+                        content {
+                            val window = comboBox { byType("com.intellij.openapi.ui.ComboBox") }.waitFound()
+                            check(window.getSelectedItem() == savedWindow) { "Publication window was not saved: $savedWindow" }
+                            check(window.listValues() == listOf("Month", "Week", "2 days", "12 hours"))
+                            val tooltip = withContext(OnDispatcher.EDT) {
+                                driver.cast(window.component, UpdateWindowComponent::class).getToolTipText()
+                            }
+                            check(tooltip.contains("shorter period") && tooltip.contains("time away"))
+                            check(tooltip.contains("automatic and manual") && tooltip.contains("does not change how often"))
+                            check(tooltip.contains("publication date") && tooltip.contains("UTC"))
+                            window.selectItem(label)
+                        }
+                        if (label != savedWindow) {
+                            waitFor("publication window enables Apply", 10.seconds) { applyButton.component.isEnabled() }
+                            applyButton.click()
+                            waitFor("publication window is saved", 10.seconds) { !applyButton.component.isEnabled() }
+                        }
+                        button("Cancel").click()
+                    }
+                    savedWindow = label
+                    invokeAction("Magento.CheckUpdates")
+                    waitFor("$label publication window filters $age old findings", 2.minutes, errorMessage = {
+                        "Window: $label, age: $age, included: $included\nRequests: $requests\nNotifications: ${getNotifications().filter { it.getGroupId() == "Magento Updates" }.joinToString {
+                            "expired=${cast(it, UpdateNotificationState::class).isExpired()}: ${it.getContent()}"
+                        }}"
+                    }) {
+                        val contents = getNotifications().filter {
+                            it.getGroupId() == "Magento Updates" && !cast(it, UpdateNotificationState::class).isExpired()
+                        }.map { it.getContent() }
+                        if (included) {
+                            contents.any { it.startsWith("$publication<br/>Newer release available: 2.4.9") } &&
+                                contents.any { it.startsWith("$publication<br/>Critical security advisory: APSB-WINDOW") } &&
+                                contents.none { it.contains(timestamp.toString()) }
+                        } else {
+                            contents.any { it.contains("No newer stable releases published in the past ${label.lowercase()}") &&
+                                it.contains("No security advisories published in the past ${label.lowercase()}") } &&
+                                contents.none { it.contains("APSB-WINDOW") || it.contains("Newer release available:") }
+                        }
+                    }
+                }
+                updateSettings {
+                    content {
+                        val window = comboBox { byType("com.intellij.openapi.ui.ComboBox") }.waitFound()
+                        check(window.getSelectedItem() == "12 hours")
+                        window.selectItem("Week")
+                    }
+                    button("Cancel").click()
+                }
+                updateSettings {
+                    content {
+                        check(comboBox { byType("com.intellij.openapi.ui.ComboBox") }.waitFound().getSelectedItem() == "12 hours")
+                    }
+                    button("OK").click()
+                }
+            }
+        } finally {
+            server.stop(0)
+        }
+    }
 
     private fun checkDistribution(distribution: String, packageName: String, version: String, expected: String,
                                   sourceCheckout: Boolean = false, newerVersion: String? = null, oldFindings: Boolean = false,
@@ -166,6 +283,9 @@ class MagentoUpdatesUiTest {
                     check(content.contains("APSB-TEST"))
                     check(content.contains("No complete local patch coverage"))
                     val security = getNotifications().last { it.getGroupId() == "Magento Updates" && it.getContent().contains("APSB-TEST") }
+                    val days = ChronoUnit.DAYS.between(date, LocalDate.now(ZoneOffset.UTC))
+                    val publication = "Published $days day${if (days == 1L) "" else "s"} ago"
+                    check(security.getContent().startsWith("$publication<br/>Critical security advisory: APSB-TEST."))
                     check(cast(security.getType(), UpdateNotificationType::class).name() == "ERROR")
                     check(!security.getContent().contains("Newer release available"))
                     if (newerVersion != null) {
@@ -173,6 +293,7 @@ class MagentoUpdatesUiTest {
                         check(cast(release.getType(), UpdateNotificationType::class).name() == "INFORMATION")
                         check(!release.getContent().contains("APSB-TEST"))
                         check(release.getContent().contains(newerVersion))
+                        check(release.getContent().startsWith("$publication<br/>Newer release available: $newerVersion."))
                     }
                 }
                 if (distribution == "magento-community") {
@@ -202,6 +323,30 @@ class MagentoUpdatesUiTest {
             server.stop(0)
         }
     }
+
+    private fun Driver.updateSettings(action: SettingsDialogUiComponent.() -> Unit) {
+        ideFrame {
+            openSettingsDialog()
+            settingsDialog {
+                searchTextField.text = "Magento"
+                waitFor("Magento settings", 30.seconds) {
+                    settingsTree.collectExpandedPaths().any { it.path.last() == "Magento" }
+                }
+                settingsTree.clickRow { it == "Magento" }
+                action()
+            }
+        }
+    }
+}
+
+@Remote("javax.swing.JComponent")
+private interface UpdateWindowComponent {
+    fun getToolTipText(): String
+}
+
+@Remote("com.intellij.notification.Notification")
+private interface UpdateNotificationState {
+    fun isExpired(): Boolean
 }
 
 @Remote("javax.swing.JButton")

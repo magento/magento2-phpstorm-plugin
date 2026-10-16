@@ -17,6 +17,7 @@ class MagentoUpdateSettings : PersistentStateComponent<MagentoUpdateSettings.Opt
     class Options {
         var enabled: Boolean = true
         var feedUrl: String = DEFAULT_FEED_URL
+        var checkWindow: UpdateCheckWindow = UpdateCheckWindow.MONTH
         var lastNotifiedFingerprints: MutableMap<String, String> = linkedMapOf()
         var snoozedFingerprints: MutableMap<String, String> = linkedMapOf()
         var snoozedUntil: MutableMap<String, Long> = linkedMapOf()

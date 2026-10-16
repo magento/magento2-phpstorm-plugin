@@ -8,9 +8,11 @@ import com.intellij.openapi.options.ConfigurationException
 import com.intellij.util.xmlb.XmlSerializer
 import com.magento.idea.magento2plugin.PhysicalMagentoTestCase
 import javax.swing.JCheckBox
+import javax.swing.JComboBox
 import javax.swing.JTextField
 import com.magento.idea.magento2plugin.updates.MagentoUpdateSettings
 import com.magento.idea.magento2plugin.updates.MagentoUpdatesPanel
+import com.magento.idea.magento2plugin.updates.UpdateCheckWindow
 
 class SettingsFormTest : PhysicalMagentoTestCase() {
     private fun createForm(): SettingsForm {
@@ -95,12 +97,20 @@ class SettingsFormTest : PhysicalMagentoTestCase() {
         val panel = field<MagentoUpdatesPanel>(form, "updatesPanel")
         val automatic = MagentoUpdatesPanel::class.java.getDeclaredField("automatic").apply { isAccessible = true }.get(panel) as JCheckBox
         val url = MagentoUpdatesPanel::class.java.getDeclaredField("url").apply { isAccessible = true }.get(panel) as JTextField
+        val checkWindow = MagentoUpdatesPanel::class.java.getDeclaredField("checkWindow").apply { isAccessible = true }.get(panel) as JComboBox<*>
         val settings = project.getService(MagentoUpdateSettings::class.java)
+        assertEquals(UpdateCheckWindow.MONTH, checkWindow.selectedItem)
+        assertEquals(listOf("Month", "Week", "2 days", "12 hours"), (0 until checkWindow.itemCount).map { checkWindow.getItemAt(it).toString() })
+        assertTrue(checkWindow.toolTipText.contains("does not change how often checks run"))
+        assertTrue(checkWindow.toolTipText.contains("UTC"))
+        checkWindow.selectedItem = UpdateCheckWindow.TWELVE_HOURS
+        assertTrue(form.isModified)
         automatic.isSelected = false
         url.text = "https://updates.example.test/api/v1/"
         assertTrue(form.isModified)
         form.apply()
         assertFalse(settings.state.enabled)
+        assertEquals(UpdateCheckWindow.TWELVE_HOURS, settings.state.checkWindow)
         assertEquals("https://updates.example.test/api/v1", settings.state.feedUrl)
         assertEquals(Settings.DEFAULT_PUBLISHED_RELEASES_URL, Settings.getInstance(project).getPublishedReleasesUrl())
         assertFalse(form.isModified)
@@ -108,14 +118,29 @@ class SettingsFormTest : PhysicalMagentoTestCase() {
         val reloaded = MagentoUpdateSettings()
         reloaded.loadState(XmlSerializer.deserialize(saved, MagentoUpdateSettings.Options::class.java))
         assertFalse(reloaded.state.enabled)
+        assertEquals(UpdateCheckWindow.TWELVE_HOURS, reloaded.state.checkWindow)
         assertEquals(settings.state.feedUrl, reloaded.state.feedUrl)
         automatic.isSelected = true
         url.text = "https://unsaved.example.test"
+        checkWindow.selectedItem = UpdateCheckWindow.WEEK
         form.reset()
         assertFalse(automatic.isSelected)
         assertEquals(settings.state.feedUrl, url.text)
+        assertEquals(UpdateCheckWindow.TWELVE_HOURS, checkWindow.selectedItem)
+        assertFalse(form.isModified)
         url.text = "http://insecure.example.test"
         org.junit.Assert.assertThrows(ConfigurationException::class.java) { form.apply() }
         assertEquals("https://updates.example.test/api/v1", settings.state.feedUrl)
+        field<JCheckBox>(form, "pluginEnabled").doClick()
+        assertFalse(checkWindow.isEnabled)
+        field<JCheckBox>(form, "pluginEnabled").doClick()
+        assertTrue(checkWindow.isEnabled)
+    }
+
+    fun testExistingUpdatePreferencesDefaultToMonthWhenPublicationWindowIsMissing() {
+        val settings = MagentoUpdateSettings()
+        settings.state.checkWindow = UpdateCheckWindow.TWELVE_HOURS
+        settings.loadState(XmlSerializer.deserialize(org.jdom.Element("Options"), MagentoUpdateSettings.Options::class.java))
+        assertEquals(UpdateCheckWindow.MONTH, settings.state.checkWindow)
     }
 }
