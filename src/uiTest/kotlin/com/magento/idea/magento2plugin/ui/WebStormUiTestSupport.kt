@@ -27,7 +27,6 @@ import com.intellij.ide.starter.project.LocalProjectInfo
 import com.intellij.ide.starter.runner.CurrentTestMethod
 import com.intellij.ide.starter.runner.Starter
 import com.intellij.platform.testFramework.teamCity.TeamCityReporter.SyntheticTestKind
-import com.intellij.platform.testFramework.teamCity.TeamCityReporter.TestMetadata
 import com.intellij.tools.ide.starter.product.webstorm.WebStorm
 import org.junit.jupiter.api.fail
 import org.kodein.di.DI
@@ -102,7 +101,6 @@ private object WebStormUiTestEnvironment {
                         linkToLogs: String?,
                         kind: SyntheticTestKind,
                         generifyTestName: Boolean,
-                        additionalMetadata: List<TestMetadata>,
                     ) {
                         fail("$testName failed in WebStorm: $message\n$details")
                     }
