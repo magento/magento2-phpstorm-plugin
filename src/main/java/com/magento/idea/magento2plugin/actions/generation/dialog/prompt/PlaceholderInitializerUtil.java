@@ -5,10 +5,9 @@
 
 package com.magento.idea.magento2plugin.actions.generation.dialog.prompt;
 
+import com.intellij.ui.components.JBTextField;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import javax.swing.text.JTextComponent;
-import org.jdesktop.swingx.prompt.PromptSupport;
 import org.jetbrains.annotations.NotNull;
 
 public final class PlaceholderInitializerUtil {
@@ -33,7 +32,7 @@ public final class PlaceholderInitializerUtil {
      */
     public void initialize() {
         for (final Field field : type.getDeclaredFields()) {
-            final JTextComponent target = getTarget(field);
+            final JBTextField target = getTarget(field);
 
             if (target == null) {
                 continue;
@@ -45,11 +44,11 @@ public final class PlaceholderInitializerUtil {
             if (promptProperty == null) {
                 continue;
             }
-            PromptSupport.setPrompt((String) promptProperty, target);
+            target.getEmptyText().setText((String) promptProperty);
         }
     }
 
-    private JTextComponent getTarget(final Field field) {
+    private JBTextField getTarget(final Field field) {
         if (Modifier.isStatic(field.getModifiers())) {
             return null;
         }
@@ -59,7 +58,7 @@ public final class PlaceholderInitializerUtil {
         try {
             final Object value = field.get(object);
 
-            return value instanceof JTextComponent ? (JTextComponent) value : null;
+            return value instanceof JBTextField ? (JBTextField) value : null;
         } catch (IllegalAccessException exception) {
             return null;
         } finally {

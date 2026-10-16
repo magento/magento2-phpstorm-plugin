@@ -87,7 +87,7 @@ private interface SwingButton {
     fun doClick()
 }
 
-@Remote("com.intellij.javaee.ExternalResourceManager")
+@Remote("com.intellij.javaee.ExternalResourceManager", plugin = "com.intellij.xml/intellij.xml.psi")
 private interface ExternalResources {
     fun getResourceLocation(url: String, project: Project): String
 }

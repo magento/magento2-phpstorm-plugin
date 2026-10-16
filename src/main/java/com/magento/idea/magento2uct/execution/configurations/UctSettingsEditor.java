@@ -18,6 +18,7 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.components.ActionLink;
 import com.intellij.util.ui.UIUtil;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
@@ -40,7 +41,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
-import org.jdesktop.swingx.JXHyperlink;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({
@@ -83,11 +83,11 @@ public class UctSettingsEditor extends SettingsEditor<UctRunConfiguration> {
     private JLabel infoLabel;//NOPMD
     private JLabel infoLabel2;//NOPMD
     private JLabel uctLookupFailedWarning;//NOPMD
-    private JXHyperlink installTypeOne;//NOPMD
+    private ActionLink installTypeOne;//NOPMD
     private JLabel licenseWarning;//NOPMD
     private JLabel modulePathComment;//NOPMD
     private JLabel modulePathLabel;//NOPMD
-    private JXHyperlink learnMoreLink;//NOPMD
+    private ActionLink learnMoreLink;//NOPMD
     private JPanel adobeCommercePanel;//NOPMD
 
     /**

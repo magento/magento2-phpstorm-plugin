@@ -75,6 +75,10 @@ class MagentoEntityCrudCommandsTest : BaseProjectTestCase() {
             "app/code/Foo/Bar/Controller/Adminhtml/McpCrud/Save.php",
             "if (\$this->getRequest()->getParam('back'))"
         )
+        assertFileNotContains(
+            "app/code/Foo/Bar/etc/adminhtml/menu.xml",
+            "parent=\"\""
+        )
     }
 
     private fun assertContains(text: String, expected: String) {
@@ -96,5 +100,14 @@ class MagentoEntityCrudCommandsTest : BaseProjectTestCase() {
             ?: error("Expected PSI file to exist: $relativePath")
 
         assertContains(psiFile.text, expected)
+    }
+
+    private fun assertFileNotContains(relativePath: String, unexpected: String) {
+        val virtualFile = myFixture.findFileInTempDir(relativePath)
+            ?: error("Expected file to exist: $relativePath")
+        val psiFile = myFixture.psiManager.findFile(virtualFile)
+            ?: error("Expected PSI file to exist: $relativePath")
+
+        assertFalse("Did not expect <$unexpected> in:\n${psiFile.text}", psiFile.text.contains(unexpected))
     }
 }

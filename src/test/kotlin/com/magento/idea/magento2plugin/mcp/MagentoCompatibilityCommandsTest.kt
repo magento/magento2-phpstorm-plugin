@@ -381,7 +381,15 @@ class MagentoCompatibilityCommandsTest : PhysicalMagentoTestCase() {
     }
 
     fun testNativeMcpDiscoveryPublishesOnlyTypedArgumentsWithoutRequiredJsonEncoding() {
-        val schema = nativeTool().descriptor.inputSchema
+        val descriptor = nativeTool().descriptor
+        assertEquals("magento_compatibility", descriptor.name)
+        assertTrue(descriptor.description.isNotBlank())
+        assertEquals("${MagentoMcpToolset::class.java.name}.magentoCompatibility", descriptor.fullyQualifiedName)
+        assertEquals("MagentoMcpToolset", descriptor.category.shortName)
+        assertEquals(MagentoMcpToolset::class.java.name, descriptor.category.fullyQualifiedName)
+        assertFalse(descriptor.category.isExperimental)
+        assertFalse(descriptor.category.alwaysIncluded)
+        val schema = descriptor.inputSchema
         assertTrue(schema.requiredProperties.isEmpty())
         val properties = JSONObject(schema.propertiesSchema.toString())
         assertFalse(properties.has("parametersJson"))
