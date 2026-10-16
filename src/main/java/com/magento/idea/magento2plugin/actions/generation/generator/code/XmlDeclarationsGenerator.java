@@ -11,6 +11,7 @@ import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFi
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFieldsetData;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormFileData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.GetCodeTemplateUtil;
+import com.magento.idea.magento2plugin.magento.files.FormButtonBlockFile;
 import com.magento.idea.magento2plugin.magento.files.UiComponentFormXmlFile;
 import com.magento.idea.magento2plugin.util.FirstLetterToLowercaseUtil;
 import java.io.IOException;
@@ -60,9 +61,7 @@ public class XmlDeclarationsGenerator {
 
             for (final UiComponentFormButtonData formButtonData : uiFormFileData.getButtons()) {
                 final XmlTag buttonTag = buttonsTag.createChildTag("button", null, null, false);
-                buttonTag.setAttribute("name", FirstLetterToLowercaseUtil.convert(
-                        formButtonData.getButtonClassName())
-                );
+                buttonTag.setAttribute("name", getButtonName(formButtonData));
                 buttonTag.setAttribute("class",formButtonData.getFqn());
                 buttonsTag.addSubTag(buttonTag, false);
             }
@@ -71,6 +70,24 @@ public class XmlDeclarationsGenerator {
 
             psiDocumentManager.commitDocument(document);
         });
+    }
+
+    /**
+     * Get button name for the form XML.
+     *
+     * <p>The UI form adapter binds the save and continue handler to the button
+     * with the `save_and_continue` id, so this button must keep Magento's name.</p>
+     *
+     * @param formButtonData UiComponentFormButtonData
+     *
+     * @return String
+     */
+    private String getButtonName(final UiComponentFormButtonData formButtonData) {
+        if (FormButtonBlockFile.TYPE_SAVE_AND_CONTINUE.equals(formButtonData.getButtonType())) {
+            return FormButtonBlockFile.SAVE_AND_CONTINUE_BUTTON_NAME;
+        }
+
+        return FirstLetterToLowercaseUtil.convert(formButtonData.getButtonClassName());
     }
 
     private Properties fillAttributes(final UiComponentFormFieldData formFieldData) {

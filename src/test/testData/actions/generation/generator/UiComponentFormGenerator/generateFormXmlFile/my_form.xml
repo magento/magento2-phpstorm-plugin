@@ -16,6 +16,7 @@
         </deps>
         <buttons>
             <button name="saveEntity" class="Foo\Bar\Block\Form\Save"/>
+            <button name="save_and_continue" class="Foo\Bar\Block\Form\SaveAndContinue"/>
             <button name="backToEntity" class="Foo\Bar\Block\Form\Back"/>
             <button name="deleteEntity" class="Foo\Bar\Block\Form\Delete"/>
             <button name="customController" class="Foo\Bar\Block\Form\Custom"/>

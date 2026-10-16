@@ -14,6 +14,8 @@ public class FormButtonBlockFile extends AbstractPhpFile {
     public static final String DATA_PROVIDER_TYPE =
             "Magento\\Framework\\View\\Element\\UiComponent\\Control\\ButtonProviderInterface";
     public static final String TYPE_SAVE = "Save";
+    public static final String TYPE_SAVE_AND_CONTINUE = "Save_And_Continue";
+    public static final String SAVE_AND_CONTINUE_BUTTON_NAME = "save_and_continue";
     public static final String TYPE_DELETE = "Delete";
     public static final String TYPE_BACK = "Back";
     public static final String TYPE_CUSTOM = "Custom";

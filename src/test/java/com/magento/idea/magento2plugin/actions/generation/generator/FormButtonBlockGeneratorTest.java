@@ -11,6 +11,7 @@ import com.magento.idea.magento2plugin.actions.generation.context.EntityCreatorC
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentFormButtonData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.NamespaceBuilder;
 import com.magento.idea.magento2plugin.actions.generation.util.GenerationContextRegistry;
+import com.magento.idea.magento2plugin.magento.files.FormButtonBlockFile;
 import org.junit.Before;
 
 public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
@@ -57,6 +58,44 @@ public class FormButtonBlockGeneratorTest extends BaseGeneratorTestCase {
                 namespace.getNamespace(),
                 "Save Entity",
                 "10",
+                FORM_NAME,
+                namespace.getClassFqn()
+        );
+        final UiComponentFormButtonBlockGenerator formButtonPhpClassGenerator =
+                new UiComponentFormButtonBlockGenerator(
+                        uiComponentFormButtonData,
+                        project,
+                        ENTITY_NAME,
+                        ENTITY_ID,
+                        false
+                );
+
+        final PsiFile file = formButtonPhpClassGenerator.generate(ACTION_NAME);
+        assertGeneratedFileIsCorrect(expectedFile, EXPECTED_DIRECTORY, file);
+    }
+
+    /**
+     * Test creation Block type Save and Continue.
+     */
+    public void testGenerateSaveAndContinueButtonBlock() {
+        final String filePath = this.getFixturePath("SaveAndContinue.php");
+        final PsiFile expectedFile = myFixture.configureByFile(filePath);
+        final Project project = myFixture.getProject();
+        final String className = "SaveAndContinue";
+        final NamespaceBuilder namespace = new NamespaceBuilder(
+                MODULE_NAME,
+                className,
+                BLOCK_DIRECTORY
+        );
+
+        final UiComponentFormButtonData uiComponentFormButtonData = new UiComponentFormButtonData(
+                BLOCK_DIRECTORY,
+                className,
+                MODULE_NAME,
+                FormButtonBlockFile.TYPE_SAVE_AND_CONTINUE,
+                namespace.getNamespace(),
+                "Save and Continue Edit",
+                "15",
                 FORM_NAME,
                 namespace.getClassFqn()
         );
