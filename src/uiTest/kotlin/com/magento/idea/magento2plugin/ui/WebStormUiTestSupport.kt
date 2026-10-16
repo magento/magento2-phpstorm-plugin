@@ -52,8 +52,10 @@ internal fun runWebStormUiTest(
     prepareProject(projectPath)
     val pluginPath = Path.of(System.getProperty("path.to.build.plugin"))
 
+    // Starter adds the JUnit class and method below this directory.
+    val contextName = "ui-${testName.hashCode().toUInt().toString(16)}"
     Starter.newContext(
-        testName,
+        contextName,
         TestCase(IdeInfo.WebStorm, LocalProjectInfo(projectPath))
             .useEAP(System.getProperty("ui.test.ide.build")),
     ).apply {

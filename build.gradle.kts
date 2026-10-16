@@ -83,10 +83,6 @@ dependencies {
         zipSigner()
         testFramework(TestFrameworkType.Platform)
         testFramework(TestFrameworkType.JUnit5)
-        testFramework(
-            TestFrameworkType.Starter,
-            configurationName = "uiTestImplementation"
-        )
     }
 
     uiTestImplementation(platform(libs.junit.bom))
@@ -246,6 +242,10 @@ intellijPlatformTesting.testIdeUi.register("uiTest") {
     type = IntelliJPlatformType.WebStorm
     version = providers.gradleProperty("uiTestPlatformVersion")
     useInstaller = true
+
+    // Starter and Driver must match the IDE launched by the UI tests.
+    testFramework(TestFrameworkType.Starter)
+    uiTestImplementation.extendsFrom(configurations.getByName("intellijPlatformTestDependencies_uiTest"))
 
     task {
         val uiTestSourceSet = sourceSets.getByName("uiTest")
