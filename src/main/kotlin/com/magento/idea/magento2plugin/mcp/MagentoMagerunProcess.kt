@@ -4,6 +4,7 @@
  */
 package com.magento.idea.magento2plugin.mcp
 
+import com.intellij.execution.CommandLineUtil
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.nio.file.Path
@@ -30,7 +31,8 @@ internal class MagentoMagerunProcess(
 ) : MagerunRunner {
     override fun run(argv: List<String>, cwd: Path, checkCancelled: () -> Unit): MagerunProcessResult {
         checkCancelled()
-        val process = ProcessBuilder(argv).directory(cwd.toFile()).apply {
+        // Preserve literal quotes and backslashes when Windows serializes the argument vector.
+        val process = ProcessBuilder(CommandLineUtil.toCommandLine(argv)).directory(cwd.toFile()).apply {
             environment()["NO_COLOR"] = "1"
         }.start()
         val exceeded = AtomicBoolean(false)
