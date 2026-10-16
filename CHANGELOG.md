@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 ### Changed
 
 - Updated Gradle to 9.8.1, IntelliJ Platform Gradle Plugin to 2.19.0, Kotlin, runtime and test dependencies, and CI tooling. Compile against PhpStorm 2026.2 while retaining WebStorm 2026.3 EAP UI tests.
+- Improved Magento MCP CLI discovery with deterministic wrapper selection, added `magento_magerun` for installed command discovery and native MCP configuration, and updated bundled skills and HTTP end-to-end tests.
 
 ### Fixed
 
