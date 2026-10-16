@@ -455,14 +455,20 @@ class MagentoMcpQueriesTest : BaseProjectTestCase() {
         resetCliEnvironment()
         Settings.getInstance(project).mcpCliToolCandidates = "bin/magento"
         writeProjectFile("bin/common", "#!/usr/bin/env bash\n")
-        assertTrue(projectRootPath().resolve("bin/common").toFile().setExecutable(false, false))
+        val common = projectRootPath().resolve("bin/common")
+        val supportsPosixPermissions = Files.getFileStore(common).supportsFileAttributeView("posix")
+        if (supportsPosixPermissions) {
+            assertTrue(common.toFile().setExecutable(false, false))
+        }
         writeProjectFile("bin/.htaccess", "Require all denied\n")
         writeProjectFile("bin/removeall", "#!/usr/bin/env bash\n")
         writeProjectFile("bin/magento", "#!/usr/bin/env php\n")
 
         val result = MagentoCliToolQueries.describeCliEnvironment(project)
 
-        assertDoesNotContain(result, "./bin/common")
+        if (supportsPosixPermissions) {
+            assertDoesNotContain(result, "./bin/common")
+        }
         assertDoesNotContain(result, "./bin/.htaccess")
         assertContains(result, "./bin/removeall")
         assertDoesNotContain(result, "example: ./bin/removeall")

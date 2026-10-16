@@ -4,12 +4,15 @@
  */
 package com.magento.idea.magento2plugin.mcp
 
+import com.intellij.testFramework.JUnit38AssumeSupportRunner
 import com.magento.idea.magento2plugin.project.Settings
 import org.json.JSONObject
+import org.junit.runner.RunWith
 import java.nio.file.Files
 import java.nio.file.Path
 
 /** Assertions cross the HTTP API; magerun metadata comes from an actual PHP process. */
+@RunWith(JUnit38AssumeSupportRunner::class)
 class MagentoMcpHttpTest : McpHttpTestCase() {
     private val root: Path get() = Path.of(project.basePath!!)
 
