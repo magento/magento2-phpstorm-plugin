@@ -5,10 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 
-## [Unreleased]
+## 2026.3.5
+
+### Changed
+
+- Updated Gradle to 9.8.1, IntelliJ Platform Gradle Plugin to 2.19.0, Kotlin, runtime and test dependencies, and CI tooling. Compile against PhpStorm 2026.2 while retaining WebStorm 2026.3 EAP UI tests.
 
 ### Fixed
 
+- Replaced internal and deprecated platform API calls in UCT method inspections, run configuration validation, and MCP plugin version reporting.
+- Replaced SwingX hyperlinks and input placeholders with platform UI components for compatibility with 2026.3 IDEs.
+- Preserve MCP tool discovery across 2026.2 and 2026.3 by binding shared MCP descriptor constructor parameters by name and using the host IDE's defaults for added fields.
+- CLI command generation escapes single quotes and backslashes in descriptions to preserve their text and prevent invalid PHP syntax [#1280](https://github.com/magento/magento2-phpstorm-plugin/issues/1280).
 - Generated `menu.xml` no longer gets an empty `parent` attribute, which failed Magento's menu schema, when no parent menu item is set, as in the MCP `entity_crud` scaffold [#2750](https://github.com/magento/magento2-phpstorm-plugin/issues/2750).
 
 ## 2026.3.4-p1

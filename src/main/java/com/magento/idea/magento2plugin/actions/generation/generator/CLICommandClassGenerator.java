@@ -118,6 +118,8 @@ public class CLICommandClassGenerator extends FileGenerator {
         attributes.setProperty("CLI_COMMAND_NAME",
                 this.phpClassData.getCommandName());
         attributes.setProperty("CLI_COMMAND_DESCRIPTION",
-                this.phpClassData.getCommandDescription());
+                this.phpClassData.getCommandDescription()
+                        .replace("\\", "\\\\")
+                        .replace("'", "\\'"));
     }
 }

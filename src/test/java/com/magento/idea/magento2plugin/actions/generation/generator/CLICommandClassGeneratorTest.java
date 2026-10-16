@@ -6,7 +6,9 @@
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiErrorElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.magento.idea.magento2plugin.actions.generation.data.CLICommandClassData;
 
 public class CLICommandClassGeneratorTest extends BaseGeneratorTestCase {
@@ -40,6 +42,43 @@ public class CLICommandClassGeneratorTest extends BaseGeneratorTestCase {
                 expectedFile,
                 "src/app/code/Foo/Bar/Console/Command",
                 cliCommandClass
+        );
+    }
+
+    public void testGenerateCLICommandClassEscapesSingleQuotes() {
+        assertGeneratedDescription("Test command's bug", "Test command\\'s bug");
+    }
+
+    public void testGenerateCLICommandClassEscapesBackslashes() {
+        assertGeneratedDescription("Read C:\\temp\\\\logs\\", "Read C:\\\\temp\\\\\\\\logs\\\\");
+    }
+
+    public void testGenerateCLICommandClassEscapesBackslashesBeforeQuotes() {
+        assertGeneratedDescription("Test \\'quoted' command", "Test \\\\\\'quoted\\' command");
+    }
+
+    private void assertGeneratedDescription(final String description, final String escapedDescription) {
+        final CLICommandClassData classData = new CLICommandClassData(
+                CLASS_NAME,
+                PARENT_DIRECTORY,
+                COMMAND_NAME,
+                description,
+                NAMESPACE,
+                MODULE_NAME
+        );
+        final PsiFile cliCommandClass = new CLICommandClassGenerator(
+                myFixture.getProject(),
+                classData
+        ).generate("test");
+
+        assertNotNull("CLI command class should be generated", cliCommandClass);
+        assertNull(
+                "Generated CLI command should have valid PHP syntax",
+                PsiTreeUtil.findChildOfType(cliCommandClass, PsiErrorElement.class)
+        );
+        assertTrue(
+                "Description should be escaped in the generated PHP string: " + cliCommandClass.getText(),
+                cliCommandClass.getText().contains("$this->setDescription('" + escapedDescription + "');")
         );
     }
 }

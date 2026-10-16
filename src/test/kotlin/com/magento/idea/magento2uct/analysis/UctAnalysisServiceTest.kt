@@ -262,6 +262,44 @@ class UctAnalysisServiceTest : PhysicalMagentoTestCase() {
         assertFalse(result.findings.any { it.message.contains("Implementation") })
     }
 
+    fun testIntersectionAndGenericReceiverContractsAreStillInspected() {
+        myFixture.addFileToProject("vendor/magento/test/ReceiverContracts.php", """
+            <?php namespace Magento\Test;
+            interface FirstContract { public function method(); }
+            interface SecondContract { public function method(); }
+            class UnrelatedImplementation implements FirstContract, SecondContract { public function method() {} }
+            /** @template T */
+            class GenericReceiver { public function method() {} }
+        """.trimIndent())
+        val first = "\\Magento\\Test\\FirstContract.method"
+        val second = "\\Magento\\Test\\SecondContract.method"
+        val generic = "\\Magento\\Test\\GenericReceiver.method"
+        val implementation = "\\Magento\\Test\\UnrelatedImplementation.method"
+        val catalog = UctIndexCatalogTest.fixtureCatalog().withReleases(mapOf(
+            "2.4.8-p5" to UctReleaseFixture.index("2.4.8-p5", setOf(first, second, generic, implementation)),
+            "2.4.9" to UctReleaseFixture.index("2.4.9", emptySet())
+        ))
+        val cases = listOf(
+            "function example(\\Magento\\Test\\FirstContract&\\Magento\\Test\\SecondContract \$value)" to setOf(first, second),
+            "function example((\\Magento\\Test\\FirstContract&\\Magento\\Test\\SecondContract)|\\Magento\\Test\\GenericReceiver \$value)" to setOf(first, second, generic),
+            "/** @param \\Magento\\Test\\GenericReceiver<\\Magento\\Test\\FirstContract&\\Magento\\Test\\SecondContract> \$value */ function example(\$value)" to setOf(generic)
+        )
+        for ((number, case) in cases.withIndex()) {
+            val (declaration, expectedMethods) = case
+            val file = myFixture.addFileToProject("app/code/Foo/Bar/Receiver$number.php",
+                "<?php namespace Foo\\Bar\\Case$number; $declaration { \$value->method(); }")
+            PsiDocumentManager.getInstance(project).commitAllDocuments()
+            val result = analyzeWithCatalog(catalog, request().copy(
+                paths = listOf(file.virtualFile.path), currentVersion = "2.4.8-p5", targetVersion = "2.4.9"
+            ))
+            val calls = result.findings.filter { it.issue == SupportedIssue.CALLED_NON_EXISTENT_METHOD }
+            assertEquals("$declaration: $calls", expectedMethods.size, calls.size)
+            for (method in expectedMethods) {
+                assertTrue("$declaration: $calls", calls.any { it.message.contains(method) })
+            }
+        }
+    }
+
     fun testPolyvariantInheritedTemplateMethodsRemainStableAcrossVersionAndCatalogChanges() {
         myFixture.addFileToProject("vendor/magento/test/Block.php", """
             <?php namespace Magento\Test;

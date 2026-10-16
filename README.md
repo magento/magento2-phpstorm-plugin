@@ -73,7 +73,8 @@
 
 ## Works with
 
-* PhpStorm 2026+
+* PhpStorm, WebStorm, and IntelliJ IDEA 2026.2+ with JavaScript and CSS support.
+* PHP features require the PHP plugin; XML, JavaScript, theme, and other PHP-independent features also work without it.
 
 ## MCP tools
 
