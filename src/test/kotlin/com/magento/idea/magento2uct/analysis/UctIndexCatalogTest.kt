@@ -62,6 +62,24 @@ class UctIndexCatalogTest {
     }
 
     @Test
+    fun realFactoriesAreCheckedAsIsWhileGeneratedOnesUseTheirBaseClass() {
+        val factory = "\\Magento\\Test\\RealFactory"
+        val model = "\\Magento\\Test\\Model"
+        val history = mapOf(
+            "2.4.8" to mapOf(factory to true, "$factory.create" to true, "$model->sourceFactory" to true, model to true),
+            "2.4.9" to mapOf(factory to false, "$factory.create" to false, "$model->sourceFactory" to false)
+        )
+        val catalog = UctIndexCatalog(history, history, history.mapValues { emptyMap() })
+        val target = catalog.snapshot(null, "2.4.9", false)
+        assertFalse(target.isExists(factory))
+        assertFalse(target.isExists("$factory.create"))
+        assertFalse(target.isExists("$model->sourceFactory"))
+        assertEquals("2.4.9", target.getRemovedInVersion(factory))
+        assertTrue(target.isPresentInCodebase("\\Magento\\Test\\ModelFactory"))
+        assertTrue(target.isExists("\\Magento\\Test\\ModelFactory"))
+    }
+
+    @Test
     fun resourceLoaderRejectsMissingBaselineAndCorruptIndexes() {
         assertThrows(IllegalStateException::class.java) { UctIndexCatalog.load { null } }
         val bytes = ByteArrayOutputStream().also { out ->

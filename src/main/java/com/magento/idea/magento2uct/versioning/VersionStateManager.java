@@ -222,7 +222,8 @@ public final class VersionStateManager implements UctVersionState {
     private String escapeFqn(final @NotNull String fqn) {
         return MagentoTypeEscapeUtil.escape(
                 !fqn.trim().isEmpty() && fqn.trim().charAt(0)
-                        == '\\' ? fqn.trim() : '\\' + fqn.trim()
+                        == '\\' ? fqn.trim() : '\\' + fqn.trim(),
+                existenceStateIndex::isPresentInCodebase
         );
     }
 }
