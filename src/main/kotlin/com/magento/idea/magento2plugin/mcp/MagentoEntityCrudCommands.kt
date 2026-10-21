@@ -340,6 +340,7 @@ internal object MagentoEntityCrudCommands {
     private fun buildButtons(moduleName: String, entityName: String, formName: String): List<UiComponentFormButtonData> {
         val directory = "Block/Form/$entityName"
         val saveNamespace = NamespaceBuilder(moduleName, "Save", directory)
+        val saveAndContinueNamespace = NamespaceBuilder(moduleName, "SaveAndContinue", directory)
         val backNamespace = NamespaceBuilder(moduleName, "Back", directory)
         val deleteNamespace = NamespaceBuilder(moduleName, "Delete", directory)
 
@@ -354,6 +355,17 @@ internal object MagentoEntityCrudCommands {
                 "10",
                 formName,
                 saveNamespace.classFqn
+            ),
+            UiComponentFormButtonData(
+                directory,
+                "SaveAndContinue",
+                moduleName,
+                FormButtonBlockFile.TYPE_SAVE_AND_CONTINUE,
+                saveAndContinueNamespace.namespace,
+                "Save and Continue Edit",
+                "15",
+                formName,
+                saveAndContinueNamespace.classFqn
             ),
             UiComponentFormButtonData(
                 directory,
@@ -418,6 +430,7 @@ internal object MagentoEntityCrudCommands {
             files += NewActionFile(moduleName, entityName)
             files += FormGenericButtonBlockFile(moduleName, entityName)
             files += FormButtonBlockFile(moduleName, "Save", "Block/Form/$entityName")
+            files += FormButtonBlockFile(moduleName, "SaveAndContinue", "Block/Form/$entityName")
             files += FormButtonBlockFile(moduleName, "Back", "Block/Form/$entityName")
             files += FormButtonBlockFile(moduleName, "Delete", "Block/Form/$entityName")
             files += GridActionColumnFile(moduleName, entityName)

@@ -7,160 +7,25 @@ package com.magento.idea.magento2plugin.mcp
 
 import com.intellij.openapi.project.Project
 import com.magento.idea.magento2plugin.project.Settings
+import java.io.IOException
 import java.nio.file.Files
+import java.nio.file.InvalidPathException
 import java.nio.file.Path
 
 internal object MagentoCliToolQueries {
     private const val MAX_CLI_TOOLS_TO_REPORT = 100
-    private val N98_MAGERUN_CAPABILITY_GROUPS = listOf(
-        CapabilityGroup(
-            name = "admin",
-            description = "Commands for managing Magento admin user accounts and related settings.",
-            exampleCommands = listOf(
-                "admin:user:list",
-                "admin:user:create",
-                "admin:user:change-password",
-                "admin:notifications"
-            )
-        ),
-        CapabilityGroup(
-            name = "cache",
-            description = "Commands for interacting with and managing Magento's various cache systems.",
-            exampleCommands = listOf(
-                "cache:clean",
-                "cache:disable",
-                "cache:enable",
-                "cache:flush",
-                "cache:list"
-            )
-        ),
-        CapabilityGroup(
-            name = "config",
-            description = "Commands for managing Magento store configurations and environment settings.",
-            exampleCommands = listOf(
-                "config:store:get",
-                "config:store:set",
-                "config:env:set",
-                "config:search"
-            )
-        ),
-        CapabilityGroup(
-            name = "composer",
-            description = "Commands for managing Composer-related tasks and package deployment.",
-            exampleCommands = listOf("composer:redeploy-base-packages")
-        ),
-        CapabilityGroup(
-            name = "customer",
-            description = "Commands for managing Magento customer accounts.",
-            exampleCommands = listOf(
-                "customer:create",
-                "customer:list",
-                "customer:info",
-                "customer:change-password"
-            )
-        ),
-        CapabilityGroup(
-            name = "db",
-            description = "Commands for database operations such as dumps, imports, and queries.",
-            exampleCommands = listOf(
-                "db:dump",
-                "db:import",
-                "db:query",
-                "db:create",
-                "db:info"
-            )
-        ),
-        CapabilityGroup(
-            name = "dev",
-            description = "Commands tailored for Magento developers, including code generation and debugging tools.",
-            exampleCommands = listOf(
-                "dev:module:create",
-                "dev:console",
-                "dev:translate:admin",
-                "dev:theme:list"
-            )
-        ),
-        CapabilityGroup(
-            name = "eav",
-            description = "Commands for managing EAV (Entity-Attribute-Value) attributes.",
-            exampleCommands = listOf(
-                "eav:attribute:list",
-                "eav:attribute:view",
-                "eav:attribute:remove"
-            )
-        ),
-        CapabilityGroup(
-            name = "giftcard",
-            description = "Commands for managing Magento gift cards.",
-            exampleCommands = listOf(
-                "giftcard:pool:generate",
-                "giftcard:create",
-                "giftcard:info",
-                "giftcard:remove"
-            )
-        ),
-        CapabilityGroup(
-            name = "generation",
-            description = "Commands related to Magento's code generation processes.",
-            exampleCommands = listOf("generation:flush")
-        ),
-        CapabilityGroup(
-            name = "index",
-            description = "Commands for managing Magento's indexers.",
-            exampleCommands = listOf(
-                "index:list",
-                "index:trigger:recreate"
-            )
-        ),
-        CapabilityGroup(
-            name = "install",
-            description = "Command for installing Magento.",
-            exampleCommands = listOf("installer")
-        ),
-        CapabilityGroup(
-            name = "integration",
-            description = "Command for integrations to Magento.",
-            exampleCommands = listOf(
-                "integration:list",
-                "integration:show",
-                "integration:delete"
-            )
-        ),
-        CapabilityGroup(
-            name = "magerun",
-            description = "Commands for working with n98-magerun2 config and internal tools.",
-            exampleCommands = listOf(
-                "magerun:config:info",
-                "magerun:config:dump"
-            )
-        ),
-        CapabilityGroup(
-            name = "routes",
-            description = "Commands for managing and viewing Magento routes.",
-            exampleCommands = listOf("routes:list")
-        ),
-        CapabilityGroup(
-            name = "script",
-            description = "Command for running sequences of n98-magerun2 commands from a file.",
-            exampleCommands = listOf("script")
-        ),
-        CapabilityGroup(
-            name = "sys",
-            description = "Commands for system-level information, checks, and maintenance tasks.",
-            exampleCommands = listOf(
-                "sys:info",
-                "sys:check",
-                "sys:maintenance",
-                "sys:cron:list",
-                "sys:store:list"
-            )
-        )
+    private val DOCKER_COMPOSE_FILES = listOf(
+        "compose.yaml", "compose.yml", "docker-compose.yaml", "docker-compose.yml"
     )
     private val N98_MAGERUN_TOOL_KIND = ToolKind(
-        description = "n98-magerun wrapper",
-        usage = "Use this for n98-magerun commands in the project runtime.",
-        exampleSuffix = "sys:info",
-        capabilityGroups = N98_MAGERUN_CAPABILITY_GROUPS
+        description = "n98-magerun2 candidate (version unverified)",
+        usage = "Use magento_magerun status, then commands or command_help to inspect this project's installed tool.",
+        exampleSuffix = null
+    )
+    private val LEGACY_MAGERUN_TOOL_KIND = ToolKind(
+        description = "magerun candidate (may be Magento 1; version unverified)",
+        usage = "Verify with magento_magerun before treating this alias as n98-magerun2.",
+        exampleSuffix = null
     )
     private val GRUNT_TOOL_KIND = ToolKind(
         description = "frontend build wrapper",
@@ -175,8 +40,12 @@ internal object MagentoCliToolQueries {
             exampleSuffix = "cache:flush"
         ),
         "n98-magerun2" to N98_MAGERUN_TOOL_KIND,
-        "n98-magerun" to N98_MAGERUN_TOOL_KIND,
-        "magerun" to N98_MAGERUN_TOOL_KIND,
+        "n98-magerun2.phar" to N98_MAGERUN_TOOL_KIND,
+        "magerun2" to N98_MAGERUN_TOOL_KIND,
+        "magerun2.phar" to N98_MAGERUN_TOOL_KIND,
+        "n98-magerun" to LEGACY_MAGERUN_TOOL_KIND,
+        "n98-magerun.phar" to LEGACY_MAGERUN_TOOL_KIND,
+        "magerun" to LEGACY_MAGERUN_TOOL_KIND,
         "composer" to ToolKind(
             description = "Composer wrapper",
             usage = "Use this for Composer commands in the project runtime.",
@@ -232,9 +101,12 @@ internal object MagentoCliToolQueries {
 
     fun describeCliEnvironment(project: Project): String {
         val configuredCandidates = Settings.getMcpCliToolCandidates(project)
+        val projectRoot = projectRootPath(project)
+            ?: return "The project directory is unavailable."
         val configuredMagentoRootRelative = resolveConfiguredMagentoRootRelativePath(project)
-        val searchRoots = buildSearchRoots(configuredMagentoRootRelative)
-        val detectedTools = discoverTools(project, searchRoots, configuredCandidates)
+        val searchRoots = buildSearchRoots(projectRoot, configuredMagentoRootRelative)
+        val detectedTools = discoverTools(projectRoot, searchRoots, configuredCandidates)
+        val preferredTools = detectedTools.groupBy { it.selectionKey }.mapValues { (_, tools) -> tools.first() }
         val wrappersOutsideMagentoRoot = if (configuredMagentoRootRelative == null) {
             emptyList()
         } else {
@@ -244,7 +116,7 @@ internal object MagentoCliToolQueries {
         }
         val wrapperCommandsOutsideMagentoRoot = wrappersOutsideMagentoRoot.map { it.command }.toSet()
         val lines = mutableListOf<String>()
-        val hasN98MagerunWrapper = detectedTools.any { it.kind.capabilityGroups.isNotEmpty() }
+        val hasN98MagerunWrapper = detectedTools.any { MagentoMagerunSupport.isMagerunName(it.name) }
         val hasGruntWrapper = detectedTools.any { it.kind == GRUNT_TOOL_KIND }
 
         lines += "Magento CLI environment"
@@ -253,6 +125,8 @@ internal object MagentoCliToolQueries {
 
         if (searchRoots.isNotEmpty()) {
             lines += "Search roots: ${searchRoots.joinToString(", ")}"
+            lines += "Preferred CLI directory: ${resolveProjectPath(projectRoot, searchRoots.first())}"
+            lines += "Selection: prefer scripts beside the nearest Docker Compose configuration within the project; use Magento-root scripts as fallbacks."
         }
         if (configuredMagentoRootRelative != null) {
             lines += "Configured Magento root: ./$configuredMagentoRootRelative"
@@ -270,36 +144,43 @@ internal object MagentoCliToolQueries {
         for (tool in detectedTools.take(MAX_CLI_TOOLS_TO_REPORT)) {
             lines += tool.command
             lines += "  type: ${tool.kind.description}"
+            val preferredTool = preferredTools.getValue(tool.selectionKey)
+            lines += if (preferredTool == tool) {
+                "  selection: preferred"
+            } else {
+                "  selection: fallback for ${preferredTool.command}; use only when the preferred script is unavailable"
+            }
+            lines += "  working directory: ${resolveProjectPath(projectRoot, tool.workingDirectory)}"
             lines += "  use: ${tool.kind.usage}"
             if (configuredMagentoRootRelative != null && tool.command in wrapperCommandsOutsideMagentoRoot) {
                 lines += "  location: outside configured Magento root `./$configuredMagentoRootRelative`"
             }
-            lines += "  example: ${exampleCommand(tool)}"
+            exampleCommand(tool)?.let { lines += "  example: $it" }
+        }
+        if (detectedTools.size > MAX_CLI_TOOLS_TO_REPORT) {
+            lines += "${detectedTools.size - MAX_CLI_TOOLS_TO_REPORT} additional scripts omitted."
         }
 
         if (hasN98MagerunWrapper) {
             lines += ""
-            lines += "Known n98-magerun capability groups:"
-            for (group in N98_MAGERUN_CAPABILITY_GROUPS) {
-                lines += "${group.name}: ${group.description}"
-                lines += "  examples: ${group.exampleCommands.joinToString(", ")}"
-            }
-            lines += "This is a built-in capability snapshot. Use the detected n98 wrapper with `list` or `--help` to confirm the exact command surface and any project-specific custom commands."
+            lines += "n98-magerun capabilities are not probed during environment discovery."
+            lines += "Use magento_magerun mode=status for detection, commands for the installed command catalogue, command_help for arguments/options, or mcp_config for native MCP settings."
         }
 
         lines += ""
         lines += "Agent guidance:"
         val guidance = mutableListOf<String>()
         guidance += "Call this tool before running shell commands that normally use Magento, n98-magerun, or project environment wrappers such as `./bin/start`, `./bin/stop`, or `./bin/restart`."
-        guidance += "Use the returned wrapper path exactly instead of a global binary or `php bin/...` fallback."
+        guidance += "Use the preferred script's example from its working directory instead of a global binary or `php bin/...` fallback."
+        guidance += "Choose the preferred script for each command. Run its example from the reported working directory; fallback scripts may use a different runtime. Do not switch to a fallback merely because a command fails."
         if (configuredMagentoRootRelative != null) {
             guidance += "Create and edit Magento files under `./$configuredMagentoRootRelative`; that is the configured Magento root."
         }
         if (configuredMagentoRootRelative != null && wrappersOutsideMagentoRoot.isNotEmpty()) {
-            guidance += "If a detected wrapper is outside `./$configuredMagentoRootRelative`, that is valid for a nested Magento root. Run the wrapper from the returned project-relative path and do not rewrite it under the Magento root."
+            guidance += "If a detected wrapper is outside `./$configuredMagentoRootRelative`, that is valid for a nested Magento root. Keep its reported working directory and invocation; do not rewrite it under the Magento root."
         }
         if (hasN98MagerunWrapper) {
-            guidance += "For exact n98 command discovery, follow up with the detected wrapper and `list` or a targeted `--help` call such as `sys:info --help`."
+            guidance += "Use magento_magerun for bounded metadata probes through the selected runtime; it verifies n98-magerun2 and does not run install, update, or application commands."
         }
         if (hasGruntWrapper) {
             guidance += "After editing styles, run the detected grunt wrapper right away to rebuild theme assets, usually `./bin/grunt exec:THEMENAME` and `./bin/grunt less:THEMENAME`."
@@ -312,25 +193,33 @@ internal object MagentoCliToolQueries {
         return lines.joinToString("\n")
     }
 
-    private fun discoverTools(
-        project: Project,
+    internal fun discoverTools(
+        projectRoot: Path,
         searchRoots: List<String>,
         configuredCandidates: List<String>
     ): List<DetectedTool> {
         val detected = LinkedHashMap<String, DetectedTool>()
-        val projectRoot = projectRootPath(project) ?: return emptyList()
+        val candidates = (configuredCandidates + MagentoMagerunSupport.DEFAULT_CANDIDATES).distinct()
 
-        for (root in searchRoots) {
-            for (candidate in configuredCandidates) {
+        for ((rootOrder, root) in searchRoots.withIndex()) {
+            val workingDirectory = resolveProjectPath(projectRoot, root) ?: continue
+            for (candidate in candidates) {
                 val expectedRelativePath = normalizePath(
                     expectedProjectRelativePath(root, candidate)
                 )
                 val candidatePath = resolveProjectPath(projectRoot, expectedRelativePath)
-                if (candidatePath != null && Files.exists(candidatePath) && !Files.isDirectory(candidatePath)) {
+                if (candidatePath != null && candidatePath.startsWith(workingDirectory)
+                    && isCliFile(candidatePath)) {
+                    val owner = searchRoots.lastOrNull { searchRoot ->
+                        resolveProjectPath(projectRoot, searchRoot)?.let { candidatePath.startsWith(it) } == true
+                    }
+                    if (owner != root) {
+                        continue
+                    }
                     val relativePath = relativeProjectPath(projectRoot, candidatePath)
                     detected.putIfAbsent(
                         relativePath,
-                        buildDetectedTool(relativePath, candidatePath.fileName.toString())
+                        buildDetectedTool(relativePath, candidatePath, root, workingDirectory, rootOrder)
                     )
                 }
             }
@@ -342,26 +231,30 @@ internal object MagentoCliToolQueries {
             if (binDirectory != null && Files.isDirectory(binDirectory)) {
                 Files.list(binDirectory).use { children ->
                     children
-                        .filter { !Files.isDirectory(it) }
-                        .sorted(
-                            compareBy<Path> { toolSortOrder(it.fileName.toString(), configuredCandidates) }
-                                .thenBy { it.fileName.toString().lowercase() }
-                        )
+                        .filter { !it.fileName.toString().startsWith(".") }
+                        .filter { isCliFile(it) }
+                        .filter { resolveProjectPath(projectRoot, it.toString()) != null }
                         .forEach { file ->
                             val relativePath = relativeProjectPath(projectRoot, file)
                             detected.putIfAbsent(
                                 relativePath,
-                                buildDetectedTool(relativePath, file.fileName.toString())
+                                buildDetectedTool(relativePath, file, root, workingDirectory, rootOrder)
                             )
                         }
                 }
             }
         }
 
-        return detected.values.toList()
+        return detected.values.sortedWith(
+            compareBy<DetectedTool> { toolSortOrder(it.name, configuredCandidates) }
+                .thenBy { it.rootOrder }
+                .thenBy { if (MagentoMagerunSupport.isMagerunName(it.name)) MagentoMagerunSupport.candidatePriority(it.command, configuredCandidates) else 0 }
+                .thenBy { it.name.lowercase() }
+                .thenBy { it.command }
+        )
     }
 
-    private fun resolveConfiguredMagentoRootRelativePath(project: Project): String? {
+    internal fun resolveConfiguredMagentoRootRelativePath(project: Project): String? {
         val configuredMagentoPath = Settings.getMagentoPath(project)?.trim().orEmpty()
         if (configuredMagentoPath.isEmpty()) {
             return null
@@ -402,37 +295,77 @@ internal object MagentoCliToolQueries {
         return relativeCandidate.ifEmpty { null }
     }
 
-    private fun buildSearchRoots(configuredMagentoRootRelative: String?): List<String> {
-        val roots = linkedSetOf(".")
-        if (!configuredMagentoRootRelative.isNullOrEmpty()) {
-            roots += configuredMagentoRootRelative
+    internal fun buildSearchRoots(projectRoot: Path, configuredMagentoRootRelative: String?): List<String> {
+        val normalizedProjectRoot = projectRoot.toAbsolutePath().normalize()
+        val magentoRoot = resolveProjectPath(normalizedProjectRoot, configuredMagentoRootRelative ?: ".")
+            ?: return emptyList()
+        val roots = linkedSetOf<String>()
+        var directory = magentoRoot
+        while (directory.startsWith(normalizedProjectRoot)) {
+            if (DOCKER_COMPOSE_FILES.any { name ->
+                    resolveProjectPath(normalizedProjectRoot, directory.resolve(name).toString())
+                        ?.let { Files.isRegularFile(it) } == true
+                }) {
+                roots += relativeProjectPath(normalizedProjectRoot, directory).ifEmpty { "." }
+                break
+            }
+            if (directory == normalizedProjectRoot) {
+                break
+            }
+            directory = directory.parent ?: break
         }
+        roots += relativeProjectPath(normalizedProjectRoot, magentoRoot).ifEmpty { "." }
         return roots.toList()
     }
 
-    private fun buildDetectedTool(relativePath: String, fileName: String): DetectedTool {
+    private fun buildDetectedTool(
+        relativePath: String,
+        path: Path,
+        root: String,
+        workingDirectory: Path,
+        rootOrder: Int
+    ): DetectedTool {
+        val fileName = path.fileName.toString()
         val normalizedName = fileName.lowercase()
         val toolKind = knownToolTypes[normalizedName] ?: ToolKind(
             description = "project wrapper",
             usage = "Use this wrapper instead of a global command when the project expects it.",
-            exampleSuffix = "--help"
+            exampleSuffix = null
         )
 
         return DetectedTool(
             command = "./$relativePath",
-            kind = toolKind
+            kind = toolKind,
+            name = fileName,
+            workingDirectory = root,
+            invocation = "./${relativeProjectPath(workingDirectory, path)}",
+            rootOrder = rootOrder
         )
     }
 
-    private fun exampleCommand(tool: DetectedTool): String {
-        return if (tool.kind.exampleSuffix.isEmpty()) {
-            tool.command
+    private fun exampleCommand(tool: DetectedTool): String? {
+        val suffix = tool.kind.exampleSuffix ?: return null
+        val command = shellQuote(tool.invocation)
+        return if (suffix.isEmpty()) {
+            command
         } else {
-            "${tool.command} ${tool.kind.exampleSuffix}"
+            "$command $suffix"
         }
     }
 
+    private fun shellQuote(value: String): String =
+        if (value.matches(Regex("[a-zA-Z0-9_./-]+"))) value else "'${value.replace("'", "'\"'\"'")}'"
+
+    private fun isCliFile(path: Path): Boolean = Files.isRegularFile(path) && Files.isReadable(path)
+        && (Files.isExecutable(path) || MagentoMagerunSupport.isMagerunName(path.fileName.toString()))
+
     private fun toolSortOrder(fileName: String, configuredCandidates: List<String>): Int {
+        if (MagentoMagerunSupport.isMagerunName(fileName)) {
+            val configuredIndex = configuredCandidates.indexOfFirst {
+                MagentoMagerunSupport.isMagerunName(it.substringAfterLast('/'))
+            }
+            return if (configuredIndex >= 0) configuredIndex else configuredCandidates.size + 1
+        }
         val configuredIndex = configuredCandidates.indexOfFirst { candidate ->
             candidate.substringAfterLast('/').equals(fileName, ignoreCase = true)
         }
@@ -455,7 +388,9 @@ internal object MagentoCliToolQueries {
     private fun expectedProjectRelativePath(searchRoot: String, candidate: String): String {
         val normalizedCandidate = normalizePath(candidate)
         val rootRelativePath = normalizePath(searchRoot)
-        return if (rootRelativePath.isEmpty() || rootRelativePath == ".") {
+        return if (rootRelativePath.isEmpty() || rootRelativePath == "."
+            || normalizedCandidate.startsWith("$rootRelativePath/")
+            || runCatching { Path.of(normalizedCandidate).isAbsolute }.getOrDefault(false)) {
             normalizedCandidate
         } else {
             "$rootRelativePath/$normalizedCandidate"
@@ -468,21 +403,30 @@ internal object MagentoCliToolQueries {
         return normalizedPath == normalizedRoot || normalizedPath.startsWith("$normalizedRoot/")
     }
 
-    private fun projectRootPath(project: Project): Path? {
+    internal fun projectRootPath(project: Project): Path? {
         val projectBasePath = project.basePath ?: project.projectFile?.parent?.path ?: return null
         return Path.of(projectBasePath).toAbsolutePath().normalize()
     }
 
-    private fun resolveProjectPath(projectRoot: Path, relativePath: String): Path? {
+    internal fun resolveProjectPath(projectRoot: Path, relativePath: String): Path? {
         val normalizedRelativePath = normalizePath(relativePath)
         if (normalizedRelativePath.isEmpty()) {
             return projectRoot
         }
 
-        val resolvedPath = projectRoot.resolve(normalizedRelativePath).toAbsolutePath().normalize()
-        return if (resolvedPath.startsWith(projectRoot)) {
-            resolvedPath
-        } else {
+        return try {
+            val resolvedPath = projectRoot.resolve(normalizedRelativePath).toAbsolutePath().normalize()
+            if (!resolvedPath.startsWith(projectRoot)) {
+                null
+            } else if (Files.exists(resolvedPath)
+                && !resolvedPath.toRealPath().startsWith(projectRoot.toRealPath())) {
+                null
+            } else {
+                resolvedPath
+            }
+        } catch (_: IOException) {
+            null
+        } catch (_: InvalidPathException) {
             null
         }
     }
@@ -491,21 +435,20 @@ internal object MagentoCliToolQueries {
         return projectRoot.relativize(path.toAbsolutePath().normalize()).toString().replace('\\', '/')
     }
 
-    private data class DetectedTool(
+    internal data class DetectedTool(
         val command: String,
-        val kind: ToolKind
-    )
+        val kind: ToolKind,
+        val name: String,
+        val workingDirectory: String,
+        val invocation: String,
+        val rootOrder: Int
+    ) {
+        val selectionKey: String get() = if (MagentoMagerunSupport.isMagerunName(name)) "magerun_candidate" else name
+    }
 
-    private data class ToolKind(
+    internal data class ToolKind(
         val description: String,
         val usage: String,
-        val exampleSuffix: String,
-        val capabilityGroups: List<CapabilityGroup> = emptyList()
-    )
-
-    private data class CapabilityGroup(
-        val name: String,
-        val description: String,
-        val exampleCommands: List<String>
+        val exampleSuffix: String?
     )
 }

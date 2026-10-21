@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+if ! bin/cliq ls bin/n98-magerun2.phar; then
+  echo "Downloading n98-magerun2.phar, just a moment..."
+  bin/clinotty curl -sS -O https://files.magerun.net/n98-magerun2.phar
+  bin/clinotty curl -sS -o n98-magerun2.phar.sha256 https://files.magerun.net/sha256.php?file=n98-magerun2.phar
+  bin/clinotty shasum -a 256 -c n98-magerun2.phar.sha256
+  [ $? != 0 ] && echo "sha256 checksum do not match!" && exit
+
+  bin/cliq chmod +x n98-magerun2.phar
+  bin/cliq mkdir -p bin
+  bin/cliq mv n98-magerun2.phar bin
+fi
+
+bin/cli bin/n98-magerun2.phar "$@"

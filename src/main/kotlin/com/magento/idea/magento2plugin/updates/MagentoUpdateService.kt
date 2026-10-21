@@ -57,6 +57,7 @@ class MagentoUpdateService(private val project: Project, private val scope: Coro
         if (!settings.pluginEnabled || (!manual && !options.enabled)) return null
         val root = Settings.getMagentoPath(project)?.takeIf { it.isNotBlank() } ?: return null
         val feedUrl = MagentoUpdateSettings.normalizeFeedUrl(options.feedUrl)
+        val window = options.checkWindow
         return scope.launch(Dispatchers.IO) {
             mutex.withLock {
                 if (requestId != generation.get()) return@withLock
@@ -64,7 +65,7 @@ class MagentoUpdateService(private val project: Project, private val scope: Coro
                     val installed = InstalledMagento.detect(project, root)
                     if (installed.development) {
                         withContext(Dispatchers.EDT) {
-                            if (isCurrent(requestId, root, feedUrl, manual)) {
+                            if (isCurrent(requestId, root, feedUrl, manual, window)) {
                                 notifications.values.forEach(Notification::expire)
                                 notifications.clear()
                                 if (manual) publish("Magento update checks skipped",
@@ -77,14 +78,14 @@ class MagentoUpdateService(private val project: Project, private val scope: Coro
                     val localPatches = LocalSecurityPatches.inspect(Path.of(root))
                     patchPaths = localPatches.watchedPaths
                     val result = ApplicationManager.getApplication().getService(MagentoUpdateFeed::class.java)
-                        .check(feedUrl, installed, manual, localPatches)
+                        .check(feedUrl, installed, manual, localPatches, window)
                     // A checkout or Composer operation during the request invalidates this result.
                     if (InstalledMagento.detect(project, root) != installed ||
                         LocalSecurityPatches.inspect(Path.of(root)) != localPatches) return@withLock
                     withContext(Dispatchers.EDT) {
-                        if (isCurrent(requestId, root, feedUrl, manual)) {
+                        if (isCurrent(requestId, root, feedUrl, manual, window)) {
                             val retryScheduled = result.retryNeeded && allowRetry
-                            if (retryScheduled) scheduleRetry(requestId, root, feedUrl, manual)
+                            if (retryScheduled) scheduleRetry(requestId, root, feedUrl, manual, window)
                             show(result, root, feedUrl, manual, retryScheduled)
                         }
                     }
@@ -92,10 +93,10 @@ class MagentoUpdateService(private val project: Project, private val scope: Coro
                     MagentoUpdateFeed.rethrowCancellation(exception)
                     LOG.debug("Magento update check failed", exception)
                     withContext(Dispatchers.EDT) {
-                        if (isCurrent(requestId, root, feedUrl, manual)) {
+                        if (isCurrent(requestId, root, feedUrl, manual, window)) {
                             val unavailable = exception is UpdateFeedUnavailableException
                             val retryScheduled = unavailable && allowRetry
-                            if (retryScheduled) scheduleRetry(requestId, root, feedUrl, manual)
+                            if (retryScheduled) scheduleRetry(requestId, root, feedUrl, manual, window)
                             if (manual) {
                                 val message = when {
                                     retryScheduled -> "Update information is unavailable. Will try again in two minutes."
@@ -111,22 +112,22 @@ class MagentoUpdateService(private val project: Project, private val scope: Coro
         }
     }
 
-    private fun scheduleRetry(id: Long, root: String, feed: String, manual: Boolean) {
+    private fun scheduleRetry(id: Long, root: String, feed: String, manual: Boolean, window: UpdateCheckWindow) {
         retryJob?.cancel()
         retryJob = scope.launch {
             delay(2 * 60 * 1000L)
             withContext(Dispatchers.EDT) {
                 retryJob = null
-                if (isCurrent(id, root, feed, manual)) checkForUpdates(manual, allowRetry = false)
+                if (isCurrent(id, root, feed, manual, window)) checkForUpdates(manual, allowRetry = false)
             }
         }
     }
 
-    private fun isCurrent(id: Long, root: String, feed: String, manual: Boolean): Boolean {
+    private fun isCurrent(id: Long, root: String, feed: String, manual: Boolean, window: UpdateCheckWindow): Boolean {
         if (project.isDisposed || id != generation.get()) return false
         val options = project.getService(MagentoUpdateSettings::class.java).state
         return Settings.isEnabled(project) && (manual || options.enabled) && Settings.getMagentoPath(project) == root &&
-            MagentoUpdateSettings.normalizeFeedUrl(options.feedUrl) == feed
+            MagentoUpdateSettings.normalizeFeedUrl(options.feedUrl) == feed && options.checkWindow == window
     }
 
     private fun show(result: UpdateFeedResult, root: String, feed: String, manual: Boolean, retryScheduled: Boolean) {

@@ -102,7 +102,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run automated tests
-        run: ./gradlew clean test --fail-fast --no-daemon --no-build-cache --no-configuration-cache
+        run: ./gradlew clean test --no-daemon --no-build-cache --no-configuration-cache
       - name: Upload Windows test failure artifacts
         if: failure()
         uses: actions/upload-artifact@v7.0.2
