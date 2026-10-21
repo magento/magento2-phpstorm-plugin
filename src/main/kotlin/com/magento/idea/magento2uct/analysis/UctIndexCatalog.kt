@@ -45,6 +45,13 @@ class UctIndexCatalog internal constructor(
     fun requiresCurrentCoverage(currentVersion: String?, targetVersion: String, ignoreCurrentVersion: Boolean): Boolean =
         ignoreCurrentVersion || (currentVersion != null && (isPrepared(targetVersion) || targetVersion !in existence.keys.intersect(api.keys).intersect(deprecation.keys)))
 
+    fun missingVersions(currentVersion: String?, targetVersion: String, ignoreCurrentVersion: Boolean): List<String> =
+        buildList {
+            if (requiresCurrentCoverage(currentVersion, targetVersion, ignoreCurrentVersion) && currentVersion != null &&
+                currentVersion !in supportedVersions) add(currentVersion)
+            if (targetVersion !in supportedVersions) add(targetVersion)
+        }.distinct()
+
     fun validateVersions(currentVersion: String?, targetVersion: String, ignoreCurrentVersion: Boolean) {
         require(targetVersion in supportedVersions) {
             "Compatibility indexes are unavailable for targetVersion `$targetVersion`. Use mode `status` for supportedVersions."

@@ -256,7 +256,7 @@ internal object MagentoCompatibilityCommands {
         validate(!ignore || current != null, "ignoreCurrentVersion", "ignoreCurrentVersion requires a detected or explicit currentVersion.", listOf("false", "true with a detected or explicit currentVersion"))
         val scoped = validateScanOptions(parameters, ignore)
         val continuation = target?.let { statusOptions(current, it, ignore, parameters) }
-        val missing = if (target == null) emptyList() else missingVersions(catalog, current, target, ignore)
+        val missing = if (target == null) emptyList() else catalog.missingVersions(current, target, ignore)
         val active = preparation.activeRunIds()
         val next = when {
             !Settings.isEnabled(project) -> JSONObject.NULL
@@ -490,12 +490,6 @@ internal object MagentoCompatibilityCommands {
             scanOptions.filter(statusParameters::has).forEach { put(it, statusParameters.get(it)) }
         }
 
-    private fun missingVersions(catalog: UctIndexCatalog, current: String?, target: String, ignore: Boolean): List<String> =
-        buildList {
-            if (catalog.requiresCurrentCoverage(current, target, ignore) && current != null && current !in catalog.supportedVersions) add(current)
-            if (target !in catalog.supportedVersions) add(target)
-        }.distinct()
-
     private fun preparationView(project: Project, view: UctReleasePreparation.View, statusParameters: JSONObject): JSONObject =
         MagentoMcpProjectContext.identity(project).put("operation", "prepare")
             .put("runId", view.runId ?: JSONObject.NULL).put("targetVersion", view.version)
@@ -530,7 +524,7 @@ internal object MagentoCompatibilityCommands {
 
     private fun coverageError(project: Project, request: UctAnalysisRequest, parameters: JSONObject, kind: String, message: String): String {
         val catalog = project.getService(UctReleasePreparation::class.java).catalog()
-        val missing = missingVersions(catalog, request.currentVersion, request.targetVersion, request.ignoreCurrentVersion)
+        val missing = catalog.missingVersions(request.currentVersion, request.targetVersion, request.ignoreCurrentVersion)
         val action = "Follow nextCall to prepare missing Magento Open Source release data through MCP. Missing coverage does not establish whether the official tag exists; preparation verifies it and can fail. No scan was started. Continue through status and the preserved analyze call once readiness.ready is true."
         return JSONObject(error(project, "coverage_required", message)).put("state", "blocked")
             .put("currentVersion", request.currentVersion ?: JSONObject.NULL).put("targetVersion", request.targetVersion)

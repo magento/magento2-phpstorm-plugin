@@ -32,6 +32,19 @@ class UctIndexCatalogTest {
     }
 
     @Test
+    fun missingVersionsListTargetAndOnlyTheBaselineItRequires() {
+        val catalog = fixtureCatalog()
+        assertEquals(emptyList<String>(), catalog.missingVersions("2.4.1", "2.4.3", false))
+        assertEquals(listOf("2.4.1"), catalog.missingVersions("2.4.1", "2.4.3", true))
+        assertEquals(listOf("2.4.1", "2.4.9"), catalog.missingVersions("2.4.1", "2.4.9", false))
+        assertEquals(listOf("2.4.9"), catalog.missingVersions("2.4.2", "2.4.9", false))
+        assertEquals(listOf("2.4.9"), catalog.missingVersions(null, "2.4.9", false))
+        val prepared = catalog.withReleases(mapOf("2.4.9" to UctReleaseFixture.index("2.4.9")))
+        assertEquals(listOf("2.4.1"), prepared.missingVersions("2.4.1", "2.4.9", false))
+        assertEquals(emptyList<String>(), prepared.missingVersions("2.4.2", "2.4.9", false))
+    }
+
+    @Test
     fun snapshotsKeepTheirVersionsAndSuppressOnlyExistingIssues() {
         val catalog = fixtureCatalog()
         val before = catalog.snapshot(null, "2.4.2", false)
