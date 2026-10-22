@@ -24,6 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Preserve MCP tool discovery across 2026.2 and 2026.3 by binding shared MCP descriptor constructor parameters by name and using the host IDE's defaults for added fields.
 - CLI command generation escapes single quotes and backslashes in descriptions to preserve their text and prevent invalid PHP syntax [#1280](https://github.com/magento/magento2-phpstorm-plugin/issues/1280).
 - Generated `menu.xml` no longer gets an empty `parent` attribute, which failed Magento's menu schema, when no parent menu item is set, as in the MCP `entity_crud` scaffold [#2750](https://github.com/magento/magento2-phpstorm-plugin/issues/2750).
+- The MCP `magento_scaffold` render of `view_model` runs off the EDT with file writes dispatched to it, so it no longer reports "Slow operations are prohibited on EDT" [#2762](https://github.com/magento/magento2-phpstorm-plugin/issues/2762).
 
 ## 2026.3.4-p1
 

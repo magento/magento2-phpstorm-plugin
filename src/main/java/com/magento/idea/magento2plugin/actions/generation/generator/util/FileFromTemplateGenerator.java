@@ -58,7 +58,7 @@ public class FileFromTemplateGenerator {
         exceptionMessage = null;//NOPMD
         final String filePath = baseDir.getVirtualFile().getPath().concat("/").concat(moduleFile.getFileName());
 
-        CommandProcessor.getInstance().executeCommand(project, () -> {
+        final Runnable command = () -> CommandProcessor.getInstance().executeCommand(project, () -> {
             final Runnable run = () -> {
                 try {
                     final PsiFile file = createFile(moduleFile, filePath, baseDir, attributes);
@@ -72,6 +72,12 @@ public class FileFromTemplateGenerator {
             };
             ApplicationManager.getApplication().runWriteAction(run);
         }, actionName, null);
+
+        if (ApplicationManager.getApplication().isDispatchThread()) {
+            command.run();
+        } else {
+            ApplicationManager.getApplication().invokeAndWait(command);
+        }
 
         if (exceptionRef.isNull()) {
             return fileRef.get();
