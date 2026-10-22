@@ -5,7 +5,10 @@
 package com.magento.idea.magento2uct.analysis
 
 import com.intellij.openapi.progress.ProcessCanceledException
+import com.intellij.openapi.util.JDOMUtil
 import com.intellij.psi.PsiDocumentManager
+import com.intellij.psi.PsiFile
+import com.intellij.util.xmlb.XmlSerializer
 import com.magento.idea.magento2plugin.PhysicalMagentoTestCase
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel
 import com.magento.idea.magento2uct.packages.SupportedIssue
@@ -86,6 +89,36 @@ class UctAnalysisServiceTest : PhysicalMagentoTestCase() {
         assertFalse(removedXml.message.startsWith("[1110]"))
         assertEquals(result.findings, analyze().findings)
     }
+
+    fun testEditorInspectionsUseCompatibilityDataOfConfiguredVersions() {
+        val file = myFixture.addFileToProject("app/code/Foo/Bar/Model/UrlFixerUser.php", """
+            <?php
+            namespace Foo\Bar\Model;
+            use Magento\CloudComponents\Model\UrlFixer;
+            class UrlFixerUser {}
+        """.trimIndent())
+        configure("2.4.2", "2.4.4-beta4")
+        assertTrue(editorMessages(file).toString(), editorMessages(file).any { it.contains("UrlFixer") })
+        configure("2.4.2", "2.4.9")
+        assertEquals(emptyList<String>(), editorMessages(file))
+    }
+
+    private fun configure(current: String, target: String) {
+        val state = UctSettingsService()
+        state.isEnabled = true
+        XmlSerializer.deserializeInto(state, JDOMUtil.load("""
+            <state>
+              <option name="currentVersion" value="$current" />
+              <option name="targetVersion" value="$target" />
+              <option name="minIssueSeverityLevel" value="3" />
+              <option name="ignoreCurrentVersion" value="false" />
+            </state>
+        """.trimIndent()))
+        UctSettingsService.getInstance(project).loadState(state)
+    }
+
+    private fun editorMessages(file: PsiFile): List<String> =
+        UctInspectionManager(project).run(file)?.results.orEmpty().map { it.descriptionTemplate }
 
     fun testSeverityAppliesToPhpAndXmlWithoutChangingSettings() {
         val settings = UctSettingsService.getInstance(project)
