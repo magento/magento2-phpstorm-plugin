@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2uct.ui;
 
+import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
@@ -15,7 +16,11 @@ import com.intellij.openapi.ui.LabeledComponent;
 import com.intellij.openapi.ui.TextBrowseFolderListener;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.ThrowableComputable;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.ToolbarDecorator;
+import com.intellij.ui.components.JBList;
 import com.intellij.util.ui.UIUtil;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
 import com.magento.idea.magento2plugin.actions.generation.dialog.AbstractDialog;
@@ -70,6 +75,9 @@ public class ConfigurationDialog extends AbstractDialog {
     private JLabel additionalPathError;//NOPMD
     private JLabel versionDataStatus;
     private JButton prepareVersions;
+    private JLabel excludedPathsLabel;//NOPMD
+    private JPanel excludedPathsPanel;
+    private CollectionListModel<String> excludedPaths;
 
     /**
      * Configuration dialog.
@@ -195,6 +203,7 @@ public class ConfigurationDialog extends AbstractDialog {
         settingsService.setIgnoreCurrentVersion(ignoreCurrentVersion.isSelected());
         settingsService.setHasAdditionalPath(hasAdditionalPath.isSelected());
         settingsService.setAdditionalPath(additionalPath.getComponent().getText());
+        settingsService.setExcludedPaths(excludedPaths.getItems());
         exit();
     }
 
@@ -269,6 +278,7 @@ public class ConfigurationDialog extends AbstractDialog {
         if (settingsService.getAdditionalPath() != null) {
             additionalPath.getComponent().setText(settingsService.getAdditionalPath());
         }
+        excludedPaths.replaceAll(settingsService.getExcludedPaths());
     }
 
     /**
@@ -310,6 +320,12 @@ public class ConfigurationDialog extends AbstractDialog {
                         new FileChooserDescriptor(false, true, false, false, false, false)
                 )
         );
+
+        excludedPaths = new CollectionListModel<>();
+        excludedPathsPanel = ToolbarDecorator.createDecorator(new JBList<>(excludedPaths))
+                .setAddAction(button -> addExcludedPaths())
+                .disableUpDownActions()
+                .createPanel();
 
         additionalPath = new LabeledComponent<>();
         additionalPath.setComponent(new TextFieldWithBrowseButton());
@@ -414,6 +430,20 @@ public class ConfigurationDialog extends AbstractDialog {
         final Object item = comboBox.getSelectedItem();
 
         return item instanceof ComboBoxItemData ? ((ComboBoxItemData) item).getKey() : null;
+    }
+
+    private void addExcludedPaths() {
+        final VirtualFile[] chosen = FileChooser.chooseFiles(
+                new FileChooserDescriptor(true, true, false, false, false, true),
+                project,
+                null
+        );
+
+        for (final VirtualFile file : chosen) {
+            if (!excludedPaths.contains(file.getPath())) {
+                excludedPaths.add(file.getPath());
+            }
+        }
     }
 
     private void refreshAdditionalFields(final boolean isEnabled) {

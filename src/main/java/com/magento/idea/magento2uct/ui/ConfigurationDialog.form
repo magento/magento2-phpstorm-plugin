@@ -7,12 +7,12 @@
     </constraints>
     <properties>
       <minimumSize width="559" height="300"/>
-      <preferredSize width="580" height="380"/>
+      <preferredSize width="580" height="480"/>
       <requestFocusEnabled value="true"/>
     </properties>
     <border type="none"/>
     <children>
-      <grid id="d41a9" layout-manager="GridLayoutManager" row-count="13" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="d41a9" layout-manager="GridLayoutManager" row-count="14" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -20,6 +20,26 @@
         <properties/>
         <border type="none"/>
         <children>
+          <component id="c5e17" class="javax.swing.JLabel" binding="excludedPathsLabel">
+            <constraints>
+              <grid row="11" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Exclude Paths"/>
+            </properties>
+          </component>
+          <grid id="d6f28" binding="excludedPathsPanel" custom-create="true" layout-manager="BorderLayout" hgap="0" vgap="0">
+            <constraints>
+              <grid row="11" column="1" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                <preferred-size width="-1" height="90"/>
+              </grid>
+            </constraints>
+            <properties>
+              <toolTipText value="Folders and files that the report and the editor inspections skip"/>
+            </properties>
+            <border type="none"/>
+            <children/>
+          </grid>
           <component id="a7c41" class="javax.swing.JLabel" binding="versionDataStatus">
             <constraints>
               <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -95,13 +115,13 @@
           </component>
           <component id="70b2b" class="javax.swing.JComboBox" binding="issueSeverityLevel" custom-create="true">
             <constraints>
-              <grid row="11" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="12" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties/>
           </component>
           <component id="bd4f" class="javax.swing.JLabel" binding="issueSeverityLevelLabel">
             <constraints>
-              <grid row="11" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <labelFor value="70b2b"/>
@@ -110,7 +130,7 @@
           </component>
           <component id="3c2d0" class="javax.swing.JCheckBox" binding="ignoreCurrentVersion">
             <constraints>
-              <grid row="12" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="13" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="Ignore current version compatibility issues"/>
