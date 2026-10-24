@@ -130,19 +130,20 @@ class UctIndexCatalog internal constructor(
     }
 
     private class Snapshot(private val target: State, private val current: State?) : UctVersionState {
-        override fun isPresentInCodebase(fqn: String): Boolean = normalize(fqn) in target.existence
+        private fun key(fqn: String): String = normalize(fqn, target.existence)
+        override fun isPresentInCodebase(fqn: String): Boolean = key(fqn) in target.existence
         override fun isExists(fqn: String): Boolean {
-            val key = normalize(fqn)
+            val key = key(fqn)
             return target.existence[key]?.active != false || current?.existence?.get(key)?.active == false
         }
         override fun isDeprecated(fqn: String): Boolean {
-            val key = normalize(fqn)
+            val key = key(fqn)
             return target.deprecation[key]?.active == true && current?.deprecation?.get(key)?.active != true
         }
-        override fun getDeprecatedInVersion(fqn: String): String = target.deprecation[normalize(fqn)]?.version.orEmpty()
-        override fun getRemovedInVersion(fqn: String): String = target.existence[normalize(fqn)]?.version.orEmpty()
+        override fun getDeprecatedInVersion(fqn: String): String = target.deprecation[key(fqn)]?.version.orEmpty()
+        override fun getRemovedInVersion(fqn: String): String = target.existence[key(fqn)]?.version.orEmpty()
         override fun isApi(fqn: String): Boolean {
-            val key = normalize(fqn)
+            val key = key(fqn)
             return target.existence[key]?.active != true || target.api[key]?.active == true ||
                 (current?.existence?.get(key)?.active == true && current.api[key]?.active != true)
         }
@@ -191,6 +192,7 @@ class UctIndexCatalog internal constructor(
             return UctIndexCatalog(existence, api, deprecation)
         }
 
-        private fun normalize(fqn: String): String = MagentoTypeEscapeUtil.escape("\\" + fqn.trim().removePrefix("\\"))
+        private fun normalize(fqn: String, known: Map<String, *>): String =
+            MagentoTypeEscapeUtil.escape("\\" + fqn.trim().removePrefix("\\")) { it in known }
     }
 }

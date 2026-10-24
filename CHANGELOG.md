@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - CLI command generation escapes single quotes and backslashes in descriptions to preserve their text and prevent invalid PHP syntax [#1280](https://github.com/magento/magento2-phpstorm-plugin/issues/1280).
 - Generated `menu.xml` no longer gets an empty `parent` attribute, which failed Magento's menu schema, when no parent menu item is set, as in the MCP `entity_crud` scaffold [#2750](https://github.com/magento/magento2-phpstorm-plugin/issues/2750).
 - New Entity and the MCP `entity_crud` scaffold use ACL resource and menu identifiers that include the entity name, so a second entity in the same module no longer produces a duplicate resource id in `acl.xml` and a missing menu item [#2744](https://github.com/magento/magento2-phpstorm-plugin/issues/2744).
+- The Upgrade Compatibility Tool reports removed, deprecated and non-API classes and members whose name ends with `Factory`, such as `Magento\Framework\Filter\ZendFactory`; only generated factories and proxies are still checked as their base class [#2756](https://github.com/magento/magento2-phpstorm-plugin/issues/2756).
 
 ## 2026.3.4-p1
 
