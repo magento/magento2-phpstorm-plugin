@@ -17,7 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Updated Gradle to 9.8.1, IntelliJ Platform Gradle Plugin to 2.19.0, Kotlin, runtime and test dependencies, and CI tooling. Compile against PhpStorm 2026.2 while retaining WebStorm 2026.3 EAP UI tests.
 - Improved Magento MCP CLI discovery with deterministic wrapper selection, added `magento_magerun` for installed command discovery and native MCP configuration, and updated bundled skills and HTTP end-to-end tests.
 - Release and security notifications now begin with publication age and offer configurable publication windows of a month, week, 2 days, or 12 hours, with an explanatory tooltip.
-- Enabling the built-in Upgrade Compatibility Tool in its configuration also enables its UCT inspections in the project inspection profile, so the editor reports issues without a separate setting [#2758](https://github.com/magento/magento2-phpstorm-plugin/issues/2758).
+- Enabling the built-in Upgrade Compatibility Tool in its configuration also enables its UCT inspections in the project inspection profile (a shared IDE-level profile is first copied to the project, so other projects keep their settings), so the editor reports issues without a separate setting [#2758](https://github.com/magento/magento2-phpstorm-plugin/issues/2758).
 
 ### Fixed
 
