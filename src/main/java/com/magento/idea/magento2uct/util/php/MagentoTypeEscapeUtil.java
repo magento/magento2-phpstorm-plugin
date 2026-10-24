@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2uct.util.php;
 
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
@@ -43,6 +44,23 @@ public final class MagentoTypeEscapeUtil {
         }
 
         return typeFqn.equals(result) ? escapeProperty(typeFqn) : escapeProperty(result);
+    }
+
+    /**
+     * Escape Magento Type unless the index knows it as is (a real class named like a Factory or Proxy).
+     *
+     * @param typeFqn String
+     * @param isKnown Predicate[String]
+     *
+     * @return String
+     */
+    public static @NotNull String escape(
+            final @NotNull String typeFqn,
+            final @NotNull Predicate<String> isKnown
+    ) {
+        final String exact = escapeProperty(typeFqn);
+
+        return isKnown.test(exact) ? exact : escape(typeFqn);
     }
 
     /**

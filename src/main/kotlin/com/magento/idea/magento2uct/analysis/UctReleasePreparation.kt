@@ -9,8 +9,10 @@ import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.progress.ProcessCanceledException
+import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
+import com.intellij.util.TimeoutUtil
 import com.intellij.util.concurrency.AppExecutorUtil
 import org.json.JSONObject
 import java.nio.file.Files
@@ -68,6 +70,44 @@ class UctReleasePreparation internal constructor(
     @Synchronized
     internal fun start(version: String): View = start(version) { archive, check, progress ->
         source.prepare(project, version, archive, check, progress)
+    }
+
+    /** Prepares [version] and waits for it, showing its progress in [indicator]; cancelling the indicator cancels the run. */
+    fun prepare(version: String, indicator: ProgressIndicator) {
+        var view = start(version)
+        val runId = view.runId
+        while (view.state == "running" && runId != null) {
+            if (indicator.isCanceled) {
+                cancel(runId)
+                throw ProcessCanceledException()
+            }
+            show(version, view.progress, indicator)
+            TimeoutUtil.sleep(200)
+            view = results(runId)
+        }
+        check(view.state == "completed") { view.error ?: "Preparation of $version was ${view.state}." }
+    }
+
+    private fun show(version: String, progress: UctPreparationProgress, indicator: ProgressIndicator) {
+        indicator.text = "Preparing Magento $version compatibility data"
+        val total = progress.totalBytes
+        when {
+            progress.phase == "downloading" && total != null && total > 0 -> {
+                indicator.isIndeterminate = false
+                indicator.fraction = progress.downloadedBytes.toDouble() / total
+                indicator.text2 = "Downloading the release archive: ${progress.downloadedBytes / MEGABYTE} of ${total / MEGABYTE} MB"
+            }
+            progress.phase == "downloading" -> {
+                indicator.isIndeterminate = true
+                indicator.text2 = "Downloading the release archive: ${progress.downloadedBytes / MEGABYTE} MB"
+            }
+            progress.totalFiles > 0 -> {
+                indicator.isIndeterminate = false
+                indicator.fraction = progress.processedFiles.toDouble() / progress.totalFiles
+                indicator.text2 = "Indexing ${progress.processedFiles} of ${progress.totalFiles} files"
+            }
+            else -> indicator.isIndeterminate = true
+        }
     }
 
     @Synchronized
@@ -191,5 +231,9 @@ class UctReleasePreparation internal constructor(
     override fun dispose() {
         runs.values.forEach { it.indicator.cancel(); it.future?.cancel(false) }
         runs.clear()
+    }
+
+    private companion object {
+        const val MEGABYTE = 1024 * 1024
     }
 }

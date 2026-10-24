@@ -67,8 +67,10 @@ class UctAnalysisServiceTest : PhysicalMagentoTestCase() {
         "2.4.2", "2.4.3", severity, ignore
     )
 
-    private fun analyze(request: UctAnalysisRequest = request()): UctAnalysisResult =
-        UctAnalysisService(project, UctIndexCatalogTest.fixtureCatalog()).analyze(request, Runnable {}, {})
+    private fun analyze(
+        request: UctAnalysisRequest = request(),
+        catalog: UctIndexCatalog = UctIndexCatalogTest.fixtureCatalog()
+    ): UctAnalysisResult = UctAnalysisService(project, catalog).analyze(request, Runnable {}, {})
 
     fun testPhpAndXmlFindingsHaveCodesAndLocations() {
         val result = analyze()
@@ -85,6 +87,23 @@ class UctAnalysisServiceTest : PhysicalMagentoTestCase() {
         assertTrue(removedXml.column > 1)
         assertFalse(removedXml.message.startsWith("[1110]"))
         assertEquals(result.findings, analyze().findings)
+    }
+
+    fun testRemovedClassNamedLikeFactoryIsReported() {
+        val factory = "\\Magento\\Test\\RealFactory"
+        val history = mapOf("2.4.2" to mapOf(factory to true), "2.4.3" to mapOf(factory to false))
+        val catalog = UctIndexCatalog(history, history, mapOf("2.4.2" to emptyMap(), "2.4.3" to emptyMap()))
+        val file = myFixture.addFileToProject("app/code/Foo/Bar/Model/Filter.php", """
+            <?php
+            namespace Foo\Bar\Model;
+            use Magento\Test\RealFactory;
+            class Filter extends RealFactory {}
+        """.trimIndent())
+        PsiDocumentManager.getInstance(project).commitAllDocuments()
+        val result = analyze(request().copy(paths = listOf(file.virtualFile.path)), catalog)
+        val imported = result.findings.filter { it.issue == SupportedIssue.IMPORTED_NON_EXISTENT_CLASS }
+        assertEquals(result.findings.toString(), 1, imported.size)
+        assertTrue(imported.single().message, imported.single().message.contains("RealFactory"))
     }
 
     fun testSeverityAppliesToPhpAndXmlWithoutChangingSettings() {

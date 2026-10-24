@@ -64,6 +64,14 @@ class MagentoEntityCrudCommandsTest : BaseProjectTestCase() {
             "url=\"/V1/mcp-crud/get-list\""
         )
         assertFileContains(
+            "app/code/Foo/Bar/etc/acl.xml",
+            "<resource id=\"Foo_Bar::mcp_crud_management\""
+        )
+        assertFileContains(
+            "app/code/Foo/Bar/etc/adminhtml/menu.xml",
+            "id=\"Foo_Bar::mcp_crud_management\""
+        )
+        assertFileContains(
             "app/code/Foo/Bar/Block/Form/McpCrud/SaveAndContinue.php",
             "'event' => 'saveAndContinueEdit'"
         )
