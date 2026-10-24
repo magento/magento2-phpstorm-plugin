@@ -14,6 +14,7 @@ import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.util.TimeoutUtil
 import com.intellij.util.concurrency.AppExecutorUtil
+import com.magento.idea.magento2uct.versioning.UctVersionState
 import org.json.JSONObject
 import java.nio.file.Files
 import java.nio.file.Path
@@ -54,11 +55,29 @@ class UctReleasePreparation internal constructor(
     private val releases = linkedMapOf<String, UctReleaseIndex>()
     private val cacheErrors = linkedMapOf<String, String>()
     private var loaded = false
+    private var editor: Pair<List<Any?>, UctVersionState>? = null
 
     @Synchronized
     fun catalog(): UctIndexCatalog {
         loadCache()
         return UctIndexCatalog.bundled().withReleases(releases)
+    }
+
+    /** Version state for editor inspections; it reports nothing while the configured releases have no data. */
+    @Synchronized
+    fun editorState(currentVersion: String?, targetVersion: String?, ignoreCurrentVersion: Boolean): UctVersionState {
+        val catalog = catalog()
+        val key = listOf(currentVersion, targetVersion, ignoreCurrentVersion, releases.keys.toSet())
+        editor?.let { (cachedKey, state) -> if (cachedKey == key) return state }
+        val state = targetVersion?.let { target ->
+            try {
+                catalog.snapshot(currentVersion, target, ignoreCurrentVersion)
+            } catch (_: IllegalArgumentException) {
+                null
+            }
+        } ?: NoData
+        editor = key to state
+        return state
     }
 
     @Synchronized
@@ -235,5 +254,14 @@ class UctReleasePreparation internal constructor(
 
     private companion object {
         const val MEGABYTE = 1024 * 1024
+    }
+
+    private object NoData : UctVersionState {
+        override fun isPresentInCodebase(fqn: String): Boolean = false
+        override fun isDeprecated(fqn: String): Boolean = false
+        override fun getDeprecatedInVersion(fqn: String): String = ""
+        override fun isExists(fqn: String): Boolean = true
+        override fun getRemovedInVersion(fqn: String): String = ""
+        override fun isApi(fqn: String): Boolean = true
     }
 }
