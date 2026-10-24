@@ -122,6 +122,30 @@ class UctAnalysisServiceTest : PhysicalMagentoTestCase() {
         assertEquals(emptyList<String>(), editorMessages(file))
     }
 
+    fun testEditorInspectionsReportNothingWithoutCompatibilityData() {
+        myFixture.addFileToProject("vendor/magento/test/Service.php", """
+            <?php namespace Magento\Test;
+            interface ServiceInterface { public function declared(); }
+            class Service implements ServiceInterface {
+                public function declared() {}
+                public function extra(): ServiceInterface { return ${'$'}this; }
+            }
+        """.trimIndent())
+        val file = myFixture.addFileToProject("app/code/Foo/Bar/Model/ServiceUser.php", """
+            <?php namespace Foo\Bar\Model;
+            class ServiceUser {
+                public function run(\Magento\Test\Service ${'$'}service) { ${'$'}service->extra(); }
+            }
+        """.trimIndent())
+        PsiDocumentManager.getInstance(project).commitAllDocuments()
+        configure("2.4.2", "2.4.4-beta4")
+        assertTrue(editorMessages(file).toString(), editorMessages(file).any { it.startsWith("[1449]") })
+        configure("2.4.2", "2.4.9")
+        assertEquals(emptyList<String>(), editorMessages(file))
+        configure("2.4.4-beta4", "2.4.2")
+        assertEquals(emptyList<String>(), editorMessages(file))
+    }
+
     private fun configure(current: String, target: String) {
         val state = UctSettingsService()
         state.isEnabled = true

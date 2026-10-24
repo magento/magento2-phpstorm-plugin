@@ -66,12 +66,12 @@ class UctReleasePreparation internal constructor(
     /** Version state for editor inspections; it reports nothing while the configured releases have no data. */
     @Synchronized
     fun editorState(currentVersion: String?, targetVersion: String?, ignoreCurrentVersion: Boolean): UctVersionState {
-        val catalog = catalog()
+        loadCache()
         val key = listOf(currentVersion, targetVersion, ignoreCurrentVersion, releases.keys.toSet())
         editor?.let { (cachedKey, state) -> if (cachedKey == key) return state }
         val state = targetVersion?.let { target ->
             try {
-                catalog.snapshot(currentVersion, target, ignoreCurrentVersion)
+                catalog().snapshot(currentVersion, target, ignoreCurrentVersion)
             } catch (_: IllegalArgumentException) {
                 null
             }
@@ -79,6 +79,10 @@ class UctReleasePreparation internal constructor(
         editor = key to state
         return state
     }
+
+    /** Whether the configured versions have compatibility data for editor inspections. */
+    fun hasEditorData(currentVersion: String?, targetVersion: String?, ignoreCurrentVersion: Boolean): Boolean =
+        editorState(currentVersion, targetVersion, ignoreCurrentVersion) !== NoData
 
     @Synchronized
     internal fun warnings(): Map<String, String> { loadCache(); return cacheErrors.toMap() }

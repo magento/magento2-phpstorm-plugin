@@ -17,7 +17,16 @@ public record UctAnalysisContext(IssueSeverityLevel minimumSeverity, UctVersionS
     }
 
     public static boolean isEnabled(final ProblemsHolder holder) {
-        return context(holder) != null || UctSettingsService.getInstance(holder.getProject()).isEnabled();
+        if (context(holder) != null) {
+            return true;
+        }
+        final UctSettingsService settings = UctSettingsService.getInstance(holder.getProject());
+        return settings.isEnabled()
+                && holder.getProject().getService(UctReleasePreparation.class).hasEditorData(
+                        settings.getConfiguredCurrentVersion(),
+                        settings.getConfiguredTargetVersion(),
+                        Boolean.TRUE.equals(settings.shouldIgnoreCurrentVersion())
+                );
     }
 
     public static boolean accepts(final ProblemsHolder holder, final IssueSeverityLevel severity) {
