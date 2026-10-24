@@ -1,3 +1,9 @@
+# Development priorities
+
+Read [AGENTS.md](../AGENTS.md) before proposing features, and follow the existing project roadmap. Manual IDE code generators are deprecated and maintenance-only. Prioritize PHP-independent capabilities, AI-assisted development, inspections, and analysis. The portability roadmap excludes code creation.
+
+Repository development skills live in `.agents/skills`; the skills under `skills/` are bundled for users working on Magento applications.
+
 # Setting up development environment
 
 1. Check out this repository.
