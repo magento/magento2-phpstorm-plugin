@@ -32,6 +32,19 @@ class UctIndexCatalogTest {
     }
 
     @Test
+    fun missingVersionsListTargetAndOnlyTheBaselineItRequires() {
+        val catalog = fixtureCatalog()
+        assertEquals(emptyList<String>(), catalog.missingVersions("2.4.1", "2.4.3", false))
+        assertEquals(listOf("2.4.1"), catalog.missingVersions("2.4.1", "2.4.3", true))
+        assertEquals(listOf("2.4.1", "2.4.9"), catalog.missingVersions("2.4.1", "2.4.9", false))
+        assertEquals(listOf("2.4.9"), catalog.missingVersions("2.4.2", "2.4.9", false))
+        assertEquals(listOf("2.4.9"), catalog.missingVersions(null, "2.4.9", false))
+        val prepared = catalog.withReleases(mapOf("2.4.9" to UctReleaseFixture.index("2.4.9")))
+        assertEquals(listOf("2.4.1"), prepared.missingVersions("2.4.1", "2.4.9", false))
+        assertEquals(emptyList<String>(), prepared.missingVersions("2.4.2", "2.4.9", false))
+    }
+
+    @Test
     fun snapshotsKeepTheirVersionsAndSuppressOnlyExistingIssues() {
         val catalog = fixtureCatalog()
         val before = catalog.snapshot(null, "2.4.2", false)
@@ -59,6 +72,24 @@ class UctIndexCatalogTest {
         val catalog = UctIndexCatalog(history, history, history.mapValues { emptyMap() })
         assertFalse(catalog.snapshot(null, "2.4.9", false).isExists(symbol))
         assertTrue(catalog.snapshot(null, "2.4.10", false).isExists(symbol))
+    }
+
+    @Test
+    fun realFactoriesAreCheckedAsIsWhileGeneratedOnesUseTheirBaseClass() {
+        val factory = "\\Magento\\Test\\RealFactory"
+        val model = "\\Magento\\Test\\Model"
+        val history = mapOf(
+            "2.4.8" to mapOf(factory to true, "$factory.create" to true, "$model->sourceFactory" to true, model to true),
+            "2.4.9" to mapOf(factory to false, "$factory.create" to false, "$model->sourceFactory" to false)
+        )
+        val catalog = UctIndexCatalog(history, history, history.mapValues { emptyMap() })
+        val target = catalog.snapshot(null, "2.4.9", false)
+        assertFalse(target.isExists(factory))
+        assertFalse(target.isExists("$factory.create"))
+        assertFalse(target.isExists("$model->sourceFactory"))
+        assertEquals("2.4.9", target.getRemovedInVersion(factory))
+        assertTrue(target.isPresentInCodebase("\\Magento\\Test\\ModelFactory"))
+        assertTrue(target.isExists("\\Magento\\Test\\ModelFactory"))
     }
 
     @Test

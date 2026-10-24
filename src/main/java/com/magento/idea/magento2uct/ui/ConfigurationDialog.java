@@ -6,11 +6,15 @@
 package com.magento.idea.magento2uct.ui;
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.LabeledComponent;
 import com.intellij.openapi.ui.TextBrowseFolderListener;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.UIUtil;
 import com.magento.idea.magento2plugin.actions.generation.data.ui.ComboBoxItemData;
@@ -18,6 +22,8 @@ import com.magento.idea.magento2plugin.actions.generation.dialog.AbstractDialog;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
 import com.magento.idea.magento2uct.actions.ConfigureUctAction;
+import com.magento.idea.magento2uct.analysis.UctIndexCatalog;
+import com.magento.idea.magento2uct.analysis.UctReleasePreparation;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedVersion;
 import com.magento.idea.magento2uct.settings.UctSettingsService;
@@ -25,7 +31,9 @@ import com.magento.idea.magento2uct.util.inspection.EnableUctInspectionsUtil;
 import com.magento.idea.magento2uct.util.module.UctModulePathValidatorUtil;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.util.List;
 import java.util.Objects;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -39,6 +47,8 @@ public class ConfigurationDialog extends AbstractDialog {
 
     private final Project project;
     private final UctSettingsService settingsService;
+    private final UctReleasePreparation preparation;
+    private UctIndexCatalog catalog;
 
     private JCheckBox enable;
     private LabeledComponent<TextFieldWithBrowseButton> modulePath;
@@ -59,6 +69,8 @@ public class ConfigurationDialog extends AbstractDialog {
     private JLabel enableCommentPath;//NOPMD
     private JLabel additionalPathLabel;//NOPMD
     private JLabel additionalPathError;//NOPMD
+    private JLabel versionDataStatus;
+    private JButton prepareVersions;
 
     /**
      * Configuration dialog.
@@ -70,6 +82,8 @@ public class ConfigurationDialog extends AbstractDialog {
 
         this.project = project;
         settingsService = UctSettingsService.getInstance(project);
+        preparation = project.getService(UctReleasePreparation.class);
+        catalog = preparation.catalog();
 
         setTitle(ConfigureUctAction.ACTION_NAME);
 
@@ -91,8 +105,14 @@ public class ConfigurationDialog extends AbstractDialog {
         additionalPathError.setForeground(new Color(252, 119, 83));
         enableComment.setForeground(JBColor.blue);
         enableCommentPath.setForeground(JBColor.blue);
+        fillVersions();
         setDefaultValues();
         refreshAdditionalFields(hasAdditionalPath.isSelected());
+        currentVersion.addItemListener(event -> refreshVersionDataStatus());
+        targetVersion.addItemListener(event -> refreshVersionDataStatus());
+        ignoreCurrentVersion.addActionListener(event -> refreshVersionDataStatus());
+        prepareVersions.addActionListener(event -> prepareMissingVersions());
+        refreshVersionDataStatus();
 
         init();
     }
@@ -103,6 +123,13 @@ public class ConfigurationDialog extends AbstractDialog {
      * @param project Project
      */
     public static void open(final @NotNull Project project) {
+        final UctReleasePreparation preparation = project.getService(UctReleasePreparation.class);
+        ProgressManager.getInstance().runProcessWithProgressSynchronously(
+                (ThrowableComputable<UctIndexCatalog, RuntimeException>) preparation::catalog,
+                "Loading Compatibility Data",
+                false,
+                project
+        );
         final ConfigurationDialog dialog = new ConfigurationDialog(project);
         dialog.centerDialog(dialog);
         dialog.showDialog();
@@ -155,9 +182,10 @@ public class ConfigurationDialog extends AbstractDialog {
                 ? null//NOPMD
                 : SupportedVersion.getVersion(currentVersionValue)
         );
-        final SupportedVersion targetVersionValue = SupportedVersion.getVersion(
-                targetVersion.getSelectedItem().toString()
-        );
+        final String targetVersionKey = selectedKey(targetVersion);
+        final SupportedVersion targetVersionValue = targetVersionKey == null
+                ? null//NOPMD
+                : SupportedVersion.getVersion(targetVersionKey);
 
         if (targetVersionValue != null) {
             settingsService.setTargetVersion(targetVersionValue);
@@ -270,16 +298,7 @@ public class ConfigurationDialog extends AbstractDialog {
     @SuppressWarnings({"PMD.UnusedPrivateMethod", "PMD.AvoidInstantiatingObjectsInLoops"})
     private void createUIComponents() {
         targetVersion = new ComboBox<>();
-
-        for (final SupportedVersion version : SupportedVersion.getSupportedVersions()) {
-            targetVersion.addItem(new ComboBoxItemData(version.getVersion(), version.getVersion()));
-        }
         currentVersion = new ComboBox<>();
-        currentVersion.addItem(new ComboBoxItemData("", "Less than 2.3.0"));
-
-        for (final SupportedVersion version : SupportedVersion.getSupportedVersions()) {
-            currentVersion.addItem(new ComboBoxItemData(version.getVersion(), version.getVersion()));
-        }
         issueSeverityLevel = new ComboBox<>();
 
         for (final IssueSeverityLevel level : IssueSeverityLevel.getSeverityLabels()) {
@@ -303,6 +322,102 @@ public class ConfigurationDialog extends AbstractDialog {
                         new FileChooserDescriptor(false, true, false, false, false, false)
                 )
         );
+    }
+
+    /**
+     * Fill version lists, marking versions without compatibility data, and keep the selection.
+     */
+    @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops")
+    private void fillVersions() {
+        final String current = selectedKey(currentVersion);
+        final String target = selectedKey(targetVersion);
+        currentVersion.removeAllItems();
+        targetVersion.removeAllItems();
+        currentVersion.addItem(new ComboBoxItemData("", "Less than 2.3.0"));
+
+        for (final SupportedVersion version : SupportedVersion.getSupportedVersions()) {
+            final String key = version.getVersion();
+            final String label = versionLabel(key);
+            currentVersion.addItem(new ComboBoxItemData(key, label));
+            targetVersion.addItem(new ComboBoxItemData(key, label));
+        }
+        setSelectedValueByItsKey(currentVersion, current);
+        setSelectedValueByItsKey(targetVersion, target);
+    }
+
+    private String versionLabel(final String version) {
+        if (catalog.isPrepared(version)) {
+            return version + " (prepared)";
+        }
+
+        return catalog.getSupportedVersions().contains(version) ? version : version + " (no data)";
+    }
+
+    private List<String> missingVersions() {
+        final String target = selectedKey(targetVersion);
+
+        if (target == null) {
+            return List.of();
+        }
+        final String current = selectedKey(currentVersion);
+
+        return catalog.missingVersions(
+                current == null || current.isEmpty() ? null : current,
+                target,
+                ignoreCurrentVersion.isSelected()
+        );
+    }
+
+    private void refreshVersionDataStatus() {
+        final List<String> missing = missingVersions();
+        versionDataStatus.setText(
+                missing.isEmpty() ? "" : "No compatibility data for " + String.join(", ", missing)
+        );
+        prepareVersions.setVisible(!missing.isEmpty());
+    }
+
+    /**
+     * Download and index the missing releases, then refresh the version lists.
+     */
+    private void prepareMissingVersions() {
+        final List<String> missing = missingVersions();
+
+        new Task.Modal(project, "Preparing Compatibility Data", true) {
+            @Override
+            public void run(final @NotNull ProgressIndicator indicator) {
+                for (final String version : missing) {
+                    preparation.prepare(version, indicator);
+                }
+            }
+
+            @Override
+            public void onSuccess() {
+                refreshVersions();
+            }
+
+            @Override
+            public void onCancel() {
+                refreshVersions();
+            }
+
+            @Override
+            public void onThrowable(final @NotNull Throwable error) {
+                refreshVersions();
+                versionDataStatus.setText("Preparation failed: " + error.getMessage());
+            }
+        }.queue();
+    }
+
+    private void refreshVersions() {
+        catalog = preparation.catalog();
+        fillVersions();
+        refreshVersionDataStatus();
+    }
+
+    private static String selectedKey(final JComboBox<ComboBoxItemData> comboBox) {
+        final Object item = comboBox.getSelectedItem();
+
+        return item instanceof ComboBoxItemData ? ((ComboBoxItemData) item).getKey() : null;
     }
 
     private void refreshAdditionalFields(final boolean isEnabled) {

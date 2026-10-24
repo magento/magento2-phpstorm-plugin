@@ -4,15 +4,21 @@
  */
 package com.magento.idea.magento2uct.analysis
 
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.progress.ProcessCanceledException
+import com.intellij.openapi.progress.util.ProgressIndicatorBase
 import com.intellij.openapi.util.Disposer
 import com.intellij.testFramework.PlatformTestUtil
 import com.magento.idea.magento2plugin.PhysicalMagentoTestCase
+import com.sun.net.httpserver.HttpServer
 import org.junit.Assert.assertThrows
+import java.net.InetSocketAddress
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 
 class UctReleasePreparationTest : PhysicalMagentoTestCase() {
     private lateinit var cache: Path
@@ -48,6 +54,60 @@ class UctReleasePreparationTest : PhysicalMagentoTestCase() {
             assertEquals("completed", ready.state)
             assertEquals(index, ready.index)
         } finally { reopened.dispose() }
+    }
+
+    fun testBlockingPreparationShowsProgressAndPublishesTheRelease() {
+        val server = releaseServer()
+        val blocking = UctReleasePreparation(project, Files.createTempDirectory("uct-blocking-"), localSource(server, "release"))
+        try {
+            val indicator = ProgressIndicatorBase()
+            assertNull(prepareInBackground(blocking, "2.4.9", indicator))
+            assertTrue(blocking.catalog().isPrepared("2.4.9"))
+            assertEquals("Preparing Magento 2.4.9 compatibility data", indicator.text)
+        } finally { blocking.dispose(); server.stop(0) }
+    }
+
+    fun testBlockingPreparationReportsFailureAndCancellation() {
+        val server = releaseServer()
+        val release = CountDownLatch(1)
+        val failing = UctReleasePreparation(project, Files.createTempDirectory("uct-failing-"), localSource(server, "missing"))
+        val waiting = UctReleasePreparation(project, Files.createTempDirectory("uct-waiting-"), waitingSource(server, release))
+        try {
+            assertTrue(prepareInBackground(failing, "2.4.9", ProgressIndicatorBase()) is IllegalStateException)
+            assertFalse(failing.catalog().isPrepared("2.4.9"))
+            val indicator = ProgressIndicatorBase().apply { start(); cancel() }
+            assertTrue(prepareInBackground(waiting, "2.4.9", indicator) is ProcessCanceledException)
+            assertFalse(waiting.catalog().isPrepared("2.4.9"))
+            assertTrue(waiting.activeRunIds().isEmpty())
+        } finally { release.countDown(); failing.dispose(); waiting.dispose(); server.stop(0) }
+    }
+
+    private fun releaseServer(): HttpServer {
+        val bytes = UctReleaseFixture.archive("2.4.9")
+        val server = HttpServer.create(InetSocketAddress("127.0.0.1", 0), 0)
+        server.createContext("/missing") { exchange -> exchange.sendResponseHeaders(404, -1); exchange.close() }
+        server.createContext("/release") { exchange ->
+            exchange.sendResponseHeaders(200, bytes.size.toLong()); exchange.responseBody.use { it.write(bytes) }
+        }
+        server.start()
+        return server
+    }
+
+    private fun localSource(server: HttpServer, path: String) =
+        UctReleaseSource { "http://127.0.0.1:${server.address.port}/$path" }
+
+    private fun waitingSource(server: HttpServer, release: CountDownLatch) =
+        UctReleaseSource { release.await(10, TimeUnit.SECONDS); "http://127.0.0.1:${server.address.port}/release" }
+
+    private fun prepareInBackground(preparation: UctReleasePreparation, version: String,
+                                    indicator: ProgressIndicatorBase): Throwable? {
+        val failure = AtomicReference<Throwable>()
+        val done = AtomicBoolean()
+        ApplicationManager.getApplication().executeOnPooledThread {
+            try { preparation.prepare(version, indicator) } catch (error: Throwable) { failure.set(error) } finally { done.set(true) }
+        }
+        PlatformTestUtil.waitWithEventsDispatching("blocking preparation", done::get, 20)
+        return failure.get()
     }
 
     fun testCancellationIsIdempotentAndLateWorkCannotPublishData() {
