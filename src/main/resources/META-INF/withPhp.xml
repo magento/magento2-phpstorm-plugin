@@ -5,8 +5,9 @@
  */
 -->
 <idea-plugin>
-    <depends optional="true" config-file="withPhpMcp.xml">com.intellij.mcpServer</depends>
-    <depends optional="true" config-file="withJsGraphQl.xml">com.intellij.lang.jsgraphql</depends>
+    <extensions defaultExtensionNs="com.magento.idea.magento2plugin">
+        <eventNameIndexProvider implementation="com.magento.idea.magento2plugin.stubs.indexes.PhpEventNameIndexProvider"/>
+    </extensions>
     <actions>
         <!-- In editor generators -->
         <group id="MagentoGenerateGroup">
@@ -134,10 +135,6 @@
         <psi.referenceContributor language="XML" implementation="com.magento.idea.magento2plugin.reference.xml.XmlReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.magento.idea.magento2plugin.reference.php.PhpReferenceContributor"/>
 
-        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.EventObserverIndex" />
-        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.EventNameIndex" />
-        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.VirtualTypeIndex" />
-        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.PluginIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.CronGroupIndexer" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.WebApiTypeIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.PhpClassNameIndex" />
@@ -167,22 +164,6 @@
                          enabledByDefault="true"
                          level="ERROR"
                          implementationClass="com.magento.idea.magento2plugin.inspections.php.ModuleDeclarationInRegistrationPhpInspection"/>
-
-        <localInspection language="XML" groupPath="XML"
-                         shortName="ObserverDeclarationInspection"
-                         bundle="magento2.inspection" key="inspection.displayName.ObserverDeclarationInspection"
-                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
-                         enabledByDefault="true"
-                         level="WARNING"
-                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.ObserverDeclarationInspection"/>
-
-        <localInspection language="XML" groupPath="XML"
-                         shortName="PluginDeclarationInspection"
-                         bundle="magento2.inspection" key="inspection.displayName.PluginDeclarationInspection"
-                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
-                         enabledByDefault="true"
-                         level="WARNING"
-                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.PluginDeclarationInspection"/>
 
         <localInspection language="XML" groupPath="XML"
                          shortName="WebApiServiceInspection"
@@ -554,9 +535,6 @@
 
         <testSourcesFilter implementation="com.magento.idea.magento2plugin.lang.roots.MagentoTestSourceFilter"/>
 
-        <notificationGroup
-                id="Magento Notifications"
-                displayType="BALLOON" />
     </extensions>
 
     <extensions defaultExtensionNs="com.jetbrains.php">

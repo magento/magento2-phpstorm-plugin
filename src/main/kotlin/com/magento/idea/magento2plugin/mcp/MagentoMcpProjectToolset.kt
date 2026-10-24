@@ -60,4 +60,26 @@ class MagentoMcpProjectToolset : McpToolset {
             }
         }
     }
+
+    /**
+     * Provides one low-noise entry point for Magento project inspections.
+     */
+    @McpTool(name = "magento_inspect")
+    @McpDescription("Magento inspection library with three context-conscious modes. Use mode `help` first to get only a compact catalog of queryType values and short descriptions. Use mode `detailed_schema` with one queryType to load detailed required parameters, accepted values, and example parametersJson only for that inspection. Use mode `query` with queryType and parametersJson to run the inspection in the currently opened Magento project. Shared queryType values are `module`, `di_config`, `observers_for_event`, `layout_entities`, `ui_component`, and `acl_or_menu`. `plugins_for_method` additionally requires the JetBrains PHP plugin; `help` reports the capabilities available in this IDE. XML results describe declarations, not resolved PHP semantics. Prefer this single tool over individual finder tools because it keeps the agent context small: list, inspect one schema, then query.")
+    suspend fun magentoInspect(
+        mode: String,
+        queryType: String,
+        parametersJson: String
+    ): String {
+        return when (mode.trim().lowercase().replace('-', '_').replace(' ', '_')) {
+            "help" -> MagentoInspectionCommands.help()
+            "schema", "detailed_schema" -> MagentoInspectionCommands.detailedSchema(queryType)
+            "query" -> MagentoMcpToolsetSupport.withProjectReadAction(
+                requireSmartMode = MagentoInspectionCommands.requiresSmartMode(queryType)
+            ) {
+                MagentoInspectionCommands.query(it, queryType, parametersJson)
+            }
+            else -> "mode must be `help`, `detailed_schema`, or `query`. Use `help` to inspect the compact Magento inspection catalog."
+        }
+    }
 }

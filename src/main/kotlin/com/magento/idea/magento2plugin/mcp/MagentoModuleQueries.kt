@@ -62,20 +62,15 @@ internal object MagentoModuleQueries {
     }
 
     private fun runWithReadyIndexes(project: Project, action: () -> String): String {
-        val dumbService = DumbService.getInstance(project)
-        repeat(2) {
-            if (dumbService.isDumb) {
-                dumbService.waitForSmartMode()
-            }
-            try {
-                return action()
-            } catch (_: IndexNotReadyException) {
-                // Indexing can start between the smart-mode wait and the index query.
-            }
+        if (DumbService.getInstance(project).isDumb) {
+            return MagentoMcpSupport.INDEXES_NOT_READY_MESSAGE
         }
-
-        dumbService.waitForSmartMode()
-        return action()
+        return try {
+            action()
+        } catch (_: IndexNotReadyException) {
+            // Do not wait for indexing while the caller holds a read action.
+            MagentoMcpSupport.INDEXES_NOT_READY_MESSAGE
+        }
     }
 
     private fun isEditableModuleDirectory(directory: VirtualFile): Boolean {

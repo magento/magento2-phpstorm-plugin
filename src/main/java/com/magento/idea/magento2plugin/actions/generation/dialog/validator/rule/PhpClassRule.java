@@ -5,8 +5,8 @@
 
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule;
 
-import com.jetbrains.php.refactoring.PhpNameUtil;
 import com.magento.idea.magento2plugin.util.RegExUtil;
+import com.magento.idea.magento2plugin.util.php.PhpNameValidator;
 import org.jetbrains.annotations.NotNull;
 
 public class PhpClassRule implements ValidationRule {
@@ -16,7 +16,7 @@ public class PhpClassRule implements ValidationRule {
 
     @Override
     public boolean check(final @NotNull String value) {
-        return value.matches(RegExUtil.Magento.PHP_CLASS) && PhpNameUtil.isValidClassName(value);
+        return value.matches(RegExUtil.Magento.PHP_CLASS) && PhpNameValidator.isValidClassName(value);
     }
 
     public static ValidationRule getInstance() {

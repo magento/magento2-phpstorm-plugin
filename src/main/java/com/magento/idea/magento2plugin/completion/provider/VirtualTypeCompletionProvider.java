@@ -13,7 +13,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.icons.AllIcons;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
-import com.magento.idea.magento2plugin.indexes.DiIndex;
+import com.magento.idea.magento2plugin.indexes.XmlVirtualTypeIndex;
 import java.util.Collection;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +31,7 @@ public class VirtualTypeCompletionProvider extends CompletionProvider<Completion
 
         final String prefix = result.getPrefixMatcher().getPrefix();
 
-        final DiIndex index = DiIndex.getInstance(position.getProject());
+        final XmlVirtualTypeIndex index = new XmlVirtualTypeIndex(position.getProject());
         final Collection<String> elements = index.getAllVirtualTypeElementNames(
                 new PlainPrefixMatcher(prefix),
                 position.getResolveScope()

@@ -5,8 +5,7 @@
 
 package com.magento.idea.magento2plugin.actions.generation.dialog.validator.rule;
 
-import com.jetbrains.php.config.PhpLanguageLevel;
-import com.jetbrains.php.refactoring.PhpNameUtil;
+import com.magento.idea.magento2plugin.util.php.PhpNameValidator;
 import org.jetbrains.annotations.NotNull;
 
 public class PhpNamespaceNameRule implements ValidationRule {
@@ -16,7 +15,7 @@ public class PhpNamespaceNameRule implements ValidationRule {
 
     @Override
     public boolean check(final @NotNull String value) {
-        return PhpNameUtil.isValidNamespaceFullName(value, PhpLanguageLevel.DEFAULT);
+        return PhpNameValidator.isValidNamespace(value);
     }
 
     public static ValidationRule getInstance() {

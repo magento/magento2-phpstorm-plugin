@@ -64,12 +64,11 @@
 
 ## Installation
 
-1. Go to `Settings > Preferences` in the PhpStorm IDE
-2. Navigate to `Plugins`
-3. Click the `Browse repositories...` button and search for "Magento 2 and Adobe Commerce"
-4. Install the plugin and restart PhpStorm
-5. Go to `Settings > Preferences > Languages & Frameworks > PHP > Frameworks > Magento` in the PhpStorm IDE
-6. Check `Enable` and click the `OK` button
+1. Open **Settings > Plugins** in your IDE.
+2. Search for "Magento 2 and Adobe Commerce" in the Marketplace.
+3. Install the plugin and restart the IDE.
+4. Open **Settings > Languages & Frameworks > PHP > Frameworks > Magento**, or **Settings > Tools > Magento** in WebStorm.
+5. Check **Enable** and click **OK**.
 
 ## Works with
 
@@ -78,9 +77,9 @@
 
 ## MCP tools
 
-Connect your AI assistant to PhpStorm to inspect Magento configuration, generate modules and other components, and check upgrade compatibility.
+Connect your AI assistant to PhpStorm or WebStorm to find Magento modules, DI declarations, observers, layouts, UI components, and ACL/menu entries. PHP method analysis, code generation, and upgrade compatibility checks require the JetBrains PHP plugin.
 
-1. Open your Magento project and enable the plugin in **Settings > Languages & Frameworks > PHP > Frameworks > Magento**. Check the Magento installation path if it differs from the project directory.
+1. Open your Magento project and enable the plugin in the Magento settings page. Check the Magento installation path if it differs from the project directory.
 2. Enable the IDE's **MCP Server** and add its connection to your assistant using the configuration shown in the IDE.
 3. Wait for indexing to finish, then ask your assistant to work with the open project. For example:
    * “Find the plugins and observers used by Application_Blog.”

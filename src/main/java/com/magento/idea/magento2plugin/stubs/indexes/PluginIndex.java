@@ -19,11 +19,11 @@ import com.intellij.util.indexing.ID;
 import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
-import com.jetbrains.php.lang.PhpLangUtil;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.stubs.indexes.data.PluginData;
 import com.magento.idea.magento2plugin.stubs.indexes.data.PluginSetDataExternalizer;
+import com.magento.idea.magento2plugin.util.PhpNameUtil;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -80,7 +80,7 @@ public class PluginIndex extends FileBasedIndexExtension<String, Set<PluginData>
                                 continue;
                             }
 
-                            map.put(PhpLangUtil.toPresentableFQN(typeName), plugins);
+                            map.put(PhpNameUtil.toPresentableFQN(typeName), plugins);
                         }
                     }
                 }

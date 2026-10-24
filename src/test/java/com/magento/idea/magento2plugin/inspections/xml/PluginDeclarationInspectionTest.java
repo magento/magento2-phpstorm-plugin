@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.inspections.xml;
 
+import com.intellij.psi.PsiFile;
+import com.intellij.testFramework.IndexingTestUtil;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.File;
@@ -125,5 +127,54 @@ public class PluginDeclarationInspectionTest extends InspectionXmlFixtureTestCas
     public void testPluginNameAlreadyUsedInCrontabArea() {
         myFixture.configureByFile(getFixturePath(getAreaPath("crontab")));
         myFixture.testHighlighting(true, false, false);
+    }
+
+    public void testDisabledPluginFindsDeclarationWithoutRegistrationPhp() {
+        addPortableModule("First");
+        addPortableModule("Second");
+        myFixture.addFileToProject(
+                "app/code/Portable/First/etc/frontend/di.xml",
+                "<config><type name=\"Portable\\Target\">"
+                        + "<plugin name=\"portable_plugin\" type=\"Portable\\Plugin\"/>"
+                        + "</type></config>"
+        );
+        final PsiFile file = myFixture.addFileToProject(
+                "app/code/Portable/Second/etc/frontend/di.xml",
+                "<config><type name=\"Portable\\Target\">"
+                        + "<plugin name=\"portable_plugin\" disabled=\"true\"/>"
+                        + "</type></config>"
+        );
+        IndexingTestUtil.waitUntilIndexesAreReady(getProject());
+        myFixture.configureFromExistingVirtualFile(file.getVirtualFile());
+
+        assertHasNoHighlighting(inspectionBundle.message("inspection.plugin.disabledPluginDoesNotExist"));
+    }
+
+    public void testSamePluginNameOnAnotherTargetDoesNotSatisfyDisabledDeclaration() {
+        addPortableModule("First");
+        addPortableModule("Second");
+        myFixture.addFileToProject(
+                "app/code/Portable/First/etc/di.xml",
+                "<config><type name=\"Portable\\OtherTarget\">"
+                        + "<plugin name=\"portable_plugin\" type=\"Portable\\Plugin\"/>"
+                        + "</type></config>"
+        );
+        final PsiFile file = myFixture.addFileToProject(
+                "app/code/Portable/Second/etc/di.xml",
+                "<config><type name=\"Portable\\Target\">"
+                        + "<plugin name=\"portable_plugin\" disabled=\"true\"/>"
+                        + "</type></config>"
+        );
+        IndexingTestUtil.waitUntilIndexesAreReady(getProject());
+        myFixture.configureFromExistingVirtualFile(file.getVirtualFile());
+
+        assertHasHighlighting(inspectionBundle.message("inspection.plugin.disabledPluginDoesNotExist"));
+    }
+
+    private void addPortableModule(final String name) {
+        myFixture.addFileToProject(
+                "app/code/Portable/" + name + "/etc/module.xml",
+                "<config><module name=\"Portable_" + name + "\"/></config>"
+        );
     }
 }

@@ -6,9 +6,8 @@
 package com.magento.idea.magento2plugin.mcp
 
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.openapi.project.Project
-import com.magento.idea.magento2plugin.project.Settings
 import kotlinx.coroutines.currentCoroutineContext
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.coroutines.CoroutineContext
@@ -52,10 +51,11 @@ internal object MagentoMcpToolsetSupport {
                 }
             }
         } catch (throwable: Throwable) {
-            if (MagentoMcpReadActionSupport.isCancellation(throwable)) {
-                MagentoMcpReadActionSupport.cancellationMessage()
-            } else {
-                throw throwable
+            when {
+                throwable is IndexNotReadyException -> MagentoMcpSupport.INDEXES_NOT_READY_MESSAGE
+                MagentoMcpReadActionSupport.isCancellation(throwable) ->
+                    MagentoMcpReadActionSupport.cancellationMessage()
+                else -> throw throwable
             }
         }
     }
@@ -86,15 +86,8 @@ internal object MagentoMcpToolsetSupport {
         result.get() ?: ""
     }
 
-    private fun validateProject(project: Project, requireSmartMode: Boolean = true): String? {
-        if (!Settings.isEnabled(project)) {
-            return "Magento plugin support is disabled for this project."
-        }
-        if (requireSmartMode && DumbService.getInstance(project).isDumb) {
-            return "Indexes are not ready yet. Wait for indexing to finish and retry."
-        }
-        return null
-    }
+    private fun validateProject(project: Project, requireSmartMode: Boolean = true): String? =
+        MagentoMcpSupport.validateProject(project, requireSmartMode)
 
     /**
      * Uses the MCP runtime helper when available without hard-linking to a specific helper binary signature.

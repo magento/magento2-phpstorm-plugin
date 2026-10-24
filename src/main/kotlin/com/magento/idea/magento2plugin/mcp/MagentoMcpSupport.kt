@@ -14,24 +14,22 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.xml.XmlFile
-import com.jetbrains.php.PhpIndex
-import com.jetbrains.php.lang.PhpLangUtil
-import com.jetbrains.php.lang.psi.elements.Method
-import com.jetbrains.php.lang.psi.elements.PhpClass
 import com.magento.idea.magento2plugin.project.Settings
+import com.magento.idea.magento2plugin.util.PhpNameUtil
 import java.io.File
 import java.nio.file.Paths
 
 internal object MagentoMcpSupport {
     const val MAX_MATCHES = 20
     const val MAX_FILE_MATCHES = 10
+    const val INDEXES_NOT_READY_MESSAGE = "Indexes are not ready yet. Wait for indexing to finish and retry."
 
     fun validateProject(project: Project, requireSmartMode: Boolean = true): String? {
         if (!Settings.isEnabled(project)) {
             return "Magento plugin support is disabled for this project."
         }
         if (requireSmartMode && DumbService.getInstance(project).isDumb) {
-            return "Indexes are not ready yet. Wait for indexing to finish and retry."
+            return INDEXES_NOT_READY_MESSAGE
         }
         return null
     }
@@ -58,7 +56,7 @@ internal object MagentoMcpSupport {
         if (trimmed.isEmpty()) {
             return ""
         }
-        return PhpLangUtil.toPresentableFQN(trimmed.removePrefix("\\"))
+        return PhpNameUtil.toPresentableFQN(trimmed.removePrefix("\\"))
     }
 
     fun presentableFqn(value: String?): String? {
@@ -66,7 +64,7 @@ internal object MagentoMcpSupport {
         if (trimmed.isEmpty()) {
             return null
         }
-        return PhpLangUtil.toPresentableFQN(trimmed.removePrefix("\\"))
+        return PhpNameUtil.toPresentableFQN(trimmed.removePrefix("\\"))
     }
 
     fun prioritizeMatches(values: Collection<String>, query: String): List<String> {
@@ -83,22 +81,6 @@ internal object MagentoMcpSupport {
         return normalizedCandidate == normalizedQuery
             || normalizedCandidate.startsWith(normalizedQuery)
             || normalizedCandidate.contains(normalizedQuery)
-    }
-
-    fun resolveTargetClasses(phpIndex: PhpIndex, className: String): List<PhpClass> {
-        val classes = phpIndex.getClassesByFQN(className).toMutableList()
-        classes += phpIndex.getInterfacesByFQN(className)
-        return classes.distinctBy { it.fqn }
-    }
-
-    fun collectClassHierarchy(phpClass: PhpClass, fqns: MutableSet<String>) {
-        fqns += phpClass.presentableFQN
-        for (parent in phpClass.supers) {
-            val parentFqn = parent.fqn.removePrefix("\\")
-            if (fqns.add(parentFqn)) {
-                collectClassHierarchy(parent, fqns)
-            }
-        }
     }
 
     fun getPluginKind(pluginMethodName: String, targetMethodName: String): String? {
@@ -172,19 +154,5 @@ internal object MagentoMcpSupport {
             normalized.contains(query) -> 2
             else -> 3
         }
-    }
-
-    data class PluginMethodMatch(
-        val targetFqn: String,
-        val data: PluginDeclarationRecord,
-        val pluginClass: PhpClass,
-        val method: Method,
-        val kind: String
-    ) {
-        val sortOrder: Int
-            get() = data.sortOrder
-
-        val scope: String
-            get() = data.scope
     }
 }

@@ -42,6 +42,7 @@ internal fun runWebStormUiTest(
     fixtureName: String,
     vararg generatedFilesToCleanup: String,
     prepareProject: (Path) -> Unit = {},
+    enableSupport: Boolean = true,
     test: Driver.(projectPath: Path) -> Unit,
 ) {
     WebStormUiTestEnvironment.initialize()
@@ -66,14 +67,14 @@ internal fun runWebStormUiTest(
             addSystemProperty("jb.consents.confirmation.enabled", false)
         }
     }.runIdeWithDriver().useDriverAndCloseIde {
-        enableMagentoSupport()
+        ideFrame { waitForIndicators(5.minutes) }
+        if (enableSupport) enableMagentoSupport()
         test(projectPath)
     }
 }
 
 internal fun Driver.enableMagentoSupport() {
     ideFrame {
-        waitForIndicators(5.minutes)
         waitFor("Magento support notification", 2.minutes) {
             getNotifications().any { it.getContent() == MAGENTO_SUPPORT_NOTIFICATION }
         }
