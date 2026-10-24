@@ -30,7 +30,7 @@ import java.nio.file.Path
 import java.io.IOException
 
 internal object MagentoCompatibilityCommands {
-    private val scanOptions = setOf("path", "moduleName", "minimumSeverity", "explainSuppressed")
+    private val scanOptions = setOf("path", "moduleName", "minimumSeverity", "explainSuppressed", "excludedPaths")
     private val analysisOptions = scanOptions + setOf("targetVersion", "currentVersion", "ignoreCurrentVersion")
     private val preparationOptions = scanOptions + setOf("analysisTargetVersion", "currentVersion", "ignoreCurrentVersion")
 
@@ -50,6 +50,7 @@ internal object MagentoCompatibilityCommands {
         Poll only while pollRequired=true. terminal=true includes completed, failed and cancelled; successful and legacy complete indicate success only. Cached preparation has runId=null and needs no polling. Terminal job reports are exported automatically and remain readable by runId after memory eviction/restart for 30 days / 100 runs per operation.
         supportedVersions describes cached compatibility coverage, not a published-release catalog. Use releases to verify the intended published release; prepare verifies the exact official tag and can fail if it does not exist.
         Default findings include baseline issues; use ignoreCurrentVersion=true to suppress them when both releases are covered.
+        Scans skip the paths from the UCT Exclude Paths setting, like the built-in report and editor inspections. Pass excludedPaths to override them; [] scans without exclusions.
         Resolve relative paths from pathBase, the IDE project directory; with Magento in src/, use src/app/code/Vendor/Module. Invalid paths return pathBase and, when detected, suggestedPath.
         Analysis uses committed IDE documents and does not save files or change UCT settings.
     """.trimIndent()
@@ -84,6 +85,7 @@ internal object MagentoCompatibilityCommands {
           currentVersion: optional; defaults to Magento detected from composer.lock in magentoRoot. No configured-version or composer.json fallback. Must not exceed targetVersion.
           minimumSeverity: warning (default), error, or critical.
           ignoreCurrentVersion: false (default). When true, currentVersion must also have complete index coverage.
+          excludedPaths: optional array of files/directories to skip, absolute or relative to pathBase, inside the project. Omitted: the UCT Exclude Paths setting (the same paths the built-in report and editor inspections skip). []: no exclusions. An excluded directory covers everything below it. Responses echo the effective excludedPaths; status defaults also report excludedPathsSource (explicit or uct_settings).
           explainSuppressed: false (default); requires ignoreCurrentVersion=true. Returns suppression.suppressedDiagnostics (legacy total), counted before per-element severity filtering. summary.displayedFindings (legacy totalIssues) counts displayed findings; their difference need not equal suppressedDiagnostics. findingsScope distinguishes upgrade_changes from target_including_baseline.
           Explicit analysis works even when editor UCT inspections are disabled. Magento project support must be enabled and indexing finished.
           Directory scans exclude bundled Magento components and symlink directories, but include test/fixture files inside custom components. processedFiles/totalFiles count supported IDE PHP/XML PSI files, including PHTML/HTML.
@@ -297,7 +299,9 @@ internal object MagentoCompatibilityCommands {
                 .put("currentVersion", current ?: JSONObject.NULL)
                 .put("currentVersionSource", if (parameters.has("currentVersion")) "explicit" else if (detected != null) "composer.lock" else JSONObject.NULL)
                 .put("targetVersion", target ?: JSONObject.NULL)
-                .put("ignoreCurrentVersion", ignore))
+                .put("ignoreCurrentVersion", ignore)
+                .put("excludedPaths", JSONArray(relative(project, excludedPaths(project, parameters))))
+                .put("excludedPathsSource", if (parameters.has("excludedPaths")) "explicit" else "uct_settings"))
             .put("nextAction", when {
                 !Settings.isEnabled(project) -> "Enable Magento project support before preparation or analysis."
                 target == null -> "Call status with the requested targetVersion to obtain analysis readiness and the next preparation call."
@@ -360,7 +364,8 @@ internal object MagentoCompatibilityCommands {
         validate(!ignore || current != null, "ignoreCurrentVersion", "ignoreCurrentVersion requires a detected or explicit currentVersion.", listOf("false", "true with a detected or explicit currentVersion"))
         val explain = boolean(parameters, "explainSuppressed", false)
         validate(!explain || ignore, "explainSuppressed", "explainSuppressed requires ignoreCurrentVersion=true.", listOf("false", "true with ignoreCurrentVersion=true"))
-        return UctAnalysisRequest(listOf(canonical.toString()), current, target, IssueSeverityLevel.valueOf(severity.uppercase()), ignore, explain)
+        return UctAnalysisRequest(listOf(canonical.toString()), current, target, IssueSeverityLevel.valueOf(severity.uppercase()), ignore, explain,
+            excludedPaths(project, parameters))
     }
 
     private fun view(project: Project, view: UctAnalysisRuns.View, offset: Int, limit: Int): JSONObject {
@@ -379,6 +384,7 @@ internal object MagentoCompatibilityCommands {
             .put("ignoreCurrentVersion", view.request.ignoreCurrentVersion)
             .put("findingsScope", if (view.request.ignoreCurrentVersion) "upgrade_changes" else "target_including_baseline")
             .put("explainSuppressed", view.request.explainSuppressed)
+            .put("excludedPaths", JSONArray(relative(project, view.request.excludedPaths)))
             .put("pathBase", project.basePath ?: JSONObject.NULL)
             .put("analysisIdentity", result?.analysisIdentity?.let(::JSONObject) ?: JSONObject.NULL)
             .put("scope", if (result == null) JSONObject.NULL else JSONObject()
@@ -468,6 +474,7 @@ internal object MagentoCompatibilityCommands {
             validate(it in setOf("warning", "error", "critical"), "minimumSeverity", "minimumSeverity must be warning, error, or critical.", listOf("warning", "error", "critical"))
         }
         validate(!boolean(parameters, "explainSuppressed", false) || ignore, "explainSuppressed", "explainSuppressed requires ignoreCurrentVersion=true.", listOf("false", "true with ignoreCurrentVersion=true"))
+        excludedPathsOption(parameters)
         return scoped
     }
 
@@ -515,6 +522,34 @@ internal object MagentoCompatibilityCommands {
                 "cancelled" -> "Preparation was cancelled; no release data was published. Start prepare again if this release is still needed."
                 else -> "Preparation failed; no release data was published. Verify the requested official release tag and resolve the reported error before retrying prepare."
             })
+
+    private fun excludedPathsOption(parameters: JSONObject): List<String>? {
+        if (!parameters.has("excludedPaths")) return null
+        val raw = parameters.get("excludedPaths")
+        validate(raw is JSONArray && raw.all { it is String && it.isNotBlank() }, "excludedPaths",
+            "excludedPaths must be an array of non-empty paths.", listOf("[]", "array of paths relative to pathBase or absolute"))
+        return (raw as JSONArray).map { (it as String).trim() }
+    }
+
+    /** Explicit excludedPaths override the UCT setting, so editor, report and MCP skip the same paths by default. */
+    private fun excludedPaths(project: Project, parameters: JSONObject): List<String> {
+        val explicit = excludedPathsOption(parameters) ?: return UctSettingsService.getInstance(project).excludedPaths
+        val root = Path.of(requireNotNull(project.basePath) { "Project directory is unavailable." }).toRealPath()
+        return explicit.map { value ->
+            val resolved = root.resolve(value).normalize()
+            val path = if (Files.exists(resolved)) resolved.toRealPath() else resolved
+            validate(path.startsWith(root), "excludedPaths", "Excluded paths must stay inside the current project: $value", listOf("path inside $root"))
+            FileUtil.toSystemIndependentName(path.toString())
+        }
+    }
+
+    private fun relative(project: Project, paths: List<String>): List<String> {
+        val root = Path.of(project.basePath!!)
+        return paths.map { path ->
+            val absolute = Path.of(path)
+            if (absolute.startsWith(root)) root.relativize(absolute).toString().replace('\\', '/').ifEmpty { "." } else path
+        }
+    }
 
     private fun boolean(parameters: JSONObject, key: String, default: Boolean): Boolean {
         if (!parameters.has(key)) return default

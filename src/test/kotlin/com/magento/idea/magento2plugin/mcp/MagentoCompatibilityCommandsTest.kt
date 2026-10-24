@@ -29,6 +29,7 @@ import com.magento.idea.magento2uct.analysis.UctAnalysisRuns
 import com.magento.idea.magento2uct.analysis.UctFinding
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel
 import com.magento.idea.magento2uct.packages.SupportedIssue
+import com.magento.idea.magento2uct.settings.UctSettingsService
 import org.json.JSONArray
 import org.json.JSONObject
 import kotlinx.serialization.json.Json
@@ -709,6 +710,52 @@ class MagentoCompatibilityCommandsTest : McpHttpTestCase() {
         assertEquals(1, result.getJSONObject("summary").getInt("modules"))
     }
 
+    fun testAnalysisSkipsConfiguredExcludedPathsUnlessTheRequestOverridesThem() {
+        Settings.getInstance(project).pluginEnabled = true
+        myFixture.addFileToProject("app/code/Foo/Bar/registration.php", """
+            <?php \Magento\Framework\Component\ComponentRegistrar::register('module', 'Foo_Bar', __DIR__);
+        """.trimIndent())
+        myFixture.addFileToProject("app/code/Foo/Bar/Model/Keep.php", "<?php class Keep {}")
+        myFixture.addFileToProject("app/code/Foo/Bar/Test/Skip.php", "<?php class Skip {}")
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        val settings = UctSettingsService.getInstance(project)
+        settings.excludedPaths = listOf(myFixture.findFileInTempDir("app/code/Foo/Bar/Test").path)
+        try {
+            fun analyze(excluded: String = ""): JSONObject {
+                val started = call("analyze", """{"path":"app/code/Foo/Bar","targetVersion":"2.4.3"$excluded}""")
+                assertTrue(started.toString(), started.has("runId"))
+                val runId = started.getString("runId")
+                PlatformTestUtil.waitWithEventsDispatching("excluded path analysis", { runs().results(runId).state != "running" }, 20)
+                return call("results", """{"runId":"$runId"}""").also { assertEquals(it.toString(), "completed", it.getString("state")) }
+            }
+            val configured = analyze()
+            assertEquals(2, configured.getInt("processedFiles"))
+            assertEquals(listOf("app/code/Foo/Bar/Test"), configured.getJSONArray("excludedPaths").toList())
+
+            val overridden = analyze(""","excludedPaths":["app/code/Foo/Bar/Model"]""")
+            assertEquals(2, overridden.getInt("processedFiles"))
+            assertEquals(listOf("app/code/Foo/Bar/Model"), overridden.getJSONArray("excludedPaths").toList())
+
+            val unrestricted = analyze(""","excludedPaths":[]""")
+            assertEquals(3, unrestricted.getInt("processedFiles"))
+            assertTrue(unrestricted.getJSONArray("excludedPaths").isEmpty)
+
+            val status = call("status", """{"targetVersion":"2.4.3","path":"app/code/Foo/Bar"}""").getJSONObject("defaults")
+            assertEquals(listOf("app/code/Foo/Bar/Test"), status.getJSONArray("excludedPaths").toList())
+            assertEquals("uct_settings", status.getString("excludedPathsSource"))
+            val next = call("status", """{"targetVersion":"2.4.3","path":"app/code/Foo/Bar","excludedPaths":["app/code/Foo/Bar/Model"]}""")
+            assertEquals("explicit", next.getJSONObject("defaults").getString("excludedPathsSource"))
+            assertEquals(listOf("app/code/Foo/Bar/Model"), next.getJSONObject("nextCall").getJSONObject("arguments").getJSONArray("excludedPaths").toList())
+
+            for (invalid in listOf("\"Test\"", "[\"\"]", "[\"../outside\"]")) {
+                val error = call("analyze", """{"path":"app/code/Foo/Bar","targetVersion":"2.4.3","excludedPaths":$invalid}""")
+                assertEquals(invalid, "excludedPaths", error.getJSONObject("error").getString("parameter"))
+            }
+        } finally {
+            settings.excludedPaths = emptyList()
+        }
+    }
+
     fun testModuleNameAnalysisPrefersConfiguredRootOverIndexedRuntimeDuplicate() {
         Settings.getInstance(project).pluginEnabled = true
         for (directory in listOf(".runtime", "src")) {
@@ -810,12 +857,14 @@ class MagentoCompatibilityCommandsTest : McpHttpTestCase() {
         val ids = arrayListOf<String>()
         try {
             repeat(6) {
-                val started = runs().start(request()) { UctAnalysisResult(emptyList(), 0, 0, 0) }
+                val excluded = request().copy(excludedPaths = listOf(project.basePath + "/app/code/Foo/Bar/Test"))
+                val started = runs().start(excluded) { UctAnalysisResult(emptyList(), 0, 0, 0) }
                 ids += started.runId
                 PlatformTestUtil.waitWithEventsDispatching("analysis completion", { runs().results(started.runId).state != "running" }, 10)
             }
             val archived = call("results", "{\"runId\":\"${ids.first()}\"}")
             assertEquals("completed", archived.getString("state"))
+            assertEquals(listOf("app/code/Foo/Bar/Test"), archived.getJSONArray("excludedPaths").toList())
             assertTrue(archived.getJSONObject("report").getBoolean("saved"))
             assertTrue(Files.isRegularFile(java.nio.file.Path.of(archived.getJSONObject("report").getString("path"))))
             assertEquals("completed", runs().results(ids.last()).state)
