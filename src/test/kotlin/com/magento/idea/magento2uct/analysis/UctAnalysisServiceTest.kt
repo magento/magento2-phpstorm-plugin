@@ -5,7 +5,11 @@
 package com.magento.idea.magento2uct.analysis
 
 import com.intellij.openapi.progress.ProcessCanceledException
+import com.intellij.codeInspection.InspectionManager
+import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiDocumentManager
+import com.intellij.util.xmlb.XmlSerializer
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext
 import com.magento.idea.magento2plugin.PhysicalMagentoTestCase
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel
 import com.magento.idea.magento2uct.packages.SupportedIssue
@@ -104,6 +108,42 @@ class UctAnalysisServiceTest : PhysicalMagentoTestCase() {
         val imported = result.findings.filter { it.issue == SupportedIssue.IMPORTED_NON_EXISTENT_CLASS }
         assertEquals(result.findings.toString(), 1, imported.size)
         assertTrue(imported.single().message, imported.single().message.contains("RealFactory"))
+    }
+
+    fun testExcludedPathsAreNotScanned() {
+        val root = myFixture.findFileInTempDir("app/code/Foo/Bar").path
+        assertEquals(3, analyze().processedFiles)
+        assertEquals(3, analyze(request().copy(excludedPaths = listOf("$root/Exam"))).processedFiles)
+
+        val withoutEtc = analyze(request().copy(excludedPaths = listOf("$root/etc/")))
+        assertEquals(2, withoutEtc.processedFiles)
+        assertTrue(withoutEtc.findings.none { it.filePath.endsWith("etc/di.xml") })
+        assertTrue(withoutEtc.findings.any { it.filePath.endsWith("Example.php") })
+
+        val registrationOnly = analyze(request().copy(excludedPaths = listOf("$root/etc", "$root/Example.php")))
+        assertEquals(1, registrationOnly.processedFiles)
+        assertTrue(registrationOnly.findings.isEmpty())
+    }
+
+    fun testEditorInspectionsSkipExcludedPaths() {
+        val root = myFixture.findFileInTempDir("app/code/Foo/Bar").path
+        val settings = UctSettingsService.getInstance(project)
+        settings.isEnabled = true
+        settings.excludedPaths = listOf("$root/etc")
+        assertFalse(UctAnalysisContext.isEnabled(holder("app/code/Foo/Bar/etc/di.xml")))
+        assertTrue(UctAnalysisContext.isEnabled(holder("app/code/Foo/Bar/Example.php")))
+    }
+
+    private fun holder(path: String): ProblemsHolder = ProblemsHolder(
+        InspectionManager.getInstance(project), psiManager.findFile(myFixture.findFileInTempDir(path))!!, false
+    )
+
+    fun testExcludedPathsArePersisted() {
+        val settings = UctSettingsService()
+        settings.excludedPaths = listOf("/project/app/code/Foo/Bar/Test", "/project/app/code/Foo/Bar/etc/di.xml")
+        val restored = XmlSerializer.deserialize(XmlSerializer.serialize(settings), UctSettingsService::class.java)
+        assertEquals(settings.excludedPaths, restored.excludedPaths)
+        assertEquals(emptyList<String>(), UctSettingsService().excludedPaths)
     }
 
     fun testSeverityAppliesToPhpAndXmlWithoutChangingSettings() {
