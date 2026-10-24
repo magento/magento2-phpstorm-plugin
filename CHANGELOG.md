@@ -28,6 +28,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Generated `menu.xml` no longer gets an empty `parent` attribute, which failed Magento's menu schema, when no parent menu item is set, as in the MCP `entity_crud` scaffold [#2750](https://github.com/magento/magento2-phpstorm-plugin/issues/2750).
 - New Entity and the MCP `entity_crud` scaffold use ACL resource and menu identifiers that include the entity name, so a second entity in the same module no longer produces a duplicate resource id in `acl.xml` and a missing menu item [#2744](https://github.com/magento/magento2-phpstorm-plugin/issues/2744).
 - The Upgrade Compatibility Tool reports removed, deprecated and non-API classes and members whose name ends with `Factory`, such as `Magento\Framework\Filter\ZendFactory`; only generated factories and proxies are still checked as their base class [#2756](https://github.com/magento/magento2-phpstorm-plugin/issues/2756).
+- The MCP `magento_scaffold` render of `view_model` runs off the EDT with file writes dispatched to it, so it no longer reports "Slow operations are prohibited on EDT" [#2762](https://github.com/magento/magento2-phpstorm-plugin/issues/2762).
 
 ## 2026.3.4-p1
 

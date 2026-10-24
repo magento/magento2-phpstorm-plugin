@@ -25,6 +25,9 @@ internal object MagentoScaffoldCommands {
         "customer_eav_attribute"
     )
 
+    /** Types whose generators run their writes on the EDT themselves, so MCP renders them in the background. */
+    private val offEdtTypes = setOf("view_model")
+
     private val scaffoldSummaries = mapOf(
         "module" to "Create composer.json, registration.php, and etc/module.xml.",
         "plugin" to "Create a plugin class and matching di.xml declaration.",
@@ -53,6 +56,8 @@ internal object MagentoScaffoldCommands {
 
         return typeHelp(normalizedType)
     }
+
+    fun rendersOffEdt(scaffoldType: String): Boolean = normalizeType(scaffoldType) in offEdtTypes
 
     fun render(project: Project, scaffoldType: String, parametersJson: String): String {
         val normalizedType = normalizeType(scaffoldType)
