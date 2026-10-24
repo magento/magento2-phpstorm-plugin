@@ -99,6 +99,8 @@ Reconnect your assistant after updating the plugin so it discovers the latest to
 
 ## Setting up development environment
 
+See [AGENTS.md](AGENTS.md) for repository policies and development skills. Feature priorities follow the existing project roadmap.
+
 1. Check out this repository.
 1. Open the project in IntelliJ IDEA.
 1. Make sure that you are on the latest develop branch (for example `5.4.0-develop`).
