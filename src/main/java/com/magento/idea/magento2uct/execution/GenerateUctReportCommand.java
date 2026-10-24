@@ -19,10 +19,12 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiDocumentManager;
 import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
+import com.magento.idea.magento2uct.actions.ConfigureUctAction;
 import com.magento.idea.magento2uct.analysis.UctAnalysisRequest;
 import com.magento.idea.magento2uct.analysis.UctAnalysisResult;
 import com.magento.idea.magento2uct.analysis.UctAnalysisService;
 import com.magento.idea.magento2uct.analysis.UctFinding;
+import com.magento.idea.magento2uct.analysis.UctReleasePreparation;
 import com.magento.idea.magento2uct.execution.output.ReportBuilder;
 import com.magento.idea.magento2uct.execution.output.Summary;
 import com.magento.idea.magento2uct.execution.output.UctReportOutputUtil;
@@ -112,6 +114,17 @@ public class GenerateUctReportCommand {
         }
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
+                final List<String> missing = project.getService(UctReleasePreparation.class)
+                        .catalog()
+                        .missingVersions(current, target, request.getIgnoreCurrentVersion());
+
+                if (!missing.isEmpty()) {
+                    output.print(output.wrapCritical("No compatibility data for "
+                            + String.join(", ", missing) + ". Prepare it in `"
+                            + ConfigureUctAction.ACTION_NAME + "`.") + "\n");
+                    process.destroyProcess();
+                    return;
+                }
                 summary.trackProcessStarted();
                 final UctAnalysisResult result = ProgressManager.getInstance().runProcess(
                         () -> new UctAnalysisService(project).analyze(request, indicator::checkCanceled, progress -> { }),
