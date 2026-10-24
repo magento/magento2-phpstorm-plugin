@@ -152,7 +152,7 @@
               <enabled value="true"/>
               <font size="12"/>
               <icon value="icons/information.png"/>
-              <text value="To enable inspections in the real time, also enable inspections by path:"/>
+              <text value="Enabling the tool also turns on its real-time inspections, configurable in:"/>
             </properties>
           </component>
           <component id="1b278" class="javax.swing.JLabel" binding="enableCommentPath">

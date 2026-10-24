@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Updated Gradle to 9.8.1, IntelliJ Platform Gradle Plugin to 2.19.0, Kotlin, runtime and test dependencies, and CI tooling. Compile against PhpStorm 2026.2 while retaining WebStorm 2026.3 EAP UI tests.
 - Improved Magento MCP CLI discovery with deterministic wrapper selection, added `magento_magerun` for installed command discovery and native MCP configuration, and updated bundled skills and HTTP end-to-end tests.
 - Release and security notifications now begin with publication age and offer configurable publication windows of a month, week, 2 days, or 12 hours, with an explanatory tooltip.
+- Enabling the built-in Upgrade Compatibility Tool in its configuration also enables its UCT inspections in the project inspection profile (a shared IDE-level profile is first copied to the project, so other projects keep their settings), so the editor reports issues without a separate setting [#2758](https://github.com/magento/magento2-phpstorm-plugin/issues/2758).
 
 ### Fixed
 
@@ -28,6 +29,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Generated `menu.xml` no longer gets an empty `parent` attribute, which failed Magento's menu schema, when no parent menu item is set, as in the MCP `entity_crud` scaffold [#2750](https://github.com/magento/magento2-phpstorm-plugin/issues/2750).
 - New Entity and the MCP `entity_crud` scaffold use ACL resource and menu identifiers that include the entity name, so a second entity in the same module no longer produces a duplicate resource id in `acl.xml` and a missing menu item [#2744](https://github.com/magento/magento2-phpstorm-plugin/issues/2744).
 - The Upgrade Compatibility Tool reports removed, deprecated and non-API classes and members whose name ends with `Factory`, such as `Magento\Framework\Filter\ZendFactory`; only generated factories and proxies are still checked as their base class [#2756](https://github.com/magento/magento2-phpstorm-plugin/issues/2756).
+- The MCP `magento_scaffold` render of `view_model` runs off the EDT with file writes dispatched to it, so it no longer reports "Slow operations are prohibited on EDT" [#2762](https://github.com/magento/magento2-phpstorm-plugin/issues/2762).
 
 ## 2026.3.4-p1
 
