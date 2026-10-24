@@ -27,6 +27,7 @@ import com.magento.idea.magento2uct.analysis.UctReleasePreparation;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedVersion;
 import com.magento.idea.magento2uct.settings.UctSettingsService;
+import com.magento.idea.magento2uct.util.inspection.EnableUctInspectionsUtil;
 import com.magento.idea.magento2uct.util.module.UctModulePathValidatorUtil;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
@@ -162,6 +163,9 @@ public class ConfigurationDialog extends AbstractDialog {
                 && !UctModulePathValidatorUtil.validate(additionalPath.getComponent().getText())) {
             additionalPathError.setText("The `Path To Analyse` field is empty or invalid");
             return;
+        }
+        if (enable.isSelected() && !settingsService.isEnabled()) {
+            EnableUctInspectionsUtil.execute(project);
         }
         settingsService.setEnabled(enable.isSelected());
 
