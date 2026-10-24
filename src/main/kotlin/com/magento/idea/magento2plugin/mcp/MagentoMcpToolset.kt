@@ -26,8 +26,14 @@ class MagentoMcpToolset : McpToolset {
         return when (mode.trim().lowercase().replace('-', '_').replace(' ', '_')) {
             "help" -> MagentoScaffoldCommands.help()
             "schema", "detailed_schema" -> MagentoScaffoldCommands.detailedSchema(scaffoldType)
-            "render" -> MagentoMcpToolsetSupport.withProjectEdtAction {
-                MagentoScaffoldCommands.render(it, scaffoldType, parametersJson)
+            "render" -> if (MagentoScaffoldCommands.rendersOffEdt(scaffoldType)) {
+                MagentoMcpToolsetSupport.withProjectAction {
+                    MagentoScaffoldCommands.render(it, scaffoldType, parametersJson)
+                }
+            } else {
+                MagentoMcpToolsetSupport.withProjectEdtAction {
+                    MagentoScaffoldCommands.render(it, scaffoldType, parametersJson)
+                }
             }
             else -> "mode must be `help`, `detailed_schema`, or `render`. Use `help` to view the compact Magento scaffold catalog."
         }
