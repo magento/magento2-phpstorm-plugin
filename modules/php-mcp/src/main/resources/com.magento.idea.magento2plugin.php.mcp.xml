@@ -5,8 +5,16 @@
  */
 -->
 <idea-plugin>
+    <dependencies>
+        <plugin id="com.magento.idea.magento2plugin"/>
+        <plugin id="com.jetbrains.php"/>
+        <plugin id="com.intellij.mcpServer"/>
+    </dependencies>
     <extensions defaultExtensionNs="com.intellij">
         <mcpServer.mcpToolset implementation="com.magento.idea.magento2plugin.mcp.MagentoMcpToolset"/>
         <mcpServer.mcpToolsProvider implementation="com.magento.idea.magento2plugin.mcp.MagentoCompatibilityToolsProvider"/>
+    </extensions>
+    <extensions defaultExtensionNs="com.magento.idea.magento2plugin">
+        <methodPluginQueryProvider implementation="com.magento.idea.magento2plugin.mcp.MagentoPhpMethodPluginQueryProvider"/>
     </extensions>
 </idea-plugin>

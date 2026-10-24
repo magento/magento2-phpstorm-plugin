@@ -4,6 +4,9 @@
  */
 package com.magento.idea.magento2plugin.mcp
 
+import com.intellij.testFramework.ExtensionTestUtil
+import com.intellij.testFramework.DumbModeTestUtils
+import com.intellij.testFramework.IndexingTestUtil
 import com.intellij.testFramework.JUnit38AssumeSupportRunner
 import com.magento.idea.magento2plugin.project.Settings
 import org.json.JSONObject
@@ -24,7 +27,9 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
     }
 
     fun testDiscoversRegisteredToolsAndTypedSchemasOverHttp() {
-        val tools = mcp().tools().associateBy { it.getString("name") }
+        val discoveredTools = mcp().tools()
+        assertEquals(1, discoveredTools.count { it.getString("name") == "magento_inspect" })
+        val tools = discoveredTools.associateBy { it.getString("name") }
         assertEquals(MAGENTO_TOOLS, tools.keys.filter { it != "execute_tool" }.toSet())
         val properties = tools.getValue("magento_magerun").getJSONObject("inputSchema").getJSONObject("properties")
         for ((name, type) in listOf("mode" to "string", "command" to "string", "search" to "string",
@@ -44,6 +49,71 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
             for (fragment in fragments) assertTrue("$name: $description", description.contains(fragment))
         }
         assertEquals("Configured Magento root path: ${root.resolve("src").toString().replace('\\', '/')}", text("get_magento_root_path"))
+    }
+
+    fun testSharedInspectionQueriesAndUnavailablePhpCapabilityOverHttp() {
+        ExtensionTestUtil.maskExtensions(MagentoMethodPluginQueryProvider.EP_NAME, emptyList(), testRootDisposable)
+        myFixture.addFileToProject("src/app/code/Inspect/Module/etc/module.xml", """
+            <config><module name="Inspect_Module"/></config>
+        """.trimIndent())
+        myFixture.addFileToProject("src/app/code/Inspect/Module/etc/di.xml", """
+            <config><type name="Inspect\Module\Target"><plugin name="inspect_plugin" type="Inspect\Module\Plugin"/></type></config>
+        """.trimIndent())
+        myFixture.addFileToProject("src/app/code/Inspect/Module/etc/events.xml", """
+            <config><event name="inspect_event"><observer name="inspect_observer" instance="Inspect\Module\Observer" disabled="true"/></event></config>
+        """.trimIndent())
+        myFixture.addFileToProject("src/app/code/Inspect/Module/view/frontend/layout/inspect_handle.xml", """
+            <page><body><container name="inspect_container"><block name="inspect_block" template="Inspect_Module::example.phtml"/></container></body></page>
+        """.trimIndent())
+        myFixture.addFileToProject("src/app/code/Inspect/Module/view/frontend/ui_component/inspect_listing.xml", "<listing/>")
+        myFixture.addFileToProject("src/app/code/Inspect/Module/etc/acl.xml", """
+            <config><acl><resources><resource id="Inspect_Module::root" title="Inspect root"/></resources></acl></config>
+        """.trimIndent())
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+        val help = inspect("help")
+        assertFalse(help, help.contains("- `plugins_for_method`:"))
+        assertTrue(help, help.contains("requires the JetBrains PHP plugin"))
+        val queries = listOf(
+            Triple("module", "moduleName" to "Inspect_Module", "src/app/code/Inspect/Module"),
+            Triple("di_config", "className" to "Inspect\\Module\\Target", "plugin name=inspect_plugin"),
+            Triple("observers_for_event", "eventName" to "inspect_event", "observer=inspect_observer instance=Inspect\\Module\\Observer disabled=true"),
+            Triple("layout_entities", "name" to "inspect_block", "template=Inspect_Module::example.phtml"),
+            Triple("ui_component", "name" to "inspect_listing", "rootTag: listing"),
+            Triple("acl_or_menu", "identifier" to "Inspect_Module::root", "Inspect_Module::root -> title=Inspect root")
+        )
+        for ((queryType, parameter, expected) in queries) {
+            val schema = inspect("detailed_schema", queryType)
+            assertTrue(schema, schema.contains("queryType: $queryType"))
+            val result = inspect("query", queryType, JSONObject().put(parameter.first, parameter.second).toString())
+            assertTrue(result, result.replace('\\', '/').contains(expected.replace('\\', '/')))
+        }
+        assertEquals(MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE,
+            inspect("query", "plugins_for_method", "{}"))
+        assertEquals(MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE,
+            inspect("detailed_schema", "plugins_for_method"))
+        assertTrue(inspect("query", "di_config", "{}").contains("Missing required parameter `className`"))
+        assertTrue(inspect("query", "acl_or_menu", "{invalid").contains("parametersJson must be a valid JSON object"))
+    }
+
+    private fun inspect(mode: String, queryType: String = "", parametersJson: String = ""): String =
+        text("magento_inspect", JSONObject().put("mode", mode).put("queryType", queryType)
+            .put("parametersJson", parametersJson))
+
+    fun testInspectionReportsIndexingAndUnavailableCapabilityOverHttp() {
+        ExtensionTestUtil.maskExtensions(MagentoMethodPluginQueryProvider.EP_NAME, emptyList(), testRootDisposable)
+        mcp()
+        DumbModeTestUtils.runInDumbModeSynchronously(project) {
+            for (type in listOf("module", "di_config", "observers_for_event", "layout_entities",
+                "ui_component", "acl_or_menu")) {
+                assertEquals(MagentoMcpSupport.INDEXES_NOT_READY_MESSAGE,
+                    inspect("query", type, "{}"))
+            }
+            assertEquals(MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE,
+                inspect("query", "plugins_for_method", "{}"))
+            assertTrue(inspect("detailed_schema", "layout_entities").contains("queryType: layout_entities"))
+            assertTrue(inspect("help").contains("- `layout_entities`:"))
+        }
     }
 
     fun testDockerDirectoryWrappersArePreferredAndDescriptionIsDeterministic() {

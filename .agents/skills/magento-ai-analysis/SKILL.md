@@ -17,8 +17,8 @@ Current starting points:
 
 - `MagentoInspectionCommands` defines the `magento_inspect` catalog and dispatcher.
 - `MagentoModuleQueries`, `MagentoViewQueries`, `MagentoEventQueries`, and `MagentoMcpSnapshots` contain module/configuration lookup logic.
-- `MagentoDiQueries` mixes XML DI lookup and PHP method interception analysis; `MagentoMcpSupport` mixes general utilities and PHP helpers.
-- `MagentoMcpProjectToolset` is shared; `MagentoMcpToolset` and compatibility tools are currently PHP-registered. Confirm current descriptors before claiming availability.
+- `MagentoDiQueries` and `MagentoMcpSupport` provide shared XML lookup and utilities. PHP method interception is contributed through `MagentoMethodPluginQueryProvider`; its implementation and PHP helpers remain optional.
+- `MagentoMcpProjectToolset` exposes shared inspection queries and CLI/project tools through `src/main/resources/META-INF/withMcp.xml`. PHP-backed MCP tools and providers are registered in `modules/php-mcp/src/main/resources/com.magento.idea.magento2plugin.php.mcp.xml`, which requires the main plugin, PHP, and MCP. Confirm current descriptors and query capabilities before claiming availability.
 - `magento_compatibility` already has background jobs and result retrieval. Reuse relevant patterns when new analysis needs them, while respecting its PHP dependency and actual coverage.
 
 ## Define a useful agent contract
@@ -38,3 +38,5 @@ Use fixtures that demonstrate the intended finding, a valid case that should not
 When MCP contracts change, test discovery, schema/arguments, project routing, success, and relevant errors through the existing HTTP test setup. Add WebStorm capability coverage separately; the current `mcpE2eTest` task is not a WebStorm runtime test. Update affected bundled user skills under `skills/` to describe real capabilities rather than planned ones.
 
 Report what an agent can now learn, the supported scope and host capabilities, evidence returned, validation performed, and remaining coverage limits.
+
+Keep user-facing documentation focused on the questions users can answer, how to run the tools, and how to interpret their results. Include requirements and coverage limits that change usage; keep internal reasoning, implementation details, and verification procedures in developer-facing documentation or the implementation report.

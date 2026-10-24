@@ -10,7 +10,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceProvider;
 import com.intellij.util.ProcessingContext;
-import com.magento.idea.magento2plugin.indexes.DiIndex;
+import com.magento.idea.magento2plugin.indexes.XmlVirtualTypeIndex;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,7 +26,7 @@ public class VirtualTypeReferenceProvider extends PsiReferenceProvider {
             @NotNull final ProcessingContext context
     ) {
         final String value = StringUtil.unquoteString(element.getText());
-        final DiIndex index = DiIndex.getInstance(element.getProject());
+        final XmlVirtualTypeIndex index = new XmlVirtualTypeIndex(element.getProject());
         final Collection<PsiElement> targets
                 = index.getVirtualTypeElements(value, element.getResolveScope());
         final List<PsiReference> psiReferences = new ArrayList<>();

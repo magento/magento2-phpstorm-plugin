@@ -33,6 +33,32 @@ public class XmlCoreCompletionContributor extends CompletionContributor {
         registerLayoutAndUiCompletions();
         registerMftfCompletions();
         registerMenuAndSchemaCompletions();
+        registerDiAndEventCompletions();
+    }
+
+    private void registerDiAndEventCompletions() {
+        extend(CompletionType.BASIC, PlatformPatterns.psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                        .inside(XmlPatterns.xmlAttribute().withName("type")),
+                new VirtualTypeCompletionProvider()
+        );
+        extend(CompletionType.BASIC, PlatformPatterns.psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                        .inside(XmlPatterns.xmlAttribute().withName("name")
+                                .withParent(XmlPatterns.xmlTag().withName("virtualType"))),
+                new VirtualTypeCompletionProvider()
+        );
+        extend(CompletionType.BASIC, PlatformPatterns.psiElement(XmlTokenType.XML_DATA_CHARACTERS)
+                        .withParent(XmlPatterns.xmlText().withParent(XmlPatterns.xmlTag().withChild(
+                                XmlPatterns.xmlAttribute().withName("xsi:type")
+                                        .withValue(StandardPatterns.string().oneOf("object"))))
+                        ),
+                new VirtualTypeCompletionProvider()
+        );
+        extend(CompletionType.BASIC, PlatformPatterns.psiElement(XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN)
+                        .inside(XmlPatterns.xmlAttribute().withName("name")
+                                .withParent(XmlPatterns.xmlTag().withName("event")))
+                        .inFile(XmlPatterns.xmlFile().withName(StandardPatterns.string().endsWith("events.xml"))),
+                new EventNameCompletionContributor()
+        );
     }
 
     private void registerModuleCompletions() {

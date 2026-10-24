@@ -25,7 +25,7 @@ Use the existing project roadmap for feature priorities and sequencing. Keep rep
 
 ## Implementation boundaries
 
-- Register shared functionality in `src/main/resources/META-INF/plugin.xml` and PHP-backed functionality in `withPhp.xml`. Preserve other optional plugin boundaries, including MCP and GraphQL.
+- Register shared functionality in `src/main/resources/META-INF/plugin.xml`, PHP-backed functionality in `withPhp.xml`, and shared MCP tools in `withMcp.xml`. Register integrations requiring both PHP and another plugin in the optional content-module descriptors under `modules/php-mcp/src/main/resources/` and `modules/php-graphql/src/main/resources/`; preserve their explicit dependencies on the main plugin and both required plugins.
 - Audit reachable helpers, indexes, base classes, signatures, static initialization, and serializers before moving registrations. A class without a direct PHP import can still load PHP-dependent code.
 - Keep analysis logic independent of Swing dialogs and actions so editor inspections and MCP can reuse it.
 - Preserve existing PHP behavior while adding useful behavior without PHP. Distinguish unavailable analysis, incomplete indexing, cancellation, and partial coverage from a successful empty result.

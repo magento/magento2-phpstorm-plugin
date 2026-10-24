@@ -66,6 +66,8 @@ Preserve the returned `configuration` command, argument array, `cwd`, and enviro
 
 ## Compatibility Analysis
 
+`magento_compatibility` requires the JetBrains PHP plugin.
+
 For an upgrade check with a known scope, prefer `mode: "upgrade"` with the intended `projectPath` and exactly one `moduleName` or `path`. Omit `targetVersion` only when the user wants the next published feature release; provide the exact version otherwise. This preset defaults `ignoreCurrentVersion` and `explainSuppressed` to true, freezes the detected baseline and selected target, and returns the full scope/filter options in each `nextCall`. Follow `nextStep`/`nextCall` through preparation, readiness and analysis without reconstructing requests. `outcome: "no_newer_release"` means discovery found no newer feature release and no scan started. Verify project identity before continuing. Use the individual modes below when inspecting readiness, catalogs, or all target findings.
 
 1. Call `magento_compatibility` with `mode: "status"`, the intended `projectPath`, and the user's requested `targetVersion`. Include explicit `currentVersion` and `ignoreCurrentVersion` if the analysis requires them. Verify returned project identity. `readiness` separates `ideReady`, `releaseDataReady`, and overall `ready`; `missingVersions` lists required release data. `supportedVersions`/`latestSupportedVersion` describe local index coverage, not published releases. If the target is relative (such as “next minor”), use `mode: "releases"` with the intended `projectPath` and optional `currentVersion` first. It uses **Published releases URL** in Magento settings (official GitHub catalog by default) and returns compact source/cache metadata, `releaseCount`, and dated `nextMinorRelease`; pass `includeReleases: true` only when the full catalog is needed; follow its status continuation for the selected target. Do not replace an explicitly requested target with that recommendation. Effective version/filter options appear in `defaults`. A connection mismatch requires correcting MCP configuration and refreshing discovery. Do not create another IDE instance or a client script.
@@ -101,15 +103,18 @@ Follow every returned continuation verbatim, including scope, severity, suppress
 
 ## Query Types
 
-Supported `queryType` values:
+Available without the JetBrains PHP plugin (including WebStorm):
 
 - `module`
 - `di_config`
-- `plugins_for_method`
 - `observers_for_event`
 - `layout_entities`
 - `ui_component`
 - `acl_or_menu`
+
+`plugins_for_method` requires the JetBrains PHP plugin. Use `help` to check which queries the connected IDE supports. If a query is unavailable, report the requirement instead of reporting no matches.
+
+XML lookups locate declarations and source files. Use PHP analysis to validate classes and inheritance, and runtime checks to confirm the configuration Magento actually uses.
 
 ## Rules
 

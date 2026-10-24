@@ -6,11 +6,14 @@
 package com.magento.idea.magento2plugin.project;
 
 import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.options.Configurable;
+import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -31,10 +34,20 @@ public final class MagentoNotificationUtil {
             @Override
             public void actionPerformed(final @NotNull AnActionEvent event) {
                 notification.expire();
-                ShowSettingsUtil.getInstance().showSettingsDialog(project, "Magento2.SettingsForm");
+                ShowSettingsUtil.getInstance().showSettingsDialog(
+                        project, MagentoNotificationUtil::isMagentoSettings, null
+                );
             }
         };
         showPopup(project, message, showSettingsAction);
+    }
+
+    static boolean isMagentoSettings(final Configurable configurable) {
+        if (!(configurable instanceof SearchableConfigurable searchable)) {
+            return false;
+        }
+        final String id = searchable.getId();
+        return "Magento2.SettingsForm".equals(id) || "settings.php.frameworks".equals(id);
     }
 
     @SafeVarargs
@@ -61,12 +74,9 @@ public final class MagentoNotificationUtil {
             final @NotNull NotificationType notificationType,
             final @NotNull Function<Notification, AnAction>... actions
     ) {
-        final Notification notification = new Notification(
-                "Magento 2 and Adobe Commerce",
-                title,
-                message,
-                notificationType
-        );
+        final Notification notification = NotificationGroupManager.getInstance()
+                .getNotificationGroup("Magento Notifications")
+                .createNotification(title, message, notificationType);
 
         for (final Function<Notification, AnAction> generator : actions) {
             notification.addAction(generator.apply(notification));

@@ -24,6 +24,16 @@ jobs:
           cache: gradle
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+      - name: Verify PhpStorm and WebStorm compatibility
+        run: ./gradlew verifyPlugin -PverifyWebStorm=true --max-workers=1 --no-parallel --no-daemon --no-configuration-cache
+      - name: Upload Plugin Verifier reports
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: release-plugin-verifier-reports
+          if-no-files-found: warn
+          retention-days: 14
+          path: build/reports/pluginVerifier/**
       - name: Run publish plugin
         run: ./gradlew publishPlugin -i --no-daemon
         env:

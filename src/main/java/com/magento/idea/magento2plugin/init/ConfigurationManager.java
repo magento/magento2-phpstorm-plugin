@@ -26,6 +26,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.php.config.PhpProjectConfigurable;
 import com.jetbrains.php.config.library.PhpIncludePathManager;
 import com.jetbrains.php.ui.PhpUiUtil;
+import com.magento.idea.magento2plugin.project.MagentoNotificationUtil;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -181,16 +182,7 @@ public class ConfigurationManager {
     }
 
     public static void suggestToConfigureMagentoPath(@NotNull Project project) {
-        String message = "Magento 2 support is disabled. Please configure Magento 2 installation path.";
-        Function<Notification, AnAction> showSettingsAction = (notification) -> {
-            return new DumbAwareAction("Show settings") {
-                public void actionPerformed(@NotNull AnActionEvent e) {
-                    notification.expire();
-                    ShowSettingsUtil.getInstance().showSettingsDialog(project, "Magento2.SettingsForm");
-                }
-            };
-        };
-        showPopup(project, message, showSettingsAction);
+        MagentoNotificationUtil.suggestToConfigureMagentoPath(project);
     }
 
     private static boolean isInIncludePath(@NotNull VirtualFile fileToCheck, @NotNull Project project) {

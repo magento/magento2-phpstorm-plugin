@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.inspections.xml;
 
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.codeInspection.XmlSuppressableInspectionTool;
 import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiDirectory;
@@ -20,7 +21,6 @@ import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlDocument;
 import com.intellij.psi.xml.XmlTag;
-import com.jetbrains.php.lang.inspections.PhpInspection;
 import com.magento.idea.magento2plugin.bundles.InspectionBundle;
 import com.magento.idea.magento2plugin.indexes.PluginIndex;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
@@ -36,7 +36,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.NPathComplexity"})
-public class PluginDeclarationInspection extends PhpInspection {
+public class PluginDeclarationInspection extends XmlSuppressableInspectionTool {
 
     @NotNull
     @Override
