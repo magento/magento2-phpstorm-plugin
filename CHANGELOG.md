@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Fixed
 
+- PHP constants referenced only by `xsi:type="const"` arguments or array items in `di.xml` are no longer marked as unused [#1587](https://github.com/magento/magento2-phpstorm-plugin/issues/1587).
 - Replaced internal and deprecated platform API calls in UCT method inspections, run configuration validation, and MCP plugin version reporting.
 - Replaced SwingX hyperlinks and input placeholders with platform UI components for compatibility with 2026.3 IDEs.
 - Preserve MCP tool discovery across 2026.2 and 2026.3 by binding shared MCP descriptor constructor parameters by name and using the host IDE's defaults for added fields.
