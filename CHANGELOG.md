@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Improved Magento MCP CLI discovery with deterministic wrapper selection, added `magento_magerun` for installed command discovery and native MCP configuration, and updated bundled skills and HTTP end-to-end tests.
 - Release and security notifications now begin with publication age and offer configurable publication windows of a month, week, 2 days, or 12 hours, with an explanatory tooltip.
 - Enabling the built-in Upgrade Compatibility Tool in its configuration also enables its UCT inspections in the project inspection profile (a shared IDE-level profile is first copied to the project, so other projects keep their settings), so the editor reports issues without a separate setting [#2758](https://github.com/magento/magento2-phpstorm-plugin/issues/2758).
+- UCT editor inspections use the same compatibility data as the report and MCP analysis, including prepared releases, and report nothing while the configured versions have no data instead of results from older indexes [#2758](https://github.com/magento/magento2-phpstorm-plugin/issues/2758).
 
 ### Fixed
 
