@@ -9,8 +9,6 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
-import com.jetbrains.php.lang.psi.PhpFile;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.actions.generation.data.UiComponentDataProviderData;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.DirectoryGenerator;
 import com.magento.idea.magento2plugin.actions.generation.generator.util.FileFromTemplateGenerator;
@@ -65,11 +63,7 @@ public class QueryGenerator extends FileGenerator {
         final PsiFile[] dataProviderFiles = new PsiFile[1];
 
         WriteCommandAction.runWriteCommandAction(project, () -> {
-            PhpClass dataProvider = GetPhpClassByFQN.getInstance(project).execute(
-                    file.getClassFqn()
-            );
-
-            if (dataProvider != null) {
+            if (GetPhpClassByFQN.getInstance(project).exists(file.getClassFqn())) {
                 final String errorMessage = this.validatorBundle.message(
                         "validator.file.alreadyExists",
                         "DataProvider Class"
@@ -84,7 +78,7 @@ public class QueryGenerator extends FileGenerator {
                 return;
             }
 
-            dataProvider = createDataProviderClass(actionName);
+            final PsiFile dataProvider = createDataProviderFile(actionName);
 
             if (dataProvider == null) {
                 final String errorMessage = this.validatorBundle.message(
@@ -101,7 +95,7 @@ public class QueryGenerator extends FileGenerator {
                 return;
             }
 
-            dataProviderFiles[0] = dataProvider.getContainingFile();
+            dataProviderFiles[0] = dataProvider;
         });
 
         return dataProviderFiles[0];
@@ -112,9 +106,9 @@ public class QueryGenerator extends FileGenerator {
      *
      * @param actionName String
      *
-     * @return PhpClass
+     * @return PsiFile
      */
-    private PhpClass createDataProviderClass(final @NotNull String actionName) {
+    private PsiFile createDataProviderFile(final @NotNull String actionName) {
         final PsiDirectory parentDirectory = new ModuleIndex(project)
                 .getModuleDirectoryByModuleName(this.moduleName);
 
@@ -135,7 +129,7 @@ public class QueryGenerator extends FileGenerator {
             return null;
         }
 
-        return getFirstClassOfFile.execute((PhpFile) dataProviderFile);
+        return getFirstClassOfFile.getContainingFile(dataProviderFile);
     }
 
     /**

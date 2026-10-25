@@ -15,6 +15,7 @@ import com.intellij.psi.xml.XmlTokenType;
 import com.magento.idea.magento2plugin.magento.files.MftfActionGroup;
 import com.magento.idea.magento2plugin.magento.files.MftfTest;
 import com.magento.idea.magento2plugin.magento.files.ModuleDbSchemaXml;
+import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml;
 // CHECKSTYLE IGNORE check FOR NEXT 3 LINES
 import com.magento.idea.magento2plugin.reference.provider.*;//NOPMD
@@ -34,6 +35,37 @@ public class XmlCoreReferenceContributor extends PsiReferenceContributor {
         registerModuleAndFileReferences(registrar);
         registerMftfReferences(registrar);
         registerMenuAndSchemaReferences(registrar);
+        registerDiAndObserverReferences(registrar);
+    }
+
+    private void registerDiAndObserverReferences(final PsiReferenceRegistrar registrar) {
+        registrar.registerReferenceProvider(
+                XmlPatterns.xmlAttributeValue().withParent(
+                        XmlPatterns.xmlAttribute().withName("type"))
+                        .inFile(xmlFile().withName(string().endsWith("di.xml"))),
+                new VirtualTypeReferenceProvider()
+        );
+        registrar.registerReferenceProvider(
+                XmlPatterns.psiElement(XmlTokenType.XML_DATA_CHARACTERS).withParent(
+                        XmlPatterns.xmlText().withParent(XmlPatterns.xmlTag().withChild(
+                                XmlPatterns.xmlAttribute().withName("xsi:type"))))
+                        .inFile(xmlFile().withName(string().endsWith("di.xml"))),
+                new VirtualTypeReferenceProvider()
+        );
+        registrar.registerReferenceProvider(
+                XmlPatterns.xmlAttributeValue().withParent(
+                        XmlPatterns.xmlAttribute().withName("name").withParent(
+                                XmlPatterns.xmlTag().withName("observer"))),
+                new ObserverNameReferenceProvider()
+        );
+        registrar.registerReferenceProvider(
+                XmlPatterns.xmlAttributeValue().withParent(
+                        XmlPatterns.xmlAttribute().withName("name").withParent(
+                                XmlPatterns.xmlTag().withName("plugin").withChild(
+                                        XmlPatterns.xmlAttribute().withName("disabled"))))
+                        .inFile(xmlFile().withName(string().matches(ModuleDiXml.FILE_NAME))),
+                new PluginReferenceProvider()
+        );
     }
 
     private void registerLayoutReferences(final PsiReferenceRegistrar registrar) {

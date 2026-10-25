@@ -5,6 +5,8 @@
 
 package com.magento.idea.magento2plugin.mcp
 
+import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.openapi.project.Project
 import org.json.JSONException
 import org.json.JSONObject
@@ -39,7 +41,8 @@ internal object MagentoInspectionCommands {
         3. `query`: run the selected inspection with queryType and parametersJson.
 
         Queries:
-        ${supportedTypes.joinToString("\n") { "- `$it`: ${querySummaries.getValue(it)}" }}
+        ${availableTypes().joinToString("\n") { "- `$it`: ${querySummaries.getValue(it)}" }}
+        ${if (MagentoMethodPluginQueryProvider.isAvailable()) "" else MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE}
 
         Next: call mode `detailed_schema` with one queryType before querying.
     """.trimIndent()
@@ -54,6 +57,10 @@ internal object MagentoInspectionCommands {
             return unknownTypeMessage(normalizedType)
         }
 
+        if (!isAvailable(normalizedType)) {
+            return MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE
+        }
+
         return typeHelp(normalizedType)
     }
 
@@ -63,6 +70,10 @@ internal object MagentoInspectionCommands {
             return unknownTypeMessage(normalizedType)
         }
 
+        if (!isAvailable(normalizedType)) {
+            return MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE
+        }
+
         val parameters = try {
             parseParameters(parametersJson)
         } catch (exception: JSONException) {
@@ -70,15 +81,26 @@ internal object MagentoInspectionCommands {
         }
 
         return try {
+            if (DumbService.getInstance(project).isDumb) {
+                return MagentoMcpSupport.INDEXES_NOT_READY_MESSAGE
+            }
             dispatch(project, normalizedType, parameters)
         } catch (exception: MissingParameterException) {
             "Missing required parameter `${exception.parameterName}` for queryType `$normalizedType`. Call magento_inspect with mode `detailed_schema` and queryType `$normalizedType` for the expected parameters."
+        } catch (_: IndexNotReadyException) {
+            MagentoMcpSupport.INDEXES_NOT_READY_MESSAGE
         }
     }
 
     fun requiresSmartMode(queryType: String): Boolean {
-        return normalizeType(queryType) !in setOf("layout_entities", "ui_component")
+        val normalizedType = normalizeType(queryType)
+        return normalizedType in supportedTypes && isAvailable(normalizedType)
     }
+
+    private fun availableTypes(): List<String> = supportedTypes.filter(::isAvailable)
+
+    private fun isAvailable(queryType: String): Boolean =
+        queryType != "plugins_for_method" || MagentoMethodPluginQueryProvider.isAvailable()
 
     private fun dispatch(project: Project, queryType: String, parameters: JSONObject): String {
         return when (queryType) {
@@ -158,6 +180,7 @@ internal object MagentoInspectionCommands {
             Finds dependency injection declarations related to a PHP class, interface, preference target, or virtual type.
             Required: className. Use a PHP FQN such as `Magento\\Catalog\\Model\\Product`, an interface FQN, or a virtual type name.
             Result summarizes matching preferences, types, virtual types, arguments, and plugins.
+            Reports XML declarations, without validating PHP classes, inheritance, or effective runtime configuration.
             Example parametersJson:
             {"className":"Magento\\Catalog\\Api\\ProductRepositoryInterface"}
         """.trimIndent()
@@ -206,7 +229,7 @@ internal object MagentoInspectionCommands {
     }
 
     private fun unknownTypeMessage(queryType: String): String {
-        return "Unknown queryType `$queryType`. Supported values: ${supportedTypes.joinToString(", ")}. Call magento_inspect with mode `help` for the compact query catalog."
+        return "Unknown queryType `$queryType`. Supported values: ${availableTypes().joinToString(", ")}. Call magento_inspect with mode `help` for the compact query catalog."
     }
 
     private fun JSONObject.requireString(name: String): String {

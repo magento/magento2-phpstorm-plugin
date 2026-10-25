@@ -8,6 +8,7 @@ import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask
+import org.jetbrains.intellij.platform.gradle.tasks.ComposedJarTask
 import org.gradle.api.tasks.testing.TestDescriptor
 import org.gradle.api.tasks.testing.TestResult
 import org.gradle.api.tasks.testing.TestListener
@@ -53,6 +54,24 @@ repositories {
     }
 }
 
+subprojects {
+    apply(plugin = "org.jetbrains.intellij.platform.module")
+    group = rootProject.group
+    version = rootProject.version
+
+    repositories {
+        mavenCentral()
+        intellijPlatform { defaultRepositories() }
+    }
+
+    extensions.configure<JavaPluginExtension> {
+        toolchain.languageVersion = JavaLanguageVersion.of(25)
+    }
+    tasks.named<ComposedJarTask>("composedJar") {
+        archiveBaseName = "${project.group}.${project.name.replace('-', '.')}"
+    }
+}
+
 sourceSets {
     create("uiTest") {
         compileClasspath += sourceSets.main.get().output
@@ -68,6 +87,9 @@ val uiTestRuntimeOnly = configurations.getByName("uiTestRuntimeOnly") {
 }
 
 dependencies {
+    runtimeOnly(project(":php-mcp"))
+    runtimeOnly(project(":php-graphql"))
+
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit4)
     testCompileOnly(libs.junit.jupiter.api)
@@ -182,6 +204,11 @@ kover {
 }
 
 tasks {
+    named<VerifyPluginTask>("verifyPlugin") {
+        maxHeapSize = "2g"
+        systemProperty("intellij.plugin.verifier.concurrency.level", "1")
+    }
+
     processResources {
         from(layout.projectDirectory.dir("skills")) {
             into("skills")
