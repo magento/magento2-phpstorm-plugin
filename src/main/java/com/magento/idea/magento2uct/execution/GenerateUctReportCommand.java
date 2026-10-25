@@ -95,10 +95,16 @@ public class GenerateUctReportCommand {
             return;
         }
         final IssueSeverityLevel severity = settingsService.getMinIssueLevel();
+        final List<String> excludedPaths = settingsService.getExcludedPaths();
+        if (!excludedPaths.isEmpty()) {
+            output.write("Excluded paths:\n  " + String.join("\n  ", excludedPaths) + "\n");
+        }
         final UctAnalysisRequest request = new UctAnalysisRequest(
                 List.copyOf(paths), current, target,
                 severity == null ? IssueSeverityLevel.WARNING : severity,
-                Boolean.TRUE.equals(settingsService.shouldIgnoreCurrentVersion())
+                Boolean.TRUE.equals(settingsService.shouldIgnoreCurrentVersion()),
+                false,
+                excludedPaths
         );
         final Summary summary = Summary.forVersions(current, target);
         final UctReportOutputUtil outputUtil = new UctReportOutputUtil(output);
