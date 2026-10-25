@@ -24,4 +24,41 @@ class CopyMagentoPathUiTest {
             getClipboardText().toString() == "Acme_Shipping/js/shipping"
         }
     }
+
+    @Test
+    fun `copies magento asset paths from custom theme override`() =
+        runWebStormUiTest(FILE_GENERATORS_FIXTURE) {
+            invokeProjectViewAction(
+                THEME_PATH + listOf("Magento_Catalog", "templates", "product", "image.phtml"),
+                "CopyMagentoPath",
+            )
+
+            waitFor("Magento theme override asset path in clipboard", 30.seconds) {
+                getClipboardText().toString() == "Magento_Catalog::product/image.phtml"
+            }
+
+            invokeProjectViewAction(
+                THEME_PATH + listOf("Magento_Catalog", "web", "js", "product.js"),
+                "CopyMagentoPath",
+            )
+
+            waitFor("Magento theme override JavaScript path in clipboard", 30.seconds) {
+                getClipboardText().toString() == "Magento_Catalog/js/product"
+            }
+
+            invokeProjectViewAction(
+                THEME_PATH + listOf(
+                    "Magento_Catalog",
+                    "web",
+                    "template",
+                    "product",
+                    "image.html",
+                ),
+                "CopyMagentoPath",
+            )
+
+            waitFor("Magento theme override HTML path in clipboard", 30.seconds) {
+                getClipboardText().toString() == "Magento_Catalog/template/product/image"
+            }
+        }
 }
