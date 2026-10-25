@@ -8,6 +8,7 @@ package com.magento.idea.magento2plugin.indexes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.xml.XmlAttributeValue;
@@ -43,10 +44,12 @@ public class EventIndex {
                 FileBasedIndex.getInstance().getContainingFiles(EventNameIndex.KEY, name, scope);
 
         for (final VirtualFile virtualFile : virtualFiles) {
-            final XmlFile xmlFile = (XmlFile) PsiManager.getInstance(project).findFile(virtualFile);
-            final Collection<XmlAttributeValue> valueElements = XmlPsiTreeUtil
-                    .findAttributeValueElements(xmlFile, "event", "name", name);
-            result.addAll(valueElements);
+            final PsiFile file = PsiManager.getInstance(project).findFile(virtualFile);
+            if (file instanceof XmlFile) {
+                final Collection<XmlAttributeValue> valueElements = XmlPsiTreeUtil
+                        .findAttributeValueElements((XmlFile) file, "event", "name", name);
+                result.addAll(valueElements);
+            }
         }
         return result;
     }
@@ -66,11 +69,10 @@ public class EventIndex {
                 );
 
         for (final VirtualFile virtualFile: virtualFiles) {
-            final XmlFile eventsXmlFile
-                    = (XmlFile) PsiManager.getInstance(project).findFile(virtualFile);
-            if (eventsXmlFile != null) {
+            final PsiFile file = PsiManager.getInstance(project).findFile(virtualFile);
+            if (file instanceof XmlFile) {
                 result.addAll(
-                        XmlPsiTreeUtil.findObserverTags(eventsXmlFile, eventName, observerName)
+                        XmlPsiTreeUtil.findObserverTags((XmlFile) file, eventName, observerName)
                 );
             }
         }

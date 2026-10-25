@@ -6,7 +6,8 @@
 package com.magento.idea.magento2plugin.magento.files;
 
 import com.intellij.lang.Language;
-import com.jetbrains.php.lang.PhpLanguage;
+import com.intellij.openapi.fileTypes.FileTypeRegistry;
+import com.intellij.openapi.fileTypes.LanguageFileType;
 
 public class BlockPhp implements ModuleFileInterface {
     public static final String TEMPLATE = "Magento Regular Class";
@@ -38,6 +39,10 @@ public class BlockPhp implements ModuleFileInterface {
 
     @Override
     public Language getLanguage() {
-        return PhpLanguage.INSTANCE;
+        final var fileType = FileTypeRegistry.getInstance().findFileTypeByName("PHP");
+        if (!(fileType instanceof LanguageFileType languageFileType)) {
+            throw new IllegalStateException("PHP support is required");
+        }
+        return languageFileType.getLanguage();
     }
 }

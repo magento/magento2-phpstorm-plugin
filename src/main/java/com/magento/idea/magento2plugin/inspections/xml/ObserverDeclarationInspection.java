@@ -22,12 +22,11 @@ import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlDocument;
 import com.intellij.psi.xml.XmlTag;
-import com.jetbrains.php.lang.inspections.PhpInspection;
+import com.intellij.codeInspection.XmlSuppressableInspectionTool;
 import com.magento.idea.magento2plugin.bundles.InspectionBundle;
 import com.magento.idea.magento2plugin.indexes.EventIndex;
 import com.magento.idea.magento2plugin.magento.files.ModuleEventsXml;
 import com.magento.idea.magento2plugin.magento.files.ModuleXml;
-import com.magento.idea.magento2plugin.magento.files.Observer;
 import com.magento.idea.magento2plugin.magento.packages.Areas;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import java.net.URI;
@@ -45,7 +44,7 @@ import org.jetbrains.annotations.Nullable;
         "PMD.NPathComplexity",
         "PMD.ExcessiveImports",
 })
-public class ObserverDeclarationInspection extends PhpInspection {
+public class ObserverDeclarationInspection extends XmlSuppressableInspectionTool {
 
     @NotNull
     @Override
@@ -86,7 +85,7 @@ public class ObserverDeclarationInspection extends PhpInspection {
                     }
 
                     final XmlAttribute eventNameAttribute =
-                            eventXmlTag.getAttribute(Observer.NAME_ATTRIBUTE);
+                            eventXmlTag.getAttribute(ModuleEventsXml.NAME_ATTRIBUTE);
 
                     if (eventNameAttribute == null) {
                         continue;
@@ -104,7 +103,7 @@ public class ObserverDeclarationInspection extends PhpInspection {
 
                     for (final XmlTag observerXmlTag: targetObservers) {
                         final XmlAttribute observerNameAttribute =
-                                observerXmlTag.getAttribute(Observer.NAME_ATTRIBUTE);
+                                observerXmlTag.getAttribute(ModuleEventsXml.NAME_ATTRIBUTE);
                         final XmlAttribute observerDisabledAttribute =
                                 observerXmlTag.getAttribute("disabled");
 

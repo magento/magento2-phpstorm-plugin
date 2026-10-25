@@ -1,0 +1,47 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<idea-plugin>
+    <dependencies>
+        <plugin id="com.magento.idea.magento2plugin"/>
+        <plugin id="com.jetbrains.php"/>
+        <plugin id="com.intellij.lang.jsgraphql"/>
+    </dependencies>
+    <actions>
+        <group id="GraphQL.MagentoContextBasedActionsGroup">
+            <add-to-group group-id="MagentoContextBasedActionsGroup" anchor="last"/>
+            <action id="MagentoCreateGraphQlSchemaFile"
+                    class="com.magento.idea.magento2plugin.actions.context.xml.NewGraphQLSchemaAction"/>
+        </group>
+        <group id="GraphQL.MagentoNewModuleFileGroup"
+               text="GraphQL"
+               popup="false">
+            <add-to-group group-id="MagentoNewModuleFileGroup" anchor="last"/>
+            <action id="MagentoCreateAGraphQlResolver" class="com.magento.idea.magento2plugin.actions.generation.NewGraphQlResolverAction" />
+        </group>
+    </actions>
+    <extensions defaultExtensionNs="com.intellij">
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.graphql.GraphQlResolverIndex" />
+        <codeInsight.lineMarkerProvider language="PHP" implementationClass="com.magento.idea.magento2plugin.linemarker.php.GraphQlResolverUsageLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="GraphQL" implementationClass="com.magento.idea.magento2plugin.linemarker.graphql.GraphQlResolverClassLineMarkerProvider"/>
+        <localInspection language="PHP" groupPath="PHP"
+                         shortName="GraphQlResolverInspection" displayName="Graphql must implements ResolverInterface"
+                         groupName="Magento 2"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.php.GraphQlResolverInspection"/>
+        <localInspection language="GraphQL" groupPath="GraphQL"
+                         shortName="SchemaResolverInspection" displayName="Schema Resolver must implements ResolverInterface"
+                         groupName="Magento 2"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.graphqls.SchemaResolverInspection"/>
+
+        <internalFileTemplate name="Magento GraphQL Resolver Class"/>
+        <internalFileTemplate name="Magento GraphQL Schema"/>
+    </extensions>
+</idea-plugin>

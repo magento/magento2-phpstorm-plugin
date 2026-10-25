@@ -16,6 +16,12 @@ Repository development skills live in `.agents/skills`; the skills under `skills
 
 To run `./gradlew test`, also install PHP CLI and add `php` (`php.exe` on Windows) to `PATH`. The run-configuration tests launch PHP to verify interpreter settings and command arguments. CI installs PHP 8.4 on Linux, Windows, and macOS.
 
+# Optional plugin integrations
+
+Shared, PHP, and shared MCP features are registered in `src/main/resources/META-INF/plugin.xml`, `withPhp.xml`, and `withMcp.xml`, respectively. Integrations that need both PHP and MCP or GraphQL use the optional content-module descriptors in `modules/php-mcp/src/main/resources/` and `modules/php-graphql/src/main/resources/`. Each descriptor declares dependencies on the main plugin and both required plugins. Implementation classes stay in the main plugin JAR; the descriptor modules are packaged separately in `lib/modules/`.
+
+Run `./gradlew verifyPlugin -PverifyWebStorm=true --max-workers=1 --no-parallel` after changing these boundaries. This checks the configured PhpStorm and WebStorm versions; also exercise the affected behavior in both IDEs. CI runs the verifier and retains its reports, and publication requires verification to pass.
+
 # MCP HTTP end-to-end tests
 
 ```sh

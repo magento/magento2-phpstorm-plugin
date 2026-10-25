@@ -4,6 +4,7 @@
  */
 package com.magento.idea.magento2plugin.stubs.indexes;
 
+import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.LightVirtualFile;
@@ -17,25 +18,34 @@ public class EventNameIndexTest {
 
     @Test
     public void generatedMetadataPhpFilesAreExcludedFromIndexing() {
-        final EventNameIndex index = new EventNameIndex();
+        final PhpEventNameIndexProvider provider = new PhpEventNameIndexProvider();
         final VirtualFile file = new PhpVirtualFile(
                 "primary|global|webapi_rest|plugin-list.php",
                 "//wsl.localhost/Ubuntu/home/pf/projects/mag/src/generated/metadata/"
                         + "primary|global|webapi_rest|plugin-list.php"
         );
 
-        assertFalse(index.getInputFilter().acceptInput(file));
+        assertFalse(provider.accepts(file));
     }
 
     @Test
     public void regularPhpFilesRemainIndexable() {
-        final EventNameIndex index = new EventNameIndex();
+        final PhpEventNameIndexProvider provider = new PhpEventNameIndexProvider();
         final VirtualFile file = new PhpVirtualFile(
                 "Block.php",
                 "/var/www/magento/app/code/Vendor/Module/Block/Block.php"
         );
 
-        assertTrue(index.getInputFilter().acceptInput(file));
+        assertTrue(provider.accepts(file));
+    }
+
+    @Test
+    public void onlyEventsXmlFilesAreIndexedWithoutLanguageProviders() {
+        final EventNameIndex index = new EventNameIndex();
+        assertTrue(index.getInputFilter().acceptInput(
+                new LightVirtualFile("events.xml", XmlFileType.INSTANCE, "<config/>")));
+        assertFalse(index.getInputFilter().acceptInput(
+                new LightVirtualFile("di.xml", XmlFileType.INSTANCE, "<config/>")));
     }
 
     private static final class PhpVirtualFile extends LightVirtualFile {
