@@ -7,10 +7,10 @@ package com.magento.idea.magento2uct.inspections;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.magento.idea.magento2uct.analysis.UctExcludedPaths;
+import com.magento.idea.magento2uct.analysis.UctReleasePreparation;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.settings.UctSettingsService;
 import com.magento.idea.magento2uct.versioning.UctVersionState;
-import com.magento.idea.magento2uct.versioning.VersionStateManager;
 
 /** Immutable options carried by a batch holder; editor inspections keep using project settings. */
 public record UctAnalysisContext(IssueSeverityLevel minimumSeverity, UctVersionState versionState) {
@@ -25,7 +25,12 @@ public record UctAnalysisContext(IssueSeverityLevel minimumSeverity, UctVersionS
         final UctSettingsService settings = UctSettingsService.getInstance(holder.getProject());
         final VirtualFile file = holder.getFile().getVirtualFile();
         return settings.isEnabled()
-                && !UctExcludedPaths.contains(settings.getExcludedPaths(), file == null ? null : file.getPath());
+                && !UctExcludedPaths.contains(settings.getExcludedPaths(), file == null ? null : file.getPath())
+                && holder.getProject().getService(UctReleasePreparation.class).hasEditorData(
+                        settings.getConfiguredCurrentVersion(),
+                        settings.getConfiguredTargetVersion(),
+                        Boolean.TRUE.equals(settings.shouldIgnoreCurrentVersion())
+                );
     }
 
     public static boolean accepts(final ProblemsHolder holder, final IssueSeverityLevel severity) {
@@ -37,6 +42,14 @@ public record UctAnalysisContext(IssueSeverityLevel minimumSeverity, UctVersionS
 
     public static UctVersionState versions(final ProblemsHolder holder) {
         final UctAnalysisContext context = context(holder);
-        return context == null ? VersionStateManager.getInstance(holder.getProject()) : context.versionState();
+        if (context != null) {
+            return context.versionState();
+        }
+        final UctSettingsService settings = UctSettingsService.getInstance(holder.getProject());
+        return holder.getProject().getService(UctReleasePreparation.class).editorState(
+                settings.getConfiguredCurrentVersion(),
+                settings.getConfiguredTargetVersion(),
+                Boolean.TRUE.equals(settings.shouldIgnoreCurrentVersion())
+        );
     }
 }

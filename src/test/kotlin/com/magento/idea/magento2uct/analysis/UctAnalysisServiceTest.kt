@@ -4,20 +4,22 @@
  */
 package com.magento.idea.magento2uct.analysis
 
-import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.codeInspection.InspectionManager
 import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.openapi.progress.ProcessCanceledException
+import com.intellij.openapi.util.JDOMUtil
 import com.intellij.psi.PsiDocumentManager
+import com.intellij.psi.PsiFile
 import com.intellij.util.xmlb.XmlSerializer
-import com.magento.idea.magento2uct.inspections.UctAnalysisContext
 import com.magento.idea.magento2plugin.PhysicalMagentoTestCase
+import com.magento.idea.magento2uct.execution.output.ReportBuilder
+import com.magento.idea.magento2uct.execution.output.Summary
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext
+import com.magento.idea.magento2uct.inspections.UctInspectionManager
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel
 import com.magento.idea.magento2uct.packages.SupportedIssue
 import com.magento.idea.magento2uct.settings.UctSettingsService
-import com.magento.idea.magento2uct.execution.output.ReportBuilder
-import com.magento.idea.magento2uct.execution.output.Summary
 import org.json.JSONObject
-import com.magento.idea.magento2uct.inspections.UctInspectionManager
 import org.junit.Assert.assertThrows
 import java.nio.file.Files
 import java.nio.file.Path
@@ -127,8 +129,8 @@ class UctAnalysisServiceTest : PhysicalMagentoTestCase() {
 
     fun testEditorInspectionsSkipExcludedPaths() {
         val root = myFixture.findFileInTempDir("app/code/Foo/Bar").path
+        configure("2.4.2", "2.4.4-beta4")
         val settings = UctSettingsService.getInstance(project)
-        settings.isEnabled = true
         settings.excludedPaths = listOf("$root/etc")
         assertFalse(UctAnalysisContext.isEnabled(holder("app/code/Foo/Bar/etc/di.xml")))
         assertTrue(UctAnalysisContext.isEnabled(holder("app/code/Foo/Bar/Example.php")))
@@ -145,6 +147,60 @@ class UctAnalysisServiceTest : PhysicalMagentoTestCase() {
         assertEquals(settings.excludedPaths, restored.excludedPaths)
         assertEquals(emptyList<String>(), UctSettingsService().excludedPaths)
     }
+
+    fun testEditorInspectionsUseCompatibilityDataOfConfiguredVersions() {
+        val file = myFixture.addFileToProject("app/code/Foo/Bar/Model/UrlFixerUser.php", """
+            <?php
+            namespace Foo\Bar\Model;
+            use Magento\CloudComponents\Model\UrlFixer;
+            class UrlFixerUser {}
+        """.trimIndent())
+        configure("2.4.2", "2.4.4-beta4")
+        assertTrue(editorMessages(file).toString(), editorMessages(file).any { it.contains("UrlFixer") })
+        configure("2.4.2", "2.4.9")
+        assertEquals(emptyList<String>(), editorMessages(file))
+    }
+
+    fun testEditorInspectionsReportNothingWithoutCompatibilityData() {
+        myFixture.addFileToProject("vendor/magento/test/Service.php", """
+            <?php namespace Magento\Test;
+            interface ServiceInterface { public function declared(); }
+            class Service implements ServiceInterface {
+                public function declared() {}
+                public function extra(): ServiceInterface { return ${'$'}this; }
+            }
+        """.trimIndent())
+        val file = myFixture.addFileToProject("app/code/Foo/Bar/Model/ServiceUser.php", """
+            <?php namespace Foo\Bar\Model;
+            class ServiceUser {
+                public function run(\Magento\Test\Service ${'$'}service) { ${'$'}service->extra(); }
+            }
+        """.trimIndent())
+        PsiDocumentManager.getInstance(project).commitAllDocuments()
+        configure("2.4.2", "2.4.4-beta4")
+        assertTrue(editorMessages(file).toString(), editorMessages(file).any { it.startsWith("[1449]") })
+        configure("2.4.2", "2.4.9")
+        assertEquals(emptyList<String>(), editorMessages(file))
+        configure("2.4.4-beta4", "2.4.2")
+        assertEquals(emptyList<String>(), editorMessages(file))
+    }
+
+    private fun configure(current: String, target: String) {
+        val state = UctSettingsService()
+        state.isEnabled = true
+        XmlSerializer.deserializeInto(state, JDOMUtil.load("""
+            <state>
+              <option name="currentVersion" value="$current" />
+              <option name="targetVersion" value="$target" />
+              <option name="minIssueSeverityLevel" value="3" />
+              <option name="ignoreCurrentVersion" value="false" />
+            </state>
+        """.trimIndent()))
+        UctSettingsService.getInstance(project).loadState(state)
+    }
+
+    private fun editorMessages(file: PsiFile): List<String> =
+        UctInspectionManager(project).run(file)?.results.orEmpty().map { it.descriptionTemplate }
 
     fun testSeverityAppliesToPhpAndXmlWithoutChangingSettings() {
         val settings = UctSettingsService.getInstance(project)
