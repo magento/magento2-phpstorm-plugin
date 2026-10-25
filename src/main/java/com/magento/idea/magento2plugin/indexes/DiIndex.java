@@ -8,9 +8,7 @@ package com.magento.idea.magento2plugin.indexes;
 import com.intellij.codeInsight.completion.PrefixMatcher;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 // CHECKSTYLE IGNORE check FOR NEXT 1 LINES
@@ -21,7 +19,6 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.magento.idea.magento2plugin.stubs.indexes.VirtualTypeIndex;
 import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
 // CHECKSTYLE IGNORE check FOR NEXT 1 LINES
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -151,20 +148,7 @@ public class DiIndex {
      * @return Collection<PsiElement>
      */
     public Collection<PsiElement> getVirtualTypeElements(final String name, final GlobalSearchScope scope) {
-        Collection<PsiElement> result = new ArrayList<>();
-
-        Collection<VirtualFile> virtualFiles =
-                FileBasedIndex.getInstance().getContainingFiles(VirtualTypeIndex.KEY, name, scope);
-
-        for (VirtualFile virtualFile : virtualFiles) {
-            XmlFile xmlFile = (XmlFile) PsiManager.getInstance(project).findFile(virtualFile);
-            if (xmlFile != null) {
-                Collection<XmlAttributeValue> valueElements = XmlPsiTreeUtil
-                        .findAttributeValueElements(xmlFile, "virtualType", "name", name);
-                result.addAll(valueElements);
-            }
-        }
-        return result;
+        return new XmlVirtualTypeIndex(project).getVirtualTypeElements(name, scope);
     }
 
     /**
@@ -175,11 +159,7 @@ public class DiIndex {
      * @return Collection<String>
      */
     public Collection<String> getAllVirtualTypeElementNames(PrefixMatcher prefixMatcher, final GlobalSearchScope scope) {
-        Collection<String> keys =
-                FileBasedIndex.getInstance().getAllKeys(VirtualTypeIndex.KEY, project);
-
-        keys.removeIf(k -> !prefixMatcher.prefixMatches(k));
-        return keys;
+        return new XmlVirtualTypeIndex(project).getAllVirtualTypeElementNames(prefixMatcher, scope);
     }
 
     /**

@@ -13,6 +13,21 @@
     <depends>com.intellij.copyright</depends>
     <depends optional="true" config-file="withMcp.xml">com.intellij.mcpServer</depends>
     <depends optional="true" config-file="withPhp.xml">com.jetbrains.php</depends>
+    <depends optional="true" config-file="withJsGraphQl.xml">com.intellij.lang.jsgraphql</depends>
+
+    <content>
+        <module name="com.magento.idea.magento2plugin.php.mcp" loading="optional"/>
+        <module name="com.magento.idea.magento2plugin.php.graphql" loading="optional"/>
+    </content>
+
+    <extensionPoints>
+        <extensionPoint qualifiedName="com.magento.idea.magento2plugin.methodPluginQueryProvider"
+                        interface="com.magento.idea.magento2plugin.mcp.MagentoMethodPluginQueryProvider"
+                        dynamic="true"/>
+        <extensionPoint qualifiedName="com.magento.idea.magento2plugin.eventNameIndexProvider"
+                        interface="com.magento.idea.magento2plugin.stubs.indexes.EventNameIndexProvider"
+                        dynamic="false"/>
+    </extensionPoints>
 
     <actions>
         <action id="Magento.CheckUpdates"
@@ -119,6 +134,10 @@
         <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.completion.xml.SystemConfigurationContributor" id="magentoSystemConfiguration"/>
         <xml.tagNameProvider implementation="com.magento.idea.magento2plugin.completion.provider.xml.ConfigXmlTagNameProvider"/>
 
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.EventObserverIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.EventNameIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.VirtualTypeIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.PluginIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ModulePackageIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.ThemeXmlIndex" />
@@ -168,6 +187,22 @@
         <notificationGroup id="Magento Updates" displayType="BALLOON" />
 
         <projectViewNodeDecorator implementation="com.magento.idea.magento2plugin.decorator.MagentoFolderDecorator"/>
+
+        <localInspection language="XML" groupPath="XML"
+                         shortName="ObserverDeclarationInspection"
+                         bundle="magento2.inspection" key="inspection.displayName.ObserverDeclarationInspection"
+                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.ObserverDeclarationInspection"/>
+
+        <localInspection language="XML" groupPath="XML"
+                         shortName="PluginDeclarationInspection"
+                         bundle="magento2.inspection" key="inspection.displayName.PluginDeclarationInspection"
+                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.PluginDeclarationInspection"/>
 
         <localInspection language="XML" groupPath="XML"
                          shortName="CacheableFalseInDefaultLayoutInspection"

@@ -14,8 +14,8 @@ import com.intellij.util.indexing.*;
 import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
-import com.jetbrains.php.lang.PhpLangUtil;
-import com.jetbrains.php.lang.psi.stubs.indexes.StringSetDataExternalizer;
+import com.magento.idea.magento2plugin.util.PhpNameUtil;
+import com.magento.idea.magento2plugin.stubs.indexes.js.data.StringSetDataExternalizer;
 import com.magento.idea.magento2plugin.project.Settings;
 import org.jetbrains.annotations.NotNull;
 
@@ -85,7 +85,7 @@ public class EventObserverIndex extends FileBasedIndexExtension<String,Set<Strin
                 for (XmlTag observerTag: eventNode.findSubTags("observer")) {
                     String name = observerTag.getAttributeValue("instance");
                     if (name != null) {
-                        observerNames.add(PhpLangUtil.toPresentableFQN(name));
+                        observerNames.add(PhpNameUtil.toPresentableFQN(name));
                     }
                 }
 
@@ -103,7 +103,7 @@ public class EventObserverIndex extends FileBasedIndexExtension<String,Set<Strin
     @NotNull
     @Override
     public DataExternalizer<Set<String>> getValueExternalizer() {
-        return new StringSetDataExternalizer();
+        return StringSetDataExternalizer.INSTANCE;
     }
 
     @NotNull
@@ -119,6 +119,6 @@ public class EventObserverIndex extends FileBasedIndexExtension<String,Set<Strin
 
     @Override
     public int getVersion() {
-        return 2;
+        return 3;
     }
 }

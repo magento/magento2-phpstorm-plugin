@@ -301,11 +301,7 @@ class MagentoUpdatesUiTest {
                     ideFrame {
                         openSettingsDialog()
                         settingsDialog {
-                            searchTextField.text = "Magento"
-                            waitFor("Magento settings", 30.seconds) {
-                                settingsTree.collectExpandedPaths().any { it.path.last() == "Magento" }
-                            }
-                            settingsTree.clickRow { it == "Magento" }
+                            openTreeSettingsSection("Tools", "Magento")
                             content {
                                 val checkButton = button("Check Magento updates").waitFound()
                                 withContext(OnDispatcher.EDT) {
@@ -328,11 +324,7 @@ class MagentoUpdatesUiTest {
         ideFrame {
             openSettingsDialog()
             settingsDialog {
-                searchTextField.text = "Magento"
-                waitFor("Magento settings", 30.seconds) {
-                    settingsTree.collectExpandedPaths().any { it.path.last() == "Magento" }
-                }
-                settingsTree.clickRow { it == "Magento" }
+                openTreeSettingsSection("Tools", "Magento")
                 action()
             }
         }

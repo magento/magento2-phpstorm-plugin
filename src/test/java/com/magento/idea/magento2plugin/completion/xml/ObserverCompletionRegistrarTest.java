@@ -5,6 +5,8 @@
 package com.magento.idea.magento2plugin.completion.xml;
 
 import com.magento.idea.magento2plugin.magento.files.ModuleEventsXml;
+import java.util.Collections;
+import java.util.List;
 
 public class ObserverCompletionRegistrarTest extends CompletionXmlFixtureTestCase {
 
@@ -35,4 +37,23 @@ public class ObserverCompletionRegistrarTest extends CompletionXmlFixtureTestCas
 
         assertFileContainsCompletions(filePath, lookupStringsEvents);
     }
+
+    public void testDeclaredAndDispatchedEventCompletionIsDeduplicated() {
+        myFixture.addFileToProject("app/code/Test/Events/etc/events.xml",
+                "<config><event name=\"portability_shared_event\"/>"
+                        + "<event name=\"portability_declared_event\"/></config>");
+        myFixture.addFileToProject("app/code/Test/Events/Dispatch.php",
+                "<?php $events->dispatch('portability_shared_event');"
+                        + "$events->dispatch('portability_dispatched_event');");
+        myFixture.configureByText(ModuleEventsXml.FILE_NAME,
+                "<config><event name=\"portability_<caret>\"/></config>");
+        myFixture.completeBasic();
+
+        final List<String> lookupStrings = myFixture.getLookupElementStrings();
+        assertNotNull(lookupStrings);
+        assertContainsElements(lookupStrings,
+                "portability_shared_event", "portability_declared_event", "portability_dispatched_event");
+        assertEquals(1, Collections.frequency(lookupStrings, "portability_shared_event"));
+    }
+
 }

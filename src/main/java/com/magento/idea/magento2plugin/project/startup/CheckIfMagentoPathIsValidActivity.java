@@ -14,7 +14,7 @@ import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.ProjectActivity;
 import com.intellij.openapi.startup.StartupActivity;
-import com.magento.idea.magento2plugin.init.ConfigurationManager;
+import com.magento.idea.magento2plugin.project.MagentoNotificationUtil;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.magento.MagentoBasePathUtil;
 import kotlin.Unit;
@@ -47,7 +47,7 @@ public class CheckIfMagentoPathIsValidActivity implements StartupActivity, Proje
                 settings.setMagentoPath(project.getBasePath());
             } else {
                 settings.pluginEnabled = false;
-                ConfigurationManager.suggestToConfigureMagentoPath(project);
+                MagentoNotificationUtil.suggestToConfigureMagentoPath(project);
             }
         }
         DeferredProjectOpenActions.getInstance(project).runPendingActions();
