@@ -17,7 +17,7 @@ internal object UctAnalysisRunReport {
         .put("request", JSONObject().put("paths", JSONArray(view.request.paths))
             .put("currentVersion", view.request.currentVersion ?: JSONObject.NULL).put("targetVersion", view.request.targetVersion)
             .put("minimumSeverity", view.request.minimumSeverity.name).put("ignoreCurrentVersion", view.request.ignoreCurrentVersion)
-            .put("explainSuppressed", view.request.explainSuppressed))
+            .put("explainSuppressed", view.request.explainSuppressed).put("excludedPaths", JSONArray(view.request.excludedPaths)))
         .put("result", view.result?.let { result -> JSONObject()
             .put("processedFiles", result.processedFiles).put("modules", result.modules).put("themes", result.themes)
             .put("analysisIdentity", result.analysisIdentity?.let(::JSONObject) ?: JSONObject.NULL)
@@ -45,7 +45,8 @@ internal object UctAnalysisRunReport {
         return UctAnalysisRuns.View(json.getString("runId"), json.getString("state"),
             UctAnalysisRequest(request.getJSONArray("paths").toList().map { it as String },
                 if (request.isNull("currentVersion")) null else request.getString("currentVersion"), request.getString("targetVersion"),
-                IssueSeverityLevel.valueOf(request.getString("minimumSeverity")), request.getBoolean("ignoreCurrentVersion"), request.getBoolean("explainSuppressed")),
+                IssueSeverityLevel.valueOf(request.getString("minimumSeverity")), request.getBoolean("ignoreCurrentVersion"), request.getBoolean("explainSuppressed"),
+                request.optJSONArray("excludedPaths")?.toList()?.map { it as String }.orEmpty()),
             UctAnalysisProgress(json.getInt("processedFiles"), json.getInt("totalFiles")), result,
             if (json.isNull("error")) null else json.getString("error"))
     }

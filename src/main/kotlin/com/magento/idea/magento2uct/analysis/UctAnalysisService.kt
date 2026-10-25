@@ -30,7 +30,8 @@ data class UctAnalysisRequest @JvmOverloads constructor(
     val targetVersion: String,
     val minimumSeverity: IssueSeverityLevel,
     val ignoreCurrentVersion: Boolean,
-    val explainSuppressed: Boolean = false
+    val explainSuppressed: Boolean = false,
+    val excludedPaths: List<String> = emptyList()
 )
 
 data class UctFinding(
@@ -96,17 +97,18 @@ class UctAnalysisService @JvmOverloads constructor(
 
         val components = linkedMapOf<String, Component>()
         val files = linkedMapOf<String, VirtualFile>()
+        fun isExcluded(file: VirtualFile) = UctExcludedPaths.contains(request.excludedPaths, file.path)
         val roots = request.paths.distinct().map { path ->
             LocalFileSystem.getInstance().findFileByNioFile(Path.of(path))
                 ?: throw IllegalArgumentException("Analysis path does not exist: $path")
-        }
+        }.filterNot(::isExcluded)
         val excluded = ExcludeMagentoBundledFilter()
         val directories = ArrayDeque(roots.filter { it.isDirectory })
         roots.filterNot { it.isDirectory }.forEach { files[it.path] = it }
         val visited = hashSetOf<String>()
         while (directories.isNotEmpty()) {
             val directory = directories.removeFirst()
-            if (!visited.add(directory.path) || directory.`is`(VFileProperty.SYMLINK)) continue
+            if (!visited.add(directory.path) || directory.`is`(VFileProperty.SYMLINK) || isExcluded(directory)) continue
             require(visited.size <= 10000) { "Scan exceeds 10000 directories. Choose a narrower scope." }
             read {
                 val psiDirectory = PsiManager.getInstance(project).findDirectory(directory)
@@ -130,7 +132,7 @@ class UctAnalysisService @JvmOverloads constructor(
             if (!visited.add(directory.path) || directory.`is`(VFileProperty.SYMLINK)) continue
             require(visited.size <= 10000 && files.size <= 10000) { "Scan exceeds 10000 files or directories. Choose a narrower scope." }
             read {
-                directory.children.filterNot { it.`is`(VFileProperty.SYMLINK) }.forEach {
+                directory.children.filterNot { it.`is`(VFileProperty.SYMLINK) || isExcluded(it) }.forEach {
                     if (it.isDirectory) pending.add(it) else files[it.path] = it
                 }
             }

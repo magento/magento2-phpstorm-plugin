@@ -11,10 +11,12 @@ import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.intellij.util.xmlb.annotations.Property;
+import com.intellij.util.xmlb.annotations.XCollection;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.packages.SupportedVersion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
 @State(name = "Magento2UctSettings", storages = @Storage(UctSettingsService.M2_UCT_SETTINGS_XML))
@@ -48,6 +50,9 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
 
     @Property
     private String additionalPath;
+
+    @XCollection(style = XCollection.Style.v2)
+    private List<String> excludedPaths = new ArrayList<>();
 
     @SuppressWarnings("PMD.UncommentedEmptyConstructor")
     public UctSettingsService() {
@@ -304,5 +309,23 @@ public class UctSettingsService implements PersistentStateComponent<UctSettingsS
      */
     public @Nullable String getAdditionalPath() {
         return additionalPath;
+    }
+
+    /**
+     * Set paths excluded from the analysis.
+     *
+     * @param excludedPaths List[String]
+     */
+    public void setExcludedPaths(final @NotNull List<String> excludedPaths) {
+        this.excludedPaths = new ArrayList<>(excludedPaths);
+    }
+
+    /**
+     * Get paths excluded from the analysis.
+     *
+     * @return List[String]
+     */
+    public @NotNull List<String> getExcludedPaths() {
+        return excludedPaths == null ? List.of() : List.copyOf(excludedPaths);
     }
 }

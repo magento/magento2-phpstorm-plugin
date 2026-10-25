@@ -5,6 +5,8 @@
 package com.magento.idea.magento2uct.inspections;
 
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.magento.idea.magento2uct.analysis.UctExcludedPaths;
 import com.magento.idea.magento2uct.analysis.UctReleasePreparation;
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel;
 import com.magento.idea.magento2uct.settings.UctSettingsService;
@@ -21,7 +23,9 @@ public record UctAnalysisContext(IssueSeverityLevel minimumSeverity, UctVersionS
             return true;
         }
         final UctSettingsService settings = UctSettingsService.getInstance(holder.getProject());
+        final VirtualFile file = holder.getFile().getVirtualFile();
         return settings.isEnabled()
+                && !UctExcludedPaths.contains(settings.getExcludedPaths(), file == null ? null : file.getPath())
                 && holder.getProject().getService(UctReleasePreparation.class).hasEditorData(
                         settings.getConfiguredCurrentVersion(),
                         settings.getConfiguredTargetVersion(),
