@@ -134,6 +134,7 @@
 
         <psi.referenceContributor language="XML" implementation="com.magento.idea.magento2plugin.reference.xml.XmlReferenceContributor"/>
         <psi.referenceContributor language="PHP" implementation="com.magento.idea.magento2plugin.reference.php.PhpReferenceContributor"/>
+        <implicitUsageProvider implementation="com.magento.idea.magento2plugin.inspections.php.DiConstantImplicitUsageProvider"/>
 
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.CronGroupIndexer" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.WebApiTypeIndex" />

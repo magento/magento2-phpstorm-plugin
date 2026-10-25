@@ -110,6 +110,23 @@ class UctReleasePreparationTest : PhysicalMagentoTestCase() {
         return failure.get()
     }
 
+    fun testEditorStateFollowsTheCatalogAndReportsNothingWithoutData() {
+        val removed = "\\Magento\\CloudComponents\\Model\\UrlFixer"
+        val framework = "\\Magento\\Framework\\AppInterface"
+        val bundled = preparation.editorState("2.4.2", "2.4.4-beta4", false)
+        assertFalse(bundled.isExists(removed))
+        assertSame(bundled, preparation.editorState("2.4.2", "2.4.4-beta4", false))
+        for (state in listOf(preparation.editorState("2.4.2", "2.4.9", false),
+            preparation.editorState("2.4.4-beta4", "2.4.2", false), preparation.editorState(null, null, false))) {
+            assertTrue(state.isExists(removed))
+            assertFalse(state.isPresentInCodebase(framework))
+            assertTrue(state.isApi(removed))
+        }
+        val started = preparation.start("2.4.9") { _, _, _ -> UctReleaseFixture.index() }
+        await(started.runId!!)
+        assertTrue(preparation.editorState(null, "2.4.9", false).isPresentInCodebase(framework))
+    }
+
     fun testCancellationIsIdempotentAndLateWorkCannotPublishData() {
         val entered = AtomicBoolean()
         val returned = AtomicBoolean()
