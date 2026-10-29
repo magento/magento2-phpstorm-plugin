@@ -5,8 +5,9 @@
 package com.magento.idea.magento2uct.analysis
 
 import com.intellij.psi.PsiFile
+import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocMethod
+import com.jetbrains.php.lang.psi.elements.PhpAttributesOwner
 import com.jetbrains.php.lang.psi.elements.PhpNamedElement
-import com.jetbrains.php.lang.psi.elements.impl.PhpNamedElementImpl
 import com.magento.idea.magento2uct.versioning.processors.PhpClassLocatorUtil
 
 /**
@@ -58,10 +59,15 @@ internal class UctReleaseDeprecations {
         return false
     }
 
-    private fun isOwnDeprecated(element: PhpNamedElement): Boolean =
-        PhpNamedElementImpl.getDeprecatedSinceVersion(element) != null
+    /** A @method declaration has no markers of its own; its doc comment is the class's. */
+    private fun isOwnDeprecated(element: PhpNamedElement): Boolean = element !is PhpDocMethod && (
+        element.docComment?.getTagElementsByName(DEPRECATED_TAG)?.isNotEmpty() == true ||
+            (element as? PhpAttributesOwner)?.getAttributes(DEPRECATED_ATTRIBUTE)?.isNotEmpty() == true
+    )
 
     private companion object {
         const val INHERIT_DOC = "@inheritdoc"
+        const val DEPRECATED_TAG = "@deprecated"
+        const val DEPRECATED_ATTRIBUTE = "\\Deprecated"
     }
 }

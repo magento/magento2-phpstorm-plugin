@@ -47,6 +47,7 @@ class UctReleaseSourceTest : PhysicalMagentoTestCase() {
             class Base implements Contract {
                 /** @deprecated */ public function removed() {}
                 /** Kept. */ public function kept() {}
+                #[\Deprecated] public function attributed() {}
                 /** @inheritdoc */ public function contract() {}
                 /** @inheritdoc */ public function external() {}
             }
@@ -71,6 +72,18 @@ class UctReleaseSourceTest : PhysicalMagentoTestCase() {
         val deprecated = index(inheritedDocs(mapOf(contract))).deprecation.keys.filter { it.contains("Child") }.toSet()
         val child = "\\Magento\\Catalog\\Model\\Child"
         assertEquals(setOf("$child.removed", "$child.contract"), deprecated)
+        val legacy = "app/code/Magento/Catalog/Model/Legacy.php" to """
+            <?php namespace Magento\Catalog\Model;
+            /**
+             * @deprecated
+             * @method string getLegacy()
+             */
+            class Legacy {}
+        """.trimIndent()
+        val withLegacy = index(inheritedDocs(mapOf(legacy))).deprecation
+        assertTrue(withLegacy.containsKey("\\Magento\\Catalog\\Model\\Base.attributed"))
+        assertTrue(withLegacy.containsKey("\\Magento\\Catalog\\Model\\Legacy"))
+        assertFalse(withLegacy.containsKey("\\Magento\\Catalog\\Model\\Legacy.getLegacy"))
 
         // An installed parent must not change the release snapshot.
         myFixture.addFileToProject("vendor/magento/catalog/Model/Base.php", """
