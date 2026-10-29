@@ -73,7 +73,7 @@ public abstract class CallMethodInspection extends PhpInspection {
      * Inspect the contract on each receiver type. multiResolve also returns interface
      * implementations and overrides that the call does not depend on (e.g. test loggers).
      * Keep explicit union/intersection members and inherited declarations in stable order.
-     * Receiver interfaces that do not declare the method go to missingInInterface.
+     * Receiver interfaces that do not declare a statically named method go to missingInInterface.
      */
     private static Map<String, Method> receiverMethods(
             final MethodReference reference,
@@ -85,6 +85,8 @@ public abstract class CallMethodInspection extends PhpInspection {
             return methods;
         }
         final PhpIndex index = PhpIndex.getInstance(reference.getProject());
+        // $receiver->$name() has no name node: the method is unknown, not missing.
+        final boolean staticName = reference.getNameNode() != null;
         // getTypes() exposes class names without generic arguments, so '&' only
         // separates receiver contracts, never types nested inside a generic argument.
         for (final String type : receiver.getType().global(reference.getProject()).getTypes()) {
@@ -93,7 +95,7 @@ public abstract class CallMethodInspection extends PhpInspection {
                     final Method method = phpClass.findMethodByName(reference.getName());
                     if (method != null) {
                         methods.putIfAbsent(method.getFQN(), method);
-                    } else if (phpClass.isInterface()) {
+                    } else if (staticName && phpClass.isInterface()) {
                         missingInInterface.accept(phpClass);
                     }
                 }

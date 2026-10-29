@@ -406,6 +406,20 @@ class UctAnalysisServiceTest : PhysicalMagentoTestCase() {
         PsiDocumentManager.getInstance(project).commitAllDocuments()
         val documentedResult = analyzeWithCatalog(catalog, request().copy(paths = listOf(documented.virtualFile.path), currentVersion = "2.4.8-p5", targetVersion = "2.4.9"))
         assertTrue(documentedResult.findings.toString(), documentedResult.findings.none { it.issue == SupportedIssue.CALLED_NON_INTERFACE_METHOD })
+
+        // A dynamic method name is not known statically, so it cannot be missing from the interface.
+        val dynamic = myFixture.addFileToProject("app/code/Foo/Bar/DynamicInjector.php", """
+            <?php namespace Foo\Bar;
+            class DynamicInjector {
+                public function inject(\Magento\Framework\App\ResponseInterface ${'$'}result) {
+                    ${'$'}method = 'sendResponse';
+                    ${'$'}result->${'$'}method();
+                }
+            }
+        """.trimIndent())
+        PsiDocumentManager.getInstance(project).commitAllDocuments()
+        val dynamicResult = analyzeWithCatalog(catalog, request().copy(paths = listOf(dynamic.virtualFile.path), currentVersion = "2.4.8-p5", targetVersion = "2.4.9"))
+        assertTrue(dynamicResult.findings.toString(), dynamicResult.findings.none { it.issue == SupportedIssue.CALLED_NON_INTERFACE_METHOD })
     }
 
     fun testInterfaceContractAndExplicitConcreteUnionMembersAreStillInspected() {
