@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 
+## 2026.3.6
+
+### Fixed
+
+- Preparing Upgrade Compatibility Tool release data no longer fails while the IDE is indexing, and the prepared deprecation data no longer depends on the classes installed in the open project: methods documented with `@inheritdoc` take deprecation from their parents in the same release [#2769](https://github.com/magento/magento2-phpstorm-plugin/issues/2769).
+
 ## 2026.3.5
 
 ### Added
