@@ -11,6 +11,93 @@ import java.util.concurrent.TimeUnit
 
 class MagentoMagerunTest {
     @Test
+    fun testDdevDiscoveryAndProbesWithoutHostMagerun() = fixture { directory ->
+        val root = Files.createDirectories(directory.resolve("project"))
+        file(root, ".ddev/config.yaml", "type: magento2\n")
+        Files.createDirectories(root.resolve("src"))
+        val launcher = file(directory, "host tools/ddev", "fixture", true)
+        val env = MagentoMagerunSupport.discover(root, "src", DEFAULTS) { launcher }
+        val runner = FakeRunner()
+        val service = MagentoMagerunService(runner)
+        val status = service.execute(env, MagerunRequest())
+        assertEquals("detected", status.getString("status"))
+        assertTrue(runner.calls.isEmpty())
+        assertEquals(root.resolve("src").toString(), status.getJSONObject("invocation").getString("cwd"))
+        assertEquals("ddev exec --raw --service=web -- magerun2 --version", status.getJSONObject("terminalGuidance").getString("command"))
+        val result = service.execute(env, MagerunRequest("mcp_config"))
+        assertEquals("ok", result.getString("status"))
+        val prefix = listOf(launcher.toString(), "exec", "--raw", "--service=web", "--", "magerun2")
+        assertTrue(runner.calls.all { it.take(prefix.size) == prefix })
+        assertTrue(runner.calls.none { args -> args.any { it.startsWith("--root-dir=") } })
+        val server = result.getJSONObject("configuration").getJSONObject("mcpServers").getJSONObject("magento-magerun2")
+        assertEquals(prefix.drop(1), server.getJSONArray("args").toList().take(prefix.size - 1))
+        val callsBefore = runner.calls.size
+        file(root, ".ddev/config.yaml", "type: magento2\nname: changed\n")
+        service.execute(env, MagerunRequest("commands"))
+        assertEquals(callsBefore + 2, runner.calls.size)
+        file(directory, "host tools/ddev", "changed launcher", true)
+        service.execute(env, MagerunRequest("commands"))
+        assertEquals(callsBefore + 4, runner.calls.size)
+    }
+
+    @Test
+    fun testMissingDdevLauncherRetainsConfigurationAndTerminalGuidance() = fixture { root ->
+        file(root, ".ddev/config.yaml", "type: magento2\n")
+        val env = MagentoMagerunSupport.discover(root, null, DEFAULTS) { null }
+        val runner = FakeRunner()
+        val result = MagentoMagerunService(runner).execute(env, MagerunRequest("commands"))
+        assertEquals("missing_launcher", result.getString("status"))
+        assertEquals(root.resolve(".ddev/config.yaml").toString(), result.getJSONObject("selected").getString("path"))
+        assertTrue(result.getJSONObject("terminalGuidance").getString("message").contains("PhpStorm's Terminal"))
+        assertTrue(runner.calls.isEmpty())
+    }
+
+    @Test
+    fun testDdevFailuresRetainInvocationAndNeverRetryAnotherRuntime() = fixture { root ->
+        file(root, ".ddev/config.yaml", "type: magento2\n")
+        val launcher = file(root, "host/ddev", "fixture", true)
+        val env = MagentoMagerunSupport.discover(root, null, DEFAULTS) { launcher }
+        for ((failure, status) in listOf(
+            MagerunProcessResult(127, stderr = "magerun2: command not found") to "missing_installation",
+            MagerunProcessResult(1, stderr = "project is stopped") to "runtime_unavailable",
+            MagerunProcessResult(1, stderr = "permission denied") to "runtime_unavailable",
+            MagerunProcessResult(-1, timedOut = true) to "timeout",
+            MagerunProcessResult(-1, outputLimited = true) to "output_limit"
+        )) {
+            var calls = 0
+            val service = MagentoMagerunService(MagerunRunner { _, cwd, _ ->
+                calls++
+                assertEquals(root, cwd)
+                failure
+            })
+            val result = service.execute(env, MagerunRequest("commands"))
+            assertEquals(status, result.getString("status"))
+            assertEquals("ddev", result.getJSONObject("invocation").getString("runtime"))
+            assertEquals(root.toString(), result.getJSONObject("terminalGuidance").getString("cwd"))
+            assertEquals(1, calls)
+            assertEquals("detected", service.execute(env, MagerunRequest()).getString("status"))
+        }
+        val unavailable = MagentoMagerunService(MagerunRunner { _, _, _ -> throw java.io.IOException("denied") })
+            .execute(env, MagerunRequest("commands"))
+        assertEquals("runtime_unavailable", unavailable.getString("status"))
+        assertTrue(unavailable.has("terminalGuidance"))
+    }
+
+    @Test
+    fun testDdevKeepsLocalCandidatePriorityAndRejectsOutsideConfiguration() = fixture { root ->
+        file(root, ".ddev/config.yaml", "type: magento2\n")
+        php(root, "bin/magerun2")
+        val env = MagentoMagerunSupport.discover(root, null, DEFAULTS) { null }
+        assertEquals("local", MagentoMagerunSupport.plan(env).runtime)
+        val nested = Files.createDirectories(root.resolve("nested"))
+        assertTrue(MagentoMagerunSupport.discover(nested, null, DEFAULTS) {
+            throw AssertionError("Must not resolve DDEV without in-project configuration")
+        }.candidates.isEmpty())
+        Files.createSymbolicLink(nested.resolve(".ddev"), root.resolve(".ddev"))
+        assertTrue(MagentoMagerunSupport.discover(nested, null, DEFAULTS) { null }.candidates.isEmpty())
+    }
+
+    @Test
     fun testStatusNeverRunsAProcess() = fixture { root ->
         php(root, "bin/n98-magerun2")
         val runner = FakeRunner()

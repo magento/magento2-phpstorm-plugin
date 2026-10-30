@@ -8,6 +8,7 @@ import com.intellij.testFramework.ExtensionTestUtil
 import com.intellij.testFramework.DumbModeTestUtils
 import com.intellij.testFramework.IndexingTestUtil
 import com.intellij.testFramework.JUnit38AssumeSupportRunner
+import com.intellij.util.EnvironmentUtil
 import com.magento.idea.magento2plugin.project.Settings
 import org.json.JSONObject
 import org.junit.runner.RunWith
@@ -148,6 +149,90 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         assertEquals(root.resolve("src/bin/n98-magerun2.phar").toString(), magerun().getJSONObject("selected").getString("path"))
         assertTrue(calls("bin").isEmpty())
         assertTrue(calls("src/bin").isEmpty())
+    }
+
+    fun testDdevDiscoveryMetadataAndNativeConfigurationOverHttp() {
+        org.junit.Assume.assumeFalse("POSIX DDEV fixture", com.intellij.openapi.util.SystemInfoRt.isWindows)
+        file(".ddev/config.yaml", "name: commerce-local\ntype: magento2\ndocroot: src/pub\ncomposer_root: src\nworking_dir: {web: /var/www/html/src}\n")
+        file("src/fixture.php", javaClass.getResource("/magerun/http-fixture.php")!!.readText())
+        file("host tools/ddev", """
+            #!/bin/sh
+            printf '%s\n' "${'$'}*" >> ddev-calls.txt
+            [ "${'$'}1" = exec ] && [ "${'$'}2" = --raw ] && [ "${'$'}3" = --service=web ] && [ "${'$'}4" = --project=commerce-local ] && [ "${'$'}5" = --dir=/var/www/html/src ] && [ "${'$'}6" = -- ] && [ "${'$'}7" = magerun2 ] || exit 91
+            if [ -f ddev-stopped ]; then echo 'DDEV project is stopped or permission denied' >&2; exit 1; fi
+            if [ -f missing-magerun ]; then echo 'magerun2: command not found' >&2; exit 127; fi
+            shift 7
+            exec php fixture.php "${'$'}@"
+        """.trimIndent() + "\n", executable = true)
+        withDdevPath(root.resolve("host tools").toString() + java.io.File.pathSeparator +
+            EnvironmentUtil.getValue("PATH").orEmpty()) {
+            val description = text("describe_magento_cli_environment")
+            assertTrue(description, description.contains("DDEV configuration: ${root.resolve(".ddev/config.yaml")}"))
+            assertTrue(description, description.contains("ddev exec --raw --service=web --project=commerce-local --dir=/var/www/html/src -- php -v"))
+            assertTrue(description, description.contains("PhpStorm's Terminal"))
+            val status = magerun()
+            assertEquals(status.toString(), "detected", status.getString("status"))
+            assertEquals("ddev", status.getJSONObject("invocation").getString("runtime"))
+            assertEquals(root.resolve("src").toString(), status.getJSONObject("invocation").getString("cwd"))
+            assertFalse(Files.exists(root.resolve("src/ddev-calls.txt")))
+            val commands = magerun("commands", JSONObject().put("search", "sys:info"))
+            assertEquals(commands.toString(), "ok", commands.getString("status"))
+            assertEquals(1, commands.getInt("total"))
+            assertEquals("sys:info", magerun("command_help", JSONObject().put("command", "si"))
+                .getJSONObject("command").getString("name"))
+            val config = magerun("mcp_config").getJSONObject("configuration")
+                .getJSONObject("mcpServers").getJSONObject("magento-magerun2")
+            assertEquals(root.resolve("host tools/ddev").toString(), config.getString("command"))
+            assertEquals(listOf("exec", "--raw", "--service=web", "--project=commerce-local", "--dir=/var/www/html/src", "--", "magerun2"), config.getJSONArray("args").toList().take(7))
+            assertEquals(root.resolve("src").toString(), config.getString("cwd"))
+            assertEquals(4, calls("src").size)
+            for (call in calls("src")) {
+                assertEquals(root.resolve("src").toString(), call.getString("cwd"))
+                assertFalse(call.getJSONArray("arguments").toList().any { it.toString().startsWith("--root-dir=") })
+            }
+            file("src/ddev-stopped", "stopped")
+            val failure = magerun("commands", JSONObject().put("refresh", true))
+            assertEquals("runtime_unavailable", failure.getString("status"))
+            assertTrue(failure.getString("message").contains("permission denied"))
+            assertEquals("ddev exec --raw --service=web --project=commerce-local --dir=/var/www/html/src -- magerun2 --version", failure.getJSONObject("terminalGuidance").getString("command"))
+            assertTrue(failure.has("invocation"))
+            Files.delete(root.resolve("src/ddev-stopped"))
+            file("src/missing-magerun", "missing")
+            assertEquals("missing_installation", magerun("commands").getString("status"))
+            assertEquals(6, Files.readAllLines(root.resolve("src/ddev-calls.txt")).size)
+        }
+    }
+
+    fun testDdevMissingHostExecutableOverHttp() {
+        file(".ddev/config.yaml", "name: commerce-local\ntype: magento2\ndocroot: src/pub\ncomposer_root: src\nworking_dir: {web: /var/www/html/src}\n")
+        withDdevPath(root.resolve("empty-path").toString()) {
+            val description = text("describe_magento_cli_environment")
+            assertTrue(description, description.contains("missing_launcher"))
+            val status = magerun()
+            assertEquals("missing_launcher", status.getString("status"))
+            assertTrue(status.getJSONObject("terminalGuidance").getString("message").contains("PhpStorm's Terminal"))
+            assertEquals("missing_launcher", magerun("commands").getString("status"))
+        }
+    }
+
+    fun testDdevCliConfigurationWithoutMagerunAndInvalidYamlOverHttp() {
+        file(".ddev/config.yaml", "name: commerce\ntype: magento2\ndocroot: src/pub\nworking_dir: {web: /original}\n")
+        file(".ddev/config.local.yaml", "name: commerce-local\nworking_dir: {web: /var/www/html/src}\nphp_version: '8.4'\n")
+        val description = text("describe_magento_cli_environment")
+        assertTrue(description, description.contains("--project=commerce-local --dir=/var/www/html/src -- php -v"))
+        assertTrue(description, description.contains("8.4") && description.contains("src/pub"))
+        assertTrue(description, description.contains(root.resolve(".ddev/config.local.yaml").toString()))
+        file(".ddev/config.local.yaml", "working_dir: [invalid")
+        val invalid = text("describe_magento_cli_environment")
+        assertTrue(invalid, invalid.contains("invalid_configuration"))
+        assertFalse(invalid, invalid.contains("execPrefix"))
+        assertEquals("invalid_configuration", magerun("commands").getString("status"))
+    }
+
+    private fun withDdevPath(path: String, test: () -> Unit) {
+        val original = EnvironmentUtil.getEnvironmentMap()
+        EnvironmentUtil.setEnvironmentLoader { original + ("PATH" to path) }
+        try { test() } finally { EnvironmentUtil.setEnvironmentLoader { original } }
     }
 
     fun testMagerunCatalogueHelpCacheAndNativeConfigurationUseRealProcesses() {

@@ -29,7 +29,8 @@ internal object MagentoMagerunSupport {
             Settings.getMcpCliToolCandidates(project))
     }
 
-    fun discover(projectRoot: Path, magentoRelative: String?, configured: List<String>): Environment {
+    fun discover(projectRoot: Path, magentoRelative: String?, configured: List<String>,
+                 findDdev: () -> Path? = MagentoDdevEnvironment::findExecutable): Environment {
         val root = projectRoot.toAbsolutePath().normalize()
         val searchRoots = MagentoCliToolQueries.buildSearchRoots(root, magentoRelative)
         val magentoRoot = MagentoCliToolQueries.resolveProjectPath(root, magentoRelative ?: ".")
@@ -42,7 +43,10 @@ internal object MagentoMagerunSupport {
             Candidate(root.resolve(tool.command.removePrefix("./")).normalize(),
                 root.resolve(tool.workingDirectory).normalize(), tool.command, isModernName(tool.name))
         }
-        return Environment(root, magentoRoot, searchRoots, candidates)
+        val ddev = MagentoDdevEnvironment.discover(root, magentoRoot, findDdev)
+        return Environment(root, magentoRoot, searchRoots, candidates + listOfNotNull(ddev?.let {
+            Candidate(it.config, it.cwd, "ddev exec magerun2", true, it)
+        }))
     }
 
     internal fun candidatePriority(command: String, configured: List<String>): Int {
@@ -58,10 +62,17 @@ internal object MagentoMagerunSupport {
         return pathRank + if (configuredIndex >= 0) configuredIndex.coerceAtMost(50) else 50 + nameRank
     }
 
-    data class Candidate(val path: Path, val cwd: Path, val displayPath: String, val modernName: Boolean) {
+    data class Candidate(val path: Path, val cwd: Path, val displayPath: String, val modernName: Boolean,
+                         val ddev: MagentoDdevEnvironment.Runtime? = null) {
         fun json(): JSONObject = JSONObject().put("path", path.toString()).put("cwd", cwd.toString())
             .put("family", if (modernName) "magerun2_candidate" else "unverified_alias")
-            .put("identityVerified", false)
+            .put("identityVerified", false).apply {
+                ddev?.let {
+                    put("runtime", "ddev").put("executable", it.executable?.toString() ?: JSONObject.NULL)
+                        .put("ddevProjectRoot", it.config.parent.parent.toString())
+                        .put("service", "web").put("configuration", it.configuration.json())
+                }
+            }
     }
 
     data class Environment(
@@ -76,6 +87,7 @@ internal object MagentoMagerunSupport {
             .put("searchRoots", JSONArray(searchRoots))
             .put("selected", selected?.json() ?: JSONObject.NULL)
             .put("alternatives", JSONArray(candidates.drop(1).map { it.json() }))
+            .apply { selected?.ddev?.takeIf { it.configuration.error == null }?.let { put("terminalGuidance", it.terminalGuidance(listOf("magerun2", "--version"))) } }
     }
 
     data class LaunchPlan(
@@ -97,6 +109,13 @@ internal object MagentoMagerunSupport {
         val candidate = environment.selected ?: throw Unavailable("not_found", "No project-local magerun candidate was found.")
         val root = environment.magentoRoot
             ?: throw Unavailable("invalid_root", "The configured Magento directory is outside the project.")
+        candidate.ddev?.let { ddev ->
+            ddev.configuration.error?.let { throw Unavailable("invalid_configuration", it) }
+            val executable = ddev.executable ?: throw Unavailable("missing_launcher",
+                "DDEV configuration was found, but the ddev executable is unavailable on the IDE's PATH. Make DDEV available to the IDE and retry; no other runtime was tried.")
+            return LaunchPlan(listOf(executable.toString()) + ddev.execArguments(listOf("magerun2")),
+                root, "ddev", ddev.config, fingerprintFiles = listOf(executable) + ddev.configuration.files)
+        }
         return planFile(environment, candidate.path, candidate.cwd, root, candidate.path, emptySet())
     }
 
@@ -180,7 +199,9 @@ internal object MagentoMagerunSupport {
             for (file in files.sortedBy { it.toString() }) {
                 append('\n').append(file)
                 val checked = MagentoCliToolQueries.resolveProjectPath(environment.projectRoot, file.toString())
-                if (checked != null && Files.isRegularFile(checked)) {
+                // The DDEV launcher is the one intentionally external file, resolved from PATH.
+                val externalLauncher = plan.runtime == "ddev" && file.toString() == plan.argv.first()
+                if ((checked != null || externalLauncher) && Files.isRegularFile(file)) {
                     append(':').append(Files.getLastModifiedTime(file)).append(':').append(Files.size(file))
                 } else append(":missing")
             }

@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
+## Unreleased
+
+### Added
+
+- DDEV support for AI-assisted Magento CLI workflows, including discovery of Magerun installed inside the container [#2777](https://github.com/magento/magento2-phpstorm-plugin/issues/2777).
+
 
 ## 2026.3.6
 
