@@ -350,6 +350,78 @@ class UctAnalysisServiceTest : PhysicalMagentoTestCase() {
         }
     }
 
+    fun testMethodMissingFromReceiverInterfaceIsReportedOnceForTheInterface() {
+        myFixture.addFileToProject("vendor/magento/framework/App/ResponseInterface.php", """
+            <?php namespace Magento\Framework\App;
+            interface ResponseInterface { public function sendResponse(); }
+        """.trimIndent())
+        myFixture.addFileToProject("vendor/magento/framework/App/Console/Response.php", """
+            <?php namespace Magento\Framework\App\Console;
+            class Response implements \Magento\Framework\App\ResponseInterface {
+                public function sendResponse() {}
+                public function setBody(${'$'}body) {}
+            }
+        """.trimIndent())
+        myFixture.addFileToProject("vendor/magento/framework/HTTP/PhpEnvironment/Response.php", """
+            <?php namespace Magento\Framework\HTTP\PhpEnvironment;
+            class Response implements \Magento\Framework\App\ResponseInterface {
+                public function sendResponse() {}
+                public function setBody(${'$'}body) {}
+            }
+        """.trimIndent())
+        val file = myFixture.addFileToProject("app/code/Foo/Bar/Injector.php", """
+            <?php namespace Foo\Bar;
+            class Injector {
+                public function inject(\Magento\Framework\App\ResponseInterface ${'$'}result) { ${'$'}result->setBody('x'); }
+            }
+        """.trimIndent())
+        PsiDocumentManager.getInstance(project).commitAllDocuments()
+        val methods = setOf(
+            "\\Magento\\Framework\\App\\ResponseInterface.sendResponse",
+            "\\Magento\\Framework\\App\\Console\\Response.setBody",
+            "\\Magento\\Framework\\HTTP\\PhpEnvironment\\Response.setBody"
+        )
+        val catalog = UctIndexCatalogTest.fixtureCatalog().withReleases(mapOf(
+            "2.4.8-p5" to UctReleaseFixture.index("2.4.8-p5", methods, api = emptySet()),
+            "2.4.9" to UctReleaseFixture.index("2.4.9", methods, api = emptySet())
+        ))
+        val result = analyzeWithCatalog(catalog, request().copy(paths = listOf(file.virtualFile.path), currentVersion = "2.4.8-p5", targetVersion = "2.4.9"))
+        assertEquals(result.findings.toString(), 1, result.findings.size)
+        val finding = result.findings.single()
+        assertEquals(SupportedIssue.CALLED_NON_INTERFACE_METHOD, finding.issue)
+        assertTrue(finding.message, finding.message.contains("\\Magento\\Framework\\App\\ResponseInterface"))
+
+        // A method declared with @method is part of the interface contract.
+        myFixture.addFileToProject("vendor/magento/framework/App/BodyInterface.php", """
+            <?php namespace Magento\Framework\App;
+            /** @method setBody(${'$'}body) */
+            interface BodyInterface {}
+        """.trimIndent())
+        val documented = myFixture.addFileToProject("app/code/Foo/Bar/DocumentedInjector.php", """
+            <?php namespace Foo\Bar;
+            class DocumentedInjector {
+                public function inject(\Magento\Framework\App\BodyInterface ${'$'}result) { ${'$'}result->setBody('x'); }
+            }
+        """.trimIndent())
+        PsiDocumentManager.getInstance(project).commitAllDocuments()
+        val documentedResult = analyzeWithCatalog(catalog, request().copy(paths = listOf(documented.virtualFile.path), currentVersion = "2.4.8-p5", targetVersion = "2.4.9"))
+        assertTrue(documentedResult.findings.toString(), documentedResult.findings.none { it.issue == SupportedIssue.CALLED_NON_INTERFACE_METHOD })
+
+        // A dynamic method name is not known statically, so it cannot be missing from the interface.
+        val dynamic = myFixture.addFileToProject("app/code/Foo/Bar/DynamicInjector.php", """
+            <?php namespace Foo\Bar;
+            class DynamicInjector {
+                public function inject(\Magento\Framework\App\ResponseInterface ${'$'}result) {
+                    ${'$'}method = 'sendResponse';
+                    ${'$'}result->${'$'}method();
+                }
+            }
+        """.trimIndent())
+        PsiDocumentManager.getInstance(project).commitAllDocuments()
+        val dynamicResult = analyzeWithCatalog(catalog, request().copy(paths = listOf(dynamic.virtualFile.path), currentVersion = "2.4.8-p5", targetVersion = "2.4.9"))
+        assertTrue(dynamicResult.findings.toString(), dynamicResult.findings.none { it.issue == SupportedIssue.CALLED_NON_INTERFACE_METHOD })
+    }
+
     fun testInterfaceContractAndExplicitConcreteUnionMembersAreStillInspected() {
         myFixture.addFileToProject("vendor/magento/test/Contracts.php", """
             <?php namespace Magento\Test;

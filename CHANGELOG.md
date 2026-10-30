@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 
+## 2026.3.6
+
+### Fixed
+
+- The Upgrade Compatibility Tool reports a call to a method that the receiver interface does not declare once, as "Called non-interface method" for that interface, instead of a non-API finding for every implementation in the project [#2770](https://github.com/magento/magento2-phpstorm-plugin/issues/2770).
+
 ## 2026.3.5
 
 ### Added
