@@ -4,11 +4,13 @@
  */
 package com.magento.idea.magento2plugin.mcp
 
-import com.intellij.execution.configurations.PathEnvironmentVariableUtil
 import com.intellij.openapi.util.SystemInfoRt
+import com.intellij.util.EnvironmentUtil
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.File
 import java.nio.file.Files
+import java.nio.file.InvalidPathException
 import java.nio.file.Path
 
 /** Shared DDEV discovery and command planning; never launches a process. */
@@ -28,8 +30,24 @@ internal object MagentoDdevEnvironment {
         return null
     }
 
-    fun findExecutable(): Path? =
-        PathEnvironmentVariableUtil.findInPath(if (SystemInfoRt.isWindows) "ddev.exe" else "ddev")?.toPath()
+    fun findExecutable(): Path? = findExecutable(EnvironmentUtil.getValue("PATH"))
+
+    internal fun findExecutable(path: String?): Path? {
+        val name = if (SystemInfoRt.isWindows) "ddev.exe" else "ddev"
+        for (entry in path.orEmpty().split(File.pathSeparatorChar)) {
+            val directory = if (SystemInfoRt.isWindows) entry.removeSurrounding("\"") else entry
+            if (directory.isEmpty()) continue
+            val candidate = try {
+                Path.of(directory).resolve(name)
+            } catch (_: InvalidPathException) {
+                continue
+            }
+            if (candidate.isAbsolute && Files.isRegularFile(candidate) && Files.isExecutable(candidate)) {
+                return candidate
+            }
+        }
+        return null
+    }
 
     data class Runtime(val config: Path, val cwd: Path, val executable: Path?,
                        val configuration: MagentoDdevConfiguration) {

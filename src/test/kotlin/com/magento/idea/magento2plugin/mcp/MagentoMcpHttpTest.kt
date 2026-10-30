@@ -221,7 +221,7 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         val description = text("describe_magento_cli_environment")
         assertTrue(description, description.contains("--project=commerce-local --dir=/var/www/html/src -- php -v"))
         assertTrue(description, description.contains("8.4") && description.contains("src/pub"))
-        assertTrue(description, description.contains(root.resolve(".ddev/config.local.yaml").toString()))
+        assertTrue(description, description.contains(JSONObject.quote(root.resolve(".ddev/config.local.yaml").toString())))
         file(".ddev/config.local.yaml", "working_dir: [invalid")
         val invalid = text("describe_magento_cli_environment")
         assertTrue(invalid, invalid.contains("invalid_configuration"))

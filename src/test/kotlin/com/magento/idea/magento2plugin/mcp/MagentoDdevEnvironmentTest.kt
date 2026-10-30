@@ -4,12 +4,50 @@
  */
 package com.magento.idea.magento2plugin.mcp
 
+import com.intellij.openapi.util.SystemInfoRt
 import org.junit.Assert.*
 import org.junit.Test
+import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 
 class MagentoDdevEnvironmentTest {
+    @Test
+    fun findsFirstExecutableOnPathAndSkipsInvalidEntries() = fixture { root ->
+        val name = if (SystemInfoRt.isWindows) "ddev.exe" else "ddev"
+        Files.createDirectories(root.resolve("directory/$name"))
+        val first = file(root, "first tools/$name", "fixture")
+        val second = file(root, "second tools/$name", "fixture")
+        assertTrue(first.toFile().setExecutable(true))
+        assertTrue(second.toFile().setExecutable(true))
+        val entries = listOf("", "relative", "invalid\u0000path", root.resolve("missing").toString(),
+            root.resolve("directory").toString(), first.parent.toString(), second.parent.toString())
+        assertEquals(first, MagentoDdevEnvironment.findExecutable(entries.joinToString(File.pathSeparator)))
+        Files.delete(first)
+        assertEquals(second, MagentoDdevEnvironment.findExecutable(entries.joinToString(File.pathSeparator)))
+        if (SystemInfoRt.isWindows) {
+            assertEquals(second, MagentoDdevEnvironment.findExecutable("\"${second.parent}\""))
+        }
+    }
+
+    @Test
+    fun missingPathDoesNotSelectAnExecutable() {
+        assertNull(MagentoDdevEnvironment.findExecutable(null))
+        assertNull(MagentoDdevEnvironment.findExecutable(""))
+        assertNull(MagentoDdevEnvironment.findExecutable("relative"))
+    }
+
+    @Test
+    fun skipsNonExecutableFilesOnPath() = fixture { root ->
+        org.junit.Assume.assumeFalse("POSIX executable permissions", SystemInfoRt.isWindows)
+        val blocked = file(root, "blocked/ddev", "fixture")
+        assertTrue(blocked.toFile().setExecutable(false, false))
+        val executable = file(root, "available/ddev", "fixture")
+        assertTrue(executable.toFile().setExecutable(true))
+        assertEquals(executable, MagentoDdevEnvironment.findExecutable(
+            listOf(blocked.parent, executable.parent).joinToString(File.pathSeparator)))
+    }
+
     @Test
     fun parsesRuntimeSettingsAndBuildsGeneralCommandPrefix() = fixture { root ->
         file(root, ".ddev/config.yaml", """
