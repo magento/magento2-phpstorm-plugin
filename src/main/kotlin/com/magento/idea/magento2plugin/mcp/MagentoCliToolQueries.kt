@@ -132,6 +132,19 @@ internal object MagentoCliToolQueries {
             lines += "Configured Magento root: ./$configuredMagentoRootRelative"
         }
 
+        val ddev = MagentoDdevEnvironment.discover(projectRoot,
+            resolveProjectPath(projectRoot, configuredMagentoRootRelative ?: "."))
+        if (ddev != null) {
+            lines += ""
+            lines += "DDEV configuration: ${ddev.config}"
+            lines += ddev.json().toString(2)
+            if (ddev.configuration.error == null) {
+                lines += "  example: ${ddev.example(listOf("php", "-v"))}"
+                lines += "Use this DDEV execution prefix for commands that belong in the container. Existing project wrappers retain their priority. Discovery does not start DDEV or run a process."
+                lines += "Optional Magerun: use magento_magerun to verify installation and inspect commands in this runtime."
+            }
+        }
+
         if (detectedTools.isEmpty()) {
             lines += ""
             lines += "No project-local CLI wrappers were detected."
@@ -353,8 +366,8 @@ internal object MagentoCliToolQueries {
         }
     }
 
-    private fun shellQuote(value: String): String =
-        if (value.matches(Regex("[a-zA-Z0-9_./-]+"))) value else "'${value.replace("'", "'\"'\"'")}'"
+    internal fun shellQuote(value: String): String =
+        if (value.matches(Regex("[a-zA-Z0-9_./=:-]+"))) value else "'${value.replace("'", "'\"'\"'")}'"
 
     private fun isCliFile(path: Path): Boolean = Files.isRegularFile(path) && Files.isReadable(path)
         && (Files.isExecutable(path) || MagentoMagerunSupport.isMagerunName(path.fileName.toString()))
