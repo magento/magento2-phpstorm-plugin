@@ -177,12 +177,12 @@ intellijPlatform {
         // Requiring a restart is intentional; every compatibility/API warning must fail verification.
         failureLevel = VerifyPluginTask.FailureLevel.ALL - VerifyPluginTask.FailureLevel.NOT_DYNAMIC
         ides {
-            create(IntelliJPlatformType.PhpStorm, "2026.2.0.1")
-            create(IntelliJPlatformType.PhpStorm, "2026.2.3")
-            create(IntelliJPlatformType.PhpStorm, "263.6259.29")
+            // Use IDE distributions containing the October 2026 eMudhra security fixes.
+            create(IntelliJPlatformType.PhpStorm, providers.gradleProperty("platformVersion").get())
+            create(IntelliJPlatformType.PhpStorm, "263.7307.117")
             if (providers.gradleProperty("verifyWebStorm").map(String::toBoolean).getOrElse(false)) {
-                create(IntelliJPlatformType.WebStorm, "2026.2.0.1")
-                create(IntelliJPlatformType.WebStorm, "263.6259.34")
+                create(IntelliJPlatformType.WebStorm, "2026.2.4")
+                create(IntelliJPlatformType.WebStorm, providers.gradleProperty("uiTestPlatformVersion").get())
             }
         }
     }
