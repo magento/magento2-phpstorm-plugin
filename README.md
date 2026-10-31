@@ -70,8 +70,6 @@
 4. Open **Settings > Languages & Frameworks > PHP > Frameworks > Magento**, or **Settings > Tools > Magento** in WebStorm.
 5. Check **Enable** and click **OK**.
 
-**Security update:** Use PhpStorm, WebStorm, or IntelliJ IDEA 2026.2.4 or a fixed newer release (including 2026.3 RC). See the [JetBrains eMudhra advisory](https://blog.jetbrains.com/security/2026/10/compromised-emudhra-certificates-ides/) for the complete fixed-version list and update instructions. Updating this plugin does not update the IDE’s bundled runtime, embedded browser, or `jetbrainsd` service. Update and restart the IDE, and verify that `jetbrainsd` is 0.9.9728 or later.
-
 ## Works with
 
 * PhpStorm, WebStorm, and IntelliJ IDEA 2026.2+ with JavaScript and CSS support.
