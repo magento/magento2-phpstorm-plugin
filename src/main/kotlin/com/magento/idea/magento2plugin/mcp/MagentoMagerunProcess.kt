@@ -5,6 +5,7 @@
 package com.magento.idea.magento2plugin.mcp
 
 import com.intellij.execution.CommandLineUtil
+import com.intellij.util.EnvironmentUtil
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.nio.file.Path
@@ -33,6 +34,7 @@ internal class MagentoMagerunProcess(
         checkCancelled()
         // Preserve literal quotes and backslashes when Windows serializes the argument vector.
         val process = ProcessBuilder(CommandLineUtil.toCommandLine(argv)).directory(cwd.toFile()).apply {
+            environment().putAll(EnvironmentUtil.getEnvironmentMap())
             environment()["NO_COLOR"] = "1"
         }.start()
         val exceeded = AtomicBoolean(false)

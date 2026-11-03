@@ -58,7 +58,8 @@ internal fun runWebStormUiTest(
     Starter.newContext(
         contextName,
         TestCase(IdeInfo.WebStorm, LocalProjectInfo(projectPath))
-            .useEAP(System.getProperty("ui.test.ide.build")),
+            .useRC()
+            .run { onIDE(ideInfo.copy(buildNumber = System.getProperty("ui.test.ide.build"))) },
     ).apply {
         PluginConfigurator(this).installPluginFromPath(pluginPath)
         applyVMOptionsPatch {

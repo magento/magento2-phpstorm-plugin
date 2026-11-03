@@ -24,7 +24,7 @@ internal object MagentoMagerunQueries {
         .put("command_help", "Return structured arguments/options for one exact command or alias from the installed catalogue. Requires command.")
         .put("mcp_config", "Generate native stdio MCP configuration if supported. Optional include/exclude command filters. Does not start a server or write client settings."))
         .put("cache", "Per project and selected invocation; expires after five minutes. refresh=true forces a new probe. Local launcher/config/Composer changes invalidate cached metadata.")
-        .put("runtime", "Uses the Docker-directory candidate first. Never installs, updates, starts services, executes an application command, or retries through another runtime.")
+        .put("runtime", "Uses project-local candidates first, then DDEV detected by .ddev/config.yaml with ddev on the IDE's PATH. Magerun reuses the general DDEV execution prefix, including the project name and container working directory parsed from project YAML and overrides, with the Magento root as host cwd. Never installs, updates, starts services, executes an application command, or retries through another runtime. For interactive permissions, use the returned terminalGuidance in PhpStorm's Terminal.")
         .toString(2)
 
     fun execute(project: Project, request: MagerunRequest, checkCancelled: () -> Unit): String {
@@ -60,12 +60,12 @@ internal class MagentoMagerunService(
 
     fun execute(environment: MagentoMagerunSupport.Environment, request: MagerunRequest,
                 checkCancelled: () -> Unit = {}): JSONObject {
+        val base = environment.json()
         while (!lock.tryLock(50, TimeUnit.MILLISECONDS)) checkCancelled()
         try {
             checkCancelled()
             validate(request)
             if (request.refresh) cache = null
-            val base = environment.json()
             if (environment.selected == null) return base.put("status", "not_found")
             val plan = try {
                 MagentoMagerunSupport.plan(environment)
@@ -94,14 +94,14 @@ internal class MagentoMagerunService(
                 else -> error("validated mode")
             }
         } catch (error: MagentoMagerunSupport.Unavailable) {
-            return JSONObject().put("status", error.status).put("message", error.message)
+            return base.put("status", error.status).put("message", error.message)
         } catch (error: IOException) {
             cache = null
-            return JSONObject().put("status", "runtime_unavailable")
+            return base.put("status", "runtime_unavailable")
                 .put("message", "The selected runtime could not be accessed: ${error.message?.take(1000)}")
         } catch (_: JSONException) {
             cache = null
-            return JSONObject().put("status", "invalid_output").put("message", "The selected runtime did not return the expected JSON command metadata.")
+            return base.put("status", "invalid_output").put("message", "The selected runtime did not return the expected JSON command metadata.")
         } finally {
             lock.unlock()
         }
@@ -162,6 +162,11 @@ internal class MagentoMagerunService(
 
     private fun probe(plan: MagentoMagerunSupport.LaunchPlan, arguments: List<String>, checkCancelled: () -> Unit): String {
         val result = runner.run(plan.argv + arguments, plan.cwd, checkCancelled)
+        if (plan.runtime == "ddev" && result.exitCode != 0 && !result.timedOut && !result.outputLimited) {
+            if (result.exitCode == 127) fail("missing_installation",
+                "Magerun could not be found in the selected DDEV container. No installation was attempted. ${result.stderr.take(1500)}")
+            fail("runtime_unavailable", "The DDEV metadata probe failed (exit ${result.exitCode}). Check the selected project's DDEV environment and permissions. ${result.stderr.take(1500)}")
+        }
         requireSuccess(result)
         return result.stdout
     }

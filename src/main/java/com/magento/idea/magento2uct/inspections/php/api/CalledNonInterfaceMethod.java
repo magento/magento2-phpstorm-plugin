@@ -67,7 +67,24 @@ public class CalledNonInterfaceMethod extends CallMethodInspection {
         if (methodNames.contains(method.getName())) {
             return;
         }
+        register(problemsHolder, methodReference, interfaceCandidate);
+    }
 
+    @Override
+    protected void executeMissingInInterface(
+            final Project project,
+            final @NotNull ProblemsHolder problemsHolder,
+            final MethodReference methodReference,
+            final PhpClass contract
+    ) {
+        register(problemsHolder, methodReference, contract);
+    }
+
+    private void register(
+            final @NotNull ProblemsHolder problemsHolder,
+            final MethodReference methodReference,
+            final PhpClass contract
+    ) {
         if (problemsHolder instanceof UctProblemsHolder) {
             ((UctProblemsHolder) problemsHolder).setIssue(
                     SupportedIssue.CALLED_NON_INTERFACE_METHOD
@@ -75,9 +92,7 @@ public class CalledNonInterfaceMethod extends CallMethodInspection {
         }
         problemsHolder.registerProblem(
                 methodReference,
-                SupportedIssue.CALLED_NON_INTERFACE_METHOD.getMessage(
-                        interfaceCandidate.getFQN()
-                ),
+                SupportedIssue.CALLED_NON_INTERFACE_METHOD.getMessage(contract.getFQN()),
                 ProblemHighlightType.WARNING
         );
     }

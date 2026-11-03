@@ -17,7 +17,30 @@ class MagentoMcpToolset : McpToolset {
      * Provides one low-noise entry point for Magento scaffolding.
      */
     @McpTool(name = "magento_scaffold")
-    @McpDescription("Magento scaffold library and renderer with three context-conscious modes. Use mode `help` first to get only a compact catalog of scaffoldType values and short descriptions. Use mode `detailed_schema` with one scaffoldType to load the detailed required parameters, optional parameters, defaults, constraints, and example parametersJson only for that scaffold. Use mode `render` with scaffoldType and parametersJson to create files in the currently opened Magento project. Supported scaffoldType values are `module`, `plugin`, `observer`, `entity_crud`, `controller`, `cli_command`, `block`, `view_model`, `product_eav_attribute`, `category_eav_attribute`, and `customer_eav_attribute`. Prefer this single tool over generator-specific tools because it keeps the agent context small: list, load one schema, then render. Most scaffold types require `moduleName` in Magento `Vendor_Module` format; PHP class names must be FQNs such as `Foo\\Bar\\Block\\Product\\BadgeBlock`; JSON backslashes must be escaped.")
+    @McpDescription(
+        "Magento scaffold library and renderer with three context-conscious modes.\n\n" +
+
+        "Workflow:\n" +
+        "- Use mode `help` first to get only a compact catalog of scaffoldType values and short " +
+        "descriptions.\n" +
+        "- Use mode `detailed_schema` with one scaffoldType to load the detailed required parameters, " +
+        "optional parameters, defaults, constraints, and example parametersJson only for that " +
+        "scaffold.\n" +
+        "- Use mode `render` with scaffoldType and parametersJson to create files in the currently " +
+        "opened Magento project.\n" +
+        "- Prefer this single tool over generator-specific tools because it keeps the agent context " +
+        "small: list, load one schema, then render.\n\n" +
+
+        "Supported scaffolds:\n" +
+        "- Supported scaffoldType values are `module`, `plugin`, `observer`, `entity_crud`, " +
+        "`controller`, `cli_command`, `block`, `view_model`, `product_eav_attribute`, " +
+        "`category_eav_attribute`, and `customer_eav_attribute`.\n\n" +
+
+        "Parameter format:\n" +
+        "- Most scaffold types require `moduleName` in Magento `Vendor_Module` format; PHP class " +
+        "names must be FQNs such as `Foo\\Bar\\Block\\Product\\BadgeBlock`; JSON backslashes must be " +
+        "escaped."
+    )
     suspend fun magentoScaffold(
         mode: String,
         scaffoldType: String,
