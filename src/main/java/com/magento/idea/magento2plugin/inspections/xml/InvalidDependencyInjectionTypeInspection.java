@@ -8,7 +8,6 @@ package com.magento.idea.magento2plugin.inspections.xml;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.codeInspection.XmlSuppressableInspectionTool;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
@@ -21,6 +20,7 @@ import com.magento.idea.magento2plugin.inspections.validator.NotEmptyValidator;
 import com.magento.idea.magento2plugin.inspections.validator.PhpClassExistenceValidator;
 import com.magento.idea.magento2plugin.inspections.validator.VirtualTypeExistenceValidator;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
+import com.magento.idea.magento2plugin.util.PhpNameUtil;
 import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -135,13 +135,9 @@ public class InvalidDependencyInjectionTypeInspection extends XmlSuppressableIns
             }
 
             private boolean isExistingObjectType(final @NotNull String type) {
-                final String withoutProxy = StringUtil.trimEnd(type, "\\Proxy");
-
-                return phpClassExistenceValidator.validate(type)
-                        || phpClassExistenceValidator.validate(withoutProxy)
-                        || phpClassExistenceValidator.validate(
-                                StringUtil.trimEnd(withoutProxy, "Factory")
-                        );
+                return PhpNameUtil.getObjectTypeCandidates(type)
+                        .stream()
+                        .anyMatch(phpClassExistenceValidator::validate);
             }
 
             /**
