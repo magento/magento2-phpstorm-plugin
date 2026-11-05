@@ -1,15 +1,17 @@
-# This workflow will build a Java project with Gradle
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
-
-name: Run automated tests
+# Temporary diagnostic PR for #1296. Close without merging after the probe.
+name: Issue 1296 Windows probe
 
 on:
   pull_request:
     branches: [ master, '*-develop', 'mainline*' ]
 
+permissions:
+  contents: read
+
 jobs:
-  verify-plugin:
-    runs-on: ubuntu-latest
+  issue-1296-windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
 
     steps:
       - uses: actions/checkout@v7.0.1
@@ -19,175 +21,32 @@ jobs:
           java-version: 25
           distribution: 'temurin'
           cache: gradle
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Verify PhpStorm and WebStorm compatibility
-        run: ./gradlew verifyPlugin -PverifyWebStorm=true --max-workers=1 --no-parallel --no-daemon --no-configuration-cache
-      - name: Upload Plugin Verifier reports
+      - name: Run the five reproduction scenarios
+        shell: pwsh
+        run: |
+          ./gradlew.bat clean test --tests 'com.magento.idea.magento2plugin.Issue1296ReproductionTest' --no-daemon --no-build-cache --no-configuration-cache
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Verify all five scenarios actually passed
+        shell: pwsh
+        run: |
+          $report = 'build/test-results/test/TEST-com.magento.idea.magento2plugin.Issue1296ReproductionTest.xml'
+          if (!(Test-Path $report)) { throw 'Reproduction test report is missing.' }
+          [xml]$results = Get-Content -Raw $report
+          $suite = $results.testsuite
+          if ([int]$suite.tests -ne 5 -or [int]$suite.failures -ne 0 -or [int]$suite.errors -ne 0 -or [int]$suite.skipped -ne 0) {
+            throw "Unexpected probe result: tests=$($suite.tests), failures=$($suite.failures), errors=$($suite.errors), skipped=$($suite.skipped)"
+          }
+          "Windows probe: 5 passed, 0 failed, 0 skipped. Real NTFS junctions at module and vendor levels, with targets outside and inside project content." >> $env:GITHUB_STEP_SUMMARY
+      - name: Upload reproduction evidence
         if: always()
         uses: actions/upload-artifact@v7.0.2
         with:
-          name: plugin-verifier-reports
+          name: issue-1296-windows-evidence
           if-no-files-found: warn
-          retention-days: 14
-          path: build/reports/pluginVerifier/**
-
-  ui-test-webstorm:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v7.0.1
-      - name: Set up JDK 25
-        uses: actions/setup-java@v6.0.1
-        with:
-          java-version: 25
-          distribution: 'temurin'
-          cache: gradle
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Cache WebStorm UI test distribution
-        uses: actions/cache@v6.1.0
-        with:
-          path: |
-            out/ide-tests/cache
-            out/ide-tests/installers
-          key: ${{ runner.os }}-webstorm-${{ hashFiles('gradle.properties') }}
-      - name: Run WebStorm UI tests
-        run: xvfb-run --auto-servernum ./gradlew uiTest --no-daemon --no-build-cache --no-configuration-cache
-      - name: Upload UI test failure artifacts
-        if: failure()
-        uses: actions/upload-artifact@v7.0.2
-        with:
-          name: webstorm-ui-test-failure-artifacts
-          if-no-files-found: ignore
-          retention-days: 14
-          path: |
-            build/reports/tests/uiTest/**
-            build/test-results/uiTest/**
-            build/idea-sandbox/**/log/**
-            build/idea-sandbox/**/system/log/**
-            out/ide-tests/tests/**
-
-  build-linux:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v7.0.1
-      - name: Set up PHP for process tests
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-          coverage: none
-          tools: none
-      - name: Set up JDK 25
-        uses: actions/setup-java@v6.0.1
-        with:
-          java-version: 25
-          distribution: 'temurin'
-          cache: gradle
-      - uses: actions/cache@v6.1.0
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Run automated tests
-        run: ./gradlew clean test --no-daemon --no-build-cache --no-configuration-cache
-
-  build-windows:
-    runs-on: windows-latest
-
-    steps:
-      - uses: actions/checkout@v7.0.1
-      - name: Set up PHP for process tests
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-          coverage: none
-          tools: none
-      - name: Set up JDK 25
-        uses: actions/setup-java@v6.0.1
-        with:
-          java-version: 25
-          distribution: 'temurin'
-          cache: gradle
-      - uses: actions/cache@v6.1.0
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Run automated tests
-        run: ./gradlew clean test --no-daemon --no-build-cache --no-configuration-cache
-      - name: Upload Windows test failure artifacts
-        if: failure()
-        uses: actions/upload-artifact@v7.0.2
-        with:
-          name: windows-test-failure-artifacts
-          if-no-files-found: ignore
+          include-hidden-files: true
           retention-days: 14
           path: |
             build/test-results/test/**
             build/reports/tests/test/**
             build/reports/problems/**
-            build/tmp/test/**
             .intellijPlatform/sandbox/**/log-test/**
-            .intellijPlatform/sandbox/**/system/log/**
-
-  build-macos:
-    runs-on: macos-latest
-
-    steps:
-      - uses: actions/checkout@v7.0.1
-      - name: Set up PHP for process tests
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-          coverage: none
-          tools: none
-      - name: Set up JDK 25
-        uses: actions/setup-java@v6.0.1
-        with:
-          java-version: 25
-          distribution: 'temurin'
-          cache: gradle
-      - uses: actions/cache@v6.1.0
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Run automated tests
-        run: ./gradlew clean test --no-daemon --no-build-cache --no-configuration-cache
-
-  static-tests:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v7.0.1
-        with:
-          fetch-depth: 0
-      - name: Set up JDK 25
-        uses: actions/setup-java@v6.0.1
-        with:
-          java-version: 25
-          distribution: 'temurin'
-          cache: gradle
-      - name: Qodana - Code Quality
-        uses: JetBrains/qodana-action@v2026.2.2
-        with:
-          cache-default-branch-only: true
-          use-caches: true
-          args: '--baseline qodana.sarif.json'
