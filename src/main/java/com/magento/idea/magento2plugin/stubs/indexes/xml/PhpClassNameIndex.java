@@ -6,7 +6,6 @@
 package com.magento.idea.magento2plugin.stubs.indexes.xml;
 
 import com.intellij.ide.highlighter.XmlFileType;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlAttribute;
@@ -20,12 +19,11 @@ import com.intellij.util.indexing.ScalarIndexExtension;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.intellij.xml.util.XmlIncludeHandler;
-import com.jetbrains.php.lang.PhpLangUtil;
 import com.magento.idea.magento2plugin.project.Settings;
+import com.magento.idea.magento2plugin.util.PhpNameUtil;
 import com.magento.idea.magento2plugin.util.RegExUtil;
 import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -36,10 +34,9 @@ import org.jetbrains.annotations.NotNull;
 public class PhpClassNameIndex extends ScalarIndexExtension<String> {
     private static final Pattern CLASS_REFERENCE_PATTERN = Pattern.compile(
             "(\\\\?" + RegExUtil.PhpRegex.CLASS_NAME
-                    + "(?:\\\\" + RegExUtil.PhpRegex.CLASS_NAME + ")+)(?:::\\w+)?"
+                    + "(?:\\\\" + RegExUtil.PhpRegex.CLASS_NAME + ")+)"
+                    + "(?:" + RegExUtil.XmlRegex.CLASS_MEMBER_NAME + ")?"
     );
-    private static final String PROXY_SUFFIX = "\\Proxy";
-    private static final String FACTORY_SUFFIX = "Factory";
 
     public static final ID<String, Void> KEY = ID.create(
             "com.magento.idea.magento2plugin.stubs.indexes.xml.php_class_name");
@@ -99,23 +96,18 @@ public class PhpClassNameIndex extends ScalarIndexExtension<String> {
      * @return class names without a leading backslash
      */
     public static @NotNull Set<String> getReferencedClasses(final @NotNull String value) {
+        if (value.indexOf('\\') < 0) {
+            return Set.of();
+        }
         final Matcher matcher = CLASS_REFERENCE_PATTERN.matcher(value.trim());
 
         if (!matcher.matches()) {
             return Set.of();
         }
-        final Set<String> classNames = new HashSet<>();
-        final String className = PhpLangUtil.toPresentableFQN(matcher.group(1));
-        final String withoutProxy = StringUtil.trimEnd(className, PROXY_SUFFIX);
-        final String source = StringUtil.trimEnd(withoutProxy, FACTORY_SUFFIX);
 
-        classNames.add(className);
-        classNames.add(withoutProxy);
-        if (!source.isEmpty() && !source.endsWith("\\")) {
-            classNames.add(source);
-        }
-
-        return classNames;
+        return PhpNameUtil.getObjectTypeCandidates(
+                PhpNameUtil.toPresentableFQN(matcher.group(1))
+        );
     }
 
     private static void visitSubTags(

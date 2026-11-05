@@ -31,6 +31,18 @@ public class PhpClassNameIndexReferencesTest {
     }
 
     @Test
+    public void everyClassMemberFormRefersToTheClass() {
+        assertEquals(
+                Set.of("Foo\\Bar"),
+                PhpClassNameIndex.getReferencedClasses("Foo\\Bar::getValue()")
+        );
+        assertEquals(
+                Set.of("Foo\\Bar"),
+                PhpClassNameIndex.getReferencedClasses("Foo\\Bar::$value")
+        );
+    }
+
+    @Test
     public void proxyRefersToItselfAndItsClass() {
         assertEquals(
                 Set.of("Foo\\Bar\\Proxy", "Foo\\Bar"),
