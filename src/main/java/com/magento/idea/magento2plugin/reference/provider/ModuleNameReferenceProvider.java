@@ -4,80 +4,86 @@
  */
 package com.magento.idea.magento2plugin.reference.provider;
 
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementResolveResult;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.PsiPolyVariantReferenceBase;
+import com.intellij.psi.PsiReference;
+import com.intellij.psi.PsiReferenceProvider;
+import com.intellij.psi.ResolveResult;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
-import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 import com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.jetbrains.annotations.NotNull;
 
 public class ModuleNameReferenceProvider extends PsiReferenceProvider {
 
+    private static final Pattern MODULE_NAME = Pattern.compile("([A-Z][a-zA-Z0-9]+)_([A-Z][a-zA-Z0-9]+)");
+
     @NotNull
     @Override
-    public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
-
-        List<PsiReference> psiReferences = new ArrayList<>();
-        String origValue = element.getText();
-
-        Pattern pattern = Pattern.compile("(([A-Z][a-zA-Z0-9]+)_([A-Z][a-zA-Z0-9]+))");
-        Matcher matcher = pattern.matcher(element.getText());
+    public PsiReference[] getReferencesByElement(
+            final @NotNull PsiElement element,
+            final @NotNull ProcessingContext context
+    ) {
+        final Matcher matcher = MODULE_NAME.matcher(element.getText());
         if (!matcher.find()) {
             return PsiReference.EMPTY_ARRAY;
         }
 
-        String moduleName = matcher.group(1);
+        return new PsiReference[]{new ModuleNameReference(
+                element, new TextRange(matcher.start(), matcher.end()), matcher.group()
+        )};
+    }
 
-        Collection<VirtualFile> moduleXmlFiles = FileBasedIndex.getInstance()
-                .getContainingFiles(ModuleXmlIndex.KEY, moduleName, GlobalSearchScope.allScope(element.getProject()));
+    private static final class ModuleNameReference extends PsiPolyVariantReferenceBase<PsiElement> {
+        private final String moduleName;
 
-        PsiManager psiManager = PsiManager.getInstance(element.getProject());
-        List<PsiElement> psiElements = new ArrayList<>();
+        private ModuleNameReference(
+                final PsiElement element,
+                final TextRange range,
+                final String moduleName
+        ) {
+            // Matching text need not name an installed module; do not report unresolved-reference errors.
+            super(element, range, true);
+            this.moduleName = moduleName;
+        }
 
-        for (VirtualFile moduleXmlFile : moduleXmlFiles) {
-            VirtualFile moduleSourceVf = getModuleRoot(moduleXmlFile);
-            if (moduleSourceVf == null || !moduleSourceVf.isDirectory()) {
-                continue;
+        @Override
+        public ResolveResult @NotNull [] multiResolve(final boolean incompleteCode) {
+            if (!myElement.isValid() || DumbService.isDumb(myElement.getProject())) {
+                return ResolveResult.EMPTY_ARRAY;
             }
 
-            addDirectoryReference(psiManager, psiElements, moduleSourceVf);
-        }
-
-        if (psiElements.size() > 0) {
-            TextRange range = new TextRange(
-                origValue.indexOf(moduleName), origValue.indexOf(moduleName) + moduleName.length()
+            // Reference collection also runs during highlighting. Only resolution may query indexes.
+            final Collection<VirtualFile> moduleXmlFiles = FileBasedIndex.getInstance().getContainingFiles(
+                    ModuleXmlIndex.KEY, moduleName, GlobalSearchScope.allScope(myElement.getProject())
             );
-            psiReferences.add(new PolyVariantReferenceBase(element, range, psiElements));
-        }
+            final PsiManager psiManager = PsiManager.getInstance(myElement.getProject());
+            final List<ResolveResult> results = new ArrayList<>();
+            for (final VirtualFile moduleXmlFile : moduleXmlFiles) {
+                final VirtualFile etcDirectory = moduleXmlFile.getParent();
+                final VirtualFile moduleRoot = etcDirectory == null ? null : etcDirectory.getParent();
+                if (moduleRoot == null || !moduleRoot.isDirectory()) {
+                    continue;
+                }
 
-        return psiReferences.toArray(new PsiReference[psiReferences.size()]);
-    }
-
-    private VirtualFile getModuleRoot(final VirtualFile moduleXmlFile) {
-        if (moduleXmlFile == null || moduleXmlFile.getParent() == null) {
-            return null;
-        }
-
-        return moduleXmlFile.getParent().getParent();
-    }
-
-    private void addDirectoryReference(
-            final PsiManager psiManager,
-            final List<PsiElement> psiElements,
-            final VirtualFile moduleRoot
-    ) {
-        PsiDirectory moduleSourceDirectory = psiManager.findDirectory(moduleRoot);
-        if (moduleSourceDirectory != null) {
-            psiElements.add(moduleSourceDirectory);
+                final PsiDirectory directory = psiManager.findDirectory(moduleRoot);
+                if (directory != null) {
+                    results.add(new PsiElementResolveResult(directory));
+                }
+            }
+            return results.toArray(ResolveResult.EMPTY_ARRAY);
         }
     }
 }
