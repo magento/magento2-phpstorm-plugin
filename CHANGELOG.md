@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Fixed
 
+- Avoid an index-storage error when highlighting Magento module names in PHP, JavaScript, and XML files [#2780](https://github.com/magento/magento2-phpstorm-plugin/issues/2780).
 - The Upgrade Compatibility Tool reports a call to a method that the receiver interface does not declare once, as "Called non-interface method" for that interface, instead of a non-API finding for every implementation in the project [#2770](https://github.com/magento/magento2-phpstorm-plugin/issues/2770).
 - Preparing Upgrade Compatibility Tool release data no longer fails while the IDE is indexing, and the prepared deprecation data no longer depends on the classes installed in the open project: methods documented with `@inheritdoc` take deprecation from their parents in the same release [#2769](https://github.com/magento/magento2-phpstorm-plugin/issues/2769).
 - The di.xml type inspection no longer reports existing classes whose name or namespace contains `Factory` as missing, and it now reports missing classes that only matched after `Factory` was removed from the middle of the name [#1607](https://github.com/magento/magento2-phpstorm-plugin/issues/1607).
