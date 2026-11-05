@@ -6,7 +6,6 @@
 package com.magento.idea.magento2plugin.util;
 
 import com.intellij.openapi.util.text.StringUtil;
-import com.magento.idea.magento2plugin.magento.packages.code.FrameworkLibraryType;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -16,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
  * Normalizes class names stored in configuration without requiring PHP PSI.
  */
 public final class PhpNameUtil {
+    public static final String FACTORY_SUFFIX = "Factory";
     private static final String PROXY_SUFFIX = "\\Proxy";
 
     private PhpNameUtil() {
@@ -39,7 +39,7 @@ public final class PhpNameUtil {
      */
     public static @NotNull Set<String> getObjectTypeCandidates(final @NotNull String type) {
         final String withoutProxy = StringUtil.trimEnd(type, PROXY_SUFFIX);
-        final String source = StringUtil.trimEnd(withoutProxy, FrameworkLibraryType.FACTORY_SUFFIX);
+        final String source = StringUtil.trimEnd(withoutProxy, FACTORY_SUFFIX);
         final Set<String> candidates = new LinkedHashSet<>();
 
         for (final String name : List.of(type, withoutProxy, source)) {
