@@ -104,6 +104,7 @@ public class ConfigurationTypeClassLinemarkerRegistrarTest extends LinemarkerFix
                         "factory_attribute.xml",
                         "leading_backslash.xml",
                         "after_include.xml",
+                        "nested_include.xml",
                         "mixed.xml"
                 ),
                 targetFiles

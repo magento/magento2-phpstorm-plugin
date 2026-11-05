@@ -22,8 +22,8 @@ import com.intellij.xml.util.XmlIncludeHandler;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.util.PhpNameUtil;
 import com.magento.idea.magento2plugin.util.RegExUtil;
-import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -114,7 +114,7 @@ public class PhpClassNameIndex extends ScalarIndexExtension<String> {
             final XmlTag parentTag,
             final BiConsumer<XmlTag, Set<String>> consumer
     ) {
-        for (final XmlTag childTag: parentTag.getSubTags()) {
+        for (final XmlTag childTag: getPhysicalSubTags(parentTag)) {
             for (final XmlAttribute xmlAttribute: childTag.getAttributes()) {
                 final String xmlAttributeValue = xmlAttribute.getValue();
 
@@ -122,13 +122,19 @@ public class PhpClassNameIndex extends ScalarIndexExtension<String> {
                     visitValue(childTag, xmlAttributeValue, consumer);
                 }
             }
-            if (XmlIncludeHandler.isXInclude(childTag)
-                    || !XmlPsiTreeUtil.findSubTagsOfParent(childTag, "xi:include").isEmpty()) {
+            if (XmlIncludeHandler.isXInclude(childTag)) {
                 continue;
             }
-            visitValue(childTag, childTag.getValue().getTrimmedText(), consumer);
+            // The platform forbids reading the value of a tag with an include during indexing.
+            if (getPhysicalSubTags(childTag).stream().noneMatch(XmlIncludeHandler::isXInclude)) {
+                visitValue(childTag, childTag.getValue().getTrimmedText(), consumer);
+            }
             visitSubTags(childTag, consumer);
         }
+    }
+
+    private static List<XmlTag> getPhysicalSubTags(final XmlTag parentTag) {
+        return PsiTreeUtil.getChildrenOfTypeAsList(parentTag, XmlTag.class);
     }
 
     private static void visitValue(
