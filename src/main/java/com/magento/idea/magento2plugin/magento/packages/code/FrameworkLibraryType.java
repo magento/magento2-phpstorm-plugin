@@ -33,7 +33,7 @@ public enum FrameworkLibraryType {
     /**
      * Factory type suffix.
      */
-    private static final String FACTORY_SUFFIX = "Factory";
+    public static final String FACTORY_SUFFIX = "Factory";
 
     /**
      * Framework Library type.
