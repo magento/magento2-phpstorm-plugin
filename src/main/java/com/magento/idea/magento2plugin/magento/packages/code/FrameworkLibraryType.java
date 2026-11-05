@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin.magento.packages.code;
 
 import com.magento.idea.magento2plugin.actions.generation.generator.util.PhpClassGeneratorUtil;
+import com.magento.idea.magento2plugin.util.PhpNameUtil;
 import org.jetbrains.annotations.NotNull;
 
 public enum FrameworkLibraryType {
@@ -29,11 +30,6 @@ public enum FrameworkLibraryType {
     SEARCH_RESULT("Magento\\Framework\\Api\\SearchResultsInterface"),
     SEARCH_RESULT_IMPLEMENTATION("Magento\\Framework\\Api\\SearchResults"),
     URL("Magento\\Framework\\UrlInterface");
-
-    /**
-     * Factory type suffix.
-     */
-    public static final String FACTORY_SUFFIX = "Factory";
 
     /**
      * Framework Library type.
@@ -73,7 +69,7 @@ public enum FrameworkLibraryType {
      * @return String
      */
     public @NotNull String getFactory() {
-        return type.concat(FACTORY_SUFFIX);
+        return type.concat(PhpNameUtil.FACTORY_SUFFIX);
     }
 
     /**
