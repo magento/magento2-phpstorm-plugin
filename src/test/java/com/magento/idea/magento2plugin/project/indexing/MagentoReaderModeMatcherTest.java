@@ -9,10 +9,17 @@ import com.intellij.codeInsight.actions.ReaderModeMatcher;
 import com.intellij.codeInsight.actions.ReaderModeProvider;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.extensions.ExtensionPointName;
+import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess;
 import com.magento.idea.magento2plugin.BaseProjectTestCase;
+import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.project.Settings;
+import com.magento.idea.magento2plugin.util.magento.MagentoVfsUtil;
+import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 public class MagentoReaderModeMatcherTest extends BaseProjectTestCase {
@@ -54,6 +61,49 @@ public class MagentoReaderModeMatcherTest extends BaseProjectTestCase {
             assertEquals(Boolean.FALSE, matches(file));
         } finally {
             settings.myMagentoFolders = null;
+        }
+    }
+
+    public void testResolvesAConfiguredPathWithADotSegment() {
+        final VirtualFile file = file("app/code/Foo/DotSegment");
+
+        Settings.getInstance(getProject()).magentoPath = "/src/.";
+
+        assertEquals(Boolean.FALSE, matches(file));
+    }
+
+    public void testExcludesVendorFolderMarkedAsContentRoot() {
+        final VirtualFile file = file("vendor/foo/marked");
+        final Settings settings = Settings.getInstance(getProject());
+
+        settings.myMagentoFolders = List.of(file.getParent().getParent().getUrl());
+
+        try {
+            assertEquals(Boolean.FALSE, matches(file));
+        } finally {
+            settings.myMagentoFolders = null;
+        }
+    }
+
+    public void testExcludesEveryLibraryRootExceptVendor() throws IOException {
+        final File magentoRoot = FileUtil.createTempDirectory("magento", "", true);
+        final String magentoPath = FileUtil.toSystemIndependentName(magentoRoot.getPath());
+
+        VfsRootAccess.allowRootAccess(getTestRootDisposable(), magentoPath);
+        for (final String root : MagentoVfsUtil.MAGENTO_SCAN_ROOTS) {
+            assertTrue(new File(magentoRoot, root).mkdirs());
+        }
+        LocalFileSystem.getInstance().refreshAndFindFileByIoFile(magentoRoot);
+        Settings.getInstance(getProject()).magentoPath = magentoPath;
+        final Collection<VirtualFile> roots = new MagentoAdditionalLibraryRootsProvider()
+                .getRootsToWatch(getProject());
+
+        assertEquals(MagentoVfsUtil.MAGENTO_SCAN_ROOTS.size(), roots.size());
+        for (final VirtualFile root : roots) {
+            final Boolean expected = root.getPath().equals(magentoPath + "/" + Package.vendor)
+                    ? null : Boolean.FALSE;
+
+            assertEquals(root.getPath(), expected, matches(root));
         }
     }
 

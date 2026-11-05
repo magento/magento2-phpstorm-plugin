@@ -28,9 +28,8 @@ public class MagentoFolderDecorator implements ProjectViewNodeDecorator {
         final Object value = projectViewNode.getValue();
         if (value instanceof PsiDirectory virtualFile) {
             final String directoryUrl = virtualFile.getVirtualFile().getUrl();
-            final String magentoPathUrl = MagentoPathUrlUtil.execute(project);
-            if (settings.containsMagentoFolder(directoryUrl) ||
-                directoryUrl.equals(magentoPathUrl)) {
+            if (settings.containsMagentoFolder(directoryUrl)
+                    || MagentoPathUrlUtil.isDefaultEditableRoot(project, directoryUrl)) {
                 presentationData.setIcon(MagentoIcons.MARK_AS);
             }
         }

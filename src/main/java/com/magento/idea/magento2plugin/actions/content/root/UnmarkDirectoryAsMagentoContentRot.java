@@ -63,9 +63,8 @@ public class UnmarkDirectoryAsMagentoContentRot extends MarkRootActionBase {
         }
 
         if (targetElement instanceof PsiDirectory && project != null) {
-            final String magentoPathUrl = MagentoPathUrlUtil.execute(project);
             final String directoryUrl = ((PsiDirectory) targetElement).getVirtualFile().getUrl();
-            if (magentoPathUrl != null && magentoPathUrl.equals(directoryUrl)) {
+            if (MagentoPathUrlUtil.isDefaultEditableRoot(project, directoryUrl)) {
                 event.getPresentation().setEnabledAndVisible(false);
                 return;
             }

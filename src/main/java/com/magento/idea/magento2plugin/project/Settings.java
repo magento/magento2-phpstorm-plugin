@@ -17,8 +17,11 @@ import com.intellij.util.EventDispatcher;
 import com.intellij.util.SmartList;
 import com.intellij.util.xmlb.annotations.Attribute;
 import com.intellij.util.xmlb.annotations.Tag;
+import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.util.magento.MagentoPathUrlUtil;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -145,7 +148,19 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         this.publishedReleasesUrl = state.getPublishedReleasesUrl();
         this.magentoVersion = state.getMagentoVersion();
         this.magentoEdition = state.getMagentoEdition();
-        this.myMagentoFolders = state.getMagentoFolders();
+        this.myMagentoFolders = withoutDefaultRoots(state.getMagentoFolders());
+    }
+
+    private @Nullable List<String> withoutDefaultRoots(final @Nullable List<String> folders) {
+        if (folders == null) {
+            return null;
+        }
+        final Set<String> result = new LinkedHashSet<>(folders);
+
+        result.remove(MagentoPathUrlUtil.rootUrl(this.magentoPath, Package.packagesRoot));
+        result.remove(MagentoPathUrlUtil.rootUrl(this.magentoPath, Package.packagesDesignRoot));
+
+        return new ArrayList<>(result);
     }
 
     public void addListener(final MagentoModuleDataListener listener) {

@@ -4,7 +4,10 @@
  */
 package com.magento.idea.magento2plugin.project
 
+import com.intellij.codeInsight.daemon.impl.analysis.FileHighlightingSetting
+import com.intellij.codeInsight.daemon.impl.analysis.HighlightingSettingsPerFile
 import com.intellij.openapi.options.ConfigurationException
+import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.util.xmlb.XmlSerializer
 import com.magento.idea.magento2plugin.PhysicalMagentoTestCase
 import javax.swing.JCheckBox
@@ -32,6 +35,21 @@ class SettingsFormTest : PhysicalMagentoTestCase() {
 
     private inline fun <reified T> field(form: SettingsForm, name: String): T =
         SettingsForm::class.java.getDeclaredField(name).apply { isAccessible = true }.get(form) as T
+
+    fun testApplyEnablesInspectionsReaderModeSwitchedOff() {
+        val form = createForm()
+        val file = myFixture.addFileToProject("app/code/Foo/Applied/etc/di.xml", "<config/>")
+        val highlighting = HighlightingSettingsPerFile.getInstance(project)
+        highlighting.setHighlightingSettingForRoot(file, FileHighlightingSetting.SKIP_INSPECTION)
+
+        form.apply()
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+
+        assertEquals(
+            FileHighlightingSetting.FORCE_HIGHLIGHTING,
+            highlighting.getHighlightingSettingForRoot(file)
+        )
+    }
 
     fun testPublishedReleasesUrlCanBeEditedAppliedResetAndPersisted() {
         val form = createForm()

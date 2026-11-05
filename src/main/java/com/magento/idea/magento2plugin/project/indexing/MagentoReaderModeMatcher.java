@@ -11,20 +11,18 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.magento.idea.magento2plugin.project.Settings;
-import java.util.List;
+import com.magento.idea.magento2plugin.util.magento.IsFileInEditableModuleUtil;
+import com.magento.idea.magento2plugin.util.magento.MagentoPathUrlUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * Keeps Reader Mode away from project code that {@link MagentoAdditionalLibraryRootsProvider}
  * reports as a library, because Reader Mode skips local inspections in library files.
+ * The vendor folder is left to the platform unless it is marked as a Magento content root,
+ * because it holds dependencies that are not edited in place.
  */
 public class MagentoReaderModeMatcher implements ReaderModeMatcher {
-    private static final String[] EDITABLE_ROOTS = {
-            "app/code",
-            "app/design",
-            "lib/web"
-    };
 
     @Override
     public @Nullable Boolean matches(
@@ -33,39 +31,26 @@ public class MagentoReaderModeMatcher implements ReaderModeMatcher {
             final @Nullable Editor editor,
             final ReaderModeProvider.@NotNull ReaderMode mode
     ) {
-        if (file.isWritable() && isInEditableRoot(project, file)) {
-            return Boolean.FALSE;
-        }
-
-        return null;
+        return isExcludedFromReaderMode(project, file) ? Boolean.FALSE : null;
     }
 
-    private static boolean isInEditableRoot(
+    /**
+     * Checks that a file is writable project code that Reader Mode must not apply to.
+     *
+     * @param project the current project
+     * @param file the file to check
+     * @return true if Reader Mode must not apply to the file
+     */
+    public static boolean isExcludedFromReaderMode(
             final @NotNull Project project,
             final @NotNull VirtualFile file
     ) {
-        if (!Settings.isEnabled(project)) {
-            return false;
-        }
-        final String magentoPath = Settings.getMagentoPath(project);
-
-        if (magentoPath != null) {
-            for (final String root : EDITABLE_ROOTS) {
-                if (file.getPath().startsWith(magentoPath + "/" + root + "/")) {
-                    return true;
-                }
-            }
-        }
-        final List<String> magentoFolders = Settings.getInstance(project).getMagentoFolders();
-
-        if (magentoFolders != null) {
-            for (final String folderUrl : magentoFolders) {
-                if (file.getUrl().startsWith(folderUrl + "/")) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return file.isWritable()
+                && Settings.isEnabled(project)
+                && (IsFileInEditableModuleUtil.execute(project, file)
+                || IsFileInEditableModuleUtil.isUnderRoot(
+                        file,
+                        MagentoPathUrlUtil.getLibWebPath(project)
+                ));
     }
 }
