@@ -128,6 +128,6 @@ public class PhpClassReferenceProvider extends PsiReferenceProvider {
                 project
         );
 
-        return keys.contains(namespaceIdentifier);
+        return keys.stream().anyMatch(namespaceIdentifier::equalsIgnoreCase);
     }
 }
