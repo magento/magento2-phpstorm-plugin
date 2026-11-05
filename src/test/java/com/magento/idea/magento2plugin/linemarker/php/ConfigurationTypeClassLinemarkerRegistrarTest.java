@@ -77,6 +77,7 @@ public class ConfigurationTypeClassLinemarkerRegistrarTest extends LinemarkerFix
 
         final Set<String> targetFiles = new HashSet<>();
         final List<String> targetNames = new ArrayList<>();
+        final List<PsiElement> targets = new ArrayList<>();
 
         for (final LineMarkerInfo<?> lineMarkerInfo : DaemonCodeAnalyzerImpl.getLineMarkers(
                 myFixture.getEditor().getDocument(),
@@ -90,6 +91,7 @@ public class ConfigurationTypeClassLinemarkerRegistrarTest extends LinemarkerFix
 
             for (final PsiElement target : gutterIconRenderer.getTargetElements()) {
                 targetFiles.add(target.getContainingFile().getName());
+                targets.add(target);
                 targetNames.add(((XmlTag) target).getAttributeValue("name"));
             }
         }
@@ -108,6 +110,11 @@ public class ConfigurationTypeClassLinemarkerRegistrarTest extends LinemarkerFix
                         "mixed.xml"
                 ),
                 targetFiles
+        );
+        assertEquals(
+                "An included file must be listed once, not again through the including file",
+                targetFiles.size(),
+                targets.size()
         );
         assertContainsElements(targetNames, "mixedExact");
         assertDoesntContain(targetNames, "mixedNested", "mixedLongerName");

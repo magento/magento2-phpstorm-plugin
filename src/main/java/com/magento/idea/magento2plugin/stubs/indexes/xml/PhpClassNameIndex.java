@@ -83,7 +83,7 @@ public class PhpClassNameIndex extends ScalarIndexExtension<String> {
             return;
         }
         for (final XmlTag xmlTag: xmlTags) {
-            visitSubTags(xmlTag, consumer);
+            visitTags(getPhysicalSubTags(xmlTag), consumer);
         }
     }
 
@@ -110,29 +110,34 @@ public class PhpClassNameIndex extends ScalarIndexExtension<String> {
         );
     }
 
-    private static void visitSubTags(
-            final XmlTag parentTag,
+    private static void visitTags(
+            final List<XmlTag> tags,
             final BiConsumer<XmlTag, Set<String>> consumer
     ) {
-        for (final XmlTag childTag: getPhysicalSubTags(parentTag)) {
-            for (final XmlAttribute xmlAttribute: childTag.getAttributes()) {
+        for (final XmlTag xmlTag: tags) {
+            for (final XmlAttribute xmlAttribute: xmlTag.getAttributes()) {
                 final String xmlAttributeValue = xmlAttribute.getValue();
 
                 if (xmlAttributeValue != null) {
-                    visitValue(childTag, xmlAttributeValue, consumer);
+                    visitValue(xmlTag, xmlAttributeValue, consumer);
                 }
             }
-            if (XmlIncludeHandler.isXInclude(childTag)) {
+            if (XmlIncludeHandler.isXInclude(xmlTag)) {
                 continue;
             }
+            final List<XmlTag> subTags = getPhysicalSubTags(xmlTag);
+
             // The platform forbids reading the value of a tag with an include during indexing.
-            if (getPhysicalSubTags(childTag).stream().noneMatch(XmlIncludeHandler::isXInclude)) {
-                visitValue(childTag, childTag.getValue().getTrimmedText(), consumer);
+            if (subTags.stream().noneMatch(XmlIncludeHandler::isXInclude)) {
+                visitValue(xmlTag, xmlTag.getValue().getTrimmedText(), consumer);
             }
-            visitSubTags(childTag, consumer);
+            visitTags(subTags, consumer);
         }
     }
 
+    /**
+     * Get the tags written in the file: getSubTags() would read the files that xi:include names.
+     */
     private static List<XmlTag> getPhysicalSubTags(final XmlTag parentTag) {
         return PsiTreeUtil.getChildrenOfTypeAsList(parentTag, XmlTag.class);
     }
@@ -175,6 +180,6 @@ public class PhpClassNameIndex extends ScalarIndexExtension<String> {
 
     @Override
     public int getVersion() {
-        return 2;
+        return 3;
     }
 }
