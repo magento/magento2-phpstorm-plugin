@@ -28,6 +28,9 @@ class Issue1296ReproductionTest : PhysicalMagentoTestCase() {
     private val links = mutableListOf<Path>()
 
     override fun setUp() {
+        VfsRootAccess.allowRootAccess(
+            testRootDisposable, Path.of(".intellijPlatform").toAbsolutePath().normalize().toString()
+        )
         super.setUp()
         root = Path.of(myFixture.tempDirFixture.tempDirPath)
         external = Files.createTempDirectory("issue1296 external ")
