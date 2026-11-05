@@ -29,7 +29,8 @@ class Issue1296ReproductionTest : PhysicalMagentoTestCase() {
 
     override fun setUp() {
         VfsRootAccess.allowRootAccess(
-            testRootDisposable, Path.of(".intellijPlatform").toAbsolutePath().normalize().toString()
+            testRootDisposable,
+            Path.of(".intellijPlatform").toAbsolutePath().normalize().toString().replace('\\', '/')
         )
         super.setUp()
         root = Path.of(myFixture.tempDirFixture.tempDirPath)
