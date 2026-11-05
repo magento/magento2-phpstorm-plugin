@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<config>
+    <type name="Foo\Bar\Model\Other">
+        <arguments>
+            <argument name="value" xsi:type="object">Foo\Bar\Model\ConfiguredClassFactory</argument>
+        </arguments>
+    </type>
+</config>

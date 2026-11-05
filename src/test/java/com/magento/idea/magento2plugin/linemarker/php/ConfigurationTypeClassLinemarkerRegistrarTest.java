@@ -14,7 +14,9 @@ import com.intellij.psi.xml.XmlTag;
 import com.magento.idea.magento2plugin.linemarker.LinemarkerFixtureTestCase;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 public class ConfigurationTypeClassLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
@@ -69,10 +71,11 @@ public class ConfigurationTypeClassLinemarkerRegistrarTest extends LinemarkerFix
     /**
      * Tests that targets keep the class and its generated types, without other classes.
      */
-    public void testTypeNameClassLinemarkerTargetsShouldSkipOtherClasses() {
+    public void testTypeNameClassLinemarkerTargetsShouldFollowEveryReferenceKind() {
         myFixture.configureByFile(this.getFixturePath("ConfiguredClass.php", "php"));
         myFixture.doHighlighting();
 
+        final Set<String> targetFiles = new HashSet<>();
         final List<String> targetNames = new ArrayList<>();
 
         for (final LineMarkerInfo<?> lineMarkerInfo : DaemonCodeAnalyzerImpl.getLineMarkers(
@@ -86,19 +89,27 @@ public class ConfigurationTypeClassLinemarkerRegistrarTest extends LinemarkerFix
                     = (NavigationGutterIconRenderer) lineMarkerInfo.getNavigationHandler();
 
             for (final PsiElement target : gutterIconRenderer.getTargetElements()) {
+                targetFiles.add(target.getContainingFile().getName());
                 targetNames.add(((XmlTag) target).getAttributeValue("name"));
             }
         }
 
-        assertContainsElements(
-                targetNames,
-                "Foo\\Bar\\Model\\ConfiguredClass",
-                "proxy",
-                "factory",
-                "factoryProxy",
-                "staticCall"
+        assertEquals(
+                Set.of(
+                        "exact.xml",
+                        "proxy.xml",
+                        "factory.xml",
+                        "factory_proxy.xml",
+                        "static.xml",
+                        "factory_attribute.xml",
+                        "leading_backslash.xml",
+                        "after_include.xml",
+                        "mixed.xml"
+                ),
+                targetFiles
         );
-        assertDoesntContain(targetNames, "nestedClass", "longerName");
+        assertContainsElements(targetNames, "mixedExact");
+        assertDoesntContain(targetNames, "mixedNested", "mixedLongerName");
     }
 
     /**
