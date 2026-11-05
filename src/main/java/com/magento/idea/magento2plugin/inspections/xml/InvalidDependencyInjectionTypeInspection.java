@@ -8,6 +8,7 @@ package com.magento.idea.magento2plugin.inspections.xml;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.codeInspection.XmlSuppressableInspectionTool;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
@@ -126,15 +127,21 @@ public class InvalidDependencyInjectionTypeInspection extends XmlSuppressableIns
                     if (tagValue.isEmpty()) {
                         return;
                     }
-                    final String cleanType = tagValue
-                            .replace("Factory", "")
-                            .replace("\\Proxy", "");
-
-                    if (!phpClassExistenceValidator.validate(cleanType)
+                    if (!isExistingObjectType(tagValue)
                             && !virtualTypeExistenceValidator.validate(tagValue)) {
                         reportClassDoesNotExists(tag, tagValue);
                     }
                 }
+            }
+
+            private boolean isExistingObjectType(final @NotNull String type) {
+                final String withoutProxy = StringUtil.trimEnd(type, "\\Proxy");
+
+                return phpClassExistenceValidator.validate(type)
+                        || phpClassExistenceValidator.validate(withoutProxy)
+                        || phpClassExistenceValidator.validate(
+                                StringUtil.trimEnd(withoutProxy, "Factory")
+                        );
             }
 
             /**
