@@ -10,6 +10,7 @@ import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerImpl;
 import com.intellij.codeInsight.navigation.NavigationGutterIconRenderer;
 import com.intellij.codeInsight.navigation.impl.PsiTargetPresentationRenderer;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.xml.XmlTag;
 import com.magento.idea.magento2plugin.linemarker.LinemarkerFixtureTestCase;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -63,6 +64,41 @@ public class ConfigurationTypeClassLinemarkerRegistrarTest extends LinemarkerFix
         }
 
         assertContainsElements(containerTexts, "vendor/magento/module-catalog/etc/di.xml");
+    }
+
+    /**
+     * Tests that targets keep the class and its generated types, without other classes.
+     */
+    public void testTypeNameClassLinemarkerTargetsShouldSkipOtherClasses() {
+        myFixture.configureByFile(this.getFixturePath("ConfiguredClass.php", "php"));
+        myFixture.doHighlighting();
+
+        final List<String> targetNames = new ArrayList<>();
+
+        for (final LineMarkerInfo<?> lineMarkerInfo : DaemonCodeAnalyzerImpl.getLineMarkers(
+                myFixture.getEditor().getDocument(),
+                getProject()
+        )) {
+            if (!"Navigate to configuration".equals(lineMarkerInfo.getLineMarkerTooltip())) {
+                continue;
+            }
+            final NavigationGutterIconRenderer gutterIconRenderer
+                    = (NavigationGutterIconRenderer) lineMarkerInfo.getNavigationHandler();
+
+            for (final PsiElement target : gutterIconRenderer.getTargetElements()) {
+                targetNames.add(((XmlTag) target).getAttributeValue("name"));
+            }
+        }
+
+        assertContainsElements(
+                targetNames,
+                "Foo\\Bar\\Model\\ConfiguredClass",
+                "proxy",
+                "factory",
+                "factoryProxy",
+                "staticCall"
+        );
+        assertDoesntContain(targetNames, "nestedClass", "longerName");
     }
 
     /**

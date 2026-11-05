@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Foo\Bar\Model\ConfiguredClass">
+        <arguments>
+            <argument name="proxy" xsi:type="object">Foo\Bar\Model\ConfiguredClass\Proxy</argument>
+            <argument name="factory" xsi:type="object">Foo\Bar\Model\ConfiguredClassFactory</argument>
+            <argument name="factoryProxy" xsi:type="object">Foo\Bar\Model\ConfiguredClassFactory\Proxy</argument>
+            <argument name="staticCall" xsi:type="string">Foo\Bar\Model\ConfiguredClass::getValue</argument>
+            <argument name="nestedClass" xsi:type="object">Foo\Bar\Model\ConfiguredClass\Nested</argument>
+            <argument name="longerName" xsi:type="object">Foo\Bar\Model\ConfiguredClassCollection</argument>
+        </arguments>
+    </type>
+</config>

@@ -20,8 +20,15 @@ import com.magento.idea.magento2plugin.stubs.indexes.xml.PhpClassNameIndex;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public final class XmlIndex {
+
+    private static final Set<String> GENERATED_TYPE_SUFFIXES = Set.of(
+            "\\Proxy",
+            "Factory",
+            "Factory\\Proxy"
+    );
 
     private XmlIndex() {
     }
@@ -79,7 +86,7 @@ public final class XmlIndex {
                 if (xmlAttributeValue != null) {
                     xmlAttributeValue = xmlAttributeValue.startsWith("\\")
                             ? xmlAttributeValue.substring(1) : xmlAttributeValue;
-                    if (xmlAttributeValue.startsWith(fqn)) {
+                    if (refersToClass(xmlAttributeValue, fqn)) {
                         list.add(childTag);
                     }
                 }
@@ -88,10 +95,21 @@ public final class XmlIndex {
             String tagValue = childTagValue.getTrimmedText();
             tagValue = tagValue.startsWith("\\") ? tagValue.substring(1) : tagValue;
 
-            if (!tagValue.isEmpty() && tagValue.startsWith(fqn)) {
+            if (!tagValue.isEmpty() && refersToClass(tagValue, fqn)) {
                 list.add(childTag);
             }
             fillList(childTag, fqn, list);
         }
+    }
+
+    private static boolean refersToClass(final String value, final String fqn) {
+        if (!value.startsWith(fqn)) {
+            return false;
+        }
+        final String suffix = value.substring(fqn.length());
+
+        return suffix.isEmpty()
+                || suffix.startsWith("::")
+                || GENERATED_TYPE_SUFFIXES.contains(suffix);
     }
 }
