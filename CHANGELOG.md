@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 ### Fixed
 
 - Restore navigation to PHP namespace segments in XML class references when namespace names contain uppercase letters.
+- Marking or unmarking a Magento content root no longer removes the marked folders from the settings on Windows [#2787](https://github.com/magento/magento2-phpstorm-plugin/issues/2787).
 - Inspections run again for writable non-PHP files inside the project content in `app/code`, `app/design`, `lib/web` and folders marked as Magento content roots, where Reader Mode skipped them because these folders are indexed as a library. A stored "skip inspections" level on any writable file in these folders, whether set by Reader Mode or by hand, is reset once per project and when a folder is marked [#2787](https://github.com/magento/magento2-phpstorm-plugin/issues/2787).
 - `app/design` shows the Magento folder icon and offers neither Mark nor Unmark, like `app/code` [#2787](https://github.com/magento/magento2-phpstorm-plugin/issues/2787).
 - A folder whose name only starts with `app/code` or `app/design`, such as `app/codeBackup`, no longer counts as an editable module location [#2787](https://github.com/magento/magento2-phpstorm-plugin/issues/2787).

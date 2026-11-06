@@ -119,6 +119,39 @@ public class MagentoContentRootActionsTest extends BaseProjectTestCase {
         );
     }
 
+    public void testMarkingKeepsExistingFoldersAndDropsMissingOnes() {
+        final VirtualFile folder = directory("packages/foo");
+        final VirtualFile other = directory("packages/bar");
+        final String missing = "file://" + settings.magentoPath + "/packages/missing";
+        final MarkDirectoryAsMagentoContentRot action = new MarkDirectoryAsMagentoContentRot();
+
+        settings.addMagentoFolder(other.getUrl());
+        settings.addMagentoFolder(missing);
+        isVisible(action, folder);
+        action.modifyRoots(folder, null);
+
+        assertTrue(settings.containsMagentoFolder(folder.getUrl()));
+        assertTrue(settings.containsMagentoFolder(other.getUrl()));
+        assertFalse(settings.containsMagentoFolder(missing));
+    }
+
+    public void testUnmarkingKeepsExistingFoldersAndDropsMissingOnes() {
+        final VirtualFile folder = directory("packages/foo");
+        final VirtualFile other = directory("packages/bar");
+        final String missing = "file://" + settings.magentoPath + "/packages/missing";
+        final UnmarkDirectoryAsMagentoContentRot action = new UnmarkDirectoryAsMagentoContentRot();
+
+        settings.addMagentoFolder(folder.getUrl());
+        settings.addMagentoFolder(other.getUrl());
+        settings.addMagentoFolder(missing);
+        isVisible(action, folder);
+        action.modifyRoots(folder, null);
+
+        assertFalse(settings.containsMagentoFolder(folder.getUrl()));
+        assertTrue(settings.containsMagentoFolder(other.getUrl()));
+        assertFalse(settings.containsMagentoFolder(missing));
+    }
+
     private Icon decoratedIcon(final VirtualFile folder) {
         final PresentationData presentation = new PresentationData();
 
