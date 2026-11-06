@@ -15,16 +15,15 @@ import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ContentEntry;
-import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.magento.idea.magento2plugin.MagentoIcons;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.project.indexing.MagentoAdditionalLibraryRootsProvider;
+import com.magento.idea.magento2plugin.project.startup.ReaderModeHighlightingReset;
 import com.magento.idea.magento2plugin.util.magento.MagentoPathUrlUtil;
-import java.net.URI;
-import java.net.MalformedURLException;
 import org.jetbrains.annotations.NotNull;
 
 public class MarkDirectoryAsMagentoContentRot extends MarkRootActionBase {
@@ -50,17 +49,14 @@ public class MarkDirectoryAsMagentoContentRot extends MarkRootActionBase {
             Settings.getInstance(project).addMagentoFolder(virtualFile.getUrl());
             if (settings.getMagentoFolders() != null) {
                 settings.getMagentoFolders().removeIf(folder -> {
-                    final VirtualFile file;
-                    try {
-                        file = VfsUtil.findFileByURL(URI.create(folder).toURL());
-                    } catch (IllegalArgumentException | MalformedURLException e) {
-                        return false;
-                    }
+                    final VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(folder);
+
                     return file == null || !file.exists();
                 });
             }
 
             MagentoAdditionalLibraryRootsProvider.refreshRoots(project);
+            ReaderModeHighlightingReset.runForFolder(project, virtualFile);
             ProjectView.getInstance(project).refresh();
         }
     }
@@ -75,9 +71,8 @@ public class MarkDirectoryAsMagentoContentRot extends MarkRootActionBase {
         }
 
         if (targetElement instanceof PsiDirectory && project != null) {
-            final String magentoPathUrl = MagentoPathUrlUtil.execute(project);
             final String directoryUrl = ((PsiDirectory) targetElement).getVirtualFile().getUrl();
-            if (magentoPathUrl != null && magentoPathUrl.equals(directoryUrl)) {
+            if (MagentoPathUrlUtil.isDefaultEditableRoot(project, directoryUrl)) {
                 event.getPresentation().setEnabledAndVisible(false);
                 return;
             }

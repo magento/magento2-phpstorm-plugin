@@ -24,6 +24,7 @@ import com.magento.idea.magento2plugin.project.MagentoSkillInstaller.AgentTarget
 import com.magento.idea.magento2plugin.magento.packages.MagentoComponentManager;
 import com.magento.idea.magento2plugin.project.MagentoSkillInstaller.Skill;
 import com.magento.idea.magento2plugin.project.indexing.MagentoAdditionalLibraryRootsProvider;
+import com.magento.idea.magento2plugin.project.startup.ReaderModeHighlightingReset;
 import com.magento.idea.magento2plugin.project.util.GetProjectBasePath;
 import com.magento.idea.magento2plugin.project.validator.SettingsFormValidator;
 import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
@@ -316,6 +317,7 @@ public class SettingsForm implements SearchableConfigurable {
         getSettings().publishedReleasesUrl = getPublishedReleasesUrl();
         buttonReindex.setEnabled(getSettings().pluginEnabled);
         regenerateUrnMapButton.setEnabled(getSettings().pluginEnabled);
+        ReaderModeHighlightingReset.run(project);
     }
 
     @NotNull

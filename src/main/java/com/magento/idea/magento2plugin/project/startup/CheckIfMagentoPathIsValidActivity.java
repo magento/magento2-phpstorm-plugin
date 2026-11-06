@@ -51,6 +51,7 @@ public class CheckIfMagentoPathIsValidActivity implements StartupActivity, Proje
             }
         }
         DeferredProjectOpenActions.getInstance(project).runPendingActions();
+        ReaderModeHighlightingReset.run(project);
     }
 
     private void registerNonPhpPhtmlSupport(final @NotNull Project project) {

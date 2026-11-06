@@ -11,17 +11,24 @@ import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.VirtualFileVisitor;
+import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.project.Settings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class MagentoVfsUtil {
-    private static final String[] MAGENTO_SCAN_ROOTS = {"app/code", "app/design", "vendor", "lib/web"};
+    public static final List<String> MAGENTO_SCAN_ROOTS = List.of(
+            Package.packagesRoot,
+            Package.packagesDesignRoot,
+            Package.vendor,
+            Package.libWebRoot
+    );
 
     private MagentoVfsUtil() {
     }

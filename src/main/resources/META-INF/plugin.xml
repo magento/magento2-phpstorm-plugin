@@ -166,6 +166,7 @@
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.SystemXmlFieldIndex" />
 
         <additionalLibraryRootsProvider implementation="com.magento.idea.magento2plugin.project.indexing.MagentoAdditionalLibraryRootsProvider"/>
+        <readerModeMatcher implementation="com.magento.idea.magento2plugin.project.indexing.MagentoReaderModeMatcher"/>
 
         <codeInsight.lineMarkerProvider language="JavaScript" implementationClass="com.magento.idea.magento2plugin.linemarker.js.JsMixinLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="JavaScript" implementationClass="com.magento.idea.magento2plugin.linemarker.js.KnockoutTemplateLineMarkerProvider"/>
