@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<config>
+    <preference for="Foo\Bar\Model\Other" type="Foo\Bar\Model\ConfiguredClassFactory"/>
+</config>
