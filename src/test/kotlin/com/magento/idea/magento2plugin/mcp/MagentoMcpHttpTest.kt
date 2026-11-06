@@ -97,6 +97,37 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         assertTrue(inspect("query", "acl_or_menu", "{invalid").contains("parametersJson must be a valid JSON object"))
     }
 
+    fun testInspectAndScaffoldRequireOnlyModeOverHttp() {
+        val client = mcp()
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        val tools = client.tools().associateBy { it.getString("name") }
+        for (tool in listOf("magento_inspect", "magento_scaffold")) {
+            assertEquals(listOf<Any>("mode"),
+                tools.getValue(tool).getJSONObject("inputSchema").getJSONArray("required").toList())
+            assertTrue(client.callEnvelope(tool, JSONObject()).has("error"))
+        }
+        fun inspect(vararg arguments: Pair<String, String>) = text("magento_inspect", JSONObject(mapOf(*arguments)))
+        fun scaffold(vararg arguments: Pair<String, String>) = text("magento_scaffold", JSONObject(mapOf(*arguments)))
+
+        assertTrue(inspect("mode" to "help").contains("Queries:"))
+        assertTrue(scaffold("mode" to "help").contains("Scaffolds:"))
+        assertTrue(scaffold("mode" to "help", "scaffoldType" to "", "parametersJson" to "").contains("Scaffolds:"))
+        assertTrue(inspect("mode" to "detailed_schema", "queryType" to "module").contains("queryType: module"))
+        assertTrue(scaffold("mode" to "detailed_schema", "scaffoldType" to "module").contains("scaffoldType: module"))
+        assertEquals(MagentoInspectionCommands.MISSING_TYPE_MESSAGE, inspect("mode" to "detailed_schema"))
+        assertEquals(MagentoScaffoldCommands.MISSING_TYPE_MESSAGE, scaffold("mode" to "detailed_schema"))
+        assertTrue(inspect("mode" to "query", "queryType" to "module")
+            .contains("Missing required parameter `moduleName`"))
+        assertTrue(scaffold("mode" to "render", "scaffoldType" to "module")
+            .contains("Missing required parameter `packageName`"))
+        assertFalse(Files.exists(root.resolve("src/app/code")))
+        // A missing type can never succeed, so indexing must not tell the agent to retry it.
+        DumbModeTestUtils.runInDumbModeSynchronously(project) {
+            assertEquals(MagentoInspectionCommands.MISSING_TYPE_MESSAGE, inspect("mode" to "query"))
+            assertEquals(MagentoScaffoldCommands.MISSING_TYPE_MESSAGE, scaffold("mode" to "render"))
+        }
+    }
+
     private fun inspect(mode: String, queryType: String = "", parametersJson: String = ""): String =
         text("magento_inspect", JSONObject().put("mode", mode).put("queryType", queryType)
             .put("parametersJson", parametersJson))
