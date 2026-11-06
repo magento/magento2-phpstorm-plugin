@@ -23,12 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class MagentoAdditionalLibraryRootsProvider extends AdditionalLibraryRootsProvider {
-    private static final String[] MAGENTO_INDEX_ROOTS = {
-            "app/code",
-            "app/design",
-            "vendor",
-            "lib/web"
-    };
 
     @Override
     public @NotNull Collection<SyntheticLibrary> getAdditionalProjectLibraries(
@@ -69,13 +63,7 @@ public class MagentoAdditionalLibraryRootsProvider extends AdditionalLibraryRoot
             return roots;
         }
 
-        final String magentoPath = Settings.getMagentoPath(project);
-
-        if (magentoPath != null) {
-            for (final String relativeRoot : MAGENTO_INDEX_ROOTS) {
-                addDirectory(roots, MagentoVfsUtil.findByPath(magentoPath + "/" + relativeRoot));
-            }
-        }
+        roots.addAll(MagentoVfsUtil.getMagentoScanRoots(project));
 
         final List<String> magentoFolders = Settings.getInstance(project).getMagentoFolders();
 
