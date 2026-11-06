@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config>
+    <include path="Foo_Bar::other.xml"/>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="other.xml"/>
+    <type name="Foo\Bar\Model\Other">
+        <arguments>
+            <argument name="value" xsi:type="object">Foo\Bar\Model\ConfiguredClassFactory</argument>
+        </arguments>
+    </type>
+</config>
