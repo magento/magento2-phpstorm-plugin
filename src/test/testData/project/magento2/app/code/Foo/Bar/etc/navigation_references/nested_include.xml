@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<config>
+    <arguments>
+        <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="exact.xml"/>
+        <argument name="value" xsi:type="object">Foo\Bar\Model\ConfiguredClass\Proxy</argument>
+    </arguments>
+</config>
