@@ -273,6 +273,15 @@ intellijPlatformTesting.testIdeUi.register("uiTest") {
     // Starter and Driver must match the IDE launched by the UI tests.
     testFramework(TestFrameworkType.Starter)
     uiTestImplementation.extendsFrom(configurations.getByName("intellijPlatformTestDependencies_uiTest"))
+    // 2.20.0 also adds base-IDE Starter dependencies directly to the source set.
+    // Keep only the WebStorm-matched dependencies inherited from this testing entry.
+    uiTestImplementation.withDependencies {
+        removeIf { dependency ->
+            TestFrameworkType.Starter.coordinates.any {
+                it.groupId == dependency.group && it.artifactId == dependency.name
+            }
+        }
+    }
 
     task {
         val uiTestSourceSet = sourceSets.getByName("uiTest")
