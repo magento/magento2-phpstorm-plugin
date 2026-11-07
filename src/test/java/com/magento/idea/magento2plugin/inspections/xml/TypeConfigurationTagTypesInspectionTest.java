@@ -168,6 +168,28 @@ public class TypeConfigurationTagTypesInspectionTest extends InspectionXmlFixtur
         assertHasNoHighlighting(errorMessage);
     }
 
+    public void testArgumentProxyFactoryExists() {
+        configureFixture();
+
+        final String errorMessage =  inspectionBundle.message(
+                CLASS_DOES_NOT_EXIST,
+                "Foo\\Bar\\Model\\SimpleModelOne\\ProxyFactory"
+        );
+
+        assertHasNoHighlighting(errorMessage);
+    }
+
+    public void testArgumentProxyFactoryWithoutSourceDoesNotExist() {
+        configureFixture();
+
+        final String errorMessage =  inspectionBundle.message(
+                CLASS_DOES_NOT_EXIST,
+                "Foo\\Bar\\Model\\Missing\\ProxyFactory"
+        );
+
+        assertHasHighlighting(errorMessage);
+    }
+
     public void testArgumentFactoryWithoutSourceDoesNotExist() {
         configureFixture();
 

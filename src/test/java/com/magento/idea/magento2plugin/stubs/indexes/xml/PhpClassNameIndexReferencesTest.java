@@ -67,6 +67,14 @@ public class PhpClassNameIndexReferencesTest {
     }
 
     @Test
+    public void proxyFactoryRefersToAllThree() {
+        assertEquals(
+                Set.of("Foo\\Bar\\ProxyFactory", "Foo\\Bar\\Proxy", "Foo\\Bar"),
+                PhpClassNameIndex.getReferencedClasses("Foo\\Bar\\ProxyFactory")
+        );
+    }
+
+    @Test
     public void classNamedFactoryHasNoSourceClass() {
         assertEquals(
                 Set.of("Foo\\Factory"),
