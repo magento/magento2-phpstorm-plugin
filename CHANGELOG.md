@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Fixed
 
+- The View Model injection action stays hidden when PhpStorm cannot locate its bundled `jsLanguageServicesImpl` resources during PSI lookup, instead of reporting an action-update exception [#1924](https://github.com/magento/magento2-phpstorm-plugin/issues/1924). The IDE installation still needs to be repaired separately.
 - Plugin generation preserves associative-array parameter defaults and strings containing `=` instead of truncating them and producing invalid PHP (related to [#1625](https://github.com/magento/magento2-phpstorm-plugin/issues/1625)).
 - Generating before, after, and around plugins for methods with nullable scalar or scalar union parameters no longer treats these types as class imports or reports a fully qualified name error [#1589](https://github.com/magento/magento2-phpstorm-plugin/issues/1589).
 - Restore navigation to PHP namespace segments in XML class references when namespace names contain uppercase letters.

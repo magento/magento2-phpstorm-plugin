@@ -10,8 +10,10 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.magento.idea.magento2plugin.BaseProjectTestCase;
 import com.magento.idea.magento2plugin.project.Settings;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class InjectAViewModelActionTest extends BaseProjectTestCase {
@@ -54,6 +56,77 @@ public class InjectAViewModelActionTest extends BaseProjectTestCase {
         assertActionEnabled(false);
     }
 
+    public void testMissingJavaScriptResourcesHideActionAndAllowRecovery() {
+        assertMissingResourcesHideActionAndAllowRecovery("Cannot find jsLanguageServicesImpl");
+    }
+
+    public void testMissingJavaScriptResourcesWithPathDiagnosticsHideAction() {
+        assertMissingResourcesHideActionAndAllowRecovery(
+                "Cannot find jsLanguageServicesImpl, additional missing path: /missing/jsLanguageServicesImpl"
+        );
+    }
+
+    private void assertMissingResourcesHideActionAndAllowRecovery(final String message) {
+        configureLayout("app/code/Foo/Bar/view/frontend/layout/inject_view_model.xml");
+        final InjectAViewModelAction action = new InjectAViewModelAction();
+        final AnActionEvent healthy = createEvent(action, createContext());
+        action.update(healthy);
+        assertTrue(healthy.getPresentation().isEnabledAndVisible());
+
+        final AnActionEvent broken = createEvent(action, failingPsiContext(
+                new RuntimeException(new IOException(message))
+        ));
+        action.update(broken);
+        assertFalse(broken.getPresentation().isEnabled());
+        assertFalse(broken.getPresentation().isVisible());
+
+        action.update(healthy);
+        assertTrue(healthy.getPresentation().isEnabledAndVisible());
+    }
+
+    public void testUnrelatedPsiLookupFailureIsPropagated() {
+        assertPsiLookupFailurePropagated(new IllegalStateException("Unexpected PSI failure"));
+    }
+
+    public void testMatchingMessageWithoutIoCauseIsPropagated() {
+        assertPsiLookupFailurePropagated(new RuntimeException("Cannot find jsLanguageServicesImpl"));
+    }
+
+    public void testUnrelatedIoFailureIsPropagated() {
+        assertPsiLookupFailurePropagated(new RuntimeException(new IOException("Cannot read index")));
+    }
+
+    public void testPsiLookupCancellationIsPropagated() {
+        assertPsiLookupFailurePropagated(new ProcessCanceledException());
+    }
+
+    public void testPsiLookupCancellationWithMissingResourcesCauseIsPropagated() {
+        assertPsiLookupFailurePropagated(
+                new ProcessCanceledException(new IOException("Cannot find jsLanguageServicesImpl"))
+        );
+    }
+
+    private void assertPsiLookupFailurePropagated(final RuntimeException failure) {
+        configureLayout("app/code/Foo/Bar/view/frontend/layout/inject_view_model.xml");
+        final InjectAViewModelAction action = new InjectAViewModelAction();
+        try {
+            action.update(createEvent(action, failingPsiContext(failure)));
+            fail("PSI lookup failure must propagate");
+        } catch (RuntimeException actual) {
+            assertSame(failure, actual);
+        }
+    }
+
+    private DataContext failingPsiContext(final RuntimeException failure) {
+        final DataContext context = createContext();
+        return dataId -> {
+            if (PlatformDataKeys.PSI_FILE.is(dataId)) {
+                throw failure;
+            }
+            return context.getData(dataId);
+        };
+    }
+
     private void configureLayout(final String path) {
         Settings.getInstance(getProject()).myMagentoFolders = new ArrayList<>();
         myFixture.addFileToProject(
@@ -66,15 +139,22 @@ public class InjectAViewModelActionTest extends BaseProjectTestCase {
 
     private void assertActionEnabled(final boolean expected) {
         final InjectAViewModelAction action = new InjectAViewModelAction();
-        final DataContext context = SimpleDataContext.builder()
-                .add(PlatformDataKeys.PROJECT, getProject())
-                .add(PlatformDataKeys.PSI_FILE, myFixture.getFile())
-                .add(PlatformDataKeys.CARET, myFixture.getEditor().getCaretModel().getPrimaryCaret())
-                .build();
-        final AnActionEvent event = AnActionEvent.createFromAnAction(action, null, ActionPlaces.UNKNOWN, context);
+        final AnActionEvent event = createEvent(action, createContext());
         action.update(event);
 
         assertEquals(expected, event.getPresentation().isEnabled());
         assertEquals(expected, event.getPresentation().isVisible());
+    }
+
+    private DataContext createContext() {
+        return SimpleDataContext.builder()
+                .add(PlatformDataKeys.PROJECT, getProject())
+                .add(PlatformDataKeys.PSI_FILE, myFixture.getFile())
+                .add(PlatformDataKeys.CARET, myFixture.getEditor().getCaretModel().getPrimaryCaret())
+                .build();
+    }
+
+    private AnActionEvent createEvent(final InjectAViewModelAction action, final DataContext context) {
+        return AnActionEvent.createFromAnAction(action, null, ActionPlaces.UNKNOWN, context);
     }
 }
