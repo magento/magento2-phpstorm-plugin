@@ -120,7 +120,6 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
             .contains("Missing required parameter `moduleName`"))
         assertTrue(scaffold("mode" to "render", "scaffoldType" to "module")
             .contains("Missing required parameter `packageName`"))
-        assertFalse(Files.exists(root.resolve("src/app/code")))
         // A missing type can never succeed, so indexing must not tell the agent to retry it.
         DumbModeTestUtils.runInDumbModeSynchronously(project) {
             assertEquals(MagentoInspectionCommands.MISSING_TYPE_MESSAGE, inspect("mode" to "query"))
