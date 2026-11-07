@@ -5,8 +5,11 @@
 
 package com.magento.idea.magento2plugin.actions.generation.generator;
 
+import com.intellij.codeInsight.PsiEquivalenceUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiErrorElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.Parameter;
@@ -16,6 +19,7 @@ import com.magento.idea.magento2plugin.magento.files.Plugin;
 import com.magento.idea.magento2plugin.util.GetFirstClassOfFile;
 import com.magento.idea.magento2plugin.util.GetPhpClassByFQN;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class PluginClassGeneratorTest extends BaseGeneratorTestCase {
 
@@ -60,10 +64,28 @@ public class PluginClassGeneratorTest extends BaseGeneratorTestCase {
                 generated.getText().contains("use Foo\\Bar\\Service\\SimpleService;"));
     }
 
+    public void testGeneratePluginsWithAssociativeArrayDefault() {
+        assertPluginParameterPreserved("array",
+                "['first' => ['enabled' => true], 'second' => false, 'filter' => 'a=b']");
+    }
+
+    public void testGeneratePluginsWithEqualsInStringDefault() {
+        assertPluginParameterPreserved("string", "'left = right'");
+    }
+
     private PsiFile assertPluginParameterTypePreserved(final String parameterType) {
+        return assertPluginParameterPreserved(parameterType, null);
+    }
+
+    private PsiFile assertPluginParameterPreserved(
+            final String parameterType,
+            final @Nullable String defaultValue
+    ) {
+        final String defaultDeclaration = defaultValue == null ? "" : " = " + defaultValue;
         myFixture.addFileToProject("app/code/Foo/Bar/Service/TypedService.php",
                 "<?php namespace Foo\\Bar\\Service; class TypedService { "
-                        + "public function execute(" + parameterType + " $value): void {} }");
+                        + "public function execute(" + parameterType + " $value"
+                        + defaultDeclaration + "): void {} }");
         final String targetFqn = "Foo\\Bar\\Service\\TypedService";
         final PhpClass targetClass = GetPhpClassByFQN.getInstance(getProject()).execute(targetFqn);
         assertNotNull(targetClass);
@@ -74,6 +96,8 @@ public class PluginClassGeneratorTest extends BaseGeneratorTestCase {
         for (final Plugin.PluginType pluginType : Plugin.PluginType.values()) {
             generated = addPluginToTargetClass(pluginType.toString(), targetFqn);
             assertNotNull(generated);
+            assertNull("Generated PHP must have no syntax errors",
+                    PsiTreeUtil.findChildOfType(generated, PsiErrorElement.class));
             final PhpClass generatedClass = GetFirstClassOfFile.getInstance()
                     .execute((PhpFile) generated);
             assertNotNull(generatedClass);
@@ -85,6 +109,12 @@ public class PluginClassGeneratorTest extends BaseGeneratorTestCase {
             assertEquals("The parameter type must survive generation and import resolution",
                     targetMethod.getParameters()[0].getDeclaredType().getTypes(),
                     value.getDeclaredType().getTypes());
+            if (defaultValue != null) {
+                assertNotNull("The parameter default must be preserved", value.getDefaultValue());
+                assertTrue("The complete default expression must survive generation and formatting",
+                        PsiEquivalenceUtil.areElementsEquivalent(
+                                targetMethod.getParameters()[0].getDefaultValue(), value.getDefaultValue()));
+            }
         }
 
         return generated;

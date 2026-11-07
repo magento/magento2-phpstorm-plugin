@@ -77,7 +77,7 @@ public final class ConvertPluginParamsToString {
 
                 // Parameter has default value.
                 if (parameterText.contains("=")) {
-                    final String[] paramParts = parameterText.split("=");
+                    final String[] paramParts = parameterText.split("=", 2);
                     parameterText = paramParts[0];
                     parameterText += " = ";//NOPMD
                     String defaultValue = paramParts[1];
