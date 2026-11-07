@@ -16,6 +16,7 @@ import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.visitors.PhpElementVisitor;
 import java.util.Collection;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class PhpClassReferenceExtractor {
 
@@ -130,14 +131,14 @@ public abstract class PhpClassReferenceExtractor {
     }
 
     /**
-     * Extract complex type.
+     * Extract a non-primitive type, or null when all type members are primitive.
      *
      * @param type PhpType
      *
      * @return String
      */
-    private String extractComplexType(final @NotNull PhpType type) {
-        String complexType = type.toString();
+    private @Nullable String extractComplexType(final @NotNull PhpType type) {
+        String complexType = null;
 
         for (final String complexTypeCandidate : type.getTypes()) {
             if (!PhpType.isPrimitiveType(complexTypeCandidate)) {
@@ -145,7 +146,7 @@ public abstract class PhpClassReferenceExtractor {
             }
         }
 
-        return PhpType.isPrimitiveType(complexType) ? null : complexType;
+        return complexType;
     }
 
     /**
