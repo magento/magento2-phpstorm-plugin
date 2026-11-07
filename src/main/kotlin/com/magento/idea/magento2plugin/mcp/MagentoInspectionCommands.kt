@@ -12,6 +12,9 @@ import org.json.JSONException
 import org.json.JSONObject
 
 internal object MagentoInspectionCommands {
+    const val MISSING_TYPE_MESSAGE =
+        "Provide queryType to inspect. Call magento_inspect with mode `help` for the compact query catalog."
+
     private val supportedTypes = listOf(
         "module",
         "di_config",
@@ -50,7 +53,7 @@ internal object MagentoInspectionCommands {
     fun detailedSchema(queryType: String): String {
         val normalizedType = normalizeType(queryType)
         if (normalizedType.isEmpty()) {
-            return "Provide queryType to inspect. Call magento_inspect with mode `help` for the compact query catalog."
+            return MISSING_TYPE_MESSAGE
         }
 
         if (normalizedType !in supportedTypes) {

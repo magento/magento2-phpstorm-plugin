@@ -68,13 +68,13 @@ Supported `scaffoldType` values:
 Get the catalog:
 
 ```json
-{"mode":"help","scaffoldType":"","parametersJson":""}
+{"mode":"help"}
 ```
 
 Get module schema:
 
 ```json
-{"mode":"detailed_schema","scaffoldType":"module","parametersJson":""}
+{"mode":"detailed_schema","scaffoldType":"module"}
 ```
 
 Render a module:

@@ -147,16 +147,20 @@ class MagentoMcpProjectToolset : McpToolset {
     )
     suspend fun magentoInspect(
         mode: String,
-        queryType: String,
-        parametersJson: String
+        queryType: String = "",
+        parametersJson: String = ""
     ): String {
         return when (mode.trim().lowercase().replace('-', '_').replace(' ', '_')) {
             "help" -> MagentoInspectionCommands.help()
             "schema", "detailed_schema" -> MagentoInspectionCommands.detailedSchema(queryType)
-            "query" -> MagentoMcpToolsetSupport.withProjectReadAction(
-                requireSmartMode = MagentoInspectionCommands.requiresSmartMode(queryType)
-            ) {
-                MagentoInspectionCommands.query(it, queryType, parametersJson)
+            "query" -> if (queryType.isBlank()) {
+                MagentoInspectionCommands.MISSING_TYPE_MESSAGE
+            } else {
+                MagentoMcpToolsetSupport.withProjectReadAction(
+                    requireSmartMode = MagentoInspectionCommands.requiresSmartMode(queryType)
+                ) {
+                    MagentoInspectionCommands.query(it, queryType, parametersJson)
+                }
             }
             else -> "mode must be `help`, `detailed_schema`, or `query`. Use `help` to inspect the compact Magento inspection catalog."
         }

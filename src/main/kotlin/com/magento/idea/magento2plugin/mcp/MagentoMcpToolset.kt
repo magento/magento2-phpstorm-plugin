@@ -43,13 +43,15 @@ class MagentoMcpToolset : McpToolset {
     )
     suspend fun magentoScaffold(
         mode: String,
-        scaffoldType: String,
-        parametersJson: String
+        scaffoldType: String = "",
+        parametersJson: String = ""
     ): String {
         return when (mode.trim().lowercase().replace('-', '_').replace(' ', '_')) {
             "help" -> MagentoScaffoldCommands.help()
             "schema", "detailed_schema" -> MagentoScaffoldCommands.detailedSchema(scaffoldType)
-            "render" -> if (MagentoScaffoldCommands.rendersOffEdt(scaffoldType)) {
+            "render" -> if (scaffoldType.isBlank()) {
+                MagentoScaffoldCommands.MISSING_TYPE_MESSAGE
+            } else if (MagentoScaffoldCommands.rendersOffEdt(scaffoldType)) {
                 MagentoMcpToolsetSupport.withProjectAction {
                     MagentoScaffoldCommands.render(it, scaffoldType, parametersJson)
                 }
