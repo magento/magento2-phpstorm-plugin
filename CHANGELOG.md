@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Fixed
 
+- Plugin generation preserves associative-array parameter defaults and strings containing `=` instead of truncating them and producing invalid PHP (related to [#1625](https://github.com/magento/magento2-phpstorm-plugin/issues/1625)).
 - Generating before, after, and around plugins for methods with nullable scalar or scalar union parameters no longer treats these types as class imports or reports a fully qualified name error [#1589](https://github.com/magento/magento2-phpstorm-plugin/issues/1589).
 - Restore navigation to PHP namespace segments in XML class references when namespace names contain uppercase letters.
 - Marking or unmarking a Magento content root no longer removes the marked folders from the settings on Windows [#2787](https://github.com/magento/magento2-phpstorm-plugin/issues/2787).
