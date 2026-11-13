@@ -180,6 +180,6 @@ public class PhpClassNameIndex extends ScalarIndexExtension<String> {
 
     @Override
     public int getVersion() {
-        return 3;
+        return 4;
     }
 }

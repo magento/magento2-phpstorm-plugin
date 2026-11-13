@@ -7,7 +7,6 @@ package com.magento.idea.magento2plugin.util;
 
 import com.intellij.openapi.util.text.StringUtil;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,14 +37,14 @@ public final class PhpNameUtil {
      * @return class names, the written type first
      */
     public static @NotNull Set<String> getObjectTypeCandidates(final @NotNull String type) {
-        final String withoutProxy = StringUtil.trimEnd(type, PROXY_SUFFIX);
-        final String source = StringUtil.trimEnd(withoutProxy, FACTORY_SUFFIX);
         final Set<String> candidates = new LinkedHashSet<>();
+        String name = type;
 
-        for (final String name : List.of(type, withoutProxy, source)) {
-            if (!name.isEmpty() && !name.endsWith("\\")) {
-                candidates.add(name);
-            }
+        // Magento also generates a missing source class, so suffixes chain at any depth.
+        while (!name.isEmpty() && !name.endsWith("\\") && candidates.add(name)) {
+            name = name.endsWith(PROXY_SUFFIX)
+                    ? StringUtil.trimEnd(name, PROXY_SUFFIX)
+                    : StringUtil.trimEnd(name, FACTORY_SUFFIX);
         }
 
         return candidates;
