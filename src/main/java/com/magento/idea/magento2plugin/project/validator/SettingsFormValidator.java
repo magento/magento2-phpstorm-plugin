@@ -39,38 +39,31 @@ public class SettingsFormValidator {
             }
 
             final String magentoRootPath = form.getMagentoPath();
-            final boolean isMagentoFrameworkDirExist =
-                    MagentoBasePathUtil.isMagentoFolderValid(magentoRootPath);
-
-            if (!MagentoBasePathUtil.isComposerJsonExists(magentoRootPath)) {
-                if (isMagentoFrameworkDirExist) {
-                    throw new ConfigurationException(
-                            validatorBundle.message("validator.package.validPathComposerFiles")
-                    );
-                }
-                throw new ConfigurationException(
-                        validatorBundle.message("validator.package.validPath")
-                );
+            final com.magento.idea.magento2plugin.project.MagentoProjectConfigurationService configService =
+                    com.magento.idea.magento2plugin.project.MagentoProjectConfigurationService.getInstance(form.getProject());
+            final java.util.List<String> pathErrors = configService.validatePathForConfiguration(magentoRootPath, true);
+            if (!pathErrors.isEmpty()) {
+                throw new ConfigurationException(String.join("<br>", pathErrors));
             }
 
-            if (!isMagentoFrameworkDirExist) {
-                throw new ConfigurationException(
-                        validatorBundle.message("validator.package.validPathVendor")
-                );
-            }
+            final String resolved = configService.resolvePath(magentoRootPath);
+            final com.magento.idea.magento2plugin.project.MagentoProjectConfigurationService.InstallationDetails details =
+                    configService.inspectPath(resolved != null ? resolved : magentoRootPath);
 
             final String magentoVersion = form.getMagentoVersion();
-            if (magentoVersion.length() == 0) {
-                throw new ConfigurationException(
-                        validatorBundle.message("validator.notEmpty", "Magento Version")
-                );
-            }
+            if (details.type() == com.magento.idea.magento2plugin.project.MagentoProjectConfigurationService.InstallationType.RECOGNIZED_APPLICATION) {
+                if (magentoVersion.length() == 0) {
+                    throw new ConfigurationException(
+                            validatorBundle.message("validator.notEmpty", "Magento Version")
+                    );
+                }
 
-            if (!magentoVersion.matches(RegExUtil.MAGENTO_VERSION)
-                    && !magentoVersion.equals(MagentoVersionUtil.DEFAULT_VERSION)) {
-                throw new ConfigurationException(
-                        validatorBundle.message("validator.magentoVersionInvalid")
-                );
+                if (!magentoVersion.matches(RegExUtil.MAGENTO_VERSION)
+                        && !magentoVersion.equals(MagentoVersionUtil.DEFAULT_VERSION)) {
+                    throw new ConfigurationException(
+                            validatorBundle.message("validator.magentoVersionInvalid")
+                    );
+                }
             }
         }
     }

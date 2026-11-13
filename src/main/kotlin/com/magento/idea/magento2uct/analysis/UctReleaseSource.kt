@@ -12,7 +12,6 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.io.HttpRequests
 import com.jetbrains.php.lang.PhpFileType
 import com.magento.idea.magento2uct.versioning.processors.ApiCoverageIndexProcessor
-import com.magento.idea.magento2uct.versioning.processors.DeprecationIndexProcessor
 import com.magento.idea.magento2uct.versioning.processors.ExistenceIndexProcessor
 import org.json.JSONObject
 import java.nio.file.Files
@@ -64,7 +63,7 @@ internal class UctReleaseSource(private val endpoint: (String) -> String = ::url
                        check: () -> Unit, progress: (UctPreparationProgress) -> Unit): UctReleaseIndex {
         val existence = ExistenceIndexProcessor()
         val api = ApiCoverageIndexProcessor()
-        val deprecation = DeprecationIndexProcessor()
+        val deprecation = UctReleaseDeprecations()
         ZipFile(archive.toFile()).use { zip ->
             val entries = zip.entries().asSequence().toList()
             require(entries.size <= 200000) { "Too many release archive entries." }

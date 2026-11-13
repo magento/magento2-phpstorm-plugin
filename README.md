@@ -72,8 +72,12 @@
 
 ## Works with
 
-* PhpStorm, WebStorm, and IntelliJ IDEA 2026.2+ with JavaScript and CSS support.
+* PhpStorm, WebStorm, and IntelliJ IDEA 2026.3+ with JavaScript and CSS support.
 * PHP features require the PHP plugin; XML, JavaScript, theme, and other PHP-independent features also work without it.
+
+## Indexing exclusions
+
+Magento settings exclude generated and runtime outputs by default, including directories named `.cache` anywhere under the configured Magento root. Newly created cache directories are picked up automatically. Source beside these caches remains indexed. You can preview the paths, disable exclusions, or reset plugin-managed exclusions through settings or MCP; existing manual exclusions are preserved.
 
 ## MCP tools
 

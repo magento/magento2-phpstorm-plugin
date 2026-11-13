@@ -6,18 +6,22 @@
 package com.magento.idea.magento2plugin.util.magento;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiFile;
 import com.magento.idea.magento2plugin.project.Settings;
 import java.util.ArrayList;
 import java.util.List;
+import org.jetbrains.annotations.Nullable;
 
 public final class IsFileInEditableModuleUtil {
 
     private IsFileInEditableModuleUtil() {}
 
     /**
-     * Module is considered editable if it is declared within `MAGENTO_ROOT/app/code` directory.
+     * Module is considered editable if it is declared within `MAGENTO_ROOT/app/code`,
+     * `MAGENTO_ROOT/app/design` or a folder marked as a Magento content root.
      *
      * @param file PsiFile
      * @return boolean
@@ -37,26 +41,22 @@ public final class IsFileInEditableModuleUtil {
      * @return true if the file is in an editable module directory, false otherwise
      */
     public static boolean execute(final Project project, final VirtualFile virtualFile) {
-        final String magentoRootPath = MagentoPathUrlUtil.execute(project);
-        if (magentoRootPath == null) {
+        final String packagesUrl = MagentoPathUrlUtil.execute(project);
+
+        if (packagesUrl == null) {
             return false;
         }
+        final List<String> editableUrls = new ArrayList<>();
+        final List<String> magentoFolders = Settings.getInstance(project).getMagentoFolders();
 
-        final Settings settings = Settings.getInstance(project);
-        List<String> editablePaths = settings.getMagentoFolders();
-        if (editablePaths == null) {
-            editablePaths = new ArrayList<>();
+        if (magentoFolders != null) {
+            editableUrls.addAll(magentoFolders);
         }
+        editableUrls.add(packagesUrl);
+        editableUrls.add(MagentoPathUrlUtil.getDesignPath(project));
 
-        editablePaths.add(magentoRootPath);
-        final String magentoDesignPath = MagentoPathUrlUtil.getDesignPath(project);
-        if (magentoDesignPath != null) {
-            editablePaths.add(magentoDesignPath);
-        }
-
-        final String currentFilePath = virtualFile.getUrl();
-        for (final String editablePath : editablePaths) {
-            if (normalizeUrl(currentFilePath).startsWith(normalizeUrl(editablePath))) {
+        for (final String editableUrl : editableUrls) {
+            if (isUnderRoot(virtualFile, editableUrl)) {
                 return true;
             }
         }
@@ -64,16 +64,22 @@ public final class IsFileInEditableModuleUtil {
     }
 
     /**
-     * Normalizes a URL by removing the scheme (e.g., temp://, file://) to allow proper comparisons.
+     * Checks a file against a root URL, resolved in the file system of the file.
      *
-     * @param url the URL to normalize
-     * @return the normalized URL as a String
+     * @param virtualFile the file to check
+     * @param rootUrl the root URL, can be null when the Magento path is not configured
+     * @return true if the file is the root or is located under it
      */
-    private static String normalizeUrl(final String url) {
-        final int schemeSeparatorIndex = url.indexOf("://");
-        if (schemeSeparatorIndex != -1) {
-            return url.substring(schemeSeparatorIndex + 3);
+    public static boolean isUnderRoot(
+            final VirtualFile virtualFile,
+            final @Nullable String rootUrl
+    ) {
+        if (rootUrl == null) {
+            return false;
         }
-        return url;
+        final VirtualFile root = virtualFile.getFileSystem()
+                .findFileByPath(VirtualFileManager.extractPath(rootUrl));
+
+        return root != null && VfsUtilCore.isAncestor(root, virtualFile, false);
     }
 }

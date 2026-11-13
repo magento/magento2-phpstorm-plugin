@@ -11,6 +11,9 @@ import org.json.JSONException
 import org.json.JSONObject
 
 internal object MagentoScaffoldCommands {
+    const val MISSING_TYPE_MESSAGE =
+        "Provide scaffoldType. Call magento_scaffold with mode `help` for the compact scaffold catalog."
+
     private val supportedTypes = listOf(
         "module",
         "plugin",
@@ -47,7 +50,7 @@ internal object MagentoScaffoldCommands {
     fun detailedSchema(scaffoldType: String): String {
         val normalizedType = normalizeType(scaffoldType)
         if (normalizedType.isEmpty()) {
-            return "Provide scaffoldType to inspect. Call magento_scaffold with mode `help` for the compact scaffold catalog."
+            return MISSING_TYPE_MESSAGE
         }
 
         if (normalizedType !in supportedTypes) {

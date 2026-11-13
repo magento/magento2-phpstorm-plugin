@@ -10,7 +10,7 @@ teamcityServiceMessages = "2024.07"
 
 # plugins
 changelog = "2.5.0"
-intelliJPlatform = "2.19.0"
+intelliJPlatform = "2.20.0"
 kotlin = "2.4.21"
 kover = "0.9.11"
 qodana = "2026.2.2"

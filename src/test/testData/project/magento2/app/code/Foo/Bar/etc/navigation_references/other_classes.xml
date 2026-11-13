@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<config>
+    <type name="Foo\Bar\Model\Other">
+        <arguments>
+            <argument name="value" xsi:type="object">Foo\Bar\Model\ConfiguredClass\Nested</argument>
+        </arguments>
+    </type>
+    <type name="Foo\Bar\Model\Other">
+        <arguments>
+            <argument name="value" xsi:type="object">Foo\Bar\Model\ConfiguredClassCollection</argument>
+        </arguments>
+    </type>
+    <type name="Foo\Bar\Model\Other">
+        <arguments>
+            <argument name="value" xsi:type="object">Foo\Bar\Model\ConfiguredClassFactory\Nested</argument>
+        </arguments>
+    </type>
+    <type name="Foo\Bar\Model\Other">
+        <arguments>
+            <argument name="value" xsi:type="object">Foo\Bar\Model\Other\Proxy</argument>
+        </arguments>
+    </type>
+</config>

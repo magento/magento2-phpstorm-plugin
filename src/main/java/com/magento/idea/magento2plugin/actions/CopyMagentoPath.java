@@ -8,11 +8,14 @@ package com.magento.idea.magento2plugin.actions;
 import com.intellij.ide.actions.CopyPathProvider;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.magento.idea.magento2plugin.util.magento.GetModuleNameByDirectoryUtil;
+import com.magento.idea.magento2plugin.magento.packages.ComponentType;
+import com.magento.idea.magento2plugin.util.RegExUtil;
+import com.magento.idea.magento2plugin.util.magento.GetMagentoModuleUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -72,11 +75,13 @@ public class CopyMagentoPath extends CopyPathProvider {
         if (directory == null) {
             return null;
         }
-        final String moduleName = GetModuleNameByDirectoryUtil.execute(directory, project);
+        final GetMagentoModuleUtil.MagentoModuleData component = GetMagentoModuleUtil
+                .getByContext(directory, project);
 
-        if (moduleName == null) {
+        if (component == null) {
             return null;
         }
+        final String moduleName = getAssetModuleName(virtualFile, component);
         final StringBuilder fullPath = new StringBuilder(virtualFile.getPath());
 
         index = -1;
@@ -108,6 +113,41 @@ public class CopyMagentoPath extends CopyPathProvider {
                 || CSS_EXTENSION.equals(virtualFile.getExtension())
                 || HTML_EXTENSION.equals(virtualFile.getExtension())
                 || SUPPORTED_IMAGE_EXTENSIONS.contains(virtualFile.getExtension());
+    }
+
+    /**
+     * Resolves the module prefix for an asset, including module overrides in a theme.
+     *
+     * @param virtualFile the asset file
+     * @param component the Magento module or theme containing the asset
+     * @return the module name used in the Magento asset path
+     */
+    private static @NotNull String getAssetModuleName(
+            final @NotNull VirtualFile virtualFile,
+            final @NotNull GetMagentoModuleUtil.MagentoModuleData component
+    ) {
+        if (!ComponentType.theme.equals(component.getType())) {
+            return component.getName();
+        }
+        final String relativePath = VfsUtilCore.getRelativePath(
+                virtualFile,
+                component.getModuleDir().getVirtualFile(),
+                '/'
+        );
+
+        if (relativePath == null) {
+            return component.getName();
+        }
+        final int separatorIndex = relativePath.indexOf('/');
+
+        if (separatorIndex == -1) {
+            return component.getName();
+        }
+        final String overrideModuleName = relativePath.substring(0, separatorIndex);
+
+        return overrideModuleName.matches(RegExUtil.Magento.MODULE_NAME)
+                ? overrideModuleName
+                : component.getName();
     }
 
     /**

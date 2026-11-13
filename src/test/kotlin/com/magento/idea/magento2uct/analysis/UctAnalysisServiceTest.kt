@@ -4,19 +4,22 @@
  */
 package com.magento.idea.magento2uct.analysis
 
+import com.intellij.codeInspection.InspectionManager
+import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.util.JDOMUtil
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import com.intellij.util.xmlb.XmlSerializer
 import com.magento.idea.magento2plugin.PhysicalMagentoTestCase
+import com.magento.idea.magento2uct.execution.output.ReportBuilder
+import com.magento.idea.magento2uct.execution.output.Summary
+import com.magento.idea.magento2uct.inspections.UctAnalysisContext
+import com.magento.idea.magento2uct.inspections.UctInspectionManager
 import com.magento.idea.magento2uct.packages.IssueSeverityLevel
 import com.magento.idea.magento2uct.packages.SupportedIssue
 import com.magento.idea.magento2uct.settings.UctSettingsService
-import com.magento.idea.magento2uct.execution.output.ReportBuilder
-import com.magento.idea.magento2uct.execution.output.Summary
 import org.json.JSONObject
-import com.magento.idea.magento2uct.inspections.UctInspectionManager
 import org.junit.Assert.assertThrows
 import java.nio.file.Files
 import java.nio.file.Path
@@ -107,6 +110,42 @@ class UctAnalysisServiceTest : PhysicalMagentoTestCase() {
         val imported = result.findings.filter { it.issue == SupportedIssue.IMPORTED_NON_EXISTENT_CLASS }
         assertEquals(result.findings.toString(), 1, imported.size)
         assertTrue(imported.single().message, imported.single().message.contains("RealFactory"))
+    }
+
+    fun testExcludedPathsAreNotScanned() {
+        val root = myFixture.findFileInTempDir("app/code/Foo/Bar").path
+        assertEquals(3, analyze().processedFiles)
+        assertEquals(3, analyze(request().copy(excludedPaths = listOf("$root/Exam"))).processedFiles)
+
+        val withoutEtc = analyze(request().copy(excludedPaths = listOf("$root/etc/")))
+        assertEquals(2, withoutEtc.processedFiles)
+        assertTrue(withoutEtc.findings.none { it.filePath.endsWith("etc/di.xml") })
+        assertTrue(withoutEtc.findings.any { it.filePath.endsWith("Example.php") })
+
+        val registrationOnly = analyze(request().copy(excludedPaths = listOf("$root/etc", "$root/Example.php")))
+        assertEquals(1, registrationOnly.processedFiles)
+        assertTrue(registrationOnly.findings.isEmpty())
+    }
+
+    fun testEditorInspectionsSkipExcludedPaths() {
+        val root = myFixture.findFileInTempDir("app/code/Foo/Bar").path
+        configure("2.4.2", "2.4.4-beta4")
+        val settings = UctSettingsService.getInstance(project)
+        settings.excludedPaths = listOf("$root/etc")
+        assertFalse(UctAnalysisContext.isEnabled(holder("app/code/Foo/Bar/etc/di.xml")))
+        assertTrue(UctAnalysisContext.isEnabled(holder("app/code/Foo/Bar/Example.php")))
+    }
+
+    private fun holder(path: String): ProblemsHolder = ProblemsHolder(
+        InspectionManager.getInstance(project), psiManager.findFile(myFixture.findFileInTempDir(path))!!, false
+    )
+
+    fun testExcludedPathsArePersisted() {
+        val settings = UctSettingsService()
+        settings.excludedPaths = listOf("/project/app/code/Foo/Bar/Test", "/project/app/code/Foo/Bar/etc/di.xml")
+        val restored = XmlSerializer.deserialize(XmlSerializer.serialize(settings), UctSettingsService::class.java)
+        assertEquals(settings.excludedPaths, restored.excludedPaths)
+        assertEquals(emptyList<String>(), UctSettingsService().excludedPaths)
     }
 
     fun testEditorInspectionsUseCompatibilityDataOfConfiguredVersions() {
@@ -309,6 +348,78 @@ class UctAnalysisServiceTest : PhysicalMagentoTestCase() {
             val result = analyzeWithCatalog(catalog, scan.copy(ignoreCurrentVersion = ignore))
             assertTrue(result.findings.toString(), result.findings.isEmpty())
         }
+    }
+
+    fun testMethodMissingFromReceiverInterfaceIsReportedOnceForTheInterface() {
+        myFixture.addFileToProject("vendor/magento/framework/App/ResponseInterface.php", """
+            <?php namespace Magento\Framework\App;
+            interface ResponseInterface { public function sendResponse(); }
+        """.trimIndent())
+        myFixture.addFileToProject("vendor/magento/framework/App/Console/Response.php", """
+            <?php namespace Magento\Framework\App\Console;
+            class Response implements \Magento\Framework\App\ResponseInterface {
+                public function sendResponse() {}
+                public function setBody(${'$'}body) {}
+            }
+        """.trimIndent())
+        myFixture.addFileToProject("vendor/magento/framework/HTTP/PhpEnvironment/Response.php", """
+            <?php namespace Magento\Framework\HTTP\PhpEnvironment;
+            class Response implements \Magento\Framework\App\ResponseInterface {
+                public function sendResponse() {}
+                public function setBody(${'$'}body) {}
+            }
+        """.trimIndent())
+        val file = myFixture.addFileToProject("app/code/Foo/Bar/Injector.php", """
+            <?php namespace Foo\Bar;
+            class Injector {
+                public function inject(\Magento\Framework\App\ResponseInterface ${'$'}result) { ${'$'}result->setBody('x'); }
+            }
+        """.trimIndent())
+        PsiDocumentManager.getInstance(project).commitAllDocuments()
+        val methods = setOf(
+            "\\Magento\\Framework\\App\\ResponseInterface.sendResponse",
+            "\\Magento\\Framework\\App\\Console\\Response.setBody",
+            "\\Magento\\Framework\\HTTP\\PhpEnvironment\\Response.setBody"
+        )
+        val catalog = UctIndexCatalogTest.fixtureCatalog().withReleases(mapOf(
+            "2.4.8-p5" to UctReleaseFixture.index("2.4.8-p5", methods, api = emptySet()),
+            "2.4.9" to UctReleaseFixture.index("2.4.9", methods, api = emptySet())
+        ))
+        val result = analyzeWithCatalog(catalog, request().copy(paths = listOf(file.virtualFile.path), currentVersion = "2.4.8-p5", targetVersion = "2.4.9"))
+        assertEquals(result.findings.toString(), 1, result.findings.size)
+        val finding = result.findings.single()
+        assertEquals(SupportedIssue.CALLED_NON_INTERFACE_METHOD, finding.issue)
+        assertTrue(finding.message, finding.message.contains("\\Magento\\Framework\\App\\ResponseInterface"))
+
+        // A method declared with @method is part of the interface contract.
+        myFixture.addFileToProject("vendor/magento/framework/App/BodyInterface.php", """
+            <?php namespace Magento\Framework\App;
+            /** @method setBody(${'$'}body) */
+            interface BodyInterface {}
+        """.trimIndent())
+        val documented = myFixture.addFileToProject("app/code/Foo/Bar/DocumentedInjector.php", """
+            <?php namespace Foo\Bar;
+            class DocumentedInjector {
+                public function inject(\Magento\Framework\App\BodyInterface ${'$'}result) { ${'$'}result->setBody('x'); }
+            }
+        """.trimIndent())
+        PsiDocumentManager.getInstance(project).commitAllDocuments()
+        val documentedResult = analyzeWithCatalog(catalog, request().copy(paths = listOf(documented.virtualFile.path), currentVersion = "2.4.8-p5", targetVersion = "2.4.9"))
+        assertTrue(documentedResult.findings.toString(), documentedResult.findings.none { it.issue == SupportedIssue.CALLED_NON_INTERFACE_METHOD })
+
+        // A dynamic method name is not known statically, so it cannot be missing from the interface.
+        val dynamic = myFixture.addFileToProject("app/code/Foo/Bar/DynamicInjector.php", """
+            <?php namespace Foo\Bar;
+            class DynamicInjector {
+                public function inject(\Magento\Framework\App\ResponseInterface ${'$'}result) {
+                    ${'$'}method = 'sendResponse';
+                    ${'$'}result->${'$'}method();
+                }
+            }
+        """.trimIndent())
+        PsiDocumentManager.getInstance(project).commitAllDocuments()
+        val dynamicResult = analyzeWithCatalog(catalog, request().copy(paths = listOf(dynamic.virtualFile.path), currentVersion = "2.4.8-p5", targetVersion = "2.4.9"))
+        assertTrue(dynamicResult.findings.toString(), dynamicResult.findings.none { it.issue == SupportedIssue.CALLED_NON_INTERFACE_METHOD })
     }
 
     fun testInterfaceContractAndExplicitConcreteUnionMembersAreStillInspected() {

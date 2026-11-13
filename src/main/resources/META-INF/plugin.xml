@@ -8,6 +8,7 @@
     <depends>JavaScript</depends>
     <depends>com.intellij.css</depends>
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.xml</depends>
     <depends>com.intellij.platform.images</depends>
     <depends>com.intellij.modules.json</depends>
     <depends>com.intellij.copyright</depends>
@@ -117,6 +118,8 @@
     <extensions defaultExtensionNs="com.intellij">
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.Settings"/>
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.startup.DeferredProjectOpenActions"/>
+        <projectService serviceImplementation="com.magento.idea.magento2plugin.project.indexing.MagentoIndexingExclusionService"/>
+        <projectService serviceImplementation="com.magento.idea.magento2plugin.project.MagentoProjectConfigurationService"/>
 
         <projectConfigurable
                 groupId="tools"
@@ -169,6 +172,7 @@
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.SystemXmlFieldIndex" />
 
         <additionalLibraryRootsProvider implementation="com.magento.idea.magento2plugin.project.indexing.MagentoAdditionalLibraryRootsProvider"/>
+        <readerModeMatcher implementation="com.magento.idea.magento2plugin.project.indexing.MagentoReaderModeMatcher"/>
 
         <codeInsight.lineMarkerProvider language="JavaScript" implementationClass="com.magento.idea.magento2plugin.linemarker.js.JsMixinLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="JavaScript" implementationClass="com.magento.idea.magento2plugin.linemarker.js.KnockoutTemplateLineMarkerProvider"/>

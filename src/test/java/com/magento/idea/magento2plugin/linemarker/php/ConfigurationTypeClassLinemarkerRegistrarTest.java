@@ -6,14 +6,16 @@
 package com.magento.idea.magento2plugin.linemarker.php;
 
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
-import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerImpl;
 import com.intellij.codeInsight.navigation.NavigationGutterIconRenderer;
 import com.intellij.codeInsight.navigation.impl.PsiTargetPresentationRenderer;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.xml.XmlTag;
 import com.magento.idea.magento2plugin.linemarker.LinemarkerFixtureTestCase;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 public class ConfigurationTypeClassLinemarkerRegistrarTest extends LinemarkerFixtureTestCase {
@@ -45,10 +47,7 @@ public class ConfigurationTypeClassLinemarkerRegistrarTest extends LinemarkerFix
 
         final List<String> containerTexts = new ArrayList<>();
 
-        for (final LineMarkerInfo<?> lineMarkerInfo : DaemonCodeAnalyzerImpl.getLineMarkers(
-                myFixture.getEditor().getDocument(),
-                getProject()
-        )) {
+        for (final LineMarkerInfo<?> lineMarkerInfo : getDocumentLineMarkers()) {
             if (!"Navigate to configuration".equals(lineMarkerInfo.getLineMarkerTooltip())) {
                 continue;
             }
@@ -63,6 +62,55 @@ public class ConfigurationTypeClassLinemarkerRegistrarTest extends LinemarkerFix
         }
 
         assertContainsElements(containerTexts, "vendor/magento/module-catalog/etc/di.xml");
+    }
+
+    /**
+     * Tests that targets keep the class and its generated types, without other classes.
+     */
+    public void testTypeNameClassLinemarkerTargetsShouldFollowEveryReferenceKind() {
+        myFixture.configureByFile(this.getFixturePath("ConfiguredClass.php", "php"));
+        myFixture.doHighlighting();
+
+        final Set<String> targetFiles = new HashSet<>();
+        final List<String> targetNames = new ArrayList<>();
+        final List<PsiElement> targets = new ArrayList<>();
+
+        for (final LineMarkerInfo<?> lineMarkerInfo : getDocumentLineMarkers()) {
+            if (!"Navigate to configuration".equals(lineMarkerInfo.getLineMarkerTooltip())) {
+                continue;
+            }
+            final NavigationGutterIconRenderer gutterIconRenderer
+                    = (NavigationGutterIconRenderer) lineMarkerInfo.getNavigationHandler();
+
+            for (final PsiElement target : gutterIconRenderer.getTargetElements()) {
+                targetFiles.add(target.getContainingFile().getName());
+                targets.add(target);
+                targetNames.add(((XmlTag) target).getAttributeValue("name"));
+            }
+        }
+
+        assertEquals(
+                Set.of(
+                        "exact.xml",
+                        "proxy.xml",
+                        "factory.xml",
+                        "factory_proxy.xml",
+                        "static.xml",
+                        "factory_attribute.xml",
+                        "leading_backslash.xml",
+                        "after_include.xml",
+                        "nested_include.xml",
+                        "mixed.xml"
+                ),
+                targetFiles
+        );
+        assertEquals(
+                "An included file must be listed once, not again through the including file",
+                targetFiles.size(),
+                targets.size()
+        );
+        assertContainsElements(targetNames, "mixedExact");
+        assertDoesntContain(targetNames, "mixedNested", "mixedLongerName");
     }
 
     /**

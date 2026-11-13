@@ -5,6 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 
+## 2026.3.6
+
+### Changed
+
+- Require PhpStorm, WebStorm, or IntelliJ IDEA 2026.3 or later.
+
+### Added
+
+- Add MCP configuration for the Magento root path and project integration with read-only status, path validation, exclusion defaults, and UI synchronization [#2774](https://github.com/magento/magento2-phpstorm-plugin/issues/2774).
+- Exclude directories named `.cache` at any depth beneath the configured Magento root by default, including newly created caches.
+- Default-enabled Magento indexing exclusions for generated and runtime files, with previews, additional paths, and apply/reset controls in settings and MCP [#2775](https://github.com/magento/magento2-phpstorm-plugin/issues/2775).
+- DDEV support for AI-assisted Magento CLI workflows, including discovery of Magerun installed inside the container [#2777](https://github.com/magento/magento2-phpstorm-plugin/issues/2777).
+
+### Security
+
+- Updated the PhpStorm development/test platform, WebStorm UI tests, and plugin verifier targets to patched 2026.3 builds following the [JetBrains eMudhra certificate advisory](https://blog.jetbrains.com/security/2026/10/compromised-emudhra-certificates-ides/) [#2779](https://github.com/magento/magento2-phpstorm-plugin/pull/2779). Users must update and restart their IDE separately; installing this plugin does not patch the host runtime, embedded browser, or `jetbrainsd` service (which requires 0.9.9728 or later).
+
+### Fixed
+
+- The View Model injection action stays hidden when PhpStorm cannot locate its bundled `jsLanguageServicesImpl` resources during PSI lookup, instead of reporting an action-update exception [#1924](https://github.com/magento/magento2-phpstorm-plugin/issues/1924). The IDE installation still needs to be repaired separately.
+- Plugin generation preserves associative-array parameter defaults and strings containing `=` instead of truncating them and producing invalid PHP (related to [#1625](https://github.com/magento/magento2-phpstorm-plugin/issues/1625)).
+- Generating before, after, and around plugins for methods with nullable scalar or scalar union parameters no longer treats these types as class imports or reports a fully qualified name error [#1589](https://github.com/magento/magento2-phpstorm-plugin/issues/1589).
+- Restore navigation to PHP namespace segments in XML class references when namespace names contain uppercase letters.
+- Marking or unmarking a Magento content root no longer removes the marked folders from the settings on Windows [#2787](https://github.com/magento/magento2-phpstorm-plugin/issues/2787).
+- Inspections run again for writable non-PHP files inside the project content in `app/code`, `app/design`, `lib/web` and folders marked as Magento content roots, where Reader Mode skipped them because these folders are indexed as a library. A stored "skip inspections" level on any writable file in these folders, whether set by Reader Mode or by hand, is reset once per project and when a folder is marked [#2787](https://github.com/magento/magento2-phpstorm-plugin/issues/2787).
+- `app/design` shows the Magento folder icon and offers neither Mark nor Unmark, like `app/code` [#2787](https://github.com/magento/magento2-phpstorm-plugin/issues/2787).
+- A folder whose name only starts with `app/code` or `app/design`, such as `app/codeBackup`, no longer counts as an editable module location [#2787](https://github.com/magento/magento2-phpstorm-plugin/issues/2787).
+- Avoid an index-storage error when highlighting Magento module names in PHP, JavaScript, and XML files [#2780](https://github.com/magento/magento2-phpstorm-plugin/issues/2780).
+- The Upgrade Compatibility Tool reports a call to a method that the receiver interface does not declare once, as "Called non-interface method" for that interface, instead of a non-API finding for every implementation in the project [#2770](https://github.com/magento/magento2-phpstorm-plugin/issues/2770).
+- Preparing Upgrade Compatibility Tool release data no longer fails while the IDE is indexing, and the prepared deprecation data no longer depends on the classes installed in the open project: methods documented with `@inheritdoc` take deprecation from their parents in the same release [#2769](https://github.com/magento/magento2-phpstorm-plugin/issues/2769).
+- The di.xml type inspection no longer reports existing classes whose name or namespace contains `Factory` as missing, and it now reports missing classes that only matched after `Factory` was removed from the middle of the name [#1607](https://github.com/magento/magento2-phpstorm-plugin/issues/1607).
+- `magento_inspect` and `magento_scaffold` no longer fail when an agent calls them without the parameters that a mode does not use, such as `help` with only `mode` [#2791](https://github.com/magento/magento2-phpstorm-plugin/issues/2791).
+- The "Navigate to configuration" popup lists the class with its proxies, factories and static references, including XML files that do not also contain the exact class name, and no longer lists other classes whose name only starts with the selected class [#1248](https://github.com/magento/magento2-phpstorm-plugin/issues/1248).
+
 ## 2026.3.5
 
 ### Added
@@ -12,6 +46,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - WebStorm now supports virtual-type completion and navigation, plugin and observer declaration inspections, and XML event completion and navigation. AI assistants can also find modules, DI declarations, observers, layouts, UI components, and ACL/menu entries through `magento_inspect` without the PHP plugin.
 - "Save and Continue Edit" button on the admin edit form generated by New Entity and the MCP `entity_crud` scaffold; the generated Save controller returns to the edit page of the saved entity [#2541](https://github.com/magento/magento2-phpstorm-plugin/issues/2541).
 - The Upgrade Compatibility Tool configuration marks versions without compatibility data and prepares the missing current and target releases with a "Prepare" button; running the tool without that data explains how to prepare it [#2758](https://github.com/magento/magento2-phpstorm-plugin/issues/2758).
+- "Exclude Paths" in the Upgrade Compatibility Tool configuration: folders and files listed there are skipped by the built-in report, which prints them before the results, by the editor inspections and by the MCP `magento_compatibility` analysis, which also accepts an `excludedPaths` override [#1039](https://github.com/magento/magento2-phpstorm-plugin/issues/1039).
 
 ### Changed
 

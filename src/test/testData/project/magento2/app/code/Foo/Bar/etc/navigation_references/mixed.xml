@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config>
+    <type name="Foo\Bar\Model\Other">
+        <arguments>
+            <argument name="mixedExact" xsi:type="object">Foo\Bar\Model\ConfiguredClass</argument>
+            <argument name="mixedNested" xsi:type="object">Foo\Bar\Model\ConfiguredClass\Nested</argument>
+            <argument name="mixedLongerName" xsi:type="object">Foo\Bar\Model\ConfiguredClassCollection</argument>
+        </arguments>
+    </type>
+</config>

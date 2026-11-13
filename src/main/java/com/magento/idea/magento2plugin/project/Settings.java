@@ -17,8 +17,11 @@ import com.intellij.util.EventDispatcher;
 import com.intellij.util.SmartList;
 import com.intellij.util.xmlb.annotations.Attribute;
 import com.intellij.util.xmlb.annotations.Tag;
+import com.magento.idea.magento2plugin.magento.packages.Package;
+import com.magento.idea.magento2plugin.util.magento.MagentoPathUrlUtil;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -56,11 +59,15 @@ public class Settings implements PersistentStateComponent<Settings.State> {
     public String magentoVersion;
     public String magentoEdition;
     public List<String> myMagentoFolders;
+    public Boolean excludeGeneratedFiles;
+    public List<String> additionalExcludedPaths;
+    public List<String> managedExcludedFolders;
+    public List<ManagedExclusion> managedExclusionOwners;
 
     @Override
     @Nullable
     public Settings.State getState() {
-        return new State(
+        final State state = new State(
                 this.pluginEnabled,
                 normalizeMagentoPath(this.magentoPath),
                 this.defaultLicense,
@@ -70,8 +77,13 @@ public class Settings implements PersistentStateComponent<Settings.State> {
                 this.publishedReleasesUrl,
                 this.magentoVersion,
                 this.magentoEdition,
-                this.myMagentoFolders
+                this.myMagentoFolders,
+                this.excludeGeneratedFiles,
+                this.additionalExcludedPaths,
+                this.managedExcludedFolders
         );
+        state.managedExclusionOwners = this.managedExclusionOwners;
+        return state;
     }
 
     /**
@@ -145,11 +157,112 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         this.publishedReleasesUrl = state.getPublishedReleasesUrl();
         this.magentoVersion = state.getMagentoVersion();
         this.magentoEdition = state.getMagentoEdition();
-        this.myMagentoFolders = state.getMagentoFolders();
+        this.myMagentoFolders = withoutDefaultRoots(state.getMagentoFolders());
+        this.excludeGeneratedFiles = state.getExcludeGeneratedFiles();
+        this.additionalExcludedPaths = state.getAdditionalExcludedPaths() == null
+                ? null
+                : new SmartList<>(state.getAdditionalExcludedPaths());
+        this.managedExclusionOwners = state.managedExclusionOwners == null
+                ? null : new SmartList<>(state.managedExclusionOwners);
+        this.managedExcludedFolders = state.getManagedExcludedFolders() == null
+                ? null
+                : new SmartList<>(state.getManagedExcludedFolders());
+    }
+
+    public boolean isExcludeGeneratedFiles() {
+        return this.excludeGeneratedFiles == null || this.excludeGeneratedFiles;
+    }
+
+    public void setExcludeGeneratedFiles(final Boolean excludeGeneratedFiles) {
+        this.excludeGeneratedFiles = excludeGeneratedFiles;
+    }
+
+    public @NotNull List<String> getAdditionalExcludedPaths() {
+        return this.additionalExcludedPaths == null
+                ? List.of()
+                : List.copyOf(this.additionalExcludedPaths);
+    }
+
+    public void setAdditionalExcludedPaths(final @Nullable List<String> additionalExcludedPaths) {
+        if (additionalExcludedPaths == null) {
+            this.additionalExcludedPaths = null;
+        } else {
+            this.additionalExcludedPaths = new SmartList<>(additionalExcludedPaths);
+        }
+    }
+
+    /** Exact root-model records created by the indexing exclusion feature. */
+    public static class ManagedExclusion {
+        public String moduleName;
+        public String contentEntryUrl;
+        public String excludedUrl;
+
+        public ManagedExclusion() {}
+
+        public ManagedExclusion(final String moduleName, final String contentEntryUrl, final String excludedUrl) {
+            this.moduleName = moduleName;
+            this.contentEntryUrl = contentEntryUrl;
+            this.excludedUrl = excludedUrl;
+        }
+
+        @Override
+        public boolean equals(final Object other) {
+            return other instanceof ManagedExclusion entry
+                    && Objects.equals(moduleName, entry.moduleName)
+                    && Objects.equals(contentEntryUrl, entry.contentEntryUrl)
+                    && Objects.equals(excludedUrl, entry.excludedUrl);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(moduleName, contentEntryUrl, excludedUrl);
+        }
+    }
+
+    public @NotNull List<ManagedExclusion> getManagedExclusionOwners() {
+        return managedExclusionOwners == null ? List.of() : List.copyOf(managedExclusionOwners);
+    }
+
+    public void setManagedExclusionOwners(final List<ManagedExclusion> owners) {
+        managedExclusionOwners = new SmartList<>(owners);
+        setManagedExcludedFolders(owners.stream().map(owner -> owner.excludedUrl).distinct().toList());
+    }
+
+    public @NotNull List<String> getManagedExcludedFolders() {
+        return this.managedExcludedFolders == null
+                ? List.of()
+                : List.copyOf(this.managedExcludedFolders);
+    }
+
+    public void setManagedExcludedFolders(final @Nullable List<String> managedExcludedFolders) {
+        if (managedExcludedFolders == null) {
+            this.managedExcludedFolders = null;
+        } else {
+            this.managedExcludedFolders = new SmartList<>(managedExcludedFolders);
+        }
+    }
+
+    private @Nullable List<String> withoutDefaultRoots(final @Nullable List<String> folders) {
+        if (folders == null) {
+            return null;
+        }
+        final Set<String> result = new LinkedHashSet<>(folders);
+
+        result.remove(MagentoPathUrlUtil.rootUrl(this.magentoPath, Package.packagesRoot));
+        result.remove(MagentoPathUrlUtil.rootUrl(this.magentoPath, Package.packagesDesignRoot));
+
+        return new ArrayList<>(result);
     }
 
     public void addListener(final MagentoModuleDataListener listener) {
         this.myEventDispatcher.addListener(listener);
+    }
+
+    public void addListener(
+            final MagentoModuleDataListener listener,
+            final com.intellij.openapi.Disposable parentDisposable
+    ) {
+        this.myEventDispatcher.addListener(listener, parentDisposable);
     }
 
     private void notifyListeners(final State state, final State oldState) {
@@ -276,6 +389,47 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         return normalizedValue;
     }
 
+    public static boolean isExcludeGeneratedFiles(final @NotNull Project project) {
+        return getInstance(project).isExcludeGeneratedFiles();
+    }
+
+    public static @NotNull List<String> parseAdditionalExcludedPaths(final @Nullable String value) {
+        if (StringUtil.isEmptyOrSpaces(value)) {
+            return List.of();
+        }
+        final Set<String> result = new LinkedHashSet<>();
+        for (final String part : value.split("[,;\\n\\r]+")) {
+            final String normalized = normalizeRelativePath(part);
+            if (!normalized.isEmpty()) {
+                result.add(normalized);
+            }
+        }
+        return List.copyOf(result);
+    }
+
+    public static @NotNull String getNormalizedAdditionalExcludedPaths(
+            final @Nullable List<String> paths
+    ) {
+        return paths == null || paths.isEmpty() ? "" : String.join(", ", paths);
+    }
+
+    public static @NotNull String normalizeRelativePath(final @Nullable String path) {
+        if (StringUtil.isEmptyOrSpaces(path)) {
+            return "";
+        }
+        String normalized = FileUtil.toSystemIndependentName(path.trim());
+        while (normalized.startsWith("./")) {
+            normalized = normalized.substring(2);
+        }
+        while (normalized.startsWith("/")) {
+            normalized = normalized.substring(1);
+        }
+        while (normalized.length() > 1 && normalized.endsWith("/")) {
+            normalized = StringUtil.trimEnd(normalized, "/");
+        }
+        return normalized;
+    }
+
     @SuppressWarnings({"PMD.DataClass"})
     @Tag
     public static class State {
@@ -289,6 +443,10 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         public String magentoVersion;
         public String magentoEdition;
         public List<String> myMagentoFolders;
+        public Boolean excludeGeneratedFiles;
+        public List<String> additionalExcludedPaths;
+        public List<String> managedExcludedFolders;
+        public List<ManagedExclusion> managedExclusionOwners;
 
         public State() {//NOPMD
         }
@@ -319,6 +477,55 @@ public class Settings implements PersistentStateComponent<Settings.State> {
                 final String magentoEdition,
                 final List<String> myMagentoFolders
         ) {
+            this(
+                    pluginEnabled,
+                    magentoPath,
+                    defaultLicenseName,
+                    mftfSupportEnabled,
+                    myDoNotAskContentConfigAgain,
+                    mcpCliToolCandidates,
+                    publishedReleasesUrl,
+                    magentoVersion,
+                    magentoEdition,
+                    myMagentoFolders,
+                    null,
+                    null,
+                    null
+            );
+        }
+
+        /**
+         * Settings State with exclusion settings.
+         *
+         * @param pluginEnabled boolean
+         * @param magentoPath String
+         * @param defaultLicenseName String
+         * @param mftfSupportEnabled boolean
+         * @param myDoNotAskContentConfigAgain boolean
+         * @param mcpCliToolCandidates String
+         * @param publishedReleasesUrl String
+         * @param magentoVersion String
+         * @param magentoEdition String
+         * @param myMagentoFolders List
+         * @param excludeGeneratedFiles Boolean
+         * @param additionalExcludedPaths List
+         * @param managedExcludedFolders List
+         */
+        public State(
+                final boolean pluginEnabled,
+                final String magentoPath,
+                final String defaultLicenseName,
+                final boolean mftfSupportEnabled,
+                final boolean myDoNotAskContentConfigAgain,
+                final String mcpCliToolCandidates,
+                final String publishedReleasesUrl,
+                final String magentoVersion,
+                final String magentoEdition,
+                final List<String> myMagentoFolders,
+                final Boolean excludeGeneratedFiles,
+                final List<String> additionalExcludedPaths,
+                final List<String> managedExcludedFolders
+        ) {
             this.pluginEnabled = pluginEnabled;
             this.magentoPath = normalizeMagentoPath(magentoPath);
             this.defaultLicenseName = defaultLicenseName;
@@ -329,6 +536,9 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             this.magentoVersion = magentoVersion;
             this.magentoEdition = magentoEdition;
             this.myMagentoFolders = myMagentoFolders;
+            this.excludeGeneratedFiles = excludeGeneratedFiles;
+            this.additionalExcludedPaths = additionalExcludedPaths;
+            this.managedExcludedFolders = managedExcludedFolders;
         }
 
         @Attribute("enabled")
@@ -447,6 +657,33 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             this.publishedReleasesUrl = publishedReleasesUrl;
         }
 
+        @Attribute("excludeGeneratedFiles")
+        public Boolean getExcludeGeneratedFiles() {
+            return this.excludeGeneratedFiles;
+        }
+
+        public void setExcludeGeneratedFiles(final Boolean excludeGeneratedFiles) {
+            this.excludeGeneratedFiles = excludeGeneratedFiles;
+        }
+
+        public List<String> getAdditionalExcludedPaths() {
+            return this.additionalExcludedPaths;
+        }
+
+        @Tag("additionalExcludedPaths")
+        public void setAdditionalExcludedPaths(final List<String> additionalExcludedPaths) {
+            this.additionalExcludedPaths = additionalExcludedPaths;
+        }
+
+        public List<String> getManagedExcludedFolders() {
+            return this.managedExcludedFolders;
+        }
+
+        @Tag("managedExcludedFolders")
+        public void setManagedExcludedFolders(final List<String> managedExcludedFolders) {
+            this.managedExcludedFolders = managedExcludedFolders;
+        }
+
         @SuppressWarnings({
                 "PMD.ConfusingTernary",
                 "PMD.CognitiveComplexity",
@@ -473,6 +710,14 @@ public class Settings implements PersistentStateComponent<Settings.State> {
                 } else if (!Objects.equals(this.publishedReleasesUrl, state.publishedReleasesUrl)) {
                     return false;
                 } else if (!Objects.equals(this.myMagentoFolders, state.myMagentoFolders)) {
+                    return false;
+                } else if (!Objects.equals(this.excludeGeneratedFiles, state.excludeGeneratedFiles)) {
+                    return false;
+                } else if (!Objects.equals(this.additionalExcludedPaths, state.additionalExcludedPaths)) {
+                    return false;
+                } else if (!Objects.equals(this.managedExclusionOwners, state.managedExclusionOwners)) {
+                    return false;
+                } else if (!Objects.equals(this.managedExcludedFolders, state.managedExcludedFolders)) {
                     return false;
                 } else {
                     if (this.magentoPath != null) {
@@ -505,6 +750,13 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             result = 31 * result + Objects.hashCode(this.publishedReleasesUrl);
             result = 31 * result
                     + (this.myMagentoFolders != null ? this.myMagentoFolders.hashCode() : 0);
+            result = 31 * result
+                    + (this.excludeGeneratedFiles != null ? this.excludeGeneratedFiles.hashCode() : 0);
+            result = 31 * result
+                    + (this.additionalExcludedPaths != null ? this.additionalExcludedPaths.hashCode() : 0);
+            result = 31 * result
+                    + Objects.hashCode(this.managedExclusionOwners)
+                    + (this.managedExcludedFolders != null ? this.managedExcludedFolders.hashCode() : 0);
             return result;
         }
     }

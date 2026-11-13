@@ -125,6 +125,21 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+      # The RC release metadata omits windowsZip, although the official ZIP exists.
+      - name: Prepare pinned PhpStorm Windows platform
+        shell: pwsh
+        run: |
+          $properties = Get-Content gradle.properties -Raw | ConvertFrom-StringData
+          $version = $properties.platformVersion
+          $archive = Join-Path $env:RUNNER_TEMP "PhpStorm-$version.win.zip"
+          $destination = Join-Path $env:RUNNER_TEMP "phpstorm-platform"
+          Invoke-WebRequest "https://download.jetbrains.com/webide/PhpStorm-$version.win.zip" -OutFile $archive
+          Expand-Archive -Path $archive -DestinationPath $destination
+          $productInfo = @(Get-ChildItem $destination -Filter product-info.json -Recurse)
+          if ($productInfo.Count -ne 1) {
+            throw "Expected one PhpStorm product-info.json in $destination"
+          }
+          "ORG_GRADLE_PROJECT_platformLocalPath=$($productInfo[0].DirectoryName)" >> $env:GITHUB_ENV
       - name: Run automated tests
         run: ./gradlew clean test --no-daemon --no-build-cache --no-configuration-cache
       - name: Upload Windows test failure artifacts

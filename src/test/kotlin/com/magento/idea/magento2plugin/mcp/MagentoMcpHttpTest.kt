@@ -8,6 +8,7 @@ import com.intellij.testFramework.ExtensionTestUtil
 import com.intellij.testFramework.DumbModeTestUtils
 import com.intellij.testFramework.IndexingTestUtil
 import com.intellij.testFramework.JUnit38AssumeSupportRunner
+import com.intellij.util.EnvironmentUtil
 import com.magento.idea.magento2plugin.project.Settings
 import org.json.JSONObject
 import org.junit.runner.RunWith
@@ -43,12 +44,18 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
             "get_magento_root_path" to listOf("absolute project path", "resolved Magento root directory"),
             "describe_magento_cli_environment" to listOf("nearest Docker Compose configuration", "never search outside the project", "./bin/magento takes precedence over ./src/bin/magento"),
             "magento_magerun" to listOf("mode=status only reads local files", "mode=commands", "mode=command_help", "mode=mcp_config", "refresh=true", "never fall back to another runtime"),
+            "get_magento_indexing_exclusions" to listOf("indexing exclusion", "preview"),
+            "configure_magento_indexing_exclusions" to listOf("apply", "update", "reset", "preview", ".runtime/"),
+            "configure_magento_project" to listOf("Inspect or configure Magento project integration", "status", "configure", "magentoPath"),
         )
         for ((name, fragments) in descriptions) {
             val description = tools.getValue(name).getString("description")
             for (fragment in fragments) assertTrue("$name: $description", description.contains(fragment))
         }
         assertEquals("Configured Magento root path: ${root.resolve("src").toString().replace('\\', '/')}", text("get_magento_root_path"))
+        val exclusionsStatus = text("get_magento_indexing_exclusions")
+        assertTrue(exclusionsStatus, exclusionsStatus.contains("Exclusions cannot be applied: Magento installation path is invalid"))
+        assertTrue(exclusionsStatus, exclusionsStatus.contains("Configure a valid Magento path before managing indexing exclusions."))
     }
 
     fun testSharedInspectionQueriesAndUnavailablePhpCapabilityOverHttp() {
@@ -94,6 +101,38 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
             inspect("detailed_schema", "plugins_for_method"))
         assertTrue(inspect("query", "di_config", "{}").contains("Missing required parameter `className`"))
         assertTrue(inspect("query", "acl_or_menu", "{invalid").contains("parametersJson must be a valid JSON object"))
+    }
+
+    fun testInspectAndScaffoldRequireOnlyModeOverHttp() {
+        val client = mcp()
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        val tools = client.tools().associateBy { it.getString("name") }
+        for (tool in listOf("magento_inspect", "magento_scaffold")) {
+            assertEquals(listOf<Any>("mode"),
+                tools.getValue(tool).getJSONObject("inputSchema").getJSONArray("required").toList())
+            val missingMode = client.callEnvelope(tool, JSONObject())
+            assertTrue(missingMode.toString(), missingMode.has("error") ||
+                missingMode.optJSONObject("result")?.optBoolean("isError") == true)
+        }
+        fun inspect(vararg arguments: Pair<String, String>) = text("magento_inspect", JSONObject(mapOf(*arguments)))
+        fun scaffold(vararg arguments: Pair<String, String>) = text("magento_scaffold", JSONObject(mapOf(*arguments)))
+
+        assertTrue(inspect("mode" to "help").contains("Queries:"))
+        assertTrue(scaffold("mode" to "help").contains("Scaffolds:"))
+        assertTrue(scaffold("mode" to "help", "scaffoldType" to "", "parametersJson" to "").contains("Scaffolds:"))
+        assertTrue(inspect("mode" to "detailed_schema", "queryType" to "module").contains("queryType: module"))
+        assertTrue(scaffold("mode" to "detailed_schema", "scaffoldType" to "module").contains("scaffoldType: module"))
+        assertEquals(MagentoInspectionCommands.MISSING_TYPE_MESSAGE, inspect("mode" to "detailed_schema"))
+        assertEquals(MagentoScaffoldCommands.MISSING_TYPE_MESSAGE, scaffold("mode" to "detailed_schema"))
+        assertTrue(inspect("mode" to "query", "queryType" to "module")
+            .contains("Missing required parameter `moduleName`"))
+        assertTrue(scaffold("mode" to "render", "scaffoldType" to "module")
+            .contains("Missing required parameter `packageName`"))
+        // A missing type can never succeed, so indexing must not tell the agent to retry it.
+        DumbModeTestUtils.runInDumbModeSynchronously(project) {
+            assertEquals(MagentoInspectionCommands.MISSING_TYPE_MESSAGE, inspect("mode" to "query"))
+            assertEquals(MagentoScaffoldCommands.MISSING_TYPE_MESSAGE, scaffold("mode" to "render"))
+        }
     }
 
     private fun inspect(mode: String, queryType: String = "", parametersJson: String = ""): String =
@@ -148,6 +187,90 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         assertEquals(root.resolve("src/bin/n98-magerun2.phar").toString(), magerun().getJSONObject("selected").getString("path"))
         assertTrue(calls("bin").isEmpty())
         assertTrue(calls("src/bin").isEmpty())
+    }
+
+    fun testDdevDiscoveryMetadataAndNativeConfigurationOverHttp() {
+        org.junit.Assume.assumeFalse("POSIX DDEV fixture", com.intellij.openapi.util.SystemInfoRt.isWindows)
+        file(".ddev/config.yaml", "name: commerce-local\ntype: magento2\ndocroot: src/pub\ncomposer_root: src\nworking_dir: {web: /var/www/html/src}\n")
+        file("src/fixture.php", javaClass.getResource("/magerun/http-fixture.php")!!.readText())
+        file("host tools/ddev", """
+            #!/bin/sh
+            printf '%s\n' "${'$'}*" >> ddev-calls.txt
+            [ "${'$'}1" = exec ] && [ "${'$'}2" = --raw ] && [ "${'$'}3" = --service=web ] && [ "${'$'}4" = --project=commerce-local ] && [ "${'$'}5" = --dir=/var/www/html/src ] && [ "${'$'}6" = -- ] && [ "${'$'}7" = magerun2 ] || exit 91
+            if [ -f ddev-stopped ]; then echo 'DDEV project is stopped or permission denied' >&2; exit 1; fi
+            if [ -f missing-magerun ]; then echo 'magerun2: command not found' >&2; exit 127; fi
+            shift 7
+            exec php fixture.php "${'$'}@"
+        """.trimIndent() + "\n", executable = true)
+        withDdevPath(root.resolve("host tools").toString() + java.io.File.pathSeparator +
+            EnvironmentUtil.getValue("PATH").orEmpty()) {
+            val description = text("describe_magento_cli_environment")
+            assertTrue(description, description.contains("DDEV configuration: ${root.resolve(".ddev/config.yaml")}"))
+            assertTrue(description, description.contains("ddev exec --raw --service=web --project=commerce-local --dir=/var/www/html/src -- php -v"))
+            assertTrue(description, description.contains("PhpStorm's Terminal"))
+            val status = magerun()
+            assertEquals(status.toString(), "detected", status.getString("status"))
+            assertEquals("ddev", status.getJSONObject("invocation").getString("runtime"))
+            assertEquals(root.resolve("src").toString(), status.getJSONObject("invocation").getString("cwd"))
+            assertFalse(Files.exists(root.resolve("src/ddev-calls.txt")))
+            val commands = magerun("commands", JSONObject().put("search", "sys:info"))
+            assertEquals(commands.toString(), "ok", commands.getString("status"))
+            assertEquals(1, commands.getInt("total"))
+            assertEquals("sys:info", magerun("command_help", JSONObject().put("command", "si"))
+                .getJSONObject("command").getString("name"))
+            val config = magerun("mcp_config").getJSONObject("configuration")
+                .getJSONObject("mcpServers").getJSONObject("magento-magerun2")
+            assertEquals(root.resolve("host tools/ddev").toString(), config.getString("command"))
+            assertEquals(listOf("exec", "--raw", "--service=web", "--project=commerce-local", "--dir=/var/www/html/src", "--", "magerun2"), config.getJSONArray("args").toList().take(7))
+            assertEquals(root.resolve("src").toString(), config.getString("cwd"))
+            assertEquals(4, calls("src").size)
+            for (call in calls("src")) {
+                assertEquals(root.resolve("src").toString(), call.getString("cwd"))
+                assertFalse(call.getJSONArray("arguments").toList().any { it.toString().startsWith("--root-dir=") })
+            }
+            file("src/ddev-stopped", "stopped")
+            val failure = magerun("commands", JSONObject().put("refresh", true))
+            assertEquals("runtime_unavailable", failure.getString("status"))
+            assertTrue(failure.getString("message").contains("permission denied"))
+            assertEquals("ddev exec --raw --service=web --project=commerce-local --dir=/var/www/html/src -- magerun2 --version", failure.getJSONObject("terminalGuidance").getString("command"))
+            assertTrue(failure.has("invocation"))
+            Files.delete(root.resolve("src/ddev-stopped"))
+            file("src/missing-magerun", "missing")
+            assertEquals("missing_installation", magerun("commands").getString("status"))
+            assertEquals(6, Files.readAllLines(root.resolve("src/ddev-calls.txt")).size)
+        }
+    }
+
+    fun testDdevMissingHostExecutableOverHttp() {
+        file(".ddev/config.yaml", "name: commerce-local\ntype: magento2\ndocroot: src/pub\ncomposer_root: src\nworking_dir: {web: /var/www/html/src}\n")
+        withDdevPath(root.resolve("empty-path").toString()) {
+            val description = text("describe_magento_cli_environment")
+            assertTrue(description, description.contains("missing_launcher"))
+            val status = magerun()
+            assertEquals("missing_launcher", status.getString("status"))
+            assertTrue(status.getJSONObject("terminalGuidance").getString("message").contains("PhpStorm's Terminal"))
+            assertEquals("missing_launcher", magerun("commands").getString("status"))
+        }
+    }
+
+    fun testDdevCliConfigurationWithoutMagerunAndInvalidYamlOverHttp() {
+        file(".ddev/config.yaml", "name: commerce\ntype: magento2\ndocroot: src/pub\nworking_dir: {web: /original}\n")
+        file(".ddev/config.local.yaml", "name: commerce-local\nworking_dir: {web: /var/www/html/src}\nphp_version: '8.4'\n")
+        val description = text("describe_magento_cli_environment")
+        assertTrue(description, description.contains("--project=commerce-local --dir=/var/www/html/src -- php -v"))
+        assertTrue(description, description.contains("8.4") && description.contains("src/pub"))
+        assertTrue(description, description.contains(JSONObject.quote(root.resolve(".ddev/config.local.yaml").toString())))
+        file(".ddev/config.local.yaml", "working_dir: [invalid")
+        val invalid = text("describe_magento_cli_environment")
+        assertTrue(invalid, invalid.contains("invalid_configuration"))
+        assertFalse(invalid, invalid.contains("execPrefix"))
+        assertEquals("invalid_configuration", magerun("commands").getString("status"))
+    }
+
+    private fun withDdevPath(path: String, test: () -> Unit) {
+        val original = EnvironmentUtil.getEnvironmentMap()
+        EnvironmentUtil.setEnvironmentLoader { original + ("PATH" to path) }
+        try { test() } finally { EnvironmentUtil.setEnvironmentLoader { original } }
     }
 
     fun testMagerunCatalogueHelpCacheAndNativeConfigurationUseRealProcesses() {
@@ -268,6 +391,120 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         val result = magerun("commands")
         assertEquals(result.toString(), "unsupported_wrapper", result.getString("status"))
         assertFalse(Files.exists(root.resolve("src/application-command-executed")))
+    }
+
+    fun testConfigureMagentoProjectOverHttp() {
+        val originalPath = Settings.getInstance(project).magentoPath
+        val originalEnabled = Settings.getInstance(project).pluginEnabled
+        try {
+            // Start with integration disabled to verify configuration from scratch
+            Settings.getInstance(project).pluginEnabled = false
+            Settings.getInstance(project).magentoPath = ""
+
+            // Status reflects disabled
+            val initialStatus = text("configure_magento_project", JSONObject().put("action", "status"))
+            assertTrue(initialStatus, initialStatus.contains("Magento Project Integration Status"))
+            assertTrue(initialStatus, initialStatus.contains("Integration enabled: no"))
+
+            // Help mode
+            val help = text("configure_magento_project", JSONObject().put("action", "help"))
+            assertTrue(help, help.contains("Magento Project Configuration Tool"))
+            assertTrue(help, help.contains("action=status"))
+            assertTrue(help, help.contains("action=configure"))
+
+            // Invalid path rejected without changing settings
+            val invalidResult = text("configure_magento_project", JSONObject()
+                .put("action", "configure")
+                .put("magentoPath", "nonexistent_dir")
+                .put("enabled", true)
+            )
+            assertTrue(invalidResult, invalidResult.contains("Result: error"))
+            assertTrue(invalidResult, invalidResult.contains("Path does not exist"))
+            assertFalse(Settings.getInstance(project).pluginEnabled)
+
+            // Unsupported action rejected without changing settings
+            val unsupported = text("configure_magento_project", JSONObject()
+                .put("action", "preview")
+                .put("enabled", false)
+            )
+            assertTrue(unsupported, unsupported.contains("Result: error"))
+            assertTrue(unsupported, unsupported.contains("Unsupported action 'preview'"))
+
+            // Project root configuration from disabled state
+            file("composer.json", """{"name":"magento/project-community-edition","version":"2.4.8"}""")
+            file("composer.lock", """{"packages":[{"name":"magento/product-community-edition","version":"2.4.8"}]}""")
+            file("vendor/magento/framework/composer.json", """{"name":"magento/framework"}""")
+            file("vendor/autoload.php", "<?php\n")
+            val configureRoot = text("configure_magento_project", JSONObject()
+                .put("action", "configure")
+                .put("magentoPath", ".")
+                .put("enabled", true)
+                .put("excludeGeneratedFiles", true)
+            )
+            assertTrue(configureRoot, configureRoot.contains("Result: success"))
+            assertTrue(configureRoot, configureRoot.contains("Integration enabled: yes"))
+            assertTrue(configureRoot, configureRoot.contains("Indexing exclusions: enabled"))
+            assertEquals("Configured Magento root path: ${root.toString().replace('\\', '/')}", text("get_magento_root_path"))
+
+            // Idempotent repeat
+            val repeatRoot = text("configure_magento_project", JSONObject()
+                .put("action", "configure")
+                .put("magentoPath", ".")
+                .put("enabled", true)
+                .put("excludeGeneratedFiles", true)
+            )
+            assertTrue(repeatRoot, repeatRoot.contains("no changes required"))
+        } finally {
+            Settings.getInstance(project).magentoPath = originalPath
+            Settings.getInstance(project).pluginEnabled = originalEnabled
+        }
+    }
+
+    fun testControlledConfigurationDuringIndexingOverHttp() {
+        val originalPath = Settings.getInstance(project).magentoPath
+        val originalEnabled = Settings.getInstance(project).pluginEnabled
+        val originalExclusions = Settings.getInstance(project).excludeGeneratedFiles
+        try {
+            Settings.getInstance(project).pluginEnabled = false
+            Settings.getInstance(project).magentoPath = null
+
+            file("src/composer.json", """{"name":"magento/project-community-edition","version":"2.4.8"}""")
+            file("src/composer.lock", """{"packages":[{"name":"magento/product-community-edition","version":"2.4.8"}]}""")
+            file("src/vendor/magento/framework/composer.json", """{"name":"magento/framework"}""")
+            file("src/vendor/autoload.php", "<?php\n")
+            myFixture.addFileToProject("src/app/code/HttpIndex/Module/etc/module.xml", """
+                <config><module name="HttpIndex_Module"/></config>
+            """.trimIndent())
+
+            DumbModeTestUtils.runInDumbModeSynchronously(project) {
+                val configured = text("configure_magento_project", JSONObject()
+                    .put("action", "configure")
+                    .put("magentoPath", "src")
+                    .put("enabled", true)
+                    .put("excludeGeneratedFiles", true)
+                )
+                assertTrue(configured, configured.contains("Result: success"))
+                assertTrue(configured, configured.contains("Integration enabled: yes"))
+                assertTrue(configured, configured.contains("Pending index refresh: yes"))
+
+                val status = text("configure_magento_project", JSONObject().put("action", "status"))
+                assertTrue(status, status.contains("Pending index refresh: yes"))
+                assertTrue(status, status.contains("Wait for IDE indexing to finish"))
+            }
+
+            IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+            val moduleResult = text("magento_inspect", JSONObject()
+                .put("mode", "query")
+                .put("queryType", "module")
+                .put("parametersJson", """{"moduleName":"HttpIndex_Module"}""")
+            )
+            assertTrue(moduleResult, moduleResult.replace('\\', '/').contains("src/app/code/HttpIndex/Module"))
+        } finally {
+            Settings.getInstance(project).magentoPath = originalPath
+            Settings.getInstance(project).pluginEnabled = originalEnabled
+            Settings.getInstance(project).setExcludeGeneratedFiles(originalExclusions)
+        }
     }
 
     private fun text(tool: String, arguments: JSONObject = JSONObject()): String {

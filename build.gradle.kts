@@ -97,7 +97,12 @@ dependencies {
     testRuntimeOnly(libs.junit.platform.launcher)
 
     intellijPlatform {
-        create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
+        val platformLocalPath = providers.gradleProperty("platformLocalPath")
+        if (platformLocalPath.isPresent) {
+            local(platformLocalPath)
+        } else {
+            create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
+        }
 
         bundledPlugins(providers.gradleProperty("platformBundledPlugins").map { it.split(',') })
         plugins(providers.gradleProperty("platformPlugins").map { it.split(',') })
@@ -177,12 +182,10 @@ intellijPlatform {
         // Requiring a restart is intentional; every compatibility/API warning must fail verification.
         failureLevel = VerifyPluginTask.FailureLevel.ALL - VerifyPluginTask.FailureLevel.NOT_DYNAMIC
         ides {
-            create(IntelliJPlatformType.PhpStorm, "2026.2.0.1")
-            create(IntelliJPlatformType.PhpStorm, "2026.2.3")
-            create(IntelliJPlatformType.PhpStorm, "263.6259.29")
+            // Use IDE distributions containing the October 2026 eMudhra security fixes.
+            create(IntelliJPlatformType.PhpStorm, providers.gradleProperty("platformVersion").get())
             if (providers.gradleProperty("verifyWebStorm").map(String::toBoolean).getOrElse(false)) {
-                create(IntelliJPlatformType.WebStorm, "2026.2.0.1")
-                create(IntelliJPlatformType.WebStorm, "263.6259.34")
+                create(IntelliJPlatformType.WebStorm, providers.gradleProperty("uiTestPlatformVersion").get())
             }
         }
     }
@@ -273,6 +276,15 @@ intellijPlatformTesting.testIdeUi.register("uiTest") {
     // Starter and Driver must match the IDE launched by the UI tests.
     testFramework(TestFrameworkType.Starter)
     uiTestImplementation.extendsFrom(configurations.getByName("intellijPlatformTestDependencies_uiTest"))
+    // 2.20.0 also adds base-IDE Starter dependencies directly to the source set.
+    // Keep only the WebStorm-matched dependencies inherited from this testing entry.
+    uiTestImplementation.withDependencies {
+        removeIf { dependency ->
+            TestFrameworkType.Starter.coordinates.any {
+                it.groupId == dependency.group && it.artifactId == dependency.name
+            }
+        }
+    }
 
     task {
         val uiTestSourceSet = sourceSets.getByName("uiTest")

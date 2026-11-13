@@ -11,7 +11,6 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
-import com.intellij.psi.xml.XmlTagValue;
 import com.intellij.util.indexing.DataIndexer;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.intellij.util.indexing.FileContent;
@@ -20,19 +19,24 @@ import com.intellij.util.indexing.ScalarIndexExtension;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.intellij.xml.util.XmlIncludeHandler;
-import com.jetbrains.php.lang.PhpLangUtil;
 import com.magento.idea.magento2plugin.project.Settings;
+import com.magento.idea.magento2plugin.util.PhpNameUtil;
 import com.magento.idea.magento2plugin.util.RegExUtil;
-import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
 
 public class PhpClassNameIndex extends ScalarIndexExtension<String> {
-    private static final String CLASS_NAME_PATTERN =
-                "\\\\?" + RegExUtil.PhpRegex.CLASS_NAME
-                + "(\\\\" + RegExUtil.PhpRegex.CLASS_NAME + ")+";
+    private static final Pattern CLASS_REFERENCE_PATTERN = Pattern.compile(
+            "(\\\\?" + RegExUtil.PhpRegex.CLASS_NAME
+                    + "(?:\\\\" + RegExUtil.PhpRegex.CLASS_NAME + ")+)"
+                    + "(?:" + RegExUtil.XmlRegex.CLASS_MEMBER_NAME + ")?"
+    );
 
     public static final ID<String, Void> KEY = ID.create(
             "com.magento.idea.magento2plugin.stubs.indexes.xml.php_class_name");
@@ -51,53 +55,102 @@ public class PhpClassNameIndex extends ScalarIndexExtension<String> {
                 return map;
             }
 
-            final XmlTag[] xmlTags = PsiTreeUtil.getChildrenOfType(
-                    psiFile.getFirstChild(),
-                    XmlTag.class
+            forEachClassReference(
+                    (XmlFile) psiFile,
+                    (xmlTag, classNames) -> classNames.forEach(name -> map.put(name, null))
             );
-            if (xmlTags == null) {
-                return map;
-            }
-
-            for (final XmlTag xmlTag: xmlTags) {
-                fillMap(xmlTag, map);
-            }
 
             return map;
         };
     }
 
-    private void fillMap(final XmlTag parentTag, final Map<String, Void> resultMap) { //NOPMD
-        for (final XmlTag childTag: parentTag.getSubTags()) {
-            for (final XmlAttribute xmlAttribute: childTag.getAttributes()) {
+    /**
+     * Passes every tag of the file with the classes that one of its values refers to.
+     *
+     * @param xmlFile XmlFile
+     * @param consumer receives the tag once per value that refers to a class
+     */
+    public static void forEachClassReference(
+            final @NotNull XmlFile xmlFile,
+            final @NotNull BiConsumer<XmlTag, Set<String>> consumer
+    ) {
+        final XmlTag[] xmlTags = PsiTreeUtil.getChildrenOfType(
+                xmlFile.getFirstChild(),
+                XmlTag.class
+        );
+
+        if (xmlTags == null) {
+            return;
+        }
+        for (final XmlTag xmlTag: xmlTags) {
+            visitTags(getPhysicalSubTags(xmlTag), consumer);
+        }
+    }
+
+    /**
+     * Get the classes a configuration value refers to: the written class and, for a generated
+     * proxy or factory name, also the class it is generated from.
+     *
+     * @param value String
+     *
+     * @return class names without a leading backslash
+     */
+    public static @NotNull Set<String> getReferencedClasses(final @NotNull String value) {
+        if (value.indexOf('\\') < 0) {
+            return Set.of();
+        }
+        final Matcher matcher = CLASS_REFERENCE_PATTERN.matcher(value.trim());
+
+        if (!matcher.matches()) {
+            return Set.of();
+        }
+
+        return PhpNameUtil.getObjectTypeCandidates(
+                PhpNameUtil.toPresentableFQN(matcher.group(1))
+        );
+    }
+
+    private static void visitTags(
+            final List<XmlTag> tags,
+            final BiConsumer<XmlTag, Set<String>> consumer
+    ) {
+        for (final XmlTag xmlTag: tags) {
+            for (final XmlAttribute xmlAttribute: xmlTag.getAttributes()) {
                 final String xmlAttributeValue = xmlAttribute.getValue();
-                if (xmlAttributeValue != null
-                        && !xmlAttributeValue.isEmpty()
-                        && xmlAttributeValue.matches(CLASS_NAME_PATTERN)
-                ) {
-                    resultMap.put(PhpLangUtil.toPresentableFQN(xmlAttributeValue), null);
+
+                if (xmlAttributeValue != null) {
+                    visitValue(xmlTag, xmlAttributeValue, consumer);
                 }
             }
-            if (XmlIncludeHandler.isXInclude(childTag)) {
-                return;
+            if (XmlIncludeHandler.isXInclude(xmlTag)) {
+                continue;
             }
+            final List<XmlTag> subTags = getPhysicalSubTags(xmlTag);
 
-            //skipping IDEA include tag
-            final List<XmlTag> ideaIncludeTags = XmlPsiTreeUtil.findSubTagsOfParent(
-                    childTag,
-                    "xi:include"
-            );
-            if (!ideaIncludeTags.isEmpty()) {
-                return;
+            // The platform forbids reading the value of a tag with an include during indexing.
+            if (subTags.stream().noneMatch(XmlIncludeHandler::isXInclude)) {
+                visitValue(xmlTag, xmlTag.getValue().getTrimmedText(), consumer);
             }
+            visitTags(subTags, consumer);
+        }
+    }
 
-            final XmlTagValue childTagValue = childTag.getValue();
-            final String tagValue = childTagValue.getTrimmedText();
-            if (!tagValue.isEmpty() && tagValue.matches(CLASS_NAME_PATTERN)) {
-                resultMap.put(PhpLangUtil.toPresentableFQN(tagValue), null);
-            }
+    /**
+     * Get the tags written in the file: getSubTags() would read the files that xi:include names.
+     */
+    private static List<XmlTag> getPhysicalSubTags(final XmlTag parentTag) {
+        return PsiTreeUtil.getChildrenOfTypeAsList(parentTag, XmlTag.class);
+    }
 
-            fillMap(childTag, resultMap);
+    private static void visitValue(
+            final XmlTag xmlTag,
+            final String value,
+            final BiConsumer<XmlTag, Set<String>> consumer
+    ) {
+        final Set<String> classNames = getReferencedClasses(value);
+
+        if (!classNames.isEmpty()) {
+            consumer.accept(xmlTag, classNames);
         }
     }
 
@@ -127,6 +180,6 @@ public class PhpClassNameIndex extends ScalarIndexExtension<String> {
 
     @Override
     public int getVersion() {
-        return 1;
+        return 4;
     }
 }

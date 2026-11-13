@@ -28,6 +28,7 @@ import com.intellij.ide.starter.runner.CurrentTestMethod
 import com.intellij.ide.starter.runner.Starter
 import com.intellij.platform.testFramework.teamCity.TeamCityReporter.SyntheticTestKind
 import com.intellij.platform.testFramework.teamCity.TeamCityReporter.TestMetadata
+import com.intellij.tools.ide.starter.product.phpstorm.PhpStorm
 import com.intellij.tools.ide.starter.product.webstorm.WebStorm
 import org.junit.jupiter.api.fail
 import org.kodein.di.DI
@@ -38,8 +39,9 @@ import kotlin.time.Duration.Companion.minutes
 
 private const val MAGENTO_SUPPORT_NOTIFICATION = "Enable Magento support for this project?"
 
-internal fun runWebStormUiTest(
+internal fun runIdeUiTest(
     fixtureName: String,
+    targetIde: IdeInfo,
     vararg generatedFilesToCleanup: String,
     prepareProject: (Path) -> Unit = {},
     enableSupport: Boolean = true,
@@ -53,12 +55,18 @@ internal fun runWebStormUiTest(
     prepareProject(projectPath)
     val pluginPath = Path.of(System.getProperty("path.to.build.plugin"))
 
-    // Starter adds the JUnit class and method below this directory.
+    val effectiveBuildNumber = if (targetIde == IdeInfo.PhpStorm) {
+        "263.7307.117"
+    } else {
+        System.getProperty("ui.test.ide.build")
+    }
+
     val contextName = "ui-${testName.hashCode().toUInt().toString(16)}"
     Starter.newContext(
         contextName,
-        TestCase(IdeInfo.WebStorm, LocalProjectInfo(projectPath))
-            .useEAP(System.getProperty("ui.test.ide.build")),
+        TestCase(targetIde, LocalProjectInfo(projectPath))
+            .useRC()
+            .run { onIDE(ideInfo.copy(buildNumber = effectiveBuildNumber)) },
     ).apply {
         PluginConfigurator(this).installPluginFromPath(pluginPath)
         applyVMOptionsPatch {
@@ -72,6 +80,36 @@ internal fun runWebStormUiTest(
         test(projectPath)
     }
 }
+
+internal fun runWebStormUiTest(
+    fixtureName: String,
+    vararg generatedFilesToCleanup: String,
+    prepareProject: (Path) -> Unit = {},
+    enableSupport: Boolean = true,
+    test: Driver.(projectPath: Path) -> Unit,
+) = runIdeUiTest(
+    fixtureName,
+    IdeInfo.WebStorm,
+    *generatedFilesToCleanup,
+    prepareProject = prepareProject,
+    enableSupport = enableSupport,
+    test = test,
+)
+
+internal fun runPhpStormUiTest(
+    fixtureName: String,
+    vararg generatedFilesToCleanup: String,
+    prepareProject: (Path) -> Unit = {},
+    enableSupport: Boolean = true,
+    test: Driver.(projectPath: Path) -> Unit,
+) = runIdeUiTest(
+    fixtureName,
+    IdeInfo.PhpStorm,
+    *generatedFilesToCleanup,
+    prepareProject = prepareProject,
+    enableSupport = enableSupport,
+    test = test,
+)
 
 internal fun Driver.enableMagentoSupport() {
     ideFrame {
