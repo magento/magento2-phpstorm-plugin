@@ -187,6 +187,78 @@ class MagentoIndexingExclusionServiceTest : BaseProjectTestCase() {
     }
 
     @Test
+    fun testLegacyUrlOnlyOwnershipDoesNotRemoveManualExclusion() {
+        val url = myFixture.findFileInTempDir("")!!.url + "/var/cache"
+        WriteAction.runAndWait<Throwable> {
+            ModuleRootModificationUtil.updateModel(myFixture.module) { model ->
+                model.contentEntries[0].addExcludeFolder(url)
+            }
+        }
+        val settings = Settings.getInstance(project)
+        settings.setManagedExcludedFolders(listOf(url))
+        getService().resetExclusions()
+        assertTrue(ModuleRootManager.getInstance(myFixture.module)
+            .contentEntries[0].excludeFolderUrls.contains(url))
+        WriteAction.runAndWait<Throwable> {
+            ModuleRootModificationUtil.updateModel(myFixture.module) { model ->
+                model.contentEntries[0].removeExcludeFolder(url)
+            }
+        }
+    }
+
+    @Test
+    fun testNestedManualExclusionSurvivesDisable() = checkNestedManualExclusion("disable")
+
+    @Test
+    fun testNestedManualExclusionSurvivesReset() = checkNestedManualExclusion("reset")
+
+    @Test
+    fun testNestedManualExclusionSurvivesRootChange() = checkNestedManualExclusion("change")
+
+    private fun checkNestedManualExclusion(action: String) {
+        val nested = myFixture.tempDirFixture.findOrCreateDir("magento")
+        val parentUrl = myFixture.findFileInTempDir("")!!.url
+        val excludedUrl = nested.url + "/var/cache"
+        val settings = Settings.getInstance(project)
+        settings.pluginEnabled = true
+        settings.magentoPath = nested.path
+        settings.setExcludeGeneratedFiles(true)
+        WriteAction.runAndWait<Throwable> {
+            ModuleRootModificationUtil.updateModel(myFixture.module) { model ->
+                model.contentEntries.first { it.url == parentUrl }.addExcludeFolder(excludedUrl)
+                model.addContentEntry(nested)
+            }
+        }
+        val service = getService()
+        assertTrue(service.applyExclusions().success())
+        assertTrue(service.applyExclusions().success()) // Reapplication must not claim the manual record.
+        val entries = ModuleRootManager.getInstance(myFixture.module).contentEntries
+        assertTrue(entries.first { it.url == parentUrl }.excludeFolderUrls.contains(excludedUrl))
+        assertTrue(entries.first { it.url == nested.url }.excludeFolderUrls.contains(excludedUrl))
+        // Ownership survives saving and loading settings.
+        settings.loadState(com.intellij.util.xmlb.XmlSerializer.deserialize(
+            com.intellij.util.xmlb.XmlSerializer.serialize(settings.state!!), Settings.State::class.java
+        ))
+        when (action) {
+            "disable" -> service.applyExclusions(false, null)
+            "reset" -> service.resetExclusions()
+            else -> {
+                settings.magentoPath = myFixture.tempDirFixture.findOrCreateDir("otherMagento").path
+                service.applyExclusions()
+            }
+        }
+        val after = ModuleRootManager.getInstance(myFixture.module).contentEntries
+        assertTrue(after.first { it.url == parentUrl }.excludeFolderUrls.contains(excludedUrl))
+        assertFalse(after.first { it.url == nested.url }.excludeFolderUrls.contains(excludedUrl))
+        WriteAction.runAndWait<Throwable> {
+            ModuleRootModificationUtil.updateModel(myFixture.module) { model ->
+                model.contentEntries.first { it.url == parentUrl }.removeExcludeFolder(excludedUrl)
+                model.removeContentEntry(model.contentEntries.first { it.url == nested.url })
+            }
+        }
+    }
+
+    @Test
     fun testRepeatedApplicationIsIdempotent() {
         val rootPath = getProjectRootPath()
         val settings = Settings.getInstance(project)

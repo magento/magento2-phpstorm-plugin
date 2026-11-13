@@ -62,11 +62,12 @@ public class Settings implements PersistentStateComponent<Settings.State> {
     public Boolean excludeGeneratedFiles;
     public List<String> additionalExcludedPaths;
     public List<String> managedExcludedFolders;
+    public List<ManagedExclusion> managedExclusionOwners;
 
     @Override
     @Nullable
     public Settings.State getState() {
-        return new State(
+        final State state = new State(
                 this.pluginEnabled,
                 normalizeMagentoPath(this.magentoPath),
                 this.defaultLicense,
@@ -81,6 +82,8 @@ public class Settings implements PersistentStateComponent<Settings.State> {
                 this.additionalExcludedPaths,
                 this.managedExcludedFolders
         );
+        state.managedExclusionOwners = this.managedExclusionOwners;
+        return state;
     }
 
     /**
@@ -159,6 +162,8 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         this.additionalExcludedPaths = state.getAdditionalExcludedPaths() == null
                 ? null
                 : new SmartList<>(state.getAdditionalExcludedPaths());
+        this.managedExclusionOwners = state.managedExclusionOwners == null
+                ? null : new SmartList<>(state.managedExclusionOwners);
         this.managedExcludedFolders = state.getManagedExcludedFolders() == null
                 ? null
                 : new SmartList<>(state.getManagedExcludedFolders());
@@ -184,6 +189,43 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         } else {
             this.additionalExcludedPaths = new SmartList<>(additionalExcludedPaths);
         }
+    }
+
+    /** Exact root-model records created by the indexing exclusion feature. */
+    public static class ManagedExclusion {
+        public String moduleName;
+        public String contentEntryUrl;
+        public String excludedUrl;
+
+        public ManagedExclusion() {}
+
+        public ManagedExclusion(final String moduleName, final String contentEntryUrl, final String excludedUrl) {
+            this.moduleName = moduleName;
+            this.contentEntryUrl = contentEntryUrl;
+            this.excludedUrl = excludedUrl;
+        }
+
+        @Override
+        public boolean equals(final Object other) {
+            return other instanceof ManagedExclusion entry
+                    && Objects.equals(moduleName, entry.moduleName)
+                    && Objects.equals(contentEntryUrl, entry.contentEntryUrl)
+                    && Objects.equals(excludedUrl, entry.excludedUrl);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(moduleName, contentEntryUrl, excludedUrl);
+        }
+    }
+
+    public @NotNull List<ManagedExclusion> getManagedExclusionOwners() {
+        return managedExclusionOwners == null ? List.of() : List.copyOf(managedExclusionOwners);
+    }
+
+    public void setManagedExclusionOwners(final List<ManagedExclusion> owners) {
+        managedExclusionOwners = new SmartList<>(owners);
+        setManagedExcludedFolders(owners.stream().map(owner -> owner.excludedUrl).distinct().toList());
     }
 
     public @NotNull List<String> getManagedExcludedFolders() {
@@ -397,6 +439,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         public Boolean excludeGeneratedFiles;
         public List<String> additionalExcludedPaths;
         public List<String> managedExcludedFolders;
+        public List<ManagedExclusion> managedExclusionOwners;
 
         public State() {//NOPMD
         }
@@ -665,6 +708,8 @@ public class Settings implements PersistentStateComponent<Settings.State> {
                     return false;
                 } else if (!Objects.equals(this.additionalExcludedPaths, state.additionalExcludedPaths)) {
                     return false;
+                } else if (!Objects.equals(this.managedExclusionOwners, state.managedExclusionOwners)) {
+                    return false;
                 } else if (!Objects.equals(this.managedExcludedFolders, state.managedExcludedFolders)) {
                     return false;
                 } else {
@@ -703,6 +748,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
             result = 31 * result
                     + (this.additionalExcludedPaths != null ? this.additionalExcludedPaths.hashCode() : 0);
             result = 31 * result
+                    + Objects.hashCode(this.managedExclusionOwners)
                     + (this.managedExcludedFolders != null ? this.managedExcludedFolders.hashCode() : 0);
             return result;
         }

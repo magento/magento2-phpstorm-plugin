@@ -24,6 +24,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.util.SmartList;
 import com.magento.idea.magento2plugin.project.Settings;
+import com.magento.idea.magento2plugin.project.Settings.ManagedExclusion;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -452,7 +453,7 @@ public class MagentoIndexingExclusionService {
         // Perform cleanup before requiring a valid Magento path
         if (!shouldExclude) {
             final List<String> removed = removeManagedExclusions(currentManaged);
-            settings.setManagedExcludedFolders(null);
+            settings.setManagedExclusionOwners(List.of());
             invalidateCache();
             notifyRootsChanged();
             return new ExclusionApplyResult(
@@ -504,7 +505,7 @@ public class MagentoIndexingExclusionService {
 
         final List<String> newlyAdded = new ArrayList<>();
         final List<String> unchanged = new ArrayList<>();
-        final Set<String> updatedManagedUrls = new LinkedHashSet<>(currentManaged);
+        final Set<ManagedExclusion> updatedOwners = new LinkedHashSet<>(settings.getManagedExclusionOwners());
         final Module[] modules = ModuleManager.getInstance(project).getModules();
 
         final Runnable action = () -> {
@@ -519,7 +520,8 @@ public class MagentoIndexingExclusionService {
                         // Remove obsolete managed URLs
                         for (final String url : urlsToRemove) {
                             for (final ContentEntry entry : contentEntries) {
-                                if (entry.getExcludeFolderUrls().contains(url)) {
+                                if (updatedOwners.contains(new ManagedExclusion(module.getName(), entry.getUrl(), url))
+                                        && entry.getExcludeFolderUrls().contains(url)) {
                                     entry.removeExcludeFolder(url);
                                 }
                             }
@@ -535,27 +537,29 @@ public class MagentoIndexingExclusionService {
                                 continue;
                             }
 
+                            final ManagedExclusion owner = new ManagedExclusion(module.getName(), matchingEntry.getUrl(), url);
                             final boolean alreadyExcluded = matchingEntry.getExcludeFolderUrls().contains(url);
                             if (alreadyExcluded) {
-                                if (currentManaged.contains(url)) {
+                                if (updatedOwners.contains(owner)) {
                                     if (!unchanged.contains(path)) {
                                         unchanged.add(path);
                                     }
-                                    updatedManagedUrls.add(url);
+                                    updatedOwners.add(owner);
                                 }
-                                // If pre-existing user exclusion (not in currentManaged), do NOT claim ownership
+                                // Preserve existing records without exact ownership, including legacy URL-only state.
                             } else {
                                 matchingEntry.addExcludeFolder(url);
                                 if (!newlyAdded.contains(path)) {
                                     newlyAdded.add(path);
                                 }
-                                updatedManagedUrls.add(url);
+                                updatedOwners.add(owner);
                             }
                         }
                     });
                 } finally {
-                    updatedManagedUrls.removeAll(urlsToRemove);
-                    settings.setManagedExcludedFolders(new ArrayList<>(updatedManagedUrls));
+                    updatedOwners.removeIf(owner -> module.getName().equals(owner.moduleName)
+                            && urlsToRemove.contains(owner.excludedUrl));
+                    settings.setManagedExclusionOwners(new ArrayList<>(updatedOwners));
                 }
             }
         };
@@ -616,7 +620,7 @@ public class MagentoIndexingExclusionService {
         final List<String> currentManaged = new ArrayList<>(settings.getManagedExcludedFolders());
         final List<String> removed = removeManagedExclusions(currentManaged);
 
-        settings.setManagedExcludedFolders(null);
+        settings.setManagedExclusionOwners(List.of());
         settings.setAdditionalExcludedPaths(null);
         settings.setExcludeGeneratedFiles(null);
         invalidateCache();
@@ -925,7 +929,7 @@ public class MagentoIndexingExclusionService {
 
         final List<String> removed = new ArrayList<>();
         final Settings settings = Settings.getInstance(project);
-        final Set<String> currentManaged = new LinkedHashSet<>(settings.getManagedExcludedFolders());
+        final Set<ManagedExclusion> currentManaged = new LinkedHashSet<>(settings.getManagedExclusionOwners());
         final Module[] modules = ModuleManager.getInstance(project).getModules();
 
         final Runnable action = () -> {
@@ -934,7 +938,8 @@ public class MagentoIndexingExclusionService {
                     ModuleRootModificationUtil.updateModel(module, model -> {
                         for (final ContentEntry entry : model.getContentEntries()) {
                             for (final String url : urlsToRemove) {
-                                if (entry.getExcludeFolderUrls().contains(url)) {
+                                if (currentManaged.contains(new ManagedExclusion(module.getName(), entry.getUrl(), url))
+                                        && entry.getExcludeFolderUrls().contains(url)) {
                                     entry.removeExcludeFolder(url);
                                     if (!removed.contains(url)) {
                                         removed.add(url);
@@ -944,8 +949,9 @@ public class MagentoIndexingExclusionService {
                         }
                     });
                 } finally {
-                    currentManaged.removeAll(removed);
-                    settings.setManagedExcludedFolders(new ArrayList<>(currentManaged));
+                    currentManaged.removeIf(owner -> module.getName().equals(owner.moduleName)
+                            && urlsToRemove.contains(owner.excludedUrl));
+                    settings.setManagedExclusionOwners(new ArrayList<>(currentManaged));
                 }
             }
         };
