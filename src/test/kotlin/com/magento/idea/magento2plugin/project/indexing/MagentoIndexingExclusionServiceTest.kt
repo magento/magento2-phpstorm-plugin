@@ -1,11 +1,14 @@
 package com.magento.idea.magento2plugin.project.indexing
 
 import com.intellij.openapi.application.WriteAction
+import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.roots.ModuleRootManager
+import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.testFramework.PlatformTestUtil
 import com.magento.idea.magento2plugin.BaseProjectTestCase
 import com.magento.idea.magento2plugin.project.Settings
 import org.junit.Test
@@ -298,5 +301,148 @@ class MagentoIndexingExclusionServiceTest : BaseProjectTestCase() {
         } catch (e: Exception) {
             // Some test environments or OS permissions might not allow creating symlinks; ignore if unsupported
         }
+    }
+
+    @Test
+    fun testAncestorOfNestedMagentoRootRejected() {
+        // Project root: /project
+        // Magento root: /project/src/magento
+        val projectRoot = getProjectRootPath()
+        val nestedMagentoDir = myFixture.tempDirFixture.findOrCreateDir("src/magento")
+        val settings = Settings.getInstance(project)
+        settings.pluginEnabled = true
+        settings.magentoPath = nestedMagentoDir.path
+        settings.setExcludeGeneratedFiles(true)
+
+        // Try to exclude "src" which encloses the Magento root
+        settings.additionalExcludedPaths = listOf("src", "src/magento/app")
+
+        val service = getService()
+        val preview = service.previewExclusions(null, null)
+        val skippedPaths = preview.skippedEntries().map { it.path() }
+
+        assertTrue(skippedPaths.any { it.endsWith("/src") })
+        assertTrue(skippedPaths.any { it.endsWith("/src/magento/app") })
+
+        val result = service.applyExclusions()
+        assertTrue(result.success())
+
+        val managed = settings.getManagedExcludedFolders()
+        // Ensure "src" was not excluded
+        assertFalse(managed.any { it.endsWith("/src") })
+        assertFalse(managed.any { it.endsWith("/src/magento/app") })
+        // But Magento's var/cache inside nested root IS excluded
+        assertTrue(managed.any { it.contains("/src/magento/var/cache") })
+    }
+
+    @Test
+    fun testDisablingIntegrationRemovesExclusionsEvenWhenMagentoPathIsClearedOrInvalid() {
+        val rootPath = getProjectRootPath()
+        val settings = Settings.getInstance(project)
+        settings.pluginEnabled = true
+        settings.magentoPath = rootPath
+        settings.setExcludeGeneratedFiles(true)
+
+        val service = getService()
+        val applyResult = service.applyExclusions()
+        assertTrue(applyResult.success())
+        assertFalse(settings.getManagedExcludedFolders().isEmpty())
+
+        // Clear Magento path or make it invalid
+        settings.magentoPath = ""
+        settings.pluginEnabled = false
+
+        // Disabling integration must successfully remove exclusions even without valid Magento path
+        val disableResult = service.applyExclusions()
+        assertTrue(disableResult.success())
+        assertTrue(settings.getManagedExcludedFolders().isEmpty())
+
+        val contentEntryUrls = ModuleRootManager.getInstance(myFixture.module)
+            .contentEntries[0].excludeFolderUrls.toList()
+        assertFalse(contentEntryUrls.any { it.contains("var/cache") })
+    }
+
+    @Test
+    fun testStartupReconciliationAppliesDefaultExclusions() {
+        val rootPath = getProjectRootPath()
+        val settings = Settings.getInstance(project)
+        settings.pluginEnabled = true
+        settings.magentoPath = rootPath
+        settings.setExcludeGeneratedFiles(true)
+        // Simulate freshly opened project where managed exclusions haven't been applied yet
+        settings.setManagedExcludedFolders(null)
+
+        val service = getService()
+        service.reconcileExclusionsOnStartup()
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+
+        val managed = settings.getManagedExcludedFolders()
+        assertFalse(managed.isEmpty())
+        assertTrue(managed.any { it.contains("var/cache") })
+    }
+
+    @Test
+    fun testStartupReconciliationPreservesExplicitOptOut() {
+        val rootPath = getProjectRootPath()
+        val settings = Settings.getInstance(project)
+        settings.pluginEnabled = true
+        settings.magentoPath = rootPath
+        settings.setExcludeGeneratedFiles(false) // Explicit opt-out
+        settings.setManagedExcludedFolders(null)
+
+        val service = getService()
+        service.reconcileExclusionsOnStartup()
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+
+        assertTrue(settings.getManagedExcludedFolders().isEmpty())
+    }
+
+    @Test
+    fun testExternalMagentoPathDoesNotThrowWhenContentEntryDoesNotContainTarget() {
+        val settings = Settings.getInstance(project)
+        settings.pluginEnabled = true
+        // Set Magento path to an external directory outside the module content roots
+        val externalDir = com.intellij.openapi.util.io.FileUtil.createTempDirectory("external_magento", null)
+        File(externalDir, "var/cache").mkdirs()
+        settings.magentoPath = externalDir.absolutePath
+        settings.setExcludeGeneratedFiles(true)
+
+        val service = getService()
+        // Must NOT throw IllegalArgumentException when content entry does not contain external target
+        val result = service.applyExclusions()
+        assertTrue(result.success())
+
+        // Module content entry has no exclude folders added because external path is not under its content root
+        val contentEntryUrls = ModuleRootManager.getInstance(myFixture.module)
+            .contentEntries[0].excludeFolderUrls.toList()
+        assertFalse(contentEntryUrls.any { it.contains("external_magento") })
+    }
+
+    @Test
+    fun testMultipleContentEntriesScoping() {
+        val rootPath = getProjectRootPath()
+        val settings = Settings.getInstance(project)
+        settings.pluginEnabled = true
+        settings.magentoPath = rootPath
+        settings.setExcludeGeneratedFiles(true)
+
+        // Add a second content entry to the module
+        val secondContentDir = myFixture.tempDirFixture.findOrCreateDir("second_content_root")
+        ModuleRootModificationUtil.addContentRoot(myFixture.module, secondContentDir)
+
+        val service = getService()
+        val result = service.applyExclusions()
+        assertTrue(result.success())
+
+        val contentEntries = ModuleRootManager.getInstance(myFixture.module).contentEntries
+        assertEquals(2, contentEntries.size)
+
+        val primaryEntry = contentEntries.first { it.url.contains(rootPath) }
+        val secondEntry = contentEntries.first { it.url.contains("second_content_root") }
+
+        // Primary entry contains Magento exclusions
+        assertTrue(primaryEntry.excludeFolderUrls.any { it.contains("var/cache") })
+        // Second entry must NOT have Magento exclusions erroneously added to it
+        assertTrue(secondEntry.excludeFolderUrls.isEmpty())
     }
 }

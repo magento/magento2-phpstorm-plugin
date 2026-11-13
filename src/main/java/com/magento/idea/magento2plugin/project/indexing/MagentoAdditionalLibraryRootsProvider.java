@@ -50,6 +50,7 @@ public class MagentoAdditionalLibraryRootsProvider extends AdditionalLibraryRoot
     }
 
     public static void refreshRoots(final @NotNull Project project) {
+        MagentoIndexingExclusionService.getInstance(project).invalidateCache();
         final Collection<VirtualFile> roots = new MagentoAdditionalLibraryRootsProvider()
                 .getMagentoIndexRoots(project);
 

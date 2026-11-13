@@ -226,4 +226,68 @@ class MagentoIndexingExclusionMcpTest : BaseProjectTestCase() {
         assertTrue(configureDescription.contains("preview"))
         assertTrue(configureDescription.contains(".runtime/"))
     }
+
+    @Test
+    fun testConfigureAdditionalPathsCanBeClearedWithEmptyList() {
+        val rootPath = getProjectRootPath()
+        val settings = Settings.getInstance(project)
+        settings.pluginEnabled = true
+        settings.magentoPath = rootPath
+
+        // Configure with .runtime
+        MagentoIndexingExclusionCommands.configure(
+            project = project,
+            action = "apply",
+            enabled = true,
+            additionalPaths = listOf(".runtime")
+        )
+        assertTrue(settings.additionalExcludedPaths.contains(".runtime"))
+        assertTrue(settings.getManagedExcludedFolders().any { it.endsWith("/.runtime") })
+
+        // Preview with empty list []
+        val preview = MagentoIndexingExclusionCommands.configure(
+            project = project,
+            action = "preview",
+            additionalPaths = emptyList()
+        )
+        assertContains(preview, "URLs to remove: 1")
+        assertFalse(preview.contains(".runtime — User-configured"))
+
+        // Update with empty list [] clears additionalPaths
+        val updateResult = MagentoIndexingExclusionCommands.configure(
+            project = project,
+            action = "update",
+            additionalPaths = emptyList()
+        )
+        assertContains(updateResult, "Result: success")
+        assertTrue(settings.additionalExcludedPaths.isEmpty())
+        assertFalse(settings.getManagedExcludedFolders().any { it.endsWith("/.runtime") })
+        // Default exclusions remain active
+        assertTrue(settings.getManagedExcludedFolders().any { it.contains("var/cache") })
+    }
+
+    @Test
+    fun testConfigureDisableSucceedsWhenMagentoPathIsClearedOrInvalid() {
+        val rootPath = getProjectRootPath()
+        val settings = Settings.getInstance(project)
+        settings.pluginEnabled = true
+        settings.magentoPath = rootPath
+
+        MagentoIndexingExclusionCommands.configure(
+            project = project,
+            action = "apply",
+            enabled = true
+        )
+        assertFalse(settings.getManagedExcludedFolders().isEmpty())
+
+        // Clear Magento path and disable exclusions via MCP
+        settings.magentoPath = ""
+        val result = MagentoIndexingExclusionCommands.configure(
+            project = project,
+            action = "update",
+            enabled = false
+        )
+        assertContains(result, "Result: success")
+        assertTrue(settings.getManagedExcludedFolders().isEmpty())
+    }
 }

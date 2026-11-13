@@ -195,8 +195,8 @@ class MagentoMcpProjectToolset : McpToolset {
     )
     suspend fun configureMagentoIndexingExclusions(
         action: String = "apply",
-        enabled: Boolean = true,
-        additionalPaths: List<String> = emptyList()
+        enabled: Boolean? = null,
+        additionalPaths: List<String>? = null
     ): String = MagentoMcpToolsetSupport.withProjectEdtAction(
         validateProject = false
     ) {

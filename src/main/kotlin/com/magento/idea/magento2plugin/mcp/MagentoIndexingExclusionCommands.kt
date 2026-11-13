@@ -72,23 +72,19 @@ internal object MagentoIndexingExclusionCommands {
         project: Project,
         action: String = "apply",
         enabled: Boolean? = null,
-        additionalPaths: List<String> = emptyList()
+        additionalPaths: List<String>? = null
     ): String {
         val normalizedAction = action.trim().lowercase()
         val service = MagentoIndexingExclusionService.getInstance(project)
 
         when (normalizedAction) {
             "apply", "update" -> {
-                if (!service.isMagentoPathConfiguredAndValid()) {
+                val effectiveEnabled = enabled ?: Settings.getInstance(project).isExcludeGeneratedFiles
+                val effectiveAdditional = additionalPaths ?: Settings.getInstance(project).getAdditionalExcludedPaths()
+
+                if (!service.isMagentoPathConfiguredAndValid() && effectiveEnabled) {
                     return "Error: Magento installation path is not configured or is invalid. " +
                         "Configure a valid Magento path before exclusions can be applied."
-                }
-
-                val effectiveEnabled = enabled ?: Settings.getInstance(project).isExcludeGeneratedFiles
-                val effectiveAdditional = if (additionalPaths.isNotEmpty()) {
-                    additionalPaths
-                } else {
-                    Settings.getInstance(project).getAdditionalExcludedPaths()
                 }
 
                 val result = service.applyExclusions(effectiveEnabled, effectiveAdditional)
@@ -107,12 +103,13 @@ internal object MagentoIndexingExclusionCommands {
                 return lines.joinToString("\n")
             }
             "preview", "status" -> {
-                if (!service.isMagentoPathConfiguredAndValid()) {
+                val effectiveEnabled = enabled ?: Settings.getInstance(project).isExcludeGeneratedFiles
+                if (!service.isMagentoPathConfiguredAndValid() && effectiveEnabled) {
                     return "Error: Magento installation path is not configured or is invalid. " +
                         "Configure a valid Magento path before exclusions can be applied."
                 }
 
-                val preview = service.previewExclusions(enabled, additionalPaths.ifEmpty { null })
+                val preview = service.previewExclusions(enabled, additionalPaths)
                 val lines = mutableListOf<String>()
                 lines += "Magento Indexing Exclusions Preview (no changes applied)"
                 lines += "Status: ${preview.statusMessage()}"

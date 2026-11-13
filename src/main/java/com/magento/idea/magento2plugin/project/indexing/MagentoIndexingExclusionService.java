@@ -114,10 +114,102 @@ public class MagentoIndexingExclusionService {
             "dev/tests"
     );
 
+    private static class ExclusionSnapshot {
+        final boolean active;
+        final List<String> excludedPaths;
+        final List<String> protectedPaths;
+        final Set<VirtualFile> excludedVirtualFiles;
+
+        ExclusionSnapshot(
+                final boolean active,
+                final @NotNull List<String> excludedPaths,
+                final @NotNull List<String> protectedPaths,
+                final @NotNull Set<VirtualFile> excludedVirtualFiles
+        ) {
+            this.active = active;
+            this.excludedPaths = excludedPaths;
+            this.protectedPaths = protectedPaths;
+            this.excludedVirtualFiles = excludedVirtualFiles;
+        }
+    }
+
     private final Project project;
+    private volatile ExclusionSnapshot cachedSnapshot = null;
 
     public MagentoIndexingExclusionService(final @NotNull Project project) {
         this.project = project;
+        Settings.getInstance(project).addListener((newState, oldState) -> invalidateCache());
+        project.getMessageBus().connect().subscribe(
+                com.intellij.ProjectTopics.PROJECT_ROOTS,
+                new com.intellij.openapi.roots.ModuleRootListener() {
+                    @Override
+                    public void rootsChanged(final @NotNull com.intellij.openapi.roots.ModuleRootEvent event) {
+                        invalidateCache();
+                    }
+                }
+        );
+    }
+
+    public void invalidateCache() {
+        this.cachedSnapshot = null;
+    }
+
+    private @NotNull ExclusionSnapshot getOrCreateSnapshot() {
+        ExclusionSnapshot snapshot = cachedSnapshot;
+        if (snapshot != null) {
+            return snapshot;
+        }
+
+        synchronized (this) {
+            snapshot = cachedSnapshot;
+            if (snapshot != null) {
+                return snapshot;
+            }
+
+            final Settings settings = Settings.getInstance(project);
+            if (!settings.pluginEnabled || !settings.isExcludeGeneratedFiles()) {
+                snapshot = new ExclusionSnapshot(false, List.of(), List.of(), Collections.emptySet());
+                cachedSnapshot = snapshot;
+                return snapshot;
+            }
+
+            final String magentoPath = Settings.getMagentoPath(project);
+            if (magentoPath == null || !isPathValid(magentoPath)) {
+                snapshot = new ExclusionSnapshot(false, List.of(), List.of(), Collections.emptySet());
+                cachedSnapshot = snapshot;
+                return snapshot;
+            }
+
+            final ResolvedExclusions resolved = resolveExclusions(
+                    magentoPath,
+                    settings.getAdditionalExcludedPaths()
+            );
+
+            final List<String> excludedPaths = new ArrayList<>();
+            final Set<VirtualFile> virtualFiles = new LinkedHashSet<>();
+            for (final ExclusionEntry entry : resolved.entries) {
+                excludedPaths.add(entry.path());
+                final VirtualFile vf = resolveDirectoryForPath(entry.path());
+                if (vf != null && vf.isDirectory()) {
+                    virtualFiles.add(vf);
+                }
+            }
+
+            final String normalizedMagento = FileUtil.toSystemIndependentName(magentoPath.trim());
+            final List<String> protectedPaths = new ArrayList<>();
+            for (final String rel : PROTECTED_MAGENTO_RELATIVE_PATHS) {
+                protectedPaths.add(normalizedMagento + "/" + rel);
+            }
+
+            snapshot = new ExclusionSnapshot(
+                    true,
+                    Collections.unmodifiableList(excludedPaths),
+                    Collections.unmodifiableList(protectedPaths),
+                    Collections.unmodifiableSet(virtualFiles)
+            );
+            cachedSnapshot = snapshot;
+            return snapshot;
+        }
     }
 
     public static MagentoIndexingExclusionService getInstance(final @NotNull Project project) {
@@ -252,12 +344,30 @@ public class MagentoIndexingExclusionService {
         final boolean exclusionEnabled = enabledOverride != null
                 ? enabledOverride
                 : settings.isExcludeGeneratedFiles();
+        final List<String> currentManaged = settings.getManagedExcludedFolders();
+
+        if (!exclusionEnabled || !pluginEnabled) {
+            final String message = !pluginEnabled
+                    ? "Magento integration is disabled for this project."
+                    : "Indexing exclusions are disabled.";
+            return new ExclusionPreview(
+                    isMagentoPathConfiguredAndValid(),
+                    Settings.getMagentoPath(project),
+                    exclusionEnabled,
+                    pluginEnabled,
+                    List.of(),
+                    List.of(),
+                    currentManaged,
+                    List.of(),
+                    currentManaged,
+                    message
+            );
+        }
+
         final String magentoPath = magentoPathOverride != null
                 ? Settings.normalizeMagentoPath(magentoPathOverride)
                 : Settings.getMagentoPath(project);
         final boolean magentoPathValid = magentoPath != null && isPathValid(magentoPath);
-
-        final List<String> currentManaged = settings.getManagedExcludedFolders();
 
         if (!magentoPathValid) {
             return new ExclusionPreview(
@@ -271,24 +381,6 @@ public class MagentoIndexingExclusionService {
                     List.of(),
                     currentManaged,
                     "Configure a valid Magento installation path before indexing exclusions can be applied."
-            );
-        }
-
-        if (!exclusionEnabled || !pluginEnabled) {
-            final String message = !pluginEnabled
-                    ? "Magento integration is disabled for this project."
-                    : "Indexing exclusions are disabled.";
-            return new ExclusionPreview(
-                    true,
-                    magentoPath,
-                    exclusionEnabled,
-                    pluginEnabled,
-                    List.of(),
-                    List.of(),
-                    currentManaged,
-                    List.of(),
-                    currentManaged,
-                    message
             );
         }
 
@@ -354,27 +446,14 @@ public class MagentoIndexingExclusionService {
             settings.setAdditionalExcludedPaths(additionalPathsOverride);
         }
 
-        if (!isMagentoPathConfiguredAndValid()) {
-            return new ExclusionApplyResult(
-                    false,
-                    "apply",
-                    List.of(),
-                    List.of(),
-                    List.of(),
-                    List.of(),
-                    List.of(),
-                    false,
-                    "Error: Magento installation path is not configured or is invalid. Configure a valid Magento path before exclusions can be applied."
-            );
-        }
-
         final boolean shouldExclude = settings.pluginEnabled && settings.isExcludeGeneratedFiles();
         final List<String> currentManaged = new ArrayList<>(settings.getManagedExcludedFolders());
 
+        // Perform cleanup before requiring a valid Magento path
         if (!shouldExclude) {
-            // Remove all managed exclusions
             final List<String> removed = removeManagedExclusions(currentManaged);
             settings.setManagedExcludedFolders(null);
+            invalidateCache();
             notifyRootsChanged();
             return new ExclusionApplyResult(
                     true,
@@ -388,6 +467,20 @@ public class MagentoIndexingExclusionService {
                     !settings.pluginEnabled
                             ? "Magento integration is disabled. Managed exclusions removed."
                             : "Indexing exclusions are disabled. Managed exclusions removed."
+            );
+        }
+
+        if (!isMagentoPathConfiguredAndValid()) {
+            return new ExclusionApplyResult(
+                    false,
+                    "apply",
+                    List.of(),
+                    List.of(),
+                    List.of(),
+                    List.of(),
+                    List.of(),
+                    false,
+                    "Error: Magento installation path is not configured or is invalid. Configure a valid Magento path before exclusions can be applied."
             );
         }
 
@@ -411,49 +504,64 @@ public class MagentoIndexingExclusionService {
 
         final List<String> newlyAdded = new ArrayList<>();
         final List<String> unchanged = new ArrayList<>();
-        final List<String> newManagedList = new ArrayList<>();
+        final Set<String> updatedManagedUrls = new LinkedHashSet<>(currentManaged);
+        final Module[] modules = ModuleManager.getInstance(project).getModules();
 
-        modifyRoots(model -> {
-            final ContentEntry[] contentEntries = model.getContentEntries();
-            if (contentEntries == null || contentEntries.length == 0) {
-                return;
-            }
+        final Runnable action = () -> {
+            for (final Module module : modules) {
+                try {
+                    ModuleRootModificationUtil.updateModel(module, model -> {
+                        final ContentEntry[] contentEntries = model.getContentEntries();
+                        if (contentEntries == null || contentEntries.length == 0) {
+                            return;
+                        }
 
-            // Remove obsolete managed URLs
-            for (final String url : urlsToRemove) {
-                for (final ContentEntry entry : contentEntries) {
-                    if (entry.getExcludeFolderUrls().contains(url)) {
-                        entry.removeExcludeFolder(url);
-                    }
+                        // Remove obsolete managed URLs
+                        for (final String url : urlsToRemove) {
+                            for (final ContentEntry entry : contentEntries) {
+                                if (entry.getExcludeFolderUrls().contains(url)) {
+                                    entry.removeExcludeFolder(url);
+                                }
+                            }
+                        }
+
+                        // Apply target URLs that belong to this module's entries
+                        for (final Map.Entry<String, ExclusionEntry> target : targetEntriesByUrl.entrySet()) {
+                            final String url = target.getKey();
+                            final String path = target.getValue().path();
+                            final ContentEntry matchingEntry = findBestMatchingContentEntry(contentEntries, path, url);
+
+                            if (matchingEntry == null) {
+                                continue;
+                            }
+
+                            final boolean alreadyExcluded = matchingEntry.getExcludeFolderUrls().contains(url);
+                            if (alreadyExcluded) {
+                                if (currentManaged.contains(url)) {
+                                    if (!unchanged.contains(path)) {
+                                        unchanged.add(path);
+                                    }
+                                    updatedManagedUrls.add(url);
+                                }
+                                // If pre-existing user exclusion (not in currentManaged), do NOT claim ownership
+                            } else {
+                                matchingEntry.addExcludeFolder(url);
+                                if (!newlyAdded.contains(path)) {
+                                    newlyAdded.add(path);
+                                }
+                                updatedManagedUrls.add(url);
+                            }
+                        }
+                    });
+                } finally {
+                    updatedManagedUrls.removeAll(urlsToRemove);
+                    settings.setManagedExcludedFolders(new ArrayList<>(updatedManagedUrls));
                 }
             }
+        };
 
-            // Apply target URLs
-            for (final Map.Entry<String, ExclusionEntry> target : targetEntriesByUrl.entrySet()) {
-                final String url = target.getKey();
-                final String path = target.getValue().path();
-                final ContentEntry matchingEntry = findBestMatchingContentEntry(contentEntries, path, url);
-
-                if (matchingEntry == null) {
-                    continue;
-                }
-
-                final boolean alreadyExcluded = matchingEntry.getExcludeFolderUrls().contains(url);
-                if (alreadyExcluded) {
-                    if (currentManaged.contains(url)) {
-                        unchanged.add(path);
-                        newManagedList.add(url);
-                    }
-                    // If pre-existing user exclusion (not in currentManaged), do NOT claim ownership
-                } else {
-                    matchingEntry.addExcludeFolder(url);
-                    newlyAdded.add(path);
-                    newManagedList.add(url);
-                }
-            }
-        });
-
-        settings.setManagedExcludedFolders(newManagedList);
+        runWriteAction(action);
+        invalidateCache();
         notifyRootsChanged();
 
         final boolean refreshPending = DumbService.getInstance(project).isDumb();
@@ -471,6 +579,36 @@ public class MagentoIndexingExclusionService {
     }
 
     /**
+     * Reconciles exclusions during project startup or when project integration is enabled.
+     */
+    public void reconcileExclusionsOnStartup() {
+        final Settings settings = Settings.getInstance(project);
+        if (!settings.pluginEnabled || !settings.isExcludeGeneratedFiles()) {
+            if (!settings.getManagedExcludedFolders().isEmpty()) {
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    if (!project.isDisposed()) {
+                        applyExclusions();
+                    }
+                });
+            }
+            return;
+        }
+
+        if (!isMagentoPathConfiguredAndValid()) {
+            return;
+        }
+
+        final ExclusionPreview preview = previewExclusions(null, null);
+        if (!preview.urlsToAdd().isEmpty() || !preview.urlsToRemove().isEmpty()) {
+            ApplicationManager.getApplication().invokeLater(() -> {
+                if (!project.isDisposed()) {
+                    applyExclusions();
+                }
+            });
+        }
+    }
+
+    /**
      * Resets indexing exclusions, removing all plugin-managed exclusions.
      */
     public @NotNull ExclusionApplyResult resetExclusions() {
@@ -481,6 +619,7 @@ public class MagentoIndexingExclusionService {
         settings.setManagedExcludedFolders(null);
         settings.setAdditionalExcludedPaths(null);
         settings.setExcludeGeneratedFiles(null);
+        invalidateCache();
         notifyRootsChanged();
 
         return new ExclusionApplyResult(
@@ -529,26 +668,23 @@ public class MagentoIndexingExclusionService {
 
     /**
      * Checks if a path is excluded by active indexing exclusions.
+     * Evaluates purely in-memory using the precomputed snapshot.
      */
     public boolean isExcludedPath(final @NotNull String filePath) {
+        final ExclusionSnapshot snapshot = getOrCreateSnapshot();
+        if (!snapshot.active) {
+            return false;
+        }
+
         final String normalized = FileUtil.toSystemIndependentName(filePath);
-        final Settings settings = Settings.getInstance(project);
-        if (!settings.pluginEnabled || !settings.isExcludeGeneratedFiles()) {
-            return false;
+
+        for (final String protectedPath : snapshot.protectedPaths) {
+            if (normalized.equals(protectedPath) || normalized.startsWith(protectedPath + "/")) {
+                return false;
+            }
         }
 
-        final String magentoPath = Settings.getMagentoPath(project);
-        if (magentoPath == null) {
-            return false;
-        }
-
-        final ResolvedExclusions resolved = resolveExclusions(
-                magentoPath,
-                settings.getAdditionalExcludedPaths()
-        );
-
-        for (final ExclusionEntry entry : resolved.entries) {
-            final String excludedPath = entry.path();
+        for (final String excludedPath : snapshot.excludedPaths) {
             if (normalized.equals(excludedPath) || normalized.startsWith(excludedPath + "/")) {
                 return true;
             }
@@ -561,35 +697,7 @@ public class MagentoIndexingExclusionService {
      * Returns existing VirtualFiles for all effective excluded locations.
      */
     public @NotNull Set<VirtualFile> getEffectiveExcludedVirtualFiles() {
-        final Settings settings = Settings.getInstance(project);
-        if (!settings.pluginEnabled || !settings.isExcludeGeneratedFiles()) {
-            return Collections.emptySet();
-        }
-
-        final String magentoPath = Settings.getMagentoPath(project);
-        if (magentoPath == null) {
-            return Collections.emptySet();
-        }
-
-        final ResolvedExclusions resolved = resolveExclusions(
-                magentoPath,
-                settings.getAdditionalExcludedPaths()
-        );
-
-        final Set<VirtualFile> result = new LinkedHashSet<>();
-        final LocalFileSystem fs = LocalFileSystem.getInstance();
-
-        for (final ExclusionEntry entry : resolved.entries) {
-            VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(entry.url());
-            if (file == null) {
-                file = fs.findFileByPath(entry.path());
-            }
-            if (file != null && file.isValid() && file.isDirectory()) {
-                result.add(file);
-            }
-        }
-
-        return result;
+        return getOrCreateSnapshot().excludedVirtualFiles;
     }
 
     private static class ResolvedExclusions {
@@ -685,6 +793,14 @@ public class MagentoIndexingExclusionService {
             return new ValidationResult(false, "Matches root directory");
         }
 
+        // Cannot be an ancestor of Magento root or project root
+        if (magentoRoot.startsWith(normalized + "/")) {
+            return new ValidationResult(false, "Cannot exclude parent of Magento root: " + magentoRoot);
+        }
+        if (projectRoot != null && projectRoot.startsWith(normalized + "/")) {
+            return new ValidationResult(false, "Cannot exclude parent of project root: " + projectRoot);
+        }
+
         // Must be within project root or Magento root
         final boolean underMagento = normalized.startsWith(magentoRoot + "/");
         final boolean underProject = projectRoot != null && normalized.startsWith(projectRoot + "/");
@@ -692,16 +808,14 @@ public class MagentoIndexingExclusionService {
             return new ValidationResult(false, "Resolved path is outside project or Magento root");
         }
 
-        // Check protected Magento paths
-        if (underMagento) {
-            final String relToMagento = normalized.substring(magentoRoot.length() + 1);
-            for (final String protectedPath : PROTECTED_MAGENTO_RELATIVE_PATHS) {
-                if (relToMagento.equals(protectedPath) || relToMagento.startsWith(protectedPath + "/")) {
-                    return new ValidationResult(false, "Matches protected source directory: " + protectedPath);
-                }
-                if (protectedPath.startsWith(relToMagento + "/")) {
-                    return new ValidationResult(false, "Cannot exclude parent of protected directory: " + protectedPath);
-                }
+        // Check protected Magento paths (in both directions: candidate cannot match, be inside, or enclose protected path)
+        for (final String protectedPath : PROTECTED_MAGENTO_RELATIVE_PATHS) {
+            final String absProtected = magentoRoot + "/" + protectedPath;
+            if (normalized.equals(absProtected) || normalized.startsWith(absProtected + "/")) {
+                return new ValidationResult(false, "Matches protected source directory: " + protectedPath);
+            }
+            if (absProtected.startsWith(normalized + "/")) {
+                return new ValidationResult(false, "Cannot exclude parent of protected directory: " + protectedPath);
             }
         }
 
@@ -712,18 +826,31 @@ public class MagentoIndexingExclusionService {
                 final Path realPath = file.toPath().toRealPath();
                 final String realPathStr = FileUtil.toSystemIndependentName(realPath.toString());
                 if (!realPathStr.equals(normalized)) {
-                    // It is a symlink: check where it points
+                    // Check canonical targets against roots
+                    if (realPathStr.equals(magentoRoot) || (projectRoot != null && realPathStr.equals(projectRoot))) {
+                        return new ValidationResult(false, "Symlink target matches root directory");
+                    }
+                    if (magentoRoot.startsWith(realPathStr + "/")) {
+                        return new ValidationResult(false, "Symlink target is parent of Magento root: " + magentoRoot);
+                    }
+                    if (projectRoot != null && projectRoot.startsWith(realPathStr + "/")) {
+                        return new ValidationResult(false, "Symlink target is parent of project root: " + projectRoot);
+                    }
+
                     final boolean realUnderMagento = realPathStr.startsWith(magentoRoot + "/");
                     final boolean realUnderProject = projectRoot != null && realPathStr.startsWith(projectRoot + "/");
                     if (!realUnderMagento && !realUnderProject) {
                         return new ValidationResult(false, "Symlink target is outside project scope");
                     }
-                    if (realUnderMagento) {
-                        final String realRel = realPathStr.substring(magentoRoot.length() + 1);
-                        for (final String protectedPath : PROTECTED_MAGENTO_RELATIVE_PATHS) {
-                            if (realRel.equals(protectedPath) || realRel.startsWith(protectedPath + "/")) {
-                                return new ValidationResult(false, "Symlink points to protected source directory: " + protectedPath);
-                            }
+
+                    // Check real path against protected Magento paths in both directions
+                    for (final String protectedPath : PROTECTED_MAGENTO_RELATIVE_PATHS) {
+                        final String absProtected = magentoRoot + "/" + protectedPath;
+                        if (realPathStr.equals(absProtected) || realPathStr.startsWith(absProtected + "/")) {
+                            return new ValidationResult(false, "Symlink points to protected source directory: " + protectedPath);
+                        }
+                        if (absProtected.startsWith(realPathStr + "/")) {
+                            return new ValidationResult(false, "Symlink target is parent of protected directory: " + protectedPath);
                         }
                     }
                 }
@@ -732,11 +859,15 @@ public class MagentoIndexingExclusionService {
             }
         }
 
-        // Verify it doesn't conflict with any module content roots
+        // Verify it doesn't conflict with any module content roots (cannot match or enclose any content root)
         final VirtualFile[] contentRoots = ProjectRootManager.getInstance(project).getContentRoots();
         for (final VirtualFile cr : contentRoots) {
-            if (normalized.equals(cr.getPath())) {
+            final String crPath = cr.getPath();
+            if (normalized.equals(crPath)) {
                 return new ValidationResult(false, "Cannot exclude project content root");
+            }
+            if (crPath.startsWith(normalized + "/")) {
+                return new ValidationResult(false, "Cannot exclude parent of project content root: " + crPath);
             }
         }
 
@@ -784,8 +915,7 @@ public class MagentoIndexingExclusionService {
             }
         }
 
-        // Fallback to first entry if not matched
-        return bestMatch != null ? bestMatch : (entries.length > 0 ? entries[0] : null);
+        return bestMatch;
     }
 
     private @NotNull List<String> removeManagedExclusions(final @NotNull List<String> urlsToRemove) {
@@ -794,34 +924,37 @@ public class MagentoIndexingExclusionService {
         }
 
         final List<String> removed = new ArrayList<>();
-        modifyRoots(model -> {
-            for (final ContentEntry entry : model.getContentEntries()) {
-                for (final String url : urlsToRemove) {
-                    if (entry.getExcludeFolderUrls().contains(url)) {
-                        entry.removeExcludeFolder(url);
-                        if (!removed.contains(url)) {
-                            removed.add(url);
-                        }
-                    }
-                }
-            }
-        });
-
-        return removed;
-    }
-
-    private void modifyRoots(final java.util.function.Consumer<com.intellij.openapi.roots.ModifiableRootModel> modifier) {
+        final Settings settings = Settings.getInstance(project);
+        final Set<String> currentManaged = new LinkedHashSet<>(settings.getManagedExcludedFolders());
         final Module[] modules = ModuleManager.getInstance(project).getModules();
-        if (modules.length == 0) {
-            return;
-        }
 
         final Runnable action = () -> {
             for (final Module module : modules) {
-                ModuleRootModificationUtil.updateModel(module, modifier::accept);
+                try {
+                    ModuleRootModificationUtil.updateModel(module, model -> {
+                        for (final ContentEntry entry : model.getContentEntries()) {
+                            for (final String url : urlsToRemove) {
+                                if (entry.getExcludeFolderUrls().contains(url)) {
+                                    entry.removeExcludeFolder(url);
+                                    if (!removed.contains(url)) {
+                                        removed.add(url);
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } finally {
+                    currentManaged.removeAll(removed);
+                    settings.setManagedExcludedFolders(new ArrayList<>(currentManaged));
+                }
             }
         };
 
+        runWriteAction(action);
+        return removed;
+    }
+
+    private void runWriteAction(final @NotNull Runnable action) {
         final com.intellij.openapi.application.Application application = ApplicationManager.getApplication();
         if (application.isDispatchThread()) {
             WriteAction.run(action::run);
