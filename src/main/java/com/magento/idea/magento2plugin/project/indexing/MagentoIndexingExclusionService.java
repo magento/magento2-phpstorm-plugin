@@ -9,6 +9,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.ModuleListener;
 import com.intellij.openapi.project.Project;
@@ -19,6 +20,12 @@ import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFileVisitor;
+import com.intellij.openapi.vfs.VFileProperty;
+import com.intellij.openapi.vfs.newvfs.BulkFileListener;
+import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
+import com.intellij.openapi.vfs.newvfs.events.VFileMoveEvent;
+import com.intellij.openapi.vfs.newvfs.events.VFilePropertyChangeEvent;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
@@ -36,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -92,6 +100,7 @@ public class MagentoIndexingExclusionService {
      * Documented default Magento output locations relative to configured Magento root.
      */
     public static final List<ExclusionCandidate> DEFAULT_CANDIDATES = List.of(
+            new ExclusionCandidate(".cache", "Local tool cache"),
             new ExclusionCandidate("var/cache", "Magento application cache"),
             new ExclusionCandidate("var/page_cache", "Full page cache"),
             new ExclusionCandidate("var/view_preprocessed", "Preprocessed view templates and assets"),
@@ -136,6 +145,9 @@ public class MagentoIndexingExclusionService {
 
     private final Project project;
     private volatile ExclusionSnapshot cachedSnapshot = null;
+    private record CacheDirectories(String rootUrl, List<ExclusionCandidate> candidates) {}
+    private volatile CacheDirectories cachedCacheDirectories;
+    private final AtomicBoolean cacheReconciliationPending = new AtomicBoolean();
 
     public MagentoIndexingExclusionService(final @NotNull Project project) {
         this.project = project;
@@ -149,6 +161,53 @@ public class MagentoIndexingExclusionService {
                     }
                 }
         );
+        project.getMessageBus().connect().subscribe(VirtualFileManager.VFS_CHANGES, new BulkFileListener() {
+            @Override
+            public void after(final @NotNull List<? extends VFileEvent> events) {
+                final VirtualFile root = resolveDirectoryForPath(Settings.getMagentoPath(project));
+                if (root == null) {
+                    return;
+                }
+                boolean affected = false;
+                for (final VFileEvent event : events) {
+                    if (event.getFile() == null || !event.getFile().isDirectory()) {
+                        continue;
+                    }
+                    String oldPath = null;
+                    String newPath = null;
+                    if (event instanceof VFilePropertyChangeEvent change
+                            && VirtualFile.PROP_NAME.equals(change.getPropertyName())) {
+                        oldPath = change.getOldPath();
+                        newPath = change.getNewPath();
+                    } else if (event instanceof VFileMoveEvent move) {
+                        oldPath = move.getOldPath();
+                        newPath = move.getNewPath();
+                    }
+                    if (event.getPath().startsWith(root.getPath() + "/")
+                            || (oldPath != null && oldPath.startsWith(root.getPath() + "/"))) {
+                        if (oldPath != null) {
+                            updateMovedExclusionOwners(oldPath, newPath);
+                            affected = true;
+                        } else if (".cache".equals(event.getFile().getName())) {
+                            affected = true;
+                        }
+                    }
+                }
+                if (!affected) {
+                    return;
+                }
+                cachedCacheDirectories = null;
+                invalidateCache();
+                if (cacheReconciliationPending.compareAndSet(false, true)) {
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        cacheReconciliationPending.set(false);
+                        if (!project.isDisposed()) {
+                            reconcileExclusionsOnStartup();
+                        }
+                    });
+                }
+            }
+        });
         project.getMessageBus().connect().subscribe(ModuleListener.TOPIC, new ModuleListener() {
             @Override
             public void modulesRenamed(
@@ -173,6 +232,28 @@ public class MagentoIndexingExclusionService {
                 invalidateCache();
             }
         });
+    }
+
+    private void updateMovedExclusionOwners(final @NotNull String oldPath, final @NotNull String newPath) {
+        final String oldUrl = VfsUtilCore.pathToUrl(oldPath);
+        final String newUrl = VfsUtilCore.pathToUrl(newPath);
+        final Settings settings = Settings.getInstance(project);
+        final List<ManagedExclusion> owners = settings.getManagedExclusionOwners().stream()
+                .map(owner -> new ManagedExclusion(owner.moduleName,
+                        movedUrl(owner.contentEntryUrl, oldUrl, newUrl),
+                        movedUrl(owner.excludedUrl, oldUrl, newUrl)))
+                .toList();
+        if (!owners.equals(settings.getManagedExclusionOwners())) {
+            settings.setManagedExclusionOwners(owners);
+            settings.setManagedExcludedFolders(settings.getManagedExcludedFolders().stream()
+                    .map(url -> movedUrl(url, oldUrl, newUrl)).toList());
+        }
+    }
+
+    private static @NotNull String movedUrl(
+            final @NotNull String url, final @NotNull String oldUrl, final @NotNull String newUrl
+    ) {
+        return url.equals(oldUrl) || url.startsWith(oldUrl + "/") ? newUrl + url.substring(oldUrl.length()) : url;
     }
 
     public void invalidateCache() {
@@ -706,6 +787,13 @@ public class MagentoIndexingExclusionService {
 
         final String normalized = FileUtil.toSystemIndependentName(filePath);
 
+        // Named cache directories are allowed inside otherwise protected source trees.
+        for (final String excludedPath : snapshot.excludedPaths) {
+            if (excludedPath.endsWith("/.cache")
+                    && (normalized.equals(excludedPath) || normalized.startsWith(excludedPath + "/"))) {
+                return true;
+            }
+        }
         for (final String protectedPath : snapshot.protectedPaths) {
             if (normalized.equals(protectedPath) || normalized.startsWith(protectedPath + "/")) {
                 return false;
@@ -746,14 +834,24 @@ public class MagentoIndexingExclusionService {
         final String projectUrl = projectDir != null ? projectDir.getUrl() : (projectRoot != null ? VfsUtilCore.pathToUrl(projectRoot) : null);
 
         // 1. Process default candidates relative to Magento root
-        for (final ExclusionCandidate candidate : DEFAULT_CANDIDATES) {
+        final List<ExclusionCandidate> candidates = new ArrayList<>(DEFAULT_CANDIDATES);
+        if (magentoDir != null) {
+            candidates.addAll(discoverCacheDirectories(magentoDir));
+        }
+        for (final ExclusionCandidate candidate : candidates) {
             final String relative = candidate.relativePath();
             final String absolute = normalizedMagentoRoot + "/" + relative;
             final String url = magentoUrl + "/" + relative;
-            final ValidationResult val = validatePath(absolute, normalizedMagentoRoot, projectRoot, false);
+            final ValidationResult val = validatePath(absolute, normalizedMagentoRoot, projectRoot,
+                    ".cache".equals(relative) || relative.endsWith("/.cache"));
             if (val.valid) {
                 final File file = new File(absolute);
                 final VirtualFile vf = VirtualFileManager.getInstance().findFileByUrl(url);
+                if ((".cache".equals(relative) || relative.endsWith("/.cache"))
+                        && (file.isFile() || (vf != null && !vf.isDirectory()))) {
+                    result.skipped.add(new SkippedEntry(absolute, "Cache rule applies to directories only"));
+                    continue;
+                }
                 final boolean exists = (file.exists() && file.isDirectory()) || (vf != null && vf.isDirectory());
                 result.entries.add(new ExclusionEntry(
                         absolute,
@@ -785,7 +883,7 @@ public class MagentoIndexingExclusionService {
                             ? VfsUtilCore.pathToUrl(absolute)
                             : magentoUrl + "/" + normalizedRel);
 
-            final ValidationResult val = validatePath(absolute, normalizedMagentoRoot, projectRoot, true);
+            final ValidationResult val = validatePath(absolute, normalizedMagentoRoot, projectRoot, false);
             if (val.valid) {
                 final File file = new File(absolute);
                 final VirtualFile vf = VirtualFileManager.getInstance().findFileByUrl(url);
@@ -806,13 +904,46 @@ public class MagentoIndexingExclusionService {
         return result;
     }
 
+    private @NotNull List<ExclusionCandidate> discoverCacheDirectories(final @NotNull VirtualFile root) {
+        final CacheDirectories cached = cachedCacheDirectories;
+        if (cached != null && cached.rootUrl().equals(root.getUrl())) {
+            return cached.candidates();
+        }
+        final List<ExclusionCandidate> candidates = new ArrayList<>();
+        VfsUtilCore.visitChildrenRecursively(root, new VirtualFileVisitor<Void>() {
+            @Override
+            public boolean visitFile(final @NotNull VirtualFile file) {
+                ProgressManager.checkCanceled();
+                if (!file.isDirectory() || file.is(VFileProperty.SYMLINK)) {
+                    return false;
+                }
+                if (file.equals(root)) {
+                    return true;
+                }
+                final String relative = VfsUtilCore.getRelativePath(file, root, '/');
+                if (".cache".equals(file.getName())) {
+                    if (!".cache".equals(relative) && relative != null) {
+                        candidates.add(new ExclusionCandidate(relative, "Local tool cache"));
+                    }
+                    return false;
+                }
+                return !".git".equals(file.getName()) && !".idea".equals(file.getName())
+                        && DEFAULT_CANDIDATES.stream().noneMatch(candidate -> candidate.relativePath().equals(relative));
+            }
+        });
+        candidates.sort(java.util.Comparator.comparing(ExclusionCandidate::relativePath));
+        final List<ExclusionCandidate> result = List.copyOf(candidates);
+        cachedCacheDirectories = new CacheDirectories(root.getUrl(), result);
+        return result;
+    }
+
     private record ValidationResult(boolean valid, @NotNull String reason) {}
 
     private @NotNull ValidationResult validatePath(
             final @NotNull String absolutePath,
             final @NotNull String magentoRoot,
             final @Nullable String projectRoot,
-            final boolean isAdditional
+            final boolean cacheDirectory
     ) {
         final String normalized = FileUtil.toSystemIndependentName(absolutePath);
 
@@ -839,7 +970,7 @@ public class MagentoIndexingExclusionService {
         // Check protected Magento paths (in both directions: candidate cannot match, be inside, or enclose protected path)
         for (final String protectedPath : PROTECTED_MAGENTO_RELATIVE_PATHS) {
             final String absProtected = magentoRoot + "/" + protectedPath;
-            if (normalized.equals(absProtected) || normalized.startsWith(absProtected + "/")) {
+            if (!cacheDirectory && (normalized.equals(absProtected) || normalized.startsWith(absProtected + "/"))) {
                 return new ValidationResult(false, "Matches protected source directory: " + protectedPath);
             }
             if (absProtected.startsWith(normalized + "/")) {

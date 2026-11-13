@@ -56,7 +56,7 @@ class MagentoIndexingExclusionMcpTest : PhysicalMagentoProjectTestCase() {
         assertContains(status, "var/session — File-based session storage")
         assertContains(status, "generated/metadata — Compiled dependency injection metadata")
         assertContains(status, "pub/static — Deployed static view files and frontend assets")
-        assertContains(status, "Managed Exclusions: 8 folder URL(s)")
+        assertContains(status, "Managed Exclusions: 9 folder URL(s)")
         assertContains(status, "Pending index refresh:")
     }
 
@@ -94,7 +94,7 @@ class MagentoIndexingExclusionMcpTest : PhysicalMagentoProjectTestCase() {
         assertContains(preview, "Magento Indexing Exclusions Preview (no changes applied)")
         assertContains(preview, "var/cache — Magento application cache")
         assertContains(preview, ".runtime — User-configured project output directory")
-        assertContains(preview, "URLs to add: 9")
+        assertContains(preview, "URLs to add: 10")
 
         // Assert nothing was applied yet
         assertTrue(settings.getManagedExcludedFolders().isEmpty())
@@ -116,14 +116,14 @@ class MagentoIndexingExclusionMcpTest : PhysicalMagentoProjectTestCase() {
 
         assertContains(applyResult, "Magento Indexing Exclusions Apply")
         assertContains(applyResult, "Result: success")
-        assertContains(applyResult, "Added exclusions (10):")
+        assertContains(applyResult, "Added exclusions (11):")
         assertContains(applyResult, "+ $rootPath/var/cache")
         assertContains(applyResult, "+ $rootPath/.runtime")
         assertContains(applyResult, "+ $rootPath/build/tmp")
 
         assertTrue(settings.isExcludeGeneratedFiles())
         assertEquals(listOf(".runtime", "build/tmp"), settings.additionalExcludedPaths)
-        assertEquals(10, settings.getManagedExcludedFolders().size)
+        assertEquals(11, settings.getManagedExcludedFolders().size)
 
         // Verify IDE indexing scope
         val runtimeFile = myFixture.addFileToProject(".runtime/cache.dat", "data")
@@ -166,7 +166,7 @@ class MagentoIndexingExclusionMcpTest : PhysicalMagentoProjectTestCase() {
 
         assertContains(resetResult, "Magento Indexing Exclusions Reset")
         assertContains(resetResult, "Result: success")
-        assertContains(resetResult, "Removed managed exclusions: 9")
+        assertContains(resetResult, "Removed managed exclusions: 10")
 
         assertTrue(settings.getManagedExcludedFolders().isEmpty())
         val contentEntryUrls = ModuleRootManager.getInstance(myFixture.module)

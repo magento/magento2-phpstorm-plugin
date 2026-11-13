@@ -36,6 +36,99 @@ class MagentoIndexingExclusionServiceTest : PhysicalMagentoProjectTestCase() {
     }
 
     @Test
+    fun testNamedCacheDirectoriesExcludedAtAnyDepthAndRemovedOnDisable() {
+        val paths = listOf(".cache/data.json", "tools/build/.cache/data.json",
+            "vendor/acme/package/.cache/data.json", "app/code/Acme/Module/.cache/data.json")
+        val caches = paths.map { myFixture.addFileToProject(it, "{} ").virtualFile }
+        val source = myFixture.addFileToProject("vendor/acme/package/source.php", "<?php class Source {}").virtualFile
+        val settings = Settings.getInstance(project)
+        settings.magentoPath = getProjectRootPath()
+        settings.pluginEnabled = true
+        settings.setExcludeGeneratedFiles(true)
+        val service = getService()
+        val preview = service.previewExclusions(null, null)
+        assertEquals(4, preview.effectiveExclusions().count { it.relativePath().endsWith(".cache") })
+        assertTrue(preview.effectiveExclusions().filter { it.relativePath().endsWith(".cache") }.all { !it.isAdditional() })
+        assertTrue(service.applyExclusions().success())
+        assertTrue(service.applyExclusions().success())
+        val index = ProjectFileIndex.getInstance(project)
+        for (cache in caches) {
+            assertTrue(cache.path, index.isExcluded(cache))
+            assertTrue(cache.path, service.isExcludedPath(cache.path))
+        }
+        assertFalse(index.isExcluded(source))
+        assertFalse(service.isExcludedPath(source.path))
+        assertTrue(service.applyExclusions(false, null).success())
+        caches.forEach { assertFalse(it.path, index.isExcluded(it)) }
+    }
+
+    @Test
+    fun testNewCacheDirectoryIsAutomaticallyExcludedInsideNestedMagentoRoot() {
+        val root = myFixture.tempDirFixture.findOrCreateDir("magento")
+        val outside = myFixture.addFileToProject("tools/.cache/data.json", "{}").virtualFile
+        val settings = Settings.getInstance(project)
+        settings.magentoPath = root.path
+        settings.pluginEnabled = true
+        settings.setExcludeGeneratedFiles(true)
+        val service = getService()
+        service.applyExclusions()
+        val cache = myFixture.addFileToProject("magento/tools/.cache/data.json", "{}").virtualFile
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+        assertTrue(ProjectFileIndex.getInstance(project).isExcluded(cache))
+        assertFalse(ProjectFileIndex.getInstance(project).isExcluded(outside))
+        service.resetExclusions()
+        assertFalse(ProjectFileIndex.getInstance(project).isExcluded(cache))
+    }
+
+    @Test
+    fun testCacheSymlinkToSourceIsNotExcluded() {
+        val rootPath = getProjectRootPath()
+        val source = myFixture.tempDirFixture.findOrCreateDir("app/code/CacheTarget")
+        val link = File(rootPath, ".cache").toPath()
+        try {
+            Files.createSymbolicLink(link, File(source.path).toPath())
+        } catch (e: Exception) {
+            org.junit.Assume.assumeNoException(e)
+        }
+        val settings = Settings.getInstance(project)
+        settings.magentoPath = rootPath
+        settings.pluginEnabled = true
+        settings.setExcludeGeneratedFiles(true)
+        assertTrue(getService().previewExclusions(null, null).skippedEntries().any { it.path().endsWith("/.cache") })
+        getService().applyExclusions()
+        assertFalse(ProjectFileIndex.getInstance(project).isExcluded(source))
+    }
+
+    @Test
+    fun testRenamingCacheDirectoryRemovesItsManagedExclusion() {
+        val cache = myFixture.tempDirFixture.findOrCreateDir("tools/.cache")
+        val settings = Settings.getInstance(project)
+        settings.magentoPath = getProjectRootPath()
+        settings.pluginEnabled = true
+        settings.setExcludeGeneratedFiles(true)
+        getService().applyExclusions()
+        assertTrue(ProjectFileIndex.getInstance(project).isExcluded(cache))
+        WriteAction.runAndWait<Throwable> { cache.rename(this, "source") }
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+        assertFalse(ProjectFileIndex.getInstance(project).isExcluded(cache))
+        assertFalse(settings.getManagedExclusionOwners().any { it.excludedUrl.contains("/tools/") })
+    }
+
+    @Test
+    fun testCacheRuleMatchesOnlyDirectoriesWithExactName() {
+        val file = myFixture.addFileToProject(".cache", "configuration").virtualFile
+        val other = myFixture.addFileToProject("tools/.cache-backup/data.json", "{}").virtualFile
+        val settings = Settings.getInstance(project)
+        settings.magentoPath = getProjectRootPath()
+        settings.pluginEnabled = true
+        settings.setExcludeGeneratedFiles(true)
+        getService().applyExclusions()
+        val index = ProjectFileIndex.getInstance(project)
+        assertFalse(index.isExcluded(file))
+        assertFalse(index.isExcluded(other))
+    }
+
+    @Test
     fun testDefaultCandidatesExcludedWhenEnabled() {
         val rootPath = getProjectRootPath()
         val settings = Settings.getInstance(project)

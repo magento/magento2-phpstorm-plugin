@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Added
 
+- Exclude directories named `.cache` at any depth beneath the configured Magento root by default, including newly created caches.
 - Default-enabled Magento indexing exclusions for generated and runtime files, with previews, additional paths, and apply/reset controls in settings and MCP [#2775](https://github.com/magento/magento2-phpstorm-plugin/issues/2775).
 - DDEV support for AI-assisted Magento CLI workflows, including discovery of Magerun installed inside the container [#2777](https://github.com/magento/magento2-phpstorm-plugin/issues/2777).
 
