@@ -10,6 +10,7 @@ import com.magento.idea.magento2plugin.project.MagentoProjectConfigurationServic
 import com.magento.idea.magento2plugin.project.MagentoProjectConfigurationService.ConfigurationResult
 import com.magento.idea.magento2plugin.project.MagentoProjectConfigurationService.ConfigurationState
 import com.magento.idea.magento2plugin.project.MagentoProjectConfigurationService.InstallationType
+import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil
 
 internal object MagentoProjectConfigurationCommands {
 
@@ -50,7 +51,11 @@ internal object MagentoProjectConfigurationCommands {
 
         val installation = state.installation
         lines += "Installation type: ${installation.type.displayName}"
-        lines += "Platform version: ${installation.version ?: "unknown"}"
+        val versionText = when {
+            installation.version.isNullOrBlank() || MagentoVersionUtil.DEFAULT_VERSION.equals(installation.version, ignoreCase = true) -> "unknown"
+            else -> installation.version
+        }
+        lines += "Platform version: $versionText"
         if (!installation.edition.isNullOrBlank()) {
             lines += "Platform edition: ${installation.edition}"
         }
@@ -137,9 +142,11 @@ internal object MagentoProjectConfigurationCommands {
             lines += "  Configured path: ${result.currentState.configuredPath ?: "(none)"}"
             lines += "  Resolved path: ${result.currentState.resolvedPath ?: "(none)"}"
             lines += "  Installation type: ${result.currentState.installation.type.displayName}"
-            if (result.currentState.installation.version != null) {
-                lines += "  Platform version: ${result.currentState.installation.version}"
+            val currentVersionText = when {
+                result.currentState.installation.version.isNullOrBlank() || MagentoVersionUtil.DEFAULT_VERSION.equals(result.currentState.installation.version, ignoreCase = true) -> "unknown"
+                else -> result.currentState.installation.version
             }
+            lines += "  Platform version: $currentVersionText"
             if (!result.currentState.installation.edition.isNullOrBlank()) {
                 lines += "  Platform edition: ${result.currentState.installation.edition}"
             }

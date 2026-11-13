@@ -76,7 +76,14 @@ public class MagentoProjectConfigurationService {
             @Nullable String edition,
             @NotNull List<String> missingDependencies,
             @NotNull String summary
-    ) {}
+    ) {
+        public InstallationDetails {
+            if (version != null && (version.isBlank() || MagentoVersionUtil.DEFAULT_VERSION.equalsIgnoreCase(version))) {
+                version = null;
+            }
+            missingDependencies = List.copyOf(missingDependencies);
+        }
+    }
 
     public record ConfigurationState(
             boolean enabled,
@@ -237,7 +244,7 @@ public class MagentoProjectConfigurationService {
                     true,
                     composerJsonExists,
                     frameworkExists,
-                    rawVersion,
+                    hasKnownVersion ? rawVersion : null,
                     rawEdition,
                     sourceMissing,
                     summary

@@ -7,8 +7,10 @@ package com.magento.idea.magento2plugin.project
 
 import com.intellij.driver.client.Remote
 import com.intellij.driver.client.utility
+import com.intellij.driver.model.LockSemantics
 import com.intellij.driver.model.OnDispatcher
 import com.intellij.driver.sdk.Project
+import com.intellij.driver.sdk.getOpenProjects
 import com.intellij.driver.sdk.isPluginLoaded
 import com.intellij.driver.sdk.singleProject
 import com.intellij.driver.sdk.ui.components.common.ideFrame
@@ -141,72 +143,100 @@ class MagentoProjectConfigurationUiTest {
             // 5. Verify MCP status reflects the updated UI setting over HTTP
             val statusAfterUiEdit = mcp.callText("configure_magento_project", JSONObject().put("action", "status"))
             check(statusAfterUiEdit.contains("Indexing exclusions: disabled (opt-out)")) { statusAfterUiEdit }
+        }
 
-            // 6. Close/reopen persistence: reopen Settings and verify saved state persists
-            ideFrame {
-                openSettingsDialog()
-                settingsDialog {
-                    openTreeSettingsSection("Tools", "Magento")
-                    val magentoRow = settingsTree.collectExpandedPaths().first { it.path.last() == "Magento" }.row
-                    withContext(OnDispatcher.EDT) {
-                        val tree = driver.cast(settingsTree.component, SwingTree::class)
-                        tree.scrollRowToVisible(magentoRow)
-                        tree.setSelectionRow(magentoRow)
-                    }
-
-                    waitFor("Magento settings reloaded", 10.seconds) {
-                        xx("//div[@class='JCheckBox' and @text='Enable Magento integration']").list().isNotEmpty()
-                    }
-
-                    content {
-                        val pluginEnabledBox = x("//div[@class='JCheckBox' and @text='Enable Magento integration']")
-                        val excludeBox = x("//div[@class='JCheckBox' and @text='Exclude generated and runtime files from indexing']")
-                        val pathField = xx("//div[@class='TextFieldWithBrowseButton']//div[contains(@class, 'TextField')]", com.intellij.driver.sdk.ui.components.elements.JTextFieldUI::class.java).list().firstOrNull()
-                            ?: xx("//div[@class='JTextField']", com.intellij.driver.sdk.ui.components.elements.JTextFieldUI::class.java).list().first { it.text.replace('\\', '/') == root.toString().replace('\\', '/') }
-
-                        val isPluginChecked = withContext(OnDispatcher.EDT) {
-                            driver.cast(pluginEnabledBox.component, SwingCheckBox::class).isSelected()
-                        }
-                        check(isPluginChecked) { "Reopened: 'Enable Magento integration' should remain selected" }
-
-                        val isExcludeChecked = withContext(OnDispatcher.EDT) {
-                            driver.cast(excludeBox.component, SwingCheckBox::class).isSelected()
-                        }
-                        check(!isExcludeChecked) { "Reopened: 'Exclude generated...' should remain unselected (opt-out)" }
-
-                        check(pathField.text.replace('\\', '/') == root.toString().replace('\\', '/')) {
-                            "Reopened: UI path text field expected ${root.toString()}, found ${pathField.text}"
-                        }
-                    }
-
-                    withContext(OnDispatcher.EDT) {
-                        val okComponent = runCatching { okButton.component }.getOrNull()
-                            ?: button("OK").component
-                        driver.cast(okComponent, ProjectConfigButton::class).doClick()
-                    }
-                }
-                waitForNoOpenedDialogs()
+        // 6. Close/reopen persistence: close project, reopen without recreating .idea, establish new MCP session
+            val initialProject = singleProject()
+            bridge.stopSession()
+            val closed = withContext(OnDispatcher.EDT) {
+                bridge.closeAndDispose(initialProject)
+            }
+            check(closed) { "Initial project should be closed and disposed" }
+            waitFor("Project closed", 20.seconds) {
+                getOpenProjects().isEmpty()
             }
 
-            // 7. Repeated configuration over HTTP is idempotent
-            val repeatResult = mcp.callText("configure_magento_project", JSONObject()
-                .put("action", "configure")
-                .put("magentoPath", ".")
-                .put("enabled", true)
-                .put("excludeGeneratedFiles", false)
-                .put("projectPath", root.toString())
-            )
-            check(repeatResult.contains("no changes required")) { repeatResult }
+            withContext(OnDispatcher.EDT) {
+                bridge.openProject(root.toString())
+            }
+            waitFor("Project reopened", 45.seconds) {
+                getOpenProjects().isNotEmpty()
+            }
+            val reopenedProject = singleProject()
+            ideFrame { waitForIndicators(5.minutes) }
 
-            // 8. Query fixture module through magento_inspect over HTTP
-            val inspectResult = mcp.callText("magento_inspect", JSONObject()
-                .put("mode", "query")
-                .put("queryType", "module")
-                .put("parametersJson", """{"moduleName":"Acme_Shipping"}""")
-            )
-            check(inspectResult.contains("app/code/Acme/Shipping")) { inspectResult }
+            // Establish a new MCP session for the reopened project
+            val reopenedSessionStr = bridge.startSession()
+            val (rPort, rName, rToken) = reopenedSessionStr.split(":")
+            McpHttpDriverClient(rPort.toInt(), rName, rToken, root.toString()).use { reopenedMcp ->
+                reopenedMcp.initialize()
+
+                // Verify saved path, enabled state, and exclusion opt-out persist across project reload
+                val statusAfterReopen = reopenedMcp.callText("configure_magento_project", JSONObject().put("action", "status"))
+                check(statusAfterReopen.contains("Integration enabled: yes")) { statusAfterReopen }
+                check(statusAfterReopen.contains("Resolved Magento path: ${root.toString().replace('\\', '/')}")) { statusAfterReopen }
+                check(statusAfterReopen.contains("Indexing exclusions: disabled (opt-out)")) { statusAfterReopen }
+
+                // Verify Settings dialog in reopened project also reflects the persisted state
+                ideFrame {
+                    val showSettings = service(RemoteShowSettingsUtil::class)
+                    withContext(OnDispatcher.EDT) {
+                        showSettings.showSettingsDialog(reopenedProject, "Magento")
+                    }
+                    settingsDialog {
+                        waitFor("Magento settings reloaded", 15.seconds) {
+                            xx("//div[@class='JCheckBox' and @text='Enable Magento integration']").list().isNotEmpty()
+                        }
+
+                        content {
+                            val pluginEnabledBox = x("//div[@class='JCheckBox' and @text='Enable Magento integration']")
+                            val excludeBox = x("//div[@class='JCheckBox' and @text='Exclude generated and runtime files from indexing']")
+                            val pathField = xx("//div[@class='TextFieldWithBrowseButton']//div[contains(@class, 'TextField')]", com.intellij.driver.sdk.ui.components.elements.JTextFieldUI::class.java).list().firstOrNull()
+                                ?: xx("//div[@class='JTextField']", com.intellij.driver.sdk.ui.components.elements.JTextFieldUI::class.java).list().first { it.text.replace('\\', '/') == root.toString().replace('\\', '/') }
+
+                            val isPluginChecked = withContext(OnDispatcher.EDT) {
+                                driver.cast(pluginEnabledBox.component, SwingCheckBox::class).isSelected()
+                            }
+                            check(isPluginChecked) { "Reopened: 'Enable Magento integration' should remain selected" }
+
+                            val isExcludeChecked = withContext(OnDispatcher.EDT) {
+                                driver.cast(excludeBox.component, SwingCheckBox::class).isSelected()
+                            }
+                            check(!isExcludeChecked) { "Reopened: 'Exclude generated...' should remain unselected (opt-out)" }
+
+                            check(pathField.text.replace('\\', '/') == root.toString().replace('\\', '/')) {
+                                "Reopened: UI path text field expected ${root.toString()}, found ${pathField.text}"
+                            }
+                        }
+
+                        withContext(OnDispatcher.EDT) {
+                            val okComponent = runCatching { okButton.component }.getOrNull()
+                                ?: button("OK").component
+                            driver.cast(okComponent, ProjectConfigButton::class).doClick()
+                        }
+                    }
+                    waitForNoOpenedDialogs()
+                }
+
+                // 7. Repeated configuration over HTTP is idempotent
+                val repeatResult = reopenedMcp.callText("configure_magento_project", JSONObject()
+                    .put("action", "configure")
+                    .put("magentoPath", ".")
+                    .put("enabled", true)
+                    .put("excludeGeneratedFiles", false)
+                    .put("projectPath", root.toString())
+                )
+                check(repeatResult.contains("no changes required")) { repeatResult }
+
+                // 8. Query fixture module through magento_inspect over HTTP
+                val inspectResult = reopenedMcp.callText("magento_inspect", JSONObject()
+                    .put("mode", "query")
+                    .put("queryType", "module")
+                    .put("parametersJson", """{"moduleName":"Acme_Shipping"}""")
+                )
+                check(inspectResult.contains("app/code/Acme/Shipping")) { inspectResult }
+            }
         }
-    }
 
     @Test
     fun nestedRootAndPartialCheckoutAndInvalidPathInWebStorm() = runWebStormUiTest(
@@ -377,6 +407,8 @@ class MagentoProjectConfigurationUiTest {
 private interface RemoteMcpSessionBridge {
     fun startSession(): String
     fun stopSession()
+    fun closeAndDispose(project: Project): Boolean
+    fun openProject(path: String): Project?
 }
 
 @Remote("com.magento.idea.magento2plugin.project.Settings", plugin = "com.magento.idea.magento2plugin")

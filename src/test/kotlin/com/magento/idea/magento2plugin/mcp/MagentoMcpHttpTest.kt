@@ -461,10 +461,49 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
     }
 
     fun testControlledConfigurationDuringIndexingOverHttp() {
-        DumbModeTestUtils.runInDumbModeSynchronously(project) {
-            val status = text("configure_magento_project", JSONObject().put("action", "status"))
-            assertTrue(status, status.contains("Pending index refresh: yes"))
-            assertTrue(status, status.contains("Wait for IDE indexing to finish"))
+        val originalPath = Settings.getInstance(project).magentoPath
+        val originalEnabled = Settings.getInstance(project).pluginEnabled
+        val originalExclusions = Settings.getInstance(project).excludeGeneratedFiles
+        try {
+            Settings.getInstance(project).pluginEnabled = false
+            Settings.getInstance(project).magentoPath = null
+
+            file("src/composer.json", """{"name":"magento/project-community-edition","version":"2.4.8"}""")
+            file("src/composer.lock", """{"packages":[{"name":"magento/product-community-edition","version":"2.4.8"}]}""")
+            file("src/vendor/magento/framework/composer.json", """{"name":"magento/framework"}""")
+            file("src/vendor/autoload.php", "<?php\n")
+            myFixture.addFileToProject("src/app/code/HttpIndex/Module/etc/module.xml", """
+                <config><module name="HttpIndex_Module"/></config>
+            """.trimIndent())
+
+            DumbModeTestUtils.runInDumbModeSynchronously(project) {
+                val configured = text("configure_magento_project", JSONObject()
+                    .put("action", "configure")
+                    .put("magentoPath", "src")
+                    .put("enabled", true)
+                    .put("excludeGeneratedFiles", true)
+                )
+                assertTrue(configured, configured.contains("Result: success"))
+                assertTrue(configured, configured.contains("Integration enabled: yes"))
+                assertTrue(configured, configured.contains("Pending index refresh: yes"))
+
+                val status = text("configure_magento_project", JSONObject().put("action", "status"))
+                assertTrue(status, status.contains("Pending index refresh: yes"))
+                assertTrue(status, status.contains("Wait for IDE indexing to finish"))
+            }
+
+            IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+            val moduleResult = text("magento_inspect", JSONObject()
+                .put("mode", "query")
+                .put("queryType", "module")
+                .put("parametersJson", """{"moduleName":"HttpIndex_Module"}""")
+            )
+            assertTrue(moduleResult, moduleResult.replace('\\', '/').contains("src/app/code/HttpIndex/Module"))
+        } finally {
+            Settings.getInstance(project).magentoPath = originalPath
+            Settings.getInstance(project).pluginEnabled = originalEnabled
+            Settings.getInstance(project).setExcludeGeneratedFiles(originalExclusions)
         }
     }
 

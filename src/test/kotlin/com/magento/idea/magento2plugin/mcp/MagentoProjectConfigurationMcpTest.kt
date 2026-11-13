@@ -127,4 +127,28 @@ class MagentoProjectConfigurationMcpTest : PhysicalMagentoTestCase() {
             assertTrue(result.contains("Pending index refresh: yes"))
         }
     }
+
+    @Test
+    fun testSourceCheckoutWithUnknownVersionRendersUnknownNotAny() {
+        myFixture.addFileToProject("lib/internal/Magento/Framework/composer.json", """{"name":"magento/framework"}""")
+        myFixture.addFileToProject("app/code/Magento/Catalog/composer.json", """{"name":"magento/module-catalog"}""")
+        myFixture.addFileToProject("composer.json", """{"name":"custom/magento-source"}""")
+        myFixture.addFileToProject("vendor/autoload.php", "<?php\n")
+
+        val result = MagentoProjectConfigurationCommands.configure(
+            project = project,
+            action = "configure",
+            magentoPath = ".",
+            enabled = true,
+            excludeGeneratedFiles = true
+        )
+        assertTrue(result.contains("Result: success"))
+        assertTrue(result.contains("Platform version: unknown"))
+        assertFalse(result.contains("Platform version: any"))
+
+        val status = MagentoProjectConfigurationCommands.getStatus(project)
+        assertTrue(status.contains("Platform version: unknown"))
+        assertFalse(status.contains("Platform version: any"))
+        assertFalse(status.contains("missing vendor dependencies"))
+    }
 }

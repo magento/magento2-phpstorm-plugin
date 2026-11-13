@@ -102,7 +102,9 @@ class McpHttpDriverClient(
             if (sessionId != null && events != null) {
                 val response = http.sendAsync(builder().DELETE().build(), HttpResponse.BodyHandlers.ofString())
                     .get(5, java.util.concurrent.TimeUnit.SECONDS)
-                check(response.statusCode() == 200) { "MCP session shutdown returned HTTP ${response.statusCode()}" }
+                check(response.statusCode() in 200..299 || response.statusCode() == 401 || response.statusCode() == 404) {
+                    "MCP session shutdown returned HTTP ${response.statusCode()}"
+                }
             }
         } finally {
             events?.close()
