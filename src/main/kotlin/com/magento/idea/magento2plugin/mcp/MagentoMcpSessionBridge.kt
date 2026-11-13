@@ -61,7 +61,7 @@ object MagentoMcpSessionBridge {
 
     fun closeAndDispose(project: com.intellij.openapi.project.Project): Boolean {
         var closed = false
-        com.intellij.openapi.application.WriteIntentReadAction.run {
+        ApplicationManager.getApplication().invokeAndWait {
             closed = com.intellij.openapi.project.ProjectManager.getInstance().closeAndDispose(project)
         }
         return closed
@@ -69,7 +69,7 @@ object MagentoMcpSessionBridge {
 
     fun openProject(path: String): com.intellij.openapi.project.Project? {
         var opened: com.intellij.openapi.project.Project? = null
-        com.intellij.openapi.application.WriteIntentReadAction.run {
+        ApplicationManager.getApplication().invokeAndWait {
             opened = com.intellij.ide.impl.ProjectUtil.openOrImport(path, null, false)
         }
         return opened

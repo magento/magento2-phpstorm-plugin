@@ -148,17 +148,13 @@ class MagentoProjectConfigurationUiTest {
         // 6. Close/reopen persistence: close project, reopen without recreating .idea, establish new MCP session
             val initialProject = singleProject()
             bridge.stopSession()
-            val closed = withContext(OnDispatcher.EDT) {
-                bridge.closeAndDispose(initialProject)
-            }
+            val closed = bridge.closeAndDispose(initialProject)
             check(closed) { "Initial project should be closed and disposed" }
             waitFor("Project closed", 20.seconds) {
                 getOpenProjects().isEmpty()
             }
 
-            withContext(OnDispatcher.EDT) {
-                bridge.openProject(root.toString())
-            }
+            bridge.openProject(root.toString())
             waitFor("Project reopened", 45.seconds) {
                 getOpenProjects().isNotEmpty()
             }
