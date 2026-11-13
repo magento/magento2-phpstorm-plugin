@@ -32,6 +32,34 @@ public class PhpNameUtilTest extends TestCase {
                 "Foo\\BarFactory",
                 "Foo\\Bar"
         );
+        assertCandidates(
+                "Foo\\Bar\\ProxyFactory",
+                "Foo\\Bar\\ProxyFactory",
+                "Foo\\Bar\\Proxy",
+                "Foo\\Bar"
+        );
+    }
+
+    public void testObjectTypeCandidatesFollowGeneratedChainsAtAnyDepth() {
+        assertCandidates(
+                "Foo\\BarFactoryFactory",
+                "Foo\\BarFactoryFactory",
+                "Foo\\BarFactory",
+                "Foo\\Bar"
+        );
+        assertCandidates(
+                "Foo\\Bar\\Proxy\\Proxy",
+                "Foo\\Bar\\Proxy\\Proxy",
+                "Foo\\Bar\\Proxy",
+                "Foo\\Bar"
+        );
+        assertCandidates(
+                "Foo\\BarFactory\\ProxyFactory",
+                "Foo\\BarFactory\\ProxyFactory",
+                "Foo\\BarFactory\\Proxy",
+                "Foo\\BarFactory",
+                "Foo\\Bar"
+        );
     }
 
     public void testObjectTypeCandidatesStripOnlyTheEndOfTheName() {

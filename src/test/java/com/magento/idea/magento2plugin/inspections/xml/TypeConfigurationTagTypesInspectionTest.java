@@ -124,6 +124,94 @@ public class TypeConfigurationTagTypesInspectionTest extends InspectionXmlFixtur
         assertHasNoHighlighting(errorMessage);
     }
 
+    public void testArgumentHandwrittenFactoryExists() {
+        configureFixture();
+
+        final String errorMessage =  inspectionBundle.message(
+                CLASS_DOES_NOT_EXIST,
+                "Foo\\Bar\\Model\\HandwrittenFactory"
+        );
+
+        assertHasNoHighlighting(errorMessage);
+    }
+
+    public void testArgumentHandwrittenFactoryProxyExists() {
+        configureFixture();
+
+        final String errorMessage =  inspectionBundle.message(
+                CLASS_DOES_NOT_EXIST,
+                "Foo\\Bar\\Model\\HandwrittenFactory\\Proxy"
+        );
+
+        assertHasNoHighlighting(errorMessage);
+    }
+
+    public void testArgumentClassInFactoryNamespaceExists() {
+        configureFixture();
+
+        final String errorMessage =  inspectionBundle.message(
+                CLASS_DOES_NOT_EXIST,
+                "Foo\\Bar\\Model\\Factory\\Worker"
+        );
+
+        assertHasNoHighlighting(errorMessage);
+    }
+
+    public void testArgumentClassNamedProxyExists() {
+        configureFixture();
+
+        final String errorMessage =  inspectionBundle.message(
+                CLASS_DOES_NOT_EXIST,
+                "Foo\\Bar\\Model\\Proxy"
+        );
+
+        assertHasNoHighlighting(errorMessage);
+    }
+
+    public void testArgumentProxyFactoryExists() {
+        configureFixture();
+
+        final String errorMessage =  inspectionBundle.message(
+                CLASS_DOES_NOT_EXIST,
+                "Foo\\Bar\\Model\\SimpleModelOne\\ProxyFactory"
+        );
+
+        assertHasNoHighlighting(errorMessage);
+    }
+
+    public void testArgumentProxyFactoryWithoutSourceDoesNotExist() {
+        configureFixture();
+
+        final String errorMessage =  inspectionBundle.message(
+                CLASS_DOES_NOT_EXIST,
+                "Foo\\Bar\\Model\\Missing\\ProxyFactory"
+        );
+
+        assertHasHighlighting(errorMessage);
+    }
+
+    public void testArgumentFactoryWithoutSourceDoesNotExist() {
+        configureFixture();
+
+        final String errorMessage =  inspectionBundle.message(
+                CLASS_DOES_NOT_EXIST,
+                "Foo\\Bar\\Model\\MissingFactory"
+        );
+
+        assertHasHighlighting(errorMessage);
+    }
+
+    public void testArgumentFactoryInsideClassNameDoesNotExist() {
+        configureFixture();
+
+        final String errorMessage =  inspectionBundle.message(
+                CLASS_DOES_NOT_EXIST,
+                "Foo\\Bar\\Model\\SimpleFactoryModelOne"
+        );
+
+        assertHasHighlighting(errorMessage);
+    }
+
     private void configureFixture() {
         myFixture.configureByFile(getFixturePath(ModuleDiXml.FILE_NAME));
     }

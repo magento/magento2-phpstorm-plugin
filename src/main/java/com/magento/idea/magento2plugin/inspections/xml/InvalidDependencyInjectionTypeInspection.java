@@ -20,6 +20,7 @@ import com.magento.idea.magento2plugin.inspections.validator.NotEmptyValidator;
 import com.magento.idea.magento2plugin.inspections.validator.PhpClassExistenceValidator;
 import com.magento.idea.magento2plugin.inspections.validator.VirtualTypeExistenceValidator;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
+import com.magento.idea.magento2plugin.util.PhpNameUtil;
 import com.magento.idea.magento2plugin.util.xml.XmlPsiTreeUtil;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -126,15 +127,17 @@ public class InvalidDependencyInjectionTypeInspection extends XmlSuppressableIns
                     if (tagValue.isEmpty()) {
                         return;
                     }
-                    final String cleanType = tagValue
-                            .replace("Factory", "")
-                            .replace("\\Proxy", "");
-
-                    if (!phpClassExistenceValidator.validate(cleanType)
+                    if (!isExistingObjectType(tagValue)
                             && !virtualTypeExistenceValidator.validate(tagValue)) {
                         reportClassDoesNotExists(tag, tagValue);
                     }
                 }
+            }
+
+            private boolean isExistingObjectType(final @NotNull String type) {
+                return PhpNameUtil.getObjectTypeCandidates(type)
+                        .stream()
+                        .anyMatch(phpClassExistenceValidator::validate);
             }
 
             /**
