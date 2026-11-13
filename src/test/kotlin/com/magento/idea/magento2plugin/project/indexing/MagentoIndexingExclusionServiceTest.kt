@@ -6,13 +6,13 @@ import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.testFramework.PlatformTestUtil
-import com.magento.idea.magento2plugin.BaseProjectTestCase
+import com.magento.idea.magento2plugin.PhysicalMagentoProjectTestCase
 import com.magento.idea.magento2plugin.project.Settings
 import org.junit.Test
 import java.io.File
 import java.nio.file.Files
 
-class MagentoIndexingExclusionServiceTest : BaseProjectTestCase() {
+class MagentoIndexingExclusionServiceTest : PhysicalMagentoProjectTestCase() {
 
     override fun setUp() {
         super.setUp()

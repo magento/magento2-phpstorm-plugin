@@ -1,11 +1,11 @@
 package com.magento.idea.magento2plugin.project
 
 import com.intellij.openapi.application.WriteAction
-import com.magento.idea.magento2plugin.BaseProjectTestCase
+import com.magento.idea.magento2plugin.PhysicalMagentoProjectTestCase
 import com.magento.idea.magento2plugin.project.indexing.MagentoIndexingExclusionService
 import org.junit.Test
 
-class SettingsFormExclusionTest : BaseProjectTestCase() {
+class SettingsFormExclusionTest : PhysicalMagentoProjectTestCase() {
 
     override fun setUp() {
         super.setUp()

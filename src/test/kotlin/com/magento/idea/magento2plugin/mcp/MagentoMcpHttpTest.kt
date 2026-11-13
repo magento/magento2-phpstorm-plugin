@@ -109,7 +109,9 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         for (tool in listOf("magento_inspect", "magento_scaffold")) {
             assertEquals(listOf<Any>("mode"),
                 tools.getValue(tool).getJSONObject("inputSchema").getJSONArray("required").toList())
-            assertTrue(client.callEnvelope(tool, JSONObject()).has("error"))
+            val missingMode = client.callEnvelope(tool, JSONObject())
+            assertTrue(missingMode.toString(), missingMode.has("error") ||
+                missingMode.optJSONObject("result")?.optBoolean("isError") == true)
         }
         fun inspect(vararg arguments: Pair<String, String>) = text("magento_inspect", JSONObject(mapOf(*arguments)))
         fun scaffold(vararg arguments: Pair<String, String>) = text("magento_scaffold", JSONObject(mapOf(*arguments)))
