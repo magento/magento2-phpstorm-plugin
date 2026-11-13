@@ -97,7 +97,12 @@ dependencies {
     testRuntimeOnly(libs.junit.platform.launcher)
 
     intellijPlatform {
-        create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
+        val platformLocalPath = providers.gradleProperty("platformLocalPath")
+        if (platformLocalPath.isPresent) {
+            local(platformLocalPath)
+        } else {
+            create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
+        }
 
         bundledPlugins(providers.gradleProperty("platformBundledPlugins").map { it.split(',') })
         plugins(providers.gradleProperty("platformPlugins").map { it.split(',') })
@@ -179,9 +184,7 @@ intellijPlatform {
         ides {
             // Use IDE distributions containing the October 2026 eMudhra security fixes.
             create(IntelliJPlatformType.PhpStorm, providers.gradleProperty("platformVersion").get())
-            create(IntelliJPlatformType.PhpStorm, "263.7307.117")
             if (providers.gradleProperty("verifyWebStorm").map(String::toBoolean).getOrElse(false)) {
-                create(IntelliJPlatformType.WebStorm, "2026.2.4")
                 create(IntelliJPlatformType.WebStorm, providers.gradleProperty("uiTestPlatformVersion").get())
             }
         }

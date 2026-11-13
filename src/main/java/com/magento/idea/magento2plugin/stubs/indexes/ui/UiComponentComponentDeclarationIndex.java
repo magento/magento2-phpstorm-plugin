@@ -18,7 +18,6 @@ import com.intellij.util.io.KeyDescriptor;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.stubs.indexes.ui.data.UiComponentNavigationData;
 import com.magento.idea.magento2plugin.stubs.indexes.ui.data.UiComponentNavigationDataSetExternalizer;
-import com.magento.idea.magento2plugin.util.magento.ui.UiComponentScopeResolver;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -56,8 +55,7 @@ public class UiComponentComponentDeclarationIndex
             if (!Settings.isEnabled(inputData.getProject())) {
                 return map;
             }
-            for (final UiComponentNavigationData declaration : UiComponentScopeResolver.getInstance()
-                    .collectComponentDeclarations(inputData.getPsiFile())) {
+            for (final UiComponentNavigationData declaration : UiComponentIndexingData.getDeclarations(inputData)) {
                 if (!UiComponentNavigationData.KIND_COMPONENT.equals(declaration.getKind())) {
                     continue;
                 }

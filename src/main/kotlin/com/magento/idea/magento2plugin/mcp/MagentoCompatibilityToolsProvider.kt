@@ -6,6 +6,8 @@ package com.magento.idea.magento2plugin.mcp
 
 import com.intellij.mcpserver.McpTool
 import com.intellij.mcpserver.McpToolCallResult
+import com.intellij.mcpserver.McpToolCategory
+import com.intellij.mcpserver.McpToolDescriptor
 import com.intellij.mcpserver.McpToolSchema
 import com.intellij.mcpserver.McpToolsProvider
 import kotlinx.coroutines.Dispatchers
@@ -22,9 +24,16 @@ class MagentoCompatibilityToolsProvider : McpToolsProvider {
     override fun getTools(): List<McpTool> = listOf(CompatibilityTool())
 
     private class CompatibilityTool : McpTool {
-        override val descriptor = McpDescriptorCompatibility.descriptor(
+        override val descriptor = McpToolDescriptor(
             name = "magento_compatibility",
             description = DESCRIPTION,
+            category = McpToolCategory(
+                shortName = "MagentoMcpToolset",
+                fullyQualifiedName = MagentoMcpToolset::class.java.name,
+                isExperimental = false,
+                alwaysIncluded = false
+            ),
+            fullyQualifiedName = "${MagentoMcpToolset::class.java.name}.magentoCompatibility",
             inputSchema = McpToolSchema(propertiesSchema = schema(), requiredProperties = emptySet(), definitions = emptyMap())
         )
 

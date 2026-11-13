@@ -12,12 +12,19 @@ import java.nio.file.Path
 
 /** A fresh project on disk for tools which intentionally validate and write filesystem paths. */
 abstract class PhysicalMagentoTestCase : BasePlatformTestCase() {
-    override fun createMyFixture(): CodeInsightTestFixture {
-        val factory = IdeaTestFixtureFactory.getFixtureFactory()
-        val directory = factory.createTempDirTestFixture()
-        val root = Path.of(directory.tempDirPath)
-        val builder = factory.createFixtureBuilder(root.fileName.toString(), root.parent, true)
-        builder.addModule(EmptyModuleFixtureBuilder::class.java).addSourceContentRoot(root.toString())
-        return factory.createCodeInsightFixture(builder.fixture, directory)
-    }
+    override fun createMyFixture(): CodeInsightTestFixture = createPhysicalProjectFixture()
+}
+
+/** Magento fixture data on the local filesystem, including for exclusion and symlink tests. */
+abstract class PhysicalMagentoProjectTestCase : BaseProjectTestCase() {
+    override fun createMyFixture(): CodeInsightTestFixture = createPhysicalProjectFixture()
+}
+
+private fun createPhysicalProjectFixture(): CodeInsightTestFixture {
+    val factory = IdeaTestFixtureFactory.getFixtureFactory()
+    val directory = factory.createTempDirTestFixture()
+    val root = Path.of(directory.tempDirPath)
+    val builder = factory.createFixtureBuilder(root.fileName.toString(), root.parent, true)
+    builder.addModule(EmptyModuleFixtureBuilder::class.java).addSourceContentRoot(root.toString())
+    return factory.createCodeInsightFixture(builder.fixture, directory)
 }
