@@ -202,7 +202,8 @@ public class MagentoProjectConfigurationService {
         }
 
         final String effectivePath = resolved != null ? resolved : path;
-        final boolean composerJsonExists = MagentoBasePathUtil.isComposerJsonExists(effectivePath);
+        final boolean composerJsonExists = isFilePresent(effectivePath, "composer.json")
+                || MagentoBasePathUtil.isComposerJsonExists(effectivePath);
         final boolean vendorFrameworkExists = isDirectoryPresent(effectivePath, Package.frameworkRootComposer)
                 || isDirectoryPresent(effectivePath, Package.mageOsFrameworkRootComposer);
         final boolean internalFrameworkExists = isDirectoryPresent(effectivePath, Package.frameworkRootGit);
@@ -227,12 +228,9 @@ public class MagentoProjectConfigurationService {
             if (!vendorAutoloadExists) {
                 sourceMissing.add("vendor dependencies (run composer install)");
             }
-            if (!hasKnownVersion) {
-                sourceMissing.add("unknown platform version");
-            }
             final String summary = "Supported source checkout"
                     + (hasKnownVersion ? " (" + rawVersion + (rawEdition != null ? ", " + rawEdition : "") + ")" : " (version unknown)")
-                    + (sourceMissing.isEmpty() ? " with installed dependencies" : " (missing vendor dependencies)");
+                    + (vendorAutoloadExists ? " with installed dependencies" : " (missing vendor dependencies)");
             return new InstallationDetails(
                     InstallationType.SOURCE_CHECKOUT,
                     true,
@@ -306,28 +304,37 @@ public class MagentoProjectConfigurationService {
         );
     }
 
-    private boolean isFilePresent(final String basePath, final String relativePath) {
-        final VirtualFile vf = resolveVirtualFile(basePath);
-        if (vf != null) {
-            final VirtualFile sub = vf.findFileByRelativePath(relativePath);
-            return sub != null && !sub.isDirectory();
-        }
-        final File f = new File(basePath, relativePath);
-        return f.exists() && f.isFile();
-    }
-
     private boolean isDirectoryPresent(final String basePath, final String relativePath) {
+        final File f = new File(basePath, relativePath);
+        if (f.exists() && f.isDirectory()) {
+            return true;
+        }
         final VirtualFile vf = resolveVirtualFile(basePath);
         if (vf != null) {
             final VirtualFile sub = vf.findFileByRelativePath(relativePath);
             return sub != null && sub.isDirectory();
         }
+        return false;
+    }
+
+    private boolean isFilePresent(final String basePath, final String relativePath) {
         final File f = new File(basePath, relativePath);
-        return f.exists() && f.isDirectory();
+        if (f.exists() && f.isFile()) {
+            return true;
+        }
+        final VirtualFile vf = resolveVirtualFile(basePath);
+        if (vf != null) {
+            final VirtualFile sub = vf.findFileByRelativePath(relativePath);
+            return sub != null && !sub.isDirectory();
+        }
+        return false;
     }
 
     private @Nullable VirtualFile resolveVirtualFile(final String path) {
-        VirtualFile file = LocalFileSystem.getInstance().findFileByPath(path);
+        VirtualFile file = LocalFileSystem.getInstance().refreshAndFindFileByPath(path);
+        if (file == null) {
+            file = LocalFileSystem.getInstance().findFileByPath(path);
+        }
         if (file == null) {
             file = VirtualFileManager.getInstance().findFileByUrl(VfsUtilCore.pathToUrl(path));
         }
@@ -358,6 +365,30 @@ public class MagentoProjectConfigurationService {
                 installation,
                 dumb
         );
+    }
+
+    /**
+     * Validates a path for Magento project configuration using the shared policy.
+     */
+    public @NotNull List<String> validatePathForConfiguration(final @Nullable String rawPath, final boolean enabled) {
+        final List<String> errors = new ArrayList<>();
+        if (!enabled) {
+            return errors;
+        }
+        if (StringUtil.isEmptyOrSpaces(rawPath)) {
+            errors.add("Magento installation path cannot be empty when enabling integration.");
+            return errors;
+        }
+        final String resolved = resolvePath(rawPath);
+        final InstallationDetails details = inspectPath(resolved != null ? resolved : rawPath);
+        if (!details.exists()) {
+            errors.add("Path does not exist: " + rawPath + (resolved != null ? " (resolved to: " + resolved + ")" : ""));
+        } else if (!details.isDirectory()) {
+            errors.add("Path is a file, not a directory: " + rawPath);
+        } else if (details.type() == InstallationType.UNRECOGNIZED_DIRECTORY) {
+            errors.add("Directory has no recognized Magento structure: " + rawPath);
+        }
+        return errors;
     }
 
     /**
@@ -414,6 +445,8 @@ public class MagentoProjectConfigurationService {
                 } else if (!validatedDetails.isDirectory()) {
                     errors.add("Path is a file, not a directory: " + (isPathProvided ? rawPath : targetResolvedPath)
                             + " (resolved to: " + targetResolvedPath + ")");
+                } else if (validatedDetails.type() == InstallationType.UNRECOGNIZED_DIRECTORY) {
+                    errors.add("Directory has no recognized Magento structure: " + (isPathProvided ? rawPath : targetResolvedPath));
                 }
             }
         } else if (isPathProvided && targetResolvedPath != null) {
@@ -431,6 +464,8 @@ public class MagentoProjectConfigurationService {
                 nextAction = "Provide a valid path to an existing Magento directory within the project or on disk.";
             } else if (validatedDetails != null && !validatedDetails.isDirectory()) {
                 nextAction = "Provide a path to a directory, not a file.";
+            } else if (validatedDetails != null && validatedDetails.type() == InstallationType.UNRECOGNIZED_DIRECTORY) {
+                nextAction = "Directory has no recognized Magento structure. Verify the Magento root directory path.";
             } else if (StringUtil.isEmptyOrSpaces(targetResolvedPath)) {
                 nextAction = "Provide a valid Magento directory path when enabling integration.";
             } else {

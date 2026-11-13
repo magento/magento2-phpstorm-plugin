@@ -460,6 +460,14 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         }
     }
 
+    fun testControlledConfigurationDuringIndexingOverHttp() {
+        DumbModeTestUtils.runInDumbModeSynchronously(project) {
+            val status = text("configure_magento_project", JSONObject().put("action", "status"))
+            assertTrue(status, status.contains("Pending index refresh: yes"))
+            assertTrue(status, status.contains("Wait for IDE indexing to finish"))
+        }
+    }
+
     private fun text(tool: String, arguments: JSONObject = JSONObject()): String {
         val result = mcp().call(tool, arguments)
         assertFalse(result.toString(), result.optBoolean("isError"))

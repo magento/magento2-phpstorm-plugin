@@ -34,6 +34,7 @@ import java.awt.BorderLayout;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -223,6 +224,16 @@ public class SettingsForm implements SearchableConfigurable {
     private void reindexFromForm() {
         try {
             this.validator.validate();
+            final MagentoProjectConfigurationService.ConfigurationResult configResult =
+                    MagentoProjectConfigurationService.getInstance(project).configure(
+                            getMagentoPath(),
+                            pluginEnabled.isSelected(),
+                            excludeGeneratedFiles.isSelected(),
+                            null
+                    );
+            if (!configResult.success() && !configResult.validationErrors().isEmpty()) {
+                throw new ConfigurationException(String.join("<br>", configResult.validationErrors()));
+            }
             saveSettings();
             reindex();
             MagentoNotificationUtil.notifyGlobally(
@@ -343,9 +354,13 @@ public class SettingsForm implements SearchableConfigurable {
     }
 
     private boolean isMagentoPathChanged() {
-        return !getMagentoPath().equals(
-                StringUtil.notNullize(Settings.getMagentoPath(project))
-        );
+        final String currentFormPath = getMagentoPath();
+        final String savedPath = StringUtil.notNullize(Settings.getMagentoPath(project));
+        if (currentFormPath.equals(savedPath)) {
+            return false;
+        }
+        final String resolvedFormPath = MagentoProjectConfigurationService.getInstance(project).resolvePath(currentFormPath);
+        return !Objects.equals(resolvedFormPath, savedPath);
     }
 
     @Override
@@ -386,15 +401,12 @@ public class SettingsForm implements SearchableConfigurable {
     }
 
     private void saveSettings() {
-        getSettings().pluginEnabled = pluginEnabled.isSelected();
         getSettings().defaultLicense = moduleDefaultLicenseName.getText();
         getSettings().mftfSupportEnabled = mftfSupportEnabled.isSelected();
-        getSettings().setMagentoPath(getMagentoPath());
         getSettings().mcpCliToolCandidates = Settings.getNormalizedMcpCliToolCandidates(
                 mcpCliToolCandidates.getText()
         );
         getSettings().publishedReleasesUrl = getPublishedReleasesUrl();
-        getSettings().setExcludeGeneratedFiles(excludeGeneratedFiles.isSelected());
         getSettings().setAdditionalExcludedPaths(
                 Settings.parseAdditionalExcludedPaths(additionalExcludedPaths.getText())
         );

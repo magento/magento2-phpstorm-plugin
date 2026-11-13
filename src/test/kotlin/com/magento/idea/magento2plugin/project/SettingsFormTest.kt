@@ -161,4 +161,28 @@ class SettingsFormTest : PhysicalMagentoTestCase() {
         settings.loadState(XmlSerializer.deserialize(org.jdom.Element("Options"), MagentoUpdateSettings.Options::class.java))
         assertEquals(UpdateCheckWindow.MONTH, settings.state.checkWindow)
     }
+
+    fun testApplySettingsFormResolvesAndPersistsAbsolutePathWithoutOverwrite() {
+        myFixture.addFileToProject("src/composer.json", """{"name":"magento/project-community-edition","version":"2.4.8"}""")
+        myFixture.addFileToProject("src/vendor/magento/framework/composer.json", """{"name":"magento/framework"}""")
+
+        val form = object : SettingsForm(project) {
+            override fun reindex() = Unit
+        }.apply {
+            createComponent()
+            reset()
+        }
+
+        val pathField = field<com.intellij.openapi.ui.TextFieldWithBrowseButton>(form, "magentoPath")
+        val enabledBox = field<JCheckBox>(form, "pluginEnabled")
+        enabledBox.isSelected = true
+        pathField.textField.text = "src"
+
+        form.apply()
+
+        val expectedResolved = project.basePath + "/src"
+        val savedPath = Settings.getInstance(project).magentoPath
+        assertEquals(expectedResolved, savedPath)
+        assertFalse(form.isModified)
+    }
 }

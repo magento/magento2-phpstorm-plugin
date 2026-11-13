@@ -39,34 +39,16 @@ public class SettingsFormValidator {
             }
 
             final String magentoRootPath = form.getMagentoPath();
-            if (com.intellij.openapi.util.text.StringUtil.isEmptyOrSpaces(magentoRootPath)) {
-                throw new ConfigurationException(
-                        validatorBundle.message("validator.package.validPath")
-                );
-            }
-
             final com.magento.idea.magento2plugin.project.MagentoProjectConfigurationService configService =
                     com.magento.idea.magento2plugin.project.MagentoProjectConfigurationService.getInstance(form.getProject());
+            final java.util.List<String> pathErrors = configService.validatePathForConfiguration(magentoRootPath, true);
+            if (!pathErrors.isEmpty()) {
+                throw new ConfigurationException(String.join("<br>", pathErrors));
+            }
+
+            final String resolved = configService.resolvePath(magentoRootPath);
             final com.magento.idea.magento2plugin.project.MagentoProjectConfigurationService.InstallationDetails details =
-                    configService.inspectPath(magentoRootPath);
-
-            if (!details.exists()) {
-                throw new ConfigurationException(
-                        validatorBundle.message("validator.package.validPath")
-                );
-            }
-
-            if (!details.isDirectory()) {
-                throw new ConfigurationException(
-                        "Path is a file, not a directory: " + magentoRootPath
-                );
-            }
-
-            if (details.type() == com.magento.idea.magento2plugin.project.MagentoProjectConfigurationService.InstallationType.UNRECOGNIZED_DIRECTORY) {
-                throw new ConfigurationException(
-                        validatorBundle.message("validator.package.validPath")
-                );
-            }
+                    configService.inspectPath(resolved != null ? resolved : magentoRootPath);
 
             final String magentoVersion = form.getMagentoVersion();
             if (details.type() == com.magento.idea.magento2plugin.project.MagentoProjectConfigurationService.InstallationType.RECOGNIZED_APPLICATION) {

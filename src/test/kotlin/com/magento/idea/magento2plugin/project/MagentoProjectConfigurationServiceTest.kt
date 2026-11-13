@@ -269,4 +269,36 @@ class MagentoProjectConfigurationServiceTest : PhysicalMagentoTestCase() {
         assertTrue(observedEnabled)
         assertEquals(project.basePath, observedPath)
     }
+
+    @Test
+    fun testSourceCheckoutWithInstalledDependenciesAndUnknownVersionDoesNotReportMissingVendorDependencies() {
+        // composer.json without version field
+        myFixture.addFileToProject("composer.json", """{"name":"magento/magento2ce"}""")
+        myFixture.addFileToProject("app/code/Magento/Catalog/registration.php", "<?php\n")
+        myFixture.addFileToProject("lib/internal/Magento/Framework/registration.php", "<?php\n")
+        myFixture.addFileToProject("vendor/autoload.php", "<?php\n")
+
+        val details = service().inspectPath(".")
+        assertEquals(InstallationType.SOURCE_CHECKOUT, details.type)
+        assertTrue(details.missingDependencies.isEmpty())
+        assertTrue(details.summary.contains("with installed dependencies"))
+        assertTrue(details.summary.contains("version unknown"))
+
+        val result = service().configure(".", true, null, null)
+        assertTrue(result.success)
+        assertEquals(InstallationType.SOURCE_CHECKOUT, result.currentState.installation.type)
+        assertTrue(result.currentState.installation.missingDependencies.isEmpty())
+        assertFalse(result.nextUsableAction.contains("composer install"))
+        assertTrue(result.nextUsableAction.contains("magento_inspect"))
+    }
+
+    @Test
+    fun testRejectUnrecognizedDirectoryWhenEnablingIntegration() {
+        myFixture.addFileToProject("not_magento/some_file.txt", "hello")
+
+        val result = service().configure("not_magento", true, null, null)
+        assertFalse(result.success)
+        assertTrue(result.validationErrors.any { it.contains("no recognized Magento structure") })
+        assertTrue(result.nextUsableAction.contains("Verify the Magento root directory path"))
+    }
 }
