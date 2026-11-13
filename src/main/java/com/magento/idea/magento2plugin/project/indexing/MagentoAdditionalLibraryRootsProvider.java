@@ -34,7 +34,14 @@ public class MagentoAdditionalLibraryRootsProvider extends AdditionalLibraryRoot
             return List.of();
         }
 
-        return List.of(SyntheticLibrary.newImmutableLibrary(roots));
+        final Set<VirtualFile> excludedRoots = MagentoIndexingExclusionService.getInstance(project)
+                .getEffectiveExcludedVirtualFiles();
+
+        final com.intellij.openapi.util.Condition<VirtualFile> condition =
+                file -> file != null && MagentoIndexingExclusionService.getInstance(project)
+                        .isExcludedPath(file.getPath());
+
+        return List.of(SyntheticLibrary.newImmutableLibrary(roots, excludedRoots, condition));
     }
 
     @Override
@@ -46,14 +53,26 @@ public class MagentoAdditionalLibraryRootsProvider extends AdditionalLibraryRoot
         final Collection<VirtualFile> roots = new MagentoAdditionalLibraryRootsProvider()
                 .getMagentoIndexRoots(project);
 
-        WriteAction.run(() -> AdditionalLibraryRootsListenerHelper.getInstance()
-                .handleAdditionalLibraryRootsChanged(
-                    project,
-                    null,
-                    List.of(),
-                    roots,
-                    "Magento additional library roots"
-                ));
+        final Runnable action = () -> {
+            try {
+                AdditionalLibraryRootsListenerHelper.getInstance()
+                        .handleAdditionalLibraryRootsChanged(
+                            project,
+                            null,
+                            List.of(),
+                            roots,
+                            "Magento additional library roots"
+                        );
+            } catch (Throwable ignored) {
+                // Ignore if platform listener helper is unavailable in certain test environments
+            }
+        };
+
+        if (com.intellij.openapi.application.ApplicationManager.getApplication().isDispatchThread()) {
+            WriteAction.run(action::run);
+        } else {
+            com.intellij.openapi.application.ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(action::run));
+        }
     }
 
     private @NotNull Collection<VirtualFile> getMagentoIndexRoots(final @NotNull Project project) {

@@ -44,12 +44,17 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
             "get_magento_root_path" to listOf("absolute project path", "resolved Magento root directory"),
             "describe_magento_cli_environment" to listOf("nearest Docker Compose configuration", "never search outside the project", "./bin/magento takes precedence over ./src/bin/magento"),
             "magento_magerun" to listOf("mode=status only reads local files", "mode=commands", "mode=command_help", "mode=mcp_config", "refresh=true", "never fall back to another runtime"),
+            "get_magento_indexing_exclusions" to listOf("indexing exclusion", "preview"),
+            "configure_magento_indexing_exclusions" to listOf("apply", "update", "reset", "preview", ".runtime/"),
         )
         for ((name, fragments) in descriptions) {
             val description = tools.getValue(name).getString("description")
             for (fragment in fragments) assertTrue("$name: $description", description.contains(fragment))
         }
         assertEquals("Configured Magento root path: ${root.resolve("src").toString().replace('\\', '/')}", text("get_magento_root_path"))
+        val exclusionsStatus = text("get_magento_indexing_exclusions")
+        assertTrue(exclusionsStatus, exclusionsStatus.contains("Exclusions cannot be applied: Magento installation path is invalid"))
+        assertTrue(exclusionsStatus, exclusionsStatus.contains("Configure a valid Magento path before managing indexing exclusions."))
     }
 
     fun testSharedInspectionQueriesAndUnavailablePhpCapabilityOverHttp() {

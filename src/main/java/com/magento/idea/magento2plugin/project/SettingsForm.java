@@ -24,19 +24,23 @@ import com.magento.idea.magento2plugin.project.MagentoSkillInstaller.AgentTarget
 import com.magento.idea.magento2plugin.magento.packages.MagentoComponentManager;
 import com.magento.idea.magento2plugin.project.MagentoSkillInstaller.Skill;
 import com.magento.idea.magento2plugin.project.indexing.MagentoAdditionalLibraryRootsProvider;
+import com.magento.idea.magento2plugin.project.indexing.MagentoIndexingExclusionService;
 import com.magento.idea.magento2plugin.project.startup.ReaderModeHighlightingReset;
 import com.magento.idea.magento2plugin.project.util.GetProjectBasePath;
 import com.magento.idea.magento2plugin.project.validator.SettingsFormValidator;
 import com.magento.idea.magento2plugin.util.magento.MagentoVersionUtil;
 import com.magento.idea.magento2plugin.updates.MagentoUpdatesPanel;
 import java.awt.BorderLayout;
+import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -60,9 +64,12 @@ public class SettingsForm implements SearchableConfigurable {
     private JTextField magentoVersion;
     private JTextField moduleDefaultLicenseName;
     private JCheckBox mftfSupportEnabled;
+    private JCheckBox excludeGeneratedFiles;
     private TextFieldWithBrowseButton magentoPath;
     private JTextField mcpCliToolCandidates;
     private JTextField publishedReleasesUrl;
+    private JTextField additionalExcludedPaths;
+    private JTextArea effectiveExclusionsArea;
     private JPanel updatesContainer;
     private MagentoUpdatesPanel updatesPanel;
     private JButton installMagentoScaffoldSkillButton;
@@ -113,9 +120,13 @@ public class SettingsForm implements SearchableConfigurable {
         }
         skillAgentTargetSelect.setSelectedItem(AgentTarget.PROJECT_SKILLS);
 
+        pluginEnabled.setSelected(getSettings().pluginEnabled);
         refreshPhpDependentControlsVisibility();
         refreshFormStatus(getSettings().pluginEnabled);
-        pluginEnabled.addActionListener(e -> refreshFormStatus(pluginEnabled.isSelected()));
+        pluginEnabled.addActionListener(e -> {
+            refreshFormStatus(pluginEnabled.isSelected());
+            updateEffectiveExclusionsDisplay();
+        });
 
         moduleDefaultLicenseName.setText(getSettings().defaultLicense);
         mftfSupportEnabled.setSelected(getSettings().mftfSupportEnabled);
@@ -124,11 +135,35 @@ public class SettingsForm implements SearchableConfigurable {
                 Settings.getNormalizedMcpCliToolCandidates(getSettings().mcpCliToolCandidates)
         );
         publishedReleasesUrl.setText(getSettings().getPublishedReleasesUrl());
+        excludeGeneratedFiles.setSelected(getSettings().isExcludeGeneratedFiles());
+        additionalExcludedPaths.setText(
+                Settings.getNormalizedAdditionalExcludedPaths(getSettings().getAdditionalExcludedPaths())
+        );
+
+        excludeGeneratedFiles.addActionListener(e -> updateEffectiveExclusionsDisplay());
+        additionalExcludedPaths.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(final DocumentEvent e) {
+                updateEffectiveExclusionsDisplay();
+            }
+
+            @Override
+            public void removeUpdate(final DocumentEvent e) {
+                updateEffectiveExclusionsDisplay();
+            }
+
+            @Override
+            public void changedUpdate(final DocumentEvent e) {
+                updateEffectiveExclusionsDisplay();
+            }
+        });
+
         resolveMagentoVersion();
 
         addPathListener();
         addMagentoVersionListener();
         updateMagentoVersion();
+        updateEffectiveExclusionsDisplay();
 
         return (JComponent) panel;
     }
@@ -148,6 +183,9 @@ public class SettingsForm implements SearchableConfigurable {
         installMagentoScaffoldSkillButton.setEnabled(isEnabled);
         installMagentoInspectSkillButton.setEnabled(isEnabled);
         skillAgentTargetSelect.setEnabled(isEnabled);
+        excludeGeneratedFiles.setEnabled(isEnabled);
+        additionalExcludedPaths.setEnabled(isEnabled);
+        effectiveExclusionsArea.setEnabled(isEnabled);
     }
 
     private void refreshPhpDependentControlsVisibility() {
@@ -266,10 +304,22 @@ public class SettingsForm implements SearchableConfigurable {
 
         final boolean publishedReleasesUrlChanged = !getPublishedReleasesUrl()
                 .equals(getSettings().getPublishedReleasesUrl());
+        final boolean excludeGeneratedFilesChanged = excludeGeneratedFiles.isSelected()
+                != getSettings().isExcludeGeneratedFiles();
+        final boolean additionalExcludedPathsChanged = !Settings
+                .getNormalizedAdditionalExcludedPaths(
+                        Settings.parseAdditionalExcludedPaths(additionalExcludedPaths.getText())
+                )
+                .equals(
+                        Settings.getNormalizedAdditionalExcludedPaths(
+                                getSettings().getAdditionalExcludedPaths()
+                        )
+                );
 
         return statusChanged || licenseChanged || mftfSupportChanged
                 || magentoPathChanged || versionChanged || mcpCliToolCandidatesChanged
-                || publishedReleasesUrlChanged || (updatesPanel != null && updatesPanel.isModified());
+                || publishedReleasesUrlChanged || excludeGeneratedFilesChanged
+                || additionalExcludedPathsChanged || (updatesPanel != null && updatesPanel.isModified());
     }
 
     private void resolveMagentoVersion() {
@@ -295,6 +345,7 @@ public class SettingsForm implements SearchableConfigurable {
             updatesPanel.apply();
         }
 
+        MagentoIndexingExclusionService.getInstance(project).applyExclusions();
         afterSettingsApplied(getSettings().getState());
 
         if (buttonReindex.isEnabled()) {
@@ -315,6 +366,10 @@ public class SettingsForm implements SearchableConfigurable {
                 mcpCliToolCandidates.getText()
         );
         getSettings().publishedReleasesUrl = getPublishedReleasesUrl();
+        getSettings().setExcludeGeneratedFiles(excludeGeneratedFiles.isSelected());
+        getSettings().setAdditionalExcludedPaths(
+                Settings.parseAdditionalExcludedPaths(additionalExcludedPaths.getText())
+        );
         buttonReindex.setEnabled(getSettings().pluginEnabled);
         regenerateUrnMapButton.setEnabled(getSettings().pluginEnabled);
         ReaderModeHighlightingReset.run(project);
@@ -350,7 +405,61 @@ public class SettingsForm implements SearchableConfigurable {
                 Settings.getNormalizedMcpCliToolCandidates(getSettings().mcpCliToolCandidates)
         );
         publishedReleasesUrl.setText(getSettings().getPublishedReleasesUrl());
+        excludeGeneratedFiles.setSelected(getSettings().isExcludeGeneratedFiles());
+        additionalExcludedPaths.setText(
+                Settings.getNormalizedAdditionalExcludedPaths(getSettings().getAdditionalExcludedPaths())
+        );
         refreshFormStatus(pluginEnabled.isSelected());
+        updateEffectiveExclusionsDisplay();
+    }
+
+    public void updateEffectiveExclusionsDisplay() {
+        if (effectiveExclusionsArea == null) {
+            return;
+        }
+
+        final String currentPath = getMagentoPath();
+        final boolean pathValid = isPathValid(currentPath);
+
+        if (!pathValid) {
+            effectiveExclusionsArea.setText(
+                    "Configure a valid Magento installation path before indexing exclusions can be applied."
+            );
+            return;
+        }
+
+        if (!pluginEnabled.isSelected() || !excludeGeneratedFiles.isSelected()) {
+            effectiveExclusionsArea.setText("Indexing exclusions are disabled.");
+            return;
+        }
+
+        final List<String> additional = Settings.parseAdditionalExcludedPaths(
+                additionalExcludedPaths.getText()
+        );
+        final MagentoIndexingExclusionService service = MagentoIndexingExclusionService.getInstance(project);
+        final MagentoIndexingExclusionService.ExclusionPreview preview = service.previewExclusions(
+                currentPath,
+                excludeGeneratedFiles.isSelected(),
+                additional
+        );
+
+        final StringBuilder sb = new StringBuilder();
+        for (final MagentoIndexingExclusionService.ExclusionEntry entry : preview.effectiveExclusions()) {
+            sb.append(entry.relativePath())
+                    .append(" — ")
+                    .append(entry.reason())
+                    .append("\n");
+        }
+        if (!preview.skippedEntries().isEmpty()) {
+            sb.append("\nSkipped:\n");
+            for (final MagentoIndexingExclusionService.SkippedEntry skipped : preview.skippedEntries()) {
+                sb.append(skipped.path())
+                        .append(" (")
+                        .append(skipped.reason())
+                        .append(")\n");
+            }
+        }
+        effectiveExclusionsArea.setText(sb.toString().trim());
     }
 
     @Override
@@ -396,16 +505,19 @@ public class SettingsForm implements SearchableConfigurable {
             @Override
             public void insertUpdate(final DocumentEvent documentEvent) {
                 updateMagentoVersion();
+                updateEffectiveExclusionsDisplay();
             }
 
             @Override
             public void removeUpdate(final DocumentEvent documentEvent) {
                 updateMagentoVersion();
+                updateEffectiveExclusionsDisplay();
             }
 
             @Override
             public void changedUpdate(final DocumentEvent documentEvent) {
                 updateMagentoVersion();
+                updateEffectiveExclusionsDisplay();
             }
         };
         this.magentoPath.getTextField().getDocument().addDocumentListener(onPathChange);
@@ -441,6 +553,67 @@ public class SettingsForm implements SearchableConfigurable {
 
     protected @NotNull Project getProject() {
         return project;
+    }
+
+    public @NotNull JCheckBox getExcludeGeneratedFilesCheckBox() {
+        return this.excludeGeneratedFiles;
+    }
+
+    public @NotNull JTextField getAdditionalExcludedPathsField() {
+        return this.additionalExcludedPaths;
+    }
+
+    public @NotNull JTextArea getEffectiveExclusionsArea() {
+        return this.effectiveExclusionsArea;
+    }
+
+    public @NotNull JCheckBox getPluginEnabledCheckBox() {
+        return this.pluginEnabled;
+    }
+
+    public @NotNull TextFieldWithBrowseButton getMagentoPathField() {
+        return this.magentoPath;
+    }
+
+    private boolean isPathValid(final String path) {
+        if (StringUtil.isEmptyOrSpaces(path)) {
+            return false;
+        }
+        final File file = new File(path);
+        if (file.exists() && file.isDirectory()) {
+            return true;
+        }
+        if (LocalFileSystem.getInstance().findFileByPath(path) != null) {
+            return true;
+        }
+        final VirtualFile vf = com.intellij.openapi.vfs.VirtualFileManager.getInstance()
+                .findFileByUrl(com.intellij.openapi.vfs.VfsUtilCore.pathToUrl(path));
+        if (vf != null && vf.isDirectory()) {
+            return true;
+        }
+        final VirtualFile projectDir = com.intellij.openapi.project.ProjectUtil.guessProjectDir(project);
+        if (projectDir != null) {
+            if (path.equals(projectDir.getPath())) {
+                return true;
+            }
+            if (path.startsWith(projectDir.getPath() + "/")) {
+                final VirtualFile sub = projectDir.findFileByRelativePath(path.substring(projectDir.getPath().length() + 1));
+                if (sub != null && sub.isDirectory()) {
+                    return true;
+                }
+            }
+            final VirtualFile rel = projectDir.findFileByRelativePath(path);
+            if (rel != null && rel.isDirectory()) {
+                return true;
+            }
+            if (path.startsWith("/")) {
+                final VirtualFile relNoSlash = projectDir.findFileByRelativePath(path.substring(1));
+                if (relNoSlash != null && relNoSlash.isDirectory()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @NotNull
