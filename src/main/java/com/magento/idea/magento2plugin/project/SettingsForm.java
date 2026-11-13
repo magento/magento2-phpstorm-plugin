@@ -34,6 +34,7 @@ import java.awt.BorderLayout;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -57,6 +58,7 @@ public class SettingsForm implements SearchableConfigurable {
     private static final String DEFAULT_MAGENTO_EDITION_LABEL = "Platform Version:";
 
     private final Project project;
+    private com.intellij.openapi.Disposable settingsListenerDisposable;
     private JCheckBox pluginEnabled;
     private JButton buttonReindex;
     private JPanel panel;
@@ -165,6 +167,26 @@ public class SettingsForm implements SearchableConfigurable {
         updateMagentoVersion();
         updateEffectiveExclusionsDisplay();
 
+        if (settingsListenerDisposable != null) {
+            com.intellij.openapi.util.Disposer.dispose(settingsListenerDisposable);
+        }
+        final com.intellij.openapi.Disposable listenerDisposable =
+                com.intellij.openapi.util.Disposer.newDisposable("Magento settings UI listener");
+        settingsListenerDisposable = listenerDisposable;
+        getSettings().addListener((state, oldState) -> {
+            com.intellij.openapi.application.ApplicationManager.getApplication().invokeLater(() -> {
+                if (settingsListenerDisposable != listenerDisposable) {
+                    return;
+                }
+                pluginEnabled.setSelected(state.isPluginEnabled());
+                magentoPath.getTextField().setText(StringUtil.notNullize(state.getMagentoPath()));
+                excludeGeneratedFiles.setSelected(state.getExcludeGeneratedFiles() == null || state.getExcludeGeneratedFiles());
+                refreshFormStatus(state.isPluginEnabled());
+                updateMagentoVersion();
+                updateEffectiveExclusionsDisplay();
+            });
+        }, listenerDisposable);
+
         return (JComponent) panel;
     }
 
@@ -209,6 +231,16 @@ public class SettingsForm implements SearchableConfigurable {
     private void reindexFromForm() {
         try {
             this.validator.validate();
+            final MagentoProjectConfigurationService.ConfigurationResult configResult =
+                    MagentoProjectConfigurationService.getInstance(project).configure(
+                            getMagentoPath(),
+                            pluginEnabled.isSelected(),
+                            excludeGeneratedFiles.isSelected(),
+                            null
+                    );
+            if (!configResult.success() && !configResult.validationErrors().isEmpty()) {
+                throw new ConfigurationException(String.join("<br>", configResult.validationErrors()));
+            }
             saveSettings();
             reindex();
             MagentoNotificationUtil.notifyGlobally(
@@ -329,9 +361,13 @@ public class SettingsForm implements SearchableConfigurable {
     }
 
     private boolean isMagentoPathChanged() {
-        return !getMagentoPath().equals(
-                StringUtil.notNullize(Settings.getMagentoPath(project))
-        );
+        final String currentFormPath = getMagentoPath();
+        final String savedPath = StringUtil.notNullize(Settings.getMagentoPath(project));
+        if (currentFormPath.equals(savedPath)) {
+            return false;
+        }
+        final String resolvedFormPath = MagentoProjectConfigurationService.getInstance(project).resolvePath(currentFormPath);
+        return !Objects.equals(resolvedFormPath, savedPath);
     }
 
     @Override
@@ -340,7 +376,21 @@ public class SettingsForm implements SearchableConfigurable {
         if (updatesPanel != null) {
             updatesPanel.validateSettings();
         }
+
+        final MagentoProjectConfigurationService.ConfigurationResult configResult =
+                MagentoProjectConfigurationService.getInstance(project).configure(
+                        getMagentoPath(),
+                        pluginEnabled.isSelected(),
+                        excludeGeneratedFiles.isSelected(),
+                        null
+                );
+
+        if (!configResult.success() && !configResult.validationErrors().isEmpty()) {
+            throw new ConfigurationException(String.join("<br>", configResult.validationErrors()));
+        }
+
         saveSettings();
+
         if (updatesPanel != null) {
             updatesPanel.apply();
         }
@@ -358,15 +408,12 @@ public class SettingsForm implements SearchableConfigurable {
     }
 
     private void saveSettings() {
-        getSettings().pluginEnabled = pluginEnabled.isSelected();
         getSettings().defaultLicense = moduleDefaultLicenseName.getText();
         getSettings().mftfSupportEnabled = mftfSupportEnabled.isSelected();
-        getSettings().setMagentoPath(getMagentoPath());
         getSettings().mcpCliToolCandidates = Settings.getNormalizedMcpCliToolCandidates(
                 mcpCliToolCandidates.getText()
         );
         getSettings().publishedReleasesUrl = getPublishedReleasesUrl();
-        getSettings().setExcludeGeneratedFiles(excludeGeneratedFiles.isSelected());
         getSettings().setAdditionalExcludedPaths(
                 Settings.parseAdditionalExcludedPaths(additionalExcludedPaths.getText())
         );
@@ -464,7 +511,11 @@ public class SettingsForm implements SearchableConfigurable {
 
     @Override
     public void disposeUIResources() {
-        //do nothing
+        final com.intellij.openapi.Disposable listenerDisposable = settingsListenerDisposable;
+        settingsListenerDisposable = null;
+        if (listenerDisposable != null) {
+            com.intellij.openapi.util.Disposer.dispose(listenerDisposable);
+        }
     }
 
     public Settings getSettings() {
@@ -551,7 +602,7 @@ public class SettingsForm implements SearchableConfigurable {
         return this.pluginEnabled.isSelected();
     }
 
-    protected @NotNull Project getProject() {
+    public @NotNull Project getProject() {
         return project;
     }
 
@@ -579,41 +630,9 @@ public class SettingsForm implements SearchableConfigurable {
         if (StringUtil.isEmptyOrSpaces(path)) {
             return false;
         }
-        final File file = new File(path);
-        if (file.exists() && file.isDirectory()) {
-            return true;
-        }
-        if (LocalFileSystem.getInstance().findFileByPath(path) != null) {
-            return true;
-        }
-        final VirtualFile vf = com.intellij.openapi.vfs.VirtualFileManager.getInstance()
-                .findFileByUrl(com.intellij.openapi.vfs.VfsUtilCore.pathToUrl(path));
-        if (vf != null && vf.isDirectory()) {
-            return true;
-        }
-        final VirtualFile projectDir = com.intellij.openapi.project.ProjectUtil.guessProjectDir(project);
-        if (projectDir != null) {
-            if (path.equals(projectDir.getPath())) {
-                return true;
-            }
-            if (path.startsWith(projectDir.getPath() + "/")) {
-                final VirtualFile sub = projectDir.findFileByRelativePath(path.substring(projectDir.getPath().length() + 1));
-                if (sub != null && sub.isDirectory()) {
-                    return true;
-                }
-            }
-            final VirtualFile rel = projectDir.findFileByRelativePath(path);
-            if (rel != null && rel.isDirectory()) {
-                return true;
-            }
-            if (path.startsWith("/")) {
-                final VirtualFile relNoSlash = projectDir.findFileByRelativePath(path.substring(1));
-                if (relNoSlash != null && relNoSlash.isDirectory()) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        final MagentoProjectConfigurationService.InstallationDetails details =
+                MagentoProjectConfigurationService.getInstance(project).inspectPath(path);
+        return details.exists() && details.isDirectory();
     }
 
     @NotNull

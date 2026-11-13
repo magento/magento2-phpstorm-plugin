@@ -116,6 +116,7 @@
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.Settings"/>
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.startup.DeferredProjectOpenActions"/>
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.indexing.MagentoIndexingExclusionService"/>
+        <projectService serviceImplementation="com.magento.idea.magento2plugin.project.MagentoProjectConfigurationService"/>
 
         <projectConfigurable
                 groupId="tools"

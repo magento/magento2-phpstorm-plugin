@@ -36,6 +36,44 @@ class SettingsFormTest : PhysicalMagentoTestCase() {
     private inline fun <reified T> field(form: SettingsForm, name: String): T =
         SettingsForm::class.java.getDeclaredField(name).apply { isAccessible = true }.get(form) as T
 
+    fun testDisableIntegrationWithMissingSavedDirectory() {
+        val form = createForm()
+        val settings = Settings.getInstance(project)
+        val missingPath = "${project.basePath}/removed-magento"
+        settings.magentoPath = missingPath
+        form.reset()
+        field<JCheckBox>(form, "pluginEnabled").isSelected = false
+
+        form.apply()
+
+        assertFalse(settings.pluginEnabled)
+        assertEquals(missingPath, settings.magentoPath)
+        form.disposeUIResources()
+    }
+
+    fun testDisposedFormIgnoresQueuedAndFutureSettingsChanges() {
+        val form = createForm()
+        val settings = Settings.getInstance(project)
+        val enabled = field<JCheckBox>(form, "pluginEnabled")
+        val disabledState = settings.state!!.apply { pluginEnabled = false }
+        settings.setState(disabledState)
+        form.disposeUIResources()
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+        assertTrue("Queued updates must not reach a disposed form", enabled.isSelected)
+
+        settings.setState(settings.state!!.apply { pluginEnabled = true })
+        settings.setState(settings.state!!.apply { pluginEnabled = false })
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+        assertTrue("Future updates must not reach a disposed form", enabled.isSelected)
+
+        form.createComponent()
+        form.reset()
+        settings.setState(settings.state!!.apply { pluginEnabled = true })
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+        assertTrue("A reopened form must receive updates", enabled.isSelected)
+        form.disposeUIResources()
+    }
+
     fun testApplyEnablesInspectionsReaderModeSwitchedOff() {
         val form = createForm()
         val file = myFixture.addFileToProject("app/code/Foo/Applied/etc/di.xml", "<config/>")
@@ -160,5 +198,29 @@ class SettingsFormTest : PhysicalMagentoTestCase() {
         settings.state.checkWindow = UpdateCheckWindow.TWELVE_HOURS
         settings.loadState(XmlSerializer.deserialize(org.jdom.Element("Options"), MagentoUpdateSettings.Options::class.java))
         assertEquals(UpdateCheckWindow.MONTH, settings.state.checkWindow)
+    }
+
+    fun testApplySettingsFormResolvesAndPersistsAbsolutePathWithoutOverwrite() {
+        myFixture.addFileToProject("src/composer.json", """{"name":"magento/project-community-edition","version":"2.4.8"}""")
+        myFixture.addFileToProject("src/vendor/magento/framework/composer.json", """{"name":"magento/framework"}""")
+
+        val form = object : SettingsForm(project) {
+            override fun reindex() = Unit
+        }.apply {
+            createComponent()
+            reset()
+        }
+
+        val pathField = field<com.intellij.openapi.ui.TextFieldWithBrowseButton>(form, "magentoPath")
+        val enabledBox = field<JCheckBox>(form, "pluginEnabled")
+        enabledBox.isSelected = true
+        pathField.textField.text = "src"
+
+        form.apply()
+
+        val expectedResolved = project.basePath + "/src"
+        val savedPath = Settings.getInstance(project).magentoPath
+        assertEquals(expectedResolved, savedPath)
+        assertFalse(form.isModified)
     }
 }

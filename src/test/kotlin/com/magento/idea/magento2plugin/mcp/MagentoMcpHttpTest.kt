@@ -46,6 +46,7 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
             "magento_magerun" to listOf("mode=status only reads local files", "mode=commands", "mode=command_help", "mode=mcp_config", "refresh=true", "never fall back to another runtime"),
             "get_magento_indexing_exclusions" to listOf("indexing exclusion", "preview"),
             "configure_magento_indexing_exclusions" to listOf("apply", "update", "reset", "preview", ".runtime/"),
+            "configure_magento_project" to listOf("Inspect or configure Magento project integration", "status", "configure", "magentoPath"),
         )
         for ((name, fragments) in descriptions) {
             val description = tools.getValue(name).getString("description")
@@ -390,6 +391,120 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         val result = magerun("commands")
         assertEquals(result.toString(), "unsupported_wrapper", result.getString("status"))
         assertFalse(Files.exists(root.resolve("src/application-command-executed")))
+    }
+
+    fun testConfigureMagentoProjectOverHttp() {
+        val originalPath = Settings.getInstance(project).magentoPath
+        val originalEnabled = Settings.getInstance(project).pluginEnabled
+        try {
+            // Start with integration disabled to verify configuration from scratch
+            Settings.getInstance(project).pluginEnabled = false
+            Settings.getInstance(project).magentoPath = ""
+
+            // Status reflects disabled
+            val initialStatus = text("configure_magento_project", JSONObject().put("action", "status"))
+            assertTrue(initialStatus, initialStatus.contains("Magento Project Integration Status"))
+            assertTrue(initialStatus, initialStatus.contains("Integration enabled: no"))
+
+            // Help mode
+            val help = text("configure_magento_project", JSONObject().put("action", "help"))
+            assertTrue(help, help.contains("Magento Project Configuration Tool"))
+            assertTrue(help, help.contains("action=status"))
+            assertTrue(help, help.contains("action=configure"))
+
+            // Invalid path rejected without changing settings
+            val invalidResult = text("configure_magento_project", JSONObject()
+                .put("action", "configure")
+                .put("magentoPath", "nonexistent_dir")
+                .put("enabled", true)
+            )
+            assertTrue(invalidResult, invalidResult.contains("Result: error"))
+            assertTrue(invalidResult, invalidResult.contains("Path does not exist"))
+            assertFalse(Settings.getInstance(project).pluginEnabled)
+
+            // Unsupported action rejected without changing settings
+            val unsupported = text("configure_magento_project", JSONObject()
+                .put("action", "preview")
+                .put("enabled", false)
+            )
+            assertTrue(unsupported, unsupported.contains("Result: error"))
+            assertTrue(unsupported, unsupported.contains("Unsupported action 'preview'"))
+
+            // Project root configuration from disabled state
+            file("composer.json", """{"name":"magento/project-community-edition","version":"2.4.8"}""")
+            file("composer.lock", """{"packages":[{"name":"magento/product-community-edition","version":"2.4.8"}]}""")
+            file("vendor/magento/framework/composer.json", """{"name":"magento/framework"}""")
+            file("vendor/autoload.php", "<?php\n")
+            val configureRoot = text("configure_magento_project", JSONObject()
+                .put("action", "configure")
+                .put("magentoPath", ".")
+                .put("enabled", true)
+                .put("excludeGeneratedFiles", true)
+            )
+            assertTrue(configureRoot, configureRoot.contains("Result: success"))
+            assertTrue(configureRoot, configureRoot.contains("Integration enabled: yes"))
+            assertTrue(configureRoot, configureRoot.contains("Indexing exclusions: enabled"))
+            assertEquals("Configured Magento root path: ${root.toString().replace('\\', '/')}", text("get_magento_root_path"))
+
+            // Idempotent repeat
+            val repeatRoot = text("configure_magento_project", JSONObject()
+                .put("action", "configure")
+                .put("magentoPath", ".")
+                .put("enabled", true)
+                .put("excludeGeneratedFiles", true)
+            )
+            assertTrue(repeatRoot, repeatRoot.contains("no changes required"))
+        } finally {
+            Settings.getInstance(project).magentoPath = originalPath
+            Settings.getInstance(project).pluginEnabled = originalEnabled
+        }
+    }
+
+    fun testControlledConfigurationDuringIndexingOverHttp() {
+        val originalPath = Settings.getInstance(project).magentoPath
+        val originalEnabled = Settings.getInstance(project).pluginEnabled
+        val originalExclusions = Settings.getInstance(project).excludeGeneratedFiles
+        try {
+            Settings.getInstance(project).pluginEnabled = false
+            Settings.getInstance(project).magentoPath = null
+
+            file("src/composer.json", """{"name":"magento/project-community-edition","version":"2.4.8"}""")
+            file("src/composer.lock", """{"packages":[{"name":"magento/product-community-edition","version":"2.4.8"}]}""")
+            file("src/vendor/magento/framework/composer.json", """{"name":"magento/framework"}""")
+            file("src/vendor/autoload.php", "<?php\n")
+            myFixture.addFileToProject("src/app/code/HttpIndex/Module/etc/module.xml", """
+                <config><module name="HttpIndex_Module"/></config>
+            """.trimIndent())
+
+            DumbModeTestUtils.runInDumbModeSynchronously(project) {
+                val configured = text("configure_magento_project", JSONObject()
+                    .put("action", "configure")
+                    .put("magentoPath", "src")
+                    .put("enabled", true)
+                    .put("excludeGeneratedFiles", true)
+                )
+                assertTrue(configured, configured.contains("Result: success"))
+                assertTrue(configured, configured.contains("Integration enabled: yes"))
+                assertTrue(configured, configured.contains("Pending index refresh: yes"))
+
+                val status = text("configure_magento_project", JSONObject().put("action", "status"))
+                assertTrue(status, status.contains("Pending index refresh: yes"))
+                assertTrue(status, status.contains("Wait for IDE indexing to finish"))
+            }
+
+            IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+            val moduleResult = text("magento_inspect", JSONObject()
+                .put("mode", "query")
+                .put("queryType", "module")
+                .put("parametersJson", """{"moduleName":"HttpIndex_Module"}""")
+            )
+            assertTrue(moduleResult, moduleResult.replace('\\', '/').contains("src/app/code/HttpIndex/Module"))
+        } finally {
+            Settings.getInstance(project).magentoPath = originalPath
+            Settings.getInstance(project).pluginEnabled = originalEnabled
+            Settings.getInstance(project).setExcludeGeneratedFiles(originalExclusions)
+        }
     }
 
     private fun text(tool: String, arguments: JSONObject = JSONObject()): String {
