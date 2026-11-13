@@ -5,9 +5,6 @@ import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.ModuleRootModificationUtil
 import com.intellij.openapi.roots.ProjectFileIndex
-import com.intellij.openapi.vfs.VfsUtil
-import com.intellij.openapi.vfs.VfsUtilCore
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.PlatformTestUtil
 import com.magento.idea.magento2plugin.BaseProjectTestCase
 import com.magento.idea.magento2plugin.project.Settings
@@ -215,7 +212,13 @@ class MagentoIndexingExclusionServiceTest : BaseProjectTestCase() {
     @Test
     fun testNestedManualExclusionSurvivesRootChange() = checkNestedManualExclusion("change")
 
-    private fun checkNestedManualExclusion(action: String) {
+    @Test
+    fun testNestedManualExclusionSurvivesRenameAndDisable() = checkNestedManualExclusion("disable", true)
+
+    @Test
+    fun testNestedManualExclusionSurvivesRenameAndReset() = checkNestedManualExclusion("reset", true)
+
+    private fun checkNestedManualExclusion(action: String, renameModule: Boolean = false) {
         val nested = myFixture.tempDirFixture.findOrCreateDir("magento")
         val parentUrl = myFixture.findFileInTempDir("")!!.url
         val excludedUrl = nested.url + "/var/cache"
@@ -235,6 +238,15 @@ class MagentoIndexingExclusionServiceTest : BaseProjectTestCase() {
         val entries = ModuleRootManager.getInstance(myFixture.module).contentEntries
         assertTrue(entries.first { it.url == parentUrl }.excludeFolderUrls.contains(excludedUrl))
         assertTrue(entries.first { it.url == nested.url }.excludeFolderUrls.contains(excludedUrl))
+        val originalName = myFixture.module.name
+        if (renameModule) {
+            WriteAction.runAndWait<Throwable> {
+                val model = ModuleManager.getInstance(project).getModifiableModel()
+                model.renameModule(myFixture.module, "$originalName-renamed")
+                model.commit()
+            }
+            assertTrue(settings.managedExclusionOwners.all { it.moduleName == myFixture.module.name })
+        }
         // Ownership survives saving and loading settings.
         settings.loadState(com.intellij.util.xmlb.XmlSerializer.deserialize(
             com.intellij.util.xmlb.XmlSerializer.serialize(settings.state!!), Settings.State::class.java
@@ -254,6 +266,11 @@ class MagentoIndexingExclusionServiceTest : BaseProjectTestCase() {
             ModuleRootModificationUtil.updateModel(myFixture.module) { model ->
                 model.contentEntries.first { it.url == parentUrl }.removeExcludeFolder(excludedUrl)
                 model.removeContentEntry(model.contentEntries.first { it.url == nested.url })
+            }
+            if (renameModule) {
+                val model = ModuleManager.getInstance(project).getModifiableModel()
+                model.renameModule(myFixture.module, originalName)
+                model.commit()
             }
         }
     }

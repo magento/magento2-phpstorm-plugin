@@ -10,6 +10,7 @@ import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.DumbService;
+import com.intellij.openapi.project.ModuleListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.roots.ContentEntry;
@@ -18,11 +19,10 @@ import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
-import com.intellij.util.SmartList;
+import com.intellij.util.Function;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.project.Settings.ManagedExclusion;
 import java.io.File;
@@ -141,7 +141,7 @@ public class MagentoIndexingExclusionService {
         this.project = project;
         Settings.getInstance(project).addListener((newState, oldState) -> invalidateCache());
         project.getMessageBus().connect().subscribe(
-                com.intellij.ProjectTopics.PROJECT_ROOTS,
+                com.intellij.openapi.roots.ModuleRootListener.TOPIC,
                 new com.intellij.openapi.roots.ModuleRootListener() {
                     @Override
                     public void rootsChanged(final @NotNull com.intellij.openapi.roots.ModuleRootEvent event) {
@@ -149,6 +149,30 @@ public class MagentoIndexingExclusionService {
                     }
                 }
         );
+        project.getMessageBus().connect().subscribe(ModuleListener.TOPIC, new ModuleListener() {
+            @Override
+            public void modulesRenamed(
+                    final @NotNull Project renamedProject,
+                    final @NotNull List<? extends Module> modules,
+                    final @NotNull Function<? super Module, String> oldNameProvider
+            ) {
+                final Map<String, String> renamedModules = new LinkedHashMap<>();
+                for (final Module module : modules) {
+                    renamedModules.put(oldNameProvider.fun(module), module.getName());
+                }
+                final Settings settings = Settings.getInstance(project);
+                final List<ManagedExclusion> owners = new ArrayList<>();
+                for (final ManagedExclusion owner : settings.getManagedExclusionOwners()) {
+                    owners.add(new ManagedExclusion(
+                            renamedModules.getOrDefault(owner.moduleName, owner.moduleName),
+                            owner.contentEntryUrl,
+                            owner.excludedUrl
+                    ));
+                }
+                settings.setManagedExclusionOwners(owners);
+                invalidateCache();
+            }
+        });
     }
 
     public void invalidateCache() {

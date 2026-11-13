@@ -8,6 +8,7 @@
     <depends>JavaScript</depends>
     <depends>com.intellij.css</depends>
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.xml</depends>
     <depends>com.intellij.platform.images</depends>
     <depends>com.intellij.modules.json</depends>
     <depends>com.intellij.copyright</depends>

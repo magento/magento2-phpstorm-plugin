@@ -7,13 +7,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ## 2026.3.6
 
+### Changed
+
+- Require PhpStorm, WebStorm, or IntelliJ IDEA 2026.3 or later.
+
 ### Added
 
+- Default-enabled Magento indexing exclusions for generated and runtime files, with previews, additional paths, and apply/reset controls in settings and MCP [#2775](https://github.com/magento/magento2-phpstorm-plugin/issues/2775).
 - DDEV support for AI-assisted Magento CLI workflows, including discovery of Magerun installed inside the container [#2777](https://github.com/magento/magento2-phpstorm-plugin/issues/2777).
 
 ### Security
 
-- Updated the PhpStorm development/test platform to 2026.2.4, WebStorm UI tests to 2026.3 RC, and the plugin verifier targets to patched 2026.2.4 and 2026.3 RC builds following the [JetBrains eMudhra certificate advisory](https://blog.jetbrains.com/security/2026/10/compromised-emudhra-certificates-ides/) [#2779](https://github.com/magento/magento2-phpstorm-plugin/pull/2779). Users must update and restart their IDE separately; installing this plugin does not patch the host runtime, embedded browser, or `jetbrainsd` service (which requires 0.9.9728 or later).
+- Updated the PhpStorm development/test platform, WebStorm UI tests, and plugin verifier targets to patched 2026.3 builds following the [JetBrains eMudhra certificate advisory](https://blog.jetbrains.com/security/2026/10/compromised-emudhra-certificates-ides/) [#2779](https://github.com/magento/magento2-phpstorm-plugin/pull/2779). Users must update and restart their IDE separately; installing this plugin does not patch the host runtime, embedded browser, or `jetbrainsd` service (which requires 0.9.9728 or later).
 
 ### Fixed
 

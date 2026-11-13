@@ -6,7 +6,6 @@
 package com.magento.idea.magento2plugin.linemarker.php;
 
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
-import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerImpl;
 import com.intellij.codeInsight.navigation.NavigationGutterIconRenderer;
 import com.intellij.codeInsight.navigation.impl.PsiTargetPresentationRenderer;
 import com.intellij.psi.PsiElement;
@@ -48,10 +47,7 @@ public class ConfigurationTypeClassLinemarkerRegistrarTest extends LinemarkerFix
 
         final List<String> containerTexts = new ArrayList<>();
 
-        for (final LineMarkerInfo<?> lineMarkerInfo : DaemonCodeAnalyzerImpl.getLineMarkers(
-                myFixture.getEditor().getDocument(),
-                getProject()
-        )) {
+        for (final LineMarkerInfo<?> lineMarkerInfo : getDocumentLineMarkers()) {
             if (!"Navigate to configuration".equals(lineMarkerInfo.getLineMarkerTooltip())) {
                 continue;
             }
@@ -79,10 +75,7 @@ public class ConfigurationTypeClassLinemarkerRegistrarTest extends LinemarkerFix
         final List<String> targetNames = new ArrayList<>();
         final List<PsiElement> targets = new ArrayList<>();
 
-        for (final LineMarkerInfo<?> lineMarkerInfo : DaemonCodeAnalyzerImpl.getLineMarkers(
-                myFixture.getEditor().getDocument(),
-                getProject()
-        )) {
+        for (final LineMarkerInfo<?> lineMarkerInfo : getDocumentLineMarkers()) {
             if (!"Navigate to configuration".equals(lineMarkerInfo.getLineMarkerTooltip())) {
                 continue;
             }

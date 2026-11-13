@@ -7,12 +7,14 @@ package com.magento.idea.magento2plugin.linemarker;
 
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.MergeableLineMarkerInfo;
-import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerImpl;
+import com.intellij.openapi.editor.impl.DocumentMarkupModel;
+import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.magento.idea.magento2plugin.BaseProjectTestCase;
 import com.magento.idea.magento2plugin.magento.packages.File;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
@@ -170,11 +172,16 @@ public abstract class LinemarkerFixtureTestCase extends BaseProjectTestCase {
     }
 
     @NotNull
-    private List<LineMarkerInfo<?>> getDocumentLineMarkers() {
-        return DaemonCodeAnalyzerImpl.getLineMarkers(
-                myFixture.getEditor().getDocument(),
-                getProject()
-        );
+    protected List<LineMarkerInfo<?>> getDocumentLineMarkers() {
+        final List<LineMarkerInfo<?>> markers = new ArrayList<>();
+        for (final RangeHighlighter highlighter : DocumentMarkupModel.forDocument(
+                myFixture.getEditor().getDocument(), getProject(), false
+        ).getAllHighlighters()) {
+            if (highlighter.getGutterIconRenderer() instanceof LineMarkerInfo.LineMarkerGutterIconRenderer<?> renderer) {
+                markers.add(renderer.getLineMarkerInfo());
+            }
+        }
+        return markers;
     }
 
     private String normalizeTooltip(final String tooltip) {
