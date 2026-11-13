@@ -7,6 +7,7 @@
 <idea-plugin>
     <extensions defaultExtensionNs="com.magento.idea.magento2plugin">
         <eventNameIndexProvider implementation="com.magento.idea.magento2plugin.stubs.indexes.PhpEventNameIndexProvider"/>
+        <eventTargetProvider implementation="com.magento.idea.magento2plugin.reference.provider.PhpEventTargetProvider"/>
     </extensions>
     <actions>
         <!-- In editor generators -->

@@ -38,6 +38,7 @@ class XmlIntelligenceUiTest {
         assertNavigation("$CONSUMER/etc/di.xml", "type=\"AcmeVirtualOne", "$DECLARATIONS/etc/di.xml")
         assertNavigation("$CONSUMER/etc/di.xml", "name=\"acme_plugin", "$DECLARATIONS/etc/di.xml")
         assertNavigation("$CONSUMER/etc/events.xml", "name=\"acme_observer", "$DECLARATIONS/etc/events.xml")
+        assertNavigation("$CONSUMER/etc/events.xml", "name=\"acme_declared_one", "$DECLARATIONS/etc/events.xml")
 
         assertInspection("$CONSUMER/etc/di.xml", "This plugin does not exist to be disabled.", "missing_plugin", "acme_plugin")
         assertInspection("$CONSUMER/etc/events.xml", "This observer does not exist to be disabled.", "missing_observer", "acme_observer")
