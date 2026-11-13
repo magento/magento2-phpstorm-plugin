@@ -54,20 +54,14 @@ public class MagentoAdditionalLibraryRootsProvider extends AdditionalLibraryRoot
         final Collection<VirtualFile> roots = new MagentoAdditionalLibraryRootsProvider()
                 .getMagentoIndexRoots(project);
 
-        final Runnable action = () -> {
-            try {
-                AdditionalLibraryRootsListenerHelper.getInstance()
-                        .handleAdditionalLibraryRootsChanged(
-                            project,
-                            null,
-                            List.of(),
-                            roots,
-                            "Magento additional library roots"
-                        );
-            } catch (Throwable ignored) {
-                // Ignore if platform listener helper is unavailable in certain test environments
-            }
-        };
+        final Runnable action = () -> AdditionalLibraryRootsListenerHelper.getInstance()
+                .handleAdditionalLibraryRootsChanged(
+                    project,
+                    null,
+                    List.of(),
+                    roots,
+                    "Magento additional library roots"
+                );
 
         if (com.intellij.openapi.application.ApplicationManager.getApplication().isDispatchThread()) {
             WriteAction.run(action::run);
