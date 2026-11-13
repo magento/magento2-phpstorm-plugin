@@ -90,4 +90,41 @@ class MagentoProjectConfigurationMcpTest : PhysicalMagentoTestCase() {
         assertTrue(err.contains("does_not_exist"))
         assertTrue(err.contains("Current State:\n  (unchanged - prior settings preserved)"))
     }
+
+    @Test
+    fun testUnsupportedActionRejectedWithoutChangingSettings() {
+        val settings = Settings.getInstance(project)
+        settings.pluginEnabled = false
+        settings.magentoPath = null
+
+        val result = MagentoProjectConfigurationCommands.configure(
+            project = project,
+            action = "preview",
+            enabled = false
+        )
+        assertTrue(result.contains("Result: error"))
+        assertTrue(result.contains("Unsupported action 'preview'"))
+        assertFalse(settings.pluginEnabled)
+    }
+
+    @Test
+    fun testControlledConfigurationDuringIndexing() {
+        myFixture.addFileToProject("composer.json", """{"name":"magento/project-community-edition","version":"2.4.8"}""")
+        myFixture.addFileToProject("composer.lock", """{"packages":[{"name":"magento/product-community-edition","version":"2.4.8"}]}""")
+        myFixture.addFileToProject("vendor/magento/framework/composer.json", """{"name":"magento/framework"}""")
+
+        com.intellij.testFramework.DumbModeTestUtils.runInDumbModeSynchronously(project) {
+            val status = MagentoProjectConfigurationCommands.getStatus(project)
+            assertTrue(status.contains("Pending index refresh: yes"))
+
+            val result = MagentoProjectConfigurationCommands.configure(
+                project = project,
+                action = "configure",
+                magentoPath = ".",
+                enabled = true
+            )
+            assertTrue(result.contains("Result: success"))
+            assertTrue(result.contains("Pending index refresh: yes"))
+        }
+    }
 }

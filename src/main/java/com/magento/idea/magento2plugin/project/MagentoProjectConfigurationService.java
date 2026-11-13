@@ -203,7 +203,11 @@ public class MagentoProjectConfigurationService {
 
         final String effectivePath = resolved != null ? resolved : path;
         final boolean composerJsonExists = MagentoBasePathUtil.isComposerJsonExists(effectivePath);
-        final boolean frameworkExists = MagentoBasePathUtil.isMagentoFolderValid(effectivePath);
+        final boolean vendorFrameworkExists = isDirectoryPresent(effectivePath, Package.frameworkRootComposer)
+                || isDirectoryPresent(effectivePath, Package.mageOsFrameworkRootComposer);
+        final boolean internalFrameworkExists = isDirectoryPresent(effectivePath, Package.frameworkRootGit);
+        final boolean frameworkExists = vendorFrameworkExists || internalFrameworkExists;
+        final boolean vendorAutoloadExists = isFilePresent(effectivePath, "vendor/autoload.php");
 
         final Pair<String, String> versionData = MagentoVersionUtil.getVersionData(project, effectivePath);
         final String rawVersion = versionData != null ? versionData.getFirst() : null;
@@ -212,36 +216,23 @@ public class MagentoProjectConfigurationService {
                 && !rawVersion.isBlank()
                 && !MagentoVersionUtil.DEFAULT_VERSION.equalsIgnoreCase(rawVersion);
 
-        final boolean isSourceCheckout = MagentoVersionUtil.getSourceVersionData(project, effectivePath) != null
-                || isDirectoryPresent(effectivePath, Package.frameworkRootGit);
-
-        final List<String> missing = new ArrayList<>();
-        if (!composerJsonExists) {
-            missing.add("composer.json");
-        }
-        if (!frameworkExists) {
-            missing.add("vendor/magento/framework");
-        }
-        if (!hasKnownVersion) {
-            missing.add("unknown platform version");
-        }
-
-        if (frameworkExists && composerJsonExists && hasKnownVersion) {
-            return new InstallationDetails(
-                    InstallationType.RECOGNIZED_APPLICATION,
-                    true,
-                    true,
-                    true,
-                    true,
-                    rawVersion,
-                    rawEdition,
-                    List.of(),
-                    "Recognized Magento 2 application (" + rawVersion
-                            + (rawEdition != null ? ", " + rawEdition : "") + ")"
-            );
-        }
+        final boolean isSourceCheckout = (internalFrameworkExists && (isDirectoryPresent(effectivePath, "app/code/Magento") || isDirectoryPresent(effectivePath, "app/code")))
+                || MagentoVersionUtil.getSourceVersionData(project, effectivePath) != null;
 
         if (isSourceCheckout) {
+            final List<String> sourceMissing = new ArrayList<>();
+            if (!composerJsonExists) {
+                sourceMissing.add("composer.json");
+            }
+            if (!vendorAutoloadExists) {
+                sourceMissing.add("vendor dependencies (run composer install)");
+            }
+            if (!hasKnownVersion) {
+                sourceMissing.add("unknown platform version");
+            }
+            final String summary = "Supported source checkout"
+                    + (hasKnownVersion ? " (" + rawVersion + (rawEdition != null ? ", " + rawEdition : "") + ")" : " (version unknown)")
+                    + (sourceMissing.isEmpty() ? " with installed dependencies" : " (missing vendor dependencies)");
             return new InstallationDetails(
                     InstallationType.SOURCE_CHECKOUT,
                     true,
@@ -250,12 +241,45 @@ public class MagentoProjectConfigurationService {
                     frameworkExists,
                     rawVersion,
                     rawEdition,
-                    missing,
-                    "Supported source checkout" + (hasKnownVersion ? " (" + rawVersion + ")" : " (version unknown)")
+                    sourceMissing,
+                    summary
+            );
+        }
+
+        if (vendorFrameworkExists && composerJsonExists && hasKnownVersion) {
+            final List<String> appMissing = new ArrayList<>();
+            if (!vendorAutoloadExists) {
+                appMissing.add("vendor/autoload.php");
+            }
+            return new InstallationDetails(
+                    InstallationType.RECOGNIZED_APPLICATION,
+                    true,
+                    true,
+                    true,
+                    true,
+                    rawVersion,
+                    rawEdition,
+                    appMissing,
+                    "Recognized Magento 2 application (" + rawVersion
+                            + (rawEdition != null ? ", " + rawEdition : "") + ")"
+                            + (appMissing.isEmpty() ? "" : " (missing: " + String.join(", ", appMissing) + ")")
             );
         }
 
         if (composerJsonExists || frameworkExists || isDirectoryPresent(effectivePath, "app/code")) {
+            final List<String> partialMissing = new ArrayList<>();
+            if (!composerJsonExists) {
+                partialMissing.add("composer.json");
+            }
+            if (!frameworkExists) {
+                partialMissing.add("vendor/magento/framework");
+            }
+            if (!vendorAutoloadExists) {
+                partialMissing.add("vendor/autoload.php");
+            }
+            if (!hasKnownVersion) {
+                partialMissing.add("unknown platform version");
+            }
             return new InstallationDetails(
                     InstallationType.PARTIAL_CHECKOUT,
                     true,
@@ -264,8 +288,8 @@ public class MagentoProjectConfigurationService {
                     frameworkExists,
                     hasKnownVersion ? rawVersion : null,
                     rawEdition,
-                    missing,
-                    "Supported partial checkout (missing: " + String.join(", ", missing) + ")"
+                    partialMissing,
+                    "Supported partial checkout (missing: " + String.join(", ", partialMissing) + ")"
             );
         }
 
@@ -280,6 +304,16 @@ public class MagentoProjectConfigurationService {
                 List.of("composer.json", "vendor/magento/framework"),
                 "Directory exists but no Magento application structure was recognized."
         );
+    }
+
+    private boolean isFilePresent(final String basePath, final String relativePath) {
+        final VirtualFile vf = resolveVirtualFile(basePath);
+        if (vf != null) {
+            final VirtualFile sub = vf.findFileByRelativePath(relativePath);
+            return sub != null && !sub.isDirectory();
+        }
+        final File f = new File(basePath, relativePath);
+        return f.exists() && f.isFile();
     }
 
     private boolean isDirectoryPresent(final String basePath, final String relativePath) {
@@ -356,26 +390,53 @@ public class MagentoProjectConfigurationService {
         final boolean newEnabled = enabled != null ? enabled : previousState.enabled();
         final boolean isPathProvided = rawPath != null && !rawPath.trim().isEmpty();
 
-        String targetResolvedPath = null;
+        final String targetResolvedPath;
         if (isPathProvided) {
             targetResolvedPath = resolvePath(rawPath);
-            final InstallationDetails targetDetails = inspectPath(targetResolvedPath);
-            if (!targetDetails.exists()) {
-                errors.add("Path does not exist: " + rawPath + " (resolved to: " + targetResolvedPath + ")");
-            } else if (!targetDetails.isDirectory()) {
-                errors.add("Path is a file, not a directory: " + rawPath + " (resolved to: " + targetResolvedPath + ")");
-            }
-        } else if (newEnabled) {
-            if (StringUtil.isEmptyOrSpaces(previousState.configuredPath())) {
+        } else if (!StringUtil.isEmptyOrSpaces(previousState.configuredPath())) {
+            targetResolvedPath = previousState.resolvedPath() != null
+                    ? previousState.resolvedPath()
+                    : resolvePath(previousState.configuredPath());
+        } else {
+            targetResolvedPath = null;
+        }
+
+        InstallationDetails validatedDetails = null;
+
+        if (newEnabled) {
+            if (StringUtil.isEmptyOrSpaces(targetResolvedPath)) {
                 errors.add("Magento installation path cannot be empty when enabling integration.");
             } else {
-                targetResolvedPath = previousState.resolvedPath();
+                validatedDetails = inspectPath(targetResolvedPath);
+                if (!validatedDetails.exists()) {
+                    errors.add("Path does not exist: " + (isPathProvided ? rawPath : targetResolvedPath)
+                            + " (resolved to: " + targetResolvedPath + ")");
+                } else if (!validatedDetails.isDirectory()) {
+                    errors.add("Path is a file, not a directory: " + (isPathProvided ? rawPath : targetResolvedPath)
+                            + " (resolved to: " + targetResolvedPath + ")");
+                }
             }
-        } else {
-            targetResolvedPath = previousState.resolvedPath();
+        } else if (isPathProvided && targetResolvedPath != null) {
+            validatedDetails = inspectPath(targetResolvedPath);
+            if (!validatedDetails.exists()) {
+                errors.add("Path does not exist: " + rawPath + " (resolved to: " + targetResolvedPath + ")");
+            } else if (!validatedDetails.isDirectory()) {
+                errors.add("Path is a file, not a directory: " + rawPath + " (resolved to: " + targetResolvedPath + ")");
+            }
         }
 
         if (!errors.isEmpty()) {
+            final String nextAction;
+            if (validatedDetails != null && !validatedDetails.exists()) {
+                nextAction = "Provide a valid path to an existing Magento directory within the project or on disk.";
+            } else if (validatedDetails != null && !validatedDetails.isDirectory()) {
+                nextAction = "Provide a path to a directory, not a file.";
+            } else if (StringUtil.isEmptyOrSpaces(targetResolvedPath)) {
+                nextAction = "Provide a valid Magento directory path when enabling integration.";
+            } else {
+                nextAction = "Correct validation errors before configuring Magento integration.";
+            }
+
             return new ConfigurationResult(
                     false,
                     "configure",
@@ -385,7 +446,7 @@ public class MagentoProjectConfigurationService {
                     errors,
                     false,
                     false,
-                    "Provide a valid path to an existing Magento directory within the project or on disk."
+                    nextAction
             );
         }
 
@@ -425,31 +486,38 @@ public class MagentoProjectConfigurationService {
             );
         }
 
-        // Apply changes to Settings
-        settings.pluginEnabled = newEnabled;
-        if (finalPathToSave != null) {
-            settings.setMagentoPath(finalPathToSave);
-        }
-        if (newExclude != null) {
-            settings.setExcludeGeneratedFiles(newExclude);
-        }
+        final Settings.State oldState = Objects.requireNonNull(settings.getState());
 
+        String finalVersion = oldState.magentoVersion;
+        String finalEdition = oldState.magentoEdition;
         if (newEnabled && finalPathToSave != null) {
             final Pair<String, String> versionData = MagentoVersionUtil.getVersionData(project, finalPathToSave);
-            settings.magentoVersion = versionData != null ? versionData.getFirst() : null;
-            settings.magentoEdition = versionData != null ? versionData.getSecond() : null;
-            settings.mftfSupportEnabled = true;
+            finalVersion = versionData != null ? versionData.getFirst() : null;
+            finalEdition = versionData != null ? versionData.getSecond() : null;
         }
 
-        // Notify settings listeners
-        settings.setState(Objects.requireNonNull(settings.getState()));
+        final Settings.State newState = new Settings.State(
+                newEnabled,
+                finalPathToSave != null ? finalPathToSave : oldState.magentoPath,
+                oldState.defaultLicenseName,
+                oldState.mftfSupportEnabled,
+                oldState.myDoNotAskContentConfigAgain,
+                oldState.mcpCliToolCandidates,
+                oldState.publishedReleasesUrl,
+                finalVersion,
+                finalEdition,
+                oldState.myMagentoFolders,
+                newExclude != null ? newExclude : oldState.excludeGeneratedFiles,
+                oldState.additionalExcludedPaths,
+                oldState.managedExcludedFolders
+        );
+        newState.managedExclusionOwners = oldState.managedExclusionOwners;
 
-        // Apply indexing exclusions
-        if (newEnabled && finalPathToSave != null && inspectPath(finalPathToSave).exists()) {
-            MagentoIndexingExclusionService.getInstance(project).applyExclusions();
-        } else if (!newEnabled) {
-            MagentoIndexingExclusionService.getInstance(project).resetExclusions();
-        }
+        // Apply via setState so notifyListeners fires properly
+        settings.setState(newState);
+
+        // Apply indexing exclusions (managed exclusions removed if !newEnabled without deleting preferences)
+        MagentoIndexingExclusionService.getInstance(project).applyExclusions();
 
         // Refresh affected module/library/index state
         refreshProjectState(newEnabled);
@@ -492,6 +560,21 @@ public class MagentoProjectConfigurationService {
             return "Wait for IDE indexing to finish before querying Magento modules or running inspections.";
         }
         final InstallationDetails installation = state.installation();
+        if (installation.type() == InstallationType.NONEXISTENT) {
+            return "Configured Magento directory does not exist. Call configure_magento_project with a valid magentoPath.";
+        }
+        if (installation.type() == InstallationType.FILE_NOT_DIRECTORY) {
+            return "Configured path points to a file, not a directory. Specify a directory path.";
+        }
+        if (installation.type() == InstallationType.NOT_CONFIGURED) {
+            return "Configure a Magento root path using configure_magento_project.";
+        }
+        if (installation.type() == InstallationType.SOURCE_CHECKOUT) {
+            if (!installation.missingDependencies().isEmpty()) {
+                return "Run \"composer install\" under the Magento root to install vendor dependencies, then query modules with magento_inspect.";
+            }
+            return "Query project configuration and declarations with magento_inspect.";
+        }
         if (installation.type() == InstallationType.PARTIAL_CHECKOUT) {
             if (!installation.frameworkExists()) {
                 return "Run \"composer install\" under the Magento root to install dependencies, then query modules with magento_inspect.";

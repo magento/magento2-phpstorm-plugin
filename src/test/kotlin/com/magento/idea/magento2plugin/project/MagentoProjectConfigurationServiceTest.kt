@@ -88,6 +88,7 @@ class MagentoProjectConfigurationServiceTest : PhysicalMagentoTestCase() {
         myFixture.addFileToProject("composer.json", """{"name":"magento/project-community-edition","version":"2.4.8"}""")
         myFixture.addFileToProject("composer.lock", """{"packages":[{"name":"magento/product-community-edition","version":"2.4.8"}]}""")
         myFixture.addFileToProject("vendor/magento/framework/composer.json", """{"name":"magento/framework"}""")
+        myFixture.addFileToProject("vendor/autoload.php", "<?php\n")
 
         val result = service().configure(".", true, null, null)
 
@@ -168,5 +169,104 @@ class MagentoProjectConfigurationServiceTest : PhysicalMagentoTestCase() {
         assertTrue(reloaded.pluginEnabled)
         assertEquals(project.basePath, reloaded.magentoPath)
         assertTrue(reloaded.isExcludeGeneratedFiles)
+    }
+
+    @Test
+    fun testSourceCheckoutWithoutInstalledDependenciesReportsMissingVendorDependencies() {
+        myFixture.addFileToProject("composer.json", """{"name":"magento/magento2ce","version":"2.4.8"}""")
+        myFixture.addFileToProject("app/code/Magento/Catalog/registration.php", "<?php\n")
+        myFixture.addFileToProject("lib/internal/Magento/Framework/registration.php", "<?php\n")
+        // Note: vendor/autoload.php is NOT present!
+
+        val details = service().inspectPath(".")
+        assertEquals(InstallationType.SOURCE_CHECKOUT, details.type)
+        assertTrue(details.missingDependencies.any { it.contains("vendor dependencies") })
+        assertTrue(details.summary.contains("missing vendor dependencies"))
+
+        val result = service().configure(".", true, null, null)
+        assertTrue(result.success)
+        assertEquals(InstallationType.SOURCE_CHECKOUT, result.currentState.installation.type)
+        assertTrue(result.currentState.installation.missingDependencies.any { it.contains("vendor dependencies") })
+        assertTrue(result.nextUsableAction.contains("composer install"))
+    }
+
+    @Test
+    fun testReenablingWithDeletedOrInvalidSavedPathFailsValidation() {
+        val settings = Settings.getInstance(project)
+        settings.pluginEnabled = false
+        settings.magentoPath = "/path/that/does/not/exist/anywhere"
+
+        val result = service().configure(null, true, null, null)
+        assertFalse(result.success)
+        assertTrue(result.validationErrors.any { it.contains("does not exist") })
+        assertFalse(settings.pluginEnabled)
+        assertTrue(result.nextUsableAction.contains("Provide a valid path"))
+    }
+
+    @Test
+    fun testPreserveMftfPreferenceWhenChangingRootOrExclusions() {
+        myFixture.addFileToProject("composer.json", """{"name":"magento/project-community-edition","version":"2.4.8"}""")
+        myFixture.addFileToProject("vendor/magento/framework/composer.json", """{"name":"magento/framework"}""")
+
+        val settings = Settings.getInstance(project)
+        settings.mftfSupportEnabled = false
+
+        val result = service().configure(".", true, true, null)
+        assertTrue(result.success)
+        assertFalse(settings.mftfSupportEnabled)
+    }
+
+    @Test
+    fun testDisablingIntegrationPreservesSavedExclusions() {
+        myFixture.addFileToProject("composer.json", """{"name":"magento/project-community-edition","version":"2.4.8"}""")
+        myFixture.addFileToProject("vendor/magento/framework/composer.json", """{"name":"magento/framework"}""")
+
+        val settings = Settings.getInstance(project)
+        settings.pluginEnabled = true
+        settings.setMagentoPath(project.basePath)
+        settings.setExcludeGeneratedFiles(false)
+        settings.setAdditionalExcludedPaths(listOf(".runtime/"))
+
+        // Disable integration
+        val disabledResult = service().configure(null, false, null, null)
+        assertTrue(disabledResult.success)
+        assertFalse(settings.pluginEnabled)
+        // Saved preferences MUST NOT be deleted
+        assertEquals(false, settings.excludeGeneratedFiles)
+        assertEquals(listOf(".runtime/"), settings.additionalExcludedPaths)
+
+        // Re-enable integration without supplying exclusion parameter
+        val enabledResult = service().configure(null, true, null, null)
+        assertTrue(enabledResult.success)
+        assertTrue(settings.pluginEnabled)
+        // Saved preferences remain intact
+        assertEquals(false, settings.excludeGeneratedFiles)
+        assertEquals(listOf(".runtime/"), settings.additionalExcludedPaths)
+    }
+
+    @Test
+    fun testSettingsChangeListenerFiresOnOrdinaryMcpUpdate() {
+        myFixture.addFileToProject("composer.json", """{"name":"magento/project-community-edition","version":"2.4.8"}""")
+        myFixture.addFileToProject("vendor/magento/framework/composer.json", """{"name":"magento/framework"}""")
+
+        val settings = Settings.getInstance(project)
+        settings.pluginEnabled = false
+        settings.magentoPath = null
+
+        var listenerFired = false
+        var observedEnabled = false
+        var observedPath: String? = null
+
+        settings.addListener { state, _ ->
+            listenerFired = true
+            observedEnabled = state.isPluginEnabled
+            observedPath = state.magentoPath
+        }
+
+        val result = service().configure(".", true, true, null)
+        assertTrue(result.success)
+        assertTrue(listenerFired)
+        assertTrue(observedEnabled)
+        assertEquals(project.basePath, observedPath)
     }
 }

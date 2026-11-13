@@ -13,6 +13,7 @@ import com.intellij.driver.sdk.isPluginLoaded
 import com.intellij.driver.sdk.singleProject
 import com.intellij.driver.sdk.ui.components.common.ideFrame
 import com.intellij.driver.sdk.ui.components.elements.button
+import com.intellij.driver.sdk.ui.components.elements.waitForNoOpenedDialogs
 import com.intellij.driver.sdk.ui.components.settings.settingsDialog
 import com.intellij.driver.sdk.waitFor
 import com.magento.idea.magento2plugin.ui.runWebStormUiTest
@@ -69,7 +70,7 @@ class MagentoProjectConfigurationUiTest {
         check(settings.isEnabled(project)) { "Plugin should be enabled after MCP configuration" }
         check(settings.isExcludeGeneratedFiles(project)) { "Exclusions should be enabled by default" }
 
-        // 3. Open Magento settings dialog and verify MCP-configured state
+        // 3. Open Magento settings dialog and verify MCP-configured state in visible UI components
         ideFrame {
             openSettingsDialog()
             settingsDialog {
@@ -79,28 +80,68 @@ class MagentoProjectConfigurationUiTest {
                 }
                 settingsTree.clickRow { it == "Magento" }
 
-                // Settings dialog shows updated values from Settings service
-                check(settings.isEnabled(project)) { "Settings dialog reflects enabled state" }
-                check(settings.getMagentoPath(project) == root.toString()) { "Settings dialog reflects configured path" }
-                check(settings.isExcludeGeneratedFiles(project)) { "Settings dialog reflects exclusion checkbox" }
+                content {
+                    val pluginEnabledBox = x("//div[@class='JCheckBox' and @text='Enable Magento integration']")
+                    val excludeBox = x("//div[@class='JCheckBox' and @text='Exclude generated and runtime files from indexing']")
+                    val pathField = xx("//div[@class='TextFieldWithBrowseButton']//div[contains(@class, 'TextField')]", com.intellij.driver.sdk.ui.components.elements.JTextFieldUI::class.java).list().firstOrNull()
+                        ?: xx("//div[@class='JTextField']", com.intellij.driver.sdk.ui.components.elements.JTextFieldUI::class.java).list().first { it.text.replace('\\', '/') == root.toString().replace('\\', '/') }
 
-                button("OK").click()
+                    val isPluginChecked = withContext(OnDispatcher.EDT) {
+                        driver.cast(pluginEnabledBox.component, SwingCheckBox::class).isSelected()
+                    }
+                    check(isPluginChecked) { "UI checkbox 'Enable Magento integration' should be selected" }
+
+                    val isExcludeChecked = withContext(OnDispatcher.EDT) {
+                        driver.cast(excludeBox.component, SwingCheckBox::class).isSelected()
+                    }
+                    check(isExcludeChecked) { "UI checkbox 'Exclude generated...' should be selected" }
+
+                    check(pathField.text.replace('\\', '/') == root.toString().replace('\\', '/')) {
+                        "UI path text field expected ${root.toString()}, found ${pathField.text}"
+                    }
+
+                    // UI edit -> save in UI -> MCP status check round trip:
+                    // Toggle exclusion checkbox in the UI
+                    withContext(OnDispatcher.EDT) {
+                        val cb = driver.cast(excludeBox.component, SwingCheckBox::class)
+                        cb.doClick(0)
+                    }
+                    val isExcludeCheckedAfterClick = withContext(OnDispatcher.EDT) {
+                        driver.cast(excludeBox.component, SwingCheckBox::class).isSelected()
+                    }
+                    check(!isExcludeCheckedAfterClick) { "UI checkbox should be unchecked after click" }
+                }
+
+                withContext(OnDispatcher.EDT) {
+                    val apply = driver.cast(applyButton.component, ProjectConfigButton::class)
+                    if (apply.isEnabled()) {
+                        apply.doClick()
+                    }
+                    val okComponent = runCatching { okButton.component }.getOrNull()
+                        ?: button("OK").component
+                    driver.cast(okComponent, ProjectConfigButton::class).doClick()
+                }
             }
+            waitForNoOpenedDialogs()
             waitForIndicators(5.minutes)
         }
 
-        // 4. Repeated configuration is idempotent
+        // 4. Verify MCP status reflects the updated UI setting
+        val statusAfterUiEdit = commands.getStatus(project)
+        check(statusAfterUiEdit.contains("Indexing exclusions: disabled (opt-out)")) { statusAfterUiEdit }
+
+        // 5. Repeated configuration is idempotent
         val repeatResult = commands.configure(
             project = project,
             action = "configure",
             magentoPath = ".",
             enabled = true,
-            excludeGeneratedFiles = true,
+            excludeGeneratedFiles = false,
             projectPath = root.toString()
         )
         check(repeatResult.contains("no changes required")) { repeatResult }
 
-        // 5. Query fixture module through magento_inspect to verify setup has a usable effect
+        // 6. Query fixture module through magento_inspect to verify setup has a usable effect
         val inspectResult = withReadAction {
             inspections.query(project, "module", """{"moduleName":"Acme_Shipping"}""")
         }
@@ -201,4 +242,17 @@ private interface ProjectSettingsRemote {
     fun isEnabled(project: Project): Boolean
     fun getMagentoPath(project: Project): String?
     fun isExcludeGeneratedFiles(project: Project): Boolean
+}
+
+@Remote("javax.swing.JCheckBox")
+private interface SwingCheckBox {
+    fun isSelected(): Boolean
+    fun setSelected(selected: Boolean)
+    fun doClick(pressTime: Int)
+}
+
+@Remote("javax.swing.AbstractButton")
+private interface ProjectConfigButton {
+    fun isEnabled(): Boolean
+    fun doClick()
 }

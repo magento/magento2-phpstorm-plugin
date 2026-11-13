@@ -355,8 +355,6 @@ public class SettingsForm implements SearchableConfigurable {
             updatesPanel.validateSettings();
         }
 
-        saveSettings();
-
         final MagentoProjectConfigurationService.ConfigurationResult configResult =
                 MagentoProjectConfigurationService.getInstance(project).configure(
                         getMagentoPath(),
@@ -369,6 +367,8 @@ public class SettingsForm implements SearchableConfigurable {
             throw new ConfigurationException(String.join("<br>", configResult.validationErrors()));
         }
 
+        saveSettings();
+
         if (updatesPanel != null) {
             updatesPanel.apply();
         }
@@ -376,7 +376,7 @@ public class SettingsForm implements SearchableConfigurable {
         MagentoIndexingExclusionService.getInstance(project).applyExclusions();
         afterSettingsApplied(getSettings().getState());
 
-        if (buttonReindex.isEnabled() && configResult.reindexExecuted()) {
+        if (buttonReindex.isEnabled()) {
             reindex();
         }
     }
@@ -579,7 +579,7 @@ public class SettingsForm implements SearchableConfigurable {
         return this.pluginEnabled.isSelected();
     }
 
-    protected @NotNull Project getProject() {
+    public @NotNull Project getProject() {
         return project;
     }
 

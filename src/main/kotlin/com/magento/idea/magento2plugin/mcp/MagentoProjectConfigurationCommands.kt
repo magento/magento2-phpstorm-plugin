@@ -83,12 +83,24 @@ internal object MagentoProjectConfigurationCommands {
     ): String {
         val normalizedAction = action.trim().lowercase()
 
-        if (normalizedAction == "help" || normalizedAction == "schema") {
+        if (normalizedAction == "help" || normalizedAction == "schema" || normalizedAction == "detailed_schema") {
             return help()
         }
 
+        if (normalizedAction == "status") {
+            return getStatus(project)
+        }
+
+        if (normalizedAction != "configure" && normalizedAction.isNotBlank()) {
+            return """
+                Result: error
+                Message: Unsupported action '$action'. Supported actions are: status, configure, help.
+                Next usable action: Call configure_magento_project with action="status", action="configure", or action="help".
+            """.trimIndent()
+        }
+
         val isConfigArgProvided = magentoPath.isNotBlank() || enabled != null || excludeGeneratedFiles != null
-        if (normalizedAction == "status" || (!isConfigArgProvided && normalizedAction == "configure")) {
+        if (!isConfigArgProvided) {
             return getStatus(project)
         }
 

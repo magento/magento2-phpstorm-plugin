@@ -397,11 +397,14 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         val originalPath = Settings.getInstance(project).magentoPath
         val originalEnabled = Settings.getInstance(project).pluginEnabled
         try {
-            // Status mode
-            val status = text("configure_magento_project", JSONObject().put("action", "status"))
-            assertTrue(status, status.contains("Magento Project Integration Status"))
-            assertTrue(status, status.contains("Integration enabled: yes"))
-            assertTrue(status, status.contains("src"))
+            // Start with integration disabled to verify configuration from scratch
+            Settings.getInstance(project).pluginEnabled = false
+            Settings.getInstance(project).magentoPath = ""
+
+            // Status reflects disabled
+            val initialStatus = text("configure_magento_project", JSONObject().put("action", "status"))
+            assertTrue(initialStatus, initialStatus.contains("Magento Project Integration Status"))
+            assertTrue(initialStatus, initialStatus.contains("Integration enabled: no"))
 
             // Help mode
             val help = text("configure_magento_project", JSONObject().put("action", "help"))
@@ -417,11 +420,21 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
             )
             assertTrue(invalidResult, invalidResult.contains("Result: error"))
             assertTrue(invalidResult, invalidResult.contains("Path does not exist"))
-            assertEquals("Configured Magento root path: ${root.resolve("src").toString().replace('\\', '/')}", text("get_magento_root_path"))
+            assertFalse(Settings.getInstance(project).pluginEnabled)
 
-            // Project root configuration
+            // Unsupported action rejected without changing settings
+            val unsupported = text("configure_magento_project", JSONObject()
+                .put("action", "preview")
+                .put("enabled", false)
+            )
+            assertTrue(unsupported, unsupported.contains("Result: error"))
+            assertTrue(unsupported, unsupported.contains("Unsupported action 'preview'"))
+
+            // Project root configuration from disabled state
             file("composer.json", """{"name":"magento/project-community-edition","version":"2.4.8"}""")
+            file("composer.lock", """{"packages":[{"name":"magento/product-community-edition","version":"2.4.8"}]}""")
             file("vendor/magento/framework/composer.json", """{"name":"magento/framework"}""")
+            file("vendor/autoload.php", "<?php\n")
             val configureRoot = text("configure_magento_project", JSONObject()
                 .put("action", "configure")
                 .put("magentoPath", ".")
@@ -431,6 +444,7 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
             assertTrue(configureRoot, configureRoot.contains("Result: success"))
             assertTrue(configureRoot, configureRoot.contains("Integration enabled: yes"))
             assertTrue(configureRoot, configureRoot.contains("Indexing exclusions: enabled"))
+            assertEquals("Configured Magento root path: ${root.toString().replace('\\', '/')}", text("get_magento_root_path"))
 
             // Idempotent repeat
             val repeatRoot = text("configure_magento_project", JSONObject()
