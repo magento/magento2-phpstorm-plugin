@@ -97,7 +97,12 @@ dependencies {
     testRuntimeOnly(libs.junit.platform.launcher)
 
     intellijPlatform {
-        create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
+        val platformLocalPath = providers.gradleProperty("platformLocalPath")
+        if (platformLocalPath.isPresent) {
+            local(platformLocalPath)
+        } else {
+            create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
+        }
 
         bundledPlugins(providers.gradleProperty("platformBundledPlugins").map { it.split(',') })
         plugins(providers.gradleProperty("platformPlugins").map { it.split(',') })
