@@ -258,6 +258,13 @@ public class Settings implements PersistentStateComponent<Settings.State> {
         this.myEventDispatcher.addListener(listener);
     }
 
+    public void addListener(
+            final MagentoModuleDataListener listener,
+            final com.intellij.openapi.Disposable parentDisposable
+    ) {
+        this.myEventDispatcher.addListener(listener, parentDisposable);
+    }
+
     private void notifyListeners(final State state, final State oldState) {
         if (!state.equals(oldState)) {
             this.myEventDispatcher.getMulticaster().stateChanged(state, oldState);

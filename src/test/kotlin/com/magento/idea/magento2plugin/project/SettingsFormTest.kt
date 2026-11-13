@@ -36,6 +36,44 @@ class SettingsFormTest : PhysicalMagentoTestCase() {
     private inline fun <reified T> field(form: SettingsForm, name: String): T =
         SettingsForm::class.java.getDeclaredField(name).apply { isAccessible = true }.get(form) as T
 
+    fun testDisableIntegrationWithMissingSavedDirectory() {
+        val form = createForm()
+        val settings = Settings.getInstance(project)
+        val missingPath = "${project.basePath}/removed-magento"
+        settings.magentoPath = missingPath
+        form.reset()
+        field<JCheckBox>(form, "pluginEnabled").isSelected = false
+
+        form.apply()
+
+        assertFalse(settings.pluginEnabled)
+        assertEquals(missingPath, settings.magentoPath)
+        form.disposeUIResources()
+    }
+
+    fun testDisposedFormIgnoresQueuedAndFutureSettingsChanges() {
+        val form = createForm()
+        val settings = Settings.getInstance(project)
+        val enabled = field<JCheckBox>(form, "pluginEnabled")
+        val disabledState = settings.state!!.apply { pluginEnabled = false }
+        settings.setState(disabledState)
+        form.disposeUIResources()
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+        assertTrue("Queued updates must not reach a disposed form", enabled.isSelected)
+
+        settings.setState(settings.state!!.apply { pluginEnabled = true })
+        settings.setState(settings.state!!.apply { pluginEnabled = false })
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+        assertTrue("Future updates must not reach a disposed form", enabled.isSelected)
+
+        form.createComponent()
+        form.reset()
+        settings.setState(settings.state!!.apply { pluginEnabled = true })
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+        assertTrue("A reopened form must receive updates", enabled.isSelected)
+        form.disposeUIResources()
+    }
+
     fun testApplyEnablesInspectionsReaderModeSwitchedOff() {
         val form = createForm()
         val file = myFixture.addFileToProject("app/code/Foo/Applied/etc/di.xml", "<config/>")

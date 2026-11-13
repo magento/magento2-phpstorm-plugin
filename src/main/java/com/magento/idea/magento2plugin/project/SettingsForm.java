@@ -58,6 +58,7 @@ public class SettingsForm implements SearchableConfigurable {
     private static final String DEFAULT_MAGENTO_EDITION_LABEL = "Platform Version:";
 
     private final Project project;
+    private com.intellij.openapi.Disposable settingsListenerDisposable;
     private JCheckBox pluginEnabled;
     private JButton buttonReindex;
     private JPanel panel;
@@ -166,9 +167,15 @@ public class SettingsForm implements SearchableConfigurable {
         updateMagentoVersion();
         updateEffectiveExclusionsDisplay();
 
+        if (settingsListenerDisposable != null) {
+            com.intellij.openapi.util.Disposer.dispose(settingsListenerDisposable);
+        }
+        final com.intellij.openapi.Disposable listenerDisposable =
+                com.intellij.openapi.util.Disposer.newDisposable("Magento settings UI listener");
+        settingsListenerDisposable = listenerDisposable;
         getSettings().addListener((state, oldState) -> {
             com.intellij.openapi.application.ApplicationManager.getApplication().invokeLater(() -> {
-                if (panel == null) {
+                if (settingsListenerDisposable != listenerDisposable) {
                     return;
                 }
                 pluginEnabled.setSelected(state.isPluginEnabled());
@@ -178,7 +185,7 @@ public class SettingsForm implements SearchableConfigurable {
                 updateMagentoVersion();
                 updateEffectiveExclusionsDisplay();
             });
-        });
+        }, listenerDisposable);
 
         return (JComponent) panel;
     }
@@ -504,7 +511,11 @@ public class SettingsForm implements SearchableConfigurable {
 
     @Override
     public void disposeUIResources() {
-        //do nothing
+        final com.intellij.openapi.Disposable listenerDisposable = settingsListenerDisposable;
+        settingsListenerDisposable = null;
+        if (listenerDisposable != null) {
+            com.intellij.openapi.util.Disposer.dispose(listenerDisposable);
+        }
     }
 
     public Settings getSettings() {

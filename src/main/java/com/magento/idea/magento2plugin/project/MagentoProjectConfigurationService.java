@@ -456,13 +456,6 @@ public class MagentoProjectConfigurationService {
                     errors.add("Directory has no recognized Magento structure: " + (isPathProvided ? rawPath : targetResolvedPath));
                 }
             }
-        } else if (isPathProvided && targetResolvedPath != null) {
-            validatedDetails = inspectPath(targetResolvedPath);
-            if (!validatedDetails.exists()) {
-                errors.add("Path does not exist: " + rawPath + " (resolved to: " + targetResolvedPath + ")");
-            } else if (!validatedDetails.isDirectory()) {
-                errors.add("Path is a file, not a directory: " + rawPath + " (resolved to: " + targetResolvedPath + ")");
-            }
         }
 
         if (!errors.isEmpty()) {
