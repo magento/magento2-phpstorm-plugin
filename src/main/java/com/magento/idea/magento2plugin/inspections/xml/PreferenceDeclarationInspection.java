@@ -17,7 +17,7 @@ import com.intellij.psi.xml.XmlTag;
 import com.magento.idea.magento2plugin.bundles.InspectionBundle;
 import com.magento.idea.magento2plugin.inspections.validator.InspectionValidator;
 import com.magento.idea.magento2plugin.inspections.validator.NotEmptyValidator;
-import com.magento.idea.magento2plugin.inspections.validator.PhpClassExistenceValidator;
+import com.magento.idea.magento2plugin.inspections.validator.ClassExistenceValidator;
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,8 +32,6 @@ public class PreferenceDeclarationInspection extends XmlSuppressableInspectionTo
         return new XmlElementVisitor() {
 
             private final InspectionBundle inspectionBundle = new InspectionBundle();
-            private final InspectionValidator phpClassExistenceValidator =
-                    new PhpClassExistenceValidator(problemsHolder.getProject());
             private final InspectionValidator notEmptyValidator = new NotEmptyValidator();
 
             @Override
@@ -79,14 +77,16 @@ public class PreferenceDeclarationInspection extends XmlSuppressableInspectionTo
                     );
                 }
 
-                if (!phpClassExistenceValidator.validate(preferenceForAttribute.getValue())) {
+                if (ClassExistenceValidator.isAvailable()
+                        && !ClassExistenceValidator.isClassDeclared(problemsHolder.getProject(), preferenceForAttribute.getValue())) {
                     reportClassDoesNotExists(
                             preferenceForAttribute.getValueElement(),
                             preferenceForAttribute.getValue()
                     );
                 }
 
-                if (!phpClassExistenceValidator.validate(preferenceTypeAttribute.getValue())) {
+                if (ClassExistenceValidator.isAvailable()
+                        && !ClassExistenceValidator.isClassDeclared(problemsHolder.getProject(), preferenceTypeAttribute.getValue())) {
                     reportClassDoesNotExists(
                             preferenceTypeAttribute.getValueElement(),
                             preferenceTypeAttribute.getValue()

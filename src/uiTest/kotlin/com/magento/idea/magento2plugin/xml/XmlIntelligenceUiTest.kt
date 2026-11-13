@@ -42,6 +42,8 @@ class XmlIntelligenceUiTest {
 
         assertInspection("$CONSUMER/etc/di.xml", "This plugin does not exist to be disabled.", "missing_plugin", "acme_plugin")
         assertInspection("$CONSUMER/etc/events.xml", "This observer does not exist to be disabled.", "missing_observer", "acme_observer")
+        assertInspection("$CONSUMER/etc/di.xml", "Attribute value \"type\" can not be empty", "\"\"", "AcmeVirtualOne")
+        assertInspection("$CONSUMER/etc/di.xml", "Attribute value \"for\" can not be empty", "\"\"", "AcmeVirtualOne")
     }
 
     private fun Driver.assertCompletion(path: String, caretPrefix: String, vararg expected: String) {
@@ -105,9 +107,12 @@ class XmlIntelligenceUiTest {
         """)
         file("$CONSUMER/etc/di.xml", """
             <config>
+                <virtualType name="EmptyVirtualType" type=""/>
                 <virtualType name="Completion" type="AcmeVirt"/>
                 <virtualType name="Navigation" type="AcmeVirtualOne"/>
+                <preference for="" type="Acme\Model"/>
                 <type name="Acme\Target">
+                    <plugin name="empty_type_plugin" type=""/>
                     <plugin name="acme_plugin" disabled="true"/>
                     <plugin name="missing_plugin" disabled="true"/>
                 </type>

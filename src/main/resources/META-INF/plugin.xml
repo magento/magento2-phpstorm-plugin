@@ -31,6 +31,9 @@
         <extensionPoint qualifiedName="com.magento.idea.magento2plugin.eventTargetProvider"
                         interface="com.magento.idea.magento2plugin.reference.provider.EventTargetProvider"
                         dynamic="false"/>
+        <extensionPoint qualifiedName="com.magento.idea.magento2plugin.classExistenceValidator"
+                        interface="com.magento.idea.magento2plugin.inspections.validator.ClassExistenceValidator"
+                        dynamic="false"/>
     </extensionPoints>
 
     <actions>
@@ -238,6 +241,27 @@
                          groupBundle="magento2.inspection" groupKey="inspection.group.name"
                          enabledByDefault="true" level="WARNING"
                          implementationClass="com.magento.idea.magento2plugin.inspections.xml.ModuleScopeInspection"/>
+
+        <localInspection language="XML" groupPath="XML"
+                         shortName="PluginAttrTypeInspection"
+                         bundle="magento2.inspection" key="inspection.displayName.PluginAttrTypeInspection"
+                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
+                         enabledByDefault="true" level="WARNING"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.PluginAttributeTypeInspection"/>
+
+        <localInspection language="XML" groupPath="XML"
+                         shortName="PreferenceXmlInspections"
+                         bundle="magento2.inspection" key="inspection.displayName.PreferenceXmlInspections"
+                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
+                         enabledByDefault="true" level="WARNING"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.PreferenceDeclarationInspection"/>
+
+        <localInspection language="XML" groupPath="XML"
+                         shortName="InvalidVirtualTypeSourceClassInspection"
+                         bundle="magento2.inspection" key="inspection.displayName.InvalidVirtualTypeSourceClassInspection"
+                         groupBundle="magento2.inspection" groupKey="inspection.group.name"
+                         enabledByDefault="true" level="WARNING"
+                         implementationClass="com.magento.idea.magento2plugin.inspections.xml.InvalidVirtualTypeSourceClassInspection"/>
 
         <searchScopesProvider implementation="com.magento.idea.magento2plugin.lang.psi.search.MagentoSearchScopesProvider"/>
 
