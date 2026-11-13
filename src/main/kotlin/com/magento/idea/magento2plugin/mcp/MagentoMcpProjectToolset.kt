@@ -207,4 +207,41 @@ class MagentoMcpProjectToolset : McpToolset {
             additionalPaths = additionalPaths
         )
     }
+
+    /**
+     * Inspects or configures the Magento project integration and root directory.
+     */
+    @McpTool(name = "configure_magento_project")
+    @McpDescription(
+        "Inspect or configure Magento project integration and root path in the current IDE project.\n\n" +
+        "Modes / Actions:\n" +
+        "- `action=\"status\"`: Read-only inspection of current integration status, resolved root path, installation type, dependencies, and readiness.\n" +
+        "- `action=\"configure\"` (default): Explicitly configure the Magento path and enabled state.\n" +
+        "- `action=\"help\"`: Return tool help and schema.\n\n" +
+        "Parameters:\n" +
+        "- `action`: One of `status`, `configure`, or `help` (default: `configure`).\n" +
+        "- `magentoPath`: Relative path against the IDE project (e.g. `.` or `src`) or absolute path to the Magento directory. Required when enabling integration.\n" +
+        "- `enabled`: `true` to enable Magento integration, `false` to disable.\n" +
+        "- `excludeGeneratedFiles`: Controls whether generated and runtime files are excluded from indexing. Selected by default when first enabled; pass `false` to opt out.\n" +
+        "- `projectPath`: Optional intended IDE project directory path to verify against the active project.\n\n" +
+        "Returns structured before/after state, validation failures, pending index status, and next usable action."
+    )
+    suspend fun configureMagentoProject(
+        action: String = "configure",
+        magentoPath: String = "",
+        enabled: Boolean? = null,
+        excludeGeneratedFiles: Boolean? = null,
+        projectPath: String = ""
+    ): String = MagentoMcpToolsetSupport.withProjectEdtAction(
+        validateProject = false
+    ) {
+        MagentoProjectConfigurationCommands.configure(
+            project = it,
+            action = action,
+            magentoPath = magentoPath,
+            enabled = enabled,
+            excludeGeneratedFiles = excludeGeneratedFiles,
+            projectPath = projectPath
+        )
+    }
 }

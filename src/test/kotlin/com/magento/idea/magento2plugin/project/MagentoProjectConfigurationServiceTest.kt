@@ -1,0 +1,172 @@
+/*
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+package com.magento.idea.magento2plugin.project
+
+import com.intellij.util.xmlb.XmlSerializer
+import com.magento.idea.magento2plugin.PhysicalMagentoTestCase
+import com.magento.idea.magento2plugin.project.MagentoProjectConfigurationService.InstallationType
+import org.junit.Test
+
+class MagentoProjectConfigurationServiceTest : PhysicalMagentoTestCase() {
+
+    private fun service(): MagentoProjectConfigurationService =
+        MagentoProjectConfigurationService.getInstance(project)
+
+    @Test
+    fun testResolvePathRelativeAndNested() {
+        val basePath = project.basePath!!
+        val s = service()
+
+        assertEquals(basePath, s.resolvePath("."))
+        assertNull(s.resolvePath(""))
+        assertEquals(basePath, s.resolvePath("./"))
+        assertEquals("$basePath/src", s.resolvePath("src"))
+        assertEquals("$basePath/src", s.resolvePath("./src/"))
+        assertEquals("$basePath/nested/dir", s.resolvePath("nested/dir/"))
+    }
+
+    @Test
+    fun testRejectEmptyPathWhenEnabling() {
+        val settings = Settings.getInstance(project)
+        settings.pluginEnabled = false
+        settings.magentoPath = null
+
+        val result = service().configure("", true, null, null)
+
+        assertFalse(result.success)
+        assertTrue(result.message.contains("cannot be empty when enabling"))
+        // Assert settings were NOT partially changed
+        assertFalse(settings.pluginEnabled)
+        assertNull(settings.magentoPath)
+    }
+
+    @Test
+    fun testRejectNonexistentPathWithoutChangingSettings() {
+        val settings = Settings.getInstance(project)
+        settings.pluginEnabled = false
+        settings.magentoPath = "/original/path"
+
+        val result = service().configure("nonexistent_subfolder", true, null, null)
+
+        assertFalse(result.success)
+        assertTrue(result.validationErrors.any { it.contains("does not exist") })
+        assertFalse(settings.pluginEnabled)
+        assertEquals("/original/path", settings.magentoPath)
+    }
+
+    @Test
+    fun testRejectFileInsteadOfDirectory() {
+        myFixture.addFileToProject("regular_file.txt", "hello")
+        val settings = Settings.getInstance(project)
+        settings.pluginEnabled = false
+        settings.magentoPath = null
+
+        val result = service().configure("regular_file.txt", true, null, null)
+
+        assertFalse(result.success)
+        assertTrue(result.validationErrors.any { it.contains("file, not a directory") })
+        assertFalse(settings.pluginEnabled)
+    }
+
+    @Test
+    fun testRejectProjectMismatch() {
+        val settings = Settings.getInstance(project)
+        settings.pluginEnabled = false
+
+        val result = service().configure(".", true, null, "/some/different/project")
+
+        assertFalse(result.success)
+        assertTrue(result.validationErrors.any { it.contains("projectPath does not match") })
+        assertFalse(settings.pluginEnabled)
+    }
+
+    @Test
+    fun testRecognizedCompleteInstallation() {
+        myFixture.addFileToProject("composer.json", """{"name":"magento/project-community-edition","version":"2.4.8"}""")
+        myFixture.addFileToProject("composer.lock", """{"packages":[{"name":"magento/product-community-edition","version":"2.4.8"}]}""")
+        myFixture.addFileToProject("vendor/magento/framework/composer.json", """{"name":"magento/framework"}""")
+
+        val result = service().configure(".", true, null, null)
+
+        assertTrue(result.success)
+        assertEquals(InstallationType.RECOGNIZED_APPLICATION, result.currentState.installation.type)
+        assertEquals(project.basePath, result.currentState.resolvedPath)
+        assertTrue(result.currentState.enabled)
+        // Default exclusion setting selected
+        assertEquals(true, result.currentState.excludeGeneratedFiles)
+        assertTrue(result.currentState.installation.missingDependencies.isEmpty())
+    }
+
+    @Test
+    fun testSupportedPartialCheckoutWithMissingDependencies() {
+        myFixture.addFileToProject("composer.json", """{"name":"magento/project-community-edition"}""")
+        // Note: vendor/magento/framework is NOT present!
+
+        val result = service().configure(".", true, null, null)
+
+        assertTrue(result.success)
+        assertEquals(InstallationType.PARTIAL_CHECKOUT, result.currentState.installation.type)
+        assertTrue(result.currentState.installation.missingDependencies.contains("vendor/magento/framework"))
+        assertTrue(result.nextUsableAction.contains("composer install"))
+    }
+
+    @Test
+    fun testExplicitExclusionOptOut() {
+        myFixture.addFileToProject("composer.json", """{"name":"magento/project-community-edition","version":"2.4.8"}""")
+        myFixture.addFileToProject("vendor/magento/framework/composer.json", """{"name":"magento/framework"}""")
+
+        val result = service().configure(".", true, false, null)
+
+        assertTrue(result.success)
+        assertEquals(false, result.currentState.excludeGeneratedFiles)
+        assertFalse(Settings.getInstance(project).isExcludeGeneratedFiles)
+    }
+
+    @Test
+    fun testPreserveExistingUserExclusionChoice() {
+        myFixture.addFileToProject("composer.json", """{"name":"magento/project-community-edition","version":"2.4.8"}""")
+        myFixture.addFileToProject("vendor/magento/framework/composer.json", """{"name":"magento/framework"}""")
+        val settings = Settings.getInstance(project)
+        settings.setExcludeGeneratedFiles(false)
+
+        val result = service().configure(".", true, null, null)
+
+        assertTrue(result.success)
+        assertEquals(false, result.currentState.excludeGeneratedFiles)
+        assertFalse(settings.isExcludeGeneratedFiles)
+    }
+
+    @Test
+    fun testRepeatedConfigurationIsIdempotent() {
+        myFixture.addFileToProject("composer.json", """{"name":"magento/project-community-edition","version":"2.4.8"}""")
+        myFixture.addFileToProject("vendor/magento/framework/composer.json", """{"name":"magento/framework"}""")
+
+        val first = service().configure(".", true, true, null)
+        assertTrue(first.success)
+        assertTrue(first.reindexExecuted)
+
+        val second = service().configure(".", true, true, null)
+        assertTrue(second.success)
+        assertFalse(second.reindexExecuted)
+        assertTrue(second.message.contains("no changes required"))
+    }
+
+    @Test
+    fun testSettingsSurvivePersistenceSerialization() {
+        val settings = Settings.getInstance(project)
+        settings.pluginEnabled = true
+        settings.setMagentoPath(project.basePath)
+        settings.setExcludeGeneratedFiles(true)
+
+        val serialized = XmlSerializer.serialize(settings.state!!)
+        val reloaded = Settings()
+        reloaded.loadState(XmlSerializer.deserialize(serialized, Settings.State::class.java))
+
+        assertTrue(reloaded.pluginEnabled)
+        assertEquals(project.basePath, reloaded.magentoPath)
+        assertTrue(reloaded.isExcludeGeneratedFiles)
+    }
+}

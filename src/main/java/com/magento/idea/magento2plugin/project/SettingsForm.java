@@ -165,6 +165,20 @@ public class SettingsForm implements SearchableConfigurable {
         updateMagentoVersion();
         updateEffectiveExclusionsDisplay();
 
+        getSettings().addListener((state, oldState) -> {
+            com.intellij.openapi.application.ApplicationManager.getApplication().invokeLater(() -> {
+                if (panel == null) {
+                    return;
+                }
+                pluginEnabled.setSelected(state.isPluginEnabled());
+                magentoPath.getTextField().setText(StringUtil.notNullize(state.getMagentoPath()));
+                excludeGeneratedFiles.setSelected(state.getExcludeGeneratedFiles() == null || state.getExcludeGeneratedFiles());
+                refreshFormStatus(state.isPluginEnabled());
+                updateMagentoVersion();
+                updateEffectiveExclusionsDisplay();
+            });
+        });
+
         return (JComponent) panel;
     }
 
@@ -340,7 +354,21 @@ public class SettingsForm implements SearchableConfigurable {
         if (updatesPanel != null) {
             updatesPanel.validateSettings();
         }
+
         saveSettings();
+
+        final MagentoProjectConfigurationService.ConfigurationResult configResult =
+                MagentoProjectConfigurationService.getInstance(project).configure(
+                        getMagentoPath(),
+                        pluginEnabled.isSelected(),
+                        excludeGeneratedFiles.isSelected(),
+                        null
+                );
+
+        if (!configResult.success() && !configResult.validationErrors().isEmpty()) {
+            throw new ConfigurationException(String.join("<br>", configResult.validationErrors()));
+        }
+
         if (updatesPanel != null) {
             updatesPanel.apply();
         }
@@ -348,7 +376,7 @@ public class SettingsForm implements SearchableConfigurable {
         MagentoIndexingExclusionService.getInstance(project).applyExclusions();
         afterSettingsApplied(getSettings().getState());
 
-        if (buttonReindex.isEnabled()) {
+        if (buttonReindex.isEnabled() && configResult.reindexExecuted()) {
             reindex();
         }
     }
@@ -579,41 +607,9 @@ public class SettingsForm implements SearchableConfigurable {
         if (StringUtil.isEmptyOrSpaces(path)) {
             return false;
         }
-        final File file = new File(path);
-        if (file.exists() && file.isDirectory()) {
-            return true;
-        }
-        if (LocalFileSystem.getInstance().findFileByPath(path) != null) {
-            return true;
-        }
-        final VirtualFile vf = com.intellij.openapi.vfs.VirtualFileManager.getInstance()
-                .findFileByUrl(com.intellij.openapi.vfs.VfsUtilCore.pathToUrl(path));
-        if (vf != null && vf.isDirectory()) {
-            return true;
-        }
-        final VirtualFile projectDir = com.intellij.openapi.project.ProjectUtil.guessProjectDir(project);
-        if (projectDir != null) {
-            if (path.equals(projectDir.getPath())) {
-                return true;
-            }
-            if (path.startsWith(projectDir.getPath() + "/")) {
-                final VirtualFile sub = projectDir.findFileByRelativePath(path.substring(projectDir.getPath().length() + 1));
-                if (sub != null && sub.isDirectory()) {
-                    return true;
-                }
-            }
-            final VirtualFile rel = projectDir.findFileByRelativePath(path);
-            if (rel != null && rel.isDirectory()) {
-                return true;
-            }
-            if (path.startsWith("/")) {
-                final VirtualFile relNoSlash = projectDir.findFileByRelativePath(path.substring(1));
-                if (relNoSlash != null && relNoSlash.isDirectory()) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        final MagentoProjectConfigurationService.InstallationDetails details =
+                MagentoProjectConfigurationService.getInstance(project).inspectPath(path);
+        return details.exists() && details.isDirectory();
     }
 
     @NotNull
