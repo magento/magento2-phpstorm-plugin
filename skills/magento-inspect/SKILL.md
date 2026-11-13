@@ -131,13 +131,13 @@ XML lookups locate declarations and source files. Use PHP analysis to validate c
 Get the catalog:
 
 ```json
-{"mode":"help","queryType":"","parametersJson":""}
+{"mode":"help"}
 ```
 
 Get plugin lookup schema:
 
 ```json
-{"mode":"detailed_schema","queryType":"plugins_for_method","parametersJson":""}
+{"mode":"detailed_schema","queryType":"plugins_for_method"}
 ```
 
 Run a plugin lookup:

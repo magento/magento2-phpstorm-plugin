@@ -16,6 +16,7 @@ import com.intellij.openapi.startup.ProjectActivity;
 import com.intellij.openapi.startup.StartupActivity;
 import com.magento.idea.magento2plugin.project.MagentoNotificationUtil;
 import com.magento.idea.magento2plugin.project.Settings;
+import com.magento.idea.magento2plugin.project.indexing.MagentoIndexingExclusionService;
 import com.magento.idea.magento2plugin.util.magento.MagentoBasePathUtil;
 import kotlin.Unit;
 import kotlin.coroutines.Continuation;
@@ -52,6 +53,7 @@ public class CheckIfMagentoPathIsValidActivity implements StartupActivity, Proje
         }
         DeferredProjectOpenActions.getInstance(project).runPendingActions();
         ReaderModeHighlightingReset.run(project);
+        MagentoIndexingExclusionService.getInstance(project).reconcileExclusionsOnStartup();
     }
 
     private void registerNonPhpPhtmlSupport(final @NotNull Project project) {

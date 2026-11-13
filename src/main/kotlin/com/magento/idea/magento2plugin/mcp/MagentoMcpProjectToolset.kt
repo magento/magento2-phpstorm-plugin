@@ -147,18 +147,64 @@ class MagentoMcpProjectToolset : McpToolset {
     )
     suspend fun magentoInspect(
         mode: String,
-        queryType: String,
-        parametersJson: String
+        queryType: String = "",
+        parametersJson: String = ""
     ): String {
         return when (mode.trim().lowercase().replace('-', '_').replace(' ', '_')) {
             "help" -> MagentoInspectionCommands.help()
             "schema", "detailed_schema" -> MagentoInspectionCommands.detailedSchema(queryType)
-            "query" -> MagentoMcpToolsetSupport.withProjectReadAction(
-                requireSmartMode = MagentoInspectionCommands.requiresSmartMode(queryType)
-            ) {
-                MagentoInspectionCommands.query(it, queryType, parametersJson)
+            "query" -> if (queryType.isBlank()) {
+                MagentoInspectionCommands.MISSING_TYPE_MESSAGE
+            } else {
+                MagentoMcpToolsetSupport.withProjectReadAction(
+                    requireSmartMode = MagentoInspectionCommands.requiresSmartMode(queryType)
+                ) {
+                    MagentoInspectionCommands.query(it, queryType, parametersJson)
+                }
             }
             else -> "mode must be `help`, `detailed_schema`, or `query`. Use `help` to inspect the compact Magento inspection catalog."
         }
+    }
+
+    /**
+     * Inspects current Magento indexing exclusion settings, effective excluded paths, reasons, skipped entries, and pending refresh.
+     */
+    @McpTool(name = "get_magento_indexing_exclusions")
+    @McpDescription(
+        "Inspect Magento indexing exclusion settings, effective excluded paths, reasons, skipped entries, and pending index refresh status.\n\n" +
+        "Use this to preview what output locations are excluded from IDE indexing."
+    )
+    suspend fun getMagentoIndexingExclusions(): String = MagentoMcpToolsetSupport.withProjectAction(
+        validateProject = false,
+        requireSmartMode = false
+    ) {
+        MagentoIndexingExclusionCommands.getStatus(it)
+    }
+
+    /**
+     * Manages Magento indexing exclusions with apply, update, reset, or preview operations.
+     */
+    @McpTool(name = "configure_magento_indexing_exclusions")
+    @McpDescription(
+        "Manage Magento indexing exclusions in the current project.\n\n" +
+        "- `action` must be one of `apply`, `update`, `reset`, or `preview`.\n" +
+        "- `enabled` controls whether generated and runtime files are excluded from indexing; omit or pass true to exclude them, or false to opt out.\n" +
+        "- `additionalPaths` specifies explicit project-relative output folders to exclude, such as `.runtime/`.\n" +
+        "- A configured Magento path is mandatory before exclusions can be applied.\n" +
+        "- Reports resolved paths, changes applied, skipped entries, and pending index refresh."
+    )
+    suspend fun configureMagentoIndexingExclusions(
+        action: String = "apply",
+        enabled: Boolean? = null,
+        additionalPaths: List<String>? = null
+    ): String = MagentoMcpToolsetSupport.withProjectEdtAction(
+        validateProject = false
+    ) {
+        MagentoIndexingExclusionCommands.configure(
+            project = it,
+            action = action,
+            enabled = enabled,
+            additionalPaths = additionalPaths
+        )
     }
 }

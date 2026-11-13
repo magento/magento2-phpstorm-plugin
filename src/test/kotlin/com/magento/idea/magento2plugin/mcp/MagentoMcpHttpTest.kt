@@ -44,12 +44,17 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
             "get_magento_root_path" to listOf("absolute project path", "resolved Magento root directory"),
             "describe_magento_cli_environment" to listOf("nearest Docker Compose configuration", "never search outside the project", "./bin/magento takes precedence over ./src/bin/magento"),
             "magento_magerun" to listOf("mode=status only reads local files", "mode=commands", "mode=command_help", "mode=mcp_config", "refresh=true", "never fall back to another runtime"),
+            "get_magento_indexing_exclusions" to listOf("indexing exclusion", "preview"),
+            "configure_magento_indexing_exclusions" to listOf("apply", "update", "reset", "preview", ".runtime/"),
         )
         for ((name, fragments) in descriptions) {
             val description = tools.getValue(name).getString("description")
             for (fragment in fragments) assertTrue("$name: $description", description.contains(fragment))
         }
         assertEquals("Configured Magento root path: ${root.resolve("src").toString().replace('\\', '/')}", text("get_magento_root_path"))
+        val exclusionsStatus = text("get_magento_indexing_exclusions")
+        assertTrue(exclusionsStatus, exclusionsStatus.contains("Exclusions cannot be applied: Magento installation path is invalid"))
+        assertTrue(exclusionsStatus, exclusionsStatus.contains("Configure a valid Magento path before managing indexing exclusions."))
     }
 
     fun testSharedInspectionQueriesAndUnavailablePhpCapabilityOverHttp() {
@@ -95,6 +100,38 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
             inspect("detailed_schema", "plugins_for_method"))
         assertTrue(inspect("query", "di_config", "{}").contains("Missing required parameter `className`"))
         assertTrue(inspect("query", "acl_or_menu", "{invalid").contains("parametersJson must be a valid JSON object"))
+    }
+
+    fun testInspectAndScaffoldRequireOnlyModeOverHttp() {
+        val client = mcp()
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        val tools = client.tools().associateBy { it.getString("name") }
+        for (tool in listOf("magento_inspect", "magento_scaffold")) {
+            assertEquals(listOf<Any>("mode"),
+                tools.getValue(tool).getJSONObject("inputSchema").getJSONArray("required").toList())
+            val missingMode = client.callEnvelope(tool, JSONObject())
+            assertTrue(missingMode.toString(), missingMode.has("error") ||
+                missingMode.optJSONObject("result")?.optBoolean("isError") == true)
+        }
+        fun inspect(vararg arguments: Pair<String, String>) = text("magento_inspect", JSONObject(mapOf(*arguments)))
+        fun scaffold(vararg arguments: Pair<String, String>) = text("magento_scaffold", JSONObject(mapOf(*arguments)))
+
+        assertTrue(inspect("mode" to "help").contains("Queries:"))
+        assertTrue(scaffold("mode" to "help").contains("Scaffolds:"))
+        assertTrue(scaffold("mode" to "help", "scaffoldType" to "", "parametersJson" to "").contains("Scaffolds:"))
+        assertTrue(inspect("mode" to "detailed_schema", "queryType" to "module").contains("queryType: module"))
+        assertTrue(scaffold("mode" to "detailed_schema", "scaffoldType" to "module").contains("scaffoldType: module"))
+        assertEquals(MagentoInspectionCommands.MISSING_TYPE_MESSAGE, inspect("mode" to "detailed_schema"))
+        assertEquals(MagentoScaffoldCommands.MISSING_TYPE_MESSAGE, scaffold("mode" to "detailed_schema"))
+        assertTrue(inspect("mode" to "query", "queryType" to "module")
+            .contains("Missing required parameter `moduleName`"))
+        assertTrue(scaffold("mode" to "render", "scaffoldType" to "module")
+            .contains("Missing required parameter `packageName`"))
+        // A missing type can never succeed, so indexing must not tell the agent to retry it.
+        DumbModeTestUtils.runInDumbModeSynchronously(project) {
+            assertEquals(MagentoInspectionCommands.MISSING_TYPE_MESSAGE, inspect("mode" to "query"))
+            assertEquals(MagentoScaffoldCommands.MISSING_TYPE_MESSAGE, scaffold("mode" to "render"))
+        }
     }
 
     private fun inspect(mode: String, queryType: String = "", parametersJson: String = ""): String =
