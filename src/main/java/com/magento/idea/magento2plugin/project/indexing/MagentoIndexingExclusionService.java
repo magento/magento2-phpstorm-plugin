@@ -17,6 +17,8 @@ import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.roots.ContentEntry;
 import com.intellij.openapi.roots.ModuleRootModificationUtil;
 import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.roots.SyntheticLibrary;
+import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -129,6 +131,7 @@ public class MagentoIndexingExclusionService {
         final List<String> excludedPaths;
         final List<String> protectedPaths;
         final Set<VirtualFile> excludedVirtualFiles;
+        final ExclusionCondition condition;
 
         ExclusionSnapshot(
                 final boolean active,
@@ -140,7 +143,77 @@ public class MagentoIndexingExclusionService {
             this.excludedPaths = excludedPaths;
             this.protectedPaths = protectedPaths;
             this.excludedVirtualFiles = excludedVirtualFiles;
+            this.condition = new ExclusionCondition(excludedPaths, protectedPaths);
         }
+    }
+
+    /**
+     * Library equality includes its condition. Compare immutable exclusion rules, rather than
+     * the identity of a newly allocated lambda, so unrelated root changes do not rescan Magento.
+     */
+    private record ExclusionCondition(
+            List<String> excludedPaths, List<String> protectedPaths, List<String> cachePaths
+    )
+            implements Condition<VirtualFile> {
+        private ExclusionCondition(final List<String> excludedPaths, final List<String> protectedPaths) {
+            this(excludedPaths, protectedPaths,
+                    excludedPaths.stream().filter(path -> path.endsWith("/.cache")).toList());
+        }
+
+        @Override
+        public boolean value(final VirtualFile file) {
+            return file != null && excludes(file.getPath());
+        }
+
+        private boolean excludes(final String path) {
+            // Named caches can be excluded inside otherwise protected source directories.
+            for (final String cachePath : cachePaths) {
+                if (isUnder(path, cachePath)) {
+                    return true;
+                }
+            }
+            for (final String protectedPath : protectedPaths) {
+                if (isUnder(path, protectedPath)) {
+                    return false;
+                }
+            }
+            for (final String excludedPath : excludedPaths) {
+                if (isUnder(path, excludedPath)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static boolean isUnder(final String path, final String directory) {
+            final int length = directory.length();
+            return path.startsWith(directory)
+                    && (path.length() == length || path.charAt(length) == '/');
+        }
+    }
+
+    /** Apply only rules that can affect these library roots. Most output lives outside them. */
+    @NotNull SyntheticLibrary createLibrary(final @NotNull List<VirtualFile> roots) {
+        final ExclusionSnapshot snapshot = getOrCreateSnapshot();
+        if (!snapshot.active) {
+            return SyntheticLibrary.newImmutableLibrary(roots);
+        }
+        final List<String> relevantPaths = snapshot.excludedPaths.stream()
+                .filter(path -> roots.stream().anyMatch(root ->
+                        ExclusionCondition.isUnder(path, root.getPath())
+                                || ExclusionCondition.isUnder(root.getPath(), path)))
+                .toList();
+        if (relevantPaths.isEmpty()) {
+            return SyntheticLibrary.newImmutableLibrary(roots);
+        }
+        final Set<VirtualFile> excludedRoots = new LinkedHashSet<>();
+        for (final VirtualFile file : snapshot.excludedVirtualFiles) {
+            if (relevantPaths.contains(file.getPath())) {
+                excludedRoots.add(file);
+            }
+        }
+        return SyntheticLibrary.newImmutableLibrary(roots, excludedRoots,
+                new ExclusionCondition(relevantPaths, snapshot.protectedPaths));
     }
 
     private final Project project;
@@ -781,32 +854,7 @@ public class MagentoIndexingExclusionService {
      */
     public boolean isExcludedPath(final @NotNull String filePath) {
         final ExclusionSnapshot snapshot = getOrCreateSnapshot();
-        if (!snapshot.active) {
-            return false;
-        }
-
-        final String normalized = FileUtil.toSystemIndependentName(filePath);
-
-        // Named cache directories are allowed inside otherwise protected source trees.
-        for (final String excludedPath : snapshot.excludedPaths) {
-            if (excludedPath.endsWith("/.cache")
-                    && (normalized.equals(excludedPath) || normalized.startsWith(excludedPath + "/"))) {
-                return true;
-            }
-        }
-        for (final String protectedPath : snapshot.protectedPaths) {
-            if (normalized.equals(protectedPath) || normalized.startsWith(protectedPath + "/")) {
-                return false;
-            }
-        }
-
-        for (final String excludedPath : snapshot.excludedPaths) {
-            if (normalized.equals(excludedPath) || normalized.startsWith(excludedPath + "/")) {
-                return true;
-            }
-        }
-
-        return false;
+        return snapshot.active && snapshot.condition.excludes(FileUtil.toSystemIndependentName(filePath));
     }
 
     /**

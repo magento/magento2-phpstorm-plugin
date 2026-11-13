@@ -10,6 +10,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.AdditionalLibraryRootsProvider;
 import com.intellij.openapi.roots.AdditionalLibraryRootsListenerHelper;
 import com.intellij.openapi.roots.SyntheticLibrary;
+import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.magento.idea.magento2plugin.project.Settings;
@@ -23,25 +24,27 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class MagentoAdditionalLibraryRootsProvider extends AdditionalLibraryRootsProvider {
+    private static final Key<Collection<SyntheticLibrary>> LAST_LIBRARIES =
+            Key.create("magento.additional.libraries");
 
     @Override
     public @NotNull Collection<SyntheticLibrary> getAdditionalProjectLibraries(
             final @NotNull Project project
     ) {
+        final Collection<SyntheticLibrary> libraries = createLibraries(project);
+        project.putUserData(LAST_LIBRARIES, libraries);
+        return libraries;
+    }
+
+    private @NotNull Collection<SyntheticLibrary> createLibraries(final @NotNull Project project) {
         final List<VirtualFile> roots = new ArrayList<>(getMagentoIndexRoots(project));
 
         if (roots.isEmpty()) {
             return List.of();
         }
 
-        final Set<VirtualFile> excludedRoots = MagentoIndexingExclusionService.getInstance(project)
-                .getEffectiveExcludedVirtualFiles();
-
-        final com.intellij.openapi.util.Condition<VirtualFile> condition =
-                file -> file != null && MagentoIndexingExclusionService.getInstance(project)
-                        .isExcludedPath(file.getPath());
-
-        return List.of(SyntheticLibrary.newImmutableLibrary(roots, excludedRoots, condition));
+        final MagentoIndexingExclusionService exclusions = MagentoIndexingExclusionService.getInstance(project);
+        return List.of(exclusions.createLibrary(roots));
     }
 
     @Override
@@ -51,10 +54,22 @@ public class MagentoAdditionalLibraryRootsProvider extends AdditionalLibraryRoot
 
     public static void refreshRoots(final @NotNull Project project) {
         MagentoIndexingExclusionService.getInstance(project).invalidateCache();
-        final Collection<VirtualFile> roots = new MagentoAdditionalLibraryRootsProvider()
-                .getMagentoIndexRoots(project);
-
-        final Runnable action = () -> AdditionalLibraryRootsListenerHelper.getInstance()
+        final Runnable action = () -> {
+            if (project.isDisposed()) {
+                return;
+            }
+            final Collection<SyntheticLibrary> libraries = new MagentoAdditionalLibraryRootsProvider()
+                    .createLibraries(project);
+            final Collection<SyntheticLibrary> previous = project.getUserData(LAST_LIBRARIES);
+            if (libraries.equals(previous == null ? List.of() : previous)) {
+                return;
+            }
+            project.putUserData(LAST_LIBRARIES, libraries);
+            final Set<VirtualFile> roots = new LinkedHashSet<>();
+            for (final SyntheticLibrary library : libraries) {
+                roots.addAll(library.getSourceRoots());
+            }
+            AdditionalLibraryRootsListenerHelper.getInstance()
                 .handleAdditionalLibraryRootsChanged(
                     project,
                     null,
@@ -62,6 +77,7 @@ public class MagentoAdditionalLibraryRootsProvider extends AdditionalLibraryRoot
                     roots,
                     "Magento additional library roots"
                 );
+        };
 
         if (com.intellij.openapi.application.ApplicationManager.getApplication().isDispatchThread()) {
             WriteAction.run(action::run);

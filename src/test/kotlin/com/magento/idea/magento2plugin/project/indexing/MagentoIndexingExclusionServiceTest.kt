@@ -36,6 +36,116 @@ class MagentoIndexingExclusionServiceTest : PhysicalMagentoProjectTestCase() {
     }
 
     @Test
+    fun testUnchangedLibrariesRemainEqualAfterSnapshotInvalidation() {
+        myFixture.addFileToProject("vendor/acme/.cache/data.json", "{}")
+        val settings = Settings.getInstance(project)
+        settings.magentoPath = getProjectRootPath()
+        settings.pluginEnabled = true
+        settings.setExcludeGeneratedFiles(true)
+        val service = getService()
+        service.applyExclusions()
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+        val provider = MagentoAdditionalLibraryRootsProvider()
+        val before = provider.getAdditionalProjectLibraries(project)
+        assertFalse(before.isEmpty())
+        service.invalidateCache()
+        val after = provider.getAdditionalProjectLibraries(project)
+        assertEquals(before, after)
+        assertEquals(before.hashCode(), after.hashCode())
+        service.applyExclusions()
+        assertEquals(before, provider.getAdditionalProjectLibraries(project))
+    }
+
+    @Test
+    fun testChangedExclusionsProduceNewLibraryWithoutMutatingOldCondition() {
+        val cache = myFixture.addFileToProject("vendor/acme/.cache/data.json", "{}").virtualFile
+        val source = myFixture.addFileToProject("vendor/acme/source.php", "<?php").virtualFile
+        val settings = Settings.getInstance(project)
+        settings.magentoPath = getProjectRootPath()
+        settings.pluginEnabled = true
+        settings.setExcludeGeneratedFiles(true)
+        val service = getService()
+        service.applyExclusions()
+        val provider = MagentoAdditionalLibraryRootsProvider()
+        val enabled = provider.getAdditionalProjectLibraries(project).single()
+        assertTrue(enabled.excludeFileCondition!!.value(cache))
+        assertFalse(enabled.excludeFileCondition!!.value(source))
+        service.applyExclusions(false, null)
+        val disabled = provider.getAdditionalProjectLibraries(project).single()
+        assertFalse(enabled == disabled)
+        assertNull(disabled.excludeFileCondition)
+        assertTrue(enabled.excludeFileCondition!!.value(cache))
+        assertFalse(ProjectFileIndex.getInstance(project).isExcluded(cache))
+        service.applyExclusions(true, null)
+        assertEquals(enabled, provider.getAdditionalProjectLibraries(project).single())
+        assertTrue(ProjectFileIndex.getInstance(project).isExcluded(cache))
+    }
+
+    @Test
+    fun testExclusionConditionPreservesPathBoundariesAndFutureDirectories() {
+        val settings = Settings.getInstance(project)
+        settings.magentoPath = getProjectRootPath()
+        settings.pluginEnabled = true
+        settings.setExcludeGeneratedFiles(true)
+        settings.addMagentoFolder(myFixture.findFileInTempDir("")!!.url)
+        val service = getService()
+        service.applyExclusions()
+        val root = getProjectRootPath()
+        assertTrue(service.isExcludedPath("$root/var/cache"))
+        assertTrue(service.isExcludedPath("$root/var/cache/future/file"))
+        assertFalse(service.isExcludedPath("$root/var/cacheable/source.php"))
+        assertFalse(service.isExcludedPath("$root/var"))
+        assertFalse(service.isExcludedPath("$root/generated/code/Example.php"))
+        val before = MagentoAdditionalLibraryRootsProvider().getAdditionalProjectLibraries(project).single()
+        val future = myFixture.addFileToProject("var/cache/new/data.json", "{}").virtualFile
+        assertTrue(before.excludeFileCondition!!.value(future))
+        assertTrue(ProjectFileIndex.getInstance(project).isExcluded(future))
+    }
+
+    @Test
+    fun testUnrelatedOutputRulesDoNotChangeSourceLibrary() {
+        val settings = Settings.getInstance(project)
+        settings.magentoPath = getProjectRootPath()
+        settings.pluginEnabled = true
+        settings.setExcludeGeneratedFiles(true)
+        val service = getService()
+        service.applyExclusions()
+        val provider = MagentoAdditionalLibraryRootsProvider()
+        val before = provider.getAdditionalProjectLibraries(project).single()
+        assertNull(before.unitedExcludeCondition)
+        myFixture.addFileToProject("tools/.cache/data.json", "{}")
+        service.applyExclusions(true, listOf("custom_output"))
+        assertEquals(before, provider.getAdditionalProjectLibraries(project).single())
+        val cache = myFixture.addFileToProject("vendor/acme/.cache/data.json", "{}").virtualFile
+        service.applyExclusions()
+        val after = provider.getAdditionalProjectLibraries(project).single()
+        assertFalse(before == after)
+        assertTrue(after.unitedExcludeCondition!!.value(cache))
+        assertTrue(ProjectFileIndex.getInstance(project).isExcluded(cache))
+    }
+
+    @Test
+    fun testRefreshUpdatesSyntheticExclusionsForOverlappingRoots() {
+        val cache = myFixture.addFileToProject("vendor/acme/.cache/data.json", "{}").virtualFile
+        val source = myFixture.addFileToProject("vendor/acme/source.php", "<?php").virtualFile
+        val settings = Settings.getInstance(project)
+        settings.magentoPath = getProjectRootPath()
+        settings.pluginEnabled = true
+        settings.setExcludeGeneratedFiles(true)
+        getService().applyExclusions()
+        val provider = MagentoAdditionalLibraryRootsProvider()
+        provider.getAdditionalProjectLibraries(project)
+        repeat(2) { MagentoAdditionalLibraryRootsProvider.refreshRoots(project) }
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+        assertTrue(ProjectFileIndex.getInstance(project).isExcluded(cache))
+        assertFalse(ProjectFileIndex.getInstance(project).isExcluded(source))
+        getService().applyExclusions(false, null)
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+        assertFalse(ProjectFileIndex.getInstance(project).isExcluded(cache))
+        assertFalse(ProjectFileIndex.getInstance(project).isExcluded(source))
+    }
+
+    @Test
     fun testNamedCacheDirectoriesExcludedAtAnyDepthAndRemovedOnDisable() {
         val paths = listOf(".cache/data.json", "tools/build/.cache/data.json",
             "vendor/acme/package/.cache/data.json", "app/code/Acme/Module/.cache/data.json")
