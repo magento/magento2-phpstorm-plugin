@@ -1,15 +1,36 @@
 ---
 name: magento-inspect
-description: Inspect Magento 2 or Adobe Commerce configuration, discover project CLI wrappers and installed n98-magerun2 commands, configure native magerun MCP access, and analyze backward or upgrade compatibility through the JetBrains Magento MCP tools.
+description: Inspect Magento 2 or Adobe Commerce configuration, configure project integration and indexing exclusions, install bundled agent skills, discover project CLI wrappers and installed n98-magerun2 commands, configure native magerun MCP access, and analyze upgrade compatibility through the JetBrains Magento MCP tools.
 ---
 
 # Magento Inspect
 
-Use this skill for Magento or Adobe Commerce configuration, CLI/runtime discovery, and compatibility analysis in an opened JetBrains IDE project.
+Discover the connected IDE's tools and verify the intended project before choosing a workflow. Available tools depend on the installed plugin version and IDE capabilities. Explain missing capabilities rather than presenting them as an empty result.
 
 - For source configuration lookups, use `magento_inspect` with the preferred flow below.
 - For project command discovery or n98-magerun2 metadata, use the CLI workflow below. Filesystem discovery alone does not require a running container.
 - For backward compatibility or upgrade analysis, use `magento_compatibility` with the compatibility workflow below.
+
+## Project Setup and Skills
+
+Read the project's existing instructions before making changes. Use `configure_magento_project` with `action: "status"` to inspect integration, the configured Magento root, missing dependencies, and indexing readiness. For a setup request, use `action: "configure"`, the intended `projectPath`, `magentoPath` (for example `.` or `src`), and `enabled: true`. Configuration works while integration is disabled or indexing is in progress. It does not install Magento or Composer dependencies. Read validation failures and pending indexing before proceeding with queries.
+
+Use the separate `magento_skills` tool for optional skill installation in new or existing projects:
+
+1. Call `mode: "status"` with the intended `projectPath` and `agentTarget` to inspect the bundled catalog and installed copies. Use `mode: "help"` for the contract. Neither mode installs files.
+2. When installation is part of the user's task, call `mode: "install"` with an explicit `skills` array, such as `["magento-inspect"]`. Choose `agentTarget: "project"` for `skills/`, `"agents"` for `.agents/skills/`, `"codex"` for `.codex/skills/`, or `"claude"` for `.claude/skills/`. All paths are relative to the IDE project root, even when Magento is nested under `src/`.
+3. Read every per-skill result. Identical copies remain unchanged; customized copies are preserved by default. Inspect existing changes before using `overwrite: true` to explicitly replace them. An incomplete installation may retain successful writes; report those paths and the failures.
+4. Use the returned Markdown links and [suggested project instructions](https://github.com/magento/magento2-phpstorm-plugin/wiki/MCP#suggested-agentsmd-instructions) to adapt the existing `AGENTS.md` when that edit belongs to the setup request. Preserve project rules, avoid duplicate sections, and adjust link paths for nested instruction files. The tool never edits `AGENTS.md`; report skill installation and instruction edits separately. Installing a skill does not configure the MCP connection or provide unavailable PHP capabilities.
+
+Example skill installation:
+
+```json
+{"mode":"install","skills":["magento-inspect"],"agentTarget":"agents","projectPath":"<IDE-project-directory>"}
+```
+
+## Indexing Exclusions
+
+For indexing questions, use `get_magento_indexing_exclusions` or `configure_magento_indexing_exclusions` with `action: "preview"`. Both report paths without applying changes. For requested changes, use `action: "apply"` or `"update"`, `enabled`, and optional project-relative `additionalPaths`. Use `action: "reset"` only when removal of plugin-managed exclusions is requested. Check skipped paths and pending index refresh. Exclusions change IDE indexing, not filesystem contents; an excluded or unindexed path is not evidence that source code is absent. Initial project setup enables generated/runtime exclusions by default; pass `excludeGeneratedFiles: false` to opt out when requested.
 
 ## CLI Environment and n98-magerun2
 
@@ -23,7 +44,7 @@ Read this workflow when the task needs shell commands, runtime inspection, or ma
 4. For DDEV, read the parsed project YAML settings and ordered overrides, their source files, `execPrefix`, and `cwd`. Append the intended container command and its arguments to `execPrefix`. It carries the configured project name and `working_dir.web`; `cwd` is on the host. `docroot` is the web document root, while `composer_root` controls `ddev composer`. Discovery works without Magerun and does not prove the container or a command is available. Check `configuration.status` and coverage before using the prefix.
 5. Use a fallback only when fresh discovery shows the preferred script is absent or no longer eligible. A failed command, stopped container, or missing dependency does not justify changing runtimes. Report the selected runtime and failure; resolve it within the user's task.
 
-If a DDEV command needs interactive permissions, suggest running the CLI environment’s `terminalGuidance.command` in **PhpStorm’s Terminal** (IDE console) from `terminalGuidance.cwd`. This checks PHP through the configured DDEV invocation so the user can handle permission prompts. The IDE process also needs access to DDEV and Docker. Retry the intended operation after access is resolved.
+If a DDEV command needs interactive permissions, suggest running the CLI environment’s `terminalGuidance.command` in **IDE Terminal** from `terminalGuidance.cwd`. This checks PHP through the configured DDEV invocation so the user can handle permission prompts. The IDE process also needs access to DDEV and Docker. Retry the intended operation after access is resolved.
 
 ### Discover installed magerun commands
 
