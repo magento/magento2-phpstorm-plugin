@@ -15,7 +15,10 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,10 +42,15 @@ public final class MagentoSkillInstaller {
         public String getDisplayName() {
             return displayName;
         }
+
+        public String getDirectoryName() {
+            return directoryName;
+        }
     }
 
     public enum AgentTarget {
         PROJECT_SKILLS("Project", "skills"),
+        AGENTS("Agents", ".agents/skills"),
         CODEX("Codex", ".codex/skills"),
         CLAUDE_CODE("Claude", ".claude/skills");
 
@@ -58,7 +66,7 @@ public final class MagentoSkillInstaller {
             return displayName;
         }
 
-        private String getProjectRelativePath(@NotNull final Skill skill) {
+        public String getProjectRelativePath(@NotNull final Skill skill) {
             return skillRoot + "/" + skill.directoryName + "/SKILL.md";
         }
 
@@ -100,14 +108,37 @@ public final class MagentoSkillInstaller {
             @NotNull final Skill skill,
             @NotNull final AgentTarget agentTarget
     ) throws IOException {
+        return install(project, skill, agentTarget, true);
+    }
+
+    /** Installs a skill without replacing customized content unless explicitly requested. */
+    public static @NotNull String install(
+            @NotNull final Project project,
+            @NotNull final Skill skill,
+            @NotNull final AgentTarget agentTarget,
+            final boolean overwrite
+    ) throws IOException {
         final Path targetPath = getTargetPath(project, skill, agentTarget);
         final String skillContent = readBundledSkill(skill);
 
         try {
             ApplicationManager.getApplication().runWriteAction(() -> {
                 try {
+                    // Recheck immediately before writing, including ancestor symlinks.
+                    getTargetPath(project, skill, agentTarget);
+                    if (Files.exists(targetPath, LinkOption.NOFOLLOW_LINKS)) {
+                        if (Objects.equals(Files.readString(targetPath), skillContent)) {
+                            return;
+                        }
+                        if (!overwrite) {
+                            throw new FileAlreadyExistsException(targetPath.toString());
+                        }
+                    }
                     Files.createDirectories(targetPath.getParent());
-                    Files.writeString(targetPath, skillContent, StandardCharsets.UTF_8);
+                    Files.writeString(targetPath, skillContent, StandardCharsets.UTF_8,
+                            StandardOpenOption.WRITE,
+                            overwrite ? StandardOpenOption.CREATE : StandardOpenOption.CREATE_NEW,
+                            StandardOpenOption.TRUNCATE_EXISTING, LinkOption.NOFOLLOW_LINKS);
                     LocalFileSystem.getInstance().refreshAndFindFileByNioFile(targetPath);
                 } catch (final IOException exception) {
                     throw new UncheckedIOException(exception);
@@ -120,19 +151,37 @@ public final class MagentoSkillInstaller {
         return targetPath.toString();
     }
 
-    private static @NotNull Path getTargetPath(
+    public static @NotNull Path getTargetPath(
             @NotNull final Project project,
             @NotNull final Skill skill,
             @NotNull final AgentTarget agentTarget
-    ) {
-        final VirtualFile projectDir = ProjectUtil.guessProjectDir(project);
-        final String basePath = projectDir == null ? project.getBasePath() : projectDir.getPath();
+    ) throws IOException {
+        final VirtualFile projectDir = project.getBasePath() == null ? ProjectUtil.guessProjectDir(project) : null;
+        final String basePath = project.getBasePath() != null
+                ? project.getBasePath() : projectDir == null ? null : projectDir.getPath();
 
         if (basePath == null) {
-            throw new IllegalStateException("Unable to resolve project directory.");
+            throw new IOException("Unable to resolve project directory.");
         }
 
-        return Path.of(basePath).resolve(agentTarget.getProjectRelativePath(skill));
+        final Path root = Path.of(basePath).toRealPath();
+        final Path relative = Path.of(agentTarget.getProjectRelativePath(skill));
+        Path current = root;
+        for (final Path segment : relative) {
+            current = current.resolve(segment);
+            if (Files.isSymbolicLink(current)) {
+                throw new IOException("Skill destination must not contain symbolic links: " + current);
+            }
+            if (Files.exists(current, LinkOption.NOFOLLOW_LINKS)
+                    && !current.equals(root.resolve(relative)) && !Files.isDirectory(current)) {
+                throw new IOException("Skill destination parent is not a directory: " + current);
+            }
+        }
+        if (Files.exists(current, LinkOption.NOFOLLOW_LINKS)
+                && !Files.isRegularFile(current, LinkOption.NOFOLLOW_LINKS)) {
+            throw new IOException("Skill destination is not a regular file: " + current);
+        }
+        return current;
     }
 
     private static @NotNull String readBundledSkill(@NotNull final Skill skill) throws IOException {
