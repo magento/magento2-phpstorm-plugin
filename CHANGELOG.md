@@ -13,6 +13,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - Bundled `magento-magerun` agent skill for common Magento runtime investigations, available through `magento_skills` with suggested project instruction links.
 - Optional agent skill installation through the separate `magento_skills` MCP tool for new or existing projects, with read-only discovery, project/Agents/Codex/Claude folder targets, and protection for customized skills. Returns skill links and suggested wiki guidance for an agent to merge into existing `AGENTS.md` instructions without editing that file automatically.
 
+### Fixed
+
+- `magento_magerun` accepts commands with leading underscores, including `_complete` in n98-magerun2 10.1.0, so command discovery and exact-command help succeed. Invalid catalog names now report the rejected field, value, and validation rule [#2802](https://github.com/magento/magento2-phpstorm-plugin/issues/2802).
+
 ## 2026.3.6
 
 ### Changed
