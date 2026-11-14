@@ -72,6 +72,21 @@ subprojects {
     }
 }
 
+project(":mcp-skills") {
+    dependencies {
+        compileOnly(rootProject)
+        intellijPlatform {
+            val platformLocalPath = providers.gradleProperty("platformLocalPath")
+            if (platformLocalPath.isPresent) {
+                local(platformLocalPath)
+            } else {
+                create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
+            }
+            bundledPlugin("com.intellij.mcpServer")
+        }
+    }
+}
+
 sourceSets {
     create("uiTest") {
         compileClasspath += sourceSets.main.get().output
@@ -218,7 +233,11 @@ tasks {
 
         doLast {
             val provider = "com.magento.idea.magento2plugin.mcp.MagentoBundledSkillsProvider"
-            val skillsApi = "com.intellij.mcpserver.skills.BundledSkill"
+            val skillsApi = setOf(
+                "com.intellij.mcpserver.skills.BundledSkill",
+                "com.intellij.mcpserver.skills.BundledSkillsProvider",
+                "com.intellij.mcpserver.skills.AgentSkillTarget",
+            )
             val externalReferenceHost = "Experimental API interface com.intellij.model.psi.PsiExternalReferenceHost is referenced in "
             val sdkPsiClasses = setOf("com.intellij.psi.xml.XmlAttribute", "com.intellij.psi.xml.XmlNamedReferenceHost",
                 "com.intellij.lang.javascript.psi.JSProperty")
@@ -228,7 +247,7 @@ tasks {
                 .filter { it.isNotBlank() }
                 .filterNot { warning ->
                     // The provider is optional and loaded only with JetBrains' bundled skills module.
-                    warning.startsWith("Experimental API ") && skillsApi in warning && provider in warning ||
+                    warning.startsWith("Experimental API ") && provider in warning && skillsApi.any { it in warning } ||
                         // The stable SDK reports these references within its own PSI classes.
                         sdkPsiClasses.any { warning.startsWith("$externalReferenceHost$it.") }
                 }

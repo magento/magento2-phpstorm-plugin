@@ -55,7 +55,9 @@ class MagentoSkillSetupMcpTest : McpHttpTestCase() {
     }
 
     fun testIdeBundledSkillCatalogReferencesPackagedFiles() {
-        val provider = BundledSkillsProvider.EP_NAME.extensionList.filterIsInstance<MagentoBundledSkillsProvider>().single()
+        val provider = BundledSkillsProvider.EP_NAME.extensionList.single {
+            it.javaClass.name == "com.magento.idea.magento2plugin.mcp.MagentoBundledSkillsProvider"
+        }
         val skills = provider.registeredSkills()
         assertEquals(setOf("magento-inspect", "magento-scaffold", "magento-magerun"), skills.map { it.skillId }.toSet())
         for (skill in skills) {
