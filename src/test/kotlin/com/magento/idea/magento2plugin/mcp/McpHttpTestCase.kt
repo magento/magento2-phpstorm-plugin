@@ -87,7 +87,7 @@ abstract class McpHttpTestCase : PhysicalMagentoTestCase() {
             "get_magento_root_path", "describe_magento_cli_environment", "magento_magerun",
             "magento_scaffold", "magento_inspect", "magento_compatibility",
             "get_magento_indexing_exclusions", "configure_magento_indexing_exclusions",
-            "configure_magento_project"
+            "configure_magento_project", "magento_skills"
         )
     }
 }

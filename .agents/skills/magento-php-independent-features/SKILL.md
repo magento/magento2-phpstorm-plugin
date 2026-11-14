@@ -26,6 +26,7 @@ Classify each dependency as XML/JS/project functionality, a replaceable PHP util
 - Extract shared lookup/analysis services and retain optional PHP providers for class, method, inheritance, and dispatch-call analysis.
 - Move registrations together with the indexes and services the feature needs. Remove duplicate registrations from PHP descriptors so PhpStorm does not produce duplicate results.
 - Preserve other dependency boundaries: PHP independence does not make GraphQL or MCP APIs unconditional.
+- Keep project setup and bundled skill installation available before integration is enabled and during indexing. Installing a skill must not imply that its PHP-backed tools are available; expose those usage requirements explicitly.
 - Preserve existing normalization and index-key semantics when replacing PHP utilities. Check serializer compatibility and bump index versions when stored representations change.
 - Use existing shared module/theme indexes rather than requiring PHP registration-file PSI.
 - Keep unsupported PHP semantics explicit. XML declarations establish configuration facts; they do not establish PHP class existence, inheritance, or effective runtime behavior.

@@ -17,6 +17,32 @@ import kotlinx.coroutines.withContext
  * Exposes Magento MCP tools that do not require the JetBrains PHP plugin.
  */
 class MagentoMcpProjectToolset : McpToolset {
+    @McpTool(name = "magento_skills")
+    @McpDescription(
+        "Discover or install bundled Magento agent skills in the current IDE project. " +
+        "Use mode=help for usage, mode=status (default) for the read-only catalog and installed state, " +
+        "or mode=install with a non-empty skills array: magento-inspect and/or magento-scaffold. " +
+        "agentTarget chooses project (default, skills/), agents (.agents/skills/), codex (.codex/skills/), " +
+        "or claude (.claude/skills/), relative to the IDE project root. " +
+        "Customized files are preserved unless overwrite=true; identical files are unchanged. " +
+        "projectPath optionally verifies the intended IDE project before reading or writing files. " +
+        "Returns skill paths, suggested Markdown links and wiki guidance for the agent to merge into existing AGENTS.md. " +
+        "Never creates or edits AGENTS.md or changes Magento settings. " +
+        "Works before integration is enabled, during indexing, and without PHP; scaffold usage requires the JetBrains PHP plugin."
+    )
+    suspend fun magentoSkills(
+        mode: String = "status",
+        skills: List<String> = emptyList(),
+        agentTarget: String = "project",
+        overwrite: Boolean = false,
+        projectPath: String = ""
+    ): String {
+        if (mode == "help") return MagentoSkillCommands.help()
+        return MagentoMcpToolsetSupport.withProjectEdtAction(validateProject = false) {
+            MagentoSkillCommands.execute(it, mode, skills, agentTarget, overwrite, projectPath)
+        }
+    }
+
     /**
      * Returns the Magento root path configured for the current project.
      */
@@ -224,7 +250,8 @@ class MagentoMcpProjectToolset : McpToolset {
         "- `enabled`: `true` to enable Magento integration, `false` to disable.\n" +
         "- `excludeGeneratedFiles`: Controls whether generated and runtime files are excluded from indexing. Selected by default when first enabled; pass `false` to opt out.\n" +
         "- `projectPath`: Optional intended IDE project directory path to verify against the active project.\n\n" +
-        "Returns structured before/after state, validation failures, pending index status, and next usable action."
+        "Returns structured before/after state, validation failures, pending index status, and next usable action. " +
+        "For optional agent skill installation, use the separate magento_skills tool; setup never installs skills or edits AGENTS.md."
     )
     suspend fun configureMagentoProject(
         action: String = "configure",

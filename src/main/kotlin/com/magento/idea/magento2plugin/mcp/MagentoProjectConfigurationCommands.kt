@@ -36,6 +36,8 @@ internal object MagentoProjectConfigurationCommands {
         lines += "  - Relative paths are resolved against the IDE project base path and normalized."
         lines += "  - Supported partial checkouts and source checkouts are preserved; missing dependencies or unknown versions are reported explicitly."
         lines += "  - Repeated identical requests are idempotent and do not trigger needless reindexing."
+        lines += "  - Optionally use magento_skills to install bundled agent skills in new or existing projects. Setup never installs skills or edits AGENTS.md."
+        lines += "  - Suggested project instructions: ${MagentoSkillCommands.WIKI_URL}"
         return lines.joinToString("\n")
     }
 
@@ -74,6 +76,7 @@ internal object MagentoProjectConfigurationCommands {
         lines += "Indexing exclusions: $exclusionText"
         lines += "Pending index refresh: ${if (state.indexingPending) "yes" else "no"}"
         lines += "Next usable action: ${service.determineNextAction(state)}"
+        lines += "Optional next step: Call magento_skills with mode=help for skill installation and suggested AGENTS.md links."
 
         return lines.joinToString("\n")
     }
@@ -117,7 +120,11 @@ internal object MagentoProjectConfigurationCommands {
             projectPath.ifBlank { null }
         )
 
-        return formatResult(service, result)
+        val formatted = formatResult(service, result)
+        return if (result.success) {
+            formatted + "\nOptional next step: Call magento_skills with mode=help to install agent skills and get suggested AGENTS.md links.\n" +
+                "Suggested project instructions: ${MagentoSkillCommands.WIKI_URL}"
+        } else formatted
     }
 
     private fun formatResult(

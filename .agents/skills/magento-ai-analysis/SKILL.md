@@ -19,6 +19,7 @@ Current starting points:
 - `MagentoModuleQueries`, `MagentoViewQueries`, `MagentoEventQueries`, and `MagentoMcpSnapshots` contain module/configuration lookup logic.
 - `MagentoDiQueries` and `MagentoMcpSupport` provide shared XML lookup and utilities. PHP method interception is contributed through `MagentoMethodPluginQueryProvider`; its implementation and PHP helpers remain optional.
 - `MagentoMcpProjectToolset` exposes shared inspection queries and CLI/project tools through `src/main/resources/META-INF/withMcp.xml`. PHP-backed MCP tools and providers are registered in `modules/php-mcp/src/main/resources/com.magento.idea.magento2plugin.php.mcp.xml`, which requires the main plugin, PHP, and MCP. Confirm current descriptors and query capabilities before claiming availability.
+- `configure_magento_project` manages integration; `magento_skills` separately discovers and installs bundled application skills. Keep read-only discovery separate from installation, preserve customized files by default, and return suggested instruction links without writing `AGENTS.md`.
 - `magento_compatibility` already has background jobs and result retrieval. Reuse relevant patterns when new analysis needs them, while respecting its PHP dependency and actual coverage.
 
 ## Define a useful agent contract
