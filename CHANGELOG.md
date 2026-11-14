@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 - Optional agent skill installation through the separate `magento_skills` MCP tool for new or existing projects, with read-only discovery, project/Agents/Codex/Claude folder targets, and protection for customized skills. Returns skill links and suggested wiki guidance for an agent to merge into existing `AGENTS.md` instructions without editing that file automatically.
 - WebStorm now supports XML event name reference navigation in `events.xml` without the PHP plugin, resolving event declarations across modules while retaining PHP dispatch resolution when the PHP plugin is present.
+- WebStorm now supports XML dependency injection declaration inspections in `di.xml` without the PHP plugin, validating empty or missing attributes for plugins, preferences, and virtual types while retaining PHP class existence verification when the PHP plugin is present.
 
 ### Changed
 
