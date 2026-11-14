@@ -152,8 +152,14 @@ internal class MagentoMagerunService(
         if (commands.length() > 10_000) fail("output_limit", "The installed command catalogue exceeds the supported size.")
         val summaries = (0 until commands.length()).map { index ->
             val command = commands.getJSONObject(index)
-            val name = command.getString("name")
-            if (!COMMAND_NAME.matches(name)) fail("invalid_output", "The catalogue contains an invalid command name.")
+            val value = command.opt("name")
+            if (value !is String || !COMMAND_NAME.matches(value)) {
+                val rejected = JSONObject.valueToString(value).let { if (it.length > 240) it.take(240) + "… (truncated)" else it }
+                fail("invalid_output", "Invalid catalogue field commands[$index].name: $rejected. " +
+                    "Expected a string matching ${COMMAND_NAME.pattern} (1..200 characters; starts with an ASCII letter, digit, or underscore; " +
+                    "remaining characters may also include colon, dot, or hyphen).")
+            }
+            val name = value
             val usage = command.optJSONArray("usage") ?: JSONArray()
             val aliases = (0 until usage.length()).map { usage.optString(it) }
                 .filter { it != name && COMMAND_NAME.matches(it) }.distinct().sorted()
@@ -252,6 +258,7 @@ internal class MagentoMagerunService(
     }
 
     companion object {
-        private val COMMAND_NAME = Regex("[a-zA-Z0-9][a-zA-Z0-9_:.-]{0,199}")
+        // Symfony exposes internal commands such as _complete in the JSON catalogue.
+        private val COMMAND_NAME = Regex("[a-zA-Z0-9_][a-zA-Z0-9_:.-]{0,199}")
     }
 }

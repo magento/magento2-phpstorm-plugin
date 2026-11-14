@@ -19,6 +19,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 - Updated bundled agent skills with project setup, skill installation, indexing exclusion workflows, and clearer PHP capability requirements.
 
+### Fixed
+
+- `magento_magerun` accepts commands with leading underscores, including `_complete` in n98-magerun2 10.1.0, so command discovery and exact-command help succeed. Invalid catalog names now report the rejected field, value, and validation rule [#2802](https://github.com/magento/magento2-phpstorm-plugin/issues/2802).
+
 
 ## 2026.3.6
 

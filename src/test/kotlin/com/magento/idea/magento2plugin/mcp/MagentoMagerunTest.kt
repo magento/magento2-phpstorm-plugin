@@ -231,6 +231,52 @@ class MagentoMagerunTest {
     }
 
     @Test
+    fun testMagerun1010DockerCatalogueAndExactHelp() = fixture { root ->
+        docker(root)
+        val catalogue = javaClass.getResource("/magerun/10.1.0-catalogue.json")!!.readText()
+        val help = javaClass.getResource("/magerun/10.1.0-sys-info-help.json")!!.readText()
+        // Each mode must work from a cold cache: help also validates the entire catalogue.
+        for (request in listOf(MagerunRequest("commands", limit = 1, refresh = true),
+            MagerunRequest("command_help", command = "sys:info"))) {
+            val runner = FakeRunner(version = "n98-magerun2 10.1.0", catalogue = catalogue, help = help)
+            val result = MagentoMagerunService(runner).execute(environment(root, "src"), request)
+            assertEquals(result.toString(), "ok", result.getString("status"))
+            assertEquals("10.1.0", result.getJSONObject("metadata").getString("version"))
+            if (request.mode == "commands") {
+                assertEquals("_complete", result.getJSONArray("commands").getJSONObject(0).getString("name"))
+                assertEquals(2, result.getInt("total"))
+                assertEquals(1, result.getInt("nextOffset"))
+            } else {
+                assertEquals(JSONObject(help).toString(), result.getJSONObject("command").toString())
+                assertEquals(listOf("help", "sys:info", "--format=json", "--no-ansi", "--no-interaction"), runner.calls.last().takeLast(5))
+            }
+            assertTrue(runner.calls.drop(1).all { it.take(3) == listOf(root.resolve("bin/clinotty").toString(), "php", "bin/n98-magerun2.phar") })
+        }
+    }
+
+    @Test
+    fun testInvalidCatalogueNameIdentifiesFieldValueAndRuleWithoutCaching() = fixture { root ->
+        php(root, "bin/n98-magerun2")
+        for (name in listOf("", "--version", "bad name", "bad;name", "bad\nname", "a".repeat(201), 42, JSONObject.NULL)) {
+            val catalogue = JSONObject(CATALOGUE)
+            catalogue.getJSONArray("commands").getJSONObject(1).put("name", name)
+            for (request in listOf(MagerunRequest("commands"), MagerunRequest("command_help", command = "sys:info"))) {
+                val runner = FakeRunner(catalogue = catalogue.toString())
+                val service = MagentoMagerunService(runner)
+                val result = service.execute(environment(root), request)
+                assertEquals("invalid_output", result.getString("status"))
+                val message = result.getString("message")
+                assertTrue(message, message.contains("commands[1].name"))
+                assertTrue(message, message.contains(JSONObject.valueToString(name)))
+                assertTrue(message, message.contains("1..200 characters"))
+                assertFalse(message, message.contains('\n'))
+                assertEquals(2, runner.calls.size) // Never request help from a rejected catalogue.
+                assertEquals("detected", service.execute(environment(root), MagerunRequest()).getString("status"))
+            }
+        }
+    }
+
+    @Test
     fun testCommandCatalogueIsSortedFilteredAndPagedIncludingCustomCommands() = fixture { root ->
         php(root, "bin/n98-magerun2")
         val runner = FakeRunner()
@@ -370,7 +416,7 @@ class MagentoMagerunTest {
     }
 
     private class FakeRunner(val version: String = "n98-magerun2 9.3.0 by netz98", val catalogue: String = CATALOGUE,
-                             val preflight: MagerunProcessResult = MagerunProcessResult(0)) : MagerunRunner {
+                             val preflight: MagerunProcessResult = MagerunProcessResult(0), val help: String? = null) : MagerunRunner {
         val calls = mutableListOf<List<String>>()
         override fun run(argv: List<String>, cwd: Path, checkCancelled: () -> Unit): MagerunProcessResult {
             calls.add(argv)
@@ -378,7 +424,7 @@ class MagentoMagerunTest {
                 "test" in argv -> preflight
                 "--version" in argv -> MagerunProcessResult(0, version)
                 "list" in argv -> MagerunProcessResult(0, catalogue)
-                "help" in argv -> MagerunProcessResult(0, JSONObject().put("name", argv[argv.indexOf("help") + 1])
+                "help" in argv -> MagerunProcessResult(0, help ?: JSONObject().put("name", argv[argv.indexOf("help") + 1])
                     .put("definition", JSONObject().put("arguments", JSONObject()).put("options", JSONObject()
                         .put("include", JSONObject().put("name", "--include")).put("exclude", JSONObject().put("name", "--exclude")))).toString())
                 else -> throw AssertionError("Unexpected executable command: $argv")
