@@ -58,6 +58,23 @@ public class ObserverReferenceRegistrarTest extends ReferenceXmlFixtureTestCase 
     }
 
     /**
+     * Tests for event name reference to another events.xml declaration.
+     */
+    public void testEventNameMustHaveXmlDeclarationReference() {
+        myFixture.configureByText(
+                ModuleEventsXml.FILE_NAME,
+                "<?xml version=\"1.0\"?>\n"
+                        + "<config xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n"
+                        + "    <event name=\"test_event_in_test_cl<caret>ass\">\n"
+                        + "        <observer name=\"foo_observer\" instance=\"Foo\\Bar\\Observer\" />\n"
+                        + "    </event>\n"
+                        + "</config>\n"
+        );
+
+        assertHasReferenceToXmlAttributeValue("test_event_in_test_class");
+    }
+
+    /**
      * Tests for no event name reference in events.xml.
      */
     public void testEventNameMustNotHaveReference() {

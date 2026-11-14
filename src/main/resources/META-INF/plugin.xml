@@ -28,6 +28,9 @@
         <extensionPoint qualifiedName="com.magento.idea.magento2plugin.eventNameIndexProvider"
                         interface="com.magento.idea.magento2plugin.stubs.indexes.EventNameIndexProvider"
                         dynamic="false"/>
+        <extensionPoint qualifiedName="com.magento.idea.magento2plugin.eventTargetProvider"
+                        interface="com.magento.idea.magento2plugin.reference.provider.EventTargetProvider"
+                        dynamic="false"/>
     </extensionPoints>
 
     <actions>
