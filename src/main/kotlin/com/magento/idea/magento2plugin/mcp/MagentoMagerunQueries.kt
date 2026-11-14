@@ -54,6 +54,7 @@ internal class MagentoMagerunService(
     private val runner: MagerunRunner = MagentoMagerunProcess(),
     private val nanoTime: () -> Long = System::nanoTime
 ) {
+    private val skillSuggestion = "Optional bundled magento-magerun skill: use magento_skills mode=status, then install it when requested. Installation returns a suggested AGENTS.md link. Verify the runtime before use."
     private val lock = ReentrantLock()
     private var cache: Snapshot? = null
     private val maxAge = TimeUnit.MINUTES.toNanos(5)
@@ -67,6 +68,7 @@ internal class MagentoMagerunService(
             validate(request)
             if (request.refresh) cache = null
             if (environment.selected == null) return base.put("status", "not_found")
+            if (environment.selected?.ddev == null) base.put("skillSuggestion", skillSuggestion)
             val plan = try {
                 MagentoMagerunSupport.plan(environment)
             } catch (error: MagentoMagerunSupport.Unavailable) {
@@ -78,6 +80,7 @@ internal class MagentoMagerunService(
             base.put("invocation", plan.json())
             if (request.mode == "status") {
                 if (cache != null) base.getJSONObject("selected").put("identityVerified", true).put("family", "n98-magerun2")
+                if (cache != null) base.put("skillSuggestion", skillSuggestion)
                 return base.put("status", if (cache == null) "detected" else "cached")
                     .put("runtimeProbed", false)
                     .put("metadata", cache?.metadata() ?: JSONObject.NULL)
@@ -85,6 +88,7 @@ internal class MagentoMagerunService(
             val fromCache = cache != null
             val snapshot = cache ?: load(plan, fingerprint, checkCancelled).also { cache = it }
             base.put("status", "ok").put("cached", fromCache).put("metadata", snapshot.metadata())
+                .put("skillSuggestion", skillSuggestion)
             // Only a successful version check upgrades an ambiguous filename to a verified family.
             base.getJSONObject("selected").put("identityVerified", true).put("family", "n98-magerun2")
             return when (request.mode) {
