@@ -14,7 +14,7 @@ Repository development skills live in `.agents/skills`; the skills under `skills
 1. In the Gradle tool window, run `Tasks > Intellij platform > runIde`.
 1. The task launches a PhpStorm sandbox with the plugin installed. Make sure that the plugin is enabled and indexing is finished before testing features.
 
-To use an extracted IDE distribution, pass `-PplatformLocalPath=/path/to/ide`. Windows CI uses the pinned PhpStorm Windows ZIP through this option because the 2026.3 RC release metadata omits its ZIP download entry.
+To use an extracted IDE distribution, pass `-PplatformLocalPath=/path/to/ide`. Windows CI uses the pinned PhpStorm Windows ZIP through this option.
 
 To run `./gradlew test`, also install PHP CLI and add `php` (`php.exe` on Windows) to `PATH`. The run-configuration tests launch PHP to verify interpreter settings and command arguments. CI installs PHP 8.4 on Linux, Windows, and macOS.
 

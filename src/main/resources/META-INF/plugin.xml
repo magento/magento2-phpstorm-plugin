@@ -17,6 +17,7 @@
     <depends optional="true" config-file="withJsGraphQl.xml">com.intellij.lang.jsgraphql</depends>
 
     <content>
+        <module name="com.magento.idea.magento2plugin.mcp.skills" loading="optional"/>
         <module name="com.magento.idea.magento2plugin.php.mcp" loading="optional"/>
         <module name="com.magento.idea.magento2plugin.php.graphql" loading="optional"/>
     </content>

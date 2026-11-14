@@ -26,7 +26,9 @@ internal object MagentoSkillCommands {
     data class Installation(val skill: Skill, val target: AgentTarget, val path: Path, val previous: String)
 
     fun help(): String = """
-        Magento agent skills
+        Magento and Adobe Commerce bundled agent skills
+        Use magento_intelligence for the full Magento MCP tool catalog.
+        For status via execute_tool, pass magento_skills --mode status --agentTarget agents.
         mode=help: Show this documentation without reading or writing project files.
         mode=status (default): Read-only catalog and installation status for the selected agentTarget.
         mode=install: Install the explicitly selected skills; requires a non-empty skills array.

@@ -30,7 +30,10 @@ abstract class McpHttpTestCase : PhysicalMagentoTestCase() {
     private var server: Future<*>? = null
     private val stopServer = CompletableDeferred<Unit>()
 
-    protected fun mcp(): McpHttpClient {
+    protected fun mcp(
+        invocationMode: McpSessionInvocationMode = McpSessionInvocationMode.DIRECT,
+        toolFilter: McpToolFilter = McpToolFilter.MaskBased("-*,+com.magento.idea.magento2plugin.mcp.*"),
+    ): McpHttpClient {
         client?.let { return it }
         val endpoint = CompletableFuture<Triple<Int, String, String>>()
         server = ApplicationManager.getApplication().executeOnPooledThread {
@@ -39,8 +42,8 @@ abstract class McpHttpTestCase : PhysicalMagentoTestCase() {
                     McpServerService.getInstance().authorizedSession(
                         McpServerService.McpSessionOptions(
                             McpServerService.AskCommandExecutionMode.DONT_ASK,
-                            McpToolFilter.MaskBased("-*,+com.magento.idea.magento2plugin.mcp.*"),
-                            invocationMode = McpSessionInvocationMode.DIRECT,
+                            toolFilter,
+                            invocationMode = invocationMode,
                         )
                     ) { port, tokenName, token ->
                         endpoint.complete(Triple(port, tokenName, token))
@@ -87,7 +90,7 @@ abstract class McpHttpTestCase : PhysicalMagentoTestCase() {
             "get_magento_root_path", "describe_magento_cli_environment", "magento_magerun",
             "magento_scaffold", "magento_inspect", "magento_compatibility",
             "get_magento_indexing_exclusions", "configure_magento_indexing_exclusions",
-            "configure_magento_project", "magento_skills"
+            "configure_magento_project", "magento_intelligence", "magento_skills"
         )
     }
 }

@@ -7,6 +7,8 @@ description: Use n98-magerun2 to investigate or operate an installed Magento 2, 
 
 Use this skill when a task needs the running Magento application or its database. Source configuration can establish declarations, but runtime results depend on the selected installation, area, scope, and deployed state.
 
+Call `magento_intelligence` to discover available Magento MCP tools. To check project skill copies via the router, pass `magento_skills --mode status --agentTarget agents` to `execute_tool`.
+
 ## Select and verify the runtime
 
 1. Call `describe_magento_cli_environment` for the intended IDE project and check the Magento root, working directory, wrappers, and container configuration. Do not assume the host and container share paths or executables.

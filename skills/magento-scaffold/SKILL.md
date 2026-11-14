@@ -5,13 +5,13 @@ description: Use when generating Magento 2 or Adobe Commerce project scaffolding
 
 # Magento Scaffold
 
-Discover the connected IDE's tools and verify the intended project. `magento_scaffold` requires the JetBrains PHP plugin; installing this skill in WebStorm does not enable code generation. Use this workflow only for a creation request, not for inspection or analysis.
+Call `magento_intelligence` to discover the connected IDE's Magento tools and verify the intended project. `magento_scaffold` requires the JetBrains PHP plugin; installing this skill in WebStorm does not enable code generation. Use this workflow only for a creation request, not for inspection or analysis.
 
 ## Project Readiness
 
 Read existing project instructions and use `configure_magento_project` with `action: "status"` when setup is uncertain. Configure the Magento root and enable integration only as part of the user's task. Wait for indexing before rendering scaffolds. Use [magento-inspect](../magento-inspect/SKILL.md), when installed, for configuration lookups, CLI discovery, and compatibility analysis.
 
-To install or update bundled skills in an existing project, use the separate `magento_skills` tool: `mode: "status"` for discovery, then `mode: "install"` with an explicit `skills` array and `agentTarget` when requested. Project, agents, Codex, and Claude targets are under the IDE project root. Customized copies are preserved unless `overwrite: true` is explicitly chosen after review. Use the returned local links and [wiki guidance](https://github.com/magento/magento2-phpstorm-plugin/wiki/MCP#suggested-agentsmd-instructions) to adapt existing `AGENTS.md` instructions within the requested scope. Installation never edits that file automatically.
+To install or update bundled skills in an existing project, use the separate `magento_skills` tool: `mode: "status"` for discovery, then `mode: "install"` with an explicit `skills` array and `agentTarget` when requested. In router mode, pass `magento_skills --mode status --agentTarget agents` to `execute_tool` to inspect the Agents folder. Project, agents, Codex, and Claude targets are under the IDE project root. Customized copies are preserved unless `overwrite: true` is explicitly chosen after review. Use the returned local links and [wiki guidance](https://github.com/magento/magento2-phpstorm-plugin/wiki/MCP#suggested-agentsmd-instructions) to adapt existing `AGENTS.md` instructions within the requested scope. Installation never edits that file automatically.
 
 ## Preferred Flow
 

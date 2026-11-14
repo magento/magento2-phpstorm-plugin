@@ -1,0 +1,15 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<idea-plugin>
+    <dependencies>
+        <plugin id="com.magento.idea.magento2plugin"/>
+        <module name="intellij.mcpserver.skills"/>
+    </dependencies>
+    <extensions defaultExtensionNs="com.intellij">
+        <mcpServer.bundledSkillsProvider implementation="com.magento.idea.magento2plugin.mcp.MagentoBundledSkillsProvider"/>
+    </extensions>
+</idea-plugin>

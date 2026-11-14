@@ -26,13 +26,17 @@ class MagentoSkillsUiTest {
         try {
             McpHttpDriverClient(port.toInt(), tokenName, token, root.toString()).use { mcp ->
                 mcp.initialize()
-                val status = mcp.callText("magento_skills", JSONObject())
-                check(status.contains("magento-inspect: missing")) { status }
+                val catalog = mcp.callText("magento_intelligence")
+                check(catalog.contains("magento_inspect") && catalog.contains("magento_skills")) { catalog }
+                check(!catalog.contains("magento_compatibility") && !catalog.contains("magento_scaffold")) { catalog }
+                val skills = listOf("magento-inspect", "magento-scaffold", "magento-magerun")
+                val status = mcp.callText("magento_skills", JSONObject().put("agentTarget", "agents"))
+                check(skills.all { status.contains("$it: missing") }) { status }
                 val args = JSONObject().put("mode", "install")
-                    .put("skills", JSONArray(listOf("magento-inspect")))
+                    .put("skills", JSONArray(skills))
                     .put("agentTarget", "agents").put("projectPath", root.toString())
                 val installed = mcp.callText("magento_skills", args)
-                check(installed.contains("magento-inspect: installed")) { installed }
+                check(skills.all { installed.contains("$it: installed") }) { installed }
                 check(installed.contains("[magento-inspect](.agents/skills/magento-inspect/SKILL.md)")) { installed }
                 check(Files.readString(root.resolve(".agents/skills/magento-inspect/SKILL.md")).contains("magento_inspect"))
                 check(mcp.callText("magento_skills", args).contains("magento-inspect: unchanged"))

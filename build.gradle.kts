@@ -87,6 +87,7 @@ val uiTestRuntimeOnly = configurations.getByName("uiTestRuntimeOnly") {
 }
 
 dependencies {
+    runtimeOnly(project(":mcp-skills"))
     runtimeOnly(project(":php-mcp"))
     runtimeOnly(project(":php-graphql"))
 
@@ -179,13 +180,17 @@ intellijPlatform {
     }
 
     pluginVerification {
-        // Requiring a restart is intentional; every compatibility/API warning must fail verification.
-        failureLevel = VerifyPluginTask.FailureLevel.ALL - VerifyPluginTask.FailureLevel.NOT_DYNAMIC
+        // Experimental API use is checked against the specific exceptions in verifyPlugin below.
+        failureLevel = VerifyPluginTask.FailureLevel.ALL - setOf(
+            VerifyPluginTask.FailureLevel.NOT_DYNAMIC,
+            VerifyPluginTask.FailureLevel.EXPERIMENTAL_API_USAGES,
+        )
         ides {
             // Use IDE distributions containing the October 2026 eMudhra security fixes.
             create(IntelliJPlatformType.PhpStorm, providers.gradleProperty("platformVersion").get())
             if (providers.gradleProperty("verifyWebStorm").map(String::toBoolean).getOrElse(false)) {
                 create(IntelliJPlatformType.WebStorm, providers.gradleProperty("uiTestPlatformVersion").get())
+                create(IntelliJPlatformType.WebStorm, "2026.3")
             }
         }
     }
@@ -210,6 +215,29 @@ tasks {
     named<VerifyPluginTask>("verifyPlugin") {
         maxHeapSize = "2g"
         systemProperty("intellij.plugin.verifier.concurrency.level", "1")
+
+        doLast {
+            val provider = "com.magento.idea.magento2plugin.mcp.MagentoBundledSkillsProvider"
+            val skillsApi = "com.intellij.mcpserver.skills.BundledSkill"
+            val externalReferenceHost = "Experimental API interface com.intellij.model.psi.PsiExternalReferenceHost is referenced in "
+            val sdkPsiClasses = setOf("com.intellij.psi.xml.XmlAttribute", "com.intellij.psi.xml.XmlNamedReferenceHost",
+                "com.intellij.lang.javascript.psi.JSProperty")
+            val unexpected = verificationReportsDirectory.get().asFile.walkTopDown()
+                .filter { it.name == "experimental-api-usages.txt" }
+                .flatMap { it.readLines().asSequence() }
+                .filter { it.isNotBlank() }
+                .filterNot { warning ->
+                    // The provider is optional and loaded only with JetBrains' bundled skills module.
+                    warning.startsWith("Experimental API ") && skillsApi in warning && provider in warning ||
+                        // The stable SDK reports these references within its own PSI classes.
+                        sdkPsiClasses.any { warning.startsWith("$externalReferenceHost$it.") }
+                }
+                .distinct()
+                .toList()
+            check(unexpected.isEmpty()) {
+                "Unexpected experimental API usage:\n${unexpected.joinToString("\n")}"
+            }
+        }
     }
 
     processResources {

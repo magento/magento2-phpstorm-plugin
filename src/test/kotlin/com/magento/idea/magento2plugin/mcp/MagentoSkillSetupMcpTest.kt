@@ -4,6 +4,9 @@
  */
 package com.magento.idea.magento2plugin.mcp
 
+import com.intellij.mcpserver.McpSessionInvocationMode
+import com.intellij.mcpserver.McpToolFilter
+import com.intellij.mcpserver.skills.BundledSkillsProvider
 import com.intellij.testFramework.DumbModeTestUtils
 import com.magento.idea.magento2plugin.project.MagentoSkillInstaller
 import com.magento.idea.magento2plugin.project.Settings
@@ -20,6 +23,47 @@ class MagentoSkillSetupMcpTest : McpHttpTestCase() {
         Settings.getInstance(project).pluginEnabled = false
         Settings.getInstance(project).magentoPath = null
         Settings.getInstance(project).excludeGeneratedFiles = null
+    }
+
+    fun testIntelligenceAndSkillsAppearWithRouterAndDiscoverAvailableTools() {
+        val client = mcp(
+            McpSessionInvocationMode.VIA_ROUTER,
+            McpToolFilter.MaskBased("-*,+com.magento.idea.magento2plugin.mcp.*,-*.magentoScaffold"),
+        )
+        val tools = client.tools().associateBy { it.getString("name") }
+        assertEquals(setOf("execute_tool", "magento_intelligence", "magento_skills"), tools.keys)
+        val description = tools.getValue("magento_skills").getString("description")
+        for (label in listOf("Magento", "Adobe Commerce", "bundled agent skills")) {
+            assertTrue(description, description.contains(label))
+        }
+        val catalog = McpHttpClient.text(client.call("magento_intelligence"))
+        assertTrue(catalog, catalog.contains("magento_skills (direct)"))
+        assertTrue(catalog, catalog.contains("magento_compatibility (router)"))
+        assertTrue(catalog, catalog.contains("get_magento_root_path (router)"))
+        assertFalse(catalog, catalog.contains("magento_scaffold"))
+
+        val schema = McpHttpClient.text(client.call("magento_intelligence", JSONObject().put("tool", "magento_inspect")))
+        assertTrue(schema, schema.contains("Call execute_tool with magento_inspect"))
+        assertTrue(schema, schema.contains("parametersJson"))
+
+        val status = McpHttpClient.text(client.call("execute_tool",
+            JSONObject().put("command", "magento_skills --mode status --agentTarget agents")))
+        for (skill in MagentoSkillInstaller.Skill.entries) {
+            assertTrue(status, status.contains("${skill.directoryName}: missing"))
+        }
+        assertFalse(Files.exists(root.resolve(".agents")))
+    }
+
+    fun testIdeBundledSkillCatalogReferencesPackagedFiles() {
+        val provider = BundledSkillsProvider.EP_NAME.extensionList.filterIsInstance<MagentoBundledSkillsProvider>().single()
+        val skills = provider.registeredSkills()
+        assertEquals(setOf("magento-inspect", "magento-scaffold", "magento-magerun"), skills.map { it.skillId }.toSet())
+        for (skill in skills) {
+            val resource = provider.javaClass.getResource("/${skill.resourcePath}/SKILL.md")
+            assertNotNull(skill.skillId, resource)
+        }
+        assertFalse(Files.exists(root.resolve(".agents")))
+        assertFalse(Files.exists(root.resolve("skills")))
     }
 
     fun testDiscoveryAndReadOnlyActionsNeverInstallSkills() {
@@ -44,14 +88,15 @@ class MagentoSkillSetupMcpTest : McpHttpTestCase() {
     fun testInstallEveryTargetDuringIndexingPreservesInstructionsAndSettings() {
         val instructions = "# Project rules\r\nKeep our custom conventions.\r\n"
         Files.writeString(root.resolve("AGENTS.md"), instructions)
+        val skills = listOf("magento-inspect", "magento-scaffold", "magento-magerun")
         DumbModeTestUtils.runInDumbModeSynchronously(project) {
             for ((target, folder) in listOf("project" to "skills", "agents" to ".agents/skills",
                 "codex" to ".codex/skills", "claude" to ".claude/skills")) {
                 val args = request().put("agentTarget", target)
-                    .put("skills", JSONArray(listOf("magento-inspect", "magento-scaffold")))
+                    .put("skills", JSONArray(skills))
                 val installed = call(args)
                 assertTrue(installed, installed.contains("Skill installation result: success"))
-                for (skill in listOf("magento-inspect", "magento-scaffold")) {
+                for (skill in skills) {
                     val relative = "$folder/$skill/SKILL.md"
                     val expected = MagentoSkillInstaller::class.java.getResourceAsStream("/skills/$skill/SKILL.md")!!
                         .bufferedReader().use { it.readText() }

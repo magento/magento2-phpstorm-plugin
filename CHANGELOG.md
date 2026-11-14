@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Added
 
+- Direct `magento_intelligence` MCP discovery for available Magento and Adobe Commerce tools, including router access and per-tool argument schemas. `magento_skills` is directly discoverable by default and the three bundled skills are registered on IDE builds that support bundled skill providers.
 - Bundled `magento-magerun` agent skill for common Magento runtime investigations, available through `magento_skills` with suggested project instruction links.
 - Optional agent skill installation through the separate `magento_skills` MCP tool for new or existing projects, with read-only discovery, project/Agents/Codex/Claude folder targets, and protection for customized skills. Returns skill links and suggested wiki guidance for an agent to merge into existing `AGENTS.md` instructions without editing that file automatically.
 

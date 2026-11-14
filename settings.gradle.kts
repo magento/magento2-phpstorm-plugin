@@ -9,6 +9,7 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-include(":php-mcp", ":php-graphql")
+include(":php-mcp", ":php-graphql", ":mcp-skills")
 project(":php-mcp").projectDir = file("modules/php-mcp")
 project(":php-graphql").projectDir = file("modules/php-graphql")
+project(":mcp-skills").projectDir = file("modules/mcp-skills")

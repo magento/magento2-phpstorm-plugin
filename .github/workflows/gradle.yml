@@ -125,7 +125,6 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      # The RC release metadata omits windowsZip, although the official ZIP exists.
       - name: Prepare pinned PhpStorm Windows platform
         shell: pwsh
         run: |

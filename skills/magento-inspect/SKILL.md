@@ -5,7 +5,7 @@ description: Inspect Magento 2 or Adobe Commerce configuration, configure projec
 
 # Magento Inspect
 
-Discover the connected IDE's tools and verify the intended project before choosing a workflow. Available tools depend on the installed plugin version and IDE capabilities. Explain missing capabilities rather than presenting them as an empty result.
+Call `magento_intelligence` to discover the connected IDE's Magento tools and verify the intended project before choosing a workflow. Available tools depend on the installed plugin version and IDE capabilities. Explain missing capabilities rather than presenting them as an empty result.
 
 - For source configuration lookups, use `magento_inspect` with the preferred flow below.
 - For project command discovery or n98-magerun2 metadata, use the CLI workflow below. Filesystem discovery alone does not require a running container.
@@ -17,7 +17,7 @@ Read the project's existing instructions before making changes. Use `configure_m
 
 Use the separate `magento_skills` tool for optional skill installation in new or existing projects:
 
-1. Call `mode: "status"` with the intended `projectPath` and `agentTarget` to inspect the bundled catalog and installed copies. Use `mode: "help"` for the contract. Neither mode installs files.
+1. Call `mode: "status"` with the intended `projectPath` and `agentTarget` to inspect the bundled catalog and installed copies. Use `mode: "help"` for the contract. Both modes are read-only. In router mode, pass `magento_skills --mode status --agentTarget agents` to `execute_tool` to inspect the Agents folder.
 2. When installation is part of the user's task, call `mode: "install"` with an explicit `skills` array, such as `["magento-inspect"]`. Choose `agentTarget: "project"` for `skills/`, `"agents"` for `.agents/skills/`, `"codex"` for `.codex/skills/`, or `"claude"` for `.claude/skills/`. All paths are relative to the IDE project root, even when Magento is nested under `src/`.
 3. Read every per-skill result. Identical copies remain unchanged; customized copies are preserved by default. Inspect existing changes before using `overwrite: true` to explicitly replace them. An incomplete installation may retain successful writes; report those paths and the failures.
 4. Use the returned Markdown links and [suggested project instructions](https://github.com/magento/magento2-phpstorm-plugin/wiki/MCP#suggested-agentsmd-instructions) to adapt the existing `AGENTS.md` when that edit belongs to the setup request. Preserve project rules, avoid duplicate sections, and adjust link paths for nested instruction files. The tool never edits `AGENTS.md`; report skill installation and instruction edits separately. Installing a skill does not configure the MCP connection or provide unavailable PHP capabilities.

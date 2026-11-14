@@ -17,32 +17,6 @@ import kotlinx.coroutines.withContext
  * Exposes Magento MCP tools that do not require the JetBrains PHP plugin.
  */
 class MagentoMcpProjectToolset : McpToolset {
-    @McpTool(name = "magento_skills")
-    @McpDescription(
-        "Discover or install bundled Magento agent skills in the current IDE project. " +
-        "Use mode=help for usage, mode=status (default) for the read-only catalog and installed state, " +
-        "or mode=install with a non-empty skills array: magento-inspect, magento-scaffold, and/or magento-magerun. " +
-        "agentTarget chooses project (default, skills/), agents (.agents/skills/), codex (.codex/skills/), " +
-        "or claude (.claude/skills/), relative to the IDE project root. " +
-        "Customized files are preserved unless overwrite=true; identical files are unchanged. " +
-        "projectPath optionally verifies the intended IDE project before reading or writing files. " +
-        "Returns skill paths, suggested Markdown links and wiki guidance for the agent to merge into existing AGENTS.md. " +
-        "Never creates or edits AGENTS.md or changes Magento settings. " +
-        "Works before integration is enabled, during indexing, and without PHP; scaffold usage requires the JetBrains PHP plugin."
-    )
-    suspend fun magentoSkills(
-        mode: String = "status",
-        skills: List<String> = emptyList(),
-        agentTarget: String = "project",
-        overwrite: Boolean = false,
-        projectPath: String = ""
-    ): String {
-        if (mode == "help") return MagentoSkillCommands.help()
-        return MagentoMcpToolsetSupport.withProjectEdtAction(validateProject = false) {
-            MagentoSkillCommands.execute(it, mode, skills, agentTarget, overwrite, projectPath)
-        }
-    }
-
     /**
      * Returns the Magento root path configured for the current project.
      */
