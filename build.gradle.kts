@@ -195,6 +195,8 @@ intellijPlatform {
     }
 
     pluginVerification {
+        // Verifier scans the optional bundled-skills module even on builds that skip loading it.
+        ignoredProblemsFile = layout.projectDirectory.file("gradle/plugin-verifier-ignored-problems.txt")
         // Experimental API use is checked against the specific exceptions in verifyPlugin below.
         failureLevel = VerifyPluginTask.FailureLevel.ALL - setOf(
             VerifyPluginTask.FailureLevel.NOT_DYNAMIC,

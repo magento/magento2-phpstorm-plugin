@@ -1,0 +1,1 @@
+com.magento.idea.magento2plugin::Package 'com\.intellij\.mcpserver\.skills' is not found
