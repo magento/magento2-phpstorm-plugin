@@ -98,6 +98,32 @@ class MagentoSkillSetupMcpTest : McpHttpTestCase() {
         assertFalse(Files.exists(root.resolve("AGENTS.md")))
     }
 
+    fun testMagerunSkillCatalogAndInstallationOverMcp() {
+        val instructions = "# Project rules\nUse our existing conventions.\n"
+        Files.writeString(root.resolve("AGENTS.md"), instructions)
+        val status = call(JSONObject().put("mode", "status").put("agentTarget", "agents"))
+        assertTrue(status, status.contains("magento-magerun: missing"))
+        assertFalse(Files.exists(root.resolve(".agents/skills/magento-magerun")))
+
+        val args = request().put("agentTarget", "agents")
+            .put("skills", JSONArray(listOf("magento-magerun")))
+        val installed = call(args)
+        val relative = ".agents/skills/magento-magerun/SKILL.md"
+        assertTrue(installed, installed.contains("magento-magerun: installed"))
+        assertTrue(installed, installed.contains("[magento-magerun]($relative)"))
+        val bundled = MagentoSkillInstaller::class.java.getResourceAsStream("/skills/magento-magerun/SKILL.md")!!
+            .bufferedReader().use { it.readText() }
+        assertEquals(bundled, Files.readString(root.resolve(relative)))
+        assertEquals(instructions, Files.readString(root.resolve("AGENTS.md")))
+        assertTrue(call(args).contains("magento-magerun: unchanged"))
+
+        Files.writeString(root.resolve(relative), "Custom Magerun instructions")
+        val conflict = call(args)
+        assertTrue(conflict, conflict.contains("Customized skill preserved"))
+        assertEquals("Custom Magerun instructions", Files.readString(root.resolve(relative)))
+        assertEquals(instructions, Files.readString(root.resolve("AGENTS.md")))
+    }
+
     fun testInvalidRequestsDoNotWriteSkillsOrSettings() {
         val invalidRequests = listOf(
             request().put("skills", JSONArray(listOf("magento-inspect", "../../outside"))),

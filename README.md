@@ -102,6 +102,8 @@ Reconnect your assistant after updating the plugin so it discovers the latest to
 
 You can also ask your assistant to install skills through **`magento_skills`**, independently of project setup. It can inspect installed copies with `mode: "status"` and install selected skills with `mode: "install"`, for example `skills: ["magento-inspect"]`. Choose the project, agents, Codex, or Claude folder with `agentTarget: "project"`, `"agents"`, `"codex"`, or `"claude"`. Customized copies are preserved unless replacement is explicitly requested. The tool returns local skill links and the [suggested AGENTS.md guidance](https://github.com/magento/magento2-phpstorm-plugin/wiki/MCP#suggested-agentsmd-instructions) for your assistant to adapt into existing instructions; it never edits `AGENTS.md` automatically. Skill installation works in WebStorm, but scaffold usage and compatibility analysis still require the PHP plugin.
 
+The `magento-magerun` skill guides runtime investigation using the project's discovered Magerun and Magento CLI environment, including configuration, database, cron, indexing, and application diagnostics. Install it with `skills: ["magento-magerun"]`; command availability depends on the installed Magerun version and runtime.
+
 ## Setting up development environment
 
 See [AGENTS.md](AGENTS.md) for repository policies and development skills. Feature priorities follow the existing project roadmap.
