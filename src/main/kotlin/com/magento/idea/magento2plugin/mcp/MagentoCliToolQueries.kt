@@ -178,6 +178,7 @@ internal object MagentoCliToolQueries {
             lines += ""
             lines += "n98-magerun capabilities are not probed during environment discovery."
             lines += "Use magento_magerun mode=status for detection, commands for the installed command catalogue, command_help for arguments/options, or mcp_config for native MCP settings."
+            lines += "Optional bundled magento-magerun skill: use magento_skills mode=status, then install it when requested; installation returns an AGENTS.md link. Verify the detected candidate before use."
         }
 
         lines += ""

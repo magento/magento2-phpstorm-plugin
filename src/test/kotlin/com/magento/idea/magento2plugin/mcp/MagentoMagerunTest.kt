@@ -21,11 +21,13 @@ class MagentoMagerunTest {
         val service = MagentoMagerunService(runner)
         val status = service.execute(env, MagerunRequest())
         assertEquals("detected", status.getString("status"))
+        assertFalse(status.has("skillSuggestion")) // DDEV configuration alone does not prove Magerun exists.
         assertTrue(runner.calls.isEmpty())
         assertEquals(root.resolve("src").toString(), status.getJSONObject("invocation").getString("cwd"))
         assertEquals("ddev exec --raw --service=web -- magerun2 --version", status.getJSONObject("terminalGuidance").getString("command"))
         val result = service.execute(env, MagerunRequest("mcp_config"))
         assertEquals("ok", result.getString("status"))
+        assertTrue(result.getString("skillSuggestion").contains("magento-magerun"))
         val prefix = listOf(launcher.toString(), "exec", "--raw", "--service=web", "--", "magerun2")
         assertTrue(runner.calls.all { it.take(prefix.size) == prefix })
         assertTrue(runner.calls.none { args -> args.any { it.startsWith("--root-dir=") } })
@@ -105,7 +107,16 @@ class MagentoMagerunTest {
         assertEquals("detected", result.getString("status"))
         assertFalse(result.getBoolean("runtimeProbed"))
         assertFalse(result.getJSONObject("selected").getBoolean("identityVerified"))
+        assertTrue(result.getString("skillSuggestion").contains("magento_skills"))
+        assertTrue(result.getString("skillSuggestion").contains("Verify"))
         assertTrue(runner.calls.isEmpty())
+    }
+
+    @Test
+    fun testMissingMagerunDoesNotSuggestSkill() = fixture { root ->
+        val result = MagentoMagerunService(FakeRunner()).execute(environment(root), MagerunRequest())
+        assertEquals("not_found", result.getString("status"))
+        assertFalse(result.has("skillSuggestion"))
     }
 
     @Test

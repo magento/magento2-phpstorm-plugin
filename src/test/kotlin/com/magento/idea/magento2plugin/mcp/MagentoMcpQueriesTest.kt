@@ -247,6 +247,8 @@ class MagentoMcpQueriesTest : BaseProjectTestCase() {
         assertContains(result, "n98-magerun2 candidate (version unverified)")
         assertContains(result, "n98-magerun capabilities are not probed during environment discovery.")
         assertContains(result, "Use magento_magerun mode=status")
+        assertContains(result, "Optional bundled magento-magerun skill")
+        assertContains(result, "installation returns an AGENTS.md link")
         assertDoesNotContain(result, "Known n98-magerun capability groups:")
         assertDoesNotContain(result, "example: ./bin/n98-magerun2")
         assertContains(result, "Create and edit Magento files under `./$nestedMagentoRoot`; that is the configured Magento root.")
@@ -357,7 +359,7 @@ class MagentoMcpQueriesTest : BaseProjectTestCase() {
     @Test
     fun testDescribeCliEnvironmentDoesNotReportNonexistentConfiguredCandidates() {
         resetCliEnvironment()
-        Settings.getInstance(project).mcpCliToolCandidates = "bin/magento, bin/php"
+        Settings.getInstance(project).mcpCliToolCandidates = "bin/magento, bin/php, bin/n98-magerun2"
         writeProjectFile("bin/magento", "#!/usr/bin/env bash\n")
 
         val result = MagentoCliToolQueries.describeCliEnvironment(project)
@@ -367,6 +369,7 @@ class MagentoMcpQueriesTest : BaseProjectTestCase() {
         assertDoesNotContain(result, "./bin/php")
         assertDoesNotContain(result, "Configured wrappers:")
         assertDoesNotContain(result, "existence could not be verified")
+        assertDoesNotContain(result, "Optional bundled magento-magerun skill")
     }
 
     @Test

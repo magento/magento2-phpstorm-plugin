@@ -29,7 +29,8 @@ public final class MagentoSkillInstaller {
 
     public enum Skill {
         MAGENTO_SCAFFOLD("Magento scaffold", "magento-scaffold"),
-        MAGENTO_INSPECT("Magento inspect", "magento-inspect");
+        MAGENTO_INSPECT("Magento inspect", "magento-inspect"),
+        MAGENTO_MAGERUN("Magento Magerun", "magento-magerun");
 
         private final String displayName;
         private final String directoryName;

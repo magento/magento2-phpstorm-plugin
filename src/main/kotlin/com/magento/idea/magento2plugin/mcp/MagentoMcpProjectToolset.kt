@@ -21,7 +21,7 @@ class MagentoMcpProjectToolset : McpToolset {
     @McpDescription(
         "Discover or install bundled Magento agent skills in the current IDE project. " +
         "Use mode=help for usage, mode=status (default) for the read-only catalog and installed state, " +
-        "or mode=install with a non-empty skills array: magento-inspect and/or magento-scaffold. " +
+        "or mode=install with a non-empty skills array: magento-inspect, magento-scaffold, and/or magento-magerun. " +
         "agentTarget chooses project (default, skills/), agents (.agents/skills/), codex (.codex/skills/), " +
         "or claude (.claude/skills/), relative to the IDE project root. " +
         "Customized files are preserved unless overwrite=true; identical files are unchanged. " +
