@@ -376,6 +376,7 @@ intellijPlatformTesting.testIde.register("mcpE2eTest") {
         filter {
             includeTestsMatching("com.magento.idea.magento2plugin.mcp.MagentoMcpHttpTest")
             includeTestsMatching("com.magento.idea.magento2plugin.mcp.MagentoSkillSetupMcpTest")
+            includeTestsMatching("com.magento.idea.magento2plugin.mcp.MagentoExternalDiscoveryMcpTest")
             includeTestsMatching("com.magento.idea.magento2plugin.mcp.MagentoCompatibilityCommandsTest")
             if (providers.environmentVariable("MAGENTO_MCP_REAL_RELEASE_TEST").orNull != "true") {
                 excludeTestsMatching("*.testHttpMcpWithActualMagentoReleases")
