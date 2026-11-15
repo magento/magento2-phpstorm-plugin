@@ -61,6 +61,12 @@ public class XmlCoreReferenceContributor extends PsiReferenceContributor {
         registrar.registerReferenceProvider(
                 XmlPatterns.xmlAttributeValue().withParent(
                         XmlPatterns.xmlAttribute().withName("name").withParent(
+                                XmlPatterns.xmlTag().withName("event"))),
+                new EventNameReferenceProvider()
+        );
+        registrar.registerReferenceProvider(
+                XmlPatterns.xmlAttributeValue().withParent(
+                        XmlPatterns.xmlAttribute().withName("name").withParent(
                                 XmlPatterns.xmlTag().withName("plugin").withChild(
                                         XmlPatterns.xmlAttribute().withName("disabled"))))
                         .inFile(xmlFile().withName(string().matches(ModuleDiXml.FILE_NAME))),

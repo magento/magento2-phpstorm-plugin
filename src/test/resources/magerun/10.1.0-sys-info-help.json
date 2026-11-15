@@ -1,0 +1,157 @@
+{
+  "name": "sys:info",
+  "description": "Prints infos about the current magento system.",
+  "usage": [
+    "sys:info [--sort] [--format [FORMAT]] [--] [<key>]"
+  ],
+  "help": "Prints infos about the current magento system.",
+  "definition": {
+    "arguments": {
+      "key": {
+        "name": "key",
+        "is_required": false,
+        "is_array": false,
+        "description": "Only output value of named param like \"version\". Key is case insensitive.",
+        "default": null
+      }
+    },
+    "options": {
+      "sort": {
+        "name": "--sort",
+        "shortcut": "",
+        "accept_value": false,
+        "is_value_required": false,
+        "is_multiple": false,
+        "description": "Sort by name",
+        "default": false
+      },
+      "format": {
+        "name": "--format",
+        "shortcut": "",
+        "accept_value": true,
+        "is_value_required": false,
+        "is_multiple": false,
+        "description": "Output Format. One of [csv,tsv,json,json_array,jsonl,yaml,markdown,xml]. Aliases: yml,md,ndjson",
+        "default": null
+      },
+      "help": {
+        "name": "--help",
+        "shortcut": "-h",
+        "accept_value": false,
+        "is_value_required": false,
+        "is_multiple": false,
+        "description": "Display help for the given command. When no command is given display help for the <info>list</info> command",
+        "default": false
+      },
+      "quiet": {
+        "name": "--quiet",
+        "shortcut": "-q",
+        "accept_value": false,
+        "is_value_required": false,
+        "is_multiple": false,
+        "description": "Do not output any message",
+        "default": false
+      },
+      "verbose": {
+        "name": "--verbose",
+        "shortcut": "-v|-vv|-vvv",
+        "accept_value": false,
+        "is_value_required": false,
+        "is_multiple": false,
+        "description": "Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug",
+        "default": false
+      },
+      "version": {
+        "name": "--version",
+        "shortcut": "-V",
+        "accept_value": false,
+        "is_value_required": false,
+        "is_multiple": false,
+        "description": "Display this application version",
+        "default": false
+      },
+      "ansi": {
+        "name": "--ansi",
+        "shortcut": "",
+        "accept_value": false,
+        "is_value_required": false,
+        "is_multiple": false,
+        "description": "Force (or disable --no-ansi) ANSI output",
+        "default": null
+      },
+      "no-ansi": {
+        "name": "--no-ansi",
+        "shortcut": "",
+        "accept_value": false,
+        "is_value_required": false,
+        "is_multiple": false,
+        "description": "Negate the \"--ansi\" option",
+        "default": null
+      },
+      "no-interaction": {
+        "name": "--no-interaction",
+        "shortcut": "-n",
+        "accept_value": false,
+        "is_value_required": false,
+        "is_multiple": false,
+        "description": "Do not ask any interactive question",
+        "default": false
+      },
+      "root-dir": {
+        "name": "--root-dir",
+        "shortcut": "",
+        "accept_value": true,
+        "is_value_required": false,
+        "is_multiple": false,
+        "description": "Force magento root dir. No auto detection",
+        "default": null
+      },
+      "skip-config": {
+        "name": "--skip-config",
+        "shortcut": "",
+        "accept_value": false,
+        "is_value_required": false,
+        "is_multiple": false,
+        "description": "Do not load any custom config.",
+        "default": false
+      },
+      "skip-root-check": {
+        "name": "--skip-root-check",
+        "shortcut": "",
+        "accept_value": false,
+        "is_value_required": false,
+        "is_multiple": false,
+        "description": "Do not check if n98-magerun runs as root",
+        "default": false
+      },
+      "skip-core-commands": {
+        "name": "--skip-core-commands",
+        "shortcut": "",
+        "accept_value": false,
+        "is_value_required": false,
+        "is_multiple": false,
+        "description": "Do not include Magento 2 core commands",
+        "default": false
+      },
+      "skip-magento-compatibility-check": {
+        "name": "--skip-magento-compatibility-check",
+        "shortcut": "",
+        "accept_value": false,
+        "is_value_required": false,
+        "is_multiple": false,
+        "description": "Do not check for Magento version compatibility",
+        "default": false
+      },
+      "add-module-dir": {
+        "name": "--add-module-dir",
+        "shortcut": "",
+        "accept_value": true,
+        "is_value_required": true,
+        "is_multiple": true,
+        "description": "Adds an additional module directory path. Use absolute paths or paths relative to the magerun execution.",
+        "default": []
+      }
+    }
+  },
+  "hidden": false
+}

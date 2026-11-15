@@ -13,7 +13,6 @@ import com.intellij.psi.PsiReferenceContributor;
 import com.intellij.psi.PsiReferenceRegistrar;
 import com.intellij.psi.xml.XmlTokenType;
 import com.magento.idea.magento2plugin.reference.provider.CompositeReferenceProvider;
-import com.magento.idea.magento2plugin.reference.provider.EventNameReferenceProvider;
 import com.magento.idea.magento2plugin.reference.provider.PhpClassMemberReferenceProvider;
 import com.magento.idea.magento2plugin.reference.provider.PhpClassReferenceProvider;
 import com.magento.idea.magento2plugin.reference.provider.PhpConstructorArgumentReferenceProvider;
@@ -66,12 +65,6 @@ public class XmlReferenceContributor extends PsiReferenceContributor {
                                 XmlPatterns.xmlTag().withName("job")))
                         .inFile(xmlFile().withName(string().matches("crontab.xml"))),
                 new PhpJobMethodReferenceProvider()
-        );
-        registrar.registerReferenceProvider(
-                XmlPatterns.xmlAttributeValue().withParent(
-                        XmlPatterns.xmlAttribute().withName("name").withParent(
-                                XmlPatterns.xmlTag().withName("event"))),
-                new EventNameReferenceProvider()
         );
     }
 }
