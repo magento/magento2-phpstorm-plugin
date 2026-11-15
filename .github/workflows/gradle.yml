@@ -5,7 +5,6 @@ name: Run automated tests
 
 on:
   pull_request:
-    branches: [ master, '*-develop', 'mainline*' ]
 
 jobs:
   verify-plugin:

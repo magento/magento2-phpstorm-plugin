@@ -278,6 +278,7 @@ class MagentoCompatibilityCommandsTest : McpHttpTestCase() {
     fun testStatusWorksWithDisabledSupportAndExposesActualCoverage() {
         val status = call("status")
         assertFalse(status.getBoolean("pluginEnabled"))
+        assertTrue(status.getString("nextAction").contains("magento_intelligence --tool configure_magento_project"))
         assertFalse(status.getBoolean("uctEnabled"))
         assertTrue(status.getJSONArray("supportedVersions").toList().contains("2.4.3"))
         assertEquals("bundled", status.getString("indexSource"))
@@ -662,7 +663,14 @@ class MagentoCompatibilityCommandsTest : McpHttpTestCase() {
     }
 
     fun testAnalyzeRejectsDisabledProjectInvalidScopeAndUnsupportedVersions() {
-        assertEquals("failed", call("analyze").getString("state"))
+        for (mode in listOf("analyze", "prepare")) {
+            val disabled = call(mode)
+            assertEquals("failed", disabled.getString("state"))
+            val message = disabled.getJSONObject("error").getString("message")
+            assertTrue(message, message.contains("Direct: call magento_intelligence"))
+            assertTrue(message, message.contains("magento_intelligence --tool configure_magento_project"))
+            assertTrue(message, message.contains(JSONObject.quote(project.basePath)))
+        }
         Settings.getInstance(project).pluginEnabled = true
         myFixture.addFileToProject("Sample.php", "<?php class Sample {}")
         for (parameters in listOf(

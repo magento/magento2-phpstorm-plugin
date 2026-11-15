@@ -15,7 +15,7 @@ internal object MagentoProjectQueries {
     fun getMagentoRootPath(project: Project): String {
         val configuredPath = Settings.getMagentoPath(project)?.trim().orEmpty()
         if (configuredPath.isEmpty()) {
-            return "Magento root path is not configured for this project."
+            return MagentoMcpSetupGuidance.missingRoot(project)
         }
 
         return "Configured Magento root path: $configuredPath"

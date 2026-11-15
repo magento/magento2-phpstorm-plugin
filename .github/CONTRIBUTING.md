@@ -44,6 +44,21 @@ The HTTP suites also run with `./gradlew test`, so the existing Linux, Windows, 
 
 Reports are written to `build/reports/tests/mcpE2eTest/index.html` (or `build/reports/tests/test/index.html` when using `test`). The installed IDE's MCP settings and open projects are not used.
 
+## External router discovery before setup
+
+Run `./gradlew test --tests '*MagentoExternalDiscoveryMcpTest'` for the first-call discovery regression. Unlike the authorized-session fixtures, this test starts the sandbox's global MCP server, selects `VIA_ROUTER` in `McpToolFilterSettings` with its default filter, and uses an independent JDK HTTP client against `/stream` without a private-session token. It sends `initialize`, opens the event stream, sends `notifications/initialized`, and immediately requests `tools/list`. The project has disabled Magento integration, no configured root, and no installed Magento skills. The test restores the sandbox server settings afterward.
+
+Observed on 2026-11-15 with PhpStorm **PS-263.7307.215** and plugin **2026.3.6-p1**:
+
+- The first `tools/list` returned exactly `execute_tool`, `magento_intelligence`, and `magento_skills`.
+- Direct `magento_intelligence` with `tool: "configure_magento_project"` and routed `execute_tool` with `command: "magento_intelligence --tool configure_magento_project"` and the current `projectPath` returned identical configuration descriptions and argument schemas.
+- Direct and routed `magento_skills --mode status` returned the same three missing skills. Discovery and recovery responses left the project settings and instruction/skill files unchanged.
+- Routed calls that encountered disabled support or an unconfigured root returned both setup-discovery invocation forms and the current `projectPath`.
+
+The plugin registers its discovery toolsets through `META-INF/withMcp.xml`; their `McpToolset.alwaysIncluded()` overrides keep them directly visible in router mode. The global endpoint uses settings-based session options and filtering; the test does not force visibility through a Magento-only filter. No plugin-owned omission reproduced. A client that exposes only `execute_tool` to the model despite receiving this three-tool wire list is applying a later client/session exposure policy. The reported Codex omission was not reproduced in this external HTTP test; this test does not inspect Codex's internal model tool selection. Compare that client's own `tools/list` trace before attributing an omission to it.
+
+The inspected JetBrains build provides `mcpToolsProvider`, `mcpToolset`, `mcpToolFilterProvider`, and `mcpManagedSessionSupport` extension points, but no extension point for appending plugin discovery hints to the router description. `UniversalToolset.execute_tool` declares the fixed description “Universal tool executor that can invoke specific IDE MCP tool dynamically.” Its `displayDescription(toolName)` belongs to `UniversalToolset` and does not aggregate other plugins' discovery hints. Keep discovery hints in Magento tool descriptions/responses; do not replace or mutate the platform-owned router descriptor. Recheck the SDK when targeting a newer IDE build.
+
 To additionally test compatibility preparation against official release archives:
 
 ```sh

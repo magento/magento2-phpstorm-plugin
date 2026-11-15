@@ -66,7 +66,7 @@ internal object MagentoModuleCommands {
 
         val configuredRoot = Settings.getMagentoPath(project)?.trim().orEmpty()
         if (configuredRoot.isEmpty()) {
-            return "Magento root path is not configured for this project."
+            return MagentoMcpSetupGuidance.missingRoot(project)
         }
 
         val magentoRootDirectory = resolveMagentoRootDirectory(project, configuredRoot)

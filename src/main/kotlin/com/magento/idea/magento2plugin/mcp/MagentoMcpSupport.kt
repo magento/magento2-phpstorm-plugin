@@ -26,7 +26,7 @@ internal object MagentoMcpSupport {
 
     fun validateProject(project: Project, requireSmartMode: Boolean = true): String? {
         if (!Settings.isEnabled(project)) {
-            return "Magento plugin support is disabled for this project."
+            return MagentoMcpSetupGuidance.disabled(project)
         }
         if (requireSmartMode && DumbService.getInstance(project).isDumb) {
             return INDEXES_NOT_READY_MESSAGE
