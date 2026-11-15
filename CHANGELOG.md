@@ -9,11 +9,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Added
 
+- WebStorm now supports XML event name reference navigation in `events.xml` without the PHP plugin, resolving event declarations across modules while retaining PHP dispatch resolution when the PHP plugin is present.
+- WebStorm now supports XML dependency injection declaration inspections in `di.xml` without the PHP plugin, validating empty or missing attributes for plugins, preferences, and virtual types while retaining PHP class existence verification when the PHP plugin is present.
+
+### Fixed
+
+- `magento_magerun` accepts commands with leading underscores, including `_complete` in n98-magerun2 10.1.0, so command discovery and exact-command help succeed. Invalid catalog names now report the rejected field, value, and validation rule [#2802](https://github.com/magento/magento2-phpstorm-plugin/issues/2802).
+
+
+## 2026.3.6-p1
+
+### Added
+
 - Direct `magento_intelligence` MCP discovery for available Magento and Adobe Commerce tools, including router access and per-tool argument schemas. `magento_skills` is directly discoverable by default and the three bundled skills are registered on IDE builds that support bundled skill providers.
 - Bundled `magento-magerun` agent skill for common Magento runtime investigations, available through `magento_skills` with suggested project instruction links.
 - Optional agent skill installation through the separate `magento_skills` MCP tool for new or existing projects, with read-only discovery, project/Agents/Codex/Claude folder targets, and protection for customized skills. Returns skill links and suggested wiki guidance for an agent to merge into existing `AGENTS.md` instructions without editing that file automatically.
-- WebStorm now supports XML event name reference navigation in `events.xml` without the PHP plugin, resolving event declarations across modules while retaining PHP dispatch resolution when the PHP plugin is present.
-- WebStorm now supports XML dependency injection declaration inspections in `di.xml` without the PHP plugin, validating empty or missing attributes for plugins, preferences, and virtual types while retaining PHP class existence verification when the PHP plugin is present.
 
 ### Changed
 
@@ -22,8 +32,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 ### Fixed
 
 - MCP responses for disabled Magento support or a missing Magento root now include direct and routed discovery calls for the project configuration schema, so assistants can find setup before integration is enabled.
-- `magento_magerun` accepts commands with leading underscores, including `_complete` in n98-magerun2 10.1.0, so command discovery and exact-command help succeed. Invalid catalog names now report the rejected field, value, and validation rule [#2802](https://github.com/magento/magento2-phpstorm-plugin/issues/2802).
-
 
 ## 2026.3.6
 
