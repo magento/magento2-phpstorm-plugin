@@ -168,7 +168,7 @@ class McpHttpClient(
         .header("Content-Type", "application/json")
         .header("Accept", "application/json, text/event-stream")
         .header("MCP-Protocol-Version", protocol)
-        .header(tokenName, token)
+        .also { if (tokenName.isNotEmpty()) it.header(tokenName, token) }
         .header("IJ_MCP_SERVER_PROJECT_PATH", projectPath)
         .also { builder -> sessionId?.let { builder.header("Mcp-Session-Id", it) } }
 

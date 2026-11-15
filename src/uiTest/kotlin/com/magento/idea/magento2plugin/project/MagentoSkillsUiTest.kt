@@ -29,6 +29,17 @@ class MagentoSkillsUiTest {
                 val catalog = mcp.callText("magento_intelligence")
                 check(catalog.contains("magento_inspect") && catalog.contains("magento_skills")) { catalog }
                 check(!catalog.contains("magento_compatibility") && !catalog.contains("magento_scaffold")) { catalog }
+                val schema = mcp.callText("magento_intelligence", JSONObject().put("tool", "configure_magento_project"))
+                check(schema.contains("magentoPath") && schema.contains("properties")) { schema }
+                for ((tool, reason) in listOf(
+                    "describe_magento_cli_environment" to "Magento plugin support is disabled",
+                    "get_magento_root_path" to "Magento root path is not configured",
+                )) {
+                    val response = mcp.callText(tool)
+                    check(response.startsWith(reason) && response.contains("Direct: call magento_intelligence") &&
+                        response.contains("magento_intelligence --tool configure_magento_project") &&
+                        response.contains(JSONObject.quote(root.toString()))) { response }
+                }
                 val skills = listOf("magento-inspect", "magento-scaffold", "magento-magerun")
                 val status = mcp.callText("magento_skills", JSONObject().put("agentTarget", "agents"))
                 check(skills.all { status.contains("$it: missing") }) { status }

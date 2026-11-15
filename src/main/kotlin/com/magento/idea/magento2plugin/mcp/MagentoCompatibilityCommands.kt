@@ -146,14 +146,14 @@ internal object MagentoCompatibilityCommands {
             }
             "prepare" -> {
                 validateKeys(parameters, preparationOptions + "targetVersion")
-                require(Settings.isEnabled(project)) { "Magento plugin support is disabled for this project." }
+                require(Settings.isEnabled(project)) { MagentoMcpSetupGuidance.disabled(project) }
                 val version = requiredString(parameters, "targetVersion")
                 validateVersion("targetVersion", version)
                 val statusParameters = preparationStatusParameters(parameters, version)
                 preparationView(project, project.getService(UctReleasePreparation::class.java).start(version), statusParameters)
             }
             "analyze" -> {
-                require(Settings.isEnabled(project)) { "Magento plugin support is disabled for this project." }
+                require(Settings.isEnabled(project)) { MagentoMcpSetupGuidance.disabled(project) }
                 require(!DumbService.isDumb(project)) { "Indexes are not ready. Wait for indexing to finish and retry." }
                 val request = request(project, parameters)
                 // Coverage checks never download data implicitly. Preparation is an explicit MCP operation.
@@ -303,7 +303,7 @@ internal object MagentoCompatibilityCommands {
                 .put("excludedPaths", JSONArray(relative(project, excludedPaths(project, parameters))))
                 .put("excludedPathsSource", if (parameters.has("excludedPaths")) "explicit" else "uct_settings"))
             .put("nextAction", when {
-                !Settings.isEnabled(project) -> "Enable Magento project support before preparation or analysis."
+                !Settings.isEnabled(project) -> MagentoMcpSetupGuidance.disabled(project)
                 target == null -> "Call status with the requested targetVersion to obtain analysis readiness and the next preparation call."
                 missing.isNotEmpty() -> "Follow nextCall to prepare missing release data. The official tag has not been verified by this status call; preparation can fail if it does not exist. Repeat this status request after preparation completes."
                 DumbService.isDumb(project) -> "IDE indexing is running. Follow nextCall until readiness.ready is true."
