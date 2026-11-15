@@ -1,0 +1,16 @@
+Captured on 2026-11-14 from the issue #2802 Docker project (Magento under src/).
+Runtime: n98-magerun2 10.1.0, reported commit ca4be30.
+Host cwd: project root.
+
+Catalogue invocation:
+./bin/clinotty php bin/n98-magerun2.phar list --format=json --no-ansi --no-interaction
+
+Help invocation:
+./bin/clinotty php bin/n98-magerun2.phar help sys:info --format=json --no-ansi --no-interaction
+
+10.1.0-catalogue.json retains the application and the unmodified _complete and
+sys:info command entries from the 243-command catalogue. Other commands and
+namespace summaries were omitted to keep the fixture focused. Only _complete
+failed the original command-name validator: commands[0].name starts with _.
+10.1.0-sys-info-help.json contains the complete help response. JSON whitespace
+has been normalized; command fields and values have not been changed.
