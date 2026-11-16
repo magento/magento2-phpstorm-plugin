@@ -29,12 +29,15 @@ internal object MagentoInspectionCommands {
     private val jsonFilters = mapOf(
         "module" to setOf("path"),
         "di_config" to setOf("module", "area", "path"),
-        "observers_for_event" to setOf("module", "area", "path")
+        "observers_for_event" to setOf("module", "area", "path"),
+        "layout_entities" to setOf("module", "area", "path"),
+        "ui_component" to setOf("module", "area", "path"),
+        "acl_or_menu" to setOf("module", "area", "path")
     )
 
     private val filterHelp = mapOf(
         "module" to "module: exact name of the module that owns the file.",
-        "area" to "area: global, frontend, adminhtml or another etc/<area> folder.",
+        "area" to "area: global, frontend, adminhtml or another etc/<area> folder; for view files, the folder after view/ or app/design/.",
         "path" to "path: project-relative directory or file prefix."
     )
 
@@ -220,6 +223,9 @@ internal object MagentoInspectionCommands {
             val records = when (queryType) {
                 "module" -> MagentoModuleQueries.moduleRecords(project, value)
                 "di_config" -> MagentoDiQueries.diConfigRecords(project, value)
+                "layout_entities" -> MagentoViewQueries.layoutRecords(project, value)
+                "ui_component" -> MagentoViewQueries.uiComponentRecords(project, value)
+                "acl_or_menu" -> MagentoViewQueries.aclOrMenuRecords(project, value)
                 else -> MagentoEventQueries.observerRecords(project, value)
             }
             MagentoInspectionResults.respond(project, queryType, query, records, options)

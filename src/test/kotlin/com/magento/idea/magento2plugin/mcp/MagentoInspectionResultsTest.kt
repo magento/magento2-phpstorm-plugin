@@ -102,8 +102,8 @@ class MagentoInspectionResultsTest : BaseProjectTestCase() {
         val missing = query("observers_for_event", JSONObject().put("format", "json"))
         assertEquals("invalid_request", missing.getString("status"))
         assertTrue(missing.getString("message").contains("`eventName`"))
-        val layout = query("layout_entities", JSONObject().put("name", "default").put("format", "json"))
-        assertEquals("invalid_request", layout.getString("status"))
+        val plugins = query("plugins_for_method", JSONObject().put("className", "A").put("methodName", "b").put("format", "json"))
+        assertEquals("invalid_request", plugins.getString("status"))
         val schema = MagentoInspectionCommands.detailedSchema("module")
         assertTrue(schema, schema.contains("filters path") && schema.contains("path: project-relative"))
         assertFalse(schema, schema.contains("area: global"))
@@ -125,7 +125,7 @@ class MagentoInspectionResultsTest : BaseProjectTestCase() {
         for ((type, parameters) in cases) {
             actual.append("### $type $parameters\n").append(MagentoInspectionCommands.query(project, type, parameters)).append("\n")
         }
-        assertEquals(9, cases.count())
+        assertEquals(14, cases.count())
         assertEquals(expected, actual.toString())
     }
 
@@ -188,6 +188,50 @@ class MagentoInspectionResultsTest : BaseProjectTestCase() {
         assertEquals("Foo_Bar2", record.getString("module"))
         assertEquals(true, record.getBoolean("editable"))
         assertTrue(record.getString("etc").endsWith("/etc"))
+    }
+
+    private fun records(result: JSONObject): List<JSONObject> =
+        (0 until result.getJSONArray("records").length()).map { result.getJSONArray("records").getJSONObject(it) }
+
+    fun testViewQueriesReturnEveryDeclaration() {
+        val layout = query("layout_entities", JSONObject().put("name", "test_index").put("format", "json").put("limit", 100))
+        assertEquals(layout.toString(), "ok", layout.getString("status"))
+        val kinds = records(layout).map { it.getString("kind") }
+        assertEquals(listOf("layout_handle", "layout_handle", "block", "block", "container", "container"), kinds)
+        assertTrue(records(layout).all { it.getString("area") == "frontend" && it.getString("module") == "Magento_Catalog" })
+        assertTrue(records(layout).filter { it.getString("kind") != "layout_handle" }.all { it.getInt("line") > 1 })
+        assertEquals("no_matches", query("layout_entities", JSONObject().put("name", "test_index").put("format", "json")
+            .put("area", "adminhtml")).getString("status"))
+
+        val module = moduleDirectory()
+        for (index in 0 until 12) {
+            myFixture.addFileToProject("$module/view/adminhtml/layout/acme_page_$index.xml",
+                "<page>\n<body>\n<block name=\"acme.repeated\" template=\"Foo_Bar2::t$index.phtml\"/>\n</body>\n</page>")
+        }
+        PsiDocumentManager.getInstance(project).commitAllDocuments()
+        val text = MagentoViewQueries.findLayoutEntities(project, "acme.repeated")
+        assertTrue(text, text.endsWith(MagentoInspectionResults.TEXT_TRUNCATED_HINT))
+        val repeated = query("layout_entities", JSONObject().put("name", "acme.repeated").put("format", "json")
+            .put("limit", 100).put("area", "adminhtml"))
+        val blocks = records(repeated).filter { it.getString("kind") == "block" && it.getString("key") == "acme.repeated" }
+        assertEquals(12, blocks.size)
+        assertEquals((0 until 12).map { "Foo_Bar2::t$it.phtml" }.toSet(), blocks.map { it.getString("template") }.toSet())
+        assertTrue(blocks.all { it.getInt("line") == 3 && it.getString("module") == "Foo_Bar2" })
+
+        val ui = query("ui_component", JSONObject().put("name", "recently_viewed").put("format", "json"))
+        assertTrue(records(ui).map { it.getString("key") }.containsAll(listOf("recently_viewed", "recently_viewed_2")))
+        assertTrue(records(ui).all { it.getString("area") == "frontend" && it.isNull("line") })
+
+        val acl = query("acl_or_menu", JSONObject().put("identifier", "Magento_Catalog").put("format", "json").put("limit", 100))
+        val aclRecords = records(acl)
+        val resource = aclRecords.first { it.getString("kind") == "acl_resource" && it.getString("key") == "Magento_Catalog::test" }
+        assertEquals("global", resource.getString("area"))
+        assertTrue(resource.getJSONArray("tree").length() > 0)
+        assertEquals(5, resource.getInt("line"))
+        val menu = aclRecords.filter { it.getString("kind") == "menu_entry" }
+        assertTrue(menu.isNotEmpty() && menu.all { it.getString("area") == "adminhtml" })
+        assertEquals(aclRecords.indexOfFirst { it.getString("kind") == "menu_entry" },
+            aclRecords.count { it.getString("kind") == "acl_resource" })
     }
 
     fun testIndexingAndDisabledSupportAreStatuses() {

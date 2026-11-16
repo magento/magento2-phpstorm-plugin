@@ -108,6 +108,16 @@ internal object MagentoMcpSupport {
         else -> 3
     }
 
+    /** Area of a view file: the folder after `view/`, or after `app/design/`; null when the path does not say. */
+    fun viewArea(path: String): String? {
+        val segments = path.replace('\\', '/').split('/')
+        val view = segments.lastIndexOf("view")
+        if (view >= 0 && view + 2 < segments.size) return segments[view + 1]
+        val design = segments.indexOf("design")
+        if (design > 0 && segments[design - 1] == "app" && design + 2 < segments.size) return segments[design + 1]
+        return null
+    }
+
     /** Line starts of one file, built once so that each tag costs a binary search. */
     class LineIndex(text: CharSequence) {
         private val starts = buildList {

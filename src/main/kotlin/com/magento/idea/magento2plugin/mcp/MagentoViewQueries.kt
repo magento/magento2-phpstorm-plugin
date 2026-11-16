@@ -12,6 +12,8 @@ import com.intellij.psi.xml.XmlFile
 import com.intellij.psi.xml.XmlTag
 import com.magento.idea.magento2plugin.indexes.LayoutIndex
 import com.magento.idea.magento2plugin.indexes.UIComponentIndex
+import com.magento.idea.magento2plugin.magento.files.ModuleAclXml
+import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml
 import com.magento.idea.magento2plugin.stubs.indexes.BlockNameIndex
 import com.magento.idea.magento2plugin.stubs.indexes.ContainerNameIndex
 
@@ -65,7 +67,13 @@ internal object MagentoViewQueries {
             return "No layout handles, blocks, or containers matched \"$query\"."
         }
 
-        return "Layout entities for \"$query\"\n\n${lines.joinToString("\n")}"
+        val truncated = handleMatches.size > MagentoMcpSupport.MAX_MATCHES ||
+            listOf(blockMatches, containerMatches).any { matches ->
+                matches.size > MagentoMcpSupport.MAX_MATCHES ||
+                    matches.take(MagentoMcpSupport.MAX_MATCHES).any { it.second.size > MagentoMcpSupport.MAX_FILE_MATCHES }
+            }
+        val hint = if (truncated) "\n\n${MagentoInspectionResults.TEXT_TRUNCATED_HINT}" else ""
+        return "Layout entities for \"$query\"\n\n${lines.joinToString("\n")}$hint"
     }
 
     /**
@@ -77,7 +85,28 @@ internal object MagentoViewQueries {
             return "Provide a UI component name."
         }
 
-        val files = UIComponentIndex.getUiComponentFiles(project)
+        val files = uiComponents(project, query)
+
+        if (files.isEmpty()) {
+            return "No UI components matched \"$query\"."
+        }
+
+        val lines = mutableListOf("Found ${files.size} UI component match(es) for \"$query\".")
+        for (file in files.take(MagentoMcpSupport.MAX_MATCHES)) {
+            lines += ""
+            lines += file.name
+            lines += "file: ${file.filePath}"
+            lines += "rootTag: ${file.rootTag}"
+        }
+        if (files.size > MagentoMcpSupport.MAX_MATCHES) {
+            lines += ""
+            lines += MagentoInspectionResults.TEXT_TRUNCATED_HINT
+        }
+        return lines.joinToString("\n")
+    }
+
+    private fun uiComponents(project: Project, query: String): List<UiComponentRecord> {
+        return UIComponentIndex.getUiComponentFiles(project)
             .asSequence()
             .mapNotNull { xmlFile ->
                 ProgressManager.checkCanceled()
@@ -95,19 +124,6 @@ internal object MagentoViewQueries {
             }
             .sortedWith(compareBy<UiComponentRecord>({ it.name }, { it.filePath }))
             .toList()
-
-        if (files.isEmpty()) {
-            return "No UI components matched \"$query\"."
-        }
-
-        val lines = mutableListOf("Found ${files.size} UI component match(es) for \"$query\".")
-        for (file in files.take(MagentoMcpSupport.MAX_MATCHES)) {
-            lines += ""
-            lines += file.name
-            lines += "file: ${file.filePath}"
-            lines += "rootTag: ${file.rootTag}"
-        }
-        return lines.joinToString("\n")
     }
 
     /**
@@ -162,7 +178,71 @@ internal object MagentoViewQueries {
             return "No ACL resources or menu entries matched \"$query\"."
         }
 
-        return "ACL and menu matches for \"$query\"\n\n${lines.joinToString("\n")}"
+        val truncated = aclMatches.size > MagentoMcpSupport.MAX_MATCHES || menuMatches.size > MagentoMcpSupport.MAX_MATCHES ||
+            aclMatches.take(MagentoMcpSupport.MAX_MATCHES).any { snapshot.aclResources[it].orEmpty().size > MagentoMcpSupport.MAX_FILE_MATCHES } ||
+            menuMatches.take(MagentoMcpSupport.MAX_MATCHES).any { snapshot.menuEntries[it].orEmpty().size > MagentoMcpSupport.MAX_FILE_MATCHES }
+        val hint = if (truncated) "\n\n${MagentoInspectionResults.TEXT_TRUNCATED_HINT}" else ""
+        return "ACL and menu matches for \"$query\"\n\n${lines.joinToString("\n")}$hint"
+    }
+
+    /** Layout handles, then every block and container declaration, each in a fixed order. */
+    fun layoutRecords(project: Project, name: String): List<InspectionRecord> {
+        val query = name.trim()
+        val lineIndexes = hashMapOf<String, MagentoMcpSupport.LineIndex>()
+        fun declaration(kind: String, key: String, tag: XmlTag, fields: Map<String, Any?>): InspectionRecord? {
+            val xmlFile = tag.containingFile as? XmlFile ?: return null
+            val path = MagentoMcpSupport.relativePath(project, xmlFile.virtualFile ?: return null)
+            val line = lineIndexes.getOrPut(path) { MagentoMcpSupport.LineIndex(xmlFile.viewProvider.contents) }.lineOf(tag)
+            return InspectionRecord(kind, key, path, line, MagentoMcpSupport.viewArea(path), fields)
+        }
+        fun declarations(kind: String, key: String, tags: Collection<XmlTag>, fields: (XmlTag) -> Map<String, Any?>) =
+            tags.mapNotNull { declaration(kind, key, it, fields(it)) }.distinctBy { it.path to it.line }
+                .sortedWith(compareBy({ it.path }, { it.line }))
+        val handles = findLayoutHandles(project, query).map {
+            InspectionRecord("layout_handle", it.name, it.filePath, null, MagentoMcpSupport.viewArea(it.filePath), linkedMapOf("name" to it.name))
+        }
+        val blocks = MagentoMcpSupport.prioritizeMatches(LayoutIndex.getAllKeys(BlockNameIndex.KEY, project), query).flatMap { blockName ->
+            declarations("block", blockName, LayoutIndex.getBlockDeclarations(blockName, project)) {
+                linkedMapOf("name" to blockName, "class" to it.getAttributeValue("class"), "template" to it.getAttributeValue("template"))
+            }
+        }
+        val containers = MagentoMcpSupport.prioritizeMatches(LayoutIndex.getAllKeys(ContainerNameIndex.KEY, project), query).flatMap { containerName ->
+            declarations("container", containerName, LayoutIndex.getContainerDeclarations(containerName, project)) {
+                linkedMapOf("name" to containerName, "htmlTag" to it.getAttributeValue("htmlTag"), "htmlClass" to it.getAttributeValue("htmlClass"))
+            }
+        }
+        return handles + blocks + containers
+    }
+
+    fun uiComponentRecords(project: Project, name: String): List<InspectionRecord> = uiComponents(project, name.trim()).map {
+        InspectionRecord("ui_component", it.name, it.filePath, null, MagentoMcpSupport.viewArea(it.filePath),
+            linkedMapOf("name" to it.name, "rootTag" to it.rootTag))
+    }
+
+    /** Every ACL resource declaration, then every menu entry, in match order. */
+    fun aclOrMenuRecords(project: Project, identifier: String): List<InspectionRecord> {
+        val query = identifier.trim()
+        val snapshot = MagentoMcpSnapshots.aclMenuSnapshot(project)
+        val acl = MagentoMcpSupport.prioritizeMatches(snapshot.aclResources.keys, query).flatMap { id ->
+            snapshot.aclResources[id].orEmpty().map { record ->
+                InspectionRecord("acl_resource", id, record.filePath, record.line,
+                    MagentoMcpSupport.determineConfigScope(record.filePath, ModuleAclXml.FILE_NAME), linkedMapOf(
+                        "id" to id,
+                        "title" to record.title,
+                        "tree" to record.tree.map { mapOf("id" to it.resourceId, "title" to it.resourceTitle) }
+                    ))
+            }
+        }
+        val menu = MagentoMcpSupport.prioritizeMatches(snapshot.menuEntries.keys, query).flatMap { id ->
+            snapshot.menuEntries[id].orEmpty().map { record ->
+                InspectionRecord("menu_entry", id, record.filePath, record.line,
+                    MagentoMcpSupport.determineConfigScope(record.filePath, ModuleMenuXml.fileName), linkedMapOf(
+                        "id" to id, "title" to record.title, "resource" to record.resource,
+                        "parent" to record.parent, "action" to record.action
+                    ))
+            }
+        }
+        return acl + menu
     }
 
     private fun findLayoutHandles(project: Project, query: String): List<LayoutHandleRecord> {
