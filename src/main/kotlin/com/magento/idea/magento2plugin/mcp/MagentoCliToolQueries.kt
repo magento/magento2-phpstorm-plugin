@@ -141,6 +141,7 @@ internal object MagentoCliToolQueries {
             if (ddev.configuration.error == null) {
                 lines += "  example: ${ddev.example(listOf("php", "-v"))}"
                 lines += "Use this DDEV execution prefix for commands that belong in the container. Existing project wrappers retain their priority. Discovery does not start DDEV or run a process."
+                lines += "Project DDEV commands in projectCommands are the project's own entrypoints, such as test runners: prefer one that fits the task and run it as its invocation."
                 lines += "Optional Magerun: use magento_magerun to verify installation and inspect commands in this runtime."
             }
         }

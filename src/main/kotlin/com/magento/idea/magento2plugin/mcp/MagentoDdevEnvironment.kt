@@ -22,7 +22,7 @@ internal object MagentoDdevEnvironment {
                 directory.resolve(".ddev/config.yaml").toString())
             if (config != null && Files.isRegularFile(config) && Files.isReadable(config)) {
                 val executable = findExecutable()?.takeIf { it.isAbsolute && Files.isRegularFile(it) && Files.isExecutable(it) }
-                return Runtime(config, magentoRoot, executable, MagentoDdevConfiguration.read(projectRoot, config))
+                return Runtime(config, magentoRoot, executable, MagentoDdevConfiguration.read(projectRoot, config), projectRoot)
             }
             if (directory == projectRoot) break
             directory = directory.parent ?: break
@@ -50,7 +50,8 @@ internal object MagentoDdevEnvironment {
     }
 
     data class Runtime(val config: Path, val cwd: Path, val executable: Path?,
-                       val configuration: MagentoDdevConfiguration) {
+                       val configuration: MagentoDdevConfiguration,
+                       val ideProjectRoot: Path? = null) {
         /** Keep each configured value as one argument; no shell interpretation. */
         fun execArguments(command: List<String>, service: String = "web"): List<String> = buildList {
             addAll(listOf("exec", "--raw", "--service=$service"))
@@ -81,6 +82,10 @@ internal object MagentoDdevEnvironment {
                 if (configuration.error == null) {
                     put("execPrefix", JSONArray(listOf(executable?.toString() ?: "ddev") + execArguments(emptyList())))
                     put("terminalGuidance", terminalGuidance())
+                    ideProjectRoot?.let { root ->
+                        put("projectCommands", MagentoDdevCommands.json(root,
+                            MagentoDdevCommands.read(root, config.parent, configuration.string("type"))))
+                    }
                     put("usage", "Append the intended command and each argument to execPrefix; run from cwd. The default service is web. working_dir.web is inside the container; docroot is the web document root, and composer_root controls ddev composer. Without working_dir.web, DDEV selects its project-type default. This is static configuration, not proof that DDEV or a command is running or installed.")
                 }
             }

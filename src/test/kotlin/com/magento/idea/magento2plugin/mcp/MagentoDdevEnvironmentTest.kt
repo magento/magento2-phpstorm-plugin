@@ -85,6 +85,67 @@ class MagentoDdevEnvironmentTest {
     }
 
     @Test
+    fun listsProjectCommandsWithDdevFileRulesAndDirectives() = fixture { root ->
+        file(root, ".ddev/config.yaml", "name: shop\ntype: magento2\n")
+        file(root, ".ddev/commands/web/test-integration", """
+            #!/usr/bin/env bash
+            ## Description: Run Magento integration tests
+            ## Usage: test-integration <path> [phpunit options]
+            ## Example: ddev test-integration dev/tests/integration\nddev test-integration app/code
+            ## Aliases: ti, integration
+            ## OSTypes: darwin,linux
+            phpunit "${'$'}@"
+        """.trimIndent())
+        file(root, ".ddev/commands/host/perf-check", "#!/usr/bin/env bash\n## Description: 'Check changed files'\n")
+        file(root, ".ddev/commands/web/plain", "#!/usr/bin/env bash\necho no directives\n")
+        file(root, ".ddev/commands/web/README.txt", "## Description: not a command\n")
+        file(root, ".ddev/commands/web/sample.example", "## Description: not a command\n")
+        file(root, ".ddev/commands/web/.hidden", "## Description: not a command\n")
+        file(root, ".ddev/commands/.hidden-service/tool", "## Description: not a command\n")
+        file(root, ".ddev/commands/web/drupal-only", "## ProjectTypes: drupal10,drupal11\n")
+        file(root, ".ddev/commands/web/windows", "## Description: x\r\n")
+        file(root, ".ddev/commands/worker/test-integration", "## Description: a later service folder does not replace it\n")
+        val json = MagentoDdevEnvironment.discover(root, root) { null }!!.json().getJSONObject("projectCommands")
+        val commands = (0 until json.getJSONArray("commands").length()).map { json.getJSONArray("commands").getJSONObject(it) }
+        assertEquals(listOf("test-integration", "perf-check", "plain").sorted(), commands.map { it.getString("name") }.sorted())
+        val integration = commands.single { it.getString("name") == "test-integration" }
+        assertEquals("web", integration.getString("service"))
+        assertEquals("container", integration.getString("runsOn"))
+        assertEquals("ddev test-integration", integration.getString("invocation"))
+        assertEquals(".ddev/commands/web/test-integration", integration.getString("path"))
+        assertEquals("Run Magento integration tests", integration.getString("description"))
+        assertEquals("test-integration <path> [phpunit options]", integration.getString("usage"))
+        assertEquals("ddev test-integration dev/tests/integration\nddev test-integration app/code", integration.getString("example"))
+        assertEquals(listOf("ti", "integration"), integration.getJSONArray("aliases").toList())
+        assertEquals("darwin,linux", integration.getJSONObject("unevaluatedConditions").getString("OSTypes"))
+        val host = commands.single { it.getString("name") == "perf-check" }
+        assertEquals("host", host.getString("runsOn"))
+        assertEquals("Check changed files", host.getString("description"))
+        val plain = commands.single { it.getString("name") == "plain" }
+        assertEquals("plain", plain.getString("description"))
+        assertEquals("plain [flags] [args]", plain.getString("usage"))
+        assertEquals(listOf("web/windows: CRLF line endings, which DDEV skips"), json.getJSONArray("skipped").toList())
+        assertFalse(json.getBoolean("truncated"))
+    }
+
+    @Test
+    fun projectCommandsStayInsideTheProjectAndAreBounded() = fixture { directory ->
+        val root = Files.createDirectories(directory.resolve("project"))
+        file(root, ".ddev/config.yaml", "type: magento2\n")
+        assertEquals(0, MagentoDdevEnvironment.discover(root, root) { null }!!.json()
+            .getJSONObject("projectCommands").getJSONArray("commands").length())
+        val outside = file(directory, "outside/secret", "## Description: outside\n")
+        Files.createDirectories(root.resolve(".ddev/commands/web"))
+        if (!SystemInfoRt.isWindows) Files.createSymbolicLink(root.resolve(".ddev/commands/web/a-linked"), outside)
+        for (index in 0 until 101) file(root, ".ddev/commands/web/command-%03d".format(index), "#!/bin/sh\n")
+        val json = MagentoDdevEnvironment.discover(root, root) { null }!!.json().getJSONObject("projectCommands")
+        assertEquals(100, json.getJSONArray("commands").length())
+        assertTrue(json.getBoolean("truncated"))
+        assertFalse(json.toString().contains("secret"))
+        if (!SystemInfoRt.isWindows) assertTrue(json.getJSONArray("skipped").toList().contains("web/a-linked: unreadable or outside the project"))
+    }
+
+    @Test
     fun mergesOrderedOverridesAndRetainsFieldEvidence() = fixture { root ->
         file(root, ".ddev/config.yaml", "name: base\ndocroot: pub\nphp_version: '8.3'\nworking_dir: {web: /original, db: /database}\n")
         file(root, ".ddev/config.z.yaml", "name: final\nworking_dir: {web: '/final path'}\n")
