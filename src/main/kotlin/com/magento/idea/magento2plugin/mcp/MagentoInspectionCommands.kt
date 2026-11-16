@@ -25,6 +25,23 @@ internal object MagentoInspectionCommands {
         "acl_or_menu"
     )
 
+    /** Query types with structured results, and the filters each supports. */
+    private val jsonFilters = mapOf(
+        "module" to setOf("path"),
+        "di_config" to setOf("module", "area", "path"),
+        "observers_for_event" to setOf("module", "area", "path")
+    )
+
+    private val queryParameters = mapOf(
+        "module" to "moduleName",
+        "di_config" to "className",
+        "plugins_for_method" to "className",
+        "observers_for_event" to "eventName",
+        "layout_entities" to "name",
+        "ui_component" to "name",
+        "acl_or_menu" to "identifier"
+    )
+
     private val querySummaries = mapOf(
         "module" to "Find modules by exact or partial Magento module name.",
         "di_config" to "Find di.xml declarations related to a PHP FQN or virtual type.",
@@ -64,7 +81,16 @@ internal object MagentoInspectionCommands {
             return MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE
         }
 
-        return typeHelp(normalizedType)
+        val filters = jsonFilters[normalizedType] ?: return typeHelp(normalizedType)
+        val parameter = queryParameters.getValue(normalizedType)
+        return typeHelp(normalizedType) + "\n\n" + """
+            Structured results (optional): add "format":"json" to parametersJson.
+            Optional with format json: limit (1-${MagentoInspectionResults.MAX_LIMIT}, default ${MagentoInspectionResults.DEFAULT_LIMIT}), cursor (nextCursor of the previous page, with the same parameters), filters ${filters.sorted().joinToString(", ")}.
+            Filters: module is an exact module name that owns the file; area is global, frontend, adminhtml or another etc/<area> folder; path is a project-relative directory or file prefix.
+            Reply: status (ok, no_matches, indexing, unavailable, invalid_request, stale_cursor), total, returned, complete, nextCursor, and records with kind, key, path, line, module, area and query-specific fields.
+            Example parametersJson:
+            {"$parameter":"…","format":"json","limit":50}
+        """.trimIndent()
     }
 
     fun query(project: Project, queryType: String, parametersJson: String): String {
@@ -81,6 +107,15 @@ internal object MagentoInspectionCommands {
             parseParameters(parametersJson)
         } catch (exception: JSONException) {
             return "parametersJson must be a valid JSON object. ${exception.message}"
+        }
+
+        if (MagentoInspectionResults.isJson(parameters)) {
+            return jsonQuery(project, normalizedType, parameters)
+        }
+        try {
+            MagentoInspectionResults.options(parameters, jsonFilters[normalizedType].orEmpty())
+        } catch (exception: InvalidInspectionRequest) {
+            return exception.message.orEmpty()
         }
 
         return try {
@@ -144,6 +179,48 @@ internal object MagentoInspectionCommands {
             )
 
             else -> unknownTypeMessage(queryType)
+        }
+    }
+
+    /** Whether the caller asked for structured results; malformed JSON is reported by [query]. */
+    fun wantsJson(parametersJson: String): Boolean = try {
+        MagentoInspectionResults.isJson(parseParameters(parametersJson))
+    } catch (_: JSONException) {
+        false
+    }
+
+    private fun jsonQuery(project: Project, queryType: String, parameters: JSONObject): String {
+        val queryParameter = queryParameters.getValue(queryType)
+        val query = parameters.optString(queryParameter).trim()
+        fun status(status: String, message: String, options: InspectionOptions? = null) =
+            MagentoInspectionResults.status(queryType, query, options, status, message)
+        val filters = jsonFilters[queryType]
+            ?: return status("invalid_request", "format `json` is not available for queryType `$queryType` yet. Omit format to get text.")
+        val options = try {
+            MagentoInspectionResults.options(parameters, filters)
+        } catch (exception: InvalidInspectionRequest) {
+            return status("invalid_request", exception.message.orEmpty())
+        }
+        MagentoMcpSupport.validateProject(project, requireSmartMode = false)?.let { return status("unavailable", it, options) }
+        if (DumbService.getInstance(project).isDumb) {
+            return status("indexing", MagentoMcpSupport.INDEXES_NOT_READY_MESSAGE, options)
+        }
+        return try {
+            val value = parameters.requireString(queryParameter)
+            val records = when (queryType) {
+                "module" -> MagentoModuleQueries.moduleRecords(project, value)
+                "di_config" -> MagentoDiQueries.diConfigRecords(project, value)
+                else -> MagentoEventQueries.observerRecords(project, value)
+            }
+            MagentoInspectionResults.respond(project, queryType, query, records, options)
+        } catch (_: MissingParameterException) {
+            status("invalid_request", "Missing required parameter `$queryParameter` for queryType `$queryType`.", options)
+        } catch (exception: InvalidInspectionRequest) {
+            status("invalid_request", exception.message.orEmpty(), options)
+        } catch (exception: MagentoInspectionResults.StaleCursor) {
+            status("stale_cursor", exception.message.orEmpty(), options)
+        } catch (_: IndexNotReadyException) {
+            status("indexing", MagentoMcpSupport.INDEXES_NOT_READY_MESSAGE, options)
         }
     }
 

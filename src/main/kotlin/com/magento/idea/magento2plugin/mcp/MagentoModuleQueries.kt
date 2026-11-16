@@ -58,7 +58,31 @@ internal object MagentoModuleQueries {
             lines += "view: $viewPath"
         }
 
+        if (matches.size > MagentoMcpSupport.MAX_MATCHES) {
+            lines += ""
+            lines += MagentoInspectionResults.TEXT_TRUNCATED_HINT
+        }
         return lines.joinToString("\n")
+    }
+
+    /** Every matching module, in match order; the record path is the module directory. */
+    fun moduleRecords(project: Project, moduleName: String): List<InspectionRecord> {
+        val query = moduleName.trim()
+        val moduleIndex = ModuleIndex(project)
+        val candidateNames = linkedSetOf<String>()
+        candidateNames += moduleIndex.moduleNames
+        if (moduleIndex.getModuleDirectoryByModuleName(query) != null) {
+            candidateNames += query
+        }
+        return MagentoMcpSupport.prioritizeMatches(candidateNames, query).map { name ->
+            val directory = moduleIndex.getModuleDirectoryVirtualFileByModuleName(name)
+            InspectionRecord("module", name, directory?.let { MagentoMcpSupport.relativePath(project, it) }, null, null, linkedMapOf(
+                "name" to name,
+                "editable" to (directory?.let(::isEditableModuleDirectory) ?: false),
+                "etc" to directory?.findChild("etc")?.let { MagentoMcpSupport.relativePath(project, it) },
+                "view" to directory?.findChild("view")?.let { MagentoMcpSupport.relativePath(project, it) }
+            ))
+        }
     }
 
     private fun runWithReadyIndexes(project: Project, action: () -> String): String {

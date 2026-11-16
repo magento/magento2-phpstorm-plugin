@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin.mcp
 
 import com.intellij.openapi.project.Project
+import com.magento.idea.magento2plugin.magento.files.ModuleDiXml
 
 internal object MagentoDiQueries {
     /**
@@ -53,7 +54,33 @@ internal object MagentoDiQueries {
             return "No DI configuration matched \"$query\"."
         }
 
-        return "DI configuration for \"$query\"\n\n${lines.joinToString("\n")}"
+        val truncated = listOf(preferencesFor, preferencesType, typeDeclarations, virtualTypeDeclarations, pluginDeclarations)
+            .any { it.size > MagentoMcpSupport.MAX_MATCHES }
+        val hint = if (truncated) "\n\n${MagentoInspectionResults.TEXT_TRUNCATED_HINT}" else ""
+        return "DI configuration for \"$query\"\n\n${lines.joinToString("\n")}$hint"
+    }
+
+    /** Every di.xml declaration of the class, in the order of the text sections. */
+    fun diConfigRecords(project: Project, className: String): List<InspectionRecord> {
+        val query = MagentoMcpSupport.normalizeFqn(className)
+        val snapshot = MagentoMcpSnapshots.diSnapshot(project)
+        fun area(path: String) = MagentoMcpSupport.determineConfigScope(path, ModuleDiXml.FILE_NAME)
+        fun preference(role: String, record: PreferenceRecord) = InspectionRecord("preference", query, record.filePath,
+            record.line, area(record.filePath), linkedMapOf("role" to role, "for" to record.preferenceFor, "type" to record.preferenceType))
+        return snapshot.preferencesFor[query].orEmpty().map { preference("for", it) } +
+            snapshot.preferencesType[query].orEmpty().map { preference("type", it) } +
+            snapshot.typeDeclarations[query].orEmpty().map {
+                InspectionRecord("type", query, it.filePath, it.line, area(it.filePath),
+                    linkedMapOf("name" to it.typeName, "arguments" to it.argumentNames))
+            } +
+            (snapshot.virtualTypesByName[query].orEmpty() + snapshot.virtualTypesByTarget[query].orEmpty()).distinct().map {
+                InspectionRecord("virtualType", query, it.filePath, it.line, area(it.filePath),
+                    linkedMapOf("name" to it.name, "type" to it.targetType))
+            } +
+            snapshot.pluginDeclarations[query].orEmpty().map {
+                InspectionRecord("plugin", query, it.filePath, it.line, it.scope, linkedMapOf("name" to it.pluginName,
+                    "type" to it.pluginType, "sortOrder" to it.sortOrder, "disabled" to it.disabled))
+            }
     }
 
     /** Retains the existing query API while dispatching PHP semantics through the optional provider. */

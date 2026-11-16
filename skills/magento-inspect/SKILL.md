@@ -120,6 +120,8 @@ Follow every returned continuation verbatim, including scope, severity, suppress
    - First call with `mode: "help"` to get only query names and short descriptions.
    - Then call with `mode: "detailed_schema"` and one `queryType` to load only that query's parameters and example JSON.
    - Then call with `mode: "query"`, the chosen `queryType`, and `parametersJson` as a JSON object string.
+   - For `module`, `di_config` and `observers_for_event`, add `"format":"json"` when you need every record or a narrower scope. The reply has flat `records` with `path`, `line`, `module` and `area`, a `status`, `total` and `nextCursor`. Follow `nextCursor` with the same parameters until it is null; `stale_cursor` means the declarations changed, so start again. Use the `module`, `area` and `path` filters that `detailed_schema` lists. `no_matches` is an empty result; `indexing`, `unavailable` and `invalid_request` are not.
+   - Text replies that end with a note about more results were cut; repeat the query with `"format":"json"` instead of assuming the list is complete.
 
 2. Use the returned result:
    - Prefer canonical module names, paths, class names, event names, handles, component names, ACL IDs, and menu IDs from the result.

@@ -142,6 +142,13 @@ class MagentoMcpProjectToolset : McpToolset {
         "- `plugins_for_method` additionally requires the JetBrains PHP plugin; `help` reports the " +
         "capabilities available in this IDE.\n\n" +
 
+        "Structured results:\n" +
+        "- For `module`, `di_config` and `observers_for_event`, add \"format\":\"json\" to parametersJson " +
+        "for flat records with path, line, module and area, a status (ok, no_matches, indexing, unavailable, " +
+        "invalid_request, stale_cursor), total and nextCursor. Optional limit (1-100, default 20), cursor, " +
+        "and the module, area and path filters that `detailed_schema` lists. Text output is unchanged and " +
+        "says when it was cut.\n\n" +
+
         "Coverage:\n" +
         "- XML results describe declarations, not resolved PHP semantics."
     )
@@ -156,8 +163,11 @@ class MagentoMcpProjectToolset : McpToolset {
             "query" -> if (queryType.isBlank()) {
                 MagentoInspectionCommands.MISSING_TYPE_MESSAGE
             } else {
+                // Structured results report setup and indexing as a status of their own.
+                val json = MagentoInspectionCommands.wantsJson(parametersJson)
                 MagentoMcpToolsetSupport.withProjectReadAction(
-                    requireSmartMode = MagentoInspectionCommands.requiresSmartMode(queryType)
+                    validateProject = !json,
+                    requireSmartMode = !json && MagentoInspectionCommands.requiresSmartMode(queryType)
                 ) {
                     MagentoInspectionCommands.query(it, queryType, parametersJson)
                 }

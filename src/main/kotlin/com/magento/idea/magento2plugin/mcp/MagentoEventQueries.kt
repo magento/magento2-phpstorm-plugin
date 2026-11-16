@@ -28,6 +28,7 @@ internal object MagentoEventQueries {
         }
 
         val lines = mutableListOf("Found ${matchedEvents.size} event match(es) for \"$query\".")
+        var truncated = matchedEvents.size > MagentoMcpSupport.MAX_MATCHES
         for (matchedEvent in matchedEvents.take(MagentoMcpSupport.MAX_MATCHES)) {
             lines += ""
             lines += matchedEvent
@@ -38,11 +39,37 @@ internal object MagentoEventQueries {
                 continue
             }
 
+            truncated = truncated || observers.size > MagentoMcpSupport.MAX_FILE_MATCHES
             for (observer in observers.take(MagentoMcpSupport.MAX_FILE_MATCHES)) {
                 lines += "file: ${observer.filePath} observer=${observer.observerName} instance=${observer.observerInstance} disabled=${observer.disabled}"
             }
         }
 
+        if (truncated) {
+            lines += ""
+            lines += MagentoInspectionResults.TEXT_TRUNCATED_HINT
+        }
         return lines.joinToString("\n")
+    }
+
+    /** Every observer of every matching event, one record each, in match order. */
+    fun observerRecords(project: Project, eventName: String): List<InspectionRecord> {
+        val snapshot = MagentoMcpSnapshots.eventSnapshot(project)
+        return MagentoMcpSupport.prioritizeMatches(snapshot.observersByEvent.keys, eventName.trim()).flatMap { event ->
+            snapshot.observersByEvent[event].orEmpty().map { observer ->
+                InspectionRecord(
+                    kind = "observer",
+                    key = event,
+                    path = observer.filePath,
+                    line = observer.line,
+                    area = MagentoMcpSupport.determineConfigScope(observer.filePath, "events.xml"),
+                    fields = linkedMapOf(
+                        "observerName" to observer.observerName,
+                        "instance" to observer.observerInstance,
+                        "disabled" to observer.disabled
+                    )
+                )
+            }
+        }
     }
 }

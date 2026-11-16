@@ -65,6 +65,7 @@ internal object MagentoMcpSnapshots {
             for (preferenceTag in rootTag.findSubTags(ModuleDiXml.PREFERENCE_TAG_NAME)) {
                 val record = PreferenceRecord(
                     filePath = filePath,
+                    line = MagentoMcpSupport.lineOf(preferenceTag),
                     preferenceFor = MagentoMcpSupport.presentableFqn(
                         preferenceTag.getAttributeValue(ModuleDiXml.PREFERENCE_ATTR_FOR)
                     ),
@@ -84,6 +85,7 @@ internal object MagentoMcpSnapshots {
                     .orEmpty()
                 typeDeclarations.getOrPut(typeName, ::mutableListOf) += TypeDeclarationRecord(
                     filePath = filePath,
+                    line = MagentoMcpSupport.lineOf(typeTag),
                     typeName = typeName,
                     argumentNames = argumentNames
                 )
@@ -91,6 +93,7 @@ internal object MagentoMcpSnapshots {
                 for (pluginTag in typeTag.findSubTags(ModuleDiXml.PLUGIN_TAG_NAME)) {
                     pluginDeclarations.getOrPut(typeName, ::mutableListOf) += PluginDeclarationRecord(
                         filePath = filePath,
+                        line = MagentoMcpSupport.lineOf(pluginTag),
                         targetFqn = typeName,
                         pluginName = pluginTag.getAttributeValue(ModuleDiXml.NAME_ATTR) ?: "-",
                         pluginType = MagentoMcpSupport.presentableFqn(
@@ -107,6 +110,7 @@ internal object MagentoMcpSnapshots {
             for (virtualTypeTag in rootTag.findSubTags(ModuleDiXml.VIRTUAL_TYPE_TAG)) {
                 val record = VirtualTypeRecord(
                     filePath = filePath,
+                    line = MagentoMcpSupport.lineOf(virtualTypeTag),
                     name = MagentoMcpSupport.presentableFqn(
                         virtualTypeTag.getAttributeValue(ModuleDiXml.NAME_ATTR)
                     ),
@@ -125,7 +129,7 @@ internal object MagentoMcpSnapshots {
             typeDeclarations = typeDeclarations.freezeByFilePath(),
             virtualTypesByName = virtualTypeByName.freezeByFilePath(),
             virtualTypesByTarget = virtualTypeByTarget.freezeByFilePath(),
-            pluginDeclarations = pluginDeclarations.freeze(compareBy<PluginDeclarationRecord>({ it.scope }, { it.sortOrder }, { it.filePath }))
+            pluginDeclarations = pluginDeclarations.freeze(compareBy<PluginDeclarationRecord>({ it.scope }, { it.sortOrder }, { it.filePath }, { it.line }))
         )
     }
 
@@ -143,6 +147,7 @@ internal object MagentoMcpSnapshots {
                 for (observerTag in eventTag.findSubTags("observer")) {
                     observersByEvent.getOrPut(eventName, ::mutableListOf) += EventObserverRecord(
                         filePath = filePath,
+                        line = MagentoMcpSupport.lineOf(observerTag),
                         observerName = observerTag.getAttributeValue("name") ?: "-",
                         observerInstance = MagentoMcpSupport.presentableFqn(
                             observerTag.getAttributeValue("instance")
@@ -154,7 +159,7 @@ internal object MagentoMcpSnapshots {
         }
 
         return EventSnapshot(
-            observersByEvent = observersByEvent.freeze(compareBy<EventObserverRecord>({ it.filePath }, { it.observerName }))
+            observersByEvent = observersByEvent.freeze(compareBy<EventObserverRecord>({ it.filePath }, { it.line }, { it.observerName }))
         )
     }
 
@@ -255,24 +260,28 @@ internal interface HasFilePath {
 
 internal data class PreferenceRecord(
     override val filePath: String,
+    val line: Int,
     val preferenceFor: String?,
     val preferenceType: String?
 ) : HasFilePath
 
 internal data class TypeDeclarationRecord(
     override val filePath: String,
+    val line: Int,
     val typeName: String,
     val argumentNames: List<String>
 ) : HasFilePath
 
 internal data class VirtualTypeRecord(
     override val filePath: String,
+    val line: Int,
     val name: String?,
     val targetType: String?
 ) : HasFilePath
 
 internal data class PluginDeclarationRecord(
     override val filePath: String,
+    val line: Int,
     val targetFqn: String,
     val pluginName: String,
     val pluginType: String?,
@@ -283,6 +292,7 @@ internal data class PluginDeclarationRecord(
 
 internal data class EventObserverRecord(
     override val filePath: String,
+    val line: Int,
     val observerName: String,
     val observerInstance: String,
     val disabled: Boolean

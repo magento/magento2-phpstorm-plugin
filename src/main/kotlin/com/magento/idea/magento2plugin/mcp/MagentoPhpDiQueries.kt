@@ -150,6 +150,7 @@ internal object MagentoPhpDiQueries {
             for (pluginTag in typeTag.findSubTags(ModuleDiXml.PLUGIN_TAG_NAME)) {
                 declarations.getOrPut(typeName, ::mutableListOf) += PluginDeclarationRecord(
                     filePath = filePath,
+                    line = MagentoMcpSupport.lineOf(pluginTag),
                     targetFqn = typeName,
                     pluginName = pluginTag.getAttributeValue(ModuleDiXml.NAME_ATTR) ?: "-",
                     pluginType = MagentoMcpSupport.presentableFqn(

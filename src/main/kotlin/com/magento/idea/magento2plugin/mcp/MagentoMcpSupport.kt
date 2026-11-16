@@ -8,12 +8,14 @@ package com.magento.idea.magento2plugin.mcp
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
-import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VfsUtilCore
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.xml.XmlFile
+import com.intellij.psi.xml.XmlTag
 import com.magento.idea.magento2plugin.project.Settings
 import com.magento.idea.magento2plugin.util.PhpNameUtil
 import java.io.File
@@ -106,6 +108,10 @@ internal object MagentoMcpSupport {
         "adminhtml" -> 2
         else -> 3
     }
+
+    /** One-based line of a tag in its file. */
+    fun lineOf(tag: XmlTag): Int =
+        StringUtil.offsetToLineNumber(tag.containingFile.viewProvider.contents, tag.textOffset) + 1
 
     fun relativePath(project: Project, virtualFile: VirtualFile): String {
         val projectRoot = projectRoot(project)
