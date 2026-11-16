@@ -21,14 +21,76 @@ internal object MagentoPhpDiQueries {
     fun findPluginsForMethod(project: Project, className: String, methodName: String): String {
         val targetClassName = MagentoMcpSupport.normalizeFqn(className)
         val targetMethodName = methodName.trim()
+        val sorted = try {
+            pluginMatches(project, targetClassName, targetMethodName)
+        } catch (exception: InvalidInspectionRequest) {
+            return exception.message.orEmpty()
+        }
+        if (sorted.isEmpty()) {
+            return "No plugins matched ${targetClassName}::${targetMethodName}()."
+        }
+
+        val lines = mutableListOf(
+            "Found ${sorted.size} plugin method match(es) for ${targetClassName}::${targetMethodName}()."
+        )
+        for (match in sorted.take(MagentoMcpSupport.MAX_MATCHES)) {
+            lines += ""
+            lines += "${match.kind} plugin"
+            lines += "target: ${match.targetFqn}::${targetMethodName}()"
+            lines += "pluginClass: ${match.pluginClass.presentableFQN}"
+            lines += "pluginMethod: ${match.method.name}()"
+            lines += "scope: ${match.scope}"
+            lines += "sortOrder: ${match.sortOrder}"
+            lines += "file: ${MagentoMcpSupport.relativePath(project, match.method.containingFile.virtualFile)}"
+        }
+        if (sorted.size > MagentoMcpSupport.MAX_MATCHES) {
+            lines += ""
+            lines += MagentoInspectionResults.TEXT_TRUNCATED_HINT
+        }
+
+        return lines.joinToString("\n")
+    }
+
+    /**
+     * One record per matching plugin method, located at its `di.xml` declaration so the module and
+     * area filters apply; the plugin method's own file and line are fields.
+     */
+    fun pluginRecords(project: Project, className: String, methodName: String): List<InspectionRecord> {
+        val targetClassName = MagentoMcpSupport.normalizeFqn(className)
+        val targetMethodName = methodName.trim()
+        val key = "$targetClassName::$targetMethodName"
+        val lineIndexes = mutableMapOf<String, MagentoMcpSupport.LineIndex>()
+        return pluginMatches(project, targetClassName, targetMethodName).map { match ->
+            val methodFile = match.method.containingFile
+            val methodPath = MagentoMcpSupport.relativePath(project, methodFile.virtualFile)
+            val methodLines = lineIndexes.getOrPut(methodPath) { MagentoMcpSupport.LineIndex(methodFile.viewProvider.contents) }
+            InspectionRecord("plugin", key, match.data.filePath, match.data.line, match.scope, linkedMapOf(
+                "name" to match.data.pluginName,
+                "type" to match.pluginClass.presentableFQN,
+                "method" to match.method.name,
+                "pluginKind" to match.kind,
+                "target" to match.targetFqn,
+                "sortOrder" to match.sortOrder,
+                "methodPath" to methodPath,
+                "methodLine" to methodLines.lineOf(match.method)
+            ))
+        }
+    }
+
+    /** Plugin methods of the target hierarchy in the order of the text reply. */
+    private fun pluginMatches(
+        project: Project,
+        targetClassName: String,
+        targetMethodName: String
+    ): List<MagentoPhpInspectionSupport.PluginMethodMatch> {
         if (targetClassName.isEmpty() || targetMethodName.isEmpty()) {
-            return "Provide both a target class name and method name."
+            throw InvalidInspectionRequest("Provide both a target class name and method name.")
         }
 
         val phpIndex = PhpIndex.getInstance(project)
         val targetClasses = MagentoPhpInspectionSupport.resolveTargetClasses(phpIndex, targetClassName)
         if (targetClasses.isEmpty()) {
-            return "Could not resolve target class \"$targetClassName\"."
+            throw InvalidInspectionRequest("Could not resolve target class \"$targetClassName\".")
         }
 
         val allTargetFqns = linkedSetOf(targetClassName)
@@ -60,11 +122,7 @@ internal object MagentoPhpDiQueries {
             }
         }
 
-        if (pluginCandidates.isEmpty()) {
-            return "No plugins matched ${targetClassName}::${targetMethodName}()."
-        }
-
-        val sorted = pluginCandidates
+        return pluginCandidates
             .distinctBy { "${it.targetFqn}:${it.pluginClass.fqn}:${it.method.name}:${it.scope}:${it.sortOrder}" }
             .sortedWith(
                 compareBy<MagentoPhpInspectionSupport.PluginMethodMatch>(
@@ -75,22 +133,6 @@ internal object MagentoPhpDiQueries {
                     { it.method.name }
                 )
             )
-
-        val lines = mutableListOf(
-            "Found ${sorted.size} plugin method match(es) for ${targetClassName}::${targetMethodName}()."
-        )
-        for (match in sorted.take(MagentoMcpSupport.MAX_MATCHES)) {
-            lines += ""
-            lines += "${match.kind} plugin"
-            lines += "target: ${match.targetFqn}::${targetMethodName}()"
-            lines += "pluginClass: ${match.pluginClass.presentableFQN}"
-            lines += "pluginMethod: ${match.method.name}()"
-            lines += "scope: ${match.scope}"
-            lines += "sortOrder: ${match.sortOrder}"
-            lines += "file: ${MagentoMcpSupport.relativePath(project, match.method.containingFile.virtualFile)}"
-        }
-
-        return lines.joinToString("\n")
     }
 
     private fun findPluginDeclarations(

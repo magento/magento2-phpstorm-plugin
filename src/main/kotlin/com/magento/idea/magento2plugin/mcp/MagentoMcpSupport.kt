@@ -10,11 +10,11 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.xml.XmlFile
-import com.intellij.psi.xml.XmlTag
 import com.magento.idea.magento2plugin.project.Settings
 import com.magento.idea.magento2plugin.util.PhpNameUtil
 import java.io.File
@@ -141,9 +141,9 @@ internal object MagentoMcpSupport {
             for (index in text.indices) if (text[index] == '\n') add(index + 1)
         }
 
-        /** One-based line of a tag in this file. */
-        fun lineOf(tag: XmlTag): Int {
-            val found = starts.binarySearch(tag.textOffset)
+        /** One-based line of an element in this file. */
+        fun lineOf(element: PsiElement): Int {
+            val found = starts.binarySearch(element.textOffset)
             return if (found >= 0) found + 1 else -found - 1
         }
     }

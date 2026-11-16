@@ -91,4 +91,9 @@ internal object MagentoDiQueries {
             ?: return MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE
         return provider.findPluginsForMethod(project, className, methodName)
     }
+
+    /** Structured plugin matches, or null when the registered provider offers only text. */
+    fun pluginRecords(project: Project, className: String, methodName: String): List<InspectionRecord>? =
+        (MagentoMethodPluginQueryProvider.EP_NAME.extensionList.firstOrNull() as? MagentoMethodPluginRecordProvider)
+            ?.pluginRecords(project, className, methodName)
 }

@@ -32,7 +32,8 @@ internal object MagentoInspectionCommands {
         "observers_for_event" to setOf("module", "area", "path"),
         "layout_entities" to setOf("module", "area", "path"),
         "ui_component" to setOf("module", "area", "path"),
-        "acl_or_menu" to setOf("module", "area", "path")
+        "acl_or_menu" to setOf("module", "area", "path"),
+        "plugins_for_method" to setOf("module", "area", "path")
     )
 
     private val viewTypes = setOf("layout_entities", "ui_component")
@@ -101,8 +102,12 @@ internal object MagentoInspectionCommands {
             ${filters.sorted().joinToString(" ") { if (it == "area" && normalizedType in viewTypes) VIEW_AREA_HELP else filterHelp.getValue(it) }}
             Reply: status (ok, no_matches, indexing, unavailable, invalid_request, stale_cursor), total, returned, complete, nextCursor, and records with kind, key, path, line (null for whole-file records such as modules, layout handles and UI components), module, area and query-specific fields.
             Example parametersJson:
-            {"$parameter":"…","format":"json","limit":50}
-        """.trimIndent()
+            {"$parameter":"…",${if (normalizedType == "plugins_for_method") "\"methodName\":\"…\"," else ""}"format":"json","limit":50}
+        """.trimIndent() + if (normalizedType == "plugins_for_method") {
+            "\nPlugin records point at the di.xml declaration like di_config plugin records (name, type, sortOrder); method, pluginKind (before, around, after), target, methodPath and methodLine describe the matched plugin method."
+        } else {
+            ""
+        }
     }
 
     fun query(project: Project, queryType: String, parametersJson: String): String {
@@ -207,7 +212,9 @@ internal object MagentoInspectionCommands {
 
     private fun jsonQuery(project: Project, queryType: String, parameters: JSONObject): String {
         val queryParameter = queryParameters.getValue(queryType)
-        val query = parameters.optString(queryParameter).trim()
+        val query = parameters.optString(queryParameter).trim().let {
+            if (queryType == "plugins_for_method") "$it::${parameters.optString("methodName").trim()}" else it
+        }
         fun status(status: String, message: String, options: InspectionOptions? = null) =
             MagentoInspectionResults.status(queryType, query, options, status, message)
         val filters = jsonFilters[queryType]
@@ -229,11 +236,13 @@ internal object MagentoInspectionCommands {
                 "layout_entities" -> MagentoViewQueries.layoutRecords(project, value)
                 "ui_component" -> MagentoViewQueries.uiComponentRecords(project, value)
                 "acl_or_menu" -> MagentoViewQueries.aclOrMenuRecords(project, value)
+                "plugins_for_method" -> MagentoDiQueries.pluginRecords(project, value, parameters.requireString("methodName"))
+                    ?: return status("unavailable", "The registered `plugins_for_method` provider returns text only. Omit format to get text.", options)
                 else -> MagentoEventQueries.observerRecords(project, value)
             }
             MagentoInspectionResults.respond(project, queryType, query, records, options)
-        } catch (_: MissingParameterException) {
-            status("invalid_request", "Missing required parameter `$queryParameter` for queryType `$queryType`.", options)
+        } catch (exception: MissingParameterException) {
+            status("invalid_request", "Missing required parameter `${exception.parameterName}` for queryType `$queryType`.", options)
         } catch (exception: InvalidInspectionRequest) {
             status("invalid_request", exception.message.orEmpty(), options)
         } catch (exception: MagentoInspectionResults.StaleCursor) {

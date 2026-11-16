@@ -104,6 +104,7 @@ class MagentoInspectionResultsTest : BaseProjectTestCase() {
         assertTrue(missing.getString("message").contains("`eventName`"))
         val plugins = query("plugins_for_method", JSONObject().put("className", "A").put("methodName", "b").put("format", "json"))
         assertEquals("invalid_request", plugins.getString("status"))
+        assertTrue(plugins.getString("message").contains("Could not resolve target class"))
         val schema = MagentoInspectionCommands.detailedSchema("module")
         assertTrue(schema, schema.contains("filters path") && schema.contains("path: project-relative"))
         assertFalse(schema, schema.contains("area: global"))

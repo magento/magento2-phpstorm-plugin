@@ -23,3 +23,8 @@ interface MagentoMethodPluginQueryProvider {
         fun isAvailable(): Boolean = EP_NAME.hasAnyExtensions()
     }
 }
+
+/** Structured `plugins_for_method` results; a provider without it answers `format: json` with `unavailable`. */
+internal interface MagentoMethodPluginRecordProvider {
+    fun pluginRecords(project: Project, className: String, methodName: String): List<InspectionRecord>
+}
