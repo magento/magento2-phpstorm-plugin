@@ -90,14 +90,16 @@ class MagentoMcpProjectToolset : McpToolset {
         "candidate exists and .ddev/config.yaml is present.\n" +
         "- Magerun uses the shared DDEV CLI environment, including parsed project and container " +
         "working-directory settings. The host ddev executable is resolved from the IDE PATH.\n" +
-        "- A DDEV project that ddev describe does not report as running returns environment_not_running; " +
-        "nothing is run in it, because ddev exec would start it. Ask the developer to run ddev start.\n" +
+        "- A DDEV probe not served from cached metadata first checks ddev describe, because ddev exec " +
+        "starts a project that is not running. A project that is not running returns environment_not_running " +
+        "and ddev exec is not run; ask the developer to run ddev start.\n" +
         "- Commands never fall back to another runtime on failure.\n" +
         "- For interactive permissions, suggest the returned terminalGuidance command in PhpStorm's " +
         "Terminal (IDE console).\n\n" +
 
         "Probe limits:\n" +
-        "- Probes only check installation, version, command list and help; no installation, download, " +
+        "- Probes only check installation, version, command list and help, and the DDEV project status; " +
+        "no installation, download, " +
         "service start, or application command execution.\n" +
         "- Unsupported shell wrappers are reported without executing them."
     )

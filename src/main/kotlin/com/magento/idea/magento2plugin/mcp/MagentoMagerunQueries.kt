@@ -24,7 +24,7 @@ internal object MagentoMagerunQueries {
         .put("command_help", "Return structured arguments/options for one exact command or alias from the installed catalogue. Requires command.")
         .put("mcp_config", "Generate native stdio MCP configuration if supported. Optional include/exclude command filters. Does not start a server or write client settings."))
         .put("cache", "Per project and selected invocation; expires after five minutes. refresh=true forces a new probe. Local launcher/config/Composer changes invalidate cached metadata.")
-        .put("runtime", "Uses project-local candidates first, then DDEV detected by .ddev/config.yaml with ddev on the IDE's PATH. Magerun reuses the general DDEV execution prefix, including the project name and container working directory parsed from project YAML and overrides, with the Magento root as host cwd. Before ddev exec, ddev describe must report the project as running; otherwise the reply is environment_not_running and nothing else is run, because ddev exec would start the project. Never installs, updates, starts services, executes an application command, or retries through another runtime. For interactive permissions, use the returned terminalGuidance in PhpStorm's Terminal.")
+        .put("runtime", "Uses project-local candidates first, then DDEV detected by .ddev/config.yaml with ddev on the IDE's PATH. Magerun reuses the general DDEV execution prefix, including the project name and container working directory parsed from project YAML and overrides, with the Magento root as host cwd. A probe that is not served from cached metadata first asks ddev describe for the project status, because ddev exec starts a project that is not running: a project that is not running returns environment_not_running and ddev exec is not run; a failed status check returns runtime_unavailable or timeout. Never installs, updates, starts services, executes an application command, or retries through another runtime. For interactive permissions, use the returned terminalGuidance in PhpStorm's Terminal.")
         .toString(2)
 
     fun execute(project: Project, request: MagerunRequest, checkCancelled: () -> Unit): String {
@@ -187,22 +187,26 @@ internal class MagentoMagerunService(
         return result.stdout
     }
 
-    // ddev exec starts any project whose status is not "running", so nothing is executed in a stopped,
-    // paused or unhealthy project. The describe output also holds connection details; only the status is read.
+    // ddev exec starts any project whose status is not "running", so nothing is executed in a project that
+    // is not running. The describe output also holds connection details: only a known status and the message of
+    // a DDEV error line, which DDEV writes to stderr, reach the reply.
     private fun requireDdevRunning(plan: MagentoMagerunSupport.LaunchPlan, ddev: MagentoDdevEnvironment.Runtime,
                                    checkCancelled: () -> Unit) {
         val result = runner.run(listOf(plan.argv.first()) + ddev.statusArguments(), ddev.projectRoot, checkCancelled)
         if (result.timedOut) fail("timeout", "DDEV did not report the project status within the probe timeout. ddev exec was not run.")
-        val lines = result.stdout.lines().mapNotNull { line -> runCatching { JSONObject(line) }.getOrNull() }
-        val status = lines.asReversed().firstNotNullOfOrNull { line ->
+        val lines = (result.stdout.lines() + result.stderr.lines())
+            .mapNotNull { line -> runCatching { JSONObject(line) }.getOrNull() }
+        val status = lines.firstNotNullOfOrNull { line ->
             line.optJSONObject("raw")?.optString("status")?.takeIf { it.isNotEmpty() }
         } ?: fail("runtime_unavailable", "DDEV did not report the project status (exit ${result.exitCode}). ddev exec was not run. " +
             lines.lastOrNull { it.optString("level") in setOf("error", "fatal") }?.optString("msg").orEmpty().take(500))
-        if (status != "running") {
-            val name = ddev.configuration.string("name")?.let { " '$it'" }.orEmpty()
-            fail("environment_not_running", "DDEV project$name is $status. Magerun was not run, because ddev exec " +
-                "starts a project that is not running. Ask the developer to run `ddev start` in ${ddev.projectRoot}, then retry.")
-        }
+        if (status == "running") return
+        val name = ddev.configuration.string("name")?.let { " '$it'" }.orEmpty()
+        val shown = status.takeIf { it in DDEV_STATUSES } ?: "in an unknown state"
+        val next = if (status == "starting") "Wait until `ddev describe` reports it as running, then retry."
+            else "Ask the developer to run `ddev start` in ${ddev.projectRoot}, then retry."
+        fail("environment_not_running", "DDEV project$name is $shown. Magerun was not run, because ddev exec starts " +
+            "a project that is not running. $next")
     }
 
     private fun requireSuccess(result: MagerunProcessResult) {
@@ -256,7 +260,8 @@ internal class MagentoMagerunService(
             .put("cwd", plan.cwd.toString()).put("env", JSONObject().put("NO_COLOR", "1"))
         return base.put("serverStarted", false).put("configurationWritten", false)
             .put("configuration", JSONObject().put("mcpServers", JSONObject().put("magento-magerun2", config)))
-            .put("note", "Client must honor cwd and stdio. This configuration uses the verified invocation; it does not install magerun or start Docker. Review selected commands before enabling it.")
+            .put("note", "Client must honor cwd and stdio. This configuration uses the verified invocation; it does not install magerun or start Docker. Review selected commands before enabling it." +
+                if (plan.ddev != null) " Launching it runs ddev exec, which starts the DDEV project when it is not running." else "")
     }
 
     private fun parseJson(value: String): JSONObject {
@@ -283,6 +288,9 @@ internal class MagentoMagerunService(
 
     companion object {
         // Symfony exposes internal commands such as _complete in the JSON catalogue.
+        // Project states defined by DDEV (pkg/ddevapp); other values are not echoed.
+        private val DDEV_STATUSES = setOf("starting", "stopped", "paused", "unhealthy",
+            "project directory missing", ".ddev/config.yaml missing")
         private val COMMAND_NAME = Regex("[a-zA-Z0-9_][a-zA-Z0-9_:.-]{0,199}")
     }
 }

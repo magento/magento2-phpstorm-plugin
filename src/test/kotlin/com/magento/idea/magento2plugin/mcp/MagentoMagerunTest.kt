@@ -106,7 +106,17 @@ class MagentoMagerunTest {
             }
             assertEquals(List(3) { listOf(launcher.toString(), "describe", "--json-output", "shop") }, runner.calls)
         }
-        val missing = FakeRunner(describe = MagerunProcessResult(1,
+        val starting = MagentoMagerunService(FakeRunner(describe = MagerunProcessResult(0, RUNNING.replace("running", "starting"))))
+            .execute(env, MagerunRequest("commands"))
+        assertEquals("environment_not_running", starting.getString("status"))
+        assertTrue(starting.getString("message").contains("Wait until `ddev describe` reports it as running"))
+        val unknown = MagentoMagerunService(FakeRunner(describe = MagerunProcessResult(0, RUNNING.replace("running", "odd-SECRET"))))
+            .execute(env, MagerunRequest("commands"))
+        assertEquals("environment_not_running", unknown.getString("status"))
+        assertTrue(unknown.getString("message").contains("is in an unknown state"))
+        assertFalse(unknown.toString().contains("SECRET"))
+        // DDEV writes errors to stderr.
+        val missing = FakeRunner(describe = MagerunProcessResult(1, stderr =
             """{"level":"fatal","msg":"could not find requested project 'shop'"}"""))
         val result = MagentoMagerunService(missing).execute(env, MagerunRequest("commands"))
         assertEquals("runtime_unavailable", result.getString("status"))
@@ -115,6 +125,22 @@ class MagentoMagerunTest {
         val slow = FakeRunner(describe = MagerunProcessResult(-1, timedOut = true))
         assertEquals("timeout", MagentoMagerunService(slow).execute(env, MagerunRequest("commands")).getString("status"))
         assertEquals(1, slow.calls.size)
+    }
+
+    @Test
+    fun testDdevStatusIsReadFromNoisyOutputWithoutEchoingConnectionDetails() = fixture { root ->
+        file(root, ".ddev/config.yaml", "type: magento2\n")
+        val launcher = file(root, "host/ddev", "fixture", true)
+        val env = MagentoMagerunSupport.discover(root, null, DEFAULTS) { launcher }
+        fun describe(status: String) = MagerunProcessResult(0, "warning: noise\n" +
+            """{"level":"info","msg":"","raw":{"status":"$status","dbinfo":{"password":"MARKER"}}}""")
+        val running = MagentoMagerunService(FakeRunner(describe = describe("running"))).execute(env, MagerunRequest("mcp_config"))
+        assertEquals("ok", running.getString("status"))
+        assertTrue(running.getString("note").contains("starts the DDEV project when it is not running"))
+        val stopped = MagentoMagerunService(FakeRunner(describe = describe("stopped"))).execute(env, MagerunRequest("commands"))
+        assertEquals("environment_not_running", stopped.getString("status"))
+        assertFalse(running.toString().contains("MARKER"))
+        assertFalse(stopped.toString().contains("MARKER"))
     }
 
     @Test

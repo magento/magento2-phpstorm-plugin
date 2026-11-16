@@ -69,7 +69,7 @@ internal object MagentoMagerunSupport {
             .put("identityVerified", false).apply {
                 ddev?.let {
                     put("runtime", "ddev").put("executable", it.executable?.toString() ?: JSONObject.NULL)
-                        .put("ddevProjectRoot", it.config.parent.parent.toString())
+                        .put("ddevProjectRoot", it.projectRoot.toString())
                         .put("service", "web").put("configuration", it.configuration.json())
                 }
             }
