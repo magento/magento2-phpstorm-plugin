@@ -141,6 +141,7 @@ internal object MagentoPhpDiQueries {
         declarations: MutableMap<String, MutableList<PluginDeclarationRecord>>
     ) {
         val rootTag = xmlFile.rootTag ?: return
+        val lines = MagentoMcpSupport.LineIndex(xmlFile.viewProvider.contents)
         for (typeTag in rootTag.findSubTags(ModuleDiXml.TYPE_TAG)) {
             val typeName = MagentoMcpSupport.presentableFqn(typeTag.getAttributeValue(ModuleDiXml.NAME_ATTR)) ?: continue
             if (typeName != targetFqn) {
@@ -150,7 +151,7 @@ internal object MagentoPhpDiQueries {
             for (pluginTag in typeTag.findSubTags(ModuleDiXml.PLUGIN_TAG_NAME)) {
                 declarations.getOrPut(typeName, ::mutableListOf) += PluginDeclarationRecord(
                     filePath = filePath,
-                    line = MagentoMcpSupport.lineOf(pluginTag),
+                    line = lines.lineOf(pluginTag),
                     targetFqn = typeName,
                     pluginName = pluginTag.getAttributeValue(ModuleDiXml.NAME_ATTR) ?: "-",
                     pluginType = MagentoMcpSupport.presentableFqn(

@@ -60,7 +60,7 @@ internal object MagentoDiQueries {
         return "DI configuration for \"$query\"\n\n${lines.joinToString("\n")}$hint"
     }
 
-    /** Every di.xml declaration of the class, in the order of the text sections. */
+    /** Every di.xml declaration of the class, ordered by file, line and kind. */
     fun diConfigRecords(project: Project, className: String): List<InspectionRecord> {
         val query = MagentoMcpSupport.normalizeFqn(className)
         val snapshot = MagentoMcpSnapshots.diSnapshot(project)
@@ -80,6 +80,8 @@ internal object MagentoDiQueries {
             snapshot.pluginDeclarations[query].orEmpty().map {
                 InspectionRecord("plugin", query, it.filePath, it.line, it.scope, linkedMapOf("name" to it.pluginName,
                     "type" to it.pluginType, "sortOrder" to it.sortOrder, "disabled" to it.disabled))
+            }.let { records ->
+                records.sortedWith(compareBy({ it.path }, { it.line }, { it.kind }, { it.fields["role"]?.toString() }))
             }
     }
 

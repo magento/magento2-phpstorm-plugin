@@ -5,7 +5,6 @@
 package com.magento.idea.magento2plugin.mcp
 
 import com.intellij.openapi.project.Project
-import com.magento.idea.magento2plugin.indexes.ModuleIndex
 import org.json.JSONArray
 import org.json.JSONObject
 import java.nio.charset.StandardCharsets
@@ -44,7 +43,7 @@ internal object MagentoInspectionResults {
     const val SCHEMA_VERSION = 1
     val OPTION_KEYS = setOf("format", "limit", "cursor", "module", "area", "path")
     const val TEXT_TRUNCATED_HINT = "More results exist. Add \"format\":\"json\" to parametersJson and follow " +
-        "nextCursor to read every record; module, area and path filters narrow the result."
+        "nextCursor to read every record; detailed_schema lists the filters of this queryType."
 
     fun isJson(parameters: JSONObject): Boolean = parameters.optString("format").trim().lowercase() == "json"
 
@@ -82,14 +81,14 @@ internal object MagentoInspectionResults {
         records: List<InspectionRecord>,
         options: InspectionOptions
     ): String {
-        val owners = if (records.isEmpty()) emptyMap() else moduleOwners(project)
+        val owners = if (records.isEmpty()) emptyMap() else MagentoMcpSnapshots.moduleOwners(project)
         val owned = records.map { it to ownerOf(it.path, owners) }
         val matching = owned.filter { (record, module) ->
             (options.module == null || module == options.module) &&
                 (options.area == null || record.area == options.area) &&
                 (options.path == null || record.path == options.path || record.path?.startsWith(options.path + "/") == true)
         }
-        val fingerprint = fingerprint(matching.map { it.first })
+        val fingerprint = fingerprint(matching)
         val offset = options.cursor?.let { decodeCursor(it, fingerprint) } ?: 0
         if (offset > matching.size) invalid("cursor points past the end of the result. Start again without cursor.")
         val page = matching.drop(offset).take(options.limit)
@@ -104,9 +103,11 @@ internal object MagentoInspectionResults {
             .toString(2)
     }
 
-    /** A reply without records: `indexing`, `unavailable` or `invalid_request`. */
+    /** A reply without records, such as `indexing`, `unavailable`, `invalid_request` or `stale_cursor`. */
     fun status(queryType: String, query: String, options: InspectionOptions?, status: String, message: String): String =
-        envelope(queryType, query, options, status).put("message", message).toString(2)
+        envelope(queryType, query, options, status).put("message", message).put("total", 0).put("offset", 0)
+            .put("returned", 0).put("complete", false).put("nextCursor", JSONObject.NULL)
+            .put("records", JSONArray()).toString(2)
 
     private fun envelope(queryType: String, query: String, options: InspectionOptions?, status: String): JSONObject =
         JSONObject().put("schemaVersion", SCHEMA_VERSION).put("queryType", queryType).put("query", query)
@@ -118,23 +119,20 @@ internal object MagentoInspectionResults {
         .put("area", record.area ?: JSONObject.NULL)
         .apply { record.fields.forEach { (name, value) -> put(name, value ?: JSONObject.NULL) } }
 
-    /** Project-relative module directories from the module index, mapped to module names. */
-    private fun moduleOwners(project: Project): Map<String, String> {
-        val index = ModuleIndex(project)
-        return index.moduleNames.mapNotNull { name ->
-            index.getModuleDirectoryVirtualFileByModuleName(name)?.let { MagentoMcpSupport.relativePath(project, it) to name }
-        }.toMap()
+    /** The nearest enclosing module directory, so a nested module owns its own files. */
+    private fun ownerOf(path: String?, owners: Map<String, String>): String? {
+        var directory = path ?: return null
+        while (true) {
+            owners[directory]?.let { return it }
+            directory = directory.substringBeforeLast('/', "").ifEmpty { return null }
+        }
     }
 
-    private fun ownerOf(path: String?, owners: Map<String, String>): String? = if (path == null) null else owners.entries
-        .filter { (directory, _) -> path == directory || path.startsWith("$directory/") }
-        .maxByOrNull { it.key.length }?.value
-
-    private fun fingerprint(records: List<InspectionRecord>): String {
+    private fun fingerprint(records: List<Pair<InspectionRecord, String?>>): String {
         val digest = MessageDigest.getInstance("SHA-256")
-        for (record in records) {
-            digest.update("${record.kind}\u0000${record.key}\u0000${record.path}\u0000${record.line}\u0000${record.fields}\n"
-                .toByteArray(StandardCharsets.UTF_8))
+        for ((record, module) in records) {
+            digest.update(("${record.kind}\u0000${record.key}\u0000${record.path}\u0000${record.line}\u0000" +
+                "${record.area}\u0000$module\u0000${record.fields}\n").toByteArray(StandardCharsets.UTF_8))
         }
         return digest.digest().take(8).joinToString("") { "%02x".format(it) }
     }
@@ -159,12 +157,12 @@ internal object MagentoInspectionResults {
     }
 
     private fun normalizePath(value: String): String {
-        val path = value.replace('\\', '/').trim().removePrefix("./").trimEnd('/')
-        if (path.isEmpty() || path.startsWith("/") || Regex("^[A-Za-z]:").containsMatchIn(path) ||
-            path.split('/').any { it == ".." }) {
+        val raw = value.replace('\\', '/').trim()
+        val segments = raw.split('/').filter { it.isNotEmpty() && it != "." }
+        if (raw.startsWith("/") || Regex("^[A-Za-z]:").containsMatchIn(raw) || segments.isEmpty() || ".." in segments) {
             invalid("path must be a project-relative directory or file, such as `app/code/Vendor/Module`.")
         }
-        return path
+        return segments.joinToString("/")
     }
 
     private fun text(parameters: JSONObject, name: String): String? =

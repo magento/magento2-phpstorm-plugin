@@ -510,6 +510,11 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
             val record = structured.getJSONArray("records").getJSONObject(0)
             assertEquals("HttpIndex_Module", record.getString("module"))
             assertEquals("src/app/code/HttpIndex/Module", record.getString("path"))
+            Settings.getInstance(project).pluginEnabled = false
+            val disabled = JSONObject(text("magento_inspect", JSONObject().put("mode", "query").put("queryType", "module")
+                .put("parametersJson", """{"moduleName":"HttpIndex_Module","format":"json"}""")))
+            assertEquals(disabled.toString(), "unavailable", disabled.getString("status"))
+            Settings.getInstance(project).pluginEnabled = true
             val schema = text("magento_inspect", JSONObject().put("mode", "detailed_schema").put("queryType", "module"))
             assertTrue(schema, schema.contains("filters path") && schema.contains("stale_cursor"))
         } finally {

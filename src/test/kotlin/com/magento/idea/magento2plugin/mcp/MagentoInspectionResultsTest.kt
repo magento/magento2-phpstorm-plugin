@@ -89,10 +89,14 @@ class MagentoInspectionResultsTest : BaseProjectTestCase() {
         val areaOnModules = query("module", JSONObject().put("moduleName", "Foo").put("format", "json").put("area", "global"))
         assertEquals("invalid_request", areaOnModules.getString("status"))
         assertTrue(areaOnModules.getString("message").contains("Supported filters: `path`"))
-        for ((key, value) in listOf("limit" to 0, "limit" to 101, "path" to "/etc", "path" to "../x", "cursor" to "garbage")) {
+        for ((key, value) in listOf("limit" to 0, "limit" to 101, "path" to "/etc", "path" to "../x", "path" to ".",
+            "path" to "C:/x", "cursor" to "garbage")) {
             val result = events(JSONObject().put(key, value))
             assertEquals("$key=$value: $result", "invalid_request", result.getString("status"))
+            assertEquals(0, result.getInt("total"))
+            assertEquals(0, result.getJSONArray("records").length())
         }
+        assertEquals(8, events(JSONObject().put("path", "$module//etc/./adminhtml/")).getInt("total"))
         val xml = MagentoInspectionCommands.query(project, "observers_for_event", """{"eventName":"acme_paging","format":"xml"}""")
         assertTrue(xml, xml.contains("format must be `text` or `json`"))
         val missing = query("observers_for_event", JSONObject().put("format", "json"))
@@ -100,6 +104,9 @@ class MagentoInspectionResultsTest : BaseProjectTestCase() {
         assertTrue(missing.getString("message").contains("`eventName`"))
         val layout = query("layout_entities", JSONObject().put("name", "default").put("format", "json"))
         assertEquals("invalid_request", layout.getString("status"))
+        val schema = MagentoInspectionCommands.detailedSchema("module")
+        assertTrue(schema, schema.contains("filters path") && schema.contains("path: project-relative"))
+        assertFalse(schema, schema.contains("area: global"))
     }
 
     fun testTextOutputIsUnchangedAndRejectsJsonOnlyOptions() {
@@ -109,6 +116,53 @@ class MagentoInspectionResultsTest : BaseProjectTestCase() {
         assertFalse(text, text.contains(MagentoInspectionResults.TEXT_TRUNCATED_HINT))
         val limited = MagentoInspectionCommands.query(project, "observers_for_event", """{"eventName":"acme_paging","limit":5}""")
         assertTrue(limited, limited.contains("`limit` require `\"format\":\"json\"`"))
+    }
+
+    fun testTextRepliesStayAsBefore() {
+        val expected = java.io.File("src/test/testData/mcp/inspect-text-replies.txt").readText()
+        val cases = Regex("^### (\\S+) (.*)$", RegexOption.MULTILINE).findAll(expected).map { it.groupValues[1] to it.groupValues[2] }
+        val actual = StringBuilder()
+        for ((type, parameters) in cases) {
+            actual.append("### $type $parameters\n").append(MagentoInspectionCommands.query(project, type, parameters)).append("\n")
+        }
+        assertEquals(9, cases.count())
+        assertEquals(expected, actual.toString())
+    }
+
+    fun testCursorReuseFollowsTheResultItWasIssuedFor() {
+        addEvents()
+        val admin = events(JSONObject().put("area", "adminhtml").put("limit", 3))
+        val reusedWithoutFilter = events(JSONObject().put("limit", 3).put("cursor", admin.getString("nextCursor")))
+        assertEquals("stale_cursor", reusedWithoutFilter.getString("status"))
+        assertEquals(0, reusedWithoutFilter.getJSONArray("records").length())
+        assertTrue(reusedWithoutFilter.isNull("nextCursor"))
+        val first = events(JSONObject().put("limit", 5))
+        val wider = events(JSONObject().put("limit", 7).put("cursor", first.getString("nextCursor")))
+        assertEquals(5, wider.getInt("offset"))
+        assertEquals(7, wider.getInt("returned"))
+        val parts = String(java.util.Base64.getUrlDecoder().decode(first.getString("nextCursor"))).split(':')
+        val pastEnd = java.util.Base64.getUrlEncoder().withoutPadding().encodeToString("v1:999:${parts[2]}".toByteArray())
+        assertEquals("invalid_request", events(JSONObject().put("cursor", pastEnd)).getString("status"))
+    }
+
+    fun testNestedModuleOwnsItsOwnFiles() {
+        val outer = moduleDirectory()
+        myFixture.addFileToProject("$outer/Nested/registration.php", """
+            <?php \Magento\Framework\Component\ComponentRegistrar::register(\Magento\Framework\Component\ComponentRegistrar::MODULE, 'Foo_Nested', __DIR__);
+        """.trimIndent())
+        myFixture.addFileToProject("$outer/Nested/etc/module.xml", "<config><module name=\"Foo_Nested\"/></config>")
+        myFixture.addFileToProject("$outer/Nested/etc/events.xml",
+            "<config><event name=\"acme_nested\"><observer name=\"inner\" instance=\"Foo\\Nested\\Observer\"/></event></config>")
+        myFixture.addFileToProject("$outer/etc/events.xml",
+            "<config><event name=\"acme_nested\"><observer name=\"outer\" instance=\"Foo\\Bar2\\Observer\"/></event></config>")
+        PsiDocumentManager.getInstance(project).commitAllDocuments()
+        val result = query("observers_for_event", JSONObject().put("eventName", "acme_nested").put("format", "json"))
+        val owners = (0 until result.getJSONArray("records").length()).associate {
+            result.getJSONArray("records").getJSONObject(it).let { record -> record.getString("observerName") to record.getString("module") }
+        }
+        assertEquals(mapOf("inner" to "Foo_Nested", "outer" to "Foo_Bar2"), owners)
+        assertEquals(1, query("observers_for_event", JSONObject().put("eventName", "acme_nested").put("format", "json")
+            .put("module", "Foo_Nested")).getInt("total"))
     }
 
     fun testCursorFromChangedDeclarationsIsStale() {

@@ -32,6 +32,12 @@ internal object MagentoInspectionCommands {
         "observers_for_event" to setOf("module", "area", "path")
     )
 
+    private val filterHelp = mapOf(
+        "module" to "module: exact name of the module that owns the file.",
+        "area" to "area: global, frontend, adminhtml or another etc/<area> folder.",
+        "path" to "path: project-relative directory or file prefix."
+    )
+
     private val queryParameters = mapOf(
         "module" to "moduleName",
         "di_config" to "className",
@@ -86,7 +92,7 @@ internal object MagentoInspectionCommands {
         return typeHelp(normalizedType) + "\n\n" + """
             Structured results (optional): add "format":"json" to parametersJson.
             Optional with format json: limit (1-${MagentoInspectionResults.MAX_LIMIT}, default ${MagentoInspectionResults.DEFAULT_LIMIT}), cursor (nextCursor of the previous page, with the same parameters), filters ${filters.sorted().joinToString(", ")}.
-            Filters: module is an exact module name that owns the file; area is global, frontend, adminhtml or another etc/<area> folder; path is a project-relative directory or file prefix.
+            ${filters.sorted().joinToString(" ") { filterHelp.getValue(it) }}
             Reply: status (ok, no_matches, indexing, unavailable, invalid_request, stale_cursor), total, returned, complete, nextCursor, and records with kind, key, path, line, module, area and query-specific fields.
             Example parametersJson:
             {"$parameter":"…","format":"json","limit":50}
@@ -99,6 +105,10 @@ internal object MagentoInspectionCommands {
             return unknownTypeMessage(normalizedType)
         }
 
+        if (!isAvailable(normalizedType) && wantsJson(parametersJson)) {
+            return MagentoInspectionResults.status(normalizedType, "", null, "unavailable",
+                MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE)
+        }
         if (!isAvailable(normalizedType)) {
             return MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE
         }

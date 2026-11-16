@@ -14,6 +14,7 @@ import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.PsiModificationTracker
 import com.intellij.psi.xml.XmlTag
+import com.magento.idea.magento2plugin.indexes.ModuleIndex
 import com.magento.idea.magento2plugin.magento.files.ModuleAclXml
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml
@@ -22,6 +23,7 @@ internal object MagentoMcpSnapshots {
     private val DI_SNAPSHOT_KEY = Key.create<CachedValue<DiSnapshot>>("magento.mcp.diSnapshot")
     private val EVENT_SNAPSHOT_KEY = Key.create<CachedValue<EventSnapshot>>("magento.mcp.eventSnapshot")
     private val ACL_MENU_SNAPSHOT_KEY = Key.create<CachedValue<AclMenuSnapshot>>("magento.mcp.aclMenuSnapshot")
+    private val MODULE_OWNERS_KEY = Key.create<CachedValue<Map<String, String>>>("magento.mcp.moduleOwners")
 
     fun diSnapshot(project: Project): DiSnapshot = getCachedValue(project, DI_SNAPSHOT_KEY) {
         buildDiSnapshot(project)
@@ -33,6 +35,14 @@ internal object MagentoMcpSnapshots {
 
     fun aclMenuSnapshot(project: Project): AclMenuSnapshot = getCachedValue(project, ACL_MENU_SNAPSHOT_KEY) {
         buildAclMenuSnapshot(project)
+    }
+
+    /** Project-relative module directories mapped to module names, from the module index. */
+    fun moduleOwners(project: Project): Map<String, String> = getCachedValue(project, MODULE_OWNERS_KEY) {
+        val index = ModuleIndex(project)
+        index.moduleNames.mapNotNull { name ->
+            index.getModuleDirectoryVirtualFileByModuleName(name)?.let { MagentoMcpSupport.relativePath(project, it) to name }
+        }.toMap()
     }
 
     private fun <T> getCachedValue(
@@ -61,11 +71,12 @@ internal object MagentoMcpSnapshots {
             val rootTag = xmlFile.rootTag ?: continue
             val filePath = MagentoMcpSupport.relativePath(project, xmlFile.virtualFile)
             val scope = MagentoMcpSupport.determineConfigScope(filePath, ModuleDiXml.FILE_NAME)
+            val lines = MagentoMcpSupport.LineIndex(xmlFile.viewProvider.contents)
 
             for (preferenceTag in rootTag.findSubTags(ModuleDiXml.PREFERENCE_TAG_NAME)) {
                 val record = PreferenceRecord(
                     filePath = filePath,
-                    line = MagentoMcpSupport.lineOf(preferenceTag),
+                    line = lines.lineOf(preferenceTag),
                     preferenceFor = MagentoMcpSupport.presentableFqn(
                         preferenceTag.getAttributeValue(ModuleDiXml.PREFERENCE_ATTR_FOR)
                     ),
@@ -85,7 +96,7 @@ internal object MagentoMcpSnapshots {
                     .orEmpty()
                 typeDeclarations.getOrPut(typeName, ::mutableListOf) += TypeDeclarationRecord(
                     filePath = filePath,
-                    line = MagentoMcpSupport.lineOf(typeTag),
+                    line = lines.lineOf(typeTag),
                     typeName = typeName,
                     argumentNames = argumentNames
                 )
@@ -93,7 +104,7 @@ internal object MagentoMcpSnapshots {
                 for (pluginTag in typeTag.findSubTags(ModuleDiXml.PLUGIN_TAG_NAME)) {
                     pluginDeclarations.getOrPut(typeName, ::mutableListOf) += PluginDeclarationRecord(
                         filePath = filePath,
-                        line = MagentoMcpSupport.lineOf(pluginTag),
+                        line = lines.lineOf(pluginTag),
                         targetFqn = typeName,
                         pluginName = pluginTag.getAttributeValue(ModuleDiXml.NAME_ATTR) ?: "-",
                         pluginType = MagentoMcpSupport.presentableFqn(
@@ -110,7 +121,7 @@ internal object MagentoMcpSnapshots {
             for (virtualTypeTag in rootTag.findSubTags(ModuleDiXml.VIRTUAL_TYPE_TAG)) {
                 val record = VirtualTypeRecord(
                     filePath = filePath,
-                    line = MagentoMcpSupport.lineOf(virtualTypeTag),
+                    line = lines.lineOf(virtualTypeTag),
                     name = MagentoMcpSupport.presentableFqn(
                         virtualTypeTag.getAttributeValue(ModuleDiXml.NAME_ATTR)
                     ),
@@ -141,13 +152,14 @@ internal object MagentoMcpSnapshots {
 
             val rootTag = xmlFile.rootTag ?: continue
             val filePath = MagentoMcpSupport.relativePath(project, xmlFile.virtualFile)
+            val lines = MagentoMcpSupport.LineIndex(xmlFile.viewProvider.contents)
 
             for (eventTag in rootTag.findSubTags("event")) {
                 val eventName = eventTag.getAttributeValue("name") ?: continue
                 for (observerTag in eventTag.findSubTags("observer")) {
                     observersByEvent.getOrPut(eventName, ::mutableListOf) += EventObserverRecord(
                         filePath = filePath,
-                        line = MagentoMcpSupport.lineOf(observerTag),
+                        line = lines.lineOf(observerTag),
                         observerName = observerTag.getAttributeValue("name") ?: "-",
                         observerInstance = MagentoMcpSupport.presentableFqn(
                             observerTag.getAttributeValue("instance")

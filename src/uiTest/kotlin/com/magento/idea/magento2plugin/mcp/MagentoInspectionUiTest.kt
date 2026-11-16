@@ -72,6 +72,12 @@ class MagentoInspectionUiTest {
         val unavailable = withReadAction { commands.query(project, "plugins_for_method", "{}") }
         check(unavailable.contains("unavailable") && unavailable.contains("requires the JetBrains PHP plugin")) { unavailable }
         check(commands.detailedSchema("plugins_for_method") == unavailable)
+        val unavailableJson = withReadAction { commands.query(project, "plugins_for_method", """{"format":"json"}""") }
+        check(unavailableJson.contains("\"status\": \"unavailable\"")) { unavailableJson }
+        val observers = withReadAction {
+            commands.query(project, "observers_for_event", """{"eventName":"shipping_event","format":"json"}""")
+        }
+        check(observers.contains("\"status\": \"ok\"") && observers.contains("\"observerName\": \"shipping_observer\"")) { observers }
         val empty = withReadAction { commands.query(project, "ui_component", """{"name":"missing_component"}""") }
         check(empty == "No UI components matched \"missing_component\".") { empty }
     }

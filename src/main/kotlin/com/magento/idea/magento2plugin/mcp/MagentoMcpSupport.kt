@@ -8,7 +8,6 @@ package com.magento.idea.magento2plugin.mcp
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
-import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiManager
@@ -109,9 +108,19 @@ internal object MagentoMcpSupport {
         else -> 3
     }
 
-    /** One-based line of a tag in its file. */
-    fun lineOf(tag: XmlTag): Int =
-        StringUtil.offsetToLineNumber(tag.containingFile.viewProvider.contents, tag.textOffset) + 1
+    /** Line starts of one file, built once so that each tag costs a binary search. */
+    class LineIndex(text: CharSequence) {
+        private val starts = buildList {
+            add(0)
+            for (index in text.indices) if (text[index] == '\n') add(index + 1)
+        }
+
+        /** One-based line of a tag in this file. */
+        fun lineOf(tag: XmlTag): Int {
+            val found = starts.binarySearch(tag.textOffset)
+            return if (found >= 0) found + 1 else -found - 1
+        }
+    }
 
     fun relativePath(project: Project, virtualFile: VirtualFile): String {
         val projectRoot = projectRoot(project)

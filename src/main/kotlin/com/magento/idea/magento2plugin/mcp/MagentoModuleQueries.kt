@@ -27,35 +27,19 @@ internal object MagentoModuleQueries {
     }
 
     private fun findMagentoModuleWithReadyIndexes(project: Project, query: String): String {
-        val moduleIndex = ModuleIndex(project)
-        val candidateNames = linkedSetOf<String>()
-        candidateNames += moduleIndex.moduleNames
-        if (moduleIndex.getModuleDirectoryByModuleName(query) != null) {
-            candidateNames += query
-        }
-        val matches = MagentoMcpSupport.prioritizeMatches(candidateNames, query)
+        val matches = moduleRecords(project, query)
         if (matches.isEmpty()) {
             return "No Magento modules matched \"$query\"."
         }
 
         val lines = mutableListOf("Found ${matches.size} Magento module match(es) for \"$query\".")
-        for (name in matches.take(MagentoMcpSupport.MAX_MATCHES)) {
-            val directory = moduleIndex.getModuleDirectoryVirtualFileByModuleName(name)
-            val path = directory?.let { MagentoMcpSupport.relativePath(project, it) } ?: "<unresolved>"
-            val editable = directory?.let(::isEditableModuleDirectory) ?: false
-            val etcPath = directory?.findChild("etc")?.let {
-                MagentoMcpSupport.relativePath(project, it)
-            } ?: "-"
-            val viewPath = directory?.findChild("view")?.let {
-                MagentoMcpSupport.relativePath(project, it)
-            } ?: "-"
-
+        for (record in matches.take(MagentoMcpSupport.MAX_MATCHES)) {
             lines += ""
-            lines += name
-            lines += "path: $path"
-            lines += "editable: ${if (editable) "yes" else "no"}"
-            lines += "etc: $etcPath"
-            lines += "view: $viewPath"
+            lines += record.key
+            lines += "path: ${record.path ?: "<unresolved>"}"
+            lines += "editable: ${if (record.fields["editable"] == true) "yes" else "no"}"
+            lines += "etc: ${record.fields["etc"] ?: "-"}"
+            lines += "view: ${record.fields["view"] ?: "-"}"
         }
 
         if (matches.size > MagentoMcpSupport.MAX_MATCHES) {

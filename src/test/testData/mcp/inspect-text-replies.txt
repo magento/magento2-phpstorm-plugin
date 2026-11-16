@@ -1,0 +1,78 @@
+### module {"moduleName":"Foo"}
+Found 3 Magento module match(es) for "Foo".
+
+Foo_Bar
+path: app/code/Foo/Bar
+editable: yes
+etc: app/code/Foo/Bar/etc
+view: app/code/Foo/Bar/view
+
+Foo_Bar2
+path: app/code/Foo/Bar2
+editable: yes
+etc: app/code/Foo/Bar2/etc
+view: -
+
+Foo_BarWithoutComposer
+path: app/code/Foo/BarWithoutComposer
+editable: yes
+etc: app/code/Foo/BarWithoutComposer/etc
+view: -
+### module {"moduleName":"Magento_"}
+Found 5 Magento module match(es) for "Magento_".
+
+Magento_Backend
+path: vendor/magento/module-backend
+editable: no
+etc: vendor/magento/module-backend/etc
+view: -
+
+Magento_Catalog
+path: vendor/magento/module-catalog
+editable: no
+etc: vendor/magento/module-catalog/etc
+view: vendor/magento/module-catalog/view
+
+Magento_CatalogGraphQl
+path: vendor/magento/module-catalog-graph-ql
+editable: no
+etc: vendor/magento/module-catalog-graph-ql/etc
+view: -
+
+Magento_CatalogRuleConfigurable
+path: vendor/magento/module-catalog-rule-configurable
+editable: no
+etc: vendor/magento/module-catalog-rule-configurable/etc
+view: -
+
+Magento_Config
+path: vendor/magento/module-config
+editable: no
+etc: vendor/magento/module-config/etc
+view: -
+### module {"moduleName":"Missing"}
+No Magento modules matched "Missing".
+### di_config {"className":"Magento\\Theme\\Block\\Html\\Topmenu"}
+DI configuration for "Magento\Theme\Block\Html\Topmenu"
+
+type declarations
+vendor/magento/module-catalog/etc/di.xml -> type name=Magento\Theme\Block\Html\Topmenu
+
+plugin declarations
+vendor/magento/module-catalog/etc/di.xml -> plugin name=catalogTopmenu type=Magento\Catalog\Plugin\Block\Topmenu sortOrder=0 disabled=false scope=global
+### di_config {"className":"Missing\\X"}
+No DI configuration matched "Missing\X".
+### observers_for_event {"eventName":"test_event_in_test_class"}
+Found 1 event match(es) for "test_event_in_test_class".
+
+test_event_in_test_class
+file: vendor/magento/module-catalog/etc/events.xml observer=test_observer instance=Magento\Catalog\Observer\TestObserver disabled=false
+### observers_for_event {"eventName":"e"}
+Found 1 event match(es) for "e".
+
+test_event_in_test_class
+file: vendor/magento/module-catalog/etc/events.xml observer=test_observer instance=Magento\Catalog\Observer\TestObserver disabled=false
+### module {}
+Missing required parameter `moduleName` for queryType `module`. Call magento_inspect with mode `detailed_schema` and queryType `module` for the expected parameters.
+### di_config {"className":""}
+Missing required parameter `className` for queryType `di_config`. Call magento_inspect with mode `detailed_schema` and queryType `di_config` for the expected parameters.
